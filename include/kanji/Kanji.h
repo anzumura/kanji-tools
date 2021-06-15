@@ -43,8 +43,10 @@ private:
 class KanjiLists {
 public:
   KanjiLists(int argc, char** argv);
-  using List = std::vector<std::unique_ptr<class Kanji>>;
+  using Entry = std::unique_ptr<class Kanji>;
+  using List = std::vector<Entry>;
   const List& jouyou() const { return _jouyou; }
+  const List& nonJouyou() const { return _nonJouyou; }
 
   int getFrequency(const std::string& k) const { return frequency.get(k); }
   Levels getLevel(const std::string&) const;

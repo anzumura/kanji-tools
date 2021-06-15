@@ -134,19 +134,23 @@ void KanjiLists::populateJouyou() {
 }
 
 void KanjiLists::processList(const KanjiList& l) {
-  KanjiList::List jlptNonJouyou;
+  KanjiList::List nonJouyou;
   for (const auto& i : l.list()) {
     if (_jouyouSet.find(i) == _jouyouSet.end()) {
       auto k = _nonJouyouSet.insert(i);
       if (k.second) {
         _nonJouyou.emplace_back(std::move(std::make_unique<Kanji>(i, *this, l.level)));
-        if (l.level != Levels::None) jlptNonJouyou.emplace_back(i);
+        nonJouyou.emplace_back(i);
       }
     }
   }
-  if (!jlptNonJouyou.empty()) {
-    std::cout << ">>> found " << jlptNonJouyou.size() << " non-Jouyou in JLPT " << l.level << ':';
-    for (const auto& i : jlptNonJouyou)
+  if (!nonJouyou.empty()) {
+    std::cout << ">>> found " << nonJouyou.size() << " non-Jouyou";
+    if (l.level == Levels::None)
+      std::cout << "/non-JLPT in top " << l.list().size() << " frequency:";
+    else
+      std::cout << " in JLPT " << l.level << ':';
+    for (const auto& i : nonJouyou)
       std::cout << ' ' << i;
     std::cout << '\n';
   }
