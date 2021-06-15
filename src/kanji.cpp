@@ -115,14 +115,16 @@ void KanjiLists::populateJouyou() {
   if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
   std::set<std::string> found;
   std::ifstream f(p);
-  for (std::string line; std::getline(f, line);) {
+  int number = 1;
+  for (std::string line; std::getline(f, line); ++number) {
     std::stringstream ss(line);
     KanjiList::List tokens;
     for (std::string token; std::getline(ss, token, '\t');)
       tokens.emplace_back(token);
     if (tokens.size() == JouyouKanji::MaxIndex) {
       try {
-        auto k = std::make_unique<JouyouKanji>(tokens, *this);
+        auto k = std::make_shared<JouyouKanji>(tokens, *this);
+        assert(k->number == number); // Jouyou file should be ordered by the number column
         _jouyouSet.insert(k->name);
         _jouyou.emplace_back(std::move(k));
       } catch (const std::exception& e) {
@@ -135,11 +137,12 @@ void KanjiLists::populateJouyou() {
 
 void KanjiLists::processList(const KanjiList& l) {
   KanjiList::List nonJouyou;
+  auto count = _jouyou.size() + _nonJouyou.size();
   for (const auto& i : l.list()) {
     if (_jouyouSet.find(i) == _jouyouSet.end()) {
       auto k = _nonJouyouSet.insert(i);
       if (k.second) {
-        _nonJouyou.emplace_back(std::move(std::make_unique<Kanji>(i, *this, l.level)));
+        _nonJouyou.emplace_back(std::move(std::make_shared<Kanji>(++count, i, *this, l.level)));
         nonJouyou.emplace_back(i);
       }
     }

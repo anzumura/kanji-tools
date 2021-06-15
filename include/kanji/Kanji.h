@@ -43,7 +43,7 @@ private:
 class KanjiLists {
 public:
   KanjiLists(int argc, char** argv);
-  using Entry = std::unique_ptr<class Kanji>;
+  using Entry = std::shared_ptr<class Kanji>;
   using List = std::vector<Entry>;
   const List& jouyou() const { return _jouyou; }
   const List& nonJouyou() const { return _nonJouyou; }
@@ -72,32 +72,34 @@ private:
 
 class Kanji {
 public:
-  Kanji(const std::string& s, const KanjiLists& k, Levels l)
-    : name(s), grade(Grades::None), level(l), frequency(k.getFrequency(s)) {}
+  Kanji(int n, const std::string& s, const KanjiLists& k, Levels l)
+    : number(n), name(s), grade(Grades::None), level(l), frequency(k.getFrequency(s)) {}
   Kanji(const Kanji&) = delete;
   Kanji& operator=(const Kanji&) = delete;
   virtual ~Kanji() = default;
 
+  virtual bool isJouyou() const { return false; }
+  const int number;
   const std::string name;
   const Grades grade;
   const Levels level;
   const int frequency;
 
 protected:
-  Kanji(const std::string& s, const KanjiLists& k, Grades g)
-    : name(s), grade(g), level(k.getLevel(s)), frequency(k.getFrequency(s)) {}
+  Kanji(int n, const std::string& s, const KanjiLists& k, Grades g)
+    : number(n), name(s), grade(g), level(k.getLevel(s)), frequency(k.getFrequency(s)) {}
 };
 
 class JouyouKanji : public Kanji {
 public:
   enum Values { Number = 0, Name, OldName, Radical, Strokes, Grade, Year, Meaning, Reading, MaxIndex };
   JouyouKanji(const KanjiList::List& l, const KanjiLists& k)
-    : Kanji(l[Name], k, getGrade(l[Grade])), number(toInt(l, Number)),
+    : Kanji(toInt(l, Number), l[Name], k, getGrade(l[Grade])),
       oldName(l[OldName].empty() ? std::nullopt : std::optional(l[OldName])), radical(l[Radical]),
       strokes(toInt(l, Strokes)), year(l[Year].empty() ? std::nullopt : std::optional(toInt(l, Year))),
       meaning(l[Meaning]), readings(l[Reading]) {}
 
-  const int number;
+  bool isJouyou() const override { return true; }
   const std::optional<std::string> oldName;
   const std::string radical;
   const int strokes;
