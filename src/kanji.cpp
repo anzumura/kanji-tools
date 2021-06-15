@@ -25,47 +25,48 @@ const fs::path N5 = "n5.txt";
 
 } // namespace
 
-std::ostream& operator<<(std::ostream& os, const Grades& g) {
+const char* toString(Grades g) {
   switch (g) {
   case Grades::S:
-    return os << "S";
+    return "S";
   case Grades::G6:
-    return os << "G6";
+    return "G6";
   case Grades::G5:
-    return os << "G5";
+    return "G5";
   case Grades::G4:
-    return os << "G4";
+    return "G4";
   case Grades::G3:
-    return os << "G3";
+    return "G3";
   case Grades::G2:
-    return os << "G2";
+    return "G2";
   case Grades::G1:
-    return os << "G1";
+    return "G1";
   default:
-    return os << "None";
+    return "None";
   }
 }
 
-std::ostream& operator<<(std::ostream& os, const Levels& l) {
+const char* toString(Levels l) {
   switch (l) {
   case Levels::N1:
-    return os << "N1";
+    return "N1";
   case Levels::N2:
-    return os << "N2";
+    return "N2";
   case Levels::N3:
-    return os << "N3";
+    return "N3";
   case Levels::N4:
-    return os << "N4";
+    return "N4";
   case Levels::N5:
-    return os << "N5";
+    return "N5";
   default:
-    return os << "None";
+    return "None";
   }
 }
 
 KanjiList::Set KanjiList::uniqueNames;
 
-KanjiList::KanjiList(const fs::path& p, Levels l) : name(p.stem().string()), level(l) {
+KanjiList::KanjiList(const fs::path& p, Levels l)
+  : name(l == Levels::None ? std::string("Top Frequency") : std::string("JLPT ") + toString(l)), level(l) {
   if (!fs::is_regular_file(p)) usage("can't open " + p.string());
   int count = 0;
   std::ifstream f(p);
@@ -96,6 +97,15 @@ KanjiList::KanjiList(const fs::path& p, Levels l) : name(p.stem().string()), lev
     std::ofstream of(newFile);
     for (const auto& i : good)
       of << i << '\n';
+  }
+}
+
+void KanjiList::print(const List& l, const std::string& type, const std::string& group) {
+  if (!l.empty()) {
+    std::cout << ">>> Found " << l.size() << ' ' << type << " in " << group << ':';
+    for (const auto& i : l)
+      std::cout << ' ' << i;
+    std::cout << '\n';
   }
 }
 
@@ -178,44 +188,18 @@ void KanjiLists::processList(const KanjiList& l) {
         jinmei.emplace_back(i);
     }
   }
-  if (!other.empty()) {
-    std::cout << ">>> found " << other.size() << " non-Jouyou/non-Jinmei";
-    if (l.level == Levels::None)
-      std::cout << "/non-JLPT in top " << l.list().size() << " frequency:";
-    else
-      std::cout << " in JLPT " << l.level << ':';
-    for (const auto& i : other)
-      std::cout << ' ' << i;
-    std::cout << '\n';
-  }
-  if (!jinmei.empty()) {
-    if (l.level == Levels::None) {
-      KanjiList::List jlptJinmei, otherJinmei;
-      for (const auto& i : jinmei)
-        if (getLevel(i) != Levels::None)
-          jlptJinmei.emplace_back(i);
-        else
-          otherJinmei.emplace_back(i);
-      if (!jlptJinmei.empty()) {
-        std::cout << ">>> found " << jlptJinmei.size() << " JLPT Jinmei in top " << l.list().size() << " frequency:";
-        for (const auto& i : jlptJinmei)
-          std::cout << ' ' << i;
-        std::cout << '\n';
-      }
-      if (!otherJinmei.empty()) {
-        std::cout << ">>> found " << otherJinmei.size() << " non-JLPT Jinmei in top " << l.list().size()
-                  << " frequency:";
-        for (const auto& i : otherJinmei)
-          std::cout << ' ' << i;
-        std::cout << '\n';
-      }
-    } else {
-      std::cout << ">>> found " << jinmei.size() << " Jinmei in JLPT " << l.level << ':';
-      for (const auto& i : jinmei)
-        std::cout << ' ' << i;
-      std::cout << '\n';
-    }
-  }
+  KanjiList::print(other, std::string("non-Jouyou/non-Jinmei") + (l.level == Levels::None ? "/non-JLPT" : ""), l.name);
+  if (l.level == Levels::None) {
+    KanjiList::List jlptJinmei, otherJinmei;
+    for (const auto& i : jinmei)
+      if (getLevel(i) != Levels::None)
+        jlptJinmei.emplace_back(i);
+      else
+        otherJinmei.emplace_back(i);
+    KanjiList::print(jlptJinmei, "JLPT Jinmei", l.name);
+    KanjiList::print(otherJinmei, "non-JLPT Jinmei", l.name);
+  } else
+    KanjiList::print(jinmei, "Jinmei", l.name);
 }
 
 fs::path KanjiLists::getDataDir(int argc, char** argv) {

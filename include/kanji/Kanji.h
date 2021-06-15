@@ -15,8 +15,10 @@ namespace kanji {
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
 enum class Levels { N5, N4, N3, N2, N1, None };
 
-std::ostream& operator<<(std::ostream&, const Grades&);
-std::ostream& operator<<(std::ostream&, const Levels&);
+const char* toString(Grades);
+const char* toString(Levels);
+inline std::ostream& operator<<(std::ostream& os, const Grades& g) { return os << toString(g); }
+inline std::ostream& operator<<(std::ostream& os, const Levels& l) { return os << toString(l); }
 
 class KanjiList {
 public:
@@ -34,6 +36,7 @@ public:
   const List& list() const { return _list; }
   const std::string name;
   const Levels level;
+  static void print(const List&, const std::string& type, const std::string& group);
 
 private:
   static Set uniqueNames; // populated and used by lists that specify a non-None level
