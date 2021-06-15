@@ -15,6 +15,7 @@ void usage(const std::string& msg) {
 }
 
 const fs::path Jouyou = "jouyou.txt";
+const fs::path Jinmei = "jinmei.txt";
 const fs::path Frequency = "frequency.txt";
 const fs::path N1 = "n1.txt";
 const fs::path N2 = "n2.txt";
@@ -102,6 +103,7 @@ KanjiLists::KanjiLists(int argc, char** argv)
   : data(getDataDir(argc, argv)), n5(data / N5, Levels::N5), n4(data / N4, Levels::N4), n3(data / N3, Levels::N3),
     n2(data / N2, Levels::N2), n1(data / N1, Levels::N1), frequency(data / Frequency) {
   populateJouyou();
+  populateJinmei();
   processList(n5);
   processList(n4);
   processList(n3);
@@ -123,10 +125,9 @@ void KanjiLists::populateJouyou() {
       tokens.emplace_back(token);
     if (tokens.size() == JouyouKanji::MaxIndex) {
       try {
-        auto k = std::make_shared<JouyouKanji>(tokens, *this);
-        assert(k->number == number); // Jouyou file should be ordered by the number column
+        auto k = std::make_shared<JouyouKanji>(*this, tokens);
         _jouyouSet.insert(k->name);
-        _jouyou.emplace_back(std::move(k));
+        _jouyouKanji.push_back(k);
       } catch (const std::exception& e) {
         std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
       }
@@ -135,27 +136,85 @@ void KanjiLists::populateJouyou() {
   }
 }
 
+void KanjiLists::populateJinmei() {
+  fs::path p(data / Jinmei);
+  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  std::set<std::string> found;
+  std::ifstream f(p);
+  int count = _jouyouKanji.size();
+  for (std::string line; std::getline(f, line); ++count) {
+    std::stringstream ss(line);
+    KanjiList::List tokens;
+    for (std::string token; std::getline(ss, token, '\t');)
+      tokens.emplace_back(token);
+    if (tokens.size() && tokens.size() < 3) {
+      try {
+        auto k = std::make_shared<Kanji>(*this, ++count, tokens);
+        // Jinmei kanji should not be part of Jouyou set
+        assert(_jouyouSet.find(k->name) == _jouyouSet.end());
+        _jinmeiSet.insert(k->name);
+        _jinmeiKanji.push_back(k);
+      } catch (const std::exception& e) {
+        std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
+      }
+    } else
+      std::cerr << "got " << tokens.size() << " tokens (wanted 1 or 2) line: " << line << '\n';
+  }
+}
+
 void KanjiLists::processList(const KanjiList& l) {
-  KanjiList::List nonJouyou;
-  auto count = _jouyou.size() + _nonJouyou.size();
+  KanjiList::List other;
+  KanjiList::List jinmei;
+  auto count = _jouyouKanji.size() + _jinmeiKanji.size() + _otherSet.size();
   for (const auto& i : l.list()) {
     if (_jouyouSet.find(i) == _jouyouSet.end()) {
-      auto k = _nonJouyouSet.insert(i);
-      if (k.second) {
-        _nonJouyou.emplace_back(std::move(std::make_shared<Kanji>(++count, i, *this, l.level)));
-        nonJouyou.emplace_back(i);
-      }
+      if (_jinmeiSet.find(i) == _jinmeiSet.end()) {
+        auto k = _otherSet.insert(i);
+        if (k.second) {
+          _otherKanji.push_back(std::make_shared<Kanji>(*this, ++count, i, l.level));
+          other.emplace_back(i);
+        }
+      } else
+        jinmei.emplace_back(i);
     }
   }
-  if (!nonJouyou.empty()) {
-    std::cout << ">>> found " << nonJouyou.size() << " non-Jouyou";
+  if (!other.empty()) {
+    std::cout << ">>> found " << other.size() << " non-Jouyou/non-Jinmei";
     if (l.level == Levels::None)
       std::cout << "/non-JLPT in top " << l.list().size() << " frequency:";
     else
       std::cout << " in JLPT " << l.level << ':';
-    for (const auto& i : nonJouyou)
+    for (const auto& i : other)
       std::cout << ' ' << i;
     std::cout << '\n';
+  }
+  if (!jinmei.empty()) {
+    if (l.level == Levels::None) {
+      KanjiList::List jlptJinmei, otherJinmei;
+      for (const auto& i : jinmei)
+        if (getLevel(i) != Levels::None)
+          jlptJinmei.emplace_back(i);
+        else
+          otherJinmei.emplace_back(i);
+      if (!jlptJinmei.empty()) {
+        std::cout << ">>> found " << jlptJinmei.size() << " JLPT Jinmei in top " << l.list().size() << " frequency:";
+        for (const auto& i : jlptJinmei)
+          std::cout << ' ' << i;
+        std::cout << '\n';
+      }
+      if (!otherJinmei.empty()) {
+        std::cout << ">>> found " << otherJinmei.size() << " non-JLPT Jinmei in top " << l.list().size()
+                  << " frequency:";
+        for (const auto& i : otherJinmei)
+          std::cout << ' ' << i;
+        std::cout << '\n';
+      }
+    } else {
+      std::cout << ">>> found " << jinmei.size() << " Jinmei in JLPT " << l.level << ':';
+      for (const auto& i : jinmei)
+        std::cout << ' ' << i;
+      std::cout << '\n';
+    }
   }
 }
 
