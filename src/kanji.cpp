@@ -144,8 +144,8 @@ void KanjiLists::populateJouyou() {
       try {
         auto k = std::make_shared<JouyouKanji>(*this, tokens);
         // all Jouyou Kanji must have a grade
-        assert(k->grade != Grades::None);
-        checkInsert(_jouyouSet, k->name);
+        assert(k->grade() != Grades::None);
+        checkInsert(_jouyouSet, k->name());
         _jouyouKanji.push_back(k);
       } catch (const std::exception& e) {
         std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
@@ -169,8 +169,8 @@ void KanjiLists::populateJinmei() {
     if (tokens.size() && tokens.size() <= JinmeiKanji::MaxIndex) {
       try {
         auto k = std::make_shared<JinmeiKanji>(*this, ++count, tokens);
-        checkInsert(_jinmeiSet, k->name);
-        checkNotFound(_jouyouSet, k->name);
+        checkInsert(_jinmeiSet, k->name());
+        checkNotFound(_jouyouSet, k->name());
         _jinmeiKanji.push_back(k);
       } catch (const std::exception& e) {
         std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
@@ -194,9 +194,9 @@ void KanjiLists::populateExtra() {
     if (tokens.size() == ExtraKanji::MaxIndex) {
       try {
         auto k = std::make_shared<ExtraKanji>(*this, ++count, tokens);
-        checkInsert(_extraSet, k->name);
-        checkNotFound(_jouyouSet, k->name);
-        checkNotFound(_jinmeiSet, k->name);
+        checkInsert(_extraSet, k->name());
+        checkNotFound(_jouyouSet, k->name());
+        checkNotFound(_jinmeiSet, k->name());
         _extraKanji.push_back(k);
       } catch (const std::exception& e) {
         std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';

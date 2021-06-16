@@ -14,8 +14,9 @@ namespace kanji {
 
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
 enum class Levels { N5, N4, N3, N2, N1, None };
-// Type 'Extra' is for kanjis loaded from 'extra.txt' file whereas 'Other' is for any other
-// kanji found in the 'frequency.txt' file that isn't one of the first 3 types.
+// Type 'Extra' is for kanjis loaded from 'extra.txt' file whereas 'Other' is for other
+// kanjis in 'frequency.txt' file that isn't one of the first 3 types. The extra.txt file
+// should only contain kanji that are not in jouyou.txt, jinmei.txt or frequency.txt.
 enum class Types { Jouyou, Jinmei, Extra, Other };
 
 const char* toString(Grades);
@@ -91,64 +92,78 @@ private:
 
 class Kanji {
 public:
+  using OptString = std::optional<std::string>;
   // constructor for Kanji found in frequency.txt that weren't found in one of the other 3 type files
   Kanji(const KanjiLists& k, int n, const std::string& s, Levels l)
-    : number(n), name(s), grade(Grades::None), level(l), frequency(k.getFrequency(s)) {}
+    : _number(n), _name(s), _level(l), _frequency(k.getFrequency(s)) {}
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
   Kanji& operator=(const Kanji&) = delete;
 
   virtual Types type() const { return Types::Other; }
+  virtual Grades grade() const { return Grades::None; }
+  virtual OptString oldName() const { return {}; }
 
-  const int number;
-  const std::string name;
-  const Grades grade;
-  const Levels level;
-  const int frequency;
+  int number() const { return _number; }
+  const std::string& name() const { return _name; }
+  Levels level() const { return _level; }
+  int frequency() const { return _frequency; }
 
 protected:
-  Kanji(const KanjiLists& k, int n, const std::string& s, Grades g)
-    : number(n), name(s), grade(g), level(k.getLevel(s)), frequency(k.getFrequency(s)) {}
+  Kanji(const KanjiLists& k, int n, const std::string& s)
+    : _number(n), _name(s), _level(k.getLevel(s)), _frequency(k.getFrequency(s)) {}
+
+private:
+  const int _number;
+  const std::string _name;
+  const Levels _level;
+  const int _frequency;
 };
 
 class JinmeiKanji : public Kanji {
 public:
-  using OptString = std::optional<std::string>;
   enum Columns { Name, OldName, MaxIndex };
   JinmeiKanji(const KanjiLists& k, int n, const KanjiList::List& l)
-    : Kanji(k, n, l[Name], Grades::None), oldName(optString(l, OldName)) {}
+    : Kanji(k, n, l[Name]), _oldName(optString(l, OldName)) {}
 
   Types type() const override { return Types::Jinmei; }
-
-  const OptString oldName;
+  OptString oldName() const override { return _oldName; }
 
 protected:
-  JinmeiKanji(const KanjiLists& k, int n, const std::string& s, OptString o = {}, Grades g = Grades::None)
-    : Kanji(k, n, s, g), oldName(o) {}
   static OptString optString(const KanjiList::List& l, int i) {
     return l.size() <= i || l[i].empty() ? std::nullopt : std::optional(l[i]);
   }
+  JinmeiKanji(const KanjiLists& k, int n, const std::string& s, OptString o = {}) : Kanji(k, n, s), _oldName(o) {}
+
+private:
+  const OptString _oldName;
 };
 
 class ExtraKanji : public JinmeiKanji {
 public:
   enum Columns { Name, Radical, Strokes, Meaning, Reading, MaxIndex };
   ExtraKanji(const KanjiLists& k, int n, const KanjiList::List& l)
-    : JinmeiKanji(k, n, l[Name]), radical(l[Radical]), strokes(toInt(l, Strokes)), meaning(l[Meaning]),
-      reading(l[Reading]) {}
+    : JinmeiKanji(k, n, l[Name]), _radical(l[Radical]), _strokes(toInt(l, Strokes)), _meaning(l[Meaning]),
+      _reading(l[Reading]) {}
 
   Types type() const override { return Types::Extra; }
 
-  const std::string radical;
-  const int strokes;
-  const std::string meaning;
-  const std::string reading;
+  const std::string& radical() const { return _radical; }
+  int strokes() const { return _strokes; }
+  const std::string& meaning() const { return _meaning; }
+  const std::string& reading() const { return _reading; }
 
 protected:
-  ExtraKanji(const KanjiLists& k, int n, const std::string& s, OptString o, Grades g, const std::string& r, int st,
-             const std::string& m, const std::string& re)
-    : JinmeiKanji(k, n, s, o, g), radical(r), strokes(st), meaning(m), reading(re) {}
   static int toInt(const KanjiList::List&, int);
+  ExtraKanji(const KanjiLists& k, int n, const std::string& s, OptString o, const std::string& r, int st,
+             const std::string& m, const std::string& re)
+    : JinmeiKanji(k, n, s, o), _radical(r), _strokes(st), _meaning(m), _reading(re) {}
+
+private:
+  const std::string _radical;
+  const int _strokes;
+  const std::string _meaning;
+  const std::string _reading;
 };
 
 class JouyouKanji : public ExtraKanji {
@@ -156,16 +171,19 @@ public:
   using OptInt = std::optional<int>;
   enum Columns { Number, Name, OldName, Radical, Strokes, Grade, Year, Meaning, Reading, MaxIndex };
   JouyouKanji(const KanjiLists& k, const KanjiList::List& l)
-    : ExtraKanji(k, toInt(l, Number), l[Name], optString(l, OldName), getGrade(l[Grade]), l[Radical], toInt(l, Strokes),
-                 l[Meaning], l[Reading]),
-      year(l[Year].empty() ? std::nullopt : std::optional(toInt(l, Year))) {}
+    : ExtraKanji(k, toInt(l, Number), l[Name], optString(l, OldName), l[Radical], toInt(l, Strokes), l[Meaning],
+                 l[Reading]),
+      _grade(getGrade(l[Grade])), _year(l[Year].empty() ? std::nullopt : std::optional(toInt(l, Year))) {}
 
   Types type() const override { return Types::Jouyou; }
-
-  const OptInt year;
+  Grades grade() const override { return _grade; }
+  OptInt year() const { return _year; }
 
 private:
   static Grades getGrade(const std::string&);
+
+  const Grades _grade;
+  const OptInt _year;
 };
 
 } // namespace kanji
