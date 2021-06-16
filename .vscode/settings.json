@@ -96,7 +96,7 @@
     "filesystem": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
-  "C_Cpp.clang_format_fallbackStyle": "{ ConstructorInitializerIndentWidth: 2, ColumnLimit: 120, PointerAlignment: Left, AllowShortIfStatementsOnASingleLine: true, SpaceAfterTemplateKeyword: false, AlignOperands: false, ContinuationIndentWidth: 2  }",
+  "C_Cpp.clang_format_fallbackStyle": "{ AllowShortCaseLabelsOnASingleLine: true, ConstructorInitializerIndentWidth: 2, ColumnLimit: 120, PointerAlignment: Left, AllowShortIfStatementsOnASingleLine: true, SpaceAfterTemplateKeyword: false, AlignOperands: false, ContinuationIndentWidth: 2  }",
   "cmake.debugConfig": {
     "args": [
       "../../data"

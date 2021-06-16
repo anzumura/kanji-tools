@@ -1,12 +1,14 @@
 #include <kanji/Kanji.h>
 
 #include <array>
+#include <numeric>
 
 using namespace kanji;
 
 constexpr std::array<Grades, 8> grades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
                                           Grades::G5, Grades::G6, Grades::S,  Grades::None};
 constexpr std::array<Levels, 6> levels = {Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
+constexpr std::array<Types, 4> types = {Types::Jouyou, Types::Jinmei, Types::Extra, Types::Other};
 
 void noFreq(int f, bool brackets = false) {
   if (f) {
@@ -14,7 +16,7 @@ void noFreq(int f, bool brackets = false) {
       std::cout << " (";
     else
       std::cout << ' ';
-    std::cout << "No-Freq " << f;
+    std::cout << "nf " << f;
     if (brackets) std::cout << ')';
   }
 }
@@ -33,34 +35,28 @@ void countGrades(const KanjiLists::List& l) {
   std::cout << ">>> Total for all grades: " << all << '\n';
 }
 
-void countLevels(const KanjiLists::List& l1, const KanjiLists::List& l2, const KanjiLists::List& l3) {
-  int all = 0;
-  for (auto i : levels) {
-    const auto c1 = std::count_if(l1.begin(), l1.end(), [i](const auto& x) { return x->level == i; });
-    const auto c2 = std::count_if(l2.begin(), l2.end(), [i](const auto& x) { return x->level == i; });
-    const auto c3 = std::count_if(l3.begin(), l3.end(), [i](const auto& x) { return x->level == i; });
-    const auto c = c1 + c2 + c3;
-    if (c) {
-      all += c;
-      std::cout << ">>>   Total for level " << i << ": " << c << " (";
-      if (c1) {
-        std::cout << "Jouyou " << c1;
-        noFreq(std::count_if(l1.begin(), l1.end(), [i](const auto& x) { return x->level == i && !x->frequency; }));
-        if (c2 || c3) std::cout << ", ";
-      }
-      if (c2) {
-        std::cout << "Jinmei " << c2;
-        noFreq(std::count_if(l2.begin(), l2.end(), [i](const auto& x) { return x->level == i && !x->frequency; }));
-        if (c3) std::cout << ", ";
-      }
-      if (c3) {
-        std::cout << "Other " << c3;
-        noFreq(std::count_if(l3.begin(), l3.end(), [i](const auto& x) { return x->level == i && !x->frequency; }));
-      }
+void countLevels(const std::vector<const KanjiLists::List*>& lists) {
+  int total = 0;
+  for (auto level : levels) {
+    std::vector<int> counts;
+    for (const auto& l : lists)
+      counts.push_back(std::count_if(l->begin(), l->end(), [level](const auto& x) { return x->level == level; }));
+    int levelTotal = std::reduce(counts.begin(), counts.end());
+    if (levelTotal) {
+      total += levelTotal;
+      std::cout << ">>>   Total for level " << level << ": " << levelTotal << " (";
+      for (int j = 0; j < counts.size(); ++j)
+        if (counts[j]) {
+          total -= counts[j];
+          std::cout << types[j] << ' ' << counts[j];
+          noFreq(std::count_if(lists[j]->begin(), lists[j]->end(),
+                               [level](const auto& x) { return x->level == level && !x->frequency; }));
+          if (total) std::cout << ", ";
+        }
       std::cout << ")\n";
     }
   }
-  std::cout << ">>> Total for all levels: " << all << '\n';
+  std::cout << ">>> Total for all levels: " << total << '\n';
 }
 
 auto noFrequency(const KanjiLists::List& l) {
@@ -71,17 +67,19 @@ int main(int argc, char** argv) {
   KanjiLists l(argc, argv);
   const auto& jouyou = l.jouyouKanji();
   const auto& jinmei = l.jinmeiKanji();
+  const auto& extra = l.extraKanji();
   const auto& other = l.otherKanji();
-  auto total = jouyou.size() + jinmei.size() + other.size();
+  auto total = jouyou.size() + jinmei.size() + extra.size() + other.size();
   std::cout << ">>> Loaded " << total << " Kanji (Jouyou: " << jouyou.size() << " Jinmei: " << jinmei.size()
-            << " Other: " << other.size() << ")\n";
+            << " Extra: " << extra.size() << " Other: " << other.size() << ")\n";
   auto jouyouNF = noFrequency(jouyou);
   auto jinmeiNF = noFrequency(jinmei);
+  auto extraNF = noFrequency(extra);
   auto otherNF = noFrequency(other);
-  std::cout << ">>> No-Freq " << jouyouNF + jinmeiNF + otherNF << " (Jouyou: " << jouyouNF << " Jinmei: " << jinmeiNF
-            << " Other: " << otherNF << ")\n";
+  std::cout << ">>> NF (no-frequency) " << jouyouNF + jinmeiNF + extraNF + otherNF << " (Jouyou: " << jouyouNF
+            << " Jinmei: " << jinmeiNF << " Extra: " << extraNF << " Other: " << otherNF << ")\n";
   countGrades(jouyou);
-  countLevels(jouyou, jinmei, other);
+  countLevels({&jouyou, &jinmei, &extra, &other});
   // for (const auto& i : kanji)
   //   std::cout << i->name << ": " << i->grade << ", " << i->level << ", " << i->frequency << '\n';
   return 0;

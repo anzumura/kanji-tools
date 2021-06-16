@@ -16,6 +16,7 @@ void usage(const std::string& msg) {
 
 const fs::path Jouyou = "jouyou.txt";
 const fs::path Jinmei = "jinmei.txt";
+const fs::path Extra = "extra.txt";
 const fs::path Frequency = "frequency.txt";
 const fs::path N1 = "n1.txt";
 const fs::path N2 = "n2.txt";
@@ -25,41 +26,36 @@ const fs::path N5 = "n5.txt";
 
 } // namespace
 
-const char* toString(Grades g) {
-  switch (g) {
-  case Grades::S:
-    return "S";
-  case Grades::G6:
-    return "G6";
-  case Grades::G5:
-    return "G5";
-  case Grades::G4:
-    return "G4";
-  case Grades::G3:
-    return "G3";
-  case Grades::G2:
-    return "G2";
-  case Grades::G1:
-    return "G1";
-  default:
-    return "None";
+const char* toString(Grades x) {
+  switch (x) {
+  case Grades::S: return "S";
+  case Grades::G6: return "G6";
+  case Grades::G5: return "G5";
+  case Grades::G4: return "G4";
+  case Grades::G3: return "G3";
+  case Grades::G2: return "G2";
+  case Grades::G1: return "G1";
+  default: return "None";
   }
 }
 
-const char* toString(Levels l) {
-  switch (l) {
-  case Levels::N1:
-    return "N1";
-  case Levels::N2:
-    return "N2";
-  case Levels::N3:
-    return "N3";
-  case Levels::N4:
-    return "N4";
-  case Levels::N5:
-    return "N5";
-  default:
-    return "None";
+const char* toString(Levels x) {
+  switch (x) {
+  case Levels::N1: return "N1";
+  case Levels::N2: return "N2";
+  case Levels::N3: return "N3";
+  case Levels::N4: return "N4";
+  case Levels::N5: return "N5";
+  default: return "None";
+  }
+}
+
+const char* toString(Types x) {
+  switch (x) {
+  case Types::Jouyou: return "Jouyou";
+  case Types::Jinmei: return "Jinmei";
+  case Types::Extra: return "Extra";
+  default: return "Other";
   }
 }
 
@@ -114,12 +110,23 @@ KanjiLists::KanjiLists(int argc, char** argv)
     n2(data / N2, Levels::N2), n1(data / N1, Levels::N1), frequency(data / Frequency) {
   populateJouyou();
   populateJinmei();
+  populateExtra();
   processList(n5);
   processList(n4);
   processList(n3);
   processList(n2);
   processList(n1);
   processList(frequency);
+}
+
+void KanjiLists::checkInsert(KanjiList::Set& s, const std::string& n) {
+  if (!s.insert(n).second)
+    throw std::invalid_argument("failed to insert " + n + " - already in set");
+}
+
+void KanjiLists::checkNotFound(const KanjiList::Set& s, const std::string& n) {
+  if (s.find(n) != s.end())
+    throw std::invalid_argument(n + " already in set");
 }
 
 void KanjiLists::populateJouyou() {
@@ -136,7 +143,9 @@ void KanjiLists::populateJouyou() {
     if (tokens.size() == JouyouKanji::MaxIndex) {
       try {
         auto k = std::make_shared<JouyouKanji>(*this, tokens);
-        _jouyouSet.insert(k->name);
+        // all Jouyou Kanji must have a grade
+        assert(k->grade != Grades::None);
+        checkInsert(_jouyouSet, k->name);
         _jouyouKanji.push_back(k);
       } catch (const std::exception& e) {
         std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
@@ -157,12 +166,11 @@ void KanjiLists::populateJinmei() {
     KanjiList::List tokens;
     for (std::string token; std::getline(ss, token, '\t');)
       tokens.emplace_back(token);
-    if (tokens.size() && tokens.size() < 3) {
+    if (tokens.size() && tokens.size() <= JinmeiKanji::MaxIndex) {
       try {
-        auto k = std::make_shared<Kanji>(*this, ++count, tokens);
-        // Jinmei kanji should not be part of Jouyou set
-        assert(_jouyouSet.find(k->name) == _jouyouSet.end());
-        _jinmeiSet.insert(k->name);
+        auto k = std::make_shared<JinmeiKanji>(*this, ++count, tokens);
+        checkInsert(_jinmeiSet, k->name);
+        checkNotFound(_jouyouSet, k->name);
         _jinmeiKanji.push_back(k);
       } catch (const std::exception& e) {
         std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
@@ -172,11 +180,39 @@ void KanjiLists::populateJinmei() {
   }
 }
 
+void KanjiLists::populateExtra() {
+  fs::path p(data / Extra);
+  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  std::set<std::string> found;
+  std::ifstream f(p);
+  int count = _jouyouKanji.size() + _jinmeiKanji.size();
+  for (std::string line; std::getline(f, line); ++count) {
+    std::stringstream ss(line);
+    KanjiList::List tokens;
+    for (std::string token; std::getline(ss, token, '\t');)
+      tokens.emplace_back(token);
+    if (tokens.size() == ExtraKanji::MaxIndex) {
+      try {
+        auto k = std::make_shared<ExtraKanji>(*this, ++count, tokens);
+        checkInsert(_extraSet, k->name);
+        checkNotFound(_jouyouSet, k->name);
+        checkNotFound(_jinmeiSet, k->name);
+        _extraKanji.push_back(k);
+      } catch (const std::exception& e) {
+        std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
+      }
+    } else
+      std::cerr << "got " << tokens.size() << " tokens (wanted " << ExtraKanji::MaxIndex << ") line: " << line << '\n';
+  }
+}
+
 void KanjiLists::processList(const KanjiList& l) {
   KanjiList::List other;
   KanjiList::List jinmei;
-  auto count = _jouyouKanji.size() + _jinmeiKanji.size() + _otherSet.size();
+  auto count = _jouyouKanji.size() + _jinmeiKanji.size() + _extraKanji.size() + _otherSet.size();
   for (const auto& i : l.list()) {
+    // Kanjis in lists (n1 - n5 and frequency) shouldn't be in the '_extraSet'
+    checkNotFound(_extraSet, i);
     if (_jouyouSet.find(i) == _jouyouSet.end()) {
       if (_jinmeiSet.find(i) == _jinmeiSet.end()) {
         auto k = _otherSet.insert(i);
@@ -218,6 +254,15 @@ Levels KanjiLists::getLevel(const std::string& k) const {
   return Levels::None;
 }
 
+int ExtraKanji::toInt(const KanjiList::List& l, int i) {
+  const std::string& s = l[i];
+  try {
+    return std::stoi(s);
+  } catch (...) {
+    throw std::invalid_argument("failed to pasrse token " + std::to_string(i) + " - string was: " + s);
+  }
+}
+
 Grades JouyouKanji::getGrade(const std::string& g) {
   if (g == "S") return Grades::S;
   if (g == "6") return Grades::G6;
@@ -227,15 +272,6 @@ Grades JouyouKanji::getGrade(const std::string& g) {
   if (g == "2") return Grades::G2;
   if (g == "1") return Grades::G1;
   return Grades::None;
-}
-
-int JouyouKanji::toInt(const KanjiList::List& l, int i) {
-  const std::string& s = l[i];
-  try {
-    return std::stoi(s);
-  } catch (...) {
-    throw std::invalid_argument("failed to pasrse token " + std::to_string(i) + " - string was: " + s);
-  }
 }
 
 } // namespace kanji
