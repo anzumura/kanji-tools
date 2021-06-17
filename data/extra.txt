@@ -1,24 +1,25 @@
-霙	雨	16	sleet	エイ、ヨウ、みぞれ
-邯	邑	8	tree cricket	カン
-姦	女	9	wicked	カン、ケン、かん-する、かしま-しい、みだら
-緘	糸	15	shut	カン、かん-する、と-じる
-哭	口	10	weep	コク、なげ-く、な-く
-屎	尸	9	shit	シ、キ、くそ
-屍	尸	9	corpse	シ、かたしろ
-綬	糸	14	ribbon	ジュ、ひも
-嘯	口	16	roar	ショウ、シツ、うそぶ-く
-囁	口	21	whisper	ショウ、ささや-く
-妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
-鶺	鳥	21	wagtail	セキ
-雙	隹	18	pair	ソウ、たぐい、ならぶ、ふたつ、ふた-
-鄲	邑	15	place name	タン
-痔	疒	11	piles	ヂ、ジ、しもがさ
-梃	木	11	lever	チョウ、テイ、てこ、つえ
-慟	心	14	be sad	ドウ、トウ、なげ-く
-禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
-屁	尸	7	fart	ヒ、へ、おなら
-騙	馬	19	deceive	ヘン、かた-る、だま-す
-蝿	虫	15	fly	ヨウ、はえ、はい
-泪	水	8	tears	ルイ、レイ、なみだ
-鴒	鳥	16	wagtail	レイ
-朧	月	20	haziness	ロウ、おぼろ
+Number	Name	Radical	Strokes	Meaning	Reading
+1	霙	雨	16	sleet	エイ、ヨウ、みぞれ
+2	邯	邑	8	tree cricket	カン
+3	姦	女	9	wicked	カン、ケン、かん-する、かしま-しい、みだら
+4	緘	糸	15	shut	カン、かん-する、と-じる
+5	哭	口	10	weep	コク、なげ-く、な-く
+6	屎	尸	9	shit	シ、キ、くそ
+7	屍	尸	9	corpse	シ、かたしろ
+8	綬	糸	14	ribbon	ジュ、ひも
+9	嘯	口	16	roar	ショウ、シツ、うそぶ-く
+10	囁	口	21	whisper	ショウ、ささや-く
+11	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
+12	鶺	鳥	21	wagtail	セキ
+13	雙	隹	18	pair	ソウ、たぐい、ならぶ、ふたつ、ふた-
+14	鄲	邑	15	place name	タン
+15	痔	疒	11	piles	ヂ、ジ、しもがさ
+16	梃	木	11	lever	チョウ、テイ、てこ、つえ
+17	慟	心	14	be sad	ドウ、トウ、なげ-く
+18	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
+19	屁	尸	7	fart	ヒ、へ、おなら
+20	騙	馬	19	deceive	ヘン、かた-る、だま-す
+21	蝿	虫	15	fly	ヨウ、はえ、はい
+22	泪	水	8	tears	ルイ、レイ、なみだ
+23	鴒	鳥	16	wagtail	レイ
+24	朧	月	20	haziness	ロウ、おぼろ

@@ -1,6 +1,5 @@
 #include <kanji/Kanji.h>
 
-#include <array>
 #include <numeric>
 
 using namespace kanji;
@@ -79,6 +78,7 @@ int main(int argc, char** argv) {
   lists.push_back(&l.jinmeiKanji());
   lists.push_back(&l.extraKanji());
   lists.push_back(&l.otherKanji());
+  decltype(lists) fileLists(lists.begin(), lists.end() - 1);
   int total = 0;
   for (const auto& l : lists)
     total += l->size();
@@ -90,6 +90,9 @@ int main(int argc, char** argv) {
   std::cout << ")\n";
   count(lists, "NF (no-frequency)", [](const KanjiLists::Entry& x) { return !x->frequency(); });
   count(lists, "Old Forms", [](const KanjiLists::Entry& x) { return x->oldName().has_value(); });
+  count(fileLists, "Has Strokes", [](const KanjiLists::Entry& x) {
+    return static_cast<const FileListKanji&>(*x).strokes() != 0;
+  });
   countGrades(*lists[0]); // only Jouyou list has Grades
   countLevels(lists);
   // for (const auto& i : *lists[0])

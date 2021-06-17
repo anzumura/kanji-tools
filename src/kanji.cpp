@@ -14,15 +14,16 @@ void usage(const std::string& msg) {
   exit(1);
 }
 
-const fs::path Jouyou = "jouyou.txt";
-const fs::path Jinmei = "jinmei.txt";
-const fs::path Extra = "extra.txt";
-const fs::path Frequency = "frequency.txt";
 const fs::path N1 = "n1.txt";
 const fs::path N2 = "n2.txt";
 const fs::path N3 = "n3.txt";
 const fs::path N4 = "n4.txt";
 const fs::path N5 = "n5.txt";
+const fs::path Frequency = "frequency.txt";
+const fs::path Strokes = "strokes.txt";
+const fs::path Jouyou = "jouyou.txt";
+const fs::path Jinmei = "jinmei.txt";
+const fs::path Extra = "extra.txt";
 
 } // namespace
 
@@ -108,6 +109,19 @@ void KanjiList::print(const List& l, const std::string& type, const std::string&
 KanjiLists::KanjiLists(int argc, char** argv)
   : data(getDataDir(argc, argv)), n5(data / N5, Levels::N5), n4(data / N4, Levels::N4), n3(data / N3, Levels::N3),
     n2(data / N2, Levels::N2), n1(data / N1, Levels::N1), frequency(data / Frequency) {
+  fs::path p(data / Strokes);
+  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  std::ifstream f(p);
+  std::string line;
+  int strokes = 0;
+  while (std::getline(f, line))
+    if (std::isdigit(line[0]))
+      strokes = std::stoi(line);
+    else {
+      assert(strokes != 0); // first line must have a stroke count
+      if (!_strokes.insert(std::pair(line, strokes)).second)
+        std::cerr << "duplicate entry in " << p.string() << ": " << line << '\n';
+    }
   populateJouyou();
   populateJinmei();
   populateExtra();
@@ -120,89 +134,39 @@ KanjiLists::KanjiLists(int argc, char** argv)
 }
 
 void KanjiLists::checkInsert(KanjiList::Set& s, const std::string& n) {
-  if (!s.insert(n).second)
-    throw std::invalid_argument("failed to insert " + n + " - already in set");
+  if (!s.insert(n).second) std::cerr << "ERROR --- failed to insert " << n << '\n';
 }
 
 void KanjiLists::checkNotFound(const KanjiList::Set& s, const std::string& n) {
-  if (s.find(n) != s.end())
-    throw std::invalid_argument(n + " already in set");
+  if (s.find(n) != s.end()) std::cerr << "ERROR --- " << n + " already in set\n";
 }
 
 void KanjiLists::populateJouyou() {
-  fs::path p(data / Jouyou);
-  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
-  std::set<std::string> found;
-  std::ifstream f(p);
-  int number = 1;
-  for (std::string line; std::getline(f, line); ++number) {
-    std::stringstream ss(line);
-    KanjiList::List tokens;
-    for (std::string token; std::getline(ss, token, '\t');)
-      tokens.emplace_back(token);
-    if (tokens.size() == JouyouKanji::MaxIndex) {
-      try {
-        auto k = std::make_shared<JouyouKanji>(*this, tokens);
-        // all Jouyou Kanji must have a grade
-        assert(k->grade() != Grades::None);
-        checkInsert(_jouyouSet, k->name());
-        _jouyouKanji.push_back(k);
-      } catch (const std::exception& e) {
-        std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
-      }
-    } else
-      std::cerr << "got " << tokens.size() << " tokens (wanted " << JouyouKanji::MaxIndex << ") line: " << line << '\n';
+  auto results = FileListKanji::fromFile(*this, Types::Jouyou, data / Jouyou);
+  for (const auto& i : results) {
+    // all Jouyou Kanji must have a grade
+    assert(i->grade() != Grades::None);
+    checkInsert(_jouyouSet, i->name());
+    _jouyouKanji.push_back(i);
   }
 }
 
 void KanjiLists::populateJinmei() {
-  fs::path p(data / Jinmei);
-  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
-  std::set<std::string> found;
-  std::ifstream f(p);
-  int count = _jouyouKanji.size();
-  for (std::string line; std::getline(f, line); ++count) {
-    std::stringstream ss(line);
-    KanjiList::List tokens;
-    for (std::string token; std::getline(ss, token, '\t');)
-      tokens.emplace_back(token);
-    if (tokens.size() && tokens.size() <= JinmeiKanji::MaxIndex) {
-      try {
-        auto k = std::make_shared<JinmeiKanji>(*this, ++count, tokens);
-        checkInsert(_jinmeiSet, k->name());
-        checkNotFound(_jouyouSet, k->name());
-        _jinmeiKanji.push_back(k);
-      } catch (const std::exception& e) {
-        std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
-      }
-    } else
-      std::cerr << "got " << tokens.size() << " tokens (wanted 1 or 2) line: " << line << '\n';
+  auto results = FileListKanji::fromFile(*this, Types::Jinmei, data / Jinmei);
+  for (const auto& i : results) {
+    checkInsert(_jinmeiSet, i->name());
+    checkNotFound(_jouyouSet, i->name());
+    _jinmeiKanji.push_back(i);
   }
 }
 
 void KanjiLists::populateExtra() {
-  fs::path p(data / Extra);
-  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
-  std::set<std::string> found;
-  std::ifstream f(p);
-  int count = _jouyouKanji.size() + _jinmeiKanji.size();
-  for (std::string line; std::getline(f, line); ++count) {
-    std::stringstream ss(line);
-    KanjiList::List tokens;
-    for (std::string token; std::getline(ss, token, '\t');)
-      tokens.emplace_back(token);
-    if (tokens.size() == ExtraKanji::MaxIndex) {
-      try {
-        auto k = std::make_shared<ExtraKanji>(*this, ++count, tokens);
-        checkInsert(_extraSet, k->name());
-        checkNotFound(_jouyouSet, k->name());
-        checkNotFound(_jinmeiSet, k->name());
-        _extraKanji.push_back(k);
-      } catch (const std::exception& e) {
-        std::cerr << "got exception: " << e.what() << " while processing line: " << line << '\n';
-      }
-    } else
-      std::cerr << "got " << tokens.size() << " tokens (wanted " << ExtraKanji::MaxIndex << ") line: " << line << '\n';
+  auto results = FileListKanji::fromFile(*this, Types::Extra, data / Extra);
+  for (const auto& i : results) {
+    checkInsert(_extraSet, i->name());
+    checkNotFound(_jouyouSet, i->name());
+    checkNotFound(_jinmeiSet, i->name());
+    _extraKanji.push_back(i);
   }
 }
 
@@ -254,23 +218,64 @@ Levels KanjiLists::getLevel(const std::string& k) const {
   return Levels::None;
 }
 
-int ExtraKanji::toInt(const KanjiList::List& l, int i) {
-  const std::string& s = l[i];
-  try {
-    return std::stoi(s);
-  } catch (...) {
-    throw std::invalid_argument("failed to pasrse token " + std::to_string(i) + " - string was: " + s);
+KanjiLists::List FileListKanji::fromFile(const KanjiLists& k, Types type, const fs::path& file) {
+  assert(type != Types::Other);
+  if (!fs::is_regular_file(file)) usage("can't find file: " + file.string());
+  std::ifstream f(file);
+  std::string line;
+  std::map<int, int> colMap;
+  KanjiLists::List results;
+  while (std::getline(f, line)) {
+    std::stringstream ss(line);
+    int pos = 0;
+    // first line should be headers, don't catch exceptions for first line since whole file would be a problem
+    if (colMap.empty())
+      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+        auto i = ColumnMap.find(token);
+        if (i == ColumnMap.end()) throw std::domain_error("unrecognized column: " + token);
+        if (!colMap.insert(std::pair(pos, i->second)).second) throw std::domain_error("duplicate column: " + token);
+      }
+    else
+      try {
+        for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+          auto i = colMap.find(pos);
+          if (i == colMap.end()) throw std::out_of_range("too many columns");
+          columns[i->second] = token;
+        }
+        switch (type) {
+        case Types::Jouyou: results.push_back(std::make_shared<JouyouKanji>(k)); break;
+        case Types::Jinmei: results.push_back(std::make_shared<JinmeiKanji>(k)); break;
+        default: results.push_back(std::make_shared<ExtraKanji>(k)); break;
+        }
+      } catch (const std::exception& e) {
+        std::cerr << "got exception: " << e.what() << " while processing " << file.string() << " line: " << line << '\n';
+      }
   }
+  return results;
 }
 
-Grades JouyouKanji::getGrade(const std::string& g) {
-  if (g == "S") return Grades::S;
-  if (g == "6") return Grades::G6;
-  if (g == "5") return Grades::G5;
-  if (g == "4") return Grades::G4;
-  if (g == "3") return Grades::G3;
-  if (g == "2") return Grades::G2;
-  if (g == "1") return Grades::G1;
+std::array<std::string, FileListKanji::MaxIndex> FileListKanji::columns;
+
+std::map<std::string, int> FileListKanji::ColumnMap = {
+  {"Number", Number},   {"Name", Name},   {"Radical", Radical}, {"OldName", OldName}, {"Year", Year},
+  {"Strokes", Strokes}, {"Grade", Grade}, {"Meaning", Meaning}, {"Reading", Reading}, {"Reason", Reason}};
+
+JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
+  if (s == "Names") return Reasons::Names;
+  if (s == "Print") return Reasons::Print;
+  if (s == "Moved") return Reasons::Moved;
+  if (s == "Variant") return Reasons::Variant;
+  return Reasons::Other;
+}
+
+Grades JouyouKanji::getGrade(const std::string& s) {
+  if (s == "S") return Grades::S;
+  if (s == "6") return Grades::G6;
+  if (s == "5") return Grades::G5;
+  if (s == "4") return Grades::G4;
+  if (s == "3") return Grades::G3;
+  if (s == "2") return Grades::G2;
+  if (s == "1") return Grades::G1;
   return Grades::None;
 }
 
