@@ -240,7 +240,8 @@ KanjiLists::List FileListKanji::fromFile(const KanjiLists& k, Types type, const 
   while (std::getline(f, line)) {
     std::stringstream ss(line);
     int pos = 0;
-    // first line should be headers, don't catch exceptions for first line since whole file would be a problem
+    // first line should be headers, don't catch exceptions for first line since
+    // whole file would be a problem
     if (colMap.empty())
       for (std::string token; std::getline(ss, token, '\t'); ++pos) {
         auto i = ColumnMap.find(token);
