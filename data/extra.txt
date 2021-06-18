@@ -11,15 +11,15 @@ Number	Name	Radical	Strokes	Meaning	Reading
 10	囁	口	21	whisper	ショウ、ささや-く
 11	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
 12	鶺	鳥	21	wagtail	セキ
-13	雙	隹	18	pair	ソウ、たぐい、ならぶ、ふたつ、ふた-
-14	鄲	邑	15	place name	タン
-15	痔	疒	11	piles	ヂ、ジ、しもがさ
-16	梃	木	11	lever	チョウ、テイ、てこ、つえ
-17	慟	心	14	be sad	ドウ、トウ、なげ-く
-18	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
-19	屁	尸	7	fart	ヒ、へ、おなら
-20	騙	馬	19	deceive	ヘン、かた-る、だま-す
-21	蝿	虫	15	fly	ヨウ、はえ、はい
+13	鄲	邑	15	place name	タン
+14	痔	疒	11	piles	ヂ、ジ、しもがさ
+15	梃	木	11	lever	チョウ、テイ、てこ、つえ
+16	慟	心	14	be sad	ドウ、トウ、なげ-く
+17	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
+18	屁	尸	7	fart	ヒ、へ、おなら
+19	騙	馬	19	deceive	ヘン、かた-る、だま-す
+20	蝿	虫	15	fly	ヨウ、はえ、はい
+21	孕	子	5	become pregnant	ヨウ、はらむ
 22	泪	水	8	tears	ルイ、レイ、なみだ
 23	鴒	鳥	16	wagtail	レイ
 24	朧	月	20	haziness	ロウ、おぼろ

@@ -7,7 +7,7 @@ using namespace kanji;
 constexpr std::array<Grades, 8> grades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
                                           Grades::G5, Grades::G6, Grades::S,  Grades::None};
 constexpr std::array<Levels, 6> levels = {Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
-constexpr std::array<Types, 4> types = {Types::Jouyou, Types::Jinmei, Types::Extra, Types::Other};
+constexpr std::array<Types, 5> types = {Types::Jouyou, Types::Jinmei, Types::Extra, Types::Other, Types::None};
 
 void noFreq(int f, bool brackets = false) {
   if (f) {
@@ -21,6 +21,7 @@ void noFreq(int f, bool brackets = false) {
 }
 
 void countGrades(const KanjiLists::List& l) {
+  std::cout << "<<< Grade breakdown:\n";
   int all = 0;
   for (auto i : grades) {
     const auto c = std::count_if(l.begin(), l.end(), [i](const auto& x) { return x->grade() == i; });
@@ -32,10 +33,11 @@ void countGrades(const KanjiLists::List& l) {
       std::cout << '\n';
     }
   }
-  std::cout << ">>> Total for all grades: " << all << '\n';
+  std::cout << ">>>   Total for all grades: " << all << '\n';
 }
 
 void countLevels(const std::vector<const KanjiLists::List*>& lists) {
+  std::cout << "<<< Level breakdown:\n";
   int total = 0;
   for (auto level : levels) {
     std::vector<int> counts;
@@ -56,10 +58,10 @@ void countLevels(const std::vector<const KanjiLists::List*>& lists) {
       std::cout << ")\n";
     }
   }
-  std::cout << ">>> Total for all levels: " << total << '\n';
+  std::cout << ">>>   Total for all levels: " << total << '\n';
 }
 
-void count(const std::vector<const KanjiLists::List*>& lists, const char* name, bool pred(const KanjiLists::Entry&)) {
+template<typename T> void count(const std::vector<const KanjiLists::List*>& lists, const std::string& name, T pred) {
   std::vector<int> counts;
   for (const auto& l : lists)
     counts.push_back(std::count_if(l->begin(), l->end(), pred));
@@ -79,6 +81,7 @@ int main(int argc, char** argv) {
   lists.push_back(&l.extraKanji());
   lists.push_back(&l.otherKanji());
   decltype(lists) fileLists(lists.begin(), lists.end() - 1);
+  decltype(lists) officialLists(lists.begin(), lists.end() - 2);
   int total = 0;
   for (const auto& l : lists)
     total += l->size();
@@ -88,11 +91,19 @@ int main(int argc, char** argv) {
     std::cout << types[i] << ' ' << lists[i]->size();
   }
   std::cout << ")\n";
-  count(lists, "NF (no-frequency)", [](const KanjiLists::Entry& x) { return !x->frequency(); });
-  count(lists, "Old Forms", [](const KanjiLists::Entry& x) { return x->oldName().has_value(); });
-  count(fileLists, "Has Strokes", [](const KanjiLists::Entry& x) {
-    return static_cast<const FileListKanji&>(*x).strokes() != 0;
-  });
+  count(lists, "NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
+  count(lists, "Old Forms", [](const auto& x) { return x->oldName().has_value(); });
+  count(fileLists, "Has Strokes", [](const auto& x) { return static_cast<const FileListKanji&>(*x).strokes() != 0; });
+  // some old kanjis should have a non-zero frequency
+  count(officialLists, "Old Has Frequency", [&l](const KanjiLists::Entry& x) { return x->oldFrequency(l) != 0; });
+  // some old kanjis have stroke counts
+  count(officialLists, "Old Has Strokes", [&l](const KanjiLists::Entry& x) { return x->oldStrokes(l) != 0; });
+  // no old kanjis should have a non-None level
+  count(officialLists, "Old Has Level", [&l](const KanjiLists::Entry& x) { return x->oldLevel(l) != Levels::None; });
+  // check if old kanjis all have
+  for (auto i : types)
+    count(officialLists, std::string("Old is type ") + toString(i),
+          [&l, i](const KanjiLists::Entry& x) { return x->oldType(l) == i; });
   countGrades(*lists[0]); // only Jouyou list has Grades
   countLevels(lists);
   // for (const auto& i : *lists[0])

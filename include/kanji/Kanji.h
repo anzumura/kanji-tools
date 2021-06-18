@@ -18,7 +18,8 @@ enum class Levels { N5, N4, N3, N2, N1, None };
 // Type 'Extra' is for kanjis loaded from 'extra.txt' file whereas 'Other' is for other
 // kanjis in 'frequency.txt' file that isn't one of the first 3 types. The extra.txt file
 // should only contain kanji that are not in jouyou.txt, jinmei.txt or frequency.txt.
-enum class Types { Jouyou, Jinmei, Extra, Other };
+// 'None' type is for a Kanji that isn't any of the previous 4 types.
+enum class Types { Jouyou, Jinmei, Extra, Other, None };
 
 const char* toString(Grades);
 const char* toString(Levels);
@@ -66,6 +67,13 @@ public:
     auto i = _strokes.find(name);
     return i == _strokes.end() ? 0 : i->second;
   }
+  Types getType(const std::string& name) const {
+    if (_jouyouSet.find(name) != _jouyouSet.end()) return Types::Jouyou;
+    if (_jinmeiSet.find(name) != _jinmeiSet.end()) return Types::Jinmei;
+    if (_extraSet.find(name) != _extraSet.end()) return Types::Extra;
+    if (_otherSet.find(name) != _otherSet.end()) return Types::Other;
+    return Types::None;
+  }
 private:
   static std::filesystem::path getDataDir(int, char**);
   static void checkInsert(KanjiList::Set&, const std::string&);
@@ -98,6 +106,8 @@ private:
   KanjiList::Set _jinmeiSet;
   KanjiList::Set _extraSet;
   KanjiList::Set _otherSet;
+  KanjiList::Set _jouyouOldSet;
+  KanjiList::Set _jinmeiOldSet;
 };
 
 class Kanji {
@@ -111,6 +121,27 @@ public:
   virtual Types type() const { return Types::Other; }
   virtual Grades grade() const { return Grades::None; }
   virtual OptString oldName() const { return {}; }
+  // helper functions for getting information on 'oldValue' (旧字体) kanjis
+  int oldFrequency(const KanjiLists& k) const {
+    auto i = oldName();
+    if (i.has_value()) return k.getFrequency(*i);
+    return 0;
+  }
+  Levels oldLevel(const KanjiLists& k) const {
+    auto i = oldName();
+    if (i.has_value()) return k.getLevel(*i);
+    return Levels::None;
+  }
+  int oldStrokes(const KanjiLists& k) const {
+    auto i = oldName();
+    if (i.has_value()) return k.getStrokes(*i);
+    return 0;
+  }
+  Types oldType(const KanjiLists& k) const {
+    auto i = oldName();
+    if (i.has_value()) return k.getType(*i);
+    return Types::None;
+  }
 
   int number() const { return _number; }
   const std::string& name() const { return _name; }
