@@ -7,7 +7,8 @@ using namespace kanji;
 constexpr std::array<Grades, 8> grades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
                                           Grades::G5, Grades::G6, Grades::S,  Grades::None};
 constexpr std::array<Levels, 6> levels = {Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
-constexpr std::array<Types, 5> types = {Types::Jouyou, Types::Jinmei, Types::Extra, Types::Other, Types::None};
+constexpr std::array<Types, 6> types = {Types::Jouyou, Types::Jinmei, Types::Extra,
+                                        Types::LinkedJinmei,  Types::Other,  Types::None};
 
 void noFreq(int f, bool brackets = false) {
   if (f) {
@@ -79,9 +80,10 @@ int main(int argc, char** argv) {
   lists.push_back(&l.jouyouKanji());
   lists.push_back(&l.jinmeiKanji());
   lists.push_back(&l.extraKanji());
+  lists.push_back(&l.linkedJinmeiKanji());
   lists.push_back(&l.otherKanji());
-  decltype(lists) fileLists(lists.begin(), lists.end() - 1);
-  decltype(lists) officialLists(lists.begin(), lists.end() - 2);
+  decltype(lists) mayHaveOld(lists.begin(), lists.begin() + 2);
+  decltype(lists) hasRadical(lists.begin(), lists.begin() + 3);
   int total = 0;
   for (const auto& l : lists)
     total += l->size();
@@ -92,18 +94,18 @@ int main(int argc, char** argv) {
   }
   std::cout << ")\n";
   count(lists, "NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
-  count(lists, "Old Forms", [](const auto& x) { return x->oldName().has_value(); });
-  count(fileLists, "Has Strokes", [](const auto& x) { return static_cast<const FileListKanji&>(*x).strokes() != 0; });
+  count(lists, "Has Strokes", [](const auto& x) { return x->strokes() != 0; });
+  count(mayHaveOld, "Old Forms", [](const auto& x) { return x->oldName().has_value(); });
   // some old kanjis should have a non-zero frequency
-  count(officialLists, "Old Has Frequency", [&l](const KanjiLists::Entry& x) { return x->oldFrequency(l) != 0; });
+  count(mayHaveOld, "  Old Has Frequency", [&l](const KanjiLists::Entry& x) { return x->oldFrequency(l) != 0; });
   // some old kanjis have stroke counts
-  count(officialLists, "Old Has Strokes", [&l](const KanjiLists::Entry& x) { return x->oldStrokes(l) != 0; });
+  count(mayHaveOld, "  Old Has Strokes", [&l](const KanjiLists::Entry& x) { return x->oldStrokes(l) != 0; });
   // no old kanjis should have a non-None level
-  count(officialLists, "Old Has Level", [&l](const KanjiLists::Entry& x) { return x->oldLevel(l) != Levels::None; });
+  count(mayHaveOld, "  Old Has Level", [&l](const KanjiLists::Entry& x) { return x->oldLevel(l) != Levels::None; });
   // check if old kanjis all have
   for (auto i : types)
-    count(officialLists, std::string("Old is type ") + toString(i),
-          [&l, i](const KanjiLists::Entry& x) { return x->oldType(l) == i; });
+    count(mayHaveOld, std::string("  Old is type ") + toString(i),
+          [&l, i](const KanjiLists::Entry& x) { return x->oldName().has_value() && x->oldType(l) == i; });
   countGrades(*lists[0]); // only Jouyou list has Grades
   countLevels(lists);
   // for (const auto& i : *lists[0])
