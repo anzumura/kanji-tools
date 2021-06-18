@@ -15,13 +15,15 @@ namespace kanji {
 
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
 enum class Levels { N5, N4, N3, N2, N1, None };
-// 'LinkedJinmei' is used for official Jinmei kanji that are old/alternative forms of regular
-// Jouyou kanji or other Jinmei kanji - Jouyou linked ones are loaded from 'linked-jinmei.txt'.
-// 'Extra' is for kanjis loaded from 'extra.txt' file whereas 'Other' is for other
-// kanjis in 'frequency.txt' file that isn't one of the first 3 types. The extra.txt file
-// should only contain kanji that are not in jouyou.txt, jinmei.txt or frequency.txt.
-// 'None' type is for a Kanji that isn't any of the previous 4 types.
-enum class Types { Jouyou, Jinmei, LinkedJinmei, Extra, Other, None };
+// Types represents the type of Kanji:
+// - Jouyou: 2136 official Jouyou kanji
+// - Jinmei: 633 official Jinmei kanji
+// - LinkedJinmei: 230 more Jinmei kanji that are old/alternative forms of Jouyou (212) or Jinmei (18)
+// - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
+// - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
+// - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
+// - None: used as a type for a kanji that hasn't been loaded
+enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, None };
 
 const char* toString(Grades);
 const char* toString(Levels);
@@ -29,6 +31,14 @@ const char* toString(Types);
 inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os << toString(x); }
 inline std::ostream& operator<<(std::ostream& os, const Levels& x) { return os << toString(x); }
 inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
+
+// helper functions to get the string length in encoded charaters instead of bytes
+inline size_t length(const char* s) {
+  size_t len = 0;
+  while (*s) len += (*s++ & 0xc0) != 0x80;
+  return len;
+}
+inline size_t length(const std::string& s) { return length(s.c_str()); }
 
 class KanjiList {
 public:
@@ -46,7 +56,7 @@ public:
   const List& list() const { return _list; }
   const std::string name;
   const Levels level;
-  static void print(const List&, const std::string& type, const std::string& group);
+  static void print(const List&, const std::string& type, const std::string& group, bool isError = false);
 private:
   static Set uniqueNames; // populated and used by lists that specify a non-None level
   List _list;
@@ -62,8 +72,9 @@ public:
   const List& jouyouKanji() const { return _jouyouKanji; }
   const List& jinmeiKanji() const { return _jinmeiKanji; }
   const List& linkedJinmeiKanji() const { return _linkedJinmeiKanji; }
-  const List& extraKanji() const { return _extraKanji; }
+  const List& linkedOldKanji() const { return _linkedOldKanji; }
   const List& otherKanji() const { return _otherKanji; }
+  const List& extraKanji() const { return _extraKanji; }
 
   int getFrequency(const std::string& name) const { return frequency.get(name); }
   Levels getLevel(const std::string&) const;
@@ -75,8 +86,9 @@ public:
     if (_jouyouMap.find(name) != _jouyouMap.end()) return Types::Jouyou;
     if (_jinmeiMap.find(name) != _jinmeiMap.end()) return Types::Jinmei;
     if (_linkedJinmeiMap.find(name) != _linkedJinmeiMap.end()) return Types::LinkedJinmei;
-    if (_extraMap.find(name) != _extraMap.end()) return Types::Extra;
+    if (_linkedOldMap.find(name) != _linkedOldMap.end()) return Types::LinkedOld;
     if (_otherMap.find(name) != _otherMap.end()) return Types::Other;
+    if (_extraMap.find(name) != _extraMap.end()) return Types::Extra;
     return Types::None;
   }
   bool isOldJouyou(const std::string& name) const { return _jouyouOldSet.find(name) != _jouyouOldSet.end(); }
@@ -88,10 +100,12 @@ private:
   static void checkInsert(KanjiList::Set&, const std::string&);
   static void checkNotFound(const Map&, const Entry&);
   static void checkNotFound(const KanjiList::Set&, const std::string&);
+  void loadStrokes();
   void populateJouyou();
   void populateJinmei();
   void populateExtra();
   void processList(const KanjiList&);
+  void checkStrokes() const;
 
   const std::filesystem::path data;
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
@@ -110,14 +124,16 @@ private:
   List _jouyouKanji;
   List _jinmeiKanji;
   List _linkedJinmeiKanji;
-  List _extraKanji;
+  List _linkedOldKanji;
   List _otherKanji;
+  List _extraKanji;
   // allow lookup by name
   Map _jouyouMap;
   Map _jinmeiMap;
   Map _linkedJinmeiMap;
-  Map _extraMap;
+  Map _linkedOldMap;
   Map _otherMap;
+  Map _extraMap;
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)
   KanjiList::Set _jouyouOldSet;
   KanjiList::Set _jinmeiOldSet;
@@ -126,7 +142,7 @@ private:
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
-  // constructor for Kanji found in frequency.txt that weren't found in one of the other 3 type files
+  // constructor for Kanji found in frequency.txt that weren't found in one of the other files
   Kanji(const KanjiLists& k, int number, const std::string& name, Levels level = Levels::None)
     : _number(number), _name(name), _strokes(k.getStrokes(name)), _level(level), _frequency(k.getFrequency(name)) {}
   virtual ~Kanji() = default;
@@ -177,14 +193,30 @@ private:
 
 inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
 
-class LinkedJinmeiKanji : public Kanji {
-public:
-  LinkedJinmeiKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
+class LinkedKanji : public Kanji {
+protected:
+  LinkedKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
     : Kanji(k, number, name), _kanji(kanji) {}
 
   const KanjiLists::Entry& kanji() const { return _kanji; }
 private:
   const KanjiLists::Entry _kanji;
+};
+
+class LinkedJinmeiKanji : public LinkedKanji {
+public:
+  LinkedJinmeiKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
+    : LinkedKanji(k, number, name, kanji) {}
+
+  Types type() const override { return Types::LinkedJinmei; }
+};
+
+class LinkedOldKanji : public LinkedKanji {
+public:
+  LinkedOldKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
+    : LinkedKanji(k, number, name, kanji) {}
+
+  Types type() const override { return Types::LinkedOld; }
 };
 
 // FileListKanji is the base class for kanjis loaded from 'jouyou.txt', 'jinmei.txt' and 'extra.txt' files
