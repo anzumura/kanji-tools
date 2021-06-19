@@ -103,7 +103,9 @@ KanjiList::KanjiList(const fs::path& p, Levels l)
 
 void KanjiList::print(const List& l, const std::string& type, const std::string& group, bool isError) {
   if (!l.empty()) {
-    std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type << " in " << group << ':';
+    std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
+    if (!group.empty()) std::cout << " in " << group;
+    std::cout << ':';
     for (const auto& i : l)
       std::cout << ' ' << i;
     std::cout << '\n';
@@ -126,16 +128,19 @@ KanjiLists::KanjiLists(int argc, char** argv)
   checkStrokes();
 }
 
-void KanjiLists::checkInsert(Map& s, const Entry& i) {
-  if (!s.insert(std::make_pair(i->name(), i)).second) std::cerr << "ERROR --- failed to insert " << *i << " into map\n";
+void KanjiLists::checkInsert(List& s, const Entry& i) {
+  if (_map.insert(std::make_pair(i->name(), i)).second)
+    s.push_back(i);
+  else
+    std::cerr << "ERROR --- failed to insert " << *i << " into map\n";
+}
+
+void KanjiLists::checkNotFound(const Entry& i) {
+  if (_map.find(i->name()) != _map.end()) std::cerr << "ERROR --- " << *i << " already in map\n";
 }
 
 void KanjiLists::checkInsert(KanjiList::Set& s, const std::string& n) {
   if (!s.insert(n).second) std::cerr << "ERROR --- failed to insert " << n << " into set\n";
-}
-
-void KanjiLists::checkNotFound(const Map& s, const Entry& i) {
-  if (s.find(i->name()) != s.end()) std::cerr << "ERROR --- " << *i << " already in map\n";
 }
 
 void KanjiLists::checkNotFound(const KanjiList::Set& s, const std::string& n) {
@@ -181,109 +186,96 @@ void KanjiLists::populateJouyou() {
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != Grades::None);
-    checkInsert(_jouyouMap, i);
+    checkInsert(_jouyouKanji, i);
     if (i->oldName().has_value()) checkInsert(_jouyouOldSet, *i->oldName());
-    _jouyouKanji.push_back(i);
   }
   // populate _linkedJinmeiKanji that are linked to Jouyou
   fs::path p(data / LinkedJinmei);
   if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
   std::ifstream f(p);
   std::string line;
-  KanjiList::List notInOld;
+  KanjiList::List found, notFound;
   int count = 0;
   while (std::getline(f, line)) {
     std::stringstream ss(line);
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
-      const auto i = _jouyouMap.find(jouyou);
-      if (i == _jouyouMap.end())
+      const auto i = _map.find(jouyou);
+      if (i == _map.end())
         std::cerr << "ERROR --- can't find " << jouyou << " while processing " << p.string() << '\n';
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
-        checkInsert(_linkedJinmeiMap, k);
-        _linkedJinmeiKanji.push_back(k);
-        if (_jouyouOldSet.find(linked) == _jouyouOldSet.end()) notInOld.emplace_back(linked);
+        checkInsert(_linkedJinmeiKanji, k);
+        if (_jouyouOldSet.find(linked) == _jouyouOldSet.end()) notFound.emplace_back(linked);
+        else found.emplace_back(linked);
       }
     } else
       std::cerr << "ERROR --- bad line in " << p.string() << ": " << line << '\n';
   }
-  KanjiList::print(notInOld, "kanji that are not 'old jouyou'", p.stem().string());
+  KanjiList::print(found, "kanji that are 'old jouyou'", p.stem().string());
+  KanjiList::print(notFound, "kanji that are not 'old jouyou'", p.stem().string());
+  found.clear();
   // populate _linkedOldKanji (so old Jouyou that are not Linked Jinmei)
   count = 0;
   for (const auto& i : _jouyouKanji)
     if (i->oldName().has_value()) {
-      auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i->oldName(), i);
-      checkInsert(_linkedOldMap, k);
-      _linkedOldKanji.push_back(k);
+      if (_map.find(*i->oldName()) == _map.end()) {
+        auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i->oldName(), i);
+        checkInsert(_linkedOldKanji, k);
+        found.push_back(*i->oldName());
+      }
     }
+  KanjiList::print(found, "'old jouyou' that are not " + p.stem().string());
 }
 
 void KanjiLists::populateJinmei() {
   auto results = FileListKanji::fromFile(*this, Types::Jinmei, data / Jinmei);
   for (const auto& i : results) {
-    checkInsert(_jinmeiMap, i);
-    checkNotFound(_jouyouMap, i);
+    checkInsert(_jinmeiKanji, i);
     checkNotFound(_jouyouOldSet, i->name());
     if (i->oldName().has_value()) {
       checkInsert(_jinmeiOldSet, *i->oldName());
-      auto k = std::make_shared<LinkedJinmeiKanji>(*this, _linkedJinmeiMap.size(), *i->oldName(), i);
-      checkInsert(_linkedJinmeiMap, k);
-      _linkedJinmeiKanji.push_back(k);
+      auto k = std::make_shared<LinkedJinmeiKanji>(*this, _linkedJinmeiKanji.size(), *i->oldName(), i);
+      checkInsert(_linkedJinmeiKanji, k);
     }
-    _jinmeiKanji.push_back(i);
   }
 }
 
 void KanjiLists::populateExtra() {
   auto results = FileListKanji::fromFile(*this, Types::Extra, data / Extra);
-  for (const auto& i : results) {
-    checkInsert(_extraMap, i);
-    checkNotFound(_jouyouMap, i);
-    checkNotFound(_jinmeiMap, i);
-    checkNotFound(_linkedJinmeiMap, i);
-    checkNotFound(_linkedOldMap, i);
-    _extraKanji.push_back(i);
-  }
+  for (const auto& i : results)
+    checkInsert(_extraKanji, i);
 }
 
 void KanjiLists::processList(const KanjiList& l) {
-  KanjiList::List jouyouOld;
-  KanjiList::List jinmeiOld;
-  KanjiList::List other;
-  KanjiList::List jinmei;
-  KanjiList::List linkedJinmei;
-  KanjiList::List linkedOld;
+  KanjiList::List jouyouOld, jinmeiOld, other;
+  std::map<Types, KanjiList::List> found;
   auto count = 0;
   for (const auto& i : l.list()) {
-    if (_jouyouMap.find(i) == _jouyouMap.end()) {
-      // keep track of any 'old' kanji in a level or top frequency list
-      if (_jouyouOldSet.find(i) != _jouyouOldSet.end())
-        jouyouOld.push_back(i);
-      else if (_jinmeiOldSet.find(i) != _jinmeiOldSet.end())
-        jinmeiOld.push_back(i);
-      // only add to _otherKanji/_otherMap if not in any other collections
-      if (_jinmeiMap.find(i) != _jinmeiMap.end())
-        jinmei.emplace_back(i);
-      else if (_linkedJinmeiMap.find(i) != _linkedJinmeiMap.end())
-        linkedJinmei.emplace_back(i);
-      else if (_linkedOldMap.find(i) != _linkedOldMap.end())
-        linkedOld.emplace_back(i);
-      else if (_otherMap.find(i) == _otherMap.end()) {
-        auto k = std::make_shared<Kanji>(*this, ++count, i, l.level);
-        // Kanjis in lists (n1 - n5 and frequency) shouldn't be in the '_extraSet'
-        checkNotFound(_extraMap, k);
-        _otherMap.insert(std::make_pair(i, k));
-        _otherKanji.push_back(k);
-        other.emplace_back(i);
-      }
+    // keep track of any 'old' kanji in a level or top frequency list
+    if (_jouyouOldSet.find(i) != _jouyouOldSet.end())
+      jouyouOld.push_back(i);
+    else if (_jinmeiOldSet.find(i) != _jinmeiOldSet.end())
+      jinmeiOld.push_back(i);
+    auto j = _map.find(i);
+    if (j != _map.end()) {
+      if (j->second->type() != Types::Jouyou)
+        found[j->second->type()].emplace_back(i);
+    } else {
+      // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
+      auto k = std::make_shared<Kanji>(*this, ++count, i, l.level);
+      _map.insert(std::make_pair(i, k));
+      _otherKanji.push_back(k);
+      other.emplace_back(i);
     }
   }
   KanjiList::print(jouyouOld, "Jouyou Old", l.name);
   KanjiList::print(jinmeiOld, "Jinmei Old", l.name);
-  KanjiList::print(linkedOld, "Linked Old", l.name);
+  KanjiList::print(found[Types::LinkedOld], "Linked Old", l.name);
   KanjiList::print(other, std::string("non-Jouyou/non-Jinmei") + (l.level == Levels::None ? "/non-JLPT" : ""), l.name);
+  // l.level is None when processing 'frequency.txt' file (so not a JLPT level file)
   if (l.level == Levels::None) {
-    std::vector lists = {std::make_pair(&jinmei, ""), std::make_pair(&linkedJinmei, "Linked ")};
+    std::vector lists = {std::make_pair(&found[Types::Jinmei], ""),
+                         std::make_pair(&found[Types::LinkedJinmei], "Linked ")};
     for (const auto& i : lists) {
       KanjiList::List jlptJinmei, otherJinmei;
       for (const auto& j : *i.first)
@@ -295,8 +287,8 @@ void KanjiLists::processList(const KanjiList& l) {
       KanjiList::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", l.name);
     }
   } else {
-    KanjiList::print(jinmei, "Jinmei", l.name);
-    KanjiList::print(linkedJinmei, "Linked Jinmei", l.name);
+    KanjiList::print(found[Types::Jinmei], "Jinmei", l.name);
+    KanjiList::print(found[Types::LinkedJinmei], "Linked Jinmei", l.name);
   }
 }
 

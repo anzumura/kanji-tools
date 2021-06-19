@@ -56,7 +56,7 @@ public:
   const List& list() const { return _list; }
   const std::string name;
   const Levels level;
-  static void print(const List&, const std::string& type, const std::string& group, bool isError = false);
+  static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
 private:
   static Set uniqueNames; // populated and used by lists that specify a non-None level
   List _list;
@@ -76,29 +76,27 @@ public:
   const List& otherKanji() const { return _otherKanji; }
   const List& extraKanji() const { return _extraKanji; }
 
+  std::optional<const Entry> find(const std::string& name) const {
+    auto i = _map.find(name);
+    if (i == _map.end()) return {};
+    return i->second;
+  }
+  Types getType(const std::string& name) const;
+  bool isOldJouyou(const std::string& name) const { return _jouyouOldSet.find(name) != _jouyouOldSet.end(); }
+  bool isOldJinmei(const std::string& name) const { return _jinmeiOldSet.find(name) != _jinmeiOldSet.end(); }
+  bool isOldName(const std::string& name) const { return isOldJouyou(name) || isOldJinmei(name); }
+  // helper functions during loading
   int getFrequency(const std::string& name) const { return frequency.get(name); }
   Levels getLevel(const std::string&) const;
   int getStrokes(const std::string& name) const {
     auto i = _strokes.find(name);
     return i == _strokes.end() ? 0 : i->second;
   }
-  Types getType(const std::string& name) const {
-    if (_jouyouMap.find(name) != _jouyouMap.end()) return Types::Jouyou;
-    if (_jinmeiMap.find(name) != _jinmeiMap.end()) return Types::Jinmei;
-    if (_linkedJinmeiMap.find(name) != _linkedJinmeiMap.end()) return Types::LinkedJinmei;
-    if (_linkedOldMap.find(name) != _linkedOldMap.end()) return Types::LinkedOld;
-    if (_otherMap.find(name) != _otherMap.end()) return Types::Other;
-    if (_extraMap.find(name) != _extraMap.end()) return Types::Extra;
-    return Types::None;
-  }
-  bool isOldJouyou(const std::string& name) const { return _jouyouOldSet.find(name) != _jouyouOldSet.end(); }
-  bool isOldJinmei(const std::string& name) const { return _jinmeiOldSet.find(name) != _jinmeiOldSet.end(); }
-  bool isOldName(const std::string& name) const { return isOldJouyou(name) || isOldJinmei(name); }
 private:
   static std::filesystem::path getDataDir(int, char**);
-  static void checkInsert(Map&, const Entry&);
+  void checkInsert(List&, const Entry&);
+  void checkNotFound(const Entry&);
   static void checkInsert(KanjiList::Set&, const std::string&);
-  static void checkNotFound(const Map&, const Entry&);
   static void checkNotFound(const KanjiList::Set&, const std::string&);
   void loadStrokes();
   void populateJouyou();
@@ -120,7 +118,7 @@ private:
   // contains stroke counts followed by one or more lines each with a single kanji that has the given
   // number of strokes.
   std::map<std::string, int> _strokes;
-  // 4 lists of kanjis (lists correspond to 'Types' enum)
+  // lists of kanjis corresponding to 'Types' enum
   List _jouyouKanji;
   List _jinmeiKanji;
   List _linkedJinmeiKanji;
@@ -128,12 +126,7 @@ private:
   List _otherKanji;
   List _extraKanji;
   // allow lookup by name
-  Map _jouyouMap;
-  Map _jinmeiMap;
-  Map _linkedJinmeiMap;
-  Map _linkedOldMap;
-  Map _otherMap;
-  Map _extraMap;
+  Map _map;
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)
   KanjiList::Set _jouyouOldSet;
   KanjiList::Set _jinmeiOldSet;
@@ -192,6 +185,12 @@ private:
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
+
+inline Types KanjiLists::getType(const std::string& name) const {
+  auto i = _map.find(name);
+  if (i == _map.end()) return Types::None;
+  return i->second->type();
+}
 
 class LinkedKanji : public Kanji {
 protected:
