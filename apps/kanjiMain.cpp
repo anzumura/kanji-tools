@@ -22,7 +22,7 @@ void noFreq(int f, bool brackets = false) {
 }
 
 void countGrades(const KanjiLists::List& l) {
-  std::cout << "<<< Grade breakdown:\n";
+  std::cout << ">>> Grade breakdown:\n";
   int all = 0;
   for (auto i : grades) {
     const auto c = std::count_if(l.begin(), l.end(), [i](const auto& x) { return x->grade() == i; });
@@ -38,7 +38,7 @@ void countGrades(const KanjiLists::List& l) {
 }
 
 void countLevels(const std::vector<const KanjiLists::List*>& lists) {
-  std::cout << "<<< Level breakdown:\n";
+  std::cout << ">>> Level breakdown:\n";
   int total = 0;
   for (auto level : levels) {
     std::vector<int> counts;
@@ -60,6 +60,42 @@ void countLevels(const std::vector<const KanjiLists::List*>& lists) {
     }
   }
   std::cout << ">>>   Total for all levels: " << total << '\n';
+}
+
+void countRadicals(const std::vector<const KanjiLists::List*>& lists) {
+  std::cout << ">>> Radical breakdown:\n";
+  std::map<std::string, KanjiLists::List> radicals;
+  for (const auto& i : lists) {
+    KanjiLists::List sorted(*i);
+    std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
+    for (const auto& j : sorted)
+      radicals[static_cast<const FileListKanji&>(*j).radical()].push_back(j);
+  }
+  int jouyou = 0, jinmei = 0, extra = 0;
+  for (const auto& i : radicals) {
+    int jo = 0, ji = 0, ex = 0;
+    for (const auto& j : i.second)
+      switch (j->type()) {
+      case Types::Jouyou: ++jo; break;
+      case Types::Jinmei: ++ji; break;
+      default: ++ex; break;
+      }
+    std::cout << ">>>   " << i.first << std::setw(4) << i.second.size() << " (" << jo << ' ' << ji << ' ' << ex << "):";
+    jouyou += jo;
+    jinmei += ji;
+    extra += ex;
+    Types oldType = i.second[0]->type();
+    for (const auto& j : i.second) {
+      if (j->type() != oldType) {
+        std::cout << ',';
+        oldType = j->type();
+      }
+      std::cout << ' ' << *j;
+    }
+    std::cout << '\n';
+  }
+  std::cout << ">>>   Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou "
+            << jouyou << " Jinmei " << jinmei << " Extra " << extra << ")\n";
 }
 
 template<typename T> void count(const std::vector<const KanjiLists::List*>& lists, const std::string& name, T pred) {
@@ -110,6 +146,7 @@ int main(int argc, char** argv) {
           [&l, i](const KanjiLists::Entry& x) { return x->oldName().has_value() && x->oldType(l) == i; });
   countGrades(*lists[0]); // only Jouyou list has Grades
   countLevels(lists);
+  countRadicals(hasRadical);
   // const auto& k = (*lists[0])[0];
   // std::cout << "First Jouyou: " << k->name() << " - len: " << length(k->name()) << '\n';
   // for (const auto& i : *lists[0])
