@@ -44,9 +44,9 @@ Total | 2136  | 103 | 181 | 361 | 415 | 911 | 165
 
 Total for all grades is the same as the total Jōyō (2136) and all are in the Top 2501 frequency list except for 99 *S* (Secondary School) kanjis.
 
-Some helpful commands for re-ordering columns, converting double byte numbers to single byte and re-numbering (assuming there is a header row and the first column should be numbered starting at 1):
+Helpful commands for re-ordering columns, re-numbering (assuming header and first column should be numbered starting at 1) and converting double byte to single byte:
 ```
 awk -F'[\t]' -v OFS="\t" '{print $1,$2,$4,$5,$3,$6,$7,$8,$9}' file
+awk -F'[\t]' -v OFS="\t" 'NR==1{print}NR>1{for(i=1;i<=NF;i++) printf "%s",(i>1 ? OFS $i : NR-1);print ""}' file
 cat file|tr '１２３４５６７８９０' '1234567890'|tr -d '画'
-awk -F'[\t]' -v OFS="\t" '{if (NR>1){for(i=1;i<=NF;i++) printf "%s",(i>1 ? OFS $i : NR-1);print ""} else print $0}'
 ```

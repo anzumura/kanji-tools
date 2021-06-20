@@ -1,183 +1,18 @@
 #ifndef KANJI_KANJI_H
 #define KANJI_KANJI_H
 
+#include <kanji/Data.h>
+
 #include <array>
-#include <filesystem>
-#include <iostream>
-#include <map>
-#include <memory>
-#include <optional>
-#include <set>
-#include <string>
-#include <vector>
 
 namespace kanji {
-
-enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
-enum class Levels { N5, N4, N3, N2, N1, None };
-// Types represents the type of Kanji:
-// - Jouyou: 2136 official Jouyou kanji
-// - Jinmei: 633 official Jinmei kanji
-// - LinkedJinmei: 230 more Jinmei kanji that are old/variant forms of Jouyou (212) or Jinmei (18)
-// - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
-// - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
-// - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
-// - None: used as a type for a kanji that hasn't been loaded
-enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, None };
-
-const char* toString(Grades);
-const char* toString(Levels);
-const char* toString(Types);
-inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os << toString(x); }
-inline std::ostream& operator<<(std::ostream& os, const Levels& x) { return os << toString(x); }
-inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
-
-// helper functions to get the string length in encoded charaters instead of bytes
-inline size_t length(const char* s) {
-  size_t len = 0;
-  while (*s)
-    len += (*s++ & 0xc0) != 0x80;
-  return len;
-}
-inline size_t length(const std::string& s) { return length(s.c_str()); }
-
-class KanjiList {
-public:
-  using List = std::vector<std::string>;
-  using Map = std::map<std::string, int>;
-  using Set = std::set<std::string>;
-
-  KanjiList(const std::filesystem::path&, Levels = Levels::None);
-  bool exists(const std::string& s) const { return _map.find(s) != _map.end(); }
-  // return 0 for 'not found'
-  int get(const std::string& name) const {
-    auto i = _map.find(name);
-    return i != _map.end() ? i->second : 0;
-  }
-  const List& list() const { return _list; }
-  const std::string name;
-  const Levels level;
-  static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
-private:
-  static Set uniqueNames; // populated and used by lists that specify a non-None level
-  List _list;
-  Map _map;
-};
-
-class KanjiRadical {
-public:
-  using AltForms = std::vector<std::string>;
-
-  KanjiRadical(int number, const std::string& radical, const AltForms& altForms, const std::string& name,
-               const std::string& reading)
-    : _number(number), _radical(radical), _altForms(altForms), _name(name), _reading(reading) {}
-  KanjiRadical(const KanjiRadical&) = default;
-  KanjiRadical& operator=(const KanjiRadical&) = default;
-  bool operator==(const KanjiRadical& rhs) const { return _number == rhs._number; }
-  bool operator<(const KanjiRadical& rhs) const { return _number < rhs._number; }
-
-  int number() const { return _number; }
-  const std::string& radical() const { return _radical; }
-  const AltForms& altForms() const { return _altForms; }
-  const std::string& name() const { return _name; }
-  const std::string& reading() const { return _reading; }
-private:
-  int _number;
-  std::string _radical;
-  AltForms _altForms;
-  std::string _name;
-  std::string _reading;
-};
-
-inline std::ostream& operator<<(std::ostream& os, const KanjiRadical& r) {
-  return os << '[' << std::right << std::setfill('0') << std::setw(3) << r.number() << "] " << r.radical();
-}
-
-class KanjiLists {
-public:
-  KanjiLists(int argc, char** argv);
-  using Entry = std::shared_ptr<class Kanji>;
-  using List = std::vector<Entry>;
-  using Map = std::map<std::string, Entry>;
-  using RadicalMap = std::map<std::string, KanjiRadical>;
-  const List& jouyouKanji() const { return _jouyouKanji; }
-  const List& jinmeiKanji() const { return _jinmeiKanji; }
-  const List& linkedJinmeiKanji() const { return _linkedJinmeiKanji; }
-  const List& linkedOldKanji() const { return _linkedOldKanji; }
-  const List& otherKanji() const { return _otherKanji; }
-  const List& extraKanji() const { return _extraKanji; }
-  const RadicalMap& radicals() const { return _radicals; }
-
-  std::optional<const Entry> find(const std::string& name) const {
-    auto i = _map.find(name);
-    if (i == _map.end()) return {};
-    return i->second;
-  }
-  Types getType(const std::string& name) const;
-  bool isOldJouyou(const std::string& name) const { return _jouyouOldSet.find(name) != _jouyouOldSet.end(); }
-  bool isOldJinmei(const std::string& name) const { return _jinmeiOldSet.find(name) != _jinmeiOldSet.end(); }
-  bool isOldName(const std::string& name) const { return isOldJouyou(name) || isOldJinmei(name); }
-  // helper functions during loading
-  int getFrequency(const std::string& name) const { return frequency.get(name); }
-  Levels getLevel(const std::string&) const;
-  KanjiRadical getRadical(const std::string& radical) const {
-    auto i = _radicals.find(radical);
-    if (i == _radicals.end()) throw std::domain_error("radical not found: " + radical);
-    return i->second;
-  }
-  int getStrokes(const std::string& name) const {
-    auto i = _strokes.find(name);
-    return i == _strokes.end() ? 0 : i->second;
-  }
-private:
-  static std::filesystem::path getDataDir(int, char**);
-  void checkInsert(List&, const Entry&);
-  void checkNotFound(const Entry&);
-  static void checkInsert(KanjiList::Set&, const std::string&);
-  static void checkNotFound(const KanjiList::Set&, const std::string&);
-  void loadRadicals();
-  void loadStrokes();
-  void populateJouyou();
-  void populateJinmei();
-  void populateExtra();
-  void processList(const KanjiList&);
-  void checkStrokes() const;
-
-  const std::filesystem::path data;
-  // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
-  const KanjiList n5;
-  const KanjiList n4;
-  const KanjiList n3;
-  const KanjiList n2;
-  const KanjiList n1;
-  const KanjiList frequency;
-  // '_radicals' is populated from radicals.txt
-  RadicalMap _radicals;
-  // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
-  // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
-  // contains stroke counts followed by one or more lines each with a single kanji that has the given
-  // number of strokes.
-  std::map<std::string, int> _strokes;
-  // lists of kanjis corresponding to 'Types' enum
-  List _jouyouKanji;
-  List _jinmeiKanji;
-  List _linkedJinmeiKanji;
-  List _linkedOldKanji;
-  List _otherKanji;
-  List _extraKanji;
-  // allow lookup by name
-  Map _map;
-  // sets to help during loading (detecting duplicates, print diagnostics, etc.)
-  KanjiList::Set _jouyouOldSet;
-  KanjiList::Set _jinmeiOldSet;
-};
 
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
   // constructor for Kanji found in frequency.txt that weren't found in one of the other files
-  Kanji(const KanjiLists& k, int number, const std::string& name, Levels level = Levels::None)
-    : _number(number), _name(name), _strokes(k.getStrokes(name)), _level(level), _frequency(k.getFrequency(name)) {}
+  Kanji(const Data& d, int number, const std::string& name, Levels level = Levels::None)
+    : _number(number), _name(name), _strokes(d.getStrokes(name)), _level(level), _frequency(d.getFrequency(name)) {}
   virtual ~Kanji() = default;
 
   virtual Types type() const { return Types::Other; }
@@ -191,31 +26,31 @@ public:
   int frequency() const { return _frequency; }
 
   // helper functions for getting information on 'oldValue' (旧字体) kanjis
-  int oldFrequency(const KanjiLists& k) const {
+  int oldFrequency(const Data& d) const {
     auto i = oldName();
-    if (i.has_value()) return k.getFrequency(*i);
+    if (i.has_value()) return d.getFrequency(*i);
     return 0;
   }
-  Levels oldLevel(const KanjiLists& k) const {
+  Levels oldLevel(const Data& d) const {
     auto i = oldName();
-    if (i.has_value()) return k.getLevel(*i);
+    if (i.has_value()) return d.getLevel(*i);
     return Levels::None;
   }
-  int oldStrokes(const KanjiLists& k) const {
+  int oldStrokes(const Data& d) const {
     auto i = oldName();
-    if (i.has_value()) return k.getStrokes(*i);
+    if (i.has_value()) return d.getStrokes(*i);
     return 0;
   }
-  Types oldType(const KanjiLists& k) const {
+  Types oldType(const Data& d) const {
     auto i = oldName();
-    if (i.has_value()) return k.getType(*i);
+    if (i.has_value()) return d.getType(*i);
     return Types::None;
   }
 protected:
   // helper constructor for derived classes (can avoid looking up frequency for 'extra' kanji)
-  Kanji(const KanjiLists& k, int number, const std::string& name, int strokes, bool findFrequency)
-    : _number(number), _name(name), _strokes(strokes), _level(k.getLevel(name)),
-      _frequency(findFrequency ? k.getFrequency(name) : 0) {}
+  Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency)
+    : _number(number), _name(name), _strokes(strokes), _level(d.getLevel(name)),
+      _frequency(findFrequency ? d.getFrequency(name) : 0) {}
 private:
   const int _number;
   const std::string _name;
@@ -226,34 +61,28 @@ private:
 
 inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
 
-inline Types KanjiLists::getType(const std::string& name) const {
-  auto i = _map.find(name);
-  if (i == _map.end()) return Types::None;
-  return i->second->type();
-}
-
 class LinkedKanji : public Kanji {
 protected:
-  LinkedKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
-    : Kanji(k, number, name), _kanji(kanji) {}
+  LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& kanji)
+    : Kanji(d, number, name), _kanji(kanji) {}
 
-  const KanjiLists::Entry& kanji() const { return _kanji; }
+  const Data::Entry& kanji() const { return _kanji; }
 private:
-  const KanjiLists::Entry _kanji;
+  const Data::Entry _kanji;
 };
 
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
-  LinkedJinmeiKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
-    : LinkedKanji(k, number, name, kanji) {}
+  LinkedJinmeiKanji(const Data& d, int number, const std::string& name, const Data::Entry& kanji)
+    : LinkedKanji(d, number, name, kanji) {}
 
   Types type() const override { return Types::LinkedJinmei; }
 };
 
 class LinkedOldKanji : public LinkedKanji {
 public:
-  LinkedOldKanji(const KanjiLists& k, int number, const std::string& name, const KanjiLists::Entry& kanji)
-    : LinkedKanji(k, number, name, kanji) {}
+  LinkedOldKanji(const Data& d, int number, const std::string& name, const Data::Entry& kanji)
+    : LinkedKanji(d, number, name, kanji) {}
 
   Types type() const override { return Types::LinkedOld; }
 };
@@ -267,9 +96,9 @@ public:
   // - 'type' must be Jouyou, Jinmei or Extra
   // - 'file' must have tab separated lines that have the right number of columns for the given type
   // - the first line of 'file' should have column header names that match the names in the 'Columns' enum
-  static KanjiLists::List fromFile(const KanjiLists&, Types type, const std::filesystem::path& file);
+  static Data::List fromFile(const Data&, Types type, const std::filesystem::path& file);
 
-  const KanjiRadical& radical() const { return _radical; }
+  const Radical& radical() const { return _radical; }
   static int toInt(const std::string& s) {
     try {
       return std::stoi(s);
@@ -279,16 +108,28 @@ public:
   }
 protected:
   // list of all supported columns in files
-  enum Columns { Number, Name, Radical, OldName, Year, Strokes, Grade, Meaning, Reading, Reason, MaxIndex };
+  enum Columns {
+    NumberCol,
+    NameCol,
+    RadicalCol,
+    OldNameCol,
+    YearCol,
+    StrokesCol,
+    GradeCol,
+    MeaningCol,
+    ReadingCol,
+    ReasonCol,
+    MaxCol
+  };
   // 'columns' contains list of values for each column after parsing a line (used by 'fromString' method)
-  static std::array<std::string, MaxIndex> columns;
+  static std::array<std::string, MaxCol> columns;
 
-  FileListKanji(const KanjiLists& k, int strokes, bool findFrequency = true)
-    : Kanji(k, toInt(columns[Number]), columns[Name], strokes, findFrequency),
-      _radical(k.getRadical(columns[Radical])) {}
+  FileListKanji(const Data& d, int strokes, bool findFrequency = true)
+    : Kanji(d, toInt(columns[NumberCol]), columns[NameCol], strokes, findFrequency),
+      _radical(d.getRadical(columns[RadicalCol])) {}
 private:
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
-  const KanjiRadical _radical;
+  const Radical _radical;
 };
 
 // OfficialListKanji contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
@@ -298,8 +139,8 @@ public:
   OptString oldName() const override { return _oldName; }
   OptInt year() const { return _year; }
 protected:
-  OfficialListKanji(const KanjiLists& k, int s)
-    : FileListKanji(k, s), _oldName(optString(columns[OldName])), _year(optInt(columns[Year])) {}
+  OfficialListKanji(const Data& d, int s)
+    : FileListKanji(d, s), _oldName(optString(columns[OldNameCol])), _year(optInt(columns[YearCol])) {}
 private:
   static OptString optString(const std::string& s) { return s.empty() ? std::nullopt : std::optional(s); }
   static OptInt optInt(const std::string& s) {
@@ -319,8 +160,8 @@ public:
   // - Moved: moved out of Jouyou into Jinmei
   // - Other: reason listed as その他
   enum class Reasons { Names, Print, Variant, Moved, Other };
-  JinmeiKanji(const KanjiLists& k)
-    : OfficialListKanji(k, k.getStrokes(columns[Name])), _reason(getReason(columns[Reason])) {}
+  JinmeiKanji(const Data& d)
+    : OfficialListKanji(d, d.getStrokes(columns[NameCol])), _reason(getReason(columns[ReasonCol])) {}
 
   Types type() const override { return Types::Jinmei; }
   Reasons reason() const { return _reason; }
@@ -343,17 +184,18 @@ private:
 
 class ExtraKanji : public FileListKanji, public MeaningAndReading {
 public:
-  ExtraKanji(const KanjiLists& k)
-    : FileListKanji(k, toInt(columns[Strokes]), false), MeaningAndReading(columns[Meaning], columns[Reading]) {}
+  ExtraKanji(const Data& d)
+    : FileListKanji(d, toInt(columns[StrokesCol]), false), MeaningAndReading(columns[MeaningCol], columns[ReadingCol]) {
+  }
 
   Types type() const override { return Types::Extra; }
 };
 
 class JouyouKanji : public OfficialListKanji, public MeaningAndReading {
 public:
-  JouyouKanji(const KanjiLists& k)
-    : OfficialListKanji(k, toInt(columns[Strokes])), MeaningAndReading(columns[Meaning], columns[Reading]),
-      _grade(getGrade(columns[Grade])) {}
+  JouyouKanji(const Data& d)
+    : OfficialListKanji(d, toInt(columns[StrokesCol])), MeaningAndReading(columns[MeaningCol], columns[ReadingCol]),
+      _grade(getGrade(columns[GradeCol])) {}
 
   Types type() const override { return Types::Jouyou; }
   Grades grade() const override { return _grade; }

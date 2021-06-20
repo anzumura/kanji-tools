@@ -1,3 +1,4 @@
+#include <kanji/Data.h>
 #include <kanji/Kanji.h>
 
 #include <numeric>
@@ -21,7 +22,7 @@ void noFreq(int f, bool brackets = false) {
   }
 }
 
-void countGrades(const KanjiLists::List& l) {
+void countGrades(const Data::List& l) {
   std::cout << ">>> Grade breakdown:\n";
   int all = 0;
   for (auto i : grades) {
@@ -33,8 +34,8 @@ void countGrades(const KanjiLists::List& l) {
       noFreq(std::count_if(l.begin(), l.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }), true);
       std::cout << " (";
       for (auto level : levels) {
-        const auto gradeLevelCount = std::count_if(
-          l.begin(), l.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
+        const auto gradeLevelCount =
+          std::count_if(l.begin(), l.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
         if (gradeLevelCount) {
           gradeCount -= gradeLevelCount;
           std::cout << level << ' ' << gradeLevelCount;
@@ -47,7 +48,7 @@ void countGrades(const KanjiLists::List& l) {
   std::cout << ">>>   Total for all grades: " << all << '\n';
 }
 
-void countLevels(const std::vector<const KanjiLists::List*>& lists) {
+void countLevels(const std::vector<const Data::List*>& lists) {
   std::cout << ">>> Level breakdown:\n";
   int total = 0;
   for (auto level : levels) {
@@ -72,11 +73,11 @@ void countLevels(const std::vector<const KanjiLists::List*>& lists) {
   std::cout << ">>>   Total for all levels: " << total << '\n';
 }
 
-void countRadicals(const std::vector<const KanjiLists::List*>& lists, const KanjiLists::RadicalMap& allRadicals) {
+void countRadicals(const std::vector<const Data::List*>& lists, const Data::RadicalMap& allRadicals) {
   std::cout << ">>> Radical breakdown - total count for each radical is followed by (Jouyou Jinmei Extra) counts:\n";
-  std::map<KanjiRadical, KanjiLists::List> radicals;
+  std::map<Radical, Data::List> radicals;
   for (const auto& i : lists) {
-    KanjiLists::List sorted(*i);
+    Data::List sorted(*i);
     std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
     for (const auto& j : sorted)
       radicals[static_cast<const FileListKanji&>(*j).radical()].push_back(j);
@@ -108,7 +109,7 @@ void countRadicals(const std::vector<const KanjiLists::List*>& lists, const Kanj
   }
   std::cout << ">>>   Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou "
             << jouyou << " Jinmei " << jinmei << " Extra " << extra << ")\n";
-  std::vector<KanjiRadical> missingRadicals;
+  std::vector<Radical> missingRadicals;
   for (const auto& i : allRadicals)
     if (radicals.find(i.second) == radicals.end()) missingRadicals.push_back(i.second);
   if (!missingRadicals.empty()) {
@@ -119,27 +120,30 @@ void countRadicals(const std::vector<const KanjiLists::List*>& lists, const Kanj
   }
 }
 
-template<typename T> void count(const std::vector<const KanjiLists::List*>& lists, const std::string& name, T pred) {
+template<typename T> void count(const std::vector<const Data::List*>& lists, const std::string& name, T pred) {
   std::vector<int> counts;
   for (const auto& l : lists)
     counts.push_back(std::count_if(l->begin(), l->end(), pred));
-  std::cout << ">>> " << name << ' ' << std::reduce(counts.begin(), counts.end()) << " (";
-  for (int i = 0; i < counts.size(); ++i) {
-    if (i) std::cout << ", ";
-    std::cout << types[i] << ' ' << counts[i];
+  const auto count = std::reduce(counts.begin(), counts.end());
+  if (count) {
+    std::cout << ">>> " << name << ' ' << count << " (";
+    for (int i = 0; i < counts.size(); ++i) {
+      if (i) std::cout << ", ";
+      std::cout << types[i] << ' ' << counts[i];
+    }
+    std::cout << ")\n";
   }
-  std::cout << ")\n";
 }
 
 int main(int argc, char** argv) {
-  KanjiLists l(argc, argv);
-  std::vector<const KanjiLists::List*> lists;
-  lists.push_back(&l.jouyouKanji());
-  lists.push_back(&l.jinmeiKanji());
-  lists.push_back(&l.linkedJinmeiKanji());
-  lists.push_back(&l.linkedOldKanji());
-  lists.push_back(&l.otherKanji());
-  lists.push_back(&l.extraKanji());
+  Data data(argc, argv);
+  std::vector<const Data::List*> lists;
+  lists.push_back(&data.jouyouKanji());
+  lists.push_back(&data.jinmeiKanji());
+  lists.push_back(&data.linkedJinmeiKanji());
+  lists.push_back(&data.linkedOldKanji());
+  lists.push_back(&data.otherKanji());
+  lists.push_back(&data.extraKanji());
   decltype(lists) mayHaveOld(lists.begin(), lists.begin() + 2);
   // linked and other lists don't have radicals right now
   decltype(lists) hasRadical = {lists[0], lists[1], lists[lists.size() - 1]};
@@ -156,18 +160,18 @@ int main(int argc, char** argv) {
   count(lists, "Has Strokes", [](const auto& x) { return x->strokes() != 0; });
   count(mayHaveOld, "Old Forms", [](const auto& x) { return x->oldName().has_value(); });
   // some old kanjis should have a non-zero frequency
-  count(mayHaveOld, "  Old Has Frequency", [&l](const KanjiLists::Entry& x) { return x->oldFrequency(l) != 0; });
+  count(mayHaveOld, "  Old Has Frequency", [&data](const auto& x) { return x->oldFrequency(data) != 0; });
   // some old kanjis have stroke counts
-  count(mayHaveOld, "  Old Has Strokes", [&l](const KanjiLists::Entry& x) { return x->oldStrokes(l) != 0; });
+  count(mayHaveOld, "  Old Has Strokes", [&data](const auto& x) { return x->oldStrokes(data) != 0; });
   // no old kanjis should have a non-None level
-  count(mayHaveOld, "  Old Has Level", [&l](const KanjiLists::Entry& x) { return x->oldLevel(l) != Levels::None; });
+  count(mayHaveOld, "  Old Has Level", [&data](const auto& x) { return x->oldLevel(data) != Levels::None; });
   // old kanjis should only have types of LinkedJinmei, Other or None
   for (auto i : types)
     count(mayHaveOld, std::string("  Old is type ") + toString(i),
-          [&l, i](const KanjiLists::Entry& x) { return x->oldName().has_value() && x->oldType(l) == i; });
+          [&data, i](const auto& x) { return x->oldName().has_value() && x->oldType(data) == i; });
   countGrades(*lists[0]); // only Jouyou list has Grades
   countLevels(lists);
-  countRadicals(hasRadical, l.radicals());
+  countRadicals(hasRadical, data.radicals());
   // const auto& k = (*lists[0])[0];
   // std::cout << "First Jouyou: " << k->name() << " - len: " << length(k->name()) << '\n';
   // for (const auto& i : *lists[0])
