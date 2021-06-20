@@ -62,9 +62,9 @@ void countLevels(const std::vector<const KanjiLists::List*>& lists) {
   std::cout << ">>>   Total for all levels: " << total << '\n';
 }
 
-void countRadicals(const std::vector<const KanjiLists::List*>& lists) {
-  std::cout << ">>> Radical breakdown:\n";
-  std::map<std::string, KanjiLists::List> radicals;
+void countRadicals(const std::vector<const KanjiLists::List*>& lists, const KanjiLists::RadicalMap& allRadicals) {
+  std::cout << ">>> Radical breakdown - total count for each radical is followed by (Jouyou Jinmei Extra) counts:\n";
+  std::map<KanjiRadical, KanjiLists::List> radicals;
   for (const auto& i : lists) {
     KanjiLists::List sorted(*i);
     std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
@@ -80,14 +80,16 @@ void countRadicals(const std::vector<const KanjiLists::List*>& lists) {
       case Types::Jinmei: ++ji; break;
       default: ++ex; break;
       }
-    std::cout << ">>>   " << i.first << std::setw(4) << i.second.size() << " (" << jo << ' ' << ji << ' ' << ex << "):";
+    auto counts = std::to_string(jo) + ' ' + std::to_string(ji) + ' ' + std::to_string(ex) + ')';
+    std::cout << ">>> " << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " ("
+              << std::left << std::setw(9) << counts << ':';
     jouyou += jo;
     jinmei += ji;
     extra += ex;
     Types oldType = i.second[0]->type();
     for (const auto& j : i.second) {
       if (j->type() != oldType) {
-        std::cout << ',';
+        std::cout << "、";
         oldType = j->type();
       }
       std::cout << ' ' << *j;
@@ -96,6 +98,15 @@ void countRadicals(const std::vector<const KanjiLists::List*>& lists) {
   }
   std::cout << ">>>   Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou "
             << jouyou << " Jinmei " << jinmei << " Extra " << extra << ")\n";
+  std::vector<KanjiRadical> missingRadicals;
+  for (const auto& i : allRadicals)
+    if (radicals.find(i.second) == radicals.end()) missingRadicals.push_back(i.second);
+  if (!missingRadicals.empty()) {
+    std::cout << ">>>   Found " << missingRadicals.size() << " radicals with no kanji:";
+    for (const auto& i : missingRadicals)
+      std::cout << ' ' << i;
+    std::cout << '\n';
+  }
 }
 
 template<typename T> void count(const std::vector<const KanjiLists::List*>& lists, const std::string& name, T pred) {
@@ -146,7 +157,7 @@ int main(int argc, char** argv) {
           [&l, i](const KanjiLists::Entry& x) { return x->oldName().has_value() && x->oldType(l) == i; });
   countGrades(*lists[0]); // only Jouyou list has Grades
   countLevels(lists);
-  countRadicals(hasRadical);
+  countRadicals(hasRadical, l.radicals());
   // const auto& k = (*lists[0])[0];
   // std::cout << "First Jouyou: " << k->name() << " - len: " << length(k->name()) << '\n';
   // for (const auto& i : *lists[0])

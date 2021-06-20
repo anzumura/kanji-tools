@@ -35,7 +35,8 @@ inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os <<
 // helper functions to get the string length in encoded charaters instead of bytes
 inline size_t length(const char* s) {
   size_t len = 0;
-  while (*s) len += (*s++ & 0xc0) != 0x80;
+  while (*s)
+    len += (*s++ & 0xc0) != 0x80;
   return len;
 }
 inline size_t length(const std::string& s) { return length(s.c_str()); }
@@ -63,18 +64,49 @@ private:
   Map _map;
 };
 
+class KanjiRadical {
+public:
+  using AltForms = std::vector<std::string>;
+
+  KanjiRadical(int number, const std::string& radical, const AltForms& altForms, const std::string& name,
+               const std::string& reading)
+    : _number(number), _radical(radical), _altForms(altForms), _name(name), _reading(reading) {}
+  KanjiRadical(const KanjiRadical&) = default;
+  KanjiRadical& operator=(const KanjiRadical&) = default;
+  bool operator==(const KanjiRadical& rhs) const { return _number == rhs._number; }
+  bool operator<(const KanjiRadical& rhs) const { return _number < rhs._number; }
+
+  int number() const { return _number; }
+  const std::string& radical() const { return _radical; }
+  const AltForms& altForms() const { return _altForms; }
+  const std::string& name() const { return _name; }
+  const std::string& reading() const { return _reading; }
+private:
+  int _number;
+  std::string _radical;
+  AltForms _altForms;
+  std::string _name;
+  std::string _reading;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const KanjiRadical& r) {
+  return os << '[' << std::right << std::setfill('0') << std::setw(3) << r.number() << "] " << r.radical();
+}
+
 class KanjiLists {
 public:
   KanjiLists(int argc, char** argv);
   using Entry = std::shared_ptr<class Kanji>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
+  using RadicalMap = std::map<std::string, KanjiRadical>;
   const List& jouyouKanji() const { return _jouyouKanji; }
   const List& jinmeiKanji() const { return _jinmeiKanji; }
   const List& linkedJinmeiKanji() const { return _linkedJinmeiKanji; }
   const List& linkedOldKanji() const { return _linkedOldKanji; }
   const List& otherKanji() const { return _otherKanji; }
   const List& extraKanji() const { return _extraKanji; }
+  const RadicalMap& radicals() const { return _radicals; }
 
   std::optional<const Entry> find(const std::string& name) const {
     auto i = _map.find(name);
@@ -88,6 +120,11 @@ public:
   // helper functions during loading
   int getFrequency(const std::string& name) const { return frequency.get(name); }
   Levels getLevel(const std::string&) const;
+  KanjiRadical getRadical(const std::string& radical) const {
+    auto i = _radicals.find(radical);
+    if (i == _radicals.end()) throw std::domain_error("radical not found: " + radical);
+    return i->second;
+  }
   int getStrokes(const std::string& name) const {
     auto i = _strokes.find(name);
     return i == _strokes.end() ? 0 : i->second;
@@ -98,6 +135,7 @@ private:
   void checkNotFound(const Entry&);
   static void checkInsert(KanjiList::Set&, const std::string&);
   static void checkNotFound(const KanjiList::Set&, const std::string&);
+  void loadRadicals();
   void loadStrokes();
   void populateJouyou();
   void populateJinmei();
@@ -113,6 +151,8 @@ private:
   const KanjiList n2;
   const KanjiList n1;
   const KanjiList frequency;
+  // '_radicals' is populated from radicals.txt
+  RadicalMap _radicals;
   // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
   // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
   // contains stroke counts followed by one or more lines each with a single kanji that has the given
@@ -229,8 +269,7 @@ public:
   // - the first line of 'file' should have column header names that match the names in the 'Columns' enum
   static KanjiLists::List fromFile(const KanjiLists&, Types type, const std::filesystem::path& file);
 
-  const std::string& radical() const { return _radical; }
-protected:
+  const KanjiRadical& radical() const { return _radical; }
   static int toInt(const std::string& s) {
     try {
       return std::stoi(s);
@@ -238,16 +277,18 @@ protected:
       throw std::invalid_argument("failed to convert to int: " + s);
     }
   }
+protected:
   // list of all supported columns in files
   enum Columns { Number, Name, Radical, OldName, Year, Strokes, Grade, Meaning, Reading, Reason, MaxIndex };
   // 'columns' contains list of values for each column after parsing a line (used by 'fromString' method)
   static std::array<std::string, MaxIndex> columns;
 
   FileListKanji(const KanjiLists& k, int strokes, bool findFrequency = true)
-    : Kanji(k, toInt(columns[Number]), columns[Name], strokes, findFrequency), _radical(columns[Radical]) {}
+    : Kanji(k, toInt(columns[Number]), columns[Name], strokes, findFrequency),
+      _radical(k.getRadical(columns[Radical])) {}
 private:
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
-  const std::string _radical;
+  const KanjiRadical _radical;
 };
 
 // OfficialListKanji contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values

@@ -20,6 +20,7 @@ const fs::path N3 = "n3.txt";
 const fs::path N4 = "n4.txt";
 const fs::path N5 = "n5.txt";
 const fs::path Frequency = "frequency.txt";
+const fs::path Radicals = "radicals.txt";
 const fs::path Strokes = "strokes.txt";
 const fs::path Jouyou = "jouyou.txt";
 const fs::path Jinmei = "jinmei.txt";
@@ -115,6 +116,7 @@ void KanjiList::print(const List& l, const std::string& type, const std::string&
 KanjiLists::KanjiLists(int argc, char** argv)
   : data(getDataDir(argc, argv)), n5(data / N5, Levels::N5), n4(data / N4, Levels::N4), n3(data / N3, Levels::N3),
     n2(data / N2, Levels::N2), n1(data / N1, Levels::N1), frequency(data / Frequency) {
+  loadRadicals();
   loadStrokes();
   populateJouyou();
   populateJinmei();
@@ -145,6 +147,54 @@ void KanjiLists::checkInsert(KanjiList::Set& s, const std::string& n) {
 
 void KanjiLists::checkNotFound(const KanjiList::Set& s, const std::string& n) {
   if (s.find(n) != s.end()) std::cerr << "ERROR --- " << n + " already in set\n";
+}
+
+void KanjiLists::loadRadicals() {
+  fs::path p(data / Radicals);
+  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  std::ifstream f(p);
+  std::string line;
+  int numberCol = -1, radicalCol = -1, nameCol = -1, readingCol = -1;
+  auto setCol = [&p](int& col, int pos) {
+    if (col != -1) usage("column " + std::to_string(pos) + " has duplicate name in " + p.string());
+    col = pos;
+  };
+  std::array<std::string, 4> cols;
+  while (std::getline(f, line)) {
+    int pos = 0;
+    std::stringstream ss(line);
+    if (numberCol == -1) {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos)
+        if (token == "Number")
+          setCol(numberCol, pos);
+        else if (token == "Radical")
+          setCol(radicalCol, pos);
+        else if (token == "Name")
+          setCol(nameCol, pos);
+        else if (token == "Reading")
+          setCol(readingCol, pos);
+        else
+          usage("unrecognized column '" + token + "' in " + p.string());
+      if (pos != cols.size()) usage("not enough columns in " + p.string());
+    } else {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+        if (pos == cols.size()) usage("too many columns on line: " + line);
+        cols[pos] = token;
+      }
+      if (pos != cols.size()) usage("not enough columns on line: " + line);
+      std::stringstream radicals(cols[radicalCol]);
+      KanjiRadical::AltForms altForms;
+      std::string radical, token;
+      while (std::getline(radicals, token, ' '))
+        if (radical.empty())
+          radical = token;
+        else
+          altForms.emplace_back(token);
+      _radicals.emplace(
+        std::piecewise_construct, std::make_tuple(radical),
+        std::make_tuple(FileListKanji::toInt(cols[numberCol]), radical, altForms, cols[nameCol], cols[readingCol]));
+    }
+  }
 }
 
 void KanjiLists::loadStrokes() {
@@ -205,8 +255,10 @@ void KanjiLists::populateJouyou() {
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
         checkInsert(_linkedJinmeiKanji, k);
-        if (_jouyouOldSet.find(linked) == _jouyouOldSet.end()) notFound.emplace_back(linked);
-        else found.emplace_back(linked);
+        if (_jouyouOldSet.find(linked) == _jouyouOldSet.end())
+          notFound.emplace_back(linked);
+        else
+          found.emplace_back(linked);
       }
     } else
       std::cerr << "ERROR --- bad line in " << p.string() << ": " << line << '\n';
@@ -258,8 +310,7 @@ void KanjiLists::processList(const KanjiList& l) {
       jinmeiOld.push_back(i);
     auto j = _map.find(i);
     if (j != _map.end()) {
-      if (j->second->type() != Types::Jouyou)
-        found[j->second->type()].emplace_back(i);
+      if (j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
     } else {
       // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
       auto k = std::make_shared<Kanji>(*this, ++count, i, l.level);
