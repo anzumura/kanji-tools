@@ -18,7 +18,7 @@ enum class Levels { N5, N4, N3, N2, N1, None };
 // Types represents the type of Kanji:
 // - Jouyou: 2136 official Jouyou kanji
 // - Jinmei: 633 official Jinmei kanji
-// - LinkedJinmei: 230 more Jinmei kanji that are old/alternative forms of Jouyou (212) or Jinmei (18)
+// - LinkedJinmei: 230 more Jinmei kanji that are old/variant forms of Jouyou (212) or Jinmei (18)
 // - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
 // - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 // - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types

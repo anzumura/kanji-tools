@@ -25,13 +25,23 @@ void countGrades(const KanjiLists::List& l) {
   std::cout << ">>> Grade breakdown:\n";
   int all = 0;
   for (auto i : grades) {
-    const auto c = std::count_if(l.begin(), l.end(), [i](const auto& x) { return x->grade() == i; });
-    if (c) {
-      all += c;
-      std::cout << ">>>   Total for grade " << i << ": " << c;
-      noFreq(std::count_if(l.begin(), l.end(), [i](const auto& x) { return x->grade() == i && !x->frequency(); }),
-             true);
-      std::cout << '\n';
+    auto grade = [i](const auto& x) { return x->grade() == i; };
+    auto gradeCount = std::count_if(l.begin(), l.end(), grade);
+    if (gradeCount) {
+      all += gradeCount;
+      std::cout << ">>>   Total for grade " << i << ": " << gradeCount;
+      noFreq(std::count_if(l.begin(), l.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }), true);
+      std::cout << " (";
+      for (auto level : levels) {
+        const auto gradeLevelCount = std::count_if(
+          l.begin(), l.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
+        if (gradeLevelCount) {
+          gradeCount -= gradeLevelCount;
+          std::cout << level << ' ' << gradeLevelCount;
+          if (gradeCount) std::cout << ", ";
+        }
+      }
+      std::cout << ")\n";
     }
   }
   std::cout << ">>>   Total for all grades: " << all << '\n';
