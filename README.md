@@ -2,7 +2,7 @@
 
 Program that loads information about Kanji and supports various types of tests. The program classifies Kanjis into the following categories:
 - **Jouyou**: 2136 official Jōyō (常用) kanji
-- **Jinmei**: 633 official Jinmeijō (人名用) kanji
+- **Jinmei**: 633 official Jinmeiyō (人名用) kanji
 - **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
 - **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'LinkedJinmei'
 - **Other**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
