@@ -18,10 +18,28 @@ const char* toString(Levels x) {
   }
 }
 
-FileList::Set FileList::uniqueNames;
+FileList::Set FileList::UniqueNames;
+
+fs::path FileList::getRegularFile(const fs::path& dir, const fs::path& file) {
+  fs::path p(dir / file);
+  if (!fs::exists(p)) usage(dir.string() + " must contain " + file.string());
+  if (!fs::is_regular_file(p)) usage(file.string() + " must be a regular file");
+  return p;
+}
+
+void FileList::print(const List& l, const std::string& type, const std::string& group, bool isError) {
+  if (!l.empty()) {
+    std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
+    if (!group.empty()) std::cout << " in " << group;
+    std::cout << ':';
+    for (const auto& i : l)
+      std::cout << ' ' << i;
+    std::cout << '\n';
+  }
+}
 
 FileList::FileList(const fs::path& p, Levels l)
-  : name(l == Levels::None ? std::string("Top Frequency") : std::string("JLPT ") + toString(l)), level(l) {
+  : _name(l == Levels::None ? std::string("Top Frequency") : std::string("JLPT ") + toString(l)), _level(l) {
   if (!fs::is_regular_file(p)) usage("can't open " + p.string());
   int count = 0;
   std::ifstream f(p);
@@ -30,7 +48,7 @@ FileList::FileList(const fs::path& p, Levels l)
   while (std::getline(f, line)) {
     assert(_map.find(line) == _map.end());
     if (l != Levels::None) {
-      auto i = uniqueNames.insert(line);
+      auto i = UniqueNames.insert(line);
       if (!i.second) {
         dups.emplace_back(*i.first);
         continue;
@@ -42,7 +60,7 @@ FileList::FileList(const fs::path& p, Levels l)
     _map[line] = ++count;
   }
   if (!dups.empty()) {
-    std::cerr << ">>> found " << dups.size() << " duplicates in JLPT list " << name << ":";
+    std::cerr << ">>> found " << dups.size() << " duplicates in JLPT list " << _name << ":";
     for (const auto& i : dups)
       std::cerr << ' ' << i;
     fs::path newFile(p);
@@ -51,17 +69,6 @@ FileList::FileList(const fs::path& p, Levels l)
     std::ofstream of(newFile);
     for (const auto& i : good)
       of << i << '\n';
-  }
-}
-
-void FileList::print(const List& l, const std::string& type, const std::string& group, bool isError) {
-  if (!l.empty()) {
-    std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
-    if (!group.empty()) std::cout << " in " << group;
-    std::cout << ':';
-    for (const auto& i : l)
-      std::cout << ' ' << i;
-    std::cout << '\n';
   }
 }
 

@@ -4,10 +4,10 @@ Program that loads information about Kanji and supports various types of tests. 
 - **Jouyou**: 2136 official Jōyō (常用) kanji
 - **Jinmei**: 633 official Jinmeiyō (人名用) kanji
 - **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
-- **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'LinkedJinmei'
+- **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'Linked Jinmei'
 - **Other**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 - **Extra**: kanji loaded from 'extra.txt' - shouldn't be any of the above types
-- **None**: used as a type for a kanji that hasn't been loaded
+- **None**: used for kanji that haven't been loaded from any files
 
 The program also loads the 214 official kanji radicals (部首).
 
@@ -21,7 +21,7 @@ The data directory contains the following files:
 - **n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
 - **extra.txt**: created manually
 
-Note that JLPT level lists are no longer * *official* * since 2010. Also, each level file only contains uniquely new kanji for the level (instead some of the of N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji:
+Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (instead some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji (with the count per type shown in brackets):
 - N5: 103 -- all Jōyō
 - N4: 181 -- all Jōyō
 - N3: 361 -- all Jōyō

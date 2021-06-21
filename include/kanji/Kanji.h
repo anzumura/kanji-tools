@@ -3,8 +3,6 @@
 
 #include <kanji/Data.h>
 
-#include <array>
-
 namespace kanji {
 
 class Kanji {

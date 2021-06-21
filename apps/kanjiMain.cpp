@@ -5,12 +5,6 @@
 
 using namespace kanji;
 
-constexpr std::array<Grades, 8> grades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
-                                          Grades::G5, Grades::G6, Grades::S,  Grades::None};
-constexpr std::array<Levels, 6> levels = {Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
-constexpr std::array<Types, 7> types = {Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
-                                        Types::Other,  Types::Extra,  Types::None};
-
 void noFreq(int f, bool brackets = false) {
   if (f) {
     if (brackets)
@@ -25,7 +19,7 @@ void noFreq(int f, bool brackets = false) {
 void countGrades(const Data::List& l) {
   std::cout << ">>> Grade breakdown:\n";
   int all = 0;
-  for (auto i : grades) {
+  for (auto i : AllGrades) {
     auto grade = [i](const auto& x) { return x->grade() == i; };
     auto gradeCount = std::count_if(l.begin(), l.end(), grade);
     if (gradeCount) {
@@ -33,7 +27,7 @@ void countGrades(const Data::List& l) {
       std::cout << ">>>   Total for grade " << i << ": " << gradeCount;
       noFreq(std::count_if(l.begin(), l.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }), true);
       std::cout << " (";
-      for (auto level : levels) {
+      for (auto level : AllLevels) {
         const auto gradeLevelCount =
           std::count_if(l.begin(), l.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
         if (gradeLevelCount) {
@@ -51,7 +45,7 @@ void countGrades(const Data::List& l) {
 void countLevels(const std::vector<const Data::List*>& lists) {
   std::cout << ">>> Level breakdown:\n";
   int total = 0;
-  for (auto level : levels) {
+  for (auto level : AllLevels) {
     std::vector<int> counts;
     for (const auto& l : lists)
       counts.push_back(std::count_if(l->begin(), l->end(), [level](const auto& x) { return x->level() == level; }));
@@ -62,7 +56,7 @@ void countLevels(const std::vector<const Data::List*>& lists) {
       for (int j = 0; j < counts.size(); ++j)
         if (counts[j]) {
           levelTotal -= counts[j];
-          std::cout << types[j] << ' ' << counts[j];
+          std::cout << AllTypes[j] << ' ' << counts[j];
           noFreq(std::count_if(lists[j]->begin(), lists[j]->end(),
                                [level](const auto& x) { return x->level() == level && !x->frequency(); }));
           if (levelTotal) std::cout << ", ";
@@ -129,7 +123,7 @@ template<typename T> void count(const std::vector<const Data::List*>& lists, con
     std::cout << ">>> " << name << ' ' << count << " (";
     for (int i = 0; i < counts.size(); ++i) {
       if (i) std::cout << ", ";
-      std::cout << types[i] << ' ' << counts[i];
+      std::cout << AllTypes[i] << ' ' << counts[i];
     }
     std::cout << ")\n";
   }
@@ -153,7 +147,7 @@ int main(int argc, char** argv) {
   std::cout << ">>> Loaded " << total << " Kanji (";
   for (int i = 0; i < lists.size(); ++i) {
     if (i) std::cout << ' ';
-    std::cout << types[i] << ' ' << lists[i]->size();
+    std::cout << AllTypes[i] << ' ' << lists[i]->size();
   }
   std::cout << ")\n";
   count(lists, "NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
@@ -166,7 +160,7 @@ int main(int argc, char** argv) {
   // no old kanjis should have a non-None level
   count(mayHaveOld, "  Old Has Level", [&data](const auto& x) { return x->oldLevel(data) != Levels::None; });
   // old kanjis should only have types of LinkedJinmei, Other or None
-  for (auto i : types)
+  for (auto i : AllTypes)
     count(mayHaveOld, std::string("  Old is type ") + toString(i),
           [&data, i](const auto& x) { return x->oldName().has_value() && x->oldType(data) == i; });
   countGrades(*lists[0]); // only Jouyou list has Grades

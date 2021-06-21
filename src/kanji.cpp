@@ -9,7 +9,6 @@ namespace fs = std::filesystem;
 
 Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path& file) {
   assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
-  if (!fs::is_regular_file(file)) usage("can't find file: " + file.string());
   std::ifstream f(file);
   std::string line;
   std::map<int, int> colMap;

@@ -51,19 +51,20 @@ const char* toString(Types x) {
 }
 
 Data::Data(int argc, char** argv)
-  : data(getDataDir(argc, argv)), n5(data / N5, Levels::N5), n4(data / N4, Levels::N4), n3(data / N3, Levels::N3),
-    n2(data / N2, Levels::N2), n1(data / N1, Levels::N1), frequency(data / Frequency) {
+  : _dataDir(getDataDir(argc, argv)), _debug(getDebug(argc, argv)), _n5(_dataDir / N5, Levels::N5),
+    _n4(_dataDir / N4, Levels::N4), _n3(_dataDir / N3, Levels::N3), _n2(_dataDir / N2, Levels::N2),
+    _n1(_dataDir / N1, Levels::N1), _frequency(_dataDir / Frequency) {
   loadRadicals();
   loadStrokes();
   populateJouyou();
   populateJinmei();
   populateExtra();
-  processList(n5);
-  processList(n4);
-  processList(n3);
-  processList(n2);
-  processList(n1);
-  processList(frequency);
+  processList(_n5);
+  processList(_n4);
+  processList(_n3);
+  processList(_n2);
+  processList(_n1);
+  processList(_frequency);
   checkStrokes();
 }
 
@@ -71,6 +72,28 @@ Types Data::getType(const std::string& name) const {
   auto i = _map.find(name);
   if (i == _map.end()) return Types::None;
   return i->second->type();
+}
+
+Levels Data::getLevel(const std::string& k) const {
+  if (_n1.exists(k)) return Levels::N1;
+  if (_n2.exists(k)) return Levels::N2;
+  if (_n3.exists(k)) return Levels::N3;
+  if (_n4.exists(k)) return Levels::N4;
+  if (_n5.exists(k)) return Levels::N5;
+  return Levels::None;
+}
+
+fs::path Data::getDataDir(int argc, char** argv) {
+  if (argc < 2) usage("please specify data directory");
+  fs::path f(argv[1]);
+  if (!fs::is_directory(f)) usage(f.string() + " is not a valid directory");
+  return f;
+}
+
+bool Data::getDebug(int argc, char** argv) {
+  for (int i = 2; i < argc; ++i)
+    if (std::string(argv[i]) == "-debug") return true;
+  return false;
 }
 
 void Data::checkInsert(List& s, const Entry& i) {
@@ -93,8 +116,7 @@ void Data::checkNotFound(const FileList::Set& s, const std::string& n) {
 }
 
 void Data::loadRadicals() {
-  fs::path p(data / Radicals);
-  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  fs::path p = FileList::getRegularFile(_dataDir, Radicals);
   std::ifstream f(p);
   std::string line;
   int numberCol = -1, radicalCol = -1, nameCol = -1, readingCol = -1;
@@ -141,8 +163,7 @@ void Data::loadRadicals() {
 }
 
 void Data::loadStrokes() {
-  fs::path p(data / Strokes);
-  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  fs::path p = FileList::getRegularFile(_dataDir, Strokes);
   std::ifstream f(p);
   std::string line;
   int strokes = 0;
@@ -175,7 +196,7 @@ void Data::checkStrokes() const {
 }
 
 void Data::populateJouyou() {
-  auto results = FileListKanji::fromFile(*this, Types::Jouyou, data / Jouyou);
+  auto results = FileListKanji::fromFile(*this, Types::Jouyou, FileList::getRegularFile(_dataDir, Jouyou));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != Grades::None);
@@ -183,8 +204,7 @@ void Data::populateJouyou() {
     if (i->oldName().has_value()) checkInsert(_jouyouOldSet, *i->oldName());
   }
   // populate _linkedJinmeiKanji that are linked to Jouyou
-  fs::path p(data / LinkedJinmei);
-  if (!fs::is_regular_file(p)) usage(data.string() + " must contain " + p.string());
+  fs::path p = FileList::getRegularFile(_dataDir, LinkedJinmei);
   std::ifstream f(p);
   std::string line;
   FileList::List found, notFound;
@@ -198,10 +218,12 @@ void Data::populateJouyou() {
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
         checkInsert(_linkedJinmeiKanji, k);
-        if (_jouyouOldSet.find(linked) == _jouyouOldSet.end())
-          notFound.emplace_back(linked);
-        else
-          found.emplace_back(linked);
+        if (_debug) {
+          if (_jouyouOldSet.find(linked) == _jouyouOldSet.end())
+            notFound.emplace_back(linked);
+          else
+            found.emplace_back(linked);
+        }
       }
     } else
       std::cerr << "ERROR --- bad line in " << p.string() << ": " << line << '\n';
@@ -216,14 +238,14 @@ void Data::populateJouyou() {
       if (_map.find(*i->oldName()) == _map.end()) {
         auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i->oldName(), i);
         checkInsert(_linkedOldKanji, k);
-        found.push_back(*i->oldName());
+        if (_debug) found.push_back(*i->oldName());
       }
     }
   FileList::print(found, "'old jouyou' that are not " + p.stem().string());
 }
 
 void Data::populateJinmei() {
-  auto results = FileListKanji::fromFile(*this, Types::Jinmei, data / Jinmei);
+  auto results = FileListKanji::fromFile(*this, Types::Jinmei, FileList::getRegularFile(_dataDir, Jinmei));
   for (const auto& i : results) {
     checkInsert(_jinmeiKanji, i);
     checkNotFound(_jouyouOldSet, i->name());
@@ -236,7 +258,7 @@ void Data::populateJinmei() {
 }
 
 void Data::populateExtra() {
-  auto results = FileListKanji::fromFile(*this, Types::Extra, data / Extra);
+  auto results = FileListKanji::fromFile(*this, Types::Extra, FileList::getRegularFile(_dataDir, Extra));
   for (const auto& i : results)
     checkInsert(_extraKanji, i);
 }
@@ -247,27 +269,29 @@ void Data::processList(const FileList& l) {
   auto count = 0;
   for (const auto& i : l.list()) {
     // keep track of any 'old' kanji in a level or top frequency list
-    if (_jouyouOldSet.find(i) != _jouyouOldSet.end())
-      jouyouOld.push_back(i);
-    else if (_jinmeiOldSet.find(i) != _jinmeiOldSet.end())
-      jinmeiOld.push_back(i);
+    if (_debug) {
+      if (_jouyouOldSet.find(i) != _jouyouOldSet.end())
+        jouyouOld.push_back(i);
+      else if (_jinmeiOldSet.find(i) != _jinmeiOldSet.end())
+        jinmeiOld.push_back(i);
+    }
     auto j = _map.find(i);
     if (j != _map.end()) {
-      if (j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
+      if (_debug && j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
     } else {
       // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
-      auto k = std::make_shared<Kanji>(*this, ++count, i, l.level);
+      auto k = std::make_shared<Kanji>(*this, ++count, i, l.level());
       _map.insert(std::make_pair(i, k));
       _otherKanji.push_back(k);
-      other.emplace_back(i);
+      if (_debug) other.emplace_back(i);
     }
   }
-  FileList::print(jouyouOld, "Jouyou Old", l.name);
-  FileList::print(jinmeiOld, "Jinmei Old", l.name);
-  FileList::print(found[Types::LinkedOld], "Linked Old", l.name);
-  FileList::print(other, std::string("non-Jouyou/non-Jinmei") + (l.level == Levels::None ? "/non-JLPT" : ""), l.name);
+  FileList::print(jouyouOld, "Jouyou Old", l.name());
+  FileList::print(jinmeiOld, "Jinmei Old", l.name());
+  FileList::print(found[Types::LinkedOld], "Linked Old", l.name());
+  FileList::print(other, std::string("non-Jouyou/Jinmei") + (l.level() == Levels::None ? "/JLPT" : ""), l.name());
   // l.level is None when processing 'frequency.txt' file (so not a JLPT level file)
-  if (l.level == Levels::None) {
+  if (l.level() == Levels::None) {
     std::vector lists = {std::make_pair(&found[Types::Jinmei], ""),
                          std::make_pair(&found[Types::LinkedJinmei], "Linked ")};
     for (const auto& i : lists) {
@@ -277,29 +301,13 @@ void Data::processList(const FileList& l) {
           jlptJinmei.emplace_back(j);
         else
           otherJinmei.emplace_back(j);
-      FileList::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", l.name);
-      FileList::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", l.name);
+      FileList::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", l.name());
+      FileList::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", l.name());
     }
   } else {
-    FileList::print(found[Types::Jinmei], "Jinmei", l.name);
-    FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", l.name);
+    FileList::print(found[Types::Jinmei], "Jinmei", l.name());
+    FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", l.name());
   }
-}
-
-fs::path Data::getDataDir(int argc, char** argv) {
-  if (argc < 2) usage("please specify data directory");
-  fs::path f(argv[1]);
-  if (!fs::is_directory(f)) usage(f.string() + " is not a valid directory");
-  return f;
-}
-
-Levels Data::getLevel(const std::string& k) const {
-  if (n1.exists(k)) return Levels::N1;
-  if (n2.exists(k)) return Levels::N2;
-  if (n3.exists(k)) return Levels::N3;
-  if (n4.exists(k)) return Levels::N4;
-  if (n5.exists(k)) return Levels::N5;
-  return Levels::None;
 }
 
 } // namespace kanji

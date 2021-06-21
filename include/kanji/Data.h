@@ -11,6 +11,8 @@ namespace kanji {
 
 // Official Grades for Jouyou kanji
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
+constexpr std::array AllGrades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
+                                  Grades::G5, Grades::G6, Grades::S,  Grades::None};
 const char* toString(Grades);
 inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os << toString(x); }
 
@@ -23,6 +25,8 @@ inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os <
 // - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
 // - None: used as a type for a kanji that hasn't been loaded
 enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, None };
+constexpr std::array AllTypes = {Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
+                                 Types::Other,  Types::Extra,  Types::None};
 const char* toString(Types);
 inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
 
@@ -51,7 +55,7 @@ public:
   bool isOldJinmei(const std::string& name) const { return _jinmeiOldSet.find(name) != _jinmeiOldSet.end(); }
   bool isOldName(const std::string& name) const { return isOldJouyou(name) || isOldJinmei(name); }
   // helper functions during loading
-  int getFrequency(const std::string& name) const { return frequency.get(name); }
+  int getFrequency(const std::string& name) const { return _frequency.get(name); }
   Levels getLevel(const std::string&) const;
   Radical getRadical(const std::string& radical) const {
     auto i = _radicals.find(radical);
@@ -63,7 +67,10 @@ public:
     return i == _strokes.end() ? 0 : i->second;
   }
 private:
+  // helper functions for getting command line options
   static std::filesystem::path getDataDir(int, char**);
+  static bool getDebug(int, char**);
+
   void checkInsert(List&, const Entry&);
   void checkNotFound(const Entry&);
   static void checkInsert(FileList::Set&, const std::string&);
@@ -76,14 +83,15 @@ private:
   void processList(const FileList&);
   void checkStrokes() const;
 
-  const std::filesystem::path data;
+  const std::filesystem::path _dataDir;
+  const bool _debug;
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
-  const FileList n5;
-  const FileList n4;
-  const FileList n3;
-  const FileList n2;
-  const FileList n1;
-  const FileList frequency;
+  const FileList _n5;
+  const FileList _n4;
+  const FileList _n3;
+  const FileList _n2;
+  const FileList _n1;
+  const FileList _frequency;
   // '_radicals' is populated from radicals.txt
   RadicalMap _radicals;
   // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
