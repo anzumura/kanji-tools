@@ -37,13 +37,15 @@ public:
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
-  const List& jouyouKanji() const { return _jouyouKanji; }
-  const List& jinmeiKanji() const { return _jinmeiKanji; }
-  const List& linkedJinmeiKanji() const { return _linkedJinmeiKanji; }
-  const List& linkedOldKanji() const { return _linkedOldKanji; }
-  const List& otherKanji() const { return _otherKanji; }
-  const List& extraKanji() const { return _extraKanji; }
+  const List& jouyouKanji() const { return _lists.at(Types::Jouyou); }
+  const List& jinmeiKanji() const { return _lists.at(Types::Jinmei); }
+  const List& linkedJinmeiKanji() const { return _lists.at(Types::LinkedJinmei); }
+  const List& linkedOldKanji() const { return _lists.at(Types::LinkedOld); }
+  const List& otherKanji() const { return _lists.at(Types::Other); }
+  const List& extraKanji() const { return _lists.at(Types::Extra); }
   const RadicalMap& radicals() const { return _radicals; }
+  // 'Linked' and 'Other' types don't have radicals right now
+  static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
 
   std::optional<const Entry> find(const std::string& name) const {
     auto i = _map.find(name);
@@ -71,8 +73,9 @@ private:
   static std::filesystem::path getDataDir(int, char**);
   static bool getDebug(int, char**);
 
+  bool checkInsert(const Entry&);
   void checkInsert(List&, const Entry&);
-  void checkNotFound(const Entry&);
+  void checkNotFound(const Entry&) const;
   static void checkInsert(FileList::Set&, const std::string&);
   static void checkNotFound(const FileList::Set&, const std::string&);
   void loadRadicals();
@@ -82,6 +85,12 @@ private:
   void populateExtra();
   void processList(const FileList&);
   void checkStrokes() const;
+  // the following print functions are called after loading all data if -debug flag is specified
+  void printStats() const;
+  void printGrades() const;
+  void printLevels() const;
+  void printRadicals() const;
+  template<typename T> void printCount(const std::string& name, T pred) const;
 
   const std::filesystem::path _dataDir;
   const bool _debug;
@@ -100,12 +109,7 @@ private:
   // number of strokes.
   std::map<std::string, int> _strokes;
   // lists of kanjis corresponding to 'Types' enum
-  List _jouyouKanji;
-  List _jinmeiKanji;
-  List _linkedJinmeiKanji;
-  List _linkedOldKanji;
-  List _otherKanji;
-  List _extraKanji;
+  std::map<Types, List> _lists;
   // allow lookup by name
   Map _map;
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)

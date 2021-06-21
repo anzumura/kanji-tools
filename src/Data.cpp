@@ -2,6 +2,7 @@
 #include <kanji/Kanji.h>
 
 #include <fstream>
+#include <numeric>
 #include <sstream>
 
 namespace kanji {
@@ -22,6 +23,18 @@ const fs::path Jouyou = "jouyou.txt";
 const fs::path Jinmei = "jinmei.txt";
 const fs::path LinkedJinmei = "linked-jinmei.txt";
 const fs::path Extra = "extra.txt";
+
+// helper function for printing 'no-frequency' counts
+void noFreq(int f, bool brackets = false) {
+  if (f) {
+    if (brackets)
+      std::cout << " (";
+    else
+      std::cout << ' ';
+    std::cout << "nf " << f;
+    if (brackets) std::cout << ')';
+  }
+}
 
 } // namespace
 
@@ -66,6 +79,12 @@ Data::Data(int argc, char** argv)
   processList(_n1);
   processList(_frequency);
   checkStrokes();
+  if (_debug) {
+    printStats();
+    printGrades();
+    printLevels();
+    printRadicals();
+  }
 }
 
 Types Data::getType(const std::string& name) const {
@@ -96,14 +115,17 @@ bool Data::getDebug(int argc, char** argv) {
   return false;
 }
 
-void Data::checkInsert(List& s, const Entry& i) {
-  if (_map.insert(std::make_pair(i->name(), i)).second)
-    s.push_back(i);
-  else
-    std::cerr << "ERROR --- failed to insert " << *i << " into map\n";
+bool Data::checkInsert(const Entry& i) {
+  if (_map.insert(std::make_pair(i->name(), i)).second) return true;
+  std::cerr << "ERROR --- failed to insert " << *i << " into map\n";
+  return false;
 }
 
-void Data::checkNotFound(const Entry& i) {
+void Data::checkInsert(List& s, const Entry& i) {
+  if (checkInsert(i)) s.push_back(i);
+}
+
+void Data::checkNotFound(const Entry& i) const {
   if (_map.find(i->name()) != _map.end()) std::cerr << "ERROR --- " << *i << " already in map\n";
 }
 
@@ -200,15 +222,17 @@ void Data::populateJouyou() {
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != Grades::None);
-    checkInsert(_jouyouKanji, i);
+    checkInsert(i);
     if (i->oldName().has_value()) checkInsert(_jouyouOldSet, *i->oldName());
   }
+  _lists.insert(std::make_pair(Types::Jouyou, std::move(results)));
   // populate _linkedJinmeiKanji that are linked to Jouyou
   fs::path p = FileList::getRegularFile(_dataDir, LinkedJinmei);
   std::ifstream f(p);
   std::string line;
   FileList::List found, notFound;
   int count = 0;
+  auto& linkedJinmei = _lists[Types::LinkedJinmei];
   while (std::getline(f, line)) {
     std::stringstream ss(line);
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
@@ -217,7 +241,7 @@ void Data::populateJouyou() {
         std::cerr << "ERROR --- can't find " << jouyou << " while processing " << p.string() << '\n';
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
-        checkInsert(_linkedJinmeiKanji, k);
+        checkInsert(linkedJinmei, k);
         if (_debug) {
           if (_jouyouOldSet.find(linked) == _jouyouOldSet.end())
             notFound.emplace_back(linked);
@@ -233,12 +257,13 @@ void Data::populateJouyou() {
   found.clear();
   // populate _linkedOldKanji (so old Jouyou that are not Linked Jinmei)
   count = 0;
-  for (const auto& i : _jouyouKanji)
-    if (i->oldName().has_value()) {
-      if (_map.find(*i->oldName()) == _map.end()) {
-        auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i->oldName(), i);
-        checkInsert(_linkedOldKanji, k);
-        if (_debug) found.push_back(*i->oldName());
+  auto& linkedOld = _lists[Types::LinkedOld];
+  for (const auto& i : _map)
+    if (i.second->oldName().has_value()) {
+      if (_map.find(*i.second->oldName()) == _map.end()) {
+        auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i.second->oldName(), i.second);
+        checkInsert(linkedOld, k);
+        if (_debug) found.push_back(*i.second->oldName());
       }
     }
   FileList::print(found, "'old jouyou' that are not " + p.stem().string());
@@ -246,27 +271,31 @@ void Data::populateJouyou() {
 
 void Data::populateJinmei() {
   auto results = FileListKanji::fromFile(*this, Types::Jinmei, FileList::getRegularFile(_dataDir, Jinmei));
+  auto& linkedJinmei = _lists[Types::LinkedJinmei];
   for (const auto& i : results) {
-    checkInsert(_jinmeiKanji, i);
+    checkInsert(i);
     checkNotFound(_jouyouOldSet, i->name());
     if (i->oldName().has_value()) {
       checkInsert(_jinmeiOldSet, *i->oldName());
-      auto k = std::make_shared<LinkedJinmeiKanji>(*this, _linkedJinmeiKanji.size(), *i->oldName(), i);
-      checkInsert(_linkedJinmeiKanji, k);
+      auto k = std::make_shared<LinkedJinmeiKanji>(*this, linkedJinmei.size(), *i->oldName(), i);
+      checkInsert(linkedJinmei, k);
     }
   }
+  _lists.insert(std::make_pair(Types::Jinmei, std::move(results)));
 }
 
 void Data::populateExtra() {
   auto results = FileListKanji::fromFile(*this, Types::Extra, FileList::getRegularFile(_dataDir, Extra));
   for (const auto& i : results)
-    checkInsert(_extraKanji, i);
+    checkInsert(i);
+  _lists.insert(std::make_pair(Types::Extra, std::move(results)));
 }
 
 void Data::processList(const FileList& l) {
   FileList::List jouyouOld, jinmeiOld, other;
   std::map<Types, FileList::List> found;
   auto count = 0;
+  auto& otherKanji = _lists[Types::Other];
   for (const auto& i : l.list()) {
     // keep track of any 'old' kanji in a level or top frequency list
     if (_debug) {
@@ -282,7 +311,7 @@ void Data::processList(const FileList& l) {
       // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
       auto k = std::make_shared<Kanji>(*this, ++count, i, l.level());
       _map.insert(std::make_pair(i, k));
-      _otherKanji.push_back(k);
+      otherKanji.push_back(k);
       if (_debug) other.emplace_back(i);
     }
   }
@@ -307,6 +336,158 @@ void Data::processList(const FileList& l) {
   } else {
     FileList::print(found[Types::Jinmei], "Jinmei", l.name());
     FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", l.name());
+  }
+}
+
+template<typename T> void Data::printCount(const std::string& name, T pred) const {
+  std::vector<std::pair<Types, int>> counts;
+  int total = 0;
+  for (const auto& l : _lists) {
+    const int count = std::count_if(l.second.begin(), l.second.end(), pred);
+    if (count) {
+      counts.emplace_back(l.first, count);
+      total += count;
+    }
+  }
+  if (total) {
+    std::cout << ">>> " << name << ' ' << total << " (";
+    for (const auto& i : counts) {
+      std::cout << i.first << ' ' << i.second;
+      total -= i.second;
+      if (total) std::cout << ", ";
+    }
+    std::cout << ")\n";
+  }
+}
+
+void Data::printStats() const {
+  std::cout << ">>> Loaded " << _map.size() << " Kanji (";
+  for (const auto& i : _lists) {
+    if (i != *_lists.begin()) std::cout << ' ';
+    std::cout << i.first << ' ' << i.second.size();
+  }
+  std::cout << ")\n";
+  printCount("NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
+  printCount("Has Strokes", [](const auto& x) { return x->strokes() != 0; });
+  printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
+  // some old kanjis have a non-zero frequency
+  printCount("  Old Has Frequency", [&](const auto& x) { return x->oldFrequency(*this) != 0; });
+  // some old kanjis have stroke counts
+  printCount("  Old Has Strokes", [&](const auto& x) { return x->oldStrokes(*this) != 0; });
+  // no old kanjis should have a JLPT level, i.e.: they all should have Level 'None'
+  printCount("  Old Has Level", [&](const auto& x) { return x->oldLevel(*this) != Levels::None; });
+  // old kanjis should only have types of LinkedJinmei, Other or None
+  for (auto i : AllTypes)
+    printCount(std::string("  Old is type ") + toString(i),
+               [&](const auto& x) { return x->oldName().has_value() && x->oldType(*this) == i; });
+}
+
+void Data::printGrades() const {
+  std::cout << ">>> Grade breakdown:\n";
+  int all = 0;
+  const auto& jouyou = _lists.at(Types::Jouyou);
+  for (auto i : AllGrades) {
+    auto grade = [i](const auto& x) { return x->grade() == i; };
+    auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
+    if (gradeCount) {
+      all += gradeCount;
+      std::cout << ">>>   Total for grade " << i << ": " << gradeCount;
+      noFreq(
+        std::count_if(jouyou.begin(), jouyou.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }),
+        true);
+      std::cout << " (";
+      for (auto level : AllLevels) {
+        const auto gradeLevelCount = std::count_if(
+          jouyou.begin(), jouyou.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
+        if (gradeLevelCount) {
+          gradeCount -= gradeLevelCount;
+          std::cout << level << ' ' << gradeLevelCount;
+          if (gradeCount) std::cout << ", ";
+        }
+      }
+      std::cout << ")\n";
+    }
+  }
+  std::cout << ">>>   Total for all grades: " << all << '\n';
+}
+
+void Data::printLevels() const {
+  std::cout << ">>> Level breakdown:\n";
+  int total = 0;
+  for (auto level : AllLevels) {
+    std::vector<std::pair<Types, int>> counts;
+    int levelTotal = 0;
+    for (const auto& l : _lists) {
+      int count =
+        std::count_if(l.second.begin(), l.second.end(), [level](const auto& x) { return x->level() == level; });
+      if (count) {
+        counts.emplace_back(l.first, count);
+        levelTotal += count;
+      }
+    }
+    if (levelTotal) {
+      total += levelTotal;
+      std::cout << ">>>   Total for level " << level << ": " << levelTotal << " (";
+      for (const auto& j : counts) {
+        std::cout << j.first << ' ' << j.second;
+        const auto& l = _lists.at(j.first);
+        noFreq(
+          std::count_if(l.begin(), l.end(), [level](const auto& x) { return x->level() == level && !x->frequency(); }));
+        levelTotal -= j.second;
+        if (levelTotal) std::cout << ", ";
+      }
+      std::cout << ")\n";
+    }
+  }
+  std::cout << ">>>   Total for all levels: " << total << '\n';
+}
+
+void Data::printRadicals() const {
+  std::cout << ">>> Radical breakdown - total count for each radical is followed by (Jouyou Jinmei Extra) counts:\n";
+  std::map<Radical, Data::List> radicals;
+  for (const auto& i : _lists) {
+    if (hasRadical(i.first)) {
+      Data::List sorted(i.second);
+      std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
+      for (const auto& j : sorted)
+        radicals[static_cast<const FileListKanji&>(*j).radical()].push_back(j);
+    }
+  }
+  int jouyou = 0, jinmei = 0, extra = 0;
+  for (const auto& i : radicals) {
+    int jo = 0, ji = 0, ex = 0;
+    for (const auto& j : i.second)
+      switch (j->type()) {
+      case Types::Jouyou: ++jo; break;
+      case Types::Jinmei: ++ji; break;
+      default: ++ex; break;
+      }
+    auto counts = std::to_string(jo) + ' ' + std::to_string(ji) + ' ' + std::to_string(ex) + ')';
+    std::cout << ">>> " << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " ("
+              << std::left << std::setw(9) << counts << ':';
+    jouyou += jo;
+    jinmei += ji;
+    extra += ex;
+    Types oldType = i.second[0]->type();
+    for (const auto& j : i.second) {
+      if (j->type() != oldType) {
+        std::cout << "、";
+        oldType = j->type();
+      }
+      std::cout << ' ' << *j;
+    }
+    std::cout << '\n';
+  }
+  std::cout << ">>>   Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou "
+            << jouyou << " Jinmei " << jinmei << " Extra " << extra << ")\n";
+  std::vector<Radical> missingRadicals;
+  for (const auto& i : _radicals)
+    if (radicals.find(i.second) == radicals.end()) missingRadicals.push_back(i.second);
+  if (!missingRadicals.empty()) {
+    std::cout << ">>>   Found " << missingRadicals.size() << " radicals with no kanji:";
+    for (const auto& i : missingRadicals)
+      std::cout << ' ' << i;
+    std::cout << '\n';
   }
 }
 
