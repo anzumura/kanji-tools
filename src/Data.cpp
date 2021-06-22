@@ -534,7 +534,7 @@ void Data::printRadicals() const {
       default: ++ex; break;
       }
     auto counts = std::to_string(jo) + ' ' + std::to_string(ji) + ' ' + std::to_string(ex) + ')';
-    std::cout << ">>> " << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " ("
+    std::cout << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " ("
               << std::left << std::setw(9) << counts << ':';
     jouyou += jo;
     jinmei += ji;
@@ -566,7 +566,7 @@ void Data::printGroups() const {
   std::cout << ">>> Loaded " << _groups.size() << " kanji into " << _groupList.size()
             << " groups (j=Jouyou, n=JLPT, f=Freq, i=Jinmei, e=Extra, *=...):\n";
   for (const auto& i : _groupList) {
-    std::cout << ">>> [" << std::setw(3) << std::setfill('0') << i.number() << "] ";
+    std::cout << '[' << std::setw(3) << std::setfill('0') << i.number() << "] ";
     if (i.peers())
       std::cout << "　 : " << i.name()->qualifiedName() << ", ";
     else
