@@ -23,20 +23,20 @@ public:
   Levels level() const { return _level; }
   bool hasLevel() const { return _level != Levels::None; }
   int frequency() const { return _frequency; }
-  // 'qualifiedName' returns 'name' plus an extra marker to indicate some additional useful information:
-  // - Jouyou: j
-  // - Has JLPT level (but not Jouyou): n
-  // - Top Frequency (but not Jouyou or JLPT): f
-  // - Jinmei: e
-  // - Extra: x
-  // - Anything else: *
+  // 'qualifiedName' returns 'name' plus an extra marker to indicate additional useful information:
+  //   space = Jouyou (use space since this is the most common type)
+  //       ' = JLPT
+  //       " = Top Frequency
+  //       j = Jinmei (not already covered by the above types)
+  //       e = Extra
+  //       * = anything else
   std::string qualifiedName() const {
     auto t = type();
     return _name +
-      (t == Types::Jouyou     ? 'j'
-         : hasLevel()         ? 'n'
-         : _frequency         ? 'f'
-         : t == Types::Jinmei ? 'i'
+      (t == Types::Jouyou     ? ' '
+         : hasLevel()         ? '\''
+         : _frequency         ? '"'
+         : t == Types::Jinmei ? 'j'
          : t == Types::Extra  ? 'e'
                               : '*');
   }

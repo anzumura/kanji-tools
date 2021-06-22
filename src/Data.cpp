@@ -563,16 +563,16 @@ void Data::printRadicals() const {
 }
 
 void Data::printGroups() const {
-  std::cout << ">>> Loaded " << _groups.size() << " kanji into " << _groupList.size()
-            << " groups (j=Jouyou, n=JLPT, f=Freq, i=Jinmei, e=Extra, *=...):\n";
+  std::cout << ">>> Loaded " << _groups.size() << " kanji into " << _groupList.size() << " groups\n"
+    << ">>>   Jouyou kanji have no suffix, otherwise '=JLPT, \"=Freq, j=Jinmei, e=Extra, *=...:\n";
   for (const auto& i : _groupList) {
     std::cout << '[' << std::setw(3) << std::setfill('0') << i.number() << "] ";
     if (i.peers())
-      std::cout << "　 : " << i.name()->qualifiedName() << ", ";
+      std::cout << "　 : " << i.name()->qualifiedName() << ' ';
     else
       std::cout << i.name()->qualifiedName() << ": ";
     for (const auto& j : i.members()) {
-      if (j != i.members()[0]) std::cout << ", ";
+      if (j != i.members()[0]) std::cout << ' ';
       std::cout << j->qualifiedName();
     }
     std::cout << '\n';
