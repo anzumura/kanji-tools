@@ -21,12 +21,34 @@ public:
   const std::string& name() const { return _name; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
   Levels level() const { return _level; }
+  bool hasLevel() const { return _level != Levels::None; }
   int frequency() const { return _frequency; }
-
+  // 'qualifiedName' returns 'name' plus an extra marker to indicate some additional useful information:
+  // - Jouyou: j
+  // - Has JLPT level (but not Jouyou): n
+  // - Top Frequency (but not Jouyou or JLPT): f
+  // - Jinmei: e
+  // - Extra: x
+  // - Anything else: *
+  std::string qualifiedName() const {
+    auto t = type();
+    return _name +
+      (t == Types::Jouyou     ? 'j'
+         : hasLevel()         ? 'n'
+         : _frequency         ? 'f'
+         : t == Types::Jinmei ? 'i'
+         : t == Types::Extra  ? 'e'
+                              : '*');
+  }
   // helper functions for getting information on 'oldValue' (旧字体) kanjis
-  int oldFrequency(const Data& d) const {
+  Types oldType(const Data& d) const {
     auto i = oldName();
-    if (i.has_value()) return d.getFrequency(*i);
+    if (i.has_value()) return d.getType(*i);
+    return Types::None;
+  }
+  int oldStrokes(const Data& d) const {
+    auto i = oldName();
+    if (i.has_value()) return d.getStrokes(*i);
     return 0;
   }
   Levels oldLevel(const Data& d) const {
@@ -34,15 +56,10 @@ public:
     if (i.has_value()) return d.getLevel(*i);
     return Levels::None;
   }
-  int oldStrokes(const Data& d) const {
+  int oldFrequency(const Data& d) const {
     auto i = oldName();
-    if (i.has_value()) return d.getStrokes(*i);
+    if (i.has_value()) return d.getFrequency(*i);
     return 0;
-  }
-  Types oldType(const Data& d) const {
-    auto i = oldName();
-    if (i.has_value()) return d.getType(*i);
-    return Types::None;
   }
 protected:
   // helper constructor for derived classes (can avoid looking up frequency for 'extra' kanji)

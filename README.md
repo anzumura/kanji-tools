@@ -20,6 +20,7 @@ The data directory contains the following files:
 - **frequency.txt**: top 2501 frequency kanji loaded from [KanjiCards](https://kanjicards.org/kanji-list-by-freq.html)
 - **n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
 - **extra.txt**: created manually
+- **groups.txt**: created manually
 
 Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (instead some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji (with the count per type shown in brackets):
 - N5: 103 -- all Jōyō
