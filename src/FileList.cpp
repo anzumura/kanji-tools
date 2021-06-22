@@ -19,6 +19,7 @@ const char* toString(Levels x) {
 }
 
 FileList::Set FileList::UniqueNames;
+FileList::Set FileList::UniqueLevelNames;
 
 fs::path FileList::getRegularFile(const fs::path& dir, const fs::path& file) {
   fs::path p(dir / file);
@@ -44,30 +45,36 @@ FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
                             : capitalize(p.stem().string())),
     _level(l) {
   if (!fs::is_regular_file(p)) usage("can't open " + p.string());
-  int count = 0;
   std::ifstream f(p);
   std::string line;
   FileList::List good, dups;
   while (std::getline(f, line)) {
     std::stringstream ss(line);
+    auto error = [&](const std::string& s){ usage(s + " - line: '" + line + "', file: " + p.string()); };
     for (std::string token; std::getline(ss, token, ' ');) {
       if (onePerLine) {
-        if (token != line) usage("got multiple tokens for line '" + line + "' in file " + p.string());
+        if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
-        continue; // skip empty tokens and wide spaces when processing multiple per line
+        continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
+      if (length(token) != 1) error("found token '" + token + "' with length " + std::to_string(length(token)));
+      // check uniqueness with file
       if (_map.find(token) != _map.end())
-        usage("got duplicate token '" + token + "' on line '" + line + "' in file " + p.string());
-      if (l != Levels::None) {
-        auto i = UniqueNames.insert(token);
+        error("got duplicate token '" + token);
+      // check uniqueness across files
+      if (l == Levels::None) {
+        if (!UniqueNames.insert(token).second)
+          error("found globally non-unique entry '" + token + "'");
+      } else {
+        auto i = UniqueLevelNames.insert(token);
         if (!i.second) {
           dups.emplace_back(*i.first);
           continue;
         }
         good.emplace_back(*i.first);
       }
-      _list.emplace_back(token);
-      // map value count starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
-      _map[token] = ++count;
+      _list.push_back(token);
+      // _map 'value' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
+      _map[token] = _list.size();
     }
   }
   if (!dups.empty()) {
