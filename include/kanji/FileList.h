@@ -31,6 +31,16 @@ inline size_t length(const char* s) {
 }
 inline size_t length(const std::string& s) { return length(s.c_str()); }
 
+// only works for single byte strings
+inline std::string capitalize(const std::string& s) {
+  if (s.length()) {
+    std::string result(s);
+    result[0] = std::toupper(result[0]);
+    return result;
+  }
+  return s;
+}
+
 class FileList {
 public:
   using List = std::vector<std::string>;
@@ -39,7 +49,12 @@ public:
   static std::filesystem::path getRegularFile(const std::filesystem::path& dir, const std::filesystem::path& file);
   static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
 
-  FileList(const std::filesystem::path&, Levels = Levels::None);
+  FileList(const std::filesystem::path&, Levels, bool onePerLine);
+  // Constructor for kana and punctuation files (the have multiple space separated entries per line)
+  FileList(const std::filesystem::path& p) : FileList(p, Levels::None, false) {}
+  // Constructor for JLPT n1-n5 and frequency files (which have one entry per line and name is based on level)
+  FileList(const std::filesystem::path& p, Levels level) : FileList(p, level, true) {}
+
   bool exists(const std::string& s) const { return _map.find(s) != _map.end(); }
   // return 0 for 'not found'
   int get(const std::string& name) const {

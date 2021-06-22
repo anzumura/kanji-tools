@@ -24,6 +24,10 @@ const fs::path JinmeiFile = "jinmei.txt";
 const fs::path LinkedJinmeiFile = "linked-jinmei.txt";
 const fs::path ExtraFile = "extra.txt";
 const fs::path GroupsFile = "groups.txt";
+const fs::path HiraganaFile = "hiragana.txt";
+const fs::path KatakanaFile = "katakana.txt";
+const fs::path HalfwidthFile = "halfwidth.txt";
+const fs::path PunctuationFile = "punctuation.txt";
 
 // helper function for printing 'no-frequency' counts
 void noFreq(int f, bool brackets = false) {
@@ -67,7 +71,9 @@ const char* toString(Types x) {
 Data::Data(int argc, char** argv)
   : _dataDir(getDataDir(argc, argv)), _debug(getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
     _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
-    _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile) {
+    _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile, Levels::None),
+    _hiragana(_dataDir / HiraganaFile), _katakana(_dataDir / KatakanaFile), _halfwidth(_dataDir / HalfwidthFile),
+    _punctuation(_dataDir / PunctuationFile) {
   loadRadicals();
   loadStrokes();
   populateJouyou();

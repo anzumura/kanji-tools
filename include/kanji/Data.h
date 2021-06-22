@@ -130,6 +130,11 @@ private:
   const FileList _n2;
   const FileList _n1;
   const FileList _frequency;
+  // lists to help determin the type of a wide character
+  const FileList _hiragana;
+  const FileList _katakana;
+  const FileList _halfwidth;
+  const FileList _punctuation;
   // '_groups' and '_groupList' are populated from groups.txt
   // '_groups' maps each kanji name to its group so currently a kanji can't be included in more than one group
   GroupMap _groups;

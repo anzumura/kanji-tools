@@ -38,26 +38,37 @@ void FileList::print(const List& l, const std::string& type, const std::string& 
   }
 }
 
-FileList::FileList(const fs::path& p, Levels l)
-  : _name(l == Levels::None ? std::string("Top Frequency") : std::string("JLPT ") + toString(l)), _level(l) {
+FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
+  : _name(l != Levels::None ? std::string("JLPT ") + toString(l)
+            : onePerLine    ? std::string("Top Frequency")
+                            : capitalize(p.stem().string())),
+    _level(l) {
   if (!fs::is_regular_file(p)) usage("can't open " + p.string());
   int count = 0;
   std::ifstream f(p);
   std::string line;
   FileList::List good, dups;
   while (std::getline(f, line)) {
-    assert(_map.find(line) == _map.end());
-    if (l != Levels::None) {
-      auto i = UniqueNames.insert(line);
-      if (!i.second) {
-        dups.emplace_back(*i.first);
-        continue;
+    std::stringstream ss(line);
+    for (std::string token; std::getline(ss, token, ' ');) {
+      if (onePerLine) {
+        if (token != line) usage("got multiple tokens for line '" + line + "' in file " + p.string());
+      } else if (token.empty() || token == "　")
+        continue; // skip empty tokens and wide spaces when processing multiple per line
+      if (_map.find(token) != _map.end())
+        usage("got duplicate token '" + token + "' on line '" + line + "' in file " + p.string());
+      if (l != Levels::None) {
+        auto i = UniqueNames.insert(token);
+        if (!i.second) {
+          dups.emplace_back(*i.first);
+          continue;
+        }
+        good.emplace_back(*i.first);
       }
-      good.emplace_back(*i.first);
+      _list.emplace_back(token);
+      // map value count starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
+      _map[token] = ++count;
     }
-    _list.emplace_back(line);
-    // map value count starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
-    _map[line] = ++count;
   }
   if (!dups.empty()) {
     std::cerr << ">>> found " << dups.size() << " duplicates in JLPT list " << _name << ":";
