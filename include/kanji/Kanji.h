@@ -23,22 +23,24 @@ public:
   Levels level() const { return _level; }
   bool hasLevel() const { return _level != Levels::None; }
   int frequency() const { return _frequency; }
-  // 'qualifiedName' returns 'name' plus an extra marker to indicate additional useful information:
-  //   space = Jouyou (use space since this is the most common type)
-  //       ' = JLPT
-  //       " = Top Frequency
-  //       j = Jinmei (not already covered by the above types)
-  //       e = Extra
-  //       * = anything else
+  // 'qualifiedName' returns 'name' plus an extra marker to show additional information:
+  // space = Jouyou         : all 2136 Jouyou (use space since this is the most common type)
+  //     ' = JLPT           : 251 Jinmei in JLPT (out of 2222 total - the other 1971 are Jouyou)
+  //     " = Top Frequency  : 296 top frequency not in Jouyou or JLPT
+  //     ^ = Jinmei         : 224 Jinmei not already covered by the above types
+  //     ~ = Linked Jinmei  : 218 Linked Jinmei (with no frequency)
+  //     + = Extra          : all kanji loaded from Extra file
+  //     * = anything else  : currently includes 211 'no-frequency' Linked Old
   std::string qualifiedName() const {
     auto t = type();
     return _name +
-      (t == Types::Jouyou     ? ' '
-         : hasLevel()         ? '\''
-         : _frequency         ? '"'
-         : t == Types::Jinmei ? 'j'
-         : t == Types::Extra  ? 'e'
-                              : '*');
+      (t == Types::Jouyou           ? ' '
+         : hasLevel()               ? '\''
+         : _frequency               ? '"'
+         : t == Types::Jinmei       ? '^'
+         : t == Types::LinkedJinmei ? '~'
+         : t == Types::Extra        ? '+'
+                                    : '*');
   }
   // helper functions for getting information on 'oldValue' (旧字体) kanjis
   Types oldType(const Data& d) const {

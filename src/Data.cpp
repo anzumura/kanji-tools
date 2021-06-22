@@ -438,8 +438,13 @@ void Data::printStats() const {
     std::cout << i.first << ' ' << i.second.size();
   }
   std::cout << ")\n";
-  printCount("NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
-  printCount("Has Strokes", [](const auto& x) { return x->strokes() != 0; });
+  printCount("  Has JLPT level", [](const auto& x) { return x->hasLevel(); });
+  printCount("  Has frequency and not in Jouyou or JLPT",
+             [](const auto& x) { return x->frequency() && x->type() != Types::Jouyou && !x->hasLevel(); });
+  printCount("  Jinmei with no frequency and not JLPT",
+             [](const auto& x) { return x->type() == Types::Jinmei && !x->frequency() && !x->hasLevel(); });
+  printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
+  printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
   printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
   // some old kanjis have a non-zero frequency
   printCount("  Old Has Frequency", [&](const auto& x) { return x->oldFrequency(*this) != 0; });
@@ -564,7 +569,7 @@ void Data::printRadicals() const {
 
 void Data::printGroups() const {
   std::cout << ">>> Loaded " << _groups.size() << " kanji into " << _groupList.size() << " groups\n"
-            << ">>>   Jouyou kanji have no suffix, otherwise '=JLPT, \"=Freq, j=Jinmei, e=Extra, *=...:\n";
+            << ">>> Jouyou kanji have no suffix, otherwise '=JLPT \"=Freq ^=Jinmei ~=Linked Jinmei +=Extra *=...:\n";
   for (const auto& i : _groupList) {
     std::cout << '[' << std::setw(3) << std::setfill('0') << i.number() << "] ";
     if (i.peers())
