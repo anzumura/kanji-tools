@@ -57,7 +57,7 @@ FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
         if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
         continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
-      if (auto len = MBChar(token).length(); len != 1)
+      if (auto len = MBChar::length(token); len != 1)
         error("found token '" + token + "' with length " + std::to_string(len));
       // check uniqueness with file
       if (_map.find(token) != _map.end()) error("got duplicate token '" + token);

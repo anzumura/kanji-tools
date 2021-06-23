@@ -20,5 +20,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 endif()
 
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG HEAD
+)
+FetchContent_MakeAvailable(googletest)
+
 add_subdirectory(src)
 add_subdirectory(apps)
+
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
