@@ -1,4 +1,5 @@
 #include <kanji/FileList.h>
+#include <kanji/MBChar.h>
 
 #include <fstream>
 #include <sstream>
@@ -50,20 +51,19 @@ FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
   FileList::List good, dups;
   while (std::getline(f, line)) {
     std::stringstream ss(line);
-    auto error = [&](const std::string& s){ usage(s + " - line: '" + line + "', file: " + p.string()); };
+    auto error = [&](const std::string& s) { usage(s + " - line: '" + line + "', file: " + p.string()); };
     for (std::string token; std::getline(ss, token, ' ');) {
       if (onePerLine) {
         if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
         continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
-      if (length(token) != 1) error("found token '" + token + "' with length " + std::to_string(length(token)));
+      if (auto len = MBChar(token).length(); len != 1)
+        error("found token '" + token + "' with length " + std::to_string(len));
       // check uniqueness with file
-      if (_map.find(token) != _map.end())
-        error("got duplicate token '" + token);
+      if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
       // check uniqueness across files
       if (l == Levels::None) {
-        if (!UniqueNames.insert(token).second)
-          error("found globally non-unique entry '" + token + "'");
+        if (!UniqueNames.insert(token).second) error("found globally non-unique entry '" + token + "'");
       } else {
         auto i = UniqueLevelNames.insert(token);
         if (!i.second) {

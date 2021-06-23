@@ -59,40 +59,6 @@ private:
   Map _map;
 };
 
-// Helper functions for working with UTF-8 strings. Note on UTF-8 structure:
-// - if high bit is 0 then it's a single byte value (so normal case)
-// - if two high bits are 10 then it's a continuation byte (of a multi-byte sequence)
-// - Otherwise it's the first byte of a multi-byte sequence. The number of leading '1's indicates
-//   how many bytes are in the sequence, i.e.: 110 means 2 bytes, 1110 means 3, etc.
-
-// 'length' works for both normal and UTF-8 encoded strings
-inline size_t length(const char* s) {
-  size_t len = 0;
-  // don't add 'continuation' bytes to length, i.e.: 0xc0 is '11 00 00 00' in binary form so use
-  // it to grab the first two bits and only add to length is these bits are not 0x80 (10 00 00 00)
-  while (*s)
-    len += (*s++ & 0xc0) != 0x80;
-  return len;
-}
-
-inline size_t length(const std::string& s) { return length(s.c_str()); }
-
-inline std::string to_binary(unsigned char x) {
-  std::string result;
-  for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + x % 2);
-  return result;
-}
-
-inline std::string to_hex(unsigned char x) {
-  std::string result;
-  for (; x > 0; x >>= 4) { 
-    const auto i = x % 16;
-    result.insert(result.begin(), (i < 10 ? '0' + i : 'a' + i - 10));
-  }
-  return result;
-}
-
 inline std::string capitalize(const std::string& s) {
   if (s.length() && std::islower(s[0])) {
     std::string result(s);

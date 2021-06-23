@@ -37,13 +37,18 @@ public:
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
-
+  // 'Group' is meant to hold a group of 'related' kanji from 'groups.txt' file for
+  // study purposes. Groups are intended to be organized by the 'non-radical' part in
+  // order to help see related kanji that only differ by radical. Right now a kanji
+  // can only belong to at most one group which makes the 'group' concept arbitrary
+  // at best since more complex kanji could be part of more than one group (depending
+  // on which part you are looking at).
   class Group {
   public:
-    // 'peers' should be false for most groups, but should be true for a group where 'name'
-    // is just one of the 'members' (instead of 'name' being a logical parent). For example,
-    // a 'peers=false' group could have name: '太' and members: '駄' and '汰' whereas a
-    // 'peers=true' group could have name: '粋' and members: '枠' and '砕'
+    // 'peers' should be false for most groups, but should be true for a group where
+    // 'name' is just one of the 'members' (instead of 'name' being a logical parent).
+    // For example, a 'peers=false' group could have name='太' and members: '駄, 汰'
+    // whereas a 'peers=true' group could have name='粋' and members: '枠, 砕'
     Group(int number, const Entry& name, const Data::List& members, bool peers)
       : _number(number), _name(name), _members(members), _peers(peers) {}
     Group(const Group&) = default;
@@ -61,7 +66,7 @@ public:
   };
   using GroupMap = std::map<std::string, Group>;
   using GroupList = std::vector<Group>;
-
+  // get kanji lists
   const List& jouyouKanji() const { return _lists.at(Types::Jouyou); }
   const List& jinmeiKanji() const { return _lists.at(Types::Jinmei); }
   const List& linkedJinmeiKanji() const { return _lists.at(Types::LinkedJinmei); }
@@ -71,26 +76,33 @@ public:
   const RadicalMap& radicals() const { return _radicals; }
   // 'Linked' and 'Other' types don't have radicals right now
   static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
-
-  std::optional<const Entry> find(const std::string& name) const {
-    auto i = _map.find(name);
+  // functions for classifying a utf-8 encoded character
+  bool isHiragana(const std::string& s) const { return _hiragana.exists(s); }
+  bool isKatakana(const std::string& s) const { return _katakana.exists(s); }
+  bool isFullWidthKana(const std::string& s) const { return isHiragana(s) || isKatakana(s); }
+  bool isHalfwidthKana(const std::string& s) const { return _halfwidth.exists(s); }
+  bool isKana(const std::string& s) const { return isFullWidthKana(s) || isHalfwidthKana(s); }
+  bool isWidePunctuation(const std::string& s) const { return _punctuation.exists(s); }
+  bool isKanaOrPunctuation(const std::string& s) const { return isKana(s) || isWidePunctuation(s); }
+  std::optional<const Entry> findKanji(const std::string& s) const {
+    auto i = _map.find(s);
     if (i == _map.end()) return {};
     return i->second;
   }
-  Types getType(const std::string& name) const;
-  bool isOldJouyou(const std::string& name) const { return _jouyouOldSet.find(name) != _jouyouOldSet.end(); }
-  bool isOldJinmei(const std::string& name) const { return _jinmeiOldSet.find(name) != _jinmeiOldSet.end(); }
-  bool isOldName(const std::string& name) const { return isOldJouyou(name) || isOldJinmei(name); }
+  Types getType(const std::string& s) const;
+  bool isOldJouyou(const std::string& s) const { return _jouyouOldSet.find(s) != _jouyouOldSet.end(); }
+  bool isOldJinmei(const std::string& s) const { return _jinmeiOldSet.find(s) != _jinmeiOldSet.end(); }
+  bool isOldName(const std::string& s) const { return isOldJouyou(s) || isOldJinmei(s); }
   // helper functions during loading
-  int getFrequency(const std::string& name) const { return _frequency.get(name); }
+  int getFrequency(const std::string& s) const { return _frequency.get(s); }
   Levels getLevel(const std::string&) const;
   Radical getRadical(const std::string& radical) const {
     auto i = _radicals.find(radical);
     if (i == _radicals.end()) throw std::domain_error("radical not found: " + radical);
     return i->second;
   }
-  int getStrokes(const std::string& name) const {
-    auto i = _strokes.find(name);
+  int getStrokes(const std::string& s) const {
+    auto i = _strokes.find(s);
     return i == _strokes.end() ? 0 : i->second;
   }
 private:

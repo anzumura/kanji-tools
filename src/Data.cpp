@@ -379,10 +379,10 @@ void Data::loadGroups() {
           name = token;
         else
           kanjis.emplace_back(token);
-      if (const auto nameKanji = find(name); nameKanji.has_value()) {
+      if (const auto nameKanji = findKanji(name); nameKanji.has_value()) {
         List memberKanjis;
         for (const auto& i : kanjis) {
-          const auto memberKanji = find(i);
+          const auto memberKanji = findKanji(i);
           if (memberKanji.has_value())
             memberKanjis.push_back(*memberKanji);
           else
