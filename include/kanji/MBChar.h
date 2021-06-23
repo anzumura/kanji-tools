@@ -52,12 +52,10 @@ public:
   // - isMBChar("雪") = true
   // - isMBChar("吹雪") = false
   // - isMBChar("a猫") = false
-  static bool validOne(const char* s) {
+  static bool valid(const char* s, bool checkLengthOne = true) {
     if (s) {
-      const unsigned char x = *s;
-      // first two bits must be '11' to start a sequency
-      if ((x & Mask) == Mask) {
-        if ((*++s & Mask) != Bit1) return false; // second byte didn't start with '10'
+      if (const unsigned char x = *s; (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
+        if ((*++s & Mask) != Bit1) return false;            // second byte didn't start with '10'
         if (x & Bit3) {
           if ((*++s & Mask) != Bit1) return false; // third byte didn't start with '10'
           if (x & Bit4) {
@@ -65,12 +63,12 @@ public:
             if ((*++s & Mask) != Bit1) return false; // fourth byte didn't start with '10'
           }
         }
-        return !*++s; // return true if next byte is 0 (end of string)
+        return !checkLengthOne || !*++s;
       }
     }
     return false;
   }
-  static bool validOne(const std::string& s) { return validOne(s.c_str()); }
+  static bool valid(const std::string& s, bool checkLengthOne = true) { return valid(s.c_str(), checkLengthOne); }
 
   explicit MBChar(const std::string& data) : _data(data), _location(_data.c_str()) {}
   // call reset in order to loop over the string again
@@ -79,7 +77,7 @@ public:
   // returns true if result was populated.
   bool getNext(std::string& result, bool onlyMB = true);
   size_t length(bool onlyMB = true) const { return length(_data, onlyMB); }
-  bool validOne() const { return validOne(_data); }
+  bool valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
 private:
   const std::string _data;
   const char* _location;
