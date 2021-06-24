@@ -4,6 +4,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 3	姦	女	9	wicked	カン、ケン、かん-する、かしま-しい、みだら
 4	緘	糸	15	shut	カン、かん-する、と-じる
 5	哭	口	10	weep	コク、なげ-く、な-く
+5	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
 6	驕	馬	22	pride	キョウ、おご-る
 7	屎	尸	9	shit	シ、キ、くそ
 8	屍	尸	9	corpse	シ、かたしろ
@@ -13,6 +14,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 12	囁	口	21	whisper	ショウ、ささや-く
 13	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
 14	鶺	鳥	21	wagtail	セキ
+14	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
 15	鄲	邑	15	place name	タン
 16	憚	心	15	hesitate	タン、タ、はばか-る
 17	痔	疒	11	piles	ヂ、ジ、しもがさ

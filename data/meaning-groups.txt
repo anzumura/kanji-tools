@@ -1,0 +1,3 @@
+Number	Name	Members
+1	Animal	牛,犬,猫,虎,亀,獅,狸,狐,兎,鼠
+2	Fish	魚,鯨,鮎,鯉,鯛,鱒,鰯,鮪

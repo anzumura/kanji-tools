@@ -22,7 +22,7 @@ const char* toString(Levels x) {
 FileList::Set FileList::UniqueNames;
 FileList::Set FileList::UniqueLevelNames;
 
-fs::path FileList::getRegularFile(const fs::path& dir, const fs::path& file) {
+fs::path FileList::getFile(const fs::path& dir, const fs::path& file) {
   fs::path p(dir / file);
   if (!fs::exists(p)) usage(dir.string() + " must contain " + file.string());
   if (!fs::is_regular_file(p)) usage(file.string() + " must be a regular file");

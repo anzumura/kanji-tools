@@ -22,7 +22,8 @@ public:
   using List = std::vector<std::string>;
   using Map = std::map<std::string, int>;
   using Set = std::set<std::string>;
-  static std::filesystem::path getRegularFile(const std::filesystem::path& dir, const std::filesystem::path& file);
+  // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and then returns the full path
+  static std::filesystem::path getFile(const std::filesystem::path& dir, const std::filesystem::path& file);
   static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
 

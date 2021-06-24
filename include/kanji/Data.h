@@ -9,6 +9,11 @@
 
 namespace kanji {
 
+// forward declares
+class Kanji;
+class Group;
+enum class GroupType;
+
 // Official Grades for Jouyou kanji
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
 constexpr std::array AllGrades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
@@ -30,73 +35,23 @@ constexpr std::array AllTypes = {Types::Jouyou, Types::Jinmei, Types::LinkedJinm
 const char* toString(Types);
 inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
 
+// 'Data': provides methods used by 'Kanji' classes during loading and is the base class for KanjiData
 class Data {
 public:
   static void usage(const std::string& msg) { FileList::usage(msg); }
-  Data(int argc, char** argv);
-  using Entry = std::shared_ptr<class Kanji>;
+  // 'Linked' and 'Other' types don't have radicals right now
+  static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
+
+  using Entry = std::shared_ptr<Kanji>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
-  // 'Group' is meant to hold a group of 'related' kanji from 'groups.txt' file for
-  // study purposes. Groups are intended to be organized by the 'non-radical' part in
-  // order to help see related kanji that only differ by radical. Right now a kanji
-  // can only belong to at most one group which makes the 'group' concept arbitrary
-  // at best since more complex kanji could be part of more than one group (depending
-  // on which part you are looking at).
-  class Group {
-  public:
-    // 'peers' should be false for most groups, but should be true for a group where
-    // 'name' is just one of the 'members' (instead of 'name' being a logical parent).
-    // For example, a 'peers=false' group could have name='太' and members: '駄, 汰'
-    // whereas a 'peers=true' group could have name='粋' and members: '枠, 砕'
-    Group(int number, const Entry& name, const Data::List& members, bool peers)
-      : _number(number), _name(name), _members(members), _peers(peers) {}
-    Group(const Group&) = default;
 
-    int number() const { return _number; }
-    const Entry& name() const { return _name; }
-    const Data::List& members() const { return _members; }
-    bool peers() const { return _peers; }
-    std::string toString() const;
-  private:
-    int _number;
-    const Entry _name;
-    Data::List _members;
-    bool _peers;
-  };
-  using GroupMap = std::map<std::string, Group>;
-  using GroupList = std::vector<Group>;
-  // get kanji lists
-  const List& jouyouKanji() const { return _lists.at(Types::Jouyou); }
-  const List& jinmeiKanji() const { return _lists.at(Types::Jinmei); }
-  const List& linkedJinmeiKanji() const { return _lists.at(Types::LinkedJinmei); }
-  const List& linkedOldKanji() const { return _lists.at(Types::LinkedOld); }
-  const List& otherKanji() const { return _lists.at(Types::Other); }
-  const List& extraKanji() const { return _lists.at(Types::Extra); }
-  const RadicalMap& radicals() const { return _radicals; }
-  // 'Linked' and 'Other' types don't have radicals right now
-  static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
-  // functions for classifying a utf-8 encoded character
-  bool isHiragana(const std::string& s) const { return _hiragana.exists(s); }
-  bool isKatakana(const std::string& s) const { return _katakana.exists(s); }
-  bool isFullWidthKana(const std::string& s) const { return isHiragana(s) || isKatakana(s); }
-  bool isHalfwidthKana(const std::string& s) const { return _halfwidth.exists(s); }
-  bool isKana(const std::string& s) const { return isFullWidthKana(s) || isHalfwidthKana(s); }
-  bool isWidePunctuation(const std::string& s) const { return _punctuation.exists(s); }
-  bool isKanaOrPunctuation(const std::string& s) const { return isKana(s) || isWidePunctuation(s); }
-  std::optional<const Entry> findKanji(const std::string& s) const {
-    auto i = _map.find(s);
-    if (i == _map.end()) return {};
-    return i->second;
-  }
-  Types getType(const std::string& s) const;
-  bool isOldJouyou(const std::string& s) const { return _jouyouOldSet.find(s) != _jouyouOldSet.end(); }
-  bool isOldJinmei(const std::string& s) const { return _jinmeiOldSet.find(s) != _jinmeiOldSet.end(); }
-  bool isOldName(const std::string& s) const { return isOldJouyou(s) || isOldJinmei(s); }
-  // helper functions during loading
-  int getFrequency(const std::string& s) const { return _frequency.get(s); }
-  Levels getLevel(const std::string&) const;
+  Data(const std::filesystem::path& dataDir, bool debug) : _dataDir(dataDir), _debug(debug) {}
+
+  // functions used by 'Kanji' classes during construction
+  virtual int getFrequency(const std::string&) const = 0;
+  virtual Levels getLevel(const std::string&) const = 0;
   Radical getRadical(const std::string& radical) const {
     auto i = _radicals.find(radical);
     if (i == _radicals.end()) throw std::domain_error("radical not found: " + radical);
@@ -106,52 +61,72 @@ public:
     auto i = _strokes.find(s);
     return i == _strokes.end() ? 0 : i->second;
   }
-private:
+
+  // get kanji lists
+  const List& jouyouKanji() const { return _lists.at(Types::Jouyou); }
+  const List& jinmeiKanji() const { return _lists.at(Types::Jinmei); }
+  const List& linkedJinmeiKanji() const { return _lists.at(Types::LinkedJinmei); }
+  const List& linkedOldKanji() const { return _lists.at(Types::LinkedOld); }
+  const List& otherKanji() const { return _lists.at(Types::Other); }
+  const List& extraKanji() const { return _lists.at(Types::Extra); }
+  const RadicalMap& radicals() const { return _radicals; }
+  std::optional<const Entry> findKanji(const std::string& s) const {
+    auto i = _map.find(s);
+    if (i == _map.end()) return {};
+    return i->second;
+  }
+  Types getType(const std::string& s) const;
+  bool isOldJouyou(const std::string& s) const { return _jouyouOldSet.find(s) != _jouyouOldSet.end(); }
+  bool isOldJinmei(const std::string& s) const { return _jinmeiOldSet.find(s) != _jinmeiOldSet.end(); }
+  bool isOldName(const std::string& s) const { return isOldJouyou(s) || isOldJinmei(s); }
+
+  using GroupEntry = std::shared_ptr<Group>;
+  using GroupMap = std::map<std::string, GroupEntry>;
+  using GroupList = std::vector<GroupEntry>;
+protected:
+  const std::filesystem::path _dataDir;
+  const bool _debug;
   // helper functions for getting command line options
   static std::filesystem::path getDataDir(int, char**);
   static bool getDebug(int, char**);
-
-  bool checkInsert(const Entry&);
-  void checkInsert(List&, const Entry&);
-  void checkInsert(const std::string&, const Group&);
-  void checkNotFound(const Entry&) const;
+  // helper functions for checking and inserting into collection
+  static void checkInsert(const std::string&, GroupMap&, const GroupEntry&);
   static void checkInsert(FileList::Set&, const std::string&);
   static void checkNotFound(const FileList::Set&, const std::string&);
   static void printError(const std::string&);
-  void loadRadicals();
-  void loadStrokes();
+  bool checkInsert(const Entry&);
+  void checkInsert(List&, const Entry&);
+  void checkNotFound(const Entry&) const;
+  // 'loadRadicals' and 'loadStrokes' must be called before calling the 'populate Lists' functions
+  void loadRadicals(const std::filesystem::path&);
+  void loadStrokes(const std::filesystem::path&);
+  // populate Lists (_lists datastructure)
   void populateJouyou();
   void populateJinmei();
   void populateExtra();
   void processList(const FileList&);
-  void loadGroups();
+  // 'checkStrokes' should be called after all lists are populated. This function makes sure
+  // that there isn't any entries in _strokes that are 'Other' or 'None' type, but instead of
+  // asserting, print lists to help find any problems.
   void checkStrokes() const;
+  // 'loadGroups' loads from '-groups.txt' files
+  void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
   // the following print functions are called after loading all data if -debug flag is specified
   void printStats() const;
   void printGrades() const;
   void printLevels() const;
   void printRadicals() const;
-  void printGroups() const;
+  void printGroups(const GroupMap&, const GroupList&) const;
   template<typename T> void printCount(const std::string& name, T pred) const;
 
-  const std::filesystem::path _dataDir;
-  const bool _debug;
-  // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
-  const FileList _n5;
-  const FileList _n4;
-  const FileList _n3;
-  const FileList _n2;
-  const FileList _n1;
-  const FileList _frequency;
-  // lists to help determin the type of a wide character
-  const FileList _hiragana;
-  const FileList _katakana;
-  const FileList _halfwidth;
-  const FileList _punctuation;
-  // '_groups' and '_groupList' are populated from groups.txt
-  // '_groups' maps each kanji name to its group so currently a kanji can't be included in more than one group
-  GroupMap _groups;
-  GroupList _groupList;
+  // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
+  // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
+  // maps have an entry for each kanji to its group so currently a kanji can't be in more
+  // than one group per group type.
+  GroupMap _meaningGroups;
+  GroupMap _patternGroups;
+  GroupList _meaningGroupList;
+  GroupList _patternGroupList;
   // '_radicals' is populated from radicals.txt
   RadicalMap _radicals;
   // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
@@ -170,4 +145,4 @@ private:
 
 } // namespace kanji
 
-#endif // KANJI_KANJI_LISTS_H
+#endif // KANJI_DATA_H

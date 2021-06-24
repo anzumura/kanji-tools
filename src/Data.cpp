@@ -1,5 +1,4 @@
-#include <kanji/Data.h>
-#include <kanji/Kanji.h>
+#include <kanji/Group.h>
 
 #include <fstream>
 #include <numeric>
@@ -11,23 +10,10 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path N1File = "n1.txt";
-const fs::path N2File = "n2.txt";
-const fs::path N3File = "n3.txt";
-const fs::path N4File = "n4.txt";
-const fs::path N5File = "n5.txt";
-const fs::path FrequencyFile = "frequency.txt";
-const fs::path RadicalsFile = "radicals.txt";
-const fs::path StrokesFile = "strokes.txt";
 const fs::path JouyouFile = "jouyou.txt";
 const fs::path JinmeiFile = "jinmei.txt";
 const fs::path LinkedJinmeiFile = "linked-jinmei.txt";
 const fs::path ExtraFile = "extra.txt";
-const fs::path GroupsFile = "groups.txt";
-const fs::path HiraganaFile = "hiragana.txt";
-const fs::path KatakanaFile = "katakana.txt";
-const fs::path HalfwidthFile = "halfwidth.txt";
-const fs::path PunctuationFile = "punctuation.txt";
 
 // helper function for printing 'no-frequency' counts
 void noFreq(int f, bool brackets = false) {
@@ -68,47 +54,10 @@ const char* toString(Types x) {
   }
 }
 
-Data::Data(int argc, char** argv)
-  : _dataDir(getDataDir(argc, argv)), _debug(getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
-    _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
-    _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile, Levels::None),
-    _hiragana(_dataDir / HiraganaFile), _katakana(_dataDir / KatakanaFile), _halfwidth(_dataDir / HalfwidthFile),
-    _punctuation(_dataDir / PunctuationFile) {
-  loadRadicals();
-  loadStrokes();
-  populateJouyou();
-  populateJinmei();
-  populateExtra();
-  processList(_n5);
-  processList(_n4);
-  processList(_n3);
-  processList(_n2);
-  processList(_n1);
-  processList(_frequency);
-  loadGroups();
-  checkStrokes();
-  if (_debug) {
-    printStats();
-    printGrades();
-    printLevels();
-    printRadicals();
-    printGroups();
-  }
-}
-
 Types Data::getType(const std::string& name) const {
   auto i = _map.find(name);
   if (i == _map.end()) return Types::None;
   return i->second->type();
-}
-
-Levels Data::getLevel(const std::string& k) const {
-  if (_n1.exists(k)) return Levels::N1;
-  if (_n2.exists(k)) return Levels::N2;
-  if (_n3.exists(k)) return Levels::N3;
-  if (_n4.exists(k)) return Levels::N4;
-  if (_n5.exists(k)) return Levels::N5;
-  return Levels::None;
 }
 
 fs::path Data::getDataDir(int argc, char** argv) {
@@ -134,11 +83,11 @@ void Data::checkInsert(List& s, const Entry& i) {
   if (checkInsert(i)) s.push_back(i);
 }
 
-void Data::checkInsert(const std::string& name, const Group& group) {
-  auto i = _groups.insert(std::make_pair(name, group));
+void Data::checkInsert(const std::string& name, GroupMap& groups, const GroupEntry& group) {
+  auto i = groups.insert(std::make_pair(name, group));
   if (!i.second)
-    printError(name + " from group " + std::to_string(group.number()) + " already in group " +
-               i.first->second.toString());
+    printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
+               i.first->second->toString());
 }
 
 void Data::checkNotFound(const Entry& i) const {
@@ -155,8 +104,7 @@ void Data::checkNotFound(const FileList::Set& s, const std::string& n) {
 
 void Data::printError(const std::string& msg) { std::cerr << "ERROR --- " << msg << '\n'; }
 
-void Data::loadRadicals() {
-  fs::path p = FileList::getRegularFile(_dataDir, RadicalsFile);
+void Data::loadRadicals(const fs::path& p) {
   std::ifstream f(p);
   std::string line;
   int numberCol = -1, radicalCol = -1, nameCol = -1, readingCol = -1;
@@ -202,8 +150,7 @@ void Data::loadRadicals() {
   }
 }
 
-void Data::loadStrokes() {
-  fs::path p = FileList::getRegularFile(_dataDir, StrokesFile);
+void Data::loadStrokes(const fs::path& p) {
   std::ifstream f(p);
   std::string line;
   int strokes = 0;
@@ -220,7 +167,7 @@ void Data::loadStrokes() {
 }
 
 void Data::populateJouyou() {
-  auto results = FileListKanji::fromFile(*this, Types::Jouyou, FileList::getRegularFile(_dataDir, JouyouFile));
+  auto results = FileListKanji::fromFile(*this, Types::Jouyou, FileList::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != Grades::None);
@@ -229,7 +176,7 @@ void Data::populateJouyou() {
   }
   _lists.insert(std::make_pair(Types::Jouyou, std::move(results)));
   // populate _linkedJinmeiKanji that are linked to Jouyou
-  fs::path p = FileList::getRegularFile(_dataDir, LinkedJinmeiFile);
+  fs::path p = FileList::getFile(_dataDir, LinkedJinmeiFile);
   std::ifstream f(p);
   std::string line;
   FileList::List found, notFound;
@@ -272,7 +219,7 @@ void Data::populateJouyou() {
 }
 
 void Data::populateJinmei() {
-  auto results = FileListKanji::fromFile(*this, Types::Jinmei, FileList::getRegularFile(_dataDir, JinmeiFile));
+  auto results = FileListKanji::fromFile(*this, Types::Jinmei, FileList::getFile(_dataDir, JinmeiFile));
   auto& linkedJinmei = _lists[Types::LinkedJinmei];
   for (const auto& i : results) {
     checkInsert(i);
@@ -287,7 +234,7 @@ void Data::populateJinmei() {
 }
 
 void Data::populateExtra() {
-  auto results = FileListKanji::fromFile(*this, Types::Extra, FileList::getRegularFile(_dataDir, ExtraFile));
+  auto results = FileListKanji::fromFile(*this, Types::Extra, FileList::getFile(_dataDir, ExtraFile));
   for (const auto& i : results)
     checkInsert(i);
   _lists.insert(std::make_pair(Types::Extra, std::move(results)));
@@ -341,17 +288,19 @@ void Data::processList(const FileList& l) {
   }
 }
 
-void Data::loadGroups() {
-  fs::path p = FileList::getRegularFile(_dataDir, GroupsFile);
+void Data::loadGroup(const std::filesystem::path& p, GroupMap& groups, GroupList& list, GroupType type) {
   std::ifstream f(p);
-  std::string line;
   int numberCol = -1, nameCol = -1, membersCol = -1;
   auto setCol = [&p](int& col, int pos) {
     if (col != -1) usage("column " + std::to_string(pos) + " has duplicate name in " + p.string());
     col = pos;
   };
   std::array<std::string, 3> cols;
-  while (std::getline(f, line)) {
+  int lineNumber = 1;
+  auto error = [&](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + p.string());
+  };
+  for (std::string line; std::getline(f, line); ++lineNumber) {
     int pos = 0;
     std::stringstream ss(line);
     if (numberCol == -1) {
@@ -363,47 +312,45 @@ void Data::loadGroups() {
         else if (token == "Members")
           setCol(membersCol, pos);
         else
-          usage("unrecognized column '" + token + "' in " + p.string());
-      if (pos != cols.size()) usage("not enough columns in " + p.string());
+          error("unrecognized column '" + token + "'", false);
+      if (pos != cols.size()) error("not enough columns", false);
     } else {
       for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) usage("too many columns on line: " + line);
+        if (pos == cols.size()) error("too many columns");
         cols[pos] = token;
       }
-      if (pos != cols.size()) usage("not enough columns on line: " + line);
-      FileList::List kanjis;
+      if (pos != cols.size()) error("not enough columns");
       std::string number(cols[numberCol]), name(cols[nameCol]), token;
+      FileList::List kanjis;
       const bool peers = name.empty();
+      if (type == GroupType::Meaning) {
+        if (peers) error("Meaning group must have a name");
+      } else if (!peers) // if populated, 'name colum' is the first member of a Pattern group
+        kanjis.emplace_back(name);
       for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
-        if (name.empty())
-          name = token;
+        kanjis.emplace_back(token);
+      List memberKanjis;
+      for (const auto& i : kanjis) {
+        const auto memberKanji = findKanji(i);
+        if (memberKanji.has_value())
+          memberKanjis.push_back(*memberKanji);
         else
-          kanjis.emplace_back(token);
-      if (const auto nameKanji = findKanji(name); nameKanji.has_value()) {
-        List memberKanjis;
-        for (const auto& i : kanjis) {
-          const auto memberKanji = findKanji(i);
-          if (memberKanji.has_value())
-            memberKanjis.push_back(*memberKanji);
-          else
-            printError("failed to find member " + i + " in group " + number);
-        }
-        if (memberKanjis.empty()) usage("group " + number + " has not valid members");
-        const Group group(FileListKanji::toInt(number), *nameKanji, memberKanjis, peers);
-        checkInsert(name, group);
-        for (const auto& i : memberKanjis)
-          checkInsert(i->name(), group);
-        _groupList.push_back(group);
-      } else
-        printError("failed to find name " + name + " in group " + number);
+          printError("failed to find member " + i + " in group " + number);
+      }
+      if (memberKanjis.empty()) error("group " + number + " has no valid members");
+      GroupEntry group;
+      if (type == GroupType::Meaning)
+        group = std::make_shared<MeaningGroup>(FileListKanji::toInt(number), name, memberKanjis);
+      else
+        group = std::make_shared<PatternGroup>(FileListKanji::toInt(number), memberKanjis, peers);
+      for (const auto& i : memberKanjis)
+        checkInsert(i->name(), groups, group);
+      list.push_back(group);
     }
   }
 }
 
 void Data::checkStrokes() const {
-  // There shouldn't be any entries in _strokes that are 'Other' or 'None' type, but instead of
-  // asserting, print lists to help find any problems. This function should be called after all
-  // kanji have been loaded from other files.
   FileList::List strokesOther, strokesNotFound;
   for (const auto& i : _strokes) {
     auto t = getType(i.first);
@@ -573,25 +520,26 @@ void Data::printRadicals() const {
   }
 }
 
-void Data::printGroups() const {
-  std::cout << ">>> Loaded " << _groups.size() << " kanji into " << _groupList.size() << " groups\n"
+void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const {
+  std::cout << ">>> Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n"
             << ">>> Jouyou kanji have no suffix, otherwise '=JLPT \"=Freq ^=Jinmei ~=Linked Jinmei +=Extra *=...:\n";
-  for (const auto& i : _groupList) {
-    std::cout << '[' << std::setw(3) << std::setfill('0') << i.number() << "] ";
-    if (i.peers())
-      std::cout << "　 : " << i.name()->qualifiedName() << ' ';
-    else
-      std::cout << i.name()->qualifiedName() << ": ";
-    for (const auto& j : i.members()) {
-      if (j != i.members()[0]) std::cout << ' ';
-      std::cout << j->qualifiedName();
-    }
+  for (const auto& i : groupList) {
+    std::cout << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
+    if (i->type() == GroupType::Meaning) {
+      std::cout << i->name() << "\t:";
+      for (const auto& j : i->members())
+        std::cout << ' ' << j->qualifiedName();
+    } else
+      for (const auto& j : i->members())
+        if (j == i->members()[0]) {
+          if (i->peers())
+            std::cout << "　 : " << j->qualifiedName();
+          else
+            std::cout << j->qualifiedName() << ":";
+        } else
+          std::cout << ' ' << j->qualifiedName();
     std::cout << '\n';
   }
-}
-
-std::string Data::Group::toString() const {
-  return "[" + std::to_string(_number) + ' ' + _name->name() + (_peers ? "*]" : "]");
 }
 
 } // namespace kanji
