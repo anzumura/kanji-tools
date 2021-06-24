@@ -3,6 +3,7 @@
 #include <kanji/MBChar.h>
 
 #include <array>
+#include <fstream>
 
 namespace kanji {
 
@@ -116,6 +117,80 @@ TEST(MBChar, Reset) {
     EXPECT_EQ(x, i);
   }
   EXPECT_FALSE(s.getNext(x));
+}
+
+namespace fs = std::filesystem;
+
+class MBCharCountTest : public ::testing::Test {
+protected:
+  void SetUp() override {
+    if (fs::exists(_testDir)) TearDown();
+    EXPECT_TRUE(fs::create_directories(_testSubDir));
+    std::array files = {std::make_pair(_testFile1, "北海道"), std::make_pair(_testFile2, "南北"),
+                        std::make_pair(_testSubFile1, "東西線"), std::make_pair(_testSubFile2, "東北")};
+    for (auto& i : files) {
+      std::ofstream of(i.first);
+      of << i.second;
+      of.close();
+    }
+  }
+  void TearDown() override { fs::remove_all(_testDir); }
+  MBCharCount c;
+  fs::path _testDir = "testDir";
+  fs::path _testFile1 = _testDir / "testFile1";
+  fs::path _testFile2 = _testDir / "testFile2";
+  fs::path _testSubDir = _testDir / "testSubDir";
+  fs::path _testSubFile1 = _testSubDir / "testSubFile1";
+  fs::path _testSubFile2 = _testSubDir / "testSubFile2";
+};
+
+TEST_F(MBCharCountTest, Add) {
+  EXPECT_EQ(c.add("hello空は青い"), 4);
+  EXPECT_EQ(c.add("箱は空です"), 5);
+  EXPECT_EQ(c.add("今日は涼しい。good bye"), 7);
+  // map only includes MB chars
+  EXPECT_EQ(c.uniqueEntries(), 12);
+  EXPECT_EQ(c.count("空"), 2);
+  EXPECT_EQ(c.count("は"), 3);
+  EXPECT_EQ(c.count("青"), 1);
+  EXPECT_EQ(c.count("い"), 2);
+  EXPECT_EQ(c.count("箱"), 1);
+  EXPECT_EQ(c.count("で"), 1);
+  EXPECT_EQ(c.count("す"), 1);
+  EXPECT_EQ(c.count("今"), 1);
+  EXPECT_EQ(c.count("日"), 1);
+  EXPECT_EQ(c.count("涼"), 1);
+  EXPECT_EQ(c.count("し"), 1);
+  EXPECT_EQ(c.count("。"), 1);
+}
+
+TEST_F(MBCharCountTest, AddFile) {
+  EXPECT_EQ(c.addFile(_testFile1), 3);
+  EXPECT_EQ(c.uniqueEntries(), 3);
+  EXPECT_EQ(c.count("北"), 1);
+  EXPECT_EQ(c.count("海"), 1);
+  EXPECT_EQ(c.count("道"), 1);
+}
+
+TEST_F(MBCharCountTest, AddDirectoryNoRecurse) {
+  EXPECT_EQ(c.addFile(_testDir, false), 5);
+  EXPECT_EQ(c.uniqueEntries(), 4);
+  EXPECT_EQ(c.count("北"), 2);
+  EXPECT_EQ(c.count("南"), 1);
+  EXPECT_EQ(c.count("海"), 1);
+  EXPECT_EQ(c.count("道"), 1);
+}
+
+TEST_F(MBCharCountTest, AddDirectoryRecurse) {
+  EXPECT_EQ(c.addFile(_testDir), 10);
+  EXPECT_EQ(c.uniqueEntries(), 7);
+  EXPECT_EQ(c.count("北"), 3);
+  EXPECT_EQ(c.count("東"), 2);
+  EXPECT_EQ(c.count("南"), 1);
+  EXPECT_EQ(c.count("海"), 1);
+  EXPECT_EQ(c.count("西"), 1);
+  EXPECT_EQ(c.count("道"), 1);
+  EXPECT_EQ(c.count("線"), 1);
 }
 
 } // namespace kanji

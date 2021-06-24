@@ -1,6 +1,8 @@
 #ifndef KANJI_MBCHAR_H
 #define KANJI_MBCHAR_H
 
+#include <filesystem>
+#include <map>
 #include <string>
 
 namespace kanji {
@@ -46,12 +48,15 @@ public:
     return len;
   }
   static size_t length(const std::string& s, bool onlyMB = true) { return length(s.c_str(), onlyMB); }
-  // 'validOne' returns true if string contains one proper multi-byte sequence, i.e., a
-  // single well-formed 'multi-byte symbol'. Examples:
-  // - isMBChar("a") = false
-  // - isMBChar("雪") = true
-  // - isMBChar("吹雪") = false
-  // - isMBChar("a猫") = false
+  // 'valid' returns true if string contains one proper multi-byte sequence, i.e., a single
+  // well-formed 'multi-byte symbol'. Examples:
+  // - valid("") = false
+  // - valid("a") = false
+  // - valid("a猫") = false
+  // - valid("雪") = true
+  // - valid("雪s") = false
+  // - valid("吹雪") = false
+  // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
   static bool valid(const char* s, bool checkLengthOne = true) {
     if (s) {
       if (const unsigned char x = *s; (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
@@ -81,6 +86,33 @@ public:
 private:
   const std::string _data;
   const char* _location;
+};
+
+// 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
+class MBCharCount {
+public:
+  using Map = std::map<std::string, int>;
+  MBCharCount() {}
+  // 'add' adds all the 'MBChars' from the given string 's' and returns the number added
+  size_t add(const std::string& s) {
+    MBChar c(s);
+    size_t added = 0;
+    for (std::string token; c.getNext(token); ++added)
+      ++_map[token];
+    return added;
+  }
+  // 'addFile' adds strings from given 'file' or from all files in directory (if file is 'directory').
+  // 'recurse' determines if subdirectories are also searched.
+  size_t addFile(const std::filesystem::path& file, bool recurse = true);
+  // return count for given string or 0 if not found
+  size_t count(const std::string& s) const {
+    auto i = _map.find(s);
+    return i != _map.end() ? i->second : 0;
+  }
+  size_t uniqueEntries() const { return _map.size(); }
+  const Map& map() const { return _map; }
+private:
+  Map _map;
 };
 
 // Helper methods to print binary or hex versions of an unsigned char
