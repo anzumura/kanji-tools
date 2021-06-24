@@ -11,11 +11,6 @@
 
 namespace kanji {
 
-inline void usage(const std::string& msg) {
-  std::cerr << msg << '\n';
-  exit(1);
-}
-
 // JLPT Levels, None=not a JLPT kanji
 enum class Levels { N5, N4, N3, N2, N1, None };
 constexpr std::array AllLevels = {Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
@@ -29,9 +24,10 @@ public:
   using Set = std::set<std::string>;
   static std::filesystem::path getRegularFile(const std::filesystem::path& dir, const std::filesystem::path& file);
   static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
+  static void usage(const std::string& msg) { throw std::domain_error(msg); }
 
   FileList(const std::filesystem::path&, Levels, bool onePerLine);
-  // Constructor for kana and punctuation files (the have multiple space separated entries per line)
+  // Constructor for kana and punctuation files (allows multiple space separated entries per line)
   FileList(const std::filesystem::path& p) : FileList(p, Levels::None, false) {}
   // Constructor for JLPT n1-n5 and frequency files (which have one entry per line and name is based on level)
   FileList(const std::filesystem::path& p, Levels level) : FileList(p, level, true) {}

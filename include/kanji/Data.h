@@ -32,6 +32,7 @@ inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os <<
 
 class Data {
 public:
+  static void usage(const std::string& msg) { FileList::usage(msg); }
   Data(int argc, char** argv);
   using Entry = std::shared_ptr<class Kanji>;
   using List = std::vector<Entry>;

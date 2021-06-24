@@ -47,18 +47,19 @@ FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
     _level(l) {
   if (!fs::is_regular_file(p)) usage("can't open " + p.string());
   std::ifstream f(p);
-  std::string line;
   FileList::List good, dups;
-  while (std::getline(f, line)) {
+  int lineNumber = 1;
+  auto error = [&](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + p.string());
+  };
+  for (std::string line; std::getline(f, line); ++lineNumber) {
     std::stringstream ss(line);
-    auto error = [&](const std::string& s) { usage(s + " - line: '" + line + "', file: " + p.string()); };
     for (std::string token; std::getline(ss, token, ' ');) {
       if (onePerLine) {
         if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
         continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
-      if (!MBChar::valid(token))
-        error("invalid multi-byte token '" + token + "'");
+      if (!MBChar::valid(token)) error("invalid multi-byte token '" + token + "'");
       // check uniqueness with file
       if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
       // check uniqueness across files
@@ -78,15 +79,19 @@ FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
     }
   }
   if (!dups.empty()) {
-    std::cerr << ">>> found " << dups.size() << " duplicates in JLPT list " << _name << ":";
-    for (const auto& i : dups)
-      std::cerr << ' ' << i;
-    fs::path newFile(p);
-    newFile.replace_extension(fs::path("new"));
-    std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
-    std::ofstream of(newFile);
-    for (const auto& i : good)
-      of << i << '\n';
+    if (good.empty())
+      error("found " + std::to_string(dups.size()) + " duplicates in " + _name, false);
+    else {
+      std::cerr << ">>> found " << dups.size() << " duplicates in " << _name << ":";
+      for (const auto& i : dups)
+        std::cerr << ' ' << i;
+      fs::path newFile(p);
+      newFile.replace_extension(fs::path("new"));
+      std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
+      std::ofstream of(newFile);
+      for (const auto& i : good)
+        of << i << '\n';
+    }
   }
 }
 
