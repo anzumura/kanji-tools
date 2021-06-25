@@ -524,12 +524,12 @@ void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const
   std::cout << ">>> Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n"
             << ">>> Jouyou kanji have no suffix, otherwise '=JLPT \"=Freq ^=Jinmei ~=Linked Jinmei +=Extra *=...:\n";
   for (const auto& i : groupList) {
-    std::cout << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
     if (i->type() == GroupType::Meaning) {
-      std::cout << i->name() << "\t:";
+      std::cout << i->name() << " (" << i->members().size() << ")\t:";
       for (const auto& j : i->members())
         std::cout << ' ' << j->qualifiedName();
-    } else
+    } else {
+      std::cout << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
       for (const auto& j : i->members())
         if (j == i->members()[0]) {
           if (i->peers())
@@ -538,6 +538,7 @@ void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const
             std::cout << j->qualifiedName() << ":";
         } else
           std::cout << ' ' << j->qualifiedName();
+    }
     std::cout << '\n';
   }
 }
