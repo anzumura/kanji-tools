@@ -16,20 +16,21 @@ Number	Name	Radical	Strokes	Meaning	Reading
 15	囁	口	21	whisper	ショウ、ささや-く
 16	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
 17	鶺	鳥	21	wagtail	セキ
-18	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
-19	鄲	邑	15	place name	タン
-20	憚	心	15	hesitate	タン、タ、はばか-る
-21	痔	疒	11	piles	ヂ、ジ、しもがさ
-22	闖	門	18	inquire about	チン、うかが-う
-23	梃	木	11	lever	チョウ、テイ、てこ、つえ
-24	籐	竹	21	cane	トウ
-25	慟	心	14	be sad	ドウ、トウ、なげ-く
-26	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
-27	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
-28	屁	尸	7	fart	ヒ、へ、おなら
-29	騙	馬	19	deceive	ヘン、かた-る、だま-す
-30	蝿	虫	15	fly	ヨウ、はえ、はい
-31	孕	子	5	become pregnant	ヨウ、はらむ
-32	泪	水	8	tears	ルイ、レイ、なみだ
-33	鴒	鳥	16	wagtail	レイ
-34	朧	月	20	haziness	ロウ、おぼろ
+18	仟	人	5	Thousand	セン、ち、かしら
+19	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
+20	鄲	邑	15	place name	タン
+21	憚	心	15	hesitate	タン、タ、はばか-る
+22	痔	疒	11	piles	ヂ、ジ、しもがさ
+23	闖	門	18	inquire about	チン、うかが-う
+24	梃	木	11	lever	チョウ、テイ、てこ、つえ
+25	籐	竹	21	cane	トウ
+26	慟	心	14	be sad	ドウ、トウ、なげ-く
+27	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
+28	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
+29	屁	尸	7	fart	ヒ、へ、おなら
+30	騙	馬	19	deceive	ヘン、かた-る、だま-す
+31	蝿	虫	15	fly	ヨウ、はえ、はい
+32	孕	子	5	become pregnant	ヨウ、はらむ
+33	泪	水	8	tears	ルイ、レイ、なみだ
+34	鴒	鳥	16	wagtail	レイ
+35	朧	月	20	haziness	ロウ、おぼろ
