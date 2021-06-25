@@ -1,4 +1,5 @@
 #include <kanji/Group.h>
+#include <kanji/MBChar.h>
 
 #include <fstream>
 #include <numeric>
@@ -525,7 +526,12 @@ void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const
             << ">>> Jouyou kanji have no suffix, otherwise '=JLPT \"=Freq ^=Jinmei ~=Linked Jinmei +=Extra *=...:\n";
   for (const auto& i : groupList) {
     if (i->type() == GroupType::Meaning) {
-      std::cout << i->name() << " (" << i->members().size() << ")\t:";
+      auto len = MBChar::length(i->name());
+      std::cout << i->name()
+                << (len == 1     ? "　　"
+                      : len == 2 ? "　"
+                                 : "")
+                << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")\t:";
       for (const auto& j : i->members())
         std::cout << ' ' << j->qualifiedName();
     } else {

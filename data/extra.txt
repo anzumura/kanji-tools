@@ -20,7 +20,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 19	囁	口	21	whisper	ショウ、ささや-く
 20	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
 21	鶺	鳥	21	wagtail	セキ
-22	仟	人	5	Thousand	セン、ち、かしら
+22	仟	人	5	thousand	セン、ち、かしら
 23	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
 24	鄲	邑	15	place name	タン
 25	憚	心	15	hesitate	タン、タ、はばか-る
