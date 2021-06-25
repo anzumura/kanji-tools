@@ -9,11 +9,14 @@ namespace fs = std::filesystem;
 
 Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path& file) {
   assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
+  int lineNumber = 1;
+  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
+    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  };
   std::ifstream f(file);
-  std::string line;
   std::map<int, int> colMap;
   Data::List results;
-  while (std::getline(f, line)) {
+  for (std::string line; std::getline(f, line); ++lineNumber) {
     std::stringstream ss(line);
     int pos = 0;
     // first line should be headers, don't catch exceptions for first line since
@@ -21,25 +24,25 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
     if (colMap.empty())
       for (std::string token; std::getline(ss, token, '\t'); ++pos) {
         auto i = ColumnMap.find(token);
-        if (i == ColumnMap.end()) throw std::domain_error("unrecognized column: " + token);
-        if (!colMap.insert(std::pair(pos, i->second)).second) throw std::domain_error("duplicate column: " + token);
+        if (i == ColumnMap.end()) error("unrecognized column: " + token, false);
+        if (!colMap.insert(std::pair(pos, i->second)).second) error("duplicate column: " + token, false);
       }
-    else
+    else {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+        auto i = colMap.find(pos);
+        if (i == colMap.end()) error("too many columns");
+        columns[i->second] = token;
+      }
       try {
-        for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-          auto i = colMap.find(pos);
-          if (i == colMap.end()) throw std::out_of_range("too many columns");
-          columns[i->second] = token;
-        }
         switch (type) {
         case Types::Jouyou: results.push_back(std::make_shared<JouyouKanji>(data)); break;
         case Types::Jinmei: results.push_back(std::make_shared<JinmeiKanji>(data)); break;
         default: results.push_back(std::make_shared<ExtraKanji>(data)); break;
         }
       } catch (const std::exception& e) {
-        std::cerr << "got exception: " << e.what() << " while processing " << file.string() << " line: " << line
-                  << '\n';
+        error(std::string("got exception while creating kanji '") + e.what() + "'");
       }
+    }
   }
   return results;
 }

@@ -40,18 +40,18 @@ void FileList::print(const List& l, const std::string& type, const std::string& 
   }
 }
 
-FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
+FileList::FileList(const fs::path& file, Levels l, bool onePerLine)
   : _name(l != Levels::None ? std::string("JLPT ") + toString(l)
             : onePerLine    ? std::string("Top Frequency")
-                            : capitalize(p.stem().string())),
+                            : capitalize(file.stem().string())),
     _level(l) {
-  if (!fs::is_regular_file(p)) usage("can't open " + p.string());
-  std::ifstream f(p);
-  FileList::List good, dups;
+  if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   int lineNumber = 1;
-  auto error = [&](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + p.string());
+  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
   };
+  std::ifstream f(file);
+  FileList::List good, dups;
   for (std::string line; std::getline(f, line); ++lineNumber) {
     std::stringstream ss(line);
     for (std::string token; std::getline(ss, token, ' ');) {
@@ -85,7 +85,7 @@ FileList::FileList(const fs::path& p, Levels l, bool onePerLine)
       std::cerr << ">>> found " << dups.size() << " duplicates in " << _name << ":";
       for (const auto& i : dups)
         std::cerr << ' ' << i;
-      fs::path newFile(p);
+      fs::path newFile(file);
       newFile.replace_extension(fs::path("new"));
       std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
       std::ofstream of(newFile);

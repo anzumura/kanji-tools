@@ -48,6 +48,7 @@ public:
   using RadicalMap = std::map<std::string, Radical>;
 
   Data(const std::filesystem::path& dataDir, bool debug) : _dataDir(dataDir), _debug(debug) {}
+  Data(const Data&) = delete;
 
   // functions used by 'Kanji' classes during construction
   virtual int getFrequency(const std::string&) const = 0;

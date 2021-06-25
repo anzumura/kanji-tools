@@ -85,10 +85,10 @@ TEST(MBChar, GetNext) {
   std::string x;
   std::array expected = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
   for (const auto& i : expected) {
-    EXPECT_TRUE(s.getNext(x));
+    EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
-  EXPECT_FALSE(s.getNext(x));
+  EXPECT_FALSE(s.next(x));
 }
 
 TEST(MBChar, GetNextIncludingSingleByte) {
@@ -96,10 +96,10 @@ TEST(MBChar, GetNextIncludingSingleByte) {
   std::string x;
   std::array expected = {"a", "天", "気", "b"};
   for (const auto& i : expected) {
-    EXPECT_TRUE(s.getNext(x, false));
+    EXPECT_TRUE(s.next(x, false));
     EXPECT_EQ(x, i);
   }
-  EXPECT_FALSE(s.getNext(x, false));
+  EXPECT_FALSE(s.next(x, false));
 }
 
 TEST(MBChar, Reset) {
@@ -107,16 +107,16 @@ TEST(MBChar, Reset) {
   std::string x;
   std::array expected = {"天", "気"};
   for (const auto& i : expected) {
-    EXPECT_TRUE(s.getNext(x));
+    EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
-  EXPECT_FALSE(s.getNext(x));
+  EXPECT_FALSE(s.next(x));
   s.reset();
   for (const auto& i : expected) {
-    EXPECT_TRUE(s.getNext(x));
+    EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
-  EXPECT_FALSE(s.getNext(x));
+  EXPECT_FALSE(s.next(x));
 }
 
 namespace fs = std::filesystem;

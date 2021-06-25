@@ -26,6 +26,7 @@ public:
   Group(int number, const Data::List& members)
     : _number(number), _members(members) {}
   virtual ~Group() = default;
+  Group(const Group&) = delete;
 
   virtual GroupType type() const = 0;
   virtual const std::string& name() const = 0;

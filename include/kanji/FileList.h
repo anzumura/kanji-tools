@@ -32,6 +32,7 @@ public:
   FileList(const std::filesystem::path& p) : FileList(p, Levels::None, false) {}
   // Constructor for JLPT n1-n5 and frequency files (which have one entry per line and name is based on level)
   FileList(const std::filesystem::path& p, Levels level) : FileList(p, level, true) {}
+  FileList(const FileList&) = delete;
 
   bool exists(const std::string& s) const { return _map.find(s) != _map.end(); }
   // return 0 for 'not found'

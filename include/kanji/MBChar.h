@@ -80,7 +80,7 @@ public:
   void reset() { _location = _data.c_str(); }
   // 'next' populates 'result' with the full multi-byte character (so could be more than one byte)
   // returns true if result was populated.
-  bool getNext(std::string& result, bool onlyMB = true);
+  bool next(std::string& result, bool onlyMB = true);
   size_t length(bool onlyMB = true) const { return length(_data, onlyMB); }
   bool valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
 private:
@@ -97,7 +97,7 @@ public:
   size_t add(const std::string& s) {
     MBChar c(s);
     size_t added = 0;
-    for (std::string token; c.getNext(token); ++added)
+    for (std::string token; c.next(token); ++added)
       ++_map[token];
     return added;
   }

@@ -4,7 +4,7 @@
 
 namespace kanji {
 
-bool MBChar::getNext(std::string& result, bool onlyMB) {
+bool MBChar::next(std::string& result, bool onlyMB) {
   for (; *_location; ++_location) {
     const unsigned char firstOfGroup = *_location;
     unsigned char x = firstOfGroup & Mask;

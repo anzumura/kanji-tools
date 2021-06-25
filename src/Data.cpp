@@ -105,16 +105,18 @@ void Data::checkNotFound(const FileList::Set& s, const std::string& n) {
 
 void Data::printError(const std::string& msg) { std::cerr << "ERROR --- " << msg << '\n'; }
 
-void Data::loadRadicals(const fs::path& p) {
-  std::ifstream f(p);
-  std::string line;
-  int numberCol = -1, radicalCol = -1, nameCol = -1, readingCol = -1;
-  auto setCol = [&p](int& col, int pos) {
-    if (col != -1) usage("column " + std::to_string(pos) + " has duplicate name in " + p.string());
+void Data::loadRadicals(const fs::path& file) {
+  int lineNumber = 1, numberCol = -1, radicalCol = -1, nameCol = -1, readingCol = -1;
+  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  };
+  auto setCol = [&file, &error](int& col, int pos) {
+    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
     col = pos;
   };
+  std::ifstream f(file);
   std::array<std::string, 4> cols;
-  while (std::getline(f, line)) {
+  for (std::string line; std::getline(f, line); ++lineNumber) {
     int pos = 0;
     std::stringstream ss(line);
     if (numberCol == -1) {
@@ -128,14 +130,14 @@ void Data::loadRadicals(const fs::path& p) {
         else if (token == "Reading")
           setCol(readingCol, pos);
         else
-          usage("unrecognized column '" + token + "' in " + p.string());
-      if (pos != cols.size()) usage("not enough columns in " + p.string());
+          error("unrecognized column '" + token + "'", false);
+      if (pos != cols.size()) error("not enough columns", false);
     } else {
       for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) usage("too many columns on line: " + line);
+        if (pos == cols.size()) error("too many columns");
         cols[pos] = token;
       }
-      if (pos != cols.size()) usage("not enough columns on line: " + line);
+      if (pos != cols.size()) error("not enough columns");
       std::stringstream radicals(cols[radicalCol]);
       Radical::AltForms altForms;
       std::string radical, token;
@@ -151,8 +153,8 @@ void Data::loadRadicals(const fs::path& p) {
   }
 }
 
-void Data::loadStrokes(const fs::path& p) {
-  std::ifstream f(p);
+void Data::loadStrokes(const fs::path& file) {
+  std::ifstream f(file);
   std::string line;
   int strokes = 0;
   while (std::getline(f, line))
@@ -163,7 +165,7 @@ void Data::loadStrokes(const fs::path& p) {
     } else {
       assert(strokes != 0); // first line must have a stroke count
       if (!_strokes.insert(std::pair(line, strokes)).second)
-        printError("duplicate entry in " + p.string() + ": " + line);
+        printError("duplicate entry in " + file.string() + ": " + line);
     }
 }
 
@@ -177,18 +179,17 @@ void Data::populateJouyou() {
   }
   _lists.insert(std::make_pair(Types::Jouyou, std::move(results)));
   // populate _linkedJinmeiKanji that are linked to Jouyou
-  fs::path p = FileList::getFile(_dataDir, LinkedJinmeiFile);
-  std::ifstream f(p);
-  std::string line;
+  fs::path file = FileList::getFile(_dataDir, LinkedJinmeiFile);
+  std::ifstream f(file);
   FileList::List found, notFound;
   int count = 0;
   auto& linkedJinmei = _lists[Types::LinkedJinmei];
-  while (std::getline(f, line)) {
+  for (std::string line; std::getline(f, line);) {
     std::stringstream ss(line);
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
       const auto i = _map.find(jouyou);
       if (i == _map.end())
-        printError("can't find " + jouyou + " while processing " + p.string());
+        printError("can't find " + jouyou + " while processing " + file.string());
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
         checkInsert(linkedJinmei, k);
@@ -200,10 +201,10 @@ void Data::populateJouyou() {
         }
       }
     } else
-      printError("bad line in " + p.string() + ": " + line);
+      printError("bad line in " + file.string() + ": " + line);
   }
-  FileList::print(found, "kanji that are 'old jouyou'", p.stem().string());
-  FileList::print(notFound, "kanji that are not 'old jouyou'", p.stem().string());
+  FileList::print(found, "kanji that are 'old jouyou'", file.stem().string());
+  FileList::print(notFound, "kanji that are not 'old jouyou'", file.stem().string());
   found.clear();
   // populate _linkedOldKanji (so old Jouyou that are not Linked Jinmei)
   count = 0;
@@ -216,7 +217,7 @@ void Data::populateJouyou() {
         if (_debug) found.push_back(*i.second->oldName());
       }
     }
-  FileList::print(found, "'old jouyou' that are not " + p.stem().string());
+  FileList::print(found, "'old jouyou' that are not " + file.stem().string());
 }
 
 void Data::populateJinmei() {
@@ -241,12 +242,12 @@ void Data::populateExtra() {
   _lists.insert(std::make_pair(Types::Extra, std::move(results)));
 }
 
-void Data::processList(const FileList& l) {
+void Data::processList(const FileList& list) {
   FileList::List jouyouOld, jinmeiOld, other;
   std::map<Types, FileList::List> found;
   auto count = 0;
   auto& otherKanji = _lists[Types::Other];
-  for (const auto& i : l.list()) {
+  for (const auto& i : list.list()) {
     // keep track of any 'old' kanji in a level or top frequency list
     if (_debug) {
       if (_jouyouOldSet.find(i) != _jouyouOldSet.end())
@@ -259,18 +260,18 @@ void Data::processList(const FileList& l) {
       if (_debug && j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
     } else {
       // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
-      auto k = std::make_shared<Kanji>(*this, ++count, i, l.level());
+      auto k = std::make_shared<Kanji>(*this, ++count, i, list.level());
       _map.insert(std::make_pair(i, k));
       otherKanji.push_back(k);
       if (_debug) other.emplace_back(i);
     }
   }
-  FileList::print(jouyouOld, "Jouyou Old", l.name());
-  FileList::print(jinmeiOld, "Jinmei Old", l.name());
-  FileList::print(found[Types::LinkedOld], "Linked Old", l.name());
-  FileList::print(other, std::string("non-Jouyou/Jinmei") + (l.level() == Levels::None ? "/JLPT" : ""), l.name());
-  // l.level is None when processing 'frequency.txt' file (so not a JLPT level file)
-  if (l.level() == Levels::None) {
+  FileList::print(jouyouOld, "Jouyou Old", list.name());
+  FileList::print(jinmeiOld, "Jinmei Old", list.name());
+  FileList::print(found[Types::LinkedOld], "Linked Old", list.name());
+  FileList::print(other, std::string("non-Jouyou/Jinmei") + (list.level() == Levels::None ? "/JLPT" : ""), list.name());
+  // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
+  if (list.level() == Levels::None) {
     std::vector lists = {std::make_pair(&found[Types::Jinmei], ""),
                          std::make_pair(&found[Types::LinkedJinmei], "Linked ")};
     for (const auto& i : lists) {
@@ -280,27 +281,26 @@ void Data::processList(const FileList& l) {
           jlptJinmei.emplace_back(j);
         else
           otherJinmei.emplace_back(j);
-      FileList::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", l.name());
-      FileList::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", l.name());
+      FileList::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", list.name());
+      FileList::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", list.name());
     }
   } else {
-    FileList::print(found[Types::Jinmei], "Jinmei", l.name());
-    FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", l.name());
+    FileList::print(found[Types::Jinmei], "Jinmei", list.name());
+    FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", list.name());
   }
 }
 
-void Data::loadGroup(const std::filesystem::path& p, GroupMap& groups, GroupList& list, GroupType type) {
-  std::ifstream f(p);
-  int numberCol = -1, nameCol = -1, membersCol = -1;
-  auto setCol = [&p](int& col, int pos) {
-    if (col != -1) usage("column " + std::to_string(pos) + " has duplicate name in " + p.string());
+void Data::loadGroup(const std::filesystem::path& file, GroupMap& groups, GroupList& list, GroupType type) {
+  int lineNumber = 1, numberCol = -1, nameCol = -1, membersCol = -1;
+  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  };
+  auto setCol = [&file, &error](int& col, int pos) {
+    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name", false);
     col = pos;
   };
+  std::ifstream f(file);
   std::array<std::string, 3> cols;
-  int lineNumber = 1;
-  auto error = [&](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + p.string());
-  };
   for (std::string line; std::getline(f, line); ++lineNumber) {
     int pos = 0;
     std::stringstream ss(line);
@@ -401,15 +401,15 @@ void Data::printStats() const {
   printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
   printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
   // some old kanjis have a non-zero frequency
-  printCount("  Old Has Frequency", [&](const auto& x) { return x->oldFrequency(*this) != 0; });
+  printCount("  Old Has Frequency", [this](const auto& x) { return x->oldFrequency(*this) != 0; });
   // some old kanjis have stroke counts
-  printCount("  Old Has Strokes", [&](const auto& x) { return x->oldStrokes(*this) != 0; });
+  printCount("  Old Has Strokes", [this](const auto& x) { return x->oldStrokes(*this) != 0; });
   // no old kanjis should have a JLPT level, i.e.: they all should have Level 'None'
-  printCount("  Old Has Level", [&](const auto& x) { return x->oldLevel(*this) != Levels::None; });
+  printCount("  Old Has Level", [this](const auto& x) { return x->oldLevel(*this) != Levels::None; });
   // old kanjis should only have types of LinkedJinmei, Other or None
   for (auto i : AllTypes)
     printCount(std::string("  Old is type ") + toString(i),
-               [&](const auto& x) { return x->oldName().has_value() && x->oldType(*this) == i; });
+               [this, i](const auto& x) { return x->oldName().has_value() && x->oldType(*this) == i; });
 }
 
 void Data::printGrades() const {
@@ -527,11 +527,11 @@ void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const
   for (const auto& i : groupList) {
     if (i->type() == GroupType::Meaning) {
       auto len = MBChar::length(i->name());
-      std::cout << i->name()
+      std::cout << '[' << i->name()
                 << (len == 1     ? "　　"
                       : len == 2 ? "　"
                                  : "")
-                << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")\t:";
+                << ' ' << std::setw(2) << std::setfill(' ') << i->members().size() << "] :";
       for (const auto& j : i->members())
         std::cout << ' ' << j->qualifiedName();
     } else {
@@ -541,7 +541,7 @@ void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const
           if (i->peers())
             std::cout << "　 : " << j->qualifiedName();
           else
-            std::cout << j->qualifiedName() << ":";
+            std::cout << j->qualifiedName() << ':';
         } else
           std::cout << ' ' << j->qualifiedName();
     }

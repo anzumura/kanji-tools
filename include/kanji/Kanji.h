@@ -12,6 +12,7 @@ public:
   Kanji(const Data& d, int number, const std::string& name, Levels level = Levels::None)
     : _number(number), _name(name), _strokes(d.getStrokes(name)), _level(level), _frequency(d.getFrequency(name)) {}
   virtual ~Kanji() = default;
+  Kanji(const Kanji&) = delete;
 
   virtual Types type() const { return Types::Other; }
   virtual Grades grade() const { return Grades::None; }
