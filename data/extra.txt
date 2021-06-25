@@ -4,33 +4,38 @@ Number	Name	Radical	Strokes	Meaning	Reading
 3	姦	女	9	wicked	カン、ケン、かん-する、かしま-しい、みだら
 4	緘	糸	15	shut	カン、かん-する、と-じる
 5	哭	口	10	weep	コク、なげ-く、な-く
-6	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
-7	驕	馬	22	pride	キョウ、おご-る
-8	棘	艸	12	thorn	キョク、いばら、とげ
-9	薊	艸	16	thistle	ケイ、キカイ、ケ、あざみ、さく、とげ
-10	屎	尸	9	shit	シ、キ、くそ
-11	屍	尸	9	corpse	シ、かたしろ
-12	綬	糸	14	ribbon	ジュ、ひも
-13	嘯	口	16	roar	ショウ、シツ、うそぶ-く
-14	圳	土	6	furrow in field	ショウ、シュ、シン、ソン、シュン、みぞ
-15	囁	口	21	whisper	ショウ、ささや-く
-16	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
-17	鶺	鳥	21	wagtail	セキ
-18	仟	人	5	Thousand	セン、ち、かしら
-19	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
-20	鄲	邑	15	place name	タン
-21	憚	心	15	hesitate	タン、タ、はばか-る
-22	痔	疒	11	piles	ヂ、ジ、しもがさ
-23	闖	門	18	inquire about	チン、うかが-う
-24	梃	木	11	lever	チョウ、テイ、てこ、つえ
-25	籐	竹	21	cane	トウ
-26	慟	心	14	be sad	ドウ、トウ、なげ-く
-27	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
-28	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
-29	屁	尸	7	fart	ヒ、へ、おなら
-30	騙	馬	19	deceive	ヘン、かた-る、だま-す
-31	蝿	虫	15	fly	ヨウ、はえ、はい
-32	孕	子	5	become pregnant	ヨウ、はらむ
-33	泪	水	8	tears	ルイ、レイ、なみだ
-34	鴒	鳥	16	wagtail	レイ
-35	朧	月	20	haziness	ロウ、おぼろ
+6	坤	土	8	southwest	コン
+7	艮	艮	6	northeast	コン、ゴン、うしとら
+8	癸	癶	9	10th calendaar sign	キ、みずのと
+9	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
+10	驕	馬	22	pride	キョウ、おご-る
+11	棘	艸	12	thorn	キョク、いばら、とげ
+12	薊	艸	16	thistle	ケイ、キカイ、ケ、あざみ、さく、とげ
+13	屎	尸	9	shit	シ、キ、くそ
+14	屍	尸	9	corpse	シ、かたしろ
+15	戌	戈	6	sign of the dog	ジュツ、いぬ
+16	綬	糸	14	ribbon	ジュ、ひも
+17	嘯	口	16	roar	ショウ、シツ、うそぶ-く
+18	圳	土	6	furrow in field	ショウ、シュ、シン、ソン、シュン、みぞ
+19	囁	口	21	whisper	ショウ、ささや-く
+20	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
+21	鶺	鳥	21	wagtail	セキ
+22	仟	人	5	Thousand	セン、ち、かしら
+23	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
+24	鄲	邑	15	place name	タン
+25	憚	心	15	hesitate	タン、タ、はばか-る
+26	痔	疒	11	piles	ヂ、ジ、しもがさ
+27	闖	門	18	inquire about	チン、うかが-う
+28	梃	木	11	lever	チョウ、テイ、てこ、つえ
+29	籐	竹	21	cane	トウ
+30	慟	心	14	be sad	ドウ、トウ、なげ-く
+31	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
+32	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
+33	屁	尸	7	fart	ヒ、へ、おなら
+34	騙	馬	19	deceive	ヘン、かた-る、だま-す
+35	鰻	魚	22	eel	マン、バン、うなぎ
+36	蝿	虫	15	fly	ヨウ、はえ、はい
+37	孕	子	5	become pregnant	ヨウ、はらむ
+38	泪	水	8	tears	ルイ、レイ、なみだ
+39	鴒	鳥	16	wagtail	レイ
+40	朧	月	20	haziness	ロウ、おぼろ
