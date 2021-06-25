@@ -6,6 +6,8 @@ Number	Name	Radical	Strokes	Meaning	Reading
 5	哭	口	10	weep	コク、なげ-く、な-く
 5	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
 6	驕	馬	22	pride	キョウ、おご-る
+6	棘	艸	12	thorn	キョク、いばら、とげ
+6	薊	艸	16	thistle	ケイ、キカイ、ケ、あざみ、さく、とげ
 7	屎	尸	9	shit	シ、キ、くそ
 8	屍	尸	9	corpse	シ、かたしろ
 9	綬	糸	14	ribbon	ジュ、ひも
