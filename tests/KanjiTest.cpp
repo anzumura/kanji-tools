@@ -90,4 +90,18 @@ Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
   }
 }
 
+TEST_F(KanjiTest, ExtraFileWithDuplicateColumn) {
+  writeTestFile("\
+Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
+霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
+  try {
+    auto results = FileListKanji::fromFile(_data, Types::Extra, _testFile);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("duplicate column: Name, file: testDir/test.txt"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
 } // namespace kanji

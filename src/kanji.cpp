@@ -14,25 +14,27 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
   };
   std::ifstream f(file);
-  std::map<int, int> colMap;
+  std::bitset<MaxCol> found;
+  std::array<int, MaxCol> colMap;
+  colMap.fill(-1);
   Data::List results;
   for (std::string line; std::getline(f, line); ++lineNumber) {
     std::stringstream ss(line);
     int pos = 0;
-    // first line should be headers, don't catch exceptions for first line since
-    // whole file would be a problem
-    if (colMap.empty())
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        auto i = ColumnMap.find(token);
+    for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+      if (pos >= MaxCol) error("too many columns");
+      if (lineNumber == 1) {
+        const auto i = ColumnMap.find(token);
         if (i == ColumnMap.end()) error("unrecognized column: " + token, false);
-        if (!colMap.insert(std::pair(pos, i->second)).second) error("duplicate column: " + token, false);
-      }
-    else {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        auto i = colMap.find(pos);
-        if (i == colMap.end()) error("too many columns");
-        columns[i->second] = token;
-      }
+        if (found[i->second]) error("duplicate column: " + token, false);
+        found.flip(i->second);
+        colMap[pos] = i->second;
+      } else if (colMap[pos] == -1)
+        error("too many columns");
+      else
+        columns[colMap[pos]] = token;
+    }
+    if (lineNumber > 1) {
       try {
         switch (type) {
         case Types::Jouyou: results.push_back(std::make_shared<JouyouKanji>(data)); break;
