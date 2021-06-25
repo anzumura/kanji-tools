@@ -4,32 +4,32 @@ Number	Name	Radical	Strokes	Meaning	Reading
 3	姦	女	9	wicked	カン、ケン、かん-する、かしま-しい、みだら
 4	緘	糸	15	shut	カン、かん-する、と-じる
 5	哭	口	10	weep	コク、なげ-く、な-く
-5	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
-6	驕	馬	22	pride	キョウ、おご-る
-6	棘	艸	12	thorn	キョク、いばら、とげ
-6	薊	艸	16	thistle	ケイ、キカイ、ケ、あざみ、さく、とげ
-7	屎	尸	9	shit	シ、キ、くそ
-8	屍	尸	9	corpse	シ、かたしろ
-9	綬	糸	14	ribbon	ジュ、ひも
-10	嘯	口	16	roar	ショウ、シツ、うそぶ-く
-11	圳	土	6	furrow in field	ショウ、シュ、シン、ソン、シュン、みぞ
-12	囁	口	21	whisper	ショウ、ささや-く
-13	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
-14	鶺	鳥	21	wagtail	セキ
-14	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
-15	鄲	邑	15	place name	タン
-16	憚	心	15	hesitate	タン、タ、はばか-る
-17	痔	疒	11	piles	ヂ、ジ、しもがさ
-18	闖	門	18	inquire about	チン、うかが-う
-19	梃	木	11	lever	チョウ、テイ、てこ、つえ
-20	籐	竹	21	cane	トウ
-21	慟	心	14	be sad	ドウ、トウ、なげ-く
-22	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
-23	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
-24	屁	尸	7	fart	ヒ、へ、おなら
-25	騙	馬	19	deceive	ヘン、かた-る、だま-す
-26	蝿	虫	15	fly	ヨウ、はえ、はい
-27	孕	子	5	become pregnant	ヨウ、はらむ
-28	泪	水	8	tears	ルイ、レイ、なみだ
-29	鴒	鳥	16	wagtail	レイ
-30	朧	月	20	haziness	ロウ、おぼろ
+6	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
+7	驕	馬	22	pride	キョウ、おご-る
+8	棘	艸	12	thorn	キョク、いばら、とげ
+9	薊	艸	16	thistle	ケイ、キカイ、ケ、あざみ、さく、とげ
+10	屎	尸	9	shit	シ、キ、くそ
+11	屍	尸	9	corpse	シ、かたしろ
+12	綬	糸	14	ribbon	ジュ、ひも
+13	嘯	口	16	roar	ショウ、シツ、うそぶ-く
+14	圳	土	6	furrow in field	ショウ、シュ、シン、ソン、シュン、みぞ
+15	囁	口	21	whisper	ショウ、ささや-く
+16	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
+17	鶺	鳥	21	wagtail	セキ
+18	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
+19	鄲	邑	15	place name	タン
+20	憚	心	15	hesitate	タン、タ、はばか-る
+21	痔	疒	11	piles	ヂ、ジ、しもがさ
+22	闖	門	18	inquire about	チン、うかが-う
+23	梃	木	11	lever	チョウ、テイ、てこ、つえ
+24	籐	竹	21	cane	トウ
+25	慟	心	14	be sad	ドウ、トウ、なげ-く
+26	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
+27	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
+28	屁	尸	7	fart	ヒ、へ、おなら
+29	騙	馬	19	deceive	ヘン、かた-る、だま-す
+30	蝿	虫	15	fly	ヨウ、はえ、はい
+31	孕	子	5	become pregnant	ヨウ、はらむ
+32	泪	水	8	tears	ルイ、レイ、なみだ
+33	鴒	鳥	16	wagtail	レイ
+34	朧	月	20	haziness	ロウ、おぼろ
