@@ -24,12 +24,13 @@ const fs::path PatternGroupFile = "pattern-groups.txt";
 
 } // namespace
 
-KanjiData::KanjiData(int argc, char** argv)
+KanjiData::KanjiData(int argc, const char** argv)
   : Data(getDataDir(argc, argv), getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
     _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
     _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile, Levels::None),
     _hiragana(_dataDir / HiraganaFile), _katakana(_dataDir / KatakanaFile), _halfwidth(_dataDir / HalfwidthFile),
     _punctuation(_dataDir / PunctuationFile) {
+  FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
   loadStrokes(FileList::getFile(_dataDir, StrokesFile));
   populateJouyou();

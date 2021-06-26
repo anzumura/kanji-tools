@@ -88,8 +88,8 @@ protected:
   const std::filesystem::path _dataDir;
   const bool _debug;
   // helper functions for getting command line options
-  static std::filesystem::path getDataDir(int, char**);
-  static bool getDebug(int, char**);
+  static std::filesystem::path getDataDir(int, const char**);
+  static bool getDebug(int, const char**);
   // helper functions for checking and inserting into collection
   static void checkInsert(const std::string&, GroupMap&, const GroupEntry&);
   static void checkInsert(FileList::Set&, const std::string&);

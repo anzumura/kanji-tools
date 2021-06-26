@@ -26,6 +26,11 @@ public:
   static std::filesystem::path getFile(const std::filesystem::path& dir, const std::filesystem::path& file);
   static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
+  // should be called after loading all lists to clean up unneeded static data
+  static void clearUniqueCheckData() {
+    UniqueNames.clear();
+    UniqueLevelNames.clear();
+  }
 
   FileList(const std::filesystem::path&, Levels, bool onePerLine);
   // Constructor for kana and punctuation files (allows multiple space separated entries per line)

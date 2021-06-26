@@ -61,14 +61,15 @@ Types Data::getType(const std::string& name) const {
   return i->second->type();
 }
 
-fs::path Data::getDataDir(int argc, char** argv) {
+fs::path Data::getDataDir(int argc, const char** argv) {
   if (argc < 2) usage("please specify data directory");
   fs::path f(argv[1]);
-  if (!fs::is_directory(f)) usage(f.string() + " is not a valid directory");
+  if (!fs::is_directory(f))
+    usage(f.string() + " is not a valid directory - current directory is: " + fs::current_path().string());
   return f;
 }
 
-bool Data::getDebug(int argc, char** argv) {
+bool Data::getDebug(int argc, const char** argv) {
   for (int i = 2; i < argc; ++i)
     if (std::string(argv[i]) == "-debug") return true;
   return false;

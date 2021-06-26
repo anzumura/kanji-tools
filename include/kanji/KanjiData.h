@@ -10,7 +10,7 @@ namespace kanji {
 // files (such as jouyou.txt, jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(int argc, char** argv);
+  KanjiData(int argc, const char** argv);
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;
@@ -18,8 +18,8 @@ public:
   bool isHiragana(const std::string& s) const { return _hiragana.exists(s); }
   bool isKatakana(const std::string& s) const { return _katakana.exists(s); }
   bool isFullWidthKana(const std::string& s) const { return isHiragana(s) || isKatakana(s); }
-  bool isHalfwidthKana(const std::string& s) const { return _halfwidth.exists(s); }
-  bool isKana(const std::string& s) const { return isFullWidthKana(s) || isHalfwidthKana(s); }
+  bool isHalfWidthKana(const std::string& s) const { return _halfwidth.exists(s); }
+  bool isKana(const std::string& s) const { return isFullWidthKana(s) || isHalfWidthKana(s); }
   bool isWidePunctuation(const std::string& s) const { return _punctuation.exists(s); }
   bool isKanaOrPunctuation(const std::string& s) const { return isKana(s) || isWidePunctuation(s); }
 private:

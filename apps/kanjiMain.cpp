@@ -2,7 +2,7 @@
 
 using namespace kanji;
 
-int main(int argc, char** argv) {
+int main(int argc, const char** argv) {
   try {
     KanjiData data(argc, argv);
   } catch(const std::exception& err) {
