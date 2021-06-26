@@ -1,7 +1,5 @@
 #include <kanji/MBChar.h>
 
-#include <fstream>
-
 namespace kanji {
 
 bool MBChar::next(std::string& result, bool onlyMB) {
@@ -21,21 +19,6 @@ bool MBChar::next(std::string& result, bool onlyMB) {
     }
   }
   return false;
-}
-
-namespace fs = std::filesystem;
-
-size_t MBCharCount::addFile(const fs::path& file, bool recurse) {
-  size_t added = 0;
-  if (fs::is_regular_file(file)) {
-    std::ifstream f(file);
-    std::string line;
-    while (std::getline(f, line))
-      added += add(line);
-  } else if (fs::is_directory(file))
-    for (const fs::directory_entry& i : fs::directory_iterator(file))
-      added += recurse ? addFile(i.path()) : fs::is_regular_file(i.path()) ? addFile(i.path(), false) : 0;
-  return added;
 }
 
 } // namespace kanji

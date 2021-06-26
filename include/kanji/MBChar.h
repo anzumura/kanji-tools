@@ -2,6 +2,7 @@
 #define KANJI_MBCHAR_H
 
 #include <filesystem>
+#include <fstream>
 #include <map>
 #include <string>
 
@@ -88,22 +89,45 @@ private:
   const char* _location;
 };
 
+constexpr auto defaultMBCheck = [](const std::string&) { return true; };
+
 // 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
-class MBCharCount {
+template<typename Pred> class MBCharCount {
 public:
   using Map = std::map<std::string, int>;
-  MBCharCount() {}
+  MBCharCount(Pred pred) : _pred(pred) {}
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added
   size_t add(const std::string& s) {
     MBChar c(s);
     size_t added = 0;
-    for (std::string token; c.next(token); ++added)
-      ++_map[token];
+    for (std::string token; c.next(token);)
+      if (_pred(token)) {
+        ++_map[token];
+        ++added;
+      }
     return added;
   }
   // 'addFile' adds strings from given 'file' or from all files in directory (if file is 'directory').
   // 'recurse' determines if subdirectories are also searched.
-  size_t addFile(const std::filesystem::path& file, bool recurse = true);
+  size_t addFile(const std::filesystem::path& file, bool recurse = true) {
+    using DirEnt = const std::filesystem::directory_entry&;
+    using DirIt = std::filesystem::directory_iterator;
+    size_t added = 0;
+    if (isReg(file)) {
+      std::ifstream f(file);
+      std::string line;
+      while (std::getline(f, line))
+        added += add(line);
+    } else if (std::filesystem::is_directory(file))
+      for (DirEnt i : DirIt(file))
+        added += recurse ? addFile(i.path()) : isReg(i.path()) ? addFile(i.path(), false) : 0;
+    else if (!std::filesystem::exists(file))
+      throw std::domain_error("file not found: " + file.string());
+    else
+      throw std::domain_error("file type not supported: " + file.string());
+    return added;
+  }
+
   // return count for given string or 0 if not found
   size_t count(const std::string& s) const {
     auto i = _map.find(s);
@@ -112,7 +136,9 @@ public:
   size_t uniqueEntries() const { return _map.size(); }
   const Map& map() const { return _map; }
 private:
+  bool isReg(const std::filesystem::path& p) const { return std::filesystem::is_regular_file(p); }
   Map _map;
+  Pred _pred;
 };
 
 // Helper methods to print binary or hex versions of an unsigned char

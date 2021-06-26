@@ -1,5 +1,6 @@
-#include <kanji/KanjiData.h>
 #include <kanji/Group.h>
+#include <kanji/KanjiData.h>
+#include <kanji/MBChar.h>
 
 namespace kanji {
 
@@ -53,6 +54,8 @@ KanjiData::KanjiData(int argc, const char** argv)
     printGroups(_meaningGroups, _meaningGroupList);
     printGroups(_patternGroups, _patternGroupList);
   }
+  for (int i = 2; i < argc; ++i)
+    if (std::string(argv[i]) == "-count" && i + 1 < argc) countKanji(argv[i + 1]);
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {
@@ -62,6 +65,29 @@ Levels KanjiData::getLevel(const std::string& k) const {
   if (_n4.exists(k)) return Levels::N4;
   if (_n5.exists(k)) return Levels::N5;
   return Levels::None;
+}
+
+void KanjiData::countKanji(const fs::path& top) const {
+  auto pred = [this](const auto& x) { return !this->isKanaOrPunctuation(x) && x != "　"; };
+  MBCharCount count(pred);
+  count.addFile(top);
+  auto& m = count.map();
+  std::vector<std::pair<int, std::string>> frequency;
+  int total = 0;
+  for (const auto& i : m) {
+    total += i.second;
+    frequency.push_back(std::make_pair(i.second, i.first));
+  }
+  std::sort(frequency.begin(), frequency.end(), [](const auto& x, const auto& y) { return x.first > y.first; });
+  std::cout << "Total kanji: " << total << ", unique: " << frequency.size() << '\n';
+  total = 0;
+  for (const auto& i : frequency) {
+    auto k = findKanji(i.second);
+    std::cout << "  " << std::left << std::setw(5) << ++total << "'" << i.second << "' ("
+              << std::right << std::setw(3) << std::setfill('0') << i.first << ')' << std::setfill(' ');
+    if (k.has_value()) std::cout << " - freq: " << std::setw(4) << (**k).frequency() << ", type: " << (**k).type();
+    std::cout << '\n';
+  }
 }
 
 } // namespace kanji

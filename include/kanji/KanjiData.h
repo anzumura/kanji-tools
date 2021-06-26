@@ -23,6 +23,11 @@ public:
   bool isWidePunctuation(const std::string& s) const { return _punctuation.exists(s); }
   bool isKanaOrPunctuation(const std::string& s) const { return isKana(s) || isWidePunctuation(s); }
 private:
+  // 'countKanji' will count all multi-byte characters in 'top' file and if 'top' is a directroy
+  // then all the regulars under top will be processed (recursively). The 'count' for each unique
+  // kanji (frequency) will be displayed (non-kanji are not included).
+  void countKanji(const std::filesystem::path& top) const;
+
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;

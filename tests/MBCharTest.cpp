@@ -135,7 +135,7 @@ protected:
     }
   }
   void TearDown() override { fs::remove_all(_testDir); }
-  MBCharCount c;
+  MBCharCount<decltype(defaultMBCheck)> c{defaultMBCheck};
   fs::path _testDir = "testDir";
   fs::path _testFile1 = _testDir / "testFile1";
   fs::path _testFile2 = _testDir / "testFile2";
@@ -164,12 +164,40 @@ TEST_F(MBCharCountTest, Add) {
   EXPECT_EQ(c.count("。"), 1);
 }
 
+TEST_F(MBCharCountTest, AddWithPredicate) {
+  auto pred = [](const auto& s){ return s != "。" && s != "は"; };
+  MBCharCount cPred(pred);
+  EXPECT_EQ(cPred.add("これは模擬テストです。"), 9);
+  EXPECT_EQ(cPred.count("こ"), 1);
+  EXPECT_EQ(cPred.count("れ"), 1);
+  EXPECT_EQ(cPred.count("模"), 1);
+  EXPECT_EQ(cPred.count("擬"), 1);
+  EXPECT_EQ(cPred.count("テ"), 1);
+  EXPECT_EQ(cPred.count("ス"), 1);
+  EXPECT_EQ(cPred.count("ト"), 1);
+  EXPECT_EQ(cPred.count("で"), 1);
+  EXPECT_EQ(cPred.count("す"), 1);
+  EXPECT_EQ(cPred.count("は"), 0);
+  EXPECT_EQ(cPred.count("。"), 0);
+}
+
 TEST_F(MBCharCountTest, AddFile) {
   EXPECT_EQ(c.addFile(_testFile1), 3);
   EXPECT_EQ(c.uniqueEntries(), 3);
   EXPECT_EQ(c.count("北"), 1);
   EXPECT_EQ(c.count("海"), 1);
   EXPECT_EQ(c.count("道"), 1);
+}
+
+TEST_F(MBCharCountTest, AddMissingFile) {
+  try {
+    c.addFile(_testDir / "missing");
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("file not found: testDir/missing"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
 }
 
 TEST_F(MBCharCountTest, AddDirectoryNoRecurse) {
