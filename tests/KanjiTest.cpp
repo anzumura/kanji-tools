@@ -18,6 +18,7 @@ public:
     _radicals.insert(std::make_pair("雨", _radical));
     _radicals.insert(std::make_pair("二", _radical));
     _strokes.insert(std::make_pair("亘", 6));
+    _strokes.insert(std::make_pair("亙", 6));
   }
   MOCK_METHOD(int, getFrequency, (const std::string&), (const, override));
   MOCK_METHOD(Levels, getLevel, (const std::string&), (const, override));
@@ -70,6 +71,18 @@ protected:
   fs::path _testFile;
   MockData _data;
 };
+
+TEST_F(KanjiTest, OtherKanji) {
+  int frequency = 2362;
+  EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(frequency));
+  Kanji k(_data, 4, "呑");
+  EXPECT_EQ(k.type(), Types::Other);
+  EXPECT_EQ(k.name(), "呑");
+  EXPECT_EQ(k.number(), 4);
+  EXPECT_EQ(k.frequency(), frequency);
+  EXPECT_EQ(k.level(), Levels::None);
+  EXPECT_EQ(k.grade(), Grades::None);
+}
 
 TEST_F(KanjiTest, ExtraFile) {
   writeTestFile("\
@@ -171,6 +184,37 @@ Number	Name	Radical	OldName	Year	Reason\n\
   auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
   EXPECT_EQ(results.size(), 1);
   checkJinmeiKanji(results[0]);
+}
+
+TEST_F(KanjiTest, LinkedJinmei) {
+  writeTestFile("\
+Number	Name	Radical	OldName	Year	Reason\n\
+1	亘	二	亙	1951	Names");
+  EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
+  EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
+  EXPECT_CALL(_data, getFrequency("亙")).WillOnce(Return(0));
+  auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
+  EXPECT_EQ(results.size(), 1);
+  LinkedJinmeiKanji k(_data, 7, "亙", results[0]);
+  EXPECT_EQ(k.type(), Types::LinkedJinmei);
+  EXPECT_EQ(k.name(), "亙");
+  EXPECT_EQ(k.level(), Levels::None);
+  EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.link(), results[0]);
+}
+
+TEST_F(KanjiTest, BadLinkedJinmei) {
+  EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(2362));
+  auto other = std::make_shared<Kanji>(_data, 4, "呑");
+  try {
+    LinkedJinmeiKanji k(_data, 7, "亙", other);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(std::string(err.what()), "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but got 'Other'");
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
 }
 
 TEST_F(KanjiTest, JinmeiFileWithMissingReason) {

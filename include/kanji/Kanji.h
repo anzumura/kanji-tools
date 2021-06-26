@@ -8,7 +8,9 @@ namespace kanji {
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
-  // constructor for Kanji found in frequency.txt that weren't found in one of the other files
+  // Public constructor for Kanji found in frequency.txt that weren't found in one of the other
+  // files. This constructor is also used by LinkedKanji derived class to avoid 'getLevel' call
+  // done by the protected constructor.
   Kanji(const Data& d, int number, const std::string& name, Levels level = Levels::None)
     : _number(number), _name(name), _strokes(d.getStrokes(name)), _level(level), _frequency(d.getFrequency(name)) {}
   virtual ~Kanji() = default;
@@ -80,27 +82,37 @@ private:
 inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
 
 class LinkedKanji : public Kanji {
+public:
+  const Data::Entry& link() const { return _link; }
 protected:
-  LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& kanji)
-    : Kanji(d, number, name), _kanji(kanji) {}
+  LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
+    : Kanji(d, number, name), _link(link) {}
 
-  const Data::Entry& kanji() const { return _kanji; }
+  // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
+  static const std::string& checkType(const std::string& name, const Data::Entry& link, bool isJinmei = false) {
+    Types t = link->type();
+    if (t != Types::Jouyou && (!isJinmei || t != Types::Jinmei))
+      throw std::domain_error("LinkedKanji " + name + " wanted type '" + toString(Types::Jouyou) +
+                              (isJinmei ? std::string("' or '") + toString(Types::Jinmei) : std::string()) +
+                              "' for link " + link->name() + ", but got '" + toString(t) + "'");
+    return name;
+  }
 private:
-  const Data::Entry _kanji;
+  const Data::Entry _link;
 };
 
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
-  LinkedJinmeiKanji(const Data& d, int number, const std::string& name, const Data::Entry& kanji)
-    : LinkedKanji(d, number, name, kanji) {}
+  LinkedJinmeiKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
+    : LinkedKanji(d, number, checkType(name, link, true), link) {}
 
   Types type() const override { return Types::LinkedJinmei; }
 };
 
 class LinkedOldKanji : public LinkedKanji {
 public:
-  LinkedOldKanji(const Data& d, int number, const std::string& name, const Data::Entry& kanji)
-    : LinkedKanji(d, number, name, kanji) {}
+  LinkedOldKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
+    : LinkedKanji(d, number, checkType(name, link), link) {}
 
   Types type() const override { return Types::LinkedOld; }
 };
