@@ -53,9 +53,9 @@ public:
   // functions used by 'Kanji' classes during construction
   virtual int getFrequency(const std::string&) const = 0;
   virtual Levels getLevel(const std::string&) const = 0;
-  Radical getRadical(const std::string& radical) const {
-    auto i = _radicals.find(radical);
-    if (i == _radicals.end()) throw std::domain_error("radical not found: " + radical);
+  Radical getRadical(const std::string& name) const {
+    auto i = _radicals.find(name);
+    if (i == _radicals.end()) throw std::domain_error("name not found: " + name);
     return i->second;
   }
   int getStrokes(const std::string& s) const {

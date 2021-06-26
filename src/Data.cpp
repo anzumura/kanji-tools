@@ -106,7 +106,7 @@ void Data::checkNotFound(const FileList::Set& s, const std::string& n) {
 void Data::printError(const std::string& msg) { std::cerr << "ERROR --- " << msg << '\n'; }
 
 void Data::loadRadicals(const fs::path& file) {
-  int lineNumber = 1, numberCol = -1, radicalCol = -1, nameCol = -1, readingCol = -1;
+  int lineNumber = 1, numberCol = -1, nameCol = -1, longNameCol = -1, readingCol = -1;
   auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
     usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
   };
@@ -123,10 +123,10 @@ void Data::loadRadicals(const fs::path& file) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
         if (token == "Number")
           setCol(numberCol, pos);
-        else if (token == "Radical")
-          setCol(radicalCol, pos);
         else if (token == "Name")
           setCol(nameCol, pos);
+        else if (token == "LongName")
+          setCol(longNameCol, pos);
         else if (token == "Reading")
           setCol(readingCol, pos);
         else
@@ -138,17 +138,17 @@ void Data::loadRadicals(const fs::path& file) {
         cols[pos] = token;
       }
       if (pos != cols.size()) error("not enough columns");
-      std::stringstream radicals(cols[radicalCol]);
+      std::stringstream radicals(cols[nameCol]);
       Radical::AltForms altForms;
-      std::string radical, token;
+      std::string name, token;
       while (std::getline(radicals, token, ' '))
-        if (radical.empty())
-          radical = token;
+        if (name.empty())
+          name = token;
         else
           altForms.emplace_back(token);
       _radicals.emplace(
-        std::piecewise_construct, std::make_tuple(radical),
-        std::make_tuple(FileListKanji::toInt(cols[numberCol]), radical, altForms, cols[nameCol], cols[readingCol]));
+        std::piecewise_construct, std::make_tuple(name),
+        std::make_tuple(FileListKanji::toInt(cols[numberCol]), name, altForms, cols[longNameCol], cols[readingCol]));
     }
   }
 }
@@ -473,7 +473,7 @@ void Data::printLevels() const {
 }
 
 void Data::printRadicals() const {
-  std::cout << ">>> Radical breakdown - total count for each radical is followed by (Jouyou Jinmei Extra) counts:\n";
+  std::cout << ">>> Radical breakdown - total count for each name is followed by (Jouyou Jinmei Extra) counts:\n";
   std::map<Radical, Data::List> radicals;
   for (const auto& i : _lists) {
     if (hasRadical(i.first)) {

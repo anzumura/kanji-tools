@@ -1,4 +1,4 @@
-Number	Radical	Name	Reading
+Number	Name	LongName	Reading
 001	一	一部（いちぶ）	イチ
 002	丨	丨部（こんぶ）	ぼう たてぼう
 003	丶	丶部（ちゅぶ）	てん

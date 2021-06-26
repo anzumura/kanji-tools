@@ -14,16 +14,25 @@ using ::testing::Return;
 
 class MockData : public Data {
 public:
-  MockData(const fs::path& p) : Data(p, false), _radical(0, "", Radical::AltForms(), "", "") {
-    _radicals.insert(std::make_pair("雨", _radical));
-    _radicals.insert(std::make_pair("二", _radical));
-    _strokes.insert(std::make_pair("亘", 6));
-    _strokes.insert(std::make_pair("亙", 6));
+  MockData(const fs::path& p) : Data(p, false) {
+    radical("雨");
+    radical("二");
+    radical("心");
+    radical("色");
+    strokes("亘", 6);
+    strokes("亙", 6);
+    strokes("云", 6);
   }
   MOCK_METHOD(int, getFrequency, (const std::string&), (const, override));
   MOCK_METHOD(Levels, getLevel, (const std::string&), (const, override));
-
-  Radical _radical;
+private:
+  void radical(const std::string& name) {
+    static int count;
+    _radicals.insert(std::make_pair(name, Radical(++count, name, Radical::AltForms(), "", "")));
+  }
+  void strokes(const std::string& name, int count) {
+    _strokes.insert(std::make_pair(name, count));
+  }
 };
 
 class KanjiTest : public ::testing::Test {
@@ -41,26 +50,28 @@ protected:
     of << s;
     of.close();
   }
-  void checkExtraKanji(const Data::Entry& k) const {
-    EXPECT_EQ(k->type(), Types::Extra);
-    EXPECT_EQ(k->grade(), Grades::None);
-    EXPECT_EQ(k->level(), Levels::None);
-    EXPECT_EQ(k->frequency(), 0);
-    EXPECT_EQ(k->name(), "霙");
-    auto& e = static_cast<const ExtraKanji&>(*k);
-    EXPECT_EQ(e.radical(), _data._radical);
+
+  void checkExtraKanji(const Kanji& k) const {
+    EXPECT_EQ(k.type(), Types::Extra);
+    EXPECT_EQ(k.grade(), Grades::None);
+    EXPECT_EQ(k.level(), Levels::None);
+    EXPECT_EQ(k.frequency(), 0);
+    EXPECT_EQ(k.name(), "霙");
+    auto& e = static_cast<const ExtraKanji&>(k);
+    EXPECT_EQ(e.radical().name(), "雨");
     EXPECT_EQ(e.strokes(), 16);
     EXPECT_EQ(e.meaning(), "sleet");
     EXPECT_EQ(e.reading(), "エイ、ヨウ、みぞれ");
   }
-  void checkJinmeiKanji(const Data::Entry& k) const {
-    EXPECT_EQ(k->type(), Types::Jinmei);
-    EXPECT_EQ(k->grade(), Grades::None);
-    EXPECT_EQ(k->level(), Levels::N1);
-    EXPECT_EQ(k->frequency(), 1728);
-    EXPECT_EQ(k->name(), "亘");
-    auto& e = static_cast<const JinmeiKanji&>(*k);
-    EXPECT_EQ(e.radical(), _data._radical);
+
+  void checkJinmeiKanji(const Kanji& k) const {
+    EXPECT_EQ(k.type(), Types::Jinmei);
+    EXPECT_EQ(k.grade(), Grades::None);
+    EXPECT_EQ(k.level(), Levels::N1);
+    EXPECT_EQ(k.frequency(), 1728);
+    EXPECT_EQ(k.name(), "亘");
+    auto& e = static_cast<const JinmeiKanji&>(k);
+    EXPECT_EQ(e.radical().name(), "二");
     EXPECT_EQ(e.strokes(), 6);
     EXPECT_EQ(e.oldName(), "亙");
     EXPECT_EQ(e.year(), 1951);
@@ -91,7 +102,7 @@ Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
   EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(Levels::None));
   auto results = FileListKanji::fromFile(_data, Types::Extra, _testFile);
   EXPECT_EQ(results.size(), 1);
-  checkExtraKanji(results[0]);
+  checkExtraKanji(*results[0]);
 }
 
 TEST_F(KanjiTest, ExtraFileWithDifferentColumnOrder) {
@@ -101,7 +112,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(Levels::None));
   auto results = FileListKanji::fromFile(_data, Types::Extra, _testFile);
   EXPECT_EQ(results.size(), 1);
-  checkExtraKanji(results[0]);
+  checkExtraKanji(*results[0]);
 }
 
 TEST_F(KanjiTest, ExtraFileWithUnrecognizedColumn) {
@@ -177,19 +188,35 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 
 TEST_F(KanjiTest, JinmeiFile) {
   writeTestFile("\
-Number	Name	Radical	OldName	Year	Reason\n\
-1	亘	二	亙	1951	Names");
-  EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(Levels::N1));
-  EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(1728));
+Number\tName\tRadical\tOldName\tYear\tReason\n\
+7\t云\t二\t\t2004\tPrint\n\
+8\t亘\t二\t亙\t1951\tNames");
+  EXPECT_CALL(_data, getLevel("云")).WillOnce(Return(Levels::None));
+  EXPECT_CALL(_data, getFrequency("云")).WillOnce(Return(0));
+  EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
+  EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
   auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
-  EXPECT_EQ(results.size(), 1);
-  checkJinmeiKanji(results[0]);
+  EXPECT_EQ(results.size(), 2);
+
+  auto& k = *results[0];
+  EXPECT_EQ(k.type(), Types::Jinmei);
+  EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_FALSE(k.hasLevel());
+  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.name(), "云");
+  auto& e = static_cast<const JinmeiKanji&>(k);
+  EXPECT_EQ(e.radical().name(), "二");
+  EXPECT_EQ(e.strokes(), 6);
+  EXPECT_EQ(e.oldName(), std::nullopt);
+  EXPECT_EQ(e.year(), 2004);
+  EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Print);
+  checkJinmeiKanji(*results[1]);
 }
 
 TEST_F(KanjiTest, LinkedJinmei) {
   writeTestFile("\
-Number	Name	Radical	OldName	Year	Reason\n\
-1	亘	二	亙	1951	Names");
+Number\tName\tRadical\tOldName\tYear\tReason\n\
+1\t亘\t二\t亙\t1951\tNames");
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
   EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
   EXPECT_CALL(_data, getFrequency("亙")).WillOnce(Return(0));
@@ -219,13 +246,87 @@ TEST_F(KanjiTest, BadLinkedJinmei) {
 
 TEST_F(KanjiTest, JinmeiFileWithMissingReason) {
   writeTestFile("\
-Number	Name	Radical	OldName	Year\n\
-1	亘	二	亙	1951");
+Number\tName\tRadical\tOldName\tYear\n\
+1\t亘\t二\t亙\t1951");
   try {
     auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(std::string(err.what()), "missing required column: Reason, file: testDir/test.txt");
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(KanjiTest, JouyouFile) {
+  writeTestFile("\
+Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
+4\t愛\t心\t\t\t13\t4\tlove\tアイ\n\
+103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
+  EXPECT_CALL(_data, getLevel("愛")).WillOnce(Return(Levels::N3));
+  EXPECT_CALL(_data, getFrequency("愛")).WillOnce(Return(640));
+  EXPECT_CALL(_data, getLevel("艶")).WillOnce(Return(Levels::N1));
+  EXPECT_CALL(_data, getFrequency("艶")).WillOnce(Return(2207));
+  auto results = FileListKanji::fromFile(_data, Types::Jouyou, _testFile);
+  EXPECT_EQ(results.size(), 2);
+
+  for (auto& i : results) {
+    auto& k = *i;
+    EXPECT_EQ(k.type(), Types::Jouyou);
+    auto& e = static_cast<const JouyouKanji&>(k);
+    if (k.number() == 4) {
+      EXPECT_EQ(k.grade(), Grades::G4);
+      EXPECT_EQ(k.level(), Levels::N3);
+      EXPECT_EQ(k.frequency(), 640);
+      EXPECT_EQ(k.name(), "愛");
+      EXPECT_EQ(e.radical().name(), "心");
+      EXPECT_EQ(e.strokes(), 13);
+      EXPECT_EQ(e.oldName(), std::nullopt);
+      EXPECT_EQ(e.year(), std::nullopt);
+      EXPECT_EQ(e.meaning(), "love");
+      EXPECT_EQ(e.reading(), "アイ");
+    } else {
+      EXPECT_EQ(k.number(), 103);
+      EXPECT_EQ(k.grade(), Grades::S);
+      EXPECT_EQ(k.level(), Levels::N1);
+      EXPECT_EQ(k.frequency(), 2207);
+      EXPECT_EQ(k.name(), "艶");
+      EXPECT_EQ(e.radical().name(), "色");
+      EXPECT_EQ(e.strokes(), 19);
+      EXPECT_EQ(e.oldName(), "艷");
+      EXPECT_EQ(e.year(), 2010);
+      EXPECT_EQ(e.meaning(), "glossy");
+      EXPECT_EQ(e.reading(), "エン、つや");
+    }
+  }
+}
+
+TEST_F(KanjiTest, LinkedOld) {
+  writeTestFile("\
+Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
+103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
+  EXPECT_CALL(_data, getLevel("艶")).WillOnce(Return(Levels::N1));
+  EXPECT_CALL(_data, getFrequency("艶")).WillOnce(Return(2207));
+  EXPECT_CALL(_data, getFrequency("艷")).WillOnce(Return(0));
+  auto results = FileListKanji::fromFile(_data, Types::Jouyou, _testFile);
+  EXPECT_EQ(results.size(), 1);
+  LinkedOldKanji k(_data, 7, "艷", results[0]);
+  EXPECT_EQ(k.type(), Types::LinkedOld);
+  EXPECT_EQ(k.name(), "艷");
+  EXPECT_EQ(k.level(), Levels::None);
+  EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.link(), results[0]);
+}
+
+TEST_F(KanjiTest, BadLinkedOld) {
+  EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(2362));
+  auto other = std::make_shared<Kanji>(_data, 4, "呑");
+  try {
+    LinkedOldKanji k(_data, 7, "艷", other);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(std::string(err.what()), "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got 'Other'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
