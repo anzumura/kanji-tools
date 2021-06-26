@@ -16,8 +16,8 @@ enum class GroupType;
 
 // Official Grades for Jouyou kanji
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
-constexpr std::array AllGrades = {Grades::G1, Grades::G2, Grades::G3, Grades::G4,
-                                  Grades::G5, Grades::G6, Grades::S,  Grades::None};
+constexpr std::array AllGrades{Grades::G1, Grades::G2, Grades::G3, Grades::G4,
+                               Grades::G5, Grades::G6, Grades::S,  Grades::None};
 const char* toString(Grades);
 inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os << toString(x); }
 
@@ -30,8 +30,8 @@ inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os <
 // - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
 // - None: used as a type for a kanji that hasn't been loaded
 enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, None };
-constexpr std::array AllTypes = {Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
-                                 Types::Other,  Types::Extra,  Types::None};
+constexpr std::array AllTypes{Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
+                              Types::Other,  Types::Extra,  Types::None};
 const char* toString(Types);
 inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
 

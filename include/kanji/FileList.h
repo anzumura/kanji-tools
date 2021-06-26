@@ -13,7 +13,7 @@ namespace kanji {
 
 // JLPT Levels, None=not a JLPT kanji
 enum class Levels { N5, N4, N3, N2, N1, None };
-constexpr std::array AllLevels = {Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
+constexpr std::array AllLevels{Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
 const char* toString(Levels);
 inline std::ostream& operator<<(std::ostream& os, const Levels& x) { return os << toString(x); }
 
