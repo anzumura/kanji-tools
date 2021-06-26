@@ -34,7 +34,19 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
       else
         columns[colMap[pos]] = token;
     }
-    if (lineNumber > 1) {
+    if (lineNumber == 1) {
+      auto check = [&found, &error](const auto& x) {
+        for (auto i : x)
+          if (!found[i]) error(std::string("missing required column: ") + ColumnNames[i], false);
+      };
+      check(requiredColumns);
+      switch (type) {
+      case Types::Jouyou: check(jouyouRequiredColumns); break;
+      case Types::Jinmei: check(jinmeiRequiredColumns); break;
+      default: check(extraRequiredColumns);
+      }
+    } else {
+      if (pos < MaxCol && colMap[pos] != -1) error("not enough columns");
       try {
         switch (type) {
         case Types::Jouyou: results.push_back(std::make_shared<JouyouKanji>(data)); break;
@@ -50,11 +62,9 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
 }
 
 std::array<std::string, FileListKanji::MaxCol> FileListKanji::columns;
-
 std::map<std::string, int> FileListKanji::ColumnMap = {
-  {"Number", NumberCol},   {"Name", NameCol},       {"Radical", RadicalCol}, {"OldName", OldNameCol},
-  {"Year", YearCol},       {"Strokes", StrokesCol}, {"Grade", GradeCol},     {"Meaning", MeaningCol},
-  {"Reading", ReadingCol}, {"Reason", ReasonCol}};
+  colPair(NumberCol),  colPair(NameCol),  colPair(RadicalCol), colPair(OldNameCol), colPair(YearCol),
+  colPair(StrokesCol), colPair(GradeCol), colPair(MeaningCol), colPair(ReadingCol), colPair(ReasonCol)};
 
 JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
   if (s == "Names") return Reasons::Names;

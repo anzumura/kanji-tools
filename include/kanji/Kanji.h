@@ -146,6 +146,17 @@ protected:
     : Kanji(d, toInt(columns[NumberCol]), columns[NameCol], strokes, findFrequency),
       _radical(d.getRadical(columns[RadicalCol])) {}
 private:
+  // all kanji files must have at least the following columns
+  static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol};
+  // specific types require additional columns
+  static constexpr std::array jouyouRequiredColumns{OldNameCol, YearCol, StrokesCol, GradeCol, MeaningCol, ReadingCol};
+  static constexpr std::array jinmeiRequiredColumns{OldNameCol, YearCol, ReasonCol};
+  static constexpr std::array extraRequiredColumns{StrokesCol, MeaningCol, ReadingCol};
+
+  static constexpr std::array ColumnNames{"Number",  "Name",  "Radical", "OldName", "Year",
+                                          "Strokes", "Grade", "Meaning", "Reading", "Reason"};
+  static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
+
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
   const Radical _radical;
 };
