@@ -83,9 +83,11 @@ void KanjiData::countKanji(const fs::path& top) const {
   total = 0;
   for (const auto& i : frequency) {
     auto k = findKanji(i.second);
-    std::cout << "  " << std::left << std::setw(5) << ++total << "'" << i.second << "' ("
-              << std::right << std::setw(3) << std::setfill('0') << i.first << ')' << std::setfill(' ');
-    if (k.has_value()) std::cout << " - freq: " << std::setw(4) << (**k).frequency() << ", type: " << (**k).type();
+    std::cout << "  " << std::left << std::setw(5) << ++total << "'" << i.second << "' (" << std::right << std::setw(3)
+              << std::setfill('0') << i.first << ')' << std::setfill(' ');
+    if (k.has_value())
+      std::cout << " - freq: " << std::setw(4) << (**k).frequency() << ", "
+                << ((**k).hasLevel() ? toString((**k).level()) : std::string("--")) << ", " << (**k).type();
     std::cout << '\n';
   }
 }

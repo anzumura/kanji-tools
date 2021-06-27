@@ -137,9 +137,9 @@ protected:
   void TearDown() override { fs::remove_all(_testDir); }
   MBCharCount<decltype(defaultMBCheck)> c{defaultMBCheck};
   fs::path _testDir = "testDir";
-  fs::path _testFile1 = _testDir / "testFile1";
-  fs::path _testFile2 = _testDir / "testFile2";
-  fs::path _testSubDir = _testDir / "testSubDir";
+  fs::path _testFile1 = _testDir / "testFile甲";
+  fs::path _testFile2 = _testDir / "testFile乙";
+  fs::path _testSubDir = _testDir / "test下";
   fs::path _testSubFile1 = _testSubDir / "testSubFile1";
   fs::path _testSubFile2 = _testSubDir / "testSubFile2";
 };
@@ -182,11 +182,20 @@ TEST_F(MBCharCountTest, AddWithPredicate) {
 }
 
 TEST_F(MBCharCountTest, AddFile) {
-  EXPECT_EQ(c.addFile(_testFile1), 3);
+  EXPECT_EQ(c.addFile(_testFile1, false, false), 3);
   EXPECT_EQ(c.uniqueEntries(), 3);
   EXPECT_EQ(c.count("北"), 1);
   EXPECT_EQ(c.count("海"), 1);
   EXPECT_EQ(c.count("道"), 1);
+}
+
+TEST_F(MBCharCountTest, AddFileIncludingFile) {
+  EXPECT_EQ(c.addFile(_testFile1, true, false), 4);
+  EXPECT_EQ(c.uniqueEntries(), 4);
+  EXPECT_EQ(c.count("北"), 1);
+  EXPECT_EQ(c.count("海"), 1);
+  EXPECT_EQ(c.count("道"), 1);
+  EXPECT_EQ(c.count("甲"), 1);
 }
 
 TEST_F(MBCharCountTest, AddMissingFile) {
@@ -201,7 +210,7 @@ TEST_F(MBCharCountTest, AddMissingFile) {
 }
 
 TEST_F(MBCharCountTest, AddDirectoryNoRecurse) {
-  EXPECT_EQ(c.addFile(_testDir, false), 5);
+  EXPECT_EQ(c.addFile(_testDir, false, false), 5);
   EXPECT_EQ(c.uniqueEntries(), 4);
   EXPECT_EQ(c.count("北"), 2);
   EXPECT_EQ(c.count("南"), 1);
@@ -209,8 +218,19 @@ TEST_F(MBCharCountTest, AddDirectoryNoRecurse) {
   EXPECT_EQ(c.count("道"), 1);
 }
 
+TEST_F(MBCharCountTest, AddDirectoryNoRecurseIncludingFileNames) {
+  EXPECT_EQ(c.addFile(_testDir, true, false), 7);
+  EXPECT_EQ(c.uniqueEntries(), 6);
+  EXPECT_EQ(c.count("北"), 2);
+  EXPECT_EQ(c.count("南"), 1);
+  EXPECT_EQ(c.count("海"), 1);
+  EXPECT_EQ(c.count("道"), 1);
+  EXPECT_EQ(c.count("甲"), 1);
+  EXPECT_EQ(c.count("乙"), 1);
+}
+
 TEST_F(MBCharCountTest, AddDirectoryRecurse) {
-  EXPECT_EQ(c.addFile(_testDir), 10);
+  EXPECT_EQ(c.addFile(_testDir, false), 10);
   EXPECT_EQ(c.uniqueEntries(), 7);
   EXPECT_EQ(c.count("北"), 3);
   EXPECT_EQ(c.count("東"), 2);
@@ -219,6 +239,21 @@ TEST_F(MBCharCountTest, AddDirectoryRecurse) {
   EXPECT_EQ(c.count("西"), 1);
   EXPECT_EQ(c.count("道"), 1);
   EXPECT_EQ(c.count("線"), 1);
+}
+
+TEST_F(MBCharCountTest, AddDirectoryRecurseIncludingFileNames) {
+  EXPECT_EQ(c.addFile(_testDir), 13);
+  EXPECT_EQ(c.uniqueEntries(), 10);
+  EXPECT_EQ(c.count("北"), 3);
+  EXPECT_EQ(c.count("東"), 2);
+  EXPECT_EQ(c.count("南"), 1);
+  EXPECT_EQ(c.count("海"), 1);
+  EXPECT_EQ(c.count("西"), 1);
+  EXPECT_EQ(c.count("道"), 1);
+  EXPECT_EQ(c.count("線"), 1);
+  EXPECT_EQ(c.count("甲"), 1);
+  EXPECT_EQ(c.count("乙"), 1);
+  EXPECT_EQ(c.count("下"), 1);
 }
 
 } // namespace kanji

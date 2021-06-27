@@ -108,26 +108,12 @@ public:
     return added;
   }
   // 'addFile' adds strings from given 'file' or from all files in directory (if file is 'directory').
-  // 'recurse' determines if subdirectories are also searched.
-  size_t addFile(const std::filesystem::path& file, bool recurse = true) {
-    using DirEnt = const std::filesystem::directory_entry&;
-    using DirIt = std::filesystem::directory_iterator;
-    size_t added = 0;
-    if (isReg(file)) {
-      std::ifstream f(file);
-      std::string line;
-      while (std::getline(f, line))
-        added += add(line);
-    } else if (std::filesystem::is_directory(file))
-      for (DirEnt i : DirIt(file))
-        added += recurse ? addFile(i.path()) : isReg(i.path()) ? addFile(i.path(), false) : 0;
-    else if (!std::filesystem::exists(file))
-      throw std::domain_error("file not found: " + file.string());
-    else
-      throw std::domain_error("file type not supported: " + file.string());
-    return added;
+  // 'fileNames' controls whether the name of the file (or directory) should also be included
+  // in the count and 'recurse' determines if subdirectories are also searched.
+  size_t addFile(const std::filesystem::path& file, bool fileNames = true, bool recurse = true) {
+    if (!std::filesystem::exists(file)) throw std::domain_error("file not found: " + file.string());
+    return doAddFile(file, fileNames, recurse);
   }
-
   // return count for given string or 0 if not found
   size_t count(const std::string& s) const {
     auto i = _map.find(s);
@@ -136,7 +122,26 @@ public:
   size_t uniqueEntries() const { return _map.size(); }
   const Map& map() const { return _map; }
 private:
+  using DirEnt = const std::filesystem::directory_entry&;
+  using DirIt = std::filesystem::directory_iterator;
+
+  size_t doAddFile(const std::filesystem::path& file, bool fileNames, bool recurse = true) {
+    size_t added = 0;
+    if (isReg(file)) {
+      std::ifstream f(file);
+      std::string line;
+      while (std::getline(f, line))
+        added += add(line);
+    } else if (std::filesystem::is_directory(file))
+      for (DirEnt i : DirIt(file))
+        added += recurse ? doAddFile(i.path(), fileNames) : isReg(i.path()) ? doAddFile(i.path(), fileNames, false) : 0;
+    else // skip if not a regular file or directory
+      return 0;
+    if (fileNames) added += add(file.filename().string()); // only include the last component
+    return added;
+  }
   bool isReg(const std::filesystem::path& p) const { return std::filesystem::is_regular_file(p); }
+
   Map _map;
   Pred _pred;
 };
