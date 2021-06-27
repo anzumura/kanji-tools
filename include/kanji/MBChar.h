@@ -95,7 +95,7 @@ constexpr auto defaultMBCheck = [](const std::string&) { return true; };
 template<typename Pred> class MBCharCount {
 public:
   using Map = std::map<std::string, int>;
-  MBCharCount(Pred pred) : _pred(pred) {}
+  MBCharCount(Pred pred) : _pred(pred), _files(0), _directories(0) {}
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added
   size_t add(const std::string& s) {
     MBChar c(s);
@@ -120,6 +120,8 @@ public:
     return i != _map.end() ? i->second : 0;
   }
   size_t uniqueEntries() const { return _map.size(); }
+  size_t files() const { return _files; }
+  size_t directories() const { return _directories; }
   const Map& map() const { return _map; }
 private:
   using DirEnt = const std::filesystem::directory_entry&;
@@ -128,13 +130,16 @@ private:
   size_t doAddFile(const std::filesystem::path& file, bool fileNames, bool recurse = true) {
     size_t added = 0;
     if (isReg(file)) {
+      ++_files;
       std::ifstream f(file);
       std::string line;
       while (std::getline(f, line))
         added += add(line);
-    } else if (std::filesystem::is_directory(file))
+    } else if (std::filesystem::is_directory(file)) {
+      ++_directories;
       for (DirEnt i : DirIt(file))
         added += recurse ? doAddFile(i.path(), fileNames) : isReg(i.path()) ? doAddFile(i.path(), fileNames, false) : 0;
+    }
     else // skip if not a regular file or directory
       return 0;
     if (fileNames) added += add(file.filename().string()); // only include the last component
@@ -144,6 +149,9 @@ private:
 
   Map _map;
   Pred _pred;
+  // keep a count of number of files and directories processed
+  size_t _files;
+  size_t _directories;
 };
 
 // Helper methods to print binary or hex versions of an unsigned char

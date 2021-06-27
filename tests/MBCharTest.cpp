@@ -184,6 +184,8 @@ TEST_F(MBCharCountTest, AddWithPredicate) {
 TEST_F(MBCharCountTest, AddFile) {
   EXPECT_EQ(c.addFile(_testFile1, false, false), 3);
   EXPECT_EQ(c.uniqueEntries(), 3);
+  EXPECT_EQ(c.files(), 1);
+  EXPECT_EQ(c.directories(), 0);
   EXPECT_EQ(c.count("北"), 1);
   EXPECT_EQ(c.count("海"), 1);
   EXPECT_EQ(c.count("道"), 1);
@@ -204,6 +206,8 @@ TEST_F(MBCharCountTest, AddMissingFile) {
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("file not found: testDir/missing"));
+    EXPECT_EQ(c.files(), 0);
+    EXPECT_EQ(c.directories(), 0);
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -212,6 +216,8 @@ TEST_F(MBCharCountTest, AddMissingFile) {
 TEST_F(MBCharCountTest, AddDirectoryNoRecurse) {
   EXPECT_EQ(c.addFile(_testDir, false, false), 5);
   EXPECT_EQ(c.uniqueEntries(), 4);
+  EXPECT_EQ(c.files(), 2);
+  EXPECT_EQ(c.directories(), 1);
   EXPECT_EQ(c.count("北"), 2);
   EXPECT_EQ(c.count("南"), 1);
   EXPECT_EQ(c.count("海"), 1);
@@ -232,6 +238,8 @@ TEST_F(MBCharCountTest, AddDirectoryNoRecurseIncludingFileNames) {
 TEST_F(MBCharCountTest, AddDirectoryRecurse) {
   EXPECT_EQ(c.addFile(_testDir, false), 10);
   EXPECT_EQ(c.uniqueEntries(), 7);
+  EXPECT_EQ(c.files(), 4);
+  EXPECT_EQ(c.directories(), 2);
   EXPECT_EQ(c.count("北"), 3);
   EXPECT_EQ(c.count("東"), 2);
   EXPECT_EQ(c.count("南"), 1);

@@ -79,7 +79,8 @@ void KanjiData::countKanji(const fs::path& top) const {
     frequency.push_back(std::make_pair(i.second, i.first));
   }
   std::sort(frequency.begin(), frequency.end(), [](const auto& x, const auto& y) { return x.first > y.first; });
-  std::cout << "Total kanji: " << total << ", unique: " << frequency.size() << '\n';
+  std::cout << "Total kanji: " << total << ", unique: " << frequency.size() << ", directories: " << count.directories()
+            << ", files: " << count.files() << '\n';
   total = 0;
   for (const auto& i : frequency) {
     auto k = findKanji(i.second);
