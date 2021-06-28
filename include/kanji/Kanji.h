@@ -26,6 +26,7 @@ public:
   Levels level() const { return _level; }
   bool hasLevel() const { return _level != Levels::None; }
   int frequency() const { return _frequency; }
+  int frequencyOrDefault(int x) const { return _frequency ? _frequency : x; }
   // 'qualifiedName' returns 'name' plus an extra marker to show additional information:
   // space = Jouyou         : all 2136 Jouyou (use space since this is the most common type)
   //     ' = JLPT           : 251 Jinmei in JLPT (out of 2222 total - the other 1971 are Jouyou)

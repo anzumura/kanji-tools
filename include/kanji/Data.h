@@ -43,6 +43,7 @@ public:
   static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
 
   using Entry = std::shared_ptr<Kanji>;
+  using OptEntry = std::optional<const Entry>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
@@ -71,7 +72,7 @@ public:
   const List& otherKanji() const { return _lists.at(Types::Other); }
   const List& extraKanji() const { return _lists.at(Types::Extra); }
   const RadicalMap& radicals() const { return _radicals; }
-  std::optional<const Entry> findKanji(const std::string& s) const {
+  OptEntry findKanji(const std::string& s) const {
     auto i = _map.find(s);
     if (i == _map.end()) return {};
     return i->second;
@@ -142,6 +143,8 @@ protected:
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)
   FileList::Set _jouyouOldSet;
   FileList::Set _jinmeiOldSet;
+  // 'MaxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
+  static int MaxFrequency;
 };
 
 } // namespace kanji

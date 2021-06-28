@@ -2,6 +2,8 @@
 #include <kanji/KanjiData.h>
 #include <kanji/MBChar.h>
 
+#include <tuple>
+
 namespace kanji {
 
 namespace fs = std::filesystem;
@@ -18,7 +20,8 @@ const fs::path RadicalsFile = "radicals.txt";
 const fs::path StrokesFile = "strokes.txt";
 const fs::path HiraganaFile = "hiragana.txt";
 const fs::path KatakanaFile = "katakana.txt";
-const fs::path HalfwidthFile = "halfwidth.txt";
+const fs::path HalfwidthKanaFile = "halfwidth-kana.txt";
+const fs::path WideLettersFile = "wide-letters.txt";
 const fs::path PunctuationFile = "punctuation.txt";
 const fs::path MeaningGroupFile = "meaning-groups.txt";
 const fs::path PatternGroupFile = "pattern-groups.txt";
@@ -29,7 +32,8 @@ KanjiData::KanjiData(int argc, const char** argv)
   : Data(getDataDir(argc, argv), getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
     _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
     _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile, Levels::None),
-    _hiragana(_dataDir / HiraganaFile), _katakana(_dataDir / KatakanaFile), _halfwidth(_dataDir / HalfwidthFile),
+    _hiragana(_dataDir / HiraganaFile), _katakana(_dataDir / KatakanaFile),
+    _halfwidthKana(_dataDir / HalfwidthKanaFile), _wideLetters(_dataDir / WideLettersFile),
     _punctuation(_dataDir / PunctuationFile) {
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
@@ -67,30 +71,37 @@ Levels KanjiData::getLevel(const std::string& k) const {
   return Levels::None;
 }
 
+int KanjiData::Count::getFrequency() const {
+  return entry.has_value() ? (**entry).frequencyOrDefault(MaxFrequency) : MaxFrequency + 1;
+}
+
 void KanjiData::countKanji(const fs::path& top) const {
-  auto pred = [this](const auto& x) { return !this->isKanaOrPunctuation(x) && x != "　"; };
+  auto pred = [this](const auto& x) { return !this->isWideNonKanji(x); };
   MBCharCount count(pred);
   count.addFile(top);
   auto& m = count.map();
-  std::vector<std::pair<int, std::string>> frequency;
+  std::set<Count> frequency;
   int total = 0;
   for (const auto& i : m) {
     total += i.second;
-    frequency.push_back(std::make_pair(i.second, i.first));
+    frequency.emplace(i.second, i.first, findKanji(i.first));
   }
-  std::sort(frequency.begin(), frequency.end(), [](const auto& x, const auto& y) { return x.first > y.first; });
   std::cout << "Total kanji: " << total << ", unique: " << frequency.size() << ", directories: " << count.directories()
             << ", files: " << count.files() << '\n';
   total = 0;
+  FileList::List missing;
   for (const auto& i : frequency) {
-    auto k = findKanji(i.second);
-    std::cout << "  " << std::left << std::setw(5) << ++total << "'" << i.second << "' (" << std::right << std::setw(3)
-              << std::setfill('0') << i.first << ')' << std::setfill(' ');
-    if (k.has_value())
-      std::cout << " - freq: " << std::setw(4) << (**k).frequency() << ", "
-                << ((**k).hasLevel() ? toString((**k).level()) : std::string("--")) << ", " << (**k).type();
+    std::cout << "  " << std::left << std::setw(5) << ++total << "'" << i.count << "' (" << std::right << std::setw(3)
+              << std::setfill('0') << i.name << ')' << std::setfill(' ');
+    if (i.entry.has_value())
+      std::cout << " - freq: " << std::setw(4) << (**i.entry).frequency() << ", "
+                << ((**i.entry).hasLevel() ? toString((**i.entry).level()) : std::string("--")) << ", "
+                << (**i.entry).type();
+    else
+      missing.push_back(i.name);
     std::cout << '\n';
   }
+  FileList::print(missing, "missing");
 }
 
 } // namespace kanji

@@ -7,6 +7,8 @@
 
 namespace kanji {
 
+int Data::MaxFrequency;
+
 namespace fs = std::filesystem;
 
 namespace {
@@ -76,7 +78,11 @@ bool Data::getDebug(int argc, const char** argv) {
 }
 
 bool Data::checkInsert(const Entry& i) {
-  if (_map.insert(std::make_pair(i->name(), i)).second) return true;
+  if (_map.insert(std::make_pair(i->name(), i)).second) {
+    if (i->frequency() >= MaxFrequency)
+      MaxFrequency = i->frequency() + 1;
+    return true;
+  }
   printError("failed to insert " + i->name() + " into map");
   return false;
 }

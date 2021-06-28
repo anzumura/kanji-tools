@@ -22,8 +22,9 @@ The data directory contains the following files:
 - **extra.txt**: meant to hold any extra kanji of interest not in other files
 - **hiragana.txt**: wide hiragana
 - **katakana.txt**: wide katakana
-- **halfwidth.txt**: half-width katakana
-- **punctuation.txt**: wide punctuation marks
+- **halfwidth-kana.txt**: half-width katakana
+- **wide-letters.txt**: wide letters and numbers
+- **punctuation.txt**: wide punctuation marks and common wide symbols (like 〒, ～, ※, etc.)
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see Data.h for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see Data.h for more details)
 
