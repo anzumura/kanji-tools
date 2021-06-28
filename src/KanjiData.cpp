@@ -26,6 +26,14 @@ const fs::path PunctuationFile = "punctuation.txt";
 const fs::path MeaningGroupFile = "meaning-groups.txt";
 const fs::path PatternGroupFile = "pattern-groups.txt";
 
+std::ostream& operator<<(std::ostream& os, const KanjiData::Count& c) {
+  os << '[' << c.name << ' ' << std::right << std::setw(3) << c.count << ']';
+  if (c.entry.has_value())
+    os << " - freq: " << std::setw(4) << (**c.entry).frequency() << ", "
+       << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type();
+  return os;
+}
+
 } // namespace
 
 KanjiData::KanjiData(int argc, const char** argv)
@@ -91,15 +99,9 @@ void KanjiData::countKanji(const fs::path& top) const {
   total = 0;
   FileList::List missing;
   for (const auto& i : frequency) {
-    std::cout << "  " << std::left << std::setw(5) << ++total << "'" << i.count << "' (" << std::right << std::setw(3)
-              << std::setfill('0') << i.name << ')' << std::setfill(' ');
-    if (i.entry.has_value())
-      std::cout << " - freq: " << std::setw(4) << (**i.entry).frequency() << ", "
-                << ((**i.entry).hasLevel() ? toString((**i.entry).level()) : std::string("--")) << ", "
-                << (**i.entry).type();
-    else
+    std::cout << "  " << std::left << std::setw(5) << ++total << ' ' << i << '\n';
+    if (!i.entry.has_value())
       missing.push_back(i.name);
-    std::cout << '\n';
   }
   FileList::print(missing, "missing");
 }

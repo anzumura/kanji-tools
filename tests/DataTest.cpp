@@ -60,6 +60,10 @@ TEST_F(DataTest, SanityChecks) {
   EXPECT_FALSE(_data.isKana("。"));
   EXPECT_TRUE(_data.isWidePunctuation("。"));
   EXPECT_TRUE(_data.isWidePunctuation("、"));
+  EXPECT_TRUE(_data.isWidePunctuation("　"));
+  EXPECT_TRUE(_data.isWideLetter("ｄ"));
+  EXPECT_TRUE(_data.isWideLetter("Ｚ"));
+  EXPECT_TRUE(_data.isWideLetter("１"));
 }
 
 } // namespace kanji

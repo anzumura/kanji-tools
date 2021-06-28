@@ -25,7 +25,7 @@ public:
   bool isWideLetter(const std::string& s) const { return _wideLetters.exists(s); }
   // 'isWideNonKanji' returns true if the character is in any of the 'non-kanji files
   bool isWideNonKanji(const std::string& s) const { return isKana(s) || isWideLetter(s) || isWidePunctuation(s); }
-private:
+
   // helper class for printing out kanji found in files
   class Count {
   public:
@@ -44,7 +44,7 @@ private:
     std::string name;
     OptEntry entry;
   };
-
+private:
   // 'countKanji' will count all multi-byte characters in 'top' file and if 'top' is a directroy
   // then all the regulars under top will be processed (recursively). The 'count' for each unique
   // kanji (frequency) will be displayed (non-kanji are not included).
