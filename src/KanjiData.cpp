@@ -30,7 +30,8 @@ std::ostream& operator<<(std::ostream& os, const KanjiData::Count& c) {
   os << '[' << c.name << ' ' << std::right << std::setw(3) << c.count << ']';
   if (c.entry.has_value())
     os << " - freq: " << std::setw(4) << (**c.entry).frequency() << ", "
-       << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type();
+       << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type()
+       << ": " << (**c.entry).number();
   return os;
 }
 
@@ -100,8 +101,7 @@ void KanjiData::countKanji(const fs::path& top) const {
   FileList::List missing;
   for (const auto& i : frequency) {
     std::cout << "  " << std::left << std::setw(5) << ++total << ' ' << i << '\n';
-    if (!i.entry.has_value())
-      missing.push_back(i.name);
+    if (!i.entry.has_value()) missing.push_back(i.name);
   }
   FileList::print(missing, "missing");
 }
