@@ -3,13 +3,17 @@ Number	Name	Radical	Strokes	Meaning	Reading
 2	邯	邑	8	tree cricket	カン
 3	姦	女	9	wicked	カン、ケン、かん-する、かしま-しい、みだら
 4	緘	糸	15	shut	カン、かん-する、と-じる
+1	檻	木	19	pen	カン、おり、おばしま、てすり
+1	呟	口	8	mutter	ゲン、つぶや-く
 5	哭	口	10	weep	コク、なげ-く、な-く
 6	坤	土	8	southwest	コン
 7	艮	艮	6	northeast	コン、ゴン、うしとら
 8	癸	癶	9	10th calendaar sign	キ、みずのと
 9	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
 10	驕	馬	22	pride	キョウ、おご-る
+1	怯	心	8	cowardice	キョウ、コウ、ひる-む、おびえ-る、おじ-る、おび-える、おそ-れる
 11	棘	艸	12	thorn	キョク、いばら、とげ
+1	繋	糸	17	tie	ケイ、つな-ぐ、かか-、かけ-る
 12	薊	艸	16	thistle	ケイ、キカイ、ケ、あざみ、さく、とげ
 13	屎	尸	9	shit	シ、キ、くそ
 14	屍	尸	9	corpse	シ、かたしろ
