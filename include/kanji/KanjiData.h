@@ -20,8 +20,10 @@ public:
   bool isFullWidthKana(const std::string& s) const { return isHiragana(s) || isKatakana(s); }
   bool isHalfWidthKana(const std::string& s) const { return _halfwidthKana.exists(s); }
   bool isKana(const std::string& s) const { return isFullWidthKana(s) || isHalfWidthKana(s); }
-  // 'isPunctuation' tests for wide space directly here since this character is skipped by FileList constructor
-  bool isWidePunctuation(const std::string& s) const { return s == "　" || _punctuation.exists(s); }
+  // 'isPunctuation' tests for wide space directly here by default, but also allows not including spaces.
+  bool isWidePunctuation(const std::string& s, bool includeSpace = true) const {
+    return includeSpace && s == "　" || _punctuation.exists(s);
+  }
   bool isWideLetter(const std::string& s) const { return _wideLetters.exists(s); }
   // 'isWideNonKanji' returns true if the character is in any of the 'non-kanji files
   bool isWideNonKanji(const std::string& s) const { return isKana(s) || isWideLetter(s) || isWidePunctuation(s); }
@@ -49,6 +51,7 @@ private:
   // then all the regulars under top will be processed (recursively). The 'count' for each unique
   // kanji (frequency) will be displayed (non-kanji are not included).
   void countKanji(const std::filesystem::path& top) const;
+  template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&) const;
 
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;

@@ -89,69 +89,76 @@ private:
   const char* _location;
 };
 
-constexpr auto defaultMBCheck = [](const std::string&) { return true; };
-
 // 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
-template<typename Pred> class MBCharCount {
+class MBCharCount {
 public:
   using Map = std::map<std::string, int>;
-  MBCharCount(Pred pred) : _pred(pred), _files(0), _directories(0) {}
+  using TagMap = std::map<std::string, Map>;
+
+  MBCharCount() : _files(0), _directories(0) {}
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added
   size_t add(const std::string& s) {
     MBChar c(s);
     size_t added = 0;
     for (std::string token; c.next(token);)
-      if (_pred(token)) {
+      if (allowAdd(token)) {
         ++_map[token];
+        ++added;
+      }
+    return added;
+  }
+  // 'add' with a 'tag' works like regular add function, but will also keep track of counts per tag
+  size_t add(const std::string& s, const std::string& tag) {
+    MBChar c(s);
+    size_t added = 0;
+    for (std::string token; c.next(token);)
+      if (allowAdd(token)) {
+        ++_map[token];
+        ++_tags[token][tag];
         ++added;
       }
     return added;
   }
   // 'addFile' adds strings from given 'file' or from all files in directory (if file is 'directory').
   // 'fileNames' controls whether the name of the file (or directory) should also be included
-  // in the count and 'recurse' determines if subdirectories are also searched.
-  size_t addFile(const std::filesystem::path& file, bool fileNames = true, bool recurse = true) {
+  // in the count and 'recurse' determines if subdirectories are also searched. By default, file names
+  // are used as 'tag' values when calling 'add'.
+  size_t addFile(const std::filesystem::path& file, bool addTag = true, bool fileNames = true, bool recurse = true) {
     if (!std::filesystem::exists(file)) throw std::domain_error("file not found: " + file.string());
-    return doAddFile(file, fileNames, recurse);
+    return doAddFile(file, addTag, fileNames, recurse);
   }
   // return count for given string or 0 if not found
   size_t count(const std::string& s) const {
     auto i = _map.find(s);
     return i != _map.end() ? i->second : 0;
   }
+  const Map* tags(const std::string& s) const {
+    auto i = _tags.find(s);
+    if (i != _tags.end())
+      return &i->second;
+    return nullptr;
+  }
   size_t uniqueEntries() const { return _map.size(); }
   size_t files() const { return _files; }
   size_t directories() const { return _directories; }
   const Map& map() const { return _map; }
 private:
-  using DirEnt = const std::filesystem::directory_entry&;
-  using DirIt = std::filesystem::directory_iterator;
-
-  size_t doAddFile(const std::filesystem::path& file, bool fileNames, bool recurse = true) {
-    size_t added = 0;
-    if (isReg(file)) {
-      ++_files;
-      std::ifstream f(file);
-      std::string line;
-      while (std::getline(f, line))
-        added += add(line);
-    } else if (std::filesystem::is_directory(file)) {
-      ++_directories;
-      for (DirEnt i : DirIt(file))
-        added += recurse ? doAddFile(i.path(), fileNames) : isReg(i.path()) ? doAddFile(i.path(), fileNames, false) : 0;
-    }
-    else // skip if not a regular file or directory
-      return 0;
-    if (fileNames) added += add(file.filename().string()); // only include the last component
-    return added;
-  }
-  bool isReg(const std::filesystem::path& p) const { return std::filesystem::is_regular_file(p); }
+  virtual bool allowAdd(const std::string&) const { return true; }
+  size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
 
   Map _map;
-  Pred _pred;
+  TagMap _tags;
   // keep a count of number of files and directories processed
   size_t _files;
   size_t _directories;
+};
+
+template<typename Pred> class MBCharCountIf : public MBCharCount {
+public:
+  MBCharCountIf(Pred pred) : _pred(pred) {}
+private:
+  bool allowAdd(const std::string& token) const override { return _pred(token); }
+  Pred _pred;
 };
 
 // Helper methods to print binary or hex versions of an unsigned char

@@ -21,4 +21,27 @@ bool MBChar::next(std::string& result, bool onlyMB) {
   return false;
 }
 
+namespace fs = std::filesystem;
+
+size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
+  size_t added = 0;
+  std::string tag = file.filename().string();
+  if (fs::is_regular_file(file)) {
+    ++_files;
+    std::ifstream f(file);
+    std::string line;
+    while (std::getline(f, line))
+      added += addTag ? add(line, tag) : add(line);
+  } else if (fs::is_directory(file)) {
+    ++_directories;
+    for (fs::directory_entry i : fs::directory_iterator(file))
+      added += recurse                  ? doAddFile(i.path(), addTag, fileNames)
+        : fs::is_regular_file(i.path()) ? doAddFile(i.path(), addTag, fileNames, false)
+                                        : 0;
+  } else // skip if not a regular file or directory
+    return 0;
+  if (fileNames) added += add(tag, tag); // only include the last component
+  return added;
+}
+
 } // namespace kanji

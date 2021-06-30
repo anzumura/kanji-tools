@@ -2,6 +2,7 @@
 #include <kanji/KanjiData.h>
 #include <kanji/MBChar.h>
 
+#include <numeric>
 #include <tuple>
 
 namespace kanji {
@@ -27,11 +28,11 @@ const fs::path MeaningGroupFile = "meaning-groups.txt";
 const fs::path PatternGroupFile = "pattern-groups.txt";
 
 std::ostream& operator<<(std::ostream& os, const KanjiData::Count& c) {
-  os << '[' << c.name << ' ' << std::right << std::setw(3) << c.count << ']';
+  os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
   if (c.entry.has_value())
-    os << " - freq: " << std::setw(4) << (**c.entry).frequency() << ", "
+    os << std::setw(5) << (**c.entry).frequency() << ", "
        << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type()
-       << ": " << (**c.entry).number();
+       << " (" << (**c.entry).number() << ')';
   return os;
 }
 
@@ -84,33 +85,74 @@ int KanjiData::Count::getFrequency() const {
   return entry.has_value() ? (**entry).frequencyOrDefault(MaxFrequency) : MaxFrequency + 1;
 }
 
-void KanjiData::countKanji(const fs::path& top) const {
-  auto pred = [this](const auto& x) { return !this->isWideNonKanji(x); };
-  MBCharCount count(pred);
-  count.addFile(top);
+template<typename Pred>
+int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::string& name) const {
+  const bool isKanji = name == "Kanji";
+  MBCharCountIf count(pred);
+  count.addFile(top, isKanji);
   auto& m = count.map();
   std::set<Count> frequency;
-  int total = 0;
+  int total = 0, rank = 0;
   for (const auto& i : m) {
     total += i.second;
-    frequency.emplace(i.second, i.first, findKanji(i.first));
+    frequency.emplace(i.second, i.first, isKanji ? findKanji(i.first) : std::nullopt);
   }
-  std::cout << "Total kanji: " << total << ", unique: " << frequency.size() << ", directories: " << count.directories()
-            << ", files: " << count.files() << '\n';
-  total = 0;
-  FileList::List missing;
-  std::map<Types, int> types;
-  for (const auto& i : frequency) {
-    std::cout << "  " << std::left << std::setw(5) << ++total << ' ' << i << '\n';
-    if (!i.entry.has_value())
-      missing.push_back(i.name);
-    else
-      types[(**i.entry).type()]++;
+  if (isKanji) {
+    std::cout << "Rank  [Kanji #] Freq, LV, Type (No.) == Highest Count File (if not found)\n";
+    FileList::List missing;
+    std::map<Types, int> types;
+    for (const auto& i : frequency) {
+      std::cout << std::left << std::setw(5) << ++rank << ' ' << i;
+      if (i.entry.has_value())
+        types[(**i.entry).type()]++;
+      else {
+        missing.push_back(i.name);
+        auto tags = count.tags(i.name);
+        if (tags != nullptr) {
+          int maxCount = 0;
+          std::string file;
+          for (const auto& j : *tags)
+            if (j.second > maxCount) {
+              maxCount = j.second;
+              file = j.first;
+            }
+          std::cout << " == " << file;
+        }
+      }
+      std::cout << '\n';
+    }
+    if (!types.empty()) {
+      std::cout << ">>> Types:\n";
+      for (auto i : types)
+        std::cout << "  " << i.first << ": " << i.second << '\n';
+    }
+    FileList::print(missing, "missing");
   }
-  FileList::print(missing, "missing");
-  std::cout << ">>> Type Totals:\n";
-  for (auto i : types)
-    std::cout << "  " << i.first << ": " << i.second << '\n';
+  if (total)
+    std::cout << ">>>" << std::right << std::setw(17) << name << ": " << std::setw(6) << total
+              << ", unique: " << std::setw(4) << frequency.size() << " (directories: " << count.directories()
+              << ", files: " << count.files() << ")\n";
+  return total;
+}
+
+void KanjiData::countKanji(const fs::path& top) const {
+  auto f = [this, &top](const auto& x, const auto& y) { return std::make_pair(this->processCount(top, x, y), y); };
+  std::array totals{f([this](const auto& x) { return !this->isWideNonKanji(x); }, "Kanji"),
+                    f([this](const auto& x) { return this->isHiragana(x); }, "Hiragana"),
+                    f([this](const auto& x) { return this->isKatakana(x); }, "Katakana"),
+                    f([this](const auto& x) { return this->isWidePunctuation(x, false); }, "MB-Punctuation"),
+                    f([this](const auto& x) { return this->isWideLetter(x); }, "MB-Letter"),
+                    f([this](const auto& x) { return this->isHalfWidthKana(x); }, "Half-Width Kana")};
+  int total = 0;
+  for (const auto& i : totals)
+    total += i.first;
+  std::cout << ">>> Total: " << total << " (" << std::fixed << std::setprecision(1);
+  for (const auto& i : totals)
+    if (i.first) {
+      if (i.second != totals[0].second) std::cout << ", ";
+      std::cout << i.second << ": " << i.first * 100. / total << "%";
+    }
+  std::cout << ")\n";
 }
 
 } // namespace kanji
