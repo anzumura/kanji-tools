@@ -99,11 +99,18 @@ void KanjiData::countKanji(const fs::path& top) const {
             << ", files: " << count.files() << '\n';
   total = 0;
   FileList::List missing;
+  std::map<Types, int> types;
   for (const auto& i : frequency) {
     std::cout << "  " << std::left << std::setw(5) << ++total << ' ' << i << '\n';
-    if (!i.entry.has_value()) missing.push_back(i.name);
+    if (!i.entry.has_value())
+      missing.push_back(i.name);
+    else
+      types[(**i.entry).type()]++;
   }
   FileList::print(missing, "missing");
+  std::cout << ">>> Type Totals:\n";
+  for (auto i : types)
+    std::cout << "  " << i.first << ": " << i.second << '\n';
 }
 
 } // namespace kanji
