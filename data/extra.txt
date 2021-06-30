@@ -21,6 +21,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 20	屎	尸	9	shit	シ、キ、くそ
 21	屍	尸	9	corpse	シ、かたしろ
 22	覗	見	12	peep	シ、のぞ-く、うかが-う
+1	嗤	口	13	laygh	シ、わら-う
 23	戌	戈	6	sign of the dog	ジュツ、いぬ
 24	綬	糸	14	ribbon	ジュ、ひも
 25	嘯	口	16	roar	ショウ、シツ、うそぶ-く
@@ -29,6 +30,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 28	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
 29	滲	水	14	imbued with	シン、しみ-る、にじ-む
 30	鶺	鳥	21	wagtail	セキ
+1	煽	火	14	セン、あお-る、おだて-る、おこ-る
 31	仟	人	5	thousand	セン、ち、かしら
 32	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
 33	鄲	邑	15	place name	タン
@@ -48,4 +50,5 @@ Number	Name	Radical	Strokes	Meaning	Reading
 47	孕	子	5	become pregnant	ヨウ、はらむ
 48	泪	水	8	tears	ルイ、レイ、なみだ
 49	鴒	鳥	16	wagtail	レイ
+1	埒	土	10	picket	レツ、ラツ、ラチ、らち-があく、かこ-い
 50	朧	月	20	haziness	ロウ、おぼろ
