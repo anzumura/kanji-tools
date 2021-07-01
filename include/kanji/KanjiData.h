@@ -50,8 +50,8 @@ private:
   // 'countKanji' will count all multi-byte characters in 'top' file and if 'top' is a directroy
   // then all the regulars under top will be processed (recursively). The 'count' for each unique
   // kanji (frequency) will be displayed (non-kanji are not included).
-  void countKanji(const std::filesystem::path& top) const;
-  template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&) const;
+  void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
+  template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool) const;
 
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;

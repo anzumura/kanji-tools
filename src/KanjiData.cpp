@@ -68,8 +68,22 @@ KanjiData::KanjiData(int argc, const char** argv)
     printGroups(_meaningGroups, _meaningGroupList);
     printGroups(_patternGroups, _patternGroupList);
   }
-  for (int i = 2; i < argc; ++i)
-    if (std::string(argv[i]) == "-count" && i + 1 < argc) countKanji(argv[i + 1]);
+  for (int i = 2; i < argc; ++i) {
+    std::string arg = argv[i];
+    if (arg == "-b") {
+      if (++i == argc) usage("-b must be followed by a file or directory name");
+      countKanji(argv[i], true);
+    } else if (arg == "-c") {
+      if (++i == argc) usage("-c must be followed by a file or directory name");
+      countKanji(argv[i]);
+    } else if (arg == "-h") {
+      std::cout << "command line options:\n  -b file: show wide-character counts and full kanji breakdown for 'file'\n"
+                << "  -c file: show wide-character counts for 'file'\n"
+                << "  -h: show help message for command-line options\n";
+      break;
+    } else
+      usage("unrecognized arg: " + arg);
+  }
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {
@@ -86,11 +100,18 @@ int KanjiData::Count::getFrequency() const {
 }
 
 template<typename Pred>
-int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::string& name) const {
-  static MBCharCount::OptRegex RemoveFurigana("（[^）]+）");
+int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown) const {
+  // Furigana in a .txt file is usually a Kanji followed by one or more Hiragana characters inside wide
+  // brackets. For now use a 'regex' that matches one non-kanji (at least a best guess) followed by bracketed
+  // Hiragana (and replace it with just the non-Kanji match). This should catch most reasonable examples.
+  static const MBCharCount::OptRegex FindFurigana(
+    utf8_to_wstring("([^ 　a-zA-Z0-9" + _hiragana.toString() + _wideLetters.toString() + _halfwidthKana.toString() +
+                    _punctuation.toString() + _katakana.toString() + "]{1})（[" + _hiragana.toString() + "]+）"));
+  static const std::string ReplaceFurigana("$1");
   const bool isKanji = name == "Kanji";
-  const bool removeFurigana = name == "Hiragana" || name == "MB-Punctuation";
-  MBCharCountIf count(pred, removeFurigana ? RemoveFurigana : std::nullopt);
+  const bool isHiragana = name == "Hiragana";
+  const bool removeFurigana = isHiragana || name == "MB-Punctuation";
+  MBCharCountIf count(pred, removeFurigana ? FindFurigana : std::nullopt, ReplaceFurigana);
   count.addFile(top, isKanji);
   auto& m = count.map();
   std::set<Count> frequency;
@@ -99,7 +120,7 @@ int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::st
     total += i.second;
     frequency.emplace(i.second, i.first, isKanji ? findKanji(i.first) : std::nullopt);
   }
-  if (isKanji) {
+  if (isKanji && showBreakdown) {
     std::cout << "Rank  [Kanji #] Freq, LV, Type (No.) == Highest Count File (if not found)\n";
     FileList::List missing;
     std::map<Types, int> types;
@@ -137,9 +158,11 @@ int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::st
   return total;
 }
 
-void KanjiData::countKanji(const fs::path& top) const {
+void KanjiData::countKanji(const fs::path& top, bool showBreakdown) const {
   static const int IncludeInTotals = 3; // only include Kanji and full-width kana in total and percents
-  auto f = [this, &top](const auto& x, const auto& y) { return std::make_pair(this->processCount(top, x, y), y); };
+  auto f = [this, &top, showBreakdown](const auto& x, const auto& y) {
+    return std::make_pair(this->processCount(top, x, y, showBreakdown), y);
+  };
   std::array totals{f([this](const auto& x) { return !this->isWideNonKanji(x); }, "Kanji"),
                     f([this](const auto& x) { return this->isHiragana(x); }, "Hiragana"),
                     f([this](const auto& x) { return this->isKatakana(x); }, "Katakana"),

@@ -48,6 +48,13 @@ public:
   const std::string& name() const { return _name; }
   Levels level() const { return _level; }
   const List& list() const { return _list; }
+  // 'toString' returns the full contents of this list into a string (with no separates)
+  std::string toString() const {
+    std::string result;
+    for (const auto& i : _list)
+      result += i;
+    return result;
+  }
 private:
   // Static sets used to ensure uniqueness across multiple FileList instances:
   //   'UniqueNames': ensures uniqueness across non-JLPT lists (like frequency and kana lists)

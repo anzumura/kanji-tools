@@ -1,12 +1,27 @@
 #ifndef KANJI_MBCHAR_H
 #define KANJI_MBCHAR_H
 
+#include <codecvt>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
+#include <locale>
 #include <map>
 #include <optional>
 #include <regex>
 #include <string>
+
+// convert UTF-8 string to wstring
+inline std::wstring utf8_to_wstring(const std::string& str) {
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+  return conv.from_bytes(str);
+}
+
+// convert wstring to UTF-8 string
+inline std::string wstring_to_utf8(const std::wstring& str) {
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+  return conv.to_bytes(str);
+}
 
 namespace kanji {
 
@@ -96,13 +111,22 @@ class MBCharCount {
 public:
   using Map = std::map<std::string, int>;
   using TagMap = std::map<std::string, Map>;
-  using OptRegex = std::optional<std::regex>;
+  using OptRegex = std::optional<std::wregex>;
 
   // if 'regex' is provided it will be applied to strings before they are processed to remove data
-  MBCharCount(OptRegex regex = std::nullopt) : _regex(regex), _files(0), _directories(0) {}
+  MBCharCount(OptRegex find = std::nullopt, const std::string& replace = "", bool debug = false)
+    : _files(0), _directories(0), _find(find), _replace(utf8_to_wstring(replace)), _debug(debug) {}
+  virtual ~MBCharCount() = default;
+
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added
   size_t add(const std::string& s) {
-    MBChar c(_regex.has_value() ? std::regex_replace(s, *_regex, "") : s);
+    std::string n = s;
+    if (_find.has_value()) {
+      static int count;
+      n = wstring_to_utf8(std::regex_replace(utf8_to_wstring(s), *_find, _replace));
+      if (_debug && n != s) std::cout << ++count << " Before: " << s << '\n' << count << "  After: " << n << '\n';
+    }
+    MBChar c(n);
     size_t added = 0;
     for (std::string token; c.next(token);)
       if (allowAdd(token)) {
@@ -138,8 +162,7 @@ public:
   }
   const Map* tags(const std::string& s) const {
     auto i = _tags.find(s);
-    if (i != _tags.end())
-      return &i->second;
+    if (i != _tags.end()) return &i->second;
     return nullptr;
   }
   size_t uniqueEntries() const { return _map.size(); }
@@ -150,20 +173,23 @@ private:
   virtual bool allowAdd(const std::string&) const { return true; }
   size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
 
-  OptRegex _regex;
   Map _map;
   TagMap _tags;
   // keep a count of number of files and directories processed
   size_t _files;
   size_t _directories;
+  const OptRegex _find;
+  const std::wstring _replace;
+  const bool _debug;
 };
 
 template<typename Pred> class MBCharCountIf : public MBCharCount {
 public:
-  MBCharCountIf(Pred pred, OptRegex regex = std::nullopt) : MBCharCount(regex), _pred(pred) {}
+  MBCharCountIf(Pred pred, OptRegex find = std::nullopt, const std::string& replace = "", bool debug = false)
+    : MBCharCount(find, replace, debug), _pred(pred) {}
 private:
   bool allowAdd(const std::string& token) const override { return _pred(token); }
-  Pred _pred;
+  const Pred _pred;
 };
 
 // Helper methods to print binary or hex versions of an unsigned char

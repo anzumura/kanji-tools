@@ -41,7 +41,7 @@ void FileList::print(const List& l, const std::string& type, const std::string& 
 }
 
 FileList::FileList(const fs::path& file, Levels l, bool onePerLine)
-  : _name(l != Levels::None ? std::string("JLPT ") + toString(l)
+  : _name(l != Levels::None ? std::string("JLPT ") + kanji::toString(l)
             : onePerLine    ? std::string("Top Frequency")
                             : capitalize(file.stem().string())),
     _level(l) {

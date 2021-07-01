@@ -47,6 +47,7 @@ TEST_F(FileListTest, GoodOnePerLine) {
     // numbers start at 1
     EXPECT_EQ(f.get(r), ++pos);
   }
+  EXPECT_EQ(f.toString(), "北海道");
 }
 
 TEST_F(FileListTest, GoodOnePerLineLevel) {

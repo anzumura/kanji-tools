@@ -4,7 +4,6 @@
 
 #include <array>
 #include <fstream>
-#include <regex>
 
 namespace kanji {
 
@@ -284,11 +283,11 @@ TEST_F(MBCharCountTest, CheckTags) {
 }
 
 TEST_F(MBCharCountTest, Regex) {
-  std::regex regex("（[^）]+）");
+  std::wregex regex(L"（[^）]+）");
   MBCharCount r(regex);
-  EXPECT_EQ(r.add("abc仰（あお）ぐ）"), 3);
-  EXPECT_EQ(r.count("仰"), 1);
-  EXPECT_EQ(r.count("ぐ"), 1);
+  EXPECT_EQ(r.add("a仰（あお）ぐbc仰（あお）ぐ）"), 5);
+  EXPECT_EQ(r.count("仰"), 2);
+  EXPECT_EQ(r.count("ぐ"), 2);
   EXPECT_EQ(r.count("）"), 1);
   EXPECT_EQ(r.count("あ"), 0);
   EXPECT_EQ(r.count("お"), 0);
