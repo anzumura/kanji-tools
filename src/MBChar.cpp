@@ -25,7 +25,7 @@ namespace fs = std::filesystem;
 
 size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
   size_t added = 0;
-  std::string tag = file.filename().string();
+  std::string tag = file.filename().string(); // only use the final component of the path
   if (fs::is_regular_file(file)) {
     ++_files;
     std::ifstream f(file);
@@ -40,7 +40,7 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
                                         : 0;
   } else // skip if not a regular file or directory
     return 0;
-  if (fileNames) added += add(tag, tag); // only include the last component
+  if (fileNames) added += addTag ? add(tag, tag) : add(tag);
   return added;
 }
 

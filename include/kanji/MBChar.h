@@ -1,6 +1,7 @@
 #ifndef KANJI_MBCHAR_H
 #define KANJI_MBCHAR_H
 
+#include <array>
 #include <codecvt>
 #include <filesystem>
 #include <fstream>
@@ -10,6 +11,8 @@
 #include <optional>
 #include <regex>
 #include <string>
+
+namespace kanji {
 
 // convert UTF-8 string to wstring
 inline std::wstring utf8_to_wstring(const std::string& str) {
@@ -23,7 +26,65 @@ inline std::string wstring_to_utf8(const std::wstring& str) {
   return conv.to_bytes(str);
 }
 
-namespace kanji {
+// Important Unicode values
+constexpr auto WidePunctuationStart = L'\u3000';
+constexpr auto WidePunctuationEnd = L'\u303f';
+// 'OtherWidePunctuation' contains other common wide punctuation values not included in the above range
+constexpr std::array OtherWidePunctuation{L'…', L'─', L'“', L'”', L'‥', L'℃'};
+constexpr auto HiraganaStart = L'\u3040';
+constexpr auto HiraganaEnd = L'\u309f';
+constexpr auto KatakanaStart = L'\u30a0';
+constexpr auto KatakanaEnd = L'\u30ff';
+// WideLetters includes 'full-width roman letters' as well as 'half-width katakana'
+constexpr auto WideLetterStart = L'\uff00';
+constexpr auto WideLetterEnd = L'\uffef';
+// KanjiRange includes both the 'common range' and the 'rare range'
+constexpr auto KanjiRange = L"\u4e00-\u9faf\u3400-\u4dbf";
+constexpr auto HiraganaRange = L"\u3040-\u309f";
+
+inline bool checkUnicodeList(wchar_t c, int otherCount, const wchar_t* others) {
+  for (int i = 0; i < otherCount; ++i)
+    if (c == others[i]) return true;
+  return false;
+}
+
+inline bool checkUnicodeRange(const std::string& s, wchar_t start, wchar_t end, int otherCount = 0,
+                              const wchar_t* others = nullptr) {
+  if (s.length() < 2 || s.length() > 4) return false;
+  auto w = utf8_to_wstring(s);
+  return w.length() == 1 && (w[0] >= start && w[0] <= end || checkUnicodeList(w[0], otherCount, others));
+}
+
+inline bool checkUnicodeRange(const std::string& s, wchar_t start1, wchar_t end1, wchar_t start2, wchar_t end2,
+                              int otherCount = 0, const wchar_t* others = nullptr) {
+  if (s.length() < 2 || s.length() > 4) return false;
+  auto w = utf8_to_wstring(s);
+  return w.length() == 1 &&
+    (w[0] >= start1 && w[0] <= end1 || w[0] >= start2 && w[0] <= end2 || checkUnicodeList(w[0], otherCount, others));
+}
+
+// functions for classifying 'recognized' utf-8 encoded characters:
+//   's' should be a single wide character (so 2-4 bytes)
+inline bool isHiragana(const std::string& s) { return checkUnicodeRange(s, HiraganaStart, HiraganaEnd); }
+inline bool isKatakana(const std::string& s) { return checkUnicodeRange(s, KatakanaStart, KatakanaEnd); }
+inline bool isKana(const std::string& s) {
+  // more efficient to check both ranges at once instead of converting to wstring twice
+  return checkUnicodeRange(s, HiraganaStart, HiraganaEnd, KatakanaStart, KatakanaEnd);
+}
+// 'isPunctuation' tests for wide space directly here by default, but also allows not including spaces.
+inline bool isWidePunctuation(const std::string& s, bool includeSpace = true) {
+  return s == "　" ? includeSpace
+                   : checkUnicodeRange(s, WidePunctuationStart, WidePunctuationEnd, OtherWidePunctuation.size(),
+                                       OtherWidePunctuation.data());
+}
+inline bool isWideLetter(const std::string& s) { return checkUnicodeRange(s, WideLetterStart, WideLetterEnd); }
+inline bool isKanji(const std::string& s) { return checkUnicodeRange(s, L'\u4e00', L'\u9faf', L'\u3400', L'\u4dbf'); }
+// 'isRecognizedWide' returns true if 's' is Kanji, Kana, Wide Punctuation (including wide space) or Wide Letter
+inline bool isRecognizedWide(const std::string& s) {
+  return isKanji(s) || isKana(s) ||
+    checkUnicodeRange(s, WidePunctuationStart, WidePunctuationEnd, WideLetterStart, WideLetterEnd,
+                      OtherWidePunctuation.size(), OtherWidePunctuation.data());
+}
 
 // MBChar is a helper class for working with UTF-8 strings. Create an MBChar from a string
 // and then call 'getNext' to get one 'character' at a time. 'getNext' will return false
@@ -199,6 +260,7 @@ inline std::string to_binary(unsigned char x) {
     result.insert(result.begin(), '0' + x % 2);
   return result;
 }
+
 inline std::string to_hex(unsigned char x) {
   std::string result;
   for (; x > 0; x >>= 4) {

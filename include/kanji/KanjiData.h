@@ -14,19 +14,6 @@ public:
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;
-  // functions for classifying a 'non-kanji' utf-8 encoded character
-  bool isHiragana(const std::string& s) const { return _hiragana.exists(s); }
-  bool isKatakana(const std::string& s) const { return _katakana.exists(s); }
-  bool isFullWidthKana(const std::string& s) const { return isHiragana(s) || isKatakana(s); }
-  bool isHalfWidthKana(const std::string& s) const { return _halfwidthKana.exists(s); }
-  bool isKana(const std::string& s) const { return isFullWidthKana(s) || isHalfWidthKana(s); }
-  // 'isPunctuation' tests for wide space directly here by default, but also allows not including spaces.
-  bool isWidePunctuation(const std::string& s, bool includeSpace = true) const {
-    return includeSpace && s == "　" || _punctuation.exists(s);
-  }
-  bool isWideLetter(const std::string& s) const { return _wideLetters.exists(s); }
-  // 'isWideNonKanji' returns true if the character is in any of the 'non-kanji files
-  bool isWideNonKanji(const std::string& s) const { return isKana(s) || isWideLetter(s) || isWidePunctuation(s); }
 
   // helper class for printing out kanji found in files
   class Count {
@@ -60,12 +47,6 @@ private:
   const FileList _n2;
   const FileList _n1;
   const FileList _frequency;
-  // lists to help determin the type of a wide character
-  const FileList _hiragana;
-  const FileList _katakana;
-  const FileList _halfwidthKana;
-  const FileList _wideLetters;
-  const FileList _punctuation;
 };
 
 } // namespace kanji

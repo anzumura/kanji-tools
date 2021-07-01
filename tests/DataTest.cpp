@@ -43,27 +43,6 @@ TEST_F(DataTest, SanityChecks) {
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
-  // MB character types
-  EXPECT_TRUE(_data.isHiragana("ゑ"));
-  EXPECT_FALSE(_data.isKatakana("ゑ"));
-  EXPECT_TRUE(_data.isKatakana("ヰ"));
-  EXPECT_FALSE(_data.isHiragana("ヰ"));  
-  EXPECT_TRUE(_data.isFullWidthKana("ー"));
-  EXPECT_TRUE(_data.isFullWidthKana("さ"));
-  EXPECT_FALSE(_data.isHalfWidthKana("ー"));
-  EXPECT_FALSE(_data.isHalfWidthKana("さ"));
-  EXPECT_FALSE(_data.isFullWidthKana("ｶ"));
-  EXPECT_TRUE(_data.isHalfWidthKana("ｶ"));
-  EXPECT_TRUE(_data.isKana("こ"));
-  EXPECT_TRUE(_data.isKana("コ"));
-  EXPECT_TRUE(_data.isKana("ｺ"));
-  EXPECT_FALSE(_data.isKana("。"));
-  EXPECT_TRUE(_data.isWidePunctuation("。"));
-  EXPECT_TRUE(_data.isWidePunctuation("、"));
-  EXPECT_TRUE(_data.isWidePunctuation("　"));
-  EXPECT_TRUE(_data.isWideLetter("ｄ"));
-  EXPECT_TRUE(_data.isWideLetter("Ｚ"));
-  EXPECT_TRUE(_data.isWideLetter("１"));
 }
 
 } // namespace kanji

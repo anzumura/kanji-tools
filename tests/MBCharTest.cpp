@@ -7,6 +7,30 @@
 
 namespace kanji {
 
+TEST(MBChar, CheckFunctions) {
+  EXPECT_TRUE(isHiragana("ゑ"));
+  EXPECT_FALSE(isKatakana("ゑ"));
+  EXPECT_TRUE(isKatakana("ヰ"));
+  EXPECT_FALSE(isHiragana("ヰ"));
+  EXPECT_TRUE(isKana("ー"));
+  EXPECT_TRUE(isKana("さ"));
+  EXPECT_FALSE(isWideLetter("ー"));
+  EXPECT_FALSE(isWideLetter("さ"));
+  EXPECT_FALSE(isKana("ｶ"));
+  // Note: half-width katakana is included in Unicode wide letter area
+  EXPECT_TRUE(isWideLetter("ｶ"));
+  EXPECT_TRUE(isKana("こ"));
+  EXPECT_TRUE(isKana("コ"));
+  EXPECT_FALSE(isKana("。"));
+  EXPECT_TRUE(isWidePunctuation("。"));
+  EXPECT_TRUE(isWidePunctuation("、"));
+  EXPECT_TRUE(isWidePunctuation("　"));
+  EXPECT_FALSE(isWidePunctuation("ｺ"));
+  EXPECT_TRUE(isWideLetter("ｄ"));
+  EXPECT_TRUE(isWideLetter("Ｚ"));
+  EXPECT_TRUE(isWideLetter("１"));
+}
+
 TEST(MBChar, Length) {
   EXPECT_EQ(MBChar("").length(), 0);
   EXPECT_EQ(MBChar::length(nullptr), 0);
@@ -165,7 +189,7 @@ TEST_F(MBCharCountTest, Add) {
 }
 
 TEST_F(MBCharCountTest, AddWithPredicate) {
-  auto pred = [](const auto& s){ return s != "。" && s != "は"; };
+  auto pred = [](const auto& s) { return s != "。" && s != "は"; };
   MBCharCountIf cPred(pred);
   EXPECT_EQ(cPred.add("これは模擬テストです。"), 9);
   EXPECT_EQ(cPred.count("こ"), 1);
