@@ -138,6 +138,7 @@ int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::st
 }
 
 void KanjiData::countKanji(const fs::path& top) const {
+  static const int IncludeInTotals = 3; // only include Kanji and full-width kana in total and percents
   auto f = [this, &top](const auto& x, const auto& y) { return std::make_pair(this->processCount(top, x, y), y); };
   std::array totals{f([this](const auto& x) { return !this->isWideNonKanji(x); }, "Kanji"),
                     f([this](const auto& x) { return this->isHiragana(x); }, "Hiragana"),
@@ -146,13 +147,13 @@ void KanjiData::countKanji(const fs::path& top) const {
                     f([this](const auto& x) { return this->isWideLetter(x); }, "MB-Letter"),
                     f([this](const auto& x) { return this->isHalfWidthKana(x); }, "Half-Width Kana")};
   int total = 0;
-  for (const auto& i : totals)
-    total += i.first;
-  std::cout << ">>> Total: " << total << " (" << std::fixed << std::setprecision(1);
-  for (const auto& i : totals)
-    if (i.first) {
-      if (i.second != totals[0].second) std::cout << ", ";
-      std::cout << i.second << ": " << i.first * 100. / total << "%";
+  for (int i = 0; i < IncludeInTotals; ++i)
+    total += totals[i].first;
+  std::cout << ">>> Total Kanji+Kana: " << total << " (" << std::fixed << std::setprecision(1);
+  for (int i = 0; i < IncludeInTotals; ++i)
+    if (totals[i].first) {
+      if (totals[i].second != totals[0].second) std::cout << ", ";
+      std::cout << totals[i].second << ": " << totals[i].first * 100. / total << "%";
     }
   std::cout << ")\n";
 }
