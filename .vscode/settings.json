@@ -93,12 +93,16 @@
     "memory_resource": "cpp",
     "stop_token": "cpp",
     "cinttypes": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "regex": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "cmake.debugConfig": {
     "args": [
       "../../data"
     ]
-  }
+  },
+  "cSpell.words": [
+    "Furigana"
+  ]
 }

@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <optional>
+#include <regex>
 #include <string>
 
 namespace kanji {
@@ -94,11 +96,13 @@ class MBCharCount {
 public:
   using Map = std::map<std::string, int>;
   using TagMap = std::map<std::string, Map>;
+  using OptRegex = std::optional<std::regex>;
 
-  MBCharCount() : _files(0), _directories(0) {}
+  // if 'regex' is provided it will be applied to strings before they are processed to remove data
+  MBCharCount(OptRegex regex = std::nullopt) : _regex(regex), _files(0), _directories(0) {}
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added
   size_t add(const std::string& s) {
-    MBChar c(s);
+    MBChar c(_regex.has_value() ? std::regex_replace(s, *_regex, "") : s);
     size_t added = 0;
     for (std::string token; c.next(token);)
       if (allowAdd(token)) {
@@ -146,6 +150,7 @@ private:
   virtual bool allowAdd(const std::string&) const { return true; }
   size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
 
+  OptRegex _regex;
   Map _map;
   TagMap _tags;
   // keep a count of number of files and directories processed
@@ -155,7 +160,7 @@ private:
 
 template<typename Pred> class MBCharCountIf : public MBCharCount {
 public:
-  MBCharCountIf(Pred pred) : _pred(pred) {}
+  MBCharCountIf(Pred pred, OptRegex regex = std::nullopt) : MBCharCount(regex), _pred(pred) {}
 private:
   bool allowAdd(const std::string& token) const override { return _pred(token); }
   Pred _pred;

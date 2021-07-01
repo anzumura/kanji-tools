@@ -4,6 +4,7 @@
 
 #include <array>
 #include <fstream>
+#include <regex>
 
 namespace kanji {
 
@@ -280,6 +281,18 @@ TEST_F(MBCharCountTest, CheckTags) {
   i = tags->find("testSubFile2.txt");
   ASSERT_NE(i, tags->end());
   EXPECT_EQ(i->second, 1);
+}
+
+TEST_F(MBCharCountTest, Regex) {
+  std::regex regex("（[^）]+）");
+  MBCharCount r(regex);
+  EXPECT_EQ(r.add("abc仰（あお）ぐ）"), 3);
+  EXPECT_EQ(r.count("仰"), 1);
+  EXPECT_EQ(r.count("ぐ"), 1);
+  EXPECT_EQ(r.count("）"), 1);
+  EXPECT_EQ(r.count("あ"), 0);
+  EXPECT_EQ(r.count("お"), 0);
+  EXPECT_EQ(r.count("（"), 0);
 }
 
 } // namespace kanji

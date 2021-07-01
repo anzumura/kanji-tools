@@ -21,34 +21,34 @@ Number	Name	Radical	Strokes	Meaning	Reading
 20	屎	尸	9	shit	シ、キ、くそ
 21	屍	尸	9	corpse	シ、かたしろ
 22	覗	見	12	peep	シ、のぞ-く、うかが-う
-1	嗤	口	13	laygh	シ、わら-う
-23	戌	戈	6	sign of the dog	ジュツ、いぬ
-24	綬	糸	14	ribbon	ジュ、ひも
-25	嘯	口	16	roar	ショウ、シツ、うそぶ-く
-26	圳	土	6	furrow in field	ショウ、シュ、シン、ソン、シュン、みぞ
-27	囁	口	21	whisper	ショウ、ささや-く
-28	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
-29	滲	水	14	imbued with	シン、しみ-る、にじ-む
-30	鶺	鳥	21	wagtail	セキ
-1	煽	火	14	セン、あお-る、おだて-る、おこ-る
-31	仟	人	5	thousand	セン、ち、かしら
-32	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
-33	鄲	邑	15	place name	タン
-34	憚	心	15	hesitate	タン、タ、はばか-る
-35	痔	疒	11	piles	ヂ、ジ、しもがさ
-36	闖	門	18	inquire about	チン、うかが-う
-37	梃	木	11	lever	チョウ、テイ、てこ、つえ
-38	籐	竹	21	cane	トウ
-39	慟	心	14	be sad	ドウ、トウ、なげ-く
-40	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
-41	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
-42	屁	尸	7	fart	ヒ、へ、おなら
-43	騙	馬	19	deceive	ヘン、かた-る、だま-す
-44	儚	人	15	fleeting	ボウ、モウ、はかな-い、くら-い
-45	鰻	魚	22	eel	マン、バン、うなぎ
-46	蝿	虫	15	fly	ヨウ、はえ、はい
-47	孕	子	5	become pregnant	ヨウ、はらむ
-48	泪	水	8	tears	ルイ、レイ、なみだ
-49	鴒	鳥	16	wagtail	レイ
-1	埒	土	10	picket	レツ、ラツ、ラチ、らち-があく、かこ-い
-50	朧	月	20	haziness	ロウ、おぼろ
+23	嗤	口	13	laygh	シ、わら-う
+24	戌	戈	6	sign of the dog	ジュツ、いぬ
+25	綬	糸	14	ribbon	ジュ、ひも
+26	嘯	口	16	roar	ショウ、シツ、うそぶ-く
+27	圳	土	6	furrow in field	ショウ、シュ、シン、ソン、シュン、みぞ
+28	囁	口	21	whisper	ショウ、ささや-く
+29	妾	立	8	concubine	ショウ、めかけ、そばめ、わらわ
+30	滲	水	14	imbued with	シン、しみ-る、にじ-む
+31	鶺	鳥	21	wagtail	セキ
+32	煽	火	14	fan	セン、あお-る、おだて-る、おこ-る
+33	仟	人	5	thousand	セン、ち、かしら
+34	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
+35	鄲	邑	15	place name	タン
+36	憚	心	15	hesitate	タン、タ、はばか-る
+37	痔	疒	11	piles	ヂ、ジ、しもがさ
+38	闖	門	18	inquire about	チン、うかが-う
+39	梃	木	11	lever	チョウ、テイ、てこ、つえ
+40	籐	竹	21	cane	トウ
+41	慟	心	14	be sad	ドウ、トウ、なげ-く
+42	禿	禾	7	become bald	トク、ちび-る、かむろ、は-げる、はげ
+43	鄙	邑	14	lowly	ヒ、ひな、ひな-びる、いや-しい
+44	屁	尸	7	fart	ヒ、へ、おなら
+45	騙	馬	19	deceive	ヘン、かた-る、だま-す
+46	儚	人	15	fleeting	ボウ、モウ、はかな-い、くら-い
+47	鰻	魚	22	eel	マン、バン、うなぎ
+48	蝿	虫	15	fly	ヨウ、はえ、はい
+49	孕	子	5	become pregnant	ヨウ、はらむ
+50	泪	水	8	tears	ルイ、レイ、なみだ
+51	鴒	鳥	16	wagtail	レイ
+52	埒	土	10	picket	レツ、ラツ、ラチ、らち-があく、かこ-い
+53	朧	月	20	haziness	ロウ、おぼろ

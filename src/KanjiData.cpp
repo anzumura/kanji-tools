@@ -87,8 +87,10 @@ int KanjiData::Count::getFrequency() const {
 
 template<typename Pred>
 int KanjiData::processCount(const fs::path& top, const Pred& pred, const std::string& name) const {
+  static MBCharCount::OptRegex RemoveFurigana("（[^）]+）");
   const bool isKanji = name == "Kanji";
-  MBCharCountIf count(pred);
+  const bool removeFurigana = name == "Hiragana" || name == "MB-Punctuation";
+  MBCharCountIf count(pred, removeFurigana ? RemoveFurigana : std::nullopt);
   count.addFile(top, isKanji);
   auto& m = count.map();
   std::set<Count> frequency;
