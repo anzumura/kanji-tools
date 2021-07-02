@@ -1,5 +1,8 @@
 #include <kanji/MBChar.h>
 
+#include <fstream>
+#include <iostream>
+
 namespace kanji {
 
 bool MBChar::next(std::string& result, bool onlyMB) {
@@ -22,6 +25,24 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 }
 
 namespace fs = std::filesystem;
+
+size_t MBCharCount::add(const std::string& s, const std::string& tag) {
+  std::string n = s;
+  if (_find.has_value()) {
+    static int count;
+    n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
+    if (_debug && n != s) std::cout << ++count << " Before: " << s << '\n' << count << "  After: " << n << '\n';
+  }
+  MBChar c(n);
+  size_t added = 0;
+  for (std::string token; c.next(token);)
+    if (allowAdd(token)) {
+      ++_map[token];
+      ++added;
+      if (!tag.empty()) ++_tags[token][tag];
+    }
+  return added;
+}
 
 size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
   size_t added = 0;

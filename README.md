@@ -15,7 +15,8 @@ The data directory contains the following files:
 - **jouyou.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_jōyō_kanji)
 - **jinmei.txt**: loaded from [here](https://ja.wikipedia.org/wiki/人名用漢字一覧)
 - **linked.jinmei.txt**: loaded from [here](https://en.wikipedia.org/wiki/Jinmeiyō_kanji)
-- **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html)
+- **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō kanji and some old forms.
+- **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Other' type Kanji.
 - **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
 - **frequency.txt**: top 2501 frequency kanji loaded from [KanjiCards](https://kanjicards.org/kanji-list-by-freq.html)
 - **n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).

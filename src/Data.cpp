@@ -160,7 +160,7 @@ void Data::loadRadicals(const fs::path& file) {
   }
 }
 
-void Data::loadStrokes(const fs::path& file) {
+void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
   std::string line;
   int strokes = 0;
@@ -171,8 +171,16 @@ void Data::loadStrokes(const fs::path& file) {
       strokes = newStrokes;
     } else {
       assert(strokes != 0); // first line must have a stroke count
-      if (!_strokes.insert(std::pair(line, strokes)).second)
-        printError("duplicate entry in " + file.string() + ": " + line);
+      std::stringstream ss(line);
+      for (std::string token; std::getline(ss, token, ' ');) {
+        auto i = _strokes.insert(std::pair(token, strokes));
+        if (!i.second) {
+          if (checkDuplicates)
+            printError("duplicate entry in " + file.string() + ": " + token);
+          else if (i.first->second != strokes)
+            printError("found entry with different count in " + file.string() + ": " + token);
+        }
+      }
     }
 }
 
@@ -367,8 +375,10 @@ void Data::checkStrokes() const {
     else if (t == Types::None && !isOldName(i.first))
       strokesNotFound.push_back(i.first);
   }
-  FileList::print(strokesOther, "Kanjis in 'Other' group", "strokes.txt", true);
-  FileList::print(strokesNotFound, "Kanjis without other groups", "strokes.txt", true);
+  if (_debug) {
+    FileList::print(strokesOther, "Kanjis in 'Other' group", "_strokes");
+    FileList::print(strokesNotFound, "Kanjis without other groups", "_strokes");
+  }
 }
 
 template<typename T> void Data::printCount(const std::string& name, T pred) const {

@@ -51,6 +51,8 @@ public:
   // 'toString' returns the full contents of this list into a string (with no separates)
   std::string toString() const {
     std::string result;
+    // reserve for efficiency - make a guess that each entry in the list is a 3 byte utf8 character
+    result.reserve(_list.size() * 3);
     for (const auto& i : _list)
       result += i;
     return result;

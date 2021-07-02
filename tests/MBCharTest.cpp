@@ -307,6 +307,7 @@ TEST_F(MBCharCountTest, CheckTags) {
 }
 
 TEST_F(MBCharCountTest, Regex) {
+  EXPECT_EQ(sizeof(L'a'), 4);
   std::wregex regex(L"（[^）]+）");
   MBCharCount r(regex);
   EXPECT_EQ(r.add("a仰（あお）ぐbc仰（あお）ぐ）"), 5);

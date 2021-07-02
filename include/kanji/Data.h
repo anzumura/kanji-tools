@@ -101,15 +101,14 @@ protected:
   void checkNotFound(const Entry&) const;
   // 'loadRadicals' and 'loadStrokes' must be called before calling the 'populate Lists' functions
   void loadRadicals(const std::filesystem::path&);
-  void loadStrokes(const std::filesystem::path&);
+  void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
   // populate Lists (_lists datastructure)
   void populateJouyou();
   void populateJinmei();
   void populateExtra();
   void processList(const FileList&);
-  // 'checkStrokes' should be called after all lists are populated. This function makes sure
-  // that there isn't any entries in _strokes that are 'Other' or 'None' type, but instead of
-  // asserting, print lists to help find any problems.
+  // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
+  // then this function will print any entries in _strokes that are 'Other' type or not found.
   void checkStrokes() const;
   // 'loadGroups' loads from '-groups.txt' files
   void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);

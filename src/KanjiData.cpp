@@ -19,6 +19,7 @@ const fs::path N5File = "n5.txt";
 const fs::path FrequencyFile = "frequency.txt";
 const fs::path RadicalsFile = "radicals.txt";
 const fs::path StrokesFile = "strokes.txt";
+const fs::path WikiStrokesFile = "wiki-strokes.txt";
 const fs::path MeaningGroupFile = "meaning-groups.txt";
 const fs::path PatternGroupFile = "pattern-groups.txt";
 
@@ -40,6 +41,7 @@ KanjiData::KanjiData(int argc, const char** argv)
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
   loadStrokes(FileList::getFile(_dataDir, StrokesFile));
+  loadStrokes(FileList::getFile(_dataDir, WikiStrokesFile), false);
   populateJouyou();
   populateJinmei();
   populateExtra();
@@ -60,7 +62,7 @@ KanjiData::KanjiData(int argc, const char** argv)
     printGroups(_meaningGroups, _meaningGroupList);
     printGroups(_patternGroups, _patternGroupList);
   }
-  for (int i = 2; i < argc; ++i) {
+  for (int i = _debug ? 3 : 2; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-b") {
       if (++i == argc) usage("-b must be followed by a file or directory name");
