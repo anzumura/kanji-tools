@@ -8,6 +8,7 @@
 namespace kanji {
 
 int Data::MaxFrequency;
+Data::List Data::emptyList;
 
 namespace fs = std::filesystem;
 
@@ -79,35 +80,43 @@ bool Data::getDebug(int argc, const char** argv) {
 
 bool Data::checkInsert(const Entry& i) {
   if (_map.insert(std::make_pair(i->name(), i)).second) {
-    if (i->frequency() >= MaxFrequency)
-      MaxFrequency = i->frequency() + 1;
+    if (i->frequency() >= MaxFrequency) MaxFrequency = i->frequency() + 1;
     return true;
   }
   printError("failed to insert " + i->name() + " into map");
   return false;
 }
 
-void Data::checkInsert(List& s, const Entry& i) {
-  if (checkInsert(i)) s.push_back(i);
+bool Data::checkInsert(List& s, const Entry& i) {
+  if (!checkInsert(i)) return false;
+  s.push_back(i);
+  return true;
 }
 
-void Data::checkInsert(const std::string& name, GroupMap& groups, const GroupEntry& group) {
+bool Data::checkInsert(const std::string& name, GroupMap& groups, const GroupEntry& group) {
   auto i = groups.insert(std::make_pair(name, group));
   if (!i.second)
     printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
                i.first->second->toString());
+  return i.second;
 }
 
-void Data::checkNotFound(const Entry& i) const {
-  if (_map.find(i->name()) != _map.end()) printError(i->name() + " already in map");
+bool Data::checkNotFound(const Entry& i) const {
+  if (_map.find(i->name()) == _map.end()) return true;
+  printError(i->name() + " already in map");
+  return false;
 }
 
-void Data::checkInsert(FileList::Set& s, const std::string& n) {
-  if (!s.insert(n).second) printError("failed to insert " + n + " into set");
+bool Data::checkInsert(FileList::Set& s, const std::string& n) {
+  if (s.insert(n).second) return true;
+  printError("failed to insert " + n + " into set");
+  return false;
 }
 
-void Data::checkNotFound(const FileList::Set& s, const std::string& n) {
-  if (s.find(n) != s.end()) printError(n + " already in set");
+bool Data::checkNotFound(const FileList::Set& s, const std::string& n) {
+  if (s.find(n) == s.end()) return true;
+  printError(n + " already in set");
+  return false;
 }
 
 void Data::printError(const std::string& msg) { std::cerr << "ERROR --- " << msg << '\n'; }
@@ -189,16 +198,16 @@ void Data::populateJouyou() {
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != Grades::None);
-    checkInsert(i);
+    if (checkInsert(i)) _grades[i->grade()].push_back(i);
     if (i->oldName().has_value()) checkInsert(_jouyouOldSet, *i->oldName());
   }
-  _lists.insert(std::make_pair(Types::Jouyou, std::move(results)));
+  _types.insert(std::make_pair(Types::Jouyou, std::move(results)));
   // populate _linkedJinmeiKanji that are linked to Jouyou
   fs::path file = FileList::getFile(_dataDir, LinkedJinmeiFile);
   std::ifstream f(file);
   FileList::List found, notFound;
   int count = 0;
-  auto& linkedJinmei = _lists[Types::LinkedJinmei];
+  auto& linkedJinmei = _types[Types::LinkedJinmei];
   for (std::string line; std::getline(f, line);) {
     std::stringstream ss(line);
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
@@ -223,7 +232,7 @@ void Data::populateJouyou() {
   found.clear();
   // populate _linkedOldKanji (so old Jouyou that are not Linked Jinmei)
   count = 0;
-  auto& linkedOld = _lists[Types::LinkedOld];
+  auto& linkedOld = _types[Types::LinkedOld];
   for (const auto& i : _map)
     if (i.second->oldName().has_value()) {
       if (_map.find(*i.second->oldName()) == _map.end()) {
@@ -237,7 +246,7 @@ void Data::populateJouyou() {
 
 void Data::populateJinmei() {
   auto results = FileListKanji::fromFile(*this, Types::Jinmei, FileList::getFile(_dataDir, JinmeiFile));
-  auto& linkedJinmei = _lists[Types::LinkedJinmei];
+  auto& linkedJinmei = _types[Types::LinkedJinmei];
   for (const auto& i : results) {
     checkInsert(i);
     checkNotFound(_jouyouOldSet, i->name());
@@ -247,21 +256,21 @@ void Data::populateJinmei() {
       checkInsert(linkedJinmei, k);
     }
   }
-  _lists.insert(std::make_pair(Types::Jinmei, std::move(results)));
+  _types.insert(std::make_pair(Types::Jinmei, std::move(results)));
 }
 
 void Data::populateExtra() {
   auto results = FileListKanji::fromFile(*this, Types::Extra, FileList::getFile(_dataDir, ExtraFile));
   for (const auto& i : results)
     checkInsert(i);
-  _lists.insert(std::make_pair(Types::Extra, std::move(results)));
+  _types.insert(std::make_pair(Types::Extra, std::move(results)));
 }
 
 void Data::processList(const FileList& list) {
   FileList::List jouyouOld, jinmeiOld, other;
   std::map<Types, FileList::List> found;
   auto count = 0;
-  auto& otherKanji = _lists[Types::Other];
+  auto& otherKanji = _types[Types::Other];
   for (const auto& i : list.list()) {
     // keep track of any 'old' kanji in a level or top frequency list
     if (_debug) {
@@ -271,7 +280,9 @@ void Data::processList(const FileList& list) {
         jinmeiOld.push_back(i);
     }
     auto j = _map.find(i);
+    Entry kanji;
     if (j != _map.end()) {
+      kanji = j->second;
       if (_debug && j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
     } else {
       // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
@@ -279,6 +290,15 @@ void Data::processList(const FileList& list) {
       _map.insert(std::make_pair(i, k));
       otherKanji.push_back(k);
       if (_debug) other.emplace_back(i);
+      kanji = k;
+    }
+    if (list.level() == Levels::None) {
+      assert(kanji->frequency() != 0);
+      int index = (kanji->frequency() - 1) / 500;
+      _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
+    } else {
+      assert(kanji->level() == list.level());
+      _levels[list.level()].push_back(kanji);
     }
   }
   FileList::print(jouyouOld, "Jouyou Old", list.name());
@@ -384,7 +404,7 @@ void Data::checkStrokes() const {
 template<typename T> void Data::printCount(const std::string& name, T pred) const {
   std::vector<std::pair<Types, int>> counts;
   int total = 0;
-  for (const auto& l : _lists) {
+  for (const auto& l : _types) {
     const int count = std::count_if(l.second.begin(), l.second.end(), pred);
     if (count) {
       counts.emplace_back(l.first, count);
@@ -404,8 +424,8 @@ template<typename T> void Data::printCount(const std::string& name, T pred) cons
 
 void Data::printStats() const {
   std::cout << ">>> Loaded " << _map.size() << " Kanji (";
-  for (const auto& i : _lists) {
-    if (i != *_lists.begin()) std::cout << ' ';
+  for (const auto& i : _types) {
+    if (i != *_types.begin()) std::cout << ' ';
     std::cout << i.first << ' ' << i.second.size();
   }
   std::cout << ")\n";
@@ -432,7 +452,7 @@ void Data::printStats() const {
 void Data::printGrades() const {
   std::cout << ">>> Grade breakdown:\n";
   int all = 0;
-  const auto& jouyou = _lists.at(Types::Jouyou);
+  const auto& jouyou = _types.at(Types::Jouyou);
   for (auto i : AllGrades) {
     auto grade = [i](const auto& x) { return x->grade() == i; };
     auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
@@ -464,7 +484,7 @@ void Data::printLevels() const {
   for (auto level : AllLevels) {
     std::vector<std::pair<Types, int>> counts;
     int levelTotal = 0;
-    for (const auto& l : _lists) {
+    for (const auto& l : _types) {
       int count =
         std::count_if(l.second.begin(), l.second.end(), [level](const auto& x) { return x->level() == level; });
       if (count) {
@@ -477,7 +497,7 @@ void Data::printLevels() const {
       std::cout << ">>>   Total for level " << level << ": " << levelTotal << " (";
       for (const auto& j : counts) {
         std::cout << j.first << ' ' << j.second;
-        const auto& l = _lists.at(j.first);
+        const auto& l = _types.at(j.first);
         noFreq(
           std::count_if(l.begin(), l.end(), [level](const auto& x) { return x->level() == level && !x->frequency(); }));
         levelTotal -= j.second;
@@ -492,7 +512,7 @@ void Data::printLevels() const {
 void Data::printRadicals() const {
   std::cout << ">>> Radical breakdown - total count for each name is followed by (Jouyou Jinmei Extra) counts:\n";
   std::map<Radical, Data::List> radicals;
-  for (const auto& i : _lists) {
+  for (const auto& i : _types) {
     if (hasRadical(i.first)) {
       Data::List sorted(i.second);
       std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });

@@ -65,12 +65,12 @@ public:
   }
 
   // get kanji lists
-  const List& jouyouKanji() const { return _lists.at(Types::Jouyou); }
-  const List& jinmeiKanji() const { return _lists.at(Types::Jinmei); }
-  const List& linkedJinmeiKanji() const { return _lists.at(Types::LinkedJinmei); }
-  const List& linkedOldKanji() const { return _lists.at(Types::LinkedOld); }
-  const List& otherKanji() const { return _lists.at(Types::Other); }
-  const List& extraKanji() const { return _lists.at(Types::Extra); }
+  const List& jouyouKanji() const { return _types.at(Types::Jouyou); }
+  const List& jinmeiKanji() const { return _types.at(Types::Jinmei); }
+  const List& linkedJinmeiKanji() const { return _types.at(Types::LinkedJinmei); }
+  const List& linkedOldKanji() const { return _types.at(Types::LinkedOld); }
+  const List& otherKanji() const { return _types.at(Types::Other); }
+  const List& extraKanji() const { return _types.at(Types::Extra); }
   const RadicalMap& radicals() const { return _radicals; }
   OptEntry findKanji(const std::string& s) const {
     auto i = _map.find(s);
@@ -82,6 +82,23 @@ public:
   bool isOldJinmei(const std::string& s) const { return _jinmeiOldSet.find(s) != _jinmeiOldSet.end(); }
   bool isOldName(const std::string& s) const { return isOldJouyou(s) || isOldJinmei(s); }
 
+  const List& gradeList(Grades grade) const { 
+    auto i = _grades.find(grade);
+    return i != _grades.end() ? i->second : emptyList;
+  }
+  size_t gradeTotal(Grades grade) const { return gradeList(grade).size(); }
+  const List& levelList(Levels level) const {
+    auto i = _levels.find(level);
+    return i != _levels.end() ? i->second : emptyList;
+  }
+  size_t levelTotal(Levels level) const { return levelList(level).size(); }
+  // See comment for '_frequencies' private data member for more details about frequency lists
+  enum Values { FrequencyBuckets = 5 };
+  const List& frequencyList(int range) const {
+    return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : emptyList;
+  }
+  size_t frequencyTotal(int range) const { return frequencyList(range).size(); }
+
   using GroupEntry = std::shared_ptr<Group>;
   using GroupMap = std::map<std::string, GroupEntry>;
   using GroupList = std::vector<GroupEntry>;
@@ -92,17 +109,17 @@ protected:
   static std::filesystem::path getDataDir(int, const char**);
   static bool getDebug(int, const char**);
   // helper functions for checking and inserting into collection
-  static void checkInsert(const std::string&, GroupMap&, const GroupEntry&);
-  static void checkInsert(FileList::Set&, const std::string&);
-  static void checkNotFound(const FileList::Set&, const std::string&);
+  static bool checkInsert(const std::string&, GroupMap&, const GroupEntry&);
+  static bool checkInsert(FileList::Set&, const std::string&);
+  static bool checkNotFound(const FileList::Set&, const std::string&);
   static void printError(const std::string&);
   bool checkInsert(const Entry&);
-  void checkInsert(List&, const Entry&);
-  void checkNotFound(const Entry&) const;
+  bool checkInsert(List&, const Entry&);
+  bool checkNotFound(const Entry&) const;
   // 'loadRadicals' and 'loadStrokes' must be called before calling the 'populate Lists' functions
   void loadRadicals(const std::filesystem::path&);
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
-  // populate Lists (_lists datastructure)
+  // populate Lists (_types datastructure)
   void populateJouyou();
   void populateJinmei();
   void populateExtra();
@@ -135,8 +152,13 @@ protected:
   // contains stroke counts followed by one or more lines each with a single kanji that has the given
   // number of strokes.
   std::map<std::string, int> _strokes;
-  // lists of kanjis corresponding to 'Types' enum
-  std::map<Types, List> _lists;
+  // lists of kanji corresponding to 'Types', 'Grades' and 'Levels' (excluding the 'None' enum values)
+  std::map<Types, List> _types;
+  std::map<Grades, List> _grades;
+  std::map<Levels, List> _levels;
+  // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500, 1501-2000, 2001-2501.
+  // The last list is one longer in order to hold the full frequency list (of 2501 kanji).
+  std::array<List, FrequencyBuckets> _frequencies;
   // allow lookup by name
   Map _map;
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)
@@ -144,6 +166,7 @@ protected:
   FileList::Set _jinmeiOldSet;
   // 'MaxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
   static int MaxFrequency;
+  static List emptyList;
 };
 
 } // namespace kanji

@@ -34,7 +34,7 @@ std::ostream& operator<<(std::ostream& os, const KanjiData::Count& c) {
 
 } // namespace
 
-KanjiData::KanjiData(int argc, const char** argv)
+KanjiData::KanjiData(int argc, const char** argv, bool startQuiz)
   : Data(getDataDir(argc, argv), getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
     _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
     _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile, Levels::None) {
@@ -62,22 +62,26 @@ KanjiData::KanjiData(int argc, const char** argv)
     printGroups(_meaningGroups, _meaningGroupList);
     printGroups(_patternGroups, _patternGroupList);
   }
+  bool count = false;
   for (int i = _debug ? 3 : 2; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-b") {
       if (++i == argc) usage("-b must be followed by a file or directory name");
       countKanji(argv[i], true);
+      count = true;
     } else if (arg == "-c") {
       if (++i == argc) usage("-c must be followed by a file or directory name");
       countKanji(argv[i]);
+      count = true;
     } else if (arg == "-h") {
       std::cout << "command line options:\n  -b file: show wide-character counts and full kanji breakdown for 'file'\n"
                 << "  -c file: show wide-character counts for 'file'\n"
                 << "  -h: show help message for command-line options\n";
-      break;
+      return;
     } else
       usage("unrecognized arg: " + arg);
   }
+  if (startQuiz && !count && !_debug) quiz();
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {
@@ -172,6 +176,32 @@ void KanjiData::countKanji(const fs::path& top, bool showBreakdown) const {
       std::cout << totals[i].second << ": " << totals[i].first * 100. / total << "%";
     }
   std::cout << ")\n";
+}
+
+char KanjiData::getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) {
+  std::string line, promptMsg(">>> " + msg + " (");
+  for (const auto& i : choices) {
+    if (i.first != choices.begin()->first) promptMsg += ", ";
+    promptMsg += i.first;
+    promptMsg += "=" + i.second;
+  }
+  if (def.has_value()) {
+    assert(choices.find(*def) != choices.end());
+    promptMsg += std::string(") default '");
+    promptMsg += *def;
+    promptMsg += "': ";
+  } else
+    promptMsg += "): ";
+  do {
+    std::cout << promptMsg;
+    std::getline(std::cin, line);
+    if (line.empty() && def.has_value()) return *def;
+  } while (line.length() != 1 || choices.find(line[0]) == choices.end());
+  return line[0];
+}
+
+void KanjiData::quiz() const {
+  char quizType = getChoice("Quiz type", {{'f', "frequency"}, {'g', "grade"}, {'l', "JLPT level"}}, 'g');
 }
 
 } // namespace kanji

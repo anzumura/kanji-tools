@@ -48,6 +48,7 @@ public:
   const std::string& name() const { return _name; }
   Levels level() const { return _level; }
   const List& list() const { return _list; }
+  size_t size() const { return _list.size(); }
   // 'toString' returns the full contents of this list into a string (with no separates)
   std::string toString() const {
     std::string result;

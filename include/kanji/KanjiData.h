@@ -10,7 +10,7 @@ namespace kanji {
 // files (such as jouyou.txt, jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(int argc, const char** argv);
+  KanjiData(int argc, const char** argv, bool startQuiz = true);
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;
@@ -39,6 +39,13 @@ private:
   // kanji (frequency) will be displayed (non-kanji are not included).
   void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
   template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool) const;
+
+  // 'Choices' should map 'char' choices to a description of the choice
+  using Choices = std::map<char, std::string>;
+  // 'getChoice' will return prompt the use to enter one of the choices in the 'choices' structure.
+  // If an optional default choice is provided it must correspond to an entry in 'choices'.
+  static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
+  void quiz() const;
 
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
