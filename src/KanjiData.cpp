@@ -3,7 +3,7 @@
 #include <kanji/MBChar.h>
 
 #include <numeric>
-#include <tuple>
+#include <random>
 
 namespace kanji {
 
@@ -62,17 +62,16 @@ KanjiData::KanjiData(int argc, const char** argv, bool startQuiz)
     printGroups(_meaningGroups, _meaningGroupList);
     printGroups(_patternGroups, _patternGroupList);
   }
-  bool count = false;
   for (int i = _debug ? 3 : 2; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-b") {
       if (++i == argc) usage("-b must be followed by a file or directory name");
       countKanji(argv[i], true);
-      count = true;
+      startQuiz = false;
     } else if (arg == "-c") {
       if (++i == argc) usage("-c must be followed by a file or directory name");
       countKanji(argv[i]);
-      count = true;
+      startQuiz = false;
     } else if (arg == "-h") {
       std::cout << "command line options:\n  -b file: show wide-character counts and full kanji breakdown for 'file'\n"
                 << "  -c file: show wide-character counts for 'file'\n"
@@ -81,7 +80,7 @@ KanjiData::KanjiData(int argc, const char** argv, bool startQuiz)
     } else
       usage("unrecognized arg: " + arg);
   }
-  if (startQuiz && !count && !_debug) quiz();
+  if (startQuiz && !_debug) quiz();
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {
@@ -179,12 +178,24 @@ void KanjiData::countKanji(const fs::path& top, bool showBreakdown) const {
 }
 
 char KanjiData::getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) {
-  std::string line, promptMsg(">>> " + msg + " (");
-  for (const auto& i : choices) {
-    if (i.first != choices.begin()->first) promptMsg += ", ";
-    promptMsg += i.first;
-    promptMsg += "=" + i.second;
-  }
+  std::string line, promptMsg(msg + " (");
+  std::optional<char> range = std::nullopt;
+  for (const auto& i : choices)
+    if (i.second.empty()) {
+      if (!range.has_value()) {
+        promptMsg += i.first;
+        promptMsg += '-';
+      }
+      range = i.first;
+    } else {
+      if (range.has_value()) {
+        promptMsg += *range;
+        range = std::nullopt;
+      }
+      if (i.first != choices.begin()->first) promptMsg += ", ";
+      promptMsg += i.first;
+      promptMsg += "=" + i.second;
+    }
   if (def.has_value()) {
     assert(choices.find(*def) != choices.end());
     promptMsg += std::string(") default '");
@@ -201,7 +212,78 @@ char KanjiData::getChoice(const std::string& msg, const Choices& choices, std::o
 }
 
 void KanjiData::quiz() const {
-  char quizType = getChoice("Quiz type", {{'f', "frequency"}, {'g', "grade"}, {'l', "JLPT level"}}, 'g');
+  char choice = getChoice("Quiz type", {{'f', "frequency"}, {'g', "grade"}, {'l', "JLPT level"}}, 'g');
+  if (choice == 'f') {
+    choice = getChoice("Choose list",
+                       {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
+    quiz(frequencyList(choice - '1'));
+  } else if (choice == 'g') {
+    choice = getChoice("Choose grade",
+                       {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}});
+    quiz(gradeList(AllGrades[choice == 's' ? 6 : choice - '1']));
+  } else {
+    choice = getChoice("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
+    quiz(levelList(AllLevels[choice - '1']));
+  }
+}
+
+void KanjiData::quiz(const List& list) const {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+
+  List readings;
+  for (auto& i : list)
+    if (i->type() == Types::Jouyou || i->type() == Types::Extra) readings.push_back(i);
+  std::cout << ">>> Starting quiz for " << readings.size() << " kanji";
+  if (readings.size() < list.size())
+    std::cout << " (original list had " << list.size() << ", but not all entries have readings yet)";
+  std::cout << '\n';
+  std::uniform_int_distribution<> randomReading(0, readings.size() - 1);
+  std::uniform_int_distribution<> randomCorrect(1, 4);
+  int question = 0, score = 0;
+  for (auto& i : readings) {
+    int correctChoice = randomCorrect(gen);
+    // 'sameReading' set is used to prevent more than one choice having the exact same reading
+    std::set<std::string> sameReading = {getReading(i)};
+    std::map<int, int> choices = {{correctChoice, question}};
+    for (int j = 1; j < 5; ++j) {
+      if (j != correctChoice) {
+        do {
+          int choice = randomReading(gen);
+          if (sameReading.insert(getReading(readings[choice])).second) {
+            choices[j] = choice;
+            break;
+          }
+        } while(true);
+      }
+    }
+    std::cout << "\nQuestion " << ++question << ". '" << i->name() << "', meaning: " << getMeaning(i) << '\n';
+    for (auto& j : choices)
+      std::cout << "    " << j.first << ".  " << getReading(readings[j.second]) << '\n';
+    char answer = getChoice("  Select correct reading", {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'q', "quit"}});
+    if (answer == 'q') {
+      // when quitting don't count the current question in the final score
+      --question;
+      break;
+    }
+    if (answer - '0' == correctChoice)
+      std::cout << "  Correct! (" << ++score << '/' << question << ")\n";
+    else
+      std::cout << "  The correct answer is " << correctChoice << '\n';
+  }
+  std::cout << "\nFinal score: " << score << '/' << question << '\n';
+}
+
+const std::string& KanjiData::getReading(const Entry& k) const {
+  if (k->type() == Types::Jouyou) return static_cast<const JouyouKanji&>(*k).reading();
+  if (k->type() == Types::Extra) return static_cast<const ExtraKanji&>(*k).reading();
+  throw std::domain_error("kanji doesn't have a reading");
+}
+
+const std::string& KanjiData::getMeaning(const Entry& k) const {
+  if (k->type() == Types::Jouyou) return static_cast<const JouyouKanji&>(*k).meaning();
+  if (k->type() == Types::Extra) return static_cast<const ExtraKanji&>(*k).meaning();
+  throw std::domain_error("kanji doesn't have a meaning");
 }
 
 } // namespace kanji

@@ -44,8 +44,12 @@ private:
   using Choices = std::map<char, std::string>;
   // 'getChoice' will return prompt the use to enter one of the choices in the 'choices' structure.
   // If an optional default choice is provided it must correspond to an entry in 'choices'.
+  static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
   static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
   void quiz() const;
+  void quiz(const List&) const;
+  const std::string& getReading(const Entry&) const;
+  const std::string& getMeaning(const Entry&) const;
 
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
