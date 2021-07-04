@@ -56,12 +56,16 @@ protected:
     EXPECT_EQ(k.level(), Levels::None);
     EXPECT_EQ(k.frequency(), 0);
     EXPECT_EQ(k.name(), "霙");
+    EXPECT_EQ(k.strokes(), 16);
+    EXPECT_EQ(k.meaning(), "sleet");
+    EXPECT_EQ(k.reading(), "エイ、ヨウ、みぞれ");
+    EXPECT_FALSE(k.hasGrade());
+    EXPECT_FALSE(k.hasLevel());
+    EXPECT_TRUE(k.hasMeaning());
+    EXPECT_TRUE(k.hasReading());
     ASSERT_EQ(k.type(), Types::Extra);
     auto& e = static_cast<const ExtraKanji&>(k);
     EXPECT_EQ(e.radical().name(), "雨");
-    EXPECT_EQ(e.strokes(), 16);
-    EXPECT_EQ(e.meaning(), "sleet");
-    EXPECT_EQ(e.reading(), "エイ、ヨウ、みぞれ");
   }
 
   void checkJinmeiKanji(const Kanji& k) const {
@@ -69,10 +73,12 @@ protected:
     EXPECT_EQ(k.level(), Levels::N1);
     EXPECT_EQ(k.frequency(), 1728);
     EXPECT_EQ(k.name(), "亘");
+    EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
+    EXPECT_FALSE(k.hasMeaning());
+    EXPECT_EQ(k.strokes(), 6);
     ASSERT_EQ(k.type(), Types::Jinmei);
     auto& e = static_cast<const JinmeiKanji&>(k);
     EXPECT_EQ(e.radical().name(), "二");
-    EXPECT_EQ(e.strokes(), 6);
     EXPECT_EQ(e.oldName(), "亙");
     EXPECT_EQ(e.year(), 1951);
     EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Names);
@@ -93,6 +99,23 @@ TEST_F(KanjiTest, OtherKanji) {
   EXPECT_EQ(k.frequency(), frequency);
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_FALSE(k.hasMeaning());
+  EXPECT_FALSE(k.hasReading());
+}
+
+TEST_F(KanjiTest, OtherKanjiWithReading) {
+  int frequency = 2362;
+  EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(frequency));
+  ReadingKanji k(_data, 4, "呑", "トン、ドン、の-む");
+  EXPECT_EQ(k.type(), Types::Other);
+  EXPECT_EQ(k.name(), "呑");
+  EXPECT_EQ(k.number(), 4);
+  EXPECT_EQ(k.frequency(), frequency);
+  EXPECT_EQ(k.level(), Levels::None);
+  EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_FALSE(k.hasMeaning());
+  EXPECT_TRUE(k.hasReading());
+  EXPECT_EQ(k.reading(), "トン、ドン、の-む");
 }
 
 TEST_F(KanjiTest, ExtraFile) {
@@ -188,9 +211,9 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 
 TEST_F(KanjiTest, JinmeiFile) {
   writeTestFile("\
-Number\tName\tRadical\tOldName\tYear\tReason\n\
-7\t云\t二\t\t2004\tPrint\n\
-8\t亘\t二\t亙\t1951\tNames");
+Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
+7\t云\t二\t\t2004\tPrint\tウン、い-う、ここに\n\
+8\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
   EXPECT_CALL(_data, getLevel("云")).WillOnce(Return(Levels::None));
   EXPECT_CALL(_data, getFrequency("云")).WillOnce(Return(0));
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
@@ -203,10 +226,10 @@ Number\tName\tRadical\tOldName\tYear\tReason\n\
   EXPECT_FALSE(k.hasLevel());
   EXPECT_EQ(k.frequency(), 0);
   EXPECT_EQ(k.name(), "云");
+  EXPECT_EQ(k.strokes(), 6);
   ASSERT_EQ(k.type(), Types::Jinmei);
   auto& e = static_cast<const JinmeiKanji&>(k);
   EXPECT_EQ(e.radical().name(), "二");
-  EXPECT_EQ(e.strokes(), 6);
   EXPECT_EQ(e.oldName(), std::nullopt);
   EXPECT_EQ(e.year(), 2004);
   EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Print);
@@ -215,8 +238,8 @@ Number\tName\tRadical\tOldName\tYear\tReason\n\
 
 TEST_F(KanjiTest, LinkedJinmei) {
   writeTestFile("\
-Number\tName\tRadical\tOldName\tYear\tReason\n\
-1\t亘\t二\t亙\t1951\tNames");
+Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
+1\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
   EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
   EXPECT_CALL(_data, getFrequency("亙")).WillOnce(Return(0));
@@ -228,6 +251,8 @@ Number\tName\tRadical\tOldName\tYear\tReason\n\
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
+  EXPECT_FALSE(k.hasMeaning());
   EXPECT_EQ(k.link(), results[0]);
 }
 
@@ -246,8 +271,8 @@ TEST_F(KanjiTest, BadLinkedJinmei) {
 
 TEST_F(KanjiTest, JinmeiFileWithMissingReason) {
   writeTestFile("\
-Number\tName\tRadical\tOldName\tYear\n\
-1\t亘\t二\t亙\t1951");
+Number\tName\tRadical\tOldName\tYear\tReading\n\
+1\t亘\t二\t亙\t1951\tコウ、カン、わた-る、もと-める");
   try {
     auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
     FAIL() << "Expected std::domain_error";
@@ -279,24 +304,24 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.level(), Levels::N3);
       EXPECT_EQ(k.frequency(), 640);
       EXPECT_EQ(k.name(), "愛");
+      EXPECT_EQ(k.strokes(), 13);
+      EXPECT_EQ(k.meaning(), "love");
+      EXPECT_EQ(k.reading(), "アイ");
       EXPECT_EQ(e.radical().name(), "心");
-      EXPECT_EQ(e.strokes(), 13);
       EXPECT_EQ(e.oldName(), std::nullopt);
       EXPECT_EQ(e.year(), std::nullopt);
-      EXPECT_EQ(e.meaning(), "love");
-      EXPECT_EQ(e.reading(), "アイ");
     } else {
       EXPECT_EQ(k.number(), 103);
       EXPECT_EQ(k.grade(), Grades::S);
       EXPECT_EQ(k.level(), Levels::N1);
       EXPECT_EQ(k.frequency(), 2207);
       EXPECT_EQ(k.name(), "艶");
+      EXPECT_EQ(k.meaning(), "glossy");
+      EXPECT_EQ(k.reading(), "エン、つや");
+      EXPECT_EQ(k.strokes(), 19);
       EXPECT_EQ(e.radical().name(), "色");
-      EXPECT_EQ(e.strokes(), 19);
       EXPECT_EQ(e.oldName(), "艷");
       EXPECT_EQ(e.year(), 2010);
-      EXPECT_EQ(e.meaning(), "glossy");
-      EXPECT_EQ(e.reading(), "エン、つや");
     }
   }
 }
@@ -316,6 +341,8 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.reading(), "エン、つや");
+  EXPECT_EQ(k.meaning(), "glossy");
   EXPECT_EQ(k.link(), results[0]);
 }
 

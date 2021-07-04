@@ -20,6 +20,7 @@ const fs::path FrequencyFile = "frequency.txt";
 const fs::path RadicalsFile = "radicals.txt";
 const fs::path StrokesFile = "strokes.txt";
 const fs::path WikiStrokesFile = "wiki-strokes.txt";
+const fs::path OtherReadingsFile = "other-readings.txt";
 const fs::path MeaningGroupFile = "meaning-groups.txt";
 const fs::path PatternGroupFile = "pattern-groups.txt";
 
@@ -34,8 +35,6 @@ std::ostream& operator<<(std::ostream& os, const KanjiData::Count& c) {
 
 } // namespace
 
-const std::string KanjiData::MissingMeaning = "";
-
 KanjiData::KanjiData(int argc, const char** argv, bool startQuiz)
   : Data(getDataDir(argc, argv), getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
     _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
@@ -44,6 +43,7 @@ KanjiData::KanjiData(int argc, const char** argv, bool startQuiz)
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
   loadStrokes(FileList::getFile(_dataDir, StrokesFile));
   loadStrokes(FileList::getFile(_dataDir, WikiStrokesFile), false);
+  loadOtherReadings(FileList::getFile(_dataDir, OtherReadingsFile));
   populateJouyou();
   populateJinmei();
   populateExtra();
@@ -245,7 +245,7 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
 
   List questions, mistakes;
   for (auto& i : list)
-    if (i->type() == Types::Jouyou || i->type() == Types::Jinmei || i->type() == Types::Extra) questions.push_back(i);
+    if (i->hasReading()) questions.push_back(i);
   if (listOrder == 'e')
     std::reverse(questions.begin(), questions.end());
   else if (listOrder == 'r')
@@ -261,13 +261,13 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
   for (auto& i : questions) {
     const int correctChoice = randomCorrect(gen);
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
-    std::set<std::string> sameReading = {getReading(i)};
+    std::set<std::string> sameReading = {i->reading()};
     std::map<int, int> answers = {{correctChoice, question}};
     for (int j = 1; j <= choices; ++j) {
       if (j != correctChoice) {
         do {
           const int choice = randomReading(gen);
-          if (sameReading.insert(getReading(questions[choice])).second) {
+          if (sameReading.insert(questions[choice]->reading()).second) {
             answers[j] = choice;
             break;
           }
@@ -278,11 +278,10 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
     if (printFrequency && i->frequency()) std::cout << ", Frequency: " << i->frequency();
     if (printGrade && i->grade() != Grades::None) std::cout << ", Grade: " << i->grade();
     if (printLevel && i->level() != Levels::None) std::cout << ", Level: " << i->level();
-    const auto& meaning = getMeaning(i);
-    if (!meaning.empty()) std::cout << ", Meaning: '" << meaning << "'";
+    if (i->hasMeaning()) std::cout << ", Meaning: '" << i->meaning() << "'";
     std::cout << '\n';
     for (auto& j : answers)
-      std::cout << "    " << j.first << ".  " << getReading(questions[j.second]) << '\n';
+      std::cout << "    " << j.first << ".  " << questions[j.second]->reading() << '\n';
     const char answer = getChoice("  Select correct reading", numberOfChoices);
     if (answer == 'q') {
       // when quitting don't count the current question in the final score
@@ -307,19 +306,6 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
       std::cout << ' ' << i->name();
     std::cout << '\n';
   }
-}
-
-const std::string& KanjiData::getReading(const Entry& k) const {
-  if (k->type() == Types::Jouyou) return static_cast<const JouyouKanji&>(*k).reading();
-  if (k->type() == Types::Jinmei) return static_cast<const JinmeiKanji&>(*k).reading();
-  if (k->type() == Types::Extra) return static_cast<const ExtraKanji&>(*k).reading();
-  throw std::domain_error("kanji doesn't have a reading");
-}
-
-const std::string& KanjiData::getMeaning(const Entry& k) const {
-  if (k->type() == Types::Jouyou) return static_cast<const JouyouKanji&>(*k).meaning();
-  if (k->type() == Types::Extra) return static_cast<const ExtraKanji&>(*k).meaning();
-  return MissingMeaning;
 }
 
 } // namespace kanji

@@ -193,6 +193,40 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
     }
 }
 
+void Data::loadOtherReadings(const fs::path& file) {
+  int lineNumber = 1, nameCol = -1, readingCol = -1;
+  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  };
+  auto setCol = [&file, &error](int& col, int pos) {
+    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
+    col = pos;
+  };
+  std::ifstream f(file);
+  std::array<std::string, 2> cols;
+  for (std::string line; std::getline(f, line); ++lineNumber) {
+    int pos = 0;
+    std::stringstream ss(line);
+    if (nameCol == -1) {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos)
+        if (token == "Name")
+          setCol(nameCol, pos);
+        else if (token == "Reading")
+          setCol(readingCol, pos);
+        else
+          error("unrecognized column '" + token + "'", false);
+      if (pos != cols.size()) error("not enough columns", false);
+    } else {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+        if (pos == cols.size()) error("too many columns");
+        cols[pos] = token;
+      }
+      if (pos != cols.size()) error("not enough columns");
+      if (!_otherReadings.insert(std::make_pair(cols[nameCol], cols[readingCol])).second) error("duplicate name");
+    }
+  }
+}
+
 void Data::populateJouyou() {
   auto results = FileListKanji::fromFile(*this, Types::Jouyou, FileList::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
@@ -285,12 +319,17 @@ void Data::processList(const FileList& list) {
       kanji = j->second;
       if (_debug && j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
     } else {
-      // kanji wasn't already in _map so it only exists in the 'frequency.txt' file
-      auto k = std::make_shared<Kanji>(*this, ++count, i, list.level());
-      _map.insert(std::make_pair(i, k));
-      otherKanji.push_back(k);
+      // kanji wasn't already in _map so it only exists in the 'frequency.txt' file - these kanjis
+      // are considered 'Other' type and by definition are not part of Jouyou or Jinmei (so also
+      // not part of JLPT levels)
+      auto reading = _otherReadings.find(i);
+      if (reading != _otherReadings.end())
+        kanji = std::make_shared<ReadingKanji>(*this, ++count, i, reading->second);
+      else
+        kanji = std::make_shared<Kanji>(*this, ++count, i);
+      _map.insert(std::make_pair(i, kanji));
+      otherKanji.push_back(kanji);
       if (_debug) other.emplace_back(i);
-      kanji = k;
     }
     if (list.level() == Levels::None) {
       assert(kanji->frequency() != 0);

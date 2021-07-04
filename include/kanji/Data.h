@@ -116,9 +116,10 @@ protected:
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
   bool checkNotFound(const Entry&) const;
-  // 'loadRadicals' and 'loadStrokes' must be called before calling the 'populate Lists' functions
+  // 'loadRadicals', 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
   void loadRadicals(const std::filesystem::path&);
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
+  void loadOtherReadings(const std::filesystem::path&);
   // populate Lists (_types datastructure)
   void populateJouyou();
   void populateJinmei();
@@ -147,6 +148,9 @@ protected:
   GroupList _patternGroupList;
   // '_radicals' is populated from radicals.txt
   RadicalMap _radicals;
+  // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji
+  // that aren't part of any other group (so not Jouyou or Jinmei).
+  std::map<std::string, std::string> _otherReadings;
   // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
   // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
   // contains stroke counts followed by one or more lines each with a single kanji that has the given

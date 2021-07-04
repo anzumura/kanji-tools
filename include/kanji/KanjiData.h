@@ -34,8 +34,6 @@ public:
     OptEntry entry;
   };
 private:
-  // Only Jouyou and Extra type kanji currently have English 'meanings'
-  static const std::string MissingMeaning;
   // 'countKanji' will count all multi-byte characters in 'top' file and if 'top' is a directroy
   // then all the regulars under top will be processed (recursively). The 'count' for each unique
   // kanji (frequency) will be displayed (non-kanji are not included).
@@ -44,14 +42,12 @@ private:
 
   // 'Choices' should map 'char' choices to a description of the choice
   using Choices = std::map<char, std::string>;
-  // 'getChoice' will return prompt the use to enter one of the choices in the 'choices' structure.
+  // 'getChoice' will prompt the use to enter one of the choices in the 'choices' structure.
   // If an optional default choice is provided it must correspond to an entry in 'choices'.
   static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
   static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
   void quiz() const;
   void quiz(const List&, bool printFrequency, bool printGrade, bool printLevel) const;
-  const std::string& getReading(const Entry&) const;
-  const std::string& getMeaning(const Entry&) const;
 
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;

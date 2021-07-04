@@ -21,6 +21,7 @@ The data directory contains the following files:
 - **frequency.txt**: top 2501 frequency kanji loaded from [KanjiCards](https://kanjicards.org/kanji-list-by-freq.html)
 - **n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
 - **extra.txt**: meant to hold any extra kanji of interest not in other files
+- **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see Data.h for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see Data.h for more details)
 

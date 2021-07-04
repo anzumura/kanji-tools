@@ -7,6 +7,8 @@ namespace kanji {
 
 namespace fs = std::filesystem;
 
+const std::string Kanji::EmptyString = "";
+
 Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path& file) {
   assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
   int lineNumber = 1;
