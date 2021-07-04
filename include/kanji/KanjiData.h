@@ -49,7 +49,7 @@ private:
   static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
   static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
   void quiz() const;
-  void quiz(const List&) const;
+  void quiz(const List&, bool printFrequency, bool printGrade, bool printLevel) const;
   const std::string& getReading(const Entry&) const;
   const std::string& getMeaning(const Entry&) const;
 

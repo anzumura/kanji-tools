@@ -180,33 +180,34 @@ void KanjiData::countKanji(const fs::path& top, bool showBreakdown) const {
 }
 
 char KanjiData::getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) {
-  std::string line, promptMsg(msg + " (");
+  std::string line, prompt(msg + " (");
   std::optional<char> range = std::nullopt;
   for (const auto& i : choices)
     if (i.second.empty()) {
       if (!range.has_value()) {
-        promptMsg += i.first;
-        promptMsg += '-';
+        prompt += i.first;
+        prompt += '-';
       }
       range = i.first;
     } else {
       if (range.has_value()) {
-        promptMsg += *range;
+        prompt += *range;
         range = std::nullopt;
       }
-      if (i.first != choices.begin()->first) promptMsg += ", ";
-      promptMsg += i.first;
-      promptMsg += "=" + i.second;
+      if (i.first != choices.begin()->first) prompt += ", ";
+      prompt += i.first;
+      prompt += "=" + i.second;
     }
+  if (range.has_value()) prompt += *range;
   if (def.has_value()) {
     assert(choices.find(*def) != choices.end());
-    promptMsg += std::string(") default '");
-    promptMsg += *def;
-    promptMsg += "': ";
+    prompt += std::string(") default '");
+    prompt += *def;
+    prompt += "': ";
   } else
-    promptMsg += "): ";
+    prompt += "): ";
   do {
-    std::cout << promptMsg;
+    std::cout << prompt;
     std::getline(std::cin, line);
     if (line.empty() && def.has_value()) return *def;
   } while (line.length() != 1 || choices.find(line[0]) == choices.end());
@@ -218,54 +219,71 @@ void KanjiData::quiz() const {
   if (choice == 'f') {
     choice = getChoice("Choose list",
                        {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
-    quiz(frequencyList(choice - '1'));
+    quiz(frequencyList(choice - '1'), false, true, true);
   } else if (choice == 'g') {
     choice = getChoice("Choose grade",
                        {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}});
-    quiz(gradeList(AllGrades[choice == 's' ? 6 : choice - '1']));
+    quiz(gradeList(AllGrades[choice == 's' ? 6 : choice - '1']), true, false, true);
   } else {
     choice = getChoice("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
-    quiz(levelList(AllLevels[choice - '1']));
+    quiz(levelList(AllLevels[choice - '1']), true, true, false);
   }
 }
 
-void KanjiData::quiz(const List& list) const {
+void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, bool printLevel) const {
   static std::random_device rd;
   static std::mt19937 gen(rd());
 
-  List readings;
+  Choices numberOfChoices;
+  for (int i = 2; i < 10; ++i)
+    numberOfChoices['0' + i] = "";
+  const int choices = getChoice("Number of choices", numberOfChoices, '4') - '0';
+  numberOfChoices = {{'q', "quit"}};
+  for (int i = 0; i < choices; ++i)
+    numberOfChoices['1' + i] = "";
+  const char listOrder = getChoice("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'b');
+
+  List questions, mistakes;
   for (auto& i : list)
-    if (i->type() == Types::Jouyou || i->type() == Types::Jinmei || i->type() == Types::Extra) readings.push_back(i);
-  std::cout << ">>> Starting quiz for " << readings.size() << " kanji";
-  if (readings.size() < list.size())
+    if (i->type() == Types::Jouyou || i->type() == Types::Jinmei || i->type() == Types::Extra) questions.push_back(i);
+  if (listOrder == 'e')
+    std::reverse(questions.begin(), questions.end());
+  else if (listOrder == 'r')
+    std::shuffle(questions.begin(), questions.end(), gen);
+
+  std::cout << ">>> Starting quiz for " << questions.size() << " kanji";
+  if (questions.size() < list.size())
     std::cout << " (original list had " << list.size() << ", but not all entries have readings yet)";
   std::cout << '\n';
-  std::uniform_int_distribution<> randomReading(0, readings.size() - 1);
-  std::uniform_int_distribution<> randomCorrect(1, 4);
+  std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
+  std::uniform_int_distribution<> randomCorrect(1, choices);
   int question = 0, score = 0;
-  for (auto& i : readings) {
-    int correctChoice = randomCorrect(gen);
+  for (auto& i : questions) {
+    const int correctChoice = randomCorrect(gen);
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
     std::set<std::string> sameReading = {getReading(i)};
-    std::map<int, int> choices = {{correctChoice, question}};
-    for (int j = 1; j < 5; ++j) {
+    std::map<int, int> answers = {{correctChoice, question}};
+    for (int j = 1; j <= choices; ++j) {
       if (j != correctChoice) {
         do {
-          int choice = randomReading(gen);
-          if (sameReading.insert(getReading(readings[choice])).second) {
-            choices[j] = choice;
+          const int choice = randomReading(gen);
+          if (sameReading.insert(getReading(questions[choice])).second) {
+            answers[j] = choice;
             break;
           }
-        } while(true);
+        } while (true);
       }
     }
-    auto meaning = getMeaning(i);
-    std::cout << "\nQuestion " << ++question << ". '" << i->name() << "'";
-    if (!meaning.empty()) std::cout << ", meaning: " << meaning;
+    std::cout << "\nQuestion " << ++question << '/' << questions.size() << ".  Kanji: '" << i->name() << "'";
+    if (printFrequency && i->frequency()) std::cout << ", Frequency: " << i->frequency();
+    if (printGrade && i->grade() != Grades::None) std::cout << ", Grade: " << i->grade();
+    if (printLevel && i->level() != Levels::None) std::cout << ", Level: " << i->level();
+    const auto& meaning = getMeaning(i);
+    if (!meaning.empty()) std::cout << ", Meaning: '" << meaning << "'";
     std::cout << '\n';
-    for (auto& j : choices)
-      std::cout << "    " << j.first << ".  " << getReading(readings[j.second]) << '\n';
-    char answer = getChoice("  Select correct reading", {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'q', "quit"}});
+    for (auto& j : answers)
+      std::cout << "    " << j.first << ".  " << getReading(questions[j.second]) << '\n';
+    const char answer = getChoice("  Select correct reading", numberOfChoices);
     if (answer == 'q') {
       // when quitting don't count the current question in the final score
       --question;
@@ -273,10 +291,22 @@ void KanjiData::quiz(const List& list) const {
     }
     if (answer - '0' == correctChoice)
       std::cout << "  Correct! (" << ++score << '/' << question << ")\n";
-    else
+    else {
       std::cout << "  The correct answer is " << correctChoice << '\n';
+      mistakes.push_back(i);
+    }
   }
-  std::cout << "\nFinal score: " << score << '/' << question << '\n';
+  std::cout << "\nFinal score: " << score << '/' << question;
+  if (!question)
+    std::cout << '\n';
+  else if (mistakes.empty())
+    std::cout << " - perfect!\n";
+  else {
+    std::cout << " - mistakes:";
+    for (auto& i : mistakes)
+      std::cout << ' ' << i->name();
+    std::cout << '\n';
+  }
 }
 
 const std::string& KanjiData::getReading(const Entry& k) const {
