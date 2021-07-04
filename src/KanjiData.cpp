@@ -241,7 +241,9 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
   numberOfChoices = {{'q', "quit"}};
   for (int i = 0; i < choices; ++i)
     numberOfChoices['1' + i] = "";
-  const char listOrder = getChoice("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'b');
+  const char listOrder = getChoice("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'r');
+  const char quizStyle = getChoice("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, 'k');
+  const std::string prompt = std::string("  Select correct ") + (quizStyle == 'k' ? "reading" : "kanji");
 
   List questions, mistakes;
   for (auto& i : list)
@@ -274,15 +276,20 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
         } while (true);
       }
     }
-    std::cout << "\nQuestion " << ++question << '/' << questions.size() << ".  Kanji: '" << i->name() << "'";
-    if (printFrequency && i->frequency()) std::cout << ", Frequency: " << i->frequency();
-    if (printGrade && i->grade() != Grades::None) std::cout << ", Grade: " << i->grade();
-    if (printLevel && i->level() != Levels::None) std::cout << ", Level: " << i->level();
-    if (i->hasMeaning()) std::cout << ", Meaning: '" << i->meaning() << "'";
+    std::cout << "\nQuestion " << ++question << '/' << questions.size() << ".  ";
+    if (quizStyle == 'k') {
+      std::cout << "Kanji: '" << i->name() << "'";
+      if (printFrequency && i->frequency()) std::cout << ", Frequency: " << i->frequency();
+      if (printGrade && i->grade() != Grades::None) std::cout << ", Grade: " << i->grade();
+      if (printLevel && i->level() != Levels::None) std::cout << ", Level: " << i->level();
+      if (i->hasMeaning()) std::cout << ", Meaning: '" << i->meaning() << "'";
+    } else
+      std::cout << "Reading: '" << i->reading() << "'";
     std::cout << '\n';
     for (auto& j : answers)
-      std::cout << "    " << j.first << ".  " << questions[j.second]->reading() << '\n';
-    const char answer = getChoice("  Select correct reading", numberOfChoices);
+      std::cout << "    " << j.first << ".  "
+                << (quizStyle == 'k' ? questions[j.second]->reading() : questions[j.second]->name()) << '\n';
+    const char answer = getChoice(prompt, numberOfChoices);
     if (answer == 'q') {
       // when quitting don't count the current question in the final score
       --question;
@@ -299,7 +306,7 @@ void KanjiData::quiz(const List& list, bool printFrequency, bool printGrade, boo
   if (!question)
     std::cout << '\n';
   else if (mistakes.empty())
-    std::cout << " - perfect!\n";
+    std::cout << " - Perfect!\n";
   else {
     std::cout << " - mistakes:";
     for (auto& i : mistakes)
