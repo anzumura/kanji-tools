@@ -34,6 +34,8 @@ std::ostream& operator<<(std::ostream& os, const KanjiData::Count& c) {
 
 } // namespace
 
+const std::string KanjiData::MissingMeaning = "";
+
 KanjiData::KanjiData(int argc, const char** argv, bool startQuiz)
   : Data(getDataDir(argc, argv), getDebug(argc, argv)), _n5(_dataDir / N5File, Levels::N5),
     _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
@@ -233,7 +235,7 @@ void KanjiData::quiz(const List& list) const {
 
   List readings;
   for (auto& i : list)
-    if (i->type() == Types::Jouyou || i->type() == Types::Extra) readings.push_back(i);
+    if (i->type() == Types::Jouyou || i->type() == Types::Jinmei || i->type() == Types::Extra) readings.push_back(i);
   std::cout << ">>> Starting quiz for " << readings.size() << " kanji";
   if (readings.size() < list.size())
     std::cout << " (original list had " << list.size() << ", but not all entries have readings yet)";
@@ -257,7 +259,10 @@ void KanjiData::quiz(const List& list) const {
         } while(true);
       }
     }
-    std::cout << "\nQuestion " << ++question << ". '" << i->name() << "', meaning: " << getMeaning(i) << '\n';
+    auto meaning = getMeaning(i);
+    std::cout << "\nQuestion " << ++question << ". '" << i->name() << "'";
+    if (!meaning.empty()) std::cout << ", meaning: " << meaning;
+    std::cout << '\n';
     for (auto& j : choices)
       std::cout << "    " << j.first << ".  " << getReading(readings[j.second]) << '\n';
     char answer = getChoice("  Select correct reading", {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'q', "quit"}});
@@ -276,6 +281,7 @@ void KanjiData::quiz(const List& list) const {
 
 const std::string& KanjiData::getReading(const Entry& k) const {
   if (k->type() == Types::Jouyou) return static_cast<const JouyouKanji&>(*k).reading();
+  if (k->type() == Types::Jinmei) return static_cast<const JinmeiKanji&>(*k).reading();
   if (k->type() == Types::Extra) return static_cast<const ExtraKanji&>(*k).reading();
   throw std::domain_error("kanji doesn't have a reading");
 }
@@ -283,7 +289,7 @@ const std::string& KanjiData::getReading(const Entry& k) const {
 const std::string& KanjiData::getMeaning(const Entry& k) const {
   if (k->type() == Types::Jouyou) return static_cast<const JouyouKanji&>(*k).meaning();
   if (k->type() == Types::Extra) return static_cast<const ExtraKanji&>(*k).meaning();
-  throw std::domain_error("kanji doesn't have a meaning");
+  return MissingMeaning;
 }
 
 } // namespace kanji

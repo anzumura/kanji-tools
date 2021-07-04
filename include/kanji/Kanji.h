@@ -119,7 +119,7 @@ public:
 };
 
 // FileListKanji is the base class for kanjis loaded from 'jouyou.txt', 'jinmei.txt' and 'extra.txt' files
-// - Each file contains the same first 3 columns: 'Number', 'Name', 'Radical'
+// - Each file contains the same first 4 columns: 'Number', 'Name', 'Radical' and 'Reading'
 // - Jouyou and Extra files contain 'Strokes' column, Jinmei strokes come from a separate 'strokes.txt' file.
 class FileListKanji : public Kanji {
 public:
@@ -128,8 +128,6 @@ public:
   // - 'file' must have tab separated lines that have the right number of columns for the given type
   // - the first line of 'file' should have column header names that match the names in the 'Columns' enum
   static Data::List fromFile(const Data&, Types type, const std::filesystem::path& file);
-
-  const Radical& radical() const { return _radical; }
   static int toInt(const std::string& s) {
     try {
       return std::stoi(s);
@@ -137,6 +135,9 @@ public:
       throw std::invalid_argument("failed to convert to int: " + s);
     }
   }
+
+  const Radical& radical() const { return _radical; }
+  const std::string& reading() const { return _reading; }
 protected:
   // list of all supported columns in files
   enum Columns {
@@ -157,21 +158,21 @@ protected:
 
   FileListKanji(const Data& d, int strokes, bool findFrequency = true)
     : Kanji(d, toInt(columns[NumberCol]), columns[NameCol], strokes, findFrequency),
-      _radical(d.getRadical(columns[RadicalCol])) {}
+      _radical(d.getRadical(columns[RadicalCol])), _reading(columns[ReadingCol]) {}
 private:
   // all kanji files must have at least the following columns
-  static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol};
+  static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
   // specific types require additional columns
-  static constexpr std::array jouyouRequiredColumns{OldNameCol, YearCol, StrokesCol, GradeCol, MeaningCol, ReadingCol};
+  static constexpr std::array jouyouRequiredColumns{OldNameCol, YearCol, StrokesCol, GradeCol, MeaningCol};
   static constexpr std::array jinmeiRequiredColumns{OldNameCol, YearCol, ReasonCol};
-  static constexpr std::array extraRequiredColumns{StrokesCol, MeaningCol, ReadingCol};
-
+  static constexpr std::array extraRequiredColumns{StrokesCol, MeaningCol};
   static constexpr std::array ColumnNames{"Number",  "Name",  "Radical", "OldName", "Year",
                                           "Strokes", "Grade", "Meaning", "Reading", "Reason"};
   static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
-
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
+
   const Radical _radical;
+  const std::string _reading;
 };
 
 // OfficialListKanji contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
@@ -204,46 +205,40 @@ public:
   enum class Reasons { Names, Print, Variant, Moved, Other };
   JinmeiKanji(const Data& d)
     : OfficialListKanji(d, d.getStrokes(columns[NameCol])), _reason(getReason(columns[ReasonCol])) {}
-
   Types type() const override { return Types::Jinmei; }
   Reasons reason() const { return _reason; }
 private:
   static Reasons getReason(const std::string&);
-
   const Reasons _reason;
 };
 
-class MeaningAndReading {
+// currently only Jouyou and Extra kanji include and English 'meaning'
+class Meaning {
 public:
   const std::string& meaning() const { return _meaning; }
-  const std::string& reading() const { return _reading; }
 protected:
-  MeaningAndReading(const std::string meaning, const std::string& reading) : _meaning(meaning), _reading(reading) {}
+  Meaning(const std::string meaning) : _meaning(meaning) {}
 private:
   const std::string _meaning;
-  const std::string _reading;
 };
 
-class ExtraKanji : public FileListKanji, public MeaningAndReading {
+class ExtraKanji : public FileListKanji, public Meaning {
 public:
   ExtraKanji(const Data& d)
-    : FileListKanji(d, toInt(columns[StrokesCol]), false), MeaningAndReading(columns[MeaningCol], columns[ReadingCol]) {
+    : FileListKanji(d, toInt(columns[StrokesCol]), false), Meaning(columns[MeaningCol]) {
   }
-
   Types type() const override { return Types::Extra; }
 };
 
-class JouyouKanji : public OfficialListKanji, public MeaningAndReading {
+class JouyouKanji : public OfficialListKanji, public Meaning {
 public:
   JouyouKanji(const Data& d)
-    : OfficialListKanji(d, toInt(columns[StrokesCol])), MeaningAndReading(columns[MeaningCol], columns[ReadingCol]),
+    : OfficialListKanji(d, toInt(columns[StrokesCol])), Meaning(columns[MeaningCol]),
       _grade(getGrade(columns[GradeCol])) {}
-
   Types type() const override { return Types::Jouyou; }
   Grades grade() const override { return _grade; }
 private:
   static Grades getGrade(const std::string&);
-
   const Grades _grade;
 };
 

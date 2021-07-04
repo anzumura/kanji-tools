@@ -13,8 +13,8 @@ The program also loads the 214 official kanji radicals (部首).
 
 The data directory contains the following files:
 - **jouyou.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_jōyō_kanji)
-- **jinmei.txt**: loaded from [here](https://ja.wikipedia.org/wiki/人名用漢字一覧)
-- **linked.jinmei.txt**: loaded from [here](https://en.wikipedia.org/wiki/Jinmeiyō_kanji)
+- **jinmei.txt**: loaded from [here](https://ja.wikipedia.org/wiki/人名用漢字一覧) and most of the readings from [here](https://ca.wikipedia.org/w/index.php?title=Jinmeiyō_kanji)
+- **linked-jinmei.txt**: loaded from [here](https://en.wikipedia.org/wiki/Jinmeiyō_kanji)
 - **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō kanji and some old forms.
 - **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Other' type Kanji.
 - **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
