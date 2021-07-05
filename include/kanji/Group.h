@@ -6,6 +6,9 @@
 namespace kanji {
 
 enum class GroupType { Meaning, Pattern };
+inline std::ostream& operator<<(std::ostream& os, const GroupType& x) {
+  return os << (x == GroupType::Meaning ? "Meaning" : "Pattern");
+}
 
 // 'Group' is meant to hold a group of 'related' kanji from 'meaning-groups.txt' or
 // 'pattern-groups.txt' for study purposes. Meaning groups are intended to be used

@@ -47,8 +47,10 @@ private:
   static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
   static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
   void quiz() const;
-  void quiz(const List&, bool printFrequency, bool printGrade, bool printLevel) const;
-
+  void quiz(char listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
+  void quiz(char listOrder, const GroupList&) const;
+  void quiz(const GroupList&) const;
+  static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;
