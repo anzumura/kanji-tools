@@ -18,7 +18,7 @@ protected:
     return args;
   }
   // Contructs KanjiData using the real data files
-  DataTest() : _data(2, argv(), false) {}
+  DataTest() : _data(2, argv()) {}
 
   KanjiData _data;
 };

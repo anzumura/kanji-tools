@@ -10,62 +10,11 @@ namespace kanji {
 // files (such as jouyou.txt, jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(int argc, const char** argv, bool startQuiz = true);
+  KanjiData(int argc, const char** argv);
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;
-
-  // helper class for printing out kanji found in files
-  class Count {
-  public:
-    Count(int f, const std::string& n, OptEntry e) : count(f), name(n), entry(e) {}
-    // Sot to have largest 'count' first followed by lowest frequency number. Lower frequency
-    // means the kanji is more common, but a frequency of '0' means the kanji isn't in the top
-    // frequency list so use 'frequencyOrDefault' to return a large number for no-frequency
-    // kanji and consider 'not-found' kanji to have even higher (worse) frequency. If kanjis
-    // both have the same 'count' and 'frequency' then sort by name.
-    bool operator<(const Count& x) const {
-      return count > x.count ||
-        (count == x.count && getFrequency() < x.getFrequency() || getFrequency() == x.getFrequency() && name < x.name);
-    }
-    int getFrequency() const;
-    int count;
-    std::string name;
-    OptEntry entry;
-  };
 private:
-  // 'countKanji' will count all multi-byte characters in 'top' file and if 'top' is a directroy
-  // then all the regulars under top will be processed (recursively). The 'count' for each unique
-  // kanji (frequency) will be displayed (non-kanji are not included).
-  void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
-  template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool) const;
-
-  enum class ListOrder { FromBeginning, FromEnd, Random };
-  static ListOrder getListOrder();
-  // 'Choices' should map 'char' choices to a description of the choice
-  using Choices = std::map<char, std::string>;
-  // 'getChoice' will prompt the use to enter one of the choices in the 'choices' structure.
-  // If an optional default choice is provided it must correspond to an entry in 'choices'.
-  static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
-  static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
-  void quiz() const;
-
-  // List type quiz
-  void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
-
-  // Group type quiz
-  void quiz(ListOrder listOrder, const GroupList&) const;
-  // 'MemberType' if used to determine which members of a group should be included in a quiz:
-  // - Jouyou: include if member is a Jouyou type
-  // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
-  // - Frequency: include if the member is Jouyou or JLPT or in the Top Frequency
-  // - All: include all members (as long as they have readings)
-  enum MemberType { Jouyou = 0, JLPT, Frequency, All };
-  static bool includeMember(const Entry&, MemberType);
-  void quiz(const GroupList&, MemberType) const;
-
-  static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
-
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;

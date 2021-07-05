@@ -1,2 +1,5 @@
-add_executable(kanji kanjiMain.cpp)
-target_link_libraries(kanji PRIVATE kanji_lib)
+add_executable(kanjiCount kanjiCountMain.cpp)
+target_link_libraries(kanjiCount PRIVATE kanji_lib)
+
+add_executable(kanjiQuiz kanjiQuizMain.cpp)
+target_link_libraries(kanjiQuiz PRIVATE kanji_lib)

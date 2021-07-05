@@ -1,10 +1,10 @@
-#include <kanji/KanjiData.h>
+#include <kanji/KanjiCount.h>
 
 using namespace kanji;
 
 int main(int argc, const char** argv) {
   try {
-    KanjiData data(argc, argv);
+    KanjiCount data(argc, argv);
   } catch(const std::exception& err) {
     std::cerr << err.what() << '\n';
     return 1;
