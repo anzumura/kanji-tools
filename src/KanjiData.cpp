@@ -217,28 +217,36 @@ char KanjiData::getChoice(const std::string& msg, const Choices& choices, std::o
   return line[0];
 }
 
-void KanjiData::quiz() const {
-  char choice = getChoice(
-    "Quiz type", {{'f', "frequency"}, {'g', "grade"}, {'l', "level"}, {'m', "meaning groups"}, {'p', "patterns"}}, 'g');
-  const char listOrder = getChoice("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'r');
-  if (choice == 'f') {
-    choice = getChoice("Choose list",
-                       {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
-    quiz(listOrder, frequencyList(choice - '1'), false, true, true);
-  } else if (choice == 'g') {
-    choice = getChoice("Choose grade",
-                       {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}});
-    quiz(listOrder, gradeList(AllGrades[choice == 's' ? 6 : choice - '1']), true, false, true);
-  } else if (choice == 'l') {
-    choice = getChoice("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
-    quiz(listOrder, levelList(AllLevels[choice - '1']), true, true, false);
-  } else if (choice == 'm')
-    quiz(listOrder, _meaningGroupList);
-  else
-    quiz(listOrder, _patternGroupList);
+KanjiData::ListOrder KanjiData::getListOrder() {
+  switch (getChoice("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'r')) {
+  case 'b': return ListOrder::FromBeginning;
+  case 'e': return ListOrder::FromEnd;
+  default: return ListOrder::Random;
+  }
 }
 
-void KanjiData::quiz(char listOrder, const List& list, bool printFrequency, bool printGrade, bool printLevel) const {
+void KanjiData::quiz() const {
+  char c =
+    getChoice("Quiz type", {{'f', "freq."}, {'g', "grade"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}}, 'g');
+  if (c == 'f') {
+    c = getChoice("Choose list",
+                  {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
+    quiz(getListOrder(), frequencyList(c - '1'), false, true, true);
+  } else if (c == 'g') {
+    c = getChoice("Choose grade",
+                  {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}});
+    quiz(getListOrder(), gradeList(AllGrades[c == 's' ? 6 : c - '1']), true, false, true);
+  } else if (c == 'l') {
+    c = getChoice("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
+    quiz(getListOrder(), levelList(AllLevels[c - '1']), true, true, false);
+  } else if (c == 'm')
+    quiz(getListOrder(), _meaningGroupList);
+  else
+    quiz(getListOrder(), _patternGroupList);
+}
+
+void KanjiData::quiz(ListOrder listOrder, const List& list, bool printFrequency, bool printGrade,
+                     bool printLevel) const {
   Choices numberOfChoices;
   for (int i = 2; i < 10; ++i)
     numberOfChoices['0' + i] = "";
@@ -253,9 +261,9 @@ void KanjiData::quiz(char listOrder, const List& list, bool printFrequency, bool
   FileList::List mistakes;
   for (auto& i : list)
     if (i->hasReading()) questions.push_back(i);
-  if (listOrder == 'e')
+  if (listOrder == ListOrder::FromEnd)
     std::reverse(questions.begin(), questions.end());
-  else if (listOrder == 'r')
+  else if (listOrder == ListOrder::Random)
     std::shuffle(questions.begin(), questions.end(), RandomGen);
 
   std::cout << ">>> Starting quiz for " << questions.size() << " kanji";
@@ -310,43 +318,59 @@ void KanjiData::quiz(char listOrder, const List& list, bool printFrequency, bool
   finalScore(question, score, mistakes);
 }
 
-void KanjiData::quiz(char listOrder, const GroupList& list) const {
-  if (listOrder == 'b')
-    quiz(list);
+bool KanjiData::includeMember(const Entry& k, MemberType type) {
+  return k->hasReading() && (k->is(Types::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
+}
+
+void KanjiData::quiz(ListOrder listOrder, const GroupList& list) const {
+  const MemberType type = static_cast<MemberType>(
+    getChoice("Kanji type", {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}}, '2') - '1');
+  if (listOrder == ListOrder::FromBeginning && type == All)
+    quiz(list, type);
   else {
-    GroupList newList = list;
-    if (listOrder == 'e')
+    GroupList newList;
+    for (const auto& i : list) {
+      int memberCount = 0;
+      for (auto& j : i->members())
+        if (includeMember(j, type)) ++memberCount;
+      // only include groups that have 2 or more members after applying the 'include member' filter
+      if (memberCount > 1) newList.push_back(i);
+    }
+    if (listOrder == ListOrder::FromEnd)
       std::reverse(newList.begin(), newList.end());
-    else
+    else if (listOrder == ListOrder::Random)
       std::shuffle(newList.begin(), newList.end(), RandomGen);
-    quiz(newList);
+    quiz(newList, type);
   }
 }
 
-void KanjiData::quiz(const GroupList& list) const {
-  const char types = getChoice("Include kanji type", {{'a', "all"}, {'f', "top 2501 frequency"}, {'l', "JLPT"}}, 'l');
+void KanjiData::quiz(const GroupList& list, MemberType type) const {
   int question = 0, score = 0;
   FileList::List mistakes;
   for (auto& i : list) {
     List questions;
     FileList::List readings;
     for (auto& j : i->members())
-      if (j->hasReading() && (types == 'a' || types == 'f' && j->frequency() || types == 'l' && j->hasLevel())) {
+      if (includeMember(j, type)) {
         questions.push_back(j);
         readings.push_back(j->reading());
       }
-    // skip questions that involve a group with 0 or 1 members (can happen based 'types' restricting values)
-    if (questions.size() < 2) continue;
     if (!question) std::cout << ">>> Starting quiz for " << list.size() << ' ' << i->type() << " groups\n";
     std::cout << "\nQuestion " << ++question << '/' << list.size() << ".  ";
+    std::cout << (i->peers() ? "peers of entry: " : "name: ") << i->name() << ", showing ";
+    if (questions.size() == i->members().size())
+      std::cout << "all " << questions.size();
+    else
+      std::cout << questions.size() << " out of " << i->members().size();
+    std::cout << " members\n";
+
     std::shuffle(readings.begin(), readings.end(), RandomGen);
-    std::cout << (i->peers() ? "peers of entry: " : "name: ") << i->name() << ", members: " << questions.size() << '\n';
     int count = 0;
     std::map<char, std::string> choices = {{'~', "quit"}};
     for (auto& j : questions) {
       const char choice = (count < 26 ? 'a' + count : 'A' + count);
-      std::cout << "  Entry: " << std::setw(2) << count + 1 << "  '" << j->name() << "'\t\tReading: " << choice << "  '"
-                << readings[count++] << "'\n";
+      std::cout << "  Entry: " << std::setw(3) << count + 1 << "  '" << j->name() << "'\t\tReading:  " << choice
+                << "  '" << readings[count++] << "'\n";
       choices[choice] = "";
     }
     std::cout << '\n';

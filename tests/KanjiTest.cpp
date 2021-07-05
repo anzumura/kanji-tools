@@ -108,6 +108,7 @@ TEST_F(KanjiTest, OtherKanjiWithReading) {
   EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(frequency));
   ReadingKanji k(_data, 4, "呑", "トン、ドン、の-む");
   EXPECT_EQ(k.type(), Types::Other);
+  EXPECT_TRUE(k.is(Types::Other));
   EXPECT_EQ(k.name(), "呑");
   EXPECT_EQ(k.number(), 4);
   EXPECT_EQ(k.frequency(), frequency);

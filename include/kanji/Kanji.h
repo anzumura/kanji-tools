@@ -29,6 +29,7 @@ public:
   int frequency() const { return _frequency; }
   int frequencyOrDefault(int x) const { return _frequency ? _frequency : x; }
 
+  bool is(Types t) const { return type() == t; }
   bool hasLevel() const { return _level != Levels::None; }
   bool hasGrade() const { return grade() != Grades::None; }
   bool hasMeaning() const { return !meaning().empty(); }

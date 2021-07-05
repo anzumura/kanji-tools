@@ -40,6 +40,8 @@ private:
   void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
   template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool) const;
 
+  enum class ListOrder { FromBeginning, FromEnd, Random };
+  static ListOrder getListOrder();
   // 'Choices' should map 'char' choices to a description of the choice
   using Choices = std::map<char, std::string>;
   // 'getChoice' will prompt the use to enter one of the choices in the 'choices' structure.
@@ -47,10 +49,23 @@ private:
   static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
   static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
   void quiz() const;
-  void quiz(char listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
-  void quiz(char listOrder, const GroupList&) const;
-  void quiz(const GroupList&) const;
+
+  // List type quiz
+  void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
+
+  // Group type quiz
+  void quiz(ListOrder listOrder, const GroupList&) const;
+  // 'MemberType' if used to determine which members of a group should be included in a quiz:
+  // - Jouyou: include if member is a Jouyou type
+  // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
+  // - Frequency: include if the member is Jouyou or JLPT or in the Top Frequency
+  // - All: include all members (as long as they have readings)
+  enum MemberType { Jouyou = 0, JLPT, Frequency, All };
+  static bool includeMember(const Entry&, MemberType);
+  void quiz(const GroupList&, MemberType) const;
+
   static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
+
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;
