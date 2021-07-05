@@ -5,10 +5,22 @@
 
 namespace kanji {
 
+// forward declares
+class Group;
+enum class GroupType;
+
 class KanjiQuiz : public KanjiData {
 public:
   KanjiQuiz(int argc, const char** argv);
+  using GroupEntry = std::shared_ptr<Group>;
+  using GroupMap = std::map<std::string, GroupEntry>;
+  using GroupList = std::vector<GroupEntry>;
 private:
+  static bool checkInsert(const std::string&, GroupMap&, const GroupEntry&);
+  // 'loadGroups' loads from '-groups.txt' files
+  void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
+  void printGroups(const GroupMap&, const GroupList&) const;
+
   enum class ListOrder { FromBeginning, FromEnd, Random };
   static ListOrder getListOrder();
   // 'Choices' should map 'char' choices to a description of the choice
@@ -34,6 +46,15 @@ private:
   void quiz(const GroupList&, MemberType) const;
 
   static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
+
+  // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
+  // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
+  // maps have an entry for each kanji to its group so currently a kanji can't be in more
+  // than one group per group type.
+  GroupMap _meaningGroups;
+  GroupMap _patternGroups;
+  GroupList _meaningGroupList;
+  GroupList _patternGroupList;
 };
 
 } // namespace kanji

@@ -1,5 +1,4 @@
-#include <kanji/Group.h>
-#include <kanji/MBChar.h>
+#include <kanji/Kanji.h>
 
 #include <fstream>
 #include <numeric>
@@ -18,18 +17,6 @@ const fs::path JouyouFile = "jouyou.txt";
 const fs::path JinmeiFile = "jinmei.txt";
 const fs::path LinkedJinmeiFile = "linked-jinmei.txt";
 const fs::path ExtraFile = "extra.txt";
-
-// helper function for printing 'no-frequency' counts
-void noFreq(int f, bool brackets = false) {
-  if (f) {
-    if (brackets)
-      std::cout << " (";
-    else
-      std::cout << ' ';
-    std::cout << "nf " << f;
-    if (brackets) std::cout << ')';
-  }
-}
 
 } // namespace
 
@@ -91,14 +78,6 @@ bool Data::checkInsert(List& s, const Entry& i) {
   if (!checkInsert(i)) return false;
   s.push_back(i);
   return true;
-}
-
-bool Data::checkInsert(const std::string& name, GroupMap& groups, const GroupEntry& group) {
-  auto i = groups.insert(std::make_pair(name, group));
-  if (!i.second)
-    printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
-               i.first->second->toString());
-  return i.second;
 }
 
 bool Data::checkNotFound(const Entry& i) const {
@@ -364,67 +343,6 @@ void Data::processList(const FileList& list) {
   }
 }
 
-void Data::loadGroup(const std::filesystem::path& file, GroupMap& groups, GroupList& list, GroupType type) {
-  int lineNumber = 1, numberCol = -1, nameCol = -1, membersCol = -1;
-  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
-  };
-  auto setCol = [&file, &error](int& col, int pos) {
-    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name", false);
-    col = pos;
-  };
-  std::ifstream f(file);
-  std::array<std::string, 3> cols;
-  for (std::string line; std::getline(f, line); ++lineNumber) {
-    int pos = 0;
-    std::stringstream ss(line);
-    if (numberCol == -1) {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Number")
-          setCol(numberCol, pos);
-        else if (token == "Name")
-          setCol(nameCol, pos);
-        else if (token == "Members")
-          setCol(membersCol, pos);
-        else
-          error("unrecognized column '" + token + "'", false);
-      if (pos != cols.size()) error("not enough columns", false);
-    } else {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) error("too many columns");
-        cols[pos] = token;
-      }
-      if (pos != cols.size()) error("not enough columns");
-      std::string number(cols[numberCol]), name(cols[nameCol]), token;
-      FileList::List kanjis;
-      const bool peers = name.empty();
-      if (type == GroupType::Meaning) {
-        if (peers) error("Meaning group must have a name");
-      } else if (!peers) // if populated, 'name colum' is the first member of a Pattern group
-        kanjis.emplace_back(name);
-      for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
-        kanjis.emplace_back(token);
-      List memberKanjis;
-      for (const auto& i : kanjis) {
-        const auto memberKanji = findKanji(i);
-        if (memberKanji.has_value())
-          memberKanjis.push_back(*memberKanji);
-        else
-          printError("failed to find member " + i + " in group " + number);
-      }
-      if (memberKanjis.empty()) error("group " + number + " has no valid members");
-      GroupEntry group;
-      if (type == GroupType::Meaning)
-        group = std::make_shared<MeaningGroup>(FileListKanji::toInt(number), name, memberKanjis);
-      else
-        group = std::make_shared<PatternGroup>(FileListKanji::toInt(number), memberKanjis, peers);
-      for (const auto& i : memberKanjis)
-        checkInsert(i->name(), groups, group);
-      list.push_back(group);
-    }
-  }
-}
-
 void Data::checkStrokes() const {
   FileList::List strokesOther, strokesNotFound;
   for (const auto& i : _strokes) {
@@ -437,191 +355,6 @@ void Data::checkStrokes() const {
   if (_debug) {
     FileList::print(strokesOther, "Kanjis in 'Other' group", "_strokes");
     FileList::print(strokesNotFound, "Kanjis without other groups", "_strokes");
-  }
-}
-
-template<typename T> void Data::printCount(const std::string& name, T pred) const {
-  std::vector<std::pair<Types, int>> counts;
-  int total = 0;
-  for (const auto& l : _types) {
-    const int count = std::count_if(l.second.begin(), l.second.end(), pred);
-    if (count) {
-      counts.emplace_back(l.first, count);
-      total += count;
-    }
-  }
-  if (total) {
-    std::cout << ">>> " << name << ' ' << total << " (";
-    for (const auto& i : counts) {
-      std::cout << i.first << ' ' << i.second;
-      total -= i.second;
-      if (total) std::cout << ", ";
-    }
-    std::cout << ")\n";
-  }
-}
-
-void Data::printStats() const {
-  std::cout << ">>> Loaded " << _map.size() << " Kanji (";
-  for (const auto& i : _types) {
-    if (i != *_types.begin()) std::cout << ' ';
-    std::cout << i.first << ' ' << i.second.size();
-  }
-  std::cout << ")\n";
-  printCount("  Has JLPT level", [](const auto& x) { return x->hasLevel(); });
-  printCount("  Has frequency and not in Jouyou or JLPT",
-             [](const auto& x) { return x->frequency() && x->type() != Types::Jouyou && !x->hasLevel(); });
-  printCount("  Jinmei with no frequency and not JLPT",
-             [](const auto& x) { return x->type() == Types::Jinmei && !x->frequency() && !x->hasLevel(); });
-  printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
-  printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
-  printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
-  // some old kanjis have a non-zero frequency
-  printCount("  Old Has Frequency", [this](const auto& x) { return x->oldFrequency(*this) != 0; });
-  // some old kanjis have stroke counts
-  printCount("  Old Has Strokes", [this](const auto& x) { return x->oldStrokes(*this) != 0; });
-  // no old kanjis should have a JLPT level, i.e.: they all should have Level 'None'
-  printCount("  Old Has Level", [this](const auto& x) { return x->oldLevel(*this) != Levels::None; });
-  // old kanjis should only have types of LinkedJinmei, Other or None
-  for (auto i : AllTypes)
-    printCount(std::string("  Old is type ") + toString(i),
-               [this, i](const auto& x) { return x->oldName().has_value() && x->oldType(*this) == i; });
-}
-
-void Data::printGrades() const {
-  std::cout << ">>> Grade breakdown:\n";
-  int all = 0;
-  const auto& jouyou = _types.at(Types::Jouyou);
-  for (auto i : AllGrades) {
-    auto grade = [i](const auto& x) { return x->grade() == i; };
-    auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
-    if (gradeCount) {
-      all += gradeCount;
-      std::cout << ">>>   Total for grade " << i << ": " << gradeCount;
-      noFreq(
-        std::count_if(jouyou.begin(), jouyou.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }),
-        true);
-      std::cout << " (";
-      for (auto level : AllLevels) {
-        const auto gradeLevelCount = std::count_if(
-          jouyou.begin(), jouyou.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
-        if (gradeLevelCount) {
-          gradeCount -= gradeLevelCount;
-          std::cout << level << ' ' << gradeLevelCount;
-          if (gradeCount) std::cout << ", ";
-        }
-      }
-      std::cout << ")\n";
-    }
-  }
-  std::cout << ">>>   Total for all grades: " << all << '\n';
-}
-
-void Data::printLevels() const {
-  std::cout << ">>> Level breakdown:\n";
-  int total = 0;
-  for (auto level : AllLevels) {
-    std::vector<std::pair<Types, int>> counts;
-    int levelTotal = 0;
-    for (const auto& l : _types) {
-      int count =
-        std::count_if(l.second.begin(), l.second.end(), [level](const auto& x) { return x->level() == level; });
-      if (count) {
-        counts.emplace_back(l.first, count);
-        levelTotal += count;
-      }
-    }
-    if (levelTotal) {
-      total += levelTotal;
-      std::cout << ">>>   Total for level " << level << ": " << levelTotal << " (";
-      for (const auto& j : counts) {
-        std::cout << j.first << ' ' << j.second;
-        const auto& l = _types.at(j.first);
-        noFreq(
-          std::count_if(l.begin(), l.end(), [level](const auto& x) { return x->level() == level && !x->frequency(); }));
-        levelTotal -= j.second;
-        if (levelTotal) std::cout << ", ";
-      }
-      std::cout << ")\n";
-    }
-  }
-  std::cout << ">>>   Total for all levels: " << total << '\n';
-}
-
-void Data::printRadicals() const {
-  std::cout << ">>> Radical breakdown - total count for each name is followed by (Jouyou Jinmei Extra) counts:\n";
-  std::map<Radical, Data::List> radicals;
-  for (const auto& i : _types) {
-    if (hasRadical(i.first)) {
-      Data::List sorted(i.second);
-      std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
-      for (const auto& j : sorted)
-        radicals[static_cast<const FileListKanji&>(*j).radical()].push_back(j);
-    }
-  }
-  int jouyou = 0, jinmei = 0, extra = 0;
-  for (const auto& i : radicals) {
-    int jo = 0, ji = 0, ex = 0;
-    for (const auto& j : i.second)
-      switch (j->type()) {
-      case Types::Jouyou: ++jo; break;
-      case Types::Jinmei: ++ji; break;
-      default: ++ex; break;
-      }
-    auto counts = std::to_string(jo) + ' ' + std::to_string(ji) + ' ' + std::to_string(ex) + ')';
-    std::cout << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " ("
-              << std::left << std::setw(9) << counts << ':';
-    jouyou += jo;
-    jinmei += ji;
-    extra += ex;
-    Types oldType = i.second[0]->type();
-    for (const auto& j : i.second) {
-      if (j->type() != oldType) {
-        std::cout << "、";
-        oldType = j->type();
-      }
-      std::cout << ' ' << *j;
-    }
-    std::cout << '\n';
-  }
-  std::cout << ">>>   Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou "
-            << jouyou << " Jinmei " << jinmei << " Extra " << extra << ")\n";
-  std::vector<Radical> missingRadicals;
-  for (const auto& i : _radicals)
-    if (radicals.find(i.second) == radicals.end()) missingRadicals.push_back(i.second);
-  if (!missingRadicals.empty()) {
-    std::cout << ">>>   Found " << missingRadicals.size() << " radicals with no kanji:";
-    for (const auto& i : missingRadicals)
-      std::cout << ' ' << i;
-    std::cout << '\n';
-  }
-}
-
-void Data::printGroups(const GroupMap& groups, const GroupList& groupList) const {
-  std::cout << ">>> Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n"
-            << ">>> Jouyou kanji have no suffix, otherwise '=JLPT \"=Freq ^=Jinmei ~=Linked Jinmei +=Extra *=...:\n";
-  for (const auto& i : groupList) {
-    if (i->type() == GroupType::Meaning) {
-      auto len = MBChar::length(i->name());
-      std::cout << '[' << i->name()
-                << (len == 1     ? "　　"
-                      : len == 2 ? "　"
-                                 : "")
-                << ' ' << std::setw(2) << std::setfill(' ') << i->members().size() << "] :";
-      for (const auto& j : i->members())
-        std::cout << ' ' << j->qualifiedName();
-    } else {
-      std::cout << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
-      for (const auto& j : i->members())
-        if (j == i->members()[0]) {
-          if (i->peers())
-            std::cout << "　 : " << j->qualifiedName();
-          else
-            std::cout << j->qualifiedName() << ':';
-        } else
-          std::cout << ' ' << j->qualifiedName();
-    }
-    std::cout << '\n';
   }
 }
 

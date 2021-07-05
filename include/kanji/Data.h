@@ -11,8 +11,6 @@ namespace kanji {
 
 // forward declares
 class Kanji;
-class Group;
-enum class GroupType;
 
 // Official Grades for Jouyou kanji
 enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
@@ -48,7 +46,9 @@ public:
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
 
-  Data(const std::filesystem::path& dataDir, bool debug) : _dataDir(dataDir), _debug(debug) {}
+  Data(const std::filesystem::path& dataDir, bool debug) : _dataDir(dataDir), _debug(debug) {
+    if (_debug) std::cout << ">>>\n>>> Begin Loading Data\n>>>\n";
+  }
   Data(const Data&) = delete;
 
   // functions used by 'Kanji' classes during construction
@@ -82,7 +82,7 @@ public:
   bool isOldJinmei(const std::string& s) const { return _jinmeiOldSet.find(s) != _jinmeiOldSet.end(); }
   bool isOldName(const std::string& s) const { return isOldJouyou(s) || isOldJinmei(s); }
 
-  const List& gradeList(Grades grade) const { 
+  const List& gradeList(Grades grade) const {
     auto i = _grades.find(grade);
     return i != _grades.end() ? i->second : emptyList;
   }
@@ -98,10 +98,6 @@ public:
     return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : emptyList;
   }
   size_t frequencyTotal(int range) const { return frequencyList(range).size(); }
-
-  using GroupEntry = std::shared_ptr<Group>;
-  using GroupMap = std::map<std::string, GroupEntry>;
-  using GroupList = std::vector<GroupEntry>;
 protected:
   const std::filesystem::path _dataDir;
   const bool _debug;
@@ -109,7 +105,6 @@ protected:
   static std::filesystem::path getDataDir(int, const char**);
   static bool getDebug(int, const char**);
   // helper functions for checking and inserting into collection
-  static bool checkInsert(const std::string&, GroupMap&, const GroupEntry&);
   static bool checkInsert(FileList::Set&, const std::string&);
   static bool checkNotFound(const FileList::Set&, const std::string&);
   static void printError(const std::string&);
@@ -128,24 +123,7 @@ protected:
   // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
   // then this function will print any entries in _strokes that are 'Other' type or not found.
   void checkStrokes() const;
-  // 'loadGroups' loads from '-groups.txt' files
-  void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
-  // the following print functions are called after loading all data if -debug flag is specified
-  void printStats() const;
-  void printGrades() const;
-  void printLevels() const;
-  void printRadicals() const;
-  void printGroups(const GroupMap&, const GroupList&) const;
-  template<typename T> void printCount(const std::string& name, T pred) const;
 
-  // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
-  // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
-  // maps have an entry for each kanji to its group so currently a kanji can't be in more
-  // than one group per group type.
-  GroupMap _meaningGroups;
-  GroupMap _patternGroups;
-  GroupList _meaningGroupList;
-  GroupList _patternGroupList;
   // '_radicals' is populated from radicals.txt
   RadicalMap _radicals;
   // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji

@@ -17,8 +17,6 @@ const fs::path RadicalsFile = "radicals.txt";
 const fs::path StrokesFile = "strokes.txt";
 const fs::path WikiStrokesFile = "wiki-strokes.txt";
 const fs::path OtherReadingsFile = "other-readings.txt";
-const fs::path MeaningGroupFile = "meaning-groups.txt";
-const fs::path PatternGroupFile = "pattern-groups.txt";
 
 } // namespace
 
@@ -41,16 +39,8 @@ KanjiData::KanjiData(int argc, const char** argv)
   processList(_n1);
   processList(_frequency);
   checkStrokes();
-  loadGroup(FileList::getFile(_dataDir, MeaningGroupFile), _meaningGroups, _meaningGroupList, GroupType::Meaning);
-  loadGroup(FileList::getFile(_dataDir, PatternGroupFile), _patternGroups, _patternGroupList, GroupType::Pattern);
-  if (_debug) {
-    printStats();
-    printGrades();
-    printLevels();
-    printRadicals();
-    printGroups(_meaningGroups, _meaningGroupList);
-    printGroups(_patternGroups, _patternGroupList);
-  }
+  if (_debug)
+    std::cout << ">>>\n>>> Finished Loading Data\n>>>\n";
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {

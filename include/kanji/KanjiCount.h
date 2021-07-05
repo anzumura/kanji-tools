@@ -32,6 +32,12 @@ public:
 private:
   void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
   template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool) const;
+  // the following print functions are called after loading all data if -debug flag is specified
+  void printStats() const;
+  void printGrades() const;
+  void printLevels() const;
+  void printRadicals() const;
+  template<typename T> void printCount(const std::string& name, T pred) const;
 };
 
 } // namespace kanji

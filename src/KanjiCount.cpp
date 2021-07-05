@@ -19,13 +19,29 @@ std::ostream& operator<<(std::ostream& os, const KanjiCount::Count& c) {
   return os;
 }
 
+// helper function for printing 'no-frequency' counts
+void noFreq(int f, bool brackets = false) {
+  if (f) {
+    if (brackets)
+      std::cout << " (";
+    else
+      std::cout << ' ';
+    std::cout << "nf " << f;
+    if (brackets) std::cout << ')';
+  }
+}
+
 } // namespace
 
 KanjiCount::KanjiCount(int argc, const char** argv) : KanjiData(argc, argv) {
-  int i = _debug ? 3 : 2;
-  if (i == argc)
+  if (_debug) {
+    printStats();
+    printGrades();
+    printLevels();
+    printRadicals();
+  } else if (argc == 2)
     usage("please specify at least one option or '-h' for help");
-  for (; i < argc; ++i) {
+  for (int i = _debug ? 3 : 2; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-b") {
       if (++i == argc) usage("-b must be followed by a file or directory name");
@@ -126,6 +142,165 @@ void KanjiCount::countKanji(const fs::path& top, bool showBreakdown) const {
       std::cout << totals[i].second << ": " << totals[i].first * 100. / total << "%";
     }
   std::cout << ")\n";
+}
+
+// Print functions called when -debug is specified
+
+template<typename T> void KanjiCount::printCount(const std::string& name, T pred) const {
+  std::vector<std::pair<Types, int>> counts;
+  int total = 0;
+  for (const auto& l : _types) {
+    const int count = std::count_if(l.second.begin(), l.second.end(), pred);
+    if (count) {
+      counts.emplace_back(l.first, count);
+      total += count;
+    }
+  }
+  if (total) {
+    std::cout << ">>> " << name << ' ' << total << " (";
+    for (const auto& i : counts) {
+      std::cout << i.first << ' ' << i.second;
+      total -= i.second;
+      if (total) std::cout << ", ";
+    }
+    std::cout << ")\n";
+  }
+}
+
+void KanjiCount::printStats() const {
+  std::cout << ">>> Loaded " << _map.size() << " Kanji (";
+  for (const auto& i : _types) {
+    if (i != *_types.begin()) std::cout << ' ';
+    std::cout << i.first << ' ' << i.second.size();
+  }
+  std::cout << ")\n";
+  printCount("  Has JLPT level", [](const auto& x) { return x->hasLevel(); });
+  printCount("  Has frequency and not in Jouyou or JLPT",
+             [](const auto& x) { return x->frequency() && x->type() != Types::Jouyou && !x->hasLevel(); });
+  printCount("  Jinmei with no frequency and not JLPT",
+             [](const auto& x) { return x->type() == Types::Jinmei && !x->frequency() && !x->hasLevel(); });
+  printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
+  printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
+  printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
+  // some old kanjis have a non-zero frequency
+  printCount("  Old Has Frequency", [this](const auto& x) { return x->oldFrequency(*this) != 0; });
+  // some old kanjis have stroke counts
+  printCount("  Old Has Strokes", [this](const auto& x) { return x->oldStrokes(*this) != 0; });
+  // no old kanjis should have a JLPT level, i.e.: they all should have Level 'None'
+  printCount("  Old Has Level", [this](const auto& x) { return x->oldLevel(*this) != Levels::None; });
+  // old kanjis should only have types of LinkedJinmei, Other or None
+  for (auto i : AllTypes)
+    printCount(std::string("  Old is type ") + toString(i),
+               [this, i](const auto& x) { return x->oldName().has_value() && x->oldType(*this) == i; });
+}
+
+void KanjiCount::printGrades() const {
+  std::cout << ">>> Grade breakdown:\n";
+  int all = 0;
+  const auto& jouyou = _types.at(Types::Jouyou);
+  for (auto i : AllGrades) {
+    auto grade = [i](const auto& x) { return x->grade() == i; };
+    auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
+    if (gradeCount) {
+      all += gradeCount;
+      std::cout << ">>>   Total for grade " << i << ": " << gradeCount;
+      noFreq(
+        std::count_if(jouyou.begin(), jouyou.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }),
+        true);
+      std::cout << " (";
+      for (auto level : AllLevels) {
+        const auto gradeLevelCount = std::count_if(
+          jouyou.begin(), jouyou.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
+        if (gradeLevelCount) {
+          gradeCount -= gradeLevelCount;
+          std::cout << level << ' ' << gradeLevelCount;
+          if (gradeCount) std::cout << ", ";
+        }
+      }
+      std::cout << ")\n";
+    }
+  }
+  std::cout << ">>>   Total for all grades: " << all << '\n';
+}
+
+void KanjiCount::printLevels() const {
+  std::cout << ">>> Level breakdown:\n";
+  int total = 0;
+  for (auto level : AllLevels) {
+    std::vector<std::pair<Types, int>> counts;
+    int levelTotal = 0;
+    for (const auto& l : _types) {
+      int count =
+        std::count_if(l.second.begin(), l.second.end(), [level](const auto& x) { return x->level() == level; });
+      if (count) {
+        counts.emplace_back(l.first, count);
+        levelTotal += count;
+      }
+    }
+    if (levelTotal) {
+      total += levelTotal;
+      std::cout << ">>>   Total for level " << level << ": " << levelTotal << " (";
+      for (const auto& j : counts) {
+        std::cout << j.first << ' ' << j.second;
+        const auto& l = _types.at(j.first);
+        noFreq(
+          std::count_if(l.begin(), l.end(), [level](const auto& x) { return x->level() == level && !x->frequency(); }));
+        levelTotal -= j.second;
+        if (levelTotal) std::cout << ", ";
+      }
+      std::cout << ")\n";
+    }
+  }
+  std::cout << ">>>   Total for all levels: " << total << '\n';
+}
+
+void KanjiCount::printRadicals() const {
+  std::cout << ">>> Radical breakdown - total count for each name is followed by (Jouyou Jinmei Extra) counts:\n";
+  std::map<Radical, Data::List> radicals;
+  for (const auto& i : _types) {
+    if (hasRadical(i.first)) {
+      Data::List sorted(i.second);
+      std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
+      for (const auto& j : sorted)
+        radicals[static_cast<const FileListKanji&>(*j).radical()].push_back(j);
+    }
+  }
+  int jouyou = 0, jinmei = 0, extra = 0;
+  for (const auto& i : radicals) {
+    int jo = 0, ji = 0, ex = 0;
+    for (const auto& j : i.second)
+      switch (j->type()) {
+      case Types::Jouyou: ++jo; break;
+      case Types::Jinmei: ++ji; break;
+      default: ++ex; break;
+      }
+    auto counts = std::to_string(jo) + ' ' + std::to_string(ji) + ' ' + std::to_string(ex) + ')';
+    std::cout << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " ("
+              << std::left << std::setw(9) << counts << ':';
+    jouyou += jo;
+    jinmei += ji;
+    extra += ex;
+    Types oldType = i.second[0]->type();
+    for (const auto& j : i.second) {
+      if (j->type() != oldType) {
+        std::cout << "、";
+        oldType = j->type();
+      }
+      std::cout << ' ' << *j;
+    }
+    std::cout << '\n';
+  }
+  std::cout << ">>>   Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou "
+            << jouyou << " Jinmei " << jinmei << " Extra " << extra << ")\n";
+  std::vector<Radical> missingRadicals;
+  for (const auto& i : _radicals)
+    if (radicals.find(i.second) == radicals.end()) missingRadicals.push_back(i.second);
+  if (!missingRadicals.empty()) {
+    std::cout << ">>>   Found " << missingRadicals.size() << " radicals with no kanji:";
+    for (const auto& i : missingRadicals)
+      std::cout << ' ' << i;
+    std::cout << '\n';
+  }
 }
 
 } // namespace kanji
