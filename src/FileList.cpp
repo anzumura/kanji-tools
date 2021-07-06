@@ -40,10 +40,10 @@ void FileList::print(const List& l, const std::string& type, const std::string& 
   }
 }
 
-FileList::FileList(const fs::path& file, Levels l, bool onePerLine)
-  : _name(l != Levels::None ? std::string("JLPT ") + kanji::toString(l)
-            : onePerLine    ? std::string("Top Frequency")
-                            : capitalize(file.stem().string())),
+FileList::FileList(const fs::path& file, Levels l, FileType fileType, bool createNewUniqueFile)
+  : _name(l != Levels::None                    ? std::string("JLPT ") + kanji::toString(l)
+            : fileType == FileType::OnePerLine ? std::string("Top Frequency")
+                                               : capitalize(file.stem().string())),
     _level(l) {
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   int lineNumber = 1;
@@ -55,7 +55,7 @@ FileList::FileList(const fs::path& file, Levels l, bool onePerLine)
   for (std::string line; std::getline(f, line); ++lineNumber) {
     std::stringstream ss(line);
     for (std::string token; std::getline(ss, token, ' ');) {
-      if (onePerLine) {
+      if (fileType == FileType::OnePerLine) {
         if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
         continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
@@ -85,12 +85,14 @@ FileList::FileList(const fs::path& file, Levels l, bool onePerLine)
       std::cerr << ">>> found " << dups.size() << " duplicates in " << _name << ":";
       for (const auto& i : dups)
         std::cerr << ' ' << i;
-      fs::path newFile(file);
-      newFile.replace_extension(fs::path("new"));
-      std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
-      std::ofstream of(newFile);
-      for (const auto& i : good)
-        of << i << '\n';
+      if (createNewUniqueFile) {
+        fs::path newFile(file);
+        newFile.replace_extension(fs::path("new"));
+        std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
+        std::ofstream of(newFile);
+        for (const auto& i : good)
+          of << i << '\n';
+      }
     }
   }
 }

@@ -33,11 +33,13 @@ public:
   }
   static bool hasUniqueCheckData() { return !UniqueNames.empty() || !UniqueLevelNames.empty(); }
 
-  FileList(const std::filesystem::path&, Levels, bool onePerLine);
+  enum class FileType { MultiPerLine, OnePerLine };
+  FileList(const std::filesystem::path&, Levels, FileType fileType, bool createNewUniqueFile = false);
   // Constructor for kana and punctuation files (allows multiple space separated entries per line)
-  FileList(const std::filesystem::path& p) : FileList(p, Levels::None, false) {}
+  FileList(const std::filesystem::path& p) : FileList(p, Levels::None, FileType::MultiPerLine) {}
   // Constructor for JLPT n1-n5 and frequency files (which have one entry per line and name is based on level)
-  FileList(const std::filesystem::path& p, Levels level) : FileList(p, level, true) {}
+  FileList(const std::filesystem::path& p, Levels level, bool createNewUniqueFile = false)
+    : FileList(p, level, FileType::OnePerLine, createNewUniqueFile) {}
   FileList(const FileList&) = delete;
 
   bool exists(const std::string& s) const { return _map.find(s) != _map.end(); }

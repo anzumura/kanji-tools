@@ -18,12 +18,12 @@ const fs::path PatternGroupFile = "pattern-groups.txt";
 std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
-// Options used in group quiz - picked ascii symbols that come before letters so that 'getChoice'
+// Options used in for quiz questions - picked ascii symbols that come before letters so that 'getChoice'
 // method displays them at the beginning of the set of choices.
-constexpr char GroupEditOption = '*';
-constexpr char GroupMeaningOption = '-';
-constexpr char GroupSkipOption = '.';
-constexpr char GroupQuitOption = '/';
+constexpr char EditOption = '*';
+constexpr char MeaningOption = '-';
+constexpr char SkipOption = '.';
+constexpr char QuitOption = '/';
 
 constexpr auto KanjiLegend = "Jōyō=no suffix, JLPT=', Freq=\", Jinmei=^, Linked Jinmei=~, Extra=+, ...=*";
 constexpr auto ShowMeanings = "show meanings";
@@ -32,7 +32,7 @@ constexpr auto HideMeanings = "hide meanings";
 } // namespace
 
 KanjiQuiz::KanjiQuiz(int argc, const char** argv, std::ostream& out, std::ostream& err, std::istream& in)
-  : KanjiData(argc, argv, out, err), _in(in) {
+  : KanjiData(argc, argv, out, err), _in(in), _question(0), _score(0), _showMeanings(false) {
   loadGroup(FileList::getFile(_dataDir, MeaningGroupFile), _meaningGroups, _meaningGroupList, GroupType::Meaning);
   loadGroup(FileList::getFile(_dataDir, PatternGroupFile), _patternGroups, _patternGroupList, GroupType::Pattern);
   if (_debug) {
@@ -142,6 +142,7 @@ void KanjiQuiz::printGroups(const GroupMap& groups, const GroupList& groupList) 
 // Top level 'quiz' function
 
 void KanjiQuiz::quiz() const {
+  reset();
   char c =
     getChoice("Quiz type", {{'f', "freq."}, {'g', "grade"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}}, 'g');
   if (c == 'f') {
@@ -159,6 +160,7 @@ void KanjiQuiz::quiz() const {
     quiz(getListOrder(), _meaningGroupList);
   else
     quiz(getListOrder(), _patternGroupList);
+  finalScore();
 }
 
 // Helper functions for getting choices and printing score
@@ -226,22 +228,29 @@ KanjiQuiz::ListOrder KanjiQuiz::getListOrder() const {
   }
 }
 
-void KanjiQuiz::finalScore(int questionsAnswered, int score, const FileList::List& mistakes) const {
-  _out << "\nFinal score: " << score << '/' << questionsAnswered;
-  if (!questionsAnswered)
+void KanjiQuiz::finalScore() const {
+  _out << "\nFinal score: " << _score << '/' << _question;
+  if (!_question)
     _out << '\n';
-  else if (score == questionsAnswered)
+  else if (_score == _question)
     _out << " - Perfect!\n";
   else {
-    int skipped = questionsAnswered - score - mistakes.size();
+    int skipped = _question - _score - _mistakes.size();
     if (skipped) _out << ", skipped: " << skipped;
-    if (!mistakes.empty()) {
+    if (!_mistakes.empty()) {
       _out << " - mistakes:";
-      for (auto& i : mistakes)
+      for (auto& i : _mistakes)
         _out << ' ' << i;
     }
     _out << '\n';
   }
+}
+
+void KanjiQuiz::reset() const {
+  _question = 0;
+  _score = 0;
+  _mistakes.clear();
+  _showMeanings = false;
 }
 
 // List Based Quiz
@@ -252,14 +261,13 @@ void KanjiQuiz::quiz(ListOrder listOrder, const List& list, bool printFrequency,
   for (int i = 2; i < 10; ++i)
     numberOfChoices['0' + i] = "";
   const int choices = getChoice("Number of choices", numberOfChoices, '4') - '0';
-  numberOfChoices = {{'q', "quit"}};
+  numberOfChoices = {{QuitOption, "quit"}};
   for (int i = 0; i < choices; ++i)
     numberOfChoices['1' + i] = "";
   const char quizStyle = getChoice("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, 'k');
   const std::string prompt = std::string("  Select correct ") + (quizStyle == 'k' ? "reading" : "kanji");
 
   List questions;
-  FileList::List mistakes;
   for (auto& i : list)
     if (i->hasReading()) questions.push_back(i);
   if (listOrder == ListOrder::FromEnd)
@@ -273,12 +281,11 @@ void KanjiQuiz::quiz(ListOrder listOrder, const List& list, bool printFrequency,
   _out << '\n';
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(1, choices);
-  int question = 0, score = 0;
   for (auto& i : questions) {
     const int correctChoice = randomCorrect(RandomGen);
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
     FileList::Set sameReading = {i->reading()};
-    std::map<int, int> answers = {{correctChoice, question}};
+    std::map<int, int> answers = {{correctChoice, _question}};
     for (int j = 1; j <= choices; ++j) {
       if (j != correctChoice) {
         do {
@@ -290,7 +297,7 @@ void KanjiQuiz::quiz(ListOrder listOrder, const List& list, bool printFrequency,
         } while (true);
       }
     }
-    _out << "\nQuestion " << ++question << '/' << questions.size() << ".  ";
+    _out << "\nQuestion " << ++_question << '/' << questions.size() << ".  ";
     if (quizStyle == 'k') {
       _out << "Kanji: '" << i->name() << "'";
       if (printFrequency && i->frequency()) _out << ", Frequency: " << i->frequency();
@@ -304,19 +311,18 @@ void KanjiQuiz::quiz(ListOrder listOrder, const List& list, bool printFrequency,
       _out << "    " << j.first << ".  "
            << (quizStyle == 'k' ? questions[j.second]->reading() : questions[j.second]->name()) << '\n';
     const char answer = getChoice(prompt, numberOfChoices);
-    if (answer == 'q') {
+    if (answer == QuitOption) {
       // when quitting don't count the current question in the final score
-      --question;
+      --_question;
       break;
     }
     if (answer - '0' == correctChoice)
-      _out << "  Correct! (" << ++score << '/' << question << ")\n";
+      _out << "  Correct! (" << ++_score << '/' << _question << ")\n";
     else {
       _out << "  The correct answer is " << correctChoice << '\n';
-      mistakes.push_back(i->name());
+      _mistakes.push_back(i->name());
     }
   }
-  finalScore(question, score, mistakes);
 }
 
 // Group Based Quiz
@@ -348,8 +354,6 @@ void KanjiQuiz::quiz(ListOrder listOrder, const GroupList& list) const {
 }
 
 void KanjiQuiz::quiz(const GroupList& list, MemberType type) const {
-  int question = 0, score = 0;
-  FileList::List mistakes;
   for (auto& i : list) {
     List questions, readings;
     for (auto& j : i->members())
@@ -357,11 +361,11 @@ void KanjiQuiz::quiz(const GroupList& list, MemberType type) const {
         questions.push_back(j);
         readings.push_back(j);
       }
-    if (!question) {
+    if (!_question) {
       log(true) << "Starting quiz for " << list.size() << ' ' << i->type() << " groups\n";
       if (type) log() << "  Note: " << KanjiLegend << '\n';
     }
-    _out << "\nQuestion " << ++question << '/' << list.size() << ".  ";
+    _out << "\nQuestion " << ++_question << '/' << list.size() << ".  ";
     _out << (i->peers() ? "peers of entry: " : "name: ") << i->name() << ", showing ";
     if (questions.size() == i->members().size())
       _out << "all " << questions.size();
@@ -373,59 +377,54 @@ void KanjiQuiz::quiz(const GroupList& list, MemberType type) const {
     std::shuffle(readings.begin(), readings.end(), RandomGen);
 
     Answers answers;
-    std::map<char, std::string> choices = {
-      {GroupMeaningOption, ShowMeanings}, {GroupSkipOption, "skip"}, {GroupQuitOption, "quit"}};
-    bool meanings = false, repeatQuestion = false, stopQuiz = false;
+    Choices choices = {{MeaningOption, ShowMeanings}, {SkipOption, "skip"}, {QuitOption, "quit"}};
+    bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
-      int count = 0;
-      for (auto& j : questions) {
-        const char choice = (count < 26 ? 'a' + count : 'A' + (count - 26));
-        _out << "  Entry: " << std::setw(3) << count + 1 << "  " << j->qualifiedName() << "\t\t" << choice << ":  "
-             << readings[count]->reading();
-        if (meanings && readings[count]->hasMeaning()) _out << " : " << readings[count]->meaning();
-        _out << '\n';
-        if (!repeatQuestion) choices[choice] = "";
-        ++count;
+      showGroup(questions, readings, choices, repeatQuestion);
+      if (getAnswers(answers, questions.size(), choices, skipGroup, stopQuiz)) {
+        checkAnswers(answers, questions, readings, i->name());
+        break;
       }
-      _out << '\n';
-      bool skipGroup = false, toggleMeanings = false;
-      for (int j = answers.size(); j < questions.size(); ++j)
-        if (!getAnswer(answers, choices, skipGroup, toggleMeanings)) break;
-      if (answers.size() < questions.size()) {
-        if (skipGroup) break;
-        if (toggleMeanings) {
-          meanings = !meanings;
-          choices[GroupMeaningOption] = meanings ? HideMeanings : ShowMeanings;
-          repeatQuestion = true;
-          _out << '\n';
-        } else {
-          // break out of top quiz loop if user quit in the middle of providing answers
-          stopQuiz = true;
-          --question;
-        }
-      } else { // all answers were provided
-        repeatQuestion = false;
-        count = 0;
-        for (auto j : answers) {
-          int index = (j <= 'z' ? j - 'a' : j - 'A' + 26);
-          // Only match on readings (and meanings if meanings is true) instead of making
-          // sure the kanji is exactly the same since many kanjis have identical readings
-          // especially in the 'patterns' groups (and the user has no way to distinguish).
-          if (questions[count]->reading() == readings[index]->reading() &&
-              (!meanings || questions[count]->meaning() == readings[index]->meaning()))
-            ++count;
-        }
-        if (count == answers.size())
-          _out << "  Correct! (" << ++score << '/' << question << ")\n";
-        else {
-          _out << "  Incorrect (got " << count << " right out of " << answers.size() << ")\n";
-          mistakes.push_back(i->name());
-        }
-      }
-    } while (!stopQuiz && repeatQuestion);
-    if (stopQuiz) break;
+      repeatQuestion = true;
+    } while (!stopQuiz && !skipGroup);
+    if (stopQuiz) {
+      --_question;
+      break;
+    }
   }
-  finalScore(question, score, mistakes);
+}
+
+void KanjiQuiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion) const {
+  int count = 0;
+  for (auto& j : questions) {
+    const char choice = (count < 26 ? 'a' + count : 'A' + (count - 26));
+    _out << "  Entry: " << std::setw(3) << count + 1 << "  " << j->qualifiedName() << "\t\t" << choice << ":  "
+         << readings[count]->reading();
+    if (_showMeanings && readings[count]->hasMeaning()) _out << " : " << readings[count]->meaning();
+    _out << '\n';
+    if (!repeatQuestion) choices[choice] = "";
+    ++count;
+  }
+  _out << '\n';
+}
+
+bool KanjiQuiz::getAnswers(Answers& answers, int totalQuestions, Choices& choices, bool& skipGroup,
+                           bool& stopQuiz) const {
+  for (int i = answers.size(); i < totalQuestions; ++i) {
+    bool toggleMeanings = false;
+    if (!getAnswer(answers, choices, skipGroup, toggleMeanings)) {
+      if (toggleMeanings) {
+        _showMeanings = !_showMeanings;
+        choices[MeaningOption] = _showMeanings ? HideMeanings : ShowMeanings;
+        _out << '\n';
+      } else if (!skipGroup) {
+        // break out of top quiz loop if user quit in the middle of providing answers
+        stopQuiz = true;
+      }
+      return false;
+    }
+  }
+  return true;
 }
 
 bool KanjiQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& toggleMeaning) const {
@@ -438,17 +437,17 @@ bool KanjiQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, b
       _out << '\n';
     }
     const char answer = getChoice("  Select reading for Entry: " + space + std::to_string(answers.size() + 1), choices);
-    if (answer == GroupQuitOption) break;
-    if (answer == GroupMeaningOption)
+    if (answer == QuitOption) break;
+    if (answer == MeaningOption)
       toggleMeaning = true;
-    else if (answer == GroupSkipOption)
+    else if (answer == SkipOption)
       skipGroup = true;
-    else if (answer == GroupEditOption)
+    else if (answer == EditOption)
       editAnswer(answers, choices);
     else {
       answers.push_back(answer);
       choices.erase(answer);
-      if (answers.size() == 1) choices[GroupEditOption] = "edit";
+      if (answers.size() == 1) choices[EditOption] = "edit";
       return true;
     }
   } while (!skipGroup && !toggleMeaning);
@@ -456,23 +455,45 @@ bool KanjiQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, b
 }
 
 void KanjiQuiz::editAnswer(Answers& answers, Choices& choices) const {
-  std::map<char, std::string> answersToEdit;
-  for (auto k : answers)
-    answersToEdit[k] = "";
-  char answer = getChoice("    Answer to edit: ", answersToEdit);
-  const auto index = std::find(answers.begin(), answers.end(), answer);
-  assert(index != answers.end());
-  const int entry = std::distance(answers.begin(), index);
+  auto getEntry = [this, &answers]() {
+    std::map<char, std::string> answersToEdit;
+    for (auto k : answers)
+      answersToEdit[k] = "";
+    const auto index = std::find(answers.begin(), answers.end(), getChoice("    Answer to edit: ", answersToEdit));
+    assert(index != answers.end());
+    return std::distance(answers.begin(), index);
+  };
+  const int entry = answers.size() == 1 ? 0 : getEntry();
   // put the answer back as a choice
-  choices[answer] = "";
+  choices[answers[entry]] = "";
   auto newChoices = choices;
-  newChoices.erase(GroupEditOption);
-  newChoices.erase(GroupMeaningOption);
-  newChoices.erase(GroupSkipOption);
-  newChoices.erase(GroupQuitOption);
-  answer = getChoice("    New reading for Entry: " + std::to_string(entry + 1), newChoices, answer);
+  newChoices.erase(EditOption);
+  newChoices.erase(MeaningOption);
+  newChoices.erase(SkipOption);
+  newChoices.erase(QuitOption);
+  const char answer = getChoice("    New reading for Entry: " + std::to_string(entry + 1), newChoices, answers[entry]);
   answers[entry] = answer;
   choices.erase(answer);
+}
+
+void KanjiQuiz::checkAnswers(const Answers& answers, const List& questions, const List& readings,
+                             const std::string& name) const {
+  int count = 0;
+  for (auto i : answers) {
+    int index = (i <= 'z' ? i - 'a' : i - 'A' + 26);
+    // Only match on readings (and meanings if '_showMeanings' is true) instead of making
+    // sure the kanji is exactly the same since many kanjis have identical readings
+    // especially in the 'patterns' groups (and the user has no way to distinguish).
+    if (questions[count]->reading() == readings[index]->reading() &&
+        (!_showMeanings || questions[count]->meaning() == readings[index]->meaning()))
+      ++count;
+  }
+  if (count == answers.size())
+    _out << "  Correct! (" << ++_score << '/' << _question << ")\n";
+  else {
+    _out << "  Incorrect (got " << count << " right out of " << answers.size() << ")\n";
+    _mistakes.push_back(name);
+  }
 }
 
 } // namespace kanji

@@ -21,9 +21,10 @@ const fs::path OtherReadingsFile = "other-readings.txt";
 } // namespace
 
 KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostream& err)
-  : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err), _n5(_dataDir / N5File, Levels::N5),
-    _n4(_dataDir / N4File, Levels::N4), _n3(_dataDir / N3File, Levels::N3), _n2(_dataDir / N2File, Levels::N2),
-    _n1(_dataDir / N1File, Levels::N1), _frequency(_dataDir / FrequencyFile, Levels::None) {
+  : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err), _n5(_dataDir / N5File, Levels::N5, _debug),
+    _n4(_dataDir / N4File, Levels::N4, _debug), _n3(_dataDir / N3File, Levels::N3, _debug),
+    _n2(_dataDir / N2File, Levels::N2, _debug), _n1(_dataDir / N1File, Levels::N1, _debug),
+    _frequency(_dataDir / FrequencyFile, Levels::None, _debug) {
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
   loadStrokes(FileList::getFile(_dataDir, StrokesFile));

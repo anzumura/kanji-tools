@@ -39,7 +39,8 @@ private:
   // If an optional default choice is provided it must correspond to an entry in 'choices'.
   char getChoice(const std::string& msg, const Choices& choices) const { return getChoice(msg, choices, {}); }
   char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) const;
-  void finalScore(int questionsAnswered, int score, const FileList::List& mistakes) const;
+  void finalScore() const;
+  void reset() const;
 
   // List type quiz
   void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
@@ -54,8 +55,17 @@ private:
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
   static bool includeMember(const Entry&, MemberType);
   void quiz(const GroupList&, MemberType) const;
+  void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
+  bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
   bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& toggleMeaning) const;
   void editAnswer(Answers&, Choices&) const;
+  void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name) const;
+
+  // used to track progress in quiz:
+  mutable int _question;
+  mutable int _score;
+  mutable FileList::List _mistakes;
+  mutable bool _showMeanings;
 
   // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
   // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
