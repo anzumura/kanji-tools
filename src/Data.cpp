@@ -86,19 +86,19 @@ bool Data::checkNotFound(const Entry& i) const {
   return false;
 }
 
-bool Data::checkInsert(FileList::Set& s, const std::string& n) {
+bool Data::checkInsert(FileList::Set& s, const std::string& n) const {
   if (s.insert(n).second) return true;
   printError("failed to insert " + n + " into set");
   return false;
 }
 
-bool Data::checkNotFound(const FileList::Set& s, const std::string& n) {
+bool Data::checkNotFound(const FileList::Set& s, const std::string& n) const {
   if (s.find(n) == s.end()) return true;
   printError(n + " already in set");
   return false;
 }
 
-void Data::printError(const std::string& msg) { std::cerr << "ERROR --- " << msg << '\n'; }
+void Data::printError(const std::string& msg) const { _err << "ERROR --- " << msg << '\n'; }
 
 void Data::loadRadicals(const fs::path& file) {
   int lineNumber = 1, numberCol = -1, nameCol = -1, longNameCol = -1, readingCol = -1;

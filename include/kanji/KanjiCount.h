@@ -10,7 +10,7 @@ namespace kanji {
 // kanji (frequency) will be displayed (non-kanji are not included).
 class KanjiCount : public KanjiData {
 public:
-  KanjiCount(int argc, const char** argv);
+  KanjiCount(int argc, const char** argv, std::ostream& = std::cout, std::ostream& = std::cerr);
   // helper class for printing out kanji found in files
   class Count {
   public:

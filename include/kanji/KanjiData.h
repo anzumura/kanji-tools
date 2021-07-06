@@ -10,7 +10,7 @@ namespace kanji {
 // files (such as jouyou.txt, jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(int argc, const char** argv);
+  KanjiData(int argc, const char** argv, std::ostream& out = std::cout, std::ostream& err = std::cerr);
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;

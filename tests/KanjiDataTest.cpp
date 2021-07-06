@@ -9,7 +9,7 @@ namespace kanji {
 
 namespace fs = std::filesystem;
 
-class DataTest : public ::testing::Test {
+class KanjiDataTest : public ::testing::Test {
 protected:
   static const char** argv() {
     static const char* arg0 = "testMain";
@@ -18,12 +18,12 @@ protected:
     return args;
   }
   // Contructs KanjiData using the real data files
-  DataTest() : _data(2, argv()) {}
+  KanjiDataTest() : _data(2, argv()) {}
 
   KanjiData _data;
 };
 
-TEST_F(DataTest, SanityChecks) {
+TEST_F(KanjiDataTest, SanityChecks) {
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), Levels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);

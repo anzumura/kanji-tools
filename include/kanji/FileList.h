@@ -31,6 +31,7 @@ public:
     UniqueNames.clear();
     UniqueLevelNames.clear();
   }
+  static bool hasUniqueCheckData() { return !UniqueNames.empty() || !UniqueLevelNames.empty(); }
 
   FileList(const std::filesystem::path&, Levels, bool onePerLine);
   // Constructor for kana and punctuation files (allows multiple space separated entries per line)

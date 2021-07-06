@@ -46,8 +46,12 @@ public:
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
 
-  Data(const std::filesystem::path& dataDir, bool debug) : _dataDir(dataDir), _debug(debug) {
-    if (_debug) out(true) << "Begin Loading Data\n>>>\n";
+  Data(const std::filesystem::path& dataDir, bool debug, std::ostream& out = std::cout, std::ostream& err = std::cerr)
+    : _dataDir(dataDir), _debug(debug), _out(out), _err(err) {
+    // clearing FileList static data is only needed to help test code, for example FileList tests can leave some
+    // data in these sets before the KanjiQuiz tests are run (leading to problems loading real files).
+    FileList::clearUniqueCheckData();
+    if (_debug) log(true) << "Begin Loading Data\n>>>\n";
   }
   Data(const Data&) = delete;
 
@@ -99,17 +103,18 @@ public:
   }
   size_t frequencyTotal(int range) const { return frequencyList(range).size(); }
 protected:
-  const std::filesystem::path _dataDir;
-  const bool _debug;
+  std::ostream& _out;
+  std::ostream& _err;
+
   // helper functions for getting command line options
   static std::filesystem::path getDataDir(int, const char**);
   static bool getDebug(int, const char**);
   // helper functions for checking and inserting into collection
-  static bool checkInsert(FileList::Set&, const std::string&);
-  static bool checkNotFound(const FileList::Set&, const std::string&);
-  static void printError(const std::string&);
-  // 'out' can be used for putting a standard prefix to output messages (used for some debug messages)
-  static std::ostream& out(bool heading = false) { return heading ? std::cout << ">>>\n>>> " : std::cout << ">>> "; }
+  bool checkInsert(FileList::Set&, const std::string&) const;
+  bool checkNotFound(const FileList::Set&, const std::string&) const;
+  void printError(const std::string&) const;
+  // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
+  std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
   bool checkNotFound(const Entry&) const;
@@ -126,6 +131,8 @@ protected:
   // then this function will print any entries in _strokes that are 'Other' type or not found.
   void checkStrokes() const;
 
+  const std::filesystem::path _dataDir;
+  const bool _debug;
   // '_radicals' is populated from radicals.txt
   RadicalMap _radicals;
   // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji

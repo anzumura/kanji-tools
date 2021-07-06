@@ -11,36 +11,41 @@ enum class GroupType;
 
 class KanjiQuiz : public KanjiData {
 public:
-  KanjiQuiz(int argc, const char** argv);
-private:
   using GroupEntry = std::shared_ptr<Group>;
   using GroupMap = std::map<std::string, GroupEntry>;
   using GroupList = std::vector<GroupEntry>;
-  static bool checkInsert(const std::string&, GroupMap&, const GroupEntry&);
-  // 'loadGroups' loads from '-groups.txt' files
-  void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
-  void printGroups(const GroupMap&, const GroupList&) const;
+  KanjiQuiz(int, const char**, std::ostream& = std::cout, std::ostream& = std::cerr, std::istream& = std::cin);
 
   // 'quiz' is the top level method for choosing quiz type (List or Group based)
   void quiz() const;
 
+  const GroupList& meaningGroupList() const { return _meaningGroupList; }
+  const GroupList& patternGroupList() const { return _patternGroupList; }
+private:
+  std::istream& _in;
+
+  bool checkInsert(const std::string&, GroupMap&, const GroupEntry&) const;
+  // 'loadGroups' loads from '-groups.txt' files
+  void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
+  void printGroups(const GroupMap&, const GroupList&) const;
+
   enum class ListOrder { FromBeginning, FromEnd, Random };
-  static ListOrder getListOrder();
+  ListOrder getListOrder() const;
   // 'Choices' should map 'char' choices to a description of the choice
   using Choices = std::map<char, std::string>;
   using Answers = std::vector<char>;
+  static void addChoices(std::string& prompt, const Choices& choices);
   // 'getChoice' will prompt the use to enter one of the choices in the 'choices' structure.
   // If an optional default choice is provided it must correspond to an entry in 'choices'.
-  static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
-  static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
-  static void addChoices(std::string& prompt, const Choices& choices);
-  static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
+  char getChoice(const std::string& msg, const Choices& choices) const { return getChoice(msg, choices, {}); }
+  char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) const;
+  void finalScore(int questionsAnswered, int score, const FileList::List& mistakes) const;
 
   // List type quiz
-  static void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel);
+  void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
 
   // Group type quiz
-  static void quiz(ListOrder listOrder, const GroupList&);
+  void quiz(ListOrder listOrder, const GroupList&) const;
   // 'MemberType' if used to determine which members of a group should be included in a quiz:
   // - Jouyou: include if member is a Jouyou type
   // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
@@ -48,9 +53,9 @@ private:
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
   static bool includeMember(const Entry&, MemberType);
-  static void quiz(const GroupList&, MemberType);
-  static bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& toggleMeaning);
-  static void editAnswer(Answers&, Choices&);
+  void quiz(const GroupList&, MemberType) const;
+  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& toggleMeaning) const;
+  void editAnswer(Answers&, Choices&) const;
 
   // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
   // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
