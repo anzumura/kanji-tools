@@ -257,7 +257,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 256	巻	卩	卷		9	6	scroll	カン、ま-く、まき
 257	看	目			9	6	watch over	カン
 258	陥	阜	陷		10	S	collapse	カン、おちい-る、おとしい-れる
-259	乾	乙			11	S	dry	カン、かわ-く、かわ-かす
+259	乾	乙			11	S	dry	カン、かわ-く、かわ-かす、（いぬい）
 260	勘	力			11	S	intuition	カン
 261	患	心			11	S	afflicted	カン、わずら-う
 262	貫	貝			11	S	pierce	カン、つらぬ-く
@@ -576,7 +576,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 575	顧	頁			21	S	look back	コ、かえり-みる
 576	五	二			4	1	five	ゴ、いつ、いつ-つ
 577	互	二			4	S	mutually	ゴ、たが-い
-578	午	十			4	2	noon	ゴ
+578	午	十			4	2	noon	ゴ、（うま）
 579	呉	口			7	S	give	ゴ
 580	後	彳			9	2	behind	ゴ、コウ、のち、うし-ろ、あと、おく-れる
 581	娯	女			10	S	recreation	ゴ
@@ -758,7 +758,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 757	斬	斤		2010	11	S	kill by slicing	ザン、き-る
 758	暫	日			15	S	temporarily	ザン
 759	士	士			3	4	gentleman	シ
-760	子	子			3	1	child	シ、ス、こ
+760	子	子			3	1	child	シ、ス、こ、（ね）
 761	支	支			4	5	branch	シ、ささ-える
 762	止	止			4	2	stop	シ、と-まる、と-める
 763	氏	氏			4	4	family name	シ、うじ
@@ -1040,7 +1040,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 1039	辱	辰			10	S	embarrass	ジョク、はずかし-める
 1040	尻	尸		2010	5	S	buttocks	しり
 1041	心	心			4	2	heart	シン、こころ
-1042	申	田			5	3	say	シン、もう-す
+1042	申	田			5	3	say	シン、もう-す、（さる）
 1043	伸	人			7	S	lengthen	シン、の-びる、の-ばす、の-べる
 1044	臣	臣			7	4	retainer	シン、ジン
 1045	芯	艸		2010	7	S	core	シン
@@ -1908,7 +1908,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 1907	満	水	滿		12	4	full	マン、み-ちる、み-たす
 1908	慢	心			14	S	ridicule	マン
 1909	漫	水			14	S	cartoon	マン
-1910	未	木			5	4	not yet	ミ
+1910	未	木			5	4	not yet	ミ、（いま-だ）、（ひつじ）
 1911	味	口			8	3	flavor	ミ、あじ、あじ-わう
 1912	魅	鬼			15	S	fascination	ミ
 1913	岬	山		1981	8	S	headland	みさき

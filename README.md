@@ -1,17 +1,21 @@
-# C++ kanji lists
+# C++ kanji
 
-Program that loads information about Kanji and supports various types of tests. The program classifies Kanjis into the following categories:
+This repository contains code for two 'main' programs:
+- **kanjiCount**: classifies and counts multi-byte characters in a file or directory tree
+- **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
+
+To support these programs, *KanjiData* class loads and breaks down **kanji** (漢字) into the following categories:
 - **Jouyou**: 2136 official Jōyō (常用) kanji
 - **Jinmei**: 633 official Jinmeiyō (人名用) kanji
 - **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
 - **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'Linked Jinmei'
 - **Other**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
-- **Extra**: kanji loaded from 'extra.txt' - shouldn't be any of the above types
-- **None**: used for kanji that haven't been loaded from any files
+- **Extra**: kanji loaded from 'extra.txt' - shouldn't be in any of the above types
+- **None**: used to classify kanji that haven't been loaded from any files
 
 The program also loads the 214 official kanji radicals (部首).
 
-The data directory contains the following files:
+The **data** directory contains the following files:
 - **jouyou.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_jōyō_kanji)
 - **jinmei.txt**: loaded from [here](https://ja.wikipedia.org/wiki/人名用漢字一覧) and most of the readings from [here](https://ca.wikipedia.org/w/index.php?title=Jinmeiyō_kanji)
 - **linked-jinmei.txt**: loaded from [here](https://en.wikipedia.org/wiki/Jinmeiyō_kanji)
@@ -22,10 +26,10 @@ The data directory contains the following files:
 - **n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
 - **extra.txt**: meant to hold any extra kanji of interest not in other files
 - **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
-- **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see Data.h for more details)
-- **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see Data.h for more details)
+- **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see KanjiQuiz.h for more details)
+- **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see KanjiQuiz.h for more details)
 
-Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (instead some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji (with the count per type shown in brackets):
+Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (as opposed to some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji:
 - N5: 103 -- all Jōyō
 - N4: 181 -- all Jōyō
 - N3: 361 -- all Jōyō
