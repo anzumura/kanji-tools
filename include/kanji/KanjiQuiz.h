@@ -21,6 +21,9 @@ private:
   void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
   void printGroups(const GroupMap&, const GroupList&) const;
 
+  // 'quiz' is the top level method for choosing quiz type (List or Group based)
+  void quiz() const;
+
   enum class ListOrder { FromBeginning, FromEnd, Random };
   static ListOrder getListOrder();
   // 'Choices' should map 'char' choices to a description of the choice
@@ -30,7 +33,8 @@ private:
   // If an optional default choice is provided it must correspond to an entry in 'choices'.
   static char getChoice(const std::string& msg, const Choices& choices) { return getChoice(msg, choices, {}); }
   static char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def);
-  void quiz() const;
+  static void addChoices(std::string& prompt, const Choices& choices);
+  static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
 
   // List type quiz
   static void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel);
@@ -47,8 +51,6 @@ private:
   static void quiz(const GroupList&, MemberType);
   static bool getAnswer(Answers&, Choices&, bool& skipGroup);
   static void editAnswer(Answers&, Choices&);
-
-  static void finalScore(int questionsAnswered, int score, const FileList::List& mistakes);
 
   // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
   // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
