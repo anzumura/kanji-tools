@@ -41,6 +41,10 @@ private:
   char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) const;
   void finalScore() const;
   void reset() const;
+  Choices getDefaultChoices() const;
+  // showing English 'meanings' can be toggled on and off
+  void toggleMeanings(Choices&) const;
+  void printMeaning(const Entry&) const;
 
   // List type quiz
   void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
@@ -57,7 +61,7 @@ private:
   void quiz(const GroupList&, MemberType) const;
   void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
   bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
-  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& toggleMeaning) const;
+  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& meanings) const;
   void editAnswer(Answers&, Choices&) const;
   void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name) const;
 
