@@ -47,7 +47,7 @@ public:
   using RadicalMap = std::map<std::string, Radical>;
 
   Data(const std::filesystem::path& dataDir, bool debug) : _dataDir(dataDir), _debug(debug) {
-    if (_debug) std::cout << ">>>\n>>> Begin Loading Data\n>>>\n";
+    if (_debug) out(true) << "Begin Loading Data\n>>>\n";
   }
   Data(const Data&) = delete;
 
@@ -108,6 +108,8 @@ protected:
   static bool checkInsert(FileList::Set&, const std::string&);
   static bool checkNotFound(const FileList::Set&, const std::string&);
   static void printError(const std::string&);
+  // 'out' can be used for putting a standard prefix to output messages (used for some debug messages)
+  static std::ostream& out(bool heading = false) { return heading ? std::cout << ">>>\n>>> " : std::cout << ">>> "; }
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
   bool checkNotFound(const Entry&) const;

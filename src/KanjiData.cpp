@@ -40,7 +40,7 @@ KanjiData::KanjiData(int argc, const char** argv)
   processList(_frequency);
   checkStrokes();
   if (_debug)
-    std::cout << ">>>\n>>> Finished Loading Data\n>>>\n";
+    out(true) << "Finished Loading Data\n>>>\n";
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {

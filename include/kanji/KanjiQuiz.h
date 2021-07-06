@@ -49,7 +49,7 @@ private:
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
   static bool includeMember(const Entry&, MemberType);
   static void quiz(const GroupList&, MemberType);
-  static bool getAnswer(Answers&, Choices&, bool& skipGroup);
+  static bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& toggleMeaning);
   static void editAnswer(Answers&, Choices&);
 
   // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
