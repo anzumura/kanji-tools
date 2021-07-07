@@ -10,7 +10,7 @@ if(EXISTS "${LOC_PATH}")
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_EXTENSIONS OFF)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem /opt/homebrew/include")
   set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls")

@@ -1,66 +1,50 @@
 #ifndef KANJI_KANJI_QUIZ
 #define KANJI_KANJI_QUIZ
 
-#include <kanji/KanjiData.h>
+#include <kanji/Choice.h>
+#include <kanji/KanjiGroupData.h>
 
 namespace kanji {
 
-// forward declares
-class Group;
-enum class GroupType;
-
-class KanjiQuiz : public KanjiData {
+class KanjiQuiz : public KanjiGroupData {
 public:
-  using GroupEntry = std::shared_ptr<Group>;
-  using GroupMap = std::map<std::string, GroupEntry>;
-  using GroupList = std::vector<GroupEntry>;
-  KanjiQuiz(int, const char**, std::ostream& = std::cout, std::ostream& = std::cerr, std::istream& = std::cin);
-
+  KanjiQuiz(int argc, const char** argv, std::ostream& out = std::cout, std::ostream& err = std::cerr,
+            std::istream& in = std::cin)
+    : KanjiGroupData(argc, argv, out, err), _question(0), _score(0), _showMeanings(false), _choice(out, in) {}
   // 'quiz' is the top level method for choosing quiz type (List or Group based)
   void quiz() const;
-
-  const GroupList& meaningGroupList() const { return _meaningGroupList; }
-  const GroupList& patternGroupList() const { return _patternGroupList; }
 private:
-  std::istream& _in;
-
-  bool checkInsert(const std::string&, GroupMap&, const GroupEntry&) const;
-  // 'loadGroups' loads from '-groups.txt' files
-  void loadGroup(const std::filesystem::path&, GroupMap&, GroupList&, GroupType);
-  void printGroups(const GroupMap&, const GroupList&) const;
-
   enum class ListOrder { FromBeginning, FromEnd, Random };
   ListOrder getListOrder() const;
-  // 'Choices' should map 'char' choices to a description of the choice
-  using Choices = std::map<char, std::string>;
-  using Answers = std::vector<char>;
-  static void addChoices(std::string& prompt, const Choices& choices);
-  // 'getChoice' will prompt the use to enter one of the choices in the 'choices' structure.
-  // If an optional default choice is provided it must correspond to an entry in 'choices'.
-  char getChoice(const std::string& msg, const Choices& choices) const { return getChoice(msg, choices, {}); }
-  char getChoice(const std::string& msg, const Choices& choices, std::optional<char> def) const;
   void finalScore() const;
   void reset() const;
+  using Choices = Choice::Choices;
+  // 'getDefaultChoices' returns a Choices structure populated with just the common values
+  // for a quiz question like skip and quit. It will also populate 'hide/show meanings' option
+  // based on the current value of '_showMeanings'.
   Choices getDefaultChoices() const;
-  // showing English 'meanings' can be toggled on and off
-  void toggleMeanings(Choices&) const;
-  void printMeaning(const Entry&) const;
+  void toggleMeanings(Choices&) const;   // display of English 'meanings' can be toggled on and off
+  void printMeaning(const Entry&) const; // print meaning if _showMeanings is true and meaning exists
 
-  // List type quiz - 'infoFields' controls which fields are shown in a 'kanji' to reading
-  // quiz (see Kanji.h for more details on 'InfoFields').
-  void quiz(ListOrder listOrder, const List&, int infoFields) const;
+  // 'listQuiz' starts a 'list based quiz'. 'infoFields' controls which fields are shown in a 'kanji
+  // to reading' quiz (see Kanji.h for more details on 'InfoFields').
+  void listQuiz(ListOrder listOrder, const List&, int infoFields) const;
 
-  // Group type quiz
-  void quiz(ListOrder listOrder, const GroupList&) const;
+  void prepareGroupQuiz(ListOrder listOrder, const GroupList&) const;
   // 'MemberType' if used to determine which members of a group should be included in a quiz:
   // - Jouyou: include if member is a Jouyou type
   // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
   // - Frequency: include if the member is Jouyou or JLPT or in the Top Frequency
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
+  // 'includeMember' returns true if a member can be included in group quiz question. The member must
+  // have a reading as well as meet the criteria of the given MemberType.
   static bool includeMember(const Entry&, MemberType);
-  void quiz(const GroupList&, MemberType) const;
+  // 'groupQuiz' starts a Group Quiz (callled by 'prepareGroupQuiz')
+  void groupQuiz(const GroupList&, MemberType) const;
+
   void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
+  using Answers = std::vector<char>;
   bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
   bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& meanings) const;
   void editAnswer(Answers&, Choices&) const;
@@ -72,14 +56,7 @@ private:
   mutable FileList::List _mistakes;
   mutable bool _showMeanings;
 
-  // '_meaningGroups' and '_meaningGroupList' are populated from 'meaning-groups.txt' and
-  // '_patternGroups' and '_patternGroupList' are populated from 'pattern-groups.txt. The
-  // maps have an entry for each kanji to its group so currently a kanji can't be in more
-  // than one group per group type.
-  GroupMap _meaningGroups;
-  GroupMap _patternGroups;
-  GroupList _meaningGroupList;
-  GroupList _patternGroupList;
+  Choice _choice;
 };
 
 } // namespace kanji

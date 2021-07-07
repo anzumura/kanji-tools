@@ -5,6 +5,10 @@
 
 namespace kanji {
 
+// 'KanjiLegend' is meant to be used in output to briefly describe the suffix added to a kanji when
+// using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
+inline constexpr auto KanjiLegend = "Jōyō=no suffix, JLPT=', Freq=\", Jinmei=^, Linked Jinmei=~, Extra=+, ...=*";
+
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
