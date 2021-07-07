@@ -148,14 +148,17 @@ void KanjiQuiz::quiz() const {
   if (c == 'f') {
     c = getChoice("Choose list",
                   {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
-    quiz(getListOrder(), frequencyList(c - '1'), false, true, true);
+    // suppress printing 'Freq' since this would work against showing the list in a random order.
+    quiz(getListOrder(), frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
   } else if (c == 'g') {
     c = getChoice("Choose grade",
                   {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}}, 's');
-    quiz(getListOrder(), gradeList(AllGrades[c == 's' ? 6 : c - '1']), true, false, true);
+    // suppress printing 'Grade' since it's the same for every kanji in the list
+    quiz(getListOrder(), gradeList(AllGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
   } else if (c == 'l') {
     c = getChoice("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
-    quiz(getListOrder(), levelList(AllLevels[c - '1']), true, true, false);
+    // suppress printing 'Level' since it's the same for every kanji in the list
+    quiz(getListOrder(), levelList(AllLevels[c - '1']), Kanji::AllFields ^ Kanji::LevelField);
   } else if (c == 'm')
     quiz(getListOrder(), _meaningGroupList);
   else
@@ -269,8 +272,7 @@ void KanjiQuiz::printMeaning(const Entry& k) const {
 
 // List Based Quiz
 
-void KanjiQuiz::quiz(ListOrder listOrder, const List& list, bool printFrequency, bool printGrade,
-                     bool printLevel) const {
+void KanjiQuiz::quiz(ListOrder listOrder, const List& list, int infoFields) const {
   Choices choices;
   for (int i = 2; i < 10; ++i)
     choices['0' + i] = "";
@@ -317,13 +319,8 @@ void KanjiQuiz::quiz(ListOrder listOrder, const List& list, bool printFrequency,
       _out << "\nQuestion " << _question << '/' << questions.size() << ".  ";
       if (quizStyle == 'k') {
         _out << "Kanji:  " << i->name();
-        if (printFrequency || printGrade || printLevel) {
-          _out << "  (";
-          if (printFrequency && i->frequency()) _out << "Freq " << i->frequency();
-          if (printGrade && i->grade() != Grades::None) _out << ", Grade " << i->grade();
-          if (printLevel && i->level() != Levels::None) _out << ", Level " << i->level();
-          _out << ")";
-        }
+        auto info = i->info(infoFields);
+        if (!info.empty()) _out << "  (" << info << ")";
       } else
         _out << "Reading: " << i->reading();
       printMeaning(i);

@@ -59,6 +59,7 @@ protected:
     EXPECT_EQ(k.strokes(), 16);
     EXPECT_EQ(k.meaning(), "sleet");
     EXPECT_EQ(k.reading(), "エイ、ヨウ、みぞれ");
+    EXPECT_EQ(k.info(), "Rad 雨, Strokes 16");
     EXPECT_FALSE(k.hasGrade());
     EXPECT_FALSE(k.hasLevel());
     EXPECT_TRUE(k.hasMeaning());
@@ -77,6 +78,7 @@ protected:
     EXPECT_FALSE(k.hasMeaning());
     EXPECT_EQ(k.strokes(), 6);
     ASSERT_EQ(k.type(), Types::Jinmei);
+    EXPECT_EQ(k.info(), "Rad 二, Strokes 6, Level N1, Freq 1728, Old 亙");
     auto& e = static_cast<const JinmeiKanji&>(k);
     EXPECT_EQ(e.radical().name(), "二");
     EXPECT_EQ(e.oldName(), "亙");
@@ -99,6 +101,7 @@ TEST_F(KanjiTest, OtherKanji) {
   EXPECT_EQ(k.frequency(), frequency);
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_EQ(k.info(), "Freq 2362");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_FALSE(k.hasReading());
 }
@@ -114,6 +117,7 @@ TEST_F(KanjiTest, OtherKanjiWithReading) {
   EXPECT_EQ(k.frequency(), frequency);
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_EQ(k.info(), "Freq 2362");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_TRUE(k.hasReading());
   EXPECT_EQ(k.reading(), "トン、ドン、の-む");
@@ -253,6 +257,7 @@ Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
   EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
+  EXPECT_EQ(k.info(Kanji::NewField), "New 亘");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_EQ(k.link(), results[0]);
 }
@@ -311,6 +316,7 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(e.radical().name(), "心");
       EXPECT_EQ(e.oldName(), std::nullopt);
       EXPECT_EQ(e.year(), std::nullopt);
+      EXPECT_EQ(k.info(), "Rad 心, Strokes 13, Grade G4, Level N3, Freq 640");
     } else {
       EXPECT_EQ(k.number(), 103);
       EXPECT_EQ(k.grade(), Grades::S);
@@ -323,6 +329,15 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(e.radical().name(), "色");
       EXPECT_EQ(e.oldName(), "艷");
       EXPECT_EQ(e.year(), 2010);
+      EXPECT_EQ(k.info(), "Rad 色, Strokes 19, Grade S, Level N1, Freq 2207, Old 艷");
+      EXPECT_EQ(k.info(Kanji::RadicalField), "Rad 色");
+      EXPECT_EQ(k.info(Kanji::StrokesField), "Strokes 19");
+      EXPECT_EQ(k.info(Kanji::GradeField), "Grade S");
+      EXPECT_EQ(k.info(Kanji::LevelField), "Level N1");
+      EXPECT_EQ(k.info(Kanji::OldField), "Old 艷");
+      EXPECT_EQ(k.info(Kanji::NewField), "");
+      EXPECT_EQ(k.info(Kanji::GradeField | Kanji::OldField), "Grade S, Old 艷");
+      EXPECT_EQ(k.info(Kanji::StrokesField | Kanji::LevelField), "Strokes 19, Level N1");
     }
   }
 }
@@ -345,6 +360,7 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_EQ(k.reading(), "エン、つや");
   EXPECT_EQ(k.meaning(), "glossy");
   EXPECT_EQ(k.link(), results[0]);
+  EXPECT_EQ(k.info(), "New 艶");
 }
 
 TEST_F(KanjiTest, BadLinkedOld) {

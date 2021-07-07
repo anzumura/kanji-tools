@@ -9,6 +9,30 @@ namespace fs = std::filesystem;
 
 const std::string Kanji::EmptyString = "";
 
+std::string Kanji::info(int infoFields) const {
+  static const std::string Rad("Rad "), Strokes("Strokes "), Grade("Grade "), Level("Level "), Freq("Freq "),
+    New("New "), Old("Old ");
+  std::string result;
+  auto add = [&result](const auto& x) {
+    if (!result.empty()) result += ", ";
+    result += x;
+  };
+  auto t = type();
+  if (infoFields & RadicalField && (t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra))
+    result += Rad + static_cast<const FileListKanji&>(*this).radical().name();
+  if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
+  if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
+  if (infoFields & LevelField && hasLevel()) add(Level + toString(level()));
+  if (infoFields & FreqField && frequency()) add(Freq + std::to_string(frequency()));
+  // a kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both, check for
+  // linked types first (since oldName is a top level optional field on all kanji)
+  if (t == Types::LinkedJinmei || t == Types::LinkedOld) {
+    if (infoFields & NewField) add(New + static_cast<const LinkedKanji&>(*this).link()->name());
+  } else if (infoFields & OldField && oldName().has_value())
+    add(Old + *oldName());
+  return result;
+}
+
 Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path& file) {
   assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
   int lineNumber = 1;

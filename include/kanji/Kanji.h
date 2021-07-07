@@ -34,6 +34,17 @@ public:
   bool hasGrade() const { return grade() != Grades::None; }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasReading() const { return !reading().empty(); }
+
+  enum InfoFields { RadicalField = 1, StrokesField, GradeField = 4, LevelField = 8, FreqField = 16,
+    NewField = 32, OldField = 64, AllFields = 0b1111111 };
+  // 'info' returns a comma separated string with extra info (if present) including:
+  //   Radical, Strokes, Grade, Level, Freq, New, Old
+  // 'infoFields' can be used to control printing of fields (default is to print all).
+  // Note: some Jouyou and Jinmei kanji have multiple old/variant forms, but at most
+  // one will be displayed. 'New' is for 'Linked' type kanji and will show the official
+  // 'standard' form in the Jouyou or Jinmei list.
+  std::string info(int infoFields = AllFields) const;
+
   // 'qualifiedName' returns 'name' plus an extra marker to show additional information:
   // space = Jouyou         : all 2136 Jouyou (use space since this is the most common type)
   //     ' = JLPT           : 251 Jinmei in JLPT (out of 2222 total - the other 1971 are Jouyou)
@@ -53,6 +64,7 @@ public:
          : t == Types::Extra        ? '+'
                                     : '*');
   }
+
   // helper functions for getting information on 'oldValue' (旧字体) kanjis
   Types oldType(const Data& d) const {
     auto i = oldName();

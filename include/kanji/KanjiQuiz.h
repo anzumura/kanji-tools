@@ -46,8 +46,9 @@ private:
   void toggleMeanings(Choices&) const;
   void printMeaning(const Entry&) const;
 
-  // List type quiz
-  void quiz(ListOrder listOrder, const List&, bool printFrequency, bool printGrade, bool printLevel) const;
+  // List type quiz - 'infoFields' controls which fields are shown in a 'kanji' to reading
+  // quiz (see Kanji.h for more details on 'InfoFields').
+  void quiz(ListOrder listOrder, const List&, int infoFields) const;
 
   // Group type quiz
   void quiz(ListOrder listOrder, const GroupList&) const;

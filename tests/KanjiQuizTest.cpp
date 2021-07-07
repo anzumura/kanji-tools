@@ -66,16 +66,12 @@ TEST_F(KanjiQuizTest, SkipQuestions) {
       lastLine = line;
     auto expected = "Final score: 0/" + std::to_string(i) + ", skipped: " + std::to_string(i);
     EXPECT_EQ(lastLine, expected);
-    // need to clear eofbit and failbit after reading to the end
-    EXPECT_FALSE(_os.good());
-    EXPECT_TRUE(_os.eof());
-    EXPECT_TRUE(_os.fail());
-    EXPECT_FALSE(_os.bad());
+    // need to clear eofbit and failbit (before looping again)
+    EXPECT_TRUE(_os.eof() && _os.fail());
+    EXPECT_FALSE(_os.good() || _os.bad());
     _os.clear();
     EXPECT_TRUE(_os.good());
-    EXPECT_FALSE(_os.eof());
-    EXPECT_FALSE(_os.fail());
-    EXPECT_FALSE(_os.bad());
+    EXPECT_FALSE(_os.eof() || _os.fail() || _os.bad());
   }
 }
 
