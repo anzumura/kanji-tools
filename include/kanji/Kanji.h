@@ -39,7 +39,7 @@ public:
     NewField = 32, OldField = 64, AllFields = 0b1111111 };
   // 'info' returns a comma separated string with extra info (if present) including:
   //   Radical, Strokes, Grade, Level, Freq, New, Old
-  // 'infoFields' can be used to control printing of fields (default is to print all).
+  // 'infoFields' can be used to control inclusion of fields (include all by default).
   // Note: some Jouyou and Jinmei kanji have multiple old/variant forms, but at most
   // one will be displayed. 'New' is for 'Linked' type kanji and will show the official
   // 'standard' form in the Jouyou or Jinmei list.

@@ -24,9 +24,10 @@ std::string Kanji::info(int infoFields) const {
   if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
   if (infoFields & LevelField && hasLevel()) add(Level + toString(level()));
   if (infoFields & FreqField && frequency()) add(Freq + std::to_string(frequency()));
-  // a kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both, check for
-  // linked types first (since oldName is a top level optional field on all kanji)
+  // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both. Check for
+  // linked types first (since oldName is a top level optional field on all kanji).
   if (t == Types::LinkedJinmei || t == Types::LinkedOld) {
+    assert(!oldName().has_value());
     if (infoFields & NewField) add(New + static_cast<const LinkedKanji&>(*this).link()->name());
   } else if (infoFields & OldField && oldName().has_value())
     add(Old + *oldName());
