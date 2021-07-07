@@ -17,8 +17,9 @@ public:
 
   // 'get' will prompt the use to enter one of the choices in the 'choices' structure. If
   // an optional default choice is provided it must correspond to an entry in 'choices'.
-  // If 'choices' contains more than two consecutive ascii values with empty descriptions
-  // then they will be displayed as a range, i.e., 1-9, a-c, F-J, etc..
+  // If 'choices' contains two or more consecutive ascii values with empty descriptions
+  // then they will be displayed as a range, i.e., 1-9, a-c, F-J, etc. - see ChoiceTest.cpp
+  // for examples of how to use this class and expected output.
   char get(const std::string& msg, const Choices& choices) const { return get(msg, choices, {}); }
   char get(const std::string& msg, const Choices& choices, std::optional<char> def) const;
 private:

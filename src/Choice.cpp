@@ -40,7 +40,8 @@ void Choice::add(std::string& prompt, const Choices& choices) {
 }
 
 char Choice::get(const std::string& msg, const Choices& choices, std::optional<char> def) const {
-  std::string line, prompt(msg + " (");
+  // if 'msg' is empty then don't leave a space before listing the choices in brackets.
+  std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
   add(prompt, choices);
   if (def.has_value()) {
     assert(choices.find(*def) != choices.end());

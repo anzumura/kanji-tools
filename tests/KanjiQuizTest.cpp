@@ -15,7 +15,7 @@ protected:
     static const char* args[] = {arg0, arg1};
     return args;
   }
-  // Contructs KanjiData using the real data files
+  // Contructs KanjiQuiz using the real data files
   KanjiQuizTest() : _quiz(2, argv(), _os, _es, _is) {}
 
   void gradeListQuiz() {
@@ -53,6 +53,7 @@ protected:
 };
 
 TEST_F(KanjiQuizTest, GroupsLoaded) {
+  // Groups are actually loaded by KanjiGroupData which is a base class of KanjiQuiz
   EXPECT_FALSE(_quiz.meaningGroupList().empty());
   EXPECT_FALSE(_quiz.patternGroupList().empty());
 }
