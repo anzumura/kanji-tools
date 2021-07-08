@@ -52,7 +52,7 @@ TEST_F(ChoiceTest, ConsecutiveAndNonConsecutiveChoices) {
   EXPECT_EQ(_choice.get("", {{'a', ""}, {'b', ""}, {'c', ""}, {'e', ""}, {'1', ""}, {'2', ""}}), 'c');
   std::string line;
   std::getline(_os, line);
-  // note, choices map is in ascii order so numbers are shown before letters
+  // Note: choices map is in ascii order so numbers are shown before letters.
   EXPECT_EQ(line, "(1-2, a-c, e): ");
 }
 
@@ -61,7 +61,6 @@ TEST_F(ChoiceTest, ChoicesWithMessageAndDescriptions) {
   EXPECT_EQ(_choice.get("hello", {{'a', "world"}, {'b', "!"}, {'e', ""}}), 'b');
   std::string line;
   std::getline(_os, line);
-  // note, choices map is in ascii order so numbers are shown before letters
   EXPECT_EQ(line, "hello (a=world, b=!, e): ");
 }
 
@@ -70,7 +69,6 @@ TEST_F(ChoiceTest, DescriptionsAndRanges) {
   EXPECT_EQ(_choice.get("hello", {{'1', ""}, {'2', ""}, {'a', "world"}, {'b', "!"}, {'c', ""}, {'d', ""}}), 'a');
   std::string line;
   std::getline(_os, line);
-  // note, choices map is in ascii order so numbers are shown before letters
   EXPECT_EQ(line, "hello (1-2, a=world, b=!, c-d): ");
 }
 
@@ -79,17 +77,46 @@ TEST_F(ChoiceTest, ChoiceWithDefault) {
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}, '1'), '1');
   std::string line;
   std::getline(_os, line);
-  // note, choices map is in ascii order so numbers are shown before letters
   EXPECT_EQ(line, "(1-2) default '1': ");
 }
 
 TEST_F(ChoiceTest, ChooseNonDefault) {
-  _is << "2\n"; // don't need to specify the choice when there's a default (just new line)
+  _is << "2\n";
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}, '1'), '2');
   std::string line;
   std::getline(_os, line);
-  // note, choices map is in ascii order so numbers are shown before letters
   EXPECT_EQ(line, "(1-2) default '1': ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, NewLineWithoutDefault) {
+  _is << "\n2\n";
+  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), '2');
+  std::string line;
+  std::getline(_os, line);
+  // Note: new line is not sent to console when prompting for an option since the user should
+  // be entering their choice on the same line as the 'prompt' message. If they choose an
+  // invalid option and presss enter then the 'prompt' message is sent again to output.
+  EXPECT_EQ(line, "(1-2): (1-2): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, ChooseBadOption) {
+  _is << "3\n2\n";
+  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), '2');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-2): (1-2): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, ChooseBadOptionWithDefault) {
+  _is << "3\n2\n";
+  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}, '1'), '2');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-2) default '1': (1-2) default '1': ");
+  EXPECT_FALSE(std::getline(_os, line));
 }
 
 } // namespace kanji

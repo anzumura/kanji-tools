@@ -35,7 +35,8 @@ protected:
     // '1' for including only Jōyō kanji
     _is << "m\nb\n1\n";
   }
-  void skip() { _is << ".\n"; }           // '.' is the option to skip
+  void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
+  void skip() { _is << ".\n"; }           // '.' is the option to skip a question
   void toggleMeanings() { _is << "-\n"; } // '-' is the option to toggle meanings
   void runQuiz() {
     // clear eofbit and failbit for output streams in case quiz is run more than once during a test
@@ -155,6 +156,43 @@ TEST_F(QuizTest, ToggleGroupMeanings) {
   // We want to find the Question string 3 times, i.e., once without meanings, then again with a meaning
   // when meanings are toggled on and then again without a meaning when meanings are toggled off.
   EXPECT_EQ(found, 3);
+}
+
+TEST_F(QuizTest, EditAfterOneAnswer) {
+  meaningGroupQuiz();
+  _is << "a\n"; // provide an answer for the first group entry
+  edit();
+  _is << "b\n"; // change the answer from 'a' to 'b'
+  runQuiz();
+  int found = 0;
+  std::string line;
+  while (std::getline(_os, line)) {
+    std::cout << line << '\n';
+    if (!found) {
+      if (line.ends_with("1->a")) ++found;
+    } else if (line.ends_with("1->b"))
+      ++found;
+  }
+  EXPECT_EQ(found, 2);
+}
+
+TEST_F(QuizTest, EditAfterMultipleAnswers) {
+  meaningGroupQuiz();
+  _is << "a\nb\n"; // entry 1 maps to 'a' and 2 maps to 'b'
+  edit();
+  _is << "a\n"; // pick the answer to change (so 1->a)
+  _is << "c\n"; // set to a new value (should now become 1->c and 2 still maps to 'b')
+  runQuiz();
+  int found = 0;
+  std::string line;
+  while (std::getline(_os, line)) {
+    std::cout << line << '\n';
+    if (!found) {
+      if (line.ends_with("1->a 2->b")) ++found; // before edit
+    } else if (line.ends_with("1->c 2->b"))     // after edit
+      ++found;
+  }
+  EXPECT_EQ(found, 2);
 }
 
 } // namespace kanji

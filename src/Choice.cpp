@@ -52,6 +52,7 @@ char Choice::get(const std::string& msg, const Choices& choices, std::optional<c
     prompt += "): ";
   do {
     _out << prompt;
+    _out.flush();
     std::getline(_in, line);
     if (line.empty() && def.has_value()) return *def;
   } while (line.length() != 1 || choices.find(line[0]) == choices.end());
