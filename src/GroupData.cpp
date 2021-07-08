@@ -1,5 +1,5 @@
 #include <kanji/Group.h>
-#include <kanji/KanjiGroupData.h>
+#include <kanji/GroupData.h>
 #include <kanji/MBChar.h>
 
 #include <fstream>
@@ -16,28 +16,27 @@ const fs::path PatternGroupFile = "pattern-groups.txt";
 
 } // namespace
 
-KanjiGroupData::KanjiGroupData(int argc, const char** argv, std::ostream& out, std::ostream& err)
-  : KanjiData(argc, argv, out, err) {
-  loadGroup(FileList::getFile(_dataDir, MeaningGroupFile), _meaningGroups, _meaningGroupList, GroupType::Meaning);
-  loadGroup(FileList::getFile(_dataDir, PatternGroupFile), _patternGroups, _patternGroupList, GroupType::Pattern);
-  if (_debug) {
-    printGroups(_meaningGroups, _meaningGroupList);
-    printGroups(_patternGroups, _patternGroupList);
+GroupData::GroupData(DataPtr data) : _data(data) {
+  loadGroup(FileList::getFile(_data->dataDir(), MeaningGroupFile), _meaningMap, _meaningGroups, GroupType::Meaning);
+  loadGroup(FileList::getFile(_data->dataDir(), PatternGroupFile), _patternMap, _patternGroups, GroupType::Pattern);
+  if (_data->debug()) {
+    printGroups(_meaningMap, _meaningGroups);
+    printGroups(_patternMap, _patternGroups);
   }
 }
 
-bool KanjiGroupData::checkInsert(const std::string& name, GroupMap& groups, const GroupEntry& group) const {
+bool GroupData::checkInsert(const std::string& name, Map& groups, const Entry& group) const {
   auto i = groups.insert(std::make_pair(name, group));
   if (!i.second)
-    printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
-               i.first->second->toString());
+    _data->printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
+                      i.first->second->toString());
   return i.second;
 }
 
-void KanjiGroupData::loadGroup(const std::filesystem::path& file, GroupMap& groups, GroupList& list, GroupType type) {
+void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& list, GroupType type) {
   int lineNumber = 1, numberCol = -1, nameCol = -1, membersCol = -1;
   auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
   };
   auto setCol = [&file, &error](int& col, int pos) {
     if (col != -1) error("column " + std::to_string(pos) + " has duplicate name", false);
@@ -74,16 +73,16 @@ void KanjiGroupData::loadGroup(const std::filesystem::path& file, GroupMap& grou
         kanjis.emplace_back(name);
       for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
         kanjis.emplace_back(token);
-      List memberKanjis;
+      Data::List memberKanjis;
       for (const auto& i : kanjis) {
-        const auto memberKanji = findKanji(i);
+        const auto memberKanji = _data->findKanji(i);
         if (memberKanji.has_value())
           memberKanjis.push_back(*memberKanji);
         else
-          printError("failed to find member " + i + " in group " + number);
+          _data->printError("failed to find member " + i + " in group " + number);
       }
       if (memberKanjis.empty()) error("group " + number + " has no valid members");
-      GroupEntry group;
+      Entry group;
       if (type == GroupType::Meaning)
         group = std::make_shared<MeaningGroup>(FileListKanji::toInt(number), name, memberKanjis);
       else
@@ -95,30 +94,30 @@ void KanjiGroupData::loadGroup(const std::filesystem::path& file, GroupMap& grou
   }
 }
 
-void KanjiGroupData::printGroups(const GroupMap& groups, const GroupList& groupList) const {
+void GroupData::printGroups(const Map& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend << ":\n";
   for (const auto& i : groupList) {
     if (i->type() == GroupType::Meaning) {
       auto len = MBChar::length(i->name());
-      _out << '[' << i->name()
-           << (len == 1     ? "　　"
-                 : len == 2 ? "　"
-                            : "")
-           << ' ' << std::setw(2) << std::setfill(' ') << i->members().size() << "] :";
+      out() << '[' << i->name()
+            << (len == 1     ? "　　"
+                  : len == 2 ? "　"
+                             : "")
+            << ' ' << std::setw(2) << std::setfill(' ') << i->members().size() << "] :";
       for (const auto& j : i->members())
-        _out << ' ' << j->qualifiedName();
+        out() << ' ' << j->qualifiedName();
     } else {
-      _out << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
+      out() << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
       for (const auto& j : i->members())
         if (j == i->members()[0]) {
           if (i->peers())
-            _out << "　 : " << j->qualifiedName();
+            out() << "　 : " << j->qualifiedName();
           else
-            _out << j->qualifiedName() << ':';
+            out() << j->qualifiedName() << ':';
         } else
-          _out << ' ' << j->qualifiedName();
+          out() << ' ' << j->qualifiedName();
     }
-    _out << '\n';
+    out() << '\n';
   }
 }
 

@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
 #include <kanji/Kanji.h>
-#include <kanji/KanjiQuiz.h>
+#include <kanji/KanjiData.h>
+#include <kanji/Quiz.h>
 
 #include <sstream>
 
 namespace kanji {
 
-class KanjiQuizTest : public ::testing::Test {
+class QuizTest : public ::testing::Test {
 protected:
   static const char** argv() {
     static const char* arg0 = "testMain";
@@ -15,8 +16,8 @@ protected:
     static const char* args[] = {arg0, arg1};
     return args;
   }
-  // Contructs KanjiQuiz using the real data files
-  KanjiQuizTest() : _quiz(2, argv(), _os, _es, _is) {}
+  // Contructs Quiz using the real data files
+  QuizTest() : _data(std::make_shared<KanjiData>(2, argv(), _os, _es)), _groupData(_data), _quiz(_groupData, _is) {}
 
   void gradeListQuiz() {
     // Send a string to '_is' so that '_quiz' can read the follow options:
@@ -49,16 +50,12 @@ protected:
   std::stringstream _os;
   std::stringstream _es;
   std::stringstream _is;
-  KanjiQuiz _quiz;
+  const DataPtr _data;
+  const GroupData _groupData;
+  const Quiz _quiz;
 };
 
-TEST_F(KanjiQuizTest, GroupsLoaded) {
-  // Groups are actually loaded by KanjiGroupData which is a base class of KanjiQuiz
-  EXPECT_FALSE(_quiz.meaningGroupList().empty());
-  EXPECT_FALSE(_quiz.patternGroupList().empty());
-}
-
-TEST_F(KanjiQuizTest, ListQuiz) {
+TEST_F(QuizTest, ListQuiz) {
   gradeListQuiz();
   runQuiz();
   std::string line, lastLine;
@@ -71,7 +68,7 @@ TEST_F(KanjiQuizTest, ListQuiz) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
-TEST_F(KanjiQuizTest, SkipListQuestions) {
+TEST_F(QuizTest, SkipListQuestions) {
   for (int i = 2; i < 4; ++i) {
     gradeListQuiz();
     for (int j = 0; j < i; ++j)
@@ -92,7 +89,7 @@ TEST_F(KanjiQuizTest, SkipListQuestions) {
   }
 }
 
-TEST_F(KanjiQuizTest, ToggleListMeanings) {
+TEST_F(QuizTest, ToggleListMeanings) {
   gradeListQuiz();
   toggleMeanings(); // turn meanings on
   toggleMeanings(); // turn meanings off
@@ -113,7 +110,7 @@ TEST_F(KanjiQuizTest, ToggleListMeanings) {
   EXPECT_EQ(found, 3);
 }
 
-TEST_F(KanjiQuizTest, GroupQuiz) {
+TEST_F(QuizTest, GroupQuiz) {
   meaningGroupQuiz();
   runQuiz();
   std::string line, lastLine;
@@ -126,7 +123,7 @@ TEST_F(KanjiQuizTest, GroupQuiz) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
-TEST_F(KanjiQuizTest, SkipGroupQuestions) {
+TEST_F(QuizTest, SkipGroupQuestions) {
   for (int i = 2; i < 4; ++i) {
     meaningGroupQuiz();
     for (int j = 0; j < i; ++j)
@@ -140,7 +137,7 @@ TEST_F(KanjiQuizTest, SkipGroupQuestions) {
   }
 }
 
-TEST_F(KanjiQuizTest, ToggleGroupMeanings) {
+TEST_F(QuizTest, ToggleGroupMeanings) {
   meaningGroupQuiz();
   toggleMeanings(); // turn meanings on
   toggleMeanings(); // turn meanings off

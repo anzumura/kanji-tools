@@ -1,5 +1,5 @@
 add_library(
-  kanji_lib Choice.cpp Data.cpp FileList.cpp Kanji.cpp KanjiCount.cpp
-  KanjiData.cpp KanjiGroupData.cpp KanjiQuiz.cpp MBChar.cpp
+  kanji_lib Choice.cpp Data.cpp FileList.cpp FileStats.cpp GroupData.cpp
+  Kanji.cpp KanjiData.cpp Quiz.cpp MBChar.cpp
 )
 target_include_directories(kanji_lib PUBLIC ../include)

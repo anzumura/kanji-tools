@@ -12,6 +12,10 @@ inline constexpr auto KanjiLegend = "Jōyō=no suffix, JLPT=', Freq=\", Jinmei=^
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
+  // 'Linked' and 'Other' type kanji don't have radicals right now
+  static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
+  static bool hasLink(Types t) { return t == Types::LinkedJinmei || t == Types::LinkedOld; }
+
   // Public constructor for Kanji found in frequency.txt that weren't found in one of the other
   // files. This constructor is also used by LinkedKanji derived class to avoid 'getLevel' call
   // done by the protected constructor.
@@ -39,8 +43,19 @@ public:
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasReading() const { return !reading().empty(); }
 
-  enum InfoFields { RadicalField = 1, StrokesField, GradeField = 4, LevelField = 8, FreqField = 16,
-    NewField = 32, OldField = 64, AllFields = 0b1111111 };
+  // 'InfoFields' members can be used to select which fields are printed by 'info'
+  // method. For example 'GradeField | LevelField | FreqField' will print grade and
+  // level fields and 'AllFields ^ StrokesField' will print all except for strokes.
+  enum InfoFields {
+    RadicalField = 1,
+    StrokesField,
+    GradeField = 4,
+    LevelField = 8,
+    FreqField = 16,
+    NewField = 32,
+    OldField = 64,
+    AllFields = 127
+  };
   // 'info' returns a comma separated string with extra info (if present) including:
   //   Radical, Strokes, Grade, Level, Freq, New, Old
   // 'infoFields' can be used to control inclusion of fields (include all by default).

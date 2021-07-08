@@ -18,7 +18,7 @@ std::string Kanji::info(int infoFields) const {
     result += x;
   };
   auto t = type();
-  if (infoFields & RadicalField && (t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra))
+  if (infoFields & RadicalField && hasRadical(t))
     result += Rad + static_cast<const FileListKanji&>(*this).radical().name();
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
   if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
@@ -26,7 +26,7 @@ std::string Kanji::info(int infoFields) const {
   if (infoFields & FreqField && frequency()) add(Freq + std::to_string(frequency()));
   // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both. Check for
   // linked types first (since oldName is a top level optional field on all kanji).
-  if (t == Types::LinkedJinmei || t == Types::LinkedOld) {
+  if (hasLink(t)) {
     assert(!oldName().has_value());
     if (infoFields & NewField) add(New + static_cast<const LinkedKanji&>(*this).link()->name());
   } else if (infoFields & OldField && oldName().has_value())

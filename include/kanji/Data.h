@@ -36,23 +36,22 @@ inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os <<
 // 'Data': provides methods used by 'Kanji' classes during loading and is the base class for KanjiData
 class Data {
 public:
-  static void usage(const std::string& msg) { FileList::usage(msg); }
-  // 'Linked' and 'Other' types don't have radicals right now
-  static bool hasRadical(Types t) { return t == Types::Jouyou || t == Types::Jinmei || t == Types::Extra; }
-
   using Entry = std::shared_ptr<Kanji>;
   using OptEntry = std::optional<const Entry>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   using RadicalMap = std::map<std::string, Radical>;
 
+  static void usage(const std::string& msg) { FileList::usage(msg); }
+
   Data(const std::filesystem::path& dataDir, bool debug, std::ostream& out = std::cout, std::ostream& err = std::cerr)
     : _dataDir(dataDir), _debug(debug), _out(out), _err(err) {
-    // clearing FileList static data is only needed to help test code, for example FileList tests can leave some
-    // data in these sets before the KanjiQuiz tests are run (leading to problems loading real files).
+    // Clearing FileList static data is only needed to help test code, for example FileList tests can leave some
+    // data in these sets before Quiz tests are run (leading to problems loading real files).
     FileList::clearUniqueCheckData();
     if (_debug) log(true) << "Begin Loading Data\n>>>\n";
   }
+  virtual ~Data() = default;
   Data(const Data&) = delete;
 
   // functions used by 'Kanji' classes during construction
@@ -88,33 +87,36 @@ public:
 
   const List& gradeList(Grades grade) const {
     auto i = _grades.find(grade);
-    return i != _grades.end() ? i->second : emptyList;
+    return i != _grades.end() ? i->second : _emptyList;
   }
   size_t gradeTotal(Grades grade) const { return gradeList(grade).size(); }
   const List& levelList(Levels level) const {
     auto i = _levels.find(level);
-    return i != _levels.end() ? i->second : emptyList;
+    return i != _levels.end() ? i->second : _emptyList;
   }
   size_t levelTotal(Levels level) const { return levelList(level).size(); }
   // See comment for '_frequencies' private data member for more details about frequency lists
   enum Values { FrequencyBuckets = 5 };
   const List& frequencyList(int range) const {
-    return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : emptyList;
+    return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : _emptyList;
   }
   size_t frequencyTotal(int range) const { return frequencyList(range).size(); }
-protected:
-  std::ostream& _out;
-  std::ostream& _err;
+  void printError(const std::string&) const;
 
+  std::ostream& out() const {return _out; }
+  std::ostream& err() const {return _err; }
+  const std::filesystem::path& dataDir() const { return _dataDir; }
+  bool debug() const { return _debug; }
+  // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
+  std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
+  static int maxFrequency() { return _maxFrequency; }
+protected:
   // helper functions for getting command line options
   static std::filesystem::path getDataDir(int, const char**);
   static bool getDebug(int, const char**);
   // helper functions for checking and inserting into collection
   bool checkInsert(FileList::Set&, const std::string&) const;
   bool checkNotFound(const FileList::Set&, const std::string&) const;
-  void printError(const std::string&) const;
-  // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
-  std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
   bool checkNotFound(const Entry&) const;
@@ -131,6 +133,8 @@ protected:
   // then this function will print any entries in _strokes that are 'Other' type or not found.
   void checkStrokes() const;
 
+  std::ostream& _out;
+  std::ostream& _err;
   const std::filesystem::path _dataDir;
   const bool _debug;
   // '_radicals' is populated from radicals.txt
@@ -155,10 +159,12 @@ protected:
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)
   FileList::Set _jouyouOldSet;
   FileList::Set _jinmeiOldSet;
-  // 'MaxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
-  static int MaxFrequency;
-  static List emptyList;
+  // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
+  static int _maxFrequency;
+  static const List _emptyList;
 };
+
+using DataPtr = std::shared_ptr<const Data>;
 
 } // namespace kanji
 

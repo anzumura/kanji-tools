@@ -15,6 +15,13 @@ public:
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;
 private:
+  // functions to print loaded data if _debug is true
+  void noFreq(int f, bool brackets = false) const; // 'noFreq' is a helper function for printing no-frequency counts
+  template<typename T> void printCount(const std::string& name, T pred) const;
+  void printStats() const;
+  void printGrades() const;
+  void printLevels() const;
+  void printRadicals() const;
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;
