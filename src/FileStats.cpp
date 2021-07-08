@@ -113,8 +113,8 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
   std::array totals{f([](const auto& x) { return isKanji(x); }, "Kanji"),
                     f([](const auto& x) { return isHiragana(x); }, "Hiragana"),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
-                    f([](const auto& x) { return isWidePunctuation(x, false); }, "MB-Punctuation"),
-                    f([](const auto& x) { return isWideLetter(x); }, "MB-Letter"),
+                    f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
+                    f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
                     f([](const auto& x) { return !isRecognizedWide(x); }, "Unrecognized")};
   int total = 0;
   for (int i = 0; i < IncludeInTotals; ++i)

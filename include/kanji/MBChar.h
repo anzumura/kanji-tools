@@ -12,18 +12,23 @@
 
 namespace kanji {
 
-// Important Unicode values
-constexpr auto WidePunctuationStart = L'\u3000';
-constexpr auto WidePunctuationEnd = L'\u303f';
-// 'OtherWidePunctuation' contains other common wide punctuation values not included in the above range
-constexpr std::array OtherWidePunctuation{L'…', L'─', L'“', L'”', L'‥', L'℃'};
-constexpr auto HiraganaStart = L'\u3040';
-constexpr auto HiraganaEnd = L'\u309f';
-constexpr auto KatakanaStart = L'\u30a0';
-constexpr auto KatakanaEnd = L'\u30ff';
+struct UnicodeBlock {
+  const wchar_t start;
+  const wchar_t end;
+  bool has(wchar_t x) const { return x >= start && x <= end; }
+};
+
+constexpr UnicodeBlock WidePunctuation{L'\u3000', L'\u303f'};
+// 'OtherMBPunctuation' contains other common multi-byte punctuation values not included in WidePunctuation
+constexpr std::array OtherMBPunctuation{L'…', L'─', L'“', L'”', L'‥', L'℃', L'·', L'×', L'→', L'–', L'—'};
+constexpr UnicodeBlock Hiragana{L'\u3040', L'\u309f'};
+constexpr UnicodeBlock Katakana{L'\u30a0', L'\u30ff'};
+constexpr UnicodeBlock KatakanaExtended{L'\u31f0', L'\u31ff'}; // things like ㇱ (small letter)
 // WideLetters includes 'full-width roman letters' as well as 'half-width katakana'
-constexpr auto WideLetterStart = L'\uff00';
-constexpr auto WideLetterEnd = L'\uffef';
+constexpr UnicodeBlock WideLetter{L'\uff00', L'\uffef'};
+// Latin Supplement and Extended blocks includes letters with accents, etc. like ā, é, etc.
+constexpr UnicodeBlock LatinSupplement{L'\u0080', L'\u00ff'};
+constexpr UnicodeBlock LatinExtended{L'\u0100', L'\u017f'};
 // KanjiRange includes both the 'common range' and the 'rare range'
 constexpr auto KanjiRange = L"\u4e00-\u9faf\u3400-\u4dbf";
 constexpr auto HiraganaRange = L"\u3040-\u309f";
@@ -31,6 +36,11 @@ constexpr auto HiraganaRange = L"\u3040-\u309f";
 inline std::wstring fromUtf8(const std::string& s) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
   return conv.from_bytes(s);
+}
+
+inline std::string toUtf8(wchar_t c) {
+  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+  return conv.to_bytes(c);
 }
 
 inline std::string toUtf8(const std::wstring& s) {
@@ -44,42 +54,41 @@ inline bool inWCharList(wchar_t c, int count, const wchar_t* list) {
   return false;
 }
 
-inline bool inWCharRange(const std::string& s, wchar_t start, wchar_t end, int count = 0,
+inline bool inWCharRange(const std::string& s, const UnicodeBlock& b, int count = 0, const wchar_t* list = nullptr) {
+  if (s.length() < 2 || s.length() > 4) return false;
+  auto w = fromUtf8(s);
+  return w.length() == 1 && (b.has(w[0]) || inWCharList(w[0], count, list));
+}
+
+inline bool inWCharRange(const std::string& s, const UnicodeBlock& b1, const UnicodeBlock& b2, int count = 0,
                          const wchar_t* list = nullptr) {
   if (s.length() < 2 || s.length() > 4) return false;
   auto w = fromUtf8(s);
-  return w.length() == 1 && (w[0] >= start && w[0] <= end || inWCharList(w[0], count, list));
+  return w.length() == 1 && (b1.has(w[0]) || b2.has(w[0]) || inWCharList(w[0], count, list));
 }
 
-inline bool inWCharRange(const std::string& s, wchar_t start1, wchar_t end1, wchar_t start2, wchar_t end2,
+inline bool inWCharRange(const std::string& s, const UnicodeBlock& b1, const UnicodeBlock& b2, const UnicodeBlock& b3,
                          int count = 0, const wchar_t* list = nullptr) {
   if (s.length() < 2 || s.length() > 4) return false;
   auto w = fromUtf8(s);
-  return w.length() == 1 &&
-    (w[0] >= start1 && w[0] <= end1 || w[0] >= start2 && w[0] <= end2 || inWCharList(w[0], count, list));
+  return w.length() == 1 && (b1.has(w[0]) || b2.has(w[0]) || b3.has(w[0]) || inWCharList(w[0], count, list));
 }
 
 // functions for classifying 'recognized' utf-8 encoded characters:
 //   's' should be a single wide character (so 2-4 bytes)
-inline bool isHiragana(const std::string& s) { return inWCharRange(s, HiraganaStart, HiraganaEnd); }
-inline bool isKatakana(const std::string& s) { return inWCharRange(s, KatakanaStart, KatakanaEnd); }
-inline bool isKana(const std::string& s) {
-  // more efficient to check both ranges at once instead of converting to wstring twice
-  return inWCharRange(s, HiraganaStart, HiraganaEnd, KatakanaStart, KatakanaEnd);
-}
-// 'isWidePunctuation' tests for wide space by default, but also allows not including spaces.
-inline bool isWidePunctuation(const std::string& s, bool includeSpace = true) {
+inline bool isHiragana(const std::string& s) { return inWCharRange(s, Hiragana); }
+inline bool isKatakana(const std::string& s) { return inWCharRange(s, Katakana, KatakanaExtended); }
+inline bool isKana(const std::string& s) { return inWCharRange(s, Hiragana, Katakana, KatakanaExtended); }
+// 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
+inline bool isMBPunctuation(const std::string& s, bool includeSpace = true) {
   return s == "　" ? includeSpace
-                   : inWCharRange(s, WidePunctuationStart, WidePunctuationEnd, OtherWidePunctuation.size(),
-                                  OtherWidePunctuation.data());
+                   : inWCharRange(s, WidePunctuation, OtherMBPunctuation.size(), OtherMBPunctuation.data());
 }
-inline bool isWideLetter(const std::string& s) { return inWCharRange(s, WideLetterStart, WideLetterEnd); }
-inline bool isKanji(const std::string& s) { return inWCharRange(s, L'\u4e00', L'\u9faf', L'\u3400', L'\u4dbf'); }
+inline bool isMBLetter(const std::string& s) { return inWCharRange(s, LatinSupplement, LatinExtended, WideLetter); }
+inline bool isKanji(const std::string& s) { return inWCharRange(s, {L'\u4e00', L'\u9faf'}, {L'\u3400', L'\u4dbf'}); }
 // 'isRecognizedWide' returns true if 's' is Kanji, Kana, Wide Punctuation (including wide space) or Wide Letter
 inline bool isRecognizedWide(const std::string& s) {
-  return isKanji(s) || isKana(s) ||
-    inWCharRange(s, WidePunctuationStart, WidePunctuationEnd, WideLetterStart, WideLetterEnd,
-                 OtherWidePunctuation.size(), OtherWidePunctuation.data());
+  return isKanji(s) || isKana(s) || isMBLetter(s) || isMBPunctuation(s);
 }
 
 // MBChar is a helper class for working with UTF-8 strings. Create an MBChar from a string

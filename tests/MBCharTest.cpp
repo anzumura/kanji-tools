@@ -7,6 +7,12 @@
 
 namespace kanji {
 
+TEST(MBChar, OtherMBPunctuationContainsUniqueValues) {
+  std::set<wchar_t> s;
+  for (auto i : OtherMBPunctuation)
+    EXPECT_TRUE(s.insert(i).second) << "entry " << s.size() << ": '" << toUtf8(i) << "'";
+}
+
 TEST(MBChar, CheckFunctions) {
   EXPECT_TRUE(isHiragana("ゑ"));
   EXPECT_FALSE(isKatakana("ゑ"));
@@ -14,21 +20,23 @@ TEST(MBChar, CheckFunctions) {
   EXPECT_FALSE(isHiragana("ヰ"));
   EXPECT_TRUE(isKana("ー"));
   EXPECT_TRUE(isKana("さ"));
-  EXPECT_FALSE(isWideLetter("ー"));
-  EXPECT_FALSE(isWideLetter("さ"));
+  EXPECT_FALSE(isMBLetter("ー"));
+  EXPECT_FALSE(isMBLetter("さ"));
   EXPECT_FALSE(isKana("ｶ"));
   // Note: half-width katakana is included in Unicode wide letter area
-  EXPECT_TRUE(isWideLetter("ｶ"));
+  EXPECT_TRUE(isMBLetter("ｶ"));
+  // 'isMBLetter' check also includes extended latin letters
+  EXPECT_TRUE(isMBLetter("ã"));
   EXPECT_TRUE(isKana("こ"));
   EXPECT_TRUE(isKana("コ"));
   EXPECT_FALSE(isKana("。"));
-  EXPECT_TRUE(isWidePunctuation("。"));
-  EXPECT_TRUE(isWidePunctuation("、"));
-  EXPECT_TRUE(isWidePunctuation("　"));
-  EXPECT_FALSE(isWidePunctuation("ｺ"));
-  EXPECT_TRUE(isWideLetter("ｄ"));
-  EXPECT_TRUE(isWideLetter("Ｚ"));
-  EXPECT_TRUE(isWideLetter("１"));
+  EXPECT_TRUE(isMBPunctuation("。"));
+  EXPECT_TRUE(isMBPunctuation("、"));
+  EXPECT_TRUE(isMBPunctuation("　"));
+  EXPECT_FALSE(isMBPunctuation("ｺ"));
+  EXPECT_TRUE(isMBLetter("ｄ"));
+  EXPECT_TRUE(isMBLetter("Ｚ"));
+  EXPECT_TRUE(isMBLetter("１"));
 }
 
 TEST(MBChar, Length) {
