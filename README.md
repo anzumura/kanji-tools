@@ -29,6 +29,8 @@ The **data** directory contains the following files:
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
 
+There is also a **tests/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫](https://www.aozora.gr.jp/) (with *furigana* removed).
+
 Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (as opposed to some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji:
 - N5: 103 -- all Jōyō
 - N4: 181 -- all Jōyō

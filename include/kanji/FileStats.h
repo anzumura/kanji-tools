@@ -34,6 +34,8 @@ public:
     OptEntry entry;
   };
 private:
+  // 'MaxExamples' is the maximum number of examples to show for each kanji type when printing stats
+  enum Values { MaxExamples = 5 };
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
   std::ostream& out() const { return _data->out(); }
   void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;

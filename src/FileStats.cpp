@@ -100,7 +100,7 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
         if (count.directories() > 1) out() << " from " << count.directories() << " directories";
         out() << ')';
       }
-      out() << '\n';
+      out() << " - showing " << MaxExamples << " most frequent kanji per type\n";
       firstCount = false;
     }
     static std::string TotalKanji("Total Kanji");
@@ -117,10 +117,14 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
 
 void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) const {
   std::map<Types, int> totalKanjiPerType, uniqueKanjiPerType;
-  std::set<std::string> found;
+  std::map<Types, std::vector<Count>> found;
   for (const auto& i : frequency) {
-    totalKanjiPerType[i.entry.has_value() ? (**i.entry).type() : Types::None] += i.count;
-    if (found.insert(i.name).second) uniqueKanjiPerType[i.entry.has_value() ? (**i.entry).type() : Types::None]++;
+    auto t = i.entry.has_value() ? (**i.entry).type() : Types::None;
+    totalKanjiPerType[t] += i.count;
+    uniqueKanjiPerType[t]++;
+    auto& j = found[t];
+    if (j.size() < MaxExamples)
+      j.push_back(i);
   }
   for (auto t : AllTypes) {
     auto i = uniqueKanjiPerType.find(t);
@@ -128,7 +132,13 @@ void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total
       int totalForType = totalKanjiPerType[t];
       log() << std::right << std::setw(16) << t << ": " << std::setw(6) << totalForType << ", unique: " << std::setw(4)
             << i->second << ", " << std::setw(6) << std::fixed << std::setprecision(2) << totalForType * 100. / total
-            << "%\n";
+            << "%  (";
+      auto& j = found[t];
+      for (int k = 0; k < j.size(); ++k) {
+        if (k) out() << ", ";
+        out() << j[k].name << ' ' << j[k].count;
+      }
+      out() << ")\n";
     }
   }
 }
