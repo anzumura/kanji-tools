@@ -49,7 +49,8 @@ int FileStats::Count::getFrequency() const {
 }
 
 template<typename Pred>
-int FileStats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown) const {
+int FileStats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
+                            bool& firstCount) const {
   // Furigana in a .txt file is usually a Kanji followed by one or more Hiragana characters inside
   // wide brackets. For now use a 'regex' that matches one Kanji followed by bracketed Hiragana (and
   // replace it with just the Kanji match). This should catch most reasonable examples.
@@ -71,12 +72,9 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
   if (total && (isUnrecognized || isKanji && showBreakdown)) {
     out() << "Rank  [Kanji #] Freq, LV, Type (No.) == Highest Count File (if not found)\n";
     FileList::List missing;
-    std::map<Types, int> types;
     for (const auto& i : frequency) {
       out() << std::left << std::setw(5) << ++rank << ' ' << i;
-      if (i.entry.has_value())
-        types[(**i.entry).type()]++;
-      else {
+      if (!i.entry.has_value()) {
         missing.push_back(i.name);
         auto tags = count.tags(i.name);
         if (tags != nullptr) {
@@ -92,23 +90,54 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
       }
       out() << '\n';
     }
-    if (!types.empty()) {
-      log() << "Types:\n";
-      for (auto i : types)
-        out() << "  " << i.first << ": " << i.second << '\n';
-    }
     FileList::print(missing, "missing");
   }
-  if (total)
-    log() << std::right << std::setw(16) << name << ": " << std::setw(6) << total << ", unique: " << std::setw(4)
-          << frequency.size() << " (directories: " << count.directories() << ", files: " << count.files() << ")\n";
+  if (total) {
+    if (firstCount) {
+      log() << "Stats for: " << top.filename().string();
+      if (count.files() > 1) {
+        out() << " (" << count.files() << (count.files() > 1 ? " files" : " file");
+        if (count.directories() > 1) out() << " from " << count.directories() << " directories";
+        out() << ')';
+      }
+      out() << '\n';
+      firstCount = false;
+    }
+    static std::string TotalKanji("Total Kanji");
+    log() << std::right << std::setw(16) << (isKanji ? TotalKanji : name) << ": " << std::setw(6) << total
+          << ", unique: " << std::setw(4) << frequency.size();
+    if (isKanji) {
+      out() << ", 100.00%\n";
+      printKanjiTypeCounts(frequency, total);
+    } else
+      out() << '\n';
+  }
   return total;
+}
+
+void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) const {
+  std::map<Types, int> totalKanjiPerType, uniqueKanjiPerType;
+  std::set<std::string> found;
+  for (const auto& i : frequency) {
+    totalKanjiPerType[i.entry.has_value() ? (**i.entry).type() : Types::None] += i.count;
+    if (found.insert(i.name).second) uniqueKanjiPerType[i.entry.has_value() ? (**i.entry).type() : Types::None]++;
+  }
+  for (auto t : AllTypes) {
+    auto i = uniqueKanjiPerType.find(t);
+    if (i != uniqueKanjiPerType.end()) {
+      int totalForType = totalKanjiPerType[t];
+      log() << std::right << std::setw(16) << t << ": " << std::setw(6) << totalForType << ", unique: " << std::setw(4)
+            << i->second << ", " << std::setw(6) << std::fixed << std::setprecision(2) << totalForType * 100. / total
+            << "%\n";
+    }
+  }
 }
 
 void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
   static const int IncludeInTotals = 3; // only include Kanji and full-width kana in total and percents
-  auto f = [this, &top, showBreakdown](const auto& x, const auto& y) {
-    return std::make_pair(this->processCount(top, x, y, showBreakdown), y);
+  bool firstCount = true;
+  auto f = [this, &top, showBreakdown, &firstCount](const auto& x, const auto& y) {
+    return std::make_pair(this->processCount(top, x, y, showBreakdown, firstCount), y);
   };
   std::array totals{f([](const auto& x) { return isKanji(x); }, "Kanji"),
                     f([](const auto& x) { return isHiragana(x); }, "Hiragana"),
@@ -122,7 +151,7 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
   log() << "Total Kanji+Kana: " << total << " (" << std::fixed << std::setprecision(1);
   for (int i = 0; i < IncludeInTotals; ++i)
     if (totals[i].first) {
-      if (totals[i].second != totals[0].second) std::cout << ", ";
+      if (totals[i].second != totals[0].second) out() << ", ";
       out() << totals[i].second << ": " << totals[i].first * 100. / total << "%";
     }
   out() << ")\n";

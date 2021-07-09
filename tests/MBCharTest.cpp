@@ -25,11 +25,17 @@ TEST(MBChar, CheckFunctions) {
   EXPECT_FALSE(isKana("ｶ"));
   // Note: half-width katakana is included in Unicode wide letter area
   EXPECT_TRUE(isMBLetter("ｶ"));
-  // 'isMBLetter' check also includes extended latin letters
+  // 'isMBLetter' check also includes extended latin letters and enclosed letters
   EXPECT_TRUE(isMBLetter("ã"));
+  EXPECT_TRUE(isMBLetter("⑦"));
+  EXPECT_TRUE(isMBLetter("Ⅰ")); // Roman Numeral 'One'
   EXPECT_TRUE(isKana("こ"));
   EXPECT_TRUE(isKana("コ"));
   EXPECT_FALSE(isKana("。"));
+  EXPECT_TRUE(isMBPunctuation("—")); // from General Punctuation block
+  EXPECT_TRUE(isMBPunctuation("∀")); // from Math Symbols block
+  EXPECT_TRUE(isMBPunctuation("☆")); // from Misc Symbols block
+  EXPECT_TRUE(isMBPunctuation("○")); // from Geometric Shapes block
   EXPECT_TRUE(isMBPunctuation("。"));
   EXPECT_TRUE(isMBPunctuation("、"));
   EXPECT_TRUE(isMBPunctuation("　"));

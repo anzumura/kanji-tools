@@ -37,7 +37,9 @@ private:
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
   std::ostream& out() const { return _data->out(); }
   void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
-  template<typename Pred> int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool) const;
+  template<typename Pred>
+  int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool&) const;
+  void printKanjiTypeCounts(const std::set<Count>&, int total) const;
 
   const DataPtr _data;
 };
