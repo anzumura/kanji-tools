@@ -26,9 +26,11 @@ public:
     // both have the same 'count' and 'frequency' then sort by name.
     bool operator<(const Count& x) const {
       return count > x.count ||
-        (count == x.count && getFrequency() < x.getFrequency() || getFrequency() == x.getFrequency() && name < x.name);
+        (count == x.count && frequency() < x.frequency() || frequency() == x.frequency() && name < x.name);
     }
-    int getFrequency() const;
+    int frequency() const;
+    Types type() const;
+
     int count;
     std::string name;
     OptEntry entry;
@@ -42,6 +44,7 @@ private:
   template<typename Pred>
   int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool&) const;
   void printKanjiTypeCounts(const std::set<Count>&, int total) const;
+  void printTotalAndUnique(const std::string& name, int total, int unique) const;
 
   const DataPtr _data;
 };

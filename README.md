@@ -1,7 +1,7 @@
 # C++ kanji
 
 This repository contains code for two 'main' programs:
-- **kanjiCount**: classifies and counts multi-byte characters in a file or directory tree
+- **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
 
 To support these programs, *KanjiData* class loads and breaks down **kanji** (漢字) into the following categories:

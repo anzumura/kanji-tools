@@ -44,9 +44,11 @@ FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
   }
 }
 
-int FileStats::Count::getFrequency() const {
+int FileStats::Count::frequency() const {
   return entry.has_value() ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
 }
+
+Types FileStats::Count::type() const { return entry.has_value() ? (**entry).type() : Types::None; }
 
 template<typename Pred>
 int FileStats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
@@ -104,8 +106,7 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
       firstCount = false;
     }
     static std::string TotalKanji("Total Kanji");
-    log() << std::right << std::setw(16) << (isKanji ? TotalKanji : name) << ": " << std::setw(6) << total
-          << ", unique: " << std::setw(4) << frequency.size();
+    printTotalAndUnique(isKanji ? TotalKanji : name, total, frequency.size());
     if (isKanji) {
       out() << ", 100.00%\n";
       printKanjiTypeCounts(frequency, total);
@@ -119,20 +120,18 @@ void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total
   std::map<Types, int> totalKanjiPerType, uniqueKanjiPerType;
   std::map<Types, std::vector<Count>> found;
   for (const auto& i : frequency) {
-    auto t = i.entry.has_value() ? (**i.entry).type() : Types::None;
+    auto t = i.type();
     totalKanjiPerType[t] += i.count;
     uniqueKanjiPerType[t]++;
     auto& j = found[t];
-    if (j.size() < MaxExamples)
-      j.push_back(i);
+    if (j.size() < MaxExamples) j.push_back(i);
   }
   for (auto t : AllTypes) {
     auto i = uniqueKanjiPerType.find(t);
     if (i != uniqueKanjiPerType.end()) {
       int totalForType = totalKanjiPerType[t];
-      log() << std::right << std::setw(16) << t << ": " << std::setw(6) << totalForType << ", unique: " << std::setw(4)
-            << i->second << ", " << std::setw(6) << std::fixed << std::setprecision(2) << totalForType * 100. / total
-            << "%  (";
+      printTotalAndUnique(toString(t), totalForType, i->second);
+      out() << ", " << std::setw(6) << std::fixed << std::setprecision(2) << totalForType * 100. / total << "%  (";
       auto& j = found[t];
       for (int k = 0; k < j.size(); ++k) {
         if (k) out() << ", ";
@@ -165,6 +164,11 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
       out() << totals[i].second << ": " << totals[i].first * 100. / total << "%";
     }
   out() << ")\n";
+}
+
+void FileStats::printTotalAndUnique(const std::string& name, int total, int unique) const {
+  log() << std::right << std::setw(16) << name << ": " << std::setw(6) << total << ", unique: " << std::setw(4)
+        << unique;
 }
 
 } // namespace kanji
