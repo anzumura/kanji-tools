@@ -82,6 +82,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
           _data->printError("failed to find member " + i + " in group " + number);
       }
       if (memberKanjis.empty()) error("group " + number + " has no valid members");
+      if (memberKanjis.size() < kanjis.size()) error("group " + number + " failed to load all members");
       Entry group;
       if (type == GroupType::Meaning)
         group = std::make_shared<MeaningGroup>(FileListKanji::toInt(number), name, memberKanjis);
