@@ -20,14 +20,14 @@ struct UnicodeBlock {
 
 constexpr std::array MBPunctuationBlocks = {
   UnicodeBlock{L'\u2000', L'\u206f'}, // General Punctuation: —, ‥, ”, “
+  UnicodeBlock{L'\u2100', L'\u2145'}, // Letterlike Symbols: ℃
+  UnicodeBlock{L'\u2190', L'\u21ff'}, // Arrows: →
   UnicodeBlock{L'\u2200', L'\u22ff'}, // Math Symbols: ∀
+  UnicodeBlock{L'\u2500', L'\u257f'}, // Box Drawing: ─
   UnicodeBlock{L'\u25A0', L'\u25ff'}, // Geometric Shapes: ○
   UnicodeBlock{L'\u2600', L'\u26ff'}, // Misc Symbols: ☆
   UnicodeBlock{L'\u3000', L'\u303f'}  // Wide Punctuation: 、, 。, （
 };
-// 'OtherMBPunctuation' contains other common multi-byte values not included in the above punctuation blocks
-constexpr std::array OtherMBPunctuation{L'─', L'℃', L'·', L'×', L'→'};
-
 constexpr std::array HiraganaBlocks = {UnicodeBlock{L'\u3040', L'\u309f'}};
 // The second block is 'Katakana Extended' and contains things like ㇱ (small letter)
 constexpr std::array KatakanaBlocks = {UnicodeBlock{L'\u30a0', L'\u30ff'}, UnicodeBlock{L'\u31f0', L'\u31ff'}};
@@ -36,7 +36,7 @@ constexpr std::array KanjiBlocks = {UnicodeBlock{L'\u4e00', L'\u9faf'}, UnicodeB
 
 const std::array MBLetterBlocks = {
   UnicodeBlock{L'\uff00', L'\uffef'}, // Wide Letters: full width Roman letters and half-width Katakana
-  UnicodeBlock{L'\u0080', L'\u00ff'}, // Latin Supplement
+  UnicodeBlock{L'\u0080', L'\u00ff'}, // Latin Supplement: ·, ×
   UnicodeBlock{L'\u0100', L'\u017f'}, // Latin Extended
   UnicodeBlock{L'\u2150', L'\u2185'}, // Number Forms: Roman Numerals, etc.
   UnicodeBlock{L'\u2460', L'\u24ff'}  // Enclosed Alphanumeic: ⑦
@@ -60,20 +60,14 @@ inline std::string toUtf8(const std::wstring& s) {
   return conv.to_bytes(s);
 }
 
-inline bool inWCharList(wchar_t c, int count, const wchar_t* list) {
-  for (int i = 0; i < count; ++i)
-    if (c == list[i]) return true;
+template<typename T> inline bool inWCharRange(const std::string& s, const T& t) {
+  if (s.length() > 1 && s.length() < 5) {
+    auto w = fromUtf8(s);
+    if (w.length() == 1)
+      for (auto& i : t)
+        if (i(w[0])) return true;
+  }
   return false;
-}
-
-template<typename T>
-inline bool inWCharRange(const std::string& s, const T& t, int count = 0, const wchar_t* list = nullptr) {
-  if (s.length() < 2 || s.length() > 4) return false;
-  auto w = fromUtf8(s);
-  if (w.length() != 1) return false;
-  for (auto& i : t)
-    if (i(w[0])) return true;
-  return inWCharList(w[0], count, list);
 }
 
 // functions for classifying 'recognized' utf-8 encoded characters:
@@ -83,12 +77,11 @@ inline bool isKatakana(const std::string& s) { return inWCharRange(s, KatakanaBl
 inline bool isKana(const std::string& s) { return inWCharRange(s, KanaBlocks); }
 // 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
 inline bool isMBPunctuation(const std::string& s, bool includeSpace = true) {
-  return s == "　" ? includeSpace
-                   : inWCharRange(s, MBPunctuationBlocks, OtherMBPunctuation.size(), OtherMBPunctuation.data());
+  return s == "　" ? includeSpace : inWCharRange(s, MBPunctuationBlocks);
 }
 inline bool isMBLetter(const std::string& s) { return inWCharRange(s, MBLetterBlocks); }
 inline bool isKanji(const std::string& s) { return inWCharRange(s, KanjiBlocks); }
-// 'isRecognizedWide' returns true if 's' is Kanji, Kana, Wide Punctuation (including wide space) or Wide Letter
+// 'isRecognizedWide' returns true if 's' is Kanji, Kana, MB Punctuation (including wide space) or MB Letter
 inline bool isRecognizedWide(const std::string& s) {
   return isKanji(s) || isKana(s) || isMBLetter(s) || isMBPunctuation(s);
 }

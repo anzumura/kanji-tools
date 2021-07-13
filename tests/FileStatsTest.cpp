@@ -38,7 +38,7 @@ TEST_F(FileStatsTest, PrintStatsForOneFile) {
     ">>>             None:     14, unique:   10,   0.14%  (聰 2, 蘋 2, 遽 2, 鶫 2, 揄 1)",
     ">>>         Hiragana:   7990, unique:   71",
     ">>>         Katakana:   7118, unique:   80",
-    ">>>   MB-Punctuation:   2112, unique:   17",
+    ">>>   MB-Punctuation:   2102, unique:   15",
     ">>>        MB-Letter:    244, unique:   11",
     ">>> Total Kanji+Kana: 24807 (Kanji: 39.1%, Hiragana: 32.2%, Katakana: 28.7%)"};
   std::string line;
@@ -65,7 +65,7 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
     ">>>             None:    158, unique:   96,   0.35%  (婬 18, 剪 10, 畸 9, 滸 4, 薛 3)",
     ">>>         Hiragana:  43197, unique:   79",
     ">>>         Katakana:  24539, unique:   83",
-    ">>>   MB-Punctuation:  10313, unique:   33",
+    ">>>   MB-Punctuation:  10289, unique:   31",
     ">>>        MB-Letter:   1240, unique:   36",
     ">>> Total Kanji+Kana: 112943 (Kanji: 40.0%, Hiragana: 38.2%, Katakana: 21.7%)"};
   std::string line;
@@ -92,7 +92,7 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
     ">>>             None:    582, unique:  282,   0.77%  (婬 18, 拵 12, 椒 11, 剪 10, 烟 9)",
     ">>>         Hiragana: 107960, unique:   80",
     ">>>         Katakana:  24721, unique:   83",
-    ">>>   MB-Punctuation:  16497, unique:   35",
+    ">>>   MB-Punctuation:  16473, unique:   33",
     ">>>        MB-Letter:   1525, unique:   39",
     ">>> Total Kanji+Kana: 208282 (Kanji: 36.3%, Hiragana: 51.8%, Katakana: 11.9%)"};
   std::string line;

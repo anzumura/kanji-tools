@@ -7,12 +7,6 @@
 
 namespace kanji {
 
-TEST(MBChar, OtherMBPunctuationContainsUniqueValues) {
-  std::set<wchar_t> s;
-  for (auto i : OtherMBPunctuation)
-    EXPECT_TRUE(s.insert(i).second) << "entry " << s.size() << ": '" << toUtf8(i) << "'";
-}
-
 TEST(MBChar, CheckFunctions) {
   EXPECT_TRUE(isHiragana("ゑ"));
   EXPECT_FALSE(isKatakana("ゑ"));
