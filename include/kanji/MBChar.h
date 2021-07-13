@@ -16,6 +16,8 @@ struct UnicodeBlock {
   const wchar_t start;
   const wchar_t end;
   bool operator()(wchar_t x) const { return x >= start && x <= end; }
+  bool operator<(const UnicodeBlock& rhs) const { return start < rhs.start; }
+  bool operator==(const UnicodeBlock& rhs) const { return start == rhs.start && end == rhs.end; }
 };
 
 constexpr std::array MBPunctuationBlocks = {
@@ -32,18 +34,18 @@ constexpr std::array HiraganaBlocks = {UnicodeBlock{L'\u3040', L'\u309f'}};
 // The second block is 'Katakana Extended' and contains things like ㇱ (small letter)
 constexpr std::array KatakanaBlocks = {UnicodeBlock{L'\u30a0', L'\u30ff'}, UnicodeBlock{L'\u31f0', L'\u31ff'}};
 constexpr std::array KanaBlocks = {HiraganaBlocks[0], KatakanaBlocks[0], KatakanaBlocks[1]};
-constexpr std::array KanjiBlocks = {UnicodeBlock{L'\u4e00', L'\u9faf'}, UnicodeBlock{L'\u3400', L'\u4dbf'}};
+constexpr std::array KanjiBlocks = {UnicodeBlock{L'\u3400', L'\u4dbf'}, UnicodeBlock{L'\u4e00', L'\u9faf'}};
 
-const std::array MBLetterBlocks = {
-  UnicodeBlock{L'\uff00', L'\uffef'}, // Wide Letters: full width Roman letters and half-width Katakana
+constexpr std::array MBLetterBlocks = {
   UnicodeBlock{L'\u0080', L'\u00ff'}, // Latin Supplement: ·, ×
   UnicodeBlock{L'\u0100', L'\u017f'}, // Latin Extended
   UnicodeBlock{L'\u2150', L'\u2185'}, // Number Forms: Roman Numerals, etc.
-  UnicodeBlock{L'\u2460', L'\u24ff'}  // Enclosed Alphanumeic: ⑦
+  UnicodeBlock{L'\u2460', L'\u24ff'}, // Enclosed Alphanumeic: ⑦
+  UnicodeBlock{L'\uff00', L'\uffef'}  // Wi```de Letters: full width Roman letters and half-width Katakana
 };
 // KanjiRange includes both the 'common range' and the 'rare range'
-constexpr auto KanjiRange = L"\u4e00-\u9faf\u3400-\u4dbf";
-constexpr auto HiraganaRange = L"\u3040-\u309f";
+constexpr wchar_t KanjiRange[] = L"\u3400-\u4dbf\u4e00-\u9faf";
+constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 
 inline std::wstring fromUtf8(const std::string& s) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;

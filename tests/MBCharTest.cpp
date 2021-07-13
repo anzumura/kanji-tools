@@ -2,10 +2,50 @@
 
 #include <kanji/MBChar.h>
 
-#include <array>
 #include <fstream>
 
 namespace kanji {
+
+namespace {
+
+using BlockSet = std::set<UnicodeBlock>;
+
+template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr, bool expectInsert = true) {
+  int oldEnd = 0;
+  for (const auto& i : blocks) {
+    EXPECT_LT(oldEnd, i.start);
+    EXPECT_LT(i.start, i.end);
+    oldEnd = i.end;
+    if (allBlocks) EXPECT_EQ(allBlocks->insert(i).second, expectInsert);
+  }
+}
+
+} // namespace
+
+TEST(MBChar, CheckNoOverlappingRanges) {
+  BlockSet allBlocks;
+  checkRange(HiraganaBlocks, &allBlocks);
+  checkRange(KatakanaBlocks, &allBlocks);
+  // All kana blocks should already be part of hiragana or katakana so make sure size is the same
+  // as well as insert 'false' into allBlocks (which means equal blocks were already inserted)
+  EXPECT_EQ(allBlocks.size(), KanaBlocks.size());
+  checkRange(KanaBlocks, &allBlocks, false);
+  checkRange(MBPunctuationBlocks, &allBlocks);
+  checkRange(MBLetterBlocks, &allBlocks);
+  checkRange(KanjiBlocks, &allBlocks);
+  checkRange(allBlocks);
+  // check 'range' strings (used in regex calls to remove furigana)
+  ASSERT_EQ(std::size(KanjiRange), 7);
+  ASSERT_EQ(KanjiBlocks.size(), 2);
+  EXPECT_EQ(KanjiRange[0], KanjiBlocks[0].start);
+  EXPECT_EQ(KanjiRange[2], KanjiBlocks[0].end);
+  EXPECT_EQ(KanjiRange[3], KanjiBlocks[1].start);
+  EXPECT_EQ(KanjiRange[5], KanjiBlocks[1].end);
+  ASSERT_EQ(std::size(HiraganaRange), 4);
+  ASSERT_EQ(HiraganaBlocks.size(), 1);
+  EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
+  EXPECT_EQ(HiraganaRange[2], HiraganaBlocks[0].end);
+}
 
 TEST(MBChar, CheckFunctions) {
   EXPECT_TRUE(isHiragana("ゑ"));
