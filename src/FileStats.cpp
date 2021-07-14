@@ -53,16 +53,12 @@ Types FileStats::Count::type() const { return entry.has_value() ? (**entry).type
 template<typename Pred>
 int FileStats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
                             bool& firstCount) const {
-  // Furigana in a .txt file is usually a Kanji followed by one or more Hiragana characters inside
-  // wide brackets. For now use a 'regex' that matches one Kanji followed by bracketed Hiragana (and
-  // replace it with just the Kanji match). This should catch most reasonable examples.
-  static const MBCharCount::OptRegex Furigana(std::wstring(L"([") + KanjiRange + L"]{1})（[" + HiraganaRange + L"]+）");
   const bool isKanji = name == "Kanji";
   const bool isUnrecognized = name == "Unrecognized";
-  // remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
+  // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
   const bool removeFurigana = name == "Hiragana" || name == "MB-Letter";
-  MBCharCountIf count(pred, removeFurigana ? Furigana : std::nullopt, "$1");
+  MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt);
   count.addFile(top, isKanji || isUnrecognized);
   auto& m = count.map();
   std::set<Count> frequency;

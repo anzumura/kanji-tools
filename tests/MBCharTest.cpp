@@ -20,6 +20,10 @@ template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = null
   }
 }
 
+auto removeFurigana(const std::wstring& s) {
+  return std::regex_replace(s, MBCharCount::RemoveFurigana, MBCharCount::DefaultReplace);
+}
+
 } // namespace
 
 TEST(MBChar, CheckNoOverlappingRanges) {
@@ -45,6 +49,21 @@ TEST(MBChar, CheckNoOverlappingRanges) {
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
   EXPECT_EQ(HiraganaRange[2], HiraganaBlocks[0].end);
+}
+
+TEST(MBChar, CheckRemovingFurigana) {
+  // replace furigana - must be kanji followed by hiragana in wide brackets
+  EXPECT_EQ(removeFurigana(L"犬（いぬ）"), L"犬");
+  // don't replace katakana
+  EXPECT_EQ(removeFurigana(L"犬（イヌ）"), L"犬（イヌ）");
+  // don't replace after non-kanji
+  EXPECT_EQ(removeFurigana(L"いぬ（いぬ）"), L"いぬ（いぬ）");
+  // don't replace at start of string
+  EXPECT_EQ(removeFurigana(L"（いぬ）"), L"（いぬ）");
+  // replace one furigana set in a longer string
+  EXPECT_EQ(removeFurigana(L"記された文（ふみ）だけがこの世に残って"), L"記された文だけがこの世に残って");
+  // replace multiple furigana sets (for compound words)
+  EXPECT_EQ(removeFurigana(L"子供たちは茫漠（ぼうばく）と見霽（みはる）かす"), L"子供たちは茫漠と見霽かす");
 }
 
 TEST(MBChar, CheckFunctions) {

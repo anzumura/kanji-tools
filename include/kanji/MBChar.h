@@ -176,9 +176,20 @@ public:
   using TagMap = std::map<std::string, Map>;
   using OptRegex = std::optional<std::wregex>;
 
-  // if 'regex' is provided it will be applied to strings before they are processed to remove data
-  MBCharCount(OptRegex find = std::nullopt, const std::string& replace = "", bool debug = false)
-    : _files(0), _directories(0), _find(find), _replace(fromUtf8(replace)), _debug(debug) {}
+  // 'RemoveFurigana' is a regex for removing furigana from text files - it can be passed
+  // to MBCharCount constructor. Furigana in a .txt file is usually a Kanji followed by one
+  // or more Hiragana characters inside wide brackets. This regex matches a Kanji followed
+  // by bracketed Hiragana (and 'DefaultReplace' will replace it with just the Kanji match
+  // part). See MBCharTest.cpp for examples of how the regex works.
+  static const std::wregex RemoveFurigana;
+  // 'DefaultReplace' is used as the default replacement string in below constructor to
+  // replace the contents in brackets with itself (and get rid of the rest of the string). It
+  // can be used in combination with 'RemoveFurigana' regex.
+  static const std::wstring DefaultReplace;
+
+  // if 'regex' is provided it will be applied to strings before they are processed for counting
+  MBCharCount(OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace, bool debug = false)
+    : _files(0), _directories(0), _find(find), _replace(replace), _debug(debug) {}
   virtual ~MBCharCount() = default;
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added. If 'tag'
@@ -227,7 +238,8 @@ private:
 
 template<typename Pred> class MBCharCountIf : public MBCharCount {
 public:
-  MBCharCountIf(Pred pred, OptRegex find = std::nullopt, const std::string& replace = "", bool debug = false)
+  MBCharCountIf(Pred pred, OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace,
+                bool debug = false)
     : MBCharCount(find, replace, debug), _pred(pred) {}
 private:
   bool allowAdd(const std::string& token) const override { return _pred(token); }
