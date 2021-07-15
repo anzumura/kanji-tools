@@ -126,7 +126,7 @@ void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total
     auto i = uniqueKanjiPerType.find(t);
     if (i != uniqueKanjiPerType.end()) {
       int totalForType = totalKanjiPerType[t];
-      printTotalAndUnique(toString(t), totalForType, i->second);
+      printTotalAndUnique(std::string("[") + toString(t) + "] ", totalForType, i->second);
       out() << ", " << std::setw(6) << std::fixed << std::setprecision(2) << totalForType * 100. / total << "%  (";
       auto& j = found[t];
       for (int k = 0; k < j.size(); ++k) {
