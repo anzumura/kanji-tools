@@ -28,7 +28,7 @@ TEST_F(FileStatsTest, PrintStatsForOneFile) {
   FileStats stats(4, testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: 中島みゆき.txt - showing 5 most frequent kanji per type",
-    ">>>      Total Kanji:   9699, unique: 1034, 100.00%",
+    ">>>     Common Kanji:   9699, unique: 1034, 100.00%",
     ">>>           Jouyou:   9543, unique:  955,  98.39%  (年 688, 日 397, 中 378, 月 352, 島 338)",
     ">>>           Jinmei:     98, unique:   48,   1.01%  (柏 9, 幌 8, 篇 7, 斐 7, 浩 6)",
     ">>>     LinkedJinmei:     13, unique:    7,   0.13%  (龍 7, 眞 1, 兒 1, 曾 1, 槇 1)",
@@ -38,9 +38,10 @@ TEST_F(FileStatsTest, PrintStatsForOneFile) {
     ">>>             None:     14, unique:   10,   0.14%  (聰 2, 蘋 2, 遽 2, 鶫 2, 揄 1)",
     ">>>         Hiragana:   7990, unique:   71",
     ">>>         Katakana:   7118, unique:   80",
-    ">>>   MB-Punctuation:   2102, unique:   15",
+    ">>>   MB-Punctuation:   2097, unique:   13",
+    ">>>        MB-Symbol:      5, unique:    2",
     ">>>        MB-Letter:    244, unique:   11",
-    ">>> Total Kanji+Kana: 24807 (Kanji: 39.1%, Hiragana: 32.2%, Katakana: 28.7%)"};
+    ">>> Total Kanji+Kana: 24807 (Common Kanji: 39.1%, Hiragana: 32.2%, Katakana: 28.7%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
@@ -55,7 +56,7 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
   FileStats stats(4, testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: wiki-articles (3 files) - showing 5 most frequent kanji per type",
-    ">>>      Total Kanji:  45207, unique: 1995, 100.00%",
+    ">>>     Common Kanji:  45207, unique: 1995, 100.00%",
     ">>>           Jouyou:  44109, unique: 1644,  97.57%  (年 1737, 日 1042, 郎 949, 月 895, 拓 847)",
     ">>>           Jinmei:    742, unique:  189,   1.64%  (之 60, 彦 52, 篇 27, 祐 20, 伊 18)",
     ">>>     LinkedJinmei:     59, unique:   21,   0.13%  (峯 11, 龍 7, 藝 5, 瀧 5, 眞 4)",
@@ -65,9 +66,10 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
     ">>>             None:    155, unique:   93,   0.34%  (婬 18, 剪 10, 畸 9, 滸 4, 薛 3)",
     ">>>         Hiragana:  43197, unique:   79",
     ">>>         Katakana:  24539, unique:   83",
-    ">>>   MB-Punctuation:  10289, unique:   31",
+    ">>>   MB-Punctuation:  10247, unique:   23",
+    ">>>        MB-Symbol:     42, unique:    8",
     ">>>        MB-Letter:   1240, unique:   36",
-    ">>> Total Kanji+Kana: 112943 (Kanji: 40.0%, Hiragana: 38.2%, Katakana: 21.7%)"};
+    ">>> Total Kanji+Kana: 112943 (Common Kanji: 40.0%, Hiragana: 38.2%, Katakana: 21.7%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
@@ -77,12 +79,22 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
   EXPECT_EQ(count, maxLines);
 }
 
+TEST_F(FileStatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
+  const char* testArgs[] = {"", "", "-c", "../../tests/sample-data/wiki-articles/"};
+  FileStats stats(4, testArgs, _data);
+  std::string line;
+  bool found = false;
+  while (!found && std::getline(_os, line))
+    found = line.starts_with(">>> Stats for: wiki-articles (3 files)");
+  EXPECT_TRUE(found);
+}
+
 TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
   const char* testArgs[] = {"", "", "-c", "../../tests/sample-data"};
   FileStats stats(4, testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: sample-data (5 files from 3 directories) - showing 5 most frequent kanji per type",
-    ">>>      Total Kanji:  75601, unique: 2608, 100.00%",
+    ">>>     Common Kanji:  75601, unique: 2608, 100.00%",
     ">>>           Jouyou:  73121, unique: 1906,  96.72%  (年 1794, 私 1488, 日 1224, 郎 967, 月 935)",
     ">>>           Jinmei:   1486, unique:  306,   1.97%  (之 60, 彦 52, 坐 51, 廻 40, 貰 29)",
     ">>>     LinkedJinmei:     84, unique:   24,   0.11%  (燈 18, 峯 12, 龍 7, 藝 5, 瀧 5)",
@@ -92,9 +104,10 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
     ">>>             None:    565, unique:  273,   0.75%  (婬 18, 拵 12, 椒 11, 剪 10, 烟 9)",
     ">>>         Hiragana: 107960, unique:   80",
     ">>>         Katakana:  24721, unique:   83",
-    ">>>   MB-Punctuation:  16473, unique:   33",
+    ">>>   MB-Punctuation:  16428, unique:   24",
+    ">>>        MB-Symbol:     45, unique:    9",
     ">>>        MB-Letter:   1525, unique:   39",
-    ">>> Total Kanji+Kana: 208282 (Kanji: 36.3%, Hiragana: 51.8%, Katakana: 11.9%)"};
+    ">>> Total Kanji+Kana: 208282 (Common Kanji: 36.3%, Hiragana: 51.8%, Katakana: 11.9%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {

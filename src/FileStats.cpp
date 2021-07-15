@@ -53,7 +53,7 @@ Types FileStats::Count::type() const { return entry.has_value() ? (**entry).type
 template<typename Pred>
 int FileStats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
                             bool& firstCount) const {
-  const bool isKanji = name == "Kanji";
+  const bool isKanji = name.ends_with("Kanji");
   const bool isUnrecognized = name == "Unrecognized";
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
@@ -92,7 +92,8 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
   }
   if (total) {
     if (firstCount) {
-      log() << "Stats for: " << top.filename().string();
+      auto filename = top.filename();
+      log() << "Stats for: " << (filename.has_filename() ? filename.string() : top.parent_path().filename().string());
       if (count.files() > 1) {
         out() << " (" << count.files() << (count.files() > 1 ? " files" : " file");
         if (count.directories() > 1) out() << " from " << count.directories() << " directories";
@@ -101,8 +102,7 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
       out() << " - showing " << MaxExamples << " most frequent kanji per type\n";
       firstCount = false;
     }
-    static std::string TotalKanji("Total Kanji");
-    printTotalAndUnique(isKanji ? TotalKanji : name, total, frequency.size());
+    printTotalAndUnique(name, total, frequency.size());
     if (isKanji) {
       out() << ", 100.00%\n";
       printKanjiTypeCounts(frequency, total);
@@ -139,17 +139,19 @@ void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total
 }
 
 void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
-  static const int IncludeInTotals = 3; // only include Kanji and full-width kana in total and percents
+  static const int IncludeInTotals = 4; // only include Kanji and full-width kana in total and percents
   bool firstCount = true;
   auto f = [this, &top, showBreakdown, &firstCount](const auto& x, const auto& y) {
     return std::make_pair(this->processCount(top, x, y, showBreakdown, firstCount), y);
   };
-  std::array totals{f([](const auto& x) { return isKanji(x); }, "Kanji"),
+  std::array totals{f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
+                    f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
                     f([](const auto& x) { return isHiragana(x); }, "Hiragana"),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
                     f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
+                    f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-                    f([](const auto& x) { return !isRecognizedWide(x); }, "Unrecognized")};
+                    f([](const auto& x) { return !isRecognizedMB(x); }, "Unrecognized")};
   int total = 0;
   for (int i = 0; i < IncludeInTotals; ++i)
     total += totals[i].first;

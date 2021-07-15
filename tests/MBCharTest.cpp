@@ -10,13 +10,13 @@ namespace {
 
 using BlockSet = std::set<UnicodeBlock>;
 
-template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr, bool expectInsert = true) {
+template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
   int oldEnd = 0;
   for (const auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
     EXPECT_LT(i.start, i.end);
     oldEnd = i.end;
-    if (allBlocks) EXPECT_EQ(allBlocks->insert(i).second, expectInsert);
+    if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
   }
 }
 
@@ -30,21 +30,22 @@ TEST(MBChar, CheckNoOverlappingRanges) {
   BlockSet allBlocks;
   checkRange(HiraganaBlocks, &allBlocks);
   checkRange(KatakanaBlocks, &allBlocks);
-  // All kana blocks should already be part of hiragana or katakana so make sure size is the same
-  // as well as insert 'false' into allBlocks (which means equal blocks were already inserted)
-  EXPECT_EQ(allBlocks.size(), KanaBlocks.size());
-  checkRange(KanaBlocks, &allBlocks, false);
-  checkRange(MBPunctuationBlocks, &allBlocks);
-  checkRange(MBLetterBlocks, &allBlocks);
-  checkRange(KanjiBlocks, &allBlocks);
+  checkRange(PunctuationBlocks, &allBlocks);
+  checkRange(SymbolBlocks, &allBlocks);
+  checkRange(LetterBlocks, &allBlocks);
+  checkRange(CommonKanjiBlocks, &allBlocks);
+  checkRange(RareKanjiBlocks, &allBlocks);
   checkRange(allBlocks);
   // check 'range' strings (used in regex calls to remove furigana)
   ASSERT_EQ(std::size(KanjiRange), 7);
-  ASSERT_EQ(KanjiBlocks.size(), 2);
-  EXPECT_EQ(KanjiRange[0], KanjiBlocks[0].start);
-  EXPECT_EQ(KanjiRange[2], KanjiBlocks[0].end);
-  EXPECT_EQ(KanjiRange[3], KanjiBlocks[1].start);
-  EXPECT_EQ(KanjiRange[5], KanjiBlocks[1].end);
+  ASSERT_EQ(CommonKanjiBlocks.size(), 1);
+  ASSERT_EQ(RareKanjiBlocks.size(), 1);
+  EXPECT_EQ(CommonKanjiBlocks[0].range(), 20989);
+  EXPECT_EQ(RareKanjiBlocks[0].range(), 6592);
+  EXPECT_EQ(KanjiRange[0], RareKanjiBlocks[0].start);
+  EXPECT_EQ(KanjiRange[2], RareKanjiBlocks[0].end);
+  EXPECT_EQ(KanjiRange[3], CommonKanjiBlocks[0].start);
+  EXPECT_EQ(KanjiRange[5], CommonKanjiBlocks[0].end);
   ASSERT_EQ(std::size(HiraganaRange), 4);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
@@ -71,31 +72,36 @@ TEST(MBChar, CheckFunctions) {
   EXPECT_FALSE(isKatakana("ゑ"));
   EXPECT_TRUE(isKatakana("ヰ"));
   EXPECT_FALSE(isHiragana("ヰ"));
-  EXPECT_TRUE(isKana("ー"));
-  EXPECT_TRUE(isKana("さ"));
+  EXPECT_TRUE(isRecognizedMB("ー"));
+  EXPECT_TRUE(isRecognizedMB("さ"));
   EXPECT_FALSE(isMBLetter("ー"));
   EXPECT_FALSE(isMBLetter("さ"));
-  EXPECT_FALSE(isKana("ｶ"));
   // Note: half-width katakana is included in Unicode wide letter area
+  EXPECT_FALSE(isKatakana("ｶ"));
   EXPECT_TRUE(isMBLetter("ｶ"));
   // 'isMBLetter' check also includes extended latin letters and enclosed letters
   EXPECT_TRUE(isMBLetter("ã"));
   EXPECT_TRUE(isMBLetter("⑦"));
   EXPECT_TRUE(isMBLetter("Ⅰ")); // Roman Numeral 'One'
-  EXPECT_TRUE(isKana("こ"));
-  EXPECT_TRUE(isKana("コ"));
-  EXPECT_FALSE(isKana("。"));
+  EXPECT_TRUE(isRecognizedMB("。"));
   EXPECT_TRUE(isMBPunctuation("—")); // from General Punctuation block
-  EXPECT_TRUE(isMBPunctuation("∀")); // from Math Symbols block
-  EXPECT_TRUE(isMBPunctuation("☆")); // from Misc Symbols block
-  EXPECT_TRUE(isMBPunctuation("○")); // from Geometric Shapes block
+  EXPECT_TRUE(isMBSymbol("∀")); // from Math Symbols block
+  EXPECT_TRUE(isMBSymbol("☆")); // from Misc Symbols block
+  EXPECT_TRUE(isMBSymbol("○")); // from Geometric Shapes block
   EXPECT_TRUE(isMBPunctuation("。"));
   EXPECT_TRUE(isMBPunctuation("、"));
   EXPECT_TRUE(isMBPunctuation("　"));
-  EXPECT_FALSE(isMBPunctuation("ｺ"));
+  EXPECT_FALSE(isMBSymbol("ｺ"));
   EXPECT_TRUE(isMBLetter("ｄ"));
   EXPECT_TRUE(isMBLetter("Ｚ"));
   EXPECT_TRUE(isMBLetter("１"));
+  // test common and rare kanji
+  EXPECT_TRUE(isCommonKanji("厭"));
+  EXPECT_FALSE(isRareKanji("厭"));
+  EXPECT_FALSE(isCommonKanji("㐀"));
+  EXPECT_TRUE(isRareKanji("㐀"));
+  EXPECT_TRUE(isKanji("厭"));
+  EXPECT_TRUE(isKanji("㐀"));
 }
 
 TEST(MBChar, Length) {
