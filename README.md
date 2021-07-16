@@ -1,8 +1,9 @@
 # C++ kanji
 
 This repository contains code for two 'main' programs:
-- **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
+- **kanjiFormat**: program used to format test/sample-data/books files (from 青空文庫 - see below)
+- **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 
 To support these programs, *KanjiData* class loads and breaks down **kanji** (漢字) into the following categories:
 - **Jouyou**: 2136 official Jōyō (常用) kanji
@@ -29,7 +30,14 @@ The **data** directory contains the following files:
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
 
-There is also a **tests/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫](https://www.aozora.gr.jp/) (with *furigana* removed).
+There is also a **tests/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
+
+The books pulled from Aozora were in Shift JIS format so the following steps were used on *macOS* to convert them to UTF-8:
+- Load the HTML version of the book in **Safari**
+- Select All, then Copy-Paste to **Notes** - this keeps the *furigana*, but puts it on a separate line
+- Open *file1* in **Terminal** using *vi* and paste in the text from **Notes**, then save and exit.
+- Run the **kanjiFormat** program (from *build/apps*) on *file1* and redirect the output to *file2*
+- *file2* should now have properly formatted *furigana* in wide brackets following the *kanji sequence* on the same line.
 
 Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (as opposed to some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji:
 - N5: 103 -- all Jōyō
