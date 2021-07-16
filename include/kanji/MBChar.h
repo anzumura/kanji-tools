@@ -1,10 +1,7 @@
 #ifndef KANJI_MBCHAR_H
 #define KANJI_MBCHAR_H
 
-#include <array>
-#include <codecvt> // for codecvt_utf8
 #include <filesystem>
-#include <locale> // for wstring_convert
 #include <map>
 #include <optional>
 #include <regex>
@@ -53,44 +50,65 @@ public:
     return len;
   }
   static size_t length(const std::string& s, bool onlyMB = true) { return length(s.c_str(), onlyMB); }
-  // 'valid' returns true if string contains one proper multi-byte sequence, i.e., a single
+  // 'Results' is used for the return value of the 'valid' method - see comments below for more details.
+  enum class Results {
+    Valid,
+    NotMBChar,
+    StringTooLong,
+    ContinuationByte,  // returned when the first byte is a continuation byte, i.e., starts with '10'
+    MBCharTooLong,     // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
+    MBCharMissingBytes // returned when there are not enough continuation bytes
+  };
+  // 'valid' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
   // well-formed 'multi-byte symbol'. Examples:
-  // - valid("") = false
-  // - valid("a") = false
-  // - valid("a猫") = false
-  // - valid("雪") = true
-  // - valid("雪s") = false
-  // - valid("吹雪") = false
+  // - valid("") = NotMBChar
+  // - valid("a") = NotMBChar
+  // - valid("a猫") = NotMBChar
+  // - valid("雪") = Valid
+  // - valid("雪s") = StringTooLong
+  // - valid("吹雪") = StringTooLong
   // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
-  static bool valid(const char* s, bool checkLengthOne = true) {
+  static Results valid(const char* s, bool checkLengthOne = true) {
     if (s) {
       if (const unsigned char x = *s; (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
-        if ((*++s & Mask) != Bit1) return false;            // second byte didn't start with '10'
+        if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
         if (x & Bit3) {
-          if ((*++s & Mask) != Bit1) return false; // third byte didn't start with '10'
+          if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
           if (x & Bit4) {
-            if (x & Bit5) return false;              // UTF-8 can only have up to 4 bytes
-            if ((*++s & Mask) != Bit1) return false; // fourth byte didn't start with '10'
+            if (x & Bit5) return Results::MBCharTooLong;                   // UTF-8 can only have up to 4 bytes
+            if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
           }
         }
-        return !checkLengthOne || !*++s;
-      }
+        return (!checkLengthOne || !*++s ? Results::Valid : Results::StringTooLong);
+      } else if ((x & Mask) == Bit1)
+        return Results::ContinuationByte;
     }
-    return false;
+    return Results::NotMBChar;
   }
-  static bool valid(const std::string& s, bool checkLengthOne = true) { return valid(s.c_str(), checkLengthOne); }
+  static Results valid(const std::string& s, bool checkLengthOne = true) { return valid(s.c_str(), checkLengthOne); }
+  static bool isValid(const std::string& s, bool checkLengthOne = true) {
+    return valid(s, checkLengthOne) == Results::Valid;
+  }
 
-  explicit MBChar(const std::string& data) : _data(data), _location(_data.c_str()) {}
+  explicit MBChar(const std::string& data) : _data(data), _location(_data.c_str()), _errors(0) {}
+
   // call reset in order to loop over the string again
-  void reset() { _location = _data.c_str(); }
+  void reset() {
+    _location = _data.c_str();
+    _errors = 0;
+  }
   // 'next' populates 'result' with the full multi-byte character (so could be more than one byte)
   // returns true if result was populated.
   bool next(std::string& result, bool onlyMB = true);
+  int errors() const { return _errors; }
   size_t length(bool onlyMB = true) const { return length(_data, onlyMB); }
-  bool valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
+  Results valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
+  bool isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
 private:
   const std::string _data;
   const char* _location;
+  // '_errors' keeps track of how many invalid bytes were encountered during iteration
+  int _errors;
 };
 
 // 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
@@ -113,7 +131,7 @@ public:
 
   // if 'regex' is provided it will be applied to strings before they are processed for counting
   MBCharCount(OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace, bool debug = false)
-    : _files(0), _directories(0), _find(find), _replace(replace), _debug(debug) {}
+    : _files(0), _directories(0), _errors(0), _find(find), _replace(replace), _debug(debug) {}
   virtual ~MBCharCount() = default;
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added. If 'tag'
@@ -143,8 +161,9 @@ public:
   }
 
   size_t uniqueEntries() const { return _map.size(); }
-  size_t files() const { return _files; }
-  size_t directories() const { return _directories; }
+  int files() const { return _files; }
+  int directories() const { return _directories; }
+  int errors() const { return _errors; }
   const Map& map() const { return _map; }
 private:
   virtual bool allowAdd(const std::string&) const { return true; }
@@ -152,9 +171,10 @@ private:
 
   Map _map;
   TagMap _tags;
-  // keep a count of number of files and directories processed
-  size_t _files;
-  size_t _directories;
+  // keep counts of number of files and directories processed
+  int _files;
+  int _directories;
+  int _errors;
   const OptRegex _find;
   const std::wstring _replace;
   const bool _debug;
@@ -169,124 +189,6 @@ private:
   bool allowAdd(const std::string& token) const override { return _pred(token); }
   const Pred _pred;
 };
-
-// Helper methods to print binary or hex versions of an unsigned char
-inline std::string toBinary(unsigned char x) {
-  std::string result;
-  for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + x % 2);
-  return result;
-}
-
-inline std::string toHex(unsigned char x) {
-  std::string result;
-  for (; x > 0; x >>= 4) {
-    const auto i = x % 16;
-    result.insert(result.begin(), (i < 10 ? '0' + i : 'a' + i - 10));
-  }
-  return result;
-}
-
-struct UnicodeBlock {
-  const wchar_t start;
-  const wchar_t end;
-  // 'range' returns the number of code points in the block (inclusive of start and end)
-  size_t range() const { return end - start + 1; }
-  // 'opterator()' returns true if the given character is in this block
-  bool operator()(wchar_t x) const { return x >= start && x <= end; }
-  bool operator<(const UnicodeBlock& rhs) const { return start < rhs.start; }
-  bool operator==(const UnicodeBlock& rhs) const { return start == rhs.start && end == rhs.end; }
-};
-
-constexpr std::array HiraganaBlocks = {UnicodeBlock{L'\u3040', L'\u309f'}};
-// Second block is 'Katakana Extended' and contains things like ㇱ (small letter)
-constexpr std::array KatakanaBlocks = {UnicodeBlock{L'\u30a0', L'\u30ff'}, UnicodeBlock{L'\u31f0', L'\u31ff'}};
-// There are ~20K common kanji in one block and several more CJK extension blocks. For now just
-// include 'Extension A' (which has ~6K kanji) in 'RareKanjiBlocks' and maybe add more extensions
-// later if needed. Note: the test/sample-data files don't contain any 'rare' kanji so far, but
-// they do contain more the 2600 unique kanji (out of over 75K total kanji).
-constexpr std::array CommonKanjiBlocks = {UnicodeBlock{L'\u4e00', L'\u9ffc'}};
-constexpr std::array RareKanjiBlocks = {UnicodeBlock{L'\u3400', L'\u4dbf'}};
-constexpr std::array PunctuationBlocks = {
-  UnicodeBlock{L'\u2000', L'\u206f'}, // General MB Punctuation: —, ‥, ”, “
-  UnicodeBlock{L'\u3000', L'\u303f'}  // Wide Punctuation: 、, 。, （
-};
-constexpr std::array SymbolBlocks = {
-  UnicodeBlock{L'\u2100', L'\u2145'}, // Letterlike Symbols: ℃
-  UnicodeBlock{L'\u2190', L'\u21ff'}, // Arrows: →
-  UnicodeBlock{L'\u2200', L'\u22ff'}, // Math Symbols: ∀
-  UnicodeBlock{L'\u2500', L'\u257f'}, // Box Drawing: ─
-  UnicodeBlock{L'\u25A0', L'\u25ff'}, // Geometric Shapes: ○
-  UnicodeBlock{L'\u2600', L'\u26ff'}  // Misc Symbols: ☆
-};
-constexpr std::array LetterBlocks = {
-  UnicodeBlock{L'\u0080', L'\u00ff'}, // Latin Supplement: ·, ×
-  UnicodeBlock{L'\u0100', L'\u017f'}, // Latin Extended
-  UnicodeBlock{L'\u2150', L'\u2185'}, // Number Forms: Roman Numerals, etc.
-  UnicodeBlock{L'\u2460', L'\u24ff'}, // Enclosed Alphanumeic: ⑦
-  UnicodeBlock{L'\uff00', L'\uffef'}  // Wide Letters: full width Roman letters and half-width Katakana
-};
-
-inline std::wstring fromUtf8(const std::string& s) {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.from_bytes(s);
-}
-
-inline std::string toUtf8(wchar_t c) {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.to_bytes(c);
-}
-
-inline std::string toUtf8(const std::wstring& s) {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.to_bytes(s);
-}
-
-template<typename T> inline bool inRange(wchar_t c, const T& t) {
-  for (auto& i : t)
-    if (i(c)) return true;
-  return false;
-}
-
-template<typename T, typename... Ts> inline bool inRange(wchar_t c, const T& t, Ts... args) {
-  for (auto& i : t)
-    if (i(c)) return true;
-  return inRange(c, args...);
-}
-
-template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
-  if (s.length() > 1 && s.length() < 5) {
-    auto w = fromUtf8(s);
-    if (w.length() == 1) return inRange(w[0], t...);
-  }
-  return false;
-}
-
-// functions for classifying 'recognized' utf-8 encoded characters: 's' should contain one MB character (so 2-4 bytes)
-
-// kana
-inline bool isHiragana(const std::string& s) { return inWCharRange(s, HiraganaBlocks); }
-inline bool isKatakana(const std::string& s) { return inWCharRange(s, KatakanaBlocks); }
-inline bool isKana(const std::string& s) { return inWCharRange(s, HiraganaBlocks, KatakanaBlocks); }
-// kanji
-inline bool isCommonKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks); }
-inline bool isRareKanji(const std::string& s) { return inWCharRange(s, RareKanjiBlocks); }
-inline bool isKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks); }
-// 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
-inline bool isMBPunctuation(const std::string& s, bool includeSpace = true) {
-  return s == "　" ? includeSpace : inWCharRange(s, PunctuationBlocks);
-}
-inline bool isMBSymbol(const std::string& s) { return inWCharRange(s, SymbolBlocks); }
-inline bool isMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
-// 'isRecognizedMB' returns true if 's' is in any UnicodeBlock defined in this header file (including wide space)
-inline bool isRecognizedMB(const std::string& s) {
-  return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks,
-                      SymbolBlocks, LetterBlocks);
-}
-
-// KanjiRange includes both the 'rare block' and the 'common block' defined above
-constexpr wchar_t KanjiRange[] = L"\u3400-\u4dbf\u4e00-\u9ffc";
-constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 
 } // namespace kanji
 

@@ -1,6 +1,7 @@
 #include <kanji/FileStats.h>
 #include <kanji/Kanji.h>
 #include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <numeric>
 
@@ -16,6 +17,8 @@ std::ostream& operator<<(std::ostream& os, const FileStats::Count& c) {
     os << std::setw(5) << (**c.entry).frequency() << ", "
        << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type()
        << " (" << (**c.entry).number() << ')';
+  else
+    os << ", '\\u" << std::setw(4) << std::setfill('0') << c.toHex() << std::setfill(' ') << "'";
   return os;
 }
 
@@ -25,6 +28,11 @@ command line options:\n  -b file: show wide-character counts and full kanji brea
   -h: show help message for command-line options\n";
 
 } // namespace
+
+std::string FileStats::Count::toHex() const {
+  auto s = fromUtf8(name);
+  return s.length() == 1 ? kanji::toHex(s[0]) : name;
+}
 
 FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
   if (!_data->debug() && argc < 2) Data::usage("please specify at least one option or '-h' for help");
@@ -67,29 +75,6 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
     total += i.second;
     frequency.emplace(i.second, i.first, isKanji ? _data->findKanji(i.first) : std::nullopt);
   }
-  if (total && (isUnrecognized || isKanji && showBreakdown)) {
-    out() << "Rank  [Kanji #] Freq, LV, Type (No.) == Highest Count File (if not found)\n";
-    FileList::List missing;
-    for (const auto& i : frequency) {
-      out() << std::left << std::setw(5) << ++rank << ' ' << i;
-      if (!i.entry.has_value()) {
-        missing.push_back(i.name);
-        auto tags = count.tags(i.name);
-        if (tags != nullptr) {
-          int maxCount = 0;
-          std::string file;
-          for (const auto& j : *tags)
-            if (j.second > maxCount) {
-              maxCount = j.second;
-              file = j.first;
-            }
-          out() << " == " << file;
-        }
-      }
-      out() << '\n';
-    }
-    FileList::print(missing, "missing");
-  }
   if (total) {
     if (firstCount) {
       auto filename = top.filename();
@@ -99,7 +84,9 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
         if (count.directories() > 1) out() << " from " << count.directories() << " directories";
         out() << ')';
       }
-      out() << " - showing " << MaxExamples << " most frequent kanji per type\n";
+      out() << " - showing " << MaxExamples << " most frequent kanji per type";
+      if (count.errors()) out() << ", found " << count.errors() << " errors!";
+      out() << '\n';
       firstCount = false;
     }
     printTotalAndUnique(name, total, frequency.size());
@@ -108,6 +95,34 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
       printKanjiTypeCounts(frequency, total);
     } else
       out() << '\n';
+    // print line-by-line breakdown
+    if (isUnrecognized || isKanji && showBreakdown) {
+      log() << "Showing Breakdown for '" << name << "':\n";
+      out() << "  " << (showBreakdown ? "Rank  [Val #] Freq, LV, Type (No.) ==" : "[Val #], Missing Unicode,")
+            << " Highest Count File\n";
+      FileList::List missing;
+      for (const auto& i : frequency) {
+        out() << "  ";
+        if (showBreakdown) out() << std::left << std::setw(5) << ++rank << ' ';
+        out() << i;
+        if (!i.entry.has_value()) {
+          missing.push_back(i.name);
+          auto tags = count.tags(i.name);
+          if (tags != nullptr) {
+            int maxCount = 0;
+            std::string file;
+            for (const auto& j : *tags)
+              if (j.second > maxCount) {
+                maxCount = j.second;
+                file = j.first;
+              }
+            out() << (showBreakdown ? " == " : ", ") << file;
+          }
+        }
+        out() << '\n';
+      }
+      if (showBreakdown) FileList::print(missing, "missing");
+    }
   }
   return total;
 }
@@ -155,13 +170,17 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
   int total = 0;
   for (int i = 0; i < IncludeInTotals; ++i)
     total += totals[i].first;
-  log() << "Total Kanji+Kana: " << total << " (" << std::fixed << std::setprecision(1);
-  for (int i = 0; i < IncludeInTotals; ++i)
-    if (totals[i].first) {
-      if (totals[i].second != totals[0].second) out() << ", ";
-      out() << totals[i].second << ": " << totals[i].first * 100. / total << "%";
-    }
-  out() << ")\n";
+  log() << "Total Kanji+Kana: " << total;
+  if (total) {
+    out() << " (" << std::fixed << std::setprecision(1);
+    for (int i = 0; i < IncludeInTotals; ++i)
+      if (totals[i].first) {
+        if (totals[i].second != totals[0].second) out() << ", ";
+        out() << totals[i].second << ": " << totals[i].first * 100. / total << "%";
+      }
+    out() << ')';
+  }
+  out() << '\n';
 }
 
 void FileStats::printTotalAndUnique(const std::string& name, int total, int unique) const {

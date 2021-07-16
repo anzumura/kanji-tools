@@ -30,6 +30,7 @@ public:
     }
     int frequency() const;
     Types type() const;
+    std::string toHex() const;
 
     int count;
     std::string name;

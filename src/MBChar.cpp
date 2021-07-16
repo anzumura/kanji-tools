@@ -1,4 +1,5 @@
 #include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <fstream>
 #include <iostream>
@@ -14,12 +15,14 @@ bool MBChar::next(std::string& result, bool onlyMB) {
         result = *_location++;
         return true;
       }
-    } else if (x != Bit1) { // shouldn't be a continuation, but check to be safe
+    } else if (MBChar::isValid(_location, false)) {
+      // only modify 'result' if '_location' is the start of a valid UTF-8 group
       result = *_location++;
       for (x = Bit2; x && firstOfGroup & x; x >>= 1)
         result += *_location++;
       return true;
-    }
+    } else
+      ++_errors;
   }
   return false;
 }
@@ -44,6 +47,7 @@ size_t MBCharCount::add(const std::string& s, const std::string& tag) {
       ++added;
       if (!tag.empty()) ++_tags[token][tag];
     }
+  _errors += c.errors();
   return added;
 }
 

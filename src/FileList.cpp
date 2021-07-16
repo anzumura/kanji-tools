@@ -59,7 +59,7 @@ FileList::FileList(const fs::path& file, Levels l, FileType fileType, bool creat
         if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
         continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
-      if (!MBChar::valid(token)) error("invalid multi-byte token '" + token + "'");
+      if (!MBChar::isValid(token)) error("invalid multi-byte token '" + token + "'");
       // check uniqueness with file
       if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
       // check uniqueness across files

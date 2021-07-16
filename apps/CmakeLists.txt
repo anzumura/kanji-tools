@@ -1,5 +1,8 @@
-add_executable(kanjiStats kanjiStatsMain.cpp)
-target_link_libraries(kanjiStats PRIVATE kanji_lib)
+add_executable(kanjiFormat formatMain.cpp)
+target_link_libraries(kanjiFormat PRIVATE kanji_lib)
 
-add_executable(kanjiQuiz kanjiQuizMain.cpp)
+add_executable(kanjiQuiz quizMain.cpp)
 target_link_libraries(kanjiQuiz PRIVATE kanji_lib)
+
+add_executable(kanjiStats statsMain.cpp)
+target_link_libraries(kanjiStats PRIVATE kanji_lib)

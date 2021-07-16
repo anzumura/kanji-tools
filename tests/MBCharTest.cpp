@@ -8,49 +8,11 @@ namespace kanji {
 
 namespace {
 
-using BlockSet = std::set<UnicodeBlock>;
-
-template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
-  int oldEnd = 0;
-  for (const auto& i : blocks) {
-    EXPECT_LT(oldEnd, i.start);
-    EXPECT_LT(i.start, i.end);
-    oldEnd = i.end;
-    if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
-  }
-}
-
 auto removeFurigana(const std::wstring& s) {
   return std::regex_replace(s, MBCharCount::RemoveFurigana, MBCharCount::DefaultReplace);
 }
 
 } // namespace
-
-TEST(MBChar, CheckNoOverlappingRanges) {
-  BlockSet allBlocks;
-  checkRange(HiraganaBlocks, &allBlocks);
-  checkRange(KatakanaBlocks, &allBlocks);
-  checkRange(PunctuationBlocks, &allBlocks);
-  checkRange(SymbolBlocks, &allBlocks);
-  checkRange(LetterBlocks, &allBlocks);
-  checkRange(CommonKanjiBlocks, &allBlocks);
-  checkRange(RareKanjiBlocks, &allBlocks);
-  checkRange(allBlocks);
-  // check 'range' strings (used in regex calls to remove furigana)
-  ASSERT_EQ(std::size(KanjiRange), 7);
-  ASSERT_EQ(CommonKanjiBlocks.size(), 1);
-  ASSERT_EQ(RareKanjiBlocks.size(), 1);
-  EXPECT_EQ(CommonKanjiBlocks[0].range(), 20989);
-  EXPECT_EQ(RareKanjiBlocks[0].range(), 6592);
-  EXPECT_EQ(KanjiRange[0], RareKanjiBlocks[0].start);
-  EXPECT_EQ(KanjiRange[2], RareKanjiBlocks[0].end);
-  EXPECT_EQ(KanjiRange[3], CommonKanjiBlocks[0].start);
-  EXPECT_EQ(KanjiRange[5], CommonKanjiBlocks[0].end);
-  ASSERT_EQ(std::size(HiraganaRange), 4);
-  ASSERT_EQ(HiraganaBlocks.size(), 1);
-  EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
-  EXPECT_EQ(HiraganaRange[2], HiraganaBlocks[0].end);
-}
 
 TEST(MBChar, CheckRemovingFurigana) {
   // replace furigana - must be kanji followed by hiragana in wide brackets
@@ -67,43 +29,6 @@ TEST(MBChar, CheckRemovingFurigana) {
   EXPECT_EQ(removeFurigana(L"子供たちは茫漠（ぼうばく）と見霽（みはる）かす"), L"子供たちは茫漠と見霽かす");
 }
 
-TEST(MBChar, CheckFunctions) {
-  EXPECT_TRUE(isHiragana("ゑ"));
-  EXPECT_FALSE(isKatakana("ゑ"));
-  EXPECT_TRUE(isKatakana("ヰ"));
-  EXPECT_FALSE(isHiragana("ヰ"));
-  EXPECT_TRUE(isRecognizedMB("ー"));
-  EXPECT_TRUE(isRecognizedMB("さ"));
-  EXPECT_FALSE(isMBLetter("ー"));
-  EXPECT_FALSE(isMBLetter("さ"));
-  // Note: half-width katakana is included in Unicode wide letter area
-  EXPECT_FALSE(isKatakana("ｶ"));
-  EXPECT_TRUE(isMBLetter("ｶ"));
-  // 'isMBLetter' check also includes extended latin letters and enclosed letters
-  EXPECT_TRUE(isMBLetter("ã"));
-  EXPECT_TRUE(isMBLetter("⑦"));
-  EXPECT_TRUE(isMBLetter("Ⅰ")); // Roman Numeral 'One'
-  EXPECT_TRUE(isRecognizedMB("。"));
-  EXPECT_TRUE(isMBPunctuation("—")); // from General Punctuation block
-  EXPECT_TRUE(isMBSymbol("∀")); // from Math Symbols block
-  EXPECT_TRUE(isMBSymbol("☆")); // from Misc Symbols block
-  EXPECT_TRUE(isMBSymbol("○")); // from Geometric Shapes block
-  EXPECT_TRUE(isMBPunctuation("。"));
-  EXPECT_TRUE(isMBPunctuation("、"));
-  EXPECT_TRUE(isMBPunctuation("　"));
-  EXPECT_FALSE(isMBSymbol("ｺ"));
-  EXPECT_TRUE(isMBLetter("ｄ"));
-  EXPECT_TRUE(isMBLetter("Ｚ"));
-  EXPECT_TRUE(isMBLetter("１"));
-  // test common and rare kanji
-  EXPECT_TRUE(isCommonKanji("厭"));
-  EXPECT_FALSE(isRareKanji("厭"));
-  EXPECT_FALSE(isCommonKanji("㐀"));
-  EXPECT_TRUE(isRareKanji("㐀"));
-  EXPECT_TRUE(isKanji("厭"));
-  EXPECT_TRUE(isKanji("㐀"));
-}
-
 TEST(MBChar, Length) {
   EXPECT_EQ(MBChar("").length(), 0);
   EXPECT_EQ(MBChar::length(nullptr), 0);
@@ -114,67 +39,68 @@ TEST(MBChar, Length) {
 }
 
 TEST(MBChar, Valid) {
-  EXPECT_FALSE(MBChar("").valid());
-  EXPECT_FALSE(MBChar::valid(nullptr));
-  EXPECT_FALSE(MBChar("a").valid());
+  EXPECT_EQ(MBChar("").valid(), MBChar::Results::NotMBChar);
+  EXPECT_EQ(MBChar::valid(nullptr), MBChar::Results::NotMBChar);
+  EXPECT_EQ(MBChar("a").valid(), MBChar::Results::NotMBChar);
   std::string x("雪");
   EXPECT_EQ(x.length(), 3);
-  EXPECT_TRUE(MBChar(x).valid());
+  EXPECT_EQ(MBChar(x).valid(), MBChar::Results::Valid);
+  EXPECT_TRUE(MBChar(x).isValid());
 
   // longer strings are not considered valid by default
-  EXPECT_FALSE(MBChar("吹雪").valid());
-  EXPECT_FALSE(MBChar("猫s").valid());
-  EXPECT_FALSE(MBChar("a猫").valid());
+  EXPECT_EQ(MBChar("吹雪").valid(), MBChar::Results::StringTooLong);
+  EXPECT_EQ(MBChar("猫s").valid(), MBChar::Results::StringTooLong);
+  EXPECT_EQ(MBChar("a猫").valid(), MBChar::Results::NotMBChar);
 
   // however, longer strings can be valid if 'checkLengthOne' is false
-  EXPECT_TRUE(MBChar("吹雪").valid(false));
-  EXPECT_TRUE(MBChar("猫s").valid(false));
+  EXPECT_TRUE(MBChar("吹雪").isValid(false));
+  EXPECT_TRUE(MBChar("猫s").isValid(false));
   // but the first char must be a multi-byte
-  EXPECT_FALSE(MBChar("a猫").valid(false));
+  EXPECT_FALSE(MBChar("a猫").isValid(false));
 
   // badly formed strings:
-  EXPECT_FALSE(MBChar::valid(x.substr(0, 1)));
-  EXPECT_FALSE(MBChar::valid(x.substr(0, 2)));
-  EXPECT_FALSE(MBChar::valid(x.substr(1, 1)));
-  EXPECT_FALSE(MBChar::valid(x.substr(1, 2)));
+  EXPECT_EQ(MBChar::valid(x.substr(0, 1)), MBChar::Results::MBCharMissingBytes);
+  EXPECT_EQ(MBChar::valid(x.substr(0, 2)), MBChar::Results::MBCharMissingBytes);
+  EXPECT_EQ(MBChar::valid(x.substr(1, 1)), MBChar::Results::ContinuationByte);
+  EXPECT_EQ(MBChar::valid(x.substr(1, 2)), MBChar::Results::ContinuationByte);
 }
 
 TEST(MBChar, ValidWithTwoByte) {
   std::string x("©");
   EXPECT_EQ(x.length(), 2);
-  EXPECT_TRUE(MBChar(x).valid());
+  EXPECT_TRUE(MBChar(x).isValid());
   // badly formed strings:
-  EXPECT_FALSE(MBChar::valid(x.substr(0, 1)));
-  EXPECT_FALSE(MBChar::valid(x.substr(1)));
+  EXPECT_EQ(MBChar::valid(x.substr(0, 1)), MBChar::Results::MBCharMissingBytes);
+  EXPECT_EQ(MBChar::valid(x.substr(1)), MBChar::Results::ContinuationByte);
 }
 
 TEST(MBChar, ValidWithFourByte) {
   std::string x("𒀄"); // a four byte sumerian cuneiform symbol
   EXPECT_EQ(x.length(), 4);
-  EXPECT_TRUE(MBChar(x).valid());
+  EXPECT_TRUE(MBChar(x).isValid());
   // badly formed strings:
-  EXPECT_FALSE(MBChar::valid(x.substr(0, 1)));
-  EXPECT_FALSE(MBChar::valid(x.substr(0, 2)));
-  EXPECT_FALSE(MBChar::valid(x.substr(0, 3)));
-  EXPECT_FALSE(MBChar::valid(x.substr(1, 1)));
-  EXPECT_FALSE(MBChar::valid(x.substr(1, 2)));
-  EXPECT_FALSE(MBChar::valid(x.substr(1, 3)));
-  EXPECT_FALSE(MBChar::valid(x.substr(2, 1)));
-  EXPECT_FALSE(MBChar::valid(x.substr(2, 2)));
-  EXPECT_FALSE(MBChar::valid(x.substr(3, 1)));
+  EXPECT_EQ(MBChar::valid(x.substr(0, 1)), MBChar::Results::MBCharMissingBytes);
+  EXPECT_EQ(MBChar::valid(x.substr(0, 2)), MBChar::Results::MBCharMissingBytes);
+  EXPECT_EQ(MBChar::valid(x.substr(0, 3)), MBChar::Results::MBCharMissingBytes);
+  EXPECT_EQ(MBChar::valid(x.substr(1, 1)), MBChar::Results::ContinuationByte);
+  EXPECT_EQ(MBChar::valid(x.substr(1, 2)), MBChar::Results::ContinuationByte);
+  EXPECT_EQ(MBChar::valid(x.substr(1, 3)), MBChar::Results::ContinuationByte);
+  EXPECT_EQ(MBChar::valid(x.substr(2, 1)), MBChar::Results::ContinuationByte);
+  EXPECT_EQ(MBChar::valid(x.substr(2, 2)), MBChar::Results::ContinuationByte);
+  EXPECT_EQ(MBChar::valid(x.substr(3, 1)), MBChar::Results::ContinuationByte);
 }
 
 TEST(MBChar, NotValidWithFiveByte) {
   std::string x("𒀄");
   EXPECT_EQ(x.length(), 4);
-  EXPECT_TRUE(MBChar(x).valid());
+  EXPECT_TRUE(MBChar(x).isValid());
   // try to make a 'fake valid' string with 5 bytes (which is not valid)
   x[0] = 0b11'11'10'10;
   EXPECT_EQ(x.length(), 4);
-  EXPECT_FALSE(MBChar::valid(x));
+  EXPECT_EQ(MBChar::valid(x), MBChar::Results::MBCharTooLong);
   x += x[3];
   EXPECT_EQ(x.length(), 5);
-  EXPECT_FALSE(MBChar::valid(x));
+  EXPECT_EQ(MBChar::valid(x), MBChar::Results::MBCharTooLong);
 }
 
 TEST(MBChar, GetNext) {

@@ -24,10 +24,10 @@ protected:
 };
 
 TEST_F(FileStatsTest, PrintStatsForOneFile) {
-  const char* testArgs[] = {"", "", "-c", "../../tests/sample-data/wiki-articles/中島みゆき.txt"};
+  const char* testArgs[] = {"", "", "-c", "../../tests/sample-data/wiki-articles/02-中島みゆき.txt"};
   FileStats stats(4, testArgs, _data);
   const char* expected[] = {
-    ">>> Stats for: 中島みゆき.txt - showing 5 most frequent kanji per type",
+    ">>> Stats for: 02-中島みゆき.txt - showing 5 most frequent kanji per type",
     ">>>     Common Kanji:   9699, unique: 1034, 100.00%",
     ">>>        [Jouyou] :   9543, unique:  955,  98.39%  (年 688, 日 397, 中 378, 月 352, 島 338)",
     ">>>        [Jinmei] :     98, unique:   48,   1.01%  (柏 9, 幌 8, 篇 7, 斐 7, 浩 6)",
@@ -94,20 +94,20 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
   FileStats stats(4, testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: sample-data (5 files from 3 directories) - showing 5 most frequent kanji per type",
-    ">>>     Common Kanji:  75601, unique: 2608, 100.00%",
-    ">>>        [Jouyou] :  73121, unique: 1906,  96.72%  (年 1794, 私 1488, 日 1224, 郎 967, 月 935)",
-    ">>>        [Jinmei] :   1486, unique:  306,   1.97%  (之 60, 彦 52, 坐 51, 廻 40, 貰 29)",
-    ">>>  [LinkedJinmei] :     84, unique:   24,   0.11%  (燈 18, 峯 12, 龍 7, 藝 5, 瀧 5)",
-    ">>>     [LinkedOld] :     46, unique:   10,   0.06%  (澤 36, 齋 2, 嶽 1, 挾 1, 會 1)",
-    ">>>         [Other] :    130, unique:   37,   0.17%  (渕 24, 呑 17, 嘘 14, 苅 8, 叱 8)",
-    ">>>         [Extra] :    169, unique:   52,   0.22%  (厭 34, 掻 12, 妾 6, 怯 5, 攫 5)",
-    ">>>          [None] :    565, unique:  273,   0.75%  (婬 18, 拵 12, 椒 11, 剪 10, 烟 9)",
-    ">>>         Hiragana: 107960, unique:   80",
-    ">>>         Katakana:  24721, unique:   83",
-    ">>>   MB-Punctuation:  16428, unique:   24",
+    ">>>     Common Kanji:  96112, unique: 2622, 100.00%",
+    ">>>        [Jouyou] :  93398, unique: 1918,  97.18%  (私 2747, 年 1838, 日 1299, 人 1168, 郎 999)",
+    ">>>        [Jinmei] :   1663, unique:  306,   1.73%  (坐 62, 之 60, 厨 55, 彦 52, 廻 51)",
+    ">>>  [LinkedJinmei] :     87, unique:   24,   0.09%  (燈 20, 峯 12, 龍 7, 藝 5, 瀧 5)",
+    ">>>     [LinkedOld] :     46, unique:   10,   0.05%  (澤 36, 齋 2, 嶽 1, 挾 1, 會 1)",
+    ">>>         [Other] :    148, unique:   37,   0.15%  (渕 24, 苅 24, 呑 17, 嘘 14, 叱 10)",
+    ">>>         [Extra] :    177, unique:   52,   0.18%  (厭 36, 掻 13, 妾 7, 怯 5, 攫 5)",
+    ">>>          [None] :    593, unique:  275,   0.62%  (婬 18, 椒 14, 婢 12, 拵 12, 掟 11)",
+    ">>>         Hiragana: 162592, unique:   80",
+    ">>>         Katakana:  24939, unique:   83",
+    ">>>   MB-Punctuation:  22127, unique:   24",
     ">>>        MB-Symbol:     45, unique:    9",
-    ">>>        MB-Letter:   1525, unique:   39",
-    ">>> Total Kanji+Kana: 208282 (Common Kanji: 36.3%, Hiragana: 51.8%, Katakana: 11.9%)"};
+    ">>>        MB-Letter:   1730, unique:   39",
+    ">>> Total Kanji+Kana: 283643 (Common Kanji: 33.9%, Hiragana: 57.3%, Katakana: 8.8%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
