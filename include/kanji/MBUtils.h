@@ -25,14 +25,14 @@ inline std::string toUtf8(const std::wstring& s) {
 }
 
 // Helper functions to print binary or hex versions of an unsigned char
-inline std::string toBinary(unsigned char x) {
+template<typename T> inline std::string toBinary(T x) {
   std::string result;
   for (; x > 0; x >>= 1)
     result.insert(result.begin(), '0' + x % 2);
   return result;
 }
 
-inline std::string toHex(unsigned char x) {
+template<typename T> inline std::string toHex(T x) {
   std::string result;
   for (; x > 0; x >>= 4) {
     const auto i = x % 16;
@@ -41,9 +41,16 @@ inline std::string toHex(unsigned char x) {
   return result;
 }
 
+// provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
+template<> inline std::string toBinary(char x) { return toBinary(static_cast<unsigned char>(x)); }
+template<> inline std::string toHex(char x) { return toHex(static_cast<unsigned char>(x)); }
+
 // 'UnicodeBlock' is used to hold a unicode block range which is used in the below 'is'
 // functions (isKanji, isHiragana, etc.).
-struct UnicodeBlock {
+class UnicodeBlock {
+public:
+  // use 'int' in the constructor to avoid having to use L'\uabcd' type literals
+  constexpr UnicodeBlock(int s, int e) : start(s), end(e) {}
   const wchar_t start;
   const wchar_t end;
   // 'range' returns the number of code points in the block (inclusive of start and end)
@@ -54,34 +61,42 @@ struct UnicodeBlock {
   bool operator==(const UnicodeBlock& rhs) const { return start == rhs.start && end == rhs.end; }
 };
 
-constexpr std::array HiraganaBlocks = {UnicodeBlock{L'\u3040', L'\u309f'}};
-// Second block is 'Katakana Extended' and contains things like ㇱ (small letter)
-constexpr std::array KatakanaBlocks = {UnicodeBlock{L'\u30a0', L'\u30ff'}, UnicodeBlock{L'\u31f0', L'\u31ff'}};
-// There are ~20K common kanji in one block and several more CJK extension blocks. For now just
-// include 'Extension A' (which has ~6K kanji) in 'RareKanjiBlocks' and maybe add more extensions
-// later if needed. Note: the test/sample-data files don't contain any 'rare' kanji so far, but
-// they do contain more the 2600 unique kanji (out of over 75K total kanji).
-constexpr std::array CommonKanjiBlocks = {UnicodeBlock{L'\u4e00', L'\u9ffc'}};
-constexpr std::array RareKanjiBlocks = {UnicodeBlock{L'\u3400', L'\u4dbf'}};
+constexpr std::array HiraganaBlocks = {UnicodeBlock{0x3040, 0x309f}};
+// Second block is 'Katakana Phonetic Extensions' which contains small letters (for Ainu) like ㇱ
+constexpr std::array KatakanaBlocks = {UnicodeBlock{0x30a0, 0x30ff}, UnicodeBlock{0x31f0, 0x31ff}};
+// There are ~20K common kanji and several more CJK extension blocks. For now just include
+// 'Extension A' (~6K kanji) and 'Radicals Supplement' (added in 1999 - version 3.0) in
+// 'RareKanjiBlocks' and maybe add more extensions later if needed - the rest are outside
+// the BMP (Basic Multilingual Plane). Note: the test/sample-data files don't contain any
+// 'rare' kanji so far, but they do contain more than 2600 unique kanji (out of almost
+// 100K total kanji).
+constexpr std::array CommonKanjiBlocks = {UnicodeBlock{0x4e00, 0x9ffc}};
+constexpr std::array RareKanjiBlocks = {UnicodeBlock{0x2e80, 0x2eff}, UnicodeBlock{0x3400, 0x4dbf}};
 constexpr std::array PunctuationBlocks = {
-  UnicodeBlock{L'\u2000', L'\u206f'}, // General MB Punctuation: —, ‥, ”, “
-  UnicodeBlock{L'\u3000', L'\u303f'}, // Wide Punctuation: 、, 。, （
-  UnicodeBlock{L'\ufff0', L'\uffff'}  // Specials (like Object Replacement, etc.)
+  UnicodeBlock{0x2000, 0x206f}, // General MB Punctuation: —, ‥, ”, “
+  UnicodeBlock{0x3000, 0x303f}, // Wide Punctuation: 、, 。, （
+  UnicodeBlock{0xfff0, 0xffff}  // Specials (like Object Replacement, etc.)
 };
+// There are a lot more symbol and letter blocks, but they haven't come up in sample files so far
 constexpr std::array SymbolBlocks = {
-  UnicodeBlock{L'\u2100', L'\u2145'}, // Letterlike Symbols: ℃
-  UnicodeBlock{L'\u2190', L'\u21ff'}, // Arrows: →
-  UnicodeBlock{L'\u2200', L'\u22ff'}, // Math Symbols: ∀
-  UnicodeBlock{L'\u2500', L'\u257f'}, // Box Drawing: ─
-  UnicodeBlock{L'\u25A0', L'\u25ff'}, // Geometric Shapes: ○
-  UnicodeBlock{L'\u2600', L'\u26ff'}  // Misc Symbols: ☆
+  UnicodeBlock{0x2100, 0x2145}, // Letterlike Symbols: ℃
+  UnicodeBlock{0x2190, 0x21ff}, // Arrows: →
+  UnicodeBlock{0x2200, 0x22ff}, // Math Symbols: ∀
+  UnicodeBlock{0x2500, 0x257f}, // Box Drawing: ─
+  UnicodeBlock{0x25A0, 0x25ff}, // Geometric Shapes: ○
+  UnicodeBlock{0x2600, 0x26ff}, // Misc Symbols: ☆
+  UnicodeBlock{0x2ff0, 0x2fff}, // CJK Ideographic Description Characters: ⿱
+  UnicodeBlock{0x3190, 0x319f}, // Kanbun (Ideographic Annotations): ㆑
+  UnicodeBlock{0x31c0, 0x31ef}  // CJK Strokes: ㇁
 };
 constexpr std::array LetterBlocks = {
-  UnicodeBlock{L'\u0080', L'\u00ff'}, // Latin Supplement: ·, ×
-  UnicodeBlock{L'\u0100', L'\u017f'}, // Latin Extended
-  UnicodeBlock{L'\u2150', L'\u2185'}, // Number Forms: Roman Numerals, etc.
-  UnicodeBlock{L'\u2460', L'\u24ff'}, // Enclosed Alphanumeic: ⑦
-  UnicodeBlock{L'\uff00', L'\uffef'}  // Wide Letters: full width Roman letters and half-width Katakana
+  UnicodeBlock{0x0080, 0x00ff}, // Latin Supplement: ·, ×
+  UnicodeBlock{0x0100, 0x017f}, // Latin Extension A
+  UnicodeBlock{0x0180, 0x024f}, // Latin Extension B
+  UnicodeBlock{0x2150, 0x2185}, // Number Forms: Roman Numerals, etc.
+  UnicodeBlock{0x2460, 0x24ff}, // Enclosed Alphanumeic: ⑦
+  UnicodeBlock{0x2c60, 0x2c7f}, // Latin Extension C
+  UnicodeBlock{0xff00, 0xffef}  // Wide Letters: full width Roman letters and half-width Katakana
 };
 
 template<typename T> inline bool inRange(wchar_t c, const T& t) {
@@ -127,7 +142,7 @@ inline bool isRecognizedMB(const std::string& s) {
 }
 
 // KanjiRange includes both the 'rare block' and the 'common block' defined above
-constexpr wchar_t KanjiRange[] = L"\u3400-\u4dbf\u4e00-\u9ffc";
+constexpr wchar_t KanjiRange[] = L"\u2e80-\u2eff\u3400-\u4dbf\u4e00-\u9ffc";
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 
 } // namespace kanji

@@ -18,38 +18,51 @@ std::ostream& operator<<(std::ostream& os, const FileStats::Count& c) {
        << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type()
        << " (" << (**c.entry).number() << ')';
   else
-    os << ", '\\u" << std::setw(4) << std::setfill('0') << c.toHex() << std::setfill(' ') << "'";
+    os << ", " << c.toHex();
   return os;
 }
 
 constexpr auto HelpMessage = "\
-command line options:\n  -b file: show wide-character counts and full kanji breakdown for 'file'\n\
-  -c file: show wide-character counts for 'file'\n\
+kanjiStats [-bh] file [file ...]:\n\
+  -b: show full kanji breakdown for 'file' (instead of just a summary)\n\
   -h: show help message for command-line options\n";
 
 } // namespace
 
 std::string FileStats::Count::toHex() const {
   auto s = fromUtf8(name);
-  return s.length() == 1 ? kanji::toHex(s[0]) : name;
+  std::string result;
+  if (s.length() == 1)
+    result = "'\\u" + kanji::toHex(s[0]) + "', ";
+  for (auto i : name) {
+    if (!result.empty()) result += ' ';
+    result += "'\\x" + kanji::toHex(i) + "'";
+  }
+  return result;
 }
 
 FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
   if (!_data->debug() && argc < 2) Data::usage("please specify at least one option or '-h' for help");
+  bool breakdown = false, endOptions = false;
+  std::vector<std::string> files;
   for (int i = _data->debug() ? 3 : 2; i < argc; ++i) {
     std::string arg = argv[i];
-    if (arg == "-b") {
-      if (++i == argc) Data::usage("-b must be followed by a file or directory name");
-      countKanji(argv[i], true);
-    } else if (arg == "-c") {
-      if (++i == argc) Data::usage("-c must be followed by a file or directory name");
-      countKanji(argv[i]);
-    } else if (arg == "-h") {
-      out() << HelpMessage;
-      return;
+    if (!endOptions && arg.starts_with("-")) {
+      if (arg == "-h") {
+        out() << HelpMessage;
+        return;
+      }
+      if (arg == "-b")
+        breakdown = true;
+      else if (arg == "--")
+        endOptions = true;
+      else
+        Data::usage("Unrecognized argument '" + arg + "' use -h for help");
     } else
-      Data::usage("unrecognized arg: " + arg);
+      files.push_back(argv[i]);
   }
+  for (auto& i : files)
+    countKanji(i, breakdown);
 }
 
 int FileStats::Count::frequency() const {
