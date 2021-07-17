@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <kanji/KanjiData.h>
 #include <kanji/Kanji.h>
+#include <kanji/KanjiData.h>
 
 #include <type_traits>
 
@@ -9,16 +9,59 @@ namespace kanji {
 
 namespace fs = std::filesystem;
 
+TEST(DataTest, NextArgWithJustArg0) {
+  const char* arg0 = "program-name";
+  // call without final 'currentArg' parameter increments to 1
+  EXPECT_EQ(Data::nextArg(1, &arg0), 1);
+}
+
+TEST(DataTest, NextArgWithCurrentArg) {
+  const char* arg0 = "program-name";
+  const char* arg1 = "arg1";
+  const char* arg2 = "arg2";
+  const char* argv[] = {arg0, arg1, arg2};
+  EXPECT_EQ(Data::nextArg(std::size(argv), argv, 1), 2);
+  EXPECT_EQ(Data::nextArg(std::size(argv), argv, 2), 3);
+}
+
+TEST(DataTest, NextArgWithDebugArg) {
+  const char* arg0 = "program-name";
+  const char* debugArg = "-debug";
+  const char* argv[] = {arg0, debugArg};
+  // skip '-data some-dir'
+  EXPECT_EQ(Data::nextArg(std::size(argv), argv), 2);
+}
+
+TEST(DataTest, NextArgWithDataArg) {
+  const char* arg0 = "program-name";
+  const char* dataArg = "-data";
+  const char* dataDir = "some-dir";
+  const char* argv[] = {arg0, dataArg, dataDir};
+  // skip '-data some-dir'
+  EXPECT_EQ(Data::nextArg(std::size(argv), argv), 3);
+}
+
+TEST(DataTest, NextArgWithDebugAndDataArgs) {
+  const char* arg0 = "program-name";
+  const char* debugArg = "-debug";
+  const char* dataArg = "-data";
+  const char* dataDir = "some-dir";
+  const char* argv[] = {arg0, debugArg, dataArg, dataDir};
+  // skip '-data some-dir'
+  EXPECT_EQ(Data::nextArg(std::size(argv), argv), 4);
+}
+
 class KanjiDataTest : public ::testing::Test {
 protected:
   static const char** argv() {
     static const char* arg0 = "testMain";
-    static const char* arg1 = "../../data";
-    static const char* args[] = { arg0, arg1 };
+    static const char* arg1 = "-data";
+    static const char* arg2 = "../../data";
+    static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
   // Contructs KanjiData using the real data files
-  KanjiDataTest() : _data(2, argv()) {}
+  KanjiDataTest() : _data(3, argv()) {}
 
   KanjiData _data;
 };

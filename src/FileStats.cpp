@@ -42,10 +42,9 @@ std::string FileStats::Count::toHex() const {
 }
 
 FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
-  if (!_data->debug() && argc < 2) Data::usage("please specify at least one option or '-h' for help");
   bool breakdown = false, endOptions = false;
   std::vector<std::string> files;
-  for (int i = _data->debug() ? 3 : 2; i < argc; ++i) {
+  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) {
     std::string arg = argv[i];
     if (!endOptions && arg.starts_with("-")) {
       if (arg == "-h") {
@@ -61,6 +60,7 @@ FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
     } else
       files.push_back(argv[i]);
   }
+  if (files.empty()) Data::usage("please specify at least one option or '-h' for help");
   for (auto& i : files)
     countKanji(i, breakdown);
 }

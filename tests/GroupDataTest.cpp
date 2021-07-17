@@ -9,13 +9,14 @@ class GroupDataTest : public ::testing::Test {
 protected:
   static const char** argv() {
     static const char* arg0 = "testMain";
-    static const char* arg1 = "../../data";
-    static const char* args[] = {arg0, arg1};
+    static const char* arg1 = "-data";
+    static const char* arg2 = "../../data";
+    static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
   // Contructs GroupData using the real data files
   GroupDataTest()
-    : _data(std::make_shared<KanjiData>(2, argv())), _groupData(_data) {}
+    : _data(std::make_shared<KanjiData>(3, argv())), _groupData(_data) {}
 
   const DataPtr _data;
   const GroupData _groupData;

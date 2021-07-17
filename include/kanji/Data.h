@@ -110,10 +110,21 @@ public:
   // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
   std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
   static int maxFrequency() { return _maxFrequency; }
+
+  // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not used by this
+  // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then
+  // a larger increment is returned to 'skip over' the args, for example:
+  //     for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+  static int nextArg(int argc, const char** argv, int currentArg = 0);
 protected:
-  // helper functions for getting command line options
-  static std::filesystem::path getDataDir(int, const char**);
-  static bool getDebug(int, const char**);
+  // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt' based on
+  // checking directories starting at 'argv[0]' (the program name) and working up parent
+  // directories. Therefore argc must be at least 1. '-data' followed by a directory
+  // name can also be used as an override.
+  static std::filesystem::path getDataDir(int argc, const char** argv);
+  // 'getDebug' looks for '-debug' flag in 'argv' list and returns true if it's found
+  static bool getDebug(int argc, const char** argv);
+
   // helper functions for checking and inserting into collection
   bool checkInsert(FileList::Set&, const std::string&) const;
   bool checkNotFound(const FileList::Set&, const std::string&) const;

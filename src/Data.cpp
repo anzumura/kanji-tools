@@ -52,17 +52,59 @@ Types Data::getType(const std::string& name) const {
 }
 
 fs::path Data::getDataDir(int argc, const char** argv) {
-  if (argc < 2) usage("please specify data directory");
-  fs::path f(argv[1]);
-  if (!fs::is_directory(f))
-    usage(f.string() + " is not a valid directory - current directory is: " + fs::current_path().string());
-  return f;
+  std::optional<fs::path> found = {};
+  for (int i = 1; !found.has_value() && i < argc; ++i) {
+    std::string arg = argv[i];
+    if (arg == "-data") {
+      if (i + 1 < argc) {
+        auto data = fs::path(argv[i + 1]);
+        if (fs::is_directory(data))
+          found = data;
+        else
+          usage(data.string() + " is not a valid directory");
+      } else
+        usage("'-data' must be followed by a directory name");
+    }
+  }
+  // If '-data' wasn't provided then search up directories for 'data' and make sure
+  // it contains at least one of the required files (jouyou.txt).
+  if (!found.has_value()) {
+    if (!argc) usage("need at least one argument, argv[0], to check for a relative 'data' directory");
+    auto oldParent = fs::absolute(fs::path(argv[0])).lexically_normal();
+    auto dataDir = fs::path("data");
+    do {
+      auto parent = oldParent.parent_path();
+      // 'has_parent_path' seems to always return true, i.e., the parent of '/' is
+      // '/' so break if new 'parent' is equal to 'oldParent'.
+      if (parent == oldParent) break;
+      auto data = parent / dataDir;
+      if (fs::is_directory(data) && fs::is_regular_file(data / JouyouFile))
+        found = data;
+      else
+        oldParent = parent;
+    } while (!found.has_value());
+  }
+  if (!found.has_value()) usage("couldn't find valid 'data' directory");
+  return *found;
 }
 
 bool Data::getDebug(int argc, const char** argv) {
-  for (int i = 2; i < argc; ++i)
+  for (int i = 1; i < argc; ++i)
     if (std::string(argv[i]) == "-debug") return true;
   return false;
+}
+
+int Data::nextArg(int argc, const char** argv, int currentArg) {
+  int result = currentArg + 1;
+  if (result < argc) {
+    std::string arg = argv[result];
+    // '-data' should be followed by a 'path' so increment by 2. If -data isn't followed
+    // by a path then an earlier call to 'getDataDir' would have failed with a call to
+    // 'usage' which ends the program.
+    if (arg == "-data") return nextArg(argc, argv, result + 1);
+    if (arg == "-debug") return nextArg(argc, argv, result);
+  }
+  return result;
 }
 
 bool Data::checkInsert(const Entry& i) {

@@ -97,22 +97,12 @@
     "regex": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
-  "cmake.debugConfig": {
-    "args": [
-      "../../data"
-    ]
-  },
   "cSpell.words": [
     "Aozora",
     "Furigana",
-    "K",
     "Kāngxī",
     "MBUTILS",
-    "Z",
     "Zìdiǎn",
-    "di",
-    "n",
-    "ngx",
     "uffef",
     "uffff",
     "wregex"

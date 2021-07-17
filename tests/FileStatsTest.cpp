@@ -12,11 +12,12 @@ class FileStatsTest : public ::testing::Test {
 protected:
   static const char** argv() {
     static const char* arg0 = "testMain";
-    static const char* arg1 = "../../data";
-    static const char* args[] = {arg0, arg1};
+    static const char* arg1 = "-data";
+    static const char* arg2 = "../../data";
+    static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
-  FileStatsTest() : _data(std::make_shared<KanjiData>(2, argv(), _os, _es)) {}
+  FileStatsTest() : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)) {}
 
   std::stringstream _os;
   std::stringstream _es;
@@ -24,7 +25,7 @@ protected:
 };
 
 TEST_F(FileStatsTest, PrintStatsForOneFile) {
-  const char* testArgs[] = {"", "", "../../tests/sample-data/wiki-articles/02-中島みゆき.txt"};
+  const char* testArgs[] = {"", "../../tests/sample-data/wiki-articles/02-中島みゆき.txt"};
   FileStats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: 02-中島みゆき.txt - showing 5 most frequent kanji per type",
@@ -52,7 +53,7 @@ TEST_F(FileStatsTest, PrintStatsForOneFile) {
 }
 
 TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
-  const char* testArgs[] = {"", "", "../../tests/sample-data/wiki-articles"};
+  const char* testArgs[] = {"", "../../tests/sample-data/wiki-articles"};
   FileStats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: wiki-articles (3 files) - showing 5 most frequent kanji per type",
@@ -80,7 +81,7 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
 }
 
 TEST_F(FileStatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
-  const char* testArgs[] = {"", "", "../../tests/sample-data/wiki-articles/"};
+  const char* testArgs[] = {"", "../../tests/sample-data/wiki-articles/"};
   FileStats stats(std::size(testArgs), testArgs, _data);
   std::string line;
   bool found = false;
@@ -90,7 +91,7 @@ TEST_F(FileStatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
 }
 
 TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
-  const char* testArgs[] = {"", "", "../../tests/sample-data"};
+  const char* testArgs[] = {"", "../../tests/sample-data"};
   FileStats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: sample-data (5 files from 3 directories) - showing 5 most frequent kanji per type",
