@@ -36,6 +36,9 @@ The books pulled from Aozora were in Shift JIS format so the following steps wer
 - Load the HTML version of the book in **Safari**
 - Select All, then Copy-Paste to **Notes** - this keeps the *furigana*, but puts it on a separate line
 - Open *file1* in **Terminal** using *vi* and paste in the text from **Notes**, then save and exit.
+  - Copying straight from the browser to *vi* puts the *furigana* immediately after the kanji (with no space, brackets, newline, etc.) which makes it pretty much impossible to 'regex' it out when producing stats (and difficult to read as well).
+  - Extremely rare kanji that are just embedded images in the HTML (instead of real Shift JIS values) do show up in **Notes**, but of course they don't end up getting pasted into the plain text file in *vi*. These need to be entered by hand (since they do exist in Unicode).
+  - **MS Word** also captures the *furigana* from the HTML, but it ends up being above unrelated text. When pasting to *vi* the *furigana* is put in standard brackets, but in incorrect locations which makes it useless (but at least it can be easily removed which is better than the straight to *vi* option). However, a more serious problem is that **MS Word** (macOS version 2019) also seemed to randomly drop parts of the text (maybe an encoding conversion issue?) which was a showstopper.
 - Run the **kanjiFormat** program (from *build/apps*) on *file1* and redirect the output to *file2*
 - *file2* should now have properly formatted *furigana* in wide brackets following the *kanji sequence* on the same line.
 
