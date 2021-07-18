@@ -1,11 +1,13 @@
 # C++ kanji
 
-This repository contains code for two 'main' programs:
-- **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
+This repository contains code for three 'main' programs:
 - **kanjiFormat**: program used to format test/sample-data/books files (from 青空文庫 - see below)
+- **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
 - **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 
-To support these programs, *KanjiData* class loads and breaks down **kanji** (漢字) into the following categories:
+The initial goal for this project was to create a program that can parse multi-byte (UTF-8) input and classify any Japanese **kanji** (漢字) characters found into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying kanji. Finally, the *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code already created for the *stats* program.
+
+To support these programs, *KanjiData* class loads and breaks down kanji into the following categories:
 - **Jouyou**: 2136 official Jōyō (常用) kanji
 - **Jinmei**: 633 official Jinmeiyō (人名用) kanji
 - **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
@@ -29,6 +31,8 @@ The **data** directory contains the following files:
 - **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
+
+No external databases are used so far, but while writing some of the code (like in *MBUtils.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
 
 There is also a **tests/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
 

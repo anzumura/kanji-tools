@@ -51,6 +51,22 @@ TEST(DataTest, NextArgWithDebugAndDataArgs) {
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 4);
 }
 
+TEST(DataTest, NextArgWithMultipleArgs) {
+  const char* arg0 = "program-name";
+  const char* arg1 = "arg1";
+  const char* debugArg = "-debug";
+  const char* arg3 = "arg3";
+  const char* dataArg = "-data";
+  const char* dataDir = "some-dir";
+  const char* arg6 = "arg6";
+  const char* argv[] = {arg0, arg1, debugArg, arg3, dataArg, dataDir, arg6};
+  int argc = std::size(argv);
+  std::vector<const char*> actualArgs;
+  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+    actualArgs.push_back(argv[i]);
+  EXPECT_EQ(actualArgs, std::vector<const char*>({arg1, arg3, arg6}));
+}
+
 class KanjiDataTest : public ::testing::Test {
 protected:
   static const char** argv() {

@@ -49,8 +49,6 @@ template<> inline std::string toHex(char x) { return toHex(static_cast<unsigned 
 // functions (isKanji, isHiragana, etc.).
 class UnicodeBlock {
 public:
-  // use 'int' in the constructor to avoid having to use L'\uabcd' type literals
-  constexpr UnicodeBlock(int s, int e) : start(s), end(e) {}
   const wchar_t start;
   const wchar_t end;
   // 'range' returns the number of code points in the block (inclusive of start and end)
