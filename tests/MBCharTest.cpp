@@ -142,6 +142,35 @@ TEST(MBChar, Reset) {
   EXPECT_FALSE(s.next(x));
 }
 
+TEST(MBChar, ErrorCount) {
+  std::string original("甲乙丙丁");
+  // there should be 4 '3-byte' characters
+  ASSERT_EQ(original.length(), 12);
+  // introduce some errors
+  original[1] = 'x'; // change the middle of 甲 resulting in 2 errors (first and last bytes)
+  original[6] = 'z'; // change the first byte of 丙 resulting in 2 errors (second and third bytes)
+  MBChar s(original);
+  std::string x;
+  std::array expected = {"乙", "丁"};
+  for (const auto& i : expected) {
+    EXPECT_TRUE(s.next(x));
+    EXPECT_EQ(x, i);
+  }
+  EXPECT_FALSE(s.next(x));
+  EXPECT_EQ(s.errors(), 4);
+  s.reset();
+  // make sure 'reset' also clears errors
+  EXPECT_EQ(s.errors(), 0);
+  // now loop again looking for single byte results as well
+  std::array expectedWithSingle = {"x", "乙", "z", "丁"};
+  for (const auto& i : expectedWithSingle) {
+    EXPECT_TRUE(s.next(x, false));
+    EXPECT_EQ(x, i);
+  }
+  EXPECT_FALSE(s.next(x));
+  EXPECT_EQ(s.errors(), 4);
+}
+
 namespace fs = std::filesystem;
 
 class MBCharCountTest : public ::testing::Test {
@@ -178,6 +207,29 @@ TEST_F(MBCharCountTest, Add) {
   EXPECT_EQ(c.count("青"), 1);
   EXPECT_EQ(c.count("い"), 2);
   EXPECT_EQ(c.count("箱"), 1);
+  EXPECT_EQ(c.count("で"), 1);
+  EXPECT_EQ(c.count("す"), 1);
+  EXPECT_EQ(c.count("今"), 1);
+  EXPECT_EQ(c.count("日"), 1);
+  EXPECT_EQ(c.count("涼"), 1);
+  EXPECT_EQ(c.count("し"), 1);
+  EXPECT_EQ(c.count("。"), 1);
+}
+
+TEST_F(MBCharCountTest, AddWithErrors) {
+  std::string s1("hello空は青い"), s2("箱は空です");
+  s1[s1.length() - 2] = 'x'; // mess up い introducing 2 errors
+  s2[0] = 'y';               // mess up 箱 introducing 2 errors
+  EXPECT_EQ(c.add(s1), 3);
+  EXPECT_EQ(c.add(s2), 4);
+  EXPECT_EQ(c.add("今日は涼しい。good bye"), 7);
+  // map only includes MB chars
+  EXPECT_EQ(c.uniqueEntries(), 11);
+  EXPECT_EQ(c.errors(), 4);
+  EXPECT_EQ(c.count("空"), 2);
+  EXPECT_EQ(c.count("は"), 3);
+  EXPECT_EQ(c.count("青"), 1);
+  EXPECT_EQ(c.count("い"), 1);
   EXPECT_EQ(c.count("で"), 1);
   EXPECT_EQ(c.count("す"), 1);
   EXPECT_EQ(c.count("今"), 1);
