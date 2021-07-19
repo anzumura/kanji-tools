@@ -34,7 +34,7 @@ TEST(MBUtils, CheckNoOverlappingRanges) {
   ASSERT_EQ(std::size(KanjiRange), 10);
   ASSERT_EQ(CommonKanjiBlocks.size(), 1);
   ASSERT_EQ(RareKanjiBlocks.size(), 2);
-  EXPECT_EQ(CommonKanjiBlocks[0].range(), 20989);
+  EXPECT_EQ(CommonKanjiBlocks[0].range(), 20992);
   EXPECT_EQ(RareKanjiBlocks[0].range(), 128);
   EXPECT_EQ(RareKanjiBlocks[1].range(), 6592);
   EXPECT_EQ(KanjiRange[0], RareKanjiBlocks[0].start);

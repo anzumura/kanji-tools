@@ -49,6 +49,10 @@ template<> inline std::string toHex(char x) { return toHex(static_cast<unsigned 
 // functions (isKanji, isHiragana, etc.).
 class UnicodeBlock {
 public:
+  constexpr UnicodeBlock(wchar_t s, wchar_t e) : start(s), end(e) {
+    assert(start % 16 == 0); // Unicode blocks must start with a value having MOD 16 of zero
+    assert(end % 16 == 15);  // Unicode blocks must end with a value having MOD 16 of 15 (hex f)
+  }
   const wchar_t start;
   const wchar_t end;
   // 'range' returns the number of code points in the block (inclusive of start and end)
@@ -68,7 +72,7 @@ constexpr std::array KatakanaBlocks = {UnicodeBlock{0x30a0, 0x30ff}, UnicodeBloc
 // the BMP (Basic Multilingual Plane). Note: the test/sample-data files don't contain any
 // 'rare' kanji so far, but they do contain more than 2600 unique kanji (out of almost
 // 100K total kanji).
-constexpr std::array CommonKanjiBlocks = {UnicodeBlock{0x4e00, 0x9ffc}};
+constexpr std::array CommonKanjiBlocks = {UnicodeBlock{0x4e00, 0x9fff}};
 constexpr std::array RareKanjiBlocks = {UnicodeBlock{0x2e80, 0x2eff}, UnicodeBlock{0x3400, 0x4dbf}};
 constexpr std::array PunctuationBlocks = {
   UnicodeBlock{0x2000, 0x206f}, // General MB Punctuation: —, ‥, ”, “
@@ -77,7 +81,7 @@ constexpr std::array PunctuationBlocks = {
 };
 // There are a lot more symbol and letter blocks, but they haven't come up in sample files so far
 constexpr std::array SymbolBlocks = {
-  UnicodeBlock{0x2100, 0x2145}, // Letterlike Symbols: ℃
+  UnicodeBlock{0x2100, 0x214f}, // Letterlike Symbols: ℃
   UnicodeBlock{0x2190, 0x21ff}, // Arrows: →
   UnicodeBlock{0x2200, 0x22ff}, // Math Symbols: ∀
   UnicodeBlock{0x2500, 0x257f}, // Box Drawing: ─
@@ -91,7 +95,7 @@ constexpr std::array LetterBlocks = {
   UnicodeBlock{0x0080, 0x00ff}, // Latin Supplement: ·, ×
   UnicodeBlock{0x0100, 0x017f}, // Latin Extension A
   UnicodeBlock{0x0180, 0x024f}, // Latin Extension B
-  UnicodeBlock{0x2150, 0x2185}, // Number Forms: Roman Numerals, etc.
+  UnicodeBlock{0x2150, 0x218f}, // Number Forms: Roman Numerals, etc.
   UnicodeBlock{0x2460, 0x24ff}, // Enclosed Alphanumeic: ⑦
   UnicodeBlock{0x2c60, 0x2c7f}, // Latin Extension C
   UnicodeBlock{0xff00, 0xffef}  // Wide Letters: full width Roman letters and half-width Katakana
@@ -140,7 +144,7 @@ inline bool isRecognizedMB(const std::string& s) {
 }
 
 // KanjiRange includes both the 'rare block' and the 'common block' defined above
-constexpr wchar_t KanjiRange[] = L"\u2e80-\u2eff\u3400-\u4dbf\u4e00-\u9ffc";
+constexpr wchar_t KanjiRange[] = L"\u2e80-\u2eff\u3400-\u4dbf\u4e00-\u9fff";
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 
 } // namespace kanji
