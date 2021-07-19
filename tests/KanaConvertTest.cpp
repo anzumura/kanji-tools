@@ -15,7 +15,7 @@ protected:
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
-  enum Values { KanaSize = 130, Variants = 13 };
+  enum Values { KanaSize = 152, Variants = 20 };
   const KanaConvert _converter;
 };
 
@@ -35,14 +35,17 @@ TEST_F(KanaConvertTest, CheckHiragana) {
       // if there's a second character it must be a small symbol matching the final romaji letter
       auto romajiLen = i.second.romaji.length();
       ASSERT_GT(romajiLen, 1);
-      switch (i.second.romaji[romajiLen - 1]) {
-      case 'a': check("ぁ", "ゃ"); break;
-      case 'i': check("ぃ"); break;
-      case 'u': check("ぅ", "ゅ"); break;
-      case 'e': check("ぇ"); break;
-      case 'o': check("ぉ", "ょ"); break;
-      default: check("");
-      }
+      if (i.second.romaji == "qwa") // the only digraph that ends with small 'wa'
+        EXPECT_EQ(i.first, "くゎ");
+      else
+        switch (i.second.romaji[romajiLen - 1]) {
+        case 'a': check("ぁ", "ゃ"); break;
+        case 'i': check("ぃ"); break;
+        case 'u': check("ぅ", "ゅ"); break;
+        case 'e': check("ぇ"); break;
+        case 'o': check("ぉ", "ょ"); break;
+        default: check("");
+        }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
     }
@@ -65,14 +68,17 @@ TEST_F(KanaConvertTest, CheckKatakana) {
       // if there's a second character it must be a small symbol matching the final romaji letter
       auto romajiLen = i.second.romaji.length();
       ASSERT_GT(romajiLen, 1);
-      switch (i.second.romaji[romajiLen - 1]) {
-      case 'a': check("ァ", "ャ"); break;
-      case 'i': check("ィ"); break;
-      case 'u': check("ゥ", "ュ"); break;
-      case 'e': check("ェ"); break;
-      case 'o': check("ォ", "ョ"); break;
-      default: check("");
-      }
+      if (i.second.romaji == "qwa") // the only digraph that ends with small 'wa'
+        EXPECT_EQ(i.first, "クヮ");
+      else
+        switch (i.second.romaji[romajiLen - 1]) {
+        case 'a': check("ァ", "ャ"); break;
+        case 'i': check("ィ"); break;
+        case 'u': check("ゥ", "ュ"); break;
+        case 'e': check("ェ"); break;
+        case 'o': check("ォ", "ョ"); break;
+        default: check("");
+        }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
     }
@@ -99,11 +105,11 @@ TEST_F(KanaConvertTest, CheckRomaji) {
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 32);
-  EXPECT_EQ(iCount, 23);
-  EXPECT_EQ(uCount, 33);
-  EXPECT_EQ(eCount, 21);
-  EXPECT_EQ(oCount, 33);
+  EXPECT_EQ(aCount, 39);
+  EXPECT_EQ(iCount, 32);
+  EXPECT_EQ(uCount, 37);
+  EXPECT_EQ(eCount, 26);
+  EXPECT_EQ(oCount, 37);
   EXPECT_EQ(nCount, 1);
   EXPECT_EQ(variantCount, Variants);
 }
