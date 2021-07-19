@@ -1,5 +1,5 @@
-#ifndef KANJI_CHOICE
-#define KANJI_CHOICE
+#ifndef KANJI_CHOICE_H
+#define KANJI_CHOICE_H
 
 #include <iostream>
 #include <map>
@@ -30,4 +30,4 @@ private:
 
 } // namespace kanji
 
-#endif // KANJI_CHOICE
+#endif // KANJI_CHOICE_H

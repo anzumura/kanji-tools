@@ -149,4 +149,4 @@ constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 
 } // namespace kanji
 
-#endif
+#endif // KANJI_MBUTILS_H

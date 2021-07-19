@@ -1,5 +1,5 @@
-#ifndef KANJI_KANJI_QUIZ
-#define KANJI_KANJI_QUIZ
+#ifndef KANJI_QUIZ_H
+#define KANJI_QUIZ_H
 
 #include <kanji/Choice.h>
 #include <kanji/GroupData.h>
@@ -67,4 +67,4 @@ private:
 
 } // namespace kanji
 
-#endif // KANJI_KANJI_QUIZ
+#endif // KANJI_QUIZ_H

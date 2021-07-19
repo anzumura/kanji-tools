@@ -1,5 +1,5 @@
-#ifndef KANJI_FILE_STATS
-#define KANJI_FILE_STATS
+#ifndef KANJI_FILE_STATS_H
+#define KANJI_FILE_STATS_H
 
 #include <kanji/Data.h>
 
@@ -52,4 +52,4 @@ private:
 
 } // namespace kanji
 
-#endif // KANJI_FILE_STATS
+#endif // KANJI_FILE_STATS_H

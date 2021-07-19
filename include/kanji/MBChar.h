@@ -192,4 +192,4 @@ private:
 
 } // namespace kanji
 
-#endif
+#endif // KANJI_MBCHAR_H

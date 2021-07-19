@@ -1,5 +1,5 @@
-#ifndef KANJI_GROUP_DATA
-#define KANJI_GROUP_DATA
+#ifndef KANJI_GROUP_DATA_H
+#define KANJI_GROUP_DATA_H
 
 #include <kanji/Data.h>
 
@@ -41,4 +41,4 @@ private:
 
 } // namespace kanji
 
-#endif // KANJI_GROUP_DATA
+#endif // KANJI_GROUP_DATA_H
