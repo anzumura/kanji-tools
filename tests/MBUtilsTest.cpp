@@ -51,6 +51,11 @@ TEST(MBUtils, CheckNoOverlappingRanges) {
 
 TEST(MBUtils, IsKana) {
   EXPECT_TRUE(isHiragana("ゑ"));
+  EXPECT_FALSE(isHiragana("ゑあ"));
+  EXPECT_TRUE(isHiragana("ゑあ", false)); // checkLengthOne=false
+  EXPECT_TRUE(isHiragana("ゑク", false)); // checkLengthOne=false
+  EXPECT_TRUE(isAllHiragana("ゑあ"));
+  EXPECT_FALSE(isAllHiragana("ゑク"));
   EXPECT_FALSE(isKatakana("ゑ"));
   EXPECT_TRUE(isKatakana("ヰ"));
   EXPECT_FALSE(isHiragana("ヰ"));
@@ -64,6 +69,10 @@ TEST(MBUtils, IsMBLetter) {
   // Note: half-width katakana is included in Unicode wide letter area
   EXPECT_FALSE(isKatakana("ｶ"));
   EXPECT_TRUE(isMBLetter("ｶ"));
+  EXPECT_FALSE(isMBLetter("ｶＺ"));
+  EXPECT_TRUE(isMBLetter("ｶＺ", false)); // checkLengthOne=false
+  EXPECT_TRUE(isAllMBLetter("ｶＺ"));
+  EXPECT_FALSE(isAllMBLetter("ｶＺ犬"));
   // 'isMBLetter' check also includes extended latin letters and enclosed letters
   EXPECT_TRUE(isMBLetter("ã"));
   EXPECT_TRUE(isMBLetter("⑦"));
@@ -75,22 +84,33 @@ TEST(MBUtils, IsMBLetter) {
 }
 
 TEST(MBUtils, IsMBPunctuation) {
-  EXPECT_TRUE(isMBPunctuation("—")); // from General Punctuation block
+  EXPECT_TRUE(isMBPunctuation("—"));  // from General Punctuation block
   EXPECT_TRUE(isMBPunctuation("。")); // from Wide Punctuation block
+  EXPECT_FALSE(isMBPunctuation("。d"));
+  EXPECT_TRUE(isMBPunctuation("。d", true, false)); // checkLengthOne=false
   EXPECT_TRUE(isMBPunctuation("、")); // from Wide Punctuation block
   EXPECT_TRUE(isMBPunctuation("　"));
+  EXPECT_FALSE(isMBPunctuation("　", false)); // includeSpace=false
+  EXPECT_FALSE(isMBPunctuation("　x", true));
+  EXPECT_TRUE(isMBPunctuation("　x", true, false)); // checkLengthOne=false
+  EXPECT_FALSE(isAllMBPunctuation("　x"));
+  EXPECT_TRUE(isAllMBPunctuation("　。　、"));
   EXPECT_TRUE(isMBPunctuation(toUtf8(L"\ufffc"))); // from Specials block
   EXPECT_TRUE(isRecognizedMB("—"));
   EXPECT_TRUE(isRecognizedMB("　"));
 }
 
 TEST(MBUtils, IsMBSymbol) {
-  EXPECT_TRUE(isMBSymbol("∀")); // from Math Symbols block
-  EXPECT_TRUE(isMBSymbol("☆")); // from Misc Symbols block
-  EXPECT_TRUE(isMBSymbol("○")); // from Geometric Shapes block
+  EXPECT_TRUE(isMBSymbol("∀"));  // from Math Symbols block
+  EXPECT_TRUE(isMBSymbol("☆"));  // from Misc Symbols block
+  EXPECT_TRUE(isMBSymbol("○"));  // from Geometric Shapes block
   EXPECT_TRUE(isMBSymbol("⿱")); // CJK Ideographic Description Character
   EXPECT_TRUE(isMBSymbol("㆑")); // Kanbun (annotations)
   EXPECT_TRUE(isMBSymbol("㇁")); // CJK Stokes
+  EXPECT_FALSE(isMBSymbol("㇁ぶ"));
+  EXPECT_TRUE(isMBSymbol("㇁ぶ", false));
+  EXPECT_FALSE(isAllMBSymbol("㇁ぶ"));
+  EXPECT_TRUE(isAllMBSymbol("㇁☆"));
   EXPECT_FALSE(isMBSymbol("ｺ"));
   EXPECT_TRUE(isRecognizedMB("☆"));
 }
@@ -98,10 +118,19 @@ TEST(MBUtils, IsMBSymbol) {
 TEST(MBUtils, IsKanji) {
   // test common and rare kanji
   EXPECT_TRUE(isCommonKanji("厭"));
+  EXPECT_FALSE(isCommonKanji("厭が"));
+  EXPECT_TRUE(isCommonKanji("厭が", false));
+  EXPECT_FALSE(isAllCommonKanji("厭が"));
+  EXPECT_TRUE(isAllCommonKanji("厭猫"));
   EXPECT_FALSE(isRareKanji("厭"));
   EXPECT_FALSE(isCommonKanji("⺠"));
   EXPECT_FALSE(isCommonKanji("㐀"));
   EXPECT_TRUE(isRareKanji("⺠"));
+  EXPECT_FALSE(isRareKanji("⺠h"));
+  EXPECT_TRUE(isRareKanji("⺠h", false)); // checkLengthOne=false
+  EXPECT_FALSE(isAllRareKanji("⺠h"));
+  EXPECT_FALSE(isAllRareKanji("⺠猫"));
+  EXPECT_TRUE(isAllRareKanji("⺠㐀"));
   EXPECT_TRUE(isRareKanji("㐀"));
   EXPECT_TRUE(isKanji("厭"));
   EXPECT_TRUE(isKanji("⺠"));
@@ -109,6 +138,10 @@ TEST(MBUtils, IsKanji) {
   EXPECT_TRUE(isRecognizedMB("厭"));
   EXPECT_TRUE(isRecognizedMB("⺠"));
   EXPECT_TRUE(isRecognizedMB("㐀"));
+  EXPECT_FALSE(isRecognizedMB("㐀馬イヌねこ"));
+  EXPECT_TRUE(isRecognizedMB("㐀馬イヌねこ", false));
+  EXPECT_TRUE(isAllRecognizedMB("㐀馬イヌねこ"));
+  EXPECT_FALSE(isAllRecognizedMB("㐀馬イxヌねこ"));
 }
 
 TEST(MBUtils, FromUTF8String) {
@@ -151,6 +184,30 @@ TEST(MBUtils, ToBinary) {
   EXPECT_EQ(toBinary(s[0]), "11101111");
   EXPECT_EQ(toBinary(s[1]), "10111111");
   EXPECT_EQ(toBinary(s[2]), "10111100");
+}
+
+TEST(MBUtils, CheckSingleByte) {
+  // normal char
+  EXPECT_TRUE(isSingleByteChar('a'));
+  EXPECT_FALSE(isSingleByteChar('\x80'));
+  // wide char
+  EXPECT_TRUE(isSingleByteChar(L'a'));
+  EXPECT_FALSE(isSingleByteChar(L'か'));
+  // normal string
+  EXPECT_TRUE(isSingleByte("x"));
+  EXPECT_FALSE(isSingleByte("く"));
+  EXPECT_FALSE(isSingleByte("xx"));
+  EXPECT_TRUE(isSingleByte("xx", false));
+  EXPECT_TRUE(isAllSingleByte("xx"));
+  EXPECT_FALSE(isAllSingleByte("xxこ"));
+  // wide string
+  EXPECT_TRUE(isSingleByte(L"x"));
+  EXPECT_FALSE(isSingleByte(L"く"));
+  EXPECT_FALSE(isSingleByte(L"xx"));
+  EXPECT_TRUE(isSingleByte(L"xx", false));
+  EXPECT_TRUE(isAllSingleByte(L"")); // true for empty strings
+  EXPECT_TRUE(isAllSingleByte(L"xx"));
+  EXPECT_FALSE(isAllSingleByte(L"xxこ"));
 }
 
 } // namespace kanji

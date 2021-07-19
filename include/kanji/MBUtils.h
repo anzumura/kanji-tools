@@ -113,34 +113,96 @@ template<typename T, typename... Ts> inline bool inRange(wchar_t c, const T& t, 
   return inRange(c, args...);
 }
 
-template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
-  if (s.length() > 1 && s.length() < 5) {
+// Return true if the first 'MB character' is in the given blocks, empty string will return false and
+// a string longer than one 'MB characer' will also return false unless 'checkLengthOne' is false.
+template<typename... T> inline bool inWCharRange(const std::string& s, bool checkLengthOne, T... t) {
+  if (s.length() > 1 && (!checkLengthOne || s.length() < 5)) {
     auto w = fromUtf8(s);
-    if (w.length() == 1) return inRange(w[0], t...);
+    if (checkLengthOne ? w.length() == 1 : w.length() >= 1) return inRange(w[0], t...);
   }
   return false;
 }
 
-// functions for classifying 'recognized' utf-8 encoded characters: 's' should contain one MB character (so 2-4 bytes)
+// Return true if all characers are in the given blocks, empty string will also return true
+template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
+  auto w = fromUtf8(s);
+  for (auto i : w)
+    if (!inRange(i, t...)) return false;
+  return true;
+}
+
+// functions for classifying 'recognized' utf-8 encoded characters: 's' should contain one MB
+// character (so 2-4 bytes) by default, but 'checkLengthOne' can be set to 'false' to check
+// just the first 'MB characer' in the string. There are alls 'isAll' functions that return
+// 'true' only if all the characers in the string are the desired type.
 
 // kana
-inline bool isHiragana(const std::string& s) { return inWCharRange(s, HiraganaBlocks); }
-inline bool isKatakana(const std::string& s) { return inWCharRange(s, KatakanaBlocks); }
-inline bool isKana(const std::string& s) { return inWCharRange(s, HiraganaBlocks, KatakanaBlocks); }
-// kanji
-inline bool isCommonKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks); }
-inline bool isRareKanji(const std::string& s) { return inWCharRange(s, RareKanjiBlocks); }
-inline bool isKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks); }
-// 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
-inline bool isMBPunctuation(const std::string& s, bool includeSpace = true) {
-  return s == "　" ? includeSpace : inWCharRange(s, PunctuationBlocks);
+inline bool isHiragana(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, HiraganaBlocks);
 }
-inline bool isMBSymbol(const std::string& s) { return inWCharRange(s, SymbolBlocks); }
-inline bool isMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
+inline bool isAllHiragana(const std::string& s) { return inWCharRange(s, HiraganaBlocks); }
+inline bool isKatakana(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, KatakanaBlocks);
+}
+inline bool isAllKatakana(const std::string& s) { return inWCharRange(s, KatakanaBlocks); }
+inline bool isKana(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, HiraganaBlocks, KatakanaBlocks);
+}
+inline bool isAllKana(const std::string& s) { return inWCharRange(s, HiraganaBlocks, KatakanaBlocks); }
+// kanji
+inline bool isCommonKanji(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, CommonKanjiBlocks);
+}
+inline bool isAllCommonKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks); }
+inline bool isRareKanji(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, RareKanjiBlocks);
+}
+inline bool isAllRareKanji(const std::string& s) { return inWCharRange(s, RareKanjiBlocks); }
+inline bool isKanji(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, CommonKanjiBlocks, RareKanjiBlocks);
+}
+inline bool isAllKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks); }
+// 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
+inline bool isMBPunctuation(const std::string& s, bool includeSpace = true, bool checkLengthOne = true) {
+  return s.starts_with("　") ? (includeSpace && (s.length() < 4 || !checkLengthOne))
+                             : inWCharRange(s, checkLengthOne, PunctuationBlocks);
+}
+inline bool isAllMBPunctuation(const std::string& s) { return inWCharRange(s, PunctuationBlocks); }
+inline bool isMBSymbol(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, SymbolBlocks);
+}
+inline bool isAllMBSymbol(const std::string& s) { return inWCharRange(s, SymbolBlocks); }
+inline bool isMBLetter(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, LetterBlocks);
+}
+inline bool isAllMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
 // 'isRecognizedMB' returns true if 's' is in any UnicodeBlock defined in this header file (including wide space)
-inline bool isRecognizedMB(const std::string& s) {
+inline bool isRecognizedMB(const std::string& s, bool checkLengthOne = true) {
+  return inWCharRange(s, checkLengthOne, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks,
+                      PunctuationBlocks, SymbolBlocks, LetterBlocks);
+}
+inline bool isAllRecognizedMB(const std::string& s) {
   return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks,
                       SymbolBlocks, LetterBlocks);
+}
+// check if a given char or string is not a 'multi-byte char'
+inline bool isSingleByteChar(char x) { return x >= 0; }
+inline bool isSingleByteChar(wchar_t x) { return x >= 0 && x < 128; }
+inline bool isSingleByte(const std::string& s, bool checkLengthOne = true) {
+  return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
+}
+inline bool isSingleByte(const std::wstring& s, bool checkLengthOne = true) {
+  return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
+}
+inline bool isAllSingleByte(const std::string& s) {
+  for (auto& i : s)
+    if (!isSingleByteChar(i)) return false;
+  return true;
+}
+inline bool isAllSingleByte(const std::wstring& s) {
+  for (auto& i : s)
+    if (!isSingleByteChar(i)) return false;
+  return true;
 }
 
 // KanjiRange includes both the 'rare block' and the 'common block' defined above

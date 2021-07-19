@@ -1,4 +1,6 @@
 #include <kanji/KanaConvert.h>
+#include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <array>
 #include <iostream>
@@ -205,7 +207,7 @@ std::ostream& operator<<(std::ostream& os, const Kana& k) {
 
 } // namespace
 
-KanaConvert::Map KanaConvert::populate(KanaConvert::Target t) {
+KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
   Map result;
   int duplicates = 0;
   auto insert = [&result, &duplicates, t](auto& k, auto& v) {
@@ -215,13 +217,25 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::Target t) {
       ++duplicates;
     }
   };
+  static bool firstTime = true;
+  if (firstTime) {
+    for (auto& i : KanaList) {
+      assert(!i.romaji.empty() && i.romaji.length() < 4);           // must be 1 to 3 chars
+      assert(i.hiragana.length() == 3 || i.hiragana.length() == 6); // 3 bytes per character
+      assert(i.katakana.length() == 3 || i.katakana.length() == 6);   // 3 bytes per characer
+      assert(isAllSingleByte(i.romaji));
+      assert(isAllHiragana(i.hiragana));
+      assert(isAllKatakana(i.katakana));
+    }
+    firstTime = false;
+  }
   for (auto& i : KanaList) {
     switch (t) {
-    case Target::Romaji: insert(i.romaji, i); break;
-    case Target::Hiragana:
+    case CharType::Romaji: insert(i.romaji, i); break;
+    case CharType::Hiragana:
       if (!i.variant) insert(i.hiragana, i);
       break;
-    case Target::Katakana:
+    case CharType::Katakana:
       if (!i.variant) insert(i.katakana, i);
       break;
     }
@@ -231,7 +245,11 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::Target t) {
 }
 
 KanaConvert::KanaConvert()
-  : _romajiMap(populate(Target::Romaji)), _hiraganaMap(populate(Target::Hiragana)),
-    _katakanaMap(populate(Target::Katakana)) {}
+  : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
+    _katakanaMap(populate(CharType::Katakana)) {}
+
+std::string KanaConvert::convert(const std::string& input, CharType target) const { return input; }
+
+std::string KanaConvert::convert(const std::string& input, CharType source, CharType target) const { return input; }
 
 } // namespace kanji

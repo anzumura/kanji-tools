@@ -8,13 +8,13 @@ namespace kanji {
 
 class KanaConvert {
 public:
-  enum class Target { Romaji, Hiragana, Katakana };
-  static const std::string& toString(Target t) {
+  enum class CharType { Romaji, Hiragana, Katakana };
+  static const std::string& toString(CharType t) {
     static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
     switch (t) {
-    case Target::Romaji: return romaji;
-    case Target::Hiragana: return hiragana;
-    case Target::Katakana: return katakana;
+    case CharType::Romaji: return romaji;
+    case CharType::Hiragana: return hiragana;
+    case CharType::Katakana: return katakana;
     }
   }
   class Kana {
@@ -28,11 +28,16 @@ public:
   };
   using Map = std::map<std::string, Kana>;
   KanaConvert();
+  // The first overload of 'convert' returns a string based on 'input' with all 'non-target' kana
+  // or romaji characters converted to 'target'. The second version only converts 'source' type
+  // characters to 'target' (the original string is returned if 'source' is the same as 'target').
+  std::string convert(const std::string& input, CharType target) const;
+  std::string convert(const std::string& input, CharType source, CharType target) const;
   const Map& romajiMap() const { return _romajiMap; }
   const Map& hiraganaMap() const { return _hiraganaMap; }
   const Map& katakanaMap() const { return _katakanaMap; }
 private:
-  static Map populate(Target);
+  static Map populate(CharType);
   const Map _romajiMap;
   const Map _hiraganaMap;
   const Map _katakanaMap;

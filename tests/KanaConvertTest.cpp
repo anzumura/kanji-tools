@@ -114,4 +114,11 @@ TEST_F(KanaConvertTest, CheckRomaji) {
   EXPECT_EQ(variantCount, Variants);
 }
 
+using CharType = KanaConvert::CharType;
+
+TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
+  std::string s("atatakai");
+  EXPECT_EQ(_converter.convert(s, CharType::Romaji, CharType::Romaji), "atatakai");
+}
+
 } // namespace kanji
