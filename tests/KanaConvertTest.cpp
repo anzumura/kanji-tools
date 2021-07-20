@@ -23,7 +23,10 @@ protected:
   std::string romajiToKatakana(const std::string& s, bool keepSpaces = true) const {
     return _converter.convert(s, CharType::Romaji, CharType::Katakana, keepSpaces);
   }
-  enum Values { KanaSize = 152, Variants = 20 };
+  std::string hiraganaToRomaji(const std::string& s) const {
+    return _converter.convert(s, CharType::Hiragana, CharType::Romaji);
+  }
+  enum Values { KanaSize = 162, Variants = 32 };
   const KanaConvert _converter;
 };
 
@@ -34,19 +37,19 @@ TEST_F(KanaConvertTest, CheckHiragana) {
     std::string c;
     auto check = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-                                                    << i.second.romaji << "', hiragana " << i.first;
+                                                    << i.second->romaji << "', hiragana " << i.first;
     };
     EXPECT_TRUE(s.next(c));
     EXPECT_TRUE(isHiragana(c)) << c;
     if (s.next(c)) {
       EXPECT_TRUE(isHiragana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second.romaji.length();
+      auto romajiLen = i.second->romaji.length();
       ASSERT_GT(romajiLen, 1);
-      if (i.second.romaji == "qwa") // the only digraph that ends with small 'wa'
+      if (i.second->romaji == "qwa") // the only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "くゎ");
       else
-        switch (i.second.romaji[romajiLen - 1]) {
+        switch (i.second->romaji[romajiLen - 1]) {
         case 'a': check("ぁ", "ゃ"); break;
         case 'i': check("ぃ"); break;
         case 'u': check("ぅ", "ゅ"); break;
@@ -67,19 +70,19 @@ TEST_F(KanaConvertTest, CheckKatakana) {
     std::string c;
     auto check = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-                                                    << i.second.romaji << "', katakana " << i.first;
+                                                    << i.second->romaji << "', katakana " << i.first;
     };
     EXPECT_TRUE(s.next(c));
     EXPECT_TRUE(isKatakana(c)) << c;
     if (s.next(c)) {
       EXPECT_TRUE(isKatakana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second.romaji.length();
+      auto romajiLen = i.second->romaji.length();
       ASSERT_GT(romajiLen, 1);
-      if (i.second.romaji == "qwa") // the only digraph that ends with small 'wa'
+      if (i.second->romaji == "qwa") // the only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "クヮ");
       else
-        switch (i.second.romaji[romajiLen - 1]) {
+        switch (i.second->romaji[romajiLen - 1]) {
         case 'a': check("ァ", "ャ"); break;
         case 'i': check("ィ"); break;
         case 'u': check("ゥ", "ュ"); break;
@@ -100,7 +103,7 @@ TEST_F(KanaConvertTest, CheckRomaji) {
   for (auto& i : _converter.romajiMap()) {
     ASSERT_FALSE(i.first.empty());
     EXPECT_LT(i.first.length(), 4);
-    if (i.second.variant) ++variantCount;
+    if (i.second->variant) ++variantCount;
     if (i.first == "n")
       ++nCount;
     else
@@ -113,11 +116,11 @@ TEST_F(KanaConvertTest, CheckRomaji) {
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 39);
-  EXPECT_EQ(iCount, 32);
-  EXPECT_EQ(uCount, 37);
-  EXPECT_EQ(eCount, 26);
-  EXPECT_EQ(oCount, 37);
+  EXPECT_EQ(aCount, 45);
+  EXPECT_EQ(iCount, 34);
+  EXPECT_EQ(uCount, 43);
+  EXPECT_EQ(eCount, 30);
+  EXPECT_EQ(oCount, 41);
   EXPECT_EQ(nCount, 1);
   EXPECT_EQ(variantCount, Variants);
 }
@@ -150,6 +153,9 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   // case insensitive
   EXPECT_EQ(romajiToHiragana("Dare desu ka? ngya!"), "だれ　です　か？　んぎゃ！");
   EXPECT_EQ(romajiToHiragana("Dare dESu ka? kyaa!!", false), "だれですか？きゃあ！！");
+  // don't convert non-romaji
+  EXPECT_EQ(romajiToHiragana("店じまいdesu."), "店じまいです。");
+  EXPECT_EQ(romajiToHiragana("[サメはkowai!]"), "「サメはこわい！」");
 }
 
 TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
@@ -161,6 +167,20 @@ TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
   EXPECT_EQ(romajiToKatakana("pāthī"), "パーティー");
   EXPECT_EQ(romajiToKatakana("chīzu"), "チーズ");
   EXPECT_EQ(romajiToKatakana("chiizu"), "チイズ");
+  // don't convert non-romaji
+  EXPECT_EQ(romajiToKatakana("店じまいdesu."), "店じまいデス。");
+  EXPECT_EQ(romajiToKatakana("[サメはkowai!]"), "「サメはコワイ！」");
+  // don't convert invalid romaji
+  EXPECT_EQ(romajiToKatakana("(hello world)"), "（ヘlォ　ヲrld）");
+}
+
+TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
+  EXPECT_EQ(hiraganaToRomaji("う"), "u");
+  EXPECT_EQ(hiraganaToRomaji("きょうと"), "kyouto");
+  EXPECT_EQ(hiraganaToRomaji("にいがた"), "niigata");
+  EXPECT_EQ(hiraganaToRomaji("かんけいない"), "kankeinai");
+  EXPECT_EQ(hiraganaToRomaji("かんい"), "kan'i");
+  EXPECT_EQ(hiraganaToRomaji("しんよう"), "shin'you");
 }
 
 } // namespace kanji

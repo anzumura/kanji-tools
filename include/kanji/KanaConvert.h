@@ -2,6 +2,7 @@
 #define KANJI_KANA_CONVERT_H
 
 #include <map>
+#include <set>
 #include <string>
 
 namespace kanji {
@@ -27,10 +28,9 @@ public:
     case CharType::Katakana: return katakana;
     }
   }
-  class Kana {
-  public:
-    Kana(const std::string& r, const std::string& h, const std::string& k, bool v = false)
-      : romaji(r), hiragana(h), katakana(k), variant(v) {}
+  struct Kana {
+    Kana(const std::string& r, const std::string& h, const std::string& k)
+      : romaji(r), hiragana(h), katakana(k), variant(false) {}
     const std::string& get(CharType t) const {
       switch (t) {
       case CharType::Romaji: return romaji;
@@ -38,12 +38,20 @@ public:
       case CharType::Katakana: return katakana;
       }
     }
+    bool contains(const std::string& s) const { return s == romaji || s == hiragana || s == katakana; }
     const std::string romaji;
     const std::string hiragana;
     const std::string katakana;
     const bool variant;
+  protected:
+    Kana(const std::string& r, const std::string& h, const std::string& k, bool v)
+      : romaji(r), hiragana(h), katakana(k), variant(v) {}
   };
-  using Map = std::map<std::string, Kana>;
+  struct VariantKana : Kana {
+    VariantKana(const std::string& r, const std::string& h, const std::string& k) : Kana(r, h, k, true) {}
+  };
+
+  using Map = std::map<std::string, const Kana*>;
   KanaConvert();
 
   // The first overload of 'convert' returns a string based on 'input' with all 'non-target' kana
@@ -65,17 +73,29 @@ public:
   const Map& katakanaMap() const { return _katakanaMap; }
 private:
   static Map populate(CharType);
+  std::string convertFromHiragana(const std::string& input, CharType target) const;
+  std::string convertFromKatakana(const std::string& input, CharType target) const;
   std::string convertFromRomaji(const std::string& input, CharType target) const;
+  std::string hiraganaLetters(const std::string& letterGroup, CharType target) const;
   void convertRomajiLetters(std::string& letterGroup, std::string& result, CharType target) const;
 
   const Map _romajiMap;
   const Map _hiraganaMap;
   const Map _katakanaMap;
-  const Kana _n;
+  const Kana& _smallTsu;
+  const Kana& _n;
   // Either '_apostrophe' or '_dash' should be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used.
   const char _apostrophe = '\'';
   const char _dash = '-';
+  // '_mark' sets contain kana symbols that should be proceedeed with _apostrophe when
+  // producing Romaji output if they follow 'n'.
+  const std::set<std::string> _markHiraganaAfterN;
+  const std::set<std::string> _markKatakanaAfterN;
+  // '_small' sets contain small kana symbols that form the second parts of digraphs
+  const std::set<std::string> _smallHiragana;
+  const std::set<std::string> _smallKatakana;
+  // Punctuation and word delimiter handling
   std::string _narrowDelims;
   std::map<char, std::string> _narrowToWideDelims;
   std::map<std::string, char> _wideToNarrowDelims;
