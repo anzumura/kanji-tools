@@ -176,11 +176,23 @@ TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
 
 TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("う"), "u");
+  EXPECT_EQ(hiraganaToRomaji("かつ　さんど！"), "katsu sando!");
+  EXPECT_EQ(hiraganaToRomaji("うぃき"), "wiki");
+  // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
+  // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
+  EXPECT_EQ(hiraganaToRomaji("ぁぃぅぇぉゃゅょっ"), "lalilulelolyalyulyoltu");
   EXPECT_EQ(hiraganaToRomaji("きょうと"), "kyouto");
   EXPECT_EQ(hiraganaToRomaji("にいがた"), "niigata");
   EXPECT_EQ(hiraganaToRomaji("かんけいない"), "kankeinai");
+  // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
   EXPECT_EQ(hiraganaToRomaji("かんい"), "kan'i");
   EXPECT_EQ(hiraganaToRomaji("しんよう"), "shin'you");
+  // here are the same examples without the apostrophes
+  EXPECT_EQ(hiraganaToRomaji("かに"), "kani");
+  EXPECT_EQ(hiraganaToRomaji("しにょう"), "shinyou");
+  // Sokuon handling
+  EXPECT_EQ(hiraganaToRomaji("きっと"), "kitto");
+  EXPECT_EQ(hiraganaToRomaji("べっぴん"), "beppin");
 }
 
 } // namespace kanji

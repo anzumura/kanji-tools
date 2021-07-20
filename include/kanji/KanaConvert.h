@@ -38,6 +38,8 @@ public:
       case CharType::Katakana: return katakana;
       }
     }
+    // repeat the first letter of romaji for sokuon (促音) output
+    std::string getSokuonRomaji() const { return romaji[0] + romaji; }
     bool contains(const std::string& s) const { return s == romaji || s == hiragana || s == katakana; }
     const std::string romaji;
     const std::string hiragana;
@@ -76,7 +78,7 @@ private:
   std::string convertFromHiragana(const std::string& input, CharType target) const;
   std::string convertFromKatakana(const std::string& input, CharType target) const;
   std::string convertFromRomaji(const std::string& input, CharType target) const;
-  std::string hiraganaLetters(const std::string& letterGroup, CharType target) const;
+  std::string hiraganaLetters(const std::string& letterGroup, int letterCount, CharType target) const;
   void convertRomajiLetters(std::string& letterGroup, std::string& result, CharType target) const;
 
   const Map _romajiMap;
@@ -88,6 +90,8 @@ private:
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used.
   const char _apostrophe = '\'';
   const char _dash = '-';
+  // '_repeatingConsonents' is used for processing of small 'tsu' for sokuon output
+  const std::set<char> _repeatingConsonents;
   // '_mark' sets contain kana symbols that should be proceedeed with _apostrophe when
   // producing Romaji output if they follow 'n'.
   const std::set<std::string> _markHiraganaAfterN;

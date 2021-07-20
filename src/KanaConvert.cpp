@@ -164,7 +164,9 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
 KanaConvert::KanaConvert()
   : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
     _katakanaMap(populate(CharType::Katakana)), _smallTsu(KanaList[KanaList.size() - 2]),
-    _n(KanaList[KanaList.size() - 1]), _markHiraganaAfterN({"あ", "い", "う", "え", "お", "や", "ゆ", "よ"}),
+    _n(KanaList[KanaList.size() - 1]),
+    _repeatingConsonents({'b', 'c', 'd', 'f', 'g', 'j', 'k', 'm', 'p', 'q', 'r', 's', 't', 'w', 'y', 'z'}),
+    _markHiraganaAfterN({"あ", "い", "う", "え", "お", "や", "ゆ", "よ"}),
     _markKatakanaAfterN({"ア", "イ", "ウ", "エ", "オ", "ヤ", "ユ", "オ"}),
     _smallHiragana({"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"}),
     _smallKatakana({"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ"}) {
@@ -212,46 +214,97 @@ std::string KanaConvert::convert(const std::string& input, CharType source, Char
 
 std::string KanaConvert::convertFromHiragana(const std::string& input, CharType target) const {
   std::string result, letterGroup, c;
+  int letterCount = 0;
+  bool hasSmallTsu = false;
   MBChar s(input);
   while (s.next(c, false)) {
     if (isHiragana(c)) {
-      if (_n.contains(c)) {
+      if (_smallTsu.contains(c)) {
+        // getting a small tsu should cause any stored letters to be processed
+        result += hiraganaLetters(letterGroup, letterCount, target);
+        letterCount = 1;
+        hasSmallTsu = true;
+        letterGroup = c;
+      } else if (_n.contains(c)) {
         // getting an 'n' should cause any stored letters to be processed
-        if (_n.contains(letterGroup))
-          result += _n.get(target);
-        else {
-          if (!letterGroup.empty()) result += hiraganaLetters(letterGroup, target);
-          letterGroup = c;
-        }
+        result += hiraganaLetters(letterGroup, letterCount, target);
+        letterCount = 1;
+        hasSmallTsu = false;
+        letterGroup = c;
       } else if (_smallHiragana.contains(c)) {
-        // getting a small letter should cause letters to be processed
+        // getting a small letter should cause letters to be processed including the new small letter
         letterGroup += c;
-        result += hiraganaLetters(letterGroup, target);
+        result += hiraganaLetters(letterGroup, letterCount, target);
         letterGroup.clear();
+        hasSmallTsu = false;
+        letterCount = 0;
+      } else if (hasSmallTsu) {
+        if (letterCount == 1) {
+          letterGroup += c;
+          ++letterCount;
+        } else {
+          // once a group has 2 letters including the first small tsu, then add the next and process
+          letterGroup += c;
+          result += hiraganaLetters(letterGroup, letterCount, target);
+          if (target == CharType::Romaji && _n.contains(letterGroup.substr(3, 3)) && _markHiraganaAfterN.contains(c))
+            result += _apostrophe;
+          letterGroup.clear();
+          letterCount = 0;
+          hasSmallTsu = false;
+        }
       } else {
         // a normal (non-n, non-small) letter can't form the second part of a digraph
         // so process any stored previous letter and hold processing of the new letter
         // in case it forms the first part of a digraph.
-        if (!letterGroup.empty()) {
-          result += hiraganaLetters(letterGroup, target);
+        if (letterCount) {
+          result += hiraganaLetters(letterGroup, letterCount, target);
           if (target == CharType::Romaji && _n.contains(letterGroup) && _markHiraganaAfterN.contains(c))
             result += _apostrophe;
+          letterCount = 1;
+          letterGroup = c;
+        } else {
+          letterGroup += c;
+          ++letterCount;
         }
-        letterGroup = c;
       }
+    } else {
+      result += hiraganaLetters(letterGroup, letterCount, target);
+      letterGroup.clear();
+      letterCount = 0;
+      hasSmallTsu = false;
+      if (target == CharType::Romaji) {
+        auto i = _wideToNarrowDelims.find(c);
+        if (i != _wideToNarrowDelims.end())
+          result += i->second;
+        else
+          result += c;
+      } else
+        result += c;
     }
   }
-  if (!letterGroup.empty()) result += hiraganaLetters(letterGroup, target);
+  result += hiraganaLetters(letterGroup, letterCount, target);
   return result;
 }
 
-std::string KanaConvert::hiraganaLetters(const std::string& letterGroup, CharType target) const {
-  auto i = _hiraganaMap.find(letterGroup);
-  if (i != _hiraganaMap.end()) return i->second->get(target);
-  // if letter group is an unknown combination, split it up and try processing each part
-  if (letterGroup.length() > 1)
-    return hiraganaLetters(letterGroup.substr(0, 1), target) + hiraganaLetters(letterGroup.substr(1), target);
-  return letterGroup; // should never happen
+std::string KanaConvert::hiraganaLetters(const std::string& letterGroup, int letterCount, CharType target) const {
+  if (!letterGroup.empty()) {
+    auto i = _hiraganaMap.find(letterGroup);
+    if (i != _hiraganaMap.end()) return i->second->get(target);
+    // if letter group is an unknown combination, split it up and try processing each part
+    if (letterCount > 1) {
+      const auto firstLetter = letterGroup.substr(0, 3);
+      i = _hiraganaMap.find(letterGroup.substr(3));
+      if (i != _hiraganaMap.end()) {
+        if (target == CharType::Romaji && _smallTsu.contains(firstLetter) &&
+            _repeatingConsonents.contains(i->second->romaji[0]))
+          return i->second->getSokuonRomaji();
+        return hiraganaLetters(firstLetter, 1, target) + i->second->get(target);
+      }
+      // error: couldn't convert second part
+      return hiraganaLetters(firstLetter, 1, target) + letterGroup.substr(3);
+    }
+  }
+  return letterGroup;
 }
 
 std::string KanaConvert::convertFromKatakana(const std::string& input, CharType target) const { return input; }
@@ -320,25 +373,10 @@ void KanaConvert::convertRomajiLetters(std::string& letterGroup, std::string& re
       result += _n.get(target);
     else if (letterGroup[0] == letterGroup[1]) {
       // convert first letter to small tsu if letter repeats and is a valid consonant
-      switch (letterGroup[0]) {
-      case 'b':
-      case 'c':
-      case 'd':
-      case 'f':
-      case 'g':
-      case 'j':
-      case 'k':
-      case 'm':
-      case 'p':
-      case 'q':
-      case 'r':
-      case 's':
-      case 't':
-      case 'w':
-      case 'y':
-      case 'z': result += _smallTsu.get(target); break;
-      default: result += letterGroup[0]; // error: first letter not valid
-      }
+      if (_repeatingConsonents.contains(letterGroup[0]))
+        result += _smallTsu.get(target);
+      else // error: first letter not valid
+        result += letterGroup[0];
     } else // error: no romaji is longer than 3 chars so output the first letter unconverted
       result += letterGroup[0];
     letterGroup = letterGroup.substr(1);
