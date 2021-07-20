@@ -4,6 +4,7 @@
 
 #include <array>
 #include <iostream>
+#include <sstream>
 
 namespace kanji {
 
@@ -61,7 +62,7 @@ const std::array KanaList = {
   Kana{"ki", "き", "キ"},
   Kana{"gi", "ぎ", "ギ"},
   Kana{"shi", "し", "シ"},
-  Kana{"si", "し", "シ", true},
+  Kana{"si", "し", "シ", true}, 
   Kana{"ji", "じ", "ジ"},
   Kana{"zi", "じ", "ジ", true},
   Kana{"chi", "ち", "チ"},
@@ -196,7 +197,7 @@ const std::array KanaList = {
   Kana{"fyo", "ふょ", "フョ"},
   Kana{"myo", "みょ", "ミョ"},
   Kana{"ryo", "りょ", "リョ"},
-  // ん
+  // ん - keep this entry at the end of the list
   Kana{"n", "ん", "ン"}
 };
 // clang-format on
@@ -204,6 +205,13 @@ const std::array KanaList = {
 std::ostream& operator<<(std::ostream& os, const Kana& k) {
   return os << '[' << k.romaji << (k.variant ? "*" : "") << ", " << k.hiragana << ", " << k.katakana << ']';
 }
+
+// Support converting some punctuation from narrow to wide values. These values are also used
+// as delimiters for splitting up input strings when converting from Rõmaji to Kana.
+constexpr std::array Delimiters = {std::make_pair(' ', "　"), std::make_pair('.', "。"), std::make_pair(',', "、"),
+                                   std::make_pair(':', "："), std::make_pair(';', "；"), std::make_pair('/', "／"),
+                                   std::make_pair('!', "！"), std::make_pair('?', "？"), std::make_pair('(', "（"),
+                                   std::make_pair(')', "）"), std::make_pair('[', "「"), std::make_pair(']', "」")};
 
 } // namespace
 
@@ -222,7 +230,7 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
     for (auto& i : KanaList) {
       assert(!i.romaji.empty() && i.romaji.length() < 4);           // must be 1 to 3 chars
       assert(i.hiragana.length() == 3 || i.hiragana.length() == 6); // 3 bytes per character
-      assert(i.katakana.length() == 3 || i.katakana.length() == 6);   // 3 bytes per characer
+      assert(i.katakana.length() == 3 || i.katakana.length() == 6); // 3 bytes per characer
       assert(isAllSingleByte(i.romaji));
       assert(isAllHiragana(i.hiragana));
       assert(isAllKatakana(i.katakana));
@@ -246,10 +254,121 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
 
 KanaConvert::KanaConvert()
   : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
-    _katakanaMap(populate(CharType::Katakana)) {}
+    _katakanaMap(populate(CharType::Katakana)), _n(KanaList[KanaList.size() - 1]) {
+  assert(_n.romaji == "n");
+  for (auto& i : Delimiters) {
+    _narrowDelims += i.first;
+    _narrowToWideDelims[i.first] = i.second;
+    _wideToNarrowDelims[i.second] = i.first;
+  }
+  _narrowDelims += _apostrophe;
+  _narrowDelims += _dash;
+}
 
-std::string KanaConvert::convert(const std::string& input, CharType target) const { return input; }
+std::string KanaConvert::convert(const std::string& input, CharType target, bool keepSpaces) const { return input; }
 
-std::string KanaConvert::convert(const std::string& input, CharType source, CharType target) const { return input; }
+std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, bool keepSpaces) const {
+  if (source == target) return input;
+  std::string result, line;
+  std::istringstream is(input);
+  if (source == CharType::Romaji) {
+    size_t oldPos = 0;
+    do {
+      size_t pos = input.find_first_of(_narrowDelims, oldPos);
+      if (pos != std::string::npos) {
+        result += convertFromRomaji(input.substr(oldPos, pos - oldPos), target);
+        const char delim = input[pos];
+        if (delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
+          result += _narrowToWideDelims.at(delim);
+        oldPos = pos + 1;
+      } else {
+        result += convertFromRomaji(input.substr(oldPos), target);
+        break;
+      }
+    } while (true);
+  }
+  return result;
+}
+
+std::string KanaConvert::convertFromRomaji(const std::string& input, CharType target) const {
+  std::string result, letterGroup, c;
+  auto macron = [this, &letterGroup, &result, target](char x, const auto& s) {
+    letterGroup += x;
+    convertRomajiLetters(letterGroup, result, target);
+    if (letterGroup.empty())
+      result += target == CharType::Hiragana ? s : "ー";
+    else
+      result += x; // should never happen ...
+  };
+  MBChar s(input);
+  while (s.next(c, false)) {
+    if (c == "ā")
+      macron('a', "あ");
+    else if (c == "ī")
+      macron('i', "い");
+    else if (c == "ū")
+      macron('u', "う");
+    else if (c == "ē")
+      macron('e', "え");
+    else if (c == "ō")
+      macron('o', "お");
+    else if (isSingleByte(c)) {
+      char letter = std::tolower(c[0]);
+      if (letter != 'n') {
+        letterGroup += letter;
+        convertRomajiLetters(letterGroup, result, target);
+      } else {
+        if (letterGroup.empty())
+          letterGroup += letter;
+        else if (letterGroup == "n") // got two 'n's in a row so output one, but don't need to clear letterGroup
+          result += _n.get(target);
+        else {
+          // error: partial romaji followed by n - output uncoverted partial group
+          result += letterGroup;
+          letterGroup = c; // 'n' starts a new group
+        }
+      }
+    } else
+      result += c;
+  }
+  if (letterGroup == "n") result += _n.get(target);
+  return result;
+}
+
+void KanaConvert::convertRomajiLetters(std::string& letterGroup, std::string& result, CharType target) const {
+  auto i = _romajiMap.find(letterGroup);
+  if (i != _romajiMap.end()) {
+    result += i->second.get(target);
+    letterGroup.clear();
+  } else if (letterGroup.length() == 3) {
+    if (letterGroup[0] == 'n')
+      result += _n.get(target);
+    else if (letterGroup[0] == letterGroup[1]) {
+      // convert first letter to small tsu if letter repeats and is a valid consonant
+      switch (letterGroup[0]) {
+      case 'b':
+      case 'c':
+      case 'd':
+      case 'f':
+      case 'g':
+      case 'j':
+      case 'k':
+      case 'm':
+      case 'p':
+      case 'q':
+      case 'r':
+      case 's':
+      case 't':
+      case 'w':
+      case 'y':
+      case 'z': result += target == CharType::Hiragana ? "っ" : "ッ"; break;
+      default: result += letterGroup[0]; // error: first letter not valid
+      }
+    } else // error: no romaji is longer than 3 chars so output the first letter unconverted
+      result += letterGroup[0];
+    letterGroup = letterGroup.substr(1);
+    convertRomajiLetters(letterGroup, result, target); // try converting the shortened letterGroup
+  }
+}
 
 } // namespace kanji

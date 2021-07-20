@@ -6,6 +6,8 @@
 
 namespace kanji {
 
+using CharType = KanaConvert::CharType;
+
 class KanaConvertTest : public ::testing::Test {
 protected:
   static const char** argv() {
@@ -14,6 +16,12 @@ protected:
     static const char* arg2 = "../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;
+  }
+  std::string romajiToHiragana(const std::string& s, bool keepSpaces = true) const {
+    return _converter.convert(s, CharType::Romaji, CharType::Hiragana, keepSpaces);
+  }
+  std::string romajiToKatakana(const std::string& s, bool keepSpaces = true) const {
+    return _converter.convert(s, CharType::Romaji, CharType::Katakana, keepSpaces);
   }
   enum Values { KanaSize = 152, Variants = 20 };
   const KanaConvert _converter;
@@ -114,11 +122,45 @@ TEST_F(KanaConvertTest, CheckRomaji) {
   EXPECT_EQ(variantCount, Variants);
 }
 
-using CharType = KanaConvert::CharType;
-
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
-  std::string s("atatakai");
-  EXPECT_EQ(_converter.convert(s, CharType::Romaji, CharType::Romaji), "atatakai");
+  std::string s("atatakaiあたたかいアタタカイ");
+  EXPECT_EQ(_converter.convert(s, CharType::Romaji, CharType::Romaji), s);
+  EXPECT_EQ(_converter.convert(s, CharType::Hiragana, CharType::Hiragana), s);
+  EXPECT_EQ(_converter.convert(s, CharType::Katakana, CharType::Katakana), s);
+}
+
+TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
+  EXPECT_EQ(romajiToHiragana("a"), "あ");
+  EXPECT_EQ(romajiToHiragana("ka"), "か");
+  EXPECT_EQ(romajiToHiragana("kitte"), "きって");
+  EXPECT_EQ(romajiToHiragana("burikko"), "ぶりっこ");
+  EXPECT_EQ(romajiToHiragana("tte"), "って");
+  EXPECT_EQ(romajiToHiragana("ryo"), "りょ");
+  // ō or other macrons map to the same vowel in hiragana which is of course not correct
+  // in many cases; 'ou' can be used instead.
+  EXPECT_EQ(romajiToHiragana("tōkyō"), "とおきょお");
+  EXPECT_EQ(romajiToHiragana("toukyou"), "とうきょう");
+  EXPECT_EQ(romajiToHiragana("no"), "の");
+  EXPECT_EQ(romajiToHiragana("ken"), "けん");
+  EXPECT_EQ(romajiToHiragana("kannon"), "かんのん");
+  EXPECT_EQ(romajiToHiragana("jun'ichi"), "じゅんいち");
+  EXPECT_EQ(romajiToHiragana("kani"), "かに");
+  EXPECT_EQ(romajiToHiragana("kan-i"), "かんい");
+  EXPECT_EQ(romajiToHiragana("ninja samurai"), "にんじゃ　さむらい");
+  // case insensitive
+  EXPECT_EQ(romajiToHiragana("Dare desu ka? ngya!"), "だれ　です　か？　んぎゃ！");
+  EXPECT_EQ(romajiToHiragana("Dare dESu ka? kyaa!!", false), "だれですか？きゃあ！！");
+}
+
+TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
+  EXPECT_EQ(romajiToKatakana("i"), "イ");
+  EXPECT_EQ(romajiToKatakana("ke"), "ケ");
+  EXPECT_EQ(romajiToKatakana("macchi"), "マッチ");
+  // use macrons to get a katakana 'ー'
+  EXPECT_EQ(romajiToKatakana("sērā"), "セーラー");
+  EXPECT_EQ(romajiToKatakana("pāthī"), "パーティー");
+  EXPECT_EQ(romajiToKatakana("chīzu"), "チーズ");
+  EXPECT_EQ(romajiToKatakana("chiizu"), "チイズ");
 }
 
 } // namespace kanji
