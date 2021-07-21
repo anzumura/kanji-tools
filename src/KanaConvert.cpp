@@ -116,7 +116,7 @@ using P = std::pair<char, const char*>;
 // Support converting other non-letter ascii from narrow to wide values. These values are also used as
 // delimiters for splitting up input strings when converting from Rõmaji to Kana. Use a '*' for katakana
 // middle dot '・' to keep round-trip translations as non-lossy as possible. For now, don't include '-'
-// (minus) or apostrophe since these could get mixed up with _prolongedSoundMark 'ー' and special
+// (minus) or apostrophe since these could get mixed up with _prolongMark 'ー' and special
 // separation handling after 'n' in Romaji output. Backslash maps to ￥ as per the usual keyboard input.
 constexpr std::array Delimiters{P(' ', "　"), P('.', "。"), P(',', "、"), P(':', "："), P(';', "；"), P('/', "／"),
                                 P('!', "！"), P('?', "？"), P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"),
@@ -168,7 +168,7 @@ KanaConvert::Map KanaConvert::populate(CharType t) {
 KanaConvert::KanaConvert()
   : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
     _katakanaMap(populate(CharType::Katakana)), _smallTsu(KanaList[KanaList.size() - 2]),
-    _n(KanaList[KanaList.size() - 1]), _prolongedSoundMark("ー") {
+    _n(KanaList[KanaList.size() - 1]), _prolongMark("ー") {
   for (auto& i : KanaList) {
     if (i.romaji[0] != 'n') {
       if (i.romaji.length() == 1 || i.romaji == "ya" || i.romaji == "yu" || i.romaji == "yo") {
@@ -222,14 +222,14 @@ void KanaConvert::verifyData() const {
   assert(_narrowDelims.length() == Delimiters.size() + 2);
 }
 
-std::string KanaConvert::convert(const std::string& input, CharType target, bool keepSpaces) const {
+std::string KanaConvert::convert(const std::string& input, CharType target, int flags) const {
   std::string result;
   for (auto i : CharTypes)
-    if (target != i) result += convert(input, i, target, keepSpaces);
+    if (target != i) result += convert(input, i, target, flags);
   return result;
 }
 
-std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, bool keepSpaces) const {
+std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, int flags) const {
   if (source == target) return input;
   if (source == CharType::Hiragana)
     return convertFromKana(input, target, _hiraganaMap, _markHiraganaAfterN, _smallHiragana);
@@ -239,16 +239,17 @@ std::string KanaConvert::convert(const std::string& input, CharType source, Char
   // each word. This helps deal with words ending in 'n'.
   std::string result;
   size_t oldPos = 0;
+  const bool keepSpaces = !(flags & RemoveSpaces);
   do {
     const size_t pos = input.find_first_of(_narrowDelims, oldPos);
     if (pos != std::string::npos) {
-      result += convertFromRomaji(input.substr(oldPos, pos - oldPos), target);
+      result += convertFromRomaji(input.substr(oldPos, pos - oldPos), target, flags);
       const char delim = input[pos];
       if (delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
         result += _narrowToWideDelims.at(delim);
       oldPos = pos + 1;
     } else {
-      result += convertFromRomaji(input.substr(oldPos), target);
+      result += convertFromRomaji(input.substr(oldPos), target, flags);
       break;
     }
   } while (true);
@@ -270,7 +271,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType targ
   };
   MBChar s(input);
   while (s.next(c, false)) {
-    if (c == _prolongedSoundMark) {
+    if (c == _prolongMark) {
       // this is actually a katakana symbol, but it can also appear in (non-standard) Hiragana.
       result += kanaLetters(sourceMap, letterGroup, count, target, true);
       letterGroup.clear();
@@ -335,14 +336,14 @@ std::string KanaConvert::kanaLetters(const Map& sourceMap, const std::string& le
                                      bool prolonged) const {
   auto macron = [this, target, prolonged](const auto& s) {
     if (prolonged) {
-      if (target != CharType::Romaji) return s + _prolongedSoundMark;
+      if (target != CharType::Romaji) return s + _prolongMark;
       switch (s[s.length() - 1]) {
       case 'a': return s.substr(0, s.length() - 1) + "ā";
       case 'i': return s.substr(0, s.length() - 1) + "ī";
       case 'u': return s.substr(0, s.length() - 1) + "ū";
       case 'e': return s.substr(0, s.length() - 1) + "ē";
       case 'o': return s.substr(0, s.length() - 1) + "ō";
-      default: return s + _prolongedSoundMark; // shouldn't happen - output mark unconverted
+      default: return s + _prolongMark; // shouldn't happen - output mark unconverted
       }
     }
     return s;
@@ -365,17 +366,17 @@ std::string KanaConvert::kanaLetters(const Map& sourceMap, const std::string& le
     }
   } else if (prolonged)
     // got 'prolonged' at the start of a group which isn't valid so just return the symbol unchanged
-    return _prolongedSoundMark;
+    return _prolongMark;
   return letterGroup;
 }
 
-std::string KanaConvert::convertFromRomaji(const std::string& input, CharType target) const {
+std::string KanaConvert::convertFromRomaji(const std::string& input, CharType target, int flags) const {
   std::string result, letterGroup, c;
-  auto macron = [this, &letterGroup, &result, target](char x, const auto& s) {
+  auto macron = [this, &letterGroup, &result, target, flags](char x, const auto& s) {
     letterGroup += x;
     romajiLetters(letterGroup, result, target);
     if (letterGroup.empty())
-      result += target == CharType::Hiragana ? s : _prolongedSoundMark;
+      result += target == CharType::Hiragana && (flags & NoProlongMark) ? s : _prolongMark;
     else
       result += x; // should never happen ...
   };

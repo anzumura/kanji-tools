@@ -32,6 +32,33 @@ inline const std::string& toString(CharType t) {
 // vowel is always used (so おお).
 class KanaConvert {
 public:
+  KanaConvert();
+
+  // 'ConversionFlags' can be used to control some aspects of conversion. For example:
+  // RemoveSpaces: off by default, only applies when converting from Romaji:
+  // - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with a wide space)
+  // - convert("akai kitsune", CharType::Hiragana, RemoveSpaces) returns "あかいきつね"
+  // NoProlongedMark: off by default, only applies to 'hiragana' output
+  // - convert("rāmen", CharType::Hiragana) returns "らーめん"
+  // - convert("rāmen", CharType::Hiragana, NoProlongedMark) returns "らあめん"
+  // Prolonged marks in hiragana are non-standard, but output them by default in order to support
+  // round-trip type conversions, otherwise the above example would map "らあめん" back to "raamen"
+  // which doesn't match the initial value.
+  // Flags can be combined the usual way using '\', for example:
+  // - convert("rāmen desu.", CharType::Hiragana, RemoveSpaces | NoProlongedMark) returns "らあめんです。"
+  enum ConversionFlags { RemoveSpaces = 1, NoProlongMark = 2 };
+
+  // The first overload of 'convert' returns a string based on 'input' with all 'non-target' kana
+  // or romaji characters converted to 'target'. The second version only converts 'source' type
+  // characters to 'target' (the original string is returned if 'source' is the same as 'target').
+  // Note: a number of delimiters are also supported and get converted from narrow to wide and
+  // vice versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji, case
+  // is ignored so both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConversionFlags' for an
+  // explanation of available flags that can be used.
+  std::string convert(const std::string& input, CharType target, int flags = 0) const;
+  std::string convert(const std::string& input, CharType source, CharType target, int flags = 0) const;
+
+  // 'Kana' is a helper class for storing relationships between Romaji, Hiragana and Katakana
   struct Kana {
     Kana(const std::string& r, const std::string& h, const std::string& k)
       : romaji(r), hiragana(h), katakana(k), variant(false) {}
@@ -61,22 +88,6 @@ public:
   };
 
   using Map = std::map<std::string, const Kana*>;
-  KanaConvert();
-
-  // The first overload of 'convert' returns a string based on 'input' with all 'non-target' kana
-  // or romaji characters converted to 'target'. The second version only converts 'source' type
-  // characters to 'target' (the original string is returned if 'source' is the same as 'target').
-  // By default space characters are preserved, but this can be overridden by setting 'keepSpaces'
-  // to 'false'. For example:
-  // - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with a wide space)
-  // - convert("akai kitsune", CharType::Hiragana, false) returns "あかいきつね"
-  // Note: a number of delimiters are also supported and get converted from narrow to wide and
-  // vice versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji, case
-  // is ignored so both 'Dare' and 'dARe' would convert to 'だれ'. 'keepSpaces' only applies when
-  // converting from Romaji.
-  std::string convert(const std::string& input, CharType target, bool keepSpaces = true) const;
-  std::string convert(const std::string& input, CharType source, CharType target, bool keepSpaces = true) const;
-
   const Map& romajiMap() const { return _romajiMap; }
   const Map& hiraganaMap() const { return _hiraganaMap; }
   const Map& katakanaMap() const { return _katakanaMap; }
@@ -87,8 +98,8 @@ private:
   using Set = std::set<std::string>;
   std::string convertFromKana(const std::string& input, CharType target, const Map& sourceMap, const Set& markAfterN,
                               const Set& smallKana) const;
-  std::string convertFromRomaji(const std::string& input, CharType target) const;
   std::string kanaLetters(const Map&, const std::string&, int count, CharType target, bool prolonged = false) const;
+  std::string convertFromRomaji(const std::string& input, CharType target, int flags) const;
   void romajiLetters(std::string& letterGroup, std::string& result, CharType target) const;
 
   const Map _romajiMap;
@@ -96,9 +107,9 @@ private:
   const Map _katakanaMap;
   const Kana& _smallTsu;
   const Kana& _n;
-  // '_prolongSoundMark' (ー) is officially in the Katakana Unicode block, but it can also very rarely
-  // appear in some (non-standard) Hiragana words like らーめん.
-  const std::string _prolongedSoundMark;
+  // '_prolongMark' (ー) is officially in the Katakana Unicode block, but it can also rarely appear
+  // in some (non-standard) Hiragana words like らーめん.
+  const std::string _prolongMark;
   // Either '_apostrophe' or '_dash' should be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used.
   const char _apostrophe = '\'';

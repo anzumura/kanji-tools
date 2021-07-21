@@ -15,11 +15,11 @@ protected:
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
-  std::string romajiToHiragana(const std::string& s, bool keepSpaces = true) const {
-    return _converter.convert(s, CharType::Romaji, CharType::Hiragana, keepSpaces);
+  std::string romajiToHiragana(const std::string& s, int flags = 0) const {
+    return _converter.convert(s, CharType::Romaji, CharType::Hiragana, flags);
   }
-  std::string romajiToKatakana(const std::string& s, bool keepSpaces = true) const {
-    return _converter.convert(s, CharType::Romaji, CharType::Katakana, keepSpaces);
+  std::string romajiToKatakana(const std::string& s, int flags = 0) const {
+    return _converter.convert(s, CharType::Romaji, CharType::Katakana, flags);
   }
   std::string hiraganaToRomaji(const std::string& s) const {
     return _converter.convert(s, CharType::Hiragana, CharType::Romaji);
@@ -34,6 +34,11 @@ protected:
     return _converter.convert(s, CharType::Katakana, CharType::Hiragana);
   }
   void kanaConvertCheck(const std::string& hiragana, const std::string& katakana) const {
+    auto r = hiraganaToRomaji(hiragana);
+    std::cout << " --- " << r << '\n';
+    EXPECT_EQ(katakanaToRomaji(katakana), r);
+    EXPECT_EQ(romajiToHiragana(r), hiragana);
+    EXPECT_EQ(romajiToKatakana(r), katakana);
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
@@ -151,9 +156,14 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("tte"), "って");
   EXPECT_EQ(romajiToHiragana("ryo"), "りょ");
   // ō or other macrons map to the same vowel in hiragana which is of course not correct
-  // in many cases; 'ou' can be used instead.
-  EXPECT_EQ(romajiToHiragana("tōkyō"), "とおきょお");
+  // so in order to preserve round-trip a macron is mapped to a prolonged mark (ー). This
+  // is not standard and can be turned off by a flag (see KanaConvert.h for more details).
+  // 'ou' can be used instead to avoid ambiguity.
+  EXPECT_EQ(romajiToHiragana("tōkyō"), "とーきょー");
   EXPECT_EQ(romajiToHiragana("toukyou"), "とうきょう");
+  // This next case is of course incorrect, but it's the standard mapping for modern Hepburn romanization.
+  EXPECT_EQ(romajiToHiragana("tōkyō", KanaConvert::NoProlongMark), "とおきょお");
+  EXPECT_EQ(romajiToHiragana("rāmen da", KanaConvert::NoProlongMark | KanaConvert::RemoveSpaces), "らあめんだ");
   EXPECT_EQ(romajiToHiragana("no"), "の");
   EXPECT_EQ(romajiToHiragana("ken"), "けん");
   EXPECT_EQ(romajiToHiragana("kannon"), "かんのん");
@@ -163,7 +173,7 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("ninja samurai"), "にんじゃ　さむらい");
   // case insensitive
   EXPECT_EQ(romajiToHiragana("Dare desu ka? ngya!"), "だれ　です　か？　んぎゃ！");
-  EXPECT_EQ(romajiToHiragana("Dare dESu ka? kyaa!!", false), "だれですか？きゃあ！！");
+  EXPECT_EQ(romajiToHiragana("Dare dESu ka? kyaa!!", KanaConvert::RemoveSpaces), "だれですか？きゃあ！！");
   // don't convert non-romaji
   EXPECT_EQ(romajiToHiragana("店じまいdesu."), "店じまいです。");
   EXPECT_EQ(romajiToHiragana("[サメはkowai!]"), "「サメはこわい！」");
@@ -263,7 +273,9 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
     EXPECT_EQ(_converter.convert(r, CharType::Hiragana, CharType::Katakana), i.second->katakana);
   }
   kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
+  // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
+  kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？", "ビッグ　バアド、スマール　ハッマー？");
 }
 
 } // namespace kanji
