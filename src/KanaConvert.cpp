@@ -2,7 +2,6 @@
 #include <kanji/MBChar.h>
 #include <kanji/MBUtils.h>
 
-#include <array>
 #include <iostream>
 #include <sstream>
 
@@ -15,7 +14,7 @@ using V = KanaConvert::VariantKana;
 
 // 'KanaList' has the standard mappings for kana. Non-standard mappings are handled separately
 // such as repeat symbols, small 'tsu' and rare kana like ( ゐ, ゑ, ヰ, and ヱ)
-const std::array KanaList = {
+const std::array KanaList{
   // --- あ 行 ---
   K{"a", "あ", "ア"}, K{"ka", "か", "カ"}, K{"ga", "が", "ガ"}, K{"sa", "さ", "サ"}, K{"za", "ざ", "ザ"},
   K{"ta", "た", "タ"}, K{"da", "だ", "ダ"}, K{"na", "な", "ナ"}, K{"ha", "は", "ハ"}, K{"ba", "ば", "バ"},
@@ -79,7 +78,7 @@ const std::array KanaList = {
 // to kana, but are not used when converting from kana to Romaji. All entries in this list should
 // have new unique Romaji values, but be duplicates of Hiragana and Katakana values in the above
 // standard 'KanaList' (these assumptions are verified by 'asserts' in 'KanaConvert' constructor).
-const std::array KanaVariantList = {
+const std::array KanaVariantList{
   // --- あ 行 ---
   // Small letters
   V{"xa", "ぁ", "ァ"}, V{"xya", "ゃ", "ャ"}, V{"xwa", "ゎ", "ヮ"},
@@ -113,16 +112,21 @@ std::ostream& operator<<(std::ostream& os, const K& k) {
   return os << '[' << k.romaji << (k.variant ? "*" : "") << ", " << k.hiragana << ", " << k.katakana << ']';
 }
 
-// Support converting some punctuation from narrow to wide values. These values are also used
-// as delimiters for splitting up input strings when converting from Rõmaji to Kana.
-constexpr std::array Delimiters = {std::make_pair(' ', "　"), std::make_pair('.', "。"), std::make_pair(',', "、"),
-                                   std::make_pair(':', "："), std::make_pair(';', "；"), std::make_pair('/', "／"),
-                                   std::make_pair('!', "！"), std::make_pair('?', "？"), std::make_pair('(', "（"),
-                                   std::make_pair(')', "）"), std::make_pair('[', "「"), std::make_pair(']', "」")};
+using P = std::pair<char, const char*>;
+// Support converting other non-letter ascii from narrow to wide values. These values are also used as
+// delimiters for splitting up input strings when converting from Rõmaji to Kana. Use a '*' for katakana
+// middle dot '・' to keep round-trip translations as non-lossy as possible. For now, don't include '-'
+// (minus) or apostrophe since these could get mixed up with _prolongedSoundMark 'ー' and special
+// separation handling after 'n' in Romaji output. Backslash maps to ￥ as per the usual keyboard input.
+constexpr std::array Delimiters{P(' ', "　"), P('.', "。"), P(',', "、"), P(':', "："), P(';', "；"), P('/', "／"),
+                                P('!', "！"), P('?', "？"), P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"),
+                                P('*', "・"), P('~', "〜"), P('=', "＝"), P('+', "＋"), P('@', "＠"), P('#', "＃"),
+                                P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"), P('{', "『"), P('}', "』"),
+                                P('|', "｜"), P('"', "”"),  P('`', "｀"), P('<', "＜"), P('>', "＞"), P('\\', "￥")};
 
 } // namespace
 
-KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
+KanaConvert::Map KanaConvert::populate(CharType t) {
   Map result;
   int duplicates = 0;
   auto insert = [&result, &duplicates, t](auto& k, auto& v) {
@@ -164,14 +168,40 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
 KanaConvert::KanaConvert()
   : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
     _katakanaMap(populate(CharType::Katakana)), _smallTsu(KanaList[KanaList.size() - 2]),
-    _n(KanaList[KanaList.size() - 1]), _prolongedSoundMark("ー"),
-    _repeatingConsonents({'b', 'c', 'd', 'f', 'g', 'j', 'k', 'm', 'p', 'q', 'r', 's', 't', 'w', 'y', 'z'}),
-    _markHiraganaAfterN({"あ", "い", "う", "え", "お", "や", "ゆ", "よ"}),
-    _markKatakanaAfterN({"ア", "イ", "ウ", "エ", "オ", "ヤ", "ユ", "ヨ"}),
-    _smallHiragana({"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"}),
-    _smallKatakana({"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ"}) {
+    _n(KanaList[KanaList.size() - 1]), _prolongedSoundMark("ー") {
+  for (auto& i : KanaList) {
+    if (i.romaji[0] != 'n') {
+      if (i.romaji.length() == 1 || i.romaji == "ya" || i.romaji == "yu" || i.romaji == "yo") {
+        assert(_markHiraganaAfterN.insert(i.hiragana).second);
+        assert(_markKatakanaAfterN.insert(i.katakana).second);
+      } else if (i.romaji[0] == 'l') {
+        if (i != _smallTsu) {
+          assert(_smallHiragana.insert(i.hiragana).second);
+          assert(_smallKatakana.insert(i.katakana).second);
+        }
+      } else
+        _repeatingConsonents.insert(i.romaji[0]);
+    }
+  }
+  for (auto& i : Delimiters) {
+    _narrowDelims += i.first;
+    _narrowToWideDelims[i.first] = i.second;
+    _wideToNarrowDelims[i.second] = i.first;
+  }
+  _narrowDelims += _apostrophe;
+  _narrowDelims += _dash;
+  verifyData();
+}
+
+void KanaConvert::verifyData() const {
   assert(_n.romaji == "n");
+  assert(_smallTsu.romaji == "ltu");
+  assert(_repeatingConsonents.size() == 18); // 26 - 8 where '8' is 5 vowels + 3 consonents (l, n and x)
+  for (auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
+    assert(_repeatingConsonents.contains(i) == false);
+  assert(_markHiraganaAfterN.size() == 8); // 5 vowels plus 3 y's
   assert(_markHiraganaAfterN.size() == _markKatakanaAfterN.size());
+  assert(_smallHiragana.size() == 9); // 5 small vowels plus 3 small y's plus small 'wa'
   assert(_smallHiragana.size() == _smallKatakana.size());
   for (auto& i : _markHiraganaAfterN)
     assert(isHiragana(i));
@@ -187,16 +217,17 @@ KanaConvert::KanaConvert()
       assert(_hiraganaMap.find(i.second->hiragana) != _hiraganaMap.end());
       assert(_katakanaMap.find(i.second->katakana) != _katakanaMap.end());
     }
-  for (auto& i : Delimiters) {
-    _narrowDelims += i.first;
-    _narrowToWideDelims[i.first] = i.second;
-    _wideToNarrowDelims[i.second] = i.first;
-  }
-  _narrowDelims += _apostrophe;
-  _narrowDelims += _dash;
+  assert(_wideToNarrowDelims.size() == Delimiters.size());
+  assert(_narrowToWideDelims.size() == Delimiters.size());
+  assert(_narrowDelims.length() == Delimiters.size() + 2);
 }
 
-std::string KanaConvert::convert(const std::string& input, CharType target, bool keepSpaces) const { return input; }
+std::string KanaConvert::convert(const std::string& input, CharType target, bool keepSpaces) const {
+  std::string result;
+  for (auto i : CharTypes)
+    if (target != i) result += convert(input, i, target, keepSpaces);
+  return result;
+}
 
 std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, bool keepSpaces) const {
   if (source == target) return input;

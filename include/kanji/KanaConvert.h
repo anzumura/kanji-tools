@@ -1,11 +1,24 @@
 #ifndef KANJI_KANA_CONVERT_H
 #define KANJI_KANA_CONVERT_H
 
+#include <array>
 #include <map>
 #include <set>
 #include <string>
 
 namespace kanji {
+
+// 'CharType' is used to specify 'source' and 'target' types for 'KanaConvert::convert' methods
+enum class CharType { Hiragana, Katakana, Romaji };
+constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
+inline const std::string& toString(CharType t) {
+  static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
+  switch (t) {
+  case CharType::Hiragana: return hiragana;
+  case CharType::Katakana: return katakana;
+  case CharType::Romaji: return romaji;
+  }
+}
 
 // 'KanaConvert' supports converting between Rōmaji (ローマジ), Hiragana (平仮名) and Katakana
 // (片仮名). When Rōmaji is the output target, Revised Hepburn System (ヘボン式) is used, but
@@ -19,15 +32,6 @@ namespace kanji {
 // vowel is always used (so おお).
 class KanaConvert {
 public:
-  enum class CharType { Romaji, Hiragana, Katakana };
-  static const std::string& toString(CharType t) {
-    static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
-    switch (t) {
-    case CharType::Romaji: return romaji;
-    case CharType::Hiragana: return hiragana;
-    case CharType::Katakana: return katakana;
-    }
-  }
   struct Kana {
     Kana(const std::string& r, const std::string& h, const std::string& k)
       : romaji(r), hiragana(h), katakana(k), variant(false) {}
@@ -41,6 +45,9 @@ public:
     // repeat the first letter of romaji for sokuon (促音) output
     std::string getSokuonRomaji() const { return romaji[0] + romaji; }
     bool contains(const std::string& s) const { return s == romaji || s == hiragana || s == katakana; }
+    bool operator==(const Kana& rhs) const {
+      return romaji == rhs.romaji && hiragana == rhs.hiragana && katakana == rhs.katakana && variant == rhs.variant;
+    }
     const std::string romaji;
     const std::string hiragana;
     const std::string katakana;
@@ -75,6 +82,8 @@ public:
   const Map& katakanaMap() const { return _katakanaMap; }
 private:
   static Map populate(CharType);
+  // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
+  void verifyData() const;
   using Set = std::set<std::string>;
   std::string convertFromKana(const std::string& input, CharType target, const Map& sourceMap, const Set& markAfterN,
                               const Set& smallKana) const;
@@ -87,7 +96,7 @@ private:
   const Map _katakanaMap;
   const Kana& _smallTsu;
   const Kana& _n;
-  // '_prolongSoundMark' ー is officially in the Katakana Unicode block, but it can also very rarely
+  // '_prolongSoundMark' (ー) is officially in the Katakana Unicode block, but it can also very rarely
   // appear in some (non-standard) Hiragana words like らーめん.
   const std::string _prolongedSoundMark;
   // Either '_apostrophe' or '_dash' should be used to separate 'n' in the middle of Romaji words
@@ -95,14 +104,14 @@ private:
   const char _apostrophe = '\'';
   const char _dash = '-';
   // '_repeatingConsonents' is used for processing of small 'tsu' for sokuon output
-  const std::set<char> _repeatingConsonents;
+  std::set<char> _repeatingConsonents;
   // '_mark' sets contain kana symbols that should be proceedeed with _apostrophe when
   // producing Romaji output if they follow 'n'.
-  const Set _markHiraganaAfterN;
-  const Set _markKatakanaAfterN;
+  Set _markHiraganaAfterN;
+  Set _markKatakanaAfterN;
   // '_small' sets contain small kana symbols that form the second parts of digraphs
-  const Set _smallHiragana;
-  const Set _smallKatakana;
+  Set _smallHiragana;
+  Set _smallKatakana;
   // Punctuation and word delimiter handling
   std::string _narrowDelims;
   std::map<char, std::string> _narrowToWideDelims;

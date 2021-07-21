@@ -6,8 +6,6 @@
 
 namespace kanji {
 
-using CharType = KanaConvert::CharType;
-
 class KanaConvertTest : public ::testing::Test {
 protected:
   static const char** argv() {
@@ -26,8 +24,18 @@ protected:
   std::string hiraganaToRomaji(const std::string& s) const {
     return _converter.convert(s, CharType::Hiragana, CharType::Romaji);
   }
+  std::string hiraganaToKatakana(const std::string& s) const {
+    return _converter.convert(s, CharType::Hiragana, CharType::Katakana);
+  }
   std::string katakanaToRomaji(const std::string& s) const {
     return _converter.convert(s, CharType::Katakana, CharType::Romaji);
+  }
+  std::string katakanaToHiragana(const std::string& s) const {
+    return _converter.convert(s, CharType::Katakana, CharType::Hiragana);
+  }
+  void kanaConvertCheck(const std::string& hiragana, const std::string& katakana) const {
+    EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
+    EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
   enum Values { KanaSize = 162, Variants = 32 };
   const KanaConvert _converter;
@@ -241,6 +249,21 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   // ー not following a vowel is left unchanged
   EXPECT_EQ(katakanaToRomaji("ーカ"), "ーka");
   EXPECT_EQ(katakanaToRomaji("ホンート"), "honーto");
+}
+
+TEST_F(KanaConvertTest, ConvertBetweenKana) {
+  for (auto& i : _converter.hiraganaMap()) {
+    auto r = _converter.convert(i.first, CharType::Hiragana, CharType::Katakana);
+    EXPECT_EQ(r, i.second->katakana);
+    EXPECT_EQ(_converter.convert(r, CharType::Katakana, CharType::Hiragana), i.second->hiragana);
+  }
+  for (auto& i : _converter.katakanaMap()) {
+    auto r = _converter.convert(i.first, CharType::Katakana, CharType::Hiragana);
+    EXPECT_EQ(r, i.second->hiragana);
+    EXPECT_EQ(_converter.convert(r, CharType::Hiragana, CharType::Katakana), i.second->katakana);
+  }
+  kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
+  kanaConvertCheck("らーめん！", "ラーメン！");
 }
 
 } // namespace kanji
