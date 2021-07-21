@@ -21,28 +21,27 @@ protected:
   std::string romajiToKatakana(const std::string& s, int flags = 0) const {
     return _converter.convert(s, CharType::Romaji, CharType::Katakana, flags);
   }
-  std::string hiraganaToRomaji(const std::string& s) const {
-    return _converter.convert(s, CharType::Hiragana, CharType::Romaji);
+  std::string hiraganaToRomaji(const std::string& s, int flags = 0) const {
+    return _converter.convert(s, CharType::Hiragana, CharType::Romaji, flags);
   }
   std::string hiraganaToKatakana(const std::string& s) const {
     return _converter.convert(s, CharType::Hiragana, CharType::Katakana);
   }
-  std::string katakanaToRomaji(const std::string& s) const {
-    return _converter.convert(s, CharType::Katakana, CharType::Romaji);
+  std::string katakanaToRomaji(const std::string& s, int flags = 0) const {
+    return _converter.convert(s, CharType::Katakana, CharType::Romaji, flags);
   }
   std::string katakanaToHiragana(const std::string& s) const {
     return _converter.convert(s, CharType::Katakana, CharType::Hiragana);
   }
   void kanaConvertCheck(const std::string& hiragana, const std::string& katakana) const {
     auto r = hiraganaToRomaji(hiragana);
-    std::cout << " --- " << r << '\n';
     EXPECT_EQ(katakanaToRomaji(katakana), r);
     EXPECT_EQ(romajiToHiragana(r), hiragana);
     EXPECT_EQ(romajiToKatakana(r), katakana);
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
-  enum Values { KanaSize = 162, Variants = 32 };
+  enum Values { KanaSize = 176, Variants = 32 };
   const KanaConvert _converter;
 };
 
@@ -132,11 +131,11 @@ TEST_F(KanaConvertTest, CheckRomaji) {
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 45);
-  EXPECT_EQ(iCount, 34);
-  EXPECT_EQ(uCount, 43);
-  EXPECT_EQ(eCount, 30);
-  EXPECT_EQ(oCount, 41);
+  EXPECT_EQ(aCount, 47);
+  EXPECT_EQ(iCount, 36);
+  EXPECT_EQ(uCount, 44);
+  EXPECT_EQ(eCount, 37);
+  EXPECT_EQ(oCount, 43);
   EXPECT_EQ(nCount, 1);
   EXPECT_EQ(variantCount, Variants);
 }
@@ -182,6 +181,8 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
 TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
   EXPECT_EQ(romajiToKatakana("i"), "イ");
   EXPECT_EQ(romajiToKatakana("ke"), "ケ");
+  // both the standard way (t+chi) as well as the wāpuro way (c+chi) are supported
+  EXPECT_EQ(romajiToKatakana("matchi"), "マッチ");
   EXPECT_EQ(romajiToKatakana("macchi"), "マッチ");
   // use macrons to get a katakana 'ー'
   EXPECT_EQ(romajiToKatakana("sērā"), "セーラー");
@@ -226,6 +227,15 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   // ー not following a vowel is left unchanged
   EXPECT_EQ(hiraganaToRomaji("ーぶ"), "ーbu");
   EXPECT_EQ(hiraganaToRomaji("はんーぶ"), "hanーbu");
+  // Hepburn examples
+  EXPECT_EQ(hiraganaToRomaji("つづき"), "tsuduki");
+  EXPECT_EQ(hiraganaToRomaji("つづき", KanaConvert::Hepburn), "tsuzuki");
+  EXPECT_EQ(hiraganaToRomaji("ぢゃ"), "dya");
+  EXPECT_EQ(hiraganaToRomaji("ぢゃ", KanaConvert::Hepburn), "ja");
+  EXPECT_EQ(hiraganaToRomaji("ぢゅ"), "dyu");
+  EXPECT_EQ(hiraganaToRomaji("ぢゅ", KanaConvert::Hepburn), "ju");
+  EXPECT_EQ(hiraganaToRomaji("ぢょ"), "dyo");
+  EXPECT_EQ(hiraganaToRomaji("ぢょ", KanaConvert::Hepburn), "jo");
 }
 
 TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
@@ -245,7 +255,7 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("ポニョ"), "ponyo"); // BTW, this is the correct name of the movie
   // Sokuon handling
   EXPECT_EQ(katakanaToRomaji("アッパ"), "appa");
-  EXPECT_EQ(katakanaToRomaji("マッチ"), "macchi");
+  EXPECT_EQ(katakanaToRomaji("マッチ"), "matchi");
   EXPECT_EQ(katakanaToRomaji("ジョッキ"), "jokki");
   // not sure what to do with a final or repeated small tsu ... for now it falls back to 'wāpuro',
   // i.e., exactly what you would need to type on a keyboard to reproduce the Hiragana.
@@ -259,6 +269,15 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   // ー not following a vowel is left unchanged
   EXPECT_EQ(katakanaToRomaji("ーカ"), "ーka");
   EXPECT_EQ(katakanaToRomaji("ホンート"), "honーto");
+  // Hepburn examples
+  EXPECT_EQ(katakanaToRomaji("ツヅキ"), "tsuduki");
+  EXPECT_EQ(katakanaToRomaji("ツヅキ", KanaConvert::Hepburn), "tsuzuki");
+  EXPECT_EQ(katakanaToRomaji("ヂャ"), "dya");
+  EXPECT_EQ(katakanaToRomaji("ヂャ", KanaConvert::Hepburn), "ja");
+  EXPECT_EQ(katakanaToRomaji("ヂュ"), "dyu");
+  EXPECT_EQ(katakanaToRomaji("ヂュ", KanaConvert::Hepburn), "ju");
+  EXPECT_EQ(katakanaToRomaji("ヂョ"), "dyo");
+  EXPECT_EQ(katakanaToRomaji("ヂョ", KanaConvert::Hepburn), "jo");
 }
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
