@@ -1,3 +1,6 @@
+add_executable(kanaConvert convertMain.cpp)
+target_link_libraries(kanaConvert PRIVATE kanji_lib)
+
 add_executable(kanjiFormat formatMain.cpp)
 target_link_libraries(kanjiFormat PRIVATE kanji_lib)
 

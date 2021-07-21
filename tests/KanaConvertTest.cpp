@@ -200,6 +200,7 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("う"), "u");
   EXPECT_EQ(hiraganaToRomaji("かつ　さんど！"), "katsu sando!");
   EXPECT_EQ(hiraganaToRomaji("うぃき"), "wiki");
+  EXPECT_EQ(hiraganaToRomaji("おんな"), "onna");
   // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
   // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
   EXPECT_EQ(hiraganaToRomaji("ぁぃぅぇぉゃゅょっ"), "lalilulelolyalyulyoltu");
@@ -228,6 +229,8 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("ーぶ"), "ーbu");
   EXPECT_EQ(hiraganaToRomaji("はんーぶ"), "hanーbu");
   // Hepburn examples
+  EXPECT_EQ(hiraganaToRomaji("ちぢむ"), "chidimu");
+  EXPECT_EQ(hiraganaToRomaji("ちぢむ", KanaConvert::Hepburn), "chijimu");
   EXPECT_EQ(hiraganaToRomaji("つづき"), "tsuduki");
   EXPECT_EQ(hiraganaToRomaji("つづき", KanaConvert::Hepburn), "tsuzuki");
   EXPECT_EQ(hiraganaToRomaji("ぢゃ"), "dya");
@@ -236,6 +239,8 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("ぢゅ", KanaConvert::Hepburn), "ju");
   EXPECT_EQ(hiraganaToRomaji("ぢょ"), "dyo");
   EXPECT_EQ(hiraganaToRomaji("ぢょ", KanaConvert::Hepburn), "jo");
+  EXPECT_EQ(hiraganaToRomaji("を"), "wo");
+  EXPECT_EQ(hiraganaToRomaji("を", KanaConvert::Hepburn), "o");
 }
 
 TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
@@ -270,6 +275,8 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("ーカ"), "ーka");
   EXPECT_EQ(katakanaToRomaji("ホンート"), "honーto");
   // Hepburn examples
+  EXPECT_EQ(katakanaToRomaji("チヂム"), "chidimu");
+  EXPECT_EQ(katakanaToRomaji("チヂム", KanaConvert::Hepburn), "chijimu");
   EXPECT_EQ(katakanaToRomaji("ツヅキ"), "tsuduki");
   EXPECT_EQ(katakanaToRomaji("ツヅキ", KanaConvert::Hepburn), "tsuzuki");
   EXPECT_EQ(katakanaToRomaji("ヂャ"), "dya");
@@ -278,6 +285,8 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("ヂュ", KanaConvert::Hepburn), "ju");
   EXPECT_EQ(katakanaToRomaji("ヂョ"), "dyo");
   EXPECT_EQ(katakanaToRomaji("ヂョ", KanaConvert::Hepburn), "jo");
+  EXPECT_EQ(katakanaToRomaji("ヲ"), "wo");
+  EXPECT_EQ(katakanaToRomaji("ヲ", KanaConvert::Hepburn), "o");
 }
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
@@ -295,6 +304,15 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
   kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？", "ビッグ　バアド、スマール　ハッマー？");
+}
+
+TEST_F(KanaConvertTest, ConvertAllToOneType) {
+  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Romaji), "ima kurisumasu desu.");
+  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Hiragana), "いま　くりすます　です。");
+  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Katakana), "イマ　クリスマス　デス。");
+  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Romaji), "rāmenrāmenrāmen!!");
+  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Hiragana), "らーめんらーめんらーめん！！");
+  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Katakana), "ラーメンラーメンラーメン！！");
 }
 
 } // namespace kanji

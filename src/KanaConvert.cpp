@@ -30,7 +30,7 @@ const std::array KanaList{
   K{"rya", "りゃ", "リャ"},
   // --- い 行 ---
   K{"i", "い", "イ"}, K{"ki", "き", "キ"}, K{"gi", "ぎ", "ギ"}, K{"shi", "し", "シ"}, K{"ji", "じ", "ジ"},
-  K{"chi", "ち", "チ"}, K{"di", "ぢ", "ヂ"}, K{"ni", "に", "ニ"}, K{"hi", "ひ", "ヒ"}, K{"bi", "び", "ビ"},
+  K{"chi", "ち", "チ"}, K{"di", "ぢ", "ヂ", "ji"}, K{"ni", "に", "ニ"}, K{"hi", "ひ", "ヒ"}, K{"bi", "び", "ビ"},
   K{"pi", "ぴ", "ピ"}, K{"mi", "み", "ミ"}, K{"ri", "り", "リ"},
   // Small letters - prefer 'l' versions for Romaji output
   K{"li", "ぃ", "ィ"},
@@ -67,7 +67,7 @@ const std::array KanaList{
   // --- お 行 ---
   K{"o", "お", "オ"}, K{"ko", "こ", "コ"}, K{"go", "ご", "ゴ"}, K{"so", "そ", "ソ"}, K{"zo", "ぞ", "ゾ"},
   K{"to", "と", "ト"}, K{"do", "ど", "ド"}, K{"no", "の", "ノ"}, K{"ho", "ほ", "ホ"}, K{"bo", "ぼ", "ボ"},
-  K{"po", "ぽ", "ポ"}, K{"mo", "も", "モ"}, K{"yo", "よ", "ヨ"}, K{"ro", "ろ", "ロ"}, K{"wo", "を", "ヲ"},
+  K{"po", "ぽ", "ポ"}, K{"mo", "も", "モ"}, K{"yo", "よ", "ヨ"}, K{"ro", "ろ", "ロ"}, K{"wo", "を", "ヲ", "o"},
   // Small letters - prefer 'l' versions for Romaji output
   K{"lo", "ぉ", "ォ"}, K{"lyo", "ょ", "ョ"},
   // Digraphs
@@ -228,9 +228,9 @@ void KanaConvert::verifyData() const {
 }
 
 std::string KanaConvert::convert(const std::string& input, CharType target, int flags) const {
-  std::string result;
+  std::string result(input);
   for (auto i : CharTypes)
-    if (target != i) result += convert(input, i, target, flags);
+    if (target != i) result = convert(result, i, target, flags);
   return result;
 }
 
@@ -413,8 +413,10 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
           letterGroup = c; // 'n' starts a new group
         }
       }
-    } else
+    } else {
+      romajiLetters(letterGroup, result, target, flags);
       result += c;
+    }
   }
   while (!letterGroup.empty()) {
     if (letterGroup == "n") {

@@ -51,14 +51,18 @@ public:
   // - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
   //
   // Notes:
+  //
   // Prolonged sound marks in hiragana are non-standard, but output them by default in order to
   // support round-trip type conversions, otherwise the above example would map "らあめん" back
   // to "raamen" which doesn't match the initial value.
   // Flags can be combined the usual way using '\', for example:
   // - convert("rāmen desu.", CharType::Hiragana, RemoveSpaces | NoProlongMark) -> "らあめんです。"
-  // Enabling 'Hepburn' leads to more standard romaji, but the output is ambiguous and would
-  // result in different kana if converted back again. This affects dya (ぢゃ), dyo (ぢょ), dyu (ぢゅ)
-  // and du (づ)
+  //
+  // Enabling 'Hepburn' leads to more standard romaji, but the output is ambiguous and leads to
+  // different kana if converted back. This affects di (ぢ), dya (ぢゃ), dyo (ぢょ), dyu (ぢゅ),
+  // du (づ) and wo (を) - these become ji, ja, ju, jo, zu and o instead. There's also no support
+  // for trying to handle は and へ (which in standard Hepburn should map to 'wa' and 'e' if they
+  // are used as particles) - instead they simply map to 'ha' and 'he' all the time.
   enum ConversionFlags { RemoveSpaces = 1, NoProlongMark = 2, Hepburn = 4 };
 
   // The first overload of 'convert' returns a string based on 'input' with all 'non-target'
