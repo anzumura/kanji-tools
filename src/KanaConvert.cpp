@@ -164,13 +164,23 @@ KanaConvert::Map KanaConvert::populate(KanaConvert::CharType t) {
 KanaConvert::KanaConvert()
   : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
     _katakanaMap(populate(CharType::Katakana)), _smallTsu(KanaList[KanaList.size() - 2]),
-    _n(KanaList[KanaList.size() - 1]),
+    _n(KanaList[KanaList.size() - 1]), _prolongedSoundMark("ー"),
     _repeatingConsonents({'b', 'c', 'd', 'f', 'g', 'j', 'k', 'm', 'p', 'q', 'r', 's', 't', 'w', 'y', 'z'}),
     _markHiraganaAfterN({"あ", "い", "う", "え", "お", "や", "ゆ", "よ"}),
-    _markKatakanaAfterN({"ア", "イ", "ウ", "エ", "オ", "ヤ", "ユ", "オ"}),
+    _markKatakanaAfterN({"ア", "イ", "ウ", "エ", "オ", "ヤ", "ユ", "ヨ"}),
     _smallHiragana({"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "ゎ"}),
     _smallKatakana({"ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ヮ"}) {
   assert(_n.romaji == "n");
+  assert(_markHiraganaAfterN.size() == _markKatakanaAfterN.size());
+  assert(_smallHiragana.size() == _smallKatakana.size());
+  for (auto& i : _markHiraganaAfterN)
+    assert(isHiragana(i));
+  for (auto& i : _markKatakanaAfterN)
+    assert(isKatakana(i));
+  for (auto& i : _smallHiragana)
+    assert(isHiragana(i));
+  for (auto& i : _smallKatakana)
+    assert(isKatakana(i));
   // make sure variants also have a 'non-variant' entry in _hiraganaMap and _katakanaMap;
   for (auto& i : _romajiMap)
     if (i.second->variant) {
@@ -190,8 +200,10 @@ std::string KanaConvert::convert(const std::string& input, CharType target, bool
 
 std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, bool keepSpaces) const {
   if (source == target) return input;
-  if (source == CharType::Hiragana) return convertFromHiragana(input, target);
-  if (source == CharType::Katakana) return convertFromKatakana(input, target);
+  if (source == CharType::Hiragana)
+    return convertFromKana(input, target, _hiraganaMap, _markHiraganaAfterN, _smallHiragana);
+  if (source == CharType::Katakana)
+    return convertFromKana(input, target, _katakanaMap, _markKatakanaAfterN, _smallKatakana);
   // When source is Romaji break input up into words separated by any of _narrowDelims and process
   // each word. This helps deal with words ending in 'n'.
   std::string result;
@@ -212,66 +224,68 @@ std::string KanaConvert::convert(const std::string& input, CharType source, Char
   return result;
 }
 
-std::string KanaConvert::convertFromHiragana(const std::string& input, CharType target) const {
+std::string KanaConvert::convertFromKana(const std::string& input, CharType target, const Map& sourceMap,
+                                         const Set& markAfterN, const Set& smallKana) const {
   std::string result, letterGroup, c;
-  int letterCount = 0;
-  bool hasSmallTsu = false;
+  int count = 0;
+  bool hasSmallTsu = false, groupDone = false;
+  auto done = [this, target, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &c, &sourceMap, &markAfterN] {
+    result += kanaLetters(sourceMap, letterGroup, count, target);
+    if (target == CharType::Romaji && _n.contains(letterGroup) && markAfterN.contains(c)) result += _apostrophe;
+    count = 1;
+    hasSmallTsu = false;
+    groupDone = false;
+    letterGroup = c;
+  };
   MBChar s(input);
   while (s.next(c, false)) {
-    if (isHiragana(c)) {
+    if (c == _prolongedSoundMark) {
+      // this is actually a katakana symbol, but it can also appear in (non-standard) Hiragana.
+      result += kanaLetters(sourceMap, letterGroup, count, target, true);
+      letterGroup.clear();
+      count = 0;
+      hasSmallTsu = false;
+      groupDone = false;
+    } else if (sourceMap.contains(c)) {
       if (_smallTsu.contains(c)) {
         // getting a small tsu should cause any stored letters to be processed
-        result += hiraganaLetters(letterGroup, letterCount, target);
-        letterCount = 1;
+        result += kanaLetters(sourceMap, letterGroup, count, target);
+        count = 1;
         hasSmallTsu = true;
         letterGroup = c;
+        groupDone = false;
       } else if (_n.contains(c)) {
         // getting an 'n' should cause any stored letters to be processed
-        result += hiraganaLetters(letterGroup, letterCount, target);
-        letterCount = 1;
+        result += kanaLetters(sourceMap, letterGroup, count, target);
+        // start a new group that just contains 'n' and is marked as done
+        count = 1;
         hasSmallTsu = false;
         letterGroup = c;
-      } else if (_smallHiragana.contains(c)) {
-        // getting a small letter should cause letters to be processed including the new small letter
+        groupDone = true;
+      } else if (groupDone)
+        done();
+      else if (smallKana.contains(c)) {
+        // a small letter should cause letters to be processed including the small letter
+        // so mark group as done, but continue the loop in case there's a 'prolong' mark.
         letterGroup += c;
-        result += hiraganaLetters(letterGroup, letterCount, target);
-        letterGroup.clear();
-        hasSmallTsu = false;
-        letterCount = 0;
-      } else if (hasSmallTsu) {
-        if (letterCount == 1) {
-          letterGroup += c;
-          ++letterCount;
-        } else {
-          // once a group has 2 letters including the first small tsu, then add the next and process
-          letterGroup += c;
-          result += hiraganaLetters(letterGroup, letterCount, target);
-          if (target == CharType::Romaji && _n.contains(letterGroup.substr(3, 3)) && _markHiraganaAfterN.contains(c))
-            result += _apostrophe;
-          letterGroup.clear();
-          letterCount = 0;
-          hasSmallTsu = false;
-        }
-      } else {
-        // a normal (non-n, non-small) letter can't form the second part of a digraph
-        // so process any stored previous letter and hold processing of the new letter
-        // in case it forms the first part of a digraph.
-        if (letterCount) {
-          result += hiraganaLetters(letterGroup, letterCount, target);
-          if (target == CharType::Romaji && _n.contains(letterGroup) && _markHiraganaAfterN.contains(c))
-            result += _apostrophe;
-          letterCount = 1;
-          letterGroup = c;
-        } else {
-          letterGroup += c;
-          ++letterCount;
-        }
+        ++count;
+        groupDone = true;
+      } else if (count > (hasSmallTsu ? 1 : 0))
+        // a normal (non-n, non-small) letter can't form the second part of a digraph so
+        // process any stored previous letter and hold processing of the new letter in
+        // case it forms the first part of a new digraph.
+        done();
+      else {
+        letterGroup += c;
+        ++count;
       }
     } else {
-      result += hiraganaLetters(letterGroup, letterCount, target);
+      // got non-hiragana letter so flus any letters and preserve the letter unconverted
+      result += kanaLetters(sourceMap, letterGroup, count, target);
       letterGroup.clear();
-      letterCount = 0;
+      count = 0;
       hasSmallTsu = false;
+      groupDone = false;
       if (target == CharType::Romaji) {
         auto i = _wideToNarrowDelims.find(c);
         if (i != _wideToNarrowDelims.end())
@@ -282,40 +296,55 @@ std::string KanaConvert::convertFromHiragana(const std::string& input, CharType 
         result += c;
     }
   }
-  result += hiraganaLetters(letterGroup, letterCount, target);
+  result += kanaLetters(sourceMap, letterGroup, count, target);
   return result;
 }
 
-std::string KanaConvert::hiraganaLetters(const std::string& letterGroup, int letterCount, CharType target) const {
+std::string KanaConvert::kanaLetters(const Map& sourceMap, const std::string& letterGroup, int count, CharType target,
+                                     bool prolonged) const {
+  auto macron = [this, target, prolonged](const auto& s) {
+    if (prolonged) {
+      if (target != CharType::Romaji) return s + _prolongedSoundMark;
+      switch (s[s.length() - 1]) {
+      case 'a': return s.substr(0, s.length() - 1) + "ā";
+      case 'i': return s.substr(0, s.length() - 1) + "ī";
+      case 'u': return s.substr(0, s.length() - 1) + "ū";
+      case 'e': return s.substr(0, s.length() - 1) + "ē";
+      case 'o': return s.substr(0, s.length() - 1) + "ō";
+      default: return s + _prolongedSoundMark; // shouldn't happen - output mark unconverted
+      }
+    }
+    return s;
+  };
   if (!letterGroup.empty()) {
-    auto i = _hiraganaMap.find(letterGroup);
-    if (i != _hiraganaMap.end()) return i->second->get(target);
+    auto i = sourceMap.find(letterGroup);
+    if (i != sourceMap.end()) return macron(i->second->get(target));
     // if letter group is an unknown combination, split it up and try processing each part
-    if (letterCount > 1) {
+    if (count > 1) {
       const auto firstLetter = letterGroup.substr(0, 3);
-      i = _hiraganaMap.find(letterGroup.substr(3));
-      if (i != _hiraganaMap.end()) {
+      i = sourceMap.find(letterGroup.substr(3));
+      if (i != sourceMap.end()) {
         if (target == CharType::Romaji && _smallTsu.contains(firstLetter) &&
             _repeatingConsonents.contains(i->second->romaji[0]))
-          return i->second->getSokuonRomaji();
-        return hiraganaLetters(firstLetter, 1, target) + i->second->get(target);
+          return macron(i->second->getSokuonRomaji());
+        return kanaLetters(sourceMap, firstLetter, 1, target) + macron(i->second->get(target));
       }
       // error: couldn't convert second part
-      return hiraganaLetters(firstLetter, 1, target) + letterGroup.substr(3);
+      return kanaLetters(sourceMap, firstLetter, 1, target) + letterGroup.substr(3);
     }
-  }
+  } else if (prolonged)
+    // got 'prolonged' at the start of a group which isn't valid so just return the symbol unchanged
+    return _prolongedSoundMark;
   return letterGroup;
 }
-
-std::string KanaConvert::convertFromKatakana(const std::string& input, CharType target) const { return input; }
 
 std::string KanaConvert::convertFromRomaji(const std::string& input, CharType target) const {
   std::string result, letterGroup, c;
   auto macron = [this, &letterGroup, &result, target](char x, const auto& s) {
     letterGroup += x;
-    convertRomajiLetters(letterGroup, result, target);
+    romajiLetters(letterGroup, result, target);
     if (letterGroup.empty())
-      result += target == CharType::Hiragana ? s : "ー";
+      result += target == CharType::Hiragana ? s : _prolongedSoundMark;
     else
       result += x; // should never happen ...
   };
@@ -335,7 +364,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
       char letter = std::tolower(c[0]);
       if (letter != 'n') {
         letterGroup += letter;
-        convertRomajiLetters(letterGroup, result, target);
+        romajiLetters(letterGroup, result, target);
       } else {
         if (letterGroup.empty())
           letterGroup += letter;
@@ -357,13 +386,13 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
     } else {
       result += letterGroup[0]; // error: output the unprocessed letter
       letterGroup = letterGroup.substr(1);
-      convertRomajiLetters(letterGroup, result, target);
+      romajiLetters(letterGroup, result, target);
     }
   }
   return result;
 }
 
-void KanaConvert::convertRomajiLetters(std::string& letterGroup, std::string& result, CharType target) const {
+void KanaConvert::romajiLetters(std::string& letterGroup, std::string& result, CharType target) const {
   auto i = _romajiMap.find(letterGroup);
   if (i != _romajiMap.end()) {
     result += i->second->get(target);
@@ -380,7 +409,7 @@ void KanaConvert::convertRomajiLetters(std::string& letterGroup, std::string& re
     } else // error: no romaji is longer than 3 chars so output the first letter unconverted
       result += letterGroup[0];
     letterGroup = letterGroup.substr(1);
-    convertRomajiLetters(letterGroup, result, target); // try converting the shortened letterGroup
+    romajiLetters(letterGroup, result, target); // try converting the shortened letterGroup
   }
 }
 

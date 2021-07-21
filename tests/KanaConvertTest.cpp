@@ -26,6 +26,9 @@ protected:
   std::string hiraganaToRomaji(const std::string& s) const {
     return _converter.convert(s, CharType::Hiragana, CharType::Romaji);
   }
+  std::string katakanaToRomaji(const std::string& s) const {
+    return _converter.convert(s, CharType::Katakana, CharType::Romaji);
+  }
   enum Values { KanaSize = 162, Variants = 32 };
   const KanaConvert _converter;
 };
@@ -193,6 +196,51 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   // Sokuon handling
   EXPECT_EQ(hiraganaToRomaji("きっと"), "kitto");
   EXPECT_EQ(hiraganaToRomaji("べっぴん"), "beppin");
+  EXPECT_EQ(hiraganaToRomaji("こっきょう"), "kokkyou");
+  // not sure what to do with a final or repeated small tsu ... for now it falls back to 'wāpuro',
+  // i.e., exactly what you would need to type on a keyboard to reproduce the Hiragana.
+  EXPECT_EQ(hiraganaToRomaji("いてっ"), "iteltu");
+  EXPECT_EQ(hiraganaToRomaji("いっって"), "iltutte");
+  // prolonged sound mark is mainly for Katakana, but also works for Hiragana, for now using this
+  // mark is the only way to get a macron (bar over letter) in Romaji output.
+  EXPECT_EQ(hiraganaToRomaji("らーめん"), "rāmen");
+  EXPECT_EQ(hiraganaToRomaji("きゃー"), "kyā");
+  // ー not following a vowel is left unchanged
+  EXPECT_EQ(hiraganaToRomaji("ーぶ"), "ーbu");
+  EXPECT_EQ(hiraganaToRomaji("はんーぶ"), "hanーbu");
+}
+
+TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
+  EXPECT_EQ(katakanaToRomaji("エ"), "e");
+  EXPECT_EQ(katakanaToRomaji("アカ　サカ！"), "aka saka!");
+  EXPECT_EQ(katakanaToRomaji("イェビス"), "yebisu");
+  // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
+  // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
+  EXPECT_EQ(katakanaToRomaji("ァィゥェォャュョッ"), "lalilulelolyalyulyoltu");
+  EXPECT_EQ(katakanaToRomaji("テニス"), "tenisu");
+  EXPECT_EQ(katakanaToRomaji("カナダ"), "kanada");
+  // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
+  EXPECT_EQ(katakanaToRomaji("タンイ"), "tan'i");
+  EXPECT_EQ(katakanaToRomaji("ポンヨ"), "pon'yo");
+  // here are the same examples without the apostrophes
+  EXPECT_EQ(katakanaToRomaji("タニ"), "tani");
+  EXPECT_EQ(katakanaToRomaji("ポニョ"), "ponyo"); // BTW, this is the correct name of the movie
+  // Sokuon handling
+  EXPECT_EQ(katakanaToRomaji("アッパ"), "appa");
+  EXPECT_EQ(katakanaToRomaji("マッチ"), "macchi");
+  EXPECT_EQ(katakanaToRomaji("ジョッキ"), "jokki");
+  // not sure what to do with a final or repeated small tsu ... for now it falls back to 'wāpuro',
+  // i.e., exactly what you would need to type on a keyboard to reproduce the Hiragana.
+  EXPECT_EQ(katakanaToRomaji("イテッ"), "iteltu");
+  EXPECT_EQ(katakanaToRomaji("イッッテ"), "iltutte");
+  // prolonged sound mark is mainly for Katakana, but also works for Hiragana, for now using this
+  // mark is the only way to get a macron (bar over letter) in Romaji output.
+  EXPECT_EQ(katakanaToRomaji("ラーメン"), "rāmen");
+  EXPECT_EQ(katakanaToRomaji("キャー"), "kyā");
+  EXPECT_EQ(katakanaToRomaji("ファーザー"), "fāzā");
+  // ー not following a vowel is left unchanged
+  EXPECT_EQ(katakanaToRomaji("ーカ"), "ーka");
+  EXPECT_EQ(katakanaToRomaji("ホンート"), "honーto");
 }
 
 } // namespace kanji

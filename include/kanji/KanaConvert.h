@@ -75,17 +75,21 @@ public:
   const Map& katakanaMap() const { return _katakanaMap; }
 private:
   static Map populate(CharType);
-  std::string convertFromHiragana(const std::string& input, CharType target) const;
-  std::string convertFromKatakana(const std::string& input, CharType target) const;
+  using Set = std::set<std::string>;
+  std::string convertFromKana(const std::string& input, CharType target, const Map& sourceMap, const Set& markAfterN,
+                              const Set& smallKana) const;
   std::string convertFromRomaji(const std::string& input, CharType target) const;
-  std::string hiraganaLetters(const std::string& letterGroup, int letterCount, CharType target) const;
-  void convertRomajiLetters(std::string& letterGroup, std::string& result, CharType target) const;
+  std::string kanaLetters(const Map&, const std::string&, int count, CharType target, bool prolonged = false) const;
+  void romajiLetters(std::string& letterGroup, std::string& result, CharType target) const;
 
   const Map _romajiMap;
   const Map _hiraganaMap;
   const Map _katakanaMap;
   const Kana& _smallTsu;
   const Kana& _n;
+  // '_prolongSoundMark' ー is officially in the Katakana Unicode block, but it can also very rarely
+  // appear in some (non-standard) Hiragana words like らーめん.
+  const std::string _prolongedSoundMark;
   // Either '_apostrophe' or '_dash' should be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used.
   const char _apostrophe = '\'';
@@ -94,11 +98,11 @@ private:
   const std::set<char> _repeatingConsonents;
   // '_mark' sets contain kana symbols that should be proceedeed with _apostrophe when
   // producing Romaji output if they follow 'n'.
-  const std::set<std::string> _markHiraganaAfterN;
-  const std::set<std::string> _markKatakanaAfterN;
+  const Set _markHiraganaAfterN;
+  const Set _markKatakanaAfterN;
   // '_small' sets contain small kana symbols that form the second parts of digraphs
-  const std::set<std::string> _smallHiragana;
-  const std::set<std::string> _smallKatakana;
+  const Set _smallHiragana;
+  const Set _smallKatakana;
   // Punctuation and word delimiter handling
   std::string _narrowDelims;
   std::map<char, std::string> _narrowToWideDelims;
