@@ -280,7 +280,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType targ
         ++count;
       }
     } else {
-      // got non-hiragana letter so flus any letters and preserve the letter unconverted
+      // got non-hiragana letter so flush any letters and preserve the new letter unconverted
       result += kanaLetters(sourceMap, letterGroup, count, target);
       letterGroup.clear();
       count = 0;
