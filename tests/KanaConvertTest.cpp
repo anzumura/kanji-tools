@@ -41,7 +41,7 @@ protected:
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
-  enum Values { KanaSize = 176, Variants = 32 };
+  enum Values { KanaSize = 177, Variants = 32 };
   const KanaConvert _converter;
 };
 
@@ -132,7 +132,7 @@ TEST_F(KanaConvertTest, CheckRomaji) {
       }
   }
   EXPECT_EQ(aCount, 47);
-  EXPECT_EQ(iCount, 36);
+  EXPECT_EQ(iCount, 37);
   EXPECT_EQ(uCount, 44);
   EXPECT_EQ(eCount, 37);
   EXPECT_EQ(oCount, 43);
