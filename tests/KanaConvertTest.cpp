@@ -41,6 +41,21 @@ protected:
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
+  void check(const char* hiragana, const char* katakana, const char* romaji, const char* hepburn = nullptr,
+             const char* kunrei = nullptr) const {
+    EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
+    EXPECT_EQ(katakanaToRomaji(katakana), romaji);
+    EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Hepburn), hepburn ? hepburn : romaji);
+    EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Hepburn), hepburn ? hepburn : romaji);
+    EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Kunrei), kunrei ? kunrei : romaji);
+    EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Kunrei), kunrei ? kunrei : romaji);
+    const char* preferHepburnIfBoth = hepburn ? hepburn : kunrei ? kunrei : romaji;
+    EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Hepburn | KanaConvert::Kunrei), preferHepburnIfBoth);
+    EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Hepburn | KanaConvert::Kunrei), preferHepburnIfBoth);
+  }
+  void checkKunrei(const char* hiragana, const char* katakana, const char* romaji, const char* kunrei) const {
+    check(hiragana, katakana, romaji, nullptr, kunrei);
+  }
   enum Values { KanaSize = 177, Variants = 32 };
   const KanaConvert _converter;
 };
@@ -52,19 +67,19 @@ TEST_F(KanaConvertTest, CheckHiragana) {
     std::string c;
     auto check = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-                                                    << i.second->romaji << "', hiragana " << i.first;
+                                                    << i.second->romaji() << "', hiragana " << i.first;
     };
     EXPECT_TRUE(s.next(c));
     EXPECT_TRUE(isHiragana(c)) << c;
     if (s.next(c)) {
       EXPECT_TRUE(isHiragana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second->romaji.length();
+      auto romajiLen = i.second->romaji().length();
       ASSERT_GT(romajiLen, 1);
-      if (i.second->romaji == "qwa") // the only digraph that ends with small 'wa'
+      if (i.second->romaji() == "qwa") // the only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "くゎ");
       else
-        switch (i.second->romaji[romajiLen - 1]) {
+        switch (i.second->romaji()[romajiLen - 1]) {
         case 'a': check("ぁ", "ゃ"); break;
         case 'i': check("ぃ"); break;
         case 'u': check("ぅ", "ゅ"); break;
@@ -85,19 +100,19 @@ TEST_F(KanaConvertTest, CheckKatakana) {
     std::string c;
     auto check = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-                                                    << i.second->romaji << "', katakana " << i.first;
+                                                    << i.second->romaji() << "', katakana " << i.first;
     };
     EXPECT_TRUE(s.next(c));
     EXPECT_TRUE(isKatakana(c)) << c;
     if (s.next(c)) {
       EXPECT_TRUE(isKatakana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second->romaji.length();
+      auto romajiLen = i.second->romaji().length();
       ASSERT_GT(romajiLen, 1);
-      if (i.second->romaji == "qwa") // the only digraph that ends with small 'wa'
+      if (i.second->romaji() == "qwa") // the only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "クヮ");
       else
-        switch (i.second->romaji[romajiLen - 1]) {
+        switch (i.second->romaji()[romajiLen - 1]) {
         case 'a': check("ァ", "ャ"); break;
         case 'i': check("ィ"); break;
         case 'u': check("ゥ", "ュ"); break;
@@ -113,12 +128,14 @@ TEST_F(KanaConvertTest, CheckKatakana) {
 
 TEST_F(KanaConvertTest, CheckRomaji) {
   EXPECT_EQ(_converter.romajiMap().size(), KanaSize + Variants);
-  int variantCount = 0, aCount = 0, iCount = 0, uCount = 0, eCount = 0, oCount = 0, nCount = 0;
+  int aCount = 0, iCount = 0, uCount = 0, eCount = 0, oCount = 0, nCount = 0;
   oCount = 0, nCount = 0;
+  std::set<std::string> variants;
   for (auto& i : _converter.romajiMap()) {
     ASSERT_FALSE(i.first.empty());
     EXPECT_LT(i.first.length(), 4);
-    if (i.second->variant) ++variantCount;
+    for (auto& j : i.second->variants())
+      variants.insert(j);
     if (i.first == "n")
       ++nCount;
     else
@@ -137,7 +154,7 @@ TEST_F(KanaConvertTest, CheckRomaji) {
   EXPECT_EQ(eCount, 37);
   EXPECT_EQ(oCount, 43);
   EXPECT_EQ(nCount, 1);
-  EXPECT_EQ(variantCount, Variants);
+  EXPECT_EQ(variants.size(), Variants);
 }
 
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
@@ -292,13 +309,13 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
   for (auto& i : _converter.hiraganaMap()) {
     auto r = _converter.convert(i.first, CharType::Hiragana, CharType::Katakana);
-    EXPECT_EQ(r, i.second->katakana);
-    EXPECT_EQ(_converter.convert(r, CharType::Katakana, CharType::Hiragana), i.second->hiragana);
+    EXPECT_EQ(r, i.second->katakana());
+    EXPECT_EQ(_converter.convert(r, CharType::Katakana, CharType::Hiragana), i.second->hiragana());
   }
   for (auto& i : _converter.katakanaMap()) {
     auto r = _converter.convert(i.first, CharType::Katakana, CharType::Hiragana);
-    EXPECT_EQ(r, i.second->hiragana);
-    EXPECT_EQ(_converter.convert(r, CharType::Hiragana, CharType::Katakana), i.second->katakana);
+    EXPECT_EQ(r, i.second->hiragana());
+    EXPECT_EQ(_converter.convert(r, CharType::Hiragana, CharType::Katakana), i.second->katakana());
   }
   kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
   // try mixing sokuon and long vowels
@@ -313,6 +330,139 @@ TEST_F(KanaConvertTest, ConvertAllToOneType) {
   EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Romaji), "rāmenrāmenrāmen!!");
   EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Hiragana), "らーめんらーめんらーめん！！");
   EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Katakana), "ラーメンラーメンラーメン！！");
+}
+
+TEST_F(KanaConvertTest, HepburnVersusKunrei) {
+  // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki sometimes in
+  // order to be unique for round-trips (plus there are a lot of extra wāpuro entries). Below
+  // are the entries from the Differences among romanizations table from:
+  // https://en.wikipedia.org/wiki/Romanization_of_Japanese
+  // -- A
+  check("あ", "ア", "a");
+  check("い", "イ", "i");
+  check("う", "ウ", "u");
+  check("え", "エ", "e");
+  check("お", "オ", "o");
+  // -- KA
+  check("か", "カ", "ka");
+  check("き", "キ", "ki");
+  check("く", "ク", "ku");
+  check("け", "ケ", "ke");
+  check("こ", "コ", "ko");
+  check("きゃ", "キャ", "kya");
+  check("きゅ", "キュ", "kyu");
+  check("きょ", "キョ", "kyo");
+  // -- SA
+  check("さ", "サ", "sa");
+  checkKunrei("し", "シ", "shi", "si");
+  check("す", "ス", "su");
+  check("せ", "セ", "se");
+  check("そ", "ソ", "so");
+  checkKunrei("しゃ", "シャ", "sha", "sya");
+  checkKunrei("しゅ", "シュ", "shu", "syu");
+  checkKunrei("しょ", "ショ", "sho", "syo");
+  // -- TA
+  check("た", "タ", "ta");
+  checkKunrei("ち", "チ", "chi", "ti");
+  checkKunrei("つ", "ツ", "tsu", "tu");
+  check("て", "テ", "te");
+  check("と", "ト", "to");
+  checkKunrei("ちゃ", "チャ", "cha", "tya");
+  checkKunrei("ちゅ", "チュ", "chu", "tyu");
+  checkKunrei("ちょ", "チョ", "cho", "tyo");
+  // -- NA
+  check("な", "ナ", "na");
+  check("に", "ニ", "ni");
+  check("ぬ", "ヌ", "nu");
+  check("ね", "ネ", "ne");
+  check("の", "ノ", "no");
+  check("にゃ", "ニャ", "nya");
+  check("にゅ", "ニュ", "nyu");
+  check("にょ", "ニョ", "nyo");
+  // -- HA
+  check("は", "ハ", "ha");
+  check("ひ", "ヒ", "hi");
+  checkKunrei("ふ", "フ", "fu", "hu");
+  check("へ", "ヘ", "he");
+  check("ほ", "ホ", "ho");
+  check("ひゃ", "ヒャ", "hya");
+  check("ひゅ", "ヒュ", "hyu");
+  check("ひょ", "ヒョ", "hyo");
+  // -- MA
+  check("ま", "マ", "ma");
+  check("み", "ミ", "mi");
+  check("む", "ム", "mu");
+  check("め", "メ", "me");
+  check("も", "モ", "mo");
+  check("みゃ", "ミャ", "mya");
+  check("みゅ", "ミュ", "myu");
+  check("みょ", "ミョ", "myo");
+  // -- YA
+  check("や", "ヤ", "ya");
+  check("ゆ", "ユ", "yu");
+  check("よ", "ヨ", "yo");
+  // -- RA, WA and N
+  check("ら", "ラ", "ra");
+  check("り", "リ", "ri");
+  check("る", "ル", "ru");
+  check("れ", "レ", "re");
+  check("ろ", "ロ", "ro");
+  check("りゃ", "リャ", "rya");
+  check("りゅ", "リュ", "ryu");
+  check("りょ", "リョ", "ryo");
+  check("わ", "ワ", "wa");
+  // both Hepburn and Kunrei use 'o' for を, but program (and Nihon Shiki) uses 'wo' for uniqueness
+  check("を", "ヲ", "wo", "o", "o");
+  check("ん", "ン", "n");
+  // -- GA
+  check("が", "ガ", "ga");
+  check("ぎ", "ギ", "gi");
+  check("ぐ", "グ", "gu");
+  check("げ", "ゲ", "ge");
+  check("ご", "ゴ", "go");
+  check("ぎゃ", "ギャ", "gya");
+  check("ぎゅ", "ギュ", "gyu");
+  check("ぎょ", "ギョ", "gyo");
+  // -- ZA
+  check("ざ", "ザ", "za");
+  checkKunrei("じ", "ジ", "ji", "zi");
+  check("ず", "ズ", "zu");
+  check("ぜ", "ゼ", "ze");
+  check("ぞ", "ゾ", "zo");
+  checkKunrei("じゃ", "ジャ", "ja", "zya");
+  checkKunrei("じゅ", "ジュ", "ju", "zyu");
+  checkKunrei("じょ", "ジョ", "jo", "zyo");
+  // -- DA
+  // Lots of differences for this group, for example the mapping for ヂ in Nihon Shiki style
+  // (and default for this program) is 'di', whereas Hepburn is 'ji' and Kunrei is 'zi'.
+  check("だ", "ダ", "da");
+  check("ぢ", "ヂ", "di", "ji", "zi");
+  check("づ", "ヅ", "du", "zu", "zu");
+  check("で", "デ", "de");
+  check("ど", "ド", "do");
+  check("ぢゃ", "ヂャ", "dya", "ja", "zya");
+  check("ぢゅ", "ヂュ", "dyu", "ju", "zyu");
+  check("ぢょ", "ヂョ", "dyo", "jo", "zyo");
+  // -- BA
+  check("ば", "バ", "ba");
+  check("び", "ビ", "bi");
+  check("ぶ", "ブ", "bu");
+  check("べ", "ベ", "be");
+  check("ぼ", "ボ", "bo");
+  check("びゃ", "ビャ", "bya");
+  check("びゅ", "ビュ", "byu");
+  check("びょ", "ビョ", "byo");
+  // -- PA
+  check("ぱ", "パ", "pa");
+  check("ぴ", "ピ", "pi");
+  check("ぷ", "プ", "pu");
+  check("ぺ", "ペ", "pe");
+  check("ぽ", "ポ", "po");
+  check("ぴゃ", "ピャ", "pya");
+  check("ぴゅ", "ピュ", "pyu");
+  check("ぴょ", "ピョ", "pyo");
+  // -- VU
+  check("ゔ", "ヴ", "vu");
 }
 
 } // namespace kanji

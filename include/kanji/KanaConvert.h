@@ -6,6 +6,7 @@
 #include <optional>
 #include <set>
 #include <string>
+#include <vector>
 
 namespace kanji {
 
@@ -43,6 +44,9 @@ public:
   // Hepburn: off by default, only applies to 'romaji' output
   // - convert("つづき", CharType::Romaji) -> "tsuduki"
   // - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
+  // Kunrei: off by default, only applies to 'romaji' output
+  // - convert("しつ", CharType::Romaji) -> "shitsu"
+  // - convert("しつ", CharType::Romaji, Kunrei) -> "situ"
   // NoProlongMark: off by default, only applies to 'hiragana' output
   // - convert("rāmen", CharType::Hiragana) -> "らーめん"
   // - convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
@@ -62,8 +66,10 @@ public:
   // different kana if converted back. This affects di (ぢ), dya (ぢゃ), dyo (ぢょ), dyu (ぢゅ),
   // du (づ) and wo (を) - these become ji, ja, ju, jo, zu and o instead. There's also no support
   // for trying to handle は and へ (which in standard Hepburn should map to 'wa' and 'e' if they
-  // are used as particles) - instead they simply map to 'ha' and 'he' all the time.
-  enum ConversionFlags { Hepburn = 1, NoProlongMark = 2, RemoveSpaces = 4 };
+  // are used as particles) - instead they simply map to 'ha' and 'he' all the time. If both
+  // Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try Kunrei before
+  // falling back to the unique '_romaji' value in the Kana class.
+  enum ConversionFlags { Hepburn = 1, Kunrei = 2, NoProlongMark = 4, RemoveSpaces = 8 };
 
   // The first overload of 'convert' returns a string based on 'input' with all 'non-target'
   // kana or romaji characters converted to 'target'. The second version only converts 'source'
@@ -76,14 +82,25 @@ public:
   std::string convert(const std::string& input, CharType source, CharType target, int flags = 0) const;
 
   // 'Kana' is a helper class for storing relationships between Romaji, Hiragana and Katakana
-  struct Kana {
-    Kana(const char* r, const char* h, const char* k, const char* s)
-      : romaji(r), hiragana(h), katakana(k), hepburn(s), variant(false) {}
-    Kana(const char* r, const char* h, const char* k)
-      : romaji(r), hiragana(h), katakana(k), hepburn(std::nullopt), variant(false) {}
-
+  class Kana {
+  public:
+    using List = std::vector<std::string>;
+    Kana(const char* romaji, const char* hiragana, const char* katakana, const char* hepburn = nullptr,
+         const char* kunrei = nullptr)
+      : _romaji(romaji), _hiragana(hiragana), _katakana(katakana),
+        _hepburn(hepburn ? std::optional(hepburn) : std::nullopt),
+        _kunrei(kunrei ? std::optional(kunrei) : std::nullopt) {}
+    // Kana with a set of unique extra variant romaji values (first variant is optionally a 'kunreiVariant')
+    Kana(const char* romaji, const char* hiragana, const char* katakana, const List& variants,
+         bool kunreiVariant = false)
+      : _romaji(romaji), _hiragana(hiragana), _katakana(katakana), _variants(variants), _kunreiVariant(kunreiVariant) {
+      assert(_kunreiVariant ? !_variants.empty() : true);
+    }
     const std::string& getRomaji(int flags) const {
-      return (flags & Hepburn) && hepburn.has_value() ? *hepburn : romaji;
+      return (flags & Hepburn) && _hepburn.has_value() ? *_hepburn
+        : (flags & Kunrei) && _kunreiVariant           ? _variants[0]
+        : (flags & Kunrei) && _kunrei.has_value()      ? *_kunrei
+                                                       : _romaji;
     }
     // repeat the first letter of romaji for sokuon (促音) output (special handling for 't' as
     // described in comments above).
@@ -94,28 +111,39 @@ public:
     const std::string& get(CharType t, int flags) const {
       switch (t) {
       case CharType::Romaji: return getRomaji(flags);
-      case CharType::Hiragana: return hiragana;
-      case CharType::Katakana: return katakana;
+      case CharType::Hiragana: return _hiragana;
+      case CharType::Katakana: return _katakana;
       }
     }
-    bool contains(const std::string& s) const { return s == romaji || s == hiragana || s == katakana; }
+    bool containsKana(const std::string& s) const { return s == _hiragana || s == _katakana; }
     bool operator==(const Kana& rhs) const {
-      return romaji == rhs.romaji && hiragana == rhs.hiragana && katakana == rhs.katakana && variant == rhs.variant;
+      // comparing _romaji is good enough since uniqueness is enforced by the rest of the program
+      return _romaji == rhs._romaji;
     }
-    const std::string romaji;
-    const std::string hiragana;
-    const std::string katakana;
-    const bool variant;
-    // 'hepburn' holds the standard hepburn value (if non-empty) for a few cases where it differs
-    // from the 'unique' wāpuro romaji. For example, づ can be uniquely identified by 'du', but the
-    // correct Hepburn output for this kana is 'zu' which is ambiguous with ず.
-    const std::optional<std::string> hepburn;
-  protected:
-    Kana(bool v, const char* r, const char* h, const char* k)
-      : romaji(r), hiragana(h), katakana(k), variant(v), hepburn(std::nullopt) {}
-  };
-  struct VariantKana : Kana {
-    VariantKana(const char* r, const char* h, const char* k) : Kana(true, r, h, k) {}
+    const std::string& romaji() const { return _romaji; }
+    const std::string& hiragana() const { return _hiragana; }
+    const std::string& katakana() const { return _katakana; }
+    const List& variants() const { return _variants; }
+  private:
+    // '_romaji' usually holds the Modern Hepburn value, but will sometimes be a Nihon Shiki
+    // value in order to ensure a unique value for Kana maps ('di' for ぢ, 'du' for づ, etc.)
+    const std::string _romaji;
+    const std::string _hiragana;
+    const std::string _katakana;
+    // '_variants' holds any further variant Romaji values that are unique for this 'Kana'
+    // class. These include extra key combinations that also map to the same value such as
+    // 'kwa' for クァ (instead of 'qa'), 'fyi' フィ (instead of 'fi'), etc.
+    const List _variants;
+    // '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where it differs
+    // from the 'unique' wāpuro romaji. For example, づ can be uniquely identified by 'du',
+    // but the correct Hepburn output for this kana is 'zu' which is ambiguous with ず.
+    // '_hepburn' (if it's populated) is always a duplicate of another Kana's '_romaji' value.
+    const std::optional<std::string> _hepburn = std::nullopt;
+    // '_kunrei' holds an optional 'Kunrei Shiki' value for a few cases like 'zya' for じゃ.
+    const std::optional<std::string> _kunrei = std::nullopt;
+    // '_kunreiVariant' is true if the first entry in '_variants' is a 'Kunrei Shiki' value. If
+    // this is true then '_kunrei' should be nullopt.
+    const bool _kunreiVariant = false;
   };
 
   using Map = std::map<std::string, const Kana*>;

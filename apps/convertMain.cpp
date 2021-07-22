@@ -20,6 +20,7 @@ int main(int argc, const char** argv) {
   -R: restrict conversion input to Romaji\n\
   -f option: set 'option' (-f can be used multiple times to combine options). Valid options are:\n\
       h: conform Romaji output more closely to 'Modern Hepburn' style\n\
+      k: conform Romaji output more closely to 'Kunrei Shiki' style\n\
       n: no prolonged sound marks on Hiragana output, i.e., vowels are repeated instead of 'ー'\n\
       r: remove spaces on output (only applies to Hiragana and Katakana output)\n\
   -i: interactive mode\n\
@@ -59,6 +60,8 @@ int main(int argc, const char** argv) {
           arg = argv[i];
           if (arg == "h")
             flags |= KanaConvert::Hepburn;
+          else if (arg == "k")
+            flags |= KanaConvert::Kunrei;
           else if (arg == "n")
             flags |= KanaConvert::NoProlongMark;
           else if (arg == "r")
