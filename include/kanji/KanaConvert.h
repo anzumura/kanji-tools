@@ -40,15 +40,15 @@ public:
   KanaConvert();
 
   // 'ConversionFlags' can be used to control some aspects of conversion. For example:
-  // RemoveSpaces: off by default, only applies when converting from Romaji:
-  // - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with a wide space)
-  // - convert("akai kitsune", CharType::Hiragana, RemoveSpaces) returns "あかいきつね"
-  // NoProlongMark: off by default, only applies to 'hiragana' output
-  // - convert("rāmen", CharType::Hiragana) -> "らーめん"
-  // - convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
   // Hepburn: off by default, only applies to 'romaji' output
   // - convert("つづき", CharType::Romaji) -> "tsuduki"
   // - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
+  // NoProlongMark: off by default, only applies to 'hiragana' output
+  // - convert("rāmen", CharType::Hiragana) -> "らーめん"
+  // - convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
+  // RemoveSpaces: off by default, only applies when converting from Romaji:
+  // - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with a wide space)
+  // - convert("akai kitsune", CharType::Hiragana, RemoveSpaces) returns "あかいきつね"
   //
   // Notes:
   //
@@ -63,7 +63,7 @@ public:
   // du (づ) and wo (を) - these become ji, ja, ju, jo, zu and o instead. There's also no support
   // for trying to handle は and へ (which in standard Hepburn should map to 'wa' and 'e' if they
   // are used as particles) - instead they simply map to 'ha' and 'he' all the time.
-  enum ConversionFlags { RemoveSpaces = 1, NoProlongMark = 2, Hepburn = 4 };
+  enum ConversionFlags { Hepburn = 1, NoProlongMark = 2, RemoveSpaces = 4 };
 
   // The first overload of 'convert' returns a string based on 'input' with all 'non-target'
   // kana or romaji characters converted to 'target'. The second version only converts 'source'
