@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 
 int main(int argc, const char** argv) {
   if (argc < 2) {
-    std::cerr << "specify a file to repair\n";
+    std::cerr << "specify a file to format\n";
     return 1;
   }
   const auto file(argv[1]);

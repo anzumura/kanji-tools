@@ -23,17 +23,17 @@ std::ostream& operator<<(std::ostream& os, const FileStats::Count& c) {
 }
 
 constexpr auto HelpMessage = "\
-kanjiStats [-bh] file [file ...]:\n\
+kanjiStats [-bhv] file [file ...]:\n\
   -b: show full kanji breakdown for 'file' (instead of just a summary)\n\
-  -h: show help message for command-line options\n";
+  -h: show help message for command-line options\n\
+  -v: show 'before' and 'after' versions of lines that changed due to furigana removal\n";
 
 } // namespace
 
 std::string FileStats::Count::toHex() const {
   auto s = fromUtf8(name);
   std::string result;
-  if (s.length() == 1)
-    result = "'\\u" + kanji::toHex(s[0]) + "', ";
+  if (s.length() == 1) result = "'\\u" + kanji::toHex(s[0]) + "', ";
   for (auto i : name) {
     if (!result.empty()) result += ' ';
     result += "'\\x" + kanji::toHex(i) + "'";
@@ -42,7 +42,7 @@ std::string FileStats::Count::toHex() const {
 }
 
 FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
-  bool breakdown = false, endOptions = false;
+  bool breakdown = false, endOptions = false, verbose = false;
   std::vector<std::string> files;
   for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) {
     std::string arg = argv[i];
@@ -53,6 +53,8 @@ FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
       }
       if (arg == "-b")
         breakdown = true;
+      else if (arg == "-v")
+        verbose = true;
       else if (arg == "--")
         endOptions = true;
       else
@@ -62,7 +64,7 @@ FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
   }
   if (files.empty()) Data::usage("please specify at least one option or '-h' for help");
   for (auto& i : files)
-    countKanji(i, breakdown);
+    countKanji(i, breakdown, verbose);
 }
 
 int FileStats::Count::frequency() const {
@@ -73,13 +75,17 @@ Types FileStats::Count::type() const { return entry.has_value() ? (**entry).type
 
 template<typename Pred>
 int FileStats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
-                            bool& firstCount) const {
+                            bool& firstCount, bool verbose) const {
   const bool isKanji = name.ends_with("Kanji");
+  const bool isHiragana = name == "Hiragana";
   const bool isUnrecognized = name == "Unrecognized";
+  if (isHiragana && verbose)
+    log() << "Showing all furigana replacements:\n";
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
-  const bool removeFurigana = name == "Hiragana" || name == "MB-Letter";
-  MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt);
+  const bool removeFurigana = isHiragana || name == "Katakana" || name == "MB-Letter";
+  MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt,
+                      MBCharCount::DefaultReplace, isHiragana && verbose);
   count.addFile(top, isKanji || isUnrecognized);
   auto& m = count.map();
   std::set<Count> frequency;
@@ -166,11 +172,11 @@ void FileStats::printKanjiTypeCounts(const std::set<Count>& frequency, int total
   }
 }
 
-void FileStats::countKanji(const fs::path& top, bool showBreakdown) const {
+void FileStats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
   static const int IncludeInTotals = 4; // only include Kanji and full-width kana in total and percents
   bool firstCount = true;
-  auto f = [this, &top, showBreakdown, &firstCount](const auto& x, const auto& y) {
-    return std::make_pair(this->processCount(top, x, y, showBreakdown, firstCount), y);
+  auto f = [this, &top, showBreakdown, verbose, &firstCount](const auto& x, const auto& y) {
+    return std::make_pair(this->processCount(top, x, y, showBreakdown, firstCount, verbose), y);
   };
   std::array totals{f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
                     f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),

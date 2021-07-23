@@ -66,11 +66,11 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
     ">>>         [Extra] :     42, unique:   21,   0.09%  (妾 4, 蝕 4, 邯 4, 鄲 4, 哭 3)",
     ">>>          [None] :    155, unique:   93,   0.34%  (婬 18, 剪 10, 畸 9, 滸 4, 薛 3)",
     ">>>         Hiragana:  43197, unique:   79",
-    ">>>         Katakana:  24539, unique:   83",
+    ">>>         Katakana:  24442, unique:   83",
     ">>>   MB-Punctuation:  10247, unique:   23",
     ">>>        MB-Symbol:     42, unique:    8",
     ">>>        MB-Letter:   1204, unique:   36",
-    ">>> Total Kanji+Kana: 112943 (Common Kanji: 40.0%, Hiragana: 38.2%, Katakana: 21.7%)"};
+    ">>> Total Kanji+Kana: 112846 (Common Kanji: 40.1%, Hiragana: 38.3%, Katakana: 21.7%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
@@ -104,11 +104,11 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
     ">>>         [Extra] :    177, unique:   52,   0.18%  (厭 36, 掻 13, 妾 7, 怯 5, 攫 5)",
     ">>>          [None] :    593, unique:  275,   0.62%  (婬 18, 椒 14, 婢 12, 拵 12, 掟 11)",
     ">>>         Hiragana: 164209, unique:   80",
-    ">>>         Katakana:  24939, unique:   83",
+    ">>>         Katakana:  24723, unique:   83",
     ">>>   MB-Punctuation:  22127, unique:   24",
     ">>>        MB-Symbol:     45, unique:    9",
     ">>>        MB-Letter:   2732, unique:   39",
-    ">>> Total Kanji+Kana: 285260 (Common Kanji: 33.7%, Hiragana: 57.6%, Katakana: 8.7%)"};
+    ">>> Total Kanji+Kana: 285044 (Common Kanji: 33.7%, Hiragana: 57.6%, Katakana: 8.7%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {

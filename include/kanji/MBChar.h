@@ -166,6 +166,7 @@ public:
   int directories() const { return _directories; }
   int errors() const { return _errors; }
   const Map& map() const { return _map; }
+  bool debug() const { return _debug; }
 private:
   virtual bool allowAdd(const std::string&) const { return true; }
   size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);

@@ -77,24 +77,28 @@ int main(int argc, const char** argv) {
     }
 
     KanaConvert converter;
-    bool outputSpace = false;
-    auto process = [source, target, flags, &converter, &outputSpace](const auto& s) {
-      if (outputSpace)
-        std::cout << (target == CharType::Romaji ? " " : "　");
-      else
-        outputSpace = target != CharType::Romaji && !(flags & KanaConvert::RemoveSpaces);
+    auto process = [source, target, flags, &converter](const auto& s) {
       if (source.has_value())
         std::cout << converter.convert(s, *source, target, flags);
       else
         std::cout << converter.convert(s, target, flags);
     };
     if (std::string s; strings.empty())
-      while (std::getline(std::cin, s))
+      while (std::getline(std::cin, s)) {
         process(s);
-    else
-      for (const auto& i : strings)
+        std::cout << '\n';
+      }
+    else {
+      bool outputSpace = false;
+      for (const auto& i : strings) {
+        if (outputSpace)
+          std::cout << (target == CharType::Romaji ? " " : "　");
+        else
+          outputSpace = target != CharType::Romaji && !(flags & KanaConvert::RemoveSpaces);
         process(i);
-    std::cout << '\n';
+      }
+      std::cout << '\n';
+    }
   } catch (const std::exception& err) {
     std::cerr << err.what() << '\n';
     return 1;

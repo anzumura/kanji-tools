@@ -41,9 +41,9 @@ private:
   enum Values { MaxExamples = 5 };
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
   std::ostream& out() const { return _data->out(); }
-  void countKanji(const std::filesystem::path& top, bool showBreakdown = false) const;
+  void countKanji(const std::filesystem::path& top, bool showBreakdown, bool verbose) const;
   template<typename Pred>
-  int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool&) const;
+  int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool&, bool) const;
   void printKanjiTypeCounts(const std::set<Count>&, int total) const;
   void printTotalAndUnique(const std::string& name, int total, int unique) const;
 
