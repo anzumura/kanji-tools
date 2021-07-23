@@ -56,12 +56,14 @@ protected:
   void checkKunrei(const char* hiragana, const char* katakana, const char* romaji, const char* kunrei) const {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
-  enum Values { KanaSize = 177, Variants = 32 };
   const KanaConvert _converter;
+  enum Values { Monographs = 86, Digraphs = 95, Variants = 34 };
+  const int TotalKanaCombinations = Monographs + Digraphs + Variants;
 };
 
 TEST_F(KanaConvertTest, CheckHiragana) {
-  EXPECT_EQ(_converter.hiraganaMap().size(), KanaSize);
+  EXPECT_EQ(_converter.hiraganaMap().size(), Monographs + Digraphs);
+  int monographs = 0, digraphs = 0;
   for (auto& i : _converter.hiraganaMap()) {
     MBChar s(i.first);
     std::string c;
@@ -72,6 +74,7 @@ TEST_F(KanaConvertTest, CheckHiragana) {
     EXPECT_TRUE(s.next(c));
     EXPECT_TRUE(isHiragana(c)) << c;
     if (s.next(c)) {
+      ++digraphs;
       EXPECT_TRUE(isHiragana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
       auto romajiLen = i.second->romaji().length();
@@ -89,12 +92,16 @@ TEST_F(KanaConvertTest, CheckHiragana) {
         }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
-    }
+    } else
+      ++monographs;
   }
+  EXPECT_EQ(monographs, Monographs);
+  EXPECT_EQ(digraphs, Digraphs);
 }
 
 TEST_F(KanaConvertTest, CheckKatakana) {
-  EXPECT_EQ(_converter.katakanaMap().size(), KanaSize);
+  EXPECT_EQ(_converter.katakanaMap().size(), Monographs + Digraphs);
+  int monographs = 0, digraphs = 0;
   for (auto& i : _converter.katakanaMap()) {
     MBChar s(i.first);
     std::string c;
@@ -105,6 +112,7 @@ TEST_F(KanaConvertTest, CheckKatakana) {
     EXPECT_TRUE(s.next(c));
     EXPECT_TRUE(isKatakana(c)) << c;
     if (s.next(c)) {
+      ++digraphs;
       EXPECT_TRUE(isKatakana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
       auto romajiLen = i.second->romaji().length();
@@ -122,12 +130,15 @@ TEST_F(KanaConvertTest, CheckKatakana) {
         }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
-    }
+    } else
+      ++monographs;
   }
+  EXPECT_EQ(monographs, Monographs);
+  EXPECT_EQ(digraphs, Digraphs);
 }
 
 TEST_F(KanaConvertTest, CheckRomaji) {
-  EXPECT_EQ(_converter.romajiMap().size(), KanaSize + Variants);
+  EXPECT_EQ(_converter.romajiMap().size(), TotalKanaCombinations);
   int aCount = 0, iCount = 0, uCount = 0, eCount = 0, oCount = 0, nCount = 0;
   oCount = 0, nCount = 0;
   std::set<std::string> variants;
@@ -148,12 +159,13 @@ TEST_F(KanaConvertTest, CheckRomaji) {
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 47);
-  EXPECT_EQ(iCount, 37);
+  EXPECT_EQ(aCount, 49);
+  EXPECT_EQ(iCount, 38);
   EXPECT_EQ(uCount, 44);
-  EXPECT_EQ(eCount, 37);
+  EXPECT_EQ(eCount, 40);
   EXPECT_EQ(oCount, 43);
   EXPECT_EQ(nCount, 1);
+  EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalKanaCombinations);
   EXPECT_EQ(variants.size(), Variants);
 }
 
@@ -401,7 +413,7 @@ TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   check("や", "ヤ", "ya");
   check("ゆ", "ユ", "yu");
   check("よ", "ヨ", "yo");
-  // -- RA, WA and N
+  // -- RA
   check("ら", "ラ", "ra");
   check("り", "リ", "ri");
   check("る", "ル", "ru");
@@ -410,7 +422,13 @@ TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   check("りゃ", "リャ", "rya");
   check("りゅ", "リュ", "ryu");
   check("りょ", "リョ", "ryo");
+  // -- WA and N
   check("わ", "ワ", "wa");
+  // Nihon Shiki for the following rare kana are 'wi' and 'we' respectively, but wāpuro
+  // values are used instead (since 'wi' and 'we' are already used for the more common
+  // diagraphs ウィ and ウェ. Hepburn and Kunrei are both 'i' and 'e' for these.
+  check("ゐ", "ヰ", "wyi", "i", "i");
+  check("ゑ", "ヱ", "wye", "e", "e");
   // both Hepburn and Kunrei use 'o' for を, but program (and Nihon Shiki) uses 'wo' for uniqueness
   check("を", "ヲ", "wo", "o", "o");
   check("ん", "ン", "n");

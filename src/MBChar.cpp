@@ -29,7 +29,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 
 namespace fs = std::filesystem;
 
-const std::wregex MBCharCount::RemoveFurigana(std::wstring(L"([") + KanjiRange + L"]{1})（[" + HiraganaRange + L"]+）");
+const std::wregex MBCharCount::RemoveFurigana(std::wstring(L"([") + KanjiRange + L"]{1})（[" + KanaRange + L"]+）");
 const std::wstring MBCharCount::DefaultReplace(L"$1");
 
 size_t MBCharCount::add(const std::string& s, const std::string& tag) {

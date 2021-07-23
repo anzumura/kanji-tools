@@ -208,6 +208,8 @@ inline bool isAllSingleByte(const std::wstring& s) {
 // KanjiRange includes both the 'rare block' and the 'common block' defined above
 constexpr wchar_t KanjiRange[] = L"\u2e80-\u2eff\u3400-\u4dbf\u4e00-\u9fff";
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
+constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
+constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";
 
 } // namespace kanji
 

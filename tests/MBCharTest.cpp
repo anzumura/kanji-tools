@@ -15,10 +15,9 @@ auto removeFurigana(const std::wstring& s) {
 } // namespace
 
 TEST(MBChar, CheckRemovingFurigana) {
-  // replace furigana - must be kanji followed by hiragana in wide brackets
+  // replace furigana - must be kanji followed by kana in wide brackets
   EXPECT_EQ(removeFurigana(L"犬（いぬ）"), L"犬");
-  // don't replace katakana
-  EXPECT_EQ(removeFurigana(L"犬（イヌ）"), L"犬（イヌ）");
+  EXPECT_EQ(removeFurigana(L"犬（イヌ）"), L"犬");
   // don't replace after non-kanji
   EXPECT_EQ(removeFurigana(L"いぬ（いぬ）"), L"いぬ（いぬ）");
   // don't replace at start of string

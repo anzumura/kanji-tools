@@ -69,7 +69,7 @@ TEST_F(FileStatsTest, PrintStatsForOneDirectory) {
     ">>>         Katakana:  24539, unique:   83",
     ">>>   MB-Punctuation:  10247, unique:   23",
     ">>>        MB-Symbol:     42, unique:    8",
-    ">>>        MB-Letter:   1240, unique:   36",
+    ">>>        MB-Letter:   1204, unique:   36",
     ">>> Total Kanji+Kana: 112943 (Common Kanji: 40.0%, Hiragana: 38.2%, Katakana: 21.7%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
@@ -103,12 +103,12 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
     ">>>         [Other] :    148, unique:   37,   0.15%  (渕 24, 苅 24, 呑 17, 嘘 14, 叱 10)",
     ">>>         [Extra] :    177, unique:   52,   0.18%  (厭 36, 掻 13, 妾 7, 怯 5, 攫 5)",
     ">>>          [None] :    593, unique:  275,   0.62%  (婬 18, 椒 14, 婢 12, 拵 12, 掟 11)",
-    ">>>         Hiragana: 162592, unique:   80",
+    ">>>         Hiragana: 164209, unique:   80",
     ">>>         Katakana:  24939, unique:   83",
     ">>>   MB-Punctuation:  22127, unique:   24",
     ">>>        MB-Symbol:     45, unique:    9",
-    ">>>        MB-Letter:   1730, unique:   39",
-    ">>> Total Kanji+Kana: 283643 (Common Kanji: 33.9%, Hiragana: 57.3%, Katakana: 8.8%)"};
+    ">>>        MB-Letter:   2732, unique:   39",
+    ">>> Total Kanji+Kana: 285260 (Common Kanji: 33.7%, Hiragana: 57.6%, Katakana: 8.7%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {

@@ -15,14 +15,14 @@ int main(int argc, const char** argv) {
   }
   const auto file(argv[1]);
   const std::wregex endsWithKanji(std::wstring(L"[") + KanjiRange + L"]{1}$");
-  const std::wregex allHiragana(std::wstring(L"^[") + HiraganaRange + L"]+$");
+  const std::wregex allKana(std::wstring(L"^[") + KanaRange + L"]+$");
   std::fstream f(file);
   std::string line, prevLine;
   bool prevLineEndedWithKanji = false;
   while (std::getline(f, line)) {
     auto wline = fromUtf8(line);
     if (prevLineEndedWithKanji) {
-      if (std::regex_search(wline, allHiragana)) {
+      if (std::regex_search(wline, allKana)) {
         prevLineEndedWithKanji = false;
         // The previous line ended with kanji and current line is all hiragana so assume
         // the current line is furigana for the kanji at the end of the previous line and

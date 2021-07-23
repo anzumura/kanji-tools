@@ -12,8 +12,9 @@ namespace {
 using K = KanaConvert::Kana;
 using V = KanaConvert::Kana::List;
 
-// 'KanaList' has the standard mappings for kana. Non-standard mappings are handled separately
-// such as repeat symbols, small 'tsu' and rare kana like ( ゐ, ゑ, ヰ, and ヱ)
+// 'KanaList' has mappings for all monographs (single kana) and regularly used digraphs (normal
+// kana followed by a small kana 'vowel', 'y' or 'wa'). See comments for 'Kana' class for a
+// description of the fields.
 const std::array KanaList{
   // --- あ 行 ---
   K{"a", "あ", "ア"}, K{"ka", "か", "カ"}, K{"ga", "が", "ガ"}, K{"sa", "さ", "サ"}, K{"za", "ざ", "ザ"},
@@ -30,7 +31,7 @@ const std::array KanaList{
   K{"i", "い", "イ"}, K{"ki", "き", "キ"}, K{"gi", "ぎ", "ギ"}, K{"shi", "し", "シ", V{"si"}, true},
   K{"ji", "じ", "ジ", V{"zi"}, true}, K{"chi", "ち", "チ", V{"ti"}, true}, K{"di", "ぢ", "ヂ", "ji", "zi"},
   K{"ni", "に", "ニ"}, K{"hi", "ひ", "ヒ"}, K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}, K{"mi", "み", "ミ"},
-  K{"ri", "り", "リ"},
+  K{"ri", "り", "リ"}, K{"wyi", "ゐ", "ヰ", "i", "i"},
   // い Digraphs
   K{"wi", "うぃ", "ウィ"}, K{"vi", "ゔぃ", "ヴィ"}, K{"kyi", "きぃ", "キィ"}, K{"gwi", "ぐぃ", "グィ"},
   K{"qi", "くぃ", "クィ"}, K{"zyi", "じぃ", "ジィ"}, K{"tsi", "つぃ", "ツィ"}, K{"thi", "てぃ", "ティ"},
@@ -51,7 +52,7 @@ const std::array KanaList{
   // --- え 行 ---
   K{"e", "え", "エ"}, K{"ke", "け", "ケ"}, K{"ge", "げ", "ゲ"}, K{"se", "せ", "セ"}, K{"ze", "ぜ", "ゼ"},
   K{"te", "て", "テ"}, K{"de", "で", "デ"}, K{"ne", "ね", "ネ"}, K{"he", "へ", "ヘ"}, K{"be", "べ", "ベ"},
-  K{"pe", "ぺ", "ペ"}, K{"me", "め", "メ"}, K{"re", "れ", "レ"},
+  K{"pe", "ぺ", "ペ"}, K{"me", "め", "メ"}, K{"re", "れ", "レ"}, K{"wye", "ゑ", "ヱ", "e", "e"},
   // え Digraphs
   K{"ye", "いぇ", "イェ"}, K{"we", "うぇ", "ウェ"}, K{"ve", "ゔぇ", "ヴェ"}, K{"kye", "きぇ", "キェ"},
   K{"gwe", "ぐぇ", "グェ"}, K{"qe", "くぇ", "クェ"}, K{"she", "しぇ", "シェ"}, K{"je", "じぇ", "ジェ", V{"zye"}},
@@ -69,12 +70,13 @@ const std::array KanaList{
   K{"tho", "てょ", "テョ"}, K{"two", "とぉ", "トォ"}, K{"nyo", "にょ", "ニョ"}, K{"hyo", "ひょ", "ヒョ"},
   K{"byo", "びょ", "ビョ"}, K{"pyo", "ぴょ", "ピョ"}, K{"fo", "ふぉ", "フォ"}, K{"fyo", "ふょ", "フョ"},
   K{"myo", "みょ", "ミョ"}, K{"ryo", "りょ", "リョ"},
-  // 9 Small letters (5 vowels, 3 y's and small 'wa') - prefer 'l' versions for Romaji output
+  // 12 Small letters (5 vowels, 2 k's, 3 y's, small 'wa' and small 'tsu') - prefer 'l' versions for Romaji output
   K{"la", "ぁ", "ァ", V{"xa"}}, K{"li", "ぃ", "ィ", V{"xi"}}, K{"lu", "ぅ", "ゥ", V{"xu"}},
-  K{"le", "ぇ", "ェ", V{"xe", "lye", "xye"}}, K{"lo", "ぉ", "ォ", V{"xo"}}, K{"lya", "ゃ", "ャ", V{"xya"}},
-  K{"lyu", "ゅ", "ュ", V{"xyu"}}, K{"lyo", "ょ", "ョ", V{"xyo"}}, K{"lwa", "ゎ", "ヮ", V{"xwa"}},
-  // Small 'tsu' amd ん - keep these entries at the end of the list
-  K{"ltu", "っ", "ッ", V{"xtu"}}, K{"n", "ん", "ン"}};
+  K{"le", "ぇ", "ェ", V{"xe", "lye", "xye"}}, K{"lo", "ぉ", "ォ", V{"xo"}}, K{"lka", "ゕ", "ヵ", V{"xka"}},
+  K{"lke", "ゖ", "ヶ", V{"xke"}}, K{"lya", "ゃ", "ャ", V{"xya"}}, K{"lyu", "ゅ", "ュ", V{"xyu"}},
+  K{"lyo", "ょ", "ョ", V{"xyo"}}, K{"lwa", "ゎ", "ヮ", V{"xwa"}}, K{"ltu", "っ", "ッ", V{"xtu"}},
+  // ん - keep 'n' as well as the previous small 'tsu' at the end of the list
+  K{"n", "ん", "ン"}};
 
 std::ostream& operator<<(std::ostream& os, const K& k) {
   return os << '[' << k.romaji() << ", " << k.hiragana() << ", " << k.katakana() << ']';
@@ -142,7 +144,7 @@ KanaConvert::KanaConvert()
         assert(_markHiraganaAfterN.insert(i.hiragana()).second);
         assert(_markKatakanaAfterN.insert(i.katakana()).second);
       } else if (i.romaji().starts_with("l")) {
-        if (i != _smallTsu) {
+        if (i != _smallTsu && !i.romaji().starts_with("lk")) {
           assert(_smallHiragana.insert(i.hiragana()).second);
           assert(_smallKatakana.insert(i.katakana()).second);
         }

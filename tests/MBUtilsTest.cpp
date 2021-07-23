@@ -47,6 +47,20 @@ TEST(MBUtils, CheckNoOverlappingRanges) {
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
   EXPECT_EQ(HiraganaRange[2], HiraganaBlocks[0].end);
+  ASSERT_EQ(std::size(KatakanaRange), 7);
+  ASSERT_EQ(KatakanaBlocks.size(), 2);
+  EXPECT_EQ(KatakanaRange[0], KatakanaBlocks[0].start);
+  EXPECT_EQ(KatakanaRange[2], KatakanaBlocks[0].end);
+  EXPECT_EQ(KatakanaRange[3], KatakanaBlocks[1].start);
+  EXPECT_EQ(KatakanaRange[5], KatakanaBlocks[1].end);
+  ASSERT_EQ(std::size(KanaRange), 7);
+  EXPECT_EQ(KanaRange[0], HiraganaBlocks[0].start);
+  // first katakana block immediately follows hiragana block so can use a bigger range
+  // but check the assumption by comparing 'end + 1' to 'start'
+  EXPECT_EQ(HiraganaBlocks[0].end + 1, KatakanaBlocks[0].start);
+  EXPECT_EQ(KanaRange[2], KatakanaBlocks[0].end);
+  EXPECT_EQ(KanaRange[3], KatakanaBlocks[1].start);
+  EXPECT_EQ(KanaRange[5], KatakanaBlocks[1].end);
 }
 
 TEST(MBUtils, IsKana) {
@@ -88,7 +102,7 @@ TEST(MBUtils, IsMBPunctuation) {
   EXPECT_TRUE(isMBPunctuation("。")); // from Wide Punctuation block
   EXPECT_FALSE(isMBPunctuation("。d"));
   EXPECT_TRUE(isMBPunctuation("。d", true, false)); // checkLengthOne=false
-  EXPECT_TRUE(isMBPunctuation("、")); // from Wide Punctuation block
+  EXPECT_TRUE(isMBPunctuation("、"));               // from Wide Punctuation block
   EXPECT_TRUE(isMBPunctuation("　"));
   EXPECT_FALSE(isMBPunctuation("　", false)); // includeSpace=false
   EXPECT_FALSE(isMBPunctuation("　x", true));

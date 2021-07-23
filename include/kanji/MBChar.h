@@ -120,9 +120,10 @@ public:
 
   // 'RemoveFurigana' is a regex for removing furigana from text files - it can be passed
   // to MBCharCount constructor. Furigana in a .txt file is usually a Kanji followed by one
-  // or more Hiragana characters inside wide brackets. This regex matches a Kanji followed
-  // by bracketed Hiragana (and 'DefaultReplace' will replace it with just the Kanji match
-  // part). See MBCharTest.cpp for examples of how the regex works.
+  // or more Kana characters inside wide brackets. This regex matches a Kanji followed
+  // by bracketed Kana (and 'DefaultReplace' will replace it with just the Kanji match
+  // part). See MBCharTest.cpp for examples of how the regex works. Note, almost all furigana
+  // is hiragana, but very occasionally katakana can also be included like: 護謨製（ゴムせい）
   static const std::wregex RemoveFurigana;
   // 'DefaultReplace' is used as the default replacement string in below constructor to
   // replace the contents in brackets with itself (and get rid of the rest of the string). It
