@@ -145,12 +145,54 @@ public:
     // this is true then '_kunrei' should be nullopt.
     const bool _kunreiVariant = false;
   };
+  // 'DakutenKana' is for 'k', 's', 't', 'h' row kana which have a dakuten, i.e., か has が
+  class DakutenKana : public Kana {
+  public:
+    DakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
+                const char* hepburn = nullptr, const char* kunrei = nullptr)
+      : Kana(romaji, hiragana, katakana, hepburn, kunrei), _dakutenKana(dakutenKana) {}
+    DakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
+                const List& variants, bool kunreiVariant = false)
+      : Kana(romaji, hiragana, katakana, variants, kunreiVariant), _dakutenKana(dakutenKana) {}
+    const Kana& dakutenKana() const { return _dakutenKana; }
+  private:
+    const Kana _dakutenKana;
+  };
+  // 'HanDakutenKana' is only populated for 'h' row kana, i.e., は has ぱ
+  class HanDakutenKana : public DakutenKana {
+  public:
+    HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
+                   const Kana& hanDakutenKana, const char* hepburn = nullptr, const char* kunrei = nullptr)
+      : DakutenKana(romaji, hiragana, katakana, dakutenKana, hepburn, kunrei), _hanDakutenKana(hanDakutenKana) {}
+    HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
+                   const Kana& hanDakutenKana, const List& variants, bool kunreiVariant = false)
+      : DakutenKana(romaji, hiragana, katakana, dakutenKana, variants, kunreiVariant), _hanDakutenKana(hanDakutenKana) {
+    }
+    const Kana& hanDakutenKana() const { return _hanDakutenKana; }
+  private:
+    const Kana _hanDakutenKana;
+  };
 
   using Map = std::map<std::string, const Kana*>;
   const Map& romajiMap() const { return _romajiMap; }
   const Map& hiraganaMap() const { return _hiraganaMap; }
   const Map& katakanaMap() const { return _katakanaMap; }
 private:
+  // 'RepeatMark' if for handling repeating kana marks (一の時点) when source is Hiragana or Katakana.
+  class RepeatMark {
+  public:
+    RepeatMark(const char* hiragana, const char* katakana, bool dakuten = false)
+      : _hiragana(hiragana), _katakana(katakana), _dakuten(dakuten) {
+      assert(_hiragana != _katakana);
+    }
+    const std::string& get(CharType target) const { return target == CharType::Hiragana ? _hiragana : _katakana; }
+    std::string getRomaji(const std::string& prevKana, int flags) const;
+  private:
+    const std::string _hiragana;
+    const std::string _katakana;
+    const bool _dakuten; // true if this instance if for the 'dakuten' (濁点) versions of the marks
+  };
+
   static Map populate(CharType);
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
@@ -175,15 +217,16 @@ private:
   // dash is used in 'Traditional Hepburn' whereas apostrophe is used in 'Modern (revised) Hepburn'.
   const char _apostrophe = '\'';
   const char _dash = '-';
-  // '_repeatingConsonents' is used for processing of small 'tsu' for sokuon output
+  // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
-  // '_mark' sets contain kana symbols that should be proceedeed with _apostrophe when
-  // producing Romaji output if they follow 'n'.
-  Set _markHiraganaAfterN;
-  Set _markKatakanaAfterN;
-  // '_small' sets contain small kana symbols that form the second parts of digraphs
-  Set _smallHiragana;
-  Set _smallKatakana;
+  // '_markAfterN...' sets contain the 8 kana symbols (5 vowels and 3 y's) that should be proceedeed
+  // with _apostrophe when producing Romaji output if they follow 'n'.
+  Set _markAfterNHiragana;
+  Set _markAfterNKatakana;
+  // '_digraphSecond...' sets contain the 9 small kana symbols (5 vowels, 3 y's, and 'wa') that form
+  // the second parts of digraphs.
+  Set _digraphSecondHiragana;
+  Set _digraphSecondKatakana;
   // Punctuation and word delimiter handling
   std::string _narrowDelims;
   std::map<char, std::string> _narrowToWideDelims;

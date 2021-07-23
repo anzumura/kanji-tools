@@ -11,65 +11,39 @@ namespace {
 
 using K = KanaConvert::Kana;
 using V = KanaConvert::Kana::List;
-
-// 'KanaList' has mappings for all monographs (single kana) and regularly used digraphs (normal
-// kana followed by a small kana 'vowel', 'y' or 'wa'). See comments for 'Kana' class for a
-// description of the fields.
+// 'KanaList' has mappings for all monographs (single kana) with no 'dakuten' or 'han-dakuten' versions
+// and regularly used digraphs (normal kana followed by a small kana 'vowel', 'y' or 'wa'). See
+// comments for 'Kana' class for a description of the fields.
 const std::array KanaList{
   // --- あ 行 ---
-  K{"a", "あ", "ア"}, K{"ka", "か", "カ"}, K{"ga", "が", "ガ"}, K{"sa", "さ", "サ"}, K{"za", "ざ", "ザ"},
-  K{"ta", "た", "タ"}, K{"da", "だ", "ダ"}, K{"na", "な", "ナ"}, K{"ha", "は", "ハ"}, K{"ba", "ば", "バ"},
-  K{"pa", "ぱ", "パ"}, K{"ma", "ま", "マ"}, K{"ya", "や", "ヤ"}, K{"ra", "ら", "ラ"}, K{"wa", "わ", "ワ"},
-  // あ Digraphs
-  K{"va", "ゔぁ", "ヴァ"}, K{"kya", "きゃ", "キャ"}, K{"gya", "ぎゃ", "ギャ"}, K{"gwa", "ぐぁ", "グァ"},
-  K{"qa", "くぁ", "クァ", V{"kwa"}}, K{"qwa", "くゎ", "クヮ"}, K{"sha", "しゃ", "シャ", V{"sya"}, true},
-  K{"ja", "じゃ", "ジャ", V{"zya", "jya"}, true}, K{"swa", "すぁ", "スァ"}, K{"tsa", "つぁ", "ツァ"},
-  K{"cha", "ちゃ", "チャ", V{"tya"}, true}, K{"dya", "ぢゃ", "ヂャ", "ja", "zya"}, K{"twa", "とぁ", "トァ"},
-  K{"nya", "にゃ", "ニャ"}, K{"hya", "ひゃ", "ヒャ"}, K{"bya", "びゃ", "ビャ"}, K{"pya", "ぴゃ", "ピャ"},
+  K{"a", "あ", "ア"}, K{"na", "な", "ナ"}, K{"ma", "ま", "マ"}, K{"ya", "や", "ヤ"}, K{"ra", "ら", "ラ"},
+  K{"wa", "わ", "ワ"},
+  // Digraphs
+  K{"qwa", "くゎ", "クヮ"}, K{"swa", "すぁ", "スァ"}, K{"tsa", "つぁ", "ツァ"}, K{"nya", "にゃ", "ニャ"},
   K{"fa", "ふぁ", "ファ"}, K{"fya", "ふゃ", "フャ"}, K{"mya", "みゃ", "ミャ"}, K{"rya", "りゃ", "リャ"},
   // --- い 行 ---
-  K{"i", "い", "イ"}, K{"ki", "き", "キ"}, K{"gi", "ぎ", "ギ"}, K{"shi", "し", "シ", V{"si"}, true},
-  K{"ji", "じ", "ジ", V{"zi"}, true}, K{"chi", "ち", "チ", V{"ti"}, true}, K{"di", "ぢ", "ヂ", "ji", "zi"},
-  K{"ni", "に", "ニ"}, K{"hi", "ひ", "ヒ"}, K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}, K{"mi", "み", "ミ"},
-  K{"ri", "り", "リ"}, K{"wyi", "ゐ", "ヰ", "i", "i"},
-  // い Digraphs
-  K{"wi", "うぃ", "ウィ"}, K{"vi", "ゔぃ", "ヴィ"}, K{"kyi", "きぃ", "キィ"}, K{"gwi", "ぐぃ", "グィ"},
-  K{"qi", "くぃ", "クィ"}, K{"zyi", "じぃ", "ジィ"}, K{"tsi", "つぃ", "ツィ"}, K{"thi", "てぃ", "ティ"},
-  K{"dhi", "でぃ", "ディ"}, K{"twi", "とぃ", "トィ"}, K{"tyi", "ちぃ", "チィ"}, K{"nyi", "にぃ", "ニィ"},
-  K{"hyi", "ひぃ", "ヒィ"}, K{"byi", "びぃ", "ビィ"}, K{"pyi", "ぴぃ", "ピィ"}, K{"fi", "ふぃ", "フィ", V{"fyi"}},
-  K{"myi", "みぃ", "ミィ"}, K{"ryi", "りぃ", "リィ"},
+  K{"i", "い", "イ"}, K{"ni", "に", "ニ"}, K{"mi", "み", "ミ"}, K{"ri", "り", "リ"}, K{"wyi", "ゐ", "ヰ", "i", "i"},
+  // Digraphs
+  K{"tsi", "つぃ", "ツィ"}, K{"nyi", "にぃ", "ニィ"}, K{"fi", "ふぃ", "フィ", V{"fyi"}}, K{"myi", "みぃ", "ミィ"},
+  K{"ryi", "りぃ", "リィ"},
   // --- う 行 ---
-  K{"u", "う", "ウ"}, K{"vu", "ゔ", "ヴ"}, K{"ku", "く", "ク"}, K{"gu", "ぐ", "グ"}, K{"su", "す", "ス"},
-  K{"zu", "ず", "ズ"}, K{"tsu", "つ", "ツ", V{"tu"}, true}, K{"du", "づ", "ヅ", "zu", "zu"}, K{"nu", "ぬ", "ヌ"},
-  K{"fu", "ふ", "フ", V{"hu"}, true}, K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"}, K{"mu", "む", "ム"},
-  K{"yu", "ゆ", "ユ"}, K{"ru", "る", "ル"},
-  // う Digraphs
-  K{"kyu", "きゅ", "キュ"}, K{"gyu", "ぎゅ", "ギュ"}, K{"gwu", "ぐぅ", "グゥ"}, K{"qu", "くぅ", "クゥ"},
-  K{"shu", "しゅ", "シュ", V{"syu"}, true}, K{"ju", "じゅ", "ジュ", V{"zyu", "jyu"}, true},
-  K{"chu", "ちゅ", "チュ", V{"tyu"}, true}, K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"}, K{"thu", "てゅ", "テュ"},
-  K{"twu", "とぅ", "トゥ"}, K{"nyu", "にゅ", "ニュ"}, K{"hyu", "ひゅ", "ヒュ"}, K{"byu", "びゅ", "ビュ"},
-  K{"pyu", "ぴゅ", "ピュ"}, K{"fyu", "ふゅ", "フュ"}, K{"myu", "みゅ", "ミュ"}, K{"ryu", "りゅ", "リュ"},
+  K{"nu", "ぬ", "ヌ"}, K{"mu", "む", "ム"}, K{"yu", "ゆ", "ユ"}, K{"ru", "る", "ル"},
+  // Digraphs
+  K{"nyu", "にゅ", "ニュ"}, K{"fyu", "ふゅ", "フュ"}, K{"myu", "みゅ", "ミュ"}, K{"ryu", "りゅ", "リュ"},
   // --- え 行 ---
-  K{"e", "え", "エ"}, K{"ke", "け", "ケ"}, K{"ge", "げ", "ゲ"}, K{"se", "せ", "セ"}, K{"ze", "ぜ", "ゼ"},
-  K{"te", "て", "テ"}, K{"de", "で", "デ"}, K{"ne", "ね", "ネ"}, K{"he", "へ", "ヘ"}, K{"be", "べ", "ベ"},
-  K{"pe", "ぺ", "ペ"}, K{"me", "め", "メ"}, K{"re", "れ", "レ"}, K{"wye", "ゑ", "ヱ", "e", "e"},
-  // え Digraphs
-  K{"ye", "いぇ", "イェ"}, K{"we", "うぇ", "ウェ"}, K{"ve", "ゔぇ", "ヴェ"}, K{"kye", "きぇ", "キェ"},
-  K{"gwe", "ぐぇ", "グェ"}, K{"qe", "くぇ", "クェ"}, K{"she", "しぇ", "シェ"}, K{"je", "じぇ", "ジェ", V{"zye"}},
-  K{"che", "ちぇ", "チェ"}, K{"tse", "つぇ", "ツェ"}, K{"the", "てぇ", "テェ"}, K{"twe", "とぇ", "トェ"},
-  K{"nye", "にぇ", "ニェ"}, K{"hye", "ひぇ", "ヒェ"}, K{"bye", "びぇ", "ビェ"}, K{"pye", "ぴぇ", "ピェ"},
+  K{"e", "え", "エ"}, K{"ne", "ね", "ネ"}, K{"me", "め", "メ"}, K{"re", "れ", "レ"}, K{"wye", "ゑ", "ヱ", "e", "e"},
+  // Digraphs
+  K{"ye", "いぇ", "イェ"}, K{"che", "ちぇ", "チェ"}, K{"tse", "つぇ", "ツェ"}, K{"nye", "にぇ", "ニェ"},
   K{"fe", "ふぇ", "フェ"}, K{"mye", "みぇ", "ミェ"}, K{"rye", "りぇ", "リェ"},
   // --- お 行 ---
-  K{"o", "お", "オ"}, K{"ko", "こ", "コ"}, K{"go", "ご", "ゴ"}, K{"so", "そ", "ソ"}, K{"zo", "ぞ", "ゾ"},
-  K{"to", "と", "ト"}, K{"do", "ど", "ド"}, K{"no", "の", "ノ"}, K{"ho", "ほ", "ホ"}, K{"bo", "ぼ", "ボ"},
-  K{"po", "ぽ", "ポ"}, K{"mo", "も", "モ"}, K{"yo", "よ", "ヨ"}, K{"ro", "ろ", "ロ"}, K{"wo", "を", "ヲ", "o", "o"},
-  // お Digraphs
-  K{"vo", "ゔぉ", "ヴォ"}, K{"kyo", "きょ", "キョ"}, K{"gyo", "ぎょ", "ギョ"}, K{"gwo", "ぐぉ", "グォ"},
-  K{"qo", "くぉ", "クォ"}, K{"sho", "しょ", "ショ", V{"syo"}, true}, K{"jo", "じょ", "ジョ", V{"zyo", "jyo"}, true},
-  K{"cho", "ちょ", "チョ", V{"tyo"}, true}, K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"}, K{"tso", "つぉ", "ツォ"},
-  K{"tho", "てょ", "テョ"}, K{"two", "とぉ", "トォ"}, K{"nyo", "にょ", "ニョ"}, K{"hyo", "ひょ", "ヒョ"},
-  K{"byo", "びょ", "ビョ"}, K{"pyo", "ぴょ", "ピョ"}, K{"fo", "ふぉ", "フォ"}, K{"fyo", "ふょ", "フョ"},
+  K{"o", "お", "オ"}, K{"no", "の", "ノ"}, K{"mo", "も", "モ"}, K{"yo", "よ", "ヨ"}, K{"ro", "ろ", "ロ"},
+  K{"wo", "を", "ヲ", "o", "o"},
+  // Digraphs
+  K{"tso", "つぉ", "ツォ"}, K{"nyo", "にょ", "ニョ"}, K{"fo", "ふぉ", "フォ"}, K{"fyo", "ふょ", "フョ"},
   K{"myo", "みょ", "ミョ"}, K{"ryo", "りょ", "リョ"},
+  // Digraphs that only have a dakuten version
+  K{"va", "ゔぁ", "ヴァ"}, K{"vo", "ゔぉ", "ヴォ"}, K{"vya", "ゔゃ", "ヴャ"}, K{"vyu", "ゔゅ", "ヴュ"},
+  K{"vyo", "ゔょ", "ヴョ"},
   // 12 Small letters (5 vowels, 2 k's, 3 y's, small 'wa' and small 'tsu') - prefer 'l' versions for Romaji output
   K{"la", "ぁ", "ァ", V{"xa"}}, K{"li", "ぃ", "ィ", V{"xi"}}, K{"lu", "ぅ", "ゥ", V{"xu"}},
   K{"le", "ぇ", "ェ", V{"xe", "lye", "xye"}}, K{"lo", "ぉ", "ォ", V{"xo"}}, K{"lka", "ゕ", "ヵ", V{"xka"}},
@@ -77,6 +51,61 @@ const std::array KanaList{
   K{"lyo", "ょ", "ョ", V{"xyo"}}, K{"lwa", "ゎ", "ヮ", V{"xwa"}}, K{"ltu", "っ", "ッ", V{"xtu"}},
   // ん - keep 'n' as well as the previous small 'tsu' at the end of the list
   K{"n", "ん", "ン"}};
+
+using D = KanaConvert::DakutenKana;
+// 'DakutenKanaList' contains kana that have a 'dakuten' version, but not 'h'
+std::array DakutenKanaList = {
+  // --- あ 行 ---
+  D{"ka", "か", "カ", K{"ga", "が", "ガ"}}, D{"sa", "さ", "サ", K{"za", "ざ", "ザ"}},
+  D{"ta", "た", "タ", K{"da", "だ", "ダ"}}, D{"kya", "きゃ", "キャ", K{"gya", "ぎゃ", "ギャ"}},
+  // Diagraphs
+  D{"qa", "くぁ", "クァ", K{"gwa", "ぐぁ", "グァ"}, V{"kwa"}},
+  D{"sha", "しゃ", "シャ", K{"ja", "じゃ", "ジャ", V{"zya", "jya"}, true}, V{"sya"}, true},
+  D{"cha", "ちゃ", "チャ", K{"dya", "ぢゃ", "ヂャ", "ja", "zya"}, V{"tya"}, true},
+  D{"twa", "とぁ", "トァ", K{"dwa", "どぁ", "ドァ"}},
+  // --- い 行 ---
+  D{"ki", "き", "キ", K{"gi", "ぎ", "ギ"}}, D{"shi", "し", "シ", K{"ji", "じ", "ジ", V{"zi"}, true}, V{"si"}, true},
+  D{"chi", "ち", "チ", K{"di", "ぢ", "ヂ", "ji", "zi"}, V{"ti"}, true},
+  // Digraphs
+  D{"kyi", "きぃ", "キィ", K{"gyi", "ぎぃ", "ギィ"}}, D{"syi", "しぃ", "シィ", K{"zyi", "じぃ", "ジィ"}},
+  D{"tyi", "ちぃ", "チィ", K{"dyi", "ぢぃ", "ヂィ"}}, D{"thi", "てぃ", "ティ", K{"dhi", "でぃ", "ディ"}},
+  // --- う 行 ---
+  D{"u", "う", "ウ", K{"vu", "ゔ", "ヴ"}}, D{"ku", "く", "ク", K{"gu", "ぐ", "グ"}},
+  D{"su", "す", "ス", K{"zu", "ず", "ズ"}}, D{"tsu", "つ", "ツ", K{"du", "づ", "ヅ", "zu", "zu"}, V{"tu"}, true},
+  // Digraphs
+  D{"wi", "うぃ", "ウィ", K{"vi", "ゔぃ", "ヴィ"}}, D{"kyu", "きゅ", "キュ", K{"gyu", "ぎゅ", "ギュ"}},
+  D{"qi", "くぃ", "クィ", K{"gwi", "ぐぃ", "グィ"}, V{"kwi"}}, D{"qu", "くぅ", "クゥ", K{"gwu", "ぐぅ", "グゥ"}},
+  D{"shu", "しゅ", "シュ", K{"ju", "じゅ", "ジュ", V{"zyu", "jyu"}, true}, V{"syu"}, true},
+  D{"chu", "ちゅ", "チュ", K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"}, V{"tyu"}, true},
+  D{"twu", "とぅ", "トゥ", K{"dwu", "どぅ", "ドゥ"}},
+  // --- え 行 ---
+  D{"ke", "け", "ケ", K{"ge", "げ", "ゲ"}}, D{"kye", "きぇ", "キェ", K{"gye", "ぎぇ", "ギェ"}},
+  D{"se", "せ", "セ", K{"ze", "ぜ", "ゼ"}}, D{"te", "て", "テ", K{"de", "で", "デ"}},
+  // Digraphs
+  D{"we", "うぇ", "ウェ", K{"ve", "ゔぇ", "ヴェ"}}, D{"qe", "くぇ", "クェ", K{"gwe", "ぐぇ", "グェ"}},
+  D{"she", "しぇ", "シェ", K{"je", "じぇ", "ジェ", V{"zye"}}}, D{"the", "てぇ", "テェ", K{"dhe", "でぇ", "デェ"}},
+  D{"twe", "とぇ", "トェ", K{"dwe", "どぇ", "ドェ"}},
+  // --- お 行 ---
+  D{"ko", "こ", "コ", K{"go", "ご", "ゴ"}}, D{"so", "そ", "ソ", K{"zo", "ぞ", "ゾ"}},
+  D{"to", "と", "ト", K{"do", "ど", "ド"}},
+  // Digraphs
+  D{"kyo", "きょ", "キョ", K{"gyo", "ぎょ", "ギョ"}}, D{"qo", "くぉ", "クォ", K{"gwo", "ぐぉ", "グォ"}},
+  D{"sho", "しょ", "ショ", K{"jo", "じょ", "ジョ", V{"zyo", "jyo"}, true}, V{"syo"}, true},
+  D{"cho", "ちょ", "チョ", K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"}, V{"tyo"}, true},
+  D{"tho", "てょ", "テョ", K{"dho", "でょ", "デョ"}}, D{"two", "とぉ", "トォ", K{"dwo", "どぉ", "ドォ"}}};
+
+using H = KanaConvert::HanDakutenKana;
+// 'HanDakutenKanaList' contains kana that have both a 'dakuten' and a 'han-dakuten' (so 'h' row)
+std::array HanDakutenKanaList = {H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{"pa", "ぱ", "パ"}},
+                                 H{"hi", "ひ", "ヒ", K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}},
+                                 H{"fu", "ふ", "フ", K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"}, V{"hu"}, true},
+                                 H{"he", "へ", "ヘ", K{"be", "べ", "ベ"}, K{"pe", "ぺ", "ペ"}},
+                                 H{"ho", "ほ", "ホ", K{"bo", "ぼ", "ボ"}, K{"po", "ぽ", "ポ"}},
+                                 H{"hya", "ひゃ", "ヒャ", K{"bya", "びゃ", "ビャ"}, K{"pya", "ぴゃ", "ピャ"}},
+                                 H{"hyi", "ひぃ", "ヒィ", K{"byi", "びぃ", "ビィ"}, K{"pyi", "ぴぃ", "ピィ"}},
+                                 H{"hyu", "ひゅ", "ヒュ", K{"byu", "びゅ", "ビュ"}, K{"pyu", "ぴゅ", "ピュ"}},
+                                 H{"hye", "ひぇ", "ヒェ", K{"bye", "びぇ", "ビェ"}, K{"pye", "ぴぇ", "ピェ"}},
+                                 H{"hyo", "ひょ", "ヒョ", K{"byo", "びょ", "ビョ"}, K{"pyo", "ぴょ", "ピョ"}}};
 
 std::ostream& operator<<(std::ostream& os, const K& k) {
   return os << '[' << k.romaji() << ", " << k.hiragana() << ", " << k.katakana() << ']';
@@ -96,6 +125,8 @@ constexpr std::array Delimiters{P(' ', "　"), P('.', "。"), P(',', "、"), P('
 
 } // namespace
 
+std::string KanaConvert::RepeatMark::getRomaji(const std::string& prevKana, int flags) const { return prevKana; }
+
 KanaConvert::Map KanaConvert::populate(CharType t) {
   Map result;
   int duplicates = 0;
@@ -106,30 +137,55 @@ KanaConvert::Map KanaConvert::populate(CharType t) {
       ++duplicates;
     }
   };
+  auto processKana = [&insert, t](auto& k) {
+    switch (t) {
+    case CharType::Romaji:
+      insert(k.romaji(), k);
+      for (auto& i : k.variants())
+        insert(i, k);
+      break;
+    case CharType::Hiragana: insert(k.hiragana(), k); break;
+    case CharType::Katakana: insert(k.katakana(), k); break;
+    }
+  };
+  auto checkKana = [](auto& k) {
+    for (auto& i : k.variants())
+      assert(!i.empty() && i.length() < 4);                           // must be 1 to 3 chars
+    assert(!k.romaji().empty() && k.romaji().length() < 4);           // must be 1 to 3 chars
+    assert(k.hiragana().length() == 3 || k.hiragana().length() == 6); // 3 bytes per character
+    assert(k.katakana().length() == 3 || k.katakana().length() == 6); // 3 bytes per characer
+    assert(isAllSingleByte(k.romaji()));
+    assert(isAllHiragana(k.hiragana()));
+    assert(isAllKatakana(k.katakana()));
+  };
+  // if first time then do some sanity checking on all the lists
   static bool firstTime = true;
   if (firstTime) {
-    for (auto& i : KanaList) {
-      for (auto& j : i.variants())
-        assert(!i.romaji().empty() && i.romaji().length() < 4);         // must be 1 to 3 chars
-      assert(!i.romaji().empty() && i.romaji().length() < 4);           // must be 1 to 3 chars
-      assert(i.hiragana().length() == 3 || i.hiragana().length() == 6); // 3 bytes per character
-      assert(i.katakana().length() == 3 || i.katakana().length() == 6); // 3 bytes per characer
-      assert(isAllSingleByte(i.romaji()));
-      assert(isAllHiragana(i.hiragana()));
-      assert(isAllKatakana(i.katakana()));
+    for (auto& i : KanaList)
+      checkKana(i);
+    for (auto& i : DakutenKanaList) {
+      checkKana(i);
+      checkKana(i.dakutenKana());
+    }
+    for (auto& i : HanDakutenKanaList) {
+      checkKana(i);
+      checkKana(i.dakutenKana());
+      checkKana(i.hanDakutenKana());
     }
     firstTime = false;
   }
+  // process lists (inserting into 'result')
   for (auto& i : KanaList)
-    switch (t) {
-    case CharType::Romaji:
-      insert(i.romaji(), i);
-      for (auto& j : i.variants())
-        insert(j, i);
-      break;
-    case CharType::Hiragana: insert(i.hiragana(), i); break;
-    case CharType::Katakana: insert(i.katakana(), i); break;
-    }
+    processKana(i);
+  for (auto& i : DakutenKanaList) {
+    processKana(i);
+    processKana(i.dakutenKana());
+  }
+  for (auto& i : HanDakutenKanaList) {
+    processKana(i);
+    processKana(i.dakutenKana());
+    processKana(i.hanDakutenKana());
+  }
   assert(duplicates == 0);
   return result;
 }
@@ -138,18 +194,19 @@ KanaConvert::KanaConvert()
   : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
     _katakanaMap(populate(CharType::Katakana)), _smallTsu(KanaList[KanaList.size() - 2]),
     _n(KanaList[KanaList.size() - 1]), _prolongMark("ー") {
-  for (auto& i : KanaList) {
-    if (!i.romaji().starts_with("n")) {
-      if (i.romaji().length() == 1 || i.romaji() == "ya" || i.romaji() == "yu" || i.romaji() == "yo") {
-        assert(_markHiraganaAfterN.insert(i.hiragana()).second);
-        assert(_markKatakanaAfterN.insert(i.katakana()).second);
-      } else if (i.romaji().starts_with("l")) {
-        if (i != _smallTsu && !i.romaji().starts_with("lk")) {
-          assert(_smallHiragana.insert(i.hiragana()).second);
-          assert(_smallKatakana.insert(i.katakana()).second);
+  for (auto& i : _hiraganaMap) {
+    auto r = i.second->romaji();
+    if (!r.starts_with("n")) {
+      if (r.length() == 1 || r == "ya" || r == "yu" || r == "yo") {
+        assert(_markAfterNHiragana.insert(i.second->hiragana()).second);
+        assert(_markAfterNKatakana.insert(i.second->katakana()).second);
+      } else if (r.starts_with("l")) {
+        if (*i.second != _smallTsu && !r.starts_with("lk")) {
+          assert(_digraphSecondHiragana.insert(i.second->hiragana()).second);
+          assert(_digraphSecondKatakana.insert(i.second->katakana()).second);
         }
       } else
-        _repeatingConsonents.insert(i.romaji()[0]);
+        _repeatingConsonents.insert(r[0]);
     }
   }
   for (auto& i : Delimiters) {
@@ -168,17 +225,17 @@ void KanaConvert::verifyData() const {
   assert(_repeatingConsonents.size() == 18); // 26 - 8 where '8' is 5 vowels + 3 consonents (l, n and x)
   for (auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
     assert(_repeatingConsonents.contains(i) == false);
-  assert(_markHiraganaAfterN.size() == 8); // 5 vowels plus 3 y's
-  assert(_markHiraganaAfterN.size() == _markKatakanaAfterN.size());
-  assert(_smallHiragana.size() == 9); // 5 small vowels plus 3 small y's plus small 'wa'
-  assert(_smallHiragana.size() == _smallKatakana.size());
-  for (auto& i : _markHiraganaAfterN)
+  assert(_markAfterNHiragana.size() == 8); // 5 vowels plus 3 y's
+  assert(_markAfterNHiragana.size() == _markAfterNKatakana.size());
+  assert(_digraphSecondHiragana.size() == 9); // 5 small vowels plus 3 small y's plus small 'wa'
+  assert(_digraphSecondHiragana.size() == _digraphSecondKatakana.size());
+  for (auto& i : _markAfterNHiragana)
     assert(isHiragana(i));
-  for (auto& i : _markKatakanaAfterN)
+  for (auto& i : _markAfterNKatakana)
     assert(isKatakana(i));
-  for (auto& i : _smallHiragana)
+  for (auto& i : _digraphSecondHiragana)
     assert(isHiragana(i));
-  for (auto& i : _smallKatakana)
+  for (auto& i : _digraphSecondKatakana)
     assert(isKatakana(i));
   assert(_wideToNarrowDelims.size() == Delimiters.size());
   assert(_narrowToWideDelims.size() == Delimiters.size());
@@ -195,9 +252,9 @@ std::string KanaConvert::convert(const std::string& input, CharType target, int 
 std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, int flags) const {
   if (source == target) return input;
   if (source == CharType::Hiragana)
-    return convertFromKana(input, target, flags, _hiraganaMap, _markHiraganaAfterN, _smallHiragana);
+    return convertFromKana(input, target, flags, _hiraganaMap, _markAfterNHiragana, _digraphSecondHiragana);
   if (source == CharType::Katakana)
-    return convertFromKana(input, target, flags, _katakanaMap, _markKatakanaAfterN, _smallKatakana);
+    return convertFromKana(input, target, flags, _katakanaMap, _markAfterNKatakana, _digraphSecondKatakana);
   // When source is Romaji break input up into words separated by any of _narrowDelims and process
   // each word. This helps deal with words ending in 'n'.
   std::string result;

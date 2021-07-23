@@ -56,8 +56,18 @@ protected:
   void checkKunrei(const char* hiragana, const char* katakana, const char* romaji, const char* kunrei) const {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
+  void checkSmallKana(CharType source, const std::string& s) const {
+    // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
+    // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
+    std::string romaji = "lalilulelolkalkelyalyulyoltulwa";
+    EXPECT_EQ(_converter.convert(s, source, CharType::Romaji), romaji);
+    EXPECT_EQ(_converter.convert(romaji, CharType::Romaji, source), s);
+    // Also test 'x' style for input to conversion
+    std::replace(romaji.begin(), romaji.end(), 'l', 'x');
+    EXPECT_EQ(_converter.convert(romaji, CharType::Romaji, source), s);
+  }
   const KanaConvert _converter;
-  enum Values { Monographs = 86, Digraphs = 95, Variants = 34 };
+  enum Values { Monographs = 86, Digraphs = 106, Variants = 35 };
   const int TotalKanaCombinations = Monographs + Digraphs + Variants;
 };
 
@@ -159,11 +169,11 @@ TEST_F(KanaConvertTest, CheckRomaji) {
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 49);
-  EXPECT_EQ(iCount, 38);
-  EXPECT_EQ(uCount, 44);
-  EXPECT_EQ(eCount, 40);
-  EXPECT_EQ(oCount, 43);
+  EXPECT_EQ(aCount, 51);
+  EXPECT_EQ(iCount, 41);
+  EXPECT_EQ(uCount, 45);
+  EXPECT_EQ(eCount, 43);
+  EXPECT_EQ(oCount, 46);
   EXPECT_EQ(nCount, 1);
   EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalKanaCombinations);
   EXPECT_EQ(variants.size(), Variants);
@@ -230,9 +240,7 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("かつ　さんど！"), "katsu sando!");
   EXPECT_EQ(hiraganaToRomaji("うぃき"), "wiki");
   EXPECT_EQ(hiraganaToRomaji("おんな"), "onna");
-  // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
-  // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
-  EXPECT_EQ(hiraganaToRomaji("ぁぃぅぇぉゃゅょっ"), "lalilulelolyalyulyoltu");
+  checkSmallKana(CharType::Hiragana, "ぁぃぅぇぉゕゖゃゅょっゎ");
   EXPECT_EQ(hiraganaToRomaji("きょうと"), "kyouto");
   EXPECT_EQ(hiraganaToRomaji("にいがた"), "niigata");
   EXPECT_EQ(hiraganaToRomaji("かんけいない"), "kankeinai");
@@ -276,9 +284,7 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("エ"), "e");
   EXPECT_EQ(katakanaToRomaji("アカ　サカ！"), "aka saka!");
   EXPECT_EQ(katakanaToRomaji("イェビス"), "yebisu");
-  // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
-  // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
-  EXPECT_EQ(katakanaToRomaji("ァィゥェォャュョッ"), "lalilulelolyalyulyoltu");
+  checkSmallKana(CharType::Katakana, "ァィゥェォヵヶャュョッヮ");
   EXPECT_EQ(katakanaToRomaji("テニス"), "tenisu");
   EXPECT_EQ(katakanaToRomaji("カナダ"), "kanada");
   // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
