@@ -2,20 +2,11 @@
 
 #include <kanji/Kana.h>
 #include <kanji/KanaConvert.h>
-#include <kanji/MBChar.h>
-#include <kanji/MBUtils.h>
 
 namespace kanji {
 
 class KanaConvertTest : public ::testing::Test {
 protected:
-  static const char** argv() {
-    static const char* arg0 = "testMain";
-    static const char* arg1 = "-data";
-    static const char* arg2 = "../../data";
-    static const char* args[] = {arg0, arg1, arg2};
-    return args;
-  }
   std::string romajiToHiragana(const std::string& s, int flags = 0) const {
     return _converter.convert(s, CharType::Romaji, CharType::Hiragana, flags);
   }
@@ -75,117 +66,7 @@ protected:
     EXPECT_EQ(_converter.convert(romaji, CharType::Romaji, source), s);
   }
   const KanaConvert _converter;
-  enum Values { Monographs = 86, Digraphs = 106, Variants = 35 };
-  const int TotalKanaCombinations = Monographs + Digraphs + Variants;
 };
-
-TEST_F(KanaConvertTest, CheckHiragana) {
-  EXPECT_EQ(_converter.hiraganaMap().size(), Monographs + Digraphs);
-  int monographs = 0, digraphs = 0;
-  for (auto& i : _converter.hiraganaMap()) {
-    MBChar s(i.first);
-    std::string c;
-    auto check = [&i, &c](const std::string& a, const std::string& b = "") {
-      EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-                                                    << i.second->romaji() << "', hiragana " << i.first;
-    };
-    EXPECT_TRUE(s.next(c));
-    EXPECT_TRUE(isHiragana(c)) << c;
-    if (s.next(c)) {
-      ++digraphs;
-      EXPECT_TRUE(isHiragana(c)) << c;
-      // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second->romaji().length();
-      ASSERT_GT(romajiLen, 1);
-      if (i.second->romaji() == "qwa") // the only digraph that ends with small 'wa'
-        EXPECT_EQ(i.first, "くゎ");
-      else
-        switch (i.second->romaji()[romajiLen - 1]) {
-        case 'a': check("ぁ", "ゃ"); break;
-        case 'i': check("ぃ"); break;
-        case 'u': check("ぅ", "ゅ"); break;
-        case 'e': check("ぇ"); break;
-        case 'o': check("ぉ", "ょ"); break;
-        default: check("");
-        }
-      // can't be longer than 2 characters
-      EXPECT_FALSE(s.next(c));
-    } else
-      ++monographs;
-  }
-  EXPECT_EQ(monographs, Monographs);
-  EXPECT_EQ(digraphs, Digraphs);
-}
-
-TEST_F(KanaConvertTest, CheckKatakana) {
-  EXPECT_EQ(_converter.katakanaMap().size(), Monographs + Digraphs);
-  int monographs = 0, digraphs = 0;
-  for (auto& i : _converter.katakanaMap()) {
-    MBChar s(i.first);
-    std::string c;
-    auto check = [&i, &c](const std::string& a, const std::string& b = "") {
-      EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-                                                    << i.second->romaji() << "', katakana " << i.first;
-    };
-    EXPECT_TRUE(s.next(c));
-    EXPECT_TRUE(isKatakana(c)) << c;
-    if (s.next(c)) {
-      ++digraphs;
-      EXPECT_TRUE(isKatakana(c)) << c;
-      // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second->romaji().length();
-      ASSERT_GT(romajiLen, 1);
-      if (i.second->romaji() == "qwa") // the only digraph that ends with small 'wa'
-        EXPECT_EQ(i.first, "クヮ");
-      else
-        switch (i.second->romaji()[romajiLen - 1]) {
-        case 'a': check("ァ", "ャ"); break;
-        case 'i': check("ィ"); break;
-        case 'u': check("ゥ", "ュ"); break;
-        case 'e': check("ェ"); break;
-        case 'o': check("ォ", "ョ"); break;
-        default: check("");
-        }
-      // can't be longer than 2 characters
-      EXPECT_FALSE(s.next(c));
-    } else
-      ++monographs;
-  }
-  EXPECT_EQ(monographs, Monographs);
-  EXPECT_EQ(digraphs, Digraphs);
-}
-
-TEST_F(KanaConvertTest, CheckRomaji) {
-  EXPECT_EQ(_converter.romajiMap().size(), TotalKanaCombinations);
-  int aCount = 0, iCount = 0, uCount = 0, eCount = 0, oCount = 0, nCount = 0;
-  oCount = 0, nCount = 0;
-  std::set<std::string> variants;
-  for (auto& i : _converter.romajiMap()) {
-    ASSERT_FALSE(i.first.empty());
-    EXPECT_LT(i.first.length(), 4);
-    for (auto& j : i.second->variants())
-      variants.insert(j);
-    if (i.first == "n")
-      ++nCount;
-    else
-      switch (i.first[i.first.length() - 1]) {
-      case 'a': ++aCount; break;
-      case 'i': ++iCount; break;
-      case 'u': ++uCount; break;
-      case 'e': ++eCount; break;
-      case 'o': ++oCount; break;
-      default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
-      }
-  }
-  EXPECT_EQ(aCount, 51);
-  EXPECT_EQ(iCount, 41);
-  EXPECT_EQ(uCount, 45);
-  EXPECT_EQ(eCount, 43);
-  EXPECT_EQ(oCount, 46);
-  EXPECT_EQ(nCount, 1);
-  EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalKanaCombinations);
-  EXPECT_EQ(variants.size(), Variants);
-}
 
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
   std::string s("atatakaiあたたかいアタタカイ");
@@ -333,12 +214,12 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
 }
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
-  for (auto& i : _converter.hiraganaMap()) {
+  for (auto& i : Kana::getMap(CharType::Hiragana)) {
     auto r = _converter.convert(i.first, CharType::Hiragana, CharType::Katakana);
     EXPECT_EQ(r, i.second->katakana());
     EXPECT_EQ(_converter.convert(r, CharType::Katakana, CharType::Hiragana), i.second->hiragana());
   }
-  for (auto& i : _converter.katakanaMap()) {
+  for (auto& i : Kana::getMap(CharType::Katakana)) {
     auto r = _converter.convert(i.first, CharType::Katakana, CharType::Hiragana);
     EXPECT_EQ(r, i.second->hiragana());
     EXPECT_EQ(_converter.convert(r, CharType::Hiragana, CharType::Katakana), i.second->katakana());
@@ -347,7 +228,9 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
   kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？", "ビッグ　バアド、スマール　ハッマー？");
-  // repeating symbol
+}
+
+TEST_F(KanaConvertTest, RepeatSymbol) {
   kanaConvertCheck("かゝ", "カヽ", "kaka");
   kanaConvertCheck("かゞ", "カヾ", "kaga");
   kanaConvertCheck("がゝ", "ガヽ", "gaka");
@@ -361,6 +244,15 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
   kanaConvertCheck("びゞ", "ビヾ", "bibi");
   kanaConvertCheck("ぴゝ", "ピヽ", "pihi");
   kanaConvertCheck("ぴゞ", "ピヾ", "pipi");
+  // don't convert a repeat symbol if it's not part of 'source' type
+  EXPECT_EQ(hiraganaToKatakana("こヽろ"), "コヽロ");
+  EXPECT_EQ(hiraganaToKatakana("こヾろ"), "コヾロ");
+  EXPECT_EQ(hiraganaToRomaji("こヽろ"), "koヽro");
+  EXPECT_EQ(hiraganaToRomaji("こヾろ"), "koヾro");
+  EXPECT_EQ(katakanaToHiragana("コゝロ"), "こゝろ");
+  EXPECT_EQ(katakanaToHiragana("コゞロ"), "こゞろ");
+  EXPECT_EQ(katakanaToRomaji("コゝロ"), "koゝro");
+  EXPECT_EQ(katakanaToRomaji("コゞロ"), "koゞro");
   // currently a digraph will also be repeated - this might not be correct behavior
   kanaConvertCheck("きょゝ", "キョヽ", "kyokyo");
   kanaConvertCheck("きょゞ", "キョヾ", "kyogyo");

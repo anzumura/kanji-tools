@@ -1,26 +1,13 @@
 #ifndef KANJI_KANA_CONVERT_H
 #define KANJI_KANA_CONVERT_H
 
-#include <array>
 #include <map>
-#include <optional>
 #include <set>
 #include <string>
-#include <vector>
 
 namespace kanji {
 
-// 'CharType' is used to specify 'source' and 'target' types for 'KanaConvert::convert' methods
-enum class CharType { Hiragana, Katakana, Romaji };
-constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
-inline const std::string& toString(CharType t) {
-  static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
-  switch (t) {
-  case CharType::Hiragana: return hiragana;
-  case CharType::Katakana: return katakana;
-  case CharType::Romaji: return romaji;
-  }
-}
+enum class CharType;
 
 // 'KanaConvert' supports converting between Rōmaji (ローマジ), Hiragana (平仮名) and Katakana
 // (片仮名). When Rōmaji is the output target, Revised Hepburn System (ヘボン式) is used, but
@@ -80,53 +67,21 @@ public:
   // an explanation of available flags that can be used.
   std::string convert(const std::string& input, CharType target, int flags = 0) const;
   std::string convert(const std::string& input, CharType source, CharType target, int flags = 0) const;
-
-  using Map = std::map<std::string, const class Kana*>;
-  const Map& romajiMap() const { return _romajiMap; }
-  const Map& hiraganaMap() const { return _hiraganaMap; }
-  const Map& katakanaMap() const { return _katakanaMap; }
 private:
-  // 'RepeatMark' if for handling repeating kana marks (一の時点) when source is Hiragana or Katakana.
-  class RepeatMark {
-  public:
-    RepeatMark(const char* hiragana, const char* katakana, bool dakuten = false)
-      : _hiragana(hiragana), _katakana(katakana), _dakuten(dakuten) {
-      assert(_hiragana != _katakana);
-    }
-    bool contains(const std::string& s) const { return _hiragana == s || _katakana == s; }
-    std::string get(CharType target, int flags, const Kana* prevKana) const;
-  private:
-    const std::string _hiragana;
-    const std::string _katakana;
-    const bool _dakuten; // true if this instance if for the 'dakuten' (濁点) versions of the marks
-  };
-
-  static Map populate(CharType);
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
   using Set = std::set<std::string>;
-  std::string convertFromKana(const std::string& input, CharType target, int flags, const Map& sourceMap,
-                              const Set& afterN, const Set& smallKana) const;
-  std::string kanaLetters(const Map& sourceMap, const Kana*& prevKana, const std::string& letterGroup, int count,
-                          CharType target, int flags, bool prolong = false) const;
+  std::string convertFromKana(const std::string& input, CharType source, CharType target, int flags, const Set& afterN,
+                              const Set& smallKana) const;
+  std::string kanaLetters(const std::string& letterGroup, CharType source, CharType target, int flags, int count,
+                          const Kana*& prevKana, bool prolong = false) const;
   std::string convertFromRomaji(const std::string& input, CharType target, int flags) const;
   void romajiLetters(std::string& letterGroup, std::string& result, CharType target, int flags) const;
-
-  const Map _romajiMap;
-  const Map _hiraganaMap;
-  const Map _katakanaMap;
-  const Kana& _smallTsu;
-  const Kana& _n;
-  // '_prolongMark' (ー) is officially in the Katakana Unicode block, but it can also rarely appear
-  // in some (non-standard) Hiragana words like らーめん.
-  const std::string _prolongMark;
   // Either '_apostrophe' or '_dash' can be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used. Note,
   // dash is used in 'Traditional Hepburn' whereas apostrophe is used in 'Modern (revised) Hepburn'.
   const char _apostrophe = '\'';
   const char _dash = '-';
-  const RepeatMark _repeatUnaccented;
-  const RepeatMark _repeatAccented;
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
   // '_markAfterN...' sets contain the 8 kana symbols (5 vowels and 3 y's) that should be proceedeed

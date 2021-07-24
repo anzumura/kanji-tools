@@ -10,108 +10,6 @@ namespace kanji {
 
 namespace {
 
-using K = Kana;
-using V = Kana::List;
-// 'KanaList' has mappings for all monographs (single kana) with no 'dakuten' or 'han-dakuten' versions
-// and regularly used digraphs (normal kana followed by a small kana 'vowel', 'y' or 'wa'). See
-// comments for 'Kana' class for a description of the fields.
-const std::array KanaList{
-  // --- あ 行 ---
-  K{"a", "あ", "ア"}, K{"na", "な", "ナ"}, K{"ma", "ま", "マ"}, K{"ya", "や", "ヤ"}, K{"ra", "ら", "ラ"},
-  K{"wa", "わ", "ワ"},
-  // Digraphs
-  K{"qwa", "くゎ", "クヮ"}, K{"swa", "すぁ", "スァ"}, K{"tsa", "つぁ", "ツァ"}, K{"nya", "にゃ", "ニャ"},
-  K{"fa", "ふぁ", "ファ"}, K{"fya", "ふゃ", "フャ"}, K{"mya", "みゃ", "ミャ"}, K{"rya", "りゃ", "リャ"},
-  // --- い 行 ---
-  K{"i", "い", "イ"}, K{"ni", "に", "ニ"}, K{"mi", "み", "ミ"}, K{"ri", "り", "リ"}, K{"wyi", "ゐ", "ヰ", "i", "i"},
-  // Digraphs
-  K{"tsi", "つぃ", "ツィ"}, K{"nyi", "にぃ", "ニィ"}, K{"fi", "ふぃ", "フィ", V{"fyi"}}, K{"myi", "みぃ", "ミィ"},
-  K{"ryi", "りぃ", "リィ"},
-  // --- う 行 ---
-  K{"nu", "ぬ", "ヌ"}, K{"mu", "む", "ム"}, K{"yu", "ゆ", "ユ"}, K{"ru", "る", "ル"},
-  // Digraphs
-  K{"nyu", "にゅ", "ニュ"}, K{"fyu", "ふゅ", "フュ"}, K{"myu", "みゅ", "ミュ"}, K{"ryu", "りゅ", "リュ"},
-  // --- え 行 ---
-  K{"e", "え", "エ"}, K{"ne", "ね", "ネ"}, K{"me", "め", "メ"}, K{"re", "れ", "レ"}, K{"wye", "ゑ", "ヱ", "e", "e"},
-  // Digraphs
-  K{"ye", "いぇ", "イェ"}, K{"che", "ちぇ", "チェ"}, K{"tse", "つぇ", "ツェ"}, K{"nye", "にぇ", "ニェ"},
-  K{"fe", "ふぇ", "フェ"}, K{"mye", "みぇ", "ミェ"}, K{"rye", "りぇ", "リェ"},
-  // --- お 行 ---
-  K{"o", "お", "オ"}, K{"no", "の", "ノ"}, K{"mo", "も", "モ"}, K{"yo", "よ", "ヨ"}, K{"ro", "ろ", "ロ"},
-  K{"wo", "を", "ヲ", "o", "o"},
-  // Digraphs
-  K{"tso", "つぉ", "ツォ"}, K{"nyo", "にょ", "ニョ"}, K{"fo", "ふぉ", "フォ"}, K{"fyo", "ふょ", "フョ"},
-  K{"myo", "みょ", "ミョ"}, K{"ryo", "りょ", "リョ"},
-  // Digraphs that only have a dakuten version
-  K{"va", "ゔぁ", "ヴァ"}, K{"vo", "ゔぉ", "ヴォ"}, K{"vya", "ゔゃ", "ヴャ"}, K{"vyu", "ゔゅ", "ヴュ"},
-  K{"vyo", "ゔょ", "ヴョ"},
-  // 12 Small letters (5 vowels, 2 k's, 3 y's, small 'wa' and small 'tsu') - prefer 'l' versions for Romaji output
-  K{"la", "ぁ", "ァ", V{"xa"}}, K{"li", "ぃ", "ィ", V{"xi"}}, K{"lu", "ぅ", "ゥ", V{"xu"}},
-  K{"le", "ぇ", "ェ", V{"xe", "lye", "xye"}}, K{"lo", "ぉ", "ォ", V{"xo"}}, K{"lka", "ゕ", "ヵ", V{"xka"}},
-  K{"lke", "ゖ", "ヶ", V{"xke"}}, K{"lya", "ゃ", "ャ", V{"xya"}}, K{"lyu", "ゅ", "ュ", V{"xyu"}},
-  K{"lyo", "ょ", "ョ", V{"xyo"}}, K{"lwa", "ゎ", "ヮ", V{"xwa"}}, K{"ltu", "っ", "ッ", V{"xtu"}},
-  // ん - keep 'n' as well as the previous small 'tsu' at the end of the list
-  K{"n", "ん", "ン"}};
-
-using D = DakutenKana;
-// 'DakutenKanaList' contains kana that have a 'dakuten' version, but not 'h'
-std::array DakutenKanaList = {
-  // --- あ 行 ---
-  D{"ka", "か", "カ", K{"ga", "が", "ガ"}}, D{"sa", "さ", "サ", K{"za", "ざ", "ザ"}},
-  D{"ta", "た", "タ", K{"da", "だ", "ダ"}}, D{"kya", "きゃ", "キャ", K{"gya", "ぎゃ", "ギャ"}},
-  // Diagraphs
-  D{"qa", "くぁ", "クァ", K{"gwa", "ぐぁ", "グァ"}, V{"kwa"}},
-  D{"sha", "しゃ", "シャ", K{"ja", "じゃ", "ジャ", V{"zya", "jya"}, true}, V{"sya"}, true},
-  D{"cha", "ちゃ", "チャ", K{"dya", "ぢゃ", "ヂャ", "ja", "zya"}, V{"tya"}, true},
-  D{"twa", "とぁ", "トァ", K{"dwa", "どぁ", "ドァ"}},
-  // --- い 行 ---
-  D{"ki", "き", "キ", K{"gi", "ぎ", "ギ"}}, D{"shi", "し", "シ", K{"ji", "じ", "ジ", V{"zi"}, true}, V{"si"}, true},
-  D{"chi", "ち", "チ", K{"di", "ぢ", "ヂ", "ji", "zi"}, V{"ti"}, true},
-  // Digraphs
-  D{"kyi", "きぃ", "キィ", K{"gyi", "ぎぃ", "ギィ"}}, D{"syi", "しぃ", "シィ", K{"zyi", "じぃ", "ジィ"}},
-  D{"tyi", "ちぃ", "チィ", K{"dyi", "ぢぃ", "ヂィ"}}, D{"thi", "てぃ", "ティ", K{"dhi", "でぃ", "ディ"}},
-  // --- う 行 ---
-  D{"u", "う", "ウ", K{"vu", "ゔ", "ヴ"}}, D{"ku", "く", "ク", K{"gu", "ぐ", "グ"}},
-  D{"su", "す", "ス", K{"zu", "ず", "ズ"}}, D{"tsu", "つ", "ツ", K{"du", "づ", "ヅ", "zu", "zu"}, V{"tu"}, true},
-  // Digraphs
-  D{"wi", "うぃ", "ウィ", K{"vi", "ゔぃ", "ヴィ"}}, D{"kyu", "きゅ", "キュ", K{"gyu", "ぎゅ", "ギュ"}},
-  D{"qi", "くぃ", "クィ", K{"gwi", "ぐぃ", "グィ"}, V{"kwi"}}, D{"qu", "くぅ", "クゥ", K{"gwu", "ぐぅ", "グゥ"}},
-  D{"shu", "しゅ", "シュ", K{"ju", "じゅ", "ジュ", V{"zyu", "jyu"}, true}, V{"syu"}, true},
-  D{"chu", "ちゅ", "チュ", K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"}, V{"tyu"}, true},
-  D{"twu", "とぅ", "トゥ", K{"dwu", "どぅ", "ドゥ"}},
-  // --- え 行 ---
-  D{"ke", "け", "ケ", K{"ge", "げ", "ゲ"}}, D{"kye", "きぇ", "キェ", K{"gye", "ぎぇ", "ギェ"}},
-  D{"se", "せ", "セ", K{"ze", "ぜ", "ゼ"}}, D{"te", "て", "テ", K{"de", "で", "デ"}},
-  // Digraphs
-  D{"we", "うぇ", "ウェ", K{"ve", "ゔぇ", "ヴェ"}}, D{"qe", "くぇ", "クェ", K{"gwe", "ぐぇ", "グェ"}},
-  D{"she", "しぇ", "シェ", K{"je", "じぇ", "ジェ", V{"zye"}}}, D{"the", "てぇ", "テェ", K{"dhe", "でぇ", "デェ"}},
-  D{"twe", "とぇ", "トェ", K{"dwe", "どぇ", "ドェ"}},
-  // --- お 行 ---
-  D{"ko", "こ", "コ", K{"go", "ご", "ゴ"}}, D{"so", "そ", "ソ", K{"zo", "ぞ", "ゾ"}},
-  D{"to", "と", "ト", K{"do", "ど", "ド"}},
-  // Digraphs
-  D{"kyo", "きょ", "キョ", K{"gyo", "ぎょ", "ギョ"}}, D{"qo", "くぉ", "クォ", K{"gwo", "ぐぉ", "グォ"}},
-  D{"sho", "しょ", "ショ", K{"jo", "じょ", "ジョ", V{"zyo", "jyo"}, true}, V{"syo"}, true},
-  D{"cho", "ちょ", "チョ", K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"}, V{"tyo"}, true},
-  D{"tho", "てょ", "テョ", K{"dho", "でょ", "デョ"}}, D{"two", "とぉ", "トォ", K{"dwo", "どぉ", "ドォ"}}};
-
-using H = HanDakutenKana;
-// 'HanDakutenKanaList' contains kana that have both a 'dakuten' and a 'han-dakuten' (so 'h' row)
-std::array HanDakutenKanaList = {H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{"pa", "ぱ", "パ"}},
-                                 H{"hi", "ひ", "ヒ", K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}},
-                                 H{"fu", "ふ", "フ", K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"}, V{"hu"}, true},
-                                 H{"he", "へ", "ヘ", K{"be", "べ", "ベ"}, K{"pe", "ぺ", "ペ"}},
-                                 H{"ho", "ほ", "ホ", K{"bo", "ぼ", "ボ"}, K{"po", "ぽ", "ポ"}},
-                                 H{"hya", "ひゃ", "ヒャ", K{"bya", "びゃ", "ビャ"}, K{"pya", "ぴゃ", "ピャ"}},
-                                 H{"hyi", "ひぃ", "ヒィ", K{"byi", "びぃ", "ビィ"}, K{"pyi", "ぴぃ", "ピィ"}},
-                                 H{"hyu", "ひゅ", "ヒュ", K{"byu", "びゅ", "ビュ"}, K{"pyu", "ぴゅ", "ピュ"}},
-                                 H{"hye", "ひぇ", "ヒェ", K{"bye", "びぇ", "ビェ"}, K{"pye", "ぴぇ", "ピェ"}},
-                                 H{"hyo", "ひょ", "ヒョ", K{"byo", "びょ", "ビョ"}, K{"pyo", "ぴょ", "ピョ"}}};
-
-std::ostream& operator<<(std::ostream& os, const K& k) {
-  return os << '[' << k.romaji() << ", " << k.hiragana() << ", " << k.katakana() << ']';
-}
-
 using P = std::pair<char, const char*>;
 // Support converting other non-letter ascii from narrow to wide values. These values are also used as
 // delimiters for splitting up input strings when converting from Rõmaji to Kana. Use a '*' for katakana
@@ -126,74 +24,15 @@ constexpr std::array Delimiters{P(' ', "　"), P('.', "。"), P(',', "、"), P('
 
 } // namespace
 
-std::string KanaConvert::RepeatMark::get(CharType target, int flags, const Kana* prevKana) const {
-  switch (target) {
-  case CharType::Hiragana: return _hiragana;
-  case CharType::Katakana: return _katakana;
-  default: break;
-  }
-  if (!prevKana) return "";
-  const Kana* k = prevKana;
-  if (_dakuten) {
-    auto accented = prevKana->dakutenKana();
-    if (accented) k = accented;
-  } else {
-    auto unaccented = prevKana->unaccentedKana();
-    if (unaccented) k = unaccented;
-  }
-  return k->getRomaji(flags);
-}
-
-KanaConvert::Map KanaConvert::populate(CharType t) {
-  Map result;
-  int duplicates = 0;
-  auto insert = [&result, &duplicates, t](auto& k, auto& v) {
-    auto i = result.insert(std::make_pair(k, &v));
-    if (!i.second) {
-      std::cerr << "key '" << k << "' already in " << toString(t) << " map: " << i.first->second << '\n';
-      ++duplicates;
-    }
-  };
-  auto processKana = [&insert, t](auto& k) {
-    switch (t) {
-    case CharType::Romaji:
-      insert(k.romaji(), k);
-      for (auto& i : k.variants())
-        insert(i, k);
-      break;
-    case CharType::Hiragana: insert(k.hiragana(), k); break;
-    case CharType::Katakana: insert(k.katakana(), k); break;
-    }
-  };
-  // process lists (inserting into 'result')
-  for (auto& i : KanaList)
-    processKana(i);
-  for (auto& i : DakutenKanaList) {
-    processKana(i);
-    processKana(*i.dakutenKana());
-  }
-  for (auto& i : HanDakutenKanaList) {
-    processKana(i);
-    processKana(*i.dakutenKana());
-    processKana(*i.hanDakutenKana());
-  }
-  assert(duplicates == 0);
-  return result;
-}
-
-KanaConvert::KanaConvert()
-  : _romajiMap(populate(CharType::Romaji)), _hiraganaMap(populate(CharType::Hiragana)),
-    _katakanaMap(populate(CharType::Katakana)), _smallTsu(KanaList[KanaList.size() - 2]),
-    _n(KanaList[KanaList.size() - 1]), _prolongMark("ー"), _repeatUnaccented("ゝ", "ヽ"),
-    _repeatAccented("ゞ", "ヾ", true) {
-  for (auto& i : _hiraganaMap) {
+KanaConvert::KanaConvert() {
+  for (auto& i : Kana::getMap(CharType::Hiragana)) {
     auto r = i.second->romaji();
     if (!r.starts_with("n")) {
       if (r.length() == 1 || r == "ya" || r == "yu" || r == "yo") {
         assert(_markAfterNHiragana.insert(i.second->hiragana()).second);
         assert(_markAfterNKatakana.insert(i.second->katakana()).second);
       } else if (r.starts_with("l")) {
-        if (*i.second != _smallTsu && !r.starts_with("lk")) {
+        if (*i.second != Kana::SmallTsu && !r.starts_with("lk")) {
           assert(_digraphSecondHiragana.insert(i.second->hiragana()).second);
           assert(_digraphSecondKatakana.insert(i.second->katakana()).second);
         }
@@ -212,8 +51,8 @@ KanaConvert::KanaConvert()
 }
 
 void KanaConvert::verifyData() const {
-  assert(_n.romaji() == "n");
-  assert(_smallTsu.romaji() == "ltu");
+  assert(Kana::N.romaji() == "n");
+  assert(Kana::SmallTsu.romaji() == "ltu");
   assert(_repeatingConsonents.size() == 18); // 26 - 8 where '8' is 5 vowels + 3 consonents (l, n and x)
   for (auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
     assert(_repeatingConsonents.contains(i) == false);
@@ -244,9 +83,9 @@ std::string KanaConvert::convert(const std::string& input, CharType target, int 
 std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, int flags) const {
   if (source == target) return input;
   if (source == CharType::Hiragana)
-    return convertFromKana(input, target, flags, _hiraganaMap, _markAfterNHiragana, _digraphSecondHiragana);
+    return convertFromKana(input, source, target, flags, _markAfterNHiragana, _digraphSecondHiragana);
   if (source == CharType::Katakana)
-    return convertFromKana(input, target, flags, _katakanaMap, _markAfterNKatakana, _digraphSecondKatakana);
+    return convertFromKana(input, source, target, flags, _markAfterNKatakana, _digraphSecondKatakana);
   // When source is Romaji break input up into words separated by any of _narrowDelims and process
   // each word. This helps deal with words ending in 'n'.
   std::string result;
@@ -268,16 +107,16 @@ std::string KanaConvert::convert(const std::string& input, CharType source, Char
   return result;
 }
 
-std::string KanaConvert::convertFromKana(const std::string& input, CharType target, int flags, const Map& sourceMap,
+std::string KanaConvert::convertFromKana(const std::string& input, CharType source, CharType target, int flags,
                                          const Set& afterN, const Set& smallKana) const {
   std::string result, letterGroup, c;
   int count = 0;
   bool hasSmallTsu = false, groupDone = false;
   const Kana* prevKana = nullptr;
-  auto done = [this, target, flags, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &c, &sourceMap,
+  auto done = [this, source, target, flags, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &c,
                &afterN](bool startNewGroup = true, bool prolong = false) {
-    result += kanaLetters(sourceMap, prevKana, letterGroup, count, target, flags, prolong);
-    if (target == CharType::Romaji && _n.containsKana(letterGroup) && afterN.contains(c)) result += _apostrophe;
+    result += kanaLetters(letterGroup, source, target, flags, count, prevKana, prolong);
+    if (target == CharType::Romaji && Kana::N.containsKana(letterGroup) && afterN.contains(c)) result += _apostrophe;
     hasSmallTsu = false;
     groupDone = false;
     // if 'startNewGroup' is false then drop the current letter instead of using it to start a new group
@@ -291,22 +130,22 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType targ
   };
   MBChar s(input);
   while (s.next(c, false)) {
-    // check prolongMark and repeating marks first since they aren't in 'sourceMap'
-    if (c == _prolongMark) {
+    // check prolong mark and repeating marks first since they aren't in 'sourceMap'
+    if (c == Kana::ProlongMark) {
       // this is actually a katakana symbol, but it can also appear in (non-standard) Hiragana.
       done(false, true);
-    } else if (_repeatUnaccented.contains(c)) {
+    } else if (Kana::RepeatUnaccented.matches(source, c)) {
       done(false);
-      result += _repeatUnaccented.get(target, flags, prevKana);
-    } else if (_repeatAccented.contains(c)) {
+      result += Kana::RepeatUnaccented.get(target, flags, prevKana);
+    } else if (Kana::RepeatAccented.matches(source, c)) {
       done(false);
-      result += _repeatAccented.get(target, flags, prevKana);
-    } else if (sourceMap.contains(c)) {
-      if (_smallTsu.containsKana(c)) {
+      result += Kana::RepeatAccented.get(target, flags, prevKana);
+    } else if (Kana::getMap(source).contains(c)) {
+      if (Kana::SmallTsu.containsKana(c)) {
         // getting a small tsu should cause any stored letters to be processed
         done();
         hasSmallTsu = true;
-      } else if (_n.containsKana(c)) {
+      } else if (Kana::N.containsKana(c)) {
         // getting an 'n' should cause any stored letters to be processed
         done();
         groupDone = true; // mark the new group as 'done' for an 'n'
@@ -340,23 +179,24 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType targ
         result += c;
     }
   }
-  result += kanaLetters(sourceMap, prevKana, letterGroup, count, target, flags);
+  result += kanaLetters(letterGroup, source, target, flags, count, prevKana);
   return result;
 }
 
-std::string KanaConvert::kanaLetters(const Map& sourceMap, const Kana*& prevKana, const std::string& letterGroup,
-                                     int count, CharType target, int flags, bool prolong) const {
-  auto macron = [this, target, flags, prolong, &prevKana](const Kana* k, bool sokuon = false) {
+std::string KanaConvert::kanaLetters(const std::string& letterGroup, CharType source, CharType target, int flags,
+                                     int count, const Kana*& prevKana, bool prolong) const {
+  auto& sourceMap = Kana::getMap(source);
+  auto macron = [target, flags, prolong, &prevKana](const Kana* k, bool sokuon = false) {
     const auto& s = sokuon ? k->getSokuonRomaji(flags) : k->get(target, flags);
     if (prolong) {
-      if (target != CharType::Romaji) return s + _prolongMark;
+      if (target != CharType::Romaji) return s + Kana::ProlongMark;
       switch (s[s.length() - 1]) {
       case 'a': return s.substr(0, s.length() - 1) + "ā";
       case 'i': return s.substr(0, s.length() - 1) + "ī";
       case 'u': return s.substr(0, s.length() - 1) + "ū";
       case 'e': return s.substr(0, s.length() - 1) + "ē";
       case 'o': return s.substr(0, s.length() - 1) + "ō";
-      default: return s + _prolongMark; // shouldn't happen - output mark unconverted
+      default: return s + Kana::ProlongMark; // shouldn't happen - output mark unconverted
       }
     }
     prevKana = k;
@@ -371,18 +211,18 @@ std::string KanaConvert::kanaLetters(const Map& sourceMap, const Kana*& prevKana
       const auto firstLetter = letterGroup.substr(0, 3);
       i = sourceMap.find(letterGroup.substr(3));
       if (i != sourceMap.end()) {
-        if (target == CharType::Romaji && _smallTsu.containsKana(firstLetter) &&
+        if (target == CharType::Romaji && Kana::SmallTsu.containsKana(firstLetter) &&
             _repeatingConsonents.contains(i->second->romaji()[0]))
           return macron(i->second, true);
-        auto transformedFirst = kanaLetters(sourceMap, prevKana, firstLetter, 1, target, flags);
+        auto transformedFirst = kanaLetters(firstLetter, source, target, flags, 1, prevKana);
         return transformedFirst + macron(i->second);
       }
       // error: couldn't convert second part
-      return kanaLetters(sourceMap, prevKana, firstLetter, 1, target, flags) + letterGroup.substr(3);
+      return kanaLetters(firstLetter, source, target, flags, 1, prevKana) + letterGroup.substr(3);
     }
   } else if (prolong)
-    // got 'prolonged' at the start of a group which isn't valid so just return the symbol unchanged
-    return _prolongMark;
+    // got 'prolong mark' at the start of a group which isn't valid so just return the symbol unchanged
+    return Kana::ProlongMark;
   return letterGroup;
 }
 
@@ -392,7 +232,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
     letterGroup += x;
     romajiLetters(letterGroup, result, target, flags);
     if (letterGroup.empty())
-      result += target == CharType::Hiragana && (flags & NoProlongMark) ? s : _prolongMark;
+      result += target == CharType::Hiragana && (flags & NoProlongMark) ? s : Kana::ProlongMark;
     else
       result += x; // should never happen ...
   };
@@ -417,7 +257,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
         if (letterGroup.empty())
           letterGroup += letter;
         else if (letterGroup == "n") // got two 'n's in a row so output one, but don't need to clear letterGroup
-          result += _n.get(target, flags);
+          result += Kana::N.get(target, flags);
         else {
           // error: partial romaji followed by n - output uncoverted partial group
           result += letterGroup;
@@ -431,7 +271,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
   }
   while (!letterGroup.empty()) {
     if (letterGroup == "n") {
-      result += _n.get(target, flags); // normal case for a word ending in 'n'
+      result += Kana::N.get(target, flags); // normal case for a word ending in 'n'
       letterGroup.clear();
     } else {
       result += letterGroup[0]; // error: output the unprocessed letter
@@ -443,17 +283,18 @@ std::string KanaConvert::convertFromRomaji(const std::string& input, CharType ta
 }
 
 void KanaConvert::romajiLetters(std::string& letterGroup, std::string& result, CharType target, int flags) const {
-  auto i = _romajiMap.find(letterGroup);
-  if (i != _romajiMap.end()) {
+  auto& sourceMap = Kana::getMap(CharType::Romaji);
+  auto i = sourceMap.find(letterGroup);
+  if (i != sourceMap.end()) {
     result += i->second->get(target, flags);
     letterGroup.clear();
   } else if (letterGroup.length() == 3) {
     if (letterGroup[0] == 'n')
-      result += _n.get(target, flags);
+      result += Kana::N.get(target, flags);
     else if (letterGroup[0] == letterGroup[1] || letterGroup[0] == 't' && letterGroup[1] == 'c') {
       // convert first letter to small tsu if letter repeats and is a valid consonant
       if (_repeatingConsonents.contains(letterGroup[0]))
-        result += _smallTsu.get(target, flags);
+        result += Kana::SmallTsu.get(target, flags);
       else // error: first letter not valid
         result += letterGroup[0];
     } else // error: no romaji is longer than 3 chars so output the first letter unconverted

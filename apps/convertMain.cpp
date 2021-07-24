@@ -1,3 +1,4 @@
+#include <kanji/Kana.h>
 #include <kanji/KanaConvert.h>
 
 #include <filesystem>

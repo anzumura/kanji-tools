@@ -1,13 +1,25 @@
 #ifndef KANJI_KANA_H
 #define KANJI_KANA_H
 
+#include <array>
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
 
 namespace kanji {
 
-enum class CharType;
+// 'CharType' is used to specify 'source' and 'target' types for 'KanaConvert::convert' methods
+enum class CharType { Hiragana, Katakana, Romaji };
+constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
+inline const std::string& toString(CharType t) {
+  static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
+  switch (t) {
+  case CharType::Hiragana: return hiragana;
+  case CharType::Katakana: return katakana;
+  case CharType::Romaji: return romaji;
+  }
+}
 
 // 'Kana' is used to represent a Kana 'Monograph' or 'Digraph'. It stores Romaji, Hiragana and Katakana
 // as well variant Romaji forms. A 'Monograph' is a single Kana character (large or small) and a 'Digraph'
@@ -16,6 +28,41 @@ enum class CharType;
 // relationships between unaccented and accented (dakuten and han-dakuten) versions.
 class Kana {
 public:
+  // 'RepeatMark' is for handling repeating kana marks (一の時点) when source is Hiragana or Katakana.
+  class RepeatMark {
+  public:
+    RepeatMark(const char* hiragana, const char* katakana, bool dakuten = false)
+      : _hiragana(hiragana), _katakana(katakana), _dakuten(dakuten) {
+      assert(_hiragana != _katakana);
+    }
+    bool matches(CharType t, const std::string& s) const {
+      return t == CharType::Hiragana && _hiragana == s || t == CharType::Katakana && _katakana == s;
+    }
+    std::string get(CharType target, int flags, const Kana* prevKana) const;
+  private:
+    const std::string _hiragana;
+    const std::string _katakana;
+    const bool _dakuten; // true if this instance if for the 'dakuten' (濁点) versions of the marks
+  };
+  // unaccented and accented repeat marks
+  static const RepeatMark RepeatUnaccented;
+  static const RepeatMark RepeatAccented;
+  // provide static const refs for some special-case Kana
+  static const Kana& SmallTsu;
+  static const Kana& N;
+  // 'ProlongMark' (ー) is officially in the Katakana Unicode block, but it can also rarely appear
+  // in some (non-standard) Hiragana words like らーめん.
+  static const std::string ProlongMark;
+
+  using Map = std::map<std::string, const class Kana*>;
+  static const Map& getMap(CharType t) {
+    switch (t) {
+    case CharType::Romaji: return _romajiMap;
+    case CharType::Hiragana: return _hiraganaMap;
+    case CharType::Katakana: return _katakanaMap;
+    }
+  }
+
   using List = std::vector<std::string>;
   Kana(const char* romaji, const char* hiragana, const char* katakana, const char* hepburn = nullptr,
        const char* kunrei = nullptr)
@@ -61,6 +108,10 @@ public:
   const std::string& katakana() const { return _katakana; }
   const List& variants() const { return _variants; }
 private:
+  static Map populate(CharType);
+  static const Map _romajiMap;
+  static const Map _hiraganaMap;
+  static const Map _katakanaMap;
   // 'validate' used asserts to make sure the data is valid such as checking lengths and
   // ensuring '_hiragana' is actually valid Hiragana, etc..
   void validate() const;
