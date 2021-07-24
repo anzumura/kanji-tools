@@ -1,3 +1,4 @@
+#include <kanji/Kana.h>
 #include <kanji/KanaConvert.h>
 #include <kanji/MBChar.h>
 #include <kanji/MBUtils.h>
@@ -9,8 +10,8 @@ namespace kanji {
 
 namespace {
 
-using K = KanaConvert::Kana;
-using V = KanaConvert::Kana::List;
+using K = Kana;
+using V = Kana::List;
 // 'KanaList' has mappings for all monographs (single kana) with no 'dakuten' or 'han-dakuten' versions
 // and regularly used digraphs (normal kana followed by a small kana 'vowel', 'y' or 'wa'). See
 // comments for 'Kana' class for a description of the fields.
@@ -52,7 +53,7 @@ const std::array KanaList{
   // ん - keep 'n' as well as the previous small 'tsu' at the end of the list
   K{"n", "ん", "ン"}};
 
-using D = KanaConvert::DakutenKana;
+using D = DakutenKana;
 // 'DakutenKanaList' contains kana that have a 'dakuten' version, but not 'h'
 std::array DakutenKanaList = {
   // --- あ 行 ---
@@ -94,7 +95,7 @@ std::array DakutenKanaList = {
   D{"cho", "ちょ", "チョ", K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"}, V{"tyo"}, true},
   D{"tho", "てょ", "テョ", K{"dho", "でょ", "デョ"}}, D{"two", "とぉ", "トォ", K{"dwo", "どぉ", "ドォ"}}};
 
-using H = KanaConvert::HanDakutenKana;
+using H = HanDakutenKana;
 // 'HanDakutenKanaList' contains kana that have both a 'dakuten' and a 'han-dakuten' (so 'h' row)
 std::array HanDakutenKanaList = {H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{"pa", "ぱ", "パ"}},
                                  H{"hi", "ひ", "ヒ", K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}},
@@ -148,43 +149,17 @@ KanaConvert::Map KanaConvert::populate(CharType t) {
     case CharType::Katakana: insert(k.katakana(), k); break;
     }
   };
-  auto checkKana = [](auto& k) {
-    for (auto& i : k.variants())
-      assert(!i.empty() && i.length() < 4);                           // must be 1 to 3 chars
-    assert(!k.romaji().empty() && k.romaji().length() < 4);           // must be 1 to 3 chars
-    assert(k.hiragana().length() == 3 || k.hiragana().length() == 6); // 3 bytes per character
-    assert(k.katakana().length() == 3 || k.katakana().length() == 6); // 3 bytes per characer
-    assert(isAllSingleByte(k.romaji()));
-    assert(isAllHiragana(k.hiragana()));
-    assert(isAllKatakana(k.katakana()));
-  };
-  // if first time then do some sanity checking on all the lists
-  static bool firstTime = true;
-  if (firstTime) {
-    for (auto& i : KanaList)
-      checkKana(i);
-    for (auto& i : DakutenKanaList) {
-      checkKana(i);
-      checkKana(i.dakutenKana());
-    }
-    for (auto& i : HanDakutenKanaList) {
-      checkKana(i);
-      checkKana(i.dakutenKana());
-      checkKana(i.hanDakutenKana());
-    }
-    firstTime = false;
-  }
   // process lists (inserting into 'result')
   for (auto& i : KanaList)
     processKana(i);
   for (auto& i : DakutenKanaList) {
     processKana(i);
-    processKana(i.dakutenKana());
+    processKana(*i.dakutenKana());
   }
   for (auto& i : HanDakutenKanaList) {
     processKana(i);
-    processKana(i.dakutenKana());
-    processKana(i.hanDakutenKana());
+    processKana(*i.dakutenKana());
+    processKana(*i.hanDakutenKana());
   }
   assert(duplicates == 0);
   return result;
