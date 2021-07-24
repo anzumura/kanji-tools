@@ -58,7 +58,7 @@ FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
       else if (arg == "--")
         endOptions = true;
       else
-        Data::usage("Unrecognized argument '" + arg + "' use -h for help");
+        Data::usage("illegal option '" + arg + "' use -h for help");
     } else
       files.push_back(argv[i]);
   }

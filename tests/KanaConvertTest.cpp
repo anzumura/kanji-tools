@@ -8,22 +8,22 @@ namespace kanji {
 class KanaConvertTest : public ::testing::Test {
 protected:
   std::string romajiToHiragana(const std::string& s, int flags = 0) {
-    return _converter.convert(s, CharType::Romaji, CharType::Hiragana, flags);
+    return _converter.convert(CharType::Romaji, s, CharType::Hiragana, flags);
   }
   std::string romajiToKatakana(const std::string& s, int flags = 0) {
-    return _converter.convert(s, CharType::Romaji, CharType::Katakana, flags);
+    return _converter.convert(CharType::Romaji, s, CharType::Katakana, flags);
   }
   std::string hiraganaToRomaji(const std::string& s, int flags = 0) {
-    return _converter.convert(s, CharType::Hiragana, CharType::Romaji, flags);
+    return _converter.convert(CharType::Hiragana, s, CharType::Romaji, flags);
   }
   std::string hiraganaToKatakana(const std::string& s) {
-    return _converter.convert(s, CharType::Hiragana, CharType::Katakana);
+    return _converter.convert(CharType::Hiragana, s, CharType::Katakana);
   }
   std::string katakanaToRomaji(const std::string& s, int flags = 0) {
-    return _converter.convert(s, CharType::Katakana, CharType::Romaji, flags);
+    return _converter.convert(CharType::Katakana, s, CharType::Romaji, flags);
   }
   std::string katakanaToHiragana(const std::string& s) {
-    return _converter.convert(s, CharType::Katakana, CharType::Hiragana);
+    return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
   // populate 'romaji' when round trip is lossy (like repeat symbols)
   void kanaConvertCheck(const std::string& hiragana, const std::string& katakana, const std::string& romaji = "") {
@@ -58,20 +58,20 @@ protected:
     // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
     // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
     std::string romaji = "lalilulelolkalkelyalyulyoltulwa";
-    EXPECT_EQ(_converter.convert(s, source, CharType::Romaji), romaji);
-    EXPECT_EQ(_converter.convert(romaji, CharType::Romaji, source), s);
+    EXPECT_EQ(_converter.convert(source, s, CharType::Romaji), romaji);
+    EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
     // Also test 'x' style for input to conversion
     std::replace(romaji.begin(), romaji.end(), 'l', 'x');
-    EXPECT_EQ(_converter.convert(romaji, CharType::Romaji, source), s);
+    EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
   }
   KanaConvert _converter;
 };
 
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
   std::string s("atatakaiあたたかいアタタカイ");
-  EXPECT_EQ(_converter.convert(s, CharType::Romaji, CharType::Romaji), s);
-  EXPECT_EQ(_converter.convert(s, CharType::Hiragana, CharType::Hiragana), s);
-  EXPECT_EQ(_converter.convert(s, CharType::Katakana, CharType::Katakana), s);
+  EXPECT_EQ(_converter.convert(CharType::Romaji, s, CharType::Romaji), s);
+  EXPECT_EQ(_converter.convert(CharType::Hiragana, s, CharType::Hiragana), s);
+  EXPECT_EQ(_converter.convert(CharType::Katakana, s, CharType::Katakana), s);
 }
 
 TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
@@ -214,14 +214,14 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
   for (auto& i : Kana::getMap(CharType::Hiragana)) {
-    auto r = _converter.convert(i.first, CharType::Hiragana, CharType::Katakana);
+    auto r = _converter.convert(CharType::Hiragana, i.first, CharType::Katakana);
     EXPECT_EQ(r, i.second->katakana());
-    EXPECT_EQ(_converter.convert(r, CharType::Katakana, CharType::Hiragana), i.second->hiragana());
+    EXPECT_EQ(_converter.convert(CharType::Katakana, r, CharType::Hiragana), i.second->hiragana());
   }
   for (auto& i : Kana::getMap(CharType::Katakana)) {
-    auto r = _converter.convert(i.first, CharType::Katakana, CharType::Hiragana);
+    auto r = _converter.convert(CharType::Katakana, i.first, CharType::Hiragana);
     EXPECT_EQ(r, i.second->hiragana());
-    EXPECT_EQ(_converter.convert(r, CharType::Hiragana, CharType::Katakana), i.second->katakana());
+    EXPECT_EQ(_converter.convert(CharType::Hiragana, r, CharType::Katakana), i.second->katakana());
   }
   kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
   // try mixing sokuon and long vowels

@@ -64,23 +64,22 @@ public:
   CharType target() const { return _target; }
   void target(CharType target) { _target = target; }
   int flags() const { return _flags; }
+  std::string flagString() const; // return a | separated string representation of current flags or 'none'
   void flags(int flags) { _flags = flags; }
 
-  // 'convert' has 3 overloads. The first converts 'input' source string based on current values of
-  // '_target' and '_flags'. The second converts all 'non-target' characters in 'input' to 'target'.
-  // The third version only converts 'source' type characters to 'target' (the original string is
-  // returned if 'source' is the same as 'target').
+  // 'convert' has 4 overloads. The first and second use the current values of '_target' and '_flags'.
+  // The first and third convert characters of any source type whereas the second and fourth restrict the
+  // source type to be converted. If 'source' = 'target' then the original string is returned.
   //
   // Note: a number of delimiters are also supported and get converted from narrow to wide and vice
   // versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji, case is ignored so
   // both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConversionFlags' for an explanation of
   // available flags that can be used. The second and third overloads update '_target' and '_flags'
   std::string convert(const std::string& input) const;
+  std::string convert(CharType source, const std::string& input) const;
   std::string convert(const std::string& input, CharType target, int flags = 0);
-  std::string convert(const std::string& input, CharType source, CharType target, int flags = 0);
+  std::string convert(CharType source, const std::string& input, CharType target, int flags = 0);
 private:
-  // 'doConvert' is called by all of the public convert functions
-  std::string doConvert(const std::string& input, CharType source) const;
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
   using Set = std::set<std::string>;

@@ -50,6 +50,23 @@ KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(f
   verifyData();
 }
 
+std::string KanaConvert::flagString() const {
+  if (!_flags)
+    return "none";
+  std::string result;
+  auto flag = [this, &result](int f, const char* v) {
+    if (_flags & f) {
+      if (!result.empty()) result += '|';
+      result += v;
+    }
+  };
+  flag(Hepburn, "Hepburn");
+  flag(Kunrei, "Kunrei");
+  flag(NoProlongMark, "NoProlongMark");
+  flag(RemoveSpaces, "RemoveSpaces");
+  return result;
+}
+
 void KanaConvert::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
@@ -76,7 +93,7 @@ void KanaConvert::verifyData() const {
 std::string KanaConvert::convert(const std::string& input) const {
   std::string result(input);
   for (auto i : CharTypes)
-    if (_target != i) result = doConvert(result, i);
+    if (_target != i) result = convert(i, result);
   return result;
 }
 
@@ -86,13 +103,13 @@ std::string KanaConvert::convert(const std::string& input, CharType target, int 
   return convert(input);
 }
 
-std::string KanaConvert::convert(const std::string& input, CharType source, CharType target, int flags) {
+std::string KanaConvert::convert(CharType source, const std::string& input, CharType target, int flags) {
   _target = target;
   _flags = flags;
-  return doConvert(input, source);
+  return convert(source, input);
 }
 
-std::string KanaConvert::doConvert(const std::string& input, CharType source) const {
+std::string KanaConvert::convert(CharType source, const std::string& input) const {
   if (source == _target) return input;
   if (source == CharType::Hiragana) return convertFromKana(input, source, _markAfterNHiragana, _digraphSecondHiragana);
   if (source == CharType::Katakana) return convertFromKana(input, source, _markAfterNKatakana, _digraphSecondKatakana);
