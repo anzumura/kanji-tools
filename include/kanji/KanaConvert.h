@@ -93,8 +93,8 @@ private:
       : _hiragana(hiragana), _katakana(katakana), _dakuten(dakuten) {
       assert(_hiragana != _katakana);
     }
-    const std::string& get(CharType target) const { return target == CharType::Hiragana ? _hiragana : _katakana; }
-    std::string getRomaji(const std::string& prevKana, int flags) const;
+    bool contains(const std::string& s) const { return _hiragana == s || _katakana == s; }
+    std::string get(CharType target, int flags, const Kana* prevKana) const;
   private:
     const std::string _hiragana;
     const std::string _katakana;
@@ -107,8 +107,8 @@ private:
   using Set = std::set<std::string>;
   std::string convertFromKana(const std::string& input, CharType target, int flags, const Map& sourceMap,
                               const Set& afterN, const Set& smallKana) const;
-  std::string kanaLetters(const Map& sourceMap, const std::string& letterGroup, int count, CharType target, int flags,
-                          bool prolonged = false) const;
+  std::string kanaLetters(const Map& sourceMap, const Kana*& prevKana, const std::string& letterGroup, int count,
+                          CharType target, int flags, bool prolong = false) const;
   std::string convertFromRomaji(const std::string& input, CharType target, int flags) const;
   void romajiLetters(std::string& letterGroup, std::string& result, CharType target, int flags) const;
 
@@ -125,6 +125,8 @@ private:
   // dash is used in 'Traditional Hepburn' whereas apostrophe is used in 'Modern (revised) Hepburn'.
   const char _apostrophe = '\'';
   const char _dash = '-';
+  const RepeatMark _repeatUnaccented;
+  const RepeatMark _repeatAccented;
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
   // '_markAfterN...' sets contain the 8 kana symbols (5 vowels and 3 y's) that should be proceedeed

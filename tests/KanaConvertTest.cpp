@@ -34,11 +34,18 @@ protected:
   std::string katakanaToHiragana(const std::string& s) const {
     return _converter.convert(s, CharType::Katakana, CharType::Hiragana);
   }
-  void kanaConvertCheck(const std::string& hiragana, const std::string& katakana) const {
-    auto r = hiraganaToRomaji(hiragana);
-    EXPECT_EQ(katakanaToRomaji(katakana), r);
-    EXPECT_EQ(romajiToHiragana(r), hiragana);
-    EXPECT_EQ(romajiToKatakana(r), katakana);
+  // populate 'romaji' when round trip is lossy (like repeat symbols)
+  void kanaConvertCheck(const std::string& hiragana, const std::string& katakana,
+                        const std::string& romaji = "") const {
+    if (romaji.empty()) {
+      auto r = hiraganaToRomaji(hiragana);
+      EXPECT_EQ(katakanaToRomaji(katakana), r);
+      EXPECT_EQ(romajiToHiragana(r), hiragana);
+      EXPECT_EQ(romajiToKatakana(r), katakana);
+    } else {
+      EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
+      EXPECT_EQ(katakanaToRomaji(katakana), romaji);
+    }
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
@@ -340,6 +347,28 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
   kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？", "ビッグ　バアド、スマール　ハッマー？");
+  // repeating symbol
+  kanaConvertCheck("かゝ", "カヽ", "kaka");
+  kanaConvertCheck("かゞ", "カヾ", "kaga");
+  kanaConvertCheck("がゝ", "ガヽ", "gaka");
+  kanaConvertCheck("がゞ", "ガヾ", "gaga");
+  kanaConvertCheck("こゝろ", "コヽロ", "kokoro");
+  kanaConvertCheck("はゝゝゝ", "ハヽヽヽ", "hahahaha");
+  // examples with h, b and p
+  kanaConvertCheck("ひゝ", "ヒヽ", "hihi");
+  kanaConvertCheck("ひゞ", "ヒヾ", "hibi");
+  kanaConvertCheck("びゝ", "ビヽ", "bihi");
+  kanaConvertCheck("びゞ", "ビヾ", "bibi");
+  kanaConvertCheck("ぴゝ", "ピヽ", "pihi");
+  kanaConvertCheck("ぴゞ", "ピヾ", "pipi");
+  // currently a digraph will also be repeated - this might not be correct behavior
+  kanaConvertCheck("きょゝ", "キョヽ", "kyokyo");
+  kanaConvertCheck("きょゞ", "キョヾ", "kyogyo");
+  // repeating symbol is ignored after 'prolong' mark when target is Romaji
+  kanaConvertCheck("はーゝろー", "ハーヽロー", "hārō");
+  kanaConvertCheck("ばーゞろー", "バーヾロー", "bārō");
+  // repeating symbol at the begining is an error so drop for romaji, but can still convert for kana
+  kanaConvertCheck("ゝろ", "ヽロ", "ro");
 }
 
 TEST_F(KanaConvertTest, ConvertAllToOneType) {
