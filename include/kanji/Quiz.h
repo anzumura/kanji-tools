@@ -8,7 +8,7 @@ namespace kanji {
 
 class Quiz {
 public:
-  Quiz(const GroupData& groupData, std::istream& in = std::cin)
+  Quiz(const GroupData& groupData, std::istream* in = 0)
     : _groupData(groupData), _question(0), _score(0), _showMeanings(false), _choice(groupData.out(), in) {}
   // 'quiz' is the top level method for choosing quiz type (List or Group based)
   void quiz() const;

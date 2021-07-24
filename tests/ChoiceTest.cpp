@@ -8,7 +8,7 @@ namespace kanji {
 
 class ChoiceTest : public ::testing::Test {
 protected:
-  ChoiceTest() : _choice(_os, _is) {}
+  ChoiceTest() : _choice(_os, &_is) {}
 
   std::stringstream _os;
   std::stringstream _is;

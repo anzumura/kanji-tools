@@ -1,6 +1,25 @@
 #include <kanji/Choice.h>
 
+#include <termios.h>
+#include <unistd.h>
+
 namespace kanji {
+
+char Choice::getOneChar() {
+  char result = 0;
+  struct termios settings = {0};
+  if (tcgetattr(0, &settings) < 0) perror("tcsetattr()");
+  settings.c_lflag &= ~ICANON;
+  settings.c_lflag &= ~ECHO;
+  settings.c_cc[VMIN] = 1;
+  settings.c_cc[VTIME] = 0;
+  if (tcsetattr(0, TCSANOW, &settings) < 0) perror("tcsetattr() - turning on raw mode");
+  if (read(0, &result, 1) < 0) perror("read()");
+  settings.c_lflag |= ICANON;
+  settings.c_lflag |= ECHO;
+  if (tcsetattr(0, TCSADRAIN, &settings) < 0) perror("tcsetattr() - turning off raw mode");
+  return result;
+}
 
 void Choice::add(std::string& prompt, const Choices& choices) {
   std::optional<char> rangeStart = std::nullopt;
@@ -53,7 +72,16 @@ char Choice::get(const std::string& msg, const Choices& choices, std::optional<c
   do {
     _out << prompt;
     _out.flush();
-    std::getline(_in, line);
+    if (_in)
+      std::getline(*_in, line);
+    else {
+      char choice = getOneChar();
+      if (choice == '\n')
+        line.clear();
+      else
+        line = choice;
+      _out << '\n';
+    }
     if (line.empty() && def.has_value()) return *def;
   } while (line.length() != 1 || choices.find(line[0]) == choices.end());
   return line[0];

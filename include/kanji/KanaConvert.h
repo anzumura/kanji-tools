@@ -25,8 +25,6 @@ enum class CharType;
 // standard form is used as output).
 class KanaConvert {
 public:
-  KanaConvert();
-
   // 'ConversionFlags' can be used to control some aspects of conversion. For example:
   // Hepburn: off by default, only applies to 'romaji' output
   // - convert("つづき", CharType::Romaji) -> "tsuduki"
@@ -58,25 +56,39 @@ public:
   // falling back to the unique '_romaji' value in the Kana class.
   enum ConversionFlags { Hepburn = 1, Kunrei = 2, NoProlongMark = 4, RemoveSpaces = 8 };
 
-  // The first overload of 'convert' returns a string based on 'input' with all 'non-target'
-  // kana or romaji characters converted to 'target'. The second version only converts 'source'
-  // type characters to 'target' (the original string is returned if 'source' is the same as
-  // 'target'). Note: a number of delimiters are also supported and get converted from narrow tp
-  // wide and vice versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji,
-  // case is ignored so both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConversionFlags' for
-  // an explanation of available flags that can be used.
-  std::string convert(const std::string& input, CharType target, int flags = 0) const;
-  std::string convert(const std::string& input, CharType source, CharType target, int flags = 0) const;
+  // 'KanaConvert' constructor defaults the 'target' for conversion to Hiragana and sets 'flags'
+  // to 0 (which means no special conversion flags). Calling the below 'convert' functions can
+  // also override these values. 
+  KanaConvert(CharType target = CharType::Hiragana, int flags = 0);
+
+  CharType target() const { return _target; }
+  void target(CharType target) { _target = target; }
+  int flags() const { return _flags; }
+  void flags(int flags) { _flags = flags; }
+
+  // 'convert' has 3 overloads. The first converts 'input' source string based on current values of
+  // '_target' and '_flags'. The second converts all 'non-target' characters in 'input' to 'target'.
+  // The third version only converts 'source' type characters to 'target' (the original string is
+  // returned if 'source' is the same as 'target').
+  //
+  // Note: a number of delimiters are also supported and get converted from narrow to wide and vice
+  // versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji, case is ignored so
+  // both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConversionFlags' for an explanation of
+  // available flags that can be used. The second and third overloads update '_target' and '_flags'
+  std::string convert(const std::string& input) const;
+  std::string convert(const std::string& input, CharType target, int flags = 0);
+  std::string convert(const std::string& input, CharType source, CharType target, int flags = 0);
 private:
+  // 'doConvert' is called by all of the public convert functions
+  std::string doConvert(const std::string& input, CharType source) const;
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
   using Set = std::set<std::string>;
-  std::string convertFromKana(const std::string& input, CharType source, CharType target, int flags, const Set& afterN,
-                              const Set& smallKana) const;
-  std::string kanaLetters(const std::string& letterGroup, CharType source, CharType target, int flags, int count,
-                          const Kana*& prevKana, bool prolong = false) const;
-  std::string convertFromRomaji(const std::string& input, CharType target, int flags) const;
-  void romajiLetters(std::string& letterGroup, std::string& result, CharType target, int flags) const;
+  std::string convertFromKana(const std::string& input, CharType source, const Set& afterN, const Set& smallKana) const;
+  std::string kanaLetters(const std::string& letterGroup, CharType source, int count, const Kana*& prevKana,
+                          bool prolong = false) const;
+  std::string convertFromRomaji(const std::string& input) const;
+  void romajiLetters(std::string& letterGroup, std::string& result) const;
   // Either '_apostrophe' or '_dash' can be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used. Note,
   // dash is used in 'Traditional Hepburn' whereas apostrophe is used in 'Modern (revised) Hepburn'.
@@ -96,6 +108,10 @@ private:
   std::string _narrowDelims;
   std::map<char, std::string> _narrowToWideDelims;
   std::map<std::string, char> _wideToNarrowDelims;
+
+  // Members for the current conversion
+  CharType _target;
+  int _flags;
 };
 
 } // namespace kanji

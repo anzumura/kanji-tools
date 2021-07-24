@@ -7,27 +7,26 @@ namespace kanji {
 
 class KanaConvertTest : public ::testing::Test {
 protected:
-  std::string romajiToHiragana(const std::string& s, int flags = 0) const {
+  std::string romajiToHiragana(const std::string& s, int flags = 0) {
     return _converter.convert(s, CharType::Romaji, CharType::Hiragana, flags);
   }
-  std::string romajiToKatakana(const std::string& s, int flags = 0) const {
+  std::string romajiToKatakana(const std::string& s, int flags = 0) {
     return _converter.convert(s, CharType::Romaji, CharType::Katakana, flags);
   }
-  std::string hiraganaToRomaji(const std::string& s, int flags = 0) const {
+  std::string hiraganaToRomaji(const std::string& s, int flags = 0) {
     return _converter.convert(s, CharType::Hiragana, CharType::Romaji, flags);
   }
-  std::string hiraganaToKatakana(const std::string& s) const {
+  std::string hiraganaToKatakana(const std::string& s) {
     return _converter.convert(s, CharType::Hiragana, CharType::Katakana);
   }
-  std::string katakanaToRomaji(const std::string& s, int flags = 0) const {
+  std::string katakanaToRomaji(const std::string& s, int flags = 0) {
     return _converter.convert(s, CharType::Katakana, CharType::Romaji, flags);
   }
-  std::string katakanaToHiragana(const std::string& s) const {
+  std::string katakanaToHiragana(const std::string& s) {
     return _converter.convert(s, CharType::Katakana, CharType::Hiragana);
   }
   // populate 'romaji' when round trip is lossy (like repeat symbols)
-  void kanaConvertCheck(const std::string& hiragana, const std::string& katakana,
-                        const std::string& romaji = "") const {
+  void kanaConvertCheck(const std::string& hiragana, const std::string& katakana, const std::string& romaji = "") {
     if (romaji.empty()) {
       auto r = hiraganaToRomaji(hiragana);
       EXPECT_EQ(katakanaToRomaji(katakana), r);
@@ -41,7 +40,7 @@ protected:
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
   void check(const char* hiragana, const char* katakana, const char* romaji, const char* hepburn = nullptr,
-             const char* kunrei = nullptr) const {
+             const char* kunrei = nullptr) {
     EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
     EXPECT_EQ(katakanaToRomaji(katakana), romaji);
     EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Hepburn), hepburn ? hepburn : romaji);
@@ -52,10 +51,10 @@ protected:
     EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Hepburn | KanaConvert::Kunrei), preferHepburnIfBoth);
     EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Hepburn | KanaConvert::Kunrei), preferHepburnIfBoth);
   }
-  void checkKunrei(const char* hiragana, const char* katakana, const char* romaji, const char* kunrei) const {
+  void checkKunrei(const char* hiragana, const char* katakana, const char* romaji, const char* kunrei) {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
-  void checkSmallKana(CharType source, const std::string& s) const {
+  void checkSmallKana(CharType source, const std::string& s) {
     // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
     // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
     std::string romaji = "lalilulelolkalkelyalyulyoltulwa";
@@ -65,7 +64,7 @@ protected:
     std::replace(romaji.begin(), romaji.end(), 'l', 'x');
     EXPECT_EQ(_converter.convert(romaji, CharType::Romaji, source), s);
   }
-  const KanaConvert _converter;
+  KanaConvert _converter;
 };
 
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {

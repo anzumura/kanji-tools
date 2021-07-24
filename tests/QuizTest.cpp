@@ -18,7 +18,7 @@ protected:
     return args;
   }
   // Contructs Quiz using the real data files
-  QuizTest() : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)), _groupData(_data), _quiz(_groupData, _is) {}
+  QuizTest() : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)), _groupData(_data), _quiz(_groupData, &_is) {}
 
   void gradeListQuiz() {
     // Send a string to '_is' so that '_quiz' can read the follow options:
