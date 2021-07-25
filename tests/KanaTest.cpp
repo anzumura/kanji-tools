@@ -8,7 +8,7 @@ namespace kanji {
 
 namespace {
 
-enum Values { Monographs = 86, Digraphs = 106, Variants = 35 };
+enum Values { Monographs = 86, Digraphs = 114, Variants = 42 };
 constexpr int TotalKanaCombinations = Monographs + Digraphs + Variants;
 
 } // namespace
@@ -114,11 +114,11 @@ TEST(KanaTest, CheckRomaji) {
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 51);
-  EXPECT_EQ(iCount, 41);
-  EXPECT_EQ(uCount, 45);
-  EXPECT_EQ(eCount, 43);
-  EXPECT_EQ(oCount, 46);
+  EXPECT_EQ(aCount, 54);
+  EXPECT_EQ(iCount, 45);
+  EXPECT_EQ(uCount, 48);
+  EXPECT_EQ(eCount, 47);
+  EXPECT_EQ(oCount, 47);
   EXPECT_EQ(nCount, 1);
   EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalKanaCombinations);
   EXPECT_EQ(variants.size(), Variants);

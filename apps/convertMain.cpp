@@ -210,18 +210,20 @@ Notes:\n\
 - Chart output is sorted on 'Hira' column, so 'a, ka, sa, ta, na, ...' ordering\n\
 - Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)\n\
 - 'Hepb' and 'Kunr' are only populated when they would produce different output\n\n";
-  auto print = [](const std::string& num, const std::string& type, const std::string& roma, const std::string& hira,
-                  const std::string& kata, const std::string& hUni, const std::string& kUni,
-                  const std::string& hepb = "", const std::string& kunr = "", const std::string& vars = "") {
+  int row = 0, monographs = 0, digraphs = 0, variants = 0, kana = 0, dakuten = 0, hanDakuten = 0, none = 0;
+  auto print = [&none](const std::string& num, const std::string& type, const std::string& roma,
+                       const std::string& hira, const std::string& kata, const std::string& hUni,
+                       const std::string& kUni, const std::string& hepb = "", const std::string& kunr = "",
+                       const std::string& vars = "") {
     // Leave 2 spaces after titles (Hira and Kata) and 'digraph' kana and 4 spaces after a single (since
     // each kana is twice as wide as an ascii character). Use 6 spaces is 'empty'.
     auto sp = [](auto& s) { return s.length() > 3 ? "  " : s.empty() ? "      " : "    "; };
     std::cout << std::left << std::setw(5) << num << std::setw(6) << type << std::setw(6) << roma << hira << sp(hira)
               << kata << sp(kata) << std::setw(6) << hUni << std::setw(6) << kUni << std::setw(6) << hepb
               << std::setw(6) << kunr << vars << '\n';
+    if (type == "N") ++none; // other type counts are handled in main for loop below
   };
   print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Vars");
-  int row = 0, monographs = 0, digraphs = 0, variants = 0, kana = 0, dakuten = 0, hanDakuten = 0, none = 0;
   std::string empty;
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i = *entry.second;
@@ -258,7 +260,6 @@ Notes:\n\
     const std::string& h = i.hiragana();
     const std::string& k = i.katakana();
     print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
-    ++none;
   }
   std::cout << "\nTotals: monographs=" << monographs << ", digraphs=" << digraphs << ", variants=" << variants
             << ", K=" << kana << ", D=" << dakuten << ", H=" << hanDakuten << ", N=" << none << '\n';
