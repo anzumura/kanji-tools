@@ -214,17 +214,32 @@ Notes:\n\
   auto print = [&none](const std::string& num, const std::string& type, const std::string& roma,
                        const std::string& hira, const std::string& kata, const std::string& hUni,
                        const std::string& kUni, const std::string& hepb = "", const std::string& kunr = "",
-                       const std::string& vars = "") {
-    // Leave 2 spaces after titles (Hira and Kata) and 'digraph' kana and 4 spaces after a single (since
-    // each kana is twice as wide as an ascii character). Use 6 spaces is 'empty'.
-    auto sp = [](auto& s) { return s.length() > 3 ? "  " : s.empty() ? "      " : "    "; };
-    std::cout << std::left << std::setw(5) << num << std::setw(6) << type << std::setw(6) << roma << hira << sp(hira)
-              << kata << sp(kata) << std::setw(6) << hUni << std::setw(6) << kUni << std::setw(6) << hepb
-              << std::setw(6) << kunr << vars << '\n';
+                       const std::string& vars = "", char fill = ' ', char delim = '|') {
+    // For cells with wide chars, setw needs to have a larger value since it only looks at
+    // string.length(). So for Hira and Kata, set width to 5 for empty or title cells, but
+    // set to 6 for a monograph and 7 for a digraph to get the right amount of spaces.
+    auto sp = [](auto& s) { return s.empty() || s.length() == 4 ? 5 : s.length() == 3 ? 6 : 7; };
+    auto cell = [delim, fill](int w, const auto& s) { std::cout << delim << fill << std::setw(w) << s; };
+    std::cout << std::left << std::setfill(fill);
+    cell(4, num);
+    cell(5, type);
+    cell(5, roma);
+    cell(sp(hira), hira);
+    cell(sp(kata), kata);
+    cell(5, hUni);
+    cell(5, kUni);
+    cell(5, hepb);
+    cell(5, kunr);
+    cell(13, vars);
+    std::cout << fill << delim << '\n';
     if (type == "N") ++none; // other type counts are handled in main for loop below
   };
+  auto border = [&print] { print("", "", "", "", "", "", "", "", "", "", '-', '+'); };
+  border();
   print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Vars");
+  border();
   std::string empty;
+  std::set<std::string> groups{"ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i = *entry.second;
     std::string t(i.isDakuten() ? (++dakuten, "D") : i.isHanDakuten() ? (++hanDakuten, "H") : (++kana, "K"));
@@ -239,6 +254,7 @@ Notes:\n\
     const std::string& h = i.hiragana();
     const std::string& k = i.katakana();
     const std::string& r = i.romaji();
+    if (groups.contains(r)) border();
     const bool uni = h.length() == 3; // only show unicode for monographs
     if (uni)
       ++monographs;
@@ -248,6 +264,7 @@ Notes:\n\
     kunr = r == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
     print(std::to_string(++row), t, r, h, k, uni ? toUnicode(h) : empty, uni ? toUnicode(k) : empty, hepb, kunr, vars);
   }
+  border();
   // special handling middle dot, prolong symbol and repeat symbols
   const char slash = '/';
   const auto& middleDot = _converter.narrowDelims().find(slash);
@@ -261,9 +278,10 @@ Notes:\n\
     const std::string& k = i.katakana();
     print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
   }
+  border();
   int regularTypes = kana + dakuten + hanDakuten;
-  std::cout << "\nTotals:\n  Regular Types: " << regularTypes << " (K=" << kana << ", D=" << dakuten
-            << ", H=" << hanDakuten << "), N=" << none << "\n  Regular Kana : " << monographs + digraphs
+  std::cout << "\nTotals:\n  Types: " << regularTypes << " (K=" << kana << ", D=" << dakuten << ", H=" << hanDakuten
+            << "), N=" << none << " (N types are not part of conversion Kana list)\n   Kana: " << monographs + digraphs
             << " (monographs=" << monographs << ", digraphs=" << digraphs << "), Variants=" << variants << '\n';
   exit(0);
 }
