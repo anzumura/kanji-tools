@@ -132,7 +132,7 @@ public:
 
   // if 'regex' is provided it will be applied to strings before they are processed for counting
   MBCharCount(OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace, bool debug = false)
-    : _files(0), _directories(0), _errors(0), _find(find), _replace(replace), _debug(debug) {}
+    : _find(find), _replace(replace), _debug(debug) {}
   virtual ~MBCharCount() = default;
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added. If 'tag'
@@ -174,9 +174,11 @@ private:
   Map _map;
   TagMap _tags;
   // keep counts of number of files and directories processed
-  int _files;
-  int _directories;
-  int _errors;
+  int _files = 0;
+  int _directories = 0;
+  int _errors = 0;
+  std::string _furiganaTag;
+  int _furiganaDebugCount = 0;
   const OptRegex _find;
   const std::wstring _replace;
   const bool _debug;

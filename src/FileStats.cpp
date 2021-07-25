@@ -79,14 +79,13 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
   const bool isKanji = name.ends_with("Kanji");
   const bool isHiragana = name == "Hiragana";
   const bool isUnrecognized = name == "Unrecognized";
-  if (isHiragana && verbose)
-    log() << "Showing all furigana replacements:\n";
+  if (isHiragana && verbose) log() << "Showing all furigana replacements:\n";
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
   const bool removeFurigana = isHiragana || name == "Katakana" || name == "MB-Letter";
   MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt,
                       MBCharCount::DefaultReplace, isHiragana && verbose);
-  count.addFile(top, isKanji || isUnrecognized);
+  count.addFile(top, isKanji || isUnrecognized || isHiragana && verbose);
   auto& m = count.map();
   std::set<Count> frequency;
   int total = 0, rank = 0;
@@ -178,10 +177,10 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown, bool verbose
   auto f = [this, &top, showBreakdown, verbose, &firstCount](const auto& x, const auto& y) {
     return std::make_pair(this->processCount(top, x, y, showBreakdown, firstCount, verbose), y);
   };
-  std::array totals{f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
-                    f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
-                    f([](const auto& x) { return isHiragana(x); }, "Hiragana"),
+  std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana"),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
+                    f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
+                    f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
                     f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
                     f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),

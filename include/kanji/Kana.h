@@ -87,6 +87,10 @@ public:
   // unaccented 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc.. ウォ can be typed with 'u'
   // then 'lo' to get a small 'o', but this is treated as two separate Kana instances ('u' and 'lo').
   const Kana* unaccentedKana() const { return _unaccentedKana; }
+  // 'is' methods test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana, i.e., the
+  // class of 'this' is 'Kana', but we are a member of a 'DakutenKana' or 'HanDakutenKana' class.
+  bool isDakuten() const { return _unaccentedKana && _unaccentedKana->dakutenKana() == this; }
+  bool isHanDakuten() const { return _unaccentedKana && _unaccentedKana->hanDakutenKana() == this; }
 
   const std::string& getRomaji(int flags) const;
 
@@ -107,6 +111,9 @@ public:
   const std::string& hiragana() const { return _hiragana; }
   const std::string& katakana() const { return _katakana; }
   const List& variants() const { return _variants; }
+  bool hasHepburn() const { return _hepburn.has_value(); }
+  bool hasKunrei() const { return _kunrei.has_value(); }
+  bool kunreiVariant() const { return _kunreiVariant; }
 private:
   static Map populate(CharType);
   static const Map _romajiMap;
@@ -134,7 +141,7 @@ private:
   // '_kunreiVariant' is true if the first entry in '_variants' is a 'Kunrei Shiki' value. If
   // this is true then '_kunrei' should be nullopt.
   const bool _kunreiVariant = false;
-  // '_unaccented' is set to unaccented version by DakutenKana and HanDakutenKana constructors.
+  // '_unaccentedKana' is set to unaccented version by DakutenKana and HanDakutenKana constructors.
   // For example, the DakutenKana instance for け contains '_dakutenKana' Kana げ and in turn, げ
   // will have '_unaccented' set to the original け to allow migration both ways.
   const Kana* _unaccentedKana = nullptr;

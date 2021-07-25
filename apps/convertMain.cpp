@@ -27,6 +27,7 @@ private:
   void setFlag(int value) { _converter.flags(_converter.flags() | value); }
   bool charTypeArgs(const std::string& arg);
   bool flagArgs(char arg);
+  void printKanaChart() const;
 
   bool _interactive = false;
   bool _suppressNewLine = false;
@@ -39,7 +40,7 @@ private:
 
 ConvertMain::ConvertMain(int argc, const char** argv)
   : _choice(std::cout), _program(argc > 0 ? fs::path(argv[0]).filename().string() : std::string("kanaConvert")) {
-  bool finishedOptions = false;
+  bool finishedOptions = false, printKana = false;
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
     if (finishedOptions)
@@ -50,6 +51,8 @@ ConvertMain::ConvertMain(int argc, const char** argv)
       _interactive = true;
     else if (arg == "-n")
       _suppressNewLine = true;
+    else if (arg == "-p")
+      printKana = true;
     else if (arg == "-?")
       usage();
     else if (arg == "-f") {
@@ -65,9 +68,15 @@ ConvertMain::ConvertMain(int argc, const char** argv)
       _strings.push_back(arg);
   }
   if (_interactive && _suppressNewLine) usage("can't combine '-i' and '-n'");
+  if (_interactive && printKana) usage("can't combine '-i' and '-p'");
+  if (printKana && _suppressNewLine) usage("can't combine '-p' and '-n'");
   if (_strings.empty()) {
-    if (isatty(fileno(stdin)) && !_interactive)
-      usage("provide one or more 'strings' to convert or specify '-i' for interactive mode");
+    if (isatty(fileno(stdin))) {
+      if (printKana)
+        printKanaChart();
+      else if (!_interactive)
+        usage("provide one or more 'strings' to convert or specify '-i' for interactive mode");
+    }
   } else if (_interactive)
     usage("'-i' can't be combined with other 'string' arguments");
 }
@@ -75,7 +84,7 @@ ConvertMain::ConvertMain(int argc, const char** argv)
 void ConvertMain::usage(const std::string& errorMsg, bool showAllOptions) const {
   std::ostream& os = errorMsg.empty() ? std::cout : std::cerr;
   if (!errorMsg.empty()) os << _program << ": " << errorMsg << '\n';
-  if (showAllOptions) os << "usage: " << _program << " [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-n] [string ...]\n";
+  if (showAllOptions) os << "usage: " << _program << " [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-n|-p] [string ...]\n";
   os << "  -h: set conversion output to Hiragana" << (showAllOptions ? " (default)" : "") << "\n\
   -k: set conversion output to Katakana\n\
   -r: set conversion output to Romaji\n\
@@ -92,6 +101,7 @@ void ConvertMain::usage(const std::string& errorMsg, bool showAllOptions) const 
       r: remove spaces on output (only applies to Hiragana and Katakana output)\n\
   -i: interactive mode\n\
   -n: suppress newline on output (for non-interactive mode)\n\
+  -p: print kana chart and exit\n\
   --: finish parsing options, all further arguments will be treated as input files\n\
   [string ...]: provide one or more strings to convert, no strings means process standard input\n";
     exit(errorMsg.empty() ? 0 : 1);
@@ -178,6 +188,42 @@ bool ConvertMain::flagArgs(char arg) {
   else
     return false;
   return true;
+}
+
+void ConvertMain::printKanaChart() const {
+  std::cout << "Printing Kana Chart\n\
+  - meaning of Type values: K=Kana, D=Dakuten, H=HanDakuten\n\
+  - a few 'K' type Kana are actually 'Dakuten Digraphs' without a non-accented version\n\
+  - any Hepburn or Kunrei values in brackets () are 'output-only' since they are ambiguous\n\n";
+  auto print = [](const std::string& c1, const std::string& c2, const std::string& c3, const std::string& c4,
+                  const std::string& c5, const std::string& c6, const std::string& c7, const std::string& c8) {
+    // for the title row leave 2 spaces (after Hiragana and Katakana) and for kana rows leave 8 spaces
+    // for a single or 6 spaces for a digraph (since each kana is twice as wide as an ascii character)
+    std::string spaces(c4.length() == 8 ? "  " : c4.length() == 3 ? "        " : "      ");
+    std::cout << std::left << std::setw(5) << c1 << std::setw(6) << c2 << std::setw(10) << c3 << c4 << spaces << c5
+              << spaces << std::setw(10) << c6 << std::setw(10) << c7 << c8 << '\n';
+  };
+  print("No.", "Type", "Romaji", "Hiragana", "Katakana", "Hepburn", "Kunrei", "Variants");
+  int count = 0;
+  std::string empty;
+  for (auto& i : Kana::getMap(CharType::Hiragana)) {
+    auto& k = *i.second;
+    std::string type(k.isDakuten() ? "D" : k.isHanDakuten() ? "H" : "K");
+    std::string variants;
+    for (int j = (k.kunreiVariant() ? 1 : 0); j < k.variants().size(); ++j) {
+      if (!variants.empty()) variants += ", ";
+      variants += k.variants()[j];
+    }
+    std::string hepburn(k.getRomaji(KanaConvert::Hepburn));
+    std::string kunrei(k.getRomaji(KanaConvert::Kunrei));
+    const std::string& r = k.romaji();
+    print(std::to_string(++count), type, r, k.hiragana(), k.katakana(), r == hepburn ? empty : ('(' + hepburn + ')'),
+          r == kunrei           ? empty
+            : k.kunreiVariant() ? kunrei
+                                : ('(' + kunrei + ')'),
+          variants);
+  }
+  exit(0);
 }
 
 int main(int argc, const char** argv) {
