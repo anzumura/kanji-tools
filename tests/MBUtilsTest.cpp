@@ -191,6 +191,11 @@ TEST(MBUtils, ToHex) {
   EXPECT_EQ(toHex(s[2]), "bc");
 }
 
+TEST(MBUtils, ToUnicode) {
+  EXPECT_EQ(toUnicode("ぁ"), "3041");
+  EXPECT_EQ(toUnicode("すずめ"), "3059 305A 3081");
+}
+
 TEST(MBUtils, ToBinary) {
   EXPECT_EQ(toBinary(L'\ufffc'), "1111111111111100");
   auto s = toUtf8(L"\ufffc");

@@ -1,6 +1,7 @@
 #include <kanji/Choice.h>
 #include <kanji/Kana.h>
 #include <kanji/KanaConvert.h>
+#include <kanji/MBUtils.h>
 
 #include <filesystem>
 #include <iostream>
@@ -191,38 +192,76 @@ bool ConvertMain::flagArgs(char arg) {
 }
 
 void ConvertMain::printKanaChart() const {
-  std::cout << "Printing Kana Chart\n\
-  - meaning of Type values: K=Kana, D=Dakuten, H=HanDakuten\n\
-  - a few 'K' type Kana are actually 'Dakuten Digraphs' without a non-accented version\n\
-  - any Hepburn or Kunrei values in brackets () are 'output-only' since they are ambiguous\n\n";
-  auto print = [](const std::string& c1, const std::string& c2, const std::string& c3, const std::string& c4,
-                  const std::string& c5, const std::string& c6, const std::string& c7, const std::string& c8) {
-    // for the title row leave 2 spaces (after Hiragana and Katakana) and for kana rows leave 8 spaces
-    // for a single or 6 spaces for a digraph (since each kana is twice as wide as an ascii character)
-    std::string spaces(c4.length() == 8 ? "  " : c4.length() == 3 ? "        " : "      ");
-    std::cout << std::left << std::setw(5) << c1 << std::setw(6) << c2 << std::setw(10) << c3 << c4 << spaces << c5
-              << spaces << std::setw(10) << c6 << std::setw(10) << c7 << c8 << '\n';
+  std::cout << "--- Kana Chart ---\n\
+Columns: 'Roma'=Rōmaji, 'Hira'=Hiragana, 'Kata'=Katakana, 'HUni'=Hiragana Unicode\n\
+         'KUni'=Katakana Unicode, 'Hepb'=Hepburn, 'Kunr'=Kunrei, 'Vars'=Variants\n\
+Types: 'K'=Kana, 'D'=Dakuten, 'H'=HanDakuten, 'N'=None - type 'N' includes:\n\
+- Middle Dot (・): maps to Rōmaji '/' to match usual IME keyboard entry\n\
+- Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value\n\
+- Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji\n\
+Notes:\n\
+- When populated, 'Roma', 'Hira' and 'Kata' columns are unique (no duplicates)\n\
+- 'Roma' is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
+- 'Hepb' and 'Kunr' in () means 'output-only' since inputting leads to a different kana\n\
+- 'Vars' are alternative keyboard combinations that lead to the same kana\n\
+- Some 'K' types are actually 'Dakuten Digraphs' with no unaccented version\n\
+- Unicode values are only shown for 'monograph' entries\n\
+- Some 'digraphs' may not be in any real words, but they are typable and thus included\n\
+- Chart output is sorted on 'Hira' column, so 'a, ka, sa, ta, na, ...' ordering\n\
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)\n\
+- 'Hepb' and 'Kunr' are only populated when they would produce different output\n\n";
+  auto print = [](const std::string& num, const std::string& type, const std::string& roma, const std::string& hira,
+                  const std::string& kata, const std::string& hUni, const std::string& kUni,
+                  const std::string& hepb = "", const std::string& kunr = "", const std::string& vars = "") {
+    // Leave 2 spaces after titles (Hira and Kata) and 'digraph' kana and 4 spaces after a single (since
+    // each kana is twice as wide as an ascii character). Use 6 spaces is 'empty'.
+    auto sp = [](auto& s) { return s.length() > 3 ? "  " : s.empty() ? "      " : "    "; };
+    std::cout << std::left << std::setw(5) << num << std::setw(6) << type << std::setw(6) << roma << hira << sp(hira)
+              << kata << sp(kata) << std::setw(6) << hUni << std::setw(6) << kUni << std::setw(6) << hepb
+              << std::setw(6) << kunr << vars << '\n';
   };
-  print("No.", "Type", "Romaji", "Hiragana", "Katakana", "Hepburn", "Kunrei", "Variants");
-  int count = 0;
+  print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Vars");
+  int row = 0, monographs = 0, digraphs = 0, variants = 0, kana = 0, dakuten = 0, hanDakuten = 0, none = 0;
   std::string empty;
-  for (auto& i : Kana::getMap(CharType::Hiragana)) {
-    auto& k = *i.second;
-    std::string type(k.isDakuten() ? "D" : k.isHanDakuten() ? "H" : "K");
-    std::string variants;
-    for (int j = (k.kunreiVariant() ? 1 : 0); j < k.variants().size(); ++j) {
-      if (!variants.empty()) variants += ", ";
-      variants += k.variants()[j];
+  for (auto& entry : Kana::getMap(CharType::Hiragana)) {
+    auto& i = *entry.second;
+    std::string t(i.isDakuten() ? (++dakuten, "D") : i.isHanDakuten() ? (++hanDakuten, "H") : (++kana, "K"));
+    variants += i.variants().size();
+    std::string vars;
+    for (int j = (i.kunreiVariant() ? 1 : 0); j < i.variants().size(); ++j) {
+      if (!vars.empty()) vars += ", ";
+      vars += i.variants()[j];
     }
-    std::string hepburn(k.getRomaji(KanaConvert::Hepburn));
-    std::string kunrei(k.getRomaji(KanaConvert::Kunrei));
-    const std::string& r = k.romaji();
-    print(std::to_string(++count), type, r, k.hiragana(), k.katakana(), r == hepburn ? empty : ('(' + hepburn + ')'),
-          r == kunrei           ? empty
-            : k.kunreiVariant() ? kunrei
-                                : ('(' + kunrei + ')'),
-          variants);
+    std::string hepb(i.getRomaji(KanaConvert::Hepburn));
+    std::string kunr(i.getRomaji(KanaConvert::Kunrei));
+    const std::string& h = i.hiragana();
+    const std::string& k = i.katakana();
+    const std::string& r = i.romaji();
+    const bool uni = h.length() == 3; // only show unicode for monographs
+    if (uni)
+      ++monographs;
+    else
+      ++digraphs;
+    hepb = r == hepb ? empty : ('(' + hepb + ')');
+    kunr = r == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
+    print(std::to_string(++row), t, r, h, k, uni ? toUnicode(h) : empty, uni ? toUnicode(k) : empty, hepb, kunr, vars);
   }
+  // special handling middle dot, prolong symbol and repeat symbols
+  const char slash = '/';
+  const auto& middleDot = _converter.narrowDelims().find(slash);
+  if (middleDot != _converter.narrowDelims().end())
+    print(std::to_string(++row), "N", empty + slash, empty, middleDot->second, empty, toUnicode(middleDot->second));
+  else
+    std::cerr << "Failed to find " << slash << " in _converter.narrowDelims()\n";
+  print(std::to_string(++row), "N", empty, empty, Kana::ProlongMark, empty, toUnicode(Kana::ProlongMark));
+  for (auto& i : std::array{Kana::RepeatUnaccented, Kana::RepeatAccented}) {
+    const std::string& h = i.hiragana();
+    const std::string& k = i.katakana();
+    print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
+    ++none;
+  }
+  std::cout << "\nTotals: monographs=" << monographs << ", digraphs=" << digraphs << ", variants=" << variants
+            << ", K=" << kana << ", D=" << dakuten << ", H=" << hanDakuten << ", N=" << none << '\n';
   exit(0);
 }
 

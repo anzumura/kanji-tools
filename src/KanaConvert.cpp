@@ -11,16 +11,11 @@ namespace kanji {
 namespace {
 
 using P = std::pair<char, const char*>;
-// Support converting other non-letter ascii from narrow to wide values. These values are also used as
-// delimiters for splitting up input strings when converting from Rõmaji to Kana. Use a '*' for katakana
-// middle dot '・' to keep round-trip translations as non-lossy as possible. For now, don't include '-'
-// (minus) or apostrophe since these could get mixed up with _prolongMark 'ー' and special
-// separation handling after 'n' in Romaji output. Backslash maps to ￥ as per the usual keyboard input.
-constexpr std::array Delimiters{P(' ', "　"), P('.', "。"), P(',', "、"), P(':', "："), P(';', "；"), P('/', "／"),
-                                P('!', "！"), P('?', "？"), P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"),
-                                P('*', "・"), P('~', "〜"), P('=', "＝"), P('+', "＋"), P('@', "＠"), P('#', "＃"),
-                                P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"), P('{', "『"), P('}', "』"),
-                                P('|', "｜"), P('"', "”"),  P('`', "｀"), P('<', "＜"), P('>', "＞"), P('\\', "￥")};
+constexpr std::array Delimiters{
+  P(' ', "　"), P('.', "。"), P(',', "、"), P(':', "："), P(';', "；"), P('/', "・"), P('!', "！"), P('?', "？"),
+  P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"), P('*', "＊"), P('~', "〜"),   P('=', "＝"), P('+', "＋"),
+  P('@', "＠"), P('#', "＃"), P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"),   P('{', "『"), P('}', "』"),
+  P('|', "｜"), P('"', "”"),  P('`', "｀"), P('<', "＜"), P('>', "＞"), P('_', "＿"),   P('\\', "￥")};
 
 } // namespace
 
@@ -41,18 +36,17 @@ KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(f
     }
   }
   for (auto& i : Delimiters) {
-    _narrowDelims += i.first;
-    _narrowToWideDelims[i.first] = i.second;
-    _wideToNarrowDelims[i.second] = i.first;
+    _narrowDelimList += i.first;
+    _narrowDelims[i.first] = i.second;
+    _wideDelims[i.second] = i.first;
   }
-  _narrowDelims += _apostrophe;
-  _narrowDelims += _dash;
+  _narrowDelimList += _apostrophe;
+  _narrowDelimList += _dash;
   verifyData();
 }
 
 std::string KanaConvert::flagString() const {
-  if (!_flags)
-    return "none";
+  if (!_flags) return "none";
   std::string result;
   auto flag = [this, &result](int f, const char* v) {
     if (_flags & f) {
@@ -85,9 +79,9 @@ void KanaConvert::verifyData() const {
     assert(isHiragana(i));
   for (auto& i : _digraphSecondKatakana)
     assert(isKatakana(i));
-  assert(_wideToNarrowDelims.size() == Delimiters.size());
-  assert(_narrowToWideDelims.size() == Delimiters.size());
-  assert(_narrowDelims.length() == Delimiters.size() + 2);
+  assert(_wideDelims.size() == Delimiters.size());
+  assert(_narrowDelims.size() == Delimiters.size());
+  assert(_narrowDelimList.length() == Delimiters.size() + 2);
 }
 
 std::string KanaConvert::convert(const std::string& input) const {
@@ -113,18 +107,17 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
   if (source == _target) return input;
   if (source == CharType::Hiragana) return convertFromKana(input, source, _markAfterNHiragana, _digraphSecondHiragana);
   if (source == CharType::Katakana) return convertFromKana(input, source, _markAfterNKatakana, _digraphSecondKatakana);
-  // When source is Romaji break input up into words separated by any of _narrowDelims and process
+  // When source is Romaji break input up into words separated by any of _narrowDelimList and process
   // each word. This helps deal with words ending in 'n'.
   std::string result;
   size_t oldPos = 0;
   const bool keepSpaces = !(_flags & RemoveSpaces);
   do {
-    const size_t pos = input.find_first_of(_narrowDelims, oldPos);
+    const size_t pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos != std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
       const char delim = input[pos];
-      if (delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
-        result += _narrowToWideDelims.at(delim);
+      if (delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' ')) result += _narrowDelims.at(delim);
       oldPos = pos + 1;
     } else {
       result += convertFromRomaji(input.substr(oldPos));
@@ -197,8 +190,8 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
       // got non-hiragana letter so flush any letters and preserve the new letter unconverted
       done(false);
       if (_target == CharType::Romaji) {
-        auto i = _wideToNarrowDelims.find(c);
-        if (i != _wideToNarrowDelims.end())
+        auto i = _wideDelims.find(c);
+        if (i != _wideDelims.end())
           result += i->second;
         else
           result += c;

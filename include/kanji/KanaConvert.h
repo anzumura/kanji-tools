@@ -58,7 +58,7 @@ public:
 
   // 'KanaConvert' constructor defaults the 'target' for conversion to Hiragana and sets 'flags'
   // to 0 (which means no special conversion flags). Calling the below 'convert' functions can
-  // also override these values. 
+  // also override these values.
   KanaConvert(CharType target = CharType::Hiragana, int flags = 0);
 
   CharType target() const { return _target; }
@@ -66,6 +66,15 @@ public:
   int flags() const { return _flags; }
   std::string flagString() const; // return a | separated string representation of current flags or 'none'
   void flags(int flags) { _flags = flags; }
+  // Support converting most non-letter ascii from narrow to wide values. These values are also used
+  // as delimiters for splitting up input strings when converting from Rõmaji to Kana. Use a '*' for
+  // katakana middle dot '・' to keep round-trip translations as non-lossy as possible. For now, don't
+  // include '-' (minus) or apostrophe since these could get mixed up with prolong mark 'ー' and special
+  // separation handling after 'n' in Romaji output. Backslash maps to ￥ as per usual keyboard input.
+  using NarrowDelims = std::map<char, std::string>;
+  using WideDelims = std::map<std::string, char>;
+  const NarrowDelims& narrowDelims() const { return _narrowDelims; }
+  const WideDelims& wideDelims() const { return _wideDelims; }
 
   // 'convert' has 4 overloads. The first and second use the current values of '_target' and '_flags'.
   // The first and third convert characters of any source type whereas the second and fourth restrict the
@@ -104,9 +113,9 @@ private:
   Set _digraphSecondHiragana;
   Set _digraphSecondKatakana;
   // Punctuation and word delimiter handling
-  std::string _narrowDelims;
-  std::map<char, std::string> _narrowToWideDelims;
-  std::map<std::string, char> _wideToNarrowDelims;
+  std::string _narrowDelimList;
+  NarrowDelims _narrowDelims;
+  WideDelims _wideDelims;
 
   // Members for the current conversion
   CharType _target;

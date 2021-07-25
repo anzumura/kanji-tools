@@ -32,18 +32,29 @@ template<typename T> inline std::string toBinary(T x) {
   return result;
 }
 
-template<typename T> inline std::string toHex(T x) {
+template<typename T> inline std::string toHex(T x, bool caps = false) {
   std::string result;
   for (; x > 0; x >>= 4) {
     const auto i = x % 16;
-    result.insert(result.begin(), (i < 10 ? '0' + i : 'a' + i - 10));
+    result.insert(result.begin(), (i < 10 ? '0' + i : (caps ? 'A' : 'a') + i - 10));
   }
   return result;
 }
 
 // provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
 template<> inline std::string toBinary(char x) { return toBinary(static_cast<unsigned char>(x)); }
-template<> inline std::string toHex(char x) { return toHex(static_cast<unsigned char>(x)); }
+template<> inline std::string toHex(char x, bool caps) { return toHex(static_cast<unsigned char>(x), caps); }
+
+// 'toUnicode' converts a UTF-8 string into space-separated Unicode code point values
+inline std::string toUnicode(const std::string& s, bool caps = true) {
+  std::string result;
+  auto w = fromUtf8(s);
+  for (auto i : w) {
+    if (!result.empty()) result += ' ';
+    result += toHex(i, caps);
+  }
+  return result;
+}
 
 // 'UnicodeBlock' is used to hold a unicode block range which is used in the below 'is'
 // functions (isKanji, isHiragana, etc.).

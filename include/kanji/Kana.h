@@ -39,6 +39,8 @@ public:
       return t == CharType::Hiragana && _hiragana == s || t == CharType::Katakana && _katakana == s;
     }
     std::string get(CharType target, int flags, const Kana* prevKana) const;
+    const std::string& hiragana() const { return _hiragana; }
+    const std::string& katakana() const { return _katakana; }
   private:
     const std::string _hiragana;
     const std::string _katakana;

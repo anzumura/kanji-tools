@@ -132,6 +132,7 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("きょうと"), "kyouto");
   EXPECT_EQ(hiraganaToRomaji("にいがた"), "niigata");
   EXPECT_EQ(hiraganaToRomaji("かんけいない"), "kankeinai");
+  EXPECT_EQ(hiraganaToRomaji("なか・ぐろ"), "naka/guro");
   // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
   EXPECT_EQ(hiraganaToRomaji("かんい"), "kan'i");
   EXPECT_EQ(hiraganaToRomaji("しんよう"), "shin'you");
@@ -175,6 +176,7 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   checkSmallKana(CharType::Katakana, "ァィゥェォヵヶャュョッヮ");
   EXPECT_EQ(katakanaToRomaji("テニス"), "tenisu");
   EXPECT_EQ(katakanaToRomaji("カナダ"), "kanada");
+  EXPECT_EQ(katakanaToRomaji("ナカ・グロ"), "naka/guro");
   // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
   EXPECT_EQ(katakanaToRomaji("タンイ"), "tan'i");
   EXPECT_EQ(katakanaToRomaji("ポンヨ"), "pon'yo");
@@ -227,6 +229,7 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
   kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？", "ビッグ　バアド、スマール　ハッマー？");
+  kanaConvertCheck("じょん・どー", "ジョン・ドー");
 }
 
 TEST_F(KanaConvertTest, RepeatSymbol) {
