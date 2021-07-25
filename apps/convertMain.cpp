@@ -261,8 +261,10 @@ Notes:\n\
     const std::string& k = i.katakana();
     print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
   }
-  std::cout << "\nTotals: monographs=" << monographs << ", digraphs=" << digraphs << ", variants=" << variants
-            << ", K=" << kana << ", D=" << dakuten << ", H=" << hanDakuten << ", N=" << none << '\n';
+  int regularTypes = kana + dakuten + hanDakuten;
+  std::cout << "\nTotals:\n  Regular Types: " << regularTypes << " (K=" << kana << ", D=" << dakuten
+            << ", H=" << hanDakuten << "), N=" << none << "\n  Regular Kana : " << monographs + digraphs
+            << " (monographs=" << monographs << ", digraphs=" << digraphs << "), Variants=" << variants << '\n';
   exit(0);
 }
 
