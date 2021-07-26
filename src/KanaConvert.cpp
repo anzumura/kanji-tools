@@ -154,9 +154,9 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
     if (c == Kana::ProlongMark) {
       // this is actually a katakana symbol, but it can also appear in (non-standard) Hiragana.
       done(false, true);
-    } else if (Kana::RepeatUnaccented.matches(source, c)) {
+    } else if (Kana::RepeatPlain.matches(source, c)) {
       done(false);
-      result += Kana::RepeatUnaccented.get(_target, _flags, prevKana);
+      result += Kana::RepeatPlain.get(_target, _flags, prevKana);
     } else if (Kana::RepeatAccented.matches(source, c)) {
       done(false);
       result += Kana::RepeatAccented.get(_target, _flags, prevKana);

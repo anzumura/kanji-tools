@@ -192,25 +192,24 @@ bool ConvertMain::flagArgs(char arg) {
 }
 
 void ConvertMain::printKanaChart() const {
-  std::cout << "--- Kana Chart ---\n\
-Columns: 'Roma'=Rōmaji, 'Hira'=Hiragana, 'Kata'=Katakana, 'HUni'=Hiragana Unicode\n\
-         'KUni'=Katakana Unicode, 'Hepb'=Hepburn, 'Kunr'=Kunrei, 'Vars'=Variants\n\
-Types: 'P'=Plain Kana, 'D'=Dakuten, 'H'=HanDakuten, 'N'=None - type 'N' includes:\n\
-- Middle Dot (・): maps to Rōmaji '/' to match usual IME keyboard entry\n\
-- Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value\n\
-- Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji\n\
-Notes:\n\
-- When populated, 'Roma', 'Hira' and 'Kata' columns are unique (no duplicates)\n\
-- 'Roma' is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
-- 'Hepb' and 'Kunr' in () means 'output-only' since inputting leads to a different kana\n\
-- 'Vars' are alternative keyboard combinations that lead to the same kana\n\
+  std::cout << ">>> Notes:\n\
+- Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei\n\
+- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
+- Hepb and Kunr are only populated when they would produce different output\n\
+  - Values in () means 'output-only' since inputting leads to a different kana\n\
+- 'Roma Variants' are alternative keyboard combinations that lead to the same kana\n\
+- When populated, Roma, Hira and Kata columns are unique (no duplicates)\n\
 - Unicode values are only shown for 'monograph' entries\n\
 - Some 'digraphs' may not be in any real words, but they are typable and thus included\n\
-- Chart output is sorted on 'Hira' column, so 'a, ka, sa, ta, na, ...' ordering\n\
+- Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering\n\
 - Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)\n\
-- 'Hepb' and 'Kunr' are only populated when they would produce different output\n\n";
+- Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None\n\
+- Type 'N' includes:\n\
+  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match usual IME keyboard entry\n\
+  - Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value\n\
+  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji\n\n";
   int row = 0, hanDakutenMonographs = 0, small = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
-      hanDakutenDigraphs = 0, dakutenDigraphs = 0, variants = 0, none = 0;
+      hanDakutenDigraphs = 0, dakutenDigraphs = 0, romajiVariants = 0, none = 0;
   auto print = [&none](const std::string& num, const std::string& type, const std::string& roma,
                        const std::string& hira, const std::string& kata, const std::string& hUni,
                        const std::string& kUni, const std::string& hepb = "", const std::string& kunr = "",
@@ -236,7 +235,7 @@ Notes:\n\
   };
   auto border = [&print] { print("", "", "", "", "", "", "", "", "", "", '-', '+'); };
   border();
-  print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Vars");
+  print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Roma Variants");
   std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when there are small letters
   // that should be included, i.e., 'la' (ぁ) comes right before 'a' (あ).
@@ -244,11 +243,11 @@ Notes:\n\
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i = *entry.second;
     std::string t(i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P");
-    variants += i.variants().size();
+    romajiVariants += i.romajiVariants().size();
     std::string vars;
-    for (int j = (i.kunreiVariant() ? 1 : 0); j < i.variants().size(); ++j) {
+    for (int j = (i.kunreiVariant() ? 1 : 0); j < i.romajiVariants().size(); ++j) {
       if (!vars.empty()) vars += ", ";
-      vars += i.variants()[j];
+      vars += i.romajiVariants()[j];
     }
     std::string hepb(i.getRomaji(KanaConvert::Hepburn));
     std::string kunr(i.getRomaji(KanaConvert::Kunrei));
@@ -287,9 +286,9 @@ Notes:\n\
   else
     std::cerr << "Failed to find " << slash << " in _converter.narrowDelims()\n";
   print(std::to_string(++row), "N", empty, empty, Kana::ProlongMark, empty, toUnicode(Kana::ProlongMark));
-  for (auto& i : std::array{Kana::RepeatUnaccented, Kana::RepeatAccented}) {
-    const std::string& h = i.hiragana();
-    const std::string& k = i.katakana();
+  for (auto& i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
+    const std::string& h = i->hiragana();
+    const std::string& k = i->katakana();
     print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
   }
   border();
@@ -305,10 +304,10 @@ Notes:\n\
             << ")\n";
   std::cout << "    Digraphs: " << std::setw(3) << digraphs << " (Plain=" << plainDigraphs
             << ", Dakuten=" << dakutenDigraphs << ", HanDakuten=" << hanDakutenDigraphs << ")\n";
-  std::cout << "    All Kana: " << std::setw(3) << monographs + digraphs << " (monographs=" << monographs
-            << ", Digraphs=" << digraphs << "), Variants=" << variants << '\n';
+  std::cout << "    All Kana: " << std::setw(3) << monographs + digraphs << " (Monographs=" << monographs
+            << ", Digraphs=" << digraphs << "), Rōmaji Variants=" << romajiVariants << '\n';
   std::cout << "       Types: " << std::setw(3) << types << " (P=" << plain << ", D=" << dakuten << ", H=" << hanDakuten
-            << ", N=" << none << "), N types are not included 'All Kana'\n";
+            << ", N=" << none << "), N types are not included in 'All Kana'\n";
   exit(0);
 }
 

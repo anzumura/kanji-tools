@@ -2,7 +2,6 @@
 
 #include <kanji/Kana.h>
 #include <kanji/MBChar.h>
-#include <kanji/MBUtils.h>
 
 namespace kanji {
 
@@ -14,13 +13,13 @@ enum Values {
   DakutenMonographs = 21,
   DakutenDigraphs = 42,
   PlainMonographs = 48,
-  PlainDigraphs = 67,
-  Variants = 46
+  PlainDigraphs = 71,
+  RomajiVariants = 55
 };
 constexpr int TotalMonographs = HanDakuten + SmallMonographs + DakutenMonographs + PlainMonographs;
 constexpr int TotalDigraphs = HanDakuten + PlainDigraphs + DakutenDigraphs;
 constexpr int TotalKana = TotalMonographs + TotalDigraphs;
-constexpr int TotalRomaji = TotalKana + Variants;
+constexpr int TotalRomaji = TotalKana + RomajiVariants;
 
 } // namespace
 
@@ -33,7 +32,7 @@ TEST(KanaTest, CheckHiragana) {
   for (auto& i : sourceMap) {
     MBChar s(i.first);
     std::string c;
-    auto check = [&i, &c](const std::string& a, const std::string& b = "") {
+    auto checkDigraph = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
                                                     << i.second->romaji() << "', hiragana " << i.first;
     };
@@ -56,12 +55,12 @@ TEST(KanaTest, CheckHiragana) {
         EXPECT_EQ(i.first, "くゎ");
       else
         switch (i.second->romaji()[romajiLen - 1]) {
-        case 'a': check("ぁ", "ゃ"); break;
-        case 'i': check("ぃ"); break;
-        case 'u': check("ぅ", "ゅ"); break;
-        case 'e': check("ぇ"); break;
-        case 'o': check("ぉ", "ょ"); break;
-        default: check("");
+        case 'a': checkDigraph("ぁ", "ゃ"); break;
+        case 'i': checkDigraph("ぃ"); break;
+        case 'u': checkDigraph("ぅ", "ゅ"); break;
+        case 'e': checkDigraph("ぇ"); break;
+        case 'o': checkDigraph("ぉ", "ょ"); break;
+        default: checkDigraph("");
         }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
@@ -94,11 +93,11 @@ TEST(KanaTest, CheckKatakana) {
   EXPECT_EQ(sourceMap.size(), TotalKana);
   for (auto& i : sourceMap) {
     MBChar s(i.first);
-    // all entries in katakana map should also be in hiragana map so no need to check
-    // various counts again.
+    // As long as all entries in katakana map are also be in hiragana map (and the maps are the same
+    // size) then there's no need to checkDigraph the various counts again.
     EXPECT_TRUE(hiraganaMap.contains(i.second->hiragana()));
     std::string c;
-    auto check = [&i, &c](const std::string& a, const std::string& b = "") {
+    auto checkDigraph = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
                                                     << i.second->romaji() << "', katakana " << i.first;
     };
@@ -111,12 +110,12 @@ TEST(KanaTest, CheckKatakana) {
         EXPECT_EQ(i.first, "クヮ");
       else
         switch (i.second->romaji()[romajiLen - 1]) {
-        case 'a': check("ァ", "ャ"); break;
-        case 'i': check("ィ"); break;
-        case 'u': check("ゥ", "ュ"); break;
-        case 'e': check("ェ"); break;
-        case 'o': check("ォ", "ョ"); break;
-        default: check("");
+        case 'a': checkDigraph("ァ", "ャ"); break;
+        case 'i': checkDigraph("ィ"); break;
+        case 'u': checkDigraph("ゥ", "ュ"); break;
+        case 'e': checkDigraph("ェ"); break;
+        case 'o': checkDigraph("ォ", "ョ"); break;
+        default: checkDigraph("");
         }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
@@ -127,33 +126,41 @@ TEST(KanaTest, CheckKatakana) {
 TEST(KanaTest, CheckRomaji) {
   auto& sourceMap = Kana::getMap(CharType::Romaji);
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
-  int aCount = 0, iCount = 0, uCount = 0, eCount = 0, oCount = 0, nCount = 0;
-  std::set<std::string> variants;
+  int aNum = 0, vaNum = 0, iNum = 0, viNum = 0, uNum = 0, vuNum = 0, eNum = 0, veNum = 0, oNum = 0, voNum = 0, nNum = 0;
+  std::set<std::string> romajiVariants;
   for (auto& i : sourceMap) {
+    auto count = [&i](auto& normal, auto& variant) { i.second->romaji() == i.first ? ++normal : ++variant; };
     ASSERT_FALSE(i.first.empty());
     EXPECT_LT(i.first.length(), 4);
-    for (auto& j : i.second->variants())
-      variants.insert(j);
+    for (auto& j : i.second->romajiVariants())
+      romajiVariants.insert(j);
     if (i.first == "n")
-      ++nCount;
+      ++nNum;
     else
       switch (i.first[i.first.length() - 1]) {
-      case 'a': ++aCount; break;
-      case 'i': ++iCount; break;
-      case 'u': ++uCount; break;
-      case 'e': ++eCount; break;
-      case 'o': ++oCount; break;
+      case 'a': count(aNum, vaNum); break;
+      case 'i': count(iNum, viNum); break;
+      case 'u': count(uNum, vuNum); break;
+      case 'e': count(eNum, veNum); break;
+      case 'o': count(oNum, voNum); break;
       default: FAIL() << "romaji " << i.first << " doesn't end with expected letter\n";
       }
   }
-  EXPECT_EQ(aCount, 55);
-  EXPECT_EQ(iCount, 46);
-  EXPECT_EQ(uCount, 48);
-  EXPECT_EQ(eCount, 48);
-  EXPECT_EQ(oCount, 48);
-  EXPECT_EQ(nCount, 1);
-  EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalRomaji);
-  EXPECT_EQ(variants.size(), Variants);
+  // test romaji counts per last letter
+  EXPECT_EQ(aNum, 44);
+  EXPECT_EQ(iNum, 38);
+  EXPECT_EQ(uNum, 40);
+  EXPECT_EQ(eNum, 40);
+  EXPECT_EQ(oNum, 41);
+  // test romaji variant counts per last letter
+  EXPECT_EQ(vaNum, 11);
+  EXPECT_EQ(viNum, 10);
+  EXPECT_EQ(vuNum, 12);
+  EXPECT_EQ(veNum, 12);
+  EXPECT_EQ(voNum, 10);
+  EXPECT_EQ(nNum, 1);
+  EXPECT_EQ(aNum + vaNum + iNum + viNum + uNum + vuNum + eNum + veNum + oNum + voNum + nNum, TotalRomaji);
+  EXPECT_EQ(romajiVariants.size(), RomajiVariants);
 }
 
 } // namespace kanji

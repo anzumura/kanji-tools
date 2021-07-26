@@ -25,16 +25,13 @@ inline const std::string& toString(CharType t) {
 // as well variant Romaji forms. A 'Monograph' is a single Kana character (large or small) and a 'Digraph'
 // is a valid (at least typable using standard IME) two Kana combination. A 'Diagraph' always has a normal
 // sized first Kana followed by a small Kana (one of the 5 vowels, 3 y's or 'wa'). This class also holds
-// relationships between unaccented and accented (dakuten and han-dakuten) versions.
+// relationships between unaccented (plain) and accented (dakuten and han-dakuten) versions.
 class Kana {
 public:
   // 'RepeatMark' is for handling repeating kana marks (一の時点) when source is Hiragana or Katakana.
   class RepeatMark {
   public:
-    RepeatMark(const char* hiragana, const char* katakana, bool dakuten = false)
-      : _hiragana(hiragana), _katakana(katakana), _dakuten(dakuten) {
-      assert(_hiragana != _katakana);
-    }
+    RepeatMark(const RepeatMark&) = delete;
     bool matches(CharType t, const std::string& s) const {
       return t == CharType::Hiragana && _hiragana == s || t == CharType::Katakana && _katakana == s;
     }
@@ -42,12 +39,17 @@ public:
     const std::string& hiragana() const { return _hiragana; }
     const std::string& katakana() const { return _katakana; }
   private:
+    friend Kana; // only Kana class can constuct
+    RepeatMark(const char* hiragana, const char* katakana, bool dakuten = false)
+      : _hiragana(hiragana), _katakana(katakana), _dakuten(dakuten) {
+      assert(_hiragana != _katakana);
+    }
     const std::string _hiragana;
     const std::string _katakana;
     const bool _dakuten; // true if this instance if for the 'dakuten' (濁点) versions of the marks
   };
-  // unaccented and accented repeat marks
-  static const RepeatMark RepeatUnaccented;
+  // plain and accented repeat marks
+  static const RepeatMark RepeatPlain;
   static const RepeatMark RepeatAccented;
   // provide static const refs for some special-case Kana
   static const Kana& SmallTsu;
@@ -74,9 +76,11 @@ public:
     validate();
   }
   // Kana with a set of unique extra variant romaji values (first variant is optionally a 'kunreiVariant')
-  Kana(const char* romaji, const char* hiragana, const char* katakana, const List& variants, bool kunreiVariant = false)
-    : _romaji(romaji), _hiragana(hiragana), _katakana(katakana), _variants(variants), _kunreiVariant(kunreiVariant) {
-    assert(_kunreiVariant ? !_variants.empty() : true);
+  Kana(const char* romaji, const char* hiragana, const char* katakana, const List& romajiVariants,
+       bool kunreiVariant = false)
+    : _romaji(romaji), _hiragana(hiragana), _katakana(katakana), _romajiVariants(romajiVariants),
+      _kunreiVariant(kunreiVariant) {
+    assert(_kunreiVariant ? !_romajiVariants.empty() : true);
     validate();
   }
   virtual ~Kana() = default;
@@ -84,11 +88,11 @@ public:
   // 'dakutenKana' and 'hanDakutenKana' are overridden by derived classes to return the accented versions
   virtual const Kana* dakutenKana() const { return nullptr; }
   virtual const Kana* hanDakutenKana() const { return nullptr; }
-  // 'unaccentedKana' returns the unaccented version of a Kana - this will return return 'nullptr' if
+  // 'plainKana' returns the unaccented version of a Kana - this will return return 'nullptr' if
   // instance is already an unaccented version or is a combination that doesn't have an equivalent
   // unaccented 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc.. ウォ can be typed with 'u'
   // then 'lo' to get a small 'o', but this is treated as two separate Kana instances ('u' and 'lo').
-  const Kana* unaccentedKana() const { return _unaccentedKana; }
+  const Kana* plainKana() const { return _plainKana; }
 
   // All small kana have _romaji starting with 'l' (and they are all monographs)
   bool isSmall() const { return _romaji.starts_with("l"); }
@@ -100,9 +104,9 @@ public:
   // 'this' is 'Kana', but we are a member of a 'DakutenKana' or 'HanDakutenKana' class.
   bool isDakuten() const {
     // special case for a few digraphs starting with 'v', but don't have an unaccented version (see above)
-    return _romaji.starts_with("v") || _unaccentedKana && _unaccentedKana->dakutenKana() == this;
+    return _romaji.starts_with("v") || _plainKana && _plainKana->dakutenKana() == this;
   }
-  bool isHanDakuten() const { return _unaccentedKana && _unaccentedKana->hanDakutenKana() == this; }
+  bool isHanDakuten() const { return _plainKana && _plainKana->hanDakutenKana() == this; }
 
   // 'getRomaji' returns 'Romaji' value based on flags (see 'ConversionFlags' in KanaConvert.h)
   const std::string& getRomaji(int flags) const;
@@ -123,7 +127,7 @@ public:
   const std::string& romaji() const { return _romaji; }
   const std::string& hiragana() const { return _hiragana; }
   const std::string& katakana() const { return _katakana; }
-  const List& variants() const { return _variants; }
+  const List& romajiVariants() const { return _romajiVariants; }
   bool hasHepburn() const { return _hepburn.has_value(); }
   bool hasKunrei() const { return _kunrei.has_value(); }
   bool kunreiVariant() const { return _kunreiVariant; }
@@ -140,10 +144,10 @@ private:
   const std::string _romaji;
   const std::string _hiragana;
   const std::string _katakana;
-  // '_variants' holds any further variant Romaji values that are unique for this 'Kana'
+  // '_romajiVariants' holds any further variant Romaji values that are unique for this 'Kana'
   // class. These include extra key combinations that also map to the same value such as
   // 'kwa' for クァ (instead of 'qa'), 'fyi' フィ (instead of 'fi'), etc.
-  const List _variants;
+  const List _romajiVariants;
   // '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where it differs
   // from the 'unique' wāpuro romaji. For example, づ can be uniquely identified by 'du',
   // but the correct Hepburn output for this kana is 'zu' which is ambiguous with ず.
@@ -151,15 +155,16 @@ private:
   const std::optional<std::string> _hepburn = std::nullopt;
   // '_kunrei' holds an optional 'Kunrei Shiki' value for a few cases like 'zya' for じゃ.
   const std::optional<std::string> _kunrei = std::nullopt;
-  // '_kunreiVariant' is true if the first entry in '_variants' is a 'Kunrei Shiki' value. If
+  // '_kunreiVariant' is true if the first entry in '_romajiVariants' is a 'Kunrei Shiki' value. If
   // this is true then '_kunrei' should be nullopt.
   const bool _kunreiVariant = false;
-  // '_unaccentedKana' is set to unaccented version by DakutenKana and HanDakutenKana constructors.
-  // For example, the DakutenKana instance for け contains '_dakutenKana' Kana げ and in turn, げ
-  // will have '_unaccented' set to the original け to allow migration both ways.
-  const Kana* _unaccentedKana = nullptr;
+  // '_plainKana' is set to unaccented version by DakutenKana and HanDakutenKana constructors. For
+  // example, the DakutenKana instance for け contains '_dakutenKana' Kana げ and in turn, げ will
+  // have '_plainKana' set to the original け to allow migration both ways.
+  const Kana* _plainKana = nullptr;
   friend class DakutenKana;
   friend class HanDakutenKana;
+  Kana(const Kana&) = default; // copy-constructor should only be called by 'friend' derived classes
 };
 
 // 'DakutenKana' is for 'k', 's', 't', 'h' row kana which have a dakuten, i.e., か has が. The _romaji
@@ -170,12 +175,12 @@ public:
   DakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
               const char* hepburn = nullptr, const char* kunrei = nullptr)
     : Kana(romaji, hiragana, katakana, hepburn, kunrei), _dakutenKana(dakutenKana) {
-    _dakutenKana._unaccentedKana = this;
+    _dakutenKana._plainKana = this;
   }
   DakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
-              const List& variants, bool kunreiVariant = false)
-    : Kana(romaji, hiragana, katakana, variants, kunreiVariant), _dakutenKana(dakutenKana) {
-    _dakutenKana._unaccentedKana = this;
+              const List& romajiVariants, bool kunreiVariant = false)
+    : Kana(romaji, hiragana, katakana, romajiVariants, kunreiVariant), _dakutenKana(dakutenKana) {
+    _dakutenKana._plainKana = this;
   }
   const Kana* dakutenKana() const override { return &_dakutenKana; }
 private:
@@ -188,12 +193,13 @@ public:
   HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
                  const Kana& hanDakutenKana, const char* hepburn = nullptr, const char* kunrei = nullptr)
     : DakutenKana(romaji, hiragana, katakana, dakutenKana, hepburn, kunrei), _hanDakutenKana(hanDakutenKana) {
-    _hanDakutenKana._unaccentedKana = this;
+    _hanDakutenKana._plainKana = this;
   }
   HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana, const Kana& dakutenKana,
-                 const Kana& hanDakutenKana, const List& variants, bool kunreiVariant = false)
-    : DakutenKana(romaji, hiragana, katakana, dakutenKana, variants, kunreiVariant), _hanDakutenKana(hanDakutenKana) {
-    _hanDakutenKana._unaccentedKana = this;
+                 const Kana& hanDakutenKana, const List& romajiVariants, bool kunreiVariant = false)
+    : DakutenKana(romaji, hiragana, katakana, dakutenKana, romajiVariants, kunreiVariant),
+      _hanDakutenKana(hanDakutenKana) {
+    _hanDakutenKana._plainKana = this;
   }
   const Kana* hanDakutenKana() const override { return &_hanDakutenKana; }
 private:
