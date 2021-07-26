@@ -195,7 +195,7 @@ void ConvertMain::printKanaChart() const {
   std::cout << "--- Kana Chart ---\n\
 Columns: 'Roma'=Rōmaji, 'Hira'=Hiragana, 'Kata'=Katakana, 'HUni'=Hiragana Unicode\n\
          'KUni'=Katakana Unicode, 'Hepb'=Hepburn, 'Kunr'=Kunrei, 'Vars'=Variants\n\
-Types: 'K'=Kana, 'D'=Dakuten, 'H'=HanDakuten, 'N'=None - type 'N' includes:\n\
+Types: 'P'=Plain Kana, 'D'=Dakuten, 'H'=HanDakuten, 'N'=None - type 'N' includes:\n\
 - Middle Dot (・): maps to Rōmaji '/' to match usual IME keyboard entry\n\
 - Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value\n\
 - Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji\n\
@@ -204,13 +204,13 @@ Notes:\n\
 - 'Roma' is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
 - 'Hepb' and 'Kunr' in () means 'output-only' since inputting leads to a different kana\n\
 - 'Vars' are alternative keyboard combinations that lead to the same kana\n\
-- Some 'K' types are actually 'Dakuten Digraphs' with no unaccented version\n\
 - Unicode values are only shown for 'monograph' entries\n\
 - Some 'digraphs' may not be in any real words, but they are typable and thus included\n\
 - Chart output is sorted on 'Hira' column, so 'a, ka, sa, ta, na, ...' ordering\n\
 - Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)\n\
 - 'Hepb' and 'Kunr' are only populated when they would produce different output\n\n";
-  int row = 0, monographs = 0, digraphs = 0, variants = 0, kana = 0, dakuten = 0, hanDakuten = 0, none = 0;
+  int row = 0, hanDakutenMonographs = 0, small = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
+      hanDakutenDigraphs = 0, dakutenDigraphs = 0, variants = 0, none = 0;
   auto print = [&none](const std::string& num, const std::string& type, const std::string& roma,
                        const std::string& hira, const std::string& kata, const std::string& hUni,
                        const std::string& kUni, const std::string& hepb = "", const std::string& kunr = "",
@@ -237,12 +237,13 @@ Notes:\n\
   auto border = [&print] { print("", "", "", "", "", "", "", "", "", "", '-', '+'); };
   border();
   print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Vars");
-  border();
   std::string empty;
-  std::set<std::string> groups{"ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
+  // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when there are small letters
+  // that should be included, i.e., 'la' (ぁ) comes right before 'a' (あ).
+  std::set<std::string> groups{"la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i = *entry.second;
-    std::string t(i.isDakuten() ? (++dakuten, "D") : i.isHanDakuten() ? (++hanDakuten, "H") : (++kana, "K"));
+    std::string t(i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P");
     variants += i.variants().size();
     std::string vars;
     for (int j = (i.kunreiVariant() ? 1 : 0); j < i.variants().size(); ++j) {
@@ -255,11 +256,24 @@ Notes:\n\
     const std::string& k = i.katakana();
     const std::string& r = i.romaji();
     if (groups.contains(r)) border();
-    const bool uni = h.length() == 3; // only show unicode for monographs
-    if (uni)
-      ++monographs;
-    else
-      ++digraphs;
+    const bool uni = i.isMonograph(); // only show unicode for monographs
+    if (i.isSmall())
+      ++small;
+    else if (uni) {
+      if (i.isDakuten())
+        ++dakutenMonographs;
+      else if (i.isHanDakuten())
+        ++hanDakutenMonographs;
+      else
+        ++plainMonographs;
+    } else {
+      if (i.isDakuten())
+        ++dakutenDigraphs;
+      else if (i.isHanDakuten())
+        ++hanDakutenDigraphs;
+      else
+        ++plainDigraphs;
+    }
     hepb = r == hepb ? empty : ('(' + hepb + ')');
     kunr = r == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
     print(std::to_string(++row), t, r, h, k, uni ? toUnicode(h) : empty, uni ? toUnicode(k) : empty, hepb, kunr, vars);
@@ -279,10 +293,22 @@ Notes:\n\
     print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
   }
   border();
-  int regularTypes = kana + dakuten + hanDakuten;
-  std::cout << "\nTotals:\n  Types: " << regularTypes << " (K=" << kana << ", D=" << dakuten << ", H=" << hanDakuten
-            << "), N=" << none << " (N types are not part of conversion Kana list)\n   Kana: " << monographs + digraphs
-            << " (monographs=" << monographs << ", digraphs=" << digraphs << "), Variants=" << variants << '\n';
+  const int monographs = small + plainMonographs + dakutenMonographs + hanDakutenMonographs;
+  const int digraphs = plainDigraphs + dakutenDigraphs + hanDakutenDigraphs;
+  const int plain = small + plainMonographs + plainDigraphs;
+  const int dakuten = dakutenMonographs + dakutenDigraphs;
+  const int hanDakuten = hanDakutenMonographs + hanDakutenDigraphs;
+  const int types = plain + dakuten + hanDakuten + none;
+  std::cout << std::setfill(' ') << std::right << "\nTotals:\n";
+  std::cout << "  Monographs: " << std::setw(3) << monographs << " (Plain=" << plainMonographs
+            << ", Dakuten=" << dakutenMonographs << ", HanDakuten=" << hanDakutenMonographs << ", Small=" << small
+            << ")\n";
+  std::cout << "    Digraphs: " << std::setw(3) << digraphs << " (Plain=" << plainDigraphs
+            << ", Dakuten=" << dakutenDigraphs << ", HanDakuten=" << hanDakutenDigraphs << ")\n";
+  std::cout << "    All Kana: " << std::setw(3) << monographs + digraphs << " (monographs=" << monographs
+            << ", Digraphs=" << digraphs << "), Variants=" << variants << '\n';
+  std::cout << "       Types: " << std::setw(3) << types << " (P=" << plain << ", D=" << dakuten << ", H=" << hanDakuten
+            << ", N=" << none << "), N types are not included 'All Kana'\n";
   exit(0);
 }
 

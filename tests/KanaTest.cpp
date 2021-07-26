@@ -8,15 +8,28 @@ namespace kanji {
 
 namespace {
 
-enum Values { Monographs = 86, Digraphs = 114, Variants = 46 };
-constexpr int TotalKanaCombinations = Monographs + Digraphs + Variants;
+enum Values {
+  HanDakuten = 5,       // both mono- and di-graphs have the same number
+  SmallMonographs = 12, // no digraphs start with a small kana (but they all end with one)
+  DakutenMonographs = 21,
+  DakutenDigraphs = 42,
+  PlainMonographs = 48,
+  PlainDigraphs = 67,
+  Variants = 46
+};
+constexpr int TotalMonographs = HanDakuten + SmallMonographs + DakutenMonographs + PlainMonographs;
+constexpr int TotalDigraphs = HanDakuten + PlainDigraphs + DakutenDigraphs;
+constexpr int TotalKana = TotalMonographs + TotalDigraphs;
+constexpr int TotalRomaji = TotalKana + Variants;
 
 } // namespace
 
 TEST(KanaTest, CheckHiragana) {
   auto& sourceMap = Kana::getMap(CharType::Hiragana);
-  EXPECT_EQ(sourceMap.size(), Monographs + Digraphs);
-  int monographs = 0, digraphs = 0;
+  EXPECT_EQ(sourceMap.size(), TotalKana);
+  // count various types including smallDigraphs (which should be 0)
+  int hanDakutenMonographs = 0, smallMonographs = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
+      hanDakutenDigraphs = 0, dakutenDigraphs = 0, smallDigraphs = 0;
   for (auto& i : sourceMap) {
     MBChar s(i.first);
     std::string c;
@@ -25,10 +38,17 @@ TEST(KanaTest, CheckHiragana) {
                                                     << i.second->romaji() << "', hiragana " << i.first;
     };
     EXPECT_TRUE(s.next(c));
-    EXPECT_TRUE(isHiragana(c)) << c;
     if (s.next(c)) {
-      ++digraphs;
-      EXPECT_TRUE(isHiragana(c)) << c;
+      EXPECT_FALSE(i.second->isMonograph());
+      EXPECT_TRUE(i.second->isDigraph());
+      if (i.second->isSmall())
+        ++smallDigraphs;
+      else if (i.second->isDakuten())
+        ++dakutenDigraphs;
+      else if (i.second->isHanDakuten())
+        ++hanDakutenDigraphs;
+      else
+        ++plainDigraphs;
       // if there's a second character it must be a small symbol matching the final romaji letter
       auto romajiLen = i.second->romaji().length();
       ASSERT_GT(romajiLen, 1);
@@ -45,29 +65,45 @@ TEST(KanaTest, CheckHiragana) {
         }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
-    } else
-      ++monographs;
+    } else {
+      EXPECT_TRUE(i.second->isMonograph());
+      EXPECT_FALSE(i.second->isDigraph());
+      if (i.second->isSmall())
+        ++smallMonographs;
+      else if (i.second->isDakuten())
+        ++dakutenMonographs;
+      else if (i.second->isHanDakuten())
+        ++hanDakutenMonographs;
+      else
+        ++plainMonographs;
+    }
   }
-  EXPECT_EQ(monographs, Monographs);
-  EXPECT_EQ(digraphs, Digraphs);
+  EXPECT_EQ(smallMonographs, SmallMonographs);
+  EXPECT_EQ(plainMonographs, PlainMonographs);
+  EXPECT_EQ(dakutenMonographs, DakutenMonographs);
+  EXPECT_EQ(hanDakutenMonographs, HanDakuten);
+  EXPECT_EQ(smallDigraphs, 0);
+  EXPECT_EQ(plainDigraphs, PlainDigraphs);
+  EXPECT_EQ(dakutenDigraphs, DakutenDigraphs);
+  EXPECT_EQ(hanDakutenDigraphs, HanDakuten);
 }
 
 TEST(KanaTest, CheckKatakana) {
   auto& sourceMap = Kana::getMap(CharType::Katakana);
-  EXPECT_EQ(sourceMap.size(), Monographs + Digraphs);
-  int monographs = 0, digraphs = 0;
+  auto& hiraganaMap = Kana::getMap(CharType::Hiragana);
+  EXPECT_EQ(sourceMap.size(), TotalKana);
   for (auto& i : sourceMap) {
     MBChar s(i.first);
+    // all entries in katakana map should also be in hiragana map so no need to check
+    // various counts again.
+    EXPECT_TRUE(hiraganaMap.contains(i.second->hiragana()));
     std::string c;
     auto check = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
                                                     << i.second->romaji() << "', katakana " << i.first;
     };
     EXPECT_TRUE(s.next(c));
-    EXPECT_TRUE(isKatakana(c)) << c;
     if (s.next(c)) {
-      ++digraphs;
-      EXPECT_TRUE(isKatakana(c)) << c;
       // if there's a second character it must be a small symbol matching the final romaji letter
       auto romajiLen = i.second->romaji().length();
       ASSERT_GT(romajiLen, 1);
@@ -84,18 +120,14 @@ TEST(KanaTest, CheckKatakana) {
         }
       // can't be longer than 2 characters
       EXPECT_FALSE(s.next(c));
-    } else
-      ++monographs;
+    }
   }
-  EXPECT_EQ(monographs, Monographs);
-  EXPECT_EQ(digraphs, Digraphs);
 }
 
 TEST(KanaTest, CheckRomaji) {
   auto& sourceMap = Kana::getMap(CharType::Romaji);
-  EXPECT_EQ(sourceMap.size(), TotalKanaCombinations);
+  EXPECT_EQ(sourceMap.size(), TotalRomaji);
   int aCount = 0, iCount = 0, uCount = 0, eCount = 0, oCount = 0, nCount = 0;
-  oCount = 0, nCount = 0;
   std::set<std::string> variants;
   for (auto& i : sourceMap) {
     ASSERT_FALSE(i.first.empty());
@@ -120,7 +152,7 @@ TEST(KanaTest, CheckRomaji) {
   EXPECT_EQ(eCount, 48);
   EXPECT_EQ(oCount, 48);
   EXPECT_EQ(nCount, 1);
-  EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalKanaCombinations);
+  EXPECT_EQ(aCount + iCount + uCount + eCount + oCount + nCount, TotalRomaji);
   EXPECT_EQ(variants.size(), Variants);
 }
 

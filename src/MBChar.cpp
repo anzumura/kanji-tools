@@ -36,13 +36,16 @@ size_t MBCharCount::add(const std::string& s, const std::string& tag) {
   std::string n = s;
   if (_find.has_value()) {
     n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
-    if (_debug && n != s) {
-      auto count = std::to_string(++_furiganaDebugCount);
-      if (!tag.empty() && tag != _furiganaTag) {
-        std::cout << ">>> Tag: " << tag << '\n';
-        _furiganaTag = tag;
+    if (n != s) {
+      ++_replaceCount;
+      if (!tag.empty() && tag != _lastReplaceTag) {
+        if (_debug) std::cout << ">>> Tag: " << tag << '\n';
+        _lastReplaceTag = tag;
       }
-      std::cout << count << " : " << s << '\n' << std::setw(count.length() + 3) << ": " << n << '\n';
+      if (_debug) {
+        auto count = std::to_string(_replaceCount);
+        std::cout << count << " : " << s << '\n' << std::setw(count.length() + 3) << ": " << n << '\n';
+      }
     }
   }
   MBChar c(n);

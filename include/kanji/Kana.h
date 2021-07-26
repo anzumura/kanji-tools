@@ -89,11 +89,22 @@ public:
   // unaccented 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc.. ウォ can be typed with 'u'
   // then 'lo' to get a small 'o', but this is treated as two separate Kana instances ('u' and 'lo').
   const Kana* unaccentedKana() const { return _unaccentedKana; }
-  // 'is' methods test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana, i.e., the
-  // class of 'this' is 'Kana', but we are a member of a 'DakutenKana' or 'HanDakutenKana' class.
-  bool isDakuten() const { return _unaccentedKana && _unaccentedKana->dakutenKana() == this; }
+
+  // All small kana have _romaji starting with 'l' (and they are all monographs)
+  bool isSmall() const { return _romaji.starts_with("l"); }
+  // A 'Kana' instance can either be a single symbol or two symbols. This is enforced by assertions
+  // in the constructor as well as unit tests.
+  bool isMonograph() const { return _hiragana.length() == 3; }
+  bool isDigraph() const { return _hiragana.length() == 6; }
+  // Test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana, i.e., the class of
+  // 'this' is 'Kana', but we are a member of a 'DakutenKana' or 'HanDakutenKana' class.
+  bool isDakuten() const {
+    // special case for a few digraphs starting with 'v', but don't have an unaccented version (see above)
+    return _romaji.starts_with("v") || _unaccentedKana && _unaccentedKana->dakutenKana() == this;
+  }
   bool isHanDakuten() const { return _unaccentedKana && _unaccentedKana->hanDakutenKana() == this; }
 
+  // 'getRomaji' returns 'Romaji' value based on flags (see 'ConversionFlags' in KanaConvert.h)
   const std::string& getRomaji(int flags) const;
 
   // repeat the first letter of romaji for sokuon (促音) output (special handling for 't' as

@@ -360,7 +360,9 @@ TEST_F(MBCharCountTest, Regex) {
   EXPECT_EQ(sizeof(L'a'), 4);
   std::wregex regex(L"（[^）]+）");
   MBCharCount r(regex);
+  EXPECT_EQ(r.replaceCount(), 0);
   EXPECT_EQ(r.add("a仰（あお）ぐbc仰（あお）ぐ）"), 5);
+  EXPECT_EQ(r.replaceCount(), 1);
   EXPECT_EQ(r.count("仰"), 2);
   EXPECT_EQ(r.count("ぐ"), 2);
   EXPECT_EQ(r.count("）"), 1);

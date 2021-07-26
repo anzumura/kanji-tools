@@ -164,6 +164,10 @@ public:
   size_t uniqueEntries() const { return _map.size(); }
   int files() const { return _files; }
   int directories() const { return _directories; }
+  // 'replaceCount' returns number of lines that were changed due to 'replace' regex
+  bool replaceCount() const { return _replaceCount; }
+  // 'lastReplaceTag' returns last tag (file name) that had line replaced (if 'addTag' is used)
+  const std::string& lastReplaceTag() const { return _lastReplaceTag; }
   int errors() const { return _errors; }
   const Map& map() const { return _map; }
   bool debug() const { return _debug; }
@@ -177,8 +181,8 @@ private:
   int _files = 0;
   int _directories = 0;
   int _errors = 0;
-  std::string _furiganaTag;
-  int _furiganaDebugCount = 0;
+  std::string _lastReplaceTag;
+  int _replaceCount = 0;
   const OptRegex _find;
   const std::wstring _replace;
   const bool _debug;
