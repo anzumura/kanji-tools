@@ -33,7 +33,7 @@ $ kanaConvert -k qarutetto  # supports multiple romaji variants:
 $ kanaConvert -k kwarutetto
 クァルテット
 ```
-The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Finally, passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported (along with some notes and totals):
+The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Finally, passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals (note, the output is aligned properly in a terminal, but small kana don't seem to align properly in a Markdown code block):
 ```
 $ kanaConvert -p
 >>> Notes:
