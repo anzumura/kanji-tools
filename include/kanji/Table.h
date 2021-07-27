@@ -39,7 +39,7 @@ private:
   using Widths = std::vector<size_t>;
   void print(std::ostream&, const Widths&, const Row&, char fill = ' ', char delim = '|') const;
   // 'border' prints a horizontal border row
-  void border(std::ostream& os, const Widths& w) const { print(os, w, Row(), '-', '+'); }
+  void border(std::ostream& os, const Widths& w) const { print(os, w, {}, '-', '+'); }
 
   const Row _title;
   const bool _countInFirstColumn;

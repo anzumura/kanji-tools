@@ -2,7 +2,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <locale>
 #include <regex>
 
 using namespace kanji;

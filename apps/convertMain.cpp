@@ -5,8 +5,6 @@
 #include <kanji/Table.h>
 
 #include <filesystem>
-#include <iostream>
-#include <vector>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -212,26 +210,13 @@ void ConvertMain::printKanaChart() const {
   int hanDakutenMonographs = 0, small = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
       hanDakutenDigraphs = 0, dakutenDigraphs = 0, romajiVariants = 0;
   Table table({"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Roma Variants"}, true);
-  std::string empty;
+  const std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when there are small letters
   // that should be included, i.e., 'la' (ぁ) comes right before 'a' (あ).
   std::set<std::string> groups{"la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i = *entry.second;
-    std::string t(i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P");
     romajiVariants += i.romajiVariants().size();
-    std::string vars;
-    for (int j = (i.kunreiVariant() ? 1 : 0); j < i.romajiVariants().size(); ++j) {
-      if (!vars.empty()) vars += ", ";
-      vars += i.romajiVariants()[j];
-    }
-    std::string hepb(i.getRomaji(KanaConvert::Hepburn));
-    std::string kunr(i.getRomaji(KanaConvert::Kunrei));
-    const std::string& h = i.hiragana();
-    const std::string& k = i.katakana();
-    const std::string& r = i.romaji();
-    // only show unicode for monographs
-    auto uni = [&i, &empty](auto& s) { return i.isMonograph() ? toUnicode(s) : empty; };
     if (i.isSmall())
       ++small;
     else if (i.isMonograph()) {
@@ -249,9 +234,22 @@ void ConvertMain::printKanaChart() const {
       else
         ++plainDigraphs;
     }
-    hepb = r == hepb ? empty : ('(' + hepb + ')');
-    kunr = r == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
-    table.add({t, r, h, k, uni(h), uni(k), hepb, kunr, vars}, groups.contains(r));
+    const std::string type(i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P");
+    const std::string& romaji = i.romaji();
+    const std::string& h = i.hiragana();
+    const std::string& k = i.katakana();
+    std::string hepb(i.getRomaji(KanaConvert::Hepburn));
+    std::string kunr(i.getRomaji(KanaConvert::Kunrei));
+    hepb = romaji == hepb ? empty : ('(' + hepb + ')');
+    kunr = romaji == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
+    std::string vars;
+    for (int j = (i.kunreiVariant() ? 1 : 0); j < i.romajiVariants().size(); ++j) {
+      if (!vars.empty()) vars += ", ";
+      vars += i.romajiVariants()[j];
+    }
+    // only show unicode for monographs
+    auto uni = [&i, &empty](auto& s) { return i.isMonograph() ? toUnicode(s) : empty; };
+    table.add({type, romaji, h, k, uni(h), uni(k), hepb, kunr, vars}, groups.contains(romaji));
   }
   // special handling middle dot, prolong symbol and repeat symbols
   const char slash = '/';
@@ -275,15 +273,15 @@ void ConvertMain::printKanaChart() const {
   const int dakuten = dakutenMonographs + dakutenDigraphs;
   const int hanDakuten = hanDakutenMonographs + hanDakutenDigraphs;
   const int types = plain + dakuten + hanDakuten + none;
-  std::cout << std::setfill(' ') << std::right << "\nTotals:\n";
-  std::cout << "  Monographs: " << std::setw(3) << monographs << " (Plain=" << plainMonographs
+  std::cout << std::setfill(' ') << std::right << "\n>>> Totals:\n";
+  std::cout << "Monographs: " << std::setw(3) << monographs << " (Plain=" << plainMonographs
             << ", Dakuten=" << dakutenMonographs << ", HanDakuten=" << hanDakutenMonographs << ", Small=" << small
             << ")\n";
-  std::cout << "    Digraphs: " << std::setw(3) << digraphs << " (Plain=" << plainDigraphs
+  std::cout << "  Digraphs: " << std::setw(3) << digraphs << " (Plain=" << plainDigraphs
             << ", Dakuten=" << dakutenDigraphs << ", HanDakuten=" << hanDakutenDigraphs << ")\n";
-  std::cout << "    All Kana: " << std::setw(3) << monographs + digraphs << " (Monographs=" << monographs
+  std::cout << "  All Kana: " << std::setw(3) << monographs + digraphs << " (Monographs=" << monographs
             << ", Digraphs=" << digraphs << "), Rōmaji Variants=" << romajiVariants << '\n';
-  std::cout << "       Types: " << std::setw(3) << types << " (P=" << plain << ", D=" << dakuten << ", H=" << hanDakuten
+  std::cout << "     Types: " << std::setw(3) << types << " (P=" << plain << ", D=" << dakuten << ", H=" << hanDakuten
             << ", N=" << none << "), N types are not included in 'All Kana'\n";
   exit(0);
 }

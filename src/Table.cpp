@@ -39,7 +39,7 @@ void Table::print(std::ostream& os) const {
 }
 
 void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill, char delim) const {
-  static std::string empty;
+  static const std::string empty;
   auto cell = [&os, delim, fill](int w, const auto& s) { os << delim << fill << std::setw(w + 1) << s; };
   os << std::left << std::setfill(fill);
   for (int i = 0; i < w.size(); ++i)
