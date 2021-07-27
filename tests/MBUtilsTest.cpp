@@ -8,19 +8,25 @@ namespace {
 
 using BlockSet = std::set<UnicodeBlock>;
 
-template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
+template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr, bool officialBlock = true) {
   int oldEnd = 0;
   for (const auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
-    EXPECT_LT(i.start, i.end);
     oldEnd = i.end;
-    if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
+    if (officialBlock) {
+      EXPECT_LT(i.start, i.end);
+      EXPECT_EQ(i.start % 16, 0); // Unicode blocks must start with a value having MOD 16 of zero
+      EXPECT_EQ(i.end % 16, 15);  // Unicode blocks must end with a value having MOD 16 of 15 (hex f)
+      if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
+    } else
+      // some 'WideBlocks' have only one value
+      EXPECT_LE(i.start, i.end);
   }
 }
 
 } // namespace
 
-TEST(MBUtils, CheckNoOverlappingRanges) {
+TEST(MBUtilsTest, CheckNoOverlappingRanges) {
   BlockSet allBlocks;
   checkRange(HiraganaBlocks, &allBlocks);
   checkRange(KatakanaBlocks, &allBlocks);
@@ -30,6 +36,8 @@ TEST(MBUtils, CheckNoOverlappingRanges) {
   checkRange(CommonKanjiBlocks, &allBlocks);
   checkRange(RareKanjiBlocks, &allBlocks);
   checkRange(allBlocks);
+  // make sure 'WideBlocks' (from generated code) has no overlaps
+  checkRange(WideBlocks, nullptr, false);
   // check 'range' strings (used in regex calls to remove furigana)
   ASSERT_EQ(std::size(KanjiRange), 10);
   ASSERT_EQ(CommonKanjiBlocks.size(), 1);
@@ -63,7 +71,7 @@ TEST(MBUtils, CheckNoOverlappingRanges) {
   EXPECT_EQ(KanaRange[5], KatakanaBlocks[1].end);
 }
 
-TEST(MBUtils, IsKana) {
+TEST(MBUtilsTest, IsKana) {
   EXPECT_TRUE(isHiragana("ゑ"));
   EXPECT_FALSE(isHiragana("ゑあ"));
   EXPECT_TRUE(isHiragana("ゑあ", false)); // checkLengthOne=false
@@ -77,7 +85,7 @@ TEST(MBUtils, IsKana) {
   EXPECT_TRUE(isRecognizedMB("さ"));
 }
 
-TEST(MBUtils, IsMBLetter) {
+TEST(MBUtilsTest, IsMBLetter) {
   EXPECT_FALSE(isMBLetter("ー"));
   EXPECT_FALSE(isMBLetter("さ"));
   // Note: half-width katakana is included in Unicode wide letter area
@@ -97,7 +105,7 @@ TEST(MBUtils, IsMBLetter) {
   EXPECT_TRUE(isRecognizedMB("。"));
 }
 
-TEST(MBUtils, IsMBPunctuation) {
+TEST(MBUtilsTest, IsMBPunctuation) {
   EXPECT_TRUE(isMBPunctuation("—"));  // from General Punctuation block
   EXPECT_TRUE(isMBPunctuation("。")); // from Wide Punctuation block
   EXPECT_FALSE(isMBPunctuation("。d"));
@@ -114,7 +122,7 @@ TEST(MBUtils, IsMBPunctuation) {
   EXPECT_TRUE(isRecognizedMB("　"));
 }
 
-TEST(MBUtils, IsMBSymbol) {
+TEST(MBUtilsTest, IsMBSymbol) {
   EXPECT_TRUE(isMBSymbol("∀"));  // from Math Symbols block
   EXPECT_TRUE(isMBSymbol("☆"));  // from Misc Symbols block
   EXPECT_TRUE(isMBSymbol("○"));  // from Geometric Shapes block
@@ -129,7 +137,7 @@ TEST(MBUtils, IsMBSymbol) {
   EXPECT_TRUE(isRecognizedMB("☆"));
 }
 
-TEST(MBUtils, IsKanji) {
+TEST(MBUtilsTest, IsKanji) {
   // test common and rare kanji
   EXPECT_TRUE(isCommonKanji("厭"));
   EXPECT_FALSE(isCommonKanji("厭が"));
@@ -158,7 +166,7 @@ TEST(MBUtils, IsKanji) {
   EXPECT_FALSE(isAllRecognizedMB("㐀馬イxヌねこ"));
 }
 
-TEST(MBUtils, FromUTF8String) {
+TEST(MBUtilsTest, FromUTF8String) {
   std::string dog("犬");
   auto wideDog = fromUtf8(dog);
   ASSERT_EQ(dog.length(), 3);
@@ -171,7 +179,7 @@ TEST(MBUtils, FromUTF8String) {
   EXPECT_EQ(dog, newDog);
 }
 
-TEST(MBUtils, FromUTF8CharArray) {
+TEST(MBUtilsTest, FromUTF8CharArray) {
   const char s[] = {'\xef', '\xbf', '\xbc', 0};
   auto w = fromUtf8(s);
   ASSERT_EQ(w.length(), 1);
@@ -182,7 +190,7 @@ TEST(MBUtils, FromUTF8CharArray) {
     EXPECT_EQ(r[i], s[i]);
 }
 
-TEST(MBUtils, ToHex) {
+TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex(L'\ufffc'), "fffc");
   auto s = toUtf8(L"\ufffc");
   ASSERT_EQ(s.length(), 3);
@@ -191,12 +199,12 @@ TEST(MBUtils, ToHex) {
   EXPECT_EQ(toHex(s[2]), "bc");
 }
 
-TEST(MBUtils, ToUnicode) {
+TEST(MBUtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode("ぁ"), "3041");
   EXPECT_EQ(toUnicode("すずめ"), "3059 305A 3081");
 }
 
-TEST(MBUtils, ToBinary) {
+TEST(MBUtilsTest, ToBinary) {
   EXPECT_EQ(toBinary(L'\ufffc'), "1111111111111100");
   auto s = toUtf8(L"\ufffc");
   ASSERT_EQ(s.length(), 3);
@@ -205,7 +213,7 @@ TEST(MBUtils, ToBinary) {
   EXPECT_EQ(toBinary(s[2]), "10111100");
 }
 
-TEST(MBUtils, CheckSingleByte) {
+TEST(MBUtilsTest, CheckSingleByte) {
   // normal char
   EXPECT_TRUE(isSingleByteChar('a'));
   EXPECT_FALSE(isSingleByteChar('\x80'));
@@ -227,6 +235,14 @@ TEST(MBUtils, CheckSingleByte) {
   EXPECT_TRUE(isAllSingleByte(L"")); // true for empty strings
   EXPECT_TRUE(isAllSingleByte(L"xx"));
   EXPECT_FALSE(isAllSingleByte(L"xxこ"));
+}
+
+TEST(MBUtilsTest, DisplayLength) {
+  EXPECT_EQ(displayLength("abc"), 3);
+  EXPECT_EQ(displayLength("abクcカ"), 7); // 3 narrow + 2 wide (wide count as len 2)
+  EXPECT_EQ(displayLength("。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
+  // rare kanji, common kanji, 4 narrow numbers and a wide space = 10
+  EXPECT_EQ(displayLength("㐀中1234　"), 10);
 }
 
 } // namespace kanji
