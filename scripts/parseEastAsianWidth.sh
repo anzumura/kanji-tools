@@ -24,7 +24,7 @@ echo "constexpr std::array WideBlocks = {"
 blocks=()
 
 function out() {
-  blocks+=("{0x$1, 0x$2}")
+  [ $1 = $2 ]&&blocks+=("{0x$1}")||blocks+=("{0x$1, 0x$2}")
   prevStart=""
   prevEnd=""
 }

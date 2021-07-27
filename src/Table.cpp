@@ -27,13 +27,15 @@ void Table::print(std::ostream& os) const {
         widths.push_back(displayLength(row[colNum]));
     }
   }
-  border(os, widths);
-  if (!_title.empty()) print(os, widths, _title);
-  for (int i = 0; i < _rows.size(); ++i) {
-    if (_sections.contains(i)) border(os, widths);
-    print(os, widths, _rows[i]);
+  if (!widths.empty()) {
+    border(os, widths);
+    if (!_title.empty()) print(os, widths, _title);
+    for (int i = 0; i < _rows.size(); ++i) {
+      if (_sections.contains(i)) border(os, widths);
+      print(os, widths, _rows[i]);
+    }
+    border(os, widths);
   }
-  border(os, widths);
 }
 
 void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill, char delim) const {

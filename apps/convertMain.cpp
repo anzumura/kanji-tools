@@ -2,6 +2,7 @@
 #include <kanji/Kana.h>
 #include <kanji/KanaConvert.h>
 #include <kanji/MBUtils.h>
+#include <kanji/Table.h>
 
 #include <filesystem>
 #include <iostream>
@@ -208,34 +209,9 @@ void ConvertMain::printKanaChart() const {
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match usual IME keyboard entry\n\
   - Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value\n\
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji\n\n";
-  int row = 0, hanDakutenMonographs = 0, small = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
-      hanDakutenDigraphs = 0, dakutenDigraphs = 0, romajiVariants = 0, none = 0;
-  auto print = [&none](const std::string& num, const std::string& type, const std::string& roma,
-                       const std::string& hira, const std::string& kata, const std::string& hUni,
-                       const std::string& kUni, const std::string& hepb = "", const std::string& kunr = "",
-                       const std::string& vars = "", char fill = ' ', char delim = '|') {
-    // For cells with wide chars, setw needs to have a larger value since it only looks at
-    // string.length(). So for Hira and Kata, set width to 5 for empty or title cells, but
-    // set to 6 for a monograph and 7 for a digraph to get the right amount of spaces.
-    auto sp = [](auto& s) { return s.empty() || s.length() == 4 ? 5 : s.length() == 3 ? 6 : 7; };
-    auto cell = [delim, fill](int w, const auto& s) { std::cout << delim << fill << std::setw(w) << s; };
-    std::cout << std::left << std::setfill(fill);
-    cell(4, num);
-    cell(5, type);
-    cell(5, roma);
-    cell(sp(hira), hira);
-    cell(sp(kata), kata);
-    cell(5, hUni);
-    cell(5, kUni);
-    cell(5, hepb);
-    cell(5, kunr);
-    cell(13, vars);
-    std::cout << fill << delim << '\n';
-    if (type == "N") ++none; // other type counts are handled in main for loop below
-  };
-  auto border = [&print] { print("", "", "", "", "", "", "", "", "", "", '-', '+'); };
-  border();
-  print("No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Roma Variants");
+  int hanDakutenMonographs = 0, small = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
+      hanDakutenDigraphs = 0, dakutenDigraphs = 0, romajiVariants = 0;
+  Table table({"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Roma Variants"}, true);
   std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when there are small letters
   // that should be included, i.e., 'la' (ぁ) comes right before 'a' (あ).
@@ -254,11 +230,11 @@ void ConvertMain::printKanaChart() const {
     const std::string& h = i.hiragana();
     const std::string& k = i.katakana();
     const std::string& r = i.romaji();
-    if (groups.contains(r)) border();
-    const bool uni = i.isMonograph(); // only show unicode for monographs
+    // only show unicode for monographs
+    auto uni = [&i, &empty](auto& s) { return i.isMonograph() ? toUnicode(s) : empty; };
     if (i.isSmall())
       ++small;
-    else if (uni) {
+    else if (i.isMonograph()) {
       if (i.isDakuten())
         ++dakutenMonographs;
       else if (i.isHanDakuten())
@@ -275,23 +251,24 @@ void ConvertMain::printKanaChart() const {
     }
     hepb = r == hepb ? empty : ('(' + hepb + ')');
     kunr = r == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
-    print(std::to_string(++row), t, r, h, k, uni ? toUnicode(h) : empty, uni ? toUnicode(k) : empty, hepb, kunr, vars);
+    table.add({t, r, h, k, uni(h), uni(k), hepb, kunr, vars}, groups.contains(r));
   }
-  border();
   // special handling middle dot, prolong symbol and repeat symbols
   const char slash = '/';
   const auto& middleDot = _converter.narrowDelims().find(slash);
-  if (middleDot != _converter.narrowDelims().end())
-    print(std::to_string(++row), "N", empty + slash, empty, middleDot->second, empty, toUnicode(middleDot->second));
+  // middleDot should always be found and thus '4' none rows, but handle if missing just in case ...
+  const int none = middleDot != _converter.narrowDelims().end() ? 4 : 3;
+  if (none == 4)
+    table.add({"N", empty + slash, empty, middleDot->second, empty, toUnicode(middleDot->second)}, true);
   else
     std::cerr << "Failed to find " << slash << " in _converter.narrowDelims()\n";
-  print(std::to_string(++row), "N", empty, empty, Kana::ProlongMark, empty, toUnicode(Kana::ProlongMark));
+  table.add({"N", empty, empty, Kana::ProlongMark, empty, toUnicode(Kana::ProlongMark)}, none == 3);
   for (auto& i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
     const std::string& h = i->hiragana();
     const std::string& k = i->katakana();
-    print(std::to_string(++row), "N", empty, h, k, toUnicode(h), toUnicode(k));
+    table.add({"N", empty, h, k, toUnicode(h), toUnicode(k)});
   }
-  border();
+  table.print();
   const int monographs = small + plainMonographs + dakutenMonographs + hanDakutenMonographs;
   const int digraphs = plainDigraphs + dakutenDigraphs + hanDakutenDigraphs;
   const int plain = small + plainMonographs + plainDigraphs;

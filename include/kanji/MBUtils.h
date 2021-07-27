@@ -62,6 +62,10 @@ inline std::string toUnicode(const std::string& s, bool caps = true) {
 class UnicodeBlock {
 public:
   constexpr UnicodeBlock(wchar_t s, wchar_t e) : start(s), end(e) {}
+  // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex '0') and
+  // end on a value having mod 16 = 15 (so ending in hex 'f'), but some of the 'WideBlocks'
+  // used for determining if a character is narrow or wide display can be a single entry.
+  constexpr UnicodeBlock(wchar_t s) : start(s), end(s) {}
   const wchar_t start;
   const wchar_t end;
   // 'range' returns the number of code points in the block (inclusive of start and end)
@@ -220,20 +224,20 @@ constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
 constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";
 
-// --- begin generated code from 'parseEastAsiaWide.sh' ---
+// --- begin generated code from 'parseEastAsiaWidth.sh' ---
 constexpr std::array WideBlocks = {
   UnicodeBlock{0x1100, 0x115F}, UnicodeBlock{0x231A, 0x231B}, UnicodeBlock{0x2329, 0x232A},
-  UnicodeBlock{0x23E9, 0x23EC}, UnicodeBlock{0x23F0, 0x23F0}, UnicodeBlock{0x23F3, 0x23F3},
+  UnicodeBlock{0x23E9, 0x23EC}, UnicodeBlock{0x23F0},         UnicodeBlock{0x23F3},
   UnicodeBlock{0x25FD, 0x25FE}, UnicodeBlock{0x2614, 0x2615}, UnicodeBlock{0x2648, 0x2653},
-  UnicodeBlock{0x267F, 0x267F}, UnicodeBlock{0x2693, 0x2693}, UnicodeBlock{0x26A1, 0x26A1},
+  UnicodeBlock{0x267F},         UnicodeBlock{0x2693},         UnicodeBlock{0x26A1},
   UnicodeBlock{0x26AA, 0x26AB}, UnicodeBlock{0x26BD, 0x26BE}, UnicodeBlock{0x26C4, 0x26C5},
-  UnicodeBlock{0x26CE, 0x26CE}, UnicodeBlock{0x26D4, 0x26D4}, UnicodeBlock{0x26EA, 0x26EA},
-  UnicodeBlock{0x26F2, 0x26F3}, UnicodeBlock{0x26F5, 0x26F5}, UnicodeBlock{0x26FA, 0x26FA},
-  UnicodeBlock{0x26FD, 0x26FD}, UnicodeBlock{0x2705, 0x2705}, UnicodeBlock{0x270A, 0x270B},
-  UnicodeBlock{0x2728, 0x2728}, UnicodeBlock{0x274C, 0x274C}, UnicodeBlock{0x274E, 0x274E},
-  UnicodeBlock{0x2753, 0x2755}, UnicodeBlock{0x2757, 0x2757}, UnicodeBlock{0x2795, 0x2797},
-  UnicodeBlock{0x27B0, 0x27B0}, UnicodeBlock{0x27BF, 0x27BF}, UnicodeBlock{0x2B1B, 0x2B1C},
-  UnicodeBlock{0x2B50, 0x2B50}, UnicodeBlock{0x2B55, 0x2B55}, UnicodeBlock{0x2E80, 0x2E99},
+  UnicodeBlock{0x26CE},         UnicodeBlock{0x26D4},         UnicodeBlock{0x26EA},
+  UnicodeBlock{0x26F2, 0x26F3}, UnicodeBlock{0x26F5},         UnicodeBlock{0x26FA},
+  UnicodeBlock{0x26FD},         UnicodeBlock{0x2705},         UnicodeBlock{0x270A, 0x270B},
+  UnicodeBlock{0x2728},         UnicodeBlock{0x274C},         UnicodeBlock{0x274E},
+  UnicodeBlock{0x2753, 0x2755}, UnicodeBlock{0x2757},         UnicodeBlock{0x2795, 0x2797},
+  UnicodeBlock{0x27B0},         UnicodeBlock{0x27BF},         UnicodeBlock{0x2B1B, 0x2B1C},
+  UnicodeBlock{0x2B50},         UnicodeBlock{0x2B55},         UnicodeBlock{0x2E80, 0x2E99},
   UnicodeBlock{0x2E9B, 0x2EF3}, UnicodeBlock{0x2F00, 0x2FD5}, UnicodeBlock{0x2FF0, 0x2FFB},
   UnicodeBlock{0x3000, 0x303E}, UnicodeBlock{0x3041, 0x3096}, UnicodeBlock{0x3099, 0x30FF},
   UnicodeBlock{0x3105, 0x312F}, UnicodeBlock{0x3131, 0x318E}, UnicodeBlock{0x3190, 0x31E3},
@@ -242,7 +246,7 @@ constexpr std::array WideBlocks = {
   UnicodeBlock{0xAC00, 0xD7A3}, UnicodeBlock{0xF900, 0xFAFF}, UnicodeBlock{0xFE10, 0xFE19},
   UnicodeBlock{0xFE30, 0xFE52}, UnicodeBlock{0xFE54, 0xFE66}, UnicodeBlock{0xFE68, 0xFE6B},
   UnicodeBlock{0xFF01, 0xFF60}, UnicodeBlock{0xFFE0, 0xFFE6}};
-// --- end generated code from 'parseEastAsiaWide.sh' ---
+// --- end generated code from 'parseEastAsiaWidth.sh' ---
 
 // 'displayLength' returns the length of 's' in terms of how many columns would be required for
 // display on a terminal, i.e, 1 column for a normal sized character and 2 for a wide character.
