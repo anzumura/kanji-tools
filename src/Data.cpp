@@ -175,6 +175,8 @@ void Data::loadRadicals(const fs::path& file) {
         cols[pos] = token;
       }
       if (pos != cols.size()) error("not enough columns");
+      const int radicalNumber = FileListKanji::toInt(cols[numberCol]);
+      if (radicalNumber + 1 != lineNumber) error("radicals must be ordered by 'number'");
       std::stringstream radicals(cols[nameCol]);
       Radical::AltForms altForms;
       std::string name, token;
@@ -183,11 +185,11 @@ void Data::loadRadicals(const fs::path& file) {
           name = token;
         else
           altForms.emplace_back(token);
-      _radicals.emplace(
-        std::piecewise_construct, std::make_tuple(name),
-        std::make_tuple(FileListKanji::toInt(cols[numberCol]), name, altForms, cols[longNameCol], cols[readingCol]));
+      _radicals.emplace_back(radicalNumber, name, altForms, cols[longNameCol], cols[readingCol]);
     }
   }
+  for (auto& i : _radicals)
+    _radicalMap[i.name()] = i.number() - 1;
 }
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {

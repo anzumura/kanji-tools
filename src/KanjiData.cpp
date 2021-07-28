@@ -217,7 +217,7 @@ void KanjiData::printRadicals() const {
         << " Jinmei " << jinmei << " Extra " << extra << ")\n";
   std::vector<Radical> missingRadicals;
   for (const auto& i : _radicals)
-    if (radicals.find(i.second) == radicals.end()) missingRadicals.push_back(i.second);
+    if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
   if (!missingRadicals.empty()) {
     log() << "  Found " << missingRadicals.size() << " radicals with no kanji:";
     for (const auto& i : missingRadicals)

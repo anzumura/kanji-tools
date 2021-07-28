@@ -3,6 +3,7 @@
     80,
     120
   ],
+  "workbench.editor.enablePreview": false,
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "files.associations": {
     "array": "cpp",

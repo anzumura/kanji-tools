@@ -27,8 +27,9 @@ public:
   MOCK_METHOD(Levels, getLevel, (const std::string&), (const, override));
 private:
   void radical(const std::string& name) {
-    static int count;
-    _radicals.insert(std::make_pair(name, Radical(++count, name, Radical::AltForms(), "", "")));
+    _radicalMap[name] = _radicals.size();
+    // construct a fake radical with 'number' one bigger than index in _radicals
+    _radicals.emplace_back(_radicals.size(), name, Radical::AltForms(), "", "");
   }
   void strokes(const std::string& name, int count) {
     _strokes.insert(std::make_pair(name, count));

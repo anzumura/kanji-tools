@@ -40,7 +40,7 @@ public:
   using OptEntry = std::optional<const Entry>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
-  using RadicalMap = std::map<std::string, Radical>;
+  using RadicalList = std::vector<Radical>;
 
   static void usage(const std::string& msg) { FileList::usage(msg); }
 
@@ -57,10 +57,16 @@ public:
   // functions used by 'Kanji' classes during construction
   virtual int getFrequency(const std::string&) const = 0;
   virtual Levels getLevel(const std::string&) const = 0;
-  Radical getRadical(const std::string& name) const {
-    auto i = _radicals.find(name);
-    if (i == _radicals.end()) throw std::domain_error("name not found: " + name);
-    return i->second;
+  // 'getRadical' by the ideograph code in utf8 (not the unicode radical code). For example,
+  // Radical number 30 (口) is Unicode 53E3, but has another 'Unicode Radical' value of 2F1D
+  const Radical& getRadical(const std::string& name) const {
+    auto i = _radicalMap.find(name);
+    if (i == _radicalMap.end()) throw std::domain_error("name not found: " + name);
+    return _radicals.at(i->second);
+  }
+  // 'getRadical' by the official Radical Number (which is one greater than index in _radicals)
+  const Radical& getRadical(int number) const {
+    return _radicals.at(number - 1);
   }
   int getStrokes(const std::string& s) const {
     auto i = _strokes.find(s);
@@ -74,7 +80,7 @@ public:
   const List& linkedOldKanji() const { return _types.at(Types::LinkedOld); }
   const List& otherKanji() const { return _types.at(Types::Other); }
   const List& extraKanji() const { return _types.at(Types::Extra); }
-  const RadicalMap& radicals() const { return _radicals; }
+  const RadicalList& radicals() const { return _radicals; }
   OptEntry findKanji(const std::string& s) const {
     auto i = _map.find(s);
     if (i == _map.end()) return {};
@@ -148,8 +154,11 @@ protected:
   std::ostream& _err;
   const std::filesystem::path _dataDir;
   const bool _debug;
-  // '_radicals' is populated from radicals.txt
-  RadicalMap _radicals;
+  // '_radicals' is populated from radicals.txt and the index in the vector is one less than
+  // the actual Radical.number().
+  std::vector<Radical> _radicals;
+  // '_radicalMap' maps from the Radical name (ideograph) to the index in _radicals.
+  std::map<std::string, int> _radicalMap;
   // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji
   // that aren't part of any other group (so not Jouyou or Jinmei).
   std::map<std::string, std::string> _otherReadings;
