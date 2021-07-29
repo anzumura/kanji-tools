@@ -20,7 +20,7 @@ public:
   // files. This constructor is also used by LinkedKanji derived class to avoid 'getLevel' call
   // done by the protected constructor.
   Kanji(const Data& d, int number, const std::string& name, Levels level = Levels::None)
-    : _number(number), _name(name), _strokes(d.getStrokes(name)), _level(level), _frequency(d.getFrequency(name)) {}
+    : Kanji(d, number, name, d.getStrokes(name), true, level) {}
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
 
@@ -32,7 +32,8 @@ public:
 
   int number() const { return _number; }
   const std::string& name() const { return _name; }
-  int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
+  bool variant() const { return _variant; } // true if _name includes a Unicode 'variation selector'
+  int strokes() const { return _strokes; }  // may be zero for kanjis only loaded from frequency.txt
   Levels level() const { return _level; }
   int frequency() const { return _frequency; }
   int frequencyOrDefault(int x) const { return _frequency ? _frequency : x; }
@@ -108,14 +109,15 @@ public:
 protected:
   // helper constructor for derived classes (can avoid looking up frequency for 'extra' kanji)
   Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency)
-    : _number(number), _name(name), _strokes(strokes), _level(d.getLevel(name)),
-      _frequency(findFrequency ? d.getFrequency(name) : 0) {}
+    : Kanji(d, number, name, strokes, findFrequency, d.getLevel(name)) {}
+  Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency, Levels level);
 private:
   // Not all 'Other' type Kanji have 'readings' and only 'Jouyou' and 'Extra' type kanji
   // currently have English 'meaning' - for these cases use 'EmptyString'.
   static const std::string EmptyString;
   const int _number;
   const std::string _name;
+  const bool _variant;
   const int _strokes;
   const Levels _level;
   const int _frequency;

@@ -1,4 +1,5 @@
 #include <kanji/Kanji.h>
+#include <kanji/MBChar.h>
 
 #include <fstream>
 #include <sstream>
@@ -8,6 +9,13 @@ namespace kanji {
 namespace fs = std::filesystem;
 
 const std::string Kanji::EmptyString = "";
+
+Kanji::Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency, Levels level)
+  : _number(number), _name(name),
+    _variant(name.length() > 4 && MBChar::isVariationSelector(name.substr(name.length() - 3))), _strokes(strokes),
+    _level(level), _frequency(findFrequency ? d.getFrequency(name) : 0) {
+  assert(MBChar::length(_name) == 1);
+}
 
 std::string Kanji::info(int infoFields) const {
   static const std::string Rad("Rad "), Strokes("Strokes "), Grade("Grade "), Level("Level "), Freq("Freq "),

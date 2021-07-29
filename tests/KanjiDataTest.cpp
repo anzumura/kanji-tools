@@ -80,12 +80,14 @@ protected:
   }
   // Contructs KanjiData using the real data files
   KanjiDataTest() : _data(3, argv()) {}
-  void checkKanji(const Data::List& l) const {
+  int checkKanji(const Data::List& l) const {
+    int variants = 0;
     for (auto& i : l) {
-      //EXPECT_LT(i->name().length(), 5);
+      if (i->variant()) ++variants;
       EXPECT_EQ(MBChar::length(i->name()), 1);
       EXPECT_TRUE(isKanji(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
     }
+    return variants;
   }
   KanjiData _data;
 };
@@ -133,12 +135,13 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.frequencyTotal(4), 501);
   EXPECT_EQ(_data.frequencyTotal(5), 0);
   // Make sure all Kanji are in Kanji related Unicode blocks
-  checkKanji(_data.jouyouKanji());
-  checkKanji(_data.jinmeiKanji());
-  checkKanji(_data.linkedJinmeiKanji());
-  checkKanji(_data.linkedOldKanji());
-  checkKanji(_data.extraKanji());
-  checkKanji(_data.otherKanji());
+  EXPECT_EQ(checkKanji(_data.jouyouKanji()), 0);
+  EXPECT_EQ(checkKanji(_data.jinmeiKanji()), 0);
+  // 52 LinkedJinmei type Kanji use the Unicode 'Variation Selector'
+  EXPECT_EQ(checkKanji(_data.linkedJinmeiKanji()), 52);
+  EXPECT_EQ(checkKanji(_data.linkedOldKanji()), 0);
+  EXPECT_EQ(checkKanji(_data.extraKanji()), 0);
+  EXPECT_EQ(checkKanji(_data.otherKanji()), 0);
 }
 
 } // namespace kanji
