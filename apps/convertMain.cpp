@@ -27,7 +27,7 @@ private:
   void setFlag(int value) { _converter.flags(_converter.flags() | value); }
   bool charTypeArgs(const std::string& arg);
   bool flagArgs(char arg);
-  void printKanaChart() const;
+  void printKanaChart(bool markdown = false) const;
 
   bool _interactive = false;
   bool _suppressNewLine = false;
@@ -40,7 +40,12 @@ private:
 
 ConvertMain::ConvertMain(int argc, const char** argv)
   : _choice(std::cout), _program(argc > 0 ? fs::path(argv[0]).filename().string() : std::string("kanaConvert")) {
-  bool finishedOptions = false, printKana = false;
+  bool finishedOptions = false, printKana = false, printMarkdown = false;
+  auto setBool = [this, &printKana, &printMarkdown](bool& b) {
+    if (_interactive || _suppressNewLine || printKana || printMarkdown)
+      usage("Can only specify one of -i, -m, -n, or -p");
+    b = true;
+  };
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
     if (finishedOptions)
@@ -48,11 +53,13 @@ ConvertMain::ConvertMain(int argc, const char** argv)
     else if (arg == "--")
       finishedOptions = true; // any more args will be added to 'files'
     else if (arg == "-i")
-      _interactive = true;
+      setBool(_interactive);
+    else if (arg == "-m")
+      setBool(printMarkdown);
     else if (arg == "-n")
-      _suppressNewLine = true;
+      setBool(_suppressNewLine);
     else if (arg == "-p")
-      printKana = true;
+      setBool(printKana);
     else if (arg == "-?")
       usage();
     else if (arg == "-f") {
@@ -67,13 +74,11 @@ ConvertMain::ConvertMain(int argc, const char** argv)
     } else
       _strings.push_back(arg);
   }
-  if (_interactive && _suppressNewLine) usage("can't combine '-i' and '-n'");
-  if (_interactive && printKana) usage("can't combine '-i' and '-p'");
-  if (printKana && _suppressNewLine) usage("can't combine '-p' and '-n'");
   if (_strings.empty()) {
     if (isatty(fileno(stdin))) {
-      if (printKana)
-        printKanaChart();
+      if (printKana) printKanaChart();
+      if (printMarkdown)
+        printKanaChart(true);
       else if (!_interactive)
         usage("provide one or more 'strings' to convert or specify '-i' for interactive mode");
     }
@@ -84,7 +89,7 @@ ConvertMain::ConvertMain(int argc, const char** argv)
 void ConvertMain::usage(const std::string& errorMsg, bool showAllOptions) const {
   std::ostream& os = errorMsg.empty() ? std::cout : std::cerr;
   if (!errorMsg.empty()) os << _program << ": " << errorMsg << '\n';
-  if (showAllOptions) os << "usage: " << _program << " [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-n|-p] [string ...]\n";
+  if (showAllOptions) os << "usage: " << _program << " [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-m|-n|-p] [string ...]\n";
   os << "  -h: set conversion output to Hiragana" << (showAllOptions ? " (default)" : "") << "\n\
   -k: set conversion output to Katakana\n\
   -r: set conversion output to Romaji\n\
@@ -100,8 +105,9 @@ void ConvertMain::usage(const std::string& errorMsg, bool showAllOptions) const 
       n: no prolonged sound marks on Hiragana output, i.e., vowels are repeated instead of 'ー'\n\
       r: remove spaces on output (only applies to Hiragana and Katakana output)\n\
   -i: interactive mode\n\
+  -m: print kana chart in 'Markdown' format and exit\n\
   -n: suppress newline on output (for non-interactive mode)\n\
-  -p: print kana chart and exit\n\
+  -p: print kana chart aligned for terminal output and exit\n\
   --: finish parsing options, all further arguments will be treated as input files\n\
   [string ...]: provide one or more strings to convert, no strings means process standard input\n";
     exit(errorMsg.empty() ? 0 : 1);
@@ -190,8 +196,9 @@ bool ConvertMain::flagArgs(char arg) {
   return true;
 }
 
-void ConvertMain::printKanaChart() const {
-  std::cout << ">>> Notes:\n\
+void ConvertMain::printKanaChart(bool markdown) const {
+  std::cout << (markdown ? "**Notes:**" : ">>> Notes:");
+  std::cout << "\n\
 - Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei\n\
 - Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
 - Hepb and Kunr are only populated when they would produce different output\n\
@@ -266,23 +273,29 @@ void ConvertMain::printKanaChart() const {
     const std::string& k = i->katakana();
     table.add({"N", empty, h, k, toUnicode(h), toUnicode(k)});
   }
-  table.print();
+  markdown ? table.printMarkdown() : table.print();
   const int monographs = small + plainMonographs + dakutenMonographs + hanDakutenMonographs;
   const int digraphs = plainDigraphs + dakutenDigraphs + hanDakutenDigraphs;
   const int plain = small + plainMonographs + plainDigraphs;
   const int dakuten = dakutenMonographs + dakutenDigraphs;
   const int hanDakuten = hanDakutenMonographs + hanDakutenDigraphs;
   const int types = plain + dakuten + hanDakuten + none;
-  std::cout << std::setfill(' ') << std::right << "\n>>> Totals:\n";
-  std::cout << "Monographs: " << std::setw(3) << monographs << " (Plain=" << plainMonographs
-            << ", Dakuten=" << dakutenMonographs << ", HanDakuten=" << hanDakutenMonographs << ", Small=" << small
-            << ")\n";
-  std::cout << "  Digraphs: " << std::setw(3) << digraphs << " (Plain=" << plainDigraphs
-            << ", Dakuten=" << dakutenDigraphs << ", HanDakuten=" << hanDakutenDigraphs << ")\n";
-  std::cout << "  All Kana: " << std::setw(3) << monographs + digraphs << " (Monographs=" << monographs
-            << ", Digraphs=" << digraphs << "), Rōmaji Variants=" << romajiVariants << '\n';
-  std::cout << "     Types: " << std::setw(3) << types << " (P=" << plain << ", D=" << dakuten << ", H=" << hanDakuten
-            << ", N=" << none << "), N types are not included in 'All Kana'\n";
+  auto out = [markdown](const std::string& s) -> std::ostream& {
+    if (markdown)
+      std::cout << "- ";
+    else
+      std::cout << std::setw(10);
+    return std::cout << s << ": " << std::setw(3);
+  };
+  std::cout << '\n' << (markdown ? "**Totals:**" : ">>> Totals:") << std::setfill(' ') << std::right << '\n';
+  out("Monograph") << monographs << " (Plain=" << plainMonographs << ", Dakuten=" << dakutenMonographs
+                   << ", HanDakuten=" << hanDakutenMonographs << ", Small=" << small << ")\n";
+  out("Digraphs") << digraphs << " (Plain=" << plainDigraphs << ", Dakuten=" << dakutenDigraphs
+                  << ", HanDakuten=" << hanDakutenDigraphs << ")\n";
+  out("All Kana") << monographs + digraphs << " (Monographs=" << monographs << ", Digraphs=" << digraphs
+                  << "), Rōmaji Variants=" << romajiVariants << '\n';
+  out("Types") << types << " (P=" << plain << ", D=" << dakuten << ", H=" << hanDakuten << ", N=" << none
+               << "), N types are not included in 'All Kana'\n";
   exit(0);
 }
 

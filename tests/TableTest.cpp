@@ -17,6 +17,9 @@ TEST_F(TableTest, EmptyTable) {
   std::string line;
   // shouldn't print anything
   EXPECT_FALSE(std::getline(_os, line));
+  _os.clear();
+  t.printMarkdown(_os);
+  EXPECT_FALSE(std::getline(_os, line));
 }
 
 TEST_F(TableTest, TableWithOnlyEmptyRows) {
@@ -26,9 +29,15 @@ TEST_F(TableTest, TableWithOnlyEmptyRows) {
   std::string line;
   // one empty row prints nothing
   EXPECT_FALSE(std::getline(_os, line));
+  _os.clear();
+  t.printMarkdown(_os);
+  EXPECT_FALSE(std::getline(_os, line));
   t.add();
   t.add();
   // multiple empty rows still prints nothing
+  EXPECT_FALSE(std::getline(_os, line));
+  _os.clear();
+  t.printMarkdown(_os);
   EXPECT_FALSE(std::getline(_os, line));
 }
 
@@ -125,12 +134,26 @@ TEST_F(TableTest, TableWithMultipleRowsAndColumns) {
     "| a | b   | c |",
     "| 1 | 123 |   |",
     "+---+-----+---+"};
+  const char* expectedMD[] = {
+    "|  |  |  |",
+    "| --- | --- | --- |",
+    "| a | b | c |",
+    "| 1 | 123 |  |"};
   // clang-format on
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+  _os.clear();
+  t.printMarkdown(_os);
+  count = 0;
+  maxLines = std::size(expectedMD);
+  while (std::getline(_os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expectedMD[count++]);
   }
   EXPECT_EQ(count, maxLines);
 }
@@ -203,12 +226,28 @@ TEST_F(TableTest, TableWithWideCharacters) {
     "| 2    | 5   | 中       |",
     "| 3    | x   | y/はい   |",
     "+------+-----+----------+"};
+  // Markdown output doesn't try to align columns (that's done by the browser or editor)
+  const char* expectedMD[] = {
+    "| 数字 | one | two |",
+    "| --- | --- | --- |",
+    "| 1 | a | カタカナ |",
+    "| 2 | 5 | 中 |",
+    "| 3 | x | y/はい |"};
   // clang-format on
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+  _os.clear();
+  t.printMarkdown(_os);
+  count = 0;
+  maxLines = std::size(expectedMD);
+  while (std::getline(_os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expectedMD[count++]);
   }
   EXPECT_EQ(count, maxLines);
 }

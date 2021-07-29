@@ -38,6 +38,29 @@ void Table::print(std::ostream& os) const {
   }
 }
 
+void Table::printMarkdown(std::ostream& os) const {
+  size_t maxColumns = _title.size();
+  for (auto& i : _rows)
+    maxColumns = std::max(maxColumns, i.size());
+  auto printRow = [&os, maxColumns](const Row& r, bool header = false) {
+    for (int i = 0; i < maxColumns; ++i) {
+      os << "| ";
+      if (header && r.empty()) os << "---";
+      if (i < r.size()) os << r[i];
+      os << ' ';
+    }
+    os << "|\n";
+  };
+  if (maxColumns) {
+    // Markdown needs a header row followed by a row for formatting (---, :-:, etc.) so
+    // print _title even if it's empty (which will just make and empty set of headers).
+    printRow(_title);
+    printRow({}, true);
+    for (auto& i : _rows)
+      printRow(i);
+  }
+}
+
 void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill, char delim) const {
   static const std::string empty;
   auto cell = [&os, delim, fill](int w, const auto& s) { os << delim << fill << std::setw(w + 1) << s; };

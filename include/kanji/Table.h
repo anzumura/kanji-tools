@@ -35,6 +35,10 @@ public:
 
   // 'print' will print the table to 'os' with a border at the top and bottom.
   void print(std::ostream& os = std::cout) const;
+  // 'printMarkdown' will print out the table suitable for putting into a README.md file. Since
+  // Markdown tables need a header row, empty values will be used if _title is empty. Also,
+  // 'sections' aren't supported. 
+  void printMarkdown(std::ostream& os = std::cout) const;
 private:
   using Widths = std::vector<size_t>;
   void print(std::ostream&, const Widths&, const Row&, char fill = ' ', char delim = '|') const;
