@@ -197,7 +197,7 @@ bool ConvertMain::flagArgs(char arg) {
 }
 
 void ConvertMain::printKanaChart(bool markdown) const {
-  std::cout << (markdown ? "**Notes:**" : ">>> Notes:");
+  std::cout << (markdown ? "## **Kana Conversion Chart**\n### **Notes:**" : ">>> Notes:");
   std::cout << "\n\
 - Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei\n\
 - Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
@@ -287,7 +287,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
       std::cout << std::setw(10);
     return std::cout << s << (markdown ? ":** " : ": ") << std::setw(3);
   };
-  std::cout << '\n' << (markdown ? "**Totals:**" : ">>> Totals:") << std::setfill(' ') << std::right << '\n';
+  std::cout << '\n' << (markdown ? "### **Totals:**" : ">>> Totals:") << std::setfill(' ') << std::right << '\n';
   out("Monograph") << monographs << " (Plain=" << plainMonographs << ", Dakuten=" << dakutenMonographs
                    << ", HanDakuten=" << hanDakutenMonographs << ", Small=" << small << ")\n";
   out("Digraphs") << digraphs << " (Plain=" << plainDigraphs << ", Dakuten=" << dakutenDigraphs

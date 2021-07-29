@@ -33,9 +33,11 @@ $ kanaConvert -k qarutetto  # supports multiple romaji variants:
 $ kanaConvert -k kwarutetto
 クァルテット
 ```
-The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see Table.h for more details). However, the output isn't aligned properly in a Markdown code block (wide to narrow character ration isn't exactly 2:1) so there is also a '-m' option to print with markdown formatting Note: the terminal output (-p) puts a border line between sections (in this case rows for each group of kana symbols, i.e., 'a', 'ka', 'sa', etc.), but for markdown (-m) the rows are in bold instead:
+The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see Table.h for more details). However, the output isn't aligned properly in a Markdown code block (wide to narrow character ratio isn't exactly 2:1) so there's also a '-m' option to print using markdown formatting.
+- Note: the terminal output (-p) puts a border line between sections (sections for the kana chart table are groups of related kana symbols, i.e., 'a', 'ka', 'sa', etc.), but for markdown (-m) the rows are in bold instead:
 
-**Notes:**
+## **Kana Conversion Chart**
+### **Notes:**
 - Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
 - Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases
 - Hepb and Kunr are only populated when they would produce different output
@@ -263,8 +265,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 207 | N |  | ゝ | ヽ | 309D | 30FD |  |  |  |
 | 208 | N |  | ゞ | ヾ | 309E | 30FE |  |  |  |
 
-
-**Totals:**
+### **Totals:**
 - **Monograph:**  86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
 - **Digraphs:** 118 (Plain=71, Dakuten=42, HanDakuten=5)
 - **All Kana:** 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55
