@@ -1,7 +1,7 @@
 # C++ kanji
 
 This repository contains code for four 'main' programs:
-- **kanaConvert**: program that converts between Hiragana, Katakana and Rõmaji
+- **kanaConvert**: program that converts between Hiragana, Katakana and Rōmaji
 - **kanjiFormat**: program used to format test/sample-data/books files (from 青空文庫 - see below)
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
 - **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree

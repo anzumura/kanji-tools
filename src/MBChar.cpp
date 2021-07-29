@@ -20,9 +20,37 @@ bool MBChar::next(std::string& result, bool onlyMB) {
       result = *_location++;
       for (x = Bit2; x && firstOfGroup & x; x >>= 1)
         result += *_location++;
+      if (!isVariationSelector(result))
+        if (std::string s; doPeek(s, onlyMB, _location, true) && isVariationSelector(s)) {
+          result += s;
+          _location += 3;
+        }
       return true;
     } else
       ++_errors;
+  }
+  return false;
+}
+
+bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall) const {
+  for (; *location; ++location) {
+    const unsigned char firstOfGroup = *location;
+    unsigned char x = firstOfGroup & Mask;
+    if (!x || x == Bit2) { // not a multi byte character
+      if (internalCall) return false;
+      if (!onlyMB) {
+        result = *location;
+        return true;
+      }
+    } else if (MBChar::isValid(location, false)) {
+      // only modify 'result' if 'location' is the start of a valid UTF-8 group
+      result = *location++;
+      for (x = Bit2; x && firstOfGroup & x; x >>= 1)
+        result += *location++;
+      if (!internalCall && !isVariationSelector(result))
+        if (std::string s; doPeek(s, onlyMB, location, true) && isVariationSelector(s)) result += s;
+      return true;
+    }
   }
   return false;
 }

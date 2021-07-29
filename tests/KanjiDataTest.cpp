@@ -2,6 +2,8 @@
 
 #include <kanji/Kanji.h>
 #include <kanji/KanjiData.h>
+#include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <type_traits>
 
@@ -78,7 +80,13 @@ protected:
   }
   // Contructs KanjiData using the real data files
   KanjiDataTest() : _data(3, argv()) {}
-
+  void checkKanji(const Data::List& l) const {
+    for (auto& i : l) {
+      //EXPECT_LT(i->name().length(), 5);
+      EXPECT_EQ(MBChar::length(i->name()), 1);
+      EXPECT_TRUE(isKanji(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+    }
+  }
   KanjiData _data;
 };
 
@@ -124,6 +132,13 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.frequencyTotal(3), 500);
   EXPECT_EQ(_data.frequencyTotal(4), 501);
   EXPECT_EQ(_data.frequencyTotal(5), 0);
+  // Make sure all Kanji are in Kanji related Unicode blocks
+  checkKanji(_data.jouyouKanji());
+  checkKanji(_data.jinmeiKanji());
+  checkKanji(_data.linkedJinmeiKanji());
+  checkKanji(_data.linkedOldKanji());
+  checkKanji(_data.extraKanji());
+  checkKanji(_data.otherKanji());
 }
 
 } // namespace kanji

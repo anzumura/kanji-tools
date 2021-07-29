@@ -35,22 +35,33 @@ TEST(MBUtilsTest, CheckNoOverlappingRanges) {
   checkRange(LetterBlocks, &allBlocks);
   checkRange(CommonKanjiBlocks, &allBlocks);
   checkRange(RareKanjiBlocks, &allBlocks);
+  checkRange(NonSpacingBlocks, &allBlocks);
   checkRange(allBlocks);
   // make sure 'WideBlocks' (from generated code) has no overlaps
   checkRange(WideBlocks, nullptr, false);
   // check 'range' strings (used in regex calls to remove furigana)
-  ASSERT_EQ(std::size(KanjiRange), 10);
-  ASSERT_EQ(CommonKanjiBlocks.size(), 1);
+  ASSERT_EQ(std::size(KanjiRange), 19);
+  ASSERT_EQ(CommonKanjiBlocks.size(), 3);
   ASSERT_EQ(RareKanjiBlocks.size(), 2);
+  ASSERT_EQ(NonSpacingBlocks.size(), 1);
   EXPECT_EQ(CommonKanjiBlocks[0].range(), 20992);
+  EXPECT_EQ(CommonKanjiBlocks[1].range(), 512);
+  EXPECT_EQ(CommonKanjiBlocks[2].range(), 42720);
   EXPECT_EQ(RareKanjiBlocks[0].range(), 128);
   EXPECT_EQ(RareKanjiBlocks[1].range(), 6592);
+  EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
   EXPECT_EQ(KanjiRange[0], RareKanjiBlocks[0].start);
   EXPECT_EQ(KanjiRange[2], RareKanjiBlocks[0].end);
   EXPECT_EQ(KanjiRange[3], RareKanjiBlocks[1].start);
   EXPECT_EQ(KanjiRange[5], RareKanjiBlocks[1].end);
   EXPECT_EQ(KanjiRange[6], CommonKanjiBlocks[0].start);
   EXPECT_EQ(KanjiRange[8], CommonKanjiBlocks[0].end);
+  EXPECT_EQ(KanjiRange[9], CommonKanjiBlocks[1].start);
+  EXPECT_EQ(KanjiRange[11], CommonKanjiBlocks[1].end);
+  EXPECT_EQ(KanjiRange[12], NonSpacingBlocks[0].start);
+  EXPECT_EQ(KanjiRange[14], NonSpacingBlocks[0].end);
+  EXPECT_EQ(KanjiRange[15], CommonKanjiBlocks[2].start);
+  EXPECT_EQ(KanjiRange[17], CommonKanjiBlocks[2].end);
   ASSERT_EQ(std::size(HiraganaRange), 4);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
@@ -139,7 +150,9 @@ TEST(MBUtilsTest, IsMBSymbol) {
 
 TEST(MBUtilsTest, IsKanji) {
   // test common and rare kanji
-  EXPECT_TRUE(isCommonKanji("厭"));
+  EXPECT_TRUE(isCommonKanji("厭")); // in Unified block
+  EXPECT_TRUE(isCommonKanji("琢")); // in Compatibility block
+  EXPECT_TRUE(isCommonKanji("𠮟")); // in Extension B (beyond BMP)
   EXPECT_FALSE(isCommonKanji("厭が"));
   EXPECT_TRUE(isCommonKanji("厭が", false));
   EXPECT_FALSE(isAllCommonKanji("厭が"));
@@ -243,6 +256,13 @@ TEST(MBUtilsTest, DisplayLength) {
   EXPECT_EQ(displayLength("。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
   // rare kanji, common kanji, 4 narrow numbers and a wide space = 10
   EXPECT_EQ(displayLength("㐀中1234　"), 10);
+  // don't include non-spacing characters
+  std::string s = "逸︁";
+  EXPECT_EQ(s.length(), 6); // two 3-byte sequences
+  EXPECT_EQ(toUnicode(s), "9038 FE01"); // 'FE01' is a variation selector
+  EXPECT_EQ(displayLength(s), 2); // should be 2 for the single displayable wide char
+  // try a character beyond BMP
+  EXPECT_EQ(displayLength("𠮟"), 2);
 }
 
 } // namespace kanji

@@ -37,19 +37,38 @@ public:
   // - length("abc", false) = 3
   // - length("大blue空") = 2
   // - length("大blue空", false) = 6
-  static size_t length(const char* s, bool onlyMB = true) {
+  // Note: some Kanji can be followed by a 'variation selector' - these are not counted by default
+  // since they are considered part of the previous 'MB character' (as a modifier).
+  static size_t length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
     size_t len = 0;
-    if (s) {
-      if (onlyMB)
-        while (*s)
-          len += (*s++ & Mask) == Mask;
-      else
-        while (*s)
-          len += (*s++ & Mask) != Bit1;
+    // doing one 'reinterpret_cast' at the beginning saves doing a bunch of static_casts when checking
+    // if the next 3 bytes represent a 'variation selector'
+    if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
+      while (*i)
+        if (skipVariationSelectors && isVariationSelector(i))
+          i += 3;
+        else if (onlyMB)
+          len += (*i++ & Mask) == Mask;
+        else
+          len += (*i++ & Mask) != Bit1;
     }
     return len;
   }
-  static size_t length(const std::string& s, bool onlyMB = true) { return length(s.c_str(), onlyMB); }
+  static size_t length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
+    return length(s.c_str(), onlyMB, skipVariationSelectors);
+  }
+  // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
+  // method is used by 'length', 'next' and 'doPeek'.
+  static bool isVariationSelector(const unsigned char* s) {
+    // Checking for variation selectors would be easier if 'i' was wchar_t, but that would involve
+    // calling more expensive conversion functions (like fromUtf8). Note, variation selectors are
+    // range 'fe00' to 'fe0f' in Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
+    return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;
+  }
+  static bool isVariationSelector(const char* s) {
+    return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
+  }
+  static bool isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
   // 'Results' is used for the return value of the 'valid' method - see comments below for more details.
   enum class Results {
     Valid,
@@ -98,13 +117,20 @@ public:
     _errors = 0;
   }
   // 'next' populates 'result' with the full multi-byte character (so could be more than one byte)
-  // returns true if result was populated.
+  // returns true if result was populated. This function also supports 'variation selectors', i.e.,
+  // when a multi-byte character is added to 'result' the next character is also inspected and if
+  // it's a variation selector it will be added as well.
   bool next(std::string& result, bool onlyMB = true);
+  // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
+  bool peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
   int errors() const { return _errors; }
   size_t length(bool onlyMB = true) const { return length(_data, onlyMB); }
   Results valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
   bool isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
 private:
+  // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
+  // in these cases it only matters if the following value is a 'variation selector'.
+  bool doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall = false) const;
   const std::string _data;
   const char* _location;
   // '_errors' keeps track of how many invalid bytes were encountered during iteration

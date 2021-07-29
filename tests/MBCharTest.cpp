@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <fstream>
 
@@ -35,6 +36,11 @@ TEST(MBChar, Length) {
   EXPECT_EQ(MBChar("abc").length(false), 3);
   EXPECT_EQ(MBChar("大blue空").length(), 2);
   EXPECT_EQ(MBChar("大blue空").length(false), 6);
+  // variation selectors are considered part of the previous character so don't affect length
+  auto mbCharWithVariant = L"\u9038\ufe01";
+  auto s = toUtf8(mbCharWithVariant);
+  EXPECT_EQ(s.length(), 6);
+  EXPECT_EQ(MBChar::length(s), 1);
 }
 
 TEST(MBChar, Valid) {

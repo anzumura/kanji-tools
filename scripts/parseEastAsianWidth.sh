@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-program='parseEastAsiaWidth.sh'
+declare -r program='parseEastAsiaWidth.sh'
 
 # This script parses the Unicode 'EastAsiaWidth.txt' file and outputs C++ code
 # that can be used in 'MBUtils.h' for calculating 'displayLength' of a string,
@@ -24,7 +24,7 @@ echo "constexpr std::array WideBlocks = {"
 blocks=()
 
 function out() {
-  [ $1 = $2 ]&&blocks+=("{0x$1}")||blocks+=("{0x$1, 0x$2}")
+  [ $1 = $2 ] && blocks+=("{0x$1}") || blocks+=("{0x$1, 0x$2}")
   prevStart=""
   prevEnd=""
 }
@@ -80,8 +80,7 @@ while read -r i; do
   if [ -n "$line" ] && echo "$line" | grep -q ';[FW]'; then
     line=${line%;*}
     start=${line%%\.*}
-    # for now only support values from BMP (so codes with 4 hex characters)
-    [ ${#start} -eq 4 ] && process $start ${line##*\.}
+    process $start ${line##*\.}
   fi
 done <$1
 
@@ -89,10 +88,9 @@ done <$1
 
 len=${#blocks[@]}
 comma=,
-for i in "${blocks[@]}"
-do
+for i in "${blocks[@]}"; do
   len=$((len - 1))
-  [ $len -eq 0 ]&&comma=""
+  [ $len -eq 0 ] && comma=""
   echo "  UnicodeBlock$i"$comma
 done
 echo "};"

@@ -67,7 +67,7 @@ public:
   std::string flagString() const; // return a | separated string representation of current flags or 'none'
   void flags(int flags) { _flags = flags; }
   // Support converting most non-letter ascii from narrow to wide values. These values are also used
-  // as delimiters for splitting up input strings when converting from Rõmaji to Kana. Use a '*' for
+  // as delimiters for splitting up input strings when converting from Rōmaji to Kana. Use a '*' for
   // katakana middle dot '・' to keep round-trip translations as non-lossy as possible. For now, don't
   // include '-' (minus) or apostrophe since these could get mixed up with prolong mark 'ー' and special
   // separation handling after 'n' in Romaji output. Backslash maps to ￥ as per usual keyboard input.
