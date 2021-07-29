@@ -282,10 +282,10 @@ void ConvertMain::printKanaChart(bool markdown) const {
   const int types = plain + dakuten + hanDakuten + none;
   auto out = [markdown](const std::string& s) -> std::ostream& {
     if (markdown)
-      std::cout << "- ";
+      std::cout << "- **";
     else
       std::cout << std::setw(10);
-    return std::cout << s << ": " << std::setw(3);
+    return std::cout << s << (markdown ? ":** " : ": ") << std::setw(3);
   };
   std::cout << '\n' << (markdown ? "**Totals:**" : ">>> Totals:") << std::setfill(' ') << std::right << '\n';
   out("Monograph") << monographs << " (Plain=" << plainMonographs << ", Dakuten=" << dakutenMonographs

@@ -33,7 +33,7 @@ $ kanaConvert -k qarutetto  # supports multiple romaji variants:
 $ kanaConvert -k kwarutetto
 クァルテット
 ```
-The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see Table.h for more details). However, the output isn't aligned properly in a Markdown code block (wide to narrow character ration isn't exactly 2:1) so there is also a '-m' option to print with markdown formatting (note: the markdown version of the output shown below unfortunately doesn't have section breaks between the different groups of kana, i.e., 'a', 'ka', 'sa', etc., but '-p' does):
+The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see Table.h for more details). However, the output isn't aligned properly in a Markdown code block (wide to narrow character ration isn't exactly 2:1) so there is also a '-m' option to print with markdown formatting Note: the terminal output (-p) puts a border line between sections (in this case rows for each group of kana symbols, i.e., 'a', 'ka', 'sa', etc.), but for markdown (-m) the rows are in bold instead:
 
 **Notes:**
 - Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
@@ -54,7 +54,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 
 | No. | Type | Roma | Hira | Kata | HUni | KUni | Hepb | Kunr | Roma Variants |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | P | la | ぁ | ァ | 3041 | 30A1 |  |  | xa |
+| **1** | **P** | **la** | **ぁ** | **ァ** | **3041** | **30A1** |  |  | **xa** |
 | 2 | P | a | あ | ア | 3042 | 30A2 |  |  |  |
 | 3 | P | li | ぃ | ィ | 3043 | 30A3 |  |  | xi |
 | 4 | P | i | い | イ | 3044 | 30A4 |  |  |  |
@@ -67,7 +67,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 11 | P | e | え | エ | 3048 | 30A8 |  |  |  |
 | 12 | P | lo | ぉ | ォ | 3049 | 30A9 |  |  | xo |
 | 13 | P | o | お | オ | 304A | 30AA |  |  |  |
-| 14 | P | ka | か | カ | 304B | 30AB |  |  |  |
+| **14** | **P** | **ka** | **か** | **カ** | **304B** | **30AB** |  |  |  |
 | 15 | D | ga | が | ガ | 304C | 30AC |  |  |  |
 | 16 | P | ki | き | キ | 304D | 30AD |  |  |  |
 | 17 | P | kyi | きぃ | キィ |  |  |  |  |  |
@@ -98,7 +98,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 42 | D | ge | げ | ゲ | 3052 | 30B2 |  |  |  |
 | 43 | P | ko | こ | コ | 3053 | 30B3 |  |  |  |
 | 44 | D | go | ご | ゴ | 3054 | 30B4 |  |  |  |
-| 45 | P | sa | さ | サ | 3055 | 30B5 |  |  |  |
+| **45** | **P** | **sa** | **さ** | **サ** | **3055** | **30B5** |  |  |  |
 | 46 | D | za | ざ | ザ | 3056 | 30B6 |  |  |  |
 | 47 | P | shi | し | シ | 3057 | 30B7 |  | si |  |
 | 48 | P | syi | しぃ | シィ |  |  |  |  |  |
@@ -123,7 +123,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 67 | D | ze | ぜ | ゼ | 305C | 30BC |  |  |  |
 | 68 | P | so | そ | ソ | 305D | 30BD |  |  |  |
 | 69 | D | zo | ぞ | ゾ | 305E | 30BE |  |  |  |
-| 70 | P | ta | た | タ | 305F | 30BF |  |  |  |
+| **70** | **P** | **ta** | **た** | **タ** | **305F** | **30BF** |  |  |  |
 | 71 | D | da | だ | ダ | 3060 | 30C0 |  |  |  |
 | 72 | P | chi | ち | チ | 3061 | 30C1 |  | ti |  |
 | 73 | P | tyi | ちぃ | チィ |  |  |  |  |  |
@@ -168,7 +168,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 112 | D | dwu | どぅ | ドゥ |  |  |  |  |  |
 | 113 | D | dwe | どぇ | ドェ |  |  |  |  |  |
 | 114 | D | dwo | どぉ | ドォ |  |  |  |  |  |
-| 115 | P | na | な | ナ | 306A | 30CA |  |  |  |
+| **115** | **P** | **na** | **な** | **ナ** | **306A** | **30CA** |  |  |  |
 | 116 | P | ni | に | ニ | 306B | 30CB |  |  |  |
 | 117 | P | nyi | にぃ | ニィ |  |  |  |  |  |
 | 118 | P | nye | にぇ | ニェ |  |  |  |  |  |
@@ -178,7 +178,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 122 | P | nu | ぬ | ヌ | 306C | 30CC |  |  |  |
 | 123 | P | ne | ね | ネ | 306D | 30CD |  |  |  |
 | 124 | P | no | の | ノ | 306E | 30CE |  |  |  |
-| 125 | P | ha | は | ハ | 306F | 30CF |  |  |  |
+| **125** | **P** | **ha** | **は** | **ハ** | **306F** | **30CF** |  |  |  |
 | 126 | D | ba | ば | バ | 3070 | 30D0 |  |  |  |
 | 127 | H | pa | ぱ | パ | 3071 | 30D1 |  |  |  |
 | 128 | P | hi | ひ | ヒ | 3072 | 30D2 |  |  |  |
@@ -216,7 +216,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 160 | P | ho | ほ | ホ | 307B | 30DB |  |  |  |
 | 161 | D | bo | ぼ | ボ | 307C | 30DC |  |  |  |
 | 162 | H | po | ぽ | ポ | 307D | 30DD |  |  |  |
-| 163 | P | ma | ま | マ | 307E | 30DE |  |  |  |
+| **163** | **P** | **ma** | **ま** | **マ** | **307E** | **30DE** |  |  |  |
 | 164 | P | mi | み | ミ | 307F | 30DF |  |  |  |
 | 165 | P | myi | みぃ | ミィ |  |  |  |  |  |
 | 166 | P | mye | みぇ | ミェ |  |  |  |  |  |
@@ -226,13 +226,13 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 170 | P | mu | む | ム | 3080 | 30E0 |  |  |  |
 | 171 | P | me | め | メ | 3081 | 30E1 |  |  |  |
 | 172 | P | mo | も | モ | 3082 | 30E2 |  |  |  |
-| 173 | P | lya | ゃ | ャ | 3083 | 30E3 |  |  | xya |
+| **173** | **P** | **lya** | **ゃ** | **ャ** | **3083** | **30E3** |  |  | **xya** |
 | 174 | P | ya | や | ヤ | 3084 | 30E4 |  |  |  |
 | 175 | P | lyu | ゅ | ュ | 3085 | 30E5 |  |  | xyu |
 | 176 | P | yu | ゆ | ユ | 3086 | 30E6 |  |  |  |
 | 177 | P | lyo | ょ | ョ | 3087 | 30E7 |  |  | xyo |
 | 178 | P | yo | よ | ヨ | 3088 | 30E8 |  |  |  |
-| 179 | P | ra | ら | ラ | 3089 | 30E9 |  |  |  |
+| **179** | **P** | **ra** | **ら** | **ラ** | **3089** | **30E9** |  |  |  |
 | 180 | P | ri | り | リ | 308A | 30EA |  |  |  |
 | 181 | P | ryi | りぃ | リィ |  |  |  |  |  |
 | 182 | P | rye | りぇ | リェ |  |  |  |  |  |
@@ -242,7 +242,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 186 | P | ru | る | ル | 308B | 30EB |  |  |  |
 | 187 | P | re | れ | レ | 308C | 30EC |  |  |  |
 | 188 | P | ro | ろ | ロ | 308D | 30ED |  |  |  |
-| 189 | P | lwa | ゎ | ヮ | 308E | 30EE |  |  | xwa |
+| **189** | **P** | **lwa** | **ゎ** | **ヮ** | **308E** | **30EE** |  |  | **xwa** |
 | 190 | P | wa | わ | ワ | 308F | 30EF |  |  |  |
 | 191 | P | wyi | ゐ | ヰ | 3090 | 30F0 | (i) | (i) |  |
 | 192 | P | wye | ゑ | ヱ | 3091 | 30F1 | (e) | (e) |  |
@@ -258,16 +258,17 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 202 | D | vyo | ゔょ | ヴョ |  |  |  |  |  |
 | 203 | P | lka | ゕ | ヵ | 3095 | 30F5 |  |  | xka |
 | 204 | P | lke | ゖ | ヶ | 3096 | 30F6 |  |  | xke |
-| 205 | N | / |  | ・ |  | 30FB |  |  |  |
+| **205** | **N** | **/** |  | **・** |  | **30FB** |  |  |  |
 | 206 | N |  |  | ー |  | 30FC |  |  |  |
 | 207 | N |  | ゝ | ヽ | 309D | 30FD |  |  |  |
 | 208 | N |  | ゞ | ヾ | 309E | 30FE |  |  |  |
 
+
 **Totals:**
-- Monograph:  86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
-- Digraphs: 118 (Plain=71, Dakuten=42, HanDakuten=5)
-- All Kana: 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55
-- Types: 208 (P=131, D=63, H=10, N=4), N types are not included in 'All Kana'
+- **Monograph:**  86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
+- **Digraphs:** 118 (Plain=71, Dakuten=42, HanDakuten=5)
+- **All Kana:** 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55
+- **Types:** 208 (P=131, D=63, H=10, N=4), N types are not included in 'All Kana'
 
 To support these programs, *KanjiData* class loads and breaks down kanji into the following categories:
 - **Jouyou**: 2136 official Jōyō (常用) kanji

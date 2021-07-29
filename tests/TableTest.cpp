@@ -230,7 +230,7 @@ TEST_F(TableTest, TableWithWideCharacters) {
   const char* expectedMD[] = {
     "| 数字 | one | two |",
     "| --- | --- | --- |",
-    "| 1 | a | カタカナ |",
+    "| **1** | **a** | **カタカナ** |",
     "| 2 | 5 | 中 |",
     "| 3 | x | y/はい |"};
   // clang-format on

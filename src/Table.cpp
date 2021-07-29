@@ -42,11 +42,16 @@ void Table::printMarkdown(std::ostream& os) const {
   size_t maxColumns = _title.size();
   for (auto& i : _rows)
     maxColumns = std::max(maxColumns, i.size());
-  auto printRow = [&os, maxColumns](const Row& r, bool header = false) {
+  auto printRow = [&os, maxColumns](const Row& r, bool header = false, bool section = false) {
     for (int i = 0; i < maxColumns; ++i) {
       os << "| ";
       if (header && r.empty()) os << "---";
-      if (i < r.size()) os << r[i];
+      if (i < r.size()) {
+        if (r[i].empty() || !section)
+          os << r[i];
+        else
+          os << "**" << r[i] << "**";
+      }
       os << ' ';
     }
     os << "|\n";
@@ -56,8 +61,8 @@ void Table::printMarkdown(std::ostream& os) const {
     // print _title even if it's empty (which will just make and empty set of headers).
     printRow(_title);
     printRow({}, true);
-    for (auto& i : _rows)
-      printRow(i);
+    for (int i = 0; i < _rows.size(); ++i)
+      printRow(_rows[i], false, _sections.contains(i));
   }
 }
 
