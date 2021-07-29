@@ -33,14 +33,14 @@ declare -A definition on kun
 
 # First filter to only get Japan sourced Kanji (kIRG_JSource) - this reduces the
 # huge set down to 16,226 entries. Then filter for characters with at least one
-# Japanese reading (On/Kun) or a value in jJoyoKanji. This further reduces the
+# Japanese reading (On/Kun) or a value in kJoyoKanji. This further reduces the
 # set to 12,276. There are actually 1,117 entries with On/Kun that don't have
 # JSource like 4E13 (专) and 4E20 (丠), but don't load them for now).
-# Don't do any more filtering since other 'Japanese' source tags either filter
-# too much or don't make much of a difference. For example:
+# Don't do any more filtering since other 'Japan' source tags either filter too
+# much or don't make much of a difference. For example:
 # - 'kNelson' (Classic 'Nelson Japanese-English Character Dictionary') has 5,398
 #   entries (5,331 with On/Kun), but missed 7 Jōyō and 48 Jinmei Kanji.
-# - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyo and 15 Jinmei.
+# - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
 # - 'kMorohashi' has 18,168 (12,966 with On/Kun) so this isn't much different
 #   compared to just using On/Kun filtering.
 # - 'kIRGDaiKanwaZiten' has 17,864 (12,942 with On/Kun). There's also a proposal
