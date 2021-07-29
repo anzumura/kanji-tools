@@ -44,21 +44,21 @@ std::string Kanji::info(int infoFields) const {
 
 Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path& file) {
   assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
-  int lineNumber = 1;
-  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  int lineNum = 1;
+  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
+    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
   };
   std::ifstream f(file);
   std::bitset<MaxCol> found;
   std::array<int, MaxCol> colMap;
   colMap.fill(-1);
   Data::List results;
-  for (std::string line; std::getline(f, line); ++lineNumber) {
+  for (std::string line; std::getline(f, line); ++lineNum) {
     std::stringstream ss(line);
     int pos = 0;
     for (std::string token; std::getline(ss, token, '\t'); ++pos) {
       if (pos >= MaxCol) error("too many columns");
-      if (lineNumber == 1) {
+      if (lineNum == 1) {
         const auto i = ColumnMap.find(token);
         if (i == ColumnMap.end()) error("unrecognized column: " + token, false);
         if (found[i->second]) error("duplicate column: " + token, false);
@@ -69,7 +69,7 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
       else
         columns[colMap[pos]] = token;
     }
-    if (lineNumber == 1) {
+    if (lineNum == 1) {
       auto check = [&found, &error](const auto& x) {
         for (auto i : x)
           if (!found[i]) error(std::string("missing required column: ") + ColumnNames[i], false);

@@ -14,8 +14,6 @@ const fs::path N4File = "n4.txt";
 const fs::path N5File = "n5.txt";
 const fs::path FrequencyFile = "frequency.txt";
 const fs::path RadicalsFile = "radicals.txt";
-const fs::path StrokesFile = "strokes.txt";
-const fs::path WikiStrokesFile = "wiki-strokes.txt";
 const fs::path OtherReadingsFile = "other-readings.txt";
 
 } // namespace
@@ -27,8 +25,7 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
     _frequency(_dataDir / FrequencyFile, Levels::None, _debug) {
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
-  loadStrokes(FileList::getFile(_dataDir, StrokesFile));
-  loadStrokes(FileList::getFile(_dataDir, WikiStrokesFile), false);
+  loadUcdData();
   loadOtherReadings(FileList::getFile(_dataDir, OtherReadingsFile));
   populateJouyou();
   populateJinmei();
@@ -39,7 +36,6 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   processList(_n2);
   processList(_n1);
   processList(_frequency);
-  checkStrokes();
   if (_debug) {
     log(true) << "Finished Loading Data\n>>>\n";
     printStats();

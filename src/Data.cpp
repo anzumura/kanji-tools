@@ -17,6 +17,7 @@ const fs::path JouyouFile = "jouyou.txt";
 const fs::path JinmeiFile = "jinmei.txt";
 const fs::path LinkedJinmeiFile = "linked-jinmei.txt";
 const fs::path ExtraFile = "extra.txt";
+const fs::path UcdFile = "ucd.txt";
 
 } // namespace
 
@@ -142,10 +143,63 @@ bool Data::checkNotFound(const FileList::Set& s, const std::string& n) const {
 
 void Data::printError(const std::string& msg) const { _err << "ERROR --- " << msg << '\n'; }
 
+void Data::loadUcdData() {
+  auto file = _dataDir / UcdFile;
+  int lineNum = 1, nameCol = -1, radicalCol = -1, strokesCol = -1, joyoCol = -1, meaningCol = -1, onCol = -1,
+      kunCol = -1;
+  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
+  };
+  auto setCol = [&file, &error](int& col, int pos) {
+    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
+    col = pos;
+  };
+  std::ifstream f(file);
+  std::array<std::string, 7> cols;
+  for (std::string line; std::getline(f, line); ++lineNum) {
+    int pos = 0;
+    std::stringstream ss(line);
+    if (nameCol == -1) {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos)
+        if (token == "Name")
+          setCol(nameCol, pos);
+        else if (token == "Radical")
+          setCol(radicalCol, pos);
+        else if (token == "Strokes")
+          setCol(strokesCol, pos);
+        else if (token == "Joyo")
+          setCol(joyoCol, pos);
+        else if (token == "Meaning")
+          setCol(meaningCol, pos);
+        else if (token == "On")
+          setCol(onCol, pos);
+        else if (token == "Kun")
+          setCol(kunCol, pos);
+        else
+          error("unrecognized column '" + token + "'", false);
+      if (pos != cols.size()) error("not enough columns", false);
+    } else {
+      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
+        if (pos == cols.size()) error("too many columns");
+        std::cout << pos << ' ' << token << '\n';
+        cols[pos] = token;
+      }
+      if (pos == cols.size() - 1)
+        cols[pos] = "";
+      else if (pos != cols.size())
+        error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
+      _ucdMap.emplace(std::piecewise_construct, std::make_tuple(cols[nameCol]),
+                      std::make_tuple(cols[nameCol], FileListKanji::toInt(cols[radicalCol]),
+                                      FileListKanji::toInt(cols[strokesCol]), cols[joyoCol] == "Y", cols[meaningCol],
+                                      cols[onCol], cols[kunCol]));
+    }
+  }
+}
+
 void Data::loadRadicals(const fs::path& file) {
-  int lineNumber = 1, numberCol = -1, nameCol = -1, longNameCol = -1, readingCol = -1;
-  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  int lineNum = 1, numberCol = -1, nameCol = -1, longNameCol = -1, readingCol = -1;
+  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
   };
   auto setCol = [&file, &error](int& col, int pos) {
     if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
@@ -153,7 +207,7 @@ void Data::loadRadicals(const fs::path& file) {
   };
   std::ifstream f(file);
   std::array<std::string, 4> cols;
-  for (std::string line; std::getline(f, line); ++lineNumber) {
+  for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
     if (numberCol == -1) {
@@ -174,9 +228,10 @@ void Data::loadRadicals(const fs::path& file) {
         if (pos == cols.size()) error("too many columns");
         cols[pos] = token;
       }
-      if (pos != cols.size()) error("not enough columns");
+      if (pos != cols.size())
+        error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
       const int radicalNumber = FileListKanji::toInt(cols[numberCol]);
-      if (radicalNumber + 1 != lineNumber) error("radicals must be ordered by 'number'");
+      if (radicalNumber + 1 != lineNum) error("radicals must be ordered by 'number'");
       std::stringstream radicals(cols[nameCol]);
       Radical::AltForms altForms;
       std::string name, token;
@@ -192,34 +247,10 @@ void Data::loadRadicals(const fs::path& file) {
     _radicalMap[i.name()] = i.number() - 1;
 }
 
-void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
-  std::ifstream f(file);
-  std::string line;
-  int strokes = 0;
-  while (std::getline(f, line))
-    if (std::isdigit(line[0])) {
-      auto newStrokes = std::stoi(line);
-      assert(newStrokes > strokes);
-      strokes = newStrokes;
-    } else {
-      assert(strokes != 0); // first line must have a stroke count
-      std::stringstream ss(line);
-      for (std::string token; std::getline(ss, token, ' ');) {
-        auto i = _strokes.insert(std::pair(token, strokes));
-        if (!i.second) {
-          if (checkDuplicates)
-            printError("duplicate entry in " + file.string() + ": " + token);
-          else if (i.first->second != strokes)
-            printError("found entry with different count in " + file.string() + ": " + token);
-        }
-      }
-    }
-}
-
 void Data::loadOtherReadings(const fs::path& file) {
-  int lineNumber = 1, nameCol = -1, readingCol = -1;
-  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  int lineNum = 1, nameCol = -1, readingCol = -1;
+  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
   };
   auto setCol = [&file, &error](int& col, int pos) {
     if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
@@ -227,7 +258,7 @@ void Data::loadOtherReadings(const fs::path& file) {
   };
   std::ifstream f(file);
   std::array<std::string, 2> cols;
-  for (std::string line; std::getline(f, line); ++lineNumber) {
+  for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
     if (nameCol == -1) {
@@ -384,21 +415,6 @@ void Data::processList(const FileList& list) {
   } else {
     FileList::print(found[Types::Jinmei], "Jinmei", list.name());
     FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", list.name());
-  }
-}
-
-void Data::checkStrokes() const {
-  FileList::List strokesOther, strokesNotFound;
-  for (const auto& i : _strokes) {
-    auto t = getType(i.first);
-    if (t == Types::Other)
-      strokesOther.push_back(i.first);
-    else if (t == Types::None && !isOldName(i.first))
-      strokesNotFound.push_back(i.first);
-  }
-  if (_debug) {
-    FileList::print(strokesOther, "Kanjis in 'Other' group", "_strokes");
-    FileList::print(strokesNotFound, "Kanjis without other groups", "_strokes");
   }
 }
 

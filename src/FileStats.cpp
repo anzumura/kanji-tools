@@ -62,7 +62,7 @@ FileStats::FileStats(int argc, const char** argv, DataPtr data) : _data(data) {
     } else
       files.push_back(argv[i]);
   }
-  if (files.empty()) Data::usage("please specify at least one option or '-h' for help");
+  if (!data->debug() && files.empty()) Data::usage("please specify at least one option or '-h' for help");
   for (auto& i : files)
     countKanji(i, breakdown, verbose);
 }
