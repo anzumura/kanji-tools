@@ -24,6 +24,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
         if (std::string s; doPeek(s, onlyMB, _location, true) && isVariationSelector(s)) {
           result += s;
           _location += 3;
+          ++_variants;
         }
       return true;
     } else
@@ -85,6 +86,7 @@ size_t MBCharCount::add(const std::string& s, const std::string& tag) {
       if (!tag.empty()) ++_tags[token][tag];
     }
   _errors += c.errors();
+  _variants += c.variants();
   return added;
 }
 

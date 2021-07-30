@@ -70,11 +70,18 @@ void KanjiData::noFreq(int f, bool brackets) const {
   }
 }
 
-template<typename T> void KanjiData::printCount(const std::string& name, T pred) const {
+template<typename T> void KanjiData::printCount(const std::string& name, T pred, int printExamples) const {
   std::vector<std::pair<Types, int>> counts;
+  std::map<Types, std::vector<std::string>> examples;
   int total = 0;
-  for (const auto& l : _types) {
-    const int count = std::count_if(l.second.begin(), l.second.end(), pred);
+  for (auto& l : _types) {
+    int count = 0;
+    if (printExamples)
+      for (auto& i : l.second) {
+        if (pred(i) && ++count <= printExamples) examples[l.first].push_back(i->name());
+      }
+    else
+      count = std::count_if(l.second.begin(), l.second.end(), pred);
     if (count) {
       counts.emplace_back(l.first, count);
       total += count;
@@ -84,6 +91,8 @@ template<typename T> void KanjiData::printCount(const std::string& name, T pred)
     log() << name << ' ' << total << " (";
     for (const auto& i : counts) {
       _out << i.first << ' ' << i.second;
+      for (const auto& j : examples[i.first])
+        _out << ' ' << j;
       total -= i.second;
       if (total) _out << ", ";
     }
@@ -105,6 +114,8 @@ void KanjiData::printStats() const {
              [](const auto& x) { return x->type() == Types::Jinmei && !x->frequency() && !x->hasLevel(); });
   printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
   printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
+  printCount(
+    "  Has Variation Selectors", [](const auto& x) { return x->variant(); }, 5);
   printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
   // some old kanjis have a non-zero frequency
   printCount("  Old Has Frequency", [this](const auto& x) { return x->oldFrequency(*this) != 0; });

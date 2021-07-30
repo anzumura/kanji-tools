@@ -244,6 +244,19 @@ TEST_F(MBCharCountTest, AddWithErrors) {
   EXPECT_EQ(c.count("。"), 1);
 }
 
+TEST_F(MBCharCountTest, AddWithVariants) {
+  std::string s1("normal中variant逸︁"), s2("あア謁︀");
+  EXPECT_EQ(c.add(s1), 2);
+  EXPECT_EQ(c.add(s2), 3);
+  EXPECT_EQ(c.count("中"), 1);
+  EXPECT_EQ(c.count("逸︁"), 1);
+  EXPECT_EQ(c.count("あ"), 1);
+  EXPECT_EQ(c.count("ア"), 1);
+  EXPECT_EQ(c.count("謁︀"), 1);
+  EXPECT_EQ(c.errors(), 0);
+  EXPECT_EQ(c.variants(), 2);
+}
+
 TEST_F(MBCharCountTest, AddWithPredicate) {
   auto pred = [](const auto& s) { return s != "。" && s != "は"; };
   MBCharCountIf cPred(pred);

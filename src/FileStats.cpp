@@ -103,7 +103,8 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
         out() << ')';
       }
       out() << " - showing " << MaxExamples << " most frequent kanji per type";
-      if (count.errors()) out() << ", found " << count.errors() << " errors!";
+      if (count.errors()) out() << ", errors: " << count.errors();
+      if (count.variants()) out() << ", variants: " << count.errors();
       out() << '\n';
       firstCount = false;
     }

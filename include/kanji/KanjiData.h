@@ -17,7 +17,7 @@ public:
 private:
   // functions to print loaded data if _debug is true
   void noFreq(int f, bool brackets = false) const; // 'noFreq' is a helper function for printing no-frequency counts
-  template<typename T> void printCount(const std::string& name, T pred) const;
+  template<typename T> void printCount(const std::string& name, T pred, int printExamples = 0) const;
   void printStats() const;
   void printGrades() const;
   void printLevels() const;

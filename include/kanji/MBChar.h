@@ -109,12 +109,13 @@ public:
     return valid(s, checkLengthOne) == Results::Valid;
   }
 
-  explicit MBChar(const std::string& data) : _data(data), _location(_data.c_str()), _errors(0) {}
+  explicit MBChar(const std::string& data) : _data(data) {}
 
   // call reset in order to loop over the string again
   void reset() {
     _location = _data.c_str();
     _errors = 0;
+    _variants = 0;
   }
   // 'next' populates 'result' with the full multi-byte character (so could be more than one byte)
   // returns true if result was populated. This function also supports 'variation selectors', i.e.,
@@ -124,6 +125,7 @@ public:
   // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
   bool peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
   int errors() const { return _errors; }
+  int variants() const { return _variants; }
   size_t length(bool onlyMB = true) const { return length(_data, onlyMB); }
   Results valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
   bool isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
@@ -132,9 +134,11 @@ private:
   // in these cases it only matters if the following value is a 'variation selector'.
   bool doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall = false) const;
   const std::string _data;
-  const char* _location;
+  const char* _location = _data.c_str();
   // '_errors' keeps track of how many invalid bytes were encountered during iteration
-  int _errors;
+  int _errors = 0;
+  // '_variants' keeps track of how many 'Variation Selector's were found
+  int _variants = 0;
 };
 
 // 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
@@ -195,6 +199,7 @@ public:
   // 'lastReplaceTag' returns last tag (file name) that had line replaced (if 'addTag' is used)
   const std::string& lastReplaceTag() const { return _lastReplaceTag; }
   int errors() const { return _errors; }
+  int variants() const { return _variants; }
   const Map& map() const { return _map; }
   bool debug() const { return _debug; }
 private:
@@ -207,6 +212,7 @@ private:
   int _files = 0;
   int _directories = 0;
   int _errors = 0;
+  int _variants = 0;
   std::string _lastReplaceTag;
   int _replaceCount = 0;
   const OptRegex _find;
