@@ -252,4 +252,37 @@ TEST_F(TableTest, TableWithWideCharacters) {
   EXPECT_EQ(count, maxLines);
 }
 
+TEST_F(TableTest, EscapePipeForMarkdown) {
+  Table t({"a", "b", "c"});
+  t.add({"1", "1|2", "3"});
+  t.print(_os);
+  // clang-format off
+  const char* expected[] = {
+    "+---+-----+---+",
+    "| a | b   | c |",
+    "| 1 | 1|2 | 3 |",
+    "+---+-----+---+"};
+  const char* expectedMD[] = {
+    "| a | b | c |",
+    "| --- | --- | --- |",
+    "| 1 | 1\\|2 | 3 |"};
+  // clang-format on
+  std::string line;
+  int count = 0, maxLines = std::size(expected);
+  while (std::getline(_os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expected[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+  _os.clear();
+  t.printMarkdown(_os);
+  count = 0;
+  maxLines = std::size(expectedMD);
+  while (std::getline(_os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expectedMD[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+}
+
 } // namespace kanji

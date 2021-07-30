@@ -187,16 +187,25 @@ void Data::loadUcdData() {
         cols[pos] = "";
       else if (pos != cols.size())
         error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
-      if (cols[nameCol].length() > 4) error("name greater than 4");
-      int radical = FileListKanji::toInt(cols[radicalCol]);
+      const auto& name = cols[nameCol];
+      if (name.length() > 4) error("name greater than 4");
+      const int radical = FileListKanji::toInt(cols[radicalCol]);
       if (radical < 1 || radical > 214) error("radical out of range");
-      int strokes = FileListKanji::toInt(cols[strokesCol]);
+      const int strokes = FileListKanji::toInt(cols[strokesCol]);
       if (strokes < 1 || strokes > 33) error("strokes out of range");
-      if (cols[meaningCol].empty()) error("meaning is empty");
+      bool joyo = false;
+      if (cols[joyoCol] == "Y")
+        joyo = true;
+      else if (!cols[joyoCol].empty())
+        error("unrecognized Joyo value '" + cols[joyoCol] + "'");
+      // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo Kanji
+      if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
       if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
-      _ucdMap.emplace(std::piecewise_construct, std::make_tuple(cols[nameCol]),
-                      std::make_tuple(cols[nameCol], radical, strokes, cols[joyoCol] == "Y", cols[meaningCol],
-                                      cols[onCol], cols[kunCol]));
+      if (!_ucdMap
+             .emplace(std::piecewise_construct, std::make_tuple(name),
+                      std::make_tuple(name, radical, strokes, joyo, cols[meaningCol], cols[onCol], cols[kunCol]))
+             .second)
+        error("duplicate entry '" + name + "'");
     }
   }
 }

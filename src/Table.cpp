@@ -47,10 +47,17 @@ void Table::printMarkdown(std::ostream& os) const {
       os << "| ";
       if (header && r.empty()) os << "---";
       if (i < r.size()) {
-        if (r[i].empty() || !section)
-          os << r[i];
+        std::string out;
+        out.reserve(r[i].size());
+        for (char c : r[i])
+          if (c == '|')
+            out += "\\|";
+          else
+            out += c;
+        if (out.empty() || !section)
+          os << out;
         else
-          os << "**" << r[i] << "**";
+          os << "**" << out << "**";
       }
       os << ' ';
     }

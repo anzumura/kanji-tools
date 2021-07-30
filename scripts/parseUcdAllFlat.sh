@@ -77,5 +77,5 @@ grep 'kIRG_JSource="[^"]' $1 | grep -E '(kJoyoKanji="[^"]|kJapanese[OK].*n="[^"]
     fi
     # cp="8303" (范) has kTotalStrokes="8 9" so just take up to the space
     echo -e "\U$cp\t${kRSUnicode%%[.\']*}\t${kTotalStrokes%\ *}\t\
-${kJoyoKanji:+Y}\t\$kDefinition\t$kJapaneseOn\t$kJapaneseKun"
+${kJoyoKanji:+Y}\t$kDefinition\t$kJapaneseOn\t$kJapaneseKun"
   done
