@@ -45,9 +45,9 @@ The program also supports various flags for controlling conversion (like Hepburn
 - 'Roma Variants' are alternative keyboard combinations that lead to the same kana
 - When populated, Roma, Hira and Kata columns are unique (no duplicates)
 - Unicode values are only shown for 'monograph' entries
-- Some 'digraphs' may not be in any real words, but they are typable and thus included
+- Some 'digraphs' may not be in any real words, but they are typeable and thus included
 - Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no standard Hiragana or Romaji)
 - Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
 - Type 'N' includes:
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match usual IME keyboard entry

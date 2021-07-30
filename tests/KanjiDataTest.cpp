@@ -84,7 +84,8 @@ protected:
     int variants = 0;
     for (auto& i : l) {
       if (i->variant()) ++variants;
-      EXPECT_EQ(MBChar::length(i->name()), 1);
+      EXPECT_TRUE(_data.getStrokes(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+      EXPECT_EQ(MBChar::length(i->name()), 1) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_TRUE(isKanji(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
     }
     return variants;
@@ -134,6 +135,8 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.frequencyTotal(3), 500);
   EXPECT_EQ(_data.frequencyTotal(4), 501);
   EXPECT_EQ(_data.frequencyTotal(5), 0);
+  // Ucd data
+  EXPECT_EQ(_data.ucdMap().size(), 12275);
   // Make sure all Kanji are in Kanji related Unicode blocks
   EXPECT_EQ(checkKanji(_data.jouyouKanji()), 0);
   EXPECT_EQ(checkKanji(_data.jinmeiKanji()), 0);

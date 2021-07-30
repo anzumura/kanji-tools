@@ -67,8 +67,10 @@ public:
   // 'getRadical' by the official Radical Number (which is one greater than index in _radicals)
   const Radical& getRadical(int number) const { return _radicals.at(number - 1); }
   int getStrokes(const std::string& s) const {
-    auto i = _ucdMap.find(s);
-    return i == _ucdMap.end() ? 0 : i->second.strokes();
+    auto i = _strokes.find(s);
+    if (i != _strokes.end()) return i->second;
+    auto j = _ucdMap.find(s);
+    return j == _ucdMap.end() ? 0 : j->second.strokes();
   }
 
   // get kanji lists
@@ -115,6 +117,33 @@ public:
   std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
   static int maxFrequency() { return _maxFrequency; }
 
+  // 'Ucd' holds the data loaded from 'ucd.txt' which is an extract from the official Unicode
+  // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
+  class Ucd {
+  public:
+    Ucd(const std::string& name, int radical, int strokes, bool joyo, const std::string& meaning,
+        const std::string& onReading, const std::string& kunReading)
+      : _name(name), _radical(radical), _strokes(strokes), _joyo(joyo), _meaning(meaning), _onReading(onReading),
+        _kunReading(kunReading) {}
+
+    const std::string& name() const { return _name; }
+    int radical() const { return _radical; }
+    int strokes() const { return _strokes; }
+    bool joyo() const { return _joyo; }
+    const std::string& meaning() const { return _meaning; }
+    const std::string& onReading() const { return _onReading; }
+    const std::string& kunReading() const { return _kunReading; }
+  private:
+    const std::string _name;
+    const int _radical;
+    const int _strokes;
+    const int _joyo;
+    const std::string _meaning;
+    const std::string _onReading;
+    const std::string _kunReading;
+  };
+  using UcdMap = std::map<std::string, Ucd>;
+  const UcdMap& ucdMap() const { return _ucdMap; }
   // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not used by this
   // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then
   // a larger increment is returned to 'skip over' the args, for example:
@@ -139,12 +168,16 @@ protected:
   void loadUcdData();
   // 'loadRadicals', 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
   void loadRadicals(const std::filesystem::path&);
+  void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
   void loadOtherReadings(const std::filesystem::path&);
   // populate Lists (_types datastructure)
   void populateJouyou();
   void populateJinmei();
   void populateExtra();
   void processList(const FileList&);
+  // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
+  // then this function will print any entries in _strokes that are 'Other' type or not found.
+  void checkStrokes() const;
 
   std::ostream& _out;
   std::ostream& _err;
@@ -158,6 +191,11 @@ protected:
   // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji
   // that aren't part of any other group (so not Jouyou or Jinmei).
   std::map<std::string, std::string> _otherReadings;
+  // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
+  // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
+  // contains stroke counts followed by one or more lines each with a single kanji that has the given
+  // number of strokes.
+  std::map<std::string, int> _strokes;
   // lists of kanji corresponding to 'Types', 'Grades' and 'Levels' (excluding the 'None' enum values)
   std::map<Types, List> _types;
   std::map<Grades, List> _grades;
@@ -171,34 +209,7 @@ protected:
   FileList::Set _jouyouOldSet;
   FileList::Set _jinmeiOldSet;
 
-  // 'UcdData' holds the data loaded from 'ucd.txt' which is an extract from the official Unicode
-  // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
-  class UcdData {
-  public:
-    UcdData(const std::string& name, int radical, int strokes, bool joyo, const std::string& meaning,
-            const std::string& onReading, const std::string& kunReading)
-      : _name(name), _radical(radical), _strokes(strokes), _joyo(joyo), _meaning(meaning), _onReading(onReading),
-        _kunReading(kunReading) {}
-
-    const std::string& name() const { return _name; }
-    int radical() const { return _radical; }
-    int strokes() const { return _strokes; }
-    bool joyo() const { return _joyo; }
-    const std::string& meaning() const { return _meaning; }
-    const std::string& onReading() const { return _onReading; }
-    const std::string& kunReading() const { return _kunReading; }
-  private:
-    const std::string _name;
-    const int _radical;
-    const int _strokes;
-    const int _joyo;
-    const std::string _meaning;
-    const std::string _onReading;
-    const std::string _kunReading;
-  };
-  using UcdMap = std::map<std::string, UcdData>;
   UcdMap _ucdMap;
-
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
   static int _maxFrequency;
   static const List _emptyList;

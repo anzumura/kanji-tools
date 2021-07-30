@@ -181,16 +181,21 @@ void Data::loadUcdData() {
     } else {
       for (std::string token; std::getline(ss, token, '\t'); ++pos) {
         if (pos == cols.size()) error("too many columns");
-        std::cout << pos << ' ' << token << '\n';
         cols[pos] = token;
       }
       if (pos == cols.size() - 1)
         cols[pos] = "";
       else if (pos != cols.size())
         error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
+      if (cols[nameCol].length() > 4) error("name greater than 4");
+      int radical = FileListKanji::toInt(cols[radicalCol]);
+      if (radical < 1 || radical > 214) error("radical out of range");
+      int strokes = FileListKanji::toInt(cols[strokesCol]);
+      if (strokes < 1 || strokes > 33) error("strokes out of range");
+      if (cols[meaningCol].empty()) error("meaning is empty");
+      if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
       _ucdMap.emplace(std::piecewise_construct, std::make_tuple(cols[nameCol]),
-                      std::make_tuple(cols[nameCol], FileListKanji::toInt(cols[radicalCol]),
-                                      FileListKanji::toInt(cols[strokesCol]), cols[joyoCol] == "Y", cols[meaningCol],
+                      std::make_tuple(cols[nameCol], radical, strokes, cols[joyoCol] == "Y", cols[meaningCol],
                                       cols[onCol], cols[kunCol]));
     }
   }
@@ -245,6 +250,30 @@ void Data::loadRadicals(const fs::path& file) {
   }
   for (auto& i : _radicals)
     _radicalMap[i.name()] = i.number() - 1;
+}
+
+void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
+  std::ifstream f(file);
+  std::string line;
+  int strokes = 0;
+  while (std::getline(f, line))
+    if (std::isdigit(line[0])) {
+      auto newStrokes = std::stoi(line);
+      assert(newStrokes > strokes);
+      strokes = newStrokes;
+    } else {
+      assert(strokes != 0); // first line must have a stroke count
+      std::stringstream ss(line);
+      for (std::string token; std::getline(ss, token, ' ');) {
+        auto i = _strokes.insert(std::pair(token, strokes));
+        if (!i.second) {
+          if (checkDuplicates)
+            printError("duplicate entry in " + file.string() + ": " + token);
+          else if (i.first->second != strokes)
+            printError("found entry with different count in " + file.string() + ": " + token);
+        }
+      }
+    }
 }
 
 void Data::loadOtherReadings(const fs::path& file) {
@@ -415,6 +444,21 @@ void Data::processList(const FileList& list) {
   } else {
     FileList::print(found[Types::Jinmei], "Jinmei", list.name());
     FileList::print(found[Types::LinkedJinmei], "Linked Jinmei", list.name());
+  }
+}
+
+void Data::checkStrokes() const {
+  FileList::List strokesOther, strokesNotFound;
+  for (const auto& i : _strokes) {
+    auto t = getType(i.first);
+    if (t == Types::Other)
+      strokesOther.push_back(i.first);
+    else if (t == Types::None && !isOldName(i.first))
+      strokesNotFound.push_back(i.first);
+  }
+  if (_debug) {
+    FileList::print(strokesOther, "Kanjis in 'Other' group", "_strokes");
+    FileList::print(strokesNotFound, "Kanjis without other groups", "_strokes");
   }
 }
 
