@@ -479,21 +479,35 @@ void Data::processList(const FileList& list) {
 }
 
 void Data::checkStrokes() const {
-  FileList::List strokesOther, strokesNotFound, strokeDiffs, vStrokeDiffs;
+  FileList::List strokesOther, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
   for (const auto& i : _strokes) {
+    const int ucdStrokes = getStrokes(i.first, false, true);
     auto k = findKanji(i.first);
+    if (ucdStrokes) {
+      // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,
+      // there are some incorrect stroke counts in 'wiki-strokes.txt', but they aren't used because
+      // the actual stroke count comes from 'jouyou.txt', 'jinmei.txt' or 'extra.txt' 
+      if (k.has_value()) {
+        if ((**k).variant()) {
+          if ((**k).strokes() != getStrokes(i.first, true, true)) vStrokeDiffs.push_back(i.first);
+        } else if ((**k).strokes() != ucdStrokes)
+         strokeDiffs.push_back(i.first);
+      } else if (i.second != ucdStrokes)
+        missingDiffs.push_back(i.first);
+    } else
+      missingUcd.push_back(i.first);
     if (k.has_value()) {
-      if (!(**k).variant() && (**k).strokes() != getStrokes(i.first, false, true)) strokeDiffs.push_back(i.first);
-      if ((**k).variant() && (**k).strokes() != getStrokes(i.first, true, true)) vStrokeDiffs.push_back(i.first);
       if ((**k).type() == Types::Other) strokesOther.push_back(i.first);
-    } else if (!isOldName(i.first))
+    } else
       strokesNotFound.push_back(i.first);
   }
   if (_debug) {
-    FileList::print(strokesOther, "Kanjis in 'Other' group", "_strokes");
-    FileList::print(strokesNotFound, "Kanjis without other groups", "_strokes");
-    FileList::print(strokeDiffs, "Kanjis with differrent strokes", "_ucdMap");
-    FileList::print(vStrokeDiffs, "Variant kanjis with differrent strokes", "_ucdMap");
+    FileList::print(strokesOther, "Kanji in 'Other' group", "_strokes");
+    FileList::print(strokesNotFound, "Kanji without other groups", "_strokes");
+    FileList::print(strokeDiffs, "Kanji with differrent strokes", "_ucdMap");
+    FileList::print(vStrokeDiffs, "Variant kanji with differrent strokes", "_ucdMap");
+    FileList::print(missingDiffs, "'_stokes only' Kanji with differrent strokes", "_ucdMap");
+    FileList::print(missingUcd, "Kanji in _strokes, but not found", "_ucdMap");
   }
 }
 

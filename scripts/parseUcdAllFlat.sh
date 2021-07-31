@@ -76,34 +76,23 @@ declare -A definition on kun
 while read -r i; do
   get cp "$i"
   get kJoyoKanji "$i"
-  get kJinmeiyoKanji "$i"
   get kDefinition "$i"
   get kJapaneseOn "$i"
   get kJapaneseKun "$i"
-  #
-  # Link definition, on and kun for some Joyo and Jinmei Kanji
-  #
-  definition[$cp]="$kDefinition"
-  on[$cp]="$kJapaneseOn"
-  kun[$cp]="$kJapaneseKun"
   if [ -n "$kJoyoKanji" ]; then
-    if [[ $kJoyoKanji =~ U+ ]]; then
-      # There are 4 entries that have a Joyo link: 5265, 53F1, 586B and 982C
-      link=${kJoyoKanji#U+}
-      # Store definition and on/kun for linked joyo since since these values
-      # are missing for 𠮟 (U+20B9F) which replaces 叱 (53F1) しか-る.
-      definition[$link]="$kDefinition"
-      on[$link]="$kJapaneseOn"
-      kun[$link]="$kJapaneseKun"
-    fi
-  elif [ -n "$kJinmeiyoKanji" ]; then
-    if [[ $kJinmeiyoKanji =~ U+ ]]; then
-      link=${kJinmeiyoKanji#*+}
-      definition[$link]="$kDefinition"
-      on[$link]="$kJapaneseOn"
-      kun[$link]="$kJapaneseKun"
-    fi
+    # There are 4 entries with a Joyo link: 5265, 53F1, 586B and 982C. Store
+    # definition/on/kun since since they are missing for some linked Jinmeiyo
+    # Kanji as well as Joyo 𠮟 (U+20B9F) which replaces 叱 (53F1) しか-る.
+    [[ $kJoyoKanji =~ U+ ]] && cp="$cp ${kJoyoKanji#U+}"
+  else
+    get kJinmeiyoKanji "$i"
+    [[ $kJinmeiyoKanji =~ U+ ]] && cp="$cp ${kJinmeiyoKanji#*+}"
   fi
+  for link in $cp; do
+    definition[$link]="$kDefinition"
+    on[$link]="$kJapaneseOn"
+    kun[$link]="$kJapaneseKun"
+  done
 done < <(grep 'kJ.*yoKanji="[^"]' $1 | grep 'kJapanese[OK].*n="[^"]')
 
 # Second loop produces output
@@ -115,29 +104,21 @@ while read -r i; do
   get kDefinition "$i"
   get kJapaneseOn "$i"
   get kJapaneseKun "$i"
+  link=
   if [ -n "$kJoyoKanji" ]; then
     if [[ $kJoyoKanji =~ U+ ]]; then
-      # Need to unset kJoyoKanji for this entry since the official version
-      # is the 'link' entry.
+      # Need to unset kJoyoKanji since the official version is the 'link' entry.
       unset -v kJoyoKanji
-    elif [ -n "${definition[$cp]}" ]; then
-      kDefinition=${kDefinition:-${definition[$cp]}}
-      kJapaneseOn=${kJapaneseOn:-${on[$cp]}}
-      kJapaneseKun=${kJapaneseKun:-${kun[$cp]}}
+    else
+      link=$cp
     fi
   elif [ -n "$kJinmeiyoKanji" ]; then
-    if [[ $kJinmeiyoKanji =~ U+ ]]; then
-      link=${kJinmeiyoKanji#*+}
-      if [ -n "${definition[$link]}" ]; then
-        kDefinition=${kDefinition:-${definition[$link]}}
-        kJapaneseOn=${kJapaneseOn:-${on[$link]}}
-        kJapaneseKun=${kJapaneseKun:-${kun[$link]}}
-      fi
-    elif [ -n "${definition[$cp]}" ]; then
-      kDefinition=${kDefinition:-${definition[$cp]}}
-      kJapaneseOn=${kJapaneseOn:-${on[$cp]}}
-      kJapaneseKun=${kJapaneseKun:-${kun[$cp]}}
-    fi
+    [[ $kJinmeiyoKanji =~ U+ ]] && link=${kJinmeiyoKanji#*+} || link=$cp
+  fi
+  if [ -n "$link" ] && [ -n "${definition[$link]}" ]; then
+    kDefinition=${kDefinition:-${definition[$link]}}
+    kJapaneseOn=${kJapaneseOn:-${on[$link]}}
+    kJapaneseKun=${kJapaneseKun:-${kun[$link]}}
   fi
   #
   # Radical and Strokes
@@ -158,9 +139,9 @@ while read -r i; do
   # for others so only swap if 'vstrokes' represents the same radical and
   # count as 'kRSUnicode' (RS = Radical+Stroke). This fixes some, but also
   # isn't a prefect solution. Further limiting swapping to only happen if
-  # vstrokes matches 'kTotalStrokes' also helps, but there are still 103
+  # vstrokes matches 'kTotalStrokes' also helps, but there are still 52
   # Joyo/Jinmei Kanji that have different total stroke counts (without any
-  # swapping there are 108 differences).
+  # swapping there are 57 differences).
   if [[ ${kRSAdobe_Japan1_6} =~ ' ' ]]; then
     s=${kRSAdobe_Japan1_6#*\ } # remove the first adobe ref
     s=${s%%\ *}                # get the first (remaining) one
