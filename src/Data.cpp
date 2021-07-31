@@ -145,30 +145,50 @@ void Data::printError(const std::string& msg) const { _err << "ERROR --- " << ms
 
 void Data::loadUcdData() {
   auto file = _dataDir / UcdFile;
-  int lineNum = 1, nameCol = -1, radicalCol = -1, strokesCol = -1, joyoCol = -1, meaningCol = -1, onCol = -1,
-      kunCol = -1;
+  int lineNum = 1, unicodeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1,
+      joyoCol = -1, jinmeiCol = -1, jinmeiLinkCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
+  };
+  auto getWchar = [&error](const std::string& col, const auto& s, bool allowEmpty = false) -> wchar_t {
+    if (s.empty() && allowEmpty) return 0;
+    if (s.length() != 4 && s.length() != 5) error(col + " length must be 4 or 5 '" + s + "'");
+    for (char c : s)
+      if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("invalid '" + col + "' string '" + s + "'");
+    return std::strtol(s.c_str(), nullptr, 16);
+  };
+  auto getBool = [&error](const std::string& col, const auto& s) {
+    if (s == "Y") return true;
+    if (!s.empty()) error("unrecognized '" + col + "' value '" + s + "'");
+    return false;
   };
   auto setCol = [&file, &error](int& col, int pos) {
     if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
     col = pos;
   };
   std::ifstream f(file);
-  std::array<std::string, 7> cols;
+  std::array<std::string, 11> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
-    if (nameCol == -1) {
+    if (unicodeCol == -1) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Name")
+        if (token == "Unicode")
+          setCol(unicodeCol, pos);
+        else if (token == "Name")
           setCol(nameCol, pos);
         else if (token == "Radical")
           setCol(radicalCol, pos);
         else if (token == "Strokes")
           setCol(strokesCol, pos);
+        else if (token == "VStrokes")
+          setCol(variantStrokesCol, pos);
         else if (token == "Joyo")
           setCol(joyoCol, pos);
+        else if (token == "Jinmei")
+          setCol(jinmeiCol, pos);
+        else if (token == "JinmeiLink")
+          setCol(jinmeiLinkCol, pos);
         else if (token == "Meaning")
           setCol(meaningCol, pos);
         else if (token == "On")
@@ -187,23 +207,25 @@ void Data::loadUcdData() {
         cols[pos] = "";
       else if (pos != cols.size())
         error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
+      const wchar_t cp = getWchar("Unicode", cols[unicodeCol]);
       const auto& name = cols[nameCol];
       if (name.length() > 4) error("name greater than 4");
       const int radical = FileListKanji::toInt(cols[radicalCol]);
       if (radical < 1 || radical > 214) error("radical out of range");
       const int strokes = FileListKanji::toInt(cols[strokesCol]);
       if (strokes < 1 || strokes > 33) error("strokes out of range");
-      bool joyo = false;
-      if (cols[joyoCol] == "Y")
-        joyo = true;
-      else if (!cols[joyoCol].empty())
-        error("unrecognized Joyo value '" + cols[joyoCol] + "'");
-      // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo Kanji
+      const int variantStrokes = cols[variantStrokesCol].empty() ? 0 : FileListKanji::toInt(cols[variantStrokesCol]);
+      if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
+      const bool joyo = getBool("Joyo", cols[joyoCol]);
+      const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
+      const wchar_t jinmeiLink = getWchar("JinmeiLink", cols[jinmeiLinkCol], true);
+      // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
       if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
       if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
       if (!_ucdMap
              .emplace(std::piecewise_construct, std::make_tuple(name),
-                      std::make_tuple(name, radical, strokes, joyo, cols[meaningCol], cols[onCol], cols[kunCol]))
+                      std::make_tuple(cp, name, radical, strokes, variantStrokes, joyo, jinmei, jinmeiLink,
+                                      cols[meaningCol], cols[onCol], cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
     }
@@ -457,17 +479,21 @@ void Data::processList(const FileList& list) {
 }
 
 void Data::checkStrokes() const {
-  FileList::List strokesOther, strokesNotFound;
+  FileList::List strokesOther, strokesNotFound, strokeDiffs, vStrokeDiffs;
   for (const auto& i : _strokes) {
-    auto t = getType(i.first);
-    if (t == Types::Other)
-      strokesOther.push_back(i.first);
-    else if (t == Types::None && !isOldName(i.first))
+    auto k = findKanji(i.first);
+    if (k.has_value()) {
+      if (!(**k).variant() && (**k).strokes() != getStrokes(i.first, false, true)) strokeDiffs.push_back(i.first);
+      if ((**k).variant() && (**k).strokes() != getStrokes(i.first, true, true)) vStrokeDiffs.push_back(i.first);
+      if ((**k).type() == Types::Other) strokesOther.push_back(i.first);
+    } else if (!isOldName(i.first))
       strokesNotFound.push_back(i.first);
   }
   if (_debug) {
     FileList::print(strokesOther, "Kanjis in 'Other' group", "_strokes");
     FileList::print(strokesNotFound, "Kanjis without other groups", "_strokes");
+    FileList::print(strokeDiffs, "Kanjis with differrent strokes", "_ucdMap");
+    FileList::print(vStrokeDiffs, "Variant kanjis with differrent strokes", "_ucdMap");
   }
 }
 

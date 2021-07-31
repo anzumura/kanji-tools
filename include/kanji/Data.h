@@ -66,11 +66,13 @@ public:
   }
   // 'getRadical' by the official Radical Number (which is one greater than index in _radicals)
   const Radical& getRadical(int number) const { return _radicals.at(number - 1); }
-  int getStrokes(const std::string& s) const {
-    auto i = _strokes.find(s);
-    if (i != _strokes.end()) return i->second;
-    auto j = _ucdMap.find(s);
-    return j == _ucdMap.end() ? 0 : j->second.strokes();
+  int getStrokes(const std::string& s, bool variant = false, bool onlyUcd = false) const {
+    if (!onlyUcd) {
+      auto i = _strokes.find(s);
+      if (i != _strokes.end()) return i->second;
+    }
+    auto i = _ucdMap.find(s);
+    return i == _ucdMap.end() ? 0 : i->second.getStrokes(variant);
   }
 
   // get kanji lists
@@ -121,23 +123,38 @@ public:
   // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
   class Ucd {
   public:
-    Ucd(const std::string& name, int radical, int strokes, bool joyo, const std::string& meaning,
-        const std::string& onReading, const std::string& kunReading)
-      : _name(name), _radical(radical), _strokes(strokes), _joyo(joyo), _meaning(meaning), _onReading(onReading),
+    Ucd(wchar_t unicode, const std::string& name, int radical, int strokes, int variantStrokes, bool joyo, bool jinmei,
+        wchar_t jinmeiLink, const std::string& meaning, const std::string& onReading, const std::string& kunReading)
+      : _name(name), _unicode(unicode), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes),
+        _joyo(joyo), _jinmei(jinmei), _jinmeiLink(jinmeiLink), _meaning(meaning), _onReading(onReading),
         _kunReading(kunReading) {}
 
+    wchar_t unicode() const { return _unicode; }
     const std::string& name() const { return _name; }
     int radical() const { return _radical; }
-    int strokes() const { return _strokes; }
+    int strokes(bool variant = false) const { return _strokes; }
+    int variantStrokes() const { return _variantStrokes; }
     bool joyo() const { return _joyo; }
+    bool jinmei() const { return _jinmei; }
+    // 'jinmeiLink' returns 0 if there is no link (this is the same concept as LinkedjinmeiKanji class)
+    wchar_t jinmeiLink() const { return _jinmeiLink; }
     const std::string& meaning() const { return _meaning; }
     const std::string& onReading() const { return _onReading; }
     const std::string& kunReading() const { return _kunReading; }
+    // '_variantStrokes' is set to 0 if there are no variants (see 'parseUcdAllFlat.sh' for more details)
+    bool hasVariantStrokes() const { return _variantStrokes != 0; }
+    // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
+    // it falls back to just return '_strokes'
+    int getStrokes(bool variant) const { return variant && hasVariantStrokes() ? _variantStrokes : _strokes; }
   private:
+    const wchar_t _unicode;
     const std::string _name;
     const int _radical;
     const int _strokes;
-    const int _joyo;
+    const int _variantStrokes;
+    const bool _joyo;
+    const bool _jinmei;
+    const wchar_t _jinmeiLink;
     const std::string _meaning;
     const std::string _onReading;
     const std::string _kunReading;
@@ -177,6 +194,7 @@ protected:
   void processList(const FileList&);
   // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
   // then this function will print any entries in _strokes that are 'Other' type or not found.
+  // It also compares strokes that were loaded from other files to strokes in 'ucd.txt'
   void checkStrokes() const;
 
   std::ostream& _out;
