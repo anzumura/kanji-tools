@@ -69,6 +69,15 @@ public:
     return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
   }
   static bool isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
+  // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so len 2-4) followed
+  // by a variation selector (which are always len 3).
+  static bool isMBCharWithVariationSelector(const std::string& s) {
+     return s.length() > 4 && s.length() < 8 && isVariationSelector(s.substr(s.length() - 3));
+   }
+   static std::string withoutVariationSelector(const std::string& s) {
+     return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
+   }
+
   // 'Results' is used for the return value of the 'valid' method - see comments below for more details.
   enum class Results {
     Valid,

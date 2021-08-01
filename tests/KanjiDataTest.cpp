@@ -84,7 +84,8 @@ protected:
     int variants = 0;
     for (auto& i : l) {
       if (i->variant()) ++variants;
-      EXPECT_TRUE(_data.getStrokes(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+      if (!Kanji::hasLink(i->type()))
+        EXPECT_TRUE(_data.getStrokes(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_EQ(MBChar::length(i->name()), 1) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_TRUE(isKanji(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
     }
@@ -113,6 +114,11 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
+  EXPECT_FALSE(k.variant());
+  auto result2 = _data.findKanji("逸︁");
+  EXPECT_TRUE((**result2).variant());
+  EXPECT_EQ((**result2).type(), Types::LinkedJinmei);
+  EXPECT_EQ((**result2).nonVariantName(), "逸");
   // totals
   EXPECT_EQ(_data.gradeTotal(Grades::G1), 80);
   EXPECT_EQ(_data.gradeTotal(Grades::G2), 160);
@@ -135,8 +141,22 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.frequencyTotal(3), 500);
   EXPECT_EQ(_data.frequencyTotal(4), 501);
   EXPECT_EQ(_data.frequencyTotal(5), 0);
-  // Ucd data
-  EXPECT_EQ(_data.ucdMap().size(), 12275);
+}
+
+TEST_F(KanjiDataTest, UcdChecks) {
+  auto count = [this](const auto& p) { return std::count_if(_data.ucdMap().begin(), _data.ucdMap().end(), p); };
+  EXPECT_EQ(_data.ucdMap().size(), 12460);
+  EXPECT_EQ(count([](auto& i) { return i.second.joyo(); }), 2136);
+  EXPECT_EQ(count([](auto& i) { return i.second.jinmei(); }), 863);
+  EXPECT_EQ(count([](auto& i) { return i.second.jinmei() && i.second.hasLink(); }), 248);
+  EXPECT_EQ(count([](auto& i) { return i.second.joyo() && i.second.hasLink(); }), 0);
+  EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 64);
+  // every 'linkName' should be different than 'name' and also exist in the map
+  for (auto& i : _data.ucdMap())
+    if (i.second.hasLink()) {
+      EXPECT_NE(i.second.name(), i.second.linkName());
+      EXPECT_TRUE(_data.ucdMap().contains(i.second.linkName()));
+    }
   // Make sure all Kanji are in Kanji related Unicode blocks
   EXPECT_EQ(checkKanji(_data.jouyouKanji()), 0);
   EXPECT_EQ(checkKanji(_data.jinmeiKanji()), 0);

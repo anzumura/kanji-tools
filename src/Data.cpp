@@ -1,4 +1,5 @@
 #include <kanji/Kanji.h>
+#include <kanji/MBChar.h>
 
 #include <fstream>
 #include <numeric>
@@ -50,6 +51,23 @@ Types Data::getType(const std::string& name) const {
   auto i = _map.find(name);
   if (i == _map.end()) return Types::None;
   return i->second->type();
+}
+
+const Data::Ucd* Data::findUcd(const std::string& s) const {
+  std::string r = s;
+  if (MBChar::isMBCharWithVariationSelector(s)) {
+    auto nonVariant = MBChar::withoutVariationSelector(s);
+    // check for linked Jinmei variant first
+    auto i = _ucdLinkedJinmei.find(nonVariant);
+    if (i == _ucdLinkedJinmei.end()) {
+      auto j = _ucdLinkedOther.find(nonVariant);
+      if (j == _ucdLinkedOther.end()) return nullptr;
+      r = j->second;
+    } else
+      r = i->second;
+  }
+  auto i = _ucdMap.find(r);
+  return i == _ucdMap.end() ? nullptr : &i->second;
 }
 
 fs::path Data::getDataDir(int argc, const char** argv) {
@@ -110,7 +128,27 @@ int Data::nextArg(int argc, const char** argv, int currentArg) {
 
 bool Data::checkInsert(const Entry& i) {
   if (_map.insert(std::make_pair(i->name(), i)).second) {
+    auto error = [this, &i](const std::string& s) {
+      std::string v;
+      if (i->variant()) v = " (non-variant: " + i->nonVariantName() + ")";
+      printError(i->name() + v + " " + s + " in _ucd");
+    };
     if (i->frequency() >= _maxFrequency) _maxFrequency = i->frequency() + 1;
+    auto t = i->type();
+    auto j = findUcd(i->name());
+    if (!j)
+      error("not found");
+    else {
+      if (t == Types::Jouyou && !j->joyo())
+        error("not marked as 'Joyo'");
+      else if (t == Types::Jinmei && !j->jinmei())
+        error("not marked as 'Jinmei'");
+      else if (t == Types::LinkedJinmei && !j->jinmei())
+        error("with link not marked as 'Jinmei'");
+      else if (t == Types::LinkedJinmei && !j->hasLink())
+        error("missing 'JinmeiLink'");
+      // skipping radical and strokes checks for now
+    }
     return true;
   }
   printError("failed to insert " + i->name() + " into map");
@@ -141,12 +179,15 @@ bool Data::checkNotFound(const FileList::Set& s, const std::string& n) const {
   return false;
 }
 
-void Data::printError(const std::string& msg) const { _err << "ERROR --- " << msg << '\n'; }
+void Data::printError(const std::string& msg) const {
+  static int count = 0;
+  _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- " << msg << std::setfill(' ') << '\n';
+}
 
 void Data::loadUcdData() {
   auto file = _dataDir / UcdFile;
-  int lineNum = 1, unicodeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1,
-      joyoCol = -1, jinmeiCol = -1, jinmeiLinkCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
+  int lineNum = 1, codeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1, joyoCol = -1,
+      jinmeiCol = -1, linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
   };
@@ -167,14 +208,14 @@ void Data::loadUcdData() {
     col = pos;
   };
   std::ifstream f(file);
-  std::array<std::string, 11> cols;
+  std::array<std::string, 12> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
-    if (unicodeCol == -1) {
+    if (codeCol == -1) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Unicode")
-          setCol(unicodeCol, pos);
+        if (token == "Code")
+          setCol(codeCol, pos);
         else if (token == "Name")
           setCol(nameCol, pos);
         else if (token == "Radical")
@@ -187,8 +228,10 @@ void Data::loadUcdData() {
           setCol(joyoCol, pos);
         else if (token == "Jinmei")
           setCol(jinmeiCol, pos);
-        else if (token == "JinmeiLink")
-          setCol(jinmeiLinkCol, pos);
+        else if (token == "LinkCode")
+          setCol(linkCodeCol, pos);
+        else if (token == "LinkName")
+          setCol(linkNameCol, pos);
         else if (token == "Meaning")
           setCol(meaningCol, pos);
         else if (token == "On")
@@ -207,7 +250,7 @@ void Data::loadUcdData() {
         cols[pos] = "";
       else if (pos != cols.size())
         error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
-      const wchar_t cp = getWchar("Unicode", cols[unicodeCol]);
+      const wchar_t code = getWchar("Unicode", cols[codeCol]);
       const auto& name = cols[nameCol];
       if (name.length() > 4) error("name greater than 4");
       const int radical = FileListKanji::toInt(cols[radicalCol]);
@@ -218,16 +261,26 @@ void Data::loadUcdData() {
       if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
       const bool joyo = getBool("Joyo", cols[joyoCol]);
       const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
-      const wchar_t jinmeiLink = getWchar("JinmeiLink", cols[jinmeiLinkCol], true);
+      const wchar_t linkCode = getWchar("LinkCode", cols[linkCodeCol], true);
+      if (linkCode > 0 && cols[linkNameCol].empty()) error("missing link name");
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
       if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
       if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
       if (!_ucdMap
              .emplace(std::piecewise_construct, std::make_tuple(name),
-                      std::make_tuple(cp, name, radical, strokes, variantStrokes, joyo, jinmei, jinmeiLink,
-                                      cols[meaningCol], cols[onCol], cols[kunCol]))
+                      std::make_tuple(code, name, radical, strokes, variantStrokes, joyo, jinmei, linkCode,
+                                      cols[linkNameCol], cols[meaningCol], cols[onCol], cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
+      if (linkCode > 0) {
+        if (jinmei) {
+          auto i = _ucdLinkedJinmei.insert(std::make_pair(cols[linkNameCol], name));
+          if (!i.second) error("jinmei link " + cols[linkNameCol] + " to " + name + " failed - has " + i.first->second);
+        } else {
+          auto i = _ucdLinkedOther.insert(std::make_pair(cols[linkNameCol], name));
+          if (!i.second) error("link " + cols[linkNameCol] + " to " + name + " failed - has " + i.first->second);
+        }
+      }
     }
   }
 }
@@ -486,12 +539,12 @@ void Data::checkStrokes() const {
     if (ucdStrokes) {
       // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,
       // there are some incorrect stroke counts in 'wiki-strokes.txt', but they aren't used because
-      // the actual stroke count comes from 'jouyou.txt', 'jinmei.txt' or 'extra.txt' 
+      // the actual stroke count comes from 'jouyou.txt', 'jinmei.txt' or 'extra.txt'
       if (k.has_value()) {
         if ((**k).variant()) {
           if ((**k).strokes() != getStrokes(i.first, true, true)) vStrokeDiffs.push_back(i.first);
         } else if ((**k).strokes() != ucdStrokes)
-         strokeDiffs.push_back(i.first);
+          strokeDiffs.push_back(i.first);
       } else if (i.second != ucdStrokes)
         missingDiffs.push_back(i.first);
     } else

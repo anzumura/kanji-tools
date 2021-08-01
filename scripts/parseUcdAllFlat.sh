@@ -4,15 +4,16 @@ declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
-# the following 11 values:
-# - Unicode: Code Point (4 or 5 digit hex code)
+# the following 12 values:
+# - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in utf8
 # - Radical: radical number (1 to 214)
 # - Strokes: total strokes (including the radical)
 # - VStrokes: total strokes for first variant (blank if no variants)
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
-# - JinmeiLink: 230 Jinmei (of the 863 total) are variants of other Jōyō/Jinmei
+# - LinkCode: 230 Jinmei (of the 863 total) are variants of other Jōyō/Jinmei
+# - LinkName: link character in utf8
 # - Meaning: semicolin separated English definitions
 # - On: space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: space-separated Japanese Kun readings (in all-caps Rōmaji)
@@ -38,11 +39,11 @@ function getFirst() {
   eval $(echo "$2" | grep -o " $1=\"[^\" ]*")\"
 }
 
-echo -e "Unicode\tName\tRadical\tStrokes\tVStrokes\tJoyo\tJinmei\tJinmeiLink\t\
-Meaning\tOn\tKun"
+echo -e "Code\tName\tRadical\tStrokes\tVStrokes\tJoyo\tJinmei\tLinkCode\t\
+LinkName\tMeaning\tOn\tKun"
 
 # declare arrays to help support links in kJoyoKanji amd kJinmeiyoKanji
-declare -A definition on kun
+declare -A definition on kun linkBack
 
 # There are over 140K characters in 'ucd.all.flat.txt' and most of them aren't
 # relevant to the current functionality of this 'kanji' project so apply some
@@ -86,7 +87,10 @@ while read -r i; do
     [[ $kJoyoKanji =~ U+ ]] && cp="$cp ${kJoyoKanji#U+}"
   else
     get kJinmeiyoKanji "$i"
-    [[ $kJinmeiyoKanji =~ U+ ]] && cp="$cp ${kJinmeiyoKanji#*+}"
+    if [[ $kJinmeiyoKanji =~ U+ ]]; then
+      linkBack[${kJinmeiyoKanji#*+}]=$cp
+      cp="$cp ${kJinmeiyoKanji#*+}"
+    fi
   fi
   for link in $cp; do
     definition[$link]="$kDefinition"
@@ -99,27 +103,44 @@ done < <(grep 'kJ.*yoKanji="[^"]' $1 | grep 'kJapanese[OK].*n="[^"]')
 while read -r i; do
   get cp "$i"
   get kRSAdobe_Japan1_6 "$i"
+  getFirst kRSUnicode "$i"
   get kJoyoKanji "$i"
   get kJinmeiyoKanji "$i"
   get kDefinition "$i"
   get kJapaneseOn "$i"
   get kJapaneseKun "$i"
-  link=
+  radical=${kRSUnicode%\.*}
+  loadFrom=
+  linkTo=
   if [ -n "$kJoyoKanji" ]; then
     if [[ $kJoyoKanji =~ U+ ]]; then
       # Need to unset kJoyoKanji since the official version is the 'link' entry.
       unset -v kJoyoKanji
     else
-      link=$cp
+      loadFrom=$cp
     fi
   elif [ -n "$kJinmeiyoKanji" ]; then
-    [[ $kJinmeiyoKanji =~ U+ ]] && link=${kJinmeiyoKanji#*+} || link=$cp
+    if [[ $kJinmeiyoKanji =~ U+ ]]; then
+      loadFrom=${kJinmeiyoKanji#*+}
+      linkTo=$loadFrom
+    else
+      loadFrom=$cp
+      linkTo=${linkBack[$cp]}
+    fi
+  else
+    get kCompatibilityVariant "$i"
+    if [[ "$kCompatibilityVariant" =~ U+ ]]; then
+      loadFrom=${kCompatibilityVariant#*+}
+      linkTo=$loadFrom
+    fi
   fi
-  if [ -n "$link" ] && [ -n "${definition[$link]}" ]; then
-    kDefinition=${kDefinition:-${definition[$link]}}
-    kJapaneseOn=${kJapaneseOn:-${on[$link]}}
-    kJapaneseKun=${kJapaneseKun:-${kun[$link]}}
+  if [ -n "$loadFrom" ] && [ -n "${definition[$loadFrom]}" ]; then
+    kDefinition=${kDefinition:-${definition[$loadFrom]}}
+    kJapaneseOn=${kJapaneseOn:-${on[$loadFrom]}}
+    kJapaneseKun=${kJapaneseKun:-${kun[$loadFrom]}}
   fi
+  # don't write a record if there are no Japanese readings
+  [ -z "$kJapaneseOn$kJapaneseKun" ] && continue
   #
   # Radical and Strokes
   #
@@ -128,7 +149,6 @@ while read -r i; do
   # Adobe refs have the form 'C+num+x.y.z' where 'x' is the radical number,
   # 'y' is number of strokes for the radical and 'z' is remaining strokes.
   s=${s##*+}               # remove the 'C+num+' prefix
-  radical=${s%%\.*}        # get 'x' (by removing the longest suffix from .)
   s=${s#*\.}               # get 'y.z' (by removing the shortest prefix to .)
   strokes=$((${s/\./ + })) # y + z
   # If there are mutiple Adobe refs then check get 'VStrokes' from the second
@@ -144,28 +164,35 @@ while read -r i; do
   # swapping there are 57 differences).
   if [[ ${kRSAdobe_Japan1_6} =~ ' ' ]]; then
     s=${kRSAdobe_Japan1_6#*\ } # remove the first adobe ref
-    s=${s%%\ *}                # get the first (remaining) one
-    # Same as 'strokes' above, i.e, remove 'V+num+', get y.z and then add
-    s=${s##*+}
-    vradical=${s%%\.*}
-    s=${s#*\.}
-    vstrokes=$((${s/\./ + }))
-    if [ $strokes -ne $vstrokes ]; then
-      getFirst kRSUnicode "$i"
-      if [ $kRSUnicode = $vradical.${s#*\.} ]; then
-        getFirst kTotalStrokes "$i"
-        if [ $kTotalStrokes -eq $vstrokes ]; then
-          radical=$vradical
-          s=$strokes
-          strokes=$vstrokes
-          vstrokes=$s
+    getFirst kTotalStrokes "$i"
+    for s in $s; do
+      # Same as 'strokes' above, i.e, remove 'V+num+', get y.z and then add
+      s=${s##*+}
+      vradical=${s%%\.*}
+      s=${s#*\.}
+      vstrokes=$((${s/\./ + }))
+      if [ $strokes -ne $vstrokes ]; then
+        if [ $kRSUnicode = $vradical.${s#*\.} ]; then
+          if [ $kTotalStrokes -eq $vstrokes ]; then
+            s=$strokes
+            strokes=$vstrokes
+            vstrokes=$s
+          fi
         fi
       fi
-    fi
+      # Only process the loop once (so the second entry) for now. Strokes and
+      # radicals mostly match official Joyo and Jinmei charts, but there are
+      # still some differences and trying to get exact matches in from ucd data
+      # may not be possible (even some dictionaries disagree about radicals and
+      # total stroke counts here are there).
+      break
+    done
   else
     vstrokes= # don't print a 'VStrokes' if there was only one entry
   fi
+  # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
+  [ -n "$linkTo" ] && s="\U$linkTo" || s=
   echo -e "$cp\t\U$cp\t$radical\t$strokes\t$vstrokes\t${kJoyoKanji:+Y}\t\
-${kJinmeiyoKanji:+Y}\t${kJinmeiyoKanji#*+}\t$kDefinition\t$kJapaneseOn\t\
-$kJapaneseKun"
-done < <(grep 'kRSAdobe_Japan1_6="[^"]' $1 | grep -E '(kJ.*yoKanji="[^"]|kJapanese[OK].*n="[^"])')
+${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$kDefinition\t$kJapaneseOn\t$kJapaneseKun"
+done < <(grep 'kRSAdobe_Japan1_6="[^"]' $1 |
+  grep -E '(kCompatibilityVariant="[^"]|kJ.*yoKanji="[^"]|kJapanese[OK].*n="[^"])')

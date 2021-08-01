@@ -33,6 +33,7 @@ public:
   int number() const { return _number; }
   const std::string& name() const { return _name; }
   bool variant() const { return _variant; } // true if _name includes a Unicode 'variation selector'
+  const std::string& nonVariantName() const { return _nonVariantName; }
   int strokes() const { return _strokes; }  // may be zero for kanjis only loaded from frequency.txt
   Levels level() const { return _level; }
   int frequency() const { return _frequency; }
@@ -118,6 +119,7 @@ private:
   const int _number;
   const std::string _name;
   const bool _variant;
+  const std::string _nonVariantName; // same as _name if _variant is false
   const int _strokes;
   const Levels _level;
   const int _frequency;
