@@ -1,6 +1,5 @@
 #include <kanji/Kanji.h>
 #include <kanji/MBChar.h>
-#include <kanji/MBUtils.h>
 
 #include <fstream>
 #include <numeric>
@@ -48,21 +47,13 @@ const char* toString(Types x) {
   }
 }
 
-std::string Data::Ucd::codeAndName() const {
-  return toHex(_code, true, true) + " " + _name;
-}
-
-std::string Data::Ucd::linkCodeAndName() const {
-  return hasLink() ? toHex(_linkCode, true, true) + " " + _linkName : Kanji::EmptyString;
-}
-
 Types Data::getType(const std::string& name) const {
   auto i = _map.find(name);
   if (i == _map.end()) return Types::None;
   return i->second->type();
 }
 
-const Data::Ucd* Data::findUcd(const std::string& s) const {
+const Ucd* Data::findUcd(const std::string& s) const {
   std::string r = s;
   if (MBChar::isMBCharWithVariationSelector(s)) {
     auto nonVariant = MBChar::withoutVariationSelector(s);
@@ -77,6 +68,24 @@ const Data::Ucd* Data::findUcd(const std::string& s) const {
   }
   auto i = _ucdMap.find(r);
   return i == _ucdMap.end() ? nullptr : &i->second;
+}
+
+std::string Data::ucdReadingsToKana(const std::string& s) const {
+  const Ucd* u = findUcd(s);
+  if (u) {
+    std::string reading = u->onReading();
+    std::replace(reading.begin(), reading.end(), ' ', ',');
+    std::string result = _converter.convert(CharType::Romaji, reading, CharType::Katakana);
+    reading = u->kunReading();
+    if (!reading.empty()) {
+      std::replace(reading.begin(), reading.end(), ' ', ',');
+      // if there are both 'on' and 'kun' readings then separate them with a comma
+      if (!result.empty()) reading = ',' + reading;
+      result += _converter.convert(CharType::Romaji, reading, CharType::Hiragana);
+    }
+    return result;
+  }
+  return Ucd::EmptyString;
 }
 
 fs::path Data::getDataDir(int argc, const char** argv) {
@@ -198,7 +207,7 @@ void Data::loadUcd() {
   int lineNum = 1, codeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1, joyoCol = -1,
       jinmeiCol = -1, linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
+    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) + ", file: " + file.string());
   };
   auto getWchar = [&error](const std::string& col, const auto& s, bool allowEmpty = false) -> wchar_t {
     if (s.empty() && allowEmpty) return 0;
@@ -303,7 +312,7 @@ void Data::loadUcd() {
 void Data::loadRadicals(const fs::path& file) {
   int lineNum = 1, numberCol = -1, nameCol = -1, longNameCol = -1, readingCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
+    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) + ", file: " + file.string());
   };
   auto setCol = [&file, &error](int& col, int pos) {
     if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
@@ -506,9 +515,9 @@ void Data::processList(const FileList& list) {
       // not part of JLPT levels)
       auto reading = _otherReadings.find(i);
       if (reading != _otherReadings.end())
-        kanji = std::make_shared<ReadingKanji>(*this, ++count, i, reading->second);
+        kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i, reading->second);
       else
-        kanji = std::make_shared<Kanji>(*this, ++count, i);
+        kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i);
       _map.insert(std::make_pair(i, kanji));
       otherKanji.push_back(kanji);
       if (_debug) other.emplace_back(i);

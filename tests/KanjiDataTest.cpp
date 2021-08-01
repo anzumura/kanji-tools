@@ -111,6 +111,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto& k = **result;
   EXPECT_EQ(k.type(), Types::LinkedOld);
   EXPECT_EQ(k.name(), "響");
+  EXPECT_EQ(k.radical(), _data.getRadical(180));
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
@@ -144,6 +145,19 @@ TEST_F(KanjiDataTest, SanityChecks) {
 }
 
 TEST_F(KanjiDataTest, UcdChecks) {
+  // 'shrimp' is a Jinmei kanji, but 'jinmei.txt' doesn't include a Meaning column so the
+  // value is pulled from UCD.
+  auto& shrimp = **_data.findKanji("蝦");
+  EXPECT_EQ(shrimp.meaning(), "shrimp, prawn");
+  // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and reading are all
+  // pulled from UCD (and readings are converted to Kana).
+  auto& dull = **_data.findKanji("呆");
+  EXPECT_EQ(dull.radical(), _data.getRadical("口"));
+  EXPECT_EQ(dull.strokes(), 7);
+  EXPECT_EQ(dull.meaning(), "dull; dull-minded, simple, stupid");
+  // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD unfortunately
+  // don't have a dash before the Okurigana.
+  EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
   auto count = [this](const auto& p) { return std::count_if(_data.ucdMap().begin(), _data.ucdMap().end(), p); };
   EXPECT_EQ(_data.ucdMap().size(), 12460);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo(); }), 2136);
@@ -153,7 +167,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 64);
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : _data.ucdMap()) {
-    const Data::Ucd& k = i.second;
+    const Ucd& k = i.second;
     if (k.joyo() || k.jinmei())
       EXPECT_TRUE(isCommonKanji(k.name())) << k.codeAndName();
     else

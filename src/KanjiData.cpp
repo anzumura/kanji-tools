@@ -195,12 +195,10 @@ void KanjiData::printRadicals() const {
   log() << "Radical breakdown - total count for each name is followed by (Jouyou Jinmei Extra) counts:\n";
   std::map<Radical, Data::List> radicals;
   for (const auto& i : _types) {
-    if (Kanji::hasRadical(i.first)) {
-      Data::List sorted(i.second);
-      std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
-      for (const auto& j : sorted)
-        radicals[static_cast<const FileListKanji&>(*j).radical()].push_back(j);
-    }
+    Data::List sorted(i.second);
+    std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
+    for (const auto& j : sorted)
+      radicals[j->radical()].push_back(j);
   }
   int jouyou = 0, jinmei = 0, extra = 0;
   for (const auto& i : radicals) {

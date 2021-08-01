@@ -11,6 +11,7 @@ namespace fs = std::filesystem;
 
 using ::testing::_;
 using ::testing::Return;
+using ::testing::ReturnRef;
 
 class MockData : public Data {
 public:
@@ -25,6 +26,7 @@ public:
   }
   MOCK_METHOD(int, getFrequency, (const std::string&), (const, override));
   MOCK_METHOD(Levels, getLevel, (const std::string&), (const, override));
+  MOCK_METHOD(const Radical&, ucdRadical, (const std::string&), (const, override));
 private:
   void radical(const std::string& name) {
     _radicalMap[name] = _radicals.size();
@@ -95,14 +97,17 @@ protected:
 TEST_F(KanjiTest, OtherKanji) {
   int frequency = 2362;
   EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(frequency));
-  Kanji k(_data, 4, "呑");
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical(_)).WillOnce(ReturnRef(rad));
+  NonLinkedKanji k(_data, 4, "呑");
   EXPECT_EQ(k.type(), Types::Other);
   EXPECT_EQ(k.name(), "呑");
+  EXPECT_EQ(k.radical(), rad);
   EXPECT_EQ(k.number(), 4);
   EXPECT_EQ(k.frequency(), frequency);
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
-  EXPECT_EQ(k.info(), "Freq 2362");
+  EXPECT_EQ(k.info(), "Rad TestRadical, Freq 2362");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_FALSE(k.hasReading());
 }
@@ -110,15 +115,18 @@ TEST_F(KanjiTest, OtherKanji) {
 TEST_F(KanjiTest, OtherKanjiWithReading) {
   int frequency = 2362;
   EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(frequency));
-  ReadingKanji k(_data, 4, "呑", "トン、ドン、の-む");
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical(_)).WillOnce(ReturnRef(rad));
+  NonLinkedKanji k(_data, 4, "呑", "トン、ドン、の-む");
   EXPECT_EQ(k.type(), Types::Other);
   EXPECT_TRUE(k.is(Types::Other));
   EXPECT_EQ(k.name(), "呑");
+  EXPECT_EQ(k.radical(), rad);
   EXPECT_EQ(k.number(), 4);
   EXPECT_EQ(k.frequency(), frequency);
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
-  EXPECT_EQ(k.info(), "Freq 2362");
+  EXPECT_EQ(k.info(), "Rad TestRadical, Freq 2362");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_TRUE(k.hasReading());
   EXPECT_EQ(k.reading(), "トン、ドン、の-む");
@@ -248,6 +256,8 @@ Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
 1\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
   EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical("亙")).WillOnce(ReturnRef(rad));
   EXPECT_CALL(_data, getFrequency("亙")).WillOnce(Return(0));
   auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
   ASSERT_EQ(results.size(), 1);
@@ -265,7 +275,9 @@ Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
 
 TEST_F(KanjiTest, BadLinkedJinmei) {
   EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(2362));
-  auto other = std::make_shared<Kanji>(_data, 4, "呑");
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical("呑")).WillOnce(ReturnRef(rad));
+  auto other = std::make_shared<NonLinkedKanji>(_data, 4, "呑");
   try {
     LinkedJinmeiKanji k(_data, 7, "亙", other);
     FAIL() << "Expected std::domain_error";
@@ -350,6 +362,8 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_CALL(_data, getLevel("艶")).WillOnce(Return(Levels::N1));
   EXPECT_CALL(_data, getFrequency("艶")).WillOnce(Return(2207));
   EXPECT_CALL(_data, getFrequency("艷")).WillOnce(Return(0));
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical("艷")).WillOnce(ReturnRef(rad));
   auto results = FileListKanji::fromFile(_data, Types::Jouyou, _testFile);
   ASSERT_EQ(results.size(), 1);
   LinkedOldKanji k(_data, 7, "艷", results[0]);
@@ -361,12 +375,15 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_EQ(k.reading(), "エン、つや");
   EXPECT_EQ(k.meaning(), "glossy");
   EXPECT_EQ(k.link(), results[0]);
-  EXPECT_EQ(k.info(), "New 艶");
+  EXPECT_EQ(k.info(), "Rad TestRadical, New 艶");
 }
 
 TEST_F(KanjiTest, BadLinkedOld) {
-  EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(2362));
-  auto other = std::make_shared<Kanji>(_data, 4, "呑");
+  EXPECT_CALL(_data, getFrequency(_)).WillRepeatedly(Return(2362));
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  std::string name("呑");
+  EXPECT_CALL(_data, ucdRadical(name)).WillOnce(ReturnRef(rad));
+  auto other = std::make_shared<NonLinkedKanji>(_data, 4, name);
   try {
     LinkedOldKanji k(_data, 7, "艷", other);
     FAIL() << "Expected std::domain_error";

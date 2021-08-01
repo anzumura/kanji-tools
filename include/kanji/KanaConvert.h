@@ -1,13 +1,10 @@
 #ifndef KANJI_KANA_CONVERT_H
 #define KANJI_KANA_CONVERT_H
 
-#include <map>
+#include <kanji/Kana.h>
 #include <set>
-#include <string>
 
 namespace kanji {
-
-enum class CharType;
 
 // 'KanaConvert' supports converting between Rōmaji (ローマジ), Hiragana (平仮名) and Katakana
 // (片仮名). When Rōmaji is the output target, Revised Hepburn System (ヘボン式) is used, but

@@ -161,10 +161,10 @@ TEST(MBUtilsTest, IsKanji) {
   EXPECT_FALSE(isAllCommonKanji("厭が"));
   EXPECT_TRUE(isAllCommonKanji("厭猫"));
   EXPECT_FALSE(isRareKanji("厭"));
-  EXPECT_FALSE(isRareKanji("輸")); // Compatibility Supplement
   EXPECT_FALSE(isCommonKanji("⺠"));
   EXPECT_FALSE(isCommonKanji("㐀"));
   EXPECT_TRUE(isRareKanji("⺠"));
+  EXPECT_TRUE(isRareKanji("輸")); // Compatibility Supplement
   EXPECT_FALSE(isRareKanji("⺠h"));
   EXPECT_TRUE(isRareKanji("⺠h", false)); // checkLengthOne=false
   EXPECT_FALSE(isAllRareKanji("⺠h"));

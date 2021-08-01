@@ -1,4 +1,3 @@
-#include <kanji/Kana.h>
 #include <kanji/KanaConvert.h>
 #include <kanji/MBChar.h>
 #include <kanji/MBUtils.h>

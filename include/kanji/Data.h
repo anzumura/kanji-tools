@@ -2,7 +2,9 @@
 #define KANJI_DATA_H
 
 #include <kanji/FileList.h>
+#include <kanji/KanaConvert.h>
 #include <kanji/Radical.h>
+#include <kanji/Ucd.h>
 
 #include <memory>
 #include <optional>
@@ -57,6 +59,22 @@ public:
   // functions used by 'Kanji' classes during construction
   virtual int getFrequency(const std::string&) const = 0;
   virtual Levels getLevel(const std::string&) const = 0;
+  virtual const Radical& ucdRadical(const std::string& s) const {
+    const Ucd* u = findUcd(s);
+    if (u) return getRadical(u->radical());
+    // 'throw' should never happen - every 'Kanji' class instance should have also exist in the
+    // data loaded from Unicode.
+    throw std::domain_error("UCD entry not found: " + s);
+  }
+  // 'ucdMeaning' returns the 'meaning' loaded from UCD file for given 's'. Almost all kanji
+  // from UCD have meanings, but a few are empty. Also, return empty string if not found.
+  virtual const std::string& ucdMeaning(const std::string& s) const {
+    const Ucd* u = findUcd(s);
+    return u ? u->meaning() : Ucd::EmptyString;
+  }
+  // 'ucdReadingsToKana' finds the UCD kanji for 's' and returns one string starting with
+  // 'onReading' converted Katakana followed by 'kunReading' converted to Hiragana.
+  virtual std::string ucdReadingsToKana(const std::string& s) const;
   // 'getRadical' by the ideograph code in utf8 (not the unicode radical code). For example,
   // Radical number 30 (口) is Unicode 53E3, but has another 'Unicode Radical' value of 2F1D
   const Radical& getRadical(const std::string& name) const {
@@ -119,53 +137,6 @@ public:
   std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
   static int maxFrequency() { return _maxFrequency; }
 
-  // 'Ucd' holds the data loaded from 'ucd.txt' which is an extract from the official Unicode
-  // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
-  class Ucd {
-  public:
-    Ucd(wchar_t code, const std::string& name, int radical, int strokes, int variantStrokes, bool joyo, bool jinmei,
-        wchar_t linkCode, const std::string& linkName, const std::string& meaning, const std::string& onReading,
-        const std::string& kunReading)
-      : _code(code), _name(name), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes),
-        _joyo(joyo), _jinmei(jinmei), _linkCode(linkCode), _linkName(linkName), _meaning(meaning),
-        _onReading(onReading), _kunReading(kunReading) {}
-
-    wchar_t code() const { return _code; }
-    const std::string& name() const { return _name; }
-    int radical() const { return _radical; }
-    int strokes(bool variant = false) const { return _strokes; }
-    int variantStrokes() const { return _variantStrokes; }
-    bool joyo() const { return _joyo; }
-    bool jinmei() const { return _jinmei; }
-    // 'linkCode' returns 0 if there is no link (this is the same concept as LinkedjinmeiKanji class)
-    wchar_t linkCode() const { return _linkCode; }
-    const std::string& linkName() const { return _linkName; }
-    bool hasLink() const { return _linkCode != 0; }
-    const std::string& meaning() const { return _meaning; }
-    const std::string& onReading() const { return _onReading; }
-    const std::string& kunReading() const { return _kunReading; }
-    // '_variantStrokes' is set to 0 if there are no variants (see 'parseUcdAllFlat.sh' for more details)
-    bool hasVariantStrokes() const { return _variantStrokes != 0; }
-    // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
-    // it falls back to just return '_strokes'
-    int getStrokes(bool variant) const { return variant && hasVariantStrokes() ? _variantStrokes : _strokes; }
-    // 'codeAndName' methods return the Unicode in square brackets plus the name, e.g.: [FA30] 侮
-    std::string codeAndName() const;
-    std::string linkCodeAndName() const;
-  private:
-    const wchar_t _code;
-    const std::string _name;
-    const int _radical;
-    const int _strokes;
-    const int _variantStrokes;
-    const bool _joyo;
-    const bool _jinmei;
-    const wchar_t _linkCode;
-    const std::string _linkName;
-    const std::string _meaning;
-    const std::string _onReading;
-    const std::string _kunReading;
-  };
   using UcdMap = std::map<std::string, Ucd>;
   const UcdMap& ucdMap() const { return _ucdMap; }
   // 'findUcd' will return a pointer to a Ucd instance if 's' is in _ucdMap. If 's' has a
@@ -246,6 +217,9 @@ protected:
   // - otherwise it will be put in '_ucdLinkedOther'
   std::map<std::string, std::string> _ucdLinkedJinmei;
   std::map<std::string, std::string> _ucdLinkedOther;
+  // '_converter' is used by 'ucdReadingsToKana' to convert the Romaji readings loaded in from
+  // UCD to Katakana and Hiragana.
+  mutable KanaConvert _converter;
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
   static int _maxFrequency;
   static const List _emptyList;

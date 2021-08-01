@@ -8,11 +8,10 @@ namespace kanji {
 
 namespace fs = std::filesystem;
 
-const std::string Kanji::EmptyString = "";
-
-Kanji::Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency, Levels level)
+Kanji::Kanji(const Data& d, int number, const std::string& name, const Radical& radical, int strokes,
+             bool findFrequency, Levels level)
   : _number(number), _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
-    _nonVariantName(MBChar::withoutVariationSelector(name)), _strokes(strokes), _level(level),
+    _nonVariantName(MBChar::withoutVariationSelector(name)), _radical(radical), _strokes(strokes), _level(level),
     _frequency(findFrequency ? d.getFrequency(name) : 0) {
   assert(MBChar::length(_name) == 1);
 }
@@ -26,8 +25,7 @@ std::string Kanji::info(int infoFields) const {
     result += x;
   };
   auto t = type();
-  if (infoFields & RadicalField && hasRadical(t))
-    result += Rad + static_cast<const FileListKanji&>(*this).radical().name();
+  if (infoFields & RadicalField) result += Rad + radical().name();
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
   if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
   if (infoFields & LevelField && hasLevel()) add(Level + toString(level()));
