@@ -1,5 +1,6 @@
 #include <kanji/Kanji.h>
 #include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <fstream>
 #include <numeric>
@@ -45,6 +46,14 @@ const char* toString(Types x) {
   case Types::Extra: return "Extra";
   default: return "None";
   }
+}
+
+std::string Data::Ucd::codeAndName() const {
+  return toHex(_code, true, true) + " " + _name;
+}
+
+std::string Data::Ucd::linkCodeAndName() const {
+  return hasLink() ? toHex(_linkCode, true, true) + " " + _linkName : Kanji::EmptyString;
 }
 
 Types Data::getType(const std::string& name) const {
@@ -184,7 +193,7 @@ void Data::printError(const std::string& msg) const {
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- " << msg << std::setfill(' ') << '\n';
 }
 
-void Data::loadUcdData() {
+void Data::loadUcd() {
   auto file = _dataDir / UcdFile;
   int lineNum = 1, codeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1, joyoCol = -1,
       jinmeiCol = -1, linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
@@ -261,8 +270,14 @@ void Data::loadUcdData() {
       if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
       const bool joyo = getBool("Joyo", cols[joyoCol]);
       const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
+      if (joyo && jinmei) error("can't be both joyo and jinmei");
       const wchar_t linkCode = getWchar("LinkCode", cols[linkCodeCol], true);
-      if (linkCode > 0 && cols[linkNameCol].empty()) error("missing link name");
+      if (linkCode > 0) {
+        if (cols[linkNameCol].empty()) error("missing link name");
+        // Joyo are standard Kanji so they shouldn't have a link back to a standard form. However,
+        // Some Jinmei do have links since they are 'officially allowed variants/old forms'.
+        if (joyo) error("joyo shouldn't have a link");
+      }
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
       if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
       if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");

@@ -152,11 +152,21 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ(count([](auto& i) { return i.second.joyo() && i.second.hasLink(); }), 0);
   EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 64);
   // every 'linkName' should be different than 'name' and also exist in the map
-  for (auto& i : _data.ucdMap())
-    if (i.second.hasLink()) {
-      EXPECT_NE(i.second.name(), i.second.linkName());
-      EXPECT_TRUE(_data.ucdMap().contains(i.second.linkName()));
+  for (auto& i : _data.ucdMap()) {
+    const Data::Ucd& k = i.second;
+    if (k.joyo() || k.jinmei())
+      EXPECT_TRUE(isCommonKanji(k.name())) << k.codeAndName();
+    else
+      EXPECT_TRUE(isKanji(k.name())) << k.codeAndName();
+    if (k.hasLink()) {
+      EXPECT_NE(k.name(), k.linkName());
+      EXPECT_TRUE(_data.ucdMap().contains(k.linkName()));
     }
+    EXPECT_FALSE(k.joyo() && k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
+    // if 'variantStrokes' is present it should be different than 'strokes'
+    if (k.hasVariantStrokes())
+      EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
+  }
   // Make sure all Kanji are in Kanji related Unicode blocks
   EXPECT_EQ(checkKanji(_data.jouyouKanji()), 0);
   EXPECT_EQ(checkKanji(_data.jinmeiKanji()), 0);

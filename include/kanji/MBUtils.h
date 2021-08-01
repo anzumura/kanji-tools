@@ -32,18 +32,21 @@ template<typename T> inline std::string toBinary(T x) {
   return result;
 }
 
-template<typename T> inline std::string toHex(T x, bool caps = false) {
+template<typename T> inline std::string toHex(T x, bool caps = false, bool squareBrackets = false) {
   std::string result;
   for (; x > 0; x >>= 4) {
     const auto i = x % 16;
     result.insert(result.begin(), (i < 10 ? '0' + i : (caps ? 'A' : 'a') + i - 10));
   }
+  if (squareBrackets) result = '[' + result + ']';
   return result;
 }
 
 // provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
 template<> inline std::string toBinary(char x) { return toBinary(static_cast<unsigned char>(x)); }
-template<> inline std::string toHex(char x, bool caps) { return toHex(static_cast<unsigned char>(x), caps); }
+template<> inline std::string toHex(char x, bool caps, bool squareBrackets) {
+  return toHex(static_cast<unsigned char>(x), caps, squareBrackets);
+}
 
 // 'toUnicode' converts a UTF-8 string into space-separated Unicode code point values
 inline std::string toUnicode(const std::string& s, bool caps = true) {
@@ -85,8 +88,9 @@ constexpr std::array CommonKanjiBlocks = {
   UnicodeBlock(0x20000, 0x2a6df) // CJK Extension B (ver 3.1 March 2001, ~42K): 𠮟
 };
 constexpr std::array RareKanjiBlocks = {
-  UnicodeBlock{0x2e80, 0x2eff}, // CJK Radicals Supplement (ver 3.0 Sep 1999, 128)
-  UnicodeBlock{0x3400, 0x4dbf}  // CJK Extension A (ver 3.0 Sep 1999, ~6K kanji)
+  UnicodeBlock{0x2e80, 0x2eff},  // CJK Radicals Supplement (ver 3.0 Sep 1999, 128)
+  UnicodeBlock{0x3400, 0x4dbf},  // CJK Extension A (ver 3.0 Sep 1999, ~6K kanji)
+  UnicodeBlock{0x2f800, 0x2fa1f} // CJK Compatibility Ideographs Supplement (ver 3.1 Mar 2001, ~6K kanji)
 };
 constexpr std::array PunctuationBlocks = {
   UnicodeBlock{0x2000, 0x206f}, // General MB Punctuation: —, ‥, ”, “
@@ -238,7 +242,7 @@ inline bool isAllSingleByte(const std::wstring& s) {
 
 // KanjiRange includes both the 'rare block' and the 'common block' defined above
 constexpr wchar_t KanjiRange[] = L"\u2e80-\u2eff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\
-\ufe00-\ufe0f\U00020000-\U0002a6df";
+\ufe00-\ufe0f\U00020000-\U0002a6df\U0002f800-\U0002fa1f";
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
 constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";

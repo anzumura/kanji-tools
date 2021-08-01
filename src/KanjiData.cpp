@@ -1,5 +1,6 @@
 #include <kanji/Group.h>
 #include <kanji/KanjiData.h>
+#include <kanji/MBUtils.h>
 
 namespace kanji {
 
@@ -29,7 +30,7 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
   loadStrokes(FileList::getFile(_dataDir, StrokesFile));
   loadStrokes(FileList::getFile(_dataDir, WikiStrokesFile), false);
-  loadUcdData();
+  loadUcd();
   loadOtherReadings(FileList::getFile(_dataDir, OtherReadingsFile));
   populateJouyou();
   populateJinmei();
@@ -47,6 +48,7 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
     printGrades();
     printLevels();
     printRadicals();
+    printUcdStats();
   }
 }
 
@@ -235,6 +237,67 @@ void KanjiData::printRadicals() const {
     for (const auto& i : missingRadicals)
       _out << ' ' << i;
     _out << '\n';
+  }
+}
+
+void KanjiData::printUcdStats() const {
+  // Some combinations are prevented by 'Data::loadUcd' (like Joyo with a link or missing meaning), but
+  // count all cases here for completeness.
+  struct Count {
+    int count = 0;
+    int link = 0;
+    int variantStrokes = 0;
+    int meaning = 0;
+    int onReading = 0;
+    int kunReading = 0;
+    void add(const Ucd& k) {
+      ++count;
+      if (k.hasLink()) ++link;
+      if (k.hasVariantStrokes()) ++variantStrokes;
+      if (!k.meaning().empty()) ++meaning;
+      if (!k.onReading().empty()) ++onReading;
+      if (!k.kunReading().empty()) ++kunReading;
+    }
+  };
+  auto print = [this](const char* s, int x, int y, int z) {
+    log() << "  " << s << ": " << x + y + z << " (Jouyou " << x << ", Jinmei " << y << ", Other " << z << ")\n";
+  };
+  Count joyo;
+  Count jinmei;
+  Count other;
+  log() << "Kanji Loaded from Unicode 'ucd' file:\n";
+  for (const auto& i : _ucdMap) {
+    const auto& k = i.second;
+    if (k.joyo()) {
+      // Can't be both Joyo and Jinmei (non-overlapping sets) - this is prevented by 'Data::loadUcdData'
+      if (k.jinmei()) printError(k.name() + " is both joyo and jinmei");
+      joyo.add(k);
+    } else {
+      if (k.jinmei())
+        jinmei.add(k);
+      else
+        other.add(k);
+    }
+  }
+  print("Total", joyo.count, jinmei.count, other.count);
+  print("Links", joyo.link, jinmei.link, other.link);
+  print("VStrokes", joyo.variantStrokes, jinmei.variantStrokes, other.variantStrokes);
+  print("Meanings", joyo.meaning, jinmei.meaning, other.meaning);
+  print("On Readdings", joyo.onReading, jinmei.onReading, other.onReading);
+  print("Kun Readings", joyo.kunReading, jinmei.kunReading, other.kunReading);
+  log() << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
+  for (const auto& i : _map) {
+    const Kanji& k = *i.second;
+    if (k.variant()) {
+      log() << "  - [" << toUnicode(k.name()) << "] " << k.name() << ", variant of " << k.nonVariantName() << " --- ";
+      const Ucd* u = findUcd(k.name());
+      if (u) {
+        out() << u->codeAndName() << " " << u->name();
+        if (u->hasLink()) out() << ", variant of " << u->linkCodeAndName() << " " << u->linkName();
+      } else
+        out() << "UCD not found";
+      out() << '\n';
+    }
   }
 }
 

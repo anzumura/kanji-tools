@@ -40,15 +40,16 @@ TEST(MBUtilsTest, CheckNoOverlappingRanges) {
   // make sure 'WideBlocks' (from generated code) has no overlaps
   checkRange(WideBlocks, nullptr, false);
   // check 'range' strings (used in regex calls to remove furigana)
-  ASSERT_EQ(std::size(KanjiRange), 19);
+  ASSERT_EQ(std::size(KanjiRange), 22);
   ASSERT_EQ(CommonKanjiBlocks.size(), 3);
-  ASSERT_EQ(RareKanjiBlocks.size(), 2);
+  ASSERT_EQ(RareKanjiBlocks.size(), 3);
   ASSERT_EQ(NonSpacingBlocks.size(), 1);
   EXPECT_EQ(CommonKanjiBlocks[0].range(), 20992);
   EXPECT_EQ(CommonKanjiBlocks[1].range(), 512);
   EXPECT_EQ(CommonKanjiBlocks[2].range(), 42720);
   EXPECT_EQ(RareKanjiBlocks[0].range(), 128);
   EXPECT_EQ(RareKanjiBlocks[1].range(), 6592);
+  EXPECT_EQ(RareKanjiBlocks[2].range(), 544);
   EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
   EXPECT_EQ(KanjiRange[0], RareKanjiBlocks[0].start);
   EXPECT_EQ(KanjiRange[2], RareKanjiBlocks[0].end);
@@ -62,6 +63,8 @@ TEST(MBUtilsTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(KanjiRange[14], NonSpacingBlocks[0].end);
   EXPECT_EQ(KanjiRange[15], CommonKanjiBlocks[2].start);
   EXPECT_EQ(KanjiRange[17], CommonKanjiBlocks[2].end);
+  EXPECT_EQ(KanjiRange[18], RareKanjiBlocks[2].start);
+  EXPECT_EQ(KanjiRange[20], RareKanjiBlocks[2].end);
   ASSERT_EQ(std::size(HiraganaRange), 4);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
@@ -158,6 +161,7 @@ TEST(MBUtilsTest, IsKanji) {
   EXPECT_FALSE(isAllCommonKanji("厭が"));
   EXPECT_TRUE(isAllCommonKanji("厭猫"));
   EXPECT_FALSE(isRareKanji("厭"));
+  EXPECT_FALSE(isRareKanji("輸")); // Compatibility Supplement
   EXPECT_FALSE(isCommonKanji("⺠"));
   EXPECT_FALSE(isCommonKanji("㐀"));
   EXPECT_TRUE(isRareKanji("⺠"));
@@ -210,6 +214,9 @@ TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex(s[0]), "ef");
   EXPECT_EQ(toHex(s[1]), "bf");
   EXPECT_EQ(toHex(s[2]), "bc");
+  EXPECT_EQ(toHex(s[2], true), "BC");
+  EXPECT_EQ(toHex(s[2], false, true), "[bc]");
+  EXPECT_EQ(toHex(s[2], true, true), "[BC]");
 }
 
 TEST(MBUtilsTest, ToUnicode) {
@@ -258,9 +265,9 @@ TEST(MBUtilsTest, DisplayLength) {
   EXPECT_EQ(displayLength("㐀中1234　"), 10);
   // don't include non-spacing characters
   std::string s = "逸︁";
-  EXPECT_EQ(s.length(), 6); // two 3-byte sequences
+  EXPECT_EQ(s.length(), 6);             // two 3-byte sequences
   EXPECT_EQ(toUnicode(s), "9038 FE01"); // 'FE01' is a variation selector
-  EXPECT_EQ(displayLength(s), 2); // should be 2 for the single displayable wide char
+  EXPECT_EQ(displayLength(s), 2);       // should be 2 for the single displayable wide char
   // try a character beyond BMP
   EXPECT_EQ(displayLength("𠮟"), 2);
 }

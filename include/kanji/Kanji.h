@@ -107,15 +107,15 @@ public:
     if (i.has_value()) return d.getFrequency(*i);
     return 0;
   }
+  // Not all 'Other' type Kanji have 'readings' and only 'Jouyou' and 'Extra' type kanji
+  // currently have English 'meaning' - for these cases use 'EmptyString'.
+  static const std::string EmptyString;
 protected:
   // helper constructor for derived classes (can avoid looking up frequency for 'extra' kanji)
   Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency)
     : Kanji(d, number, name, strokes, findFrequency, d.getLevel(name)) {}
   Kanji(const Data& d, int number, const std::string& name, int strokes, bool findFrequency, Levels level);
 private:
-  // Not all 'Other' type Kanji have 'readings' and only 'Jouyou' and 'Extra' type kanji
-  // currently have English 'meaning' - for these cases use 'EmptyString'.
-  static const std::string EmptyString;
   const int _number;
   const std::string _name;
   const bool _variant;

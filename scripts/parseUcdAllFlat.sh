@@ -151,6 +151,7 @@ while read -r i; do
   s=${s##*+}               # remove the 'C+num+' prefix
   s=${s#*\.}               # get 'y.z' (by removing the shortest prefix to .)
   strokes=$((${s/\./ + })) # y + z
+  vstrokes=                # only set if there's variant with a different count
   # If there are mutiple Adobe refs then check get 'VStrokes' from the second
   # one in the list. Some have more than two refs like 傑 (5091) having:
   # -  kRSAdobe_Japan1_6="C+1852+9.2.11 V+13433+9.2.11 V+13743+9.2.10"
@@ -165,30 +166,34 @@ while read -r i; do
   if [[ ${kRSAdobe_Japan1_6} =~ ' ' ]]; then
     s=${kRSAdobe_Japan1_6#*\ } # remove the first adobe ref
     getFirst kTotalStrokes "$i"
+    secondEntry=true
     for s in $s; do
       # Same as 'strokes' above, i.e, remove 'V+num+', get y.z and then add
       s=${s##*+}
       vradical=${s%%\.*}
       s=${s#*\.}
-      vstrokes=$((${s/\./ + }))
-      if [ $strokes -ne $vstrokes ]; then
-        if [ $kRSUnicode = $vradical.${s#*\.} ]; then
-          if [ $kTotalStrokes -eq $vstrokes ]; then
-            s=$strokes
-            strokes=$vstrokes
-            vstrokes=$s
+      newStrokes=$((${s/\./ + }))
+      if [ $strokes -ne $newStrokes ]; then
+        if $secondEntry && [ $kRSUnicode = $vradical.${s#*\.} ]; then
+          if [ $kTotalStrokes -eq $newStrokes ]; then
+            # flip strokes and vstrokes
+            vstrokes=$strokes
+            strokes=$newStrokes
+          else
+            vstrokes=$newStrokes
           fi
+        else
+          vstrokes=$newStrokes
         fi
+        break
       fi
-      # Only process the loop once (so the second entry) for now. Strokes and
+      # Only allow flipping strokes up to the second entry for now. Strokes and
       # radicals mostly match official Joyo and Jinmei charts, but there are
       # still some differences and trying to get exact matches in from ucd data
       # may not be possible (even some dictionaries disagree about radicals and
       # total stroke counts here are there).
-      break
+      secondEntry=false
     done
-  else
-    vstrokes= # don't print a 'VStrokes' if there was only one entry
   fi
   # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
   [ -n "$linkTo" ] && s="\U$linkTo" || s=

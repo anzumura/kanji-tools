@@ -71,8 +71,8 @@ public:
       auto i = _strokes.find(s);
       if (i != _strokes.end()) return i->second;
     }
-    auto i = _ucdMap.find(s);
-    return i == _ucdMap.end() ? 0 : i->second.getStrokes(variant);
+    auto i = findUcd(s);
+    return i ? i->strokes() : 0;
   }
 
   // get kanji lists
@@ -149,6 +149,9 @@ public:
     // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
     // it falls back to just return '_strokes'
     int getStrokes(bool variant) const { return variant && hasVariantStrokes() ? _variantStrokes : _strokes; }
+    // 'codeAndName' methods return the Unicode in square brackets plus the name, e.g.: [FA30] 侮
+    std::string codeAndName() const;
+    std::string linkCodeAndName() const;
   private:
     const wchar_t _code;
     const std::string _name;
@@ -166,7 +169,8 @@ public:
   using UcdMap = std::map<std::string, Ucd>;
   const UcdMap& ucdMap() const { return _ucdMap; }
   // 'findUcd' will return a pointer to a Ucd instance if 's' is in _ucdMap. If 's' has a
-  // 'variation selector' then _ucdVariants is used to map to the variant form.
+  // 'variation selector' then _ucdLinkedJinmei then _ucdLinkedOther maps are used to get
+  // a Ucd variant (the variant returned is the same displayed character for Jinmei ones)
   const Ucd* findUcd(const std::string& s) const;
   // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not used by this
   // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then
@@ -188,8 +192,8 @@ protected:
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
   bool checkNotFound(const Entry&) const;
-  // 'loadUcdData' populated _ucdMap from data in 'ucd.txt'
-  void loadUcdData();
+  // 'loadUcd' populated _ucdMap from data in 'ucd.txt'
+  void loadUcd();
   // 'loadRadicals', 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
   void loadRadicals(const std::filesystem::path&);
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
