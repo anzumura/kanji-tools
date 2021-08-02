@@ -164,57 +164,6 @@ void Data::printError(const std::string& msg) const {
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- " << msg << std::setfill(' ') << '\n';
 }
 
-void Data::loadRadicals(const fs::path& file) {
-  int lineNum = 1, numberCol = -1, nameCol = -1, longNameCol = -1, readingCol = -1;
-  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) + ", file: " + file.string());
-  };
-  auto setCol = [&file, &error](int& col, int pos) {
-    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
-    col = pos;
-  };
-  std::ifstream f(file);
-  std::array<std::string, 4> cols;
-  for (std::string line; std::getline(f, line); ++lineNum) {
-    int pos = 0;
-    std::stringstream ss(line);
-    if (numberCol == -1) {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Number")
-          setCol(numberCol, pos);
-        else if (token == "Name")
-          setCol(nameCol, pos);
-        else if (token == "LongName")
-          setCol(longNameCol, pos);
-        else if (token == "Reading")
-          setCol(readingCol, pos);
-        else
-          error("unrecognized column '" + token + "'", false);
-      if (pos != cols.size()) error("not enough columns", false);
-    } else {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) error("too many columns");
-        cols[pos] = token;
-      }
-      if (pos != cols.size())
-        error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
-      const int radicalNumber = UcdData::toInt(cols[numberCol]);
-      if (radicalNumber + 1 != lineNum) error("radicals must be ordered by 'number'");
-      std::stringstream radicals(cols[nameCol]);
-      Radical::AltForms altForms;
-      std::string name, token;
-      while (std::getline(radicals, token, ' '))
-        if (name.empty())
-          name = token;
-        else
-          altForms.emplace_back(token);
-      _radicals.emplace_back(radicalNumber, name, altForms, cols[longNameCol], cols[readingCol]);
-    }
-  }
-  for (auto& i : _radicals)
-    _radicalMap[i.name()] = i.number() - 1;
-}
-
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
   std::string line;

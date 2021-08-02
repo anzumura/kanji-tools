@@ -16,10 +16,6 @@ using ::testing::ReturnRef;
 class MockData : public Data {
 public:
   MockData(const fs::path& p) : Data(p, false) {
-    radical("雨");
-    radical("二");
-    radical("心");
-    radical("色");
     strokes("亘", 6);
     strokes("亙", 6);
     strokes("云", 6);
@@ -27,15 +23,9 @@ public:
   MOCK_METHOD(int, getFrequency, (const std::string&), (const, override));
   MOCK_METHOD(Levels, getLevel, (const std::string&), (const, override));
   MOCK_METHOD(const Radical&, ucdRadical, (const std::string&), (const, override));
+  MOCK_METHOD(const Radical&, getRadicalByName, (const std::string&), (const, override));
 private:
-  void radical(const std::string& name) {
-    _radicalMap[name] = _radicals.size();
-    // construct a fake radical with 'number' one bigger than index in _radicals
-    _radicals.emplace_back(_radicals.size(), name, Radical::AltForms(), "", "");
-  }
-  void strokes(const std::string& name, int count) {
-    _strokes.insert(std::make_pair(name, count));
-  }
+  void strokes(const std::string& kanjiName, int count) { _strokes.insert(std::make_pair(kanjiName, count)); }
 };
 
 class KanjiTest : public ::testing::Test {
@@ -137,6 +127,8 @@ TEST_F(KanjiTest, ExtraFile) {
 Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
 1\t霙\t雨\t16\tsleet\tエイ、ヨウ、みぞれ");
   EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(Levels::None));
+  Radical rad(1, "雨", {}, "", "");
+  EXPECT_CALL(_data, getRadicalByName("雨")).WillOnce(ReturnRef(rad));
   auto results = FileListKanji::fromFile(_data, Types::Extra, _testFile);
   ASSERT_EQ(results.size(), 1);
   checkExtraKanji(*results[0]);
@@ -147,6 +139,8 @@ TEST_F(KanjiTest, ExtraFileWithDifferentColumnOrder) {
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(Levels::None));
+  Radical rad(1, "雨", {}, "", "");
+  EXPECT_CALL(_data, getRadicalByName("雨")).WillOnce(ReturnRef(rad));
   auto results = FileListKanji::fromFile(_data, Types::Extra, _testFile);
   ASSERT_EQ(results.size(), 1);
   checkExtraKanji(*results[0]);
@@ -232,6 +226,8 @@ Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
   EXPECT_CALL(_data, getFrequency("云")).WillOnce(Return(0));
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
   EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
+  Radical rad(1, "二", {}, "", "");
+  EXPECT_CALL(_data, getRadicalByName("二")).WillRepeatedly(ReturnRef(rad));
   auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
   ASSERT_EQ(results.size(), 2);
 
@@ -257,6 +253,7 @@ Number\tName\tRadical\tOldName\tYear\tReason\tReading\n\
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(Levels::N1));
   EXPECT_CALL(_data, getFrequency("亘")).WillOnce(Return(1728));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, getRadicalByName("二")).WillOnce(ReturnRef(rad));
   EXPECT_CALL(_data, ucdRadical("亙")).WillOnce(ReturnRef(rad));
   EXPECT_CALL(_data, getFrequency("亙")).WillOnce(Return(0));
   auto results = FileListKanji::fromFile(_data, Types::Jinmei, _testFile);
@@ -307,6 +304,10 @@ TEST_F(KanjiTest, JouyouFile) {
 Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 4\t愛\t心\t\t\t13\t4\tlove\tアイ\n\
 103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
+  Radical heart(1, "心", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, getRadicalByName("心")).WillOnce(ReturnRef(heart));
+  Radical color(1, "色", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, getRadicalByName("色")).WillOnce(ReturnRef(color));
   EXPECT_CALL(_data, getLevel("愛")).WillOnce(Return(Levels::N3));
   EXPECT_CALL(_data, getFrequency("愛")).WillOnce(Return(640));
   EXPECT_CALL(_data, getLevel("艶")).WillOnce(Return(Levels::N1));
@@ -364,6 +365,7 @@ Number\tName\tRadical\tOldName\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_CALL(_data, getFrequency("艷")).WillOnce(Return(0));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical("艷")).WillOnce(ReturnRef(rad));
+  EXPECT_CALL(_data, getRadicalByName(_)).WillRepeatedly(ReturnRef(rad));
   auto results = FileListKanji::fromFile(_data, Types::Jouyou, _testFile);
   ASSERT_EQ(results.size(), 1);
   LinkedOldKanji k(_data, 7, "艷", results[0]);

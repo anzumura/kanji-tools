@@ -57,6 +57,7 @@ public:
     OldField = 64,
     AllFields = 127
   };
+
   // 'info' returns a comma separated string with extra info (if present) including:
   //   Radical, Strokes, Grade, Level, Freq, New, Old
   // 'infoFields' can be used to control inclusion of fields (include all by default).
@@ -133,6 +134,7 @@ public:
 protected:
   LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
     : Kanji(d, number, name), _link(link) {}
+
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
   static const std::string& checkType(const std::string& name, const Data::Entry& link, bool isJinmei = false) {
     Types t = link->type();
@@ -150,6 +152,7 @@ class LinkedJinmeiKanji : public LinkedKanji {
 public:
   LinkedJinmeiKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
     : LinkedKanji(d, number, checkType(name, link, true), link) {}
+
   Types type() const override { return Types::LinkedJinmei; }
 };
 
@@ -157,6 +160,7 @@ class LinkedOldKanji : public LinkedKanji {
 public:
   LinkedOldKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
     : LinkedKanji(d, number, checkType(name, link), link) {}
+
   Types type() const override { return Types::LinkedOld; }
 };
 
@@ -166,10 +170,10 @@ class NonLinkedKanji : public Kanji {
 public:
   // public constructor used for 'Other' kanji with readings from 'other-readings.txt'
   NonLinkedKanji(const Data& d, int number, const std::string& name, const std::string& reading)
-    : Kanji(d, number, name), _meaning(d.ucdData().getMeaning(name)), _reading(reading) {}
+    : Kanji(d, number, name), _meaning(d.ucd().getMeaning(name)), _reading(reading) {}
   // public constructor used for 'Other' kanji without a reading (will look up from UCD instead)
   NonLinkedKanji(const Data& d, int number, const std::string& name)
-    : NonLinkedKanji(d, number, name, d.ucdData().getReadingsAsKana(name)) {}
+    : NonLinkedKanji(d, number, name, d.ucd().getReadingsAsKana(name)) {}
 
   Types type() const override { return Types::Other; }
   const std::string& meaning() const override { return _meaning; }
@@ -181,7 +185,7 @@ protected:
     : Kanji(d, number, name, radical, strokes, findFrequency), _meaning(meaning), _reading(reading) {}
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& reading,
                  int strokes, bool findFrequency)
-    : NonLinkedKanji(d, number, name, radical, d.ucdData().getMeaning(name), reading, strokes, findFrequency) {}
+    : NonLinkedKanji(d, number, name, radical, d.ucd().getMeaning(name), reading, strokes, findFrequency) {}
 private:
   const std::string _meaning;
   const std::string _reading;
@@ -216,14 +220,15 @@ protected:
   static std::array<std::string, MaxCol> columns;
 
   FileListKanji(const Data& d, int strokes, bool findFrequency = true)
-    : NonLinkedKanji(d, UcdData::toInt(columns[NumberCol]), columns[NameCol], d.getRadical(columns[RadicalCol]),
+    : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
                      columns[ReadingCol], strokes, findFrequency) {}
   FileListKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true)
-    : NonLinkedKanji(d, UcdData::toInt(columns[NumberCol]), columns[NameCol], d.getRadical(columns[RadicalCol]),
+    : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
                      meaning, columns[ReadingCol], strokes, findFrequency) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
+
   // specific types require additional columns
   static constexpr std::array jouyouRequiredColumns{OldNameCol, YearCol, StrokesCol, GradeCol, MeaningCol};
   static constexpr std::array jinmeiRequiredColumns{OldNameCol, YearCol, ReasonCol};
@@ -238,6 +243,7 @@ private:
 class OfficialListKanji : public FileListKanji {
 public:
   using OptInt = std::optional<int>;
+
   OptString oldName() const override { return _oldName; }
   OptInt year() const { return _year; }
 protected:
@@ -247,10 +253,12 @@ protected:
     : FileListKanji(d, s, meaning), _oldName(optString(columns[OldNameCol])), _year(optInt(columns[YearCol])) {}
 private:
   static OptString optString(const std::string& s) { return s.empty() ? std::nullopt : std::optional(s); }
+
   static OptInt optInt(const std::string& s) {
     if (s.empty()) return {};
-    return UcdData::toInt(s);
+    return Data::toInt(s);
   }
+
   const OptString _oldName;
   const OptInt _year;
 };
@@ -266,6 +274,7 @@ public:
   enum class Reasons { Names, Print, Variant, Moved, Other };
   JinmeiKanji(const Data& d)
     : OfficialListKanji(d, d.getStrokes(columns[NameCol])), _reason(getReason(columns[ReasonCol])) {}
+
   Types type() const override { return Types::Jinmei; }
   Reasons reason() const { return _reason; }
 private:
@@ -275,15 +284,17 @@ private:
 
 class ExtraKanji : public FileListKanji {
 public:
-  ExtraKanji(const Data& d) : FileListKanji(d, UcdData::toInt(columns[StrokesCol]), columns[MeaningCol], false) {}
+  ExtraKanji(const Data& d) : FileListKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol], false) {}
+
   Types type() const override { return Types::Extra; }
 };
 
 class JouyouKanji : public OfficialListKanji {
 public:
   JouyouKanji(const Data& d)
-    : OfficialListKanji(d, UcdData::toInt(columns[StrokesCol]), columns[MeaningCol]),
-      _grade(getGrade(columns[GradeCol])) {}
+    : OfficialListKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]), _grade(getGrade(columns[GradeCol])) {
+  }
+
   Types type() const override { return Types::Jouyou; }
   Grades grade() const override { return _grade; }
 private:

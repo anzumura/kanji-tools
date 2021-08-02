@@ -1,5 +1,7 @@
-#include <kanji/UcdData.h>
+#include <kanji/Data.h>
+#include <kanji/Kanji.h>
 #include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <fstream>
 #include <sstream>
@@ -45,7 +47,8 @@ void UcdData::load(const std::filesystem::path& file) {
   int lineNum = 1, codeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1, joyoCol = -1,
       jinmeiCol = -1, linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) + ", file: " + file.string());
+    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
+                ", file: " + file.string());
   };
   auto getWchar = [&error](const std::string& col, const auto& s, bool allowEmpty = false) -> wchar_t {
     if (s.empty() && allowEmpty) return 0;
@@ -109,11 +112,11 @@ void UcdData::load(const std::filesystem::path& file) {
       const wchar_t code = getWchar("Unicode", cols[codeCol]);
       const auto& name = cols[nameCol];
       if (name.length() > 4) error("name greater than 4");
-      const int radical = toInt(cols[radicalCol]);
+      const int radical = Data::toInt(cols[radicalCol]);
       if (radical < 1 || radical > 214) error("radical out of range");
-      const int strokes = toInt(cols[strokesCol]);
+      const int strokes = Data::toInt(cols[strokesCol]);
       if (strokes < 1 || strokes > 33) error("strokes out of range");
-      const int variantStrokes = cols[variantStrokesCol].empty() ? 0 : toInt(cols[variantStrokesCol]);
+      const int variantStrokes = cols[variantStrokesCol].empty() ? 0 : Data::toInt(cols[variantStrokesCol]);
       if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
       const bool joyo = getBool("Joyo", cols[joyoCol]);
       const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
@@ -147,7 +150,7 @@ void UcdData::load(const std::filesystem::path& file) {
   }
 }
 
-void UcdData::printStats() const {
+void UcdData::print(const Data& data) const {
   // Some combinations are prevented by 'load' function (like Joyo with a link or missing
   // meaning), but count all cases here for completeness.
   struct Count {
@@ -166,13 +169,13 @@ void UcdData::printStats() const {
       if (!k.kunReading().empty()) ++kunReading;
     }
   };
-  auto print = [this](const char* s, int x, int y, int z) {
-    log() << "  " << s << ": " << x + y + z << " (Jouyou " << x << ", Jinmei " << y << ", Other " << z << ")\n";
+  auto print = [&data](const char* s, int x, int y, int z) {
+    data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x << ", Jinmei " << y << ", Other " << z << ")\n";
   };
   Count joyo;
   Count jinmei;
   Count other;
-  log() << "Kanji Loaded from Unicode 'ucd' file:\n";
+  data.log() << "Kanji Loaded from Unicode 'ucd' file:\n";
   for (const auto& i : _map) {
     const auto& k = i.second;
     if (k.joyo())
@@ -190,7 +193,24 @@ void UcdData::printStats() const {
   print("Meanings", joyo.meaning, jinmei.meaning, other.meaning);
   print("On Readdings", joyo.onReading, jinmei.onReading, other.onReading);
   print("Kun Readings", joyo.kunReading, jinmei.kunReading, other.kunReading);
-  log() << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
+  data.log() << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
+  int count = 0;
+  data.log() << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
+  data.log() << "    -      ----------------------------    -----------------------\n";
+  for (const auto& i : data.map()) {
+    const Kanji& k = *i.second;
+    if (k.variant()) {
+      data.log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    ["
+                 << toUnicode(k.name()) << "] " << k.name() << " variant of " << k.nonVariantName() << "    ";
+      auto u = find(k.name());
+      if (u) {
+        data.out() << u->codeAndName();
+        if (u->hasLink()) data.out() << " variant of " << u->linkCodeAndName();
+      } else
+        data.out() << "UCD not found";
+      data.out() << '\n';
+    }
+  }
 }
 
 } // namespace kanji

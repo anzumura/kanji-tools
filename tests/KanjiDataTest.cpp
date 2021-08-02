@@ -100,7 +100,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
   EXPECT_EQ(_data.getStrokes("廳"), 25);
   // radical
-  auto radical = _data.getRadical("鹿");
+  auto radical = _data.getRadicalByName("鹿");
   EXPECT_EQ(radical.number(), 198);
   EXPECT_EQ(radical.name(), "鹿");
   EXPECT_EQ(radical.longName(), "鹿部（ろくぶ）");
@@ -111,7 +111,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto& k = **result;
   EXPECT_EQ(k.type(), Types::LinkedOld);
   EXPECT_EQ(k.name(), "響");
-  EXPECT_EQ(k.radical(), _data.getRadical(180));
+  EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
@@ -152,13 +152,13 @@ TEST_F(KanjiDataTest, UcdChecks) {
   // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and reading are all
   // pulled from UCD (and readings are converted to Kana).
   auto& dull = **_data.findKanji("呆");
-  EXPECT_EQ(dull.radical(), _data.getRadical("口"));
+  EXPECT_EQ(dull.radical(), _data.getRadicalByName("口"));
   EXPECT_EQ(dull.strokes(), 7);
   EXPECT_EQ(dull.meaning(), "dull; dull-minded, simple, stupid");
   // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD unfortunately
   // don't have a dash before the Okurigana.
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
-  auto& ucd = _data.ucdData().map();
+  auto& ucd = _data.ucd().map();
   auto count = [&ucd](const auto& p) { return std::count_if(ucd.begin(), ucd.end(), p); };
   EXPECT_EQ(ucd.size(), 12460);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo(); }), 2136);

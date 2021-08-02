@@ -11,6 +11,7 @@ namespace kanji {
 class KanjiData : public Data {
 public:
   KanjiData(int argc, const char** argv, std::ostream& out = std::cout, std::ostream& err = std::cerr);
+
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
   Levels getLevel(const std::string&) const override;
@@ -21,8 +22,7 @@ private:
   void printStats() const;
   void printGrades() const;
   void printLevels() const;
-  void printRadicals() const;
-  void printVariantDetails() const;
+
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;

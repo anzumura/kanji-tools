@@ -28,11 +28,11 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
     _n2(_dataDir / N2File, Levels::N2, _debug), _n1(_dataDir / N1File, Levels::N1, _debug),
     _frequency(_dataDir / FrequencyFile, Levels::None, _debug) {
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
-  loadRadicals(FileList::getFile(_dataDir, RadicalsFile));
+  _ucd.load(FileList::getFile(_dataDir, UcdFile));
+  _radicals.load(FileList::getFile(_dataDir, RadicalsFile));
   loadStrokes(FileList::getFile(_dataDir, StrokesFile));
   loadStrokes(FileList::getFile(_dataDir, WikiStrokesFile), false);
   loadOtherReadings(FileList::getFile(_dataDir, OtherReadingsFile));
-  _ucd.load(_dataDir / UcdFile);
   populateJouyou();
   populateJinmei();
   populateExtra();
@@ -48,9 +48,8 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
     printStats();
     printGrades();
     printLevels();
-    printRadicals();
-    _ucd.printStats();
-    printVariantDetails();
+    _radicals.print(*this);
+    _ucd.print(*this);
   }
 }
 
@@ -191,73 +190,6 @@ void KanjiData::printLevels() const {
     }
   }
   log() << "  Total for all levels: " << total << '\n';
-}
-
-void KanjiData::printRadicals() const {
-  log() << "Radical breakdown - total count for each name is followed by (Jouyou Jinmei Extra) counts:\n";
-  std::map<Radical, Data::List> radicals;
-  for (const auto& i : _types) {
-    Data::List sorted(i.second);
-    std::sort(sorted.begin(), sorted.end(), [](const auto& x, const auto& y) { return x->strokes() - y->strokes(); });
-    for (const auto& j : sorted)
-      radicals[j->radical()].push_back(j);
-  }
-  int jouyou = 0, jinmei = 0, extra = 0;
-  for (const auto& i : radicals) {
-    int jo = 0, ji = 0, ex = 0;
-    for (const auto& j : i.second)
-      switch (j->type()) {
-      case Types::Jouyou: ++jo; break;
-      case Types::Jinmei: ++ji; break;
-      default: ++ex; break;
-      }
-    auto counts = std::to_string(jo) + ' ' + std::to_string(ji) + ' ' + std::to_string(ex) + ')';
-    _out << i.first << ':' << std::setfill(' ') << std::right << std::setw(4) << i.second.size() << " (" << std::left
-         << std::setw(9) << counts << ':';
-    jouyou += jo;
-    jinmei += ji;
-    extra += ex;
-    Types oldType = i.second[0]->type();
-    for (const auto& j : i.second) {
-      if (j->type() != oldType) {
-        _out << "、";
-        oldType = j->type();
-      }
-      _out << ' ' << *j;
-    }
-    _out << '\n';
-  }
-  log() << "  Total for " << radicals.size() << " radicals: " << jouyou + jinmei + extra << " (Jouyou " << jouyou
-        << " Jinmei " << jinmei << " Extra " << extra << ")\n";
-  std::vector<Radical> missingRadicals;
-  for (const auto& i : _radicals)
-    if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
-  if (!missingRadicals.empty()) {
-    log() << "  Found " << missingRadicals.size() << " radicals with no kanji:";
-    for (const auto& i : missingRadicals)
-      _out << ' ' << i;
-    _out << '\n';
-  }
-}
-
-void KanjiData::printVariantDetails() const {
-  int count = 0;
-  log() << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
-  log() << "    -      ----------------------------    -----------------------\n";
-  for (const auto& i : _map) {
-    const Kanji& k = *i.second;
-    if (k.variant()) {
-      log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    [" << toUnicode(k.name())
-            << "] " << k.name() << " variant of " << k.nonVariantName() << "    ";
-      auto u = _ucd.find(k.name());
-      if (u) {
-        out() << u->codeAndName();
-        if (u->hasLink()) out() << " variant of " << u->linkCodeAndName();
-      } else
-        out() << "UCD not found";
-      out() << '\n';
-    }
-  }
 }
 
 } // namespace kanji
