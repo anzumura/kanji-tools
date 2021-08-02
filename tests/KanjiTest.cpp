@@ -34,7 +34,7 @@ private:
     _radicals.emplace_back(_radicals.size(), name, Radical::AltForms(), "", "");
   }
   void strokes(const std::string& name, int count) {
-    _ucdMap.insert(std::make_pair(name, Ucd(0, name, 0, count, 0, false, false, 0, "", "", "", "")));
+    _strokes.insert(std::make_pair(name, count));
   }
 };
 

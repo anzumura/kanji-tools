@@ -166,10 +166,10 @@ class NonLinkedKanji : public Kanji {
 public:
   // public constructor used for 'Other' kanji with readings from 'other-readings.txt'
   NonLinkedKanji(const Data& d, int number, const std::string& name, const std::string& reading)
-    : Kanji(d, number, name), _meaning(d.ucdMeaning(name)), _reading(reading) {}
+    : Kanji(d, number, name), _meaning(d.ucdData().getMeaning(name)), _reading(reading) {}
   // public constructor used for 'Other' kanji without a reading (will look up from UCD instead)
   NonLinkedKanji(const Data& d, int number, const std::string& name)
-    : NonLinkedKanji(d, number, name, d.ucdReadingsToKana(name)) {}
+    : NonLinkedKanji(d, number, name, d.ucdData().getReadingsAsKana(name)) {}
 
   Types type() const override { return Types::Other; }
   const std::string& meaning() const override { return _meaning; }
@@ -181,7 +181,7 @@ protected:
     : Kanji(d, number, name, radical, strokes, findFrequency), _meaning(meaning), _reading(reading) {}
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& reading,
                  int strokes, bool findFrequency)
-    : NonLinkedKanji(d, number, name, radical, d.ucdMeaning(name), reading, strokes, findFrequency) {}
+    : NonLinkedKanji(d, number, name, radical, d.ucdData().getMeaning(name), reading, strokes, findFrequency) {}
 private:
   const std::string _meaning;
   const std::string _reading;
@@ -197,13 +197,6 @@ public:
   // - 'file' must have tab separated lines that have the right number of columns for the given type
   // - the first line of 'file' should have column header names that match the names in the 'Columns' enum
   static Data::List fromFile(const Data&, Types type, const std::filesystem::path& file);
-  static int toInt(const std::string& s) {
-    try {
-      return std::stoi(s);
-    } catch (...) {
-      throw std::invalid_argument("failed to convert to int: " + s);
-    }
-  }
 protected:
   // list of all supported columns in files
   enum Columns {
@@ -223,11 +216,11 @@ protected:
   static std::array<std::string, MaxCol> columns;
 
   FileListKanji(const Data& d, int strokes, bool findFrequency = true)
-    : NonLinkedKanji(d, toInt(columns[NumberCol]), columns[NameCol], d.getRadical(columns[RadicalCol]),
+    : NonLinkedKanji(d, UcdData::toInt(columns[NumberCol]), columns[NameCol], d.getRadical(columns[RadicalCol]),
                      columns[ReadingCol], strokes, findFrequency) {}
   FileListKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true)
-    : NonLinkedKanji(d, toInt(columns[NumberCol]), columns[NameCol], d.getRadical(columns[RadicalCol]), meaning,
-                     columns[ReadingCol], strokes, findFrequency) {}
+    : NonLinkedKanji(d, UcdData::toInt(columns[NumberCol]), columns[NameCol], d.getRadical(columns[RadicalCol]),
+                     meaning, columns[ReadingCol], strokes, findFrequency) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
@@ -256,7 +249,7 @@ private:
   static OptString optString(const std::string& s) { return s.empty() ? std::nullopt : std::optional(s); }
   static OptInt optInt(const std::string& s) {
     if (s.empty()) return {};
-    return toInt(s);
+    return UcdData::toInt(s);
   }
   const OptString _oldName;
   const OptInt _year;
@@ -282,14 +275,14 @@ private:
 
 class ExtraKanji : public FileListKanji {
 public:
-  ExtraKanji(const Data& d) : FileListKanji(d, toInt(columns[StrokesCol]), columns[MeaningCol], false) {}
+  ExtraKanji(const Data& d) : FileListKanji(d, UcdData::toInt(columns[StrokesCol]), columns[MeaningCol], false) {}
   Types type() const override { return Types::Extra; }
 };
 
 class JouyouKanji : public OfficialListKanji {
 public:
   JouyouKanji(const Data& d)
-    : OfficialListKanji(d, toInt(columns[StrokesCol]), columns[MeaningCol]),
+    : OfficialListKanji(d, UcdData::toInt(columns[StrokesCol]), columns[MeaningCol]),
       _grade(getGrade(columns[GradeCol])) {}
   Types type() const override { return Types::Jouyou; }
   Grades grade() const override { return _grade; }

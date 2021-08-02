@@ -2,9 +2,8 @@
 #define KANJI_DATA_H
 
 #include <kanji/FileList.h>
-#include <kanji/KanaConvert.h>
 #include <kanji/Radical.h>
-#include <kanji/Ucd.h>
+#include <kanji/UcdData.h>
 
 #include <memory>
 #include <optional>
@@ -60,21 +59,14 @@ public:
   virtual int getFrequency(const std::string&) const = 0;
   virtual Levels getLevel(const std::string&) const = 0;
   virtual const Radical& ucdRadical(const std::string& s) const {
-    const Ucd* u = findUcd(s);
+    const Ucd* u = _ucd.find(s);
     if (u) return getRadical(u->radical());
     // 'throw' should never happen - every 'Kanji' class instance should have also exist in the
     // data loaded from Unicode.
     throw std::domain_error("UCD entry not found: " + s);
   }
-  // 'ucdMeaning' returns the 'meaning' loaded from UCD file for given 's'. Almost all kanji
-  // from UCD have meanings, but a few are empty. Also, return empty string if not found.
-  virtual const std::string& ucdMeaning(const std::string& s) const {
-    const Ucd* u = findUcd(s);
-    return u ? u->meaning() : Ucd::EmptyString;
-  }
-  // 'ucdReadingsToKana' finds the UCD kanji for 's' and returns one string starting with
-  // 'onReading' converted Katakana followed by 'kunReading' converted to Hiragana.
-  virtual std::string ucdReadingsToKana(const std::string& s) const;
+  // 'ucd' is used by 'Kanji' classes during construction
+  const UcdData& ucdData() const { return _ucd; }
   // 'getRadical' by the ideograph code in utf8 (not the unicode radical code). For example,
   // Radical number 30 (口) is Unicode 53E3, but has another 'Unicode Radical' value of 2F1D
   const Radical& getRadical(const std::string& name) const {
@@ -89,8 +81,8 @@ public:
       auto i = _strokes.find(s);
       if (i != _strokes.end()) return i->second;
     }
-    auto i = findUcd(s);
-    return i ? i->strokes() : 0;
+    auto i = _ucd.find(s);
+    return i ? i->getStrokes(variant) : 0;
   }
 
   // get kanji lists
@@ -136,13 +128,6 @@ public:
   // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
   std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
   static int maxFrequency() { return _maxFrequency; }
-
-  using UcdMap = std::map<std::string, Ucd>;
-  const UcdMap& ucdMap() const { return _ucdMap; }
-  // 'findUcd' will return a pointer to a Ucd instance if 's' is in _ucdMap. If 's' has a
-  // 'variation selector' then _ucdLinkedJinmei then _ucdLinkedOther maps are used to get
-  // a Ucd variant (the variant returned is the same displayed character for Jinmei ones)
-  const Ucd* findUcd(const std::string& s) const;
   // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not used by this
   // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then
   // a larger increment is returned to 'skip over' the args, for example:
@@ -163,8 +148,6 @@ protected:
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
   bool checkNotFound(const Entry&) const;
-  // 'loadUcd' populated _ucdMap from data in 'ucd.txt'
-  void loadUcd();
   // 'loadRadicals', 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
   void loadRadicals(const std::filesystem::path&);
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
@@ -183,6 +166,8 @@ protected:
   std::ostream& _err;
   const std::filesystem::path _dataDir;
   const bool _debug;
+  // '_ucd' is used to supplement Kanji attributes like radical, meaning and reading
+  UcdData _ucd;
   // '_radicals' is populated from radicals.txt and the index in the vector is one less than
   // the actual Radical.number().
   std::vector<Radical> _radicals;
@@ -208,18 +193,6 @@ protected:
   // sets to help during loading (detecting duplicates, print diagnostics, etc.)
   FileList::Set _jouyouOldSet;
   FileList::Set _jinmeiOldSet;
-
-  UcdMap _ucdMap;
-  // '_ucdLinked...' are maps from standard Kanji to variant forms loaded from 'ucd.txt'
-  // For example, FA67 (逸) is a variant of 9038 (逸) which can also be constructed by a
-  // variation selector, i.e., L"\u9038\uFE01" (逸︁). Note:
-  // - if a variant is marked as 'Jinmei' it will be put in '_ucdLinkedJinmei'
-  // - otherwise it will be put in '_ucdLinkedOther'
-  std::map<std::string, std::string> _ucdLinkedJinmei;
-  std::map<std::string, std::string> _ucdLinkedOther;
-  // '_converter' is used by 'ucdReadingsToKana' to convert the Romaji readings loaded in from
-  // UCD to Katakana and Hiragana.
-  mutable KanaConvert _converter;
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
   static int _maxFrequency;
   static const List _emptyList;

@@ -85,9 +85,9 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (memberKanjis.size() < kanjis.size()) error("group " + number + " failed to load all members");
       Entry group;
       if (type == GroupType::Meaning)
-        group = std::make_shared<MeaningGroup>(FileListKanji::toInt(number), name, memberKanjis);
+        group = std::make_shared<MeaningGroup>(UcdData::toInt(number), name, memberKanjis);
       else
-        group = std::make_shared<PatternGroup>(FileListKanji::toInt(number), memberKanjis, peers);
+        group = std::make_shared<PatternGroup>(UcdData::toInt(number), memberKanjis, peers);
       for (const auto& i : memberKanjis)
         checkInsert(i->name(), groups, group);
       list.push_back(group);

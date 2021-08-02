@@ -158,15 +158,16 @@ TEST_F(KanjiDataTest, UcdChecks) {
   // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD unfortunately
   // don't have a dash before the Okurigana.
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
-  auto count = [this](const auto& p) { return std::count_if(_data.ucdMap().begin(), _data.ucdMap().end(), p); };
-  EXPECT_EQ(_data.ucdMap().size(), 12460);
+  auto& ucd = _data.ucdData().map();
+  auto count = [&ucd](const auto& p) { return std::count_if(ucd.begin(), ucd.end(), p); };
+  EXPECT_EQ(ucd.size(), 12460);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo(); }), 2136);
   EXPECT_EQ(count([](auto& i) { return i.second.jinmei(); }), 863);
   EXPECT_EQ(count([](auto& i) { return i.second.jinmei() && i.second.hasLink(); }), 248);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo() && i.second.hasLink(); }), 0);
   EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 64);
   // every 'linkName' should be different than 'name' and also exist in the map
-  for (auto& i : _data.ucdMap()) {
+  for (auto& i : ucd) {
     const Ucd& k = i.second;
     if (k.joyo() || k.jinmei())
       EXPECT_TRUE(isCommonKanji(k.name())) << k.codeAndName();
@@ -174,12 +175,11 @@ TEST_F(KanjiDataTest, UcdChecks) {
       EXPECT_TRUE(isKanji(k.name())) << k.codeAndName();
     if (k.hasLink()) {
       EXPECT_NE(k.name(), k.linkName());
-      EXPECT_TRUE(_data.ucdMap().contains(k.linkName()));
+      EXPECT_TRUE(ucd.contains(k.linkName()));
     }
     EXPECT_FALSE(k.joyo() && k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
     // if 'variantStrokes' is present it should be different than 'strokes'
-    if (k.hasVariantStrokes())
-      EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
+    if (k.hasVariantStrokes()) EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
   }
   // Make sure all Kanji are in Kanji related Unicode blocks
   EXPECT_EQ(checkKanji(_data.jouyouKanji()), 0);

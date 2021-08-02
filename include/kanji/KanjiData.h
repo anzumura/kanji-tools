@@ -22,7 +22,7 @@ private:
   void printGrades() const;
   void printLevels() const;
   void printRadicals() const;
-  void printUcdStats() const;
+  void printVariantDetails() const;
   // 'n1-n5' and 'frequency' lists are loaded from simple files with one kanji per line
   const FileList _n5;
   const FileList _n4;
