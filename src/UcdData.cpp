@@ -17,7 +17,10 @@ const Ucd* UcdData::find(const std::string& s) const {
     if (i == _linkedJinmei.end()) {
       auto j = _linkedOther.find(nonVariant);
       if (j == _linkedOther.end()) return nullptr;
-      r = j->second;
+      // if j exists it should never by an empty vector
+      assert(!j->second.empty());
+      // if there are more than one variant, just return the first one for now.
+      r = j->second[0];
     } else
       r = i->second;
   }
@@ -115,7 +118,8 @@ void UcdData::load(const std::filesystem::path& file) {
       const int radical = Data::toInt(cols[radicalCol]);
       if (radical < 1 || radical > 214) error("radical out of range");
       const int strokes = Data::toInt(cols[strokesCol]);
-      if (strokes < 1 || strokes > 33) error("strokes out of range");
+      // 9F98 (龘) has 48 strokes
+      if (strokes < 1 || strokes > 48) error("strokes out of range");
       const int variantStrokes = cols[variantStrokesCol].empty() ? 0 : Data::toInt(cols[variantStrokesCol]);
       if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
       const bool joyo = getBool("Joyo", cols[joyoCol]);
@@ -141,10 +145,8 @@ void UcdData::load(const std::filesystem::path& file) {
         if (jinmei) {
           auto i = _linkedJinmei.insert(std::make_pair(cols[linkNameCol], name));
           if (!i.second) error("jinmei link " + cols[linkNameCol] + " to " + name + " failed - has " + i.first->second);
-        } else {
-          auto i = _linkedOther.insert(std::make_pair(cols[linkNameCol], name));
-          if (!i.second) error("link " + cols[linkNameCol] + " to " + name + " failed - has " + i.first->second);
-        }
+        } else
+          _linkedOther[cols[linkNameCol]].push_back(name);
       }
     }
   }

@@ -106,7 +106,6 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
     ">>>         [Extra] :    177, unique:   52,   0.18%  (厭 36, 掻 13, 妾 7, 怯 5, 攫 5)",
     ">>>          [None] :    601, unique:  280,   0.63%  (婬 18, 椒 14, 婢 12, 拵 12, 掟 11)",
     ">>>       Rare Kanji:      2, unique:    2           (㯭 1, 㰏 1)",
-    ">>>    Non-UCD Kanji:      2, unique:    2           (㯭 1, 㰏 1)",
     ">>>   MB-Punctuation:  22117, unique:   24",
     ">>>        MB-Symbol:     45, unique:    9",
     ">>>        MB-Letter:   1698, unique:   39",

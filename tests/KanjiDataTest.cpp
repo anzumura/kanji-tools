@@ -160,12 +160,12 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
   auto& ucd = _data.ucd().map();
   auto count = [&ucd](const auto& p) { return std::count_if(ucd.begin(), ucd.end(), p); };
-  EXPECT_EQ(ucd.size(), 12460);
+  EXPECT_EQ(ucd.size(), 14905);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo(); }), 2136);
   EXPECT_EQ(count([](auto& i) { return i.second.jinmei(); }), 863);
-  EXPECT_EQ(count([](auto& i) { return i.second.jinmei() && i.second.hasLink(); }), 248);
+  EXPECT_EQ(count([](auto& i) { return i.second.jinmei() && i.second.hasLink(); }), 318);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo() && i.second.hasLink(); }), 0);
-  EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 64);
+  EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 1477);
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     const Ucd& k = i.second;

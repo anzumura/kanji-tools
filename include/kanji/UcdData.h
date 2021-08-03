@@ -48,7 +48,7 @@ private:
   // - if a variant is marked as 'Jinmei' it will be put in '_ucdLinkedJinmei'
   // - otherwise it will be put in '_ucdLinkedOther'
   std::map<std::string, std::string> _linkedJinmei;
-  std::map<std::string, std::string> _linkedOther;
+  std::map<std::string, std::vector<std::string>> _linkedOther;
 
   // '_converter' is used by 'getReadingsAsKana' to convert the Romaji readings loaded
   // from UCD (Katakana for 'onReading' and Hiragana for 'kunReading').
