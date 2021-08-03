@@ -95,10 +95,14 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
   std::string tag = file.filename().string(); // only use the final component of the path
   if (fs::is_regular_file(file)) {
     ++_files;
-    std::ifstream f(file);
-    std::string line;
-    while (std::getline(f, line))
-      added += addTag ? add(line, tag) : add(line);
+    if (_find.has_value())
+      added = balanceBrackets(file, addTag, tag);
+    else {
+      std::ifstream f(file);
+      std::string line;
+      while (std::getline(f, line))
+        added += addTag ? add(line, tag) : add(line);
+    }
   } else if (fs::is_directory(file)) {
     ++_directories;
     for (fs::directory_entry i : fs::directory_iterator(file))
@@ -108,6 +112,70 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
   } else // skip if not a regular file or directory
     return 0;
   if (fileNames) added += addTag ? add(tag, tag) : add(tag);
+  return added;
+}
+
+// In order to help with 'furigana removal', if a line would end with an open wide bracket
+// (optionally followed more text) then join with the next line up until a closing wide
+// bracket before processing. Since a file could have globally unbalanced brackets don't
+// keep looking beyond the next line (also, furigana should only be a few characters long).
+// added += addTag ? add(line, tag) : add(line);
+size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag) {
+  static const std::string openWideBracket("（"), closeWideBracket("）");
+  size_t added = 0;
+  std::ifstream f(file);
+  std::string line, prevLine;
+  bool prevOpenEnded = false;
+  auto unclosed = [&prevLine, &prevOpenEnded] {
+    auto open = prevLine.rfind(openWideBracket);
+    if (open != std::string::npos) {
+      auto close = prevLine.rfind(closeWideBracket);
+      prevOpenEnded = (close == std::string::npos || close < open);
+    } else
+      prevOpenEnded = false;
+  };
+  // process the previous line plus current line up until closing bracket
+  auto processPartial = [this, &tag, &added, &line, &prevLine, &unclosed, addTag](size_t close) {
+    auto end = close + closeWideBracket.length();
+    std::string s = prevLine + line.substr(0, end);
+    added += addTag ? add(s, tag) : add(s);
+    // save the remaider of the current line for the next loop iteration
+    prevLine = line.substr(end);
+    unclosed();
+  };
+  while (std::getline(f, line)) {
+    if (prevLine.empty()) {
+      // special case for first line - don't process in case next line stars with open bracket.
+      prevLine = line;
+      unclosed();
+      continue;
+    } else if (prevOpenEnded) {
+      auto close = line.find(closeWideBracket);
+      if (close != std::string::npos) {
+        auto open = line.find(openWideBracket);
+        if (close < open) {
+          processPartial(close);
+          continue;
+        }
+      }
+    } else {
+      auto open = line.find(openWideBracket);
+      // special case for line starting with open bracket
+      if (open == 0) {
+        auto close = line.find(closeWideBracket);
+        if (close != std::string::npos) {
+          processPartial(close);
+          continue;
+        }
+      }
+    }
+    // A new open bracket came before 'close' or no 'close' at all on line so give up on
+    // trying to balance and just process prevLine.
+    added += addTag ? add(prevLine, tag) : add(prevLine);
+    prevLine = line;
+    unclosed();
+  }
+  if (!prevLine.empty()) added += addTag ? add(prevLine, tag) : add(prevLine);
   return added;
 }
 

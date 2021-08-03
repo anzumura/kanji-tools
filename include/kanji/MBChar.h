@@ -214,6 +214,7 @@ public:
 private:
   virtual bool allowAdd(const std::string&) const { return true; }
   size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
+  size_t balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag);
 
   Map _map;
   TagMap _tags;

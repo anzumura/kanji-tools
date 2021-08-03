@@ -196,6 +196,7 @@ protected:
   fs::path _testDir = "testDir";
   fs::path _testFile1 = _testDir / "testFile甲";
   fs::path _testFile2 = _testDir / "testFile乙";
+  fs::path _bracketFile = _testDir / "bracketFile";
   fs::path _testSubDir = _testDir / "test下";
   fs::path _testSubFile1 = _testSubDir / "testSubFile1";
   fs::path _testSubFile2 = _testSubDir / "testSubFile2.txt";
@@ -388,6 +389,31 @@ TEST_F(MBCharCountTest, Regex) {
   EXPECT_EQ(r.count("あ"), 0);
   EXPECT_EQ(r.count("お"), 0);
   EXPECT_EQ(r.count("（"), 0);
+}
+
+TEST_F(MBCharCountTest, BracketsAcrossLines) {
+  std::ofstream of(_bracketFile);
+  of << "安寿が亡きあとはねんごろに弔（\n";
+  of << "とむら）われ、また入水した沼の畔（ほとり）には尼寺が立つことになった。\n";
+  of.close();
+  std::wregex regex(L"（[^）]+）");
+  MBCharCount r(regex);
+  EXPECT_EQ(r.addFile(_bracketFile), 40);
+  EXPECT_EQ(r.count("（"), 0);
+  EXPECT_EQ(r.count("）"), 0);
+}
+
+TEST_F(MBCharCountTest, BracketsAtStartOfLine) {
+  std::ofstream of(_bracketFile);
+  of << "安寿が亡きあとはねんごろに弔（と\n";
+  of << "むら）われ、また入水した沼の畔\n";
+  of << "（ほとり）には尼寺が立つことになった。\n";
+  of.close();
+  std::wregex regex(L"（[^）]+）");
+  MBCharCount r(regex);
+  EXPECT_EQ(r.addFile(_bracketFile), 40);
+  EXPECT_EQ(r.count("（"), 0);
+  EXPECT_EQ(r.count("）"), 0);
 }
 
 } // namespace kanji

@@ -79,6 +79,7 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
   const bool isKanji = name.ends_with("Kanji");
   const bool isHiragana = name == "Hiragana";
   const bool isUnrecognized = name == "Unrecognized";
+  const bool isCommonKanji = isKanji && name.starts_with("Common");
   if (isHiragana && verbose) log() << "Showing all furigana replacements:\n";
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
@@ -109,9 +110,21 @@ int FileStats::processCount(const fs::path& top, const Pred& pred, const std::st
       firstCount = false;
     }
     printTotalAndUnique(name, total, frequency.size());
-    if (isKanji) {
+    if (isCommonKanji) {
+      // only show percentage and type breakdown for 'Common Kanji'
       out() << ", 100.00%\n";
       printKanjiTypeCounts(frequency, total);
+    } else if (isKanji) {
+      // for 'Rare' and 'Non-UCD' Kanji show up to 'MaxExamples' entries in a single line since they
+      // all should be type 'None'
+      out() << std::setw(12) << '(';
+      int i = 0;
+      for (const auto& j : frequency) {
+        if (i) out() << ", ";
+        out() << j.name << ' ' << j.count;
+        if (++i == MaxExamples) break;
+      }
+      out() << ")\n";
     } else
       out() << '\n';
     // print line-by-line breakdown
@@ -182,6 +195,7 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown, bool verbose
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
                     f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
                     f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
+                    f([this](const auto& x) { return isKanji(x) && !_data->ucd().find(x); }, "Non-UCD Kanji"),
                     f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
                     f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
