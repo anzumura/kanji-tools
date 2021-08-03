@@ -60,7 +60,13 @@ void RadicalData::load(const std::filesystem::path& file) {
 }
 
 void RadicalData::print(const Data& data) const {
-  data.log() << "Radical breakdown - Total (Jouyou Jinmei LinkedJinmei LinkedOld Other Extra) followed by examples\n";
+  data.log() << "Radical breakdown - Total (";
+  for (auto i : AllTypes) {
+    data.out() << i;
+    if (i == Types::Extra) break;
+    data.out() << ' ';
+  }
+  data.out() << ") followed by examples\n";
   std::map<Radical, Data::List> radicals;
   for (auto& i : data.map())
     radicals[i.second->radical()].push_back(i.second);
