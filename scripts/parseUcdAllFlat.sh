@@ -189,8 +189,7 @@ LinkName\tMeaning\tOn\tKun"
     # some kRSUnicode entries have ' after the radical like 4336 (䌶): 120'.3
     kRSUnicode=${kRSUnicode/\'/}
     local -i radical=${kRSUnicode%\.*}
-    # only set 'vstrokes' if there's an 'adobe ref' with a different count
-    local -i vstrokes=
+    local -i vstrokes=0
     get kRSAdobe_Japan1_6 "$i"
     if [ -z "${kRSAdobe_Japan1_6}" ]; then
       getFirst kTotalStrokes "$i"
@@ -249,7 +248,8 @@ LinkName\tMeaning\tOn\tKun"
     fi
     # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
     [ -n "$linkTo" ] && s="\U$linkTo" || s=
-    echo -e "$cp\t\U$cp\t$radical\t$strokes\t$vstrokes\t${kJoyoKanji:+Y}\t\
+    # don't print 'vstrokes' if it's 0
+    echo -e "$cp\t\U$cp\t$radical\t$strokes\t${vstrokes#0}\t${kJoyoKanji:+Y}\t\
 ${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$kDefinition\t$kJapaneseOn\t$kJapaneseKun"
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }

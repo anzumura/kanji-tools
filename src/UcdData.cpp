@@ -120,6 +120,7 @@ void UcdData::load(const std::filesystem::path& file) {
       const int strokes = Data::toInt(cols[strokesCol]);
       // 9F98 (龘) has 48 strokes
       if (strokes < 1 || strokes > 48) error("strokes out of range");
+      if (cols[variantStrokesCol] == "0") error("VStrokes shouldn't be 0");
       const int variantStrokes = cols[variantStrokesCol].empty() ? 0 : Data::toInt(cols[variantStrokesCol]);
       if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
       const bool joyo = getBool("Joyo", cols[joyoCol]);
