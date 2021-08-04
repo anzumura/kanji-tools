@@ -163,7 +163,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ(ucd.size(), 14905);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo(); }), 2136);
   EXPECT_EQ(count([](auto& i) { return i.second.jinmei(); }), 863);
-  EXPECT_EQ(count([](auto& i) { return i.second.jinmei() && i.second.hasLink(); }), 318);
+  EXPECT_EQ(count([](auto& i) { return i.second.jinmei() && i.second.hasLink(); }), 248);
   EXPECT_EQ(count([](auto& i) { return i.second.joyo() && i.second.hasLink(); }), 0);
   EXPECT_EQ(count([](auto& i) { return !i.second.jinmei() && i.second.hasLink(); }), 1477);
   // every 'linkName' should be different than 'name' and also exist in the map
