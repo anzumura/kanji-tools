@@ -151,9 +151,12 @@ function populateVariantLinks() {
       [[ $kJoyoKanji =~ U+ ]] && cp="$cp ${kJoyoKanji#U+}"
     else
       get kJinmeiyoKanji "$i"
+      #if [ -n "$kjinmeiyoKanji" ]; then
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
-        linkBack[${kJinmeiyoKanji#*+}]=$cp
-        cp="$cp ${kJinmeiyoKanji#*+}"
+        kJinmeiyoKanji=${kJinmeiyoKanji#*+}
+        linkBack[$kJinmeiyoKanji]=$cp
+        cp="$cp $kJinmeiyoKanji"
+        #fi
       elif [ -z "${linkExists[$cp]}" ]; then
         # only store linked info if there's a variant that links back to this one
         continue
@@ -195,7 +198,7 @@ LinkName\tMeaning\tOn\tKun"
         [ -z "${noLink[$cp]}" ] && linkTo=$loadFrom
       else
         loadFrom=$cp
-        [ -z "${noLink[$cp]}" ] && linkTo=${linkBack[$cp]}
+        linkTo=${linkBack[$cp]}
       fi
     else
       get kCompatibilityVariant "$i"
