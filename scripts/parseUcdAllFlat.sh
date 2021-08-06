@@ -68,13 +68,13 @@ function getFirst() {
 }
 
 # global arrays to help support links for variant and compat kanjis
-declare -A definition on kun linkBack noLink linkExists variantLink
+declare -A definition on kun linkBack noLink variantLink
 
-# there are 18 Jinmei that link to other Jinmei, but unfortunately the UCD data
-# seems to have some mistakes (where the link points from the standard to the
-# variant instead). For example 4E98 (亘) has kJinmeiyoKanji="2010:U+4E99" and
-# 4E99 (亙) has kJinmeiyoKanji="2010". This contradicts the official description
-# of the field (since 4E98 is the standard form):
+# there are 18 Jinmeiyō Kanji that link to other Jinmei, but unfortunately UCD
+# data seems to have some mistakes (where the link points from the standard to
+# the variant instead). For example 4E98 (亘) has kJinmeiyoKanji="2010:U+4E99"
+# and 4E99 (亙) has kJinmeiyoKanji="2010". This contradicts the description of
+# the field (since 4E98 is the standard form). Here's the official description:
 #   The version year is either 2010 (861 ideographs), 2015 (one ideograph), or
 #   2017 (one ideograph), and 230 ideographs are variants for which the code
 #   point of the standard Japanese form is specified.
@@ -113,6 +113,8 @@ declare -r compat='kCompatibilityVariant="[^"]' # compatibility variant
 
 printResulsFilter="$onKun|$adobe|$official|$compat"
 
+# 'findVairantLinks': find links based on 'kDefinition' field. For example, if
+# the field starts with '(same as X' then store a link from 'cp' to 'X'.
 function findVariantLinks() {
   local -r defStart='kDefinition=\"\('
   for type in 'a variant of' 'interchangeable' 'same as' 'non-classical'; do
@@ -128,7 +130,6 @@ function findVariantLinks() {
         # than once, i.e., if there are multiple variants for 's'. This is true for
         # 64DA (據) which has variants 3A3F (㨿) and 3A40 (㩀).
         variantLink[$cp]=$s
-        linkExists[$s]=$cp # only needs a value (doesn't need to be unique)
         secondEntry=false
       else
         local cp=$i
@@ -139,7 +140,7 @@ function findVariantLinks() {
 }
 
 # 'populateVariantLinks': a link can point to an entry later in the file like
-# 5DE2 (巢) which links to 5DE3 (巣). Process kanji having 'on' or 'kun'
+# 5DE2 (巢) which links to 5DE3 (巣). Process kanji having an 'on' or/or 'kun'.
 function populateVariantLinks() {
   while read -r i; do
     get cp "$i"
@@ -151,15 +152,10 @@ function populateVariantLinks() {
       [[ $kJoyoKanji =~ U+ ]] && cp="$cp ${kJoyoKanji#U+}"
     else
       get kJinmeiyoKanji "$i"
-      #if [ -n "$kjinmeiyoKanji" ]; then
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
         kJinmeiyoKanji=${kJinmeiyoKanji#*+}
         linkBack[$kJinmeiyoKanji]=$cp
         cp="$cp $kJinmeiyoKanji"
-        #fi
-      elif [ -z "${linkExists[$cp]}" ]; then
-        # only store linked info if there's a variant that links back to this one
-        continue
       fi
     fi
     get kDefinition "$i"

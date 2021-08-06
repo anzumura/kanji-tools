@@ -14428,55 +14428,98 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9FA3	龣	214	25							KAKU ROKU	
 9FA4	龤	214	26						to harmonize; to accord with; to agree	KAI	
 9FA5	龥	214	26						beg, appeal for help	YAKU YU	YOBU
+F900	豈	151	10				8C48	豈	how? what?	KI GAI KAI	ANI
 F901	更	73	7				66F4	更	more, still further, much more	KOU	SARA FUKERU ARATAMERU
 F902	車	159	7				8ECA	車	cart, vehicle; carry in cart	SHA KYO	KURUMA
+F903	賈	154	13				8CC8	賈	surname; merchant; buy, trade	KO	AKINAU AKINAI URU
 F904	滑	85	12				6ED1	滑	slip, slide; slippery, polished	KATSU KOTSU	NAMERAKA SUBERU
 F905	串	2	7				4E32	串	string; relatives; conspire	SEN KAN	KUSHI TSURANUKU
 F906	句	30	5				53E5	句	sentence	KU KOU	
+F907	龜	213	16				9F9C	龜	turtle or tortoise; cuckold	KI KYUU KIN	KAME
+F908	龜	213	16				9F9C	龜	turtle or tortoise; cuckold	KI KYUU KIN	KAME
 F909	契	37	9				5951	契	deed, contract, bond; engrave	SETSU KEI	CHIGIRU KIZAMU WARIFU
 F90A	金	167	8				91D1	金	gold; metals in general; money	KIN KON	KANE
+F90B	喇	30	12				5587	喇	horn, bugle; lama; final particle	RATSU RA	MONOIU
 F90C	奈	37	8				5948	奈	but, how; bear, stand, endure	NA DAI	KARANASHI
+F90D	懶	61	19				61F6	懶	lazy, languid, listless	RAN RAI	OKOTARU MONOUI
+F90E	癩	104	21				7669	癩	leprosy, scabies, mange; shoddy	RAI	KATTAI
 F90F	羅	122	19				7F85	羅	net for catching birds; gauze	RA	AMI TSURANERU USUMONO
+F910	蘿	140	22				863F	蘿	type of creeping plant; turnip	RA	TSUTA
+F911	螺	142	17				87BA	螺	spiral shell; conch; spiral	RA	NINA
 F912	裸	145	13				88F8	裸	bare, nude; undress, strip	RA	HADAKA
+F913	邏	162	22				908F	邏	patrol; inspect; watch	RA	MEGURU
 F914	樂	75	15				6A02	樂	happy, glad; enjoyable; music	GAKU RAKU GOU	TANOSHII
+F915	洛	85	9				6D1B	洛	river in Shanxi province; city	RAKU	MATOU TSURANARU
+F916	烙	86	10				70D9	烙	brand, burn; branding iron	RAKU KAKU	YAKU
+F917	珞	96	10				73DE	珞	kind of necklace	RAKU REKI RYAKU	
 F918	落	140	12				843D	落	fall, drop; net income, surplus	RAKU	OCHIRU OTOSU SATO
 F919	酪	164	13				916A	酪	cream, cheese; koumiss	RAKU	CHICHIZAKE
+F91A	駱	187	16				99F1	駱	white horse with black mane; camel	RAKU	KAWARAGE
+F91B	亂	5	13				4E82	亂	confusion, state of chaos; create chaos, revolt	RAN RON	MIDARERU
 F91C	卵	26	7				5375	卵	egg; ovum; roe; spawn	RAN KON	TAMAGO
 F91D	欄	75	21			Y	6B04	欄	railing, balustrade; animal pan	RAN	TESURI
+F91E	爛	86	21				721B	爛	rotten, spoiled, decayed	RAN	TADARERU
+F91F	蘭	140	20				862D	蘭	orchid; elegant, graceful	RAN	FUJIBAKA
+F920	鸞	196	30				9E1E	鸞	fabulous bird	RAN	
 F921	嵐	46	12				5D50	嵐	mountain mist, mountain haze	RAN	ARASHI
 F922	濫	85	17				6FEB	濫	flood, overflow; excessive	RAN	MIDARERU MIDARINI
 F923	藍	140	17				85CD	藍	blue; indigo plant; surname	RAN	AI
 F924	襤	145	19				8964	襤	ragged, tattered, threadbare	RAN	BORO
 F925	拉	64	8				62C9	拉	pull, drag; seize, hold; lengthen	RATSU ROU	KUDAKU
+F926	臘	130	19				81D8	臘	year end sacrifice; dried meat	ROU	
 F927	蠟	142	21				881F	蠟	wax; candle; waxy, glazed	ROU	MITSUROU ROUSOKU
 F928	廊	53	13			Y	5ECA	廊	corridor, porch, veranda	ROU	WATADONO
 F929	朗	74	11			Y	6717	朗	clear, bright; distinct	ROU	HOGARAKA AKIRAKA
 F92A	浪	85	10				6D6A	浪	wave; wasteful, reckless	ROU RAN	NAMI
+F92B	狼	94	10				72FC	狼	wolf	ROU	OOKAMI
 F92C	郎	163	9				90CE	郎	gentleman, young man; husband	ROU	OTOKO
 F92D	來	9	8				4F86	來	come, coming; return, returning	RAI	KURU
 F92E	冷	15	7				51B7	冷	cold, cool; lonely	REI	HIERU TSUMETAI SAMERU
+F92F	勞	19	12				52DE	勞	labor, toil, do manual work	ROU	NEGIRAU TSUKARERU ITAWARU
+F930	擄	64	16				64C4	擄	capture, seize	RYO	TORIKU
 F931	櫓	75	19				6AD3	櫓	oar, scull; row	RO	OODATE YAGURA
+F932	爐	86	20				7210	爐	fireplace, stove, oven, furnace	RO	IRORI
+F933	盧	108	16				76E7	盧	cottage, hut; surname; black	RO RYO	MESHIBITSU SUBITSU KUROI
 F934	老	125	6				8001	老	old, aged; experienced	ROU	OIRU FUKERU OI
+F935	蘆	140	19				8606	蘆	rushes, reeds	RO	ASHI
 F936	虜	141	12			Y	865C	虜	capture, imprison, seize; prison	RYO	TORIKO
 F937	路	157	13				8DEF	路	road, path, street; journey	RO	JI MICHI
 F938	露	173	21				9732	露	dew; bare, open, exposed	RO	TSUYU ARAWARERU
+F939	魯	195	15				9B6F	魯	foolish, stupid, rash; vulgar	RO	OROKA
+F93A	鷺	196	24				9DFA	鷺	heron, egret	RO RYO	SAGI
+F93B	碌	112	13				788C	碌	rough, uneven, rocky; mediocre	ROKU	
 F93C	祿	113	13				797F	祿	blessing, happiness, prosperity	ROKU	FUCHI SAIWAI
 F93D	綠	120	14				7DA0	綠	green; chlorine	RYOKU ROKU	MIDORI
+F93E	菉	140	11				83C9	菉	the green bamboo; greenish bamboo	RYOKU ROKU	KARIYASU
 F93F	錄	167	16				9304	錄	copy, write down, record	ROKU RYO	SHIRUSU
 F940	鹿	198	11				9E7F	鹿	deer; surname; KangXi radical 198	ROKU	SHIKA KA
 F941	論	149	15				8AD6	論	debate; discuss; discourse	RON RIN	AGETSURAU TOKU SADAMERU
+F942	壟	32	19				58DF	壟	grave, mound; ridge in field	RYOU ROU	UNE TSUKA
 F943	弄	55	7				5F04	弄	do, play or fiddle with; alley	ROU	MOTEASOBU TAWAMURERU
 F944	籠	118	22				7C60	籠	cage; cage-like basket	ROU	KAGO KOMERU KOMORU
 F945	聾	128	22				807E	聾	deaf	ROU	TSUNBO
+F946	牢	93	7				7262	牢	prison; stable, pen; secure	ROU	HITOYA KATAI
+F947	磊	112	15				78CA	磊	pile of rocks or stones; great	RAI	
 F948	賂	154	13				8CC2	賂	bribe; give present	RO	MAINAU
 F949	雷	173	13				96F7	雷	thunder	RAI RUI	KAMINARI IKAZUCHI
 F94A	壘	32	18				58D8	壘	rampart, military wall	RUI	TORIDE
+F94B	屢	44	14				5C62	屢	frequently, often, again and again	RU	SHIBASHIBA
+F94C	樓	75	15				6A13	樓	building of two or more stories	ROU	TAKADONO
 F94D	淚	85	11				6DDA	淚	tears; weep, cry	RUI REI	NAMIDA
 F94E	漏	85	14				6F0F	漏	leak, drip; funnel; hour glass	ROU	MORU MORERU MORASU
 F94F	累	120	11				7D2F	累	tired; implicate, involve; bother	RUI	SHIBARU KASANERU WAZURAWASE
+F950	縷	120	17				7E37	縷	thread; detailed, precise	RU ROU	ITO
+F951	陋	170	9				964B	陋	narrow; crude, coarse; ugly	ROU	SEMAI IYASHII
+F952	勒	19	11				52D2	勒	strangle, tighten	ROKU	KUTSUWA
+F953	肋	130	6				808B	肋	ribs; chest	ROKU	ABARA
 F954	凜	15	15				51DC	凜	shiver with cold or fear, fearful	RIN	SAMUI SUSAMAJII OSORERU
+F955	凌	15	10				51CC	凌	pure; virtuous; insult; maltreat	RYOU	SHINOGU
+F956	稜	115	13				7A1C	稜	corner, edge, angle; square block	RYOU	KADO ITSU
+F957	綾	120	14				7DBE	綾	thin silk, damask silk	RYOU	AYA
 F958	菱	140	11				83F1	菱	water-chestnut, water caltrop	RYOU	HISHI
 F959	陵	170	11				9675	陵	hill, mound; mausoleum	RYOU	MISASAGI SHINOGU OKA
+F95A	讀	149	22				8B80	讀	read, study; pronounce	TOKU TOU DOKU	YOMU
+F95B	拏	64	9				62CF	拏	take; bring; grasp, hold; arrest	DA NA	HIKU
 F95C	樂	75	15				6A02	樂	happy, glad; enjoyable; music	GAKU RAKU GOU	TANOSHII
 F95D	諾	149	15				8AFE	諾	promise; assent, approve	DAKU	UBENAU
 F95E	丹	3	4				4E39	丹	cinnabar (native HgS); vermilion (artificial HgS used as pigment)	TAN	AKA NI
@@ -14485,34 +14528,59 @@ F960	怒	61	9				6012	怒	anger, rage, passion; angry	DO NU	IKARU OKORU
 F961	率	95	11				7387	率	to lead; ratio; rate; limit	RITSU SOTSU	HIKIIRU OOMUNE WARIAI
 F962	異	102	11				7570	異	different, unusual, strange	I	KOTO KOTONARU AYASHII
 F963	北	21	5				5317	北	north; northern; northward	HOKU HAI	KITA NIGERU
+F964	磻	112	17				78FB	磻	a tributary of the Wei river in Shanxi	HAN BAN HA	ISHI
 F965	便	9	9				4FBF	便	convenience, ease; expedient	BEN BIN	TAYORI SUNAWACHI
 F966	復	60	12				5FA9	復	return; repeat; repeatedly	FUKU	KAERU KAESU MATA
 F967	不	1	4				4E0D	不	no, not; un-; negative prefix	FU BU FUTSU HI	SEZU NIARAZU INAYA
 F968	泌	85	8				6CCC	泌	to seep out, excrete	HITSU HI	NAGARERU NIJIMU
+F969	數	66	15				6578	數	number; several; count; fate	SUU SHU	KAZOERU KAZU
 F96A	索	120	10				7D22	索	large rope, cable; rules, laws	SAKU	NAWA MOTOMERU
 F96B	參	28	11				53C3	參	take part in, intervene	SAN	MAIRU
 F96C	塞	32	13				585E	塞	stop up, block. seal, cork	SOKU SAI	FUSAGU MICHIRU TORIDE
 F96D	省	109	9				7701	省	province; save, economize	SEI SHOU	KAERIMIRU HABUKU MIRU
 F96E	葉	140	12				8449	葉	leaf, petal; page of book; period	YOU SHOU	HA
+F96F	說	149	14				8AAA	說	speak, say, talk; scold, upbraid	SETSU ZEI ETSU	TOKU YOROKOBU
 F970	殺	79	11				6BBA	殺	kill, slaughter, murder; hurt	SATSU SETSU SAI	KOROSU SOGU KEZURU
+F971	辰	161	7				8FB0	辰	early morning	SHIN	TATSU
 F972	沈	85	7				6C88	沈	sink, submerge; addicted to; name	CHIN JIN SHIN	SHIZUMU SHIZUMERU
 F973	拾	64	9				62FE	拾	pick up, collect, tidy up; ten	SHUU JUU	HIROU TOO
 F974	若	140	8				82E5	若	if, supposing, assuming; similar	JAKU NYAKU	MOSHIKUHA WAKAI SHITAGAU
+F975	掠	64	11				63A0	掠	rob, ransack, plunder; pass by	RYAKU RYOU	KASUMERU
 F976	略	102	11				7565	略	approximately, roughly; outline	RYAKU	OSAMERU HAKARU HAKARIGOTO
+F977	亮	8	9				4EAE	亮	bright, brilliant, radiant, light	RYOU	AKIRAKA SUKE
+F978	兩	11	8				5169	兩	two, both, pair, couple; ounce	RYOU	FUTATSU
 F979	凉	15	10				51C9	凉	cool, cold; disheartened	RYOU	SUZUSHII
+F97A	梁	75	11				6881	梁	bridge; beam; rafters; surname	RYOU	HASHI HARI YANA
 F97B	糧	119	18				7CE7	糧	food, grain, provisions	RYOU ROU	KATE
 F97C	良	138	7				826F	良	good, virtuous, respectable	RYOU	YOI YAYA
+F97D	諒	149	15				8AD2	諒	excuse, forgive; guess, presume	RYOU	AKIRAKANISU MAKOTO MAKOTONI
 F97E	量	166	12				91CF	量	measure, quantity, capacity	RYOU	HAKARU
+F97F	勵	19	16				52F5	勵	strive; encourage	REI	HAGEMU
 F980	呂	30	7				5442	呂	surname; a musical note	RYO RO	SEBONE
 F981	女	38	3				5973	女	woman, girl; feminine; rad. 38	JO NYO NYOU	ONNA ME MUSUME
+F982	廬	53	19				5EEC	廬	hut, cottage; name of a mountain	RYO RO	IORI IE
 F983	旅	70	10				65C5	旅	trip, journey; travel; traveler	RYO	TABI
+F984	濾	85	18				6FFE	濾	strain out, filter	RYO RO	KOSU
+F985	礪	112	19				792A	礪	whetstone; sharpen	REI	ARATO MIGAKU TO
+F986	閭	169	15				95AD	閭	village of twenty-five families	RO RYO	MURA MACHI
+F987	驪	187	29				9A6A	驪	a pure black horse; a pair of horses	RI REI	KUROKOMA KUROUMA KUROI
 F988	麗	198	19				9E97	麗	beautiful, magnificent, elegant	REI RI	URUWASHII TSURANARU NARABU
 F989	黎	202	15				9ECE	黎	surname; numerous, many; black	REI RI	KUROI
 F98A	力	19	2				529B	力	power, capability, influence	RYOKU RIKI	CHIKARA TSUTOMERU RIKIMU
 F98B	曆	72	16				66C6	曆	calendar, era	REKI	KOYOMI
+F98D	轢	159	22				8F62	轢	run over something with a vehicle	REKI	KISHIRU
 F98E	年	51	6				5E74	年	year; new-years; person's age	NEN	TOSHI MINORU YOWAI
 F98F	憐	61	15				6190	憐	pity, sympathize	REN	AWAREMU AWAREMI
+F990	戀	61	23				6200	戀	love; long for, yearn for; love	REN	KOI KOISHII
+F991	撚	64	15				649A	撚	twirl in fingers, tease, toy with	NEN	HINERU YORU YORI
+F992	漣	85	14				6F23	漣	flowing water; ripples; weeping	RAN REN	SAZANAMI
+F993	煉	86	13				7149	煉	smelt, refine; distill, condense	REN	NERU
+F994	璉	96	14				7489	璉	vessel used to hold grain offerings	RIN	UTSUWA
+F995	秊	115	8				79CA	秊	year; new-years; person's age	NEN	TOSHI
 F996	練	120	15				7DF4	練	practice, drill, exercise, train	REN	NERU NERIGINU
+F997	聯	128	17				806F	聯	connect, join; associate, ally	REN	TSURANARU TSURANERU
+F998	輦	159	15				8F26	輦	a hand-cart; to transport by carriage	REN	TEGURUMA TAGOSHI
+F999	蓮	140	14				84EE	蓮	lotus, water lily; paradise	REN	HASU
 F99A	連	162	11				9023	連	join, connect; continuous; even	REN	TSURANARU TSURERU SHIKIRINI
 F99B	鍊	167	17				934A	鍊	smelt metals, forge; refine	REN	NERU
 F99C	列	18	6				5217	列	a line; to arrange in order, classify	RETSU REI	TSURANERU
@@ -14520,13 +14588,21 @@ F99D	劣	19	6				52A3	劣	bad, inferior; slightly	RETSU	OTORU
 F99E	咽	30	9				54BD	咽	throat; pharynx	IN ETSU	NODO
 F99F	烈	86	10				70C8	烈	fiery, violent, vehement, ardent	RETSU	HAGESHII
 F9A0	裂	145	12				88C2	裂	split, crack, break open; rend	RETSU	SAKU SAKERU
+F9A1	說	149	14				8AAA	說	speak, say, talk; scold, upbraid	SETSU ZEI ETSU	TOKU YOROKOBU
 F9A2	廉	53	13				5EC9	廉	upright, honorable, honest	REN	KADO YASUI
 F9A3	念	61	8				5FF5	念	think of, recall, study	NEN	OMOU NENJIRU
 F9A4	捻	64	11				637B	捻	to twist, nip with the fingers	NEN JOU	HINERU
 F9A5	殮	78	17				6BAE	殮	dress corpse for burial	REN	OSAMERU
+F9A6	簾	118	19				7C3E	簾	a blind, screen, curtain	REN	SUDARE SU
+F9A7	獵	94	18				7375	獵	hunt; field sports	RYOU	KARI KARU
 F9A8	令	9	5				4EE4	令	command, order; 'commandant', magistrate; allow, cause	REI RYOU	IITSUKE OSA
+F9A9	囹	31	8				56F9	囹	prison, enclosure	REI	
 F9AA	寧	40	14				5BE7	寧	repose, serenity, peace; peaceful	NEI NYOU	YASUI MUSHIRO NANZO
+F9AB	嶺	46	17				5DBA	嶺	mountain ridge, mountain peak	REI RYOU	MINE
+F9AC	怜	61	8				601C	怜	pity, sympathize	REI RYOU REN	SATOI AWAREMU
 F9AD	玲	96	9				73B2	玲	tinkling of jade	REI ROU	
+F9AE	瑩	96	15				7469	瑩	lustre of gems; bright, lustrous	EI	AKIRAKA MIGAKU SHIBOMU
+F9AF	羚	123	11				7F9A	羚	species of antelope	REI RYOU	KAMOSHIKA
 F9B0	聆	128	11				8046	聆	listen, hear	REI RYOU	KIKU
 F9B1	鈴	167	13				9234	鈴	bell	REI RIN RYOU	SUZU
 F9B2	零	173	13				96F6	零	zero; fragment, fraction	REI	OCHIRU FURU KOBORERU
@@ -14534,6 +14610,8 @@ F9B3	靈	173	24				9748	靈	spirit, soul; spiritual world	REI RYOU	TAMA
 F9B4	領	181	14				9818	領	neck; collar; lead, guide	RYOU REI	UNAJI ERI OSAMERU
 F9B5	例	9	8				4F8B	例	precedent, example; regulation	REI RETSU	TATOERU TAGUI TAMESHI
 F9B6	禮	113	18				79AE	禮	social custom; manners; courtesy; rites	REI RAI	REI OJIGI
+F9B7	醴	164	20				91B4	醴	sweet wine; sweet spring	REI RAI	AMAZAKE
+F9B8	隸	171	17				96B8	隸	be subservient to; servant	REI I	SHIMOBE SHITAGAU
 F9B9	惡	61	12				60E1	惡	evil, wicked, bad, foul	O AKU	WARUI
 F9BA	了	6	2				4E86	了	to finish; particle of completed action	RYOU	OWARU TSUINI
 F9BB	僚	9	14				50DA	僚	officials; bureaucracy	RYOU	TOMO TSUKASA
@@ -14541,19 +14619,33 @@ F9BC	寮	40	15				5BEE	寮	shanty, hut, shack	RYOU	TSUKASA
 F9BD	尿	44	7				5C3F	尿	urine; urinate	NYOU	IBARI
 F9BE	料	68	10				6599	料	consider, conjecture; material	RYOU	HAKARU
 F9BF	樂	75	15				6A02	樂	happy, glad; enjoyable; music	GAKU RAKU GOU	TANOSHII
+F9C0	燎	86	16				71CE	燎	to burn, set afire; to illuminate; a signal lamp	RYOU	KAGARIBI
 F9C1	療	104	17				7642	療	be healed, cured, recover	RYOU	IYASU
+F9C2	蓼	140	14				84FC	蓼	smartweed, polygonum	RYOU RIKU	TADE
+F9C3	遼	162	16				907C	遼	distant, far	RYOU	HARUKA
 F9C4	龍	212	16				9F8D	龍	dragon; symbolic of emperor	RYUU ROU	TATSU
+F9C5	暈	72	13				6688	暈	halo in sky; fog; dizzy, faint	UN	KASA BOKASHI MEMAI
+F9C6	阮	170	7				962E	阮	ancient musical instrument; surname	GEN	
+F9C7	劉	18	15				5289	劉	surname; kill, destroy	RU RYUU	KOROSU
+F9C8	杻	75	8				677B	杻	Ligustrum sinense, Chinese privet	CHUU CHU SHUU NYU	TEKASE
 F9C9	柳	75	9				67F3	柳	willow tree; pleasure	RYUU	YANAGI
 F9CA	流	85	9				6D41	流	flow, circulate, drift; class	RYUU RU	NAGARERU NAGASU NAGARE
+F9CB	溜	85	13				6E9C	溜	slide, glide, slip; slippery	RYUU	SHITATARU TAMERU TAMARU
+F9CC	琉	96	10				7409	琉	sparkling stone; glazed, opaque	RYUU RU	
 F9CD	留	102	10				7559	留	stop, halt; stay, detain, keep	RYUU RU	TOMERU TODOMARU TOMARU
 F9CE	硫	112	11				786B	硫	sulfur	RYUU	IOU
+F9CF	紐	120	10				7D10	紐	knot; button; handle, knob; tie	CHUU JUU	HIMO
 F9D0	類	181	19			Y	985E	類	class, group, kind, category	RUI RAI	TAGUI
 F9D1	六	12	4				516D	六	number six	ROKU RIKU	MUTSU MUTABI
+F9D2	戮	62	15				622E	戮	kill, massacre; oppress	RIKU RYUU	KOROSU
 F9D3	陸	170	11				9678	陸	land, continental; army	RIKU ROKU	OKA
 F9D4	倫	9	10				502B	倫	normal human relationships	RIN	TAGUI TSUIDE MICHI
+F9D5	崙	46	11				5D19	崙	Kunlun mountains in Jiangsu	RON RIN	
+F9D6	淪	85	11				6DEA	淪	be lost; sink, be submerged	RIN RON	SHIZUMU
 F9D7	輪	159	15				8F2A	輪	wheel; revolve, turn; recur	RIN	WA
 F9D8	律	60	9				5F8B	律	statute, principle, regulation	RITSU RICHI	NORI
 F9D9	慄	61	13				6144	慄	shiver, shudder, tremble; tremble	RITSU	OSORERU ONONOKU
+F9DA	栗	75	10				6817	栗	chestnut tree, chestnuts; surname	RITSU	KURI ONONOKU
 F9DB	率	95	11				7387	率	to lead; ratio; rate; limit	RITSU SOTSU	HIKIIRU OOMUNE WARIAI
 F9DC	隆	170	12				9686	隆	prosperous, plentiful, abundant	RYUU	NAKADAKA TAKAI
 F9DD	利	18	7				5229	利	gains, advantage, profit, merit	RI	KIKU YOI SURUDOI
@@ -14565,20 +14657,30 @@ F9E2	梨	75	11				68A8	梨	pear; opera; cut, slash	RI	NASHI
 F9E3	泥	85	8				6CE5	泥	mud, mire; earth, clay; plaster	DEI	DORO NAZUMU
 F9E4	理	96	11				7406	理	reason, logic; manage	RI	SUJI KOTOWARI OSAMERU
 F9E5	痢	104	12				75E2	痢	dysentery	RI	HARAKUDARI
+F9E6	罹	122	16				7F79	罹	sorrow, grief; incur, meet with	RI RA	KAKARU
 F9E7	裏	145	13				88CF	裏	inside, interior, within	RI	URA
+F9E8	裡	145	12				88E1	裡	inside, interior, within	RI	URA UCHI
 F9E9	里	166	7				91CC	里	unit of distance; village; lane	RI	SATO
 F9EA	離	172	18				96E2	離	leave, depart; go away; separate	RI	HANARERU HANASU TSUKU
 F9EB	匿	23	10				533F	匿	hide; go into hiding	TOKU	KAKURERU KAKUSU
 F9EC	溺	85	13				6EBA	溺	drown; submerge in water; indulge	DEKI JOU NYOU	OBORERU IBARI
 F9ED	吝	30	7				541D	吝	stingy, miserly, parsimonious	RIN	OSHIMU
+F9EE	燐	86	16				71D0	燐	phosphorus	RIN	ONIBI
+F9EF	璘	96	16				7498	璘	luster of jade	RIN	
+F9F0	藺	140	19				85FA	藺	rush used in making mats; surname	RIN	I
 F9F1	隣	170	15				96A3	隣	neighbor; neighboring; adjacent	RIN	TONARI TONARU
+F9F2	鱗	195	23				9C57	鱗	fish scales	RIN	UROKO
+F9F3	麟	198	23				9E9F	麟	female of Chinese unicorn	RIN	
 F9F4	林	75	8				6797	林	forest, grove; surname	RIN	HAYASHI
+F9F5	淋	85	11				6DCB	淋	drip, soak, drench; perfectly	RIN	SABISHII
 F9F6	臨	131	17				81E8	臨	draw near, approach; descend	RIN	NOZOMU
 F9F7	立	117	5				7ACB	立	stand; let stand; establish, set	RITSU RYUU	TATSU TATERU TACHIDOKORO
+F9F8	笠	118	11				7B20	笠	bamboo hat; bamboo covering	RYUU	KASA
 F9F9	粒	119	11				7C92	粒	grain; small particle	RYUU	TSUBU
 F9FA	狀	94	8				72C0	狀	form; appearance; shape; official	JOU	
 F9FB	炙	86	8				7099	炙	roast, broil; toast; cauterize	SHA SEKI	ABURU
 F9FC	識	149	19				8B58	識	recognize, understand, know	SHIKI SHOKU SHI	SHIRU SHIRUSHI SHIRUSU
+F9FD	什	9	4				4EC0	什	file of ten soldiers	SHUU JUU	KUMI TOU MAJIRU
 F9FE	茶	140	9				8336	茶	tea	CHA SA TA	CHA
 F9FF	刺	18	8				523A	刺	stab; prick, irritate; prod	SHI SEKI	SASU SOSHIRU TOGE
 FA00	切	18	4				5207	切	cut, mince, slice, carve	SETSU SAI	KIRU KIRE KIRI
@@ -14588,9 +14690,11 @@ FA03	糖	119	16				7CD6	糖	sugar; candy; sweets	TOU	AME SATOU
 FA04	宅	40	6				5B85	宅	residence, dwelling, home; grave	TAKU	IE SUMAU YAKE
 FA05	洞	85	9				6D1E	洞	cave, grotto; ravine; hole	DOU TOU	HOGARAKA FUKAI HORA
 FA06	暴	72	15				66B4	暴	violent, brutal, tyrannical	BOU BAKU	ABAKU ABARERU
+FA07	輻	159	16				8F3B	輻	spokes of wheel	FUKU	YA
 FA08	行	144	6				884C	行	go; walk; move, travel; circulate	KOU GYOU AN	IKU YUKU OKONAU
 FA09	降	170	9				964D	降	descend, fall, drop; lower, down	KOU	ORIRU FURU TAGURU
 FA0A	見	147	7				898B	見	see, observe, behold; perceive	KEN	MIRU MIERU MAMIERU
+FA0B	廓	53	14				5ED3	廓	broad, wide, open, empty; expand	KAKU	TORIDE KURUWA
 FA0C	兀	10	3				5140	兀	duplicate of Big Five A461	KOTSU GOTSU	TAKAI HAGERU ASHIKIRU
 FA0D	嗀	30	13				55C0	嗀	vomit	KAKU	HAKUSAMA
 FA10	塚	32	13				585A	塚	cemetery; tomb	CHOU	TSUKA
@@ -14605,7 +14709,7 @@ FA1B	福	113	14			Y	798F	福	happiness	FUKU	SAIWAI HIMOROGI
 FA1C	靖	174	13				9756	靖	pacify; appease; calm	SEI JOU	YASUI YASUNJIRU YASU
 FA1D	精	119	14				7CBE	精	essence; semen; spirit	SEI SHOU	SHIRAGEYONE KUWASHII KOKORO
 FA1E	羽	124	6				7FBD	羽	feather	U	HA HANE
-FA20	蘒	140	26	24			8612	蘒			HAGI
+FA20	蘒	140	26	24			8612	蘒	265:143		HAGI
 FA22	諸	149	16			Y	8AF8	諸	several	SHO	MORO KORE
 FA25	逸	162	12				9038	逸	flee	ITSU ICHI	HASHIRU USHINAU SORERU
 FA26	都	163	12			Y	90FD	都	metropolis	TO TSU CHO	MIYAKO SUBETE
@@ -14627,6 +14731,7 @@ FA38	器	30	16			Y	5668	器	receptacle, vessel; instrument	KI	UTSUWA
 FA39	塀	32	14				5840	塀	wall, fence	HEI	KAKI
 FA3A	墨	32	15			Y	58A8	墨	ink; writing	BOKU MOKU	SUMI
 FA3B	層	44	15			Y	5C64	層	story, layer, floor, stratum	SOU	KASANARU KASA
+FA3C	屮	45	3				5C6E	屮	sprout; KangXi radical 45	SA	HIDARI HIDARITE
 FA3D	悔	61	11			Y	6094	悔	repent, show remorse, regret	KAI	KUIRU KUYAMU
 FA3E	慨	61	15				6168	慨	sigh, regret; generous	GAI KAI	NAGEKU
 FA3F	憎	61	15			Y	618E	憎	hate, detest, abhor; hatred	ZOU	NIKUMU NIKUSHIMI NIKUI
@@ -14639,6 +14744,7 @@ FA45	海	85	10			Y	6D77	海	sea, ocean; maritime	KAI	UMI
 FA46	渚	85	12			Y	6E1A	渚	small sand bank, islet	SHO	NAGISA
 FA47	漢	85	14			Y	6F22	漢	the Chinese people, Chinese language	KAN	KARA
 FA48	煮	86	13			Y	716E	煮	cook	SHA SHO	NIRU NIERU
+FA49	爫	87	4				722B	爫	radical 87		TSUMEKANMURI TSUMEGASHIRA
 FA4A	琢	96	13			Y	7422	琢	polish jade; cut jade	TAKU	MIGAKU
 FA4B	碑	112	13			Y	7891	碑	stone tablet; gravestone	HI	TATEISHI ISHIBUMI
 FA4C	社	113	8			Y	793E	社	god of the soil and altars to him; group of families; company, society	SHA JA	YASHIRO KUMIAI KOSO
@@ -14653,6 +14759,7 @@ FA54	穀	115	15			Y	7A40	穀	corn, grain, cereal; lucky	KOKU	TANATSUMOTSU
 FA55	突	116	9			Y	7A81	突	suddenly, abruptly, unexpectedly	TOTSU	TSUKU
 FA56	節	118	15			Y	7BC0	節	knot, node, joint; section	SETSU SECHI	FUSHI MISAO NOTTO
 FA57	練	120	15			Y	7DF4	練	practice, drill, exercise, train	REN	NERU NERIGINU
+FA58	縉	120	16				7E09	縉	red silk	SHIN	SASHIHASAMU
 FA59	繁	120	17			Y	7E41	繁	complicated, complex, difficult	HAN	SHIGESHI SHIGERU
 FA5A	署	122	14			Y	7F72	署	public office	SHO	YAKUWARI SHIRUSU
 FA5B	者	125	9			Y	8005	者	that which; he who; those who	SHA	MONO
@@ -14664,50 +14771,80 @@ FA62	謁	149	16			Y	8B01	謁	visit, pay respects to	ETSU	MAMIERU
 FA63	謹	149	18			Y	8B39	謹	prudent, cautious; attentive	KIN	TSUTSUSHIMU
 FA64	賓	154	14			Y	8CD3	賓	guest, visitor; surname; submit	HIN	MAROUDO SHITAGAU
 FA65	贈	154	19			Y	8D08	贈	give present; bestow, confer	ZOU SOU	OKURU
+FA66	辶	162	3				8FB6	辶	walk; walking; KangXi radical 162	CHAKU	SHINNYOU
 FA67	逸	162	12			Y	9038	逸	flee, escape, break loose	ITSU ICHI	HASHIRU USHINAU SORERU
 FA68	難	172	19			Y	96E3	難	difficult, arduous, hard; unable	NAN	KATAI MUZUKASHII
 FA69	響	180	22			Y	97FF	響	make sound, make noise; sound	KYOU	HIBIKU HIBIKI
 FA6A	頻	181	16				983B	頻	frequently, again and again	HIN BIN	SHIKIRINI
 FA6B	恵	61	11				6075	恵	favor, benefit, confer kindness	KEI E	MEGUMU MEGUMI
+FA6D	舘	30	16				8218	舘	a mansion; a building	KAN	YAKATA
 FA70	並	1	9				4E26	並	equal to; side by side; also, what is more; both	HEI	NAMI NARABERU NARABINI
+FA71	况	15	7				51B5	况	condition, situation; furthermore	KYOU	IWANYA OMOMUKI
 FA72	全	11	6				5168	全	maintain, keep whole or intact	ZEN SEN	MATTAKU MATTAI MATTOUSURU
+FA73	侀	9	10				4F80	侀	form	KEI KYAU	NARU
 FA74	充	10	5				5145	充	fill, be full, supply	JUU SHUU	ATERU MICHIRU MITASU
 FA75	冀	12	16				5180	冀	hope for; wish; Hebei province	KI	KOINEGAU KOINEGAWA
 FA76	勇	19	9				52C7	勇	brave, courageous, fierce	YUU	ISAMASHII ISAMU
+FA77	勺	20	3				52FA	勺	spoon, ladle; unit of volume	SHAKU	SHAKU
 FA78	喝	30	11				559D	喝	drink; shout, call out	KATSU AI	SHIKARU
+FA79	啕	30	11				5555	啕	wail	TOU DOU	OSHABERI
+FA7A	喙	30	12				5599	喙	beak, bill, snout; pant	KAI	KUCHIBASHI
+FA7B	嗢	30	12				55E2	嗢		ECHI OCHI OTSU WATSU	MUSEBU NOMU
 FA7C	塚	32	12				585A	塚	cemetery; tomb, burial mound	CHOU	TSUKA
 FA7D	墳	32	16				58B3	墳	grave, mound; bulge; bulging	FUN	HAKA
 FA7E	奄	37	8				5944	奄	ere long; remain, tarry; feeble	EN	OOU TACHIMACHI
 FA7F	奔	37	9				5954	奔	run fast, flee; rush about; run	HON	HASHIRU
+FA80	婢	38	10				5A62	婢	servant girl; your servant	HI	HASHITAME
+FA81	嬨	38	17				5B28	嬨		SHI JI	
+FA82	廒	53	13				5ED2	廒	a granary	GOU	
+FA83	廙	53	14				5ED9	廙		YOKU YOKI I	TENMAKU TSUTSUSHIMU HISASHI
 FA84	彩	59	10				5F69	彩	hue, color; variegated colors	SAI	IRODORU IRODORI TSUYA
+FA85	徭	60	12				5FAD	徭	conscript labor, compulsory labor	YOU	EDACHI
+FA86	惘	61	11				60D8	惘	disconcerted, dejected, discouraged	BOU MOU	AKIRERU
 FA87	慎	61	12				614E	慎	act with care, be cautious	SHIN	TSUTSUSHIMU TSUTSUSHIMI
+FA88	愈	61	13				6108	愈	more and more, even more	YU	MASARU IYOIYO
 FA89	憎	61	14				618E	憎	hate, detest, abhor; hatred	ZOU	NIKUMU NIKUSHIMI NIKUI
 FA8A	慠	61	13				6160	慠		GOU	OGORU UREERU
 FA8B	懲	61	18				61F2	懲	punish, reprimand; warn	CHOU	KORASU KORIRU KORASHIMERU
 FA8C	戴	62	17				6234	戴	wear on top; support	TAI	ITADAKU
+FA8D	揄	64	12				63C4	揄	lift, raise; praise; hang; flap	YU YUU	HIKU UGOKASU NABURU
 FA8E	搜	64	12				641C	搜	search, seek; investigate	SOU	SAGASU
+FA8F	摒	64	12				6452	摒	expel, cast off; arrange	HEI HYOU	HARAU
+FA90	敖	66	10				6556	敖	ramble, play about; leisurely; surname	GOU	ASOBU OGORU
 FA91	晴	72	12				6674	晴	clear weather, fine weather	SEI	HARERU HARE HARASU
 FA92	朗	74	10				6717	朗	clear, bright; distinct	ROU	HOGARAKA AKIRAKA
 FA93	望	74	11				671B	望	to look at, look forward; to hope, expect	BOU MOU	NOZOMU NOZOMI MOCHI
+FA94	杖	75	8				6756	杖	cane, walking stick	JOU	TSUE
+FA95	歹	78	4				6B79	歹	bad, vicious, depraved, wicked	GATSU ATSU GACHI	WARUI KABANEHEN
 FA96	殺	79	10				6BBA	殺	kill, slaughter, murder; hurt; to pare off, reduce, clip	SATSU SETSU SAI	KOROSU SOGU KEZURU
 FA97	流	85	9				6D41	流	flow, circulate, drift; class	RYUU RU	NAGARERU NAGASU NAGARE
 FA99	滋	85	13				6ECB	滋	grow, multiply, increase; thrive	JI SHI	SHIGERU MASU MASUMASU
 FA9A	漢	85	13				6F22	漢	the Chinese people, Chinese language	KAN	KARA
+FA9B	瀞	85	19				701E	瀞	pool in a river	JOU SEI	KYOI TORO
 FA9C	煮	86	12				716E	煮	cook	SHA SHO	NIRU NIERU
+FA9D	瞧	109	17				77A7	瞧	glance at, look at, see	SHOU JOU	NUSUMIMIRU
 FA9E	爵	87	17				7235	爵	feudal title or rank	SHAKU	SAKAZUKI
 FA9F	犯	94	6				72AF	犯	commit crime, violate; criminal	HAN BON	OKASU
 FAA0	猪	94	11				732A	猪	pig, hog, wild boar	CHO	INOSHISHI I
+FAA1	瑱	96	14				7471	瑱	a gem used as ear plug; a jade earring	TEN CHIN SHIN	MIMIDAMA
+FAA2	甆	98	14				7506	甆		SHI JI	KAME
 FAA3	画	102	8				753B	画	a painting, picture, drawing; to draw	GA KAKU	KAGIRU HAKARU HAKARIGOTO
+FAA4	瘝	104	14				761D	瘝	illness; pain; neglect; useless	KAN KEN	YAMU
+FAA5	瘟	104	14				761F	瘟	epidemic, plague, pestilence	ON	EYAMI
 FAA6	益	108	10				76CA	益	profit, benefit; advantage	EKI YAKU	MASU MASUMASU
 FAA7	盛	108	12				76DB	盛	abundant, flourishing; contain; fill	SEI JOU	MORU SAKAN SAKARU
 FAA8	直	109	8				76F4	直	straight, erect, vertical	CHOKU JIKI	NAOSU TADACHINI NAOI
+FAA9	睊	109	11				774A	睊	see, look, gaze at; askance	EN DAN	NUSUMIMIRU
 FAAA	着	109	11				7740	着	make move, take action	CHAKU JAKU	KIRU TSUKU
+FAAB	磌	112	15				78CC	磌		TEN DEN SHIN	
 FAAD	節	118	13				7BC0	節	knot, node, joint; section	SETSU SECHI	FUSHI MISAO NOTTO
+FAAF	絛	120	12				7D5B	絛	silk braid, sash	JOU TOU	SANADA
 FAB0	練	120	14				7DF4	練	practice, drill, exercise, train	REN	NERU NERIGINU
 FAB1	缾	121	14				7F3E	缾	jar, bottle	HEI	BIN
 FAB2	者	125	8				8005	者	that which; he who; those who	SHA	MONO
 FAB3	荒	140	9				8352	荒	wasteland, desert; uncultivated	KOU	ARERU ARAI ARASU
 FAB4	華	140	9				83EF	華	flowery; illustrious; Chinese	KA KE	HANA HANAYAKA
+FAB6	襁	145	16				8941	襁	swaddling clothes	KYOU	MUTSUKI
 FAB7	覆	146	18				8986	覆	cover; tip over; return; reply	FUKU FUU	OOU KUTSUGAESU OOI
 FAB8	視	113	11				8996	視	look at, inspect, observe, see	SHI	MIRU
 FAB9	調	149	15				8ABF	調	transfer, move, change; tune	CHOU	TOTONOU SHIRABERU YAWARAGU
@@ -14717,14 +14854,20 @@ FABC	謁	149	15				8B01	謁	visit, pay respects to	ETSU	MAMIERU
 FABD	諾	149	16				8AFE	諾	promise; assent, approve	DAKU	UBENAU
 FABE	諭	149	16				8AED	諭	proclaim, instruct; edict	YU	SATOSU
 FABF	謹	149	16				8B39	謹	prudent, cautious; attentive	KIN	TSUTSUSHIMU
+FAC0	變	149	22				8B8A	變	change, transform, alter; rebel	HEN	KAWARU
 FAC1	贈	154	18				8D08	贈	give present; bestow, confer	ZOU SOU	OKURU
 FAC2	輸	159	16				8F38	輸	transport, carry, haul	YU SHU	OKURU ITASU
+FAC3	遲	162	14				9072	遲	late, tardy; slow; delay	CHI	OSOI OKURERU
 FAC5	鉶	167	16				9276	鉶	sacrificial cauldron	KEI GYOU	KANAE
+FAC6	陼	170	11				967C	陼	islet	SHO TO TSU ZU	SHIMA
 FAC7	難	172	18				96E3	難	difficult, arduous, hard; unable	NAN	KATAI MUZUKASHII
+FAC8	靖	174	13				9756	靖	pacify; appease; calm, peaceful	SEI JOU	YASUI YASUNJIRU YASU
 FAC9	韛	178	19				97DB	韛		HAI BAI FUKU BUKU	FUIGAU EBIRA
 FACA	響	180	20				97FF	響	make sound, make noise; sound	KYOU	HIBIKU HIBIKI
 FACC	頻	181	17				983B	頻	frequently, again and again	HIN BIN	SHIKIRINI
 FACD	鬒	190	20				9B12	鬒	black, glossy hair	SHIN	OOI
+FACE	龜	213	15				9F9C	龜	turtle or tortoise; cuckold	KI KYUU KIN	KAME
+FAD8	齃	209	22				9F43	齃		KATSU KACHI ATSU ACHI	NEIKI
 20B9F	𠮟	30	5		Y				scold, shout at, bawl out	SHITSU SHICHI	SHIKARU
 20BEE	𠯮	30	7						(J) nonstandard variant of 品 U+54C1, an article, product, commodity	HIN HON	SHINA
 21C56	𡱖	44	9						female genitalia; vulva		TSUBI KUBO
@@ -14747,70 +14890,126 @@ FACD	鬒	190	20				9B12	鬒	black, glossy hair	SHIN	OOI
 29D4B	𩵋	195	10						(J) nonstandard variant of 魚 U+9B5A, fish	GYO	UO SAKANA SUNADORU
 2A012	𪀒	196	17						variant of 鴟 U+9D1F, a kite (bird)	SHI	TOBI
 2A269	𪉩	197	19						variant of 塩 U+5869, salt	EN	SHIO
+2F800	丽	1	8				4E3D	丽	beautiful, magnificent, elegant	REI	URUWASHI
 2F801	丸	3	3				4E38	丸	small round object; pellet, pill	GAN	MARUI MARUMERU TAMA
+2F802	乁	4	1				4E41	乁		I	NAGARERU
+2F804	你	9	7				4F60	你	you, second person pronoun	JI NI	NANJI
 2F805	侮	9	8				4FAE	侮	insult, ridicule, disgrace	BU	ANADORU ANADORI
+2F806	侻	9	9				4FBB	侻		TATSU TACHI TAI TE	KANAHU YOI TEGARU TAYASUI KARUI
+2F807	倂	9	10				5002	倂	combine	HEI	AWASERU NARABU SHIKASHI
+2F808	偺	9	11				507A	偺	(same as U+54B1 咱) we, us	SAN	
 2F809	備	9	13				5099	備	prepare, ready, perfect	BI	SONAERU SONAWARU SONAE
 2F80A	僧	9	13				50E7	僧	Buddhist priest, monk; san of Sanskrit sangha	SOU	BOUZU
 2F80B	像	9	14				50CF	像	a picture, image, figure; to resemble	ZOU SHOU	KATACHI KATADORU
 2F80E	免	10	7				514D	免	spare; excuse from; evade	MEN BEN	MANUKARERU YURUSU
+2F80F	兔	10	8				5154	兔	rabbit, hare	TO	USAGI
+2F810	兤	10	20				5164	兤		KOU	AKARUI
 2F811	具	12	8				5177	具	tool, implement; draw up, write	GU KU	SONAERU SONAE TSUBUSANI
+2F814	內	11	4				5167	內	inside, interior; domestic	DAI NAI	UCHI IRU IRERU
 2F815	再	13	6				518D	再	again, twice, re-	SAI SA	FUTATABI
 2F817	冗	14	4				5197	冗	business, duty	JOU	MUDA
+2F818	冤	14	10				51A4	冤	grievance, injustice, wrong	EN	KAGAMU NUREGINU
 2F81A	冬	15	5				51AC	冬	winter, 11th lunar month	TOU	FUYU
+2F81B	况	15	7				51B5	况	condition, situation; furthermore	KYOU	IWANYA OMOMUKI
+2F81D	凵	17	2				51F5	凵	receptacle; KangXi radical 17	KAN KON	KANNYOU KANGAMAE
 2F81E	刃	18	3				5203	刃	edged tool, cutlery, knife edge	JIN	HA YAIBA KIRU
 2F820	刻	18	8				523B	刻	carve, engrave; quarter hour	KOKU	KIZAMU KIZAMI TOKI
 2F821	剆	18	9				5246	剆		RA	UTSU
 2F822	割	18	12				5272	割	cut, divide, partition; cede	KATSU	WARU SAKU WARERU
+2F823	剷	18	13				5277	剷	to level off, cut off, pare down, raze	SAN SEN	KEZURU
 2F825	勇	19	9				52C7	勇	brave, courageous, fierce	YUU	ISAMASHII ISAMU
 2F826	勉	19	9				52C9	勉	endeavor, make effort; urge	BEN	TSUTOMERU
 2F827	勤	19	12				52E4	勤	industrious, diligent, attentive	KIN GON	TSUTOMERU TSUTOME
+2F828	勺	20	3				52FA	勺	spoon, ladle; unit of volume	SHAKU	SHAKU
 2F829	包	20	5				5305	包	wrap, pack, bundle; package	HOU	TSUTSUMU TSUTSUMI
+2F82A	匆	20	5				5306	匆	hastily, in haste, hurriedly	SOU	ISOGASHII
 2F82B	北	21	5				5317	北	north; northern; northward	HOKU HAI	KITA NIGERU
+2F82C	卉	24	6				5349	卉	general term for plants; myriads	KI	KUSA
 2F82D	卑	24	9				5351	卑	humble, low, inferior; despise	HI	HIKUI IYASHII IYASHIMERU
 2F82E	博	24	12				535A	博	gamble, play games; wide, broad	HAKU BAKU	HIROI HIROMERU
 2F82F	即	26	8				5373	即	promptly	SOKU SHOKU	TSUKU SUNAWACHI MOSHI
 2F830	卽	26	9				537D	卽	promptly	SOKU SHOKU	TSUKU SUNAWACHI MOSHI
+2F831	卿	26	11				537F	卿	noble, high officer	KYOU KEI	KIMI
+2F832	卿	26	11				537F	卿	noble, high officer	KYOU KEI	KIMI
+2F833	卿	26	12				537F	卿	noble, high officer	KYOU KEI	KIMI
 2F835	灰	27	6				7070	灰	ashes, lime	KAI	HAI
 2F836	及	29	3				53CA	及	extend; reach; come up to; and	KYUU	OYOBU OYOBI OYOBOSU
+2F837	叟	29	7				53DF	叟	old man; elder	SOU SHUU	OKINA
 2F839	叫	30	5				53EB	叫	cry, shout; hail, greet, call	KYOU	SAKEBU
 2F83A	叱	30	5				53F1	叱	scold, shout at, bawl out	SHITSU SHICHI	SHIKARU
+2F83B	吆	30	6				5406	吆	bawl, yell, shout, cry out	YOU	KOE KOGOE
 2F83D	吸	30	6				5438	吸	inhale, suck in; absorb; attract	KYUU	SUU
 2F83E	呈	30	7				5448	呈	submit, show; appear; petition	TEI	SHIMESU
 2F83F	周	30	8				5468	周	Zhou dynasty; circumference	SHUU	MAWARI AMANESHI MEGURU
 2F840	咢	30	9				54A2	咢	sound; drumming	GAKU	ODOROKU
+2F841	哶	30	10				54F6	哶	bleat	BA ME BI MI	
 2F842	唐	30	10				5510	唐	Tang dynasty; Chinese	TOU	KARA
 2F843	啓	30	11				5553	啓	open; begin, commence; explain	KEI	HIRAKU MOUSU
+2F844	啣	30	11				5563	啣	hold in mouth; harbor, cherish	KAN GAN	KUTSUWA KUTSUBAMI FUKUMU
 2F845	善	30	12				5584	善	good, virtuous, charitable, kind	ZEN	YOI
 2F846	善	30	12				5584	善	good, virtuous, charitable, kind	ZEN	YOI
+2F847	喙	30	12				5599	喙	beak, bill, snout; pant	KAI	KUCHIBASHI
 2F848	喫	30	12				55AB	喫	eat; drink; suffer, endure, bear	KITSU KEKI	KUU NOMU
+2F849	喳	30	12				55B3	喳	whispering	SA	SAWAGU
+2F84A	嗂	30	13				55C2	嗂		EU	YOROKOBU TANOSHIMU
+2F84B	圖	31	13				5716	圖	diagram; chart, map, picture	TO ZU	HAKARU
 2F84C	嘆	30	13				5606	嘆	sigh, admire	TAN	NAGEKU NAGEKI
+2F84D	圗	31	14				5717	圗	diagram; chart, map, picture	TO ZU	HAKARU EGAAKU E
 2F84F	噴	30	16				5674	噴	spurt, blow out, puff out	FUN	FUKU HAKU
 2F850	切	18	5				5207	切	cut, mince, slice, carve	SETSU SAI	KIRU KIRE KIRI
 2F851	壮	33	6				58EE	壮	big, large; robust; name of tribe	SOU	SAKAN
 2F852	城	32	10				57CE	城	castle; city, town; municipality	JOU	SHIRO KIZUKU
+2F853	埴	32	11				57F4	埴	soil with large clay content	SHOKU	HANI
+2F854	堍	32	11				580D	堍		TO	
 2F855	型	32	11				578B	型	pattern, model, type; law; mold	KEI	KATA
+2F856	堲	32	12				5832	堲	hate	SHITSU SHICHI SHOKU JIKI SHIKI SHI	YAKITSUCHI MOESASHI NIKUMU ASAGU
 2F857	報	32	13				5831	報	report, tell, announce	HOU	SHIRASERU MUKUIRU
+2F858	墬	32	15				58AC	墬	to fall, sink	CHI	
 2F85A	売	33	7				58F2	売	sell; betray; show off	BAI MAI	URU
+2F85B	壷	33	13				58F7	壷	jar, pot, jug, vase; surname	KO	TSUBO
+2F85C	夆	34	7				5906	夆	resist	HOU FU BA	SAKARAU HIKU AU ATSUI
 2F85D	多	36	6				591A	多	much, many; more than, over	TA	OOI MASARU MASANI
 2F85E	夢	36	13				5922	夢	dream; visionary; wishful	MU	YUME KURAI YUMEMIRU
+2F85F	奢	37	12				5962	奢	extravagant, wasteful; exaggerate	SHA	OGORU
 2F862	姬	38	10				59EC	姬	beauty; imperial concubine	KI	HIME
+2F863	娛	38	10				5A1B	娛	pleasure, enjoyment, amusement	GO KU	TANOSHIMU
+2F864	娧	38	10				5A27	娧		TAI TE ETSU ECHI	MIMEYOI YOROKOBU
+2F865	姘	38	11				59D8	姘	illicit sexual relations	HIN HAU HEI	
 2F866	婦	38	11				5A66	婦	married women; woman; wife	FU	YOME ONNA
+2F869	嬈	38	14				5B08	嬈	graceful, charming, fascinating	DEU NEU ZEU DAU EU KEU	WAZURUWASHII NAYAMU
 2F86A	嬾	38	19				5B3E	嬾	lazy, languid, listless	RAN	OKOTARU MONOUI
 2F86B	嬾	38	19				5B3E	嬾	lazy, languid, listless	RAN	OKOTARU MONOUI
+2F86D	寃	40	11				5BC3	寃	grievance, injustice, wrong	EN	KAGAMU NUREGINU
+2F86E	寘	40	13				5BD8	寘	put aside, put down; discard	SHI	OKU IRERU TOMERU SUKORU
 2F86F	寧	40	14				5BE7	寧	repose, serenity, peace; peaceful	NEI NYOU	YASUI MUSHIRO NANZO
+2F870	寳	40	19				5BF3	寳	treasure, jewel; precious, rare	HOU	TAKARA
 2F872	寿	41	7				5BFF	寿	old age, long life; lifespan	JU JUU SU SHUU	KOTOBUKI HISASHII KOTOHOGU
 2F873	将	41	10				5C06	将	will, going to, future; general	SHOU SOU	HIKIIRU MOTTE HATA
 2F874	当	42	6				5F53	当	bear, accept, undertake; just	TOU	ATARU ATERU ATE
+2F875	尢	43	3				5C22	尢	weak; KangXi radical 43	OU	ASHINAE SEMUSHI
+2F877	屠	44	12				5C60	屠	butcher, slaughter, massacre	TO CHO	HOFURU
+2F878	屮	45	3				5C6E	屮	sprout; KangXi radical 45	SA	HIDARI HIDARITE
+2F879	峀	46	8				5CC0	峀	mountain peak; cave, cavern	SHUU YUU	
+2F87C	嵃	46	12				5D43	嵃		GEN GAN	KEHASHII KEHASHIISAMA
+2F880	嵼	46	14				5D7C	嵼		SAN SEN	
 2F881	巡	47	6				5DE1	巡	patrol, go on circuit, cruise	JUN	MEGURU
 2F884	巽	49	12				5DFD	巽	5th of the 8 trigrams; south-east; mild, modest, obedient	SON	TATSUMI
+2F885	帨	50	10				5E28	帨	handkerchief, kerchief, shawl	SEI SAI ETSU ECHI SUI ZEI	TEHUKI
 2F886	帽	50	12				5E3D	帽	hat, cap; cap-like tops	BOU MOU	BOUSHI
+2F887	幩	50	16				5E69	幩	trappings	FUN BUN HI	KUTSUWANOKAZARI
+2F88B	庰	53	11				5EB0	庰		HEI HYOU BYOU	OOI OOU OSAMERU
+2F88C	庳	53	10				5EB3	庳	a low-built house	HI BI	HIKUI
 2F88D	庶	53	11				5EB6	庶	numerous, various; multitude	SHO	MOROMORO KOINEGAU CHIKAI
 2F88E	廊	53	13				5ECA	廊	corridor, porch, veranda	ROU	WATADONO
 2F890	廾	55	4				5EFE	廾	two hands; KangXi radical 55	KYOU KU	SASAGERU
+2F893	舁	134	9				8201	舁	carry on one's shoulder	YO	KAKU
+2F894	弢	57	8				5F22	弢	bow case; scabbard; sheathe	TOU	YUMIBUKURO
+2F895	弢	57	8				5F22	弢	bow case; scabbard; sheathe	TOU	YUMIBUKURO
 2F899	形	59	9				5F62	形	form, shape, appearance	KEI GYOU	KATACHI KATA ARAWARERU
 2F89A	彫	59	11				5F6B	彫	carve, decorate; emaciated	CHOU	HORU
 2F89D	忍	61	7				5FCD	忍	endure, bear, suffer; forbear	NIN	SHINOBU SHINOBI
 2F89E	志	61	7				5FD7	志	purpose, will, determination; annals	SHI	KOKOROZASU KOKOROZASHI SHIRUSU
+2F8A0	悁	61	9				6081	悁	irritable, nervous, impatient	EN KEN	UREERU IRADATSU
 2F8A3	悔	61	9				6094	悔	repent, show remorse, regret	KAI	KUIRU KUYAMU
 2F8A5	惇	61	12				60C7	惇	be kind, cordial, sincere	TON JUN	ATSUI MAKOTO
 2F8A6	慈	61	13				6148	慈	kind, charitable, benevolent	JI	ITSUKUSHIMU ITSUKUSHIMI
@@ -14820,87 +15019,187 @@ FACD	鬒	190	20				9B12	鬒	black, glossy hair	SHIN	OOI
 2F8AB	憎	61	14				618E	憎	hate, detest, abhor; hatred	ZOU	NIKUMU NIKUSHIMI NIKUI
 2F8AC	憲	61	16				61B2	憲	constitution, statute, law	KEN	NORI
 2F8AD	憤	61	16				61A4	憤	resent, hate; indignant	FUN	IKIDOORU IKIDOORI
+2F8AF	懞	61	17				61DE	懞	variant of U+8499 蒙	BOU MU	ATSUI
 2F8B0	懲	61	18				61F2	懲	punish, reprimand; warn	CHOU	KORASU KORIRU KORASHIMERU
+2F8B1	懶	61	19				61F6	懶	lazy, languid, listless	RAN RAI	OKOTARU MONOUI
 2F8B2	成	62	7				6210	成	completed, finished, fixed	SEI JOU	NARU TAIRAGERU NASU
+2F8B3	戛	62	11				621B	戛	lance; tap or strike lightly	KATSU	HOKO
 2F8B5	抱	64	8				62B1	抱	embrace, hold in arms, enfold	HOU	IDAKU DAKU KAKAERU
 2F8B6	拔	64	8				62D4	拔	uproot, pull out	BATSU HATSU HAI	NUKU NUKERU TASUKERU
+2F8B7	捐	64	9				6350	捐	contribute; give up, renounce	EN KEN	SUTERU ATAERU
+2F8B9	挽	64	10				633D	挽	pull; pull back, draw back	BAN	HIKU
+2F8BA	拼	64	11				62FC	拼	join together, link, incorporate	HOU HEI HYOU	SHITAGAU
 2F8BB	捨	64	11				6368	捨	discard, give up willingly; give alms	SHA	SUTERU
 2F8BC	掃	64	11				6383	掃	sweep, clear away; exterminate	SOU	HAKU HARAU
+2F8BF	搢	64	13				6422	搢	to stick into; to shake	SHIN SEN SEI SAI	HASAMU
+2F8C0	揅	64	15				63C5	揅	grind, rub; study, research; (Cant.) to play a stringed instrument	KEN	MIGAKU
+2F8C1	掩	64	13				63A9	掩	to cover (with the hand); shut, conceal; ambush	EN	OOU
 2F8C3	摩	64	15				6469	摩	rub, scour, grind; friction	MA	SURU
+2F8C5	撝	64	15				649D	撝	wave, brandish; modest, humble	KI I	HANASU
 2F8C8	敏	66	10				654F	敏	fast, quick, clever, smart	BIN MIN	TOSHI SATOI
 2F8C9	敬	66	12				656C	敬	respect, honor; respectfully	KEI KYOU	UYAMAU
+2F8CB	旣	71	11				65E3	旣	already; de facto; since; then	KI	TSUKIRU SUDENI
 2F8CC	書	73	10				66F8	書	book, letter, document; writings	SHO	KAKU FUMI
 2F8CD	晉	72	11				6649	晉	advance, increase; promote	SHIN SEN	SUSUMU OSAERU TSUTSUSHIMU
 2F8CF	暑	72	13				6691	暑	hot	SHO	ATSUI ATSUSA
 2F8D2	冒	13	9				5192	冒	risk, brave, dare	BOU	OKASU OOU
+2F8D3	冕	13	11				5195	冕	crown; ceremonial cap	BEN MEN	KANMURI
 2F8D4	最	73	12				6700	最	most, extremely, exceedingly	SAI	MOTTOMO MO
+2F8D5	暜	72	14				669C	暜		FU	AMANESHI
+2F8D6	肭	130	8				80AD	肭	fat; seal (moon radical DKW: 14342 is different)	DOTSU NACHI DATSU	KOERU
 2F8D8	朗	74	11				6717	朗	clear, bright; distinct	ROU	HOGARAKA AKIRAKA
 2F8D9	望	74	11				671B	望	to look at, look forward; to hope, expect	BOU MOU	NOZOMU NOZOMI MOCHI
+2F8DB	杞	75	7				675E	杞	willow; medlar tree; a small feudal state (Qi)	KO KI	SUKI FUGO MOKKO
+2F8DC	杓	75	7				6753	杓	handle of cup, ladle, spoon; name of a constellation	HYOU TEKI SHAKU	HISHAKU
+2F8E0	枅	75	10				6785	枅		KEI KEN	TOGATA HIJIKI
+2F8E1	桒	75	10				6852	桒		SOU	KUWA
 2F8E2	梅	75	10				6885	梅	plums; prunes; surname	BAI	UME
+2F8E4	梎	75	11				688E	梎	sickle handle, branch	OU YUU YOU	KAMANOE EDA
+2F8E5	栟	75	12				681F	栟	hemp palm	HEI HYUU HIN	
+2F8E8	楂	75	13				6942	楂	a raft, to hew, to fell trees	SA JA	IKADA
+2F8EA	槪	75	15				69EA	槪	generally	GAI KAI	TOKAKI OOMUNE OMOMUKI
+2F8ED	櫛	75	19				6ADB	櫛	comb out; weed out, eliminate	SHITSU	KUSHI KUSHIKEZURU
 2F8EF	次	76	6				6B21	次	order, sequence; next	JI SHI	TSUGU TSUGI TSUGINI
+2F8F1	歔	76	15				6B54	歔	blow through nose, snort	KYO	SUSURINAKU
+2F8F3	歲	77	14				6B72	歲	year; age; harvest	SEI SAI	TOSHI YOWAI
+2F8F4	殟	78	13				6B9F	殟		OTSU OCHI ON	
 2F8F5	殺	79	10				6BBA	殺	kill, slaughter, murder; hurt; to pare off, reduce, clip	SATSU SETSU SAI	KOROSU SOGU KEZURU
 2F8F6	殻	79	11				6BBB	殻	casing, shell, husk, hull, skin	KAKU KOKU	KARA
 2F8FA	汎	85	6				6C4E	汎	float, drift; afloat; careless	HAN FUU HOU	TADAYOU HIROI
 2F8FC	沿	85	8				6CBF	沿	follow a course, go along	EN	SOU
+2F8FD	泍	85	8				6CCD	泍		HON BON	
+2F8FE	汧	85	9				6C67	汧	name of a river in Shangdong; marsh; float	KEN KEI KYOU GEN	SAWA TADAYOU KIYOI
 2F900	派	85	9				6D3E	派	school of thought, sect, branch	HA	WAKARERU
 2F901	海	85	9				6D77	海	sea, ocean; maritime	KAI	UMI
 2F902	流	85	10				6D41	流	flow, circulate, drift; class	RYUU RU	NAGARERU NAGASU NAGARE
+2F903	浩	85	10				6D69	浩	great, numerous, vast, abundant	KOU	HIROI OOKII
 2F904	浸	85	10				6D78	浸	soak, immerse, dip, percolate	SHIN	HITASU HITARU YAYA
 2F905	涅	85	10				6D85	涅	blacken; black mud, slime	NETSU DETSU	SOMERU
 2F908	港	85	12				6E2F	港	port, harbor; small stream; bay	KOU	MINATO
+2F909	湮	85	12				6E6E	湮	bury, sink, block up; stain	IN EN	SHIZUMU FUSAGU
 2F90B	滋	85	12				6ECB	滋	grow, multiply, increase; thrive	JI SHI	SHIGERU MASU MASUMASU
+2F90C	滇	85	13				6EC7	滇	Yunnan province	TEN SHIN	
+2F90E	淹	85	13				6DF9	淹	drown; cover with liquid, steep	EN YOU	HITASU HISASHII TODOMARU
 2F90F	潮	85	15				6F6E	潮	tide; moist, wet, damp; flow	CHOU	SHIO USHIO
+2F912	濆	85	16				6FC6	濆	river bank; river in Henan province; gush	FUN HON	WAKU HOTORI
 2F913	瀹	85	16				7039	瀹	to boil; to wash, to cleanse, to soak	SEKU YOU	HITASU
+2F914	瀞	85	17				701E	瀞	pool in a river	JOU SEI	KYOI TORO
+2F915	瀛	85	20				701B	瀛	sea, ocean	EI	UMI
+2F917	灊	85	21				704A	灊		SEN ZEN SHIN JIN	
 2F918	災	86	8				707D	災	calamity, disaster, catastrophe	SAI	WAZAWAI
 2F91A	炭	86	9				70AD	炭	charcoal; coal; carbon	TAN	SUMI
+2F91C	煅	86	13				7145	煅	forge metal; perfect one's skill	TAN	KITAAERU
 2F920	爨	86	30				7228	爨	oven, cooking stove; cook	SAN	KASHIGU KAMADO
 2F921	爵	87	18				7235	爵	feudal title or rank	SHAKU	SAKAZUKI
+2F922	牐	91	11				7250	牐	sluice; flood gate, canal lock	SOU JOU	ITAGAKOI
+2F924	犀	93	11				7280	犀	rhinoceros; sharp, well-tempered	SEI SAI	SAI KATAI SURUDOI
 2F928	獺	94	19				737A	獺	otter	DATSU TATSU	KAWAUSO
 2F929	王	96	4				738B	王	king, ruler; royal; surname	OU	KIMI
+2F92B	玥	96	8				73A5	玥	mysterious gem; pearl	GETSU GACHI	
+2F92E	瑇	96	12				7447	瑇	tortoise shell	TAI	TAIMAI
+2F92F	瑜	96	13				745C	瑜	flawless gem or jewel	YU	
+2F930	瑱	96	14				7471	瑱	a gem used as ear plug; a jade earring	TEN CHIN SHIN	MIMIDAMA
+2F931	璅	96	17				7485	璅	gem	SOU SA	
 2F932	瓊	96	19				74CA	瓊	jade; rare, precious; elegant	KEI	TAMA
+2F934	甤	100	12				7524	甤	drooping leaves; fringe soft, delicate	ZUI NI	
+2F936	甾	102	9				753E	甾	ground that has been under cultivation for one year; evil, calamity	SHI	KAME
 2F938	異	102	11				7570	異	different, unusual, strange	I	KOTO KOTONARU AYASHII
 2F940	直	109	8				76F4	直	straight, erect, vertical	CHOKU JIKI	NAOSU TADACHINI NAOI
 2F945	眞	109	10				771E	眞	real, actual, true, genuine	SHIN	MA MAKOTO MAKOTONI
 2F946	真	109	10				771F	真	real, actual, true, genuine	SHIN	MAKOTO MAKOTONI MA
 2F947	真	109	10				771F	真	real, actual, true, genuine	SHIN	MAKOTO MAKOTONI MA
+2F948	睊	109	11				774A	睊	see, look, gaze at; askance	EN DAN	NUSUMIMIRU
 2F94A	瞋	109	15				778B	瞋	glare with anger	SHIN	IKARASU IKARU
+2F94E	硎	112	13				784E	硎	whetstone	KEI	TOISHI
+2F94F	碌	112	13				788C	碌	rough, uneven, rocky; mediocre	ROKU	
+2F950	磌	112	15				78CC	磌		TEN DEN SHIN	
 2F953	祖	113	9				7956	祖	ancestor, forefather; grandfather	SO	JIJI HAJIME
 2F956	福	113	14				798F	福	happiness	FUKU	SAIWAI HIMOROGI
+2F957	秫	115	10				79EB	秫	glutinous variety of millet	JOTSU SHUTSU CHUTSU	MOCHIAWA
 2F959	穀	115	14				7A40	穀	corn, grain, cereal; lucky	KOKU	TANATSUMOTSU
 2F95B	穏	115	16				7A4F	穏	calm, quiet, peace; moderation	ON	ODAYAKA
+2F962	篆	118	15				7BC6	篆	seal script; seal, official stamp	TEN	KOSHIKISHIBA
 2F963	築	118	15				7BC9	築	build, erect; building	CHIKU	KIZUKU TSUKU
+2F966	糒	119	16				7CD2	糒	food for a journey; cakes	HI BI	HOSHIII
 2F96A	紀	120	9				7D00	紀	record, annal, historical account	KI	OSAMERU NORI SHIRUSU
+2F96C	絣	120	14				7D63	絣	to baste for sewing; to connect	HOU	KASURI
+2F96E	緇	120	15				7DC7	緇	black silk	SHI	KURO
+2F96F	縂	120	15				7E02	縂	collect; overall, altogether	SOU	FUSA SUBERU SUBETE
+2F970	繅	120	19				7E45	繅	draw, reel silk from cocoons; elegant compositions	SOU	KURU
+2F979	翺	124	16				7FFA	翺	soar, roam	GOU KOU	KAKERU
 2F97A	者	125	9				8005	者	that which; he who; those who	SHA	MONO
+2F97D	聠	128	14				8060	聠		HEI HYOU	TOJIRU
+2F97F	聰	128	17				8070	聰	intelligent, clever, bright	SOU	SATOI
 2F982	育	130	8				80B2	育	produce, give birth to; educate	IKU	SODATERU HAGUKUMU SODATSU
+2F983	脃	130	10				8103	脃	gland	ZEI	MOROI
+2F985	脾	130	11				813E	脾	spleen, pancreas; disposition	HI HAI HEI	HIZOU TOMARU MOMO
 2F986	媵	38	13				5AB5	媵	a maid who accompanies bride to her new home; to escort; a concubine	YOU	OKURU TSUKISOHI OKURIME OKURIBITO
+2F98B	舁	134	9				8201	舁	carry on one's shoulder	YO	KAKU
+2F98C	舄	134	11				8204	舄	a shoe; the sole of a shoe; magpie	SHAKU SAKU SEKI TAKU	KASASAGI
 2F98D	辞	160	13				8F9E	辞	words, speech, expression, phrase	JI SHI	YAMERU KOTOBA KOTOWARU
 2F98F	芑	140	6				8291	芑	white millet	KI GI	CHISA
 2F990	芋	140	6				828B	芋	taro	U	IMO
 2F991	芝	140	6				829D	芝	sesame; a purplish or brown mushroom thought to have miraculous powers; 'a divine and felicitous plant' (Karlgren)	SHI	SHIBA
+2F992	劳	19	8				52B3	劳	labor, toil, do manual work	ROU	
 2F993	花	140	7				82B1	花	flower; blossoms	KA	HANA
 2F994	芳	140	10				82B3	芳	fragrant; virtuous; beautiful	HOU	KANBASHII KAORI
 2F995	芽	140	7				82BD	芽	bud, sprout, shoot	GA GE	ME MEGUMU
 2F996	苦	140	8				82E6	苦	bitter; hardship, suffering	KU	NIGAI KURUSHII KURUSHIMU
 2F998	若	140	8				82E5	若	if, supposing, assuming; similar	JAKU NYAKU	MOSHIKUHA WAKAI SHITAGAU
+2F999	茝	140	10				831D	茝		SAI SEI SHI	YOROIGUSA
+2F99B	莭	140	11				83AD	莭		SETSU SECHI	FUSHI
+2F99C	茣	140	10				8323	茣	mat, matting	GO	
+2F99D	莽	140	10				83BD	莽	thicket, underbrush; poisonous	BOU MOU	KUSA
 2F99F	著	140	11				8457	著	manifest; (Cant.) to wear	CHO CHAKU JAKU	ARAWASU ICHIJIRUSHI TSUKU
+2F9A0	荓	140	11				8353	荓		HEI	BYOU
 2F9A1	菊	140	11				83CA	菊	chrysanthemum	KIKU	KIKUNOHANA
 2F9A2	菌	140	11				83CC	菌	mushroom; germ, microbe	KIN	KINOKO
 2F9A3	菜	140	11				83DC	菜	vegetables; dish, order; food	SAI	NA
+2F9A8	蓱	140	14				84F1	蓱		HEI BYOU	UKIKUSA
+2F9AC	蕤	140	15				8564	蕤	drooping leaves; fringe soft, delicate	ZUI NI SOU SHOU SUI	
 2F9B3	虐	141	9				8650	虐	cruel, harsh, oppressive	GYAKU	SHIITAGERU SOKONAU
 2F9B4	虜	141	13				865C	虜	to capture, imprison, seize; a prison	RYO	TORIKO
+2F9B5	虧	141	17				8667	虧	lose, fail; damage; deficient	KI	KAKERU
+2F9B6	虩	141	19				8669	虩	fright	KEKI KYAKU SAKU SHAKU	OSORERU
 2F9B7	蚩	142	10				86A9	蚩	worm; ignorant, rustic; laugh	SHI	WARAU ANADORU OROKA
 2F9B8	蚈	142	12				8688	蚈		KEN	HOTARU YASUDE
+2F9B9	蜎	142	12				870E	蜎	mosquito larva	EN KEN GEN	BOUHURA
+2F9BC	蜨	142	15				8728	蜨	butterfly	SHOU SOU	
+2F9BE	螆	142	15				8786	螆	hairy and poisonous caterpillars; (Cant.) a louse	SHI	
 2F9C1	蠁	142	19				8801	蠁	larvae, grubs	KYOU DOU	NISHIDOCHI
+2F9C3	衠	144	16				8860	衠		SHUN	MAKOTO TADASHII MOPPARA
 2F9C4	衣	145	6				8863	衣	clothes, clothing; cover, skin	I E	KOROMO KIRU
+2F9C7	裞	145	12				88DE	裞		SEI TAI EI ZEI	
 2F9CF	誠	149	14				8AA0	誠	sincere, honest; true, real	SEI JOU	MAKOTO MAKOTONI
 2F9D0	諭	149	16				8AED	諭	proclaim, instruct; edict	YU	SATOSU
+2F9D1	變	149	22				8B8A	變	change, transform, alter; rebel	HEN	KAWARU
+2F9D2	豕	152	6				8C55	豕	a pig, boar; KangXi radical 152	SHI	INOKO
 2F9D4	貫	154	12				8CAB	貫	a string of 1000 coins; to go through	KAN WAN	TSURANUKU HIKU
+2F9D5	賁	154	13				8CC1	賁	forge ahead; energetic; surname	HI FUN HON	KAZARU KAWARU MAJIRU
+2F9D6	贛	154	24				8D1B	贛	Jiangxi province; places therein	KOU KU KAN KON	TAMAU
 2F9D7	起	156	10				8D77	起	rise, stand up; go up; begin	KI	OKIRU OKORU TATSU
 2F9DA	跋	157	12				8DCB	跋	go by foot; epilogue, colophon	BATSU HATSU	FUMU OKUGAKI
+2F9DB	趼	157	13				8DBC	趼	callous skin on hands or feet. blisters	GEN KEN	TSUMADATSU
+2F9DC	跰	157	15				8DF0	跰		HOU HEI HEN	SHITAGAU
+2F9DE	軔	159	10				8ED4	軔	a block that keeps a wheel from moving	JIN NIN JI NI	HADOME
 2F9DF	輸	159	16				8F38	輸	transport, carry, haul	YU SHU	OKURU ITASU
+2F9E7	鈸	167	13				9238	鈸	cymbals	HATSU BACHI	SUZU
+2F9E8	鋗	167	14				92D7	鋗	a small basin; rings on a cart of carriage	KEN GEN SEN ZEN	KOBACHI
+2F9E9	鋘	167	15				92D8	鋘	sword	KA GE KO GO	SUKI
+2F9EA	鉼	167	16				927C	鉼	plate; (Cant.) a penny	HEI	OOBAN
+2F9EB	鏹	167	20				93F9	鏹	coins, money, wealth; (Cant.) 鏹水, sulfuric acid	KYOU KOU	ZENI
+2F9EC	鐕	167	20				9415	鐕		SAN	
 2F9EE	開	169	14				958B	開	open; initiate, begin, start	KAI	HIRAKU AKU
+2F9F4	嶲	46	15				5DB2	嶲	a name of an old town in Sichuan; cuckoo; revolution of a wheel	KEI E KI SUI	MEGURI
+2F9F5	霣	173	17				9723	霣	fall	IN KON UN	AME
+2F9FA	韠	178	19				97E0	韠	knee-pad	HITSU HICHI	HIZAKAKE
 2FA02	飢	184	10				98E2	飢	hunger, starving; hungry; a famine	KI	UERU
+2FA07	駾	187	17				99FE	駾	run away	TAI	HASHIRU
 2FA0A	鬒	190	20				9B12	鬒	black, glossy hair	SHIN	OOI
+2FA0F	鵧	196	19				9D67	鵧		HEI BYOU HYOU	MOZU
 2FA15	麻	200	11				9EBB	麻	hemp, jute, flax; sesame	MA BA	ASA
+2FA17	黹	204	13				9EF9	黹	embroidery, needlework; radical	CHI	NUU NUI
+2FA19	鼅	205	21				9F05	鼅	spider	CHI	KUMO
+2FA1A	鼏	206	15				9F0F	鼏	cover of tripod caldron	BEKI MYAKU	
 2FA1B	鼖	207	19				9F16	鼖	drum	FUN	OOTSUZUMI
 2FA1C	鼻	209	14				9F3B	鼻	nose; first; KangXi radical 209	BI HI	HANA
