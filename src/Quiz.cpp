@@ -27,26 +27,32 @@ constexpr auto HideMeanings = "hide meanings";
 
 void Quiz::quiz() const {
   reset();
+  _choice.setQuit(QuitOption);
   char c = _choice.get("Quiz type",
                        {{'f', "freq."}, {'g', "grade"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}}, 'g');
   if (c == 'f') {
     c = _choice.get("Choose list",
                     {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
+    if (c == QuitOption) return;
     // suppress printing 'Freq' since this would work against showing the list in a random order.
     listQuiz(getListOrder(), data().frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
   } else if (c == 'g') {
     c = _choice.get("Choose grade",
                     {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}}, 's');
+    if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().gradeList(AllGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
   } else if (c == 'l') {
     c = _choice.get("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
+    if (c == QuitOption) return;
     // suppress printing 'Level' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().levelList(AllLevels[c - '1']), Kanji::AllFields ^ Kanji::LevelField);
   } else if (c == 'm')
     prepareGroupQuiz(getListOrder(), _groupData.meaningGroups());
-  else
+  else if (c == 'p')
     prepareGroupQuiz(getListOrder(), _groupData.patternGroups());
+  else
+    return;
   finalScore();
 }
 
@@ -56,7 +62,8 @@ Quiz::ListOrder Quiz::getListOrder() const {
   switch (_choice.get("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'r')) {
   case 'b': return ListOrder::FromBeginning;
   case 'e': return ListOrder::FromEnd;
-  default: return ListOrder::Random;
+  case 'r': return ListOrder::Random;
+  default: return ListOrder::Quit;
   }
 }
 
@@ -102,14 +109,18 @@ void Quiz::printMeaning(const Entry& k) const {
 // List Based Quiz
 
 void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const {
+  if (listOrder == ListOrder::Quit) return;
   Choices choices;
   for (int i = 2; i < 10; ++i)
     choices['0' + i] = "";
-  const int numberOfChoicesPerQuestion = _choice.get("Number of choices", choices, '4') - '0';
+  const char c = _choice.get("Number of choices", choices, '4');
+  if (c == QuitOption) return;
+  const int numberOfChoicesPerQuestion = c - '0';
   choices = getDefaultChoices();
   for (int i = 0; i < numberOfChoicesPerQuestion; ++i)
     choices['1' + i] = "";
   const char quizStyle = _choice.get("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, 'k');
+  if (quizStyle == QuitOption) return;
   const std::string prompt = std::string("  Select correct ") + (quizStyle == 'k' ? "reading" : "kanji");
 
   List questions;
@@ -187,8 +198,10 @@ bool Quiz::includeMember(const Entry& k, MemberType type) {
 }
 
 void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list) const {
-  const MemberType type = static_cast<MemberType>(
-    _choice.get("Kanji type", {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}}, '2') - '1');
+  if (listOrder == ListOrder::Quit) return;
+  const char c = _choice.get("Kanji type", {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}}, '2');
+  if (c == QuitOption) return;
+  const MemberType type = static_cast<MemberType>(c - '1');
   if (listOrder == ListOrder::FromBeginning && type == All)
     groupQuiz(list, type);
   else {
@@ -304,6 +317,7 @@ bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& 
 }
 
 void Quiz::editAnswer(Answers& answers, Choices& choices) const {
+  _choice.clearQuit();
   auto getEntry = [this, &answers]() {
     std::map<char, std::string> answersToEdit;
     for (auto k : answers)
@@ -319,11 +333,11 @@ void Quiz::editAnswer(Answers& answers, Choices& choices) const {
   newChoices.erase(EditOption);
   newChoices.erase(MeaningsOption);
   newChoices.erase(SkipOption);
-  newChoices.erase(QuitOption);
   const char answer =
     _choice.get("    New reading for Entry: " + std::to_string(entry + 1), newChoices, answers[entry]);
   answers[entry] = answer;
   choices.erase(answer);
+  _choice.setQuit(QuitOption);
 }
 
 void Quiz::checkAnswers(const Answers& answers, const List& questions, const List& readings,

@@ -16,6 +16,12 @@ public:
   // istream can be passed in instead (good for testing).
   Choice(std::ostream& out, std::istream* in = 0) : _out(out), _in(in) {}
 
+  // Provide special support for 'quitChoice'. If it has a value then it will be added to
+  // the 'choices' provided to the below 'get' methods.
+  std::optional<char> quit() const { return _quit; }
+  void setQuit(char c) { _quit = c; }
+  void clearQuit() { _quit = {}; }
+
   // 'get' will prompt the use to enter one of the choices in the 'choices' structure. If
   // an optional default choice is provided it must correspond to an entry in 'choices'.
   // If 'choices' contains two or more consecutive ascii values with empty descriptions
@@ -28,6 +34,7 @@ private:
   static char getOneChar();
   std::ostream& _out;
   std::istream* _in;
+  std::optional<char> _quit = {};
 };
 
 } // namespace kanji

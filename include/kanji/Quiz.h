@@ -17,7 +17,7 @@ private:
   std::ostream& out() const { return data().out(); }
   std::ostream& log(bool heading = false) const { return data().log(heading); }
 
-  enum class ListOrder { FromBeginning, FromEnd, Random };
+  enum class ListOrder { FromBeginning, FromEnd, Random, Quit };
   ListOrder getListOrder() const;
   void finalScore() const;
   void reset() const;
@@ -60,8 +60,8 @@ private:
   mutable int _score;
   mutable FileList::List _mistakes;
   mutable bool _showMeanings;
+  mutable Choice _choice;
 
-  const Choice _choice;
   const GroupData& _groupData;
 };
 

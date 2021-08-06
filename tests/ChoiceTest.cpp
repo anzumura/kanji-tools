@@ -119,4 +119,27 @@ TEST_F(ChoiceTest, ChooseBadOptionWithDefault) {
   EXPECT_FALSE(std::getline(_os, line));
 }
 
+TEST_F(ChoiceTest, QuitOption) {
+  _is << "q\n";
+  _choice.setQuit('q');
+  EXPECT_EQ(*_choice.quit(), 'q');
+  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), 'q');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-2, q=quit): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, ClearQuitOption) {
+  _is << "q\n1\n";
+  _choice.setQuit('q');
+  _choice.clearQuit();
+  EXPECT_FALSE(_choice.quit().has_value());
+  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), '1');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-2): (1-2): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
 } // namespace kanji
