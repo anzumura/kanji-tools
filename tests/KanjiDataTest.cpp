@@ -171,17 +171,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
   EXPECT_EQ(ucd.size(), 14905);
-  int jouyou = 0, jinmei = 0, jinmeiLinks = 0, otherLinks = 0;
-  // there are 18 Jinmei that link to other Jinmei, but unfortunately the UCD data seems to
-  // have some mistakes (where the link points from the standard to the variant instead). For
-  // example 4E98 (亘) has kJinmeiyoKanji="2010:U+4E99" and 4E99 (亙) has kJinmeiyoKanji="2010".
-  // This contradicts the official description of the field (since 4E98 is the standard form):
-  //   The version year is either 2010 (861 ideographs), 2015 (one ideograph), or 2017 (one
-  //   ideograph), and 230 ideographs are variants for which the code point of the standard
-  //   Japanese form is specified.
-  // Ideally linkToJinmei should be 18, linkToJouyou should be 212 and jinmeiCircularLinks
-  // should be 0, but because of the incorrect data the values end up being 36, 212 and 36.
-  int jinmeiLinksToJinmei = 0, jinmeiLinksToJouyou = 0, jinmeiCircularLinks = 0;
+  int jouyou = 0, jinmei = 0, jinmeiLinks = 0, otherLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     const Ucd& k = i.second;
@@ -209,22 +199,18 @@ TEST_F(KanjiDataTest, UcdLinks) {
         auto& link = ucd.find(k.linkName())->second;
         if (link.joyo())
           ++jinmeiLinksToJouyou;
-        else if (link.hasLink()) {
-          if (link.jinmei()) {
-            ++jinmeiLinksToJinmei;
-            if (link.linkName() == k.name()) ++jinmeiCircularLinks;
-          } else
-            EXPECT_NE(link.linkName(), k.name());
-        }
+        else if (link.jinmei())
+          ++jinmeiLinksToJinmei;
+        else
+          FAIL() << "jinmei '" << k.name() << "' shouldn't have non-official link";
+        if (link.hasLink()) EXPECT_NE(link.linkName(), k.name());
       }
     } else if (k.hasLink())
       ++otherLinks;
   }
   EXPECT_EQ(jouyou, _data.jouyouKanji().size());
-  // see comments above for why circular links isn't zero
-  const int adjustedJinmeiLinks = jinmeiLinks - jinmeiCircularLinks / 2;
-  EXPECT_EQ(jinmei - adjustedJinmeiLinks, _data.jinmeiKanji().size());
-  EXPECT_EQ(adjustedJinmeiLinks, _data.linkedJinmeiKanji().size());
+  EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
+  EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
   EXPECT_EQ(otherLinks, 1477);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
@@ -237,8 +223,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
       FAIL() << "official link from " << link << " is type " << link.type();
   }
   EXPECT_EQ(jinmeiLinksToJouyou, officialLinksToJouyou);
-  EXPECT_EQ(jinmeiLinksToJinmei, officialLinksToJinmei * 2);
-  EXPECT_EQ(jinmeiCircularLinks, jinmeiLinksToJinmei);
+  EXPECT_EQ(jinmeiLinksToJinmei, officialLinksToJinmei);
 }
 
 } // namespace kanji

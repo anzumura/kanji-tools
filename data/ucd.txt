@@ -1193,7 +1193,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4E95	井	7	4		Y				well, mine shaft, pit	SEI SHOU	I IDO
 4E96	亖	7	4						four	SHI	YO YOTSU YOTTSU YON
 4E97	亗	7	5						harvest; year; age	SAI SEI	TOSHI YOWAI
-4E98	亘	7	6			Y	4E99	亙	extend across, through; from	SEN KAN KOU	MOTOMERU WATARI
+4E98	亘	7	6			Y			extend across, through; from	SEN KAN KOU	MOTOMERU WATARI
 4E99	亙	7	6			Y	4E98	亘	extend across, through; from	KOU	WATARU WATARI
 4E9B	些	7	8			Y			little, few; rather, somewhat	SA SHA	ISASAKA
 4E9C	亜	7	7		Y				Asia; second	A ATSU OU	TSUGU
@@ -1898,7 +1898,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 51D8	凘	15	14							SHI SEI SAI	
 51D9	凙	15	15						an icicle	TAKU DAKU JAKU	TSURARA
 51DB	凛	15	15			Y	51DC	凜	to shiver with cold or fear	RIN	SAMUI SUSAMAJII OSORERU
-51DC	凜	15	15			Y	51DB	凛	shiver with cold or fear, fearful	RIN	SAMUI SUSAMAJII OSORERU
+51DC	凜	15	15			Y			shiver with cold or fear, fearful	RIN	SAMUI SUSAMAJII OSORERU
 51DD	凝	15	16		Y				coagulate; congeal; freeze	GYOU	KORU KORASU
 51DE	凞	15	17						bright, splendid, glorious	KI	YAWARAGU
 51E0	几	16	2						small table	KI	TSUKUE
@@ -4050,7 +4050,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5C2A	尪	43	7						lame	OU	MAGARU YOWAI
 5C2B	尫	43	7						lame	OU	MAGARU YOWAI
 5C2C	尬	43	7						limp, staggering gait; embarrass	KAI KATSU KECHI	ASHINAE
-5C2D	尭	43	8			Y	582F	堯	a legendary ancient emperor-sage	GYOU	TAKAI
+5C2D	尭	43	8			Y			a legendary ancient emperor-sage	GYOU	TAKAI
 5C2E	尮	43	9							TA	ASHINAE SEMUSHI
 5C2F	尯	43	9							KI	UMU CHINBA ASHINAE
 5C30	尰	43	12						swell, swelling of the legs	SHOU JU	
@@ -4365,7 +4365,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5DC7	巇	46	20						a crack; hazardous	KI	KEWASHII
 5DC9	巉	46	20	21					steep, rugged, jagged, precipitous	SAN ZAN	
 5DCB	巋	46	21						grand, stately; secure, lasting	KI GI	TSURANARU
-5DCC	巌	46	20			Y	5DD6	巖	cliff, precipice; cave, grotto	GAN	KEWASHII IWAO
+5DCC	巌	46	20			Y			cliff, precipice; cave, grotto	GAN	KEWASHII IWAO
 5DCD	巍	46	21						high, lofty, majestic, eminent	GI	TAKAI
 5DCE	巎	46	22							DOU	
 5DCF	巏	46	20							KEN GEN KON	
@@ -5879,7 +5879,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6640	晀	72	10							CHOU	AKIRAKA
 6641	晁	72	10						morning, dawn; surname	CHOU	ASA
 6642	時	72	10		Y				time, season; era, age, period	JI SHI	TOKI KORE
-6643	晃	72	10			Y	6644	晄	bright, dazzling; to sway, shake	KOU	AKIRAKA
+6643	晃	72	10			Y			bright, dazzling; to sway, shake	KOU	AKIRAKA
 6644	晄	72	10			Y	6643	晃	bright, dazzling; to sway, shake	KOU OU	AKIRAKA
 6645	晅	72	10						light of the sun; to dry in the sun	KEN KAN	AKIRAKA
 6646	晆	72	10							KAI	WAKARERU
@@ -6252,7 +6252,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 685D	桝	75	11	10					variant of 枡 U+67A1, a measuring box		MASU
 685F	桟	75	10		Y				a crosspiece, cleat, frame, door bolt; shelf	SAN SEN	KAKEHASHI TANA
 6863	档	75	10						shelf; frame, crosspiece	TOU	KOSHIKAKE FUCHI
-6867	桧	75	10			Y	6A9C	檜	Chinese cypress, Chinese juniper	KAI	HINOKI
+6867	桧	75	10			Y			Chinese cypress, Chinese juniper	KAI	HINOKI
 686B	桫	75	11						horse chestnut	SA	HEGO
 686E	桮	75	11						cup, glass, tumbler	HAI	SAKAZUKI
 686F	桯	75	11						table	TEI CHOU KEI GYOU	TSUKUE
@@ -6496,7 +6496,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 69D6	槖	75	14						a sack; a stamping sound	TAKU	HUKURO HUIGO
 69D7	槗	75	14							KYOU	HASHI
 69D8	様	75	14		Y				shape, form, pattern, style	YOU SHOU	SAMA ZAMA
-69D9	槙	75	14			Y	69C7	槇	a twig; an ornamental evergreen	TEN SHIN	KOZUE MAKI
+69D9	槙	75	14			Y			a twig; an ornamental evergreen	TEN SHIN	KOZUE MAKI
 69DD	槝	75	14							TOU	KASHI
 69DE	槞	75	14							ROU	ORI
 69E2	槢	75	15						a hard wood	SHUU JUU CHOU JOU	KUSABI
@@ -7139,7 +7139,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6E15	渕	85	11						surge up, bubble up, gush forth	EN	FUCHI
 6E17	渗	85	11						soak through, infiltrate	SHIN	SHIMIRU
 6E19	渙	85	12						scatter; scattered, dispersed	KAN	AKIRAKA
-6E1A	渚	85	11			Y	FA46	渚	small sand bank, islet	SHO	NAGISA
+6E1A	渚	85	11			Y			small sand bank, islet	SHO	NAGISA
 6E1B	減	85	12		Y				decrease, subtract, diminish	GEN KAN	HERU HERASU
 6E1D	渝	85	12						change; chongqing	YU	KAWARU
 6E1E	渞	85	12							SHUU JU	MINAMOTO
@@ -7822,7 +7822,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7327	猧	94	12							KA WA	CHIN
 7328	猨	94	12						ape	EN	SARU
 7329	猩	94	12						species of orangutan	SEI SHOU	AKAIRO
-732A	猪	94	11			Y	FA16	猪	pig, hog, wild boar	CHO	INOSHISHI I
+732A	猪	94	11			Y			pig, hog, wild boar	CHO	INOSHISHI I
 732B	猫	94	11		Y				cat	BYOU BOU MYOU	NEKO
 732C	猬	94	12						vulgar; wanton; low; many; varied; a hedgehog, porcupine	I	HARINEZUMI
 732E	献	94	13		Y				offer, present; show, display	KEN KON	TATEMATSURU
@@ -7963,7 +7963,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7411	琑	96	11							SA	CHIISAI KUSARI
 741A	琚	96	12						girdle ornaments	KYO KO	
 741B	琛	96	12						treasure, valuables	CHIN SHIN	TAKARA
-7422	琢	96	11			Y	FA4A	琢	polish jade; cut jade	TAKU	MIGAKU
+7422	琢	96	11			Y			polish jade; cut jade	TAKU	MIGAKU
 7424	琤	96	12						jade of jade being; tinkle	SOU SHOU	
 7425	琥	96	12			Y			jewel in shape of tiger; amber	KO	
 7426	琦	96	12						gem, precious stone, jade	KI GI	TAMA
@@ -8777,7 +8777,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 794A	祊	113	9						river in Shandong; space inside	HOU HYOU	MATSURI
 794B	祋	113	9							TAI TATSU TACHI	HOKO
 794F	祏	113	10						shrine	SEKI JAKU	IHAI
-7950	祐	113	9			Y	FA4F	祐	divine intervention, protection	YUU	TASUKERU
+7950	祐	113	9			Y			divine intervention, protection	YUU	TASUKERU
 7951	祑	113	10							CHITSU JICHI	
 7953	祓	113	10	8					exorcise, remove evil; clean	FUTSU HAI	HARAU HARAI
 7954	祔	113	10						worship one's ancestors; entomb	FU BU	AWASEMATSURU
@@ -8793,7 +8793,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 795E	神	113	9		Y				spirit, god, supernatural being	SHIN JIN	KAMI KOU TAMASHII
 795F	祟	113	10						evil spirit; evil influence	SUI	TATARI TATARU
 7960	祠	113	10						ancestral temple; offer sacrifice	SHI	HOKORA MATSURU
-7962	祢	113	9			Y	79B0	禰	one's deceased father; used as a synonym for U+4F60 你 when referring to deity	DEI NAI NE	KATASHIRO
+7962	祢	113	9			Y			one's deceased father; used as a synonym for U+4F60 你 when referring to deity	DEI NAI NE	KATASHIRO
 7965	祥	113	10		Y				good luck, good omen; happiness	SHOU	SAIWAI
 7967	祧	113	11						an ancestral hall	CHOU	
 7968	票	113	11		Y				slip of paper or bamboo; ticket	HYOU	FUDA
@@ -8801,7 +8801,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 796B	祫	113	11						triennial sacrifice to one's ancestors	KOU GYOU	MATSURU
 796D	祭	113	11		Y				sacrifice to, worship	SAI	MATSURU MATSURI
 7972	祲	113	12						ominous or sinister spirit; vigor	SHIN	
-7977	祷	113	11			Y	79B1	禱	pray; entreat, beg, plead; prayer	TOU	INORU INORI MATSURU
+7977	祷	113	11			Y			pray; entreat, beg, plead; prayer	TOU	INORU INORI MATSURU
 7979	祹	113	13							TOU DOU	SAIWAI
 797A	祺	113	13						good luck, good fortune	KI	SAIWAI
 797B	祻	113	13							KO KU	MATSURI
@@ -8810,13 +8810,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 797F	祿	113	13			Y	7984	禄	blessing, happiness, prosperity	ROKU	SAIWAI FUCHI
 7980	禀	113	13						report to, petition	RIN HIN	KOMEGURA
 7981	禁	113	13		Y				restrict, prohibit, forbid	KIN KON GON	TODOMERU TAERU
-7984	禄	113	12			Y	797F	祿	blessing, happiness, prosperity	ROKU	FUCHI SAIWAI
+7984	禄	113	12			Y			blessing, happiness, prosperity	ROKU	FUCHI SAIWAI
 7985	禅	113	13		Y				meditation, contemplation (DKW: 24787')	ZEN	YUZURU SHIZUKA
 798A	禊	113	14						semi-annual ceremony of purification	KEI	MISOGI HARAU
 798B	禋	113	14						offer sacrifice; sacrifice	IN EN	MATSURU
 798C	禌	113	14							SHI	IKOU
 798D	禍	113	13		Y				misfortune, calamity, disaster	KA	WAZAWAI
-798E	禎	113	13			Y	FA53	禎	lucky, auspicious, good omen	TEI	SAIWAI TADASHII
+798E	禎	113	13			Y			lucky, auspicious, good omen	TEI	SAIWAI TADASHII
 798F	福	113	13		Y				happiness, good fortune, blessing	FUKU	SAIWAI HIMOROGI
 7991	禑	113	14						happy; used in historical names	GU GO	SAIWAI
 7993	禓	113	14						to drive out demons, etc., as was done at the new-year	YOU SHOU	MATSURI
@@ -8956,7 +8956,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7A60	穠	115	18						thick, lush, in clusters	JOU NYU	SHIGERU
 7A61	穡	115	18						farm, harvest grain; stingy	SHOKU	TORIIRE
 7A62	穢	115	18						dirty, unclean; immoral, obscene	AI WAI E	KEGARERU KEGARE
-7A63	穣	115	18			Y	7A70	穰	stalks of grain; lush, abundant	JOU	YUTAKA WARA
+7A63	穣	115	18			Y			stalks of grain; lush, abundant	JOU	YUTAKA WARA
 7A65	穥	115	18							YO	UERU
 7A67	穧	115	19						sheaf	SEI ZAI SHI	KARIINE
 7A69	穩	115	19						stable, firm, solid, steady	ON	ODAYAKA
@@ -10462,7 +10462,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8407	萇	140	11						star fruit, Averrhoa carambola; surname	CHOU	
 840A	萊	140	11			Y			goosefoot, weed; fallow field	RAI RI	AKAZA AWACHI KOUGAI
 840B	萋	140	11						luxuriant foliage; crowded	SEI SAI SHI	
-840C	萌	140	11			Y	8420	萠	bud, sprout	HOU BOU	MEBAE KIZASU MOERU
+840C	萌	140	11			Y			bud, sprout	HOU BOU	MEBAE KIZASU MOERU
 840D	萍	140	11						duckweed; wandering, traveling	HEI	UKIKUSA YOMOGI
 840E	萎	140	11		Y				wither, wilt	I	NAERU
 840F	萏	140	11						lotus	TAN DON	HANAYAKA
@@ -12298,7 +12298,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9061	遡	162	13	14	Y				go upstream; trace source; formerly	SO	SAKANOBORU
 9062	遢	162	14						careless, negligent, slipshod	TOU	
 9063	遣	162	13	14	Y				send, dispatch; send off, exile	KEN	TSUKAWASU TSUKAU YARU
-9065	遥	162	12			Y	9059	遙	far away, distant, remote	YOU	HARUKA
+9065	遥	162	12			Y			far away, distant, remote	YOU	HARUKA
 9066	遦	162	15							KAN	YUKU NARERU KEGASU
 9067	遧	162	15							SHOU	AKIRAKA
 9068	遨	162	15						ramble, roam; travel for pleasure	GOU	ASOBU

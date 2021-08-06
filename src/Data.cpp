@@ -126,7 +126,7 @@ bool Data::checkInsert(const Entry& i) {
       else if (t == Types::LinkedJinmei && !j->jinmei())
         error("with link not marked as 'Jinmei'");
       else if (t == Types::LinkedJinmei && !j->hasLink())
-        error("missing 'JinmeiLink'");
+        error("missing 'JinmeiLink' for " + j->codeAndName());
       // skipping radical and strokes checks for now
     }
     return true;

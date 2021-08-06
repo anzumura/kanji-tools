@@ -68,7 +68,39 @@ function getFirst() {
 }
 
 # global arrays to help support links for variant and compat kanjis
-declare -A definition on kun linkBack linkExists variantLink
+declare -A definition on kun linkBack noLink linkExists variantLink
+
+# there are 18 Jinmei that link to other Jinmei, but unfortunately the UCD data
+# seems to have some mistakes (where the link points from the standard to the
+# variant instead). For example 4E98 (亘) has kJinmeiyoKanji="2010:U+4E99" and
+# 4E99 (亙) has kJinmeiyoKanji="2010". This contradicts the official description
+# of the field (since 4E98 is the standard form):
+#   The version year is either 2010 (861 ideographs), 2015 (one ideograph), or
+#   2017 (one ideograph), and 230 ideographs are variants for which the code
+#   point of the standard Japanese form is specified.
+# For now, store the 18 kanji in 'noLink' to block setting links.
+while read i; do
+  noLink[${i%\ *}]=${i#*\ }
+done <<EOF
+4E98 亘
+51DC 凜
+5C2D 尭
+5DCC 巌
+6643 晃
+6867 桧
+69D9 槙
+6E1A 渚
+732A 猪
+7422 琢
+7950 祐
+7962 祢
+7977 祷
+7984 禄
+798E 禎
+7A63 穣
+840C 萌
+9065 遥
+EOF
 
 # 'onKun' is used as a filter by 'populateVariantLinks' since we only want to
 # link to an entry that has an 'On' and/or 'Kun' reading.
@@ -160,10 +192,10 @@ LinkName\tMeaning\tOn\tKun"
     elif [ -n "$kJinmeiyoKanji" ]; then
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
         loadFrom=${kJinmeiyoKanji#*+}
-        linkTo=$loadFrom
+        [ -z "${noLink[$cp]}" ] && linkTo=$loadFrom
       else
         loadFrom=$cp
-        linkTo=${linkBack[$cp]}
+        [ -z "${noLink[$cp]}" ] && linkTo=${linkBack[$cp]}
       fi
     else
       get kCompatibilityVariant "$i"
