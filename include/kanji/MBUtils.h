@@ -87,10 +87,18 @@ constexpr std::array CommonKanjiBlocks = {
   UnicodeBlock(0xf900, 0xfaff),  // CJK Compatibility Ideographs (ver 3.2 Mar 2002, 512): 渚, 猪
   UnicodeBlock(0x20000, 0x2a6df) // CJK Extension B (ver 3.1 March 2001, ~42K): 𠮟
 };
+// Note: Extensions C, D, E and F are contiguous so combine into one block (more efficient for isKanji
+// functions and wregex). Here are the actual block ranges:
+// - U+2A700 to U+2B73F : CJK Extension C (ver 5.2 Oct 2009, ~4K kanji)
+// - U+2B740 to U+2B81F : CJK Extension D (ver 6.0 Oct 2010, 222 kanji)
+// - U+2B820 to U+2CEAF : CJK Extension E (ver 8.0 Jun 2015, ~6K kanji)
+// - U+2CEB0 to U+2EBEF : CJK Extension F (ver 10.0 Jun 2016, ~7K kanji)
 constexpr std::array RareKanjiBlocks = {
-  UnicodeBlock{0x2e80, 0x2eff},  // CJK Radicals Supplement (ver 3.0 Sep 1999, 128)
-  UnicodeBlock{0x3400, 0x4dbf},  // CJK Extension A (ver 3.0 Sep 1999, ~6K kanji)
-  UnicodeBlock{0x2f800, 0x2fa1f} // CJK Compatibility Ideographs Supplement (ver 3.1 Mar 2001, ~6K kanji)
+  UnicodeBlock{0x2e80, 0x2eff},   // CJK Radicals Supplement (ver 3.0 Sep 1999, 128)
+  UnicodeBlock{0x3400, 0x4dbf},   // CJK Extension A (ver 3.0 Sep 1999, ~6K kanji)
+  UnicodeBlock{0x2a700, 0x2ebef}, // CJK Extension C, D, E and F (~17K kanji)
+  UnicodeBlock{0x2f800, 0x2fa1f}, // CJK Compatibility Ideographs Supplement (ver 3.1 Mar 2001, ~6K kanji)
+  UnicodeBlock{0x30000, 0x3134f}  // CJK Extension G (ver 13.0 Mar 2020, ~5K kanji)
 };
 constexpr std::array PunctuationBlocks = {
   UnicodeBlock{0x2000, 0x206f}, // General MB Punctuation: —, ‥, ”, “
@@ -240,9 +248,21 @@ inline bool isAllSingleByte(const std::wstring& s) {
   return true;
 }
 
-// KanjiRange includes both the 'rare block' and the 'common block' defined above
-constexpr wchar_t KanjiRange[] = L"\u2e80-\u2eff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\
-\ufe00-\ufe0f\U00020000-\U0002a6df\U0002f800-\U0002fa1f";
+// KanjiRange is for wregex and includes the common and rare kanji as well as variation selectors.
+// clang-format off
+constexpr wchar_t KanjiRange[] = {
+  CommonKanjiBlocks[0].start, L'-', CommonKanjiBlocks[0].end, // CJK Unified Ideographs Kanji
+  CommonKanjiBlocks[1].start, L'-', CommonKanjiBlocks[1].end, // CJK Compatibility Ideographs
+  CommonKanjiBlocks[2].start, L'-', CommonKanjiBlocks[2].end, // CJK Extension B
+  NonSpacingBlocks[0].start, L'-', NonSpacingBlocks[0].end,   // Variation Selectors
+  RareKanjiBlocks[0].start, L'-', RareKanjiBlocks[0].end,     // CJK Radicals Supplement
+  RareKanjiBlocks[1].start, L'-', RareKanjiBlocks[1].end,     // CJK Extension A
+  RareKanjiBlocks[2].start, L'-', RareKanjiBlocks[2].end,     // CJK Extension C, D, E and F
+  RareKanjiBlocks[3].start, L'-', RareKanjiBlocks[3].end,     // CJK Compatibility Ideographs Supplement
+  RareKanjiBlocks[4].start, L'-', RareKanjiBlocks[4].end,     // CJK Extension G
+  L'\0' // null
+};
+// clang-format on
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
 constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";

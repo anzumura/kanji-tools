@@ -48,7 +48,7 @@ declare -r program="parseUcdAllFlat.sh"
 #   to remove this property (and expand 'kMorohashi') so it's probably best not
 #   to use it: https://www.unicode.org/L2/L2021/21032-unihan-kmorohashi.pdf
 
-if [ $# -lt 1 ]; then
+if [[ $# -lt 1 ]]; then
   echo "please specify 'ucd.all.flat.xml' file to parse"
   exit 1
 fi
@@ -110,8 +110,9 @@ declare -r onKun='kJapanese[OK].*n="[^"]'
 declare -r adobe='kRSAdobe_Japan1_6="[^"]'      # has an Adobe ID
 declare -r official='kJ.*yoKanji="[^"]'         # is Joyo or Jinmeiyo (for 𠮟)
 declare -r compat='kCompatibilityVariant="[^"]' # compatibility variant
+declare -r semantic='kSemanticVariant="[^"]'    # semantic variant
 
-printResulsFilter="$onKun|$adobe|$official|$compat"
+printResulsFilter="$onKun|$adobe|$official|$compat|$semantic"
 
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
@@ -145,7 +146,7 @@ function populateVariantLinks() {
   while read -r i; do
     get cp "$i"
     get kJoyoKanji "$i"
-    if [ -n "$kJoyoKanji" ]; then
+    if [[ -n $kJoyoKanji ]]; then
       # There are 4 entries with a Joyo link: 5265, 53F1, 586B and 982C. Store
       # definition/on/kun since since they are missing for some linked Jinmeiyo
       # Kanji as well as Joyo 𠮟 (U+20B9F) which replaces 叱 (53F1) しか-る.
@@ -176,43 +177,47 @@ LinkName\tMeaning\tOn\tKun"
     get cp "$i"
     get kJoyoKanji "$i"
     get kJinmeiyoKanji "$i"
-    get kDefinition "$i"
-    get kJapaneseOn "$i"
-    get kJapaneseKun "$i"
+    kDefinition=${definition[$cp]}
+    kJapaneseOn=${on[$cp]}
+    kJapaneseKun=${kun[$cp]}
     local loadFrom=
     local linkTo=
-    if [ -n "$kJoyoKanji" ]; then
+    if [[ -n $kJoyoKanji ]]; then
       if [[ $kJoyoKanji =~ U+ ]]; then
         # Need to unset kJoyoKanji since official version is the 'link' entry.
         unset -v kJoyoKanji
-      else
-        loadFrom=$cp
       fi
-    elif [ -n "$kJinmeiyoKanji" ]; then
+    elif [[ -n $kJinmeiyoKanji ]]; then
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
         loadFrom=${kJinmeiyoKanji#*+}
-        [ -z "${noLink[$cp]}" ] && linkTo=$loadFrom
+        [[ -z ${noLink[$cp]} ]] && linkTo=$loadFrom
       else
-        loadFrom=$cp
         linkTo=${linkBack[$cp]}
       fi
-    else
+    elif [[ -z $kJapaneseOn$kJapaneseKun ]]; then
       get kCompatibilityVariant "$i"
-      if [[ "$kCompatibilityVariant" =~ U+ ]]; then
+      if [[ $kCompatibilityVariant =~ U+ ]]; then
         loadFrom=${kCompatibilityVariant#*+}
         linkTo=$loadFrom
-      elif [ -n "${variantLink[$cp]}" ]; then
+      elif [[ -n ${variantLink[$cp]} ]]; then
         loadFrom=${variantLink[$cp]}
         linkTo=$loadFrom
+      else
+        get kSemanticVariant "$i"
+        if [[ $kSemanticVariant =~ U+ ]]; then
+          kSemanticVariant=${kSemanticVariant##*+} # remove leading U+
+          loadFrom=${kSemanticVariant%%&*}         # remove any trailing &lt ...
+          linkTo=$loadFrom
+        fi
       fi
     fi
-    if [ -n "$loadFrom" ] && [ -n "${on[$loadFrom]}${kun[$loadFrom]}" ]; then
+    if [[ -n $loadFrom ]]; then
       kDefinition=${kDefinition:-${definition[$loadFrom]}}
       kJapaneseOn=${kJapaneseOn:-${on[$loadFrom]}}
       kJapaneseKun=${kJapaneseKun:-${kun[$loadFrom]}}
     fi
     # don't write a record if there are no Japanese readings
-    [ -z "$kJapaneseOn$kJapaneseKun" ] && continue
+    [[ -z $kJapaneseOn$kJapaneseKun ]] && continue
     #
     # Radical and Strokes
     #
@@ -222,7 +227,7 @@ LinkName\tMeaning\tOn\tKun"
     local -i radical=${kRSUnicode%\.*}
     local -i vstrokes=0
     get kRSAdobe_Japan1_6 "$i"
-    if [ -z "${kRSAdobe_Japan1_6}" ]; then
+    if [[ -z ${kRSAdobe_Japan1_6} ]]; then
       getFirst kTotalStrokes "$i"
       local -i strokes=$kTotalStrokes
     else
@@ -259,9 +264,9 @@ LinkName\tMeaning\tOn\tKun"
           local -i vradical=${s%%\.*}
           s=${s#*\.}
           local -i newStrokes=$((${s/\./ + }))
-          if [ $strokes -ne $newStrokes ]; then
-            if $secondEntry && [ $kRSUnicode = $vradical.${s#*\.} ]; then
-              if [ $kTotalStrokes -eq $newStrokes ]; then
+          if [[ $strokes -ne $newStrokes ]]; then
+            if $secondEntry && [[ $kRSUnicode = $vradical.${s#*\.} ]]; then
+              if [[ $kTotalStrokes -eq $newStrokes ]]; then
                 # flip strokes and vstrokes
                 vstrokes=$strokes
                 strokes=$newStrokes
@@ -278,7 +283,7 @@ LinkName\tMeaning\tOn\tKun"
       fi
     fi
     # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
-    [ -n "$linkTo" ] && s="\U$linkTo" || s=
+    [[ -n $linkTo ]] && s="\U$linkTo" || s=
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$radical\t$strokes\t${vstrokes#0}\t${kJoyoKanji:+Y}\t\
 ${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$kDefinition\t$kJapaneseOn\t$kJapaneseKun"

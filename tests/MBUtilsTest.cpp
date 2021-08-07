@@ -40,31 +40,31 @@ TEST(MBUtilsTest, CheckNoOverlappingRanges) {
   // make sure 'WideBlocks' (from generated code) has no overlaps
   checkRange(WideBlocks, nullptr, false);
   // check 'range' strings (used in regex calls to remove furigana)
-  ASSERT_EQ(std::size(KanjiRange), 22);
   ASSERT_EQ(CommonKanjiBlocks.size(), 3);
-  ASSERT_EQ(RareKanjiBlocks.size(), 3);
+  ASSERT_EQ(RareKanjiBlocks.size(), 5);
   ASSERT_EQ(NonSpacingBlocks.size(), 1);
+  // KanjiRange should include all the common and rare kanji + variant selectors and a null terminator
+  ASSERT_EQ(std::size(KanjiRange), (CommonKanjiBlocks.size() + RareKanjiBlocks.size() + 1) * 3 + 1);
   EXPECT_EQ(CommonKanjiBlocks[0].range(), 20992);
   EXPECT_EQ(CommonKanjiBlocks[1].range(), 512);
   EXPECT_EQ(CommonKanjiBlocks[2].range(), 42720);
   EXPECT_EQ(RareKanjiBlocks[0].range(), 128);
   EXPECT_EQ(RareKanjiBlocks[1].range(), 6592);
-  EXPECT_EQ(RareKanjiBlocks[2].range(), 544);
+  EXPECT_EQ(RareKanjiBlocks[2].range(), 17648);
+  EXPECT_EQ(RareKanjiBlocks[3].range(), 544);
   EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
-  EXPECT_EQ(KanjiRange[0], RareKanjiBlocks[0].start);
-  EXPECT_EQ(KanjiRange[2], RareKanjiBlocks[0].end);
-  EXPECT_EQ(KanjiRange[3], RareKanjiBlocks[1].start);
-  EXPECT_EQ(KanjiRange[5], RareKanjiBlocks[1].end);
-  EXPECT_EQ(KanjiRange[6], CommonKanjiBlocks[0].start);
-  EXPECT_EQ(KanjiRange[8], CommonKanjiBlocks[0].end);
-  EXPECT_EQ(KanjiRange[9], CommonKanjiBlocks[1].start);
-  EXPECT_EQ(KanjiRange[11], CommonKanjiBlocks[1].end);
-  EXPECT_EQ(KanjiRange[12], NonSpacingBlocks[0].start);
-  EXPECT_EQ(KanjiRange[14], NonSpacingBlocks[0].end);
-  EXPECT_EQ(KanjiRange[15], CommonKanjiBlocks[2].start);
-  EXPECT_EQ(KanjiRange[17], CommonKanjiBlocks[2].end);
-  EXPECT_EQ(KanjiRange[18], RareKanjiBlocks[2].start);
-  EXPECT_EQ(KanjiRange[20], RareKanjiBlocks[2].end);
+  int pos = 0;
+  auto checkKanjiRange = [&pos](auto& blocks) {
+    for (auto& i : blocks) {
+      EXPECT_EQ(KanjiRange[pos++], i.start) << pos;
+      EXPECT_EQ(KanjiRange[pos++], L'-') << pos;
+      EXPECT_EQ(KanjiRange[pos++], i.end) << pos;
+    }
+  };
+  checkKanjiRange(CommonKanjiBlocks);
+  checkKanjiRange(NonSpacingBlocks);
+  checkKanjiRange(RareKanjiBlocks);
+  EXPECT_EQ(KanjiRange[pos], L'\0');
   ASSERT_EQ(std::size(HiraganaRange), 4);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);

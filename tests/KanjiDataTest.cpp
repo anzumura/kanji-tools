@@ -170,7 +170,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
 
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
-  EXPECT_EQ(ucd.size(), 15204);
+  EXPECT_EQ(ucd.size(), 15616);
   int jouyou = 0, jinmei = 0, jinmeiLinks = 0, otherLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
@@ -186,7 +186,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
     if (k.hasLink()) {
       EXPECT_NE(k.name(), k.linkName());
       auto link = ucd.find(k.linkName());
-      ASSERT_NE(link, ucd.end());
+      ASSERT_NE(link, ucd.end()) << k.linkCodeAndName();
     }
     if (k.joyo()) {
       EXPECT_FALSE(k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
@@ -211,7 +211,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jouyou, _data.jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
-  EXPECT_EQ(otherLinks, 1776);
+  EXPECT_EQ(otherLinks, 2171);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
