@@ -8,11 +8,23 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path N1File = "n1.txt";
-const fs::path N2File = "n2.txt";
-const fs::path N3File = "n3.txt";
-const fs::path N4File = "n4.txt";
-const fs::path N5File = "n5.txt";
+const fs::path N5File = "jlpt/n5.txt";
+const fs::path N4File = "jlpt/n4.txt";
+const fs::path N3File = "jlpt/n3.txt";
+const fs::path N2File = "jlpt/n2.txt";
+const fs::path N1File = "jlpt/n1.txt";
+const fs::path K10File = "kentei/k10.txt";
+const fs::path K9File = "kentei/k9.txt";
+const fs::path K8File = "kentei/k8.txt";
+const fs::path K7File = "kentei/k7.txt";
+const fs::path K6File = "kentei/k6.txt";
+const fs::path K5File = "kentei/k5.txt";
+const fs::path K4File = "kentei/k4.txt";
+const fs::path K3File = "kentei/k3.txt";
+const fs::path KJ2File = "kentei/kj2.txt";
+const fs::path K2File = "kentei/k2.txt";
+const fs::path KJ1File = "kentei/kj1.txt";
+const fs::path K1File = "kentei/k1.txt";
 const fs::path FrequencyFile = "frequency.txt";
 const fs::path RadicalsFile = "radicals.txt";
 const fs::path StrokesFile = "strokes.txt";
@@ -23,10 +35,17 @@ const fs::path UcdFile = "ucd.txt";
 } // namespace
 
 KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostream& err)
-  : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err), _n5(_dataDir / N5File, Levels::N5, _debug),
-    _n4(_dataDir / N4File, Levels::N4, _debug), _n3(_dataDir / N3File, Levels::N3, _debug),
-    _n2(_dataDir / N2File, Levels::N2, _debug), _n1(_dataDir / N1File, Levels::N1, _debug),
-    _frequency(_dataDir / FrequencyFile, Levels::None, _debug) {
+  : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err),
+    _levels{LevelFileList(_dataDir / N5File, Levels::N5, _debug), LevelFileList(_dataDir / N4File, Levels::N4, _debug),
+            LevelFileList(_dataDir / N3File, Levels::N3, _debug), LevelFileList(_dataDir / N2File, Levels::N2, _debug),
+            LevelFileList(_dataDir / N1File, Levels::N1, _debug)},
+    _kyus{KyuFileList(_dataDir / K10File, Kyus::K10, _debug), KyuFileList(_dataDir / K9File, Kyus::K9, _debug),
+          KyuFileList(_dataDir / K8File, Kyus::K8, _debug),   KyuFileList(_dataDir / K7File, Kyus::K7, _debug),
+          KyuFileList(_dataDir / K6File, Kyus::K6, _debug),   KyuFileList(_dataDir / K5File, Kyus::K5, _debug),
+          KyuFileList(_dataDir / K4File, Kyus::K4, _debug),   KyuFileList(_dataDir / K3File, Kyus::K3, _debug),
+          KyuFileList(_dataDir / KJ2File, Kyus::KJ2, _debug), KyuFileList(_dataDir / K2File, Kyus::K2, _debug),
+          KyuFileList(_dataDir / KJ1File, Kyus::KJ1, _debug), KyuFileList(_dataDir / K1File, Kyus::K1, _debug)},
+    _frequency(_dataDir / FrequencyFile, _debug) {
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   _ucd.load(FileList::getFile(_dataDir, UcdFile));
   _radicals.load(FileList::getFile(_dataDir, RadicalsFile));
@@ -36,30 +55,37 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   populateJouyou();
   populateJinmei();
   populateExtra();
-  processList(_n5);
-  processList(_n4);
-  processList(_n3);
-  processList(_n2);
-  processList(_n1);
+  for (auto& i : _levels)
+    processList(i);
+  // Process '_frequency' before '_kyus' in order create 'Other' type first before creating
+  // 'Kentei' kanji. This way, the 'Other' type is more meaningful since it indicates kanji
+  // in the top 2501 frequency list, but not in other more official types like Jouyou or
+  // Jinmei. 'Kentei' has many rare kanji so keep it as the last type to be processed.
   processList(_frequency);
+  for (auto& i : _kyus)
+    processList(i);
   checkStrokes();
   if (_debug) {
     log(true) << "Finished Loading Data\n>>>\n";
     printStats();
     printGrades();
-    printLevels();
+    printListStats(AllLevels, &Kanji::level, "Level", true);
+    printListStats(AllKyus, &Kanji::kyu, "Kyu", false);
     _radicals.print(*this);
     _ucd.print(*this);
   }
 }
 
 Levels KanjiData::getLevel(const std::string& k) const {
-  if (_n1.exists(k)) return Levels::N1;
-  if (_n2.exists(k)) return Levels::N2;
-  if (_n3.exists(k)) return Levels::N3;
-  if (_n4.exists(k)) return Levels::N4;
-  if (_n5.exists(k)) return Levels::N5;
+  for (auto& i : _levels)
+    if (i.exists(k)) return i.level();
   return Levels::None;
+}
+
+Kyus KanjiData::getKyu(const std::string& k) const {
+  for (auto& i : _kyus)
+    if (i.exists(k)) return i.kyu();
+  return Kyus::None;
 }
 
 void KanjiData::noFreq(int f, bool brackets) const {
@@ -161,35 +187,37 @@ void KanjiData::printGrades() const {
   log() << "  Total for all grades: " << all << '\n';
 }
 
-void KanjiData::printLevels() const {
-  log() << "Level breakdown:\n";
+template<typename T, size_t S>
+void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() const, const std::string& name,
+                               bool showNoFrequency) const {
+  log() << name << " breakdown:\n";
   int total = 0;
-  for (auto level : AllLevels) {
+  for (auto i : all) {
     std::vector<std::pair<Types, int>> counts;
-    int levelTotal = 0;
+    int iTotal = 0;
     for (const auto& l : _types) {
-      int count =
-        std::count_if(l.second.begin(), l.second.end(), [level](const auto& x) { return x->level() == level; });
+      int count = std::count_if(l.second.begin(), l.second.end(), [i, &p](const auto& x) { return ((*x).*p)() == i; });
       if (count) {
         counts.emplace_back(l.first, count);
-        levelTotal += count;
+        iTotal += count;
       }
     }
-    if (levelTotal) {
-      total += levelTotal;
-      log() << "  Total for level " << level << ": " << levelTotal << " (";
+    if (iTotal) {
+      total += iTotal;
+      log() << "  Total for " << name << i << ": " << iTotal << " (";
       for (const auto& j : counts) {
         _out << j.first << ' ' << j.second;
         const auto& l = _types.at(j.first);
-        noFreq(
-          std::count_if(l.begin(), l.end(), [level](const auto& x) { return x->level() == level && !x->frequency(); }));
-        levelTotal -= j.second;
-        if (levelTotal) std::cout << ", ";
+        if (showNoFrequency)
+          noFreq(
+            std::count_if(l.begin(), l.end(), [i, &p](const auto& x) { return ((*x).*p)() == i && !x->frequency(); }));
+        iTotal -= j.second;
+        if (iTotal) std::cout << ", ";
       }
       _out << ")\n";
     }
   }
-  log() << "  Total for all levels: " << total << '\n';
+  log() << "  Total for all " << name << "s: " << total << '\n';
 }
 
 } // namespace kanji

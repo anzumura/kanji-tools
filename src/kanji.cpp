@@ -12,13 +12,13 @@ Kanji::Kanji(const Data& d, int number, const std::string& name, const Radical& 
              bool findFrequency, Levels level)
   : _number(number), _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
     _nonVariantName(MBChar::withoutVariationSelector(name)), _radical(radical), _strokes(strokes), _level(level),
-    _frequency(findFrequency ? d.getFrequency(name) : 0) {
+    _frequency(findFrequency ? d.getFrequency(name) : 0), _kyu(d.getKyu(name)) {
   assert(MBChar::length(_name) == 1);
 }
 
 std::string Kanji::info(int infoFields) const {
   static const std::string Rad("Rad "), Strokes("Strokes "), Grade("Grade "), Level("Level "), Freq("Freq "),
-    New("New "), Old("Old ");
+    New("New "), Old("Old "), Kyu("Kyu ");
   std::string result;
   auto add = [&result](const auto& x) {
     if (!result.empty()) result += ", ";
@@ -37,6 +37,7 @@ std::string Kanji::info(int infoFields) const {
     if (infoFields & NewField) add(New + static_cast<const LinkedKanji&>(*this).link()->name());
   } else if (infoFields & OldField && oldName().has_value())
     add(Old + *oldName());
+  if (infoFields & KyuField && hasKyu()) add(Kyu + toString(kyu()));
   return result;
 }
 

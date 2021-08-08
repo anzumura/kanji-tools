@@ -27,12 +27,21 @@ inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os <
 // - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
 // - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 // - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
+// - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't in any of the above types
 // - None: used as a type for a kanji that hasn't been loaded
-enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, None };
+enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, Kentei, None };
 constexpr std::array AllTypes{Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
-                              Types::Other,  Types::Extra,  Types::None};
+                              Types::Other,  Types::Extra,  Types::Kentei, Types::None};
 const char* toString(Types);
 inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
+
+// 'secondLast' is a helper function to get the second last value of an array (useful for AllTypes,
+// AllGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
+template<typename T, size_t S>
+constexpr inline T secondLast(const std::array<T, S>& x) {
+  static_assert(S > 1);
+  return x[S - 2];
+}
 
 // 'Data': provides methods used by 'Kanji' classes during loading and is the base class for KanjiData
 class Data {
@@ -57,6 +66,7 @@ public:
   // Functions used by 'Kanji' classes during construction, each takes a kanji name.
   virtual int getFrequency(const std::string&) const = 0;
   virtual Levels getLevel(const std::string&) const = 0;
+  virtual Kyus getKyu(const std::string&) const = 0;
   virtual const Radical& ucdRadical(const std::string& kanjiName) const {
     const Ucd* u = _ucd.find(kanjiName);
     if (u) return _radicals.find(u->radical());
@@ -109,6 +119,12 @@ public:
     return i != _levels.end() ? i->second : _emptyList;
   }
   size_t levelTotal(Levels level) const { return levelList(level).size(); }
+
+  const List& kyuList(Kyus kyu) const {
+    auto i = _kyus.find(kyu);
+    return i != _kyus.end() ? i->second : _emptyList;
+  }
+  size_t kyuTotal(Kyus kyu) const { return kyuList(kyu).size(); }
 
   // See comment for '_frequencies' private data member for more details about frequency lists
   enum Values { FrequencyBuckets = 5 };
@@ -197,10 +213,11 @@ protected:
   // number of strokes.
   std::map<std::string, int> _strokes;
 
-  // lists of kanji corresponding to 'Types', 'Grades' and 'Levels' (excluding the 'None' enum values)
+  // lists of kanji corresponding to 'Types', 'Grades', 'Levels' and 'Kyus' (excluding the 'None' enum values)
   std::map<Types, List> _types;
   std::map<Grades, List> _grades;
   std::map<Levels, List> _levels;
+  std::map<Kyus, List> _kyus;
 
   // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500, 1501-2000, 2001-2501.
   // The last list is one longer in order to hold the full frequency list (of 2501 kanji).
@@ -214,9 +231,9 @@ protected:
   FileList::Set _jinmeiOldSet;
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
-  static int _maxFrequency;
+  inline static int _maxFrequency = 0;
 
-  static const List _emptyList;
+  inline static const List _emptyList;
 };
 
 using DataPtr = std::shared_ptr<const Data>;

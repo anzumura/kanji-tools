@@ -35,6 +35,9 @@ public:
   void load(const std::filesystem::path&);
   void print(const Data&) const;
 private:
+  // 'MaxExamples' controls how many examples are printed for each radical by the above 'print'
+  // function (examples are sorted by assending stroke count).
+  enum Values { MaxExamples = 12 };
   // '_radicals' is populated from radicals.txt and the index in the vector is one less than
   // the actual Radical.number().
   List _radicals;

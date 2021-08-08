@@ -5,9 +5,6 @@
 
 namespace kanji {
 
-int Data::_maxFrequency;
-const Data::List Data::_emptyList;
-
 namespace fs = std::filesystem;
 
 namespace {
@@ -40,6 +37,7 @@ const char* toString(Types x) {
   case Types::LinkedOld: return "LinkedOld";
   case Types::Other: return "Other";
   case Types::Extra: return "Extra";
+  case Types::Kentei: return "Kentei";
   default: return "None";
   }
 }
@@ -296,12 +294,13 @@ void Data::populateExtra() {
 }
 
 void Data::processList(const FileList& list) {
-  FileList::List jouyouOld, jinmeiOld, other;
+  const bool kenteiList = list.kyu() != Kyus::None;
+  FileList::List jouyouOld, jinmeiOld, created;
   std::map<Types, FileList::List> found;
-  auto count = 0;
-  auto& otherKanji = _types[Types::Other];
+  auto& newKanji = _types[kenteiList ? Types::Kentei : Types::Other];
+  auto count = newKanji.size();
   for (const auto& i : list.list()) {
-    // keep track of any 'old' kanji in a level or top frequency list
+    // keep track of any 'old' kanji
     if (_debug) {
       if (_jouyouOldSet.find(i) != _jouyouOldSet.end())
         jouyouOld.push_back(i);
@@ -312,21 +311,29 @@ void Data::processList(const FileList& list) {
     Entry kanji;
     if (j != _map.end()) {
       kanji = j->second;
-      if (_debug && j->second->type() != Types::Jouyou) found[j->second->type()].emplace_back(i);
+      if (_debug && !kenteiList && kanji->type() != Types::Jouyou) found[kanji->type()].push_back(i);
     } else {
-      // kanji wasn't already in _map so it only exists in the 'frequency.txt' file - these kanjis
-      // are considered 'Other' type and by definition are not part of Jouyou or Jinmei (so also
-      // not part of JLPT levels)
-      auto reading = _otherReadings.find(i);
-      if (reading != _otherReadings.end())
-        kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i, reading->second);
-      else
-        kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i);
+      if (kenteiList)
+        kanji = std::make_shared<KenteiKanji>(*this, ++count, i);
+      else {
+        // kanji wasn't already in _map so it only exists in the 'frequency.txt' file - these kanjis
+        // are considered 'Other' type and by definition are not part of Jouyou or Jinmei (so also
+        // not part of JLPT levels)
+        auto reading = _otherReadings.find(i);
+        if (reading != _otherReadings.end())
+          kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i, reading->second);
+        else
+          kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i);
+      }
       _map.insert(std::make_pair(i, kanji));
-      otherKanji.push_back(kanji);
-      if (_debug) other.emplace_back(i);
+      newKanji.push_back(kanji);
+      // don't print out kentei 'created' since there more than 2,000 outside of the other types
+      if (_debug && !kenteiList) created.push_back(i);
     }
-    if (list.level() == Levels::None) {
+    if (kenteiList) {
+      assert(kanji->kyu() == list.kyu());
+      _kyus[list.kyu()].push_back(kanji);
+    } else if (list.level() == Levels::None) {
       assert(kanji->frequency() != 0);
       int index = (kanji->frequency() - 1) / 500;
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
@@ -338,9 +345,9 @@ void Data::processList(const FileList& list) {
   FileList::print(jouyouOld, "Jouyou Old", list.name());
   FileList::print(jinmeiOld, "Jinmei Old", list.name());
   FileList::print(found[Types::LinkedOld], "Linked Old", list.name());
-  FileList::print(other, std::string("non-Jouyou/Jinmei") + (list.level() == Levels::None ? "/JLPT" : ""), list.name());
+  FileList::print(created, std::string("non-Jouyou/Jinmei") + (list.level() == Levels::None ? "/JLPT" : ""), list.name());
   // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
-  if (list.level() == Levels::None) {
+  if (!kenteiList && list.level() == Levels::None) {
     std::vector lists = {std::make_pair(&found[Types::Jinmei], ""),
                          std::make_pair(&found[Types::LinkedJinmei], "Linked ")};
     for (const auto& i : lists) {

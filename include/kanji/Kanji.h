@@ -35,11 +35,13 @@ public:
   const Radical& radical() const { return _radical; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
   Levels level() const { return _level; }
+  Kyus kyu() const { return _kyu; }
   int frequency() const { return _frequency; }
   int frequencyOrDefault(int x) const { return _frequency ? _frequency : x; }
 
   bool is(Types t) const { return type() == t; }
   bool hasLevel() const { return _level != Levels::None; }
+  bool hasKyu() const { return _kyu != Kyus::None; }
   bool hasGrade() const { return grade() != Grades::None; }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasReading() const { return !reading().empty(); }
@@ -55,7 +57,8 @@ public:
     FreqField = 16,
     NewField = 32,
     OldField = 64,
-    AllFields = 127
+    KyuField = 128,
+    AllFields = 255
   };
 
   // 'info' returns a comma separated string with extra info (if present) including:
@@ -121,6 +124,7 @@ private:
   const Radical _radical;
   const int _strokes;
   const Levels _level;
+  const Kyus _kyu;
   const int _frequency;
 };
 
@@ -164,8 +168,8 @@ public:
   Types type() const override { return Types::LinkedOld; }
 };
 
-// 'NonLinkedKanji' is the base class for FileListKanji and is also the class used for 'Other'
-// type kanji (pulled in from frequency.txt).
+// 'NonLinkedKanji' is the base class for KenteiKanji and FileListKanji and is also the class
+// used for 'Other' type kanji (pulled in from frequency.txt).
 class NonLinkedKanji : public Kanji {
 public:
   // public constructor used for 'Other' kanji with readings from 'other-readings.txt'
@@ -189,6 +193,14 @@ protected:
 private:
   const std::string _meaning;
   const std::string _reading;
+};
+
+// KenteiKanji is for kanji in kentei/k*.txt files that aren't already pulled in from other files.
+class KenteiKanji : public NonLinkedKanji {
+public:
+  KenteiKanji(const Data& d, int number, const std::string& name) : NonLinkedKanji(d, number, name) {}
+
+  Types type() const override { return Types::Kentei; }
 };
 
 // FileListKanji is the base class for kanjis loaded from 'jouyou.txt', 'jinmei.txt' and 'extra.txt' files

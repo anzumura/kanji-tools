@@ -63,10 +63,10 @@ void RadicalData::print(const Data& data) const {
   data.log() << "Radical breakdown - Total (";
   for (auto i : AllTypes) {
     data.out() << i;
-    if (i == Types::Extra) break;
+    if (i == secondLast(AllTypes)) break;
     data.out() << ' ';
   }
-  data.out() << ") followed by examples\n";
+  data.out() << "):\n";
   std::map<Radical, Data::List> radicals;
   for (auto& i : data.map())
     radicals[i.second->radical()].push_back(i.second);
@@ -77,8 +77,8 @@ void RadicalData::print(const Data& data) const {
     data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
     for (auto i : AllTypes) {
       auto j = c.find(i);
-      data.out() << std::setw(summary ? 4 : 3) << (j == c.end() ? 0 : j->second);
-      if (i == Types::Extra) break;
+      data.out() << std::setw(summary ? 5 : 4) << (j == c.end() ? 0 : j->second);
+      if (i == secondLast(AllTypes)) break;
     }
     data.out() << (summary ? ")\n" : ") :");
   };
@@ -93,7 +93,7 @@ void RadicalData::print(const Data& data) const {
     data.out() << i.first << ':';
     printCounts(count);
     int j = 0;
-    for (; j < l.size() && j < 20; ++j)
+    for (; j < l.size() && j < MaxExamples; ++j)
       data.out() << ' ' << l[j]->name();
     if (j < l.size()) data.out() << " ...";
     data.out() << '\n';

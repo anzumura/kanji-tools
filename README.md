@@ -278,6 +278,7 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 - **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'Linked Jinmei'
 - **Other**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 - **Extra**: kanji loaded from 'extra.txt' - shouldn't be in any of the above types
+- **Kentei**: kanji loaded from 'kentei/*' - Kanji Kentei (漢字検定) that aren't any of the above types
 - **None**: used to classify kanji that haven't been loaded from any files
 
 The program also loads the 214 official kanji radicals (部首).
@@ -290,7 +291,8 @@ The **data** directory contains the following files:
 - **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Other' type Kanji.
 - **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
 - **frequency.txt**: top 2501 frequency kanji loaded from [KanjiCards](https://kanjicards.org/kanji-list-by-freq.html)
-- **n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
+- **jlpt/n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
+- **kentei/k\*.txt**: loaded from [here](https://kanjijoho.com/cat/kyu.html)
 - **extra.txt**: meant to hold any extra kanji of interest not in other files
 - **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)

@@ -35,15 +35,19 @@ declare -r program="parseUcdAllFlat.sh"
 # standard Jōyō + Jinmei. Examples: 4EE5 (以) and 4F3C (似) have kTotalStrokes of
 # 4 and 6 respectively, but in Japanese they should be 5 and 7.
 #
-# In addition to Adobe refs, also pull in any kanji that are compatibility or
-# variants of any kanji that had an on/kun reading.
+# In addition to Adobe refs, also pull in any kanji that have a Morohashi ID or
+# are compatibility/variants of any kanji that had an on/kun reading. Note,
+# 'kMorohashi' has 18,168 entries (12,965 with On/Kun) which is more than Adobe
+# so it pull in a few hundred more entries (including some Kentei Kanji).
+# Some counts as of Unicode 13.0:
+# - has both Adobe and Morohashi: 12,447
+# - has Morohashi, but not Adobe: 5,721
+# - has Adobe, but not Morohashi: 1,010
 #
 # Here are other 'Japan' type source tags that are not used by this script:
 # - 'kNelson' (Classic 'Nelson Japanese-English Character Dictionary') has 5,398
 #   entries (5,330 with On/Kun), but missed 7 Jōyō and 48 Jinmei Kanji.
 # - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
-# - 'kMorohashi' has 18,168 (12,965 with On/Kun) so this isn't much different
-#   compared to just using On/Kun filtering.
 # - 'kIRGDaiKanwaZiten' has 17,864 (12,942 with On/Kun). There's also a proposal
 #   to remove this property (and expand 'kMorohashi') so it's probably best not
 #   to use it: https://www.unicode.org/L2/L2021/21032-unihan-kmorohashi.pdf
@@ -67,8 +71,13 @@ function getFirst() {
   eval $(echo "$2" | grep -o " $1=\"[^\" ]*")\"
 }
 
+function setOnKun() {
+  kJapaneseOn="$1"
+  kJapaneseKun="$2"
+}
+
 # global arrays to help support links for variant and compat kanjis
-declare -A definition on kun linkBack noLink variantLink
+declare -A definition definitionBack on kun linkBack noLink variantLink
 
 # there are 18 Jinmeiyō Kanji that link to other Jinmei, but unfortunately UCD
 # data seems to have some mistakes (where the link points from the standard to
@@ -107,12 +116,13 @@ EOF
 declare -r onKun='kJapanese[OK].*n="[^"]'
 
 # 'printResults' loop uses 'onKun' as well as the following (plus variants):
+declare -r morohashi='kMorohashi="[^"]'         # has a Morohashi ID
 declare -r adobe='kRSAdobe_Japan1_6="[^"]'      # has an Adobe ID
 declare -r official='kJ.*yoKanji="[^"]'         # is Joyo or Jinmeiyo (for 𠮟)
 declare -r compat='kCompatibilityVariant="[^"]' # compatibility variant
 declare -r semantic='kSemanticVariant="[^"]'    # semantic variant
 
-printResulsFilter="$onKun|$adobe|$official|$compat|$semantic"
+printResulsFilter="$onKun|$morohashi|$adobe|$official|$compat|$semantic"
 
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
@@ -127,9 +137,9 @@ function findVariantLinks() {
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
         local s=$(echo -n ${i:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
         s=$(printf '%04X' 0x$s)
-        # cp (for the variant) is unique, but the original kanji 's' can occur more
-        # than once, i.e., if there are multiple variants for 's'. This is true for
-        # 64DA (據) which has variants 3A3F (㨿) and 3A40 (㩀).
+        # cp (for variant) is unique, but the original kanji 's' can occur more
+        # than once, i.e., if there are multiple variants for 's'. This is true
+        # for 64DA (據) which has variants 3A3F (㨿) and 3A40 (㩀).
         variantLink[$cp]=$s
         secondEntry=false
       else
@@ -138,11 +148,13 @@ function findVariantLinks() {
       fi
     done
   done
+  variantLink[3D4E]=6F97 # link 㵎 (a Kentei Kanji) to 澗
 }
 
-# 'populateVariantLinks': a link can point to an entry later in the file like
-# 5DE2 (巢) which links to 5DE3 (巣). Process kanji having an 'on' or/or 'kun'.
-function populateVariantLinks() {
+# 'populateOnKun': populates arrays for all kanji having 'on' or 'kun' readings.
+# Note, a link can point to an entry later in the file like 5DE2 (巢) which
+# links to 5DE3 (巣) so populate on/kun first before calling 'printResults'.
+function populateOnKun() {
   while read -r i; do
     get cp "$i"
     get kJoyoKanji "$i"
@@ -167,6 +179,7 @@ function populateVariantLinks() {
       on[$link]="$kJapaneseOn"
       kun[$link]="$kJapaneseKun"
     done
+    [[ -n $kDefinition ]] && definitionBack["$kDefinition"]=$cp
   done < <(grep $onKun $ucdFile)
 }
 
@@ -208,16 +221,39 @@ LinkName\tMeaning\tOn\tKun"
           kSemanticVariant=${kSemanticVariant##*+} # remove leading U+
           loadFrom=${kSemanticVariant%%&*}         # remove any trailing &lt ...
           linkTo=$loadFrom
+        else
+          # Try to find a character that has the same definition - pulls in 53
+          # more including Kentei 5ECF (廏) which gets linked to 5ED0 (廐).
+          get kDefinition "$i"
+          if [[ -n $kDefinition ]]; then
+            loadFrom=${definitionBack[$kDefinition]}
+            linkTo=$loadFrom
+          fi
         fi
       fi
     fi
     if [[ -n $loadFrom ]]; then
-      kDefinition=${kDefinition:-${definition[$loadFrom]}}
-      kJapaneseOn=${kJapaneseOn:-${on[$loadFrom]}}
-      kJapaneseKun=${kJapaneseKun:-${kun[$loadFrom]}}
+      kDefinition=${definition[$loadFrom]}
+      kJapaneseOn=${on[$loadFrom]}
+      kJapaneseKun=${kun[$loadFrom]}
     fi
-    # don't write a record if there are no Japanese readings
-    [[ -z $kJapaneseOn$kJapaneseKun ]] && continue
+    if [[ -z $kJapaneseOn$kJapaneseKun ]]; then
+      # Support a few more cases where UCD is missing on/kun for Kentei kanjis.
+      # If a special case is used then also clear any 'linkTo' value since that
+      # value didn't result in an on/kun getting loaded. The first one is not
+      # Kentei, but it's in 'wiki-stokes.txt' file.
+      case $cp in
+      4BC2) setOnKun "SHIN" ;;                         # 䯂
+      6FDB) setOnKun "BOU MOU" "KOSAME" ;;             # 濛
+      6663) setOnKun "SEI SETSU" "AKIRAKA KASHIKOI" ;; # 晣
+      69D4) setOnKun "KOU" "HANETSURUBE" ;;            # 槔
+      6A94) setOnKun "TOU" ;;                          # 檔 (not in adobe)
+      7B53) setOnKun "KEI" "KOUGAI KANZASHI" ;;        # 筓
+      7CF1) setOnKun "GETSU" "KOUJI MOYASHI" ;;        # 糱
+      *) continue ;;                                   # skip if no readings
+      esac
+      linkTo=
+    fi
     #
     # Radical and Strokes
     #
@@ -291,5 +327,5 @@ ${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$kDefinition\t$kJapaneseOn\t$kJapaneseKun"
 }
 
 findVariantLinks
-populateVariantLinks
+populateOnKun
 printResults

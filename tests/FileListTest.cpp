@@ -36,9 +36,10 @@ protected:
 };
 
 TEST_F(FileListTest, GoodOnePerLine) {
-  FileList f(_goodOnePerLine, Levels::None);
+  FileList f(_goodOnePerLine);
   EXPECT_EQ(f.level(), Levels::None);
-  EXPECT_EQ(f.name(), "Top Frequency");
+  EXPECT_EQ(f.kyu(), Kyus::None);
+  EXPECT_EQ(f.name(), "GoodOnePerLine");
   std::array results = {"北", "海", "道"};
   EXPECT_EQ(f.list().size(), results.size());
   int pos = 0;
@@ -51,9 +52,10 @@ TEST_F(FileListTest, GoodOnePerLine) {
 }
 
 TEST_F(FileListTest, GoodOnePerLineLevel) {
-  FileList f(_goodOnePerLineLevel, Levels::N2);
+  LevelFileList f(_goodOnePerLineLevel, Levels::N2);
   EXPECT_EQ(f.level(), Levels::N2);
-  EXPECT_EQ(f.name(), "JLPT N2");
+  EXPECT_EQ(f.kyu(), Kyus::None);
+  EXPECT_EQ(f.name(), "N2");
   std::array results = {"犬", "猫", "虎"};
   EXPECT_EQ(f.list().size(), results.size());
   int pos = 0;
@@ -65,7 +67,7 @@ TEST_F(FileListTest, GoodOnePerLineLevel) {
 
 TEST_F(FileListTest, BadOnePerLine) {
   try {
-    FileList f(_badOnePerLine, Levels::N1);
+    LevelFileList f(_badOnePerLine, Levels::N1);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("got multiple tokens - line: 1, file: testDir/badOnePerLine"));
@@ -75,7 +77,7 @@ TEST_F(FileListTest, BadOnePerLine) {
 }
 
 TEST_F(FileListTest, MultiplePerLine) {
-  FileList f(_multiplePerLine);
+  FileList f(_multiplePerLine, FileList::FileType::MultiplePerLine);
   EXPECT_EQ(f.level(), Levels::None);
   EXPECT_EQ(f.name(), "MultiplePerLine");
   std::array results = {"東", "西", "線"};
@@ -89,7 +91,7 @@ TEST_F(FileListTest, MultiplePerLine) {
 
 TEST_F(FileListTest, GlobalDuplicate) {
   try {
-    FileList f(_multiplePerLine);
+    FileList f(_multiplePerLine, FileList::FileType::MultiplePerLine);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("found globally non-unique entry '東' - line: 1, file: testDir/multiplePerLine"));
@@ -100,10 +102,10 @@ TEST_F(FileListTest, GlobalDuplicate) {
 
 TEST_F(FileListTest, GlobalDuplicateLevel) {
   try {
-    FileList f(_goodOnePerLineLevel, Levels::N3);
+    LevelFileList f(_goodOnePerLineLevel, Levels::N3);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("found 3 duplicates in JLPT N3, file: testDir/goodOnePerLineLevel"));
+    EXPECT_EQ(err.what(), std::string("found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }

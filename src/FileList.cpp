@@ -10,17 +10,32 @@ namespace fs = std::filesystem;
 
 const char* toString(Levels x) {
   switch (x) {
-  case Levels::N1: return "N1";
-  case Levels::N2: return "N2";
-  case Levels::N3: return "N3";
-  case Levels::N4: return "N4";
   case Levels::N5: return "N5";
+  case Levels::N4: return "N4";
+  case Levels::N3: return "N3";
+  case Levels::N2: return "N2";
+  case Levels::N1: return "N1";
   default: return "None";
   }
 }
 
-FileList::Set FileList::UniqueNames;
-FileList::Set FileList::UniqueLevelNames;
+const char* toString(Kyus x) {
+  switch (x) {
+  case Kyus::K10: return "K10";
+  case Kyus::K9: return "K9";
+  case Kyus::K8: return "K8";
+  case Kyus::K7: return "K7";
+  case Kyus::K6: return "K6";
+  case Kyus::K5: return "K5";
+  case Kyus::K4: return "K4";
+  case Kyus::K3: return "K3";
+  case Kyus::KJ2: return "KJ2";
+  case Kyus::K2: return "K2";
+  case Kyus::KJ1: return "KJ1";
+  case Kyus::K1: return "K1";
+  default: return "None";
+  }
+}
 
 fs::path FileList::getFile(const fs::path& dir, const fs::path& file) {
   fs::path p(dir / file);
@@ -40,12 +55,11 @@ void FileList::print(const List& l, const std::string& type, const std::string& 
   }
 }
 
-FileList::FileList(const fs::path& file, Levels l, FileType fileType, bool createNewUniqueFile)
-  : _name(l != Levels::None                    ? std::string("JLPT ") + kanji::toString(l)
-            : fileType == FileType::OnePerLine ? std::string("Top Frequency")
-                                               : capitalize(file.stem().string())),
-    _level(l) {
+FileList::FileList(const fs::path& file, FileType fileType, bool createNewUniqueFile, Set* uniqueTypeNames,
+                   const std::string& name)
+  : _name(name.empty() ? capitalize(file.stem().string()) : name) {
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
+  if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
   int lineNumber = 1;
   auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
     usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
@@ -63,16 +77,15 @@ FileList::FileList(const fs::path& file, Levels l, FileType fileType, bool creat
       // check uniqueness with file
       if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
       // check uniqueness across files
-      if (l == Levels::None) {
-        if (!UniqueNames.insert(token).second) error("found globally non-unique entry '" + token + "'");
-      } else {
-        auto i = UniqueLevelNames.insert(token);
+      if (uniqueTypeNames) {
+        auto i = uniqueTypeNames->insert(token);
         if (!i.second) {
           dups.emplace_back(*i.first);
           continue;
         }
         good.emplace_back(*i.first);
-      }
+      } else if (!UniqueNames.insert(token).second)
+        error("found globally non-unique entry '" + token + "'");
       _list.push_back(token);
       // _map 'value' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
       _map[token] = _list.size();

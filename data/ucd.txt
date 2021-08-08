@@ -74,7 +74,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 34FB	㓻	18	12				525B	剛	hard, tough, rigid, strong	GOU	TSUYOI KOWAI
 3503	㔃	18	14				7D55	絕	cut, sever, break off, terminate	ZETSU	TAERU TATSU TAYASU
 3507	㔇	18	14				93FA	鏺		HATSU HACHI	KAMA
-350F	㔏	18	17				526E	剮	cut, cut flesh from bones	KA KE	SAKU
+350F	㔏	18	17				5246	剆		RA	UTSU
 3518	㔘	19	7				9EDC	黜	dismiss; demote, downgrade	CHUTSU	SHIRIZOKERU
 352D	㔭	21	11				5319	匙	spoon; surname	SHI JI	SAJI
 352F	㔯	22	7				5334	匴		SAN SEN	
@@ -457,6 +457,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 3D3E	㴾	85	14				6E24	渤	swelling; the Gulf of Hopei (Hebei)	BOTSU HOTSU	
 3D44	㵄	85	14				6F22	漢	the Chinese people, Chinese language	KAN	KARA
 3D46	㵆	85	14				6F94	澔	radiance of gems	KOU	HIROI
+3D4E	㵎	85	15				6F97	澗	brook, mountain stream	KAN KEN	TANI TANIMIZU
+3D4F	㵏	85	15				6F3C	漼	having the appearance of depth	SAI SUI ZUI	HUKAI
 3D52	㵒	85	15				6CB8	沸	boil, bubble up, gush	FUTSU	WAKU WAKASU
 3D53	㵓	85	15				6E5C	湜	transparent, clear	SHOKU JIKI	KIYOI
 3D55	㵕	85	15				6EF2	滲	soak through, infiltrate	SHIN	SHIMIRU
@@ -958,7 +960,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 492B	䤫	167	15				9471	鑱	spade, trowel	SAN ZEN	SURUDOI
 492F	䤯	167	15				9276	鉶	sacrificial cauldron	KEI GYOU	KANAE
 493A	䤺	167	17				91FF	釿	hew, chop, smooth	KIN GIN	TATSU KIRU MASAKARI
-493F	䤿	167	18				936E	鍮	brass	CHUU TOU	
+493F	䤿	167	18				9365	鍥	sickle; cut, carve, engrave	KETSU KECHI KEI	KAMA KIZAMU
 4940	䥀	167	18				6375	捵	(Cant.) to hold between the fingers and thumb	TEN CHIN DEN NEN	NOBASU
 4956	䥖	167	20				923F	鈿	hairpin; gold inlaid work, filigree	TEN DEN	KANZASHI
 4958	䥘	167	20				932F	錯	error, blunder, mistake, wrong	SAKU SO	MAJIRU TAGAU OKU
@@ -1083,6 +1085,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4BBE	䮾	187	26				9F8D	龍	dragon; symbolic of emperor	RYUU ROU	TATSU
 4BBF	䮿	187	27				8E47	蹇	lame, crippled; unlucky	KEN	ASHINAE NAYAMU
 4BC1	䯁	187	29				9A3E	騾	mule	RA	RABA
+4BC2	䯂	187	34						numerous; very many, large group of horses traveling in a line	SHIN	
 4BC3	䯃	187	16				978D	鞍	saddle; any saddle-shaped object	AN	KURA
 4BC6	䯆	188	11				9AAE	骮		YOKU	KOBONE
 4BCC	䯌	188	15				5C3B	尻	end of spine; buttocks, sacrum	KOU	SHIRI
@@ -1254,7 +1257,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4E95	井	7	4		Y				well, mine shaft, pit	SEI SHOU	I IDO
 4E96	亖	7	4						four	SHI	YO YOTSU YOTTSU YON
 4E97	亗	7	5						harvest; year; age	SAI SEI	TOSHI YOWAI
-4E98	亘	7	6			Y			extend across, through; from	SEN KAN KOU	MOTOMERU WATARI
+4E98	亘	7	6			Y			extend across, through; from	KOU	WATARU WATARI
 4E99	亙	7	6			Y	4E98	亘	extend across, through; from	KOU	WATARU WATARI
 4E9B	些	7	8			Y			little, few; rather, somewhat	SA SHA	ISASAKA
 4E9C	亜	7	7		Y				Asia; second; used as a prefix to names	A ATSU OU	TSUGU
@@ -1320,6 +1323,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4EE4	令	9	5		Y				command, order; 'commandant', magistrate; allow, cause	REI RYOU	IITSUKE OSA
 4EE5	以	9	5		Y				by means of; thereby, therefore; consider as; in order to	I	OMOU YUENI MOTTE
 4EE8	仨	9	5						(coll.) three (cannot be followed by a measure word)	SA	
+4EEB	仫	9	5				97A8	鞨	tribe	KATSU GACHI SETSU	KAWAGUTSU
 4EED	仭	9	5						ancient unit of measure (8 feet); 'fathom'	JIN	HAKARU
 4EEE	仮	9	6		Y				falsehood, deception; vacation	KA KE	KARI KARIRU KARINI
 4EEF	仯	9	6							SOU SHOU BYOU MYOU	SAISAMA
@@ -1362,6 +1366,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4F18	优	9	6						superior, excellent; actor	YUU U	
 4F19	伙	9	6						companion, colleague; utensils	KA	HI HO
 4F1A	会	9	6		Y				assemble, meet together; meeting	KAI E	AU ATSUMARU
+4F1B	伛	9	6				50B4	傴	humpback; stoop	U	KAGAMU SEMUSHI
 4F1C	伜	9	6						deputy, vice-	SAI SOTSU	SEGARE
 4F1D	伝	9	6		Y				summon; propagate, transmit	DEN TEN	TSUTAERU
 4F21	伡	9	6								KURUMA
@@ -1446,7 +1451,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4F83	侃	9	8			Y			upright and strong; amiable	KAN	TSUYOI
 4F84	侄	9	8						nephew	SHITSU SHICHI TETSU	KATAI OROKA TODOMARU
 4F85	侅	9	8						to give; prepared for included in; embraced in	KAI	MUSEBU
-4F86	來	9	8			Y	6765	来	come, coming; return, returning	RAI	KURU
+4F86	來	9	8			Y	6765	来	come, coming; return, returning	RAI	KURU KITARU
 4F87	侇	9	8						a class, a category a corpse	I	HITOSHII TSURANERU UTSURU
 4F88	侈	9	8						luxurious, extravagant	SHI I	OGORU
 4F89	侉	9	8						to speak with an accent; big and clumsy	KA KE A	OGORU HOKORU
@@ -1530,6 +1535,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 4FE3	俣	9	9			Y			big		MATA
 4FE4	俤	9	9						(J) same as 面影 U+9762 U+5F71, visage, face; trace, shadow; memory		OMOKAGE
 4FE5	俥	9	9						rickshaw, cart, vehicle; name of piece in Chinese chess		KURUMA
+4FE6	俦	9	9				5114	儔	companion, mate, colleague	CHUU JU	TOMOGARA
 4FEB	俫	9	9						to induce to come; to encourage	RAI	
 4FEE	修	9	10		Y				study; repair; cultivate	SHUU SHU	OSAMERU
 4FEF	俯	9	10						bow down, face down, look down	FU	FUSERU
@@ -1718,6 +1724,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 50B9	傹	9	13							KYOU GOU GYOU KOU	TSUYOI TAOSU
 50BA	傺	9	13						to hinder; to detain	TEI TAI	TOMARU TODOMARU
 50BB	傻	9	13						foolish, silly, stupid; an imbecile	SA	
+50BC	傼	9	13				913A	鄺	surname	KOU	
 50BD	傽	9	13						terror-stricken	SHOU	ODOROKU
 50BE	傾	9	13		Y				upset, pour out, overflow	KEI	KATAMUKU KATAMUKERU KUTSUGAESU
 50BF	傿	9	13							EN IN ON	KAKENEOSURU
@@ -1860,10 +1867,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5153	兓	10	10							SHIN SAN	SURUDOI TASUKERU
 5154	兔	10	8						rabbit, hare	TO	USAGI
 5155	兕	10	7						a female rhinoceros	SHI JI	
+5156	兖	10	8				5157	兗	establish; one of nine empire divisions	EN	KUKURU TADASHII MAKOTO
 5157	兗	10	9						establish; one of nine empire divisions	EN	KUKURU TADASHII MAKOTO
 5158	兘	10	9							SHI	HAJIMERU HAJIMARU
+5159	兙	10	9				74E7	瓧	decagram		DEKAGURAMU
 515A	党	10	10		Y				political party, gang, faction	TOU	NAKAMA MURA
 515C	兜	10	11			Y			pouch	TOU	KABUTO
+515E	兞	10	11				74F1	瓱	milligram		MIRIGURAMU
 515F	兟	10	12						to advance	SHIN	SUSUMU
 5162	兢	10	14						fearful, cautious, wary	KYOU	OSORERU TSUTSUSHIMU
 5164	兤	10	21							KOU	AKARUI
@@ -1878,11 +1888,14 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 516D	六	12	4		Y				number six	ROKU RIKU	MUTSU MUTABI
 516E	兮	12	4						exclamatory particle	KEI	NO
 5171	共	12	6		Y				together with, all, total; to share	KYOU	TOMO TOMONI DOMO
+5173	关	12	6				95DC	關	frontier pass; close; relation	KAN WAN	SEKI
+5174	兴	12	6				8208	興	thrive, prosper, flourish	KYOU KOU	OKORU OKOSU OKIRU
 5175	兵	12	7		Y				soldier, troops	HEI HYOU	TSUWAMONO IKUSA
 5176	其	12	8			Y			his, her, its, their; that	KI GI	SONO SORE
 5177	具	12	8		Y				tool, implement; draw up, write	GU KU	SONAERU SONAE TSUBUSANI
 5178	典	12	8		Y				law, canon; documentation; classic, scripture	TEN	NORI TSUKASADORU SAKAN
 5179	兹	12	9						now, here; this; time, year	JI SHI	SHIGERU MASU MUSHIRO
+517B	养	12	10				990A	養	raise, rear, bring up; support	YOU	YASHINAU YASHINAI
 517C	兼	12	10		Y				unite, combine; connect; and	KEN	KANERU KANETE
 517E	兾	12	13						same as 冀 U+5180 to hope for; to wish	KI	KOINEGAU
 5180	冀	12	16						hope for; wish; Hebei province	KI	KOINEGAU KOINEGAWA
@@ -1917,7 +1930,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 51A4	冤	14	10						grievance, injustice, wrong	EN	KAGAMU NUREGINU
 51A5	冥	14	10		Y				dark, gloomy, night; deep	MEI	KURAI
 51A6	冦	14	10						bandits, thieves; enemy; invade	KOU KU	ADA
-51A8	冨	14	11			Y	5BCC	富	abundant, ample; rich, wealthy	FU FUU	TOMU
+51A8	冨	14	11			Y	5BCC	富	abundant, ample; rich, wealthy	FU FUU	TOMU TOMI
 51A9	冩	14	14						write; draw, sketch; compose	SHA	UTSUSU KAKIUTSUSU
 51AA	冪	14	15						cover-cloth, cover with cloth	BEKI	OOI FUKIN
 51AB	冫	15	2						ice; KangXi radical 15	HYOU	KOORI
@@ -1944,7 +1957,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 51C6	准	15	10		Y				approve, allow, permit; in accord	JUN SHUN	NAZORAERU
 51C7	凇	15	10						dewdrop; icicle	SHOU SHU SOU SU	TSURARA
 51C8	凈	15	10						clean, pure; cleanse	SOU SHOU	HIYAYAKANASAMA
-51C9	凉	15	10			Y	6DBC	涼	cool, cold; disheartened	RYOU	SUZUSHII
+51C9	凉	15	10			Y	6DBC	涼	cool, cold; disheartened	RYOU	SUZUSHII USUI MAKOTONI
 51CA	凊	15	10						surname	SEI SHAU	SAMUI SUZUSHII
 51CB	凋	15	10						be withered, fallen; exhausted	CHOU	SHIBOMU OCHIBURERU
 51CC	凌	15	10			Y			pure; virtuous; insult; maltreat	RYOU	SHINOGU
@@ -2044,6 +2057,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 523A	刺	18	8		Y				stab; prick, irritate; prod	SHI SEKI	SASU SOSHIRU TOGE
 523B	刻	18	8		Y				carve, engrave; quarter hour	KOKU	KIZAMU KIZAMI TOKI
 523C	刼	18	8						to plunder; to rob openly	KYOU	
+523D	刽	18	8				528A	劊	amputate, cut off	KAI KE KATSU	TATSU
 5241	剁	18	8						chop by pounding, mince, hash	TA	KIRU
 5243	剃	18	9						shave	TEI	SORU
 5244	剄	18	9						cut throat	KEI	KUBIKIRU
@@ -2623,6 +2637,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 54C9	哉	30	9			Y			final exclamatory particle	SAI	KANA YA
 54CA	哊	30	9							IKU	HAKU
 54CB	哋	30	9						(Cant.) plural; adverb	TETSU	
+54CC	哌	30	9				5494	咔	used in translation	ROU	
 54CD	响	30	9						make sound, make noise; sound	KYOU	HIBIIKU
 54CE	哎	30	8						interjection of surprise	GAI	
 54CF	哏	30	9							KON	
@@ -3196,6 +3211,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 57A3	垣	32	9		Y				low wall	EN	KAKI
 57A4	垤	32	9						ant-hill, small mound; hill	TETSU	ARIZUKA
 57A5	垥	32	9							KEU KOU	
+57A6	垦	32	9				58BE	墾	cultivate, reclaim, to farm land	KON	HIRAKU
 57A7	垧	32	9						variable unit of land measure	KEI KYOU	
 57A8	垨	32	9							SHU SU	MAMOORU MORI KAMI
 57A9	垩	32	9						holy, sacred, sage; simplification of 堊 chalk; daub with chalk	SEI SHOU	HIJIRI
@@ -3230,7 +3246,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 57D4	埔	32	10						plain, arena; port, market	HO	
 57D5	埕	32	10						a large, pear-shaped earthenware jar	TEI	BIN
 57D6	埖	32	10								GOMI
-57DC	埜	32	11			Y	91CE	野	open country, field; wilderness	SHO YA	NO
+57DC	埜	32	11			Y	91CE	野	open country, field; wilderness	YA SHO	NO
 57DD	埝	32	11						bank, dike; protuberance from	TEN DEU NEU NEN	SHITA MASU OCHI
 57DE	埞	32	11						(Cant.) place	TEI	TSUTSUMI
 57DF	域	32	11		Y				district, region, boundary; land	IKI	SAKAI
@@ -3469,7 +3485,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 58FA	壺	33	12						jar, pot, jug, vase; surname	KO	TSUBO
 58FB	壻	33	12						son-in-law; husband	SEI	MUKO
 58FC	壼	33	13						palace corridor or passageway	KON	HEYANOTSURO OKU
-58FD	壽	33	14			Y	5BFF	寿	old age, long life; lifespan	JU SU SHUU JUU	KOTOBUKI HISASHII KOTOOGU
+58FD	壽	33	14			Y	5BFF	寿	old age, long life; lifespan	JU JUU SU SHUU	KOTOBUKI HISASHII KOTOHOGU
 58FE	壾	33	13							BOU MOU	
 58FF	壿	33	15							SHUN SON	MAU
 5900	夀	33	14				5BFF	寿	old age, long life; lifespan	JU JUU SU SHUU	KOTOBUKI HISASHII KOTOHOGU
@@ -3477,10 +3493,12 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5903	夃	34	4							KO KU EI	MOUKERU URU SHIBARAKU
 5905	夅	34	7						to descend; to come down from heaven. to send down	KOU	OORIRU OOROSU HUURU
 5906	夆	34	7						resist	HOU FU BA	SAKARAU HIKU AU ATSUI
+5907	备	34	8				5099	備	prepare, ready, perfect	BI	SONAERU SONAWARU SONAE
 5909	変	35	9		Y				change, transform, alter; rebel	HEN	KAWARU KAERU
 590A	夊	35	3						KangXi radical 35; go slowly	SUI	SUINYOU
 590B	夋	35	7						to dawdle; the emperor Yao's father	SHUN	OGORIIRU UZUKUMARU
 590C	夌	35	8						to dawdle; the name of the father of the Emperor Yao	RYOU	SHINOGU SUTARERU
+590D	复	35	9				5FA9	復	return; repeat; repeatedly	FUKU	KAERU KAESU MATA
 590E	夎	35	10							SA SHA SAI	ITSUWARU
 590F	夏	35	10		Y				summer; great, grand, big	KA GE	NATSU
 5910	夐	35	14						long, faraway; pre-eminent	KEI KEN	HARUKA TOOI MOTOMERU
@@ -3520,6 +3538,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5936	夶	37	6							HI	KURAABERU
 5937	夷	37	6			Y			ancient barbarian tribes	I	TAIRAGERU KOROSU EBISU
 5938	夸	37	6						extravagant, luxurious; handsome	KO KA	OGORU
+5939	夹	37	6				593E	夾	be wedged or inserted between	KOU KYOU	HASAMU
 593E	夾	37	7						be wedged or inserted between	KOU KYOU	HASAMU
 593F	夿	37	7							HA HE	OOKII
 5940	奀	37	7						(Cant.) skinny, tiny; to jerk, dangle	BOU	YASERU
@@ -3530,6 +3549,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5947	奇	37	8		Y				strange, unusual, uncanny, occult	KI	KUSHI MEZURASHII AYASHII
 5948	奈	37	8		Y				but, how; bear, stand, endure	NA DAI	KARANASHI
 5949	奉	37	8		Y				offer; receive; serve; respect	HOU BU	TATEMATSURU
+594B	奋	37	8				596E	奮	strive, exert effort; arouse	FUN	FURUU
 594C	奌	37	8						dot, speck, spot; point, degree	TEN	BOCHI CHOBO TEN
 594E	奎	37	9			Y			stride of man; one of the twenty-eight lunar mansions	KEI KI	MATA
 594F	奏	37	9		Y				memorialize emperor; report	SOU	KANADERU SUSUMERU
@@ -4005,14 +4025,17 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5B9B	宛	40	8		Y				seem, as if, crooked	EN	ATAKAMO ATE ZUTSU
 5B9C	宜	40	8		Y				suitable, right, fitting, proper	GI	YOROSHII MUBE
 5B9D	宝	40	8		Y				treasure, jewel; precious, rare	HOU	TAKARA
+5B9E	实	40	8				5B9F	実	real, true, solid, honest	JITSU SHITSU	MI MINORU
 5B9F	実	40	8		Y				real, true, solid, honest	JITSU SHITSU	MI MINORU
 5BA2	客	40	9		Y				guest, traveller; customer	KYAKU KAKU	MAROUDO
 5BA3	宣	40	9		Y				declare, announce, proclaim	SEN	NORU NOTAMAU
 5BA4	室	40	9		Y				room, home, house, chamber	SHITSU	MURO HEYA
 5BA5	宥	40	9			Y			forgive, pardon, indulge	YUU	YURUSU NADAMERU
 5BA6	宦	40	10						officialdom, government official	KAN GEN	TSUKAERU MANABU
+5BA7	宧	40	10				7A94	窔	corner	YOU	HUKAI
 5BA8	宨	40	9							TEWA	HOSHIIMAMA
 5BA9	宩	40	9							SHI	
+5BAA	宪	40	9				61B2	憲	constitution, statute, law	KEN	NORI
 5BAB	宫	40	9						palace	KYUU GUU	MIYA IE
 5BAC	宬	40	10						archives; surname	SEI JOU	KURA
 5BAD	宭	40	10							KUN GUN	MUREIRU
@@ -4114,6 +4137,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5C14	尔	42	5						you; that, those; final particle	JI NI	NANJI SONO SHIKARI
 5C16	尖	42	6			Y			sharp, pointed, acute, keen	SEN	TOGARU SURUDOI
 5C17	尗	42	6						younger of brothers; father's younger brother younger brother of a husband	SHUKU	MAME
+5C18	尘	42	6				5875	塵	dust, dirt, ashes, cinders	JIN	CHIRI
 5C19	尙	42	8						still, yet; even; fairly, rather	SHOU	
 5C1A	尚	42	8		Y				still, yet; even; fairly, rather	SHOU	KUWAERU TATTOBU NEGAU
 5C1E	尞	42	12						fuel used for sacrifices	RYOU	KAGARIBI
@@ -4275,6 +4299,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5CE0	峠	46	9		Y				mountain pass; crisis, climax		TOUGE
 5CE1	峡	46	9		Y				gorge, strait, ravine; isthmus	KYOU KOU	HAZAMA
 5CE3	峣	46	9						high or tall	GYOU	KEWASHII
+5CE6	峦	46	9				5DD2	巒	mountain range; pointed mountain	RAN	MINE
 5CE8	峨	46	10			Y			lofty	GA	TAKANE IKAMESHII
 5CE9	峩	46	10						lofty	GA	KEWASHII
 5CEA	峪	46	10						valley, ravine	YOKU	TANI
@@ -4447,7 +4472,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5DC7	巇	46	20						a crack; hazardous	KI	KEWASHII
 5DC9	巉	46	20	21					steep, rugged, jagged, precipitous	SAN ZAN	
 5DCB	巋	46	21						grand, stately; secure, lasting	KI GI	TSURANARU
-5DCC	巌	46	20			Y			cliff, precipice; cave, grotto	GAN	KEWASHII IWAO
+5DCC	巌	46	20			Y			cliff, precipice; cave, grotto	GAN GEN	KEWASHII IWAO IWA
 5DCD	巍	46	21						high, lofty, majestic, eminent	GI	TAKAI
 5DCE	巎	46	22							DOU	
 5DCF	巏	46	20							KEN GEN KON	
@@ -4490,6 +4515,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5DFE	巾	50	3		Y				kerchief; towel; turban; KangXi radical number 50	KIN	FUKIN OOI HABA
 5DFF	巿	50	4						revolve, make circuit, turn	FUTSU FUCHI HATSU HACHI	HIZAKAKE
 5E00	帀	50	4						to go round, to make a circuit, to make a revolution, to turn round	SOU	MEGURU MEGURASU MEGURI
+5E01	币	50	4				5E63	幣	currency, coins, legal tender	HEI	NUSA TAKARA ZENI
 5E02	市	50	5		Y				market, fair; city, town; trade	SHI	ICHI
 5E03	布	50	5		Y				cotton cloth, textiles, linen	FU	NUNO SHIKU
 5E04	帄	50	5							TEI CHAU	
@@ -4535,6 +4561,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5E38	常	50	11		Y				common, normal, frequent, regular	JOU SHOU	TSUNE TOKO TSUNENI
 5E3D	帽	50	12		Y				hat, cap; cap-like tops	BOU MOU	BOUSHI
 5E3E	帾	50	12							TO TSU	HATA HATAJIRUSHI WATAIRE
+5E3F	帿	50	12				4FAF	侯	marquis, lord; target in archery	KOU	MATO KIMI
 5E40	幀	50	12						picture, scroll; one of pair of	TEI TOU CHOU	KAKEMONO
 5E41	幁	50	12							SU SHU	ZUKIN
 5E42	幂	50	12						cover-cloth, cover with cloth	BEKI MYAKU	OOU OOINUNO
@@ -4611,6 +4638,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5E8D	庍	53	7							HAI HE	
 5E8E	庎	53	7							KAI	TANA NAGASHI
 5E8F	序	53	7		Y				series, serial order, sequence	JO	TSUIDE NOBERU
+5E90	庐	53	7				5EEC	廬	hut, cottage; name of a mountain	RYO RO	IORI IE
 5E95	底	53	8		Y				bottom, underneath, underside	TEI	SOKO NANZO
 5E96	庖	53	8						kitchen; cooking, cuisine	HOU	KURYA
 5E97	店	53	8		Y				shop, store; inn, hotel	TEN	MISE TANA
@@ -4658,6 +4686,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5ECB	廋	53	13	12					conceal, hide; search for, seek	SHUU SHU SOU SU	KAKUSU
 5ECC	廌	53	13						unicorn	CHI	
 5ECE	廎	53	14						room	KEI KYOU TEI	IHENOKATAHARA
+5ECF	廏	53	14				5ED0	廐	stable; barnyard	KYUU	UMAYA
 5ED0	廐	53	14	15					stable; barnyard	KYUU	UMAYA
 5ED1	廑	53	14						a hut; careful	KIN GON KON	
 5ED2	廒	53	14						a granary	GOU	
@@ -4881,6 +4910,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5FCB	忋	61	6						to rely on; look up to	KAI GAI	TANOMU AOGU
 5FCC	忌	61	7		Y				jealous, envious; fear	KI	IMU
 5FCD	忍	61	7		Y				endure, bear, suffer; forbear	NIN	SHINOBU SHINOBI
+5FCF	忏	61	6				61FA	懺	regret, repent; confess sins	ZAN SAN	KUIRU
 5FD0	忐	61	7						timorous; nervous	KUN KOU KYOU	MUNASHII
 5FD1	忑	61	7						fearful; nervous; timid	TOKU TOU	MUNASHII
 5FD2	忒	61	7						excessive; too; very-usually of objectionable things; to err; to mistake; changeable	TOKU	KAWARU
@@ -4897,6 +4927,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5FE1	忡	61	7						a sad, uneasy countenance	CHUU CHU SHUU SHU	UREERU
 5FE2	忢	61	8							GO	SATORU SATORI
 5FE4	忤	61	7						insubordinate, stubborn; wrong	GO	SAKARAU
+5FE7	忧	61	7				6182	憂	sad, grieved; grief, melancholy	YUU	UREERU UREI UI
 5FE8	忨	61	7							GAN	MUSABORU
 5FE9	忩	61	7						same as 怱 U+6031, hastily, in haste, hurriedly	SOU	NIWAKA AWATERU
 5FEA	忪	61	7						quiet, calm, tranquil, peaceful	SHOU SHU	ODOROKU
@@ -4917,6 +4948,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 5FFB	忻	61	7						delightful, joyful, pleasant	KIN	YOROKOBU
 5FFC	忼	61	7						ardent; generous, magnanimous	KOU HOU HYOU	NAGEKU ANADORU
 5FFD	忽	61	8			Y			suddenly, abruptly; neglect	KOTSU	YURUGASENI TACHIMACHI
+5FFE	忾	61	7				613E	愾	anger, wrath, hatred, enmity	KI GAI KITSU	TAMEIKI
 5FFF	忿	61	8						get angry; fury, exasperation	FUN	IKARU
 6000	怀	61	7				61F7	懷	bosom, breast; carry in bosom	KAI	NATSUKU FUTOKORO
 6007	怇	61	8							KYO GO KYOU	ANADORU
@@ -4959,7 +4991,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6041	恁	61	10						that, like this, thus, so, such	IN JIN NIN	OMOU
 6042	恂	61	9						careful, sincere, honest; trust	JUN SHUN	MAKOTO
 6043	恃	61	9						rely on, presume on, trust to	JI SHI	TANOMU
-6046	恆	61	9			Y	6052	恒	constant, regular, persistent	KOU	TSUNE
+6046	恆	61	9			Y	6052	恒	constant, regular, persistent	KOU	TSUNE TSUNENI
 6047	恇	61	9						fear	KYOU KOU	TSUNE
 6048	恈	61	9							BOU MU	MUSABORIOSHIMU
 6049	恉	61	9						meaning, purport, drift	SHI	KOKORO
@@ -4994,6 +5026,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 606F	息	61	10		Y				rest, put stop to, end, cease	SOKU	IKI YASUMU YAMERU
 6070	恰	61	9			Y			just, exactly, precisely; proper	KOU KATSU	ATAKAMO
 6071	恱	61	9							ETSU	YOROKOBU
+6073	恳	61	10				61C7	懇	sincere, earnest, cordial	KON	NENGORO
 6075	恵	61	10	11	Y				favor, benefit, confer kindness	KEI E	MEGUMU MEGUMI
 6077	恷	61	10							KYUU	
 607E	恾	61	9							BOU MOU	OSORERU UREERUSAMA
@@ -5081,6 +5114,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 60E8	惨	61	11		Y				sad, pitiful, wretched; cruel	SAN ZAN	MIJIME ITAMU
 60E9	惩	61	12				61F2	懲	punish, reprimand; warn	CHOU	KORASU KORIRU KORASHIMERU
 60EA	惪	61	12						ethics	TOKU	TOKU OSHIE
+60EE	惮	61	12				619A	憚	dread, shrink from, shirk, fear	TAN TA DAN	HABAKARU HABAKARI
 60F0	惰	61	12		Y				indolent, careless, lazy, idle	DA	OKOTARU
 60F1	惱	61	12						angered, filled with hate	NOU	NAYAMU
 60F2	惲	61	12						devise, plan, deliberate; consult	UN KIN GIN	ATSUI
@@ -5138,7 +5172,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6137	愷	61	13						enjoy, be contented, joyful	KAI GAI	TANOSHIMU
 6139	愹	61	13							YOU	IKARU YOROKOBU MICHIRU
 613B	愻	61	14				905C	遜	humble, modest; yield	SON	YUZURU HERIKUDARU SHITAGAU
-613C	愼	61	13			Y	614E	慎	act with care, be cautious	SHIN	TSUTSUSHIMU
+613C	愼	61	13			Y	614E	慎	act with care, be cautious	SHIN	TSUTSUSHIMU TSUTSUSHIMI
 613D	愽	61	13						gamble, play games; wide, broad	HAKU	HIROI HIROMERU
 613E	愾	61	13						anger, wrath, hatred, enmity	KI GAI KITSU	TAMEIKI
 613F	愿	61	14						sincere, honest, virtuous	GEN	TSUTSUSHIMU
@@ -5251,6 +5285,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 61DD	懝	61	17							GAI GI GYOKU GOKI	OROKA OSORERU HAKARU
 61DE	懞	61	16						variant of U+8499 蒙	BOU MU	ATSUI
 61DF	懟	61	18						hate, abhor; hatred, resentment	TSUI ZUI TAI	URAMU
+61E0	懠	61	17				6120	愠	angry	UN ON	URAMU IKARU
 61E1	懡	61	17							BA MA	
 61E2	懢	61	18							RAN KAN GEN	MUSABORU SUKOYAKA
 61E3	懣	61	18						be sick at heart, sorrowful, sad	MON MAN	MODAERU
@@ -5305,6 +5340,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6229	戩	62	14						exterminate, destroy; blessing	SEN	HOROBOSU
 622A	截	62	14						cut off, stop, obstruct, intersect	SETSU	TATSU KIRU
 622B	戫	62	14							YOKU IKI	HAYAI
+622D	戭	62	15				927E	鉾	spear	BOU MU	HOKO KITSUSAKI
 622E	戮	62	15						kill, massacre; oppress	RIKU RYUU	KOROSU
 622F	戯	62	15		Y				theatrical play, show	GI GE KI	TAWAMURERU
 6230	戰	62	16			Y	6226	戦	war, fighting, battle	SEN	TATAKAU IKUSA
@@ -5357,6 +5393,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 626D	扭	64	7						turn, twist, wrench; seize, grasp	JUU NYU CHUU CHU	NEJIMAWASU
 626E	扮	64	7						dress up; dress up as	FUN HAN HEN	YOSOOU
 626F	扯	64	7						rip up, tear down; raise; haul	TA SHA	HIKU
+6270	扰	64	7				64FE	擾	disturb, annoy, agitate	JOU	MIDARERU WAZURAWASHI
 6271	扱	64	6	7	Y				collect, draw in, gather; receive	SOU	ATSUKAU OSAMERU KOKU
 6273	扳	64	7						pull; drag; right itself	HAN	HIKU SAKU HIKITOMERU
 6275	扵	64	7				65BC	於	in, at, on; interjection alas!	O YO	AU YORI OITE
@@ -5387,6 +5424,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6296	抖	64	7						tremble, shake, rouse; give shake	TOU TO	AGERU FURUU
 6297	抗	64	7		Y				resist, oppose, defy, reject	KOU	ATARU FUSEGU
 6298	折	64	7		Y				break off, snap; bend	SETSU	ORU ORERU KUJIKU
+629A	抚	64	7				64AB	撫	pat, console, comfort; pacify	BU FU	NADERU
 629B	抛	64	7						throw (away)	HOU	NAGEUTSU
 629C	抜	64	7		Y				uproot, pull out	BATSU HATSU HAI	NUKU NUKERU TASUKERU
 629D	抝	64	7				62D7	拗	to pull, drag, break off, to pluck (a flower); bent, warped; perverse, obstinate	OU YOU IKU	NEJIKERU SUNERU
@@ -5435,6 +5473,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 62DB	招	64	8		Y				beckon, summon; recruit, levy	SHOU KYOU	MANEKU MANEKI
 62DC	拜	64	9			Y	62DD	拝	do obeisance, bow, kowtow	HAI	OGAMU
 62DD	拝	64	8		Y				do obeisance, bow, kowtow	HAI	OGAMU
+62DF	拟	64	7				64EC	擬	draft; intend, plan, propose	GI	NAZORAERU HAKARU MAGAI
 62E0	拠	64	8		Y				to occupy, take possession of; a base, position	KYO KO	YORU
 62E1	拡	64	8		Y				expand, enlarge, stretch	KAKU	HIROGARU HIROGERU HIROMERU
 62EA	拪	64	9							SEN I	UTSURU
@@ -5465,12 +5504,14 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 630B	挋	64	10							SHIN KIN KON	TASU
 630C	挌	64	9						fight	KAKU	UTSU
 630D	挍	64	9						collate; (Cant.) to scratch	KOU KYOU	HAKARU
+630E	挎	64	9				63F5	揵	carry	KEN GEN GON	AGERU
 6310	挐	64	10						drag	DA JO	HIKU
 6311	挑	64	9		Y				a load carried on the shoulders; to carry	CHOU TOU	KAKAGERU IDOMU
 6313	挓	64	9						to open out; to expand	TA	HIRAKU
 6316	挖	64	9						dig, dig out, gouge out, scoop	ATSU ACHI	ABAKU
 6318	挘	64	9						to pluck, pick, tear; (Cant.) rubbing action		MUSHIRU MUSHIRITORU
 6319	挙	64	10		Y				raise, lift up; recommend	KYO	AGERU AGARU KOZORU
+631B	挛	64	10				6523	攣	tangled; entwined; crooked	REN	HIKU
 631F	挟	64	9		Y				clasp under arm; hold to bosom	KYOU SHOU	HASAMU
 6327	挧	64	9							KU	
 6328	挨	64	10		Y				near, close by, next to, towards, against; to wait; to lean on	AI	HIRAKU
@@ -5701,6 +5742,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 649E	撞	64	15			Y			knock against, bump into, collide	SHU TOU DOU	TSUKU
 649F	撟	64	15						correct; to bend or twist; to feign; to raise (the hand)	KYOU KOU	
 64A1	撡	64	15							SOU SAN	MISAO AYATSURU
+64A2	撢	64	15				64A3	撣	to dust; a duster	TAN DAN SEN ZEN	MOTSU
 64A3	撣	64	15						to dust; a duster	TAN DAN SEN ZEN	MOTSU
 64A4	撤	64	15		Y				omit; remove; withdraw	TETSU	SUTERU HIRAKU
 64A5	撥	64	15	12					move; dispel; distribute; plectrum, play stringed instrument	HATSU BACHI	HANERU OSAMERU
@@ -5769,6 +5811,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6501	攁	64	18							YOU	HIRAKIUGOKASU
 6504	攄	64	18						spread, disperse; vent, set forth	CHO	NOBERU
 6505	攅	64	18						save, hoard	SAN	ATSUMARU
+6506	攆	64	18				64E5	擥	drive away, expel, oust	RAN	TORU
 6508	攈	64	19							KUN KIN HI	HIROU TORU
 6509	攉	64	19						to beckon; to urge	KAKU	
 650A	攊	64	19							FUKI RYAKU	UTSU
@@ -5866,6 +5909,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6590	斐	67	12			Y			graceful, elegant, beautiful	HI	AYA
 6591	斑	67	12		Y				mottled, striped, freckle	HAN	MADARA
 6592	斒	67	13						variegated; striped; marbled	HAN HEN	MADARA
+6593	斓	67	16				6595	斕	multicolored	RAN REN	AYA
 6595	斕	67	21						multicolored	RAN REN	AYA
 6597	斗	68	4		Y				Chinese peck; liquid measure	TO TOU	TOMASU MASU HISHAKU
 6598	斘	68	7							SHOU	NOBORU
@@ -5894,6 +5938,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 65B4	斴	69	17						the sound of water flowing among rocks	RIN	
 65B5	斵	69	17				65B2	斲	cut, chop, hack	TAKU	KIRU
 65B7	斷	69	18						sever, cut off; interrupt	DAN	TATSU KOTOWARU
+65B8	斸	69	25				7D76	絶	cut	ZETSU	TAERU TATSU TAYASU
 65B9	方	70	4		Y				a square, rectangle; a region; local	HOU	KATA NARABERU KURABERU
 65BC	於	70	8			Y			in, at, on; interjection alas!	O YO	AU YORI OITE
 65BD	施	70	9		Y				grant, bestow; give; act; name	SHI I SE	HODOKOSU SHIKU
@@ -5919,6 +5964,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 65D8	旘	70	16						a pennon; a flag. to fasten	SHI	
 65D9	旙	70	16						a pennant, a banner	HAN	HATA
 65DB	旛	70	18						a pennant, a banner	HAN	HATA
+65DC	旜	70	19				7C4F	籏	flag		HATA
 65DF	旟	70	19						an military flag or standard	YO	HATA AGARU
 65E0	无	71	4						negative, no, not; KangXi radical 71	BU MU	NAI
 65E1	旡	71	4	5					choke on something eaten	KI KE	MUSEBU
@@ -5941,6 +5987,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 65F9	旹	72	8						time, season; era, age, period	JI	TOKI
 65FA	旺	72	8		Y				prosper; prosperous; increase	OU	SAKAN
 65FB	旻	72	8						heaven	BIN MIN	AKIZORA
+65FD	旽	72	8				66BE	暾	morning sun, sunrise	TON	ASAHI
 65FE	旾	72	8							SHUN	HARU
 65FF	旿	72	8							GO	AKIRAKA
 6600	昀	72	8						sun light; used in personal names	IN	
@@ -5962,6 +6009,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6614	昔	72	8		Y				formerly; ancient; in beginning	SEKI SHAKU	MUKASHI
 6615	昕	72	8						dawn; early morning; day	KIN KON KI	ASA
 6616	昖	72	8							EN	MEGURU
+6619	昙	72	8				66C7	曇	become cloudy, overcast	DON TAN	KUMORU KUMORI
 661C	昜	72	9						to open out, to expand; bright, glorious	YOU	AGARU HIKARI
 661D	昝	72	9						a dual pronoun, I, you and me, we two	SAN	
 661E	昞	72	9						bright, luminous; glorious	HEI HYOU HOU	AKIRAKA
@@ -5996,7 +6044,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6640	晀	72	10							CHOU	AKIRAKA
 6641	晁	72	10						morning, dawn; surname	CHOU	ASA
 6642	時	72	10		Y				time, season; era, age, period	JI SHI	TOKI KORE
-6643	晃	72	10			Y			bright, dazzling; to sway, shake	KOU	AKIRAKA
+6643	晃	72	10			Y			bright, dazzling; to sway, shake	KOU OU	AKIRAKA
 6644	晄	72	10			Y	6643	晃	bright, dazzling; to sway, shake	KOU OU	AKIRAKA
 6645	晅	72	10						light of the sun; to dry in the sun	KEN KAN	AKIRAKA
 6646	晆	72	10							KAI	WAKARERU
@@ -6011,7 +6059,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6657	晗	72	11						pre-dawn	KAN GON	
 6658	晘	72	11							KAN GEN	HINODERUSAMA
 6659	晙	72	11						early; bright; respect	SHUN	AKIRAKA
-665A	晚	72	11			Y	6669	晩	night, evening; late	BAN	KURE OSOI
+665A	晚	72	11			Y	6669	晩	night	BAN	KURE OSOI
 665B	晛	72	11						sunlight	KEN GEN DEN NEN	HIGAARAWARERU HIZA
 665C	晜	72	11						insect	KON ANI	
 665D	晝	72	11			Y	663C	昼	daytime, daylight	CHUU	HIRU
@@ -6020,7 +6068,9 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6660	晠	72	11							SEI JOU	AKIRAKA
 6661	晡	72	11						late afternoon	HO FU	YUUGATA
 6662	晢	72	11						light of stars; shine	SETSU SEI	AKIRAKA
+6663	晣	72	11							SEI SETSU	AKIRAKA KASHIKOI
 6664	晤	72	11						have interview with; meet	GO	AKIRAKA
+6665	晥	72	11				7696	皖	Anhui province	KAN	
 6666	晦	72	11	10		Y			dark, unclear, obscure; night	KAI	MISOKA KURAI
 6667	晧	72	11						daybreak; bright and brilliant	KOU GOU	HIKARU AKIRAKA
 6668	晨	72	11			Y			early morning, daybreak	SHIN	ASHITA TOKI
@@ -6178,6 +6228,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 673E	朾	75	6						to bump	TOU JOU TEI CHOU	TSUKU
 673F	朿	75	6						stab	SHI	TOGE
 6741	杁	75	6								EBURI IRI
+6743	权	75	6				6B0A	權	power, right, authority	KEN GON	OMORI HAKARU KARI
 6745	杅	75	7						tub	U	YUNOMI
 6746	杆	75	7						pole; shaft of spear	KAN	TEKO TESURI
 6747	杇	75	7						loquat	O U KO GO	KOTE NURU
@@ -6192,6 +6243,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6754	杔	75	7							TAKU CHAKU	UTSUGI SAKEKOSHI
 6755	杕	75	7						alone	TEI DAI TA DA	
 6756	杖	75	7			Y			cane, walking stick	JOU	TSUE
+6757	杗	75	7				6B10	欐	beam	REI RAI RI	MUNE
 6759	杙	75	7						a tiny wooden post; peg	YOKU	KUI
 675C	杜	75	7			Y			stop, prevent; restrict; surname	DO TO ZU	YAMANASHI FUSAGU MORI
 675D	杝	75	7						tree	CHI JI SHI I	MAGAKI
@@ -6244,6 +6296,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 679B	枛	75	8							SOU SHOU	KINOTOGI
 679C	果	75	8		Y				fruit; result	KA RA	HATASU KUDAMONO HATE
 679D	枝	75	8		Y				branches, limbs; branch off	SHI KI	EDA
+679E	枞	75	8				6A05	樅	fir tree	SHOU	MOMI
+679F	枟	75	8				6A52	橒	wood streaks	UN	MOKUME
 67A0	枠	75	8		Y				a frame; a reel, spindle, spool		WAKU
 67A1	枡	75	8						measuring box		MASU
 67A2	枢	75	8		Y				door hinge; pivot; center of power	SUU SHU	TOBOSO KARAKURI
@@ -6289,6 +6343,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 67DC	柜	75	9						cabinet, cupboard; shop counter	KYO KO KU	AMADARE
 67DD	柝	75	9						watchman's rattle	TAKU	HYOUSHIGI SAKU HIRAKU
 67DE	柞	75	9						oak; spinous evergreen tree; to clear away trees	SAKU	HAHASO
+67DF	柟	75	9				692A	椪	Machilus nanmu, variety of evergreen		KUNUGI
+67E0	柠	75	9				6AB8	檸	lemon	NEI DOU	
 67E1	柡	75	10							EI YOU	
 67E2	柢	75	9						root, base; bottom of object	TEI	NE
 67E4	柤	75	9						hawthorn	SA SHO SO	ISEKI KIRIKABU KOBOKE
@@ -6309,8 +6365,10 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 67F7	柷	75	9						instrument	SHUKU	
 67F9	柹	75	8						persimmon	SHI	KAKI
 67FB	査	75	9		Y				investigate, examine, seek into	SA	SHIRABERU
+67FD	柽	75	9				6A89	檉	type of willow; tamarisk	TEI CHOU	KAWARAYANAGI
 67FE	柾	75	9			Y			straight grain	KYUU	MASA
 67FF	柿	75	9		Y				persimmon	SHI	KAKI
+6800	栀	75	9				6894	梔	gardenia	SHI	KUCHINASHI
 6802	栂	75	9	8					a kind of evergreen tree		TOGA TSUGA
 6803	栃	75	9		Y				type of oak; stable		TOCHI
 6804	栄	75	9		Y				glory, honor; flourish, prosper	EI YOU	SAKAERU HAE
@@ -6347,6 +6405,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 683B	栻	75	10						tree	CHOKU CHIKI SHOKU SHIKI	
 683C	格	75	10		Y				pattern, standard, form; style	KOU KAKU KYAKU	TADASU ITARU
 683D	栽	75	10		Y				to cultivate, plant; to care for plants	SAI	UERU
+683E	栾	75	10				6B12	欒	name of tree; a part of cornice	RAN	OUCHI HIJIKI MADOKA
 683F	栿	75	10							FUKU BUKU	HARI NOSERU
 6840	桀	75	11						chicken roost; ancient emperor	KETSU	HARITSUKE
 6841	桁	75	10		Y				cross-beams of roof	KOU	KETA
@@ -6357,6 +6416,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6846	框	75	10						frame; framework; door frame	KYOU	KAMACHI
 6848	案	75	10		Y				table, bench; legal case	AN	TSUKUE KANGAERU
 684A	桊	75	10							KEN	
+684B	桋	75	10				6AB4	檴	tree	KAKU WAKU	AKINIRE
 684C	桌	75	10						table, desk, stand	TAKU	
 684D	桍	75	10							KO KU	MUNASHII
 684E	桎	75	10						fetters, shackles, handcuffs	SHITSU	ASHIKASE
@@ -6369,6 +6429,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6857	桗	75	10							TA NE	NE
 6858	桘	75	10							TSUI SUI	SHII
 6859	桙	75	10							U BOU	HOKO
+685A	桚	75	10				62F6	拶	press, squeeze hard; force	SATSU	SEMARU
 685B	桛	75	10						a real, hank, skein		KASEI
 685C	桜	75	10		Y				cherry, cherry blossom	OU YOU	SAKURA
 685D	桝	75	11	10					variant of 枡 U+67A1, a measuring box		MASU
@@ -6401,6 +6462,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 688D	梍	75	11						tree name	SOU ZOU	SAIKACHI
 688E	梎	75	11						sickle handle, branch	OU YUU YOU	KAMANOE EDA
 688F	梏	75	11						handcuffs, manacles, fetters	KOKU KAKU	TEKASE
+6890	梐	75	11				682B	栫	fence	SON SEN	FUSHIZUKE KAKOMI MAGAKI
 6893	梓	75	11			Y			catalpa ovata	SHI	AZUSA
 6894	梔	75	11						gardenia	SHI	KUCHINASHI
 6896	梖	75	11						a palm-tree	HAI	BAITARA
@@ -6428,6 +6490,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 68B1	梱	75	11						doorsill; doorjamb	KON	SHIKIMI KORI
 68B2	梲	75	11						joist; cane, club; king-post	SETSU SECHI TATSU TACHI	TSUKA
 68B3	梳	75	11						comb; brush	SO	KUSHIKEZURU SUKU
+68B4	梴	75	11				9578	镸	long	CHOU	NAGAAI OSA
 68B5	梵	75	11						Buddhist, Sanskrit	FUU BON	
 68B6	梶	75	11			Y			oar, shaft	BI	KOZUE KAJI
 68B9	梹	75	11						the areca-nut; the betel-nut	BIN HIN	BINROUSHI
@@ -6478,6 +6541,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 68F3	棳	75	12				68B2	梲	joist; cane, club; king-post	SETSU SECHI TATSU TACHI	TSUKA
 68F5	棵	75	12						numerary adjunct for trees	KAN KA	KIGIRE
 68F6	棶	75	12							RAI	MUKU
+68F8	棸	75	12				913A	鄺	surname	KOU	
 68F9	棹	75	12						oar; boat	TOU TAKU	SAO KOGU
 68FA	棺	75	12		Y				coffin	KAN	HITSUGI
 68FC	棼	75	12						beams in the roof of a house confused, disordered	FUN BUN	MUNAGI
@@ -6538,6 +6602,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 695C	楜	75	13							KO GO	KOSHOU KURUMI
 695D	楝	75	13						Melia japonica	REN	OUCHI
 695E	楞	75	13						used for Ceylon in Buddhist texts	ROU RYOU	KADO
+695F	楟	75	13				6AB4	檴	tree	KAKU WAKU	AKINIRE
 6960	楠	75	13			Y			name of tree, machilus nanmu	NAN	KUSUNOKI
 6961	楡	75	13						elm tree	YU	NIRE
 6962	楢	75	13			Y			tinder	SHUU YUU	NARA
@@ -6619,6 +6684,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 69D0	槐	75	14						locust tree	KAI	ENJU
 69D1	槑	75	14							BAI	UME
 69D3	槓	75	14						lever, pole, crowbar; sharpen; (Cant.) a wardrobe, trunk	KOU	TEKO
+69D4	槔	75	14							KOU	HANETSURUBE
 69D6	槖	75	14						a sack; a stamping sound	TAKU	HUKURO HUIGO
 69D7	槗	75	14							KYOU	HASHI
 69D8	様	75	14		Y				shape, form, pattern, style	YOU SHOU	SAMA
@@ -6641,6 +6707,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 69F5	槵	75	15							KAN GAN	MUKU
 69F9	槹	75	15						spar; well-sweep	KOU	
 69FB	槻	75	15			Y			zelkova tree	KI	TSUKI
+69FC	槼	75	15				898F	規	rules, regulations, customs, law	KI	BUNMAWASHI NORI TADASU
 69FD	槽	75	15		Y				trough; manger; vat, tank; groove; a distillery	SOU	KAIBAOKE OKE
 69FE	槾	75	15						paste wall with dirt	BAN MAN	KOTE
 69FF	槿	75	15						hibiscus	KIN	MUKUGE
@@ -6689,6 +6756,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6A3D	樽	75	16			Y			goblet; jar, jug; lush	SON	TARU
 6A3E	樾	75	16						the shade of trees	ETSU OCHI	KOKAGE
 6A3F	樿	75	16						coffin	SEN ZEN	TSUGE
+6A41	橁	75	16				6AB4	檴	tree	KAKU WAKU	AKINIRE
 6A44	橄	75	16						olive	KAN	
 6A45	橅	75	16						a beech tree	BO MO	BUNA KATA
 6A46	橆	75	16						without, apart from, none; a negative	BU MU	SHIGERU
@@ -6712,6 +6780,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6A61	橡	75	16						chestnut oak; rubber tree; rubber	SHOU ZOU	TOCHI KUNUGI
 6A62	橢	75	16						oval-shaped, elliptical, tubular	DA	KOBANGA
 6A64	橤	75	16						stamen	ZUI NI	TARERU
+6A65	橥	75	15				6813	栓	wooden peg, post or stick	SEN	SENNOKI
 6A66	橦	75	16						tree	TOU SHOU SOU	MUNE KIGIRE TSUKU
 6A67	橧	75	16						hut	SOU SHOU ZOU	SOMAI
 6A6A	橪	75	16							ZEN NEN EN	KONATSUME
@@ -6734,6 +6803,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6A8E	檎	75	17			Y			small red apple	GO KIN	
 6A90	檐	75	17						eaves of house; brim, rim	EN TAN	HISASHI
 6A91	檑	75	17							RAI	
+6A94	檔	75	17							TOU	
 6A97	檗	75	17						tree	HAKU BYAKU	KIWADA
 6A9B	檛	75	17						a switch, whip	TA TE	TSUE
 6A9C	檜	75	17	16		Y	6867	桧	Chinese cypress, Chinese juniper	KAI	HINOKI
@@ -6784,6 +6854,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6AE7	櫧	75	20						Oak	SHO	KASHI
 6AE8	櫨	75	20						supporting block; sumac, loquat	RO	HAZE
 6AEA	櫪	75	20						type of oak; stable	REKI	KAIBAOKE KUNUGI
+6AEB	櫫	75	19				6813	栓	wooden peg, post or stick	SEN	SENNOKI
 6AEC	櫬	75	20						coffin; tung tree	SHIN KAN	HITSUGI
 6AF0	櫰	75	20							KAI E	INUENJU
 6AF1	櫱	75	20						stump, sprout	GETSU GECHI GATSU GACHI	HIKOBAE
@@ -6807,6 +6878,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6B12	欒	75	23						name of tree; a part of cornice	RAN	OUCHI HIJIKI MADOKA
 6B16	欖	75	26						olive	RAN	
 6B17	欗	75	24							RAN	TESURI
+6B19	欙	75	25				6A0F	樏	sedan	RUI RU	HACHI
 6B1B	欛	75	25						a handle	HA HE	TSUKA
 6B1D	欝	75	25	26					luxuriant; dense, thick; moody	UTSU	SHIGERU
 6B1E	欞	75	28						the lattice of a window a sill, a lintel	REI RYOU	
@@ -6859,7 +6931,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6B62	止	77	4		Y				stop, halt, desist; detain	SHI	TOMARU ASHI TOMERU
 6B63	正	77	5		Y				right, proper, correct	SEI SHOU	TADASHII MASA TADASU
 6B64	此	77	6			Y			this, these; in this case, then	SHI	KOKO KORE KONO
-6B65	步	77	7			Y	6B69	歩	step, pace; walk, stroll	HO BU FU	ARUKU AYUMU AYUMI
+6B65	步	77	7			Y	6B69	歩	step	HO BU FU	ARUKU AYUMU AYUMI
 6B66	武	77	8		Y				military; martial, warlike	BU MU	TAKESHI
 6B67	歧	77	8						fork of road; branching off	KI GI	YUBI WAKARERU
 6B69	歩	77	8		Y				step	HO BU FU	ARUKU AYUMU AYUMI
@@ -6982,6 +7054,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6C1F	氟	84	9						fluorine	FUTSU	
 6C23	氣	84	10			Y	6C17	気	air, gas, steam, vapor; spirit	KI KE	IKI
 6C24	氤	84	10						hanging fog, misty	IN	
+6C25	氥	84	10				6C19	氙	xenon	SEN	
 6C26	氦	84	10						helium	GAI	
 6C27	氧	84	10						oxygen	YOU	
 6C28	氨	84	10						ammonia; hydrogen nitride	AN	
@@ -7046,6 +7119,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6C81	沁	85	7						soak into, seep in, percolate	SHIN	SHIMIRU
 6C82	沂	85	7						river in southeast Shandong	KI KIN	HOTORI FUCHI
 6C83	沃	85	7		Y				water, irrigate; fertile, rich	YOKU OKU	SOSOGU KOERU
+6C84	沄	85	7				6F90	澐	billows	UN	
 6C85	沅	85	7						name of a river in western Hunan that flows into Dongting lake	GEN	MINAMOTO
 6C86	沆	85	7						a ferry; fog; flowing	KOU GOU	HIROI
 6C87	沇	85	7						flowing and engulfing; brimming	EN I	NAGARERU
@@ -7087,6 +7161,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6CBF	沿	85	8		Y				follow a course, go along	EN	SOU
 6CC1	況	85	8		Y				condition, situation; furthermore	KYOU	IWANYA OMOMUKI
 6CC2	泂	85	8						clear and deep (of water); wide	KEI GYOU	SAMUI
+6CC3	泃	85	8				6EB1	溱	river in Henan	SHIN	OOI
 6CC4	泄	85	8						leak; vent; flow; reveal	EI SETSU	MORERU
 6CC5	泅	85	8						swim, float, wade	SHUU	OYOGU
 6CC6	泆	85	8						licentious, libertine, dissipated	ITSU ICHI TETSU DECHI	AHURERU
@@ -7108,6 +7183,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6CDB	泛	85	7						to drift, float; careless, reckless	HAN HOU	UKABU
 6CDC	泜	85	8						a river in Hebei province	TEI TAI SHI	
 6CDD	泝	85	8						go upstream; trace source; formerly	SO	SAKANOBORU
+6CDE	泞	85	8				6FD8	濘	mud; miry, muddy, stagnant	NEI	NUKARU
 6CE0	泠	85	8						nice and cool, mild and comfortable	REI RYOU REN	SATOSU
 6CE1	泡	85	8		Y				bubbles, suds; blister; soak	HOU	AWA
 6CE2	波	85	8		Y				waves, breakers; undulations	HA HI	NAMI
@@ -7119,6 +7195,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6CEA	泪	85	8						tears; weep, cry	RUI REI	NAMIDA
 6CEB	泫	85	8						weep; cry; shine, glisten	KEN GEN	NAGARERU
 6CEC	泬	85	8							KETSU KECHI	HOTOBASHIRU
+6CED	泭	85	8				7BFA	篺	a raft	HAI BAI HI BI HEN BEN BE	IKADA
 6CEE	泮	85	8						Zhou dynasty school; disperse; fall apart	HAN	WAKATSU
 6CEF	泯	85	8						destroy, eliminate; perish	BIN BEN MIN	HOROBIRU
 6CF0	泰	85	10		Y				great, exalted, superior; big	TAI	YASUI OOKII OGORU
@@ -7127,6 +7204,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6CF3	泳	85	8		Y				dive; swim	EI	OYOGU
 6CF4	泴	85	9							KAN	KIYOMERU
 6CF5	泵	112	9						pump	RYUU	
+6CFB	泻	85	8				7009	瀉	drain off, leak; flow, pour down	SHA	SOSOGU HAKU
+6D01	洁	85	9				6F54	潔	clean, purify, pure	KETSU	ISAGYOI
 6D04	洄	85	9						a back-water; an eddy a whirlpool	KAI GAI	SAKANOBORU
 6D07	洇	85	9							IN ETSU ECHI	SHIZUMU
 6D0A	洊	85	9						flowing water	SEN ZEN SON ZON	ITARU
@@ -7160,12 +7239,14 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6D36	洶	85	9						the rush of water; turbulent; noisy, restless	KYOU	WAKU
 6D38	洸	85	9			Y			sparkle, glitter	KOU	HONOKA
 6D39	洹	85	9						river in Henan province	EN ON KAN GAN	
+6D3A	洺	85	9				6D28	洨	river in Hebei province	KOU KYOU	
 6D3B	活	85	9		Y				live, exist, survive; lively	KATSU	IKIRU YOMIGAERU
 6D3C	洼	85	9						hollow; pit; depression; swamp	AI E WAI	
 6D3D	洽	85	9						to blend with, be in harmony; to penetrate; to cover; a river in Shenxi	KOU	URUOSU AMANESHI
 6D3E	派	85	9		Y				school of thought, sect, branch	HA	WAKARERU
 6D3F	洿	85	9						stagnant water; impure, filthy	O U KO GO	
 6D41	流	85	10		Y				flow, circulate, drift; class	RYUU RU	NAGARERU NAGASU NAGARE
+6D43	浃	85	9				6D79	浹	saturate, drench; damp, wet	SHOU	AMANESHI TOORU URUOU
 6D44	浄	85	9		Y				pure, clean, unspoiled	JOU SEI	KYOI
 6D45	浅	85	9		Y				shallow, not deep; superficial	SEN	ASAI
 6D57	浗	85	10							KYUU GU	
@@ -7195,7 +7276,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6D85	涅	85	10						blacken; black mud, slime	NETSU DETSU	SOMERU
 6D87	涇	85	10						name of a river	TEI KYOU	MIZO
 6D88	消	85	10		Y				vanish, die out; melt away	SHOU	KIERU KESU
-6D89	涉	85	10			Y	6E09	渉	ford stream, wade across	SHOU	WATARU KAKAWARU
+6D89	涉	85	10			Y	6E09	渉	ford stream	SHOU	WATARU KAKAWARU
 6D8C	涌	85	10						surge up, bubble up, gush forth	YUU YOU	WAKU
 6D8E	涎	85	10						saliva	SEN EN	YODARE
 6D91	涑	85	10						river in Shansi province	SOU SU SHUU SHU	SUSUGU
@@ -7406,11 +7487,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6ED3	滓	85	13						sediment, lees, dregs	SAI SHI	ORI KASU
 6ED4	滔	85	13						overflow; rushing water, a torrent	TOU	HABIKORU
 6ED5	滕	85	15						an ancient state in Shandong province; water bursting forth	TOU	WAKU
+6ED7	滗	85	13				91C2	釂	drain	SHOU	NOMIHOSU
 6ED9	滙	85	13				532F	匯	a concourse; to flow together, gather together; (same as U+6ED9 滙) to remit money	WAI KAI E	MEGURU
 6EDA	滚	85	13						turn	KON	TAGIRU
 6EDD	滝	85	13		Y				raining; wet; soaked; a river in Guangdong	SOU ROU	TAKI
 6EDE	滞	85	13		Y				block up, obstruct; stagnant	TAI	TODOKOORU
 6EE1	满	85	13						fill; full, satisfied	MAN BAN	MICHIRU MITASU
+6EE6	滦	85	13				7064	灤	river and county in Hebei province	RAN	NAGARERU
 6EEB	滫	85	14						water in which rice has been boiled	SHUU SHU	TOGISHIRU
 6EEC	滬	85	14						Shanghai; river near Shanghai	KO	ERI AJIRO
 6EED	滭	85	14							HITSU HICHI	WAKU
@@ -7460,6 +7543,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6F32	漲	85	14						rise in price	CHOU	MINAGIRU
 6F33	漳	85	14						name of a river in Henan	SHOU	SASAERU
 6F36	漶	85	14						indecipherable	KAN GAN	HATSUKIRISHINAI
+6F37	漷	85	13				6D28	洨	river in Hebei province	KOU KYOU	
 6F38	漸	85	14		Y				gradually	ZEN SEN ZAN	SUSUMU YOUYAKU
 6F3B	漻	85	14							RYOU RYUU RU	
 6F3C	漼	85	14						having the appearance of depth	SAI SUI ZUI	HUKAI
@@ -7473,6 +7557,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6F52	潒	85	15							TOU DOU SHOU ZOU	TADAYOU
 6F53	潓	85	15							KEI E	
 6F54	潔	85	15		Y				clean, purify, pure	KETSU	ISAGYOI
+6F55	潕	85	15				6EB1	溱	river in Henan	SHIN	OOI
 6F57	潗	85	15						friendly; harmonious	SHUU	WAKU
 6F58	潘	85	15						surname; water in which rice has been rinsed; a river that flows into the Han	HAN	SHIROMIZU UZUMAKI AFURERU
 6F59	潙	85	15						river in Shanxi	KI I	
@@ -7494,6 +7579,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6F6F	潯	85	15						steep bank by stream; jiujiang	JIN	FUCHI
 6F70	潰	85	15		Y				flooding river; militarily defeat	KAI E	TSUIERU TSUBURE
 6F74	潴	85	15	14					pond; a pool	CHO	MIZUTAMARI
+6F77	潷	85	15				91C2	釂	drain	SHOU	NOMIHOSU
 6F78	潸	85	15						weep; tears flowing	SAN	
 6F7A	潺	85	15						sound of flowing water	SAN SEN	
 6F7C	潼	85	15						high, lofty; damp	DOU TOU	
@@ -7520,6 +7606,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6F97	澗	85	15						brook, mountain stream	KAN KEN	TANI TANIMIZU
 6F99	澙	85	15							SEKI	KATA
 6F9A	澚	85	15							IKU OKU	OKI KUMA
+6F9D	澝	85	15				6FD8	濘	mud; miry, muddy, stagnant	NEI	NUKARU
 6F9F	澟	85	16							RIN	SAMUI
 6FA0	澠	85	16						name of a river in Shandong	SHOU JOU BIN MIN	
 6FA1	澡	85	16						wash, bathe	SOU	ARAU
@@ -7535,6 +7622,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6FB0	澰	85	16						overflowing	REN	NAGISA
 6FB1	澱	85	16						sediment, dregs, precipitate	TEN DEN	ORI DORO YODOMU
 6FB3	澳	85	16						inlet, bay; dock, bank	IKU OKU OU	KUMA OKI
+6FB4	澴	85	16				7044	灄	river in Hubei province	SHOU JOU NYOU	
 6FB5	澵	85	16							SHIN	
 6FB6	澶	85	16						still water, placid, tranquil	SEN ZEN TEN DEN	
 6FB7	澷	85	16				6F2B	漫	overflow of water; spreading	MAN	MIDARI MIDARINI SOZORONI
@@ -7553,6 +7641,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 6FD5	濕	85	17			Y	6E7F	湿	wet, moist, humid, damp; an illness	SHITSU SHUU	SHIMERU
 6FD8	濘	85	17						mud; miry, muddy, stagnant	NEI	NUKARU
 6FDA	濚	85	17						a stream, eddy; to eddy	EI YOU	OGAWA
+6FDB	濛	85	16							BOU MOU	KOSAME
+6FDC	濜	85	17				7044	灄	river in Hubei province	SHOU JOU NYOU	
 6FDE	濞	85	17							HI HEI HAI BI	
 6FDF	濟	85	17						to help, aid, relieve; to ferry, cross	SAI SEI	SUMU
 6FE0	濠	85	17						moat, trench, ditch	GOU	HORI
@@ -7696,6 +7786,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7106	焆	86	11							ETSU ECHI KEN EN	
 7107	焇	86	11							SHOU SOU	KAWASU KAWAKASU TOROKASU
 7109	焉	86	11						thereupon, then; how? why? where?	EN I	IZUKUNSO SUNAWACHI KORE
+710A	焊	86	11				7147	煇	weld, solder	KI KEN KAN KUN	HIKARI
 710B	焋	86	11							SOU SHOU	
 710C	焌	86	11						to light	SHUN SON SAN	YAKU
 710F	焏	86	11							KYOKU KE	SUMIYAKA
@@ -7787,6 +7878,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 71CB	燋	86	16						scorch, burn, scald; torch	SHOU JOU SEKI SHAKU	TAIMATSU
 71CC	燌	86	16							FUN HON	TAKU YAKU
 71CE	燎	86	16			Y			to burn, set afire; to illuminate; a signal lamp	RYOU	KAGARIBI
+71CF	燏	86	16				719B	熛	blaze	HYOU	
 71D0	燐	86	16	17					phosphorus	RIN	ONIBI
 71D2	燒	86	16			Y	713C	焼	burn; bake; heat; roast	SHOU	YAKU
 71D3	燓	86	16							FUN BUN HAN BON	YAKU YAKIGARI
@@ -7799,6 +7891,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 71DC	燜	86	16						simmer, cook over slow fire	MON	
 71DF	營	86	17						encampment, barracks; manage	EI	ITONAMU
 71E0	燠	86	17						warm; warmth	IKU OU	ATATAKAI
+71E1	燡	86	17				FA15	凞	bright	KI	YAWARAGU
+71E3	燣	86	17				58C8	壈	disappointed	ON RAN	
 71E5	燥	86	17		Y				dry, parched, arid; quick-tempered	SOU	KAWAKU
 71E6	燦	86	17			Y			vivid, illuminating; bright	SAN	AKIRAKA
 71E7	燧	86	17						flintstone; beacon, signal fire; torch	SUI	HIUCHI NOROSHI
@@ -7821,12 +7915,14 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 720D	爍	86	19						shine, glitter, sparkle	SHAKU	TOKASU
 7210	爐	86	20						fireplace, stove, oven, furnace	RO	IRORI
 7213	爓	86	20						flame; brilliant, blazing	EN SEN ZEN	HIKARI
+7216	爖	86	20				721F	爟	fire	KAN KEN GEN	YAKU
 7217	爗	86	18							YOU YUU OU	SAKAN
 721A	爚	86	21						bright; fiery	YAKU SHAKU	
 721B	爛	86	21						rotten, spoiled, decayed	RAN	TADARERU
 721D	爝	86	22						torch; to light	SHAKU SAKU SHOU	TAIMATSU
 721F	爟	86	22						fire	KAN KEN GEN	YAKU
 7224	爤	86	24							RAN	TADARERU
+7225	爥	86	25				71DC	燜	simmer, cook over slow fire	MON	
 7228	爨	86	29						oven, cooking stove; cook	SAN	KASHIGU KAMADO
 722A	爪	87	4		Y				claw, nail, talon; animal feet	SOU	TSUME
 722B	爫	87	4						radical 87		TSUMEKANMURI TSUMEGASHIRA
@@ -7877,6 +7973,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7261	牡	93	7			Y			male of animals; bolt of door	BO BOU	OSU
 7262	牢	93	7						prison; stable, pen; secure	ROU	HITOYA KATAI
 7263	牣	93	7						fill, stuff; full	JIN NIN	MISARU
+7266	牦	93	8				6C02	氂	tail; hair; yak	RI BOU MOU RAI	
 7267	牧	93	8		Y				tend cattle, shepherd	BOKU MOKU	MAKI KAU YASHINAU
 7268	牨	93	8							KOU CHIN	OUSHI
 7269	物	93	8		Y				thing, substance, creature	MOTSU BUTSU	MONO
@@ -7966,8 +8063,11 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 730A	猊	94	11						lion; wild beast; wild horse	GEI	
 730B	猋	94	12						wind; storm; gale; dog moving; (Cant.) running quickly	HYOU	
 730D	猍	94	11							RAI RI	TANUKI
+730E	猎	94	11				7375	獵	hunt; field sports	RYOU	KARI KARU
 7312	猒	94	12							EN OU YOU	AKIRU
 7313	猓	94	11						monkey	KA	
+7314	猔	94	11				6C10	氐	name of an ancient tribe	TEI TAI SHI CHI	HUMOTO
+7315	猕	94	11				737C	獼	macacus monkey	BI MI	SARU
 7316	猖	94	11						mad, wild, reckless, unruly	SHOU	KURUU
 7317	猗	94	11						exclamation of admiration	I	AU URUWASHII NAGAI
 7318	猘	94	11						fierce dog; furious, frenzied	SEI KEI	
@@ -7983,7 +8083,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7327	猧	94	12							KA WA	CHIN
 7328	猨	94	12						ape	EN	SARU
 7329	猩	94	12						species of orangutan	SEI SHOU	AKAIRO
-732A	猪	94	11			Y			pig, hog, wild boar	CHO	INOSHISHI I
+732A	猪	94	11			Y			pig	CHO	INOSHISHI I
 732B	猫	94	11		Y				cat	BYOU BOU MYOU	NEKO
 732C	猬	94	12						vulgar; wanton; low; many; varied; a hedgehog, porcupine	I	HARINEZUMI
 732E	献	94	13		Y				offer, present; show, display	KEN KON	TATEMATSURU
@@ -8015,6 +8115,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 735E	獞	94	15						name of a variety of dog; wild tribes in South China	TOU ZU	
 735F	獟	94	15							GYOU GOU KYOU	
 7360	獠	94	15						to hunt at night by torches	RYOU ROU TOU	KARI
+7362	獢	94	15				736B	獫	dog	KEN REN	
 7363	獣	94	16		Y				beast, animal; bestial	JUU	KEMONO
 7366	獦	94	15							KATSU KACHI RYOU	OOKAMI
 7367	獧	94	16						rash; honest and straightforward	KEN	HANEODORU
@@ -8044,6 +8145,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7385	玅	95	9						mysterious, subtle; exquisite	MYOU	TAE
 7386	玆	95	10						now, here; this; time, year	JI SHI KEN GEN	SHIGERU MASU MUSHIRO KOKONI
 7387	率	95	11		Y				to lead; ratio; rate; limit	RITSU SOTSU	HIKIIRU OOMUNE WARIAI
+7388	玈	95	11				9EDD	黝	black	YUU	AOGURO
 7389	玉	96	5		Y				jade, precious stone, gem	GYOKU GOKU	TAMA
 738B	王	96	4		Y				king, ruler; royal; surname	OU	KIMI
 738E	玎	96	6						jingling, tinkling	TEI CHOU TOU	
@@ -8060,6 +8162,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 73A2	玢	96	8						(archaic) a kind of jade	HIN FUN HAN HEN	TAMA
 73A5	玥	96	8						mysterious gem; pearl	GETSU GACHI	
 73A6	玦	96	8						broken piece of jade	KETSU KECHI	
+73A8	玨	96	8				73CF	珏	two pieces of jade joined together	KAKU KOKU	
 73A9	玩	96	8		Y				play with, joke, enjoy	GAN	MOTEASOBU
 73AA	玪	96	8							KAN KEN GEN GIN GON RIN	
 73AB	玫	96	8						rose	BAI ME MAI	
@@ -8069,6 +8172,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 73B5	玵	96	9							GAN	
 73B7	玷	96	9						flaw in gem; flaw in character	TEN	KAKERU
 73B9	玹	96	9						jadelike precious stone; jade-colored	KEN GEN	ISHI
+73BA	玺	96	10				74BD	璽	imperial signet, royal signet	JI SHI	SHIRUSHI
 73BB	玻	96	9						glass	HA	
 73BC	玼	96	10						beautiful color of gem; flaw in	SEI SAI SA SHI	AZAYAKA
 73BD	玽	96	9							KOU KU	
@@ -8085,6 +8189,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 73CD	珍	96	9		Y				precious, valuable, rare	CHIN	MEZURASHII
 73CE	珎	96	9						precious, valuable, rare	CHIN	MEZURASHII
 73CF	珏	96	9						two pieces of jade joined together	KAKU KOKU	
+73D0	珐	96	9				743A	琺	enamel, cloisonné	HOU	
 73D2	珒	96	10							SHIN	TAMA
 73D3	珓	96	10						two hemispherical objects used in divination	KOU KYOU	
 73D6	珖	96	10						carat	KOU	TAMA
@@ -8095,6 +8200,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 73E1	珡	96	10						variant of U+7434 琴, guqin or zither	KIN	KOTO
 73E2	珢	96	10						precious stone	GIN	UTSUKUSHII
 73E3	珣	96	10						name of a kind of jade	SHUN	TAMA
+73E4	珤	96	10				5BF6	寶	treasure, jewel; precious, rare	HOU	TAKARA
 73E5	珥	96	10						ear ornament; stick, insert	JI	MIMIDAMA MIMIKAZARI HIGASA
 73E6	珦	96	10						a kind of jade	KYOU DOU SHOU	
 73E7	珧	96	10						mother-of-pearl	YOU	TAIRAGI
@@ -8125,6 +8231,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7411	琑	96	11							SA	CHIISAI KUSARI
 741A	琚	96	12						girdle ornaments	KYO KO	
 741B	琛	96	12						treasure, valuables	CHIN SHIN	TAKARA
+7420	琠	96	12				7471	瑱	a gem used as ear plug; a jade earring	TEN CHIN SHIN	MIMIDAMA
 7422	琢	96	11			Y			polish jade; cut jade	TAKU	MIGAKU
 7424	琤	96	12						jade of jade being; tinkle	SOU SHOU	
 7425	琥	96	12			Y			jewel in shape of tiger; amber	KO	
@@ -8188,10 +8295,12 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 747E	瑾	96	15						brilliance of gems; fine jade	KIN	
 7480	璀	96	15						lustre of gems; glitter; shine	SAI SUI	
 7481	璁	96	15						turquoise	SOU SU	
+7482	璂	96	15				73EE	珮	jade ornament	HAI	OBIDAMA
 7483	璃	96	15		Y				glass	RI	
 7485	璅	96	15						gem	SOU SA	
 7486	璆	96	15						beautiful jade; tinkle	KYUU KU YUU YU	
 7487	璇	96	15						beautiful jade; star	SEN ZEN	
+7488	璈	96	15				656B	敫	ancient musical instrument	SEKU KYOU KEKI KYAKU	UTSURU
 7489	璉	96	15						a vessel used hold grain offerings	RIN	UTSUWA
 748B	璋	96	15						jade plaything; jade ornament	SHOU	HISHAKU TAMA ARAWASU
 748F	璏	96	16							TEI DEI ETSU OCHI EI E	
@@ -8208,6 +8317,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 74A1	璡	96	16						jade look alike stone	SHIN	
 74A2	璢	96	16						precious stone	RYUU RU	
 74A3	璣	96	16						pearl that is not quite round	KI KE GE GI	TAMA
+74A5	璥	96	16				746D	瑭	a kind of jade	TOU DOU	TAMA
 74A6	璦	96	17						fine quality jade	AI	
 74A7	璧	96	18		Y				piece of jade with hole in it	HEKI	TAMA
 74A8	璨	96	17						gems; luster of gems; lustrous	SAN	
@@ -8224,6 +8334,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 74BB	璻	96	18							SUI	
 74BD	璽	96	19		Y				imperial signet, royal signet	JI SHI	SHIRUSHI
 74BF	璿	96	18						fine jade	SEN ZEN KEI KE	
+74C0	瓀	96	18				7485	璅	gem	SOU SA	
 74C8	瓈	96	19						glass	REI RAI RI	
 74C9	瓉	96	19							SAN ZAN	
 74CA	瓊	96	18	19					jade; rare, precious; elegant	KEI	TAMA
@@ -8261,11 +8372,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 74FB	瓻	98	12						jar	CHI TEKI CHAKU	KAME
 74FC	瓼	98	12								SARAKE
 74FF	瓿	98	13						jar, pot	HOU BU FU	KAME
+7500	甀	98	12				7512	甒	jar	BU MU	KAME
 7501	甁	98	13						jug	HEI BIN	KAME
 7503	甃	98	14						brick wall of a well	SHUU	SHIKIGAWARA
 7504	甄	98	14						to examine, discern; to grade; a surname	KEN SHIN	SUE
 7505	甅	98	14						centigram		SENCHIGURA
 7506	甆	98	14							SHI JI	KAME
+7507	甇	98	14				7512	甒	jar	BU MU	KAME
 750C	甌	98	16						bowl, cup; small tray	OU	HOTOGI
 750D	甍	98	15						rafters supporting roof tiles	BOU	IRAKA
 750E	甎	98	16						brick, square tile, slab	SEN	KAWARA
@@ -8389,6 +8502,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 75A3	疣	104	9						wart; tumor; goiter; papule	YUU	IBO
 75A4	疤	104	9						scar, cicatrix; birthmark	HA HE	YAMAI
 75A5	疥	104	9						scabies, itch	KAI	HIZEN YOGOSU OKORI
+75A7	疧	104	9				75EF	痯	sick	KAN	YAMU
 75AB	疫	104	9		Y				epidemic, plague, pestilence	EKI YAKU	EYAMI
 75B1	疱	104	10						acne	HOU	MOGASA
 75B2	疲	104	10		Y				feel tired, be exhausted; weak	HI	TSUKARERU TSUKARE
@@ -8463,6 +8577,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7613	瘓	104	14						paralysis, numbness of limbs	TAN	YAMU
 7615	瘕	104	14						asthma; disease of the bowels	KA GE KE	YAMAI
 7616	瘖	104	14						dumb, mute, unable speak	IN ON	OSHI
+7618	瘘	104	14				763B	瘻	fistula, sore, ulcer, goiter	ROU RU	SEMUSHI
 7619	瘙	104	15						itch	SOU	KASA
 761B	瘛	104	15							SEI SETSU SECHI	HIKITSUKE
 761C	瘜	104	15						a polypus	SHOKU SOKU	
@@ -8481,6 +8596,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7629	瘩	104	14						pimples	TOU	HAREMONO
 762D	瘭	104	16						a whitlow	HYOU	HAREMONO
 762E	瘮	104	16							SHIN	SAMUKE YAMU YAMAI
+762F	瘯	104	16				7662	癢	itch	YOU	KAYUI
 7630	瘰	104	16						scrofula, swellings	RUI RA RAI	
 7632	瘲	104	16						spasms or convulsions in young children, caused by indigestion	SHOU SHU	HIKITSUKE
 7633	瘳	104	16						to be healed; to reform	CHUU CHU RYOU	IERU
@@ -8492,6 +8608,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 763A	瘺	104	16						anal fistula; tumor, sore	ROU RU	KASA SEMUSHI DEKIMONO
 763B	瘻	104	16						fistula, sore, ulcer, goiter	ROU RU	SEMUSHI
 763C	瘼	104	15						sickness; distress	BAKU MAKU	YAMU
+763E	瘾	104	16				766E	癮	rash; addiction, craving, habit	IN ON	HAREMONO
 7640	癀	104	17						jaundice	KOU OU	
 7641	癁	104	17							FUKU BUKU	YAMU
 7642	療	104	17		Y				be healed, cured, recover	RYOU	IYASU
@@ -8505,6 +8622,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 764A	癊	104	16						a disease of the heart	IN ON	
 764B	癋	104	17							KAKU GAKU	
 764C	癌	104	17						cancer; marmoset	GAN	GAN
+764E	癎	104	17				7647	癇	epilepsy, convulsions	KAN	HIKITSUKE KAN
 7652	癒	104	18		Y				get well, recover	YU	IERU
 7655	癕	104	18						loss of the sense of smell	YOU	HAREMONO
 7656	癖	104	18		Y				craving, weakness for; indigestion	HEKI	KUSE
@@ -8512,6 +8630,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7659	癙	104	18						ill	SHO	
 765C	癜	104	18						erythema	DEN TEN	NAMAZU
 765F	癟	104	19						shrivelled up, dried up; vexed	HETSU BECHI	TOBENAI
+7660	癠	104	19				75EF	痯	sick	KAN	YAMU
 7661	癡	104	19						silly, foolish, idiotic	CHI	OROKA
 7662	癢	104	20						itch	YOU	KAYUI
 7664	癤	104	20	18					pimple, sore, boil	SETSU SECHI	KASA
@@ -8641,7 +8760,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 771A	眚	109	10						disease of the eyes; crime, fault	SEI SHOU	
 771B	眛	109	10						dim, dark, obscure; blind	MAI	KURAI
 771C	眜	109	10							BATSU MACHI BETSU MECHI	KURAI
-771E	眞	109	10			Y	771F	真	real, actual, true, genuine	SHIN	MA MAKOTO MAKOTONI
+771E	眞	109	10			Y	771F	真	real, actual, true, genuine	SHIN	MAKOTO MAKOTONI MA
 771F	真	109	10		Y				real, actual, true, genuine	SHIN	MAKOTO MAKOTONI MA
 7720	眠	109	10		Y				close eyes, sleep; hibernate	MIN BEN	NEMURU NEMURI
 7722	眢	109	10						eyes without brightness	WAN EN ON	MEGAUTSURONASAMA
@@ -8672,6 +8791,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 774D	睍	109	12						to look at fearfully; overly cautious	KEN GEN	
 774E	睎	109	12						to long for; to gaze at	KI KE	
 774F	睏	109	12						be tired, sleepy	KON	NEMURU
+7750	睐	109	12				775E	睞	squint at; sidelong glance	RAI	MIRU
 7752	睒	109	13						to glance at, to peep; glittering; to shine	SEN DAN	NUSUMIMIRU
 7756	睖	109	13						to stare straight ahead	CHOU RYOU	MIRU
 7757	睗	109	13						a flash	SEKI SHAKU	INABIKARI
@@ -8720,6 +8840,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 77A2	瞢	109	15	16					eyesight obscured; to feel ashamed	BOU MU MOU	KURAI
 77A5	瞥	109	17			Y			take fleeting glance at	BETSU HETSU	
 77A7	瞧	109	17						glance at, look at, see	SHOU JOU	NUSUMIMIRU
+77A9	瞩	109	17				77DA	矚	watch carefully, stare at, focus on	SHOKU SOKU	MIRU
 77AA	瞪	109	17						stare at	DOU TOU	MIHARU
 77AC	瞬	109	18		Y				wink, blink; in a wink, a flash	SHUN	MATATAKU MATATAKI
 77AD	瞭	109	17		Y				bright, clear; clear-sighted	RYOU	AKIRAKA
@@ -8772,6 +8893,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 77F8	矸	112	8						a rock or cliff	KAN GAN	KINUTA
 77FB	矻	112	8						toil, slave away; busy	KOTSU KUCHI KATSU KACHI	ISHI
 77FC	矼	112	8						stone bridge; stepping stones	KOU	TOBIISHI ISHIBASHI TASHIKA
+77FD	矽	112	8				7845	硅	silicon	KEI KAKU KYAKU	
 7802	砂	112	9		Y				sand; pebbles, gravel; gritty	SA SHA	SUNA
 7805	砅	112	9						cross on stepping stones	REI RI HYOU	WATARU
 7806	砆	112	9						1/2 pr stone	FU	ISHI
@@ -8832,6 +8954,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7881	碁	112	13		Y				chess; any game similar to chess	GO KI	
 7886	碆	112	13						arrow-tip	HA BA	
 7887	碇	112	13						anchor	TEI	IKARI
+7889	碉	112	13				789E	碞	room made of stone; watchtower	GAN	IWA KEWASHII
 788A	碊	112	13							SEN ZEN SAN OKU	NOSERU SOSOGU UTSURU SAKA
 788C	碌	112	13						rough, uneven, rocky; mediocre	ROKU	
 788D	碍	112	13						obstruct, hinder, block, deter	GAI GE	SAMATAGERU
@@ -8958,7 +9081,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7951	祑	113	10							CHITSU JICHI	
 7953	祓	113	10	8					exorcise, remove evil; clean	FUTSU HAI	HARAU HARAI
 7954	祔	113	10						worship one's ancestors; entomb	FU BU	AWASEMATSURU
-7955	祕	113	10			Y	79D8	秘	mysterious, secret, abstruse	HI	HIMERU
+7955	祕	113	10			Y	79D8	秘	secret, mysterious, abstruse	HI	HIMERU KAKUSU
 7956	祖	113	9		Y				ancestor, forefather; grandfather	SO	JIJI HAJIME
 7957	祗	113	10						respect, look up to, revere	SHI	TSUTSUSHIMU MASANI
 7958	祘	113	10						to calculate	SAN	KAZOERU
@@ -8970,7 +9093,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 795E	神	113	9		Y				spirit	SHIN JIN	KAMI KOU TAMASHII
 795F	祟	113	10						evil spirit; evil influence	SUI	TATARI TATARU
 7960	祠	113	10						ancestral temple; offer sacrifice	SHI	HOKORA MATSURU
-7962	祢	113	9			Y			one's deceased father; used as a synonym for U+4F60 你 when referring to deity	DEI NAI NE	KATASHIRO
+7962	祢	113	9			Y			one's deceased father	DEI NAI NE	KATASHIRO
 7965	祥	113	10		Y				good luck	SHOU	SAIWAI
 7967	祧	113	11						an ancestral hall	CHOU	
 7968	票	113	11		Y				slip of paper or bamboo; ticket	HYOU	FUDA
@@ -9002,10 +9125,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7995	禕	113	15						excellent, rare; beautiful, fine	I	YOI
 7996	禖	113	14						sacrifice	BAI MAI	
 7998	禘	113	14						imperial ancestor worship	TEI DAI	MATSURI
+799A	禚	113	14				5DC2	巂	place name	SUI	
 799B	禛	113	15						to receive blessings in a sincere spirit	SHIN	UKERU
 799C	禜	113	15						sacrifice	EI YOU	
 799D	禝	113	15							SHOKU	
+79A0	禠	113	14				6086	悆	happy	YO SHO SO	WASURERU
 79A1	禡	113	15						a sacrifice at the beginning of a military campaign or on the 2nd and 16th day of the lunar month	BA ME	MATSURI
+79A2	禢	113	14				913A	鄺	surname	KOU	
 79A6	禦	113	17						defend, resist, hold out against	GYO GO	FUSEGU
 79A7	禧	113	16	17					happiness; congratulations	KI	SAIWAI
 79A8	禨	113	17						pray for good fortune	KI KE GI	KIZASHI
@@ -9063,6 +9189,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 79EB	秫	115	10						glutinous variety of millet	JOTSU SHUTSU CHUTSU	MOCHIAWA
 79EC	秬	115	10						black millet	KYO	KUROKIBI
 79ED	秭	115	9						one thousand millions, sometimes used for one hundred millions	SHI	
+79EF	积	115	10				7A4D	積	accumulate, store up, amass	SEKI SHI	TSUMU TSUMORU
 79F0	称	115	10		Y				call; name, brand; address; say	SHOU	HAKARU TONAERU AGERU
 79F1	秱	115	11							TOU ZU	
 79F8	秸	115	11						stalks of millet, corn	KATSU KECHI KAI	WARA
@@ -9072,6 +9199,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7A02	稂	115	12						grass; weeds	ROU RYOU	IMIGARA
 7A03	稃	115	12							FU FUU BU	MOMIGARA
 7A05	稅	115	12						taxes, revenue, duty; tax	ZEI DATSU ETSU	MITSUGI
+7A06	稆	115	11				7A6D	穭	wild grain	RYO RO	
 7A07	稇	115	12						to bind, as faggots of sheaves	KON	URERU KUKURU
 7A08	稈	115	12						stalk of grain; straw	KAN	WARA
 7A09	稉	115	12						non-glutinous rice	KOU	URUCHI
@@ -9123,6 +9251,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7A47	穇	115	16						deccan grass, a barnyard grass	SAN SHIN	HIE
 7A48	穈	115	16						millet	BON MON BI MI	
 7A49	穉	115	17						young grain; young, tender	CHI	OSANAI ITOKENAI
+7A4B	穋	115	16				7A5C	穜	rice	TOU ZU SHOU SHU	OKUTE
 7A4C	穌	115	16						revive, to rise again; collect	SO	KAKIATSUMERU
 7A4D	積	115	16		Y				accumulate, store up, amass	SEKI SHI	TSUMU TSUMORU
 7A4E	穎	115	16						rice tassel; sharp point; clever	EI	HOSAKI
@@ -9146,6 +9275,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7A6A	穪	115	19						to praise	SHOU	TONAERU TATAERU
 7A6B	穫	115	18		Y				harvest, cut grain	KAKU	KARU TORIIRERU
 7A6D	穭	115	20						wild grain	RYO RO	
+7A6E	穮	115	20				8018	耘	weed	UN	KUSAGIRU
 7A70	穰	115	22			Y	7A63	穣	stalks of grain; lush, abundant	JOU	YUTAKA WARA
 7A74	穴	116	5		Y				cave, den, hole; KangXi radical 116	KETSU	ANA
 7A75	穵	116	6						deep hollow;, gouge, dig out	ATSU ECHI	ANA
@@ -9274,6 +9404,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7B2F	笯	118	11						a bird-cage	DO NU DA NA	TORIKAGO
 7B30	笰	118	11						curtain	FUTSU FUCHI HI	OOI
 7B31	笱	118	11						a basket trap for fish, placed in the opening of a weir	KOU KU	
+7B32	笲	118	11				7C43	籃	basket	RAN	KAGO
 7B33	笳	118	11						a reed leaf whistle	KA	ASHIBUE
 7B34	笴	118	11						an arrow shaft	KA KOU KAN	YAGARA
 7B35	笵	118	11						a bamboo form; a model	HAN	NORI
@@ -9296,11 +9427,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7B50	筐	118	12						bamboo basket or chest	KYOU	KAGO HAKO
 7B51	筑	118	12			Y			ancient lute; build	CHIKU	HIROU
 7B52	筒	118	12		Y				thick piece of bamboo; pipe	TOU	TSUTSU
+7B53	筓	118	12						a hairpin on which the hair is bound at the back of the head. 15 of age	KEI	KOUGAI KANZASHI
 7B54	答	118	12		Y				answer, reply; return; assent to	TOU	KOTAERU KOTAE
 7B55	筕	118	12							KOU GYOU GUU	TAKEMUSHIRO
 7B56	策	118	12		Y				scheme, plan; to whip; urge	SAKU	MUCHI TSUE KAZUTORI
 7B5D	筝	118	12						stringed musical instrument; kite	SOU SHOU	KOTO
 7B60	筠	118	13						bamboo skin; bamboo	IN UN	TAKE
+7B62	筢	118	13				8019	耙	rake	HA	
 7B64	筤	118	13						young bamboo	ROU RYOU	KAGO
 7B65	筥	118	13						round-shaped bamboo basket for holding rice	KYO	HAKO
 7B66	筦	118	13						a key; to be in charge; a pipe	KAN	HUE KUDA
@@ -9318,6 +9451,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7B74	筴	118	13						type of grass used in divination; to divine; pincers	KYOU SAKU	MEDOGI
 7B75	筵	118	13						feast	EN	MUSHIRO
 7B77	筷	118	13						chopsticks	KAI	HASHI
+7B79	筹	118	13				7C4C	籌	chip, tally, token; raise money	CHUU	KAZUTORI HAKARIGOTO
 7B7A	筺	118	13						bamboo basket or chest	KYOU	KAGO HAKO
 7B7F	筿	118	13							SHOU	SHINO
 7B84	箄	118	14							HAI BAI HI HEKI HEI BYAKU	KAGO
@@ -9331,6 +9465,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7B90	箐	118	14						to draw a bamboo bow or crossbow	SEI SHOU SEN	
 7B91	箑	118	14						fan	SOU SHOU JOU	OUGI
 7B92	箒	118	14						broom	SOU SHUU	HOUKI
+7B93	箓	118	14				7C59	籙	book	RYOKU ROKU	HONBAKO
 7B94	箔	118	14			Y			reed screen; frame for growing silkworms	HAKU	SUDARE
 7B95	箕	118	14			Y			sieve; dust pan, garbage bag	KI	MI
 7B96	箖	118	14						a large basket	RIN	TAKE
@@ -9392,6 +9527,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7BE9	篩	118	16						sieve, filter, screen; sift	SHI SAI	FURUI
 7BEA	篪	118	16						a bamboo flute with seven holes	CHI JI	HUE
 7BED	篭	118	16						cage; cage-like basket	ROU	KAGO
+7BF1	篱	118	16				7C6C	籬	bamboo or wooden fence; hedge	RI	MAGAKI KAKI
 7BF2	篲	118	17						broomstick	SUI KEI E	HOUKI
 7BF3	篳	118	17						wicker, bamboo	HITSU HICHI	MAGAKI
 7BF4	篴	118	17						bamboo flute; whistle	TEKI CHAKU CHIKU JIKU	HUE
@@ -9440,6 +9576,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7C31	簱	118	18								HATA
 7C33	簳	118	19							KAN	SHINO
 7C34	簴	118	19							KYO GO	
+7C35	簵	118	19				7B98	箘	fine bamboo	KIN	SHINODAKE YA TAKENOKO
 7C36	簶	118	19							ROKU	
 7C37	簷	118	19						eaves of house; brim	EN TAN	HISASHI
 7C38	簸	118	19						winnower	HA	HIRU
@@ -9485,8 +9622,10 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7C70	籰	118	26							WAKU YOKU IKI	ITOWAKU
 7C72	籲	118	32						appeal; request; implore	YU YAKU	YOBU
 7C73	米	119	6		Y				hulled or husked uncooked rice	BEI MAI ME	KOME YONE MEETORU
+7C74	籴	119	8				7CF4	糴	purchase grains; store grain	TEKI	KAIYONE
 7C75	籵	119	8						dm (decimetre, decimeter)		DEKAMEETORU
 7C79	籹	119	9						cake	JO NYO	
+7C7B	类	119	10				985E	類	class, group, kind, category	RUI RAI	TAGUI
 7C7C	籼	119	9						non-glutinous long grain rice	SEN	URUCHI
 7C7D	籽	119	9						seed, pip, pit, stone	SHI	
 7C7E	籾	119	9			Y			unhulled rice		MOMI
@@ -9506,6 +9645,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7C97	粗	119	11		Y				rough, thick, course; rude	SO	ARAI HOBO
 7C98	粘	119	11		Y				viscous, mucous; glutinous	NEN	NEBARU
 7C9B	粛	119	11		Y				pay respects; reverently	SHUKU	TSUTSUSHIMU
+7C9C	粜	119	11				7CF6	糶	sell grains	CHOU	URIYONE SERI
+7C9D	粝	119	11				7CF2	糲	unpolished rice; brown rice	REI RATSU RAI	KUROGOME ARAI
 7C9E	粞	119	12						to mash rice	SEI SAI	KOGOME
 7C9F	粟	119	12			Y			unhusked millet; grain	ZOKU SHOKU SOKU	AWA MOMI
 7CA0	粠	119	12							KOU	SUKUMO
@@ -9566,6 +9707,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7CEB	糫	119	19							KAI GEN	MOCHI OKOSHI
 7CEF	糯	119	20						glutinous rice; glutinous, sticky	DA NA	MOCHIGOME
 7CF0	糰	119	20						rice ball	DAN	DANGO
+7CF1	糱	119	22						fermenting grain; yeast	GETSU	KOUJI MOYASHI
 7CF2	糲	119	20						unpolished rice; brown rice	REI RATSU RAI	KUROGOME ARAI
 7CF4	糴	119	22						purchase grains; store grain	TEKI	KAIYONE
 7CF5	糵	119	22						fermenting grain; grain which has sprouted; yeast	GETSU	
@@ -9748,7 +9890,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7DE0	締	120	15		Y				tie, join, connect; connection	TEI	SHIMARU MUSUBU SHIMERU
 7DE1	緡	120	15						a fishing-line; cord; string of coins; a paper or straw string	BIN MIN KON	TSURIITO NAWA
 7DE2	緢	120	14							BOU MYOU BYOU	
-7DE3	緣	120	15			Y	7E01	縁	hem, margin; reason, cause; karma, fate	EN	FUCHI HERI YORU
+7DE3	緣	120	15			Y	7E01	縁	hem	EN	FUCHI HERI YORU
 7DE4	緤	120	15						cord	SETSU	KIZUNA
 7DE5	緥	120	15						swaddling	HOU HO	MUTSUKI
 7DE6	緦	120	15						coarse cotton cloth used for mourning	SHI	NUNO
@@ -9759,6 +9901,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7DEC	緬	120	15						distant, remote; think of	MEN BEN	HOSOITO HARUKA KARUI
 7DED	緭	120	15							I KI GI	KINU UCHIHIMO HIMO
 7DEF	緯	120	16		Y				woof; parallels of latitude	I	YOKOITO
+7DF0	緰	120	15				7F66	罦	net	FU FUU BU	AMI
 7DF1	緱	120	15						cord binding on hilt of sword	KOU KU	TSUKA
 7DF2	緲	120	15						indistinct, dim; minute; distant	BYOU MYOU	KASUKA
 7DF4	練	120	14		Y				practice, drill, exercise, train	REN	NERU NERIGINU
@@ -9900,6 +10043,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7F43	罃	121	16						long necked jar or bottle	OU YOU	
 7F44	罄	121	17						exhaust, run out, use up; empty	KEI KYOU	MUNASHII
 7F45	罅	121	17						crack, fissure, split	KA KE	HIBI SUKI
+7F46	罆	121	17				7F50	罐	jar, jug, pitcher, pot	KAN	KAN HOTOGI
 7F47	罇	121	18						a goblet; a bottle, a wine-jar	SON	KAME
 7F48	罈	121	18				58DC	壜	earthen jar or jug	TAN DON	BIN
 7F4B	罋	121	19				7515	甕	earthen jar; jar for ashes	OU	KAME MIKA
@@ -9915,12 +10059,14 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7F55	罕	122	7						rare, scarce; surname	KAN	MARE
 7F57	罗	122	8				7F85	羅	net for catching birds; gauze	RA	AMI TSURANERU USUMONO
 7F58	罘	122	9						screen used in ancient times	FU	USAGIAMI KASANERU
+7F59	罙	122	8				6EC9	滉	deep	KOU	HIROI
 7F5B	罛	122	11						large fishing net	RO KU	UOAMI
 7F5C	罜	122	10							SHU TOKU DOKU	AMI
 7F5D	罝	122	10						net for catching rabbits	SHA SHO	AMI
 7F5F	罟	122	10						net; snare; pressure come or go	KO	AMI
 7F60	罠	122	10						animal trap	BIN MIN	AMI WANA
 7F61	罡	122	10	9					the name of a certain stars; the god who is supposed to live in them	KOU	
+7F62	罢	122	10				7F77	罷	cease, finish, stop; give up	HI HAI	YAMERU TSUKARERU MAKARU
 7F63	罣	122	11						hinder, disturb, obstruct	KAI KE KEI	KAKERU
 7F64	罤	122	12							TEI DAI KON	ISAGIAMI ANI
 7F65	罥	122	12						impede	KEN	KAKERU
@@ -9940,6 +10086,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 7F77	罷	122	15		Y				cease, finish, stop; give up	HI HAI	YAMERU TSUKARERU MAKARU
 7F78	罸	122	15						penalty, fine; punish, penalize	BATSU BACHI	TOGAMERU TSUMISURU TOGAME
 7F79	罹	122	16						sorrow, grief; incur, meet with	RI RA	KAKARU
+7F7B	罻	122	16				7F66	罦	net	FU FUU BU	AMI
 7F7D	罽	122	17						a kind of woolen fabric	KEI	UOAMI
 7F7E	罾	122	17						a large square net, lowered and raised from the bank of the river	SOU	
 7F7F	罿	122	17						net catch birds	SHOU SHU TOU ZU	MUSOUAMI
@@ -10059,9 +10206,12 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8024	耤	127	14						plough	SEKI JAKU SHA JA	KARIRU
 8026	耦	127	15						plow side by side; team of two	GOU GU GUU	
 8028	耨	127	16						hoe, rake; weed	DOU JOKU NOKU	KUWA KUSAGIRU
+802A	耪	127	16				8015	耕	plow, cultivate	KOU	TAGAYASU
 802C	耬	127	17						drill for sowing grain	ROU RU	
+802D	耭	127	18				8015	耕	plow, cultivate	KOU	TAGAYASU
 802E	耮	127	18						a kind of farm tool	ROU	
 8030	耰	127	21						toothless rake for drawing earth over newly sown grain	YUU U	NARASU
+8031	耱	127	22				802E	耮	a kind of farm tool	ROU	
 8033	耳	128	6		Y				ear; merely, only; handle	JI JOU	MIMI NOMI
 8034	耴	128	7							CHOU JOU NYOU	
 8035	耵	128	8							TEI CHOU	MIMIKUSO
@@ -10130,6 +10280,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 809E	肞	130	7							SA	
 80A1	股	130	8		Y				thighs, haunches, rump; share	KO	MATA MOMO
 80A2	肢	130	8		Y				human limbs; animal feet	SHI	TEASHI
+80A4	肤	130	8				819A	膚	skin; superficial, shallow	FU	HADA
 80A5	肥	130	8		Y				fat, plump, obese; fertile	HI	KOERU KOYASU KOE
 80A6	肦	130	8						large head; many; high; to divide, to distribute	FUN BUN HAN	TAKAI WAKERU
 80A7	肧	130	8						embryo; unfinished things	HAI	HARAMU
@@ -10139,11 +10290,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 80AB	肫	130	8						the gizzard of a fowl; honest, sincere	SHUN SAI SUI	HOOBONE
 80AC	肬	130	8						wart; tumor; goiter; papule	YUU	IBO
 80AD	肭	130	8						fat; seal (moon radical DKW: 14342 is different)	DOTSU NACHI DATSU	KOERU
+80AE	肮	130	8				9AAF	骯	dirty	KOU	
 80AF	肯	130	8		Y				willing; consent to, permit	KOU KAI	UBENAU GAENJI AETE
 80B1	肱	130	8						forearm	KOU	HIJI
 80B2	育	130	8		Y				produce, give birth to; educate	IKU	SODATERU HAGUKUMU SODATSU
 80B3	肳	130	8				543B	吻	kiss; the lips; coinciding	FUN BUN	KUCHISAKI
 80B4	肴	130	8			Y			cooked or prepared meat	KOU	SAKANA
+80B5	肵	130	8				6AAF	檯	table	TAI DAI	TSUKUE
 80B8	肸	130	8						spread out; smilling or laughing	KITSU KICHI KOCHI KETSU KECHI	HIROGARU
 80B9	肹	130	8						(Cant.) vulgar, abusive term for female sex organ, cunt	HI KITSU	
 80BA	肺	130	8	9	Y				lungs	HAI	HAI MAGOKORO
@@ -10166,6 +10319,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 80D9	胙	130	9						meat offered in sacrifice to one's ancestors	SO SAKU	HIMOROGI
 80DA	胚	130	9						embryo; unfinished things	HAI	HARAMU
 80DB	胛	130	9						the shoulder, shoulder blade	KOU	KAIGARAHO
+80DC	胜	130	9				52DD	勝	victory; excel, be better than	SHOU	KATSU MASARU TAERU
 80DD	胝	130	9						callous, corn	CHI SHI TEI	TAKO MAME
 80DE	胞	130	9		Y				womb, placenta, fetal membrane	HOU	ENA
 80E0	胠	130	9						open; throw away	KYO KO KYOU KOU	WAKINOSHITA
@@ -10197,6 +10351,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8109	脉	130	9						blood vessels, veins, arteries	MYAKU BAKU	SUJI MYAKU
 810A	脊	130	10		Y				spine, backbone; ridge	SEKI	SE SEI
 810B	脋	130	10							KYOU	OBIYAAKASU ODOOSU OTOOKASU
+810D	脍	130	10				81BE	膾	minced meat or fish	KAI	NAMASU
 8116	脖	130	11						neck	HOTSU BOCHI BOTSU	
 8117	脗	130	11						coinciding, agreeing	BUN MON BIN MIN FUN	AU
 8118	脘	130	11						internal cavity of stomach	KAN GEN GAN	
@@ -10227,6 +10382,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 814A	腊	130	12						year end sacrifice; dried meat	SEKI SHAKU ROU	HOJISHI
 814B	腋	130	12						armpit	EKI SEKI	WAKI
 814C	腌	130	12						salt, pickle; be dirty	YOU OU EN	SHIOZUKE
+814D	腍	130	12				81D1	臑	soft	DAU JU JI	SUNE
 814E	腎	130	13		Y				kidneys; testes, gizzard	JIN	KANAME
 8150	腐	130	14		Y				rot, decay, spoil; rotten	FU	KUSARU
 8151	腑	130	12						bowels, entrails, internal organs	FU	HARAWATA
@@ -10253,6 +10409,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8171	腱	130	13						tendons	KEN KIN	KEN
 8173	腳	130	13				811A	脚	leg, foot; base, leg, foundation	KYAKU KYA	ASHI
 8174	腴	130	13						fat; fertile, rich; plump, soft	YU	KOERU ABURA
+8176	腶	130	13				80CF	胏	meat	SHI	
 8177	腷	130	13							HYOKU BIKI	KOMORU
 8178	腸	130	13		Y				intestines; emotions; sausage	CHOU	HARAWATA
 8179	腹	130	13		Y				stomach, belly, abdomen; inside	FUKU	HARA IDAKU
@@ -10282,6 +10439,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 819C	膜	130	14		Y				membrane; to kneel and worship	MAKU BAKU	MAKU USUKAWA
 819D	膝	130	15		Y				knee	SHITSU	HIZA
 819E	膞	130	15							SEN ZEN SHUN	KIRIMI
+819F	膟	130	15				818B	膋	fat	RYOU	ABURU
 81A0	膠	130	15						glue, gum, resin, rubber	KOU	NIKAWA
 81A2	膢	130	15							ROU RU RYUU RYO RO	
 81A3	膣	130	15						vagina	CHITSU	
@@ -10313,6 +10471,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 81CD	臍	130	18						abdominal area of crab; navel	SEI SAI	HOZO HESO
 81CE	臎	130	18							SUI	
 81CF	臏	130	18						the kneecap	HIN BIN	
+81D0	臐	130	18				81DB	臛	broth	KOKU KAKU	ATSUMONO
 81D1	臑	130	18						soft	DAU JU JI	SUNE
 81D3	臓	130	19		Y				internal organs, viscera	ZOU SOU	HARAWATA
 81D5	臕	130	19						fat; gross, sleek	HYOU	
@@ -10456,6 +10615,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8299	芙	140	7			Y			hibiscus	FU	HASU
 829A	芚	140	7						green sprout; foolish	TON DON CHUN	
 829B	芛	140	7							I SHUN SHUTSU JUCHI ITSU ICHI	
+829C	芜	140	7				856A	蕪	luxurious growth of weeds	BU MU	ARERU KABURA
 829D	芝	140	6		Y				sesame; a purplish or brown mushroom thought to have miraculous powers; 'a divine and felicitous plant' (Karlgren)	SHI	SHIBA
 829F	芟	140	7						mow, cut; weed out; scythe	SAN SEN	KARU
 82A0	芠	140	7							BUN MON	YUKINOSHITA
@@ -10487,6 +10647,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 82BD	芽	140	8		Y				bud, sprout, shoot	GA GE	ME MEGUMU
 82BE	芾	140	7						flower; small; little; lush	HI HAI FUTSU FUCHI	
 82BF	芿	140	7						grass which has been cut and regrown; wild grass	JOU NYOU	
+82C1	苁	140	7				84EF	蓯	medicinal herb	SOU SU SHOU SHU	KABURA
 82C5	苅	140	7	8					cut off, reap, mow; sickle	GAI	KARU KARI
 82C6	苆	140	7								SUSA TSUTA
 82D0	苐	140	8						sequence, number; grade, degree	TEI DAI I	TSUBANA
@@ -10551,6 +10712,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8321	茡	140	9							U	
 8322	茢	140	9						sedges; rushes	RETSU RECHI REI	ASHINOHO
 8323	茣	140	10						mat, matting	GO	
+8327	茧	140	9				7E6D	繭	cocoon; callus, blister	KEN	MAYU
 8328	茨	140	9		Y				thatching; caltrop, Tribulus terrestris	SHI JI	IBARA KUSABUKI KAYA
 832B	茫	140	9						vast, boundless, widespread	BOU	TOOI
 832C	茬	140	9						harvest	SHI JI	SHIGERU
@@ -10571,6 +10733,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 833C	茼	140	9						Chrysanthemum coronarium	TOU ZU	SHIYUNGIKU
 833D	茽	140	9							CHUU JIYU	MURAGARU
 8340	荀	140	9						surname; ancient state; plant	JUN SHUN	
+8341	荁	140	9				82B9	芹	celery	KIN	SERI
 8342	荂	140	9							KA KE FU KU	HANA
 8343	荃	140	9						aromatic herb; fine cloth	SEN SON SETSU SECHI SATSU	KARASHIAE
 8344	荄	140	9						roots	KAI	NE
@@ -10591,6 +10754,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8356	荖	140	9						betel pepper	HOU ROU	KINMA
 8357	荗	140	9							SHOKU JIKI	
 8358	荘	140	9		Y				village, hamlet; villa; surname	SOU	OGOSOKA
+835A	荚	140	9				83A2	莢	pods of leguminous plants; pods	KYOU	SAYA
 8363	荣	140	9				69AE	榮	glory, honor; flourish, prosper	EI YOU	SAKAERU HAE
 8370	荰	140	10							TO ZU	
 8373	荳	140	10						beans, peas; bean-shaped	TOU ZU	MAME
@@ -10961,6 +11125,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 85D0	藐	140	17						disregard, slight, disdain	BAKU BYOU BOU MYAKU	HARUKA SUSUMU MURASAKI
 85D5	藕	140	18						lotus root	GUU GOU GU	HASUNONE
 85D8	藘	140	18						madder	RYO RO	
+85D9	藙	140	18				8438	萸	dogwood	YU	
 85DA	藚	140	18						water plant	SHOKU ZOKU	OMODAKA
 85DC	藜	140	18						Chenopodium album, pigweed	REI RAI	AKAZA
 85DD	藝	140	18			Y	82B8	芸	art; talent, ability; craft	GEI	UERU WAZA NORI
@@ -11014,6 +11179,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 862F	蘯	140	20						to toss about; to swing; to rock	TOU DOU	
 8630	蘰	140	20								KATSURA
 8636	蘶	140	21							GI	HIKOBAE
+8637	蘷	140	21				5914	夔	one-legged monster; walrus	KI GI	
 8638	蘸	140	22						dip (a brush); remarry	SAN	HITASU
 863A	蘺	140	22						gracilaria verrucosa	RI	KUSABIE
 863C	蘼	140	22							BI MI	
@@ -11027,6 +11193,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 864D	虍	141	6						tiger; KangXi radical 141	KO KU	TORAKANMURI
 864E	虎	141	8		Y				tiger; brave, fierce; surname	KO	TORA
 8650	虐	141	9		Y				cruel, harsh, oppressive	GYAKU	SHIITAGERU SOKONAU
+8651	虑	141	10				616E	慮	be concerned, worry about	RYO ROKU	OMONPAKA
 8652	虒	27	10						an amphibious beast resembling a tiger with one horn; place name	SHI TEI DAI CHI JI	KEMONO
 8653	虓	141	10						roar	KOU KYOU	USOBUKU IKARU SHISHI TATAKU
 8654	虔	141	10						act with reverence; reverent	KEN	TSUTSUSHIMU
@@ -11050,6 +11217,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8669	虩	141	18						fright	KEKI KYAKU SAKU SHAKU	OSORERU
 866B	虫	142	6		Y				insects, worms; KangXi radical 142	CHUU KI	MUSHI
 866C	虬	142	7						young dragon	KYUU KU KYOU GYOU	MIZUCHI
+866E	虮	142	8				87E3	蟣	louse eggs, nits	KI KE GE	SHIRAMI
 866F	虯	142	8						young dragon	KYUU KU KYOU GYOU	MIZUCHI
 8671	虱	142	8						louse; bug; parasite	SHITSU	SHIRAMI
 8675	虵	142	9							SHA I YA	HEBI
@@ -11058,6 +11226,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8679	虹	142	9		Y				rainbow	KOU	NIJI
 867A	虺	142	9						large poisonous snake	KI KAI KE	MAMUSHI
 867B	虻	142	9						horsefly, gadfly	BOU	ABU
+867D	虽	142	9				96D6	雖	although, even if	SUI	IEDOMO
 8688	蚈	142	12							KEN	HOTARU YASUDE
 8689	蚉	142	10						variant of 蚊 U+868A, a mosquito, gnat	BUN	KA
 868A	蚊	142	10		Y				mosquito; gnat	BUN	KA
@@ -11066,12 +11235,14 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 868D	蚍	142	10						mussels; various shellfish	HI BI	OOARI
 8691	蚑	142	10						tip-toe	KI GI GE	HAU
 8693	蚓	142	10						earthworm	IN	MIMIZU
+8694	蚔	142	10				86B3	蚳	ant eggs	CHI JI SHI TEI TAI	
 8695	蚕	142	10		Y				silkworms	SAN TEN	KAIKO
 8696	蚖	142	10							GEN GAN	IMORI
 8698	蚘	142	10						tapeworm	KAI YUU	KAICHIYUU HARANOMUSHI
 869A	蚚	142	10							KI GE KAI GAI	KOKUZOUMUSHI
 869C	蚜	142	11						plant louse, aphids	KA KE	ABURAMUSHI
 869D	蚝	142	10				8786	螆	hairy and poisonous caterpillars; (Cant.) a louse	SHI	
+86A0	蚠	142	10				92EE	鋮	person's name	SEI	
 86A1	蚡	142	10						mole	FUN BUN	MOGURAMOCHI
 86A3	蚣	142	10						centipede	KOU KU SHOU	
 86A4	蚤	142	10						flea; louse	SOU	NOMI HAYAI
@@ -11102,6 +11273,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 86C6	蛆	142	11						maggots	SHO SO	UJI
 86C7	蛇	142	11		Y				snake	JA I DA	HEBI
 86C9	蛉	142	11						dragonfly, libellulidae	REI RYOU	
+86CA	蛊	142	11				8831	蠱	poison; venom; harm; bewitch	KO YA	SOKONAU MADOWASU KOBIRU
 86CB	蛋	142	11						eggs; term of abuse	TAN	TAMAGO
 86CC	蛌	142	11				86C4	蛄	mole cricket	KO KU	KERA
 86CD	蛍	142	11		Y				glow-worm, luminous insect	KEI EI GYOU	HOTARU
@@ -11164,6 +11336,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 871E	蜞	142	14						a kind of crab; worm, leech	KI GI	HIRU
 871F	蜟	142	14							IKU	
 8721	蜡	142	14						wax; candle; waxy, glazed; maggot; as a non-simplified form sometimes used as an equivalent to U+410D 䄍, meaning imperial harvest	SHO WA JA SEKI SHAKU	UJIMUSHI
+8722	蜢	142	14				881C	蠜	grasshopper	HAN BON	INAGO
 8723	蜣	142	14						dung beetle	KYOU KOU KYAKU KAKU	
 8725	蜥	142	14						lizard	SEKI	
 8728	蜨	142	14						butterfly	SHOU SOU	
@@ -11275,6 +11448,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 87E2	蟢	142	18						caulk; a spider	KI	
 87E3	蟣	142	18						louse eggs, nits	KI KE GE	SHIRAMI
 87E4	蟤	142	18							SEN ZEN	
+87E5	蟥	142	18				86ED	蛭	leech	SHITSU CHITSU	HIRU
 87EA	蟪	142	18						a kind of cicada	KEI E	TSUKUTSUKUBOUSHI
 87EB	蟫	142	18						silverfish	IN TAN DON	SHIMI
 87EC	蟬	142	18			Y			cicada; continuous	SEN ZEN	SEMI
@@ -11385,6 +11559,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8880	袀	145	9							KIN	IKUSAGOROMO
 8881	袁	145	10						robe; surname	EN ON	
 8882	袂	145	9						sleeves	BEI KETSU	TAMOTO
+8884	袄	145	9				8956	襖	outer garments; coat, jacket	OU	AO FUSUMA
 8888	袈	145	11			Y			Buddhist cassock	KA KE	
 888B	袋	145	11		Y				pocket, bag, sack, pouch	TAI	FUKURO
 888D	袍	145	10						long gown, robe, cloak	HOU BOU	WATAIRE
@@ -11421,6 +11596,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 88C3	裃	145	11						old ceremonial garb; samurai garb		KAMISHIMO
 88C4	裄	145	11						sleeve length		YUKI
 88C5	装	145	12		Y				dress, clothes; decorate; fill	SOU SHOU	YOSOOU
+88C6	裆	145	11				8960	襠	crotch or seat of pants; pants	TOU	MACHI
 88C8	裈	145	11						trousers, pants, shorts, drawers	KON	FUNDOSHI
 88CA	裊	145	13						curling upwards; wavering gently	JOU NYOU	SHINAYAKA
 88CB	裋	145	12						cotton clothes of a boy servant	SHU JU TAN	SHITAGI
@@ -11476,6 +11652,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8918	褘	145	15						ceremonial gowns of a queen	I KIKU	HIZAKAKE
 8919	褙	145	14						paper or cloth pasted together	HAI	HADAGI
 891A	褚	145	14						bag, valise; stuff, pad; surname	CHO SHA	WATAIRE
+891B	褛	145	14				8938	褸	lapel, collar; tattered, threadbare	ROU RU	BORO TSUZURU
 891C	褜	145	15								ENA
 891D	褝	145	14						unlined garment	TAN	HITOE
 891E	褞	145	15						a robe	ON UN	NUNOKO
@@ -11552,6 +11729,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 898B	見	147	7		Y				see, observe, behold; perceive	KEN	MIRU MIERU MAMIERU
 898C	覌	147	9						see, observe, view; appearance	KAN	MIRU
 898D	覍	147	10							HEN	
+898E	覎	147	10				5DC2	巂	place name	SUI	
 898F	規	147	11		Y				rules, regulations, customs, law	KI	BUNMAWASHI NORI TADASU
 8990	覐	147	11						to sleep; to realize, feel	KAKU	OBOOERU SAAMASU SAAMERU
 8993	覓	147	11						seek; search	BEKI	MOTOMERU
@@ -11843,6 +12021,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8B39	謹	149	17		Y				prudent, cautious; attentive	KIN	TSUTSUSHIMU
 8B3C	謼	149	18						to shout; to mourn to invoke	KO KU KOU KYOU	YOBU
 8B3E	謾	149	18						deceive, insult	BAN MAN	AZAMUKU ANADORU
+8B3F	謿	149	19				5632	嘲	ridicule, deride, scorn, jeer at	TOU CHOU	AZAKERU
 8B41	譁	149	17	18					noise, uproar; clamor, hubbub	KA GA KE	KAMABISUSHI KAWARU
 8B42	譂	149	19							SEN	ITSUWARU
 8B43	譃	149	19							KU	ITSUWARU USO
@@ -11890,6 +12069,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8B84	讄	149	22							RU I	INORU
 8B85	讅	149	22						know in detail	SHIN	TSUMABIRAKA
 8B86	讆	149	22						to exaggerate; incredible	EI E	NEGOTO
+8B87	讇	149	23				8B1F	謟	flatter; suspect, be uncertain	TOU	UTAGAU
 8B8A	變	149	23						change, transform, alter; rebel	HEN	KAWARU
 8B8B	讋	149	23						fear; envy; loquacious	SHOU TOU DOU	OSORERU
 8B8C	讌	149	23						a feast, banquet; to entertain, feast	EN	KUTSUROGU SAKAMORI
@@ -11954,6 +12134,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8C74	豴	152	18				8E62	蹢	hoof; a falter; to hesitate	TEKI JAKU TAKU	TATAZUMU
 8C75	豵	152	18						young pig	SOU SU SHOU SHU	INOKO
 8C76	豶	152	19						castrate pig	FUN BUN	
+8C77	豷	152	19				92EE	鋮	person's name	SEI	
 8C78	豸	153	7						KangXi radical 153; legless insects; a legendary beast	CHI TAI	TOKERU YURUMERU
 8C79	豹	153	10			Y			leopard, panther; surname	HOU HYOU	HYOU
 8C7A	豺	153	10						wolf; cruel, wicked, mean	SAI	YAMAINU
@@ -11980,6 +12161,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8C9C	貜	153	27						ape	KYAKU KAKU KEKI KU	OOZARU
 8C9D	貝	154	7		Y				sea shell; money, currency	BAI HAI	KAI
 8C9E	貞	154	9		Y				virtuous, chaste, pure; loyal	TEI JOU	TADASHII
+8C9F	貟	154	9				54E1	員	member; personnel, staff member	IN EN	KAZU
 8CA0	負	154	9		Y				load, burden; carry, bear	FU BU	OU MAKERU TANOMU
 8CA1	財	154	10		Y				wealth, valuables, riches	ZAI SAI	TAKARA WAZUKA
 8CA2	貢	154	10		Y				offer tribute; tribute, gifts	KOU KU	MITSUGU MITSUGI
@@ -12039,6 +12221,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8CE3	賣	154	15			Y	58F2	売	sell; betray; show off	BAI MAI	URU
 8CE4	賤	154	15						mean, low; cheap, worthless	SEN ZEN	IYASHII SHIZU
 8CE6	賦	154	15		Y				tax; give; endow; army; diffuse	FU	MITSUGI
+8CE7	賧	154	15				85C7	藇	fine	SHO JO YO	UTSUKUSHII
 8CE8	賨	154	15						tribute paid in cloth by the tribes in Szechwan and Yunnan under the Han dynasty	SOU ZU	MITSUGI
 8CEA	質	154	15		Y				matter, material, substance	SHITSU SHICHI	MOTO TASUKERU TORU
 8CEB	賫	154	15				9F4E	齎	take in both hands and offer to	SEI SAI SHI	MOTARASU
@@ -12077,6 +12260,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8D17	贗	154	22						counterfeit, false	KEN GAN GEN	TADASHIKUNAI NISE NISEMONO
 8D1B	贛	154	24						Jiangxi province; places therein	KOU KU KAN KON	TAMAU
 8D1C	贜	154	25						booty, loot, stolen goods; bribe	ZOU SOU	KAKUSU
+8D1D	贝	154	4				8C9D	貝	sea shell; money, currency	BAI HAI	KAI
 8D51	赑	154	12						strong	HI	IKARU
 8D5F	赟	154	16						affable, agreeable, pleasant	IN	
 8D64	赤	155	7		Y				red; communist, 'red'; bare	SEKI SHAKU	AKA AKAI
@@ -12176,6 +12360,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8E09	踉	157	14						hop, jump; hurriedly, urgently	RYOU ROU	ODORU
 8E0A	踊	157	14		Y				leap, jump	YOU	ODORU ODORI
 8E0B	踋	157	14						the foot or feet cast of a play	KYAKU	ASHI
+8E0C	踌	157	14				8E8A	躊	hesitate, falter; smug, self-satisfied	CHUU	TAMERAU
 8E0F	踏	157	15		Y				step on, trample, tread on, walk	TOU	FUMU
 8E10	踐	157	15						trample, tread upon, walk on	SEN	FUMU
 8E11	踑	157	15							KI GI	ASHIATO
@@ -12191,6 +12376,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8E26	踦	157	15						the shin; to pierce; to touch	KI GI	KATAASHI
 8E27	踧	157	15						uneasiness, nervousness; level	SHUKU TEKI JAKU	IKIYASUI
 8E2A	踪	157	15		Y				footprints, traces, tracks	SHOU SOU	ATO
+8E2B	踫	157	15				78B0	碰	collide, bump into	HOU	BUTSUKARU
 8E30	踰	157	16						exceed, transgress; cross over	YU YOU	KOERU
 8E31	踱	157	16						stroll, pace, walk slowly	TAKU DAKU JAKU	HADASHI
 8E33	踳	157	16							SHUN SEN	SOMUKU
@@ -12215,6 +12401,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8E4E	蹎	157	17							TEN	TSUMAZUKU
 8E4F	蹏	157	17						hoof; leg of pork; little witch a horse	TEI	HIZUME
 8E50	蹐	157	17						take short steps	SEKI	NUKIASHI SASHIASHI
+8E51	蹑	157	17				8EA1	躡	tread, step on; follow, track	JOU	FUMU
+8E52	蹒	157	17				8E63	蹣	to jump over; to limp	MAN BAN HAN	YOROMEKU
 8E54	蹔	157	18						temporary; fleeting; ephemeral	SAN ZAN	TOTSUSHINSURU
 8E55	蹕	157	18						clear way, make room for; clear street when emperor tours	HITSU	SAKIBARAI
 8E59	蹙	157	18						urgent, suddenly; grieve, lament	SHUKU SEKI	SEMARU
@@ -12261,11 +12449,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8E94	躔	157	22						follow in, imitate; rut, path	TEN	FUMU
 8E95	躕	157	22						hesitate, waver, falter	CHU JU JUU	TAMERAU
 8E97	躗	157	22						exaggerate	EI E KAI KE	HUMU
+8E98	躘	157	23				8E9E	躞	to walk	SHOU	YUKU
 8E99	躙	157	23						trample down, oppress, overrun	RIN	FUMU
 8E9A	躚	157	22						wander about, walk around; revolve	SEN	MAU
 8E9B	躛	157	23						exaggerate	EI E KAI KE	HUMU
 8E9D	躝	157	24						to pass; to step over; to creep; to twine round	RAN TAN DAN	KOERU
 8E9E	躞	157	24						to walk	SHOU	YUKU
+8EA0	躠	157	23				8E69	蹩	to limp	HETSU BECHI BETSU	HUMU
 8EA1	躡	157	25						tread, step on; follow, track	JOU	FUMU
 8EA2	躢	157	25							TOU DOU	FUMU
 8EA7	躧	157	26						sandal	SHI RI SAI SHA	KUTSU
@@ -12310,6 +12500,8 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8EE0	軠	159	11							JIN NIN	
 8EE2	転	159	11		Y				shift, move, turn	TEN	KOROBU KOROGARU
 8EE3	軣	159	11						rumble, explosion, blast	GOU KOU	TODOROKU
+8EE4	軤	159	12				913A	鄺	surname	KOU	
+8EE5	軥	159	12				80CA	胊	yoke	KU GU KYOU KOKU	
 8EE8	軨	159	12						wooden cross-piece on front inside of carriage box	REI RYOU	TESORI
 8EEB	軫	159	12						cross board at rear of carriage	SHIN	YOKOGI KOTOJI
 8EED	軭	159	13						(Cant.) to spoil, ruin	KYOU GOU	TODOKOORU
@@ -12439,6 +12631,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 8FC5	迅	162	6	7	Y				quick, hasty, rapid, sudden	JIN SHIN SHUN	HAYAI
 8FC6	迆	162	6	7					wind; walk out of straight path	I TA DA	NANAME
 8FC7	过	162	6				904E	過	pass, pass through, go across	KA	SUGIRU AYAMATSU TOGA
+8FC8	迈	162	6				9081	邁	take a big stride; pass by	BAI MAI	YUKU SUGIRU TSUTOMERU
 8FCA	迊	162	8						to go round, to make a circuit, to make a revolution, to turn round	SOU	MEGURU
 8FCB	迋	162	8						travel, go to; deceive; scare	OU	YUKU AZAMUKU
 8FCD	迍	162	8						falter, hesitate	CHUN TON DON	
@@ -12493,6 +12686,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 900F	透	162	10	11	Y				penetrate, pass through	TOU	SUKU SUKASU TOORU
 9010	逐	162	10	11	Y				chase, expel; one by one	CHIKU JIKU	OU
 9011	逑	162	11						collect, unite; match, pair	KYUU GU	ATSUMERU AU TAGUI
+9012	递	162	10				905E	遞	hand over, deliver; substitute	TEI	TAGAINI KAWARU
 9013	逓	162	10		Y				hand over, deliver; substitute	TEI	TAGAINI KAWARU
 9014	途	162	10	11	Y				way, road, path, journey; course	TO ZU	MICHI
 9015	逕	162	11						pass by, approach; direct	KEI KYOU	KOMICHI CHIKAI SUGU
@@ -12581,6 +12775,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9078	選	162	15	16	Y				choose, select; elect; election	SEN SAN	ERABU
 9079	遹	162	16						comply with, obey; shun, avoid	ITSU ICHI SHUTSU JUCHI	KATAYORU
 907A	遺	162	15	16	Y				lose; articles lost; omit	I YUI	NOKOSU WASURERU SUTERU
+907B	遻	162	15				5642	噂	meet	SON	UWASA
 907C	遼	162	15			Y			distant, far	RYOU	HARUKA
 907D	遽	162	17						suddenly, unexpectedly; at once	KYO	NIWAKA SUMIYAKA AWATADASHI
 907F	避	162	16	17	Y				avoid; turn aside; escape; hide	HI	SAKERU
@@ -12600,6 +12795,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 908F	邏	162	23						patrol; inspect; watch	RA	MEGURU
 9090	邐	162	23						meandering, winding	RI	TSUZUKU
 9091	邑	163	7			Y			area, district, city, state	YUU OU	KUNI MURA UREERU
+9093	邓	163	4				913A	鄺	surname	KOU	
 9095	邕	163	10						former or literary name for Nanning (in Guangxi)	YOU YU	
 9097	邗	163	6						an ancient place in the state of Wu	KAN GAN	
 9098	邘	163	6						state in Henan province	U KU	
@@ -12613,6 +12809,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 90A6	邦	163	7		Y				nation, country, state	HOU	KUNI
 90A8	邨	163	7						village, hamlet; rustic	SON	MURA MURAZATO
 90AA	邪	163	8	7	Y				wrong, evil, depraved, vicious, perverse, heterodox	YA JA SHA	YA KA YOKOSHIMA
+90AE	邮	163	7				90F5	郵	postal, mail; post office	YUU	SHUKUBA
 90AF	邯	163	8						city in Hebei province; various	KAN	
 90B0	邰	163	8						surname; state in modern Shanxi	TAI	
 90B1	邱	163	8						surname; hill; mound; grave	KYUU	OKA
@@ -12622,6 +12819,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 90B5	邵	163	8						surname; various place names	SHOU JOU	
 90B6	邶	163	8						place in today's Henan province	HAI BAI	
 90B8	邸	163	8		Y				official residence, residence of	TEI TAI	YASHIKI
+90B9	邹	163	7				9112	鄒	name of an ancient state; surname	SUU SHUU	
 90BD	邽	163	9						name of a county in Han dynasty	KEI KE	
 90BE	邾	163	9						a feudal state which existed B.C.700-469; now in Shandong	CHU SHU	
 90C1	郁	163	9			Y			sweet smelling, rich in aroma; (Cant.) to move, hit	IKU	AKIRAKA KAGUWASHII SAKAN
@@ -12630,6 +12828,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 90C5	郅	163	9						to go up to. flourishing a superlative	SHITSU SHICHI CHITSU CHICHI	ITARU
 90C7	郇	163	9						an ancient feudal State in Shaanxi	SHUN KAN	
 90C8	郈	163	9						place in Shandong province	KOU KU	
+90C9	郉	163	9				853F	蔿	surname; place name	I KA KE GA	
 90CA	郊	163	9		Y				suburbs; waste land, open spaces	KOU	MATSURU INAKA
 90CC	郌	163	13						name of an ancient county in modern Gansu/Shaanxi area.	KEI KE	
 90CE	郎	163	9		Y				gentleman	ROU	OTOKO
@@ -12643,6 +12842,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 90DD	郝	163	10						surname; place in modern Shanxi	KAKU SEKI SHAKU	
 90DE	郞	163	10			Y	90CE	郎	gentleman	ROU	OTOKO
 90DF	郟	163	10						county in Henan province; surname	KOU KYOU	
+90E0	郠	163	9				90C8	郈	place in Shandong province	KOU KU	
 90E1	郡	163	10		Y				administrative division	GUN KUN	KOORI
 90E2	郢	163	10						state in today's Hubei province	EI	
 90E4	郤	163	10						crack, opening; surname	GEKI KEKI KYAKU	AOGU HIMA
@@ -12652,6 +12852,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 90ED	郭	163	11		Y				outer part (of a city); surname	KAKU	KURUWA
 90EF	郯	163	11						name of a small ancient principality which was situated in what is now part of Shantung and Kiangsu	TAN DAN	
 90F0	郰	163	11						birthplace of Confucius, a place in Shandong	SHUU SHU SAN	
+90F3	郳	163	10				90D5	郕	state in Shandong province	SEI JOU	
 90F4	郴	163	11						county in Hunan province; surname	CHIN	
 90F5	郵	163	11		Y				postal, mail; post office	YUU	SHUKUBA
 90F6	郶	163	15							BU BE	
@@ -12918,6 +13119,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 926F	鉯	167	13							I	
 9270	鉰	167	13							SHI	
 9271	鉱	167	13		Y				mine; mineral, ore	KOU	ARAGANE
+9272	鉲	167	13				9398	鎘	cadmium	REKI RYAKU KAKU	KANAENOTSUKIMONO KADOMYUUSU
 9275	鉵	167	14							TOU ZU	SUKI
 9276	鉶	167	14						sacrificial cauldron	KEI GYOU	KANAE
 9277	鉷	167	14						trigger	KOU GU	
@@ -12956,6 +13158,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 92A8	銨	167	14						ammonium	AN	
 92AB	銫	167	14						cesium	SHOKU	SESHUUMU
 92AD	銭	167	14		Y				money, currency, coins	SEN ZEN	ZENI SUKI
+92AE	銮	167	14				947E	鑾	bells hung on horse; bells hung	RAN	SUZU
 92AF	銯	167	14								KASUGAI
 92B2	銲	167	15						solder, weld; leg armor, greaves	KAN GAN	KOTE
 92B3	銳	167	15						sharp, keen, acute, pointed	EI TAI	SURUDOI HAYAI
@@ -12967,6 +13170,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 92BB	銻	167	15						antimony (stibium)	TEI DAI	
 92BC	銼	167	15						carpenter's file, file smooth	SA ZA SOKU ZOKU	KAMA
 92BD	銽	167	15							KATSU KACHI	TATSU KIRU
+92BE	銾	167	15				6C5E	汞	element mercury	KOU	MIZUGANE
 92BF	銿	167	15							SHOU SHU YOU YU	TSURIGANE
 92C0	鋀	167	15							TOU ZU	TORYUUMU
 92C1	鋁	167	15						aluminum	RYO RO	YASURI ARUMINYUUMU
@@ -13014,7 +13218,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 92FF	鋿	167	16							SHOU JOU	MIGAKU
 9300	錀	167	16							RIN FUN	USAGIAMI
 9302	錂	167	16							RYOU	
-9304	錄	167	16			Y	9332	録	copy, write down, record	ROKU RYO	SHIRUSU
+9304	錄	167	16			Y	9332	録	copy	ROKU RYO	SHIRUSU
 9306	錆	167	16			Y			the color of a mineral	SEI SHOU	KUWASHII SABI
 9308	錈	167	16						to bend iron	KEN GAN	MAGARU
 930D	錍	167	16							HI HEI HAI	ONO
@@ -13123,12 +13327,13 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 93A9	鎩	167	19						moult samarium	SAI SATSU SECHI	MEBAERU
 93AB	鎫	167	18						ornament over the horse's head	BAN	
 93AC	鎬	167	18						stove; bright	KOU	NABE SHINOGI
-93AD	鎭	167	18			Y	93AE	鎮	town, market place; suppress	CHIN TEN	SHIZUMERU
+93AD	鎭	167	18			Y	93AE	鎮	town, market place; suppress	CHIN TEN	SHIZUMERU OSAE SHIZUMARU
 93AE	鎮	167	18		Y				town, market place; suppress	CHIN TEN	SHIZUMERU OSAE SHIZUMARU
 93B0	鎰	167	18						measure of weight for gold	ITSU	KAGI
 93B4	鎴	167	18							SOKU	SUTORONSHUUMU
 93B5	鎵	167	18						gallium	KA	GARYUUMU
 93B6	鎶	167	18						Copernicium	KA	KOROMUBYUUMU
+93B8	鎸	167	18				942B	鐫	engraving tool; carve, engrave	SEN	NOMI ERU KIRU
 93B9	鎹	167	18						a clamp		KASUGAI
 93BA	鎺	167	18								HABAKI
 93BB	鎻	167	18				9396	鎖	lock, padlock; shackles, chains	SA	KUSARI TOZASU
@@ -13178,6 +13383,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9407	鐇	167	20						vanadium	HAN BON	CHOUNA TSUCHI
 9408	鐈	167	20							KYOU GYOU	TAKAASHINONABE
 9409	鐉	167	20							SEN TEN	
+940B	鐋	167	20				947C	鑼	gong	RA	DORA
 940D	鐍	167	20						hasp of a lock	TETSU TECHI ITSU ICHI	OBIDOME
 940E	鐎	167	20							SHOU JOU SHUU SHU	NABE
 940F	鐏	167	20						cap	SON ZON SAN	ISHIZUKI
@@ -13227,6 +13433,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9461	鑡	167	23							SAKU	OHOBAN
 9462	鑢	167	23						file, rasp; file; polish; (Cant.) to cut	RYO RO	YASURI
 9463	鑣	167	23						bit, bridle; ride	HYOU	KUTSUWA
+9464	鑤	167	23				94C7	铇	carpenter's plane	HOU	KANNA
 9468	鑨	167	24							ROU RU	UTSUWA
 946A	鑪	167	24						fireplace, stove, oven, furnace	RO	IRORI
 946B	鑫	167	24						used in names	KIN KON KUN	
@@ -13469,6 +13676,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 96CC	雌	172	14		Y				female; feminine; gentle, soft	SHI	MESU ME
 96CD	雍	172	13						harmony, union; harmonious	YOU YU	YAWARAGU FUSAGU
 96CE	雎	172	13						osprey, fishhawk; hold back	SHO	MISAGO
+96CF	雏	172	13				9DB5	鶵	chick, fledging; infant, toddler	SUU SU JU	HINA HIYOKO
 96D1	雑	172	14		Y				mixed, blended; mix, mingle	ZATSU ZOU	MAJIRU MAJIERU
 96D2	雒	172	14						black horse with white mane	RAKU	MIMIZUKU
 96D5	雕	172	16						engrave, inlay, carve; exhaust; used for U+9D70 鵰 an eagle, vulture	CHOU	WASHI KIZAMU
@@ -13640,6 +13848,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 97D2	韒	178	16				9798	鞘	scabbard, sheath	SOU SHOU	SAYA
 97D3	韓	178	17	18	Y				fence; surname; Korea	KAN	IGETA
 97D4	韔	178	18						a wrapper or case for bow	CHOU RYOU	YUMIBUKURO
+97D6	韖	178	18				97A3	鞣	tan, soften	JUU	NAMESHIGAWA
 97D7	韗	178	19							UN KUN KEN KAN	KUTSU
 97D8	韘	178	19						archer's thumb ring	SHOU	YUGAKE
 97D9	韙	178	19						right; proper; propriety	I	TADASHII
@@ -13664,9 +13873,11 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 97FA	韺	180	17						music	EI YOU	
 97FB	韻	180	19		Y				rhyme; vowel	IN UN	HIBIKI
 97FF	響	180	20	22	Y				make sound, make noise; sound	KYOU	HIBIKU HIBIKI
+9800	頀	180	22				97FA	韺	music	EI YOU	
 9801	頁	181	9			Y			page, sheet, leaf; rad. no. 181	KETSU YOU KECHI	KASHIRA PEEJI
 9802	頂	181	11		Y				top, peak; carry on head; very	CHOU TEI	ITADAKI ITADAKU
 9803	頃	181	11		Y				a moment; a measure of area equal to 100 mu or 6.7 hectares; to lean	KEI KYOU KI	KORO SHIBARAKU
+9804	頄	181	11				982F	頯	cheekbone	KAI KYUU GU	HOOBONE
 9805	項	181	12		Y				neck, nape of neck; sum; funds	KOU GOU	UNAJI
 9806	順	181	12		Y				obey, submit to, go along with	JUN SHUN	SUNAO SHITAGAU
 9807	頇	181	12						large face, flat face; stupid	KAN GAN GATSU GACHI	OOKII
@@ -13830,6 +14041,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9926	餦	184	17						candy, pastry	CHOU	AME MOCHI
 9927	餧	184	17						steamed bread; to feed	DAI	UERU
 9928	館	184	16		Y				public building	KAN	YAKATA TATE
+992A	餪	184	17				7B75	筵	feast	EN	MUSHIRO
 992B	餫	184	18						dumpling; supply	UN KON GON	OKURU
 992C	餬	184	18						porridge, gruel, congee; paste	KO	KAYU
 992E	餮	184	18						a legendary animal; a greedy person	TETSU TEN DEN	
@@ -13878,6 +14090,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 999B	馛	186	14						fragrance, fragrant	HATSU BACHI HETSU HECHI	NIOI KOUBASHII
 999D	馝	186	14						fragrance	HITSU BICHI HETSU BECHI	KAORI
 999F	馟	186	16						fragrant	TO ZU	KOUBASHII
+99A1	馡	186	17				9E98	麘	scent	KYOU KOU	
 99A5	馥	186	18						fragrance, scent, aroma	FUKU HYOKU	KAORU KA KAORI
 99A6	馦	186	19							KEN	KOU
 99A8	馨	186	20			Y			fragrant, aromatic; distant fragrance	KEI KYOU	KAORU KAORI
@@ -14125,7 +14338,9 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9B43	魃	194	15						drought demon	BATSU HATSU	HIDERI
 9B44	魄	194	15						vigor; body; dark part of moon	HAKU BAKU	TAMASHII
 9B45	魅	194	15		Y				kind of forest demon, elf	MI BI	MONONOKE BAKEMONO SUDAMA
+9B46	魆	194	14				9EDD	黝	black	YUU	AOGURO
 9B48	魈	194	17						mischevious, one footed spirit that dwells in the mountains	SHOU	SUDAMA
+9B49	魉	194	16				9B4E	魎	a kind of monster	RYOU	KODAMA SUTAMA
 9B4B	魋	194	18						bear	TAI ZUI TSUI	
 9B4C	魌	194	18							KI	MINIKUI
 9B4D	魍	194	18						demons, mountain spirits	BOU MOU	
@@ -14143,6 +14358,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9B5E	魞	195	13						fish trap		ERI
 9B5F	魟	195	14				9C29	鰩	the nautilus; the ray	YOU	EI
 9B61	魡	195	14							TEKI CHAKU CHOU	TSURU
+9B62	魢	195	14				9C42	鱂	name of fish	SHOU SOU	
 9B63	魣	195	15							SHO JO YO	TANAGO
 9B65	魥	195	15							GOU KYOU KOU	KOGAME KOCHI HIMONO
 9B66	魦	195	15						shark family, including some rays and skates	SA SHA SHOU	SAME CHICHIBU
@@ -14223,6 +14439,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9BD6	鯖	195	19						mackerel	SEI	SABA
 9BD7	鯗	195	19						dried fish	SHOU YOU	FUKA
 9BD8	鯘	195	19							DAI NAI	KUSARU
+9BD9	鯙	195	19				9C06	鰆	Scomberomorus sinensis	SHUN	SAWARA
 9BDB	鯛	195	19			Y			pagrosomus major, porgy	CHOU	TAI
 9BDD	鯝	195	19						fish guts	KO KU	HARAWATA
 9BDF	鯟	195	19							TOU TSU	KADO
@@ -14273,6 +14490,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9C1B	鰛	195	20						sardine	ON	IWASHI
 9C1C	鰜	195	21						big-mouthed flounder	KEN KAN GEN	NISHIN
 9C1E	鰞	195	21						squid	O U	IKA
+9C20	鰠	195	20				9BEA	鯪	carp	RYOU	SENZANKOU
 9C21	鰡	195	21							RYUU	
 9C22	鰢	195	21							BA ME	UMIEBI TSUKURA SUBASHIRI
 9C23	鰣	195	21						reeves' shad; hilsa herring	SHI JI	KONOSHIRO HASU
@@ -14331,6 +14549,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9C69	鱩	195	24								HATAHATA
 9C6A	鱪	195	24								SHIIRA
 9C6B	鱫	195	24							AI	MUTSU
+9C6D	鱭	195	25				9C44	鱄	anchovy	SEN ZEN TAN DAN REN	
 9C6E	鱮	195	24						silver carp (Hypophthalmichthys molitrix); bream; (Cant.) 大嶼山 daai6ju4saan1 Lantau Island	SHO JO YO	TANAGO
 9C70	鱰	195	25								SHIIRA
 9C72	鱲	195	26						(Cant.) 赤鱲角, Hong Kong place name	RYOU	KARASUMI
@@ -14338,6 +14557,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9C76	鱶	195	26						a shark	SHOU	HIMONO FUKA
 9C77	鱷	195	27						crocodile, alligator	GAKU	WANI
 9C78	鱸	195	27						sea perch, sea bass	RO	SUZUKI
+9C7A	鱺	195	30				9C54	鱔	eel	SEN	UMIHEBI GOMAME
 9C7B	鱻	195	33						fresh, new, delicious; rare, few	SEN	ATARASHII SUKUNAI
 9C89	鲉	195	13							YUU YU SHUU JU CHUU	HAE HAYA
 9C8A	鲊	195	13						minced and salted fish; to preserve	SA	SUSHI
@@ -14365,6 +14585,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9CF9	鳹	196	15							KEN GEN KIN GON KAN KON	TSUIBAMU
 9D02	鴂	196	15						the tailor-bird; the working bird	KETSU KECHI KEI KE	SASAGI
 9D03	鴃	196	15						shrike; butcherbird	KETSU KEI GEKI	MOZU
+9D04	鴄	196	15				9DA9	鶩	duck	BOKU BU	AHIRU
 9D06	鴆	196	15						a bird resembling the secretary falcon	CHIN	
 9D07	鴇	196	15						bustard; procuress; Otis species (various)	HOU	NOGAN TOKI
 9D08	鴈	196	15						wild goose	GAN	KARI AHIRU
@@ -14382,6 +14603,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9D1E	鴞	196	16						owl	YOU KYOU	FUKUROU
 9D1F	鴟	196	16						kite, horned owl; wine cups	SHI	TOBI
 9D23	鴣	196	16						species of Taiwan pigeon	KO KU	SHAKO
+9D25	鴥	196	16				9D2A	鴪	swoop	ITSU	
 9D26	鴦	196	16						female mandarin duck (Aix galericulata)	YOU OU	OSHIDORI
 9D28	鴨	196	16			Y			duck; Anas species (various)	OU	KAMO
 9D2A	鴪	196	16						swoop	ITSU	
@@ -14455,6 +14677,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9D9A	鶚	196	20						osprey, fishhawk; Pandion haliaetus	GAKU	MISAGO
 9DA1	鶡	196	20						crossbill, species of nightingale	KATSU GACHI FUN KAI KAKU	YAMADORI
 9DA4	鶤	196	20							KON	
+9DA6	鶦	196	20				9D98	鶘	pelican	KO GO	
 9DA9	鶩	196	20						duck	BOKU BU	AHIRU
 9DAA	鶪	196	20						a shrike	KEKI KYAKU	MOZU
 9DAB	鶫	196	20						thrush; Turdus naumanni		TSUGUMI
@@ -14472,6 +14695,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9DBC	鶼	196	21						fabulous mythical bird	KEN KAN	TSUIBAMU
 9DBD	鶽	196	21				96BC	隼	aquiline (nose); a falcon	JUN SHUN	HAYABUSA
 9DBF	鶿	196	20						cormorant	SHI JI	U
+9DC0	鷀	196	20				9D41	鵁	the fishing cormorant	KOU	
 9DC1	鷁	196	21						fishhawk; bow or prow	GEKI	
 9DC2	鷂	196	21						sparrow hawk; Circus species (various)	YOU	HASHITAKA IROKIJI
 9DC3	鷃	196	21						quail	AN EN	UZURA
@@ -14595,11 +14819,12 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9ECE	黎	202	15			Y			surname; numerous, many; black	REI RI	KUROI
 9ECF	黏	202	17						stick to; glutinous, sticky; glue	NEN	NEBARU
 9ED0	黐	202	23						to stick; sticky	CHI RI	MOCHI
-9ED1	黑	203	12			Y	9ED2	黒	black; dark; evil, sinister	KOKU	KUROI KURO
+9ED1	黑	203	12			Y	9ED2	黒	black; dark; evil	KOKU	KUROI KURO
 9ED2	黒	203	11		Y				black; dark; evil	KOKU	KUROI KURO
+9ED3	黓	203	15				9EDD	黝	black	YUU	AOGURO
 9ED4	黔	203	16						black; Guizhou	KEN KIN	KUROI
 9ED5	黕	203	16						red	TAN TON CHIN	AKA
-9ED8	默	203	16			Y	9ED9	黙	silent; quiet, still; dark	MOKU	DAMARU
+9ED8	默	203	16			Y	9ED9	黙	silent; quiet, still; dark	MOKU	DAMARU MODASU
 9ED9	黙	86	15		Y				silent; quiet, still; dark	MOKU	DAMARU MODASU
 9EDB	黛	203	17	16		Y			blacken eyebrows; black	TAI	MAYUZUMI
 9EDC	黜	203	17						dismiss; demote, downgrade	CHUTSU	SHIRIZOKERU
@@ -14608,6 +14833,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9EDF	黟	203	18						black and shining; ebony	EI I	KOKUTAN
 9EE0	黠	203	18						sly, cunning, shrewd; artful	KATSU	SATOI WARUGASHIKO
 9EE1	黡	203	18						mole, scar, blemish	EN AN	HOKURO
+9EE2	黢	203	19				9EDD	黝	black	YUU	AOGURO
 9EE4	黤	203	20						blue-black	EN AN ON	AOGUROI
 9EE5	黥	203	20						to tattoo; to brand the face of criminals	GEI KEI	IREZUMI
 9EE7	黧	203	20						a dark, sallow colour	REI RAI RI	KUROI
@@ -14628,6 +14854,7 @@ Code	Name	Radical	Strokes	VStrokes	Joyo	Jinmei	LinkCode	LinkName	Meaning	On	Kun
 9EFB	黻	204	17						special pattern of embroidery	FUTSU	AYA
 9EFC	黼	204	19						embroidered official or sacrificial robe	HO FU	AYA
 9EFD	黽	205	13						to strive; to endeavor	BOU BIN BEN	TSUTOMERU AOGAERU
+9EFE	黾	205	8				9EFD	黽	to strive; to endeavor	BOU BIN BEN	TSUTOMERU AOGAERU
 9EFF	黿	205	17						large turtle, sea turtle	GEN GAN	AOUMIGAME
 9F02	鼂	205	18						a kind of sea turtle; surname	CHOU JOU	UMIGAME
 9F03	鼃	205	19						the edible water-frog	WAI KAI	KAERU
@@ -15199,6 +15426,7 @@ FAD8	齃	209	22				9F43	齃		KATSU KACHI ATSU ACHI	NEIKI
 21C56	𡱖	44	9						female genitalia; vulva		TSUBI KUBO
 21C95	𡲕	44	12				5C5C	屜	drawer; tray; pad; screen	TEI TAI	KUTSUSHIKI SHIKIWARA
 21ED5	𡻕	46	13				6B72	歲	year; age; harvest	SEI SAI	TOSHI YOWAI
+21FFA	𡿺	47	9				8166	腦	brain	NOU DOU	NOU NOUMISO ATAMA
 22091	𢂑	50	9				62ED	拭	wipe away stains with cloth	SHIKI SHOKU	NUGUU FUKU
 2214F	𢅏	50	16				7C3E	簾	a blind, screen, curtain	REN	SUDARE SU
 22156	𢅖	50	16				7C3E	簾	a blind, screen, curtain	REN	SUDARE SU
@@ -15245,6 +15473,7 @@ FAD8	齃	209	22				9F43	齃		KATSU KACHI ATSU ACHI	NEIKI
 25535	𥔵	112	15						variant of U+78C1 磁, magnetic; magnetism; porcelain	JI SHI	JISHAKU YAKIMONO
 2570C	𥜌	113	17				8956	襖	outer garments; coat, jacket	OU	AO FUSUMA
 25762	𥝢	115	8				5229	利	gains, advantage, profit, merit	RI	KIKU YOI SURUDOI
+25874	𥡴	115	16				913A	鄺	surname	KOU	
 25945	𥥅	116	9				7AC9	竉	a hole; a cleft; empty	ROU RU	ANA
 25AF1	𥫱	118	10				56E4	囤	grain basket, bin for grain	TON DON	ZARU
 25D5A	𥵚	118	19				7AFB	竻	thorns, brambles	ROKU KIN KON	SOJI

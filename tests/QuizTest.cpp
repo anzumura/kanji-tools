@@ -99,7 +99,7 @@ TEST_F(QuizTest, ToggleListMeanings) {
   std::string line;
   bool meaningsOn = false;
   int found = 0;
-  std::string expected("Question 1/80.  Kanji:  一  (Rad 一, Strokes 1, Level N5, Freq 2)");
+  std::string expected("Question 1/80.  Kanji:  一  (Rad 一, Strokes 1, Level N5, Freq 2, Kyu K10)");
   while (std::getline(_os, line)) {
     if (line.starts_with("Question")) {
       ++found;
