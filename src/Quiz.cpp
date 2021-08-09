@@ -37,8 +37,7 @@ void Quiz::quiz() const {
     // suppress printing 'Freq' since this would work against showing the list in a random order.
     listQuiz(getListOrder(), data().frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
   } else if (c == 'g') {
-    c = _choice.get("Choose grade",
-                    {{'1', ""}, {'2', ""}, {'3', ""}, {'4', ""}, {'5', ""}, {'6', ""}, {'s', "Secondary School"}}, 's');
+    c = _choice.get("Choose grade", '1', '6', {{'s', "Secondary School"}}, 's');
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().gradeList(AllGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);

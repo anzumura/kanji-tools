@@ -89,6 +89,41 @@ TEST_F(ChoiceTest, ChooseNonDefault) {
   EXPECT_FALSE(std::getline(_os, line));
 }
 
+TEST_F(ChoiceTest, RangeWithDefault) {
+  _is << "\n"; // don't need to specify the choice when there's a default (just new line)
+  EXPECT_EQ(_choice.get("", '1', '4', '1'), '1');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-4) default '1': ");
+}
+
+TEST_F(ChoiceTest, RangeWithNoDefault) {
+  _is << "b\n";
+  EXPECT_EQ(_choice.get("pick", 'a', 'z'), 'b');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "pick (a-z): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, RangeAndChoices) {
+  _is << "g\n";
+  EXPECT_EQ(_choice.get("pick", 'a', 'f', {{'g', "good"}, {'y', "yes"}}), 'g');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "pick (a-f, g=good, y=yes): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, RangeChoicesAndDefault) {
+  _is << "\n";
+  EXPECT_EQ(_choice.get("pick", 'a', 'f', {{'g', "good"}, {'y', "yes"}}, 'y'), 'y');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "pick (a-f, g=good, y=yes) default 'y': ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
 TEST_F(ChoiceTest, NewLineWithoutDefault) {
   _is << "\n2\n";
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), '2');

@@ -29,6 +29,20 @@ public:
   // for examples of how to use this class and expected output.
   char get(const std::string& msg, const Choices& choices) const { return get(msg, choices, {}); }
   char get(const std::string& msg, const Choices& choices, std::optional<char> def) const;
+  // 'get' with ranges are convenience methods when there is a range with no descriptions
+  char get(const std::string& msg, char first, char last) const { return get(msg, first, last, {}, {}); }
+  char get(const std::string& msg, char first, char last, std::optional<char> def) const {
+    return get(msg, first, last, {}, def);
+  }
+  char get(const std::string& msg, char first, char last, const Choices& choices) const {
+    return get(msg, first, last, choices, {});
+  }
+  char get(const std::string& msg, char first, char last, const Choices& choices, std::optional<char> def) const {
+    Choices c(choices);
+    while (first <= last)
+      c[first++] = "";
+    return get(msg, c, def);
+  }
 private:
   static void add(std::string& prompt, const Choices& choices);
   static char getOneChar();
