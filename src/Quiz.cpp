@@ -28,8 +28,9 @@ constexpr auto HideMeanings = "hide meanings";
 void Quiz::quiz() const {
   reset();
   _choice.setQuit(QuitOption);
-  char c = _choice.get("Quiz type",
-                       {{'f', "freq."}, {'g', "grade"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}}, 'g');
+  char c = _choice.get(
+    "Quiz type", {{'f', "freq."}, {'g', "grade"}, {'k', "kyu"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}},
+    'g');
   if (c == 'f') {
     c = _choice.get("Choose list",
                     {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
@@ -41,11 +42,23 @@ void Quiz::quiz() const {
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().gradeList(AllGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
+  } else if (c == 'k') {
+    c = _choice.get("Choose kyu", '1', '9', {{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}, '2');
+    if (c == QuitOption) return;
+    // suppress printing 'Kyu' since it's the same for every kanji in the list
+    listQuiz(getListOrder(),
+             data().kyuList(AllKyus[c == 'a'     ? 0
+                                      : c == 'c' ? 8
+                                      : c == '2' ? 9
+                                      : c == 'b' ? 10
+                                      : c == '1' ? 11
+                                                 : 7 - (c - '3')]),
+             Kanji::AllFields ^ Kanji::KyuField);
   } else if (c == 'l') {
-    c = _choice.get("Choose level", {{'1', "N5"}, {'2', "N4"}, {'3', "N3"}, {'4', "N2"}, {'5', "N1"}});
+    c = _choice.get("Choose level", {{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
     if (c == QuitOption) return;
     // suppress printing 'Level' since it's the same for every kanji in the list
-    listQuiz(getListOrder(), data().levelList(AllLevels[c - '1']), Kanji::AllFields ^ Kanji::LevelField);
+    listQuiz(getListOrder(), data().levelList(AllLevels[4 - (c - '1')]), Kanji::AllFields ^ Kanji::LevelField);
   } else if (c == 'm')
     prepareGroupQuiz(getListOrder(), _groupData.meaningGroups());
   else if (c == 'p')

@@ -20,17 +20,39 @@ protected:
   // Contructs Quiz using the real data files
   QuizTest() : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)), _groupData(_data), _quiz(_groupData, &_is) {}
 
+  // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
-    // Send a string to '_is' so that '_quiz' can read the follow options:
     // 'g' for Grade List Quiz
-    // 'b' for Beginning of list (instead of End or Random)
     // '1' for Grade 1
+    // 'b' for Beginning of list (instead of End or Random)
     // '4' for 4 choices
     // 'k' for kanji to reading quiz
     _is << "g\n1\nb\n4\nk\n";
   }
+
+  void frequencyFirstQuestion(char x, std::string& line) {
+    _is << "f\n" << x << '\n';
+    listQuiz(line);
+  }
+  void gradeFirstQuestion(char x, std::string& line) {
+    _is << "g\n" << x << '\n';
+    listQuiz(line);
+  }
+  void kyuFirstQuestion(char x, std::string& line) {
+    _is << "k\n" << x << '\n';
+    listQuiz(line);
+  }
+  void levelFirstQuestion(char x, std::string& line) {
+    _is << "l\n" << x << '\n';
+    listQuiz(line);
+  }
+  void listQuiz(std::string& line) {
+    _is << "b\n4\nk\n";
+    runQuiz();
+    getFirstQuestion(line);
+  }
+
   void meaningGroupQuiz() {
-    // Send a string to '_is' so that '_quiz' can read the follow options:
     // 'm' for Meaning Group Quiz
     // 'b' for Beginning of list (instead of End or Random)
     // '1' for including only Jōyō kanji
@@ -47,6 +69,12 @@ protected:
     // is waiting for more input.
     _is << "/\n";
     _quiz.quiz();
+  }
+
+  void getFirstQuestion(std::string& line) {
+    while (std::getline(_os, line))
+      if (line.starts_with("Question 1/")) break;
+    if (_os.eof()) FAIL() << "couldn't find first Question";
   }
 
   std::stringstream _os;
@@ -68,6 +96,68 @@ TEST_F(QuizTest, ListQuiz) {
   // should be nothing sent to _es (for errors) and nothing left in _is
   EXPECT_FALSE(std::getline(_es, line));
   EXPECT_FALSE(std::getline(_is, line));
+}
+
+TEST_F(QuizTest, FrequencyLists) {
+  std::string lines[5];
+  int i = 0;
+  for (char j : {'1', '2', '3', '4', '5'})
+    frequencyFirstQuestion(j, lines[i++]);
+  i = 0;
+  EXPECT_EQ(lines[i++], "Question 1/500.  Kanji:  日  (Rad 日, Strokes 4, Grade G1, Level N5, Kyu K10)");
+  EXPECT_EQ(lines[i++], "Question 1/500.  Kanji:  良  (Rad 艮, Strokes 7, Grade G4, Level N3, Kyu K7)");
+  EXPECT_EQ(lines[i++], "Question 1/500.  Kanji:  贈  (Rad 貝, Strokes 18, Grade S, Level N2, Old 贈, Kyu K4)");
+  EXPECT_EQ(lines[i++], "Question 1/500.  Kanji:  添  (Rad 水, Strokes 11, Grade S, Level N1, Kyu K4)");
+  EXPECT_EQ(lines[i++], "Question 1/501.  Kanji:  炒  (Rad 火, Strokes 8, Kyu K1)");
+}
+
+TEST_F(QuizTest, GradeLists) {
+  std::string lines[7];
+  int i = 0;
+  for (char j : {'1', '2', '3', '4', '5', '6', 's'})
+    gradeFirstQuestion(j, lines[i++]);
+  i = 0;
+  EXPECT_EQ(lines[i++], "Question 1/80.  Kanji:  一  (Rad 一, Strokes 1, Level N5, Freq 2, Kyu K10)");
+  EXPECT_EQ(lines[i++], "Question 1/160.  Kanji:  引  (Rad 弓, Strokes 4, Level N4, Freq 218, Kyu K9)");
+  EXPECT_EQ(lines[i++], "Question 1/200.  Kanji:  悪  (Rad 心, Strokes 11, Level N4, Freq 530, Old 惡, Kyu K8)");
+  EXPECT_EQ(lines[i++], "Question 1/200.  Kanji:  愛  (Rad 心, Strokes 13, Level N3, Freq 640, Kyu K7)");
+  EXPECT_EQ(lines[i++], "Question 1/185.  Kanji:  圧  (Rad 土, Strokes 5, Level N2, Freq 718, Old 壓, Kyu K6)");
+  EXPECT_EQ(lines[i++], "Question 1/181.  Kanji:  異  (Rad 田, Strokes 11, Level N2, Freq 631, Kyu K5)");
+  EXPECT_EQ(lines[i++], "Question 1/1130.  Kanji:  亜  (Rad 二, Strokes 7, Level N1, Freq 1509, Old 亞, Kyu KJ2)");
+}
+
+TEST_F(QuizTest, KyuLists) {
+  std::string lines[12];
+  int i = 0;
+  // 'a' = 10th Kyu, 'b' = Jun 1 Kyu, 'c' = Jun 2 Kyu
+  for (char j : {'a', '9', '8', '7', '6', '5', '4', '3', 'c', '2', 'b', '1'})
+    kyuFirstQuestion(j, lines[i++]);
+  i = 0;
+  EXPECT_EQ(lines[i++], "Question 1/80.  Kanji:  一  (Rad 一, Strokes 1, Grade G1, Level N5, Freq 2)");
+  EXPECT_EQ(lines[i++], "Question 1/160.  Kanji:  引  (Rad 弓, Strokes 4, Grade G2, Level N4, Freq 218)");
+  EXPECT_EQ(lines[i++], "Question 1/200.  Kanji:  悪  (Rad 心, Strokes 11, Grade G3, Level N4, Freq 530, Old 惡)");
+  EXPECT_EQ(lines[i++], "Question 1/202.  Kanji:  愛  (Rad 心, Strokes 13, Grade G4, Level N3, Freq 640)");
+  EXPECT_EQ(lines[i++], "Question 1/193.  Kanji:  圧  (Rad 土, Strokes 5, Grade G5, Level N2, Freq 718, Old 壓)");
+  EXPECT_EQ(lines[i++], "Question 1/191.  Kanji:  異  (Rad 田, Strokes 11, Grade G6, Level N2, Freq 631)");
+  EXPECT_EQ(lines[i++], "Question 1/313.  Kanji:  握  (Rad 手, Strokes 12, Grade S, Level N1, Freq 1003)");
+  EXPECT_EQ(lines[i++], "Question 1/284.  Kanji:  哀  (Rad 口, Strokes 9, Grade S, Level N1, Freq 1715)");
+  EXPECT_EQ(lines[i++], "Question 1/328.  Kanji:  亜  (Rad 二, Strokes 7, Grade S, Level N1, Freq 1509, Old 亞)");
+  EXPECT_EQ(lines[i++], "Question 1/188.  Kanji:  挨  (Rad 手, Strokes 10, Grade S, Freq 2258)");
+  EXPECT_EQ(lines[i++], "Question 1/940.  Kanji:  唖  (Rad 口, Strokes 10)");
+  EXPECT_EQ(lines[i++], "Question 1/2780.  Kanji:  芦  (Rad 艸, Strokes 7, Freq 1733)");
+}
+
+TEST_F(QuizTest, LevelLists) {
+  std::string lines[5];
+  int i = 0;
+  for (char j : {'5', '4', '3', '2', '1'})
+    levelFirstQuestion(j, lines[i++]);
+  i = 0;
+  EXPECT_EQ(lines[i++], "Question 1/103.  Kanji:  一  (Rad 一, Strokes 1, Grade G1, Freq 2, Kyu K10)");
+  EXPECT_EQ(lines[i++], "Question 1/181.  Kanji:  不  (Rad 一, Strokes 4, Grade G4, Freq 101, Kyu K7)");
+  EXPECT_EQ(lines[i++], "Question 1/361.  Kanji:  丁  (Rad 一, Strokes 2, Grade G3, Freq 1312, Kyu K8)");
+  EXPECT_EQ(lines[i++], "Question 1/415.  Kanji:  腕  (Rad 肉, Strokes 12, Grade S, Freq 1163, Kyu K4)");
+  EXPECT_EQ(lines[i++], "Question 1/1162.  Kanji:  統  (Rad 糸, Strokes 12, Grade G5, Freq 125, Kyu K6)");
 }
 
 TEST_F(QuizTest, SkipListQuestions) {
