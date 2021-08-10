@@ -67,7 +67,7 @@ TEST_F(FileListTest, GoodOnePerLineLevel) {
 
 TEST_F(FileListTest, BadOnePerLine) {
   try {
-    LevelFileList f(_badOnePerLine, Levels::N1);
+    FileList f(_badOnePerLine);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("got multiple tokens - line: 1, file: testDir/badOnePerLine"));

@@ -97,22 +97,22 @@ TEST_F(FileStatsTest, PrintStatsForMultipleDirectories) {
   FileStats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
     ">>> Stats for: sample-data (5 files from 3 directories) - showing 5 most frequent kanji per type",
-    ">>>         Hiragana: 162572, unique:   80",
+    ">>>         Hiragana: 162560, unique:   80",
     ">>>         Katakana:  24689, unique:   83",
-    ">>>     Common Kanji:  96120, unique: 2627, 100.00%",
-    ">>>        [Jouyou] :  93398, unique: 1918,  97.17%  (私 2747, 年 1838, 日 1299, 人 1168, 郎 999)",
+    ">>>     Common Kanji:  96135, unique: 2634, 100.00%",
+    ">>>        [Jouyou] :  93398, unique: 1918,  97.15%  (私 2747, 年 1838, 日 1299, 人 1168, 郎 999)",
     ">>>        [Jinmei] :   1663, unique:  306,   1.73%  (坐 62, 之 60, 厨 55, 彦 52, 廻 51)",
     ">>>  [LinkedJinmei] :     87, unique:   24,   0.09%  (燈 20, 峯 12, 龍 7, 藝 5, 瀧 5)",
-    ">>>     [LinkedOld] :     46, unique:   10,   0.05%  (澤 36, 齋 2, 嶽 1, 挾 1, 會 1)",
+    ">>>     [LinkedOld] :     47, unique:   11,   0.05%  (澤 36, 齋 2, 嶽 1, 挾 1, 插 1)",
     ">>>         [Other] :    148, unique:   37,   0.15%  (渕 24, 苅 24, 呑 17, 嘘 14, 叱 10)",
     ">>>         [Extra] :    233, unique:   56,   0.24%  (厭 36, 婬 18, 椒 14, 掻 13, 婢 12)",
-    ">>>        [Kentei] :    519, unique:  256,   0.54%  (掟 11, 剪 10, 烟 9, 畸 9, 竟 8)",
-    ">>>          [None] :     26, unique:   20,   0.03%  (樏 3, 欝 2, 畀 2, 聰 2, 饘 2)",
+    ">>>        [Kentei] :    520, unique:  257,   0.54%  (掟 11, 剪 10, 烟 9, 畸 9, 竟 8)",
+    ">>>          [None] :     39, unique:   25,   0.04%  (樏 5, 筯 5, 譃 3, 欝 2, 畀 2)",
     ">>>       Rare Kanji:      2, unique:    2           (㯭 1, 㰏 1)",
-    ">>>   MB-Punctuation:  22117, unique:   24",
+    ">>>   MB-Punctuation:  22102, unique:   23",
     ">>>        MB-Symbol:     45, unique:    9",
-    ">>>        MB-Letter:   1698, unique:   39",
-    ">>> Total Kanji+Kana: 283383 (Hiragana: 57.4%, Katakana: 8.7%, Common Kanji: 33.9%, Rare Kanji: 0.0%)"};
+    ">>>        MB-Letter:   1704, unique:   39",
+    ">>> Total Kanji+Kana: 283386 (Hiragana: 57.4%, Katakana: 8.7%, Common Kanji: 33.9%, Rare Kanji: 0.0%)"};
   std::string line;
   int count = 0, maxLines = std::size(expected);
   while (std::getline(_os, line)) {
