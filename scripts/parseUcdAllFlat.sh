@@ -77,7 +77,7 @@ function setOnKun() {
 }
 
 # global arrays to help support links for variant and compat kanjis
-declare -A definition definitionBack on kun linkBack noLink variantLink
+declare -A definition on kun linkBack noLink variantLink
 
 # there are 18 Jinmeiyō Kanji that link to other Jinmei, but unfortunately UCD
 # data seems to have some mistakes (where the link points from the standard to
@@ -148,7 +148,11 @@ function findVariantLinks() {
       fi
     done
   done
-  variantLink[3D4E]=6F97 # link 㵎 (a Kentei Kanji) to 澗
+  # Pull in some Kentei kanji that are missing on/kun via links (the links have
+  # the same definitions and expected on/kun).
+  variantLink[3D4E]=6F97 # link 㵎 to 澗
+  variantLink[5ECF]=5ED0 # link 廏 to 廐
+  variantLink[9D25]=9D2A # link 鴥 to 鴪
 }
 
 # 'populateOnKun': populates arrays for all kanji having 'on' or 'kun' readings.
@@ -179,7 +183,6 @@ function populateOnKun() {
       on[$link]="$kJapaneseOn"
       kun[$link]="$kJapaneseKun"
     done
-    [[ -n $kDefinition ]] && definitionBack["$kDefinition"]=$cp
   done < <(grep $onKun $ucdFile)
 }
 
@@ -221,14 +224,6 @@ LinkName\tMeaning\tOn\tKun"
           kSemanticVariant=${kSemanticVariant##*+} # remove leading U+
           loadFrom=${kSemanticVariant%%&*}         # remove any trailing &lt ...
           linkTo=$loadFrom
-        else
-          # Try to find a character that has the same definition - pulls in 53
-          # more including Kentei 5ECF (廏) which gets linked to 5ED0 (廐).
-          get kDefinition "$i"
-          if [[ -n $kDefinition ]]; then
-            loadFrom=${definitionBack[$kDefinition]}
-            linkTo=$loadFrom
-          fi
         fi
       fi
     fi
