@@ -9,7 +9,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - Name: character in utf8
 # - Radical: radical number (1 to 214)
 # - Strokes: total strokes (including the radical)
-# - VStrokes: total strokes for first variant (blank if no variants)
+# - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
 # - LinkCode: 230 Jinmei (of the 863 total) are variants of other Jōyō/Jinmei
@@ -72,8 +72,8 @@ function getFirst() {
 }
 
 function setOnKun() {
-  kJapaneseOn="$1"
-  kJapaneseKun="$2"
+  resultOn="$1"
+  resultKun="$2"
 }
 
 # global arrays to help support links for variant and compat kanjis
@@ -136,11 +136,10 @@ function findVariantLinks() {
       if $secondEntry; then
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
         local s=$(echo -n ${i:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
-        s=$(printf '%04X' 0x$s)
         # cp (for variant) is unique, but the original kanji 's' can occur more
         # than once, i.e., if there are multiple variants for 's'. This is true
         # for 64DA (據) which has variants 3A3F (㨿) and 3A40 (㩀).
-        variantLink[$cp]=$s
+        variantLink[$cp]=$(printf '%04X' 0x$s)
         secondEntry=false
       else
         local cp=$i
@@ -193,9 +192,11 @@ LinkName\tMeaning\tOn\tKun"
     get cp "$i"
     get kJoyoKanji "$i"
     get kJinmeiyoKanji "$i"
-    kDefinition=${definition[$cp]}
-    kJapaneseOn=${on[$cp]}
-    kJapaneseKun=${kun[$cp]}
+    local localDef=${definition[$cp]}
+    # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also
+    # be set by the 'setOnKun' function so they can't be local variables.
+    resultOn=${on[$cp]}
+    resultKun=${kun[$cp]}
     local loadFrom=
     local linkTo=
     if [[ -n $kJoyoKanji ]]; then
@@ -210,7 +211,7 @@ LinkName\tMeaning\tOn\tKun"
       else
         linkTo=${linkBack[$cp]}
       fi
-    elif [[ -z $kJapaneseOn$kJapaneseKun ]]; then
+    elif [[ -z $resultOn$resultKun ]]; then
       get kCompatibilityVariant "$i"
       if [[ $kCompatibilityVariant =~ U+ ]]; then
         loadFrom=${kCompatibilityVariant#*+}
@@ -228,11 +229,11 @@ LinkName\tMeaning\tOn\tKun"
       fi
     fi
     if [[ -n $loadFrom ]]; then
-      kDefinition=${definition[$loadFrom]}
-      kJapaneseOn=${on[$loadFrom]}
-      kJapaneseKun=${kun[$loadFrom]}
+      localDef=${definition[$loadFrom]}
+      resultOn=${on[$loadFrom]}
+      resultKun=${kun[$loadFrom]}
     fi
-    if [[ -z $kJapaneseOn$kJapaneseKun ]]; then
+    if [[ -z $resultOn$resultKun ]]; then
       # Support a few more cases where UCD is missing on/kun for Kentei kanjis.
       # If a special case is used then also clear any 'linkTo' value since that
       # value didn't result in an on/kun getting loaded. The first one is not
@@ -317,7 +318,7 @@ LinkName\tMeaning\tOn\tKun"
     [[ -n $linkTo ]] && s="\U$linkTo" || s=
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$radical\t$strokes\t${vstrokes#0}\t${kJoyoKanji:+Y}\t\
-${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$kDefinition\t$kJapaneseOn\t$kJapaneseKun"
+${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$localDef\t$resultOn\t$resultKun"
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 
