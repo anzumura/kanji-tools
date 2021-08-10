@@ -83,7 +83,7 @@ private:
 template<typename T> class TypeFileList : public FileList {
 protected:
   TypeFileList(const std::filesystem::path& p, T type, bool createNewUniqueFile = false)
-    : FileList(p, FileType::OnePerLine, createNewUniqueFile, &UniqueTypeNames, kanji::toString(type)), _type(type) {}
+    : FileList(p, FileType::MultiplePerLine, createNewUniqueFile, &UniqueTypeNames, kanji::toString(type)), _type(type) {}
 protected:
   const T _type;
 private:
