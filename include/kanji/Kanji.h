@@ -7,7 +7,7 @@ namespace kanji {
 
 // 'KanjiLegend' is meant to be used in output to briefly describe the suffix added to a kanji when
 // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
-inline constexpr auto KanjiLegend = "Jōyō=no suffix, JLPT=', Freq=\", Jinmei=^, Linked Jinmei=~, Extra=+, ...=*";
+inline constexpr auto KanjiLegend = "Suffixes: '=JLPT \"=Freq ^=Jinmei ~=LinkedJinmei %=LinkedOld +=Extra *=Kentei";
 
 class Kanji {
 public:
@@ -75,8 +75,9 @@ public:
   //     " = Top Frequency  : 296 top frequency not in Jouyou or JLPT
   //     ^ = Jinmei         : 224 Jinmei not already covered by the above types
   //     ~ = Linked Jinmei  : 218 Linked Jinmei (with no frequency)
+  //     % = Linked Old     : 211 'no-frequency' Linked Old (with no frequency)
   //     + = Extra          : all kanji loaded from Extra file
-  //     * = anything else  : currently includes 211 'no-frequency' Linked Old
+  //     * = Kentei         : 2823 Kentei Kanji (that aren't in any of the above categories)
   std::string qualifiedName() const {
     auto t = type();
     return _name +
@@ -85,6 +86,7 @@ public:
          : _frequency               ? '"'
          : t == Types::Jinmei       ? '^'
          : t == Types::LinkedJinmei ? '~'
+         : t == Types::LinkedOld    ? '%'
          : t == Types::Extra        ? '+'
                                     : '*');
   }

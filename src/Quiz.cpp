@@ -245,7 +245,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
     std::shuffle(readings.begin(), readings.end(), RandomGen);
     if (!_question++) {
       log(true) << "Starting quiz for " << list.size() << ' ' << i->type() << " groups\n";
-      if (type) log() << "  Note: " << KanjiLegend << '\n';
+      if (type) log() << "  " << KanjiLegend << '\n';
     }
     Answers answers;
     Choices choices = getDefaultChoices();
