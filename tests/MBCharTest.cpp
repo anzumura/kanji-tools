@@ -43,6 +43,17 @@ TEST(MBChar, Length) {
   EXPECT_EQ(MBChar::length(s), 1);
 }
 
+TEST(MBChar, GetFirst) {
+  EXPECT_EQ(MBChar::getFirst(""), "");
+  EXPECT_EQ(MBChar::getFirst("abc"), "");
+  EXPECT_EQ(MBChar::getFirst("大blue空"), "大");
+  // variation selectors are considered part of the previous character so get as well
+  auto mbCharWithVariant = L"\u9038\ufe01";
+  auto s = toUtf8(mbCharWithVariant);
+  auto r = MBChar::getFirst(s);
+  EXPECT_EQ(r, s);
+}
+
 TEST(MBChar, Valid) {
   EXPECT_EQ(MBChar("").valid(), MBChar::Results::NotMBChar);
   EXPECT_EQ(MBChar::valid(nullptr), MBChar::Results::NotMBChar);

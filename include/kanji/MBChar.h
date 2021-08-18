@@ -29,6 +29,7 @@ public:
     Bit1 = 0b10'00'00'00, // continuation pattern
     Mask = 0b11'00'00'00  // mask for first two bits
   };
+
   // 'length' with onlyMB=true only counts multi-byte 'sequence start' bytes, otherwise length
   // includes both multi-byte sequence starts as well as regular single byte values, i.e.,
   // simply don't add 'continuation' bytes to length (this done by using '11 00 00 00' to grab the
@@ -57,6 +58,7 @@ public:
   static size_t length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
     return length(s.c_str(), onlyMB, skipVariationSelectors);
   }
+
   // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
   // method is used by 'length', 'next' and 'doPeek'.
   static bool isVariationSelector(const unsigned char* s) {
@@ -69,14 +71,24 @@ public:
     return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
   }
   static bool isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
+
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so len 2-4) followed
   // by a variation selector (which are always len 3).
   static bool isMBCharWithVariationSelector(const std::string& s) {
-     return s.length() > 4 && s.length() < 8 && isVariationSelector(s.substr(s.length() - 3));
-   }
-   static std::string withoutVariationSelector(const std::string& s) {
-     return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
-   }
+    return s.length() > 4 && s.length() < 8 && isVariationSelector(s.substr(s.length() - 3));
+  }
+  static std::string withoutVariationSelector(const std::string& s) {
+    return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
+  }
+
+  // 'getFirst' returns the first MBChar from 's' (including any variation selector that might follow).
+  // If 's' doesn't start with a multi-byte sequence then empty string is returned.
+  static std::string getFirst(const std::string& s) {
+    std::string result;
+    MBChar c(s);
+    c.next(result);
+    return result;
+  }
 
   // 'Results' is used for the return value of the 'valid' method - see comments below for more details.
   enum class Results {
