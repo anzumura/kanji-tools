@@ -323,6 +323,16 @@ inline size_t displayLength(const std::string& s) {
   return result;
 }
 
+// 'wideSetw' returns a value that works for 'std::setw' when 's' contains wide chars. For
+// example, if 's' contains 1 wide char that is 3 bytes then calling 'os << std::setw(4) << s'
+// will not result in expected padding of 2 (the wide char plus 2 to get 4). Instead it will
+// add 1 space since std::setw only looks at bytes and s already has 3 bytes. However, using
+// this function, i.e., 'os << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by
+// returning '5' (5 is 2 more than the 3 byte length of 's').
+inline int wideSetw(const std::string& s, int setwLen) {
+  return setwLen + s.length() - displayLength(s);
+}
+
 } // namespace kanji
 
 #endif // KANJI_MBUTILS_H
