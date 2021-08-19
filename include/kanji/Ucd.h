@@ -9,15 +9,17 @@ namespace kanji {
 // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
-  Ucd(wchar_t code, const std::string& name, int radical, int strokes, int variantStrokes, bool joyo, bool jinmei,
-      wchar_t linkCode, const std::string& linkName, const std::string& meaning, const std::string& onReading,
-      const std::string& kunReading)
-    : _code(code), _name(name), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo),
-      _jinmei(jinmei), _linkCode(linkCode), _linkName(linkName), _meaning(meaning), _onReading(onReading),
-      _kunReading(kunReading) {}
+  Ucd(wchar_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
+      int strokes, int variantStrokes, bool joyo, bool jinmei, wchar_t linkCode, const std::string& linkName,
+      const std::string& meaning, const std::string& onReading, const std::string& kunReading)
+    : _code(code), _name(name), _block(block), _version(version), _radical(radical), _strokes(strokes),
+      _variantStrokes(variantStrokes), _joyo(joyo), _jinmei(jinmei), _linkCode(linkCode), _linkName(linkName),
+      _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
 
   wchar_t code() const { return _code; }
   const std::string& name() const { return _name; }
+  const std::string& block() const { return _block; }
+  const std::string& version() const { return _version; }
   int radical() const { return _radical; }
   int strokes(bool variant = false) const { return _strokes; }
   int variantStrokes() const { return _variantStrokes; }
@@ -43,6 +45,8 @@ public:
 private:
   const wchar_t _code;
   const std::string _name;
+  const std::string _block;
+  const std::string _version;
   const int _radical;
   const int _strokes;
   const int _variantStrokes;

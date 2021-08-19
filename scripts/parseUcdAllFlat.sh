@@ -4,9 +4,11 @@ declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
-# the following 12 values:
+# the following 15 values:
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in utf8
+# - Block: name of the Unicode block (from the 'blk' tag)
+# - Version: the Unicode version this character was added (from 'age' tag)
 # - Radical: radical number (1 to 214)
 # - Strokes: total strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
@@ -186,8 +188,8 @@ function populateOnKun() {
 }
 
 function printResults() {
-  echo -e "Code\tName\tRadical\tStrokes\tVStrokes\tJoyo\tJinmei\tLinkCode\t\
-LinkName\tMeaning\tOn\tKun"
+  echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tJoyo\t\
+Jinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
   while read -r i; do
     get cp "$i"
     get kJoyoKanji "$i"
@@ -316,9 +318,12 @@ LinkName\tMeaning\tOn\tKun"
     fi
     # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
     [[ -n $linkTo ]] && s="\U$linkTo" || s=
+    get blk "$i"     # Block
+    get age "$i"     # Version
     # don't print 'vstrokes' if it's 0
-    echo -e "$cp\t\U$cp\t$radical\t$strokes\t${vstrokes#0}\t${kJoyoKanji:+Y}\t\
-${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$localDef\t$resultOn\t$resultKun"
+    echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
+${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$localDef\t$resultOn\t\
+$resultKun"
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 

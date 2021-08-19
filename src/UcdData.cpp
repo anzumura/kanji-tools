@@ -47,8 +47,9 @@ std::string UcdData::getReadingsAsKana(const std::string& s) const {
 }
 
 void UcdData::load(const std::filesystem::path& file) {
-  int lineNum = 1, codeCol = -1, nameCol = -1, radicalCol = -1, strokesCol = -1, variantStrokesCol = -1, joyoCol = -1,
-      jinmeiCol = -1, linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
+  int lineNum = 1, codeCol = -1, nameCol = -1, blockCol = -1, versionCol = -1, radicalCol = -1, strokesCol = -1,
+      variantStrokesCol = -1, joyoCol = -1, jinmeiCol = -1, linkCodeCol = -1, linkNameCol = -1, meaningCol = -1,
+      onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
                 ", file: " + file.string());
@@ -70,7 +71,7 @@ void UcdData::load(const std::filesystem::path& file) {
     col = pos;
   };
   std::ifstream f(file);
-  std::array<std::string, 12> cols;
+  std::array<std::string, 14> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
@@ -80,6 +81,10 @@ void UcdData::load(const std::filesystem::path& file) {
           setCol(codeCol, pos);
         else if (token == "Name")
           setCol(nameCol, pos);
+        else if (token == "Block")
+          setCol(blockCol, pos);
+        else if (token == "Version")
+          setCol(versionCol, pos);
         else if (token == "Radical")
           setCol(radicalCol, pos);
         else if (token == "Strokes")
@@ -138,8 +143,9 @@ void UcdData::load(const std::filesystem::path& file) {
       if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
       if (!_map
              .emplace(std::piecewise_construct, std::make_tuple(name),
-                      std::make_tuple(code, name, radical, strokes, variantStrokes, joyo, jinmei, linkCode,
-                                      cols[linkNameCol], cols[meaningCol], cols[onCol], cols[kunCol]))
+                      std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
+                                      joyo, jinmei, linkCode, cols[linkNameCol], cols[meaningCol], cols[onCol],
+                                      cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
       if (linkCode > 0) {
