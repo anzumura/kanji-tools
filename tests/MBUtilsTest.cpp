@@ -289,4 +289,64 @@ TEST(MBUtilsTest, WideSetw) {
   EXPECT_EQ(wideSetw("𠮟", 1), 3); // request is shorted than wide char (return '4 + -1')
 }
 
+TEST(MBUtilsTest, SortingKana) {
+  // Default sort order for Japanese Kana and Rōmaji seems to be:
+  // - Rōmaji: normal latin letters
+  // - Hiragana: in Unicode order so しょう (incorrectly) comes before じょ
+  // - Katakana: should mix with Hiragana instead of always coming after
+  // - Full-width Rōmaji: should probably come before Kana
+  // - Half-width Katakana: should mix with other Kana instead
+  std::set<std::string> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ",   "バラ",    "ばら",
+                          "ぱら",   "para",     "じょ", "しょ", "ｐａｒａ"};
+  ASSERT_EQ(s.size(), 11);
+  auto i = s.begin();
+  EXPECT_EQ(*i++, "para");
+  EXPECT_EQ(*i++, "しょ");
+  EXPECT_EQ(*i++, "しょう");
+  EXPECT_EQ(*i++, "じょ");
+  EXPECT_EQ(*i++, "はら");
+  EXPECT_EQ(*i++, "ばら");
+  EXPECT_EQ(*i++, "ぱら");
+  EXPECT_EQ(*i++, "バラ");
+  EXPECT_EQ(*i++, "Ｐａｒａ");
+  EXPECT_EQ(*i++, "ｐａｒａ");
+  EXPECT_EQ(*i++, "ﾊﾗ");
+  EXPECT_EQ(i, s.end());
+}
+
+TEST(MBUtilsTest, SortingKanji) {
+  // Kanji sort order seems to follow Unicode code points instead of 'radical/stroke' ordering.
+  // Calling std::setlocale with values like ja_JP or ja_JP.UTF-8 doesn't make any difference.
+  std::set<std::string> s{"些", "丑", "云", "丞", "乃", "𠮟", "廿", "⺠", "輸", "鳩"};
+  ASSERT_EQ(s.size(), 10);
+  auto i = s.begin();
+  EXPECT_EQ(toUnicode(*i), "2EA0"); // Rare Kanji (Radical Supplement)
+  EXPECT_EQ(*i++, "⺠");
+  EXPECT_EQ(toUnicode(*i), "4E11"); // Common Kanji with radical 1 (一), strokes 4 (1+3)
+  EXPECT_EQ(*i++, "丑");
+  EXPECT_EQ(toUnicode(*i), "4E1E"); // Common Kanji with radical 1 (一), strokes 6 (1+5)
+  EXPECT_EQ(*i++, "丞");
+  EXPECT_EQ(toUnicode(*i), "4E43"); // Common Kanji with radical 4 (丿), strokes 2 (1+1)
+  EXPECT_EQ(*i++, "乃");
+  EXPECT_EQ(toUnicode(*i), "4E91"); // Common Kanji with radical 7 (二), strokes 4 (2+2)
+  EXPECT_EQ(*i++, "云");
+  EXPECT_EQ(toUnicode(*i), "4E9B"); // Common Kanji with radical 7 (二), strokes 7 (2+5)
+  EXPECT_EQ(*i++, "些");
+  // 5EFF is a Common Kanji (Jinmei) with radical 55 (廾), strokes 4 (3+1), but it can also
+  // be classified as having radical 24 (十) with strokes 4 (2+2)
+  EXPECT_EQ(toUnicode(*i), "5EFF");
+  EXPECT_EQ(*i++, "廿");
+  EXPECT_EQ(toUnicode(*i), "9CE9"); // Common kanji with radical 196 (鳥), strokes 13 (11+2)
+  EXPECT_EQ(*i++, "鳩");
+  // 20B9F is a Common Kanji (in Extension B) with radical 30 (口), strokes 5 (2+3) which would
+  // normally come before the previous two Kanji in the set since it has radical 30.
+  EXPECT_EQ(toUnicode(*i), "20B9F");
+  EXPECT_EQ(*i++, "𠮟");
+  // 2F9DF is a Rare Kanji with radical 159 (車), strokes 16 (7+9) which would come before
+  // before '9CE9' if sorting was based on radical numbers.
+  EXPECT_EQ(toUnicode(*i), "2F9DF");
+  EXPECT_EQ(*i++, "輸");
+  EXPECT_EQ(i, s.end());
+}
+
 } // namespace kanji
