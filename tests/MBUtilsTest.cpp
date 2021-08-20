@@ -289,7 +289,21 @@ TEST(MBUtilsTest, WideSetw) {
   EXPECT_EQ(wideSetw("𠮟", 1), 3); // request is shorted than wide char (return '4 + -1')
 }
 
-TEST(MBUtilsTest, SortingKana) {
+TEST(MBUtilsTest, SortKatakana) {
+  std::set<std::string> s{"ケン、トウ", "カ", "カ、サ", "ガ", "ゲン、カン"};
+  ASSERT_EQ(s.size(), 5);
+  auto i = s.begin();
+  EXPECT_EQ(*i++, "カ");
+  // The following two entries should be reversed, i.e., "ガ" then "カ、サ" - works fine with bash 'sort'.
+  // Later maybe try using https://github.com/unicode-org/icu collate functions.
+  EXPECT_EQ(*i++, "カ、サ");
+  EXPECT_EQ(*i++, "ガ");
+  EXPECT_EQ(*i++, "ケン、トウ");
+  EXPECT_EQ(*i++, "ゲン、カン");
+  EXPECT_EQ(i, s.end());
+}
+
+TEST(MBUtilsTest, SortKanaAndRomaji) {
   // Default sort order for Japanese Kana and Rōmaji seems to be:
   // - Rōmaji: normal latin letters
   // - Hiragana: in Unicode order so しょう (incorrectly) comes before じょ
@@ -314,7 +328,7 @@ TEST(MBUtilsTest, SortingKana) {
   EXPECT_EQ(i, s.end());
 }
 
-TEST(MBUtilsTest, SortingKanji) {
+TEST(MBUtilsTest, SortKanji) {
   // Kanji sort order seems to follow Unicode code points instead of 'radical/stroke' ordering.
   // Calling std::setlocale with values like ja_JP or ja_JP.UTF-8 doesn't make any difference.
   std::set<std::string> s{"些", "丑", "云", "丞", "乃", "𠮟", "廿", "⺠", "輸", "鳩"};
