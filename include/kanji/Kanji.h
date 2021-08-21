@@ -34,6 +34,7 @@ public:
   const std::string& nonVariantName() const { return _nonVariantName; }
   const Radical& radical() const { return _radical; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
+  const OptString& pinyin() const { return _pinyin; }
   Levels level() const { return _level; }
   Kyus kyu() const { return _kyu; }
   int frequency() const { return _frequency; }
@@ -52,13 +53,14 @@ public:
   enum InfoFields {
     RadicalField = 1,
     StrokesField,
-    GradeField = 4,
-    LevelField = 8,
-    FreqField = 16,
-    NewField = 32,
-    OldField = 64,
-    KyuField = 128,
-    AllFields = 255
+    PinyinField = 4,
+    GradeField = 8,
+    LevelField = 16,
+    FreqField = 32,
+    NewField = 64,
+    OldField = 128,
+    KyuField = 256,
+    AllFields = 511
   };
 
   // 'info' returns a comma separated string with extra info (if present) including:
@@ -125,6 +127,7 @@ private:
   const std::string _nonVariantName; // same as _name if _variant is false
   const Radical _radical;
   const int _strokes;
+  const OptString _pinyin;
   const Levels _level;
   const Kyus _kyu;
   const int _frequency;

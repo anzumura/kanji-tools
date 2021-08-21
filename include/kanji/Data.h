@@ -31,14 +31,13 @@ inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os <
 // - None: used as a type for a kanji that hasn't been loaded
 enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, Kentei, None };
 constexpr std::array AllTypes{Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
-                              Types::Other,  Types::Extra,  Types::Kentei, Types::None};
+                              Types::Other,  Types::Extra,  Types::Kentei,       Types::None};
 const char* toString(Types);
 inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
 
 // 'secondLast' is a helper function to get the second last value of an array (useful for AllTypes,
 // AllGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
-template<typename T, size_t S>
-constexpr inline T secondLast(const std::array<T, S>& x) {
+template<typename T, size_t S> constexpr inline T secondLast(const std::array<T, S>& x) {
   static_assert(S > 1);
   return x[S - 2];
 }
@@ -77,6 +76,12 @@ public:
   // 'getRadicalByName' is used by 'FileListKanji' classes during construction. It will return
   // the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   virtual const Radical& getRadicalByName(const std::string& radicalName) const { return _radicals.find(radicalName); }
+  // 'getPinyin' returns an optional string since not all Kanji have a Pinyin reading.
+  std::optional<std::string> getPinyin(const std::string& kanjiName) const {
+    const Ucd* u = _ucd.find(kanjiName);
+    if (u && !u->pinyin().empty()) return u->pinyin();
+    return {};
+  }
 
   const UcdData& ucd() const { return _ucd; }
 

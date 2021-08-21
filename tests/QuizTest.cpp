@@ -86,47 +86,47 @@ TEST_F(QuizTest, ListQuiz) {
 
 TEST_F(QuizTest, FrequencyLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('f', x); };
-  EXPECT_EQ(f('1'), "1/500.  Kanji:  日  (Rad 日, Strokes 4, Grade G1, Level N5, Kyu K10)");
-  EXPECT_EQ(f('2'), "1/500.  Kanji:  良  (Rad 艮, Strokes 7, Grade G4, Level N3, Kyu K7)");
-  EXPECT_EQ(f('3'), "1/500.  Kanji:  贈  (Rad 貝, Strokes 18, Grade S, Level N2, Old 贈, Kyu K4)");
-  EXPECT_EQ(f('4'), "1/500.  Kanji:  添  (Rad 水, Strokes 11, Grade S, Level N1, Kyu K4)");
-  EXPECT_EQ(f('5'), "1/501.  Kanji:  炒  (Rad 火, Strokes 8, Kyu K1)");
+  EXPECT_EQ(f('1'), "1/500.  Kanji:  日  (Rad 日, Strokes 4, Pinyin rì, Grade G1, Level N5, Kyu K10)");
+  EXPECT_EQ(f('2'), "1/500.  Kanji:  良  (Rad 艮, Strokes 7, Pinyin liáng, Grade G4, Level N3, Kyu K7)");
+  EXPECT_EQ(f('3'), "1/500.  Kanji:  贈  (Rad 貝, Strokes 18, Pinyin zèng, Grade S, Level N2, Old 贈, Kyu K4)");
+  EXPECT_EQ(f('4'), "1/500.  Kanji:  添  (Rad 水, Strokes 11, Pinyin tiān, Grade S, Level N1, Kyu K4)");
+  EXPECT_EQ(f('5'), "1/501.  Kanji:  炒  (Rad 火, Strokes 8, Pinyin chǎo, Kyu K1)");
 }
 
 TEST_F(QuizTest, GradeLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('g', x); };
-  EXPECT_EQ(f('1'), "1/80.  Kanji:  一  (Rad 一, Strokes 1, Level N5, Freq 2, Kyu K10)");
-  EXPECT_EQ(f('2'), "1/160.  Kanji:  引  (Rad 弓, Strokes 4, Level N4, Freq 218, Kyu K9)");
-  EXPECT_EQ(f('3'), "1/200.  Kanji:  悪  (Rad 心, Strokes 11, Level N4, Freq 530, Old 惡, Kyu K8)");
-  EXPECT_EQ(f('4'), "1/200.  Kanji:  愛  (Rad 心, Strokes 13, Level N3, Freq 640, Kyu K7)");
-  EXPECT_EQ(f('5'), "1/185.  Kanji:  圧  (Rad 土, Strokes 5, Level N2, Freq 718, Old 壓, Kyu K6)");
-  EXPECT_EQ(f('6'), "1/181.  Kanji:  異  (Rad 田, Strokes 11, Level N2, Freq 631, Kyu K5)");
-  EXPECT_EQ(f('s'), "1/1130.  Kanji:  亜  (Rad 二, Strokes 7, Level N1, Freq 1509, Old 亞, Kyu KJ2)");
+  EXPECT_EQ(f('1'), "1/80.  Kanji:  一  (Rad 一, Strokes 1, Pinyin yī, Level N5, Freq 2, Kyu K10)");
+  EXPECT_EQ(f('2'), "1/160.  Kanji:  引  (Rad 弓, Strokes 4, Pinyin yǐn, Level N4, Freq 218, Kyu K9)");
+  EXPECT_EQ(f('3'), "1/200.  Kanji:  悪  (Rad 心, Strokes 11, Pinyin è, Level N4, Freq 530, Old 惡, Kyu K8)");
+  EXPECT_EQ(f('4'), "1/200.  Kanji:  愛  (Rad 心, Strokes 13, Pinyin ài, Level N3, Freq 640, Kyu K7)");
+  EXPECT_EQ(f('5'), "1/185.  Kanji:  圧  (Rad 土, Strokes 5, Pinyin yā, Level N2, Freq 718, Old 壓, Kyu K6)");
+  EXPECT_EQ(f('6'), "1/181.  Kanji:  異  (Rad 田, Strokes 11, Pinyin yì, Level N2, Freq 631, Kyu K5)");
+  EXPECT_EQ(f('s'), "1/1130.  Kanji:  亜  (Rad 二, Strokes 7, Pinyin yà, Level N1, Freq 1509, Old 亞, Kyu KJ2)");
 }
 
 TEST_F(QuizTest, KyuLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('k', x); };
-  EXPECT_EQ(f('a'), "1/80.  Kanji:  一  (Rad 一, Strokes 1, Grade G1, Level N5, Freq 2)");
-  EXPECT_EQ(f('9'), "1/160.  Kanji:  引  (Rad 弓, Strokes 4, Grade G2, Level N4, Freq 218)");
-  EXPECT_EQ(f('8'), "1/200.  Kanji:  悪  (Rad 心, Strokes 11, Grade G3, Level N4, Freq 530, Old 惡)");
-  EXPECT_EQ(f('7'), "1/202.  Kanji:  愛  (Rad 心, Strokes 13, Grade G4, Level N3, Freq 640)");
-  EXPECT_EQ(f('6'), "1/193.  Kanji:  圧  (Rad 土, Strokes 5, Grade G5, Level N2, Freq 718, Old 壓)");
-  EXPECT_EQ(f('5'), "1/191.  Kanji:  異  (Rad 田, Strokes 11, Grade G6, Level N2, Freq 631)");
-  EXPECT_EQ(f('4'), "1/313.  Kanji:  握  (Rad 手, Strokes 12, Grade S, Level N1, Freq 1003)");
-  EXPECT_EQ(f('3'), "1/284.  Kanji:  哀  (Rad 口, Strokes 9, Grade S, Level N1, Freq 1715)");
-  EXPECT_EQ(f('c'), "1/328.  Kanji:  亜  (Rad 二, Strokes 7, Grade S, Level N1, Freq 1509, Old 亞)");
-  EXPECT_EQ(f('2'), "1/188.  Kanji:  挨  (Rad 手, Strokes 10, Grade S, Freq 2258)");
-  EXPECT_EQ(f('b'), "1/940.  Kanji:  唖  (Rad 口, Strokes 10)");
-  EXPECT_EQ(f('1'), "1/2780.  Kanji:  芦  (Rad 艸, Strokes 7, Freq 1733)");
+  EXPECT_EQ(f('a'), "1/80.  Kanji:  一  (Rad 一, Strokes 1, Pinyin yī, Grade G1, Level N5, Freq 2)");
+  EXPECT_EQ(f('9'), "1/160.  Kanji:  引  (Rad 弓, Strokes 4, Pinyin yǐn, Grade G2, Level N4, Freq 218)");
+  EXPECT_EQ(f('8'), "1/200.  Kanji:  悪  (Rad 心, Strokes 11, Pinyin è, Grade G3, Level N4, Freq 530, Old 惡)");
+  EXPECT_EQ(f('7'), "1/202.  Kanji:  愛  (Rad 心, Strokes 13, Pinyin ài, Grade G4, Level N3, Freq 640)");
+  EXPECT_EQ(f('6'), "1/193.  Kanji:  圧  (Rad 土, Strokes 5, Pinyin yā, Grade G5, Level N2, Freq 718, Old 壓)");
+  EXPECT_EQ(f('5'), "1/191.  Kanji:  異  (Rad 田, Strokes 11, Pinyin yì, Grade G6, Level N2, Freq 631)");
+  EXPECT_EQ(f('4'), "1/313.  Kanji:  握  (Rad 手, Strokes 12, Pinyin wò, Grade S, Level N1, Freq 1003)");
+  EXPECT_EQ(f('3'), "1/284.  Kanji:  哀  (Rad 口, Strokes 9, Pinyin āi, Grade S, Level N1, Freq 1715)");
+  EXPECT_EQ(f('c'), "1/328.  Kanji:  亜  (Rad 二, Strokes 7, Pinyin yà, Grade S, Level N1, Freq 1509, Old 亞)");
+  EXPECT_EQ(f('2'), "1/188.  Kanji:  挨  (Rad 手, Strokes 10, Pinyin āi, Grade S, Freq 2258)");
+  EXPECT_EQ(f('b'), "1/940.  Kanji:  唖  (Rad 口, Strokes 10, Pinyin yǎ)");
+  EXPECT_EQ(f('1'), "1/2780.  Kanji:  芦  (Rad 艸, Strokes 7, Pinyin lú, Freq 1733)");
 }
 
 TEST_F(QuizTest, LevelLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('l', x); };
-  EXPECT_EQ(f('5'), "1/103.  Kanji:  一  (Rad 一, Strokes 1, Grade G1, Freq 2, Kyu K10)");
-  EXPECT_EQ(f('4'), "1/181.  Kanji:  不  (Rad 一, Strokes 4, Grade G4, Freq 101, Kyu K7)");
-  EXPECT_EQ(f('3'), "1/361.  Kanji:  丁  (Rad 一, Strokes 2, Grade G3, Freq 1312, Kyu K8)");
-  EXPECT_EQ(f('2'), "1/415.  Kanji:  腕  (Rad 肉, Strokes 12, Grade S, Freq 1163, Kyu K4)");
-  EXPECT_EQ(f('1'), "1/1162.  Kanji:  統  (Rad 糸, Strokes 12, Grade G5, Freq 125, Kyu K6)");
+  EXPECT_EQ(f('5'), "1/103.  Kanji:  一  (Rad 一, Strokes 1, Pinyin yī, Grade G1, Freq 2, Kyu K10)");
+  EXPECT_EQ(f('4'), "1/181.  Kanji:  不  (Rad 一, Strokes 4, Pinyin bù, Grade G4, Freq 101, Kyu K7)");
+  EXPECT_EQ(f('3'), "1/361.  Kanji:  丁  (Rad 一, Strokes 2, Pinyin dīng, Grade G3, Freq 1312, Kyu K8)");
+  EXPECT_EQ(f('2'), "1/415.  Kanji:  腕  (Rad 肉, Strokes 12, Pinyin wàn, Grade S, Freq 1163, Kyu K4)");
+  EXPECT_EQ(f('1'), "1/1162.  Kanji:  統  (Rad 糸, Strokes 12, Pinyin tǒng, Grade G5, Freq 125, Kyu K6)");
 }
 
 TEST_F(QuizTest, SkipListQuestions) {
@@ -158,7 +158,7 @@ TEST_F(QuizTest, ToggleListMeanings) {
   std::string line;
   bool meaningsOn = false;
   int found = 0;
-  std::string expected("Question 1/80.  Kanji:  一  (Rad 一, Strokes 1, Level N5, Freq 2, Kyu K10)");
+  std::string expected("Question 1/80.  Kanji:  一  (Rad 一, Strokes 1, Pinyin yī, Level N5, Freq 2, Kyu K10)");
   while (std::getline(_os, line)) {
     if (line.starts_with("Question")) {
       ++found;

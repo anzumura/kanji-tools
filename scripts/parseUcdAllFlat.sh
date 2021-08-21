@@ -8,10 +8,11 @@ declare -r program="parseUcdAllFlat.sh"
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in utf8
 # - Block: name of the Unicode block (from the 'blk' tag)
-# - Version: the Unicode version this character was added (from 'age' tag)
+# - Version: Unicode version this character was added (from 'age' tag)
 # - Radical: radical number (1 to 214)
 # - Strokes: total strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
+# - Pinyin: most customary pīnyīn (拼音) reading (from 'kMandarin' tag)
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
 # - LinkCode: 230 Jinmei (of the 863 total) are variants of other Jōyō/Jinmei
@@ -70,7 +71,8 @@ function get() {
 # value has spaces (so it gets the value up to the first space)
 function getFirst() {
   unset -v $1
-  eval $(echo "$2" | grep -o " $1=\"[^\" ]*")\"
+  local -r s=$(echo "$2" | grep -o " $1=\"[^\" ]*")
+  [[ -n $s ]] && eval $s\"
 }
 
 function setOnKun() {
@@ -188,8 +190,8 @@ function populateOnKun() {
 }
 
 function printResults() {
-  echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tJoyo\t\
-Jinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
+  echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
+Joyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
   while read -r i; do
     get cp "$i"
     get kJoyoKanji "$i"
@@ -318,12 +320,13 @@ Jinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
     fi
     # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
     [[ -n $linkTo ]] && s="\U$linkTo" || s=
-    get blk "$i"     # Block
-    get age "$i"     # Version
+    get blk "$i" # Block
+    get age "$i" # Version
+    getFirst kMandarin "$i"
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
-${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$localDef\t$resultOn\t\
-$resultKun"
+$kMandarin\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$localDef\t\
+$resultOn\t$resultKun"
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 

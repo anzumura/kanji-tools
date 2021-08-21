@@ -11,22 +11,24 @@ namespace fs = std::filesystem;
 Kanji::Kanji(const Data& d, int number, const std::string& name, const Radical& radical, int strokes,
              bool findFrequency, Levels level)
   : _number(number), _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
-    _nonVariantName(MBChar::withoutVariationSelector(name)), _radical(radical), _strokes(strokes), _level(level),
-    _frequency(findFrequency ? d.getFrequency(name) : 0), _kyu(d.getKyu(name)) {
+    _nonVariantName(MBChar::withoutVariationSelector(name)), _radical(radical), _strokes(strokes),
+    _pinyin(d.getPinyin(name)), _level(level), _frequency(findFrequency ? d.getFrequency(name) : 0),
+    _kyu(d.getKyu(name)) {
   assert(MBChar::length(_name) == 1);
 }
 
 std::string Kanji::info(int infoFields) const {
-  static const std::string Rad("Rad "), Strokes("Strokes "), Grade("Grade "), Level("Level "), Freq("Freq "),
-    New("New "), Old("Old "), Kyu("Kyu ");
+  static const std::string Pinyin("Pinyin "), Rad("Rad "), Strokes("Strokes "), Grade("Grade "), Level("Level "),
+    Freq("Freq "), New("New "), Old("Old "), Kyu("Kyu ");
   std::string result;
   auto add = [&result](const auto& x) {
     if (!result.empty()) result += ", ";
     result += x;
   };
   auto t = type();
-  if (infoFields & RadicalField) result += Rad + radical().name();
+  if (infoFields & RadicalField) add(Rad + radical().name());
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
+  if (infoFields & PinyinField && pinyin().has_value()) add(Pinyin + *pinyin());
   if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
   if (infoFields & LevelField && hasLevel()) add(Level + toString(level()));
   if (infoFields & FreqField && frequency()) add(Freq + std::to_string(frequency()));
