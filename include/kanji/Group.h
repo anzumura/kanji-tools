@@ -25,42 +25,39 @@ public:
   // For example, a 'peers=false' group could have name='太' and members: '太, 駄, 汰'
   // whereas a 'peers=true' group could have name='粋' and members: '粋, 枠, 砕'. Note,
   // 'name' is just an arbitrary label for a Meaning group, whereas it is the 'name'
-  // of the first member in a Pattern group, i.e., the basis of the pattern.
-  Group(int number, const Data::List& members)
-    : _number(number), _members(members) {}
+  // of the first member in a Pattern group, i.e., the basis of the pattern (plus the
+  // main common pronunciations after a colon).
+  Group(int number, const std::string& name, const Data::List& members)
+    : _number(number), _name(name), _members(members) {}
   virtual ~Group() = default;
   Group(const Group&) = delete;
 
   virtual GroupType type() const = 0;
-  virtual const std::string& name() const = 0;
+  virtual const std::string& name() const { return _name; }
   virtual bool peers() const { return false; }
 
   int number() const { return _number; }
   const Data::List& members() const { return _members; }
-  std::string toString() const {
-    return "[" + std::to_string(_number) + ' ' + name() + (peers() ? "*]" : "]");
-  }
+  std::string toString() const { return "[" + std::to_string(_number) + ' ' + name() + (peers() ? "*]" : "]"); }
 private:
   const int _number;
+  const std::string _name;
   const Data::List _members;
 };
 
 class MeaningGroup : public Group {
 public:
-  MeaningGroup(int number, const std::string& name, const Data::List& members) : Group(number, members), _name(name) {}
-  
+  MeaningGroup(int number, const std::string& name, const Data::List& members) : Group(number, name, members) {}
+
   GroupType type() const override { return GroupType::Meaning; }
-  const std::string& name() const override { return _name; }
-private:
-  const std::string _name;
 };
 
 class PatternGroup : public Group {
 public:
-  PatternGroup(int number, const Data::List& members, bool peers) : Group(number, members), _peers(peers) {}
+  PatternGroup(int number, const std::string& name, const Data::List& members, bool peers)
+    : Group(number, name, members), _peers(peers) {}
 
   GroupType type() const override { return GroupType::Pattern; }
-  const std::string& name() const override { return members().at(0)->name(); }
   bool peers() const override { return _peers; }
 private:
   const bool _peers;

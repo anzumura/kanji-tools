@@ -1,6 +1,7 @@
 #include <kanji/Group.h>
 #include <kanji/GroupData.h>
 #include <kanji/MBChar.h>
+#include <kanji/MBUtils.h>
 
 #include <fstream>
 #include <sstream>
@@ -34,6 +35,7 @@ bool GroupData::checkInsert(const std::string& name, Map& groups, const Entry& g
 }
 
 void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& list, GroupType type) {
+  static const std::string wideColon("：");
   int lineNumber = 1, numberCol = -1, nameCol = -1, membersCol = -1;
   auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
@@ -66,11 +68,15 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (pos != cols.size()) error("not enough columns");
       std::string number(cols[numberCol]), name(cols[nameCol]), token;
       FileList::List kanjis;
-      const bool peers = name.empty();
+      const bool peers = name.starts_with(wideColon);
       if (type == GroupType::Meaning) {
         if (peers) error("Meaning group must have a name");
-      } else if (!peers) // if populated, 'name colum' is the first member of a Pattern group
-        kanjis.emplace_back(name);
+      } else {
+        if (!peers) // if not peer group, then 'name' before the colon is the first member of the group
+          kanjis.push_back(MBChar::getFirst(name));
+        auto i = name.find(wideColon);
+        if (i != std::string::npos) name = name.substr(i + wideColon.length());
+      }
       for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
         kanjis.emplace_back(token);
       Data::List memberKanjis;
@@ -87,7 +93,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (type == GroupType::Meaning)
         group = std::make_shared<MeaningGroup>(Data::toInt(number), name, memberKanjis);
       else
-        group = std::make_shared<PatternGroup>(Data::toInt(number), memberKanjis, peers);
+        group = std::make_shared<PatternGroup>(Data::toInt(number), name, memberKanjis, peers);
       for (const auto& i : memberKanjis)
         checkInsert(i->name(), groups, group);
       list.push_back(group);
@@ -96,19 +102,20 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
 }
 
 void GroupData::printGroups(const Map& groups, const List& groupList) const {
-  log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend << ":\n";
+  log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend
+        << "\nName (number of entries)   Parent Member : Other Members\n";
   for (const auto& i : groupList) {
     if (i->type() == GroupType::Meaning) {
       auto len = MBChar::length(i->name());
-      out() << '[' << i->name()
+      out() << i->name()
             << (len == 1     ? "　　"
                   : len == 2 ? "　"
                              : "")
-            << ' ' << std::setw(2) << std::setfill(' ') << i->members().size() << "] :";
+            << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")   :";
       for (const auto& j : i->members())
         out() << ' ' << j->qualifiedName();
     } else {
-      out() << '[' << std::setw(3) << std::setfill('0') << i->number() << "] ";
+      out() << std::setw(wideSetw(i->name(), 20)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
       for (const auto& j : i->members())
         if (j == i->members()[0]) {
           if (i->peers())
