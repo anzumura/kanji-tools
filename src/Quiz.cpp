@@ -251,8 +251,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
     Choices choices = getDefaultChoices();
     bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
-      out() << "\nQuestion " << _question << '/' << list.size() << ".  ";
-      out() << (i->peers() ? "peers of entry: " : "name: ") << i->name() << ", showing ";
+      out() << "\nQuestion " << _question << '/' << list.size() << ".  " << *i << ", showing ";
       if (questions.size() == i->members().size())
         out() << "all " << questions.size();
       else
@@ -276,8 +275,10 @@ void Quiz::showGroup(const List& questions, const List& readings, Choices& choic
   int count = 0;
   for (auto& i : questions) {
     const char choice = (count < 26 ? 'a' + count : 'A' + (count - 26));
-    out() << "  Entry: " << std::setw(3) << count + 1 << "  " << i->qualifiedName() << "\t\t" << choice << ":  "
-          << readings[count]->reading();
+    out() << "  Entry: " << std::right << std::setw(3) << count + 1 << "  ";
+    auto s = i->qualifiedName();
+    if (i->pinyin().has_value()) s += "  (" + *i->pinyin() + ')';
+    out() << std::left << std::setw(24) << s << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count]);
     if (!repeatQuestion) choices[choice] = "";
     ++count;

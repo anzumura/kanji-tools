@@ -33,10 +33,10 @@ public:
   Group(const Group&) = delete;
 
   virtual GroupType type() const = 0;
-  virtual const std::string& name() const { return _name; }
   virtual bool peers() const { return false; }
 
   int number() const { return _number; }
+  const std::string& name() const { return _name; }
   const Data::List& members() const { return _members; }
   std::string toString() const { return "[" + std::to_string(_number) + ' ' + name() + (peers() ? "*]" : "]"); }
 private:
@@ -62,6 +62,16 @@ public:
 private:
   const bool _peers;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Group& x) {
+  os << '[';
+  if (x.peers()) {
+    auto i = x.members().begin();
+    os << "Peers ";
+    if (i != x.members().end()) os << (**i).name();
+  }
+  return os << x.name() << ']';
+}
 
 } // namespace kanji
 

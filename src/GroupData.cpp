@@ -71,12 +71,8 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       const bool peers = name.starts_with(wideColon);
       if (type == GroupType::Meaning) {
         if (peers) error("Meaning group must have a name");
-      } else {
-        if (!peers) // if not peer group, then 'name' before the colon is the first member of the group
-          kanjis.push_back(MBChar::getFirst(name));
-        auto i = name.find(wideColon);
-        if (i != std::string::npos) name = name.substr(i + wideColon.length());
-      }
+      } else if (!peers) // if not peer group, then 'name' before the colon is the first member of the group
+        kanjis.push_back(MBChar::getFirst(name));
       for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
         kanjis.emplace_back(token);
       Data::List memberKanjis;
