@@ -26,7 +26,7 @@ std::string Kanji::info(int infoFields) const {
     result += x;
   };
   auto t = type();
-  if (infoFields & RadicalField) add(Rad + radical().name());
+  if (infoFields & RadicalField) add(Rad + radical().name() + ':' + std::to_string(radical().number()));
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
   if (infoFields & PinyinField && pinyin().has_value()) add(Pinyin + *pinyin());
   if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
