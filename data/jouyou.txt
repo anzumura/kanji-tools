@@ -227,7 +227,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 226	学	子	學		8	1	study	ガク、まな-ぶ
 227	岳	山	嶽		8	S	point	ガク、たけ
 228	楽	木	樂		13	2	pleasure	ガク、ラク、たの-しい、たの-しむ
-229	額	頁			18	5	amount	ガク、ひたい
+229	額	頁			18	5	amount, forehead	ガク、ひたい
 230	顎	頁		2010	18	S	jaw	ガク、あご
 231	掛	手			11	S	hang	か-ける、か-かる、かかり
 232	潟	水		1981	15	S	lagoon	かた
@@ -636,7 +636,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 635	港	水			12	3	harbor	コウ、みなと
 636	硬	石			12	S	stiff	コウ、かた-い
 637	絞	糸			12	S	strangle	コウ、しぼ-る、し-める、し-まる
-638	項	頁			12	S	paragraph	コウ
+638	項	頁			12	S	paragraph, nape of neck	コウ、（うなじ）
 639	溝	水		1981	13	S	gutter	コウ、みぞ
 640	鉱	金	鑛		13	5	mineral	コウ
 641	構	木			14	5	construct	コウ、かま-える、かま-う
@@ -986,7 +986,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 985	紹	糸			11	S	introduce	ショウ
 986	訟	言			11	S	sue	ショウ
 987	勝	力			12	3	win	ショウ、か-つ、まさ-る
-988	掌	手			12	S	manipulate	ショウ
+988	掌	手			12	S	manipulate, palm of hand	ショウ、（てのひら）
 989	晶	日			12	S	sparkle	ショウ
 990	焼	火	燒		12	4	bake	ショウ、や-く、や-ける
 991	焦	火			12	S	char	ショウ、こ-げる、こ-がす、こ-がれる、あせ-る

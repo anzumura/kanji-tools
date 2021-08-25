@@ -37,7 +37,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 36	哄	口	9	resound	コウ
 37	徨	彳	12	wandering	コウ、さまよ-う
 38	哭	口	10	weep	コク、なげ-く、な-く
-39	坤	土	8	southwest	コン
+39	坤	土	8	southwest	コン、（ひつじさる）
 40	艮	艮	6	northeast	コン、ゴン、うしとら
 41	癸	癶	9	10th calendar sign	キ、みずのと
 42	鮪	魚	17	tuna	キ、ユウ、イ、まぐろ、しび
