@@ -68,11 +68,16 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (pos != cols.size()) error("not enough columns");
       std::string number(cols[numberCol]), name(cols[nameCol]), token;
       FileList::List kanjis;
-      const bool peers = name.starts_with(wideColon);
+      Group::PatternType patternType = Group::PatternType::None;
       if (type == GroupType::Meaning) {
-        if (peers) error("Meaning group must have a name");
-      } else if (!peers) // if not peer group, then 'name' before the colon is the first member of the group
-        kanjis.push_back(MBChar::getFirst(name));
+        if (name.empty()) error("Meaning group must have a name");
+      } else {
+        patternType = name.starts_with(wideColon)     ? Group::PatternType::Peer
+          : name.find(wideColon) != std::string::npos ? Group::PatternType::Family
+                                                      : Group::PatternType::Reading;
+        // 'name' before the colon is the first member of a 'family'
+        if (patternType == Group::PatternType::Family) kanjis.push_back(MBChar::getFirst(name));
+      }
       for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
         kanjis.emplace_back(token);
       Data::List memberKanjis;
@@ -89,7 +94,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (type == GroupType::Meaning)
         group = std::make_shared<MeaningGroup>(Data::toInt(number), name, memberKanjis);
       else
-        group = std::make_shared<PatternGroup>(Data::toInt(number), name, memberKanjis, peers);
+        group = std::make_shared<PatternGroup>(Data::toInt(number), name, memberKanjis, patternType);
       for (const auto& i : memberKanjis)
         checkInsert(i->name(), groups, group);
       list.push_back(group);
@@ -114,12 +119,12 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
     } else {
       out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
       for (const auto& j : i->members())
-        if (j == i->members()[0]) {
-          if (i->peers())
-            out() << "　 : " << j->qualifiedName();
-          else
-            out() << j->qualifiedName() << ':';
-        } else
+        if (j == i->members()[0]) switch (i->patternType()) {
+          case Group::PatternType::Peer: out() << "　 : " << j->qualifiedName(); break;
+          case Group::PatternType::Reading: out() << j->qualifiedName(); break;
+          default: out() << j->qualifiedName() << ':';
+          }
+        else
           out() << ' ' << j->qualifiedName();
     }
     out() << '\n';

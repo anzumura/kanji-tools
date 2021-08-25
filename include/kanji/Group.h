@@ -20,25 +20,31 @@ inline std::ostream& operator<<(std::ostream& os, const GroupType& x) {
 // have more than one meaning).
 class Group {
 public:
-  // 'peers' should be false for Meaning groups, but could be true for a Pattern
-  // group where 'name' is just one of the 'members' (instead of being a 'parent').
-  // For example, a 'peers=false' group could have name='太' and members: '太, 駄, 汰'
-  // whereas a 'peers=true' group could have name='粋' and members: '粋, 枠, 砕'. Note,
-  // 'name' is just an arbitrary label for a Meaning group, whereas it is the 'name'
-  // of the first member in a Pattern group, i.e., the basis of the pattern (plus the
-  // main common pronunciations after a colon).
+  // 'PatternType' is 'None' for Meaning groups, but for a Pattern Group it can be one
+  // of three values:
+  // - 'Family': a pattern where the first character is a parent of all the other members,
+  //   for example: 太 -> 太, 駄, 汰, i.e., 'parent' is a sub-component of each member.
+  //   Radicals can form families, but the focus of pattern groups is on phonetic components
+  //   so in general 'parent' should correspond to the 'non-radical' part of the members.
+  // - 'Peer': each member has a common part contributing to common pronunciation if possible,
+  //   for example: 粋, 枠 and 砕 all have a common 'non-radical' component.
+  // - 'Reading': this type is used as a final catch-all for characters that don't logically
+  //   fit into a 'Family' or 'Peer' group. There are generally simpler characters such as 凹
+  //   or 後 as well as some radicals.
+  enum class PatternType { Family, Peer, Reading, None };
+
   Group(int number, const std::string& name, const Data::List& members)
     : _number(number), _name(name), _members(members) {}
   virtual ~Group() = default;
   Group(const Group&) = delete;
 
   virtual GroupType type() const = 0;
-  virtual bool peers() const { return false; }
+  virtual PatternType patternType() const { return PatternType::None; }
 
   int number() const { return _number; }
   const std::string& name() const { return _name; }
   const Data::List& members() const { return _members; }
-  std::string toString() const { return "[" + std::to_string(_number) + ' ' + name() + (peers() ? "*]" : "]"); }
+  std::string toString() const { return "[" + std::to_string(_number) + ' ' + name() + ']'; }
 private:
   const int _number;
   const std::string _name;
@@ -54,18 +60,18 @@ public:
 
 class PatternGroup : public Group {
 public:
-  PatternGroup(int number, const std::string& name, const Data::List& members, bool peers)
-    : Group(number, name, members), _peers(peers) {}
+  PatternGroup(int number, const std::string& name, const Data::List& members, PatternType patternType)
+    : Group(number, name, members), _patternType(patternType) {}
 
   GroupType type() const override { return GroupType::Pattern; }
-  bool peers() const override { return _peers; }
+  PatternType patternType() const override { return _patternType; }
 private:
-  const bool _peers;
+  const PatternType _patternType;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Group& x) {
   os << '[';
-  if (x.peers()) {
+  if (x.patternType() == Group::PatternType::Peer) {
     auto i = x.members().begin();
     os << "Peers ";
     if (i != x.members().end()) os << (**i).name();
