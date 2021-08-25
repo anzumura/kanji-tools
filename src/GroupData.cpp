@@ -101,6 +101,7 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend
         << "\nName (number of entries)   Parent Member : Other Members\n";
   for (const auto& i : groupList) {
+    out() << '[' << std::setw(3) << std::to_string(i->number()) << "]  ";
     if (i->type() == GroupType::Meaning) {
       auto len = MBChar::length(i->name());
       out() << i->name()
@@ -111,7 +112,7 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
       for (const auto& j : i->members())
         out() << ' ' << j->qualifiedName();
     } else {
-      out() << std::setw(wideSetw(i->name(), 20)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
+      out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
       for (const auto& j : i->members())
         if (j == i->members()[0]) {
           if (i->peers())
