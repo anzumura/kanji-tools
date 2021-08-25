@@ -42,8 +42,8 @@ protected:
     // 'm' for Meaning Group Quiz
     // 'b' for Beginning of list (instead of End or Random)
     // '1' for including only Jōyō kanji
-    // 'q' for 'quiz' mode (instead of review mode)
-    _is << "m\nb\n1\nq\n";
+    // 't' for 'test' mode (instead of review mode)
+    _is << "m\nb\n1\nt\n";
   }
   void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
   void skip() { _is << ".\n"; }           // '.' is the option to skip a question

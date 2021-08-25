@@ -239,7 +239,7 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list) co
 }
 
 void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
-  const char mode = _choice.get("Mode", {{'q', "Quiz"}, {'r', "Review"}}, 'q');
+  const char mode = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
   if (mode == QuitOption) return;
   _reviewMode = mode == 'r';
   bool firstTime = true;
