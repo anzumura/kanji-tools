@@ -42,7 +42,8 @@ protected:
     // 'm' for Meaning Group Quiz
     // 'b' for Beginning of list (instead of End or Random)
     // '1' for including only Jōyō kanji
-    _is << "m\nb\n1\n";
+    // 'q' for 'quiz' mode (instead of review mode)
+    _is << "m\nb\n1\nq\n";
   }
   void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
   void skip() { _is << ".\n"; }           // '.' is the option to skip a question
@@ -205,8 +206,8 @@ TEST_F(QuizTest, ToggleGroupMeanings) {
   runQuiz();
   bool meaningsOn = false;
   int found = 0;
-  std::string line, expected("リュウ、たつ");
-  std::string expectedWithMeaning = expected + " : dragon";
+  std::string line, expected("みなみ");
+  std::string expectedWithMeaning = expected + " : south";
   while (std::getline(_os, line)) {
     if (line.starts_with("  Entry") && line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
       ++found;

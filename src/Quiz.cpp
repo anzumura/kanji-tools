@@ -15,6 +15,7 @@ std::mt19937 RandomGen(RandomDevice());
 // of the list (assuming the other choices are just letters and/or numbers).
 constexpr char EditOption = '*';
 constexpr char MeaningsOption = '-';
+constexpr char PrevOption = ',';
 constexpr char SkipOption = '.';
 constexpr char QuitOption = '/';
 
@@ -65,7 +66,7 @@ void Quiz::quiz() const {
     prepareGroupQuiz(getListOrder(), _groupData.patternGroups());
   else
     return;
-  finalScore();
+  if (!_reviewMode) finalScore();
 }
 
 // Helper functions for both List and Group quizzes
@@ -105,7 +106,11 @@ void Quiz::reset() const {
 }
 
 Choice::Choices Quiz::getDefaultChoices() const {
-  return {{MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings}, {SkipOption, "skip"}, {QuitOption, "quit"}};
+  Choice::Choices c = {{MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
+          {SkipOption, _reviewMode ? "next" : "skip"},
+          {QuitOption, "quit"}};
+  if (_reviewMode && _question > 1) c[PrevOption] = "prev";
+  return c; 
 }
 
 void Quiz::toggleMeanings(Choices& choices) const {
@@ -234,18 +239,27 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list) co
 }
 
 void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
-  for (auto& i : list) {
+  const char mode = _choice.get("Mode", {{'q', "Quiz"}, {'r', "Review"}}, 'q');
+  if (mode == QuitOption) return;
+  _reviewMode = mode == 'r';
+  bool firstTime = true;
+  for (_question = 1; _question <= list.size(); ++_question) {
+    auto& i = list[_question - 1];
     List questions, readings;
     for (auto& j : i->members())
       if (includeMember(j, type)) {
         questions.push_back(j);
         readings.push_back(j);
       }
-    std::shuffle(questions.begin(), questions.end(), RandomGen);
-    std::shuffle(readings.begin(), readings.end(), RandomGen);
-    if (!_question++) {
-      log(true) << "Starting quiz for " << list.size() << ' ' << i->type() << " groups\n";
+    if (!_reviewMode) {
+      std::shuffle(questions.begin(), questions.end(), RandomGen);
+      std::shuffle(readings.begin(), readings.end(), RandomGen);
+    }
+    if (firstTime) {
+      log(true) << "Starting " << (_reviewMode ? "review" : "quiz") << " for " << list.size() << ' ' << i->type()
+                << " groups\n";
       if (type) log() << "  " << KanjiLegend << '\n';
+      firstTime = false;
     }
     Answers answers;
     Choices choices = getDefaultChoices();
@@ -274,13 +288,13 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
 void Quiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion) const {
   int count = 0;
   for (auto& i : questions) {
-    const char choice = (count < 26 ? 'a' + count : 'A' + (count - 26));
+    const char choice = _reviewMode ? ' ' : (count < 26 ? 'a' + count : 'A' + (count - 26));
     out() << "  Entry: " << std::right << std::setw(3) << count + 1 << "  ";
     auto s = i->qualifiedName();
     if (i->pinyin().has_value()) s += "  (" + *i->pinyin() + ')';
     out() << std::left << std::setw(24) << s << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count]);
-    if (!repeatQuestion) choices[choice] = "";
+    if (!repeatQuestion && !_reviewMode) choices[choice] = "";
     ++count;
   }
   out() << '\n';
@@ -302,6 +316,7 @@ bool Quiz::getAnswers(Answers& answers, int totalQuestions, Choices& choices, bo
 }
 
 bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& meanings) const {
+  const static std::string ReviewMsg("  Review mappings"), QuizMsg("  Select reading for Entry: ");
   const std::string space = (answers.size() < 9 ? " " : "");
   do {
     if (!answers.empty()) {
@@ -311,11 +326,14 @@ bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& 
       out() << '\n';
     }
     const char answer =
-      _choice.get("  Select reading for Entry: " + space + std::to_string(answers.size() + 1), choices);
+      _choice.get(_reviewMode ? ReviewMsg : QuizMsg + space + std::to_string(answers.size() + 1), choices);
     if (answer == QuitOption) break;
     if (answer == MeaningsOption)
       meanings = true;
-    else if (answer == SkipOption)
+    else if (answer == PrevOption) {
+      _question -= 2;
+      skipGroup = true;
+    } else if (answer == SkipOption)
       skipGroup = true;
     else if (answer == EditOption)
       editAnswer(answers, choices);

@@ -9,7 +9,8 @@ namespace kanji {
 class Quiz {
 public:
   Quiz(const GroupData& groupData, std::istream* in = 0)
-    : _groupData(groupData), _question(0), _score(0), _showMeanings(false), _choice(groupData.out(), in) {}
+    : _groupData(groupData), _question(0), _score(0), _showMeanings(false), _reviewMode(false),
+      _choice(groupData.out(), in) {}
   // 'quiz' is the top level method for choosing quiz type (List or Group based)
   void quiz() const;
 private:
@@ -61,6 +62,7 @@ private:
   mutable FileList::List _mistakes;
   mutable bool _showMeanings;
   mutable Choice _choice;
+  mutable bool _reviewMode;
 
   const GroupData& _groupData;
 };
