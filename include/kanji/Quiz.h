@@ -28,7 +28,7 @@ private:
   // 'getDefaultChoices' returns a Choices structure populated with just the common values
   // for a quiz question like skip and quit. It will also populate 'hide/show meanings' option
   // based on the current value of '_showMeanings'.
-  Choices getDefaultChoices() const;
+  Choices getDefaultChoices(int totalQuestions) const;
   void toggleMeanings(Choices&) const;   // display of English 'meanings' can be toggled on and off
   void printMeaning(const Entry&) const; // print meaning if _showMeanings is true and meaning exists
 
@@ -36,7 +36,7 @@ private:
   // to reading' quiz (see Kanji.h for more details on 'InfoFields').
   void listQuiz(ListOrder listOrder, const List&, int infoFields) const;
 
-  void prepareGroupQuiz(ListOrder listOrder, const GroupData::List&) const;
+  void prepareGroupQuiz(ListOrder, const GroupData::List&, const GroupData::Map& otherMap, char otherGroup) const;
   // 'MemberType' if used to determine which members of a group should be included in a quiz:
   // - Jouyou: include if member is a Jouyou type
   // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
@@ -47,9 +47,10 @@ private:
   // have a reading as well as meet the criteria of the given MemberType.
   static bool includeMember(const Entry&, MemberType);
   // 'groupQuiz' starts a Group Quiz (callled by 'prepareGroupQuiz')
-  void groupQuiz(const GroupData::List&, MemberType) const;
+  void groupQuiz(const GroupData::List&, MemberType, const GroupData::Map& otherMap, char otherGroup) const;
 
-  void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
+  void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion,
+                 const GroupData::Map& otherMap, char otherGroup) const;
   using Answers = std::vector<char>;
   bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
   bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& meanings) const;

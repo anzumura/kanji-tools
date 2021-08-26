@@ -1,4 +1,5 @@
 #include <kanji/Group.h>
+#include <kanji/MBUtils.h>
 #include <kanji/Quiz.h>
 
 #include <random>
@@ -61,9 +62,9 @@ void Quiz::quiz() const {
     // suppress printing 'Level' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().levelList(AllLevels[4 - (c - '1')]), Kanji::AllFields ^ Kanji::LevelField);
   } else if (c == 'm')
-    prepareGroupQuiz(getListOrder(), _groupData.meaningGroups());
+    prepareGroupQuiz(getListOrder(), _groupData.meaningGroups(), _groupData.patternMap(), 'p');
   else if (c == 'p')
-    prepareGroupQuiz(getListOrder(), _groupData.patternGroups());
+    prepareGroupQuiz(getListOrder(), _groupData.patternGroups(), _groupData.meaningMap(), 'm');
   else
     return;
   if (!_reviewMode) finalScore();
@@ -105,12 +106,15 @@ void Quiz::reset() const {
   _showMeanings = false;
 }
 
-Choice::Choices Quiz::getDefaultChoices() const {
+Choice::Choices Quiz::getDefaultChoices(int totalQuestions) const {
   Choice::Choices c = {{MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
-          {SkipOption, _reviewMode ? "next" : "skip"},
-          {QuitOption, "quit"}};
+                       {SkipOption,
+                        _question == totalQuestions ? "finish"
+                          : _reviewMode             ? "next"
+                                                    : "skip"},
+                       {QuitOption, "quit"}};
   if (_reviewMode && _question > 1) c[PrevOption] = "prev";
-  return c; 
+  return c;
 }
 
 void Quiz::toggleMeanings(Choices& choices) const {
@@ -133,7 +137,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   const char c = _choice.get("Number of choices", choices, '4');
   if (c == QuitOption) return;
   const int numberOfChoicesPerQuestion = c - '0';
-  choices = getDefaultChoices();
+  choices = getDefaultChoices(list.size());
   for (int i = 0; i < numberOfChoicesPerQuestion; ++i)
     choices['1' + i] = "";
   const char quizStyle = _choice.get("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, 'k');
@@ -214,13 +218,14 @@ bool Quiz::includeMember(const Entry& k, MemberType type) {
   return k->hasReading() && (k->is(Types::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
 }
 
-void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list) const {
+void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, const GroupData::Map& otherMap,
+                            char otherGroup) const {
   if (listOrder == ListOrder::Quit) return;
   const char c = _choice.get("Kanji type", {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}}, '2');
   if (c == QuitOption) return;
   const MemberType type = static_cast<MemberType>(c - '1');
   if (listOrder == ListOrder::FromBeginning && type == All)
-    groupQuiz(list, type);
+    groupQuiz(list, type, otherMap, otherGroup);
   else {
     GroupData::List newList;
     for (const auto& i : list) {
@@ -234,11 +239,12 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list) co
       std::reverse(newList.begin(), newList.end());
     else if (listOrder == ListOrder::Random)
       std::shuffle(newList.begin(), newList.end(), RandomGen);
-    groupQuiz(newList, type);
+    groupQuiz(newList, type, otherMap, otherGroup);
   }
 }
 
-void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
+void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupData::Map& otherMap,
+                     char otherGroup) const {
   const char mode = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
   if (mode == QuitOption) return;
   _reviewMode = mode == 'r';
@@ -262,7 +268,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
       firstTime = false;
     }
     Answers answers;
-    Choices choices = getDefaultChoices();
+    Choices choices = getDefaultChoices(list.size());
     bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
       out() << "\nQuestion " << _question << '/' << list.size() << ".  " << *i << ", showing ";
@@ -271,7 +277,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
       else
         out() << questions.size() << " out of " << i->members().size();
       out() << " members\n";
-      showGroup(questions, readings, choices, repeatQuestion);
+      showGroup(questions, readings, choices, repeatQuestion, otherMap, otherGroup);
       if (getAnswers(answers, questions.size(), choices, skipGroup, stopQuiz)) {
         checkAnswers(answers, questions, readings, i->name());
         break;
@@ -285,14 +291,29 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type) const {
   }
 }
 
-void Quiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion) const {
+void Quiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion,
+                     const GroupData::Map& otherMap, char otherGroup) const {
+  static const std::string NoPinyin(12, ' ');
   int count = 0;
   for (auto& i : questions) {
     const char choice = _reviewMode ? ' ' : (count < 26 ? 'a' + count : 'A' + (count - 26));
     out() << "  Entry: " << std::right << std::setw(3) << count + 1 << "  ";
     auto s = i->qualifiedName();
-    if (i->pinyin().has_value()) s += "  (" + *i->pinyin() + ')';
-    out() << std::left << std::setw(24) << s << choice << ":  " << readings[count]->reading();
+    if (i->pinyin().has_value()) {
+      std::string p = "  (" + *i->pinyin() + ')';
+      // need to use 'displayLength' since Pinyin can contain multi-byte chars (for the tones)
+      s += p + std::string(NoPinyin.length() - displayLength(p), ' ');
+    } else
+      s += NoPinyin;
+    if (_reviewMode) {
+      auto j = otherMap.find(i->name());
+      if (j != otherMap.end()) {
+        s += otherGroup;
+        s += ':';
+        s += std::to_string(j->second->number());
+      }
+    }
+    out() << std::left << std::setw(wideSetw(s, 22)) << s << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count]);
     if (!repeatQuestion && !_reviewMode) choices[choice] = "";
     ++count;

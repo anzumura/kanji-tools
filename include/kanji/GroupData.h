@@ -19,6 +19,8 @@ public:
 
   const List& meaningGroups() const { return _meaningGroups; }
   const List& patternGroups() const { return _patternGroups; }
+  const Map& meaningMap() const { return _meaningMap; }
+  const Map& patternMap() const { return _patternMap; }
   const Data& data() const { return *_data; }
   std::ostream& out() const { return _data->out(); }
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
