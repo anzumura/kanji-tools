@@ -220,20 +220,38 @@ bool Quiz::includeMember(const Entry& k, MemberType type) {
 
 void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, const GroupData::Map& otherMap,
                             char otherGroup) const {
+  static const std::array filters{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
   if (listOrder == ListOrder::Quit) return;
   const char c = _choice.get("Kanji type", {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}}, '2');
   if (c == QuitOption) return;
   const MemberType type = static_cast<MemberType>(c - '1');
-  if (listOrder == ListOrder::FromBeginning && type == All)
+  int filter = -1;
+  // for 'pattern' groups, allow choosing a smaller subset based on the name reading
+  if (otherGroup == 'm') {
+    const char f =
+      _choice.get("Pattern name",
+                  {{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}}, '1');
+    if (f == QuitOption) return;
+    filter = f - '1';
+  }
+  if (listOrder == ListOrder::FromBeginning && type == All && filter == -1)
     groupQuiz(list, type, otherMap, otherGroup);
   else {
     GroupData::List newList;
+    const bool filterHasEnd = filter >= 0 && filter < filters.size();
+    bool startIncluding = filter <= 0;
     for (const auto& i : list) {
-      int memberCount = 0;
-      for (auto& j : i->members())
-        if (includeMember(j, type)) ++memberCount;
-      // only include groups that have 2 or more members after applying the 'include member' filter
-      if (memberCount > 1) newList.push_back(i);
+      if (startIncluding) {
+        if (filterHasEnd && i->name().find(filters[filter]) != std::string::npos) break;
+      } else if (i->name().find(filters[filter - 1]) != std::string::npos)
+        startIncluding = true;
+      if (startIncluding) {
+        int memberCount = 0;
+        for (auto& j : i->members())
+          if (includeMember(j, type)) ++memberCount;
+        // only include groups that have 2 or more members after applying the 'include member' filter
+        if (memberCount > 1) newList.push_back(i);
+      }
     }
     if (listOrder == ListOrder::FromEnd)
       std::reverse(newList.begin(), newList.end());
@@ -271,11 +289,11 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
     Choices choices = getDefaultChoices(list.size());
     bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
-      out() << "\nQuestion " << _question << '/' << list.size() << ".  " << *i << ", showing ";
+      out() << "\nQuestion " << _question << '/' << list.size() << ".  " << *i << ", ";
       if (questions.size() == i->members().size())
-        out() << "all " << questions.size();
+        out() << questions.size();
       else
-        out() << questions.size() << " out of " << i->members().size();
+        out() << "showing " << questions.size() << " out of " << i->members().size();
       out() << " members\n";
       showGroup(questions, readings, choices, repeatQuestion, otherMap, otherGroup);
       if (getAnswers(answers, questions.size(), choices, skipGroup, stopQuiz)) {

@@ -32,7 +32,6 @@ protected:
 
   std::string listQuizFirstQuestion(char quizType, char questionList) {
     _is << quizType << '\n' << questionList << "\nb\n4\nk\n";
-    runQuiz();
     std::string line;
     getFirstQuestion(line);
     return line.substr(9);
@@ -59,6 +58,7 @@ protected:
   }
 
   void getFirstQuestion(std::string& line) {
+    runQuiz();
     while (std::getline(_os, line))
       if (line.starts_with("Question 1/")) break;
     if (_os.eof()) FAIL() << "couldn't find first Question";
@@ -254,6 +254,21 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
       ++found;
   }
   EXPECT_EQ(found, 2);
+}
+
+TEST_F(QuizTest, PatternListFilters) {
+  auto f = [this](char x) {
+    _is << "p\nb\n4\n" << x << "\nt\n";
+    std::string line;
+    getFirstQuestion(line);
+    return line.substr(9);
+  };
+  EXPECT_EQ(f('1'), "1/84.  [阿：ア], 3 members");
+  EXPECT_EQ(f('2'), "1/101.  [華：カ], 5 members");
+  EXPECT_EQ(f('3'), "1/185.  [差：サ], 9 members");
+  EXPECT_EQ(f('4'), "1/140.  [朶：タ], 2 members");
+  EXPECT_EQ(f('5'), "1/141.  [巴：ハ、ヒ], 8 members");
+  EXPECT_EQ(f('6'), "1/110.  [耶：ヤ], 4 members");
 }
 
 } // namespace kanji
