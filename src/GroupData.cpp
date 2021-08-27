@@ -69,9 +69,9 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       std::string number(cols[numberCol]), name(cols[nameCol]), token;
       FileList::List kanjis;
       Group::PatternType patternType = Group::PatternType::None;
-      if (type == GroupType::Meaning) {
-        if (name.empty()) error("Meaning group must have a name");
-      } else {
+      if (name.empty()) error("Group must have a name");
+      if (isAnySingleByte(name)) error("Group name must be all MB characters");
+      if (type == GroupType::Pattern) {
         patternType = name.starts_with(wideColon)     ? Group::PatternType::Peer
           : name.find(wideColon) != std::string::npos ? Group::PatternType::Family
                                                       : Group::PatternType::Reading;
