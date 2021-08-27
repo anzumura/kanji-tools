@@ -199,7 +199,7 @@ void FileStats::countKanji(const fs::path& top, bool showBreakdown, bool verbose
                     f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
                     f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-                    f([](const auto& x) { return !isRecognizedMB(x); }, "Unrecognized")};
+                    f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
   int total = 0;
   for (int i = 0; i < IncludeInTotals; ++i)
     total += totals[i].first;

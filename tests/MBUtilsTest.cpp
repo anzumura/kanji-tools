@@ -95,8 +95,8 @@ TEST(MBUtilsTest, IsKana) {
   EXPECT_FALSE(isKatakana("ゑ"));
   EXPECT_TRUE(isKatakana("ヰ"));
   EXPECT_FALSE(isHiragana("ヰ"));
-  EXPECT_TRUE(isRecognizedMB("ー"));
-  EXPECT_TRUE(isRecognizedMB("さ"));
+  EXPECT_TRUE(isRecognizedCharacter("ー"));
+  EXPECT_TRUE(isRecognizedCharacter("さ"));
 }
 
 TEST(MBUtilsTest, IsMBLetter) {
@@ -116,7 +116,7 @@ TEST(MBUtilsTest, IsMBLetter) {
   EXPECT_TRUE(isMBLetter("ｄ"));
   EXPECT_TRUE(isMBLetter("Ｚ"));
   EXPECT_TRUE(isMBLetter("１"));
-  EXPECT_TRUE(isRecognizedMB("。"));
+  EXPECT_TRUE(isRecognizedCharacter("。"));
 }
 
 TEST(MBUtilsTest, IsMBPunctuation) {
@@ -132,8 +132,8 @@ TEST(MBUtilsTest, IsMBPunctuation) {
   EXPECT_FALSE(isAllMBPunctuation("　x"));
   EXPECT_TRUE(isAllMBPunctuation("　。　、"));
   EXPECT_TRUE(isMBPunctuation(toUtf8(L"\ufffc"))); // from Specials block
-  EXPECT_TRUE(isRecognizedMB("—"));
-  EXPECT_TRUE(isRecognizedMB("　"));
+  EXPECT_TRUE(isRecognizedCharacter("—"));
+  EXPECT_TRUE(isRecognizedCharacter("　"));
 }
 
 TEST(MBUtilsTest, IsMBSymbol) {
@@ -148,7 +148,7 @@ TEST(MBUtilsTest, IsMBSymbol) {
   EXPECT_FALSE(isAllMBSymbol("㇁ぶ"));
   EXPECT_TRUE(isAllMBSymbol("㇁☆"));
   EXPECT_FALSE(isMBSymbol("ｺ"));
-  EXPECT_TRUE(isRecognizedMB("☆"));
+  EXPECT_TRUE(isRecognizedCharacter("☆"));
 }
 
 TEST(MBUtilsTest, IsKanji) {
@@ -174,13 +174,13 @@ TEST(MBUtilsTest, IsKanji) {
   EXPECT_TRUE(isKanji("厭"));
   EXPECT_TRUE(isKanji("⺠"));
   EXPECT_TRUE(isKanji("㐀"));
-  EXPECT_TRUE(isRecognizedMB("厭"));
-  EXPECT_TRUE(isRecognizedMB("⺠"));
-  EXPECT_TRUE(isRecognizedMB("㐀"));
-  EXPECT_FALSE(isRecognizedMB("㐀馬イヌねこ"));
-  EXPECT_TRUE(isRecognizedMB("㐀馬イヌねこ", false));
-  EXPECT_TRUE(isAllRecognizedMB("㐀馬イヌねこ"));
-  EXPECT_FALSE(isAllRecognizedMB("㐀馬イxヌねこ"));
+  EXPECT_TRUE(isRecognizedCharacter("厭"));
+  EXPECT_TRUE(isRecognizedCharacter("⺠"));
+  EXPECT_TRUE(isRecognizedCharacter("㐀"));
+  EXPECT_FALSE(isRecognizedCharacter("㐀馬イヌねこ"));
+  EXPECT_TRUE(isRecognizedCharacter("㐀馬イヌねこ", false));
+  EXPECT_TRUE(isAllRecognizedCharacters("㐀馬イヌねこ"));
+  EXPECT_FALSE(isAllRecognizedCharacters("㐀馬イxヌねこ"));
 }
 
 TEST(MBUtilsTest, FromUTF8String) {
@@ -247,6 +247,8 @@ TEST(MBUtilsTest, CheckSingleByte) {
   EXPECT_TRUE(isSingleByte("xx", false));
   EXPECT_TRUE(isAllSingleByte("xx"));
   EXPECT_FALSE(isAllSingleByte("xxこ"));
+  EXPECT_TRUE(isAnySingleByte("xxこ"));
+  EXPECT_FALSE(isAnySingleByte("こ"));
   // wide string
   EXPECT_TRUE(isSingleByte(L"x"));
   EXPECT_FALSE(isSingleByte(L"く"));
@@ -255,6 +257,8 @@ TEST(MBUtilsTest, CheckSingleByte) {
   EXPECT_TRUE(isAllSingleByte(L"")); // true for empty strings
   EXPECT_TRUE(isAllSingleByte(L"xx"));
   EXPECT_FALSE(isAllSingleByte(L"xxこ"));
+  EXPECT_TRUE(isAnySingleByte(L"xxこ"));
+  EXPECT_FALSE(isAnySingleByte(L"こ"));
 }
 
 TEST(MBUtilsTest, DisplayLength) {

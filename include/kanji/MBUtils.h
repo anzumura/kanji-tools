@@ -216,12 +216,12 @@ inline bool isMBLetter(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, LetterBlocks);
 }
 inline bool isAllMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
-// 'isRecognizedMB' returns true if 's' is in any UnicodeBlock defined in this header file (including wide space)
-inline bool isRecognizedMB(const std::string& s, bool checkLengthOne = true) {
+// 'isRecognizedCharacter' returns true if 's' is in any UnicodeBlock defined in this header file (including wide space)
+inline bool isRecognizedCharacter(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks,
                       PunctuationBlocks, SymbolBlocks, LetterBlocks);
 }
-inline bool isAllRecognizedMB(const std::string& s) {
+inline bool isAllRecognizedCharacters(const std::string& s) {
   return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks,
                       SymbolBlocks, LetterBlocks);
 }
@@ -246,6 +246,16 @@ inline bool isAllSingleByte(const std::wstring& s) {
   for (auto& i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
+}
+inline bool isAnySingleByte(const std::string& s) {
+  for (auto& i : s)
+    if (isSingleByteChar(i)) return true;
+  return false;
+}
+inline bool isAnySingleByte(const std::wstring& s) {
+  for (auto& i : s)
+    if (isSingleByteChar(i)) return true;
+  return false;
 }
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as variation selectors.
