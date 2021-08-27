@@ -264,7 +264,7 @@ TEST_F(QuizTest, PatternListFilters) {
     return line.substr(9);
   };
   EXPECT_EQ(f('1'), "1/84.  [阿：ア], 3 members");
-  EXPECT_EQ(f('2'), "1/101.  [華：カ], 5 members");
+  EXPECT_EQ(f('2'), "1/203.  [華：カ], 5 members");
   EXPECT_EQ(f('3'), "1/185.  [差：サ], 9 members");
   EXPECT_EQ(f('4'), "1/140.  [朶：タ], 2 members");
   EXPECT_EQ(f('5'), "1/141.  [巴：ハ、ヒ], 8 members");
