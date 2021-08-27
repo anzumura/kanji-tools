@@ -78,6 +78,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
         // 'name' before the colon is the first member of a 'family'
         if (patternType == Group::PatternType::Family) kanjis.push_back(MBChar::getFirst(name));
       }
+      if (cols[membersCol].ends_with(",")) error("members ends with ,");
       for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
         kanjis.emplace_back(token);
       Data::List memberKanjis;
@@ -89,6 +90,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
           _data->printError("failed to find member " + i + " in group " + number);
       }
       if (memberKanjis.empty()) error("group " + number + " has no valid members");
+      if (memberKanjis.size() == 1) error("group " + number + " must have more than one member");
       if (memberKanjis.size() < kanjis.size()) error("group " + number + " failed to load all members");
       Entry group;
       if (type == GroupType::Meaning)
