@@ -92,6 +92,8 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (memberKanjis.empty()) error("group " + number + " has no valid members");
       if (memberKanjis.size() == 1) error("group " + number + " must have more than one member");
       if (memberKanjis.size() < kanjis.size()) error("group " + number + " failed to load all members");
+      if (memberKanjis.size() > MaxGroupSize)
+        error("group " + number + " has more than " + std::to_string(MaxGroupSize) + "members");
       Entry group;
       if (type == GroupType::Meaning)
         group = std::make_shared<MeaningGroup>(Data::toInt(number), name, memberKanjis);
@@ -107,8 +109,9 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
 void GroupData::printGroups(const Map& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend
         << "\nName (number of entries)   Parent Member : Other Members\n";
+  const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4;
   for (const auto& i : groupList) {
-    out() << '[' << std::setw(3) << std::to_string(i->number()) << "]  ";
+    out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
     if (i->type() == GroupType::Meaning) {
       auto len = MBChar::length(i->name());
       out() << i->name()
