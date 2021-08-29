@@ -14,7 +14,7 @@ public:
   // For now, set max size for a group to '58' since this is the maximum number of entries
   // that the group quiz currently supports for entering answers, i.e., a-z, then A-Z, then
   // 6 more ascii characters following Z (before reaching 'a' again).
-  enum Values { MaxGroupSize = 58 };
+  enum Values { MissingTypeExamples = 12, MaxGroupSize = 58 };
 
   using Entry = std::shared_ptr<Group>;
   using Map = std::map<std::string, Entry>;

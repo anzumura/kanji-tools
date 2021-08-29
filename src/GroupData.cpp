@@ -110,6 +110,7 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend
         << "\nName (number of entries)   Parent Member : Other Members\n";
   const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4;
+  std::map<Types, std::vector<std::string>> types;
   for (const auto& i : groupList) {
     out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
     if (i->type() == GroupType::Meaning) {
@@ -119,11 +120,14 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
                   : len == 2 ? "　"
                              : "")
             << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")   :";
-      for (const auto& j : i->members())
+      for (const auto& j : i->members()) {
         out() << ' ' << j->qualifiedName();
+        types[j->type()].push_back(j->name());
+      }
     } else {
       out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
-      for (const auto& j : i->members())
+      for (const auto& j : i->members()) {
+        types[j->type()].push_back(j->name());
         if (j == i->members()[0]) switch (i->patternType()) {
           case Group::PatternType::Peer: out() << "　 : " << j->qualifiedName(); break;
           case Group::PatternType::Reading: out() << j->qualifiedName(); break;
@@ -131,8 +135,34 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
           }
         else
           out() << ' ' << j->qualifiedName();
+      }
     }
     out() << '\n';
+  }
+  out() << "Type Breakdown (showing up to " << MissingTypeExamples << " missing examples per type)\n";
+  for (auto i : AllTypes) {
+    auto j = types.find(i);
+    if (j != types.end()) {
+      const Data::List& list = _data->typeList(i);
+      out() << std::right << std::setw(14) << i << ": " << j->second.size() << " / " << list.size();
+      const int missing = list.size() - j->second.size();
+      if (missing < 0)
+        out() << " -- ERROR: negative missing values"; // shouldn't be possible
+      else if (missing > 0) {
+        std::sort(j->second.begin(), j->second.end());
+        out() << " (";
+        int count = 0;
+        for (auto& k : list) {
+          if (!std::binary_search(j->second.begin(), j->second.end(), k->name())) {
+            if (count) out() << ' ';
+            out() << k->name();
+            if (++count == missing || count == MissingTypeExamples) break;
+          }
+        }
+        out() << ')';
+      }
+      out() << '\n';
+    }
   }
 }
 

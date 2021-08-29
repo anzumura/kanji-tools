@@ -102,6 +102,12 @@ public:
   const List& otherKanji() const { return _types.at(Types::Other); }
   const List& extraKanji() const { return _types.at(Types::Extra); }
 
+  const List& typeList(Types type) const {
+    auto i = _types.find(type);
+    return i != _types.end() ? i->second : _emptyList;
+  }
+  size_t typeTotal(Types type) const { return typeList(type).size(); }
+
   OptEntry findKanji(const std::string& s) const {
     auto i = _map.find(s);
     if (i == _map.end()) return {};
