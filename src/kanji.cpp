@@ -11,9 +11,9 @@ namespace fs = std::filesystem;
 Kanji::Kanji(const Data& d, int number, const std::string& name, const Radical& radical, int strokes,
              bool findFrequency, Levels level)
   : _number(number), _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
-    _nonVariantName(MBChar::withoutVariationSelector(name)), _radical(radical), _strokes(strokes),
-    _pinyin(d.getPinyin(name)), _level(level), _frequency(findFrequency ? d.getFrequency(name) : 0),
-    _kyu(d.getKyu(name)) {
+    _nonVariantName(MBChar::withoutVariationSelector(name)), _compatibilityName(d.getCompatibilityName(name)),
+    _radical(radical), _strokes(strokes), _pinyin(d.getPinyin(name)), _level(level),
+    _frequency(findFrequency ? d.getFrequency(name) : 0), _kyu(d.getKyu(name)) {
   assert(MBChar::length(_name) == 1);
 }
 

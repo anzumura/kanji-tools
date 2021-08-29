@@ -83,7 +83,17 @@ protected:
   int checkKanji(const Data::List& l) const {
     int variants = 0;
     for (auto& i : l) {
-      if (i->variant()) ++variants;
+      if (i->variant()) {
+        EXPECT_NE(i->name(), i->nonVariantName());
+        EXPECT_NE(i->name(), i->compatibilityName());
+        auto j = _data.findKanji(i->compatibilityName());
+        EXPECT_TRUE(j.has_value());
+        if (j.has_value()) {
+          EXPECT_EQ((**j).type(), i->type());
+          EXPECT_EQ((**j).name(), i->name());
+        }
+        ++variants;
+      }
       if (!Kanji::hasLink(i->type()))
         EXPECT_TRUE(_data.getStrokes(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_EQ(MBChar::length(i->name()), 1) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
@@ -106,16 +116,16 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(radical.longName(), "鹿部（ろくぶ）");
   EXPECT_EQ(radical.reading(), "しか");
   // find
-  auto result = _data.findKanji("響");
+  auto result = _data.findKanji("響︀");
   ASSERT_TRUE(result.has_value());
   auto& k = **result;
-  EXPECT_EQ(k.type(), Types::LinkedOld);
-  EXPECT_EQ(k.name(), "響");
+  EXPECT_EQ(k.type(), Types::LinkedJinmei);
+  EXPECT_EQ(k.name(), "響︀");
   EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
   EXPECT_EQ(k.level(), Levels::None);
   EXPECT_EQ(k.grade(), Grades::None);
   EXPECT_EQ(k.frequency(), 0);
-  EXPECT_FALSE(k.variant());
+  EXPECT_TRUE(k.variant());
   auto result2 = _data.findKanji("逸︁");
   EXPECT_TRUE((**result2).variant());
   EXPECT_EQ((**result2).type(), Types::LinkedJinmei);

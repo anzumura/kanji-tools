@@ -1,4 +1,5 @@
 #include <kanji/Kanji.h>
+#include <kanji/MBUtils.h>
 
 #include <fstream>
 #include <sstream>
@@ -109,7 +110,7 @@ bool Data::checkInsert(const Entry& i) {
     auto error = [this, &i](const std::string& s) {
       std::string v;
       if (i->variant()) v = " (non-variant: " + i->nonVariantName() + ")";
-      printError(i->name() + v + " " + s + " in _ucd");
+      printError(i->name() + " [" + toUnicode(i->name()) + "] " + v + " " + s + " in _ucd");
     };
     if (i->frequency() >= _maxFrequency) _maxFrequency = i->frequency() + 1;
     auto t = i->type();
@@ -126,6 +127,10 @@ bool Data::checkInsert(const Entry& i) {
       else if (t == Types::LinkedJinmei && !j->hasLink())
         error("missing 'JinmeiLink' for " + j->codeAndName());
       // skipping radical and strokes checks for now
+    }
+    if (i->variant()) {
+      auto k = _compatibilityNameMap.insert(std::make_pair(i->compatibilityName(), i->name()));
+      if (!k.second) printError("failed to insert variant " + i->name() + " into map");
     }
     return true;
   }
@@ -245,10 +250,11 @@ void Data::populateJouyou() {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
         checkInsert(linkedJinmei, k);
         if (_debug) {
-          if (_jouyouOldSet.find(linked) == _jouyouOldSet.end())
-            notFound.emplace_back(linked);
+          auto name = k->compatibilityName();
+          if (_jouyouOldSet.find(name) == _jouyouOldSet.end())
+            notFound.push_back(name);
           else
-            found.emplace_back(linked);
+            found.push_back(name);
         }
       }
     } else
@@ -261,12 +267,10 @@ void Data::populateJouyou() {
   count = 0;
   auto& linkedOld = _types[Types::LinkedOld];
   for (const auto& i : _map)
-    if (i.second->oldName().has_value()) {
-      if (_map.find(*i.second->oldName()) == _map.end()) {
-        auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i.second->oldName(), i.second);
-        checkInsert(linkedOld, k);
-        if (_debug) found.push_back(*i.second->oldName());
-      }
+    if (i.second->oldName().has_value() && !findKanji(*i.second->oldName())) {
+      auto k = std::make_shared<LinkedOldKanji>(*this, ++count, *i.second->oldName(), i.second);
+      checkInsert(linkedOld, k);
+      if (_debug) found.push_back(*i.second->oldName());
     }
   FileList::print(found, "'old jouyou' that are not " + file.stem().string());
 }
@@ -345,7 +349,8 @@ void Data::processList(const FileList& list) {
   FileList::print(jouyouOld, "Jouyou Old", list.name());
   FileList::print(jinmeiOld, "Jinmei Old", list.name());
   FileList::print(found[Types::LinkedOld], "Linked Old", list.name());
-  FileList::print(created, std::string("non-Jouyou/Jinmei") + (list.level() == Levels::None ? "/JLPT" : ""), list.name());
+  FileList::print(created, std::string("non-Jouyou/Jinmei") + (list.level() == Levels::None ? "/JLPT" : ""),
+                  list.name());
   // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
   if (!kenteiList && list.level() == Levels::None) {
     std::vector lists = {std::make_pair(&found[Types::Jinmei], ""),

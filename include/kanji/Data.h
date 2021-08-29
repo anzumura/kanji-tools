@@ -83,6 +83,14 @@ public:
     return {};
   }
 
+  // 'getCompatibilityName' returns the UCD compatibility code for the given 'kanjiName' if it
+  // exists (_ucd.find method takes care of checking whether kanjiName has a variation selector).
+  const std::string& getCompatibilityName(const std::string& kanjiName) const {
+    const Ucd* u = _ucd.find(kanjiName);
+    if (u && u->name() != kanjiName) return u->name();
+    return kanjiName;
+  }
+
   const UcdData& ucd() const { return _ucd; }
 
   int getStrokes(const std::string& s, bool variant = false, bool onlyUcd = false) const {
@@ -109,9 +117,10 @@ public:
   size_t typeTotal(Types type) const { return typeList(type).size(); }
 
   OptEntry findKanji(const std::string& s) const {
-    auto i = _map.find(s);
-    if (i == _map.end()) return {};
-    return i->second;
+    auto i = _compatibilityNameMap.find(s);
+    auto j = _map.find(i != _compatibilityNameMap.end() ? i->second : s);
+    if (j == _map.end()) return {};
+    return j->second;
   }
   Types getType(const std::string& s) const;
 
@@ -213,6 +222,10 @@ protected:
 
   // '_ucd' is used to supplement Kanji attributes like radical, meaning and reading
   UcdData _ucd;
+
+  // '_compatibilityNameMap' maps from a UCD 'compatibility' code name to a 'variation selector'
+  // style name. This map only has entries for recognized kanji that were loaded with a selector.
+  std::map<std::string, std::string> _compatibilityNameMap;
 
   // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji
   // that aren't part of any other group (so not Jouyou or Jinmei).

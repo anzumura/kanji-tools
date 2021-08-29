@@ -30,8 +30,14 @@ public:
 
   int number() const { return _number; }
   const std::string& name() const { return _name; }
-  bool variant() const { return _variant; } // true if _name includes a Unicode 'variation selector'
+
+  // 'variant' is true if _name includes a Unicode 'variation selector'. In this case 'nonVariantName'
+  // returns the non-variant name and 'compatibilityName' returns the UCD 'compatibility' code (which
+  // is a single MB char without a variation selector).
+  bool variant() const { return _variant; }
   const std::string& nonVariantName() const { return _nonVariantName; }
+  const std::string& compatibilityName() const { return _compatibilityName; }
+
   const Radical& radical() const { return _radical; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
   const OptString& pinyin() const { return _pinyin; }
@@ -126,7 +132,8 @@ private:
   const int _number;
   const std::string _name;
   const bool _variant;
-  const std::string _nonVariantName; // same as _name if _variant is false
+  const std::string _nonVariantName;    // same as _name if _variant is false
+  const std::string _compatibilityName; // same as _name if _variant is false
   const Radical _radical;
   const int _strokes;
   const OptString _pinyin;
