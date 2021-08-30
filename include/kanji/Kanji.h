@@ -29,13 +29,13 @@ public:
   virtual Grades grade() const { return Grades::None; }
 
   // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
-  // - 364 Jōyō have 1 'oldName' and 1 Jōyō has 3 'oldNames' (弁 has 辨, 瓣 and 辯)
+  // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁 has 辨, 瓣 and 辯)
   //   - 163 'LinkedOld' type kanji end up getting created (367 - 204 that are linked jinmei)
   // - 230 Jinmeiyō are 'alternate forms' (type is 'LinkedJinmei'):
-  //   - 204 are part of the 364 Jōyō oldName set
+  //   - 204 are part of the 365 Jōyō oldName set
   //   - 8 are different alternate forms of Jōyō kanji (薗 駈 嶋 盃 冨 峯 埜 凉)
-  //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName' set
-  // - In summary, there should be a total of 385 kanji with non-empty 'oldNames' (364 + 1 + 18)
+  //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName'
+  // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
   virtual const OldNames& oldNames() const { return EmptyOldNames; }
 
   int number() const { return _number; }
