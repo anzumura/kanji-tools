@@ -130,6 +130,17 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_TRUE((**result2).variant());
   EXPECT_EQ((**result2).type(), Types::LinkedJinmei);
   EXPECT_EQ((**result2).nonVariantName(), "逸");
+  // kanji with 3 old names
+  auto result3 = _data.findKanji("弁");
+  ASSERT_TRUE(result3.has_value());
+  EXPECT_EQ((**result3).oldNames(), Kanji::OldNames({"辨", "瓣", "辯"}));
+  EXPECT_EQ((**result3).info(Kanji::OldField), "Old 辨／瓣／辯");
+  for (auto& i : (**result3).oldNames()) {
+    auto old = _data.findKanji(i);
+    ASSERT_TRUE(old.has_value());
+    ASSERT_EQ((**old).type(), Types::LinkedOld);
+    EXPECT_EQ(static_cast<const LinkedKanji&>(**old).link(), result3);
+  }
   // totals
   EXPECT_EQ(_data.gradeTotal(Grades::G1), 80);
   EXPECT_EQ(_data.gradeTotal(Grades::G2), 160);

@@ -1,4 +1,4 @@
-Number	Name	Radical	OldName	Year	Reason	Reading
+Number	Name	Radical	OldNames	Year	Reason	Reading
 1	丑	一		1951	Names	チュウ、うし
 2	丞	一		1951	Names	ジョウ、ショウ、すく-う、たす-ける
 3	乃	丿		1951	Names	ナイ、ダイ、ノ、アイ、の、すなわ-ち、なんじ

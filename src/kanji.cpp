@@ -35,10 +35,16 @@ std::string Kanji::info(int infoFields) const {
   // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both. Check for
   // linked types first (since oldName is a top level optional field on all kanji).
   if (hasLink(t)) {
-    assert(!oldName().has_value());
+    assert(oldNames().empty());
     if (infoFields & NewField) add(New + static_cast<const LinkedKanji&>(*this).link()->name());
-  } else if (infoFields & OldField && oldName().has_value())
-    add(Old + *oldName());
+  } else if (infoFields & OldField && !oldNames().empty()) {
+    std::string s;
+    for (auto& i : oldNames()) {
+      if (!s.empty()) s += "／";
+      s += i;
+    }
+    add(Old + s);
+  }
   if (infoFields & KyuField && hasKyu()) add(Kyu + toString(kyu()));
   return result;
 }
@@ -99,8 +105,16 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
 
 std::array<std::string, FileListKanji::MaxCol> FileListKanji::columns;
 std::map<std::string, int> FileListKanji::ColumnMap = {
-  colPair(NumberCol),  colPair(NameCol),  colPair(RadicalCol), colPair(OldNameCol), colPair(YearCol),
+  colPair(NumberCol),  colPair(NameCol),  colPair(RadicalCol), colPair(OldNamesCol), colPair(YearCol),
   colPair(StrokesCol), colPair(GradeCol), colPair(MeaningCol), colPair(ReadingCol), colPair(ReasonCol)};
+
+Kanji::OldNames OfficialListKanji::getOldNames() {
+  OldNames result;
+  std::stringstream ss(columns[OldNamesCol]);
+  for (std::string token; std::getline(ss, token, ',');)
+    result.push_back(token);
+  return result;
+}
 
 JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
   if (s == "Names") return Reasons::Names;

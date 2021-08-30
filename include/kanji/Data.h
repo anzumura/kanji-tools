@@ -122,11 +122,7 @@ public:
     if (j == _map.end()) return {};
     return j->second;
   }
-  Types getType(const std::string& s) const;
-
-  bool isOldJouyou(const std::string& s) const { return _jouyouOldSet.find(s) != _jouyouOldSet.end(); }
-  bool isOldJinmei(const std::string& s) const { return _jinmeiOldSet.find(s) != _jinmeiOldSet.end(); }
-  bool isOldName(const std::string& s) const { return isOldJouyou(s) || isOldJinmei(s); }
+  Types getType(const std::string& name) const;
 
   const List& gradeList(Grades grade) const {
     auto i = _grades.find(grade);
@@ -190,12 +186,9 @@ protected:
   // 'getDebug' looks for '-debug' flag in 'argv' list and returns true if it's found
   static bool getDebug(int argc, const char** argv);
 
-  // helper functions for checking and inserting into collection
-  bool checkInsert(FileList::Set&, const std::string&) const;
-  bool checkNotFound(const FileList::Set&, const std::string&) const;
+  // helper functions for checking and inserting into '_map'
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
-  bool checkNotFound(const Entry&) const;
 
   // 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
@@ -249,10 +242,6 @@ protected:
 
   // allow lookup by name
   Map _map;
-
-  // sets to help during loading (detecting duplicates, print diagnostics, etc.)
-  FileList::Set _jouyouOldSet;
-  FileList::Set _jinmeiOldSet;
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
   inline static int _maxFrequency = 0;

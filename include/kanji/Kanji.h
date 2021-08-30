@@ -12,6 +12,7 @@ inline constexpr auto KanjiLegend = "'=JLPT \"=Freq ^=Jinmei ~=LinkedJinmei %=Li
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
+  using OldNames = std::vector<std::string>;
   static bool hasLink(Types t) { return t == Types::LinkedJinmei || t == Types::LinkedOld; }
 
   // Public constructor for Kanji found in frequency.txt that weren't found in one of the other
@@ -26,7 +27,16 @@ public:
   virtual const std::string& meaning() const = 0;
   virtual const std::string& reading() const = 0;
   virtual Grades grade() const { return Grades::None; }
-  virtual OptString oldName() const { return {}; }
+
+  // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
+  // - 364 Jōyō have 1 'oldName' and 1 Jōyō has 3 'oldNames' (弁 has 辨, 瓣 and 辯)
+  //   - 163 'LinkedOld' type kanji end up getting created (367 - 204 that are linked jinmei)
+  // - 230 Jinmeiyō are 'alternate forms' (type is 'LinkedJinmei'):
+  //   - 204 are part of the 364 Jōyō oldName set
+  //   - 8 are different alternate forms of Jōyō kanji (薗 駈 嶋 盃 冨 峯 埜 凉)
+  //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName' set
+  // - In summary, there should be a total of 385 kanji with non-empty 'oldNames' (364 + 1 + 18)
+  virtual const OldNames& oldNames() const { return EmptyOldNames; }
 
   int number() const { return _number; }
   const std::string& name() const { return _name; }
@@ -86,7 +96,7 @@ public:
   //     % = Linked Old     : 211 Linked Old (with no frequency)
   //     + = Extra          : all kanji loaded from 'extra.txt' file
   //     # = <K1 Kentei     : 268 non-K1 Kentei Kanji that aren't in the above categories
-  //     * = K1 Kentei      : 2555 K1 Kentei Kanji that aren't in the above categories
+  //     * = K1 Kentei      : 2554 K1 Kentei Kanji that aren't in the above categories
   std::string qualifiedName() const {
     auto t = type();
     return _name +
@@ -100,28 +110,6 @@ public:
          : kyu() != Kyus::K1        ? '#'
                                     : '*');
   }
-
-  // helper functions for getting information on 'oldValue' (旧字体) kanjis
-  Types oldType(const Data& d) const {
-    auto i = oldName();
-    if (i.has_value()) return d.getType(*i);
-    return Types::None;
-  }
-  int oldStrokes(const Data& d) const {
-    auto i = oldName();
-    if (i.has_value()) return d.getStrokes(*i);
-    return 0;
-  }
-  Levels oldLevel(const Data& d) const {
-    auto i = oldName();
-    if (i.has_value()) return d.getLevel(*i);
-    return Levels::None;
-  }
-  int oldFrequency(const Data& d) const {
-    auto i = oldName();
-    if (i.has_value()) return d.getFrequency(*i);
-    return 0;
-  }
 protected:
   // helper constructor for derived classes (can avoid looking up frequency for 'extra' kanji)
   Kanji(const Data& d, int number, const std::string& name, const Radical& radical, int strokes, bool findFrequency)
@@ -129,6 +117,7 @@ protected:
   Kanji(const Data& d, int number, const std::string& name, const Radical& radical, int strokes, bool findFrequency,
         Levels level);
 private:
+  inline static const OldNames EmptyOldNames{};
   const int _number;
   const std::string _name;
   const bool _variant;
@@ -233,7 +222,7 @@ protected:
     NumberCol,
     NameCol,
     RadicalCol,
-    OldNameCol,
+    OldNamesCol,
     YearCol,
     StrokesCol,
     GradeCol,
@@ -256,11 +245,11 @@ private:
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
 
   // specific types require additional columns
-  static constexpr std::array jouyouRequiredColumns{OldNameCol, YearCol, StrokesCol, GradeCol, MeaningCol};
-  static constexpr std::array jinmeiRequiredColumns{OldNameCol, YearCol, ReasonCol};
+  static constexpr std::array jouyouRequiredColumns{OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
+  static constexpr std::array jinmeiRequiredColumns{OldNamesCol, YearCol, ReasonCol};
   static constexpr std::array extraRequiredColumns{StrokesCol, MeaningCol};
-  static constexpr std::array ColumnNames{"Number",  "Name",  "Radical", "OldName", "Year",
-                                          "Strokes", "Grade", "Meaning", "Reading", "Reason"};
+  static constexpr std::array ColumnNames{"Number",  "Name",  "Radical", "OldNames", "Year",
+                                          "Strokes", "Grade", "Meaning", "Reading",  "Reason"};
   static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
 };
@@ -270,22 +259,22 @@ class OfficialListKanji : public FileListKanji {
 public:
   using OptInt = std::optional<int>;
 
-  OptString oldName() const override { return _oldName; }
+  const OldNames& oldNames() const override { return _oldNames; }
   OptInt year() const { return _year; }
 protected:
   OfficialListKanji(const Data& d, int s)
-    : FileListKanji(d, s), _oldName(optString(columns[OldNameCol])), _year(optInt(columns[YearCol])) {}
+    : FileListKanji(d, s), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
   OfficialListKanji(const Data& d, int s, const std::string& meaning)
-    : FileListKanji(d, s, meaning), _oldName(optString(columns[OldNameCol])), _year(optInt(columns[YearCol])) {}
+    : FileListKanji(d, s, meaning), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
 private:
-  static OptString optString(const std::string& s) { return s.empty() ? std::nullopt : std::optional(s); }
+  static OldNames getOldNames();
 
   static OptInt optInt(const std::string& s) {
     if (s.empty()) return {};
     return Data::toInt(s);
   }
 
-  const OptString _oldName;
+  const OldNames _oldNames;
   const OptInt _year;
 };
 

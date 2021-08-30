@@ -145,17 +145,7 @@ void KanjiData::printStats() const {
   printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
   printCount(
     "  Has Variation Selectors", [](const auto& x) { return x->variant(); }, 5);
-  printCount("Old Forms", [](const auto& x) { return x->oldName().has_value(); });
-  // some old kanjis have a non-zero frequency
-  printCount("  Old Has Frequency", [this](const auto& x) { return x->oldFrequency(*this) != 0; });
-  // some old kanjis have stroke counts
-  printCount("  Old Has Strokes", [this](const auto& x) { return x->oldStrokes(*this) != 0; });
-  // no old kanjis should have a JLPT level, i.e.: they all should have Level 'None'
-  printCount("  Old Has Level", [this](const auto& x) { return x->oldLevel(*this) != Levels::None; });
-  // old kanjis should only have types of LinkedJinmei, Other or None
-  for (auto i : AllTypes)
-    printCount(std::string("  Old is type ") + toString(i),
-               [this, i](const auto& x) { return x->oldName().has_value() && x->oldType(*this) == i; });
+  printCount("Old Forms", [](const auto& x) { return !x->oldNames().empty(); });
 }
 
 void KanjiData::printGrades() const {

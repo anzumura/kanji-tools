@@ -1,4 +1,4 @@
-Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
+Number	Name	Radical	OldNames	Year	Strokes	Grade	Meaning	Reading
 1	亜	二	亞		7	S	sub-	ア
 2	哀	口			9	S	pathetic	アイ、あわ-れ、あわ-れむ
 3	挨	手		2010	10	S	push open	アイ
@@ -1812,7 +1812,7 @@ Number	Name	Radical	OldName	Year	Strokes	Grade	Meaning	Reading
 1811	偏	人			11	S	partial	ヘン、かたよ-る
 1812	遍	辵			12	S	everywhere	ヘン
 1813	編	糸			15	5	compile	ヘン、あ-む
-1814	弁	廾	辨		5	5	valve	ベン
+1814	弁	廾	辨,瓣,辯		5	5	valve	ベン
 1815	便	人			9	4	convenience	ベン、ビン、たよ-り
 1816	勉	力	勉		10	3	exertion	ベン
 1817	歩	止	步		8	2	walk	ホ、ブ、（フ）、ある-く、あゆ-む
