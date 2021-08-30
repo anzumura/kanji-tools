@@ -116,17 +116,15 @@ bool Data::checkInsert(const Entry& i) {
     auto j = _ucd.find(i->name());
     if (!j)
       error("not found");
-    else {
-      if (t == Types::Jouyou && !j->joyo())
-        error("not marked as 'Joyo'");
-      else if (t == Types::Jinmei && !j->jinmei())
-        error("not marked as 'Jinmei'");
-      else if (t == Types::LinkedJinmei && !j->jinmei())
-        error("with link not marked as 'Jinmei'");
-      else if (t == Types::LinkedJinmei && !j->hasLink())
-        error("missing 'JinmeiLink' for " + j->codeAndName());
-      // skipping radical and strokes checks for now
-    }
+    else if (t == Types::Jouyou && !j->joyo())
+      error("not marked as 'Joyo'");
+    else if (t == Types::Jinmei && !j->jinmei())
+      error("not marked as 'Jinmei'");
+    else if (t == Types::LinkedJinmei && !j->jinmei())
+      error("with link not marked as 'Jinmei'");
+    else if (t == Types::LinkedJinmei && !j->hasLink())
+      error("missing 'JinmeiLink' for " + j->codeAndName());
+    // skipping radical and strokes checks for now
     if (i->variant()) {
       auto k = _compatibilityNameMap.insert(std::make_pair(i->compatibilityName(), i->name()));
       if (!k.second) printError("failed to insert variant " + i->name() + " into map");
