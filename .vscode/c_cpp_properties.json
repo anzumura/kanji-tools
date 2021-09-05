@@ -3,12 +3,10 @@
     {
       "name": "Mac",
       "includePath": [
-        "/opt/homebrew/opt/boost/include",
         "${workspaceFolder}/**"
       ],
       "defines": [],
       "macFrameworkPath": [],
-      "compilerPath": "/usr/bin/clang++",
       "configurationProvider": "ms-vscode.cmake-tools",
       "compilerArgs": [],
       "cStandard": "c17",
@@ -16,7 +14,6 @@
       "intelliSenseMode": "macos-clang-arm64",
       "browse": {
         "path": [
-          "/opt/homebrew/opt/boost/include",
           "${workspaceFolder}"
         ],
         "limitSymbolsToIncludedHeaders": true

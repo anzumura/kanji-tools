@@ -8,13 +8,13 @@
 
 namespace kanji {
 
-// Helper functions to convert between 'utf8' strings and 'wchar_t' wstrings
+// Helper functions to convert between 'utf8' strings and 'char32_t' wstrings
 inline std::wstring fromUtf8(const std::string& s) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
   return conv.from_bytes(s);
 }
 
-inline std::string toUtf8(wchar_t c) {
+inline std::string toUtf8(char32_t c) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
   return conv.to_bytes(c);
 }
@@ -64,17 +64,17 @@ inline std::string toUnicode(const std::string& s, bool caps = true) {
 // all wide chars (so display on a terminal is 2 columns instead of 1). This is
 class UnicodeBlock {
 public:
-  constexpr UnicodeBlock(wchar_t s, wchar_t e) : start(s), end(e) {}
+  constexpr UnicodeBlock(char32_t s, char32_t e) : start(s), end(e) {}
   // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex '0') and
   // end on a value having mod 16 = 15 (so ending in hex 'f'), but some of the 'WideBlocks'
   // used for determining if a character is narrow or wide display can be a single entry.
-  constexpr UnicodeBlock(wchar_t s) : start(s), end(s) {}
-  const wchar_t start;
-  const wchar_t end;
+  constexpr UnicodeBlock(char32_t s) : start(s), end(s) {}
+  const char32_t start;
+  const char32_t end;
   // 'range' returns the number of code points in the block (inclusive of start and end)
   size_t range() const { return end - start + 1; }
   // 'opterator()' returns true if the given character is in this block
-  bool operator()(wchar_t x) const { return x >= start && x <= end; }
+  bool operator()(char32_t x) const { return x >= start && x <= end; }
   bool operator<(const UnicodeBlock& rhs) const { return start < rhs.start; }
   bool operator==(const UnicodeBlock& rhs) const { return start == rhs.start && end == rhs.end; }
 };
@@ -132,13 +132,13 @@ constexpr std::array NonSpacingBlocks = {
   UnicodeBlock(0xfe00, 0xfe0f) // Variation Selection (comes after some Kanji in jinmei file)
 };
 
-template<typename T> inline bool inRange(wchar_t c, const T& t) {
+template<typename T> inline bool inRange(char32_t c, const T& t) {
   for (auto& i : t)
     if (i(c)) return true;
   return false;
 }
 
-template<typename T, typename... Ts> inline bool inRange(wchar_t c, const T& t, Ts... args) {
+template<typename T, typename... Ts> inline bool inRange(char32_t c, const T& t, Ts... args) {
   for (auto& i : t)
     if (i(c)) return true;
   return inRange(c, args...);
@@ -231,6 +231,7 @@ inline bool isNonSpacing(const std::string& s, bool checkLengthOne = true) {
 // check if a given char or string is not a 'multi-byte char'
 inline bool isSingleByteChar(char x) { return x >= 0; }
 inline bool isSingleByteChar(wchar_t x) { return x >= 0 && x < 128; }
+inline bool isSingleByteChar(char32_t x) { return x >= 0 && x < 128; }
 inline bool isSingleByte(const std::string& s, bool checkLengthOne = true) {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }

@@ -1,6 +1,8 @@
 #ifndef KANJI_KANA_H
 #define KANJI_KANA_H
 
+#include <cassert>
+
 #include <array>
 #include <map>
 #include <optional>
@@ -19,6 +21,7 @@ inline const std::string& toString(CharType t) {
   case CharType::Katakana: return katakana;
   case CharType::Romaji: return romaji;
   }
+  __builtin_unreachable(); // gets rid of gcc 'control reaches end ...' warning
 }
 
 // 'Kana' is used to represent a Kana 'Monograph' or 'Digraph'. It stores Romaji, Hiragana and Katakana
@@ -65,6 +68,7 @@ public:
     case CharType::Hiragana: return _hiraganaMap;
     case CharType::Katakana: return _katakanaMap;
     }
+    __builtin_unreachable(); // gets rid of gcc 'control reaches end ...' warning
   }
 
   using List = std::vector<std::string>;

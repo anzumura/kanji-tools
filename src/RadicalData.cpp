@@ -73,7 +73,7 @@ void RadicalData::print(const Data& data) const {
   using Count = std::map<Types, int>;
   Count total;
   auto printCounts = [&data](const Count& c, bool summary = false) {
-    const int t = std::accumulate(c.begin(), c.end(), 0, [](auto& x, auto& y) { return x + y.second; });
+    const int t = std::accumulate(c.begin(), c.end(), 0, [](const auto& x, const auto& y) { return x + y.second; });
     data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
     for (auto i : AllTypes) {
       auto j = c.find(i);
