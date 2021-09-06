@@ -12,11 +12,14 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_EXTENSIONS OFF)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -isystem /opt/homebrew/include")
-  set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls")
-  # need to set env for after stack reporting: ASAN_OPTIONS=detect_stack_use_after_return=1
-  # set(SANITIZER_STACK_FLAGS "-fsanitize-address-use-after-scope")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS} ${SANITIZER_STACK_FLAGS}")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls")
+    # need to set env for after stack reporting: ASAN_OPTIONS=detect_stack_use_after_return=1
+    # set(SANITIZER_STACK_FLAGS "-fsanitize-address-use-after-scope")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS} ${SANITIZER_STACK_FLAGS} -fuse-ld=lld")
+  endif()
+  # Use the following to override the linker
+  # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
   include(CTest)
 endif()
 
