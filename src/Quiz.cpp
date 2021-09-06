@@ -289,7 +289,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
     Choices choices = getDefaultChoices(list.size());
     bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
-      out() << "\nQuestion " << _question << '/' << list.size() << ".  " << *i << ", ";
+      out() << (_reviewMode ? "\nReview " : "\nQuestion ") << _question << '/' << list.size() << ".  " << *i << ", ";
       if (questions.size() == i->members().size())
         out() << questions.size();
       else
