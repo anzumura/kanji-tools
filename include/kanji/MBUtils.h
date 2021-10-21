@@ -301,7 +301,8 @@ constexpr std::array WideBlocks = {
   UnicodeBlock{0xFE30, 0xFE52},   UnicodeBlock{0xFE54, 0xFE66},   UnicodeBlock{0xFE68, 0xFE6B},
   UnicodeBlock{0xFF01, 0xFF60},   UnicodeBlock{0xFFE0, 0xFFE6},   UnicodeBlock{0x16FE0, 0x16FE4},
   UnicodeBlock{0x16FF0, 0x16FF1}, UnicodeBlock{0x17000, 0x187F7}, UnicodeBlock{0x18800, 0x18CD5},
-  UnicodeBlock{0x18D00, 0x18D08}, UnicodeBlock{0x1B000, 0x1B11E}, UnicodeBlock{0x1B150, 0x1B152},
+  UnicodeBlock{0x18D00, 0x18D08}, UnicodeBlock{0x1AFF0, 0x1AFF3}, UnicodeBlock{0x1AFF5, 0x1AFFB},
+  UnicodeBlock{0x1AFFD, 0x1AFFE}, UnicodeBlock{0x1B000, 0x1B122}, UnicodeBlock{0x1B150, 0x1B152},
   UnicodeBlock{0x1B164, 0x1B167}, UnicodeBlock{0x1B170, 0x1B2FB}, UnicodeBlock{0x1F004},
   UnicodeBlock{0x1F0CF},          UnicodeBlock{0x1F18E},          UnicodeBlock{0x1F191, 0x1F19A},
   UnicodeBlock{0x1F200, 0x1F202}, UnicodeBlock{0x1F210, 0x1F23B}, UnicodeBlock{0x1F240, 0x1F248},
@@ -313,12 +314,13 @@ constexpr std::array WideBlocks = {
   UnicodeBlock{0x1F550, 0x1F567}, UnicodeBlock{0x1F57A},          UnicodeBlock{0x1F595, 0x1F596},
   UnicodeBlock{0x1F5A4},          UnicodeBlock{0x1F5FB, 0x1F64F}, UnicodeBlock{0x1F680, 0x1F6C5},
   UnicodeBlock{0x1F6CC},          UnicodeBlock{0x1F6D0, 0x1F6D2}, UnicodeBlock{0x1F6D5, 0x1F6D7},
-  UnicodeBlock{0x1F6EB, 0x1F6EC}, UnicodeBlock{0x1F6F4, 0x1F6FC}, UnicodeBlock{0x1F7E0, 0x1F7EB},
-  UnicodeBlock{0x1F90C, 0x1F93A}, UnicodeBlock{0x1F93C, 0x1F945}, UnicodeBlock{0x1F947, 0x1F978},
-  UnicodeBlock{0x1F97A, 0x1F9CB}, UnicodeBlock{0x1F9CD, 0x1F9FF}, UnicodeBlock{0x1FA70, 0x1FA74},
-  UnicodeBlock{0x1FA78, 0x1FA7A}, UnicodeBlock{0x1FA80, 0x1FA86}, UnicodeBlock{0x1FA90, 0x1FAA8},
-  UnicodeBlock{0x1FAB0, 0x1FAB6}, UnicodeBlock{0x1FAC0, 0x1FAC2}, UnicodeBlock{0x1FAD0, 0x1FAD6},
-  UnicodeBlock{0x20000, 0x2FFFD}, UnicodeBlock{0x30000, 0x3FFFD}};
+  UnicodeBlock{0x1F6DD, 0x1F6DF}, UnicodeBlock{0x1F6EB, 0x1F6EC}, UnicodeBlock{0x1F6F4, 0x1F6FC},
+  UnicodeBlock{0x1F7E0, 0x1F7EB}, UnicodeBlock{0x1F7F0},          UnicodeBlock{0x1F90C, 0x1F93A},
+  UnicodeBlock{0x1F93C, 0x1F945}, UnicodeBlock{0x1F947, 0x1F9FF}, UnicodeBlock{0x1FA70, 0x1FA74},
+  UnicodeBlock{0x1FA78, 0x1FA7C}, UnicodeBlock{0x1FA80, 0x1FA86}, UnicodeBlock{0x1FA90, 0x1FAAC},
+  UnicodeBlock{0x1FAB0, 0x1FABA}, UnicodeBlock{0x1FAC0, 0x1FAC5}, UnicodeBlock{0x1FAD0, 0x1FAD9},
+  UnicodeBlock{0x1FAE0, 0x1FAE7}, UnicodeBlock{0x1FAF0, 0x1FAF6}, UnicodeBlock{0x20000, 0x2FFFD},
+  UnicodeBlock{0x30000, 0x3FFFD}};
 // --- end generated code from 'parseEastAsiaWidth.sh' ---
 
 // 'displayLength' returns the length of 's' in terms of how many columns would be required for
@@ -340,9 +342,7 @@ inline size_t displayLength(const std::string& s) {
 // add 1 space since std::setw only looks at bytes and s already has 3 bytes. However, using
 // this function, i.e., 'os << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by
 // returning '5' (5 is 2 more than the 3 byte length of 's').
-inline int wideSetw(const std::string& s, int setwLen) {
-  return setwLen + s.length() - displayLength(s);
-}
+inline int wideSetw(const std::string& s, int setwLen) { return setwLen + s.length() - displayLength(s); }
 
 } // namespace kanji
 

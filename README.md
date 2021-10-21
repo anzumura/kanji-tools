@@ -297,6 +297,7 @@ The **data** directory contains the following files:
 - **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
+- **ucd.txt**: data extracted from Unicode 'UCD' (see *scripts/parseUcdAllFlat.sh* for details and links)
 
 No external databases are used so far, but while writing some of the code (like in *MBUtils.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
 

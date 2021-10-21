@@ -35,7 +35,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 3486	㒆	CJK_Ext_A	3.0	9	14		chì			6B59	歙	to suck; a county's name in anhui	KYUU SHOU KYOU	SUU
 3487	㒇	CJK_Ext_A	3.0	9	14		wǔ			61AE	憮	regretful, disappointed	BU KO	ITSUKUSHIMU
 3489	㒉	CJK_Ext_A	3.0	9	14		tǎng			60DD	惝	alarmed, agitated	SHOU TOU	UTSUTORISURU
-348B	㒋	CJK_Ext_A	3.0	9	14					5EDD	廝	servant	SHI	KOMONO
+348B	㒋	CJK_Ext_A	3.0	9	14		sī			53AE	厮	servant; to make a disturbance	SHI	KOMONO
 348D	㒍	CJK_Ext_A	3.0	9	14		léi			513D	儽	lazy; tired out, worn fatigued	RAI RE RUI RA	OKOTARU YAMITSUKARERU
 3492	㒒	CJK_Ext_A	3.0	9	15		pú			50D5	僕	slave, servant, I	BOKU	SHIMOBE YATSUGARE
 3496	㒖	CJK_Ext_A	3.0	9	15		ǒu			85D5	藕	lotus root	GUU GOU GU	HASUNONE
@@ -63,7 +63,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 34EA	㓪	CJK_Ext_A	3.0	18	9		lǎng			6717	朗	clear, bright; distinct	ROU	HOGARAKA AKIRAKA
 34EC	㓬	CJK_Ext_A	3.0	18	10					5233	刳	cut out, dig, rip up, scoop out	KO	EGURU
 34ED	㓭	CJK_Ext_A	3.0	18	10		shé			97A8	鞨	tribe	KATSU GACHI SETSU	KAWAGUTSU
-34EE	㓮	CJK_Ext_A	3.0	18	10					96D5	雕	engrave, inlay, carve; exhaust; used for U+9D70 鵰 an eagle, vulture	CHOU	WASHI KIZAMU
+34EE	㓮	CJK_Ext_A	3.0	18	10		diāo			96D5	雕	engrave, inlay, carve; exhaust; used for U+9D70 鵰 an eagle, vulture	CHOU	WASHI KIZAMU
 34EF	㓯	CJK_Ext_A	3.0	18	10		lí			5299	劙	a divide, to partition	RI REI RAI	TOKU WAKERU WARU
 34F0	㓰	CJK_Ext_A	3.0	18	10		huà			5283	劃	divide, mark off, lay boundary	KAKU	WAKATSU
 34F5	㓵	CJK_Ext_A	3.0	18	11		è			9354	鍔	high, lofty; edge of knife	GAKU	TSUBA
@@ -134,6 +134,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 3637	㘷	CJK_Ext_A	3.0	32	9		ài			827E	艾	artemisia, mugwort; translit.	GAI GEI	YOMOGI MOGUSA KARU
 3638	㘸	CJK_Ext_A	3.0	32	9		zàng			846C	葬	bury, inter	SOU	HOUMURU
 3639	㘹	CJK_Ext_A	3.0	32	9		cí			5790	垐		SHI JI SHOU JIKI	NIKUMU
+363D	㘽	CJK_Ext_A	3.0	32	9					683D	栽	to cultivate, plant; to care for plants	SAI	UERU
 363F	㘿	CJK_Ext_A	3.0	32	10		niè			6D85	涅	blacken; black mud, slime	NETSU DETSU	SOMERU
 3645	㙅	CJK_Ext_A	3.0	32	10		bǎo			5821	堡	fort, fortress; town, village	HOU HO	TORIDE
 3649	㙉	CJK_Ext_A	3.0	32	11		tiǎn			8146	腆	prosperous; good; protruding	TEN	ATSUI
@@ -209,20 +210,21 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 37A9	㞩	CJK_Ext_A	3.0	46	6		lán			5D50	嵐	mountain mist, mountain haze	RAN	ARASHI
 37AE	㞮	CJK_Ext_A	3.0	46	6							variant of 出 U+51FA, to go out, send out; to stand; to produce	SHUTSU SUI	DERU DASU
 37AF	㞯	CJK_Ext_A	3.0	46	6		jié			5C8A	岊	foothill	SETSU SECHI GU	
-37B6	㞶	CJK_Ext_A	3.0	46	7		mǐn			5CB7	岷	min mountain, min river	BIN MIN	
+37B6	㞶	CJK_Ext_A	3.0	46	7		mǐn			5CB7	岷	Minshan mountain range in northern Sichuan and southern Gansu, Min River	BIN MIN	
 37B8	㞸	CJK_Ext_A	3.0	46	7		suì			5461	呡	the corners of the mouth the lips	BUN MON	KUCHIBATA
 37BC	㞼	CJK_Ext_A	3.0	46	8		chéng			4E1E	丞	assist, aid, rescue	SHOU JOU	SUKUU TASUKERU
 37BE	㞾	CJK_Ext_A	3.0	46	8		ní			5C3C	尼	Buddhist nun; transliteration	NI JITSU	AMA
 37BF	㞿	CJK_Ext_A	3.0	46	8		chì			5C90	岐	high; majestic; fork in road	KI GI	EDAMICHI
 37C1	㟁	CJK_Ext_A	3.0	46	8		àn			5CB8	岸	bank, shore; beach, coast	GAN	KISHI
-37D7	㟗	CJK_Ext_A	3.0	46	11					8C73	豳	a Zhou-dynasty state	HIN HAN HEN	
+37D7	㟗	CJK_Ext_A	3.0	46	11		bīn			8C73	豳	a Zhou-dynasty state	HIN HAN HEN	
 37DA	㟚	CJK_Ext_A	3.0	46	11		qí			5C90	岐	high; majestic; fork in road	KI GI	EDAMICHI
 37DD	㟝	CJK_Ext_A	3.0	46	11		péi			57F9	培	bank up with dirt; cultivate	BAI HOU HAI	TSUCHIKAU
 37DF	㟟	CJK_Ext_A	3.0	46	11		xiàng			5DF7	巷	alley, lane	KOU	CHIMATA
 37E0	㟠	CJK_Ext_A	3.0	46	11		gǎng			5CA1	岡	ridge or crest of hill	KOU	OKA
-37E9	㟩	CJK_Ext_A	3.0	46	12		mín			5CB7	岷	min mountain, min river	BIN MIN	
+37E2	㟢	CJK_Ext_A	3.0	46	11		qí					the rocks on the hills are of different shapes; rugged and weird, character different from others; cape; spit; promontory		SAKI
+37E9	㟩	CJK_Ext_A	3.0	46	12		mín			5CB7	岷	Minshan mountain range in northern Sichuan and southern Gansu, Min River	BIN MIN	
 37EB	㟫	CJK_Ext_A	3.0	46	12		quán			6CC9	泉	spring, fountain; wealth, money	SEN	IZUMI ZENI
-37ED	㟭	CJK_Ext_A	3.0	46	12		mín			5CB7	岷	min mountain, min river	BIN MIN	
+37ED	㟭	CJK_Ext_A	3.0	46	12		mín			5CB7	岷	Minshan mountain range in northern Sichuan and southern Gansu, Min River	BIN MIN	
 37F5	㟵	CJK_Ext_A	3.0	46	13		gǎng			5CA1	岡	ridge or crest of hill	KOU	OKA
 37FB	㟻	CJK_Ext_A	3.0	46	14		qiàn			5D84	嶄	high, steep, precipitous; new	SAN ZAN	KEWASHII
 3800	㠀	CJK_Ext_A	3.0	46	14		dǎo			5CF6	島	island	TOU	SHIMA
@@ -267,7 +269,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 38E7	㣧	CJK_Ext_A	3.0	60	11		yìn			80E4	胤	heir, successor; progeny, posterity	IN	TANE TSUGU YOTSUGI
 38EB	㣫	CJK_Ext_A	3.0	60	12		zhǒng			8E35	踵	heel; follow; visit, call on	SHOU	TSUGU KUBISU
 38F6	㣶	CJK_Ext_A	3.0	60	16		zhān			9085	邅	hesitant, faltering	KEN GEN	YUONAYAMU
-38FA	㣺	CJK_Ext_A	3.0	61	4					5FC3	心	heart; mind, intelligence; soul	SHIN	KOKORO
+38FA	㣺	CJK_Ext_A	3.0	61	4		xīn			5FC4	忄	heart; radical number 61		RITSUSHINBEN
 38FC	㣼	CJK_Ext_A	3.0	61	6		rěn			5FCD	忍	endure, bear, suffer; forbear	NIN	SHINOBU SHINOBI
 3902	㤂	CJK_Ext_A	3.0	61	8		jí			6025	急	quick, quickly; urgent, pressing	KYUU	ISOGU
 390A	㤊	CJK_Ext_A	3.0	61	7		xiào			6054	恔	cheerful; bright, sagacious	KYOU KOU	SATOI
@@ -328,7 +330,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 3A5C	㩜	CJK_Ext_A	3.0	64	18		lǎn			652C	攬	grasp, take hold of; monopolize	RAN	TORU
 3A63	㩣	CJK_Ext_A	3.0	64	18					63EE	揮	direct; wipe away; squander	KI	FURUU
 3A66	㩦	CJK_Ext_A	3.0	64	18		xié			651C	攜	lead by hand, take with; carry	KEI	TAZUSAERU
-3A85	㪅	CJK_Ext_A	3.0	66	9					66F4	更	more, still further, much more	KOU	SARA FUKERU ARATAMERU
+3A85	㪅	CJK_Ext_A	3.0	66	9		gèng			66F4	更	more, still further, much more; to change, alter	KOU	SARA FUKERU ARATAMERU
 3A8D	㪍	CJK_Ext_A	3.0	66	11		bó			52C3	勃	suddenly, sudden, quick	BOTSU HOTSU	NIWAKANI OKORU
 3A8F	㪏	CJK_Ext_A	3.0	66	12		bǐ			636D	捭	to open; to spread out	HAI HA HEI	
 3A94	㪔	CJK_Ext_A	3.0	66	12		sàn			6563	散	scatter, disperse, break up	SAN	CHIRU CHIRASU CHIRAKASU
@@ -380,7 +382,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 3BB4	㮴	CJK_Ext_A	3.0	75	14					8258	艘	counter for ships, vessels	SOU	FUNE
 3BB6	㮶	CJK_Ext_A	3.0	75	14		shuò			69CA	槊	spear, lance	SAKU	HOKO
 3BBB	㮻	CJK_Ext_A	3.0	75	14					6414	搔	to scratch	SOU	KAKU
-3BC3	㯃	CJK_Ext_A	3.0	75	15					687C	桼	the varnish tree; lacquer, varnish, paint	SHITSU	URUSHI
+3BC3	㯃	CJK_Ext_A	3.0	75	15		qī			687C	桼	the varnish tree; lacquer, varnish, paint	SHITSU	URUSHI
 3BC9	㯉	CJK_Ext_A	3.0	75	15		huò			6AB4	檴	tree	KAKU WAKU	AKINIRE
 3BCD	㯍	CJK_Ext_A	3.0	75	15		jiǎng			69F3	槳	oar, paddle	SHOU SOU	KAJI
 3BCF	㯏	CJK_Ext_A	3.0	75	15		gǔ			7A40	穀	corn, grain, cereal; lucky	KOKU	TANATSUMOTSU
@@ -395,7 +397,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 3BF0	㯰	CJK_Ext_A	3.0	75	17		zhé			690D	植	plant, trees, plants; grow	SHOKU CHI	UERU TATERU
 3BF3	㯳	CJK_Ext_A	3.0	75	16		qíng			6AA0	檠	stand for lamp; frame for bow	KEI	YUDAME TOMOSHIBI TAKATSUKI
 3BF6	㯶	CJK_Ext_A	3.0	75	17		zōng			68D5	棕	hemp palm; palm tree	SHU SOU	
-3BFD	㯽	CJK_Ext_A	3.0	75	18					6AB3	檳	betel-nut, areca nut	BIN HIN	BINROUSHI
+3BFD	㯽	CJK_Ext_A	3.0	75	18		bīn			6AB3	檳	betel-nut, areca nut	BIN HIN	BINROUSHI
 3C03	㰃	CJK_Ext_A	3.0	75	19		mián			6AB0	檰		HEN MEN	TOCHIYUU
 3C05	㰅	CJK_Ext_A	3.0	75	19		dí			6A00	樀		TEKI CHAKU TAKU	NOKI
 3C06	㰆	CJK_Ext_A	3.0	75	19		bèi			97DB	韛		HAI BAI FUKU BUKU	FUIGAU EBIRA
@@ -616,7 +618,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 40F2	䃲	CJK_Ext_A	3.0	112	20		pán			78D0	磐	large rock, boulder; firm	HAN BAN	IWA
 40FB	䃻	CJK_Ext_A	3.0	112	26		bà			58E9	壩	embankment; dam	HA HE	RUSEKI
 4100	䄀	CJK_Ext_A	3.0	113	9		huò			798D	禍	misfortune, calamity, disaster	KA	WAZAWAI
-4103	䄃	CJK_Ext_A	3.0	113	9					6B83	殃	misfortune, disaster, calamity	YOU OU	WAZAWAI
+4103	䄃	CJK_Ext_A	3.0	113	9		yāng			6B83	殃	misfortune, disaster, calamity	YOU OU	WAZAWAI
 410D	䄍	CJK_Ext_A	3.0	113	13		zhà			8721	蜡	wax; candle; waxy, glazed; maggot; as a non-simplified form sometimes used as an equivalent to U+410D 䄍, meaning imperial harvest	SHO WA JA SEKI SHAKU	UJIMUSHI
 410E	䄎	CJK_Ext_A	3.0	113	13		qǐ			5A4D	婍		KI	MIMEYOI
 410F	䄏	CJK_Ext_A	3.0	113	13		yú			7945	祅	calamities, disasters; Ormazda	YOU	WAZAWAI
@@ -1105,7 +1107,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 4C07	䰇	CJK_Ext_A	3.0	190	19		qí			9B10	鬐	horse's mane; fins	KI GI	TATEGAMI
 4C0B	䰋	CJK_Ext_A	3.0	190	20		mán			9AEE	髮	hair	HATSU	KAMI
 4C0D	䰍	CJK_Ext_A	3.0	190	21		cì			9AF9	髹	red lacquer; to lacquer	KYUU KU SHI	URUSHI
-4C17	䰗	CJK_Ext_A	3.0	191	21					9B2E	鬮	lots (to be drawn); draw lots	KYUU	KUJI
+4C17	䰗	CJK_Ext_A	3.0	191	21		jiū			9B2E	鬮	lots (to be drawn); draw lots	KYUU	KUJI
 4C1B	䰛	CJK_Ext_A	3.0	193	15		lì			9B32	鬲	type of caldron with three hollow legs; name of a state; KangXi radical number 193	REKI KAKU	KANAE
 4C1E	䰞	CJK_Ext_A	3.0	193	25		zhǔ			716E	煮	cook	SHA SHO	NIRU NIERU
 4C1F	䰟	CJK_Ext_A	3.0	194	14		hún			9B42	魂	soul, spirit	KON GON	TAMASHII
@@ -1120,7 +1122,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 4C70	䱰	CJK_Ext_A	3.0	195	20		zhòng			9BA6	鮦	snakefish	TOU ZU	KATSUO
 4C73	䱳	CJK_Ext_A	3.0	195	20		zhān			9C63	鱣	sturgeon	TAN SEN ZEN DAN	KOI
 4C77	䱷	CJK_Ext_A	3.0	195	21		yú			9B5A	魚	fish; surname; KangXi radical 195	GYO	UO SAKANA SUNADORU
-4C7D	䱽	CJK_Ext_A	3.0	195	21					9BE7	鯧	the silvery pomfret, Stromateoides argenteus	SHOU	MANAGATSUO
+4C7D	䱽	CJK_Ext_A	3.0	195	21		chāng			9BE7	鯧	the silvery pomfret, Stromateoides argenteus	SHOU	MANAGATSUO
 4C84	䲄	CJK_Ext_A	3.0	195	22		mín			9BB8	鮸	Sciaena albiflora; Otolithoides miiuy	BEN MEN BAN MAN	NIBE ISHIMOCHI
 4C92	䲒	CJK_Ext_A	3.0	195	24		xiè			87F9	蟹	crab, brachyura	KAI	KANI
 4C9D	䲝	CJK_Ext_A	3.0	195	15					9BE7	鯧	the silvery pomfret, Stromateoides argenteus	SHOU	MANAGATSUO
@@ -1233,7 +1235,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 4E74	乴	CJK	1.1	5	8		xué						SETSU ZECHI	HINERU
 4E75	乵	CJK	1.1	5	8		yǎn					to enter; to make progress to advance; to urge forward	EN	SUSUMU
 4E79	乹	CJK	1.1	5	9		gān					(Cant.) to clean; dried up	KAN KEN	KAWAKU KAWAKASU
-4E7E	乾	CJK	1.1	5	11		gān	Y				dry; first hexagram; warming principle of the sun, penetrating and fertilizing, heavenly generative principle (male)	KAN KEN GEN	KAWAKU KAWAKASU INUI
+4E7E	乾	CJK	1.1	5	11		qián	Y				dry; first hexagram; warming principle of the sun, penetrating and fertilizing, heavenly generative principle (male)	KAN KEN GEN	KAWAKU KAWAKASU INUI
 4E7F	乿	CJK	1.1	5	11		zhì					to cure, to heal	CHI JI	OSAMERU
 4E80	亀	CJK	1.1	5	11		guī	Y				turtle or tortoise; cuckold	KI KYUU KIN	KAME
 4E81	亁	CJK	1.1	5	12		gān					dry; dried, as opposed to fresh	KEN	
@@ -1784,7 +1786,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5100	儀	CJK	1.1	9	15		yí	Y				ceremony, rites gifts; admire	GI	YOI NORI
 5101	儁	CJK	1.1	9	14		jùn					outstanding, fine; superior; talented, capable; handsome	SHUN	SUGURERU
 5102	儂	CJK	1.1	9	15		nóng					I; you; family name	DOU NOU	WASHI
-5103	儃	CJK	1.1	9	15		chán						SEN ZEN TAN DAN	TATAZUMU YAUSU HOSHIIMAMA
+5103	儃	CJK	1.1	9	15		chán					manner, air; easy-going; to turn around; lame; unable to get on	SEN ZEN TAN DAN	TATAZUMU YAUSU HOSHIIMAMA
 5104	億	CJK	1.1	9	15		yì	Y				hundred million; many	OKU YOKU	OSHIHAKARU
 5105	儅	CJK	1.1	9	15		dàng					stop	TOU	OWARU TOMARU ATARIMAEDERUI
 5106	儆	CJK	1.1	9	14		jǐng					warn; warning	KEI SHOU	IMASHIMERU
@@ -2055,7 +2057,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5247	則	CJK	1.1	18	9		zé	Y				rule, law, regulation; grades	SOKU	NORI NOTTORU SUNAWACHI
 5249	剉	CJK	1.1	18	9		cuò					cut, file, trim; file	SA	KUJIKU KADOOTORU
 524A	削	CJK	1.1	18	9		xuē	Y				scrape off, pare, trim	SAKU SHOU	KEZURU
-524B	剋	CJK	1.1	18	9		kè					subdue, overcome; cut down	KOKU	KATSU
+524B	剋	CJK	1.1	18	9		kēi					subdue, overcome; cut down	KOKU	KATSU
 524C	剌	CJK	1.1	18	9		lá					slash, cut in two; contradict	RATSU	MOTORU
 524D	前	CJK	1.1	18	9		qián	Y				in front, forward; preceding	ZEN SEN	MAE SUSUMU
 524E	剎	CJK	1.1	18	9		shā					temple	SATSU SECHI	HATABASHIRA TERA KUNI
@@ -2217,7 +2219,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 52F9	勹	CJK	1.1	20	2		bāo					wrap; KangXi radical 20	HOU	TSUTSUMU
 52FA	勺	CJK	1.1	20	3		sháo		Y			spoon, ladle; unit of volume	SHAKU	SHAKU
 52FB	勻	CJK	1.1	20	4		yún					equal, impartially, uniform, even	IN	SUKUNAI HITOSHII
-52FC	勼	CJK	1.1	20	4		jiū						KYUU KU	ATSUMERU ATSUMARU
+52FC	勼	CJK	1.1	20	4		jiū					to hook, entice, inveigle; surname	KYUU KU	ATSUMERU ATSUMARU
 52FD	勽	CJK	1.1	20	4		bào					to incubate; to brood; to hatch	BUN MON HOU BOU HYOU	TSUTSUMU
 52FE	勾	CJK	1.1	20	4		gōu	Y				hook, join, connect; entice	KOU	NOZOKU MAGARU KAGI
 52FF	勿	CJK	1.1	20	4		wù		Y			must not, do not; without, never	BUTSU BOTSU MOCHI	NASHI NAKARE
@@ -2411,7 +2413,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 53D7	受	CJK	1.1	29	8		shòu	Y				receive, accept, get; bear, stand	JU SHUU	UKERU UKE
 53D8	变	CJK	1.1	29	8		biàn					change, transform, alter; rebel	HEN	KAWARU KAERU
 53D9	叙	CJK	1.1	29	9		xù	Y				express, state, relate, narrate	JO	TSUIDERU TSUIDE
-53DA	叚	CJK	1.1	29	9		jiǎ					false	KA KE GE	KARIRU KASU
+53DA	叚	CJK	1.1	29	9		xiá					false	KA KE GE	KARIRU KASU
 53DB	叛	CJK	1.1	29	9		pàn					rebel; rebellion; rebellious	HAN BAN	SOMUKU
 53DC	叜	CJK	1.1	29	9		sǒu			53DF	叟	old man; elder	SOU SHUU	OKINA
 53DD	叝	CJK	1.1	29	9		jí					to respectfully inform	KOU	
@@ -2705,7 +2707,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5538	唸	CJK	1.1	30	11		niàn					recite, read, chant	TEN	UNARU UNARI
 5539	唹	CJK	1.1	30	11		yū					to smile at	YO	WARAU
 553B	唻	CJK	1.1	30	11		lài						RAI	UTAU
-553C	唼	CJK	1.1	30	11		shà					speaking evil. gobbling sound made by ducks	SAHU SEHU	KURAHU SUSURU TSUIBAMU HUMU
+553C	唼	CJK	1.1	30	11		shà					speaking evil; gobbling sound made by ducks	SAHU SEHU	KURAHU SUSURU TSUIBAMU HUMU
 553D	唽	CJK	1.1	30	11		xī					to twitter	SEKI SHAKU	
 553E	唾	CJK	1.1	30	11		tuò	Y				spit, spit on; saliva	DA	TSUBA
 553F	唿	CJK	1.1	30	11		hū					sad; (Cant.) a bit, part	KOTSU KOCHI	UREERU
@@ -2725,7 +2727,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 554E	啎	CJK	1.1	30	11		wǔ					obstinate, disobedient, intractable	GO	SAKARAU AU HURERU
 554F	問	CJK	1.1	30	11		wèn	Y				ask (about), inquire after	MON BUN	TOU TON
 5550	啐	CJK	1.1	30	11		cuì					to taste, to sip; to spit; the sound of sipping; to surprise	SAI SE SA SHUTSU SHUCHI KATSUKACHI	ODOROKU YOBU SAKEBU SHIKARU
-5551	啑	CJK	1.1	30	11		shà						SOU SHOU	
+5551	啑	CJK	1.1	30	11		shà					to gobble	SOU SHOU	
 5552	啒	CJK	1.1	30	11		gǔ						KOTSU KOCHI	UREERU UREERUSAMA
 5553	啓	CJK	1.1	30	11		qǐ	Y				open; begin, commence; explain	KEI	HIRAKU MOUSU
 5554	啔	CJK	1.1	30	11		qǐ						KEI	
@@ -2737,7 +2739,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 555A	啚	CJK	1.1	30	11		bǐ					low, mean	HI TO	OSHIMU
 555B	啛	CJK	1.1	30	11		cuì					(Cant.) interjection (used by men)	SAI SE	NAMERU
 555C	啜	CJK	1.1	30	11		chuài					sip, suck up; sob, weep	SETSU TETSU	SUSURU
-555D	啝	CJK	1.1	30	11		hé					(Cant.) final partical expressing surprise	KA WA	SHITAGAU
+555D	啝	CJK	1.1	30	11		hé					(Cant.) final particle expressing surprise	KA WA	SHITAGAU
 555E	啞	CJK	1.1	30	11		yǎ					dumb, mute; become hoarse	A	OSHI
 555F	啟	CJK	1.1	66	11		qǐ					open; begin	KEI	HIRAKU MOUSU
 5560	啠	CJK	1.1	30	11		zhé						TETSU	SATOI
@@ -3263,7 +3265,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 57F9	培	CJK	1.1	32	11		péi	Y				bank up with dirt; cultivate	BAI HOU HAI	TSUCHIKAU
 57FA	基	CJK	1.1	32	11		jī	Y				foundation, base	KI	MOTOI MOTO MOTOZUKU
 57FB	埻	CJK	1.1	32	11		zhǔn						SHUN TA DA TAI TE KOU JUKU	MATO NORI AZUCHI
-57FC	埼	CJK	1.1	32	11		qí	Y				headland	KI	SAKI
+57FC	埼	CJK	1.1	32	11		qí	Y				headland	KI	SAI SAKI
 57FD	埽	CJK	1.1	32	11		sào					broom; to sweep, clear away	SOU	HAKU
 57FE	埾	CJK	1.1	32	11		jù						SHU JU	
 57FF	埿	CJK	1.1	32	11		ní						DEI NAI HAN BAN	NURU KOTE NUKARAMI
@@ -3274,7 +3276,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5804	堄	CJK	1.1	32	11		nì					parapet	GEN	HIMEGAKI
 5805	堅	CJK	1.1	32	12		jiān	Y				hard, strong, firm; resolute	KEN	KATAI KATAKU
 5806	堆	CJK	1.1	32	11		duī	Y				heap, pile, crowd; pile up	TAI TSUI	UZUTAKAI
-5807	堇	CJK	1.1	32	11		jǐn					yellow loam; clay; season; few	KIN	SUMIRE
+5807	堇	CJK	1.1	32	11		jǐn					yellow loam; clay; season; few	KIN KON GON	NURU NEBATSUCHI WAZUKA
 5808	堈	CJK	1.1	32	11		gāng					earthen jug, crock, cistern	KOU	KAME OKA
 5809	堉	CJK	1.1	32	11		yù					ground, fertile land	IKU	
 580A	堊	CJK	1.1	32	11		è					white earth; to daub with white mud	A AKU O	SHIROTSUCHI IROTSUCHI
@@ -3725,7 +3727,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5A29	娩	CJK	1.1	38	10	11	miǎn		Y			give birth child; complaisant	BEN HAN	UMU
 5A2A	娪	CJK	1.1	38	10		wú						GO GYO	ONNA
 5A2C	娬	CJK	1.1	38	11		wǔ					lovely; attractive	BU MU	KOBIRU
-5A2D	娭	CJK	1.1	38	10		āi						KI AI	TAHOMURERU HASHITAME
+5A2D	娭	CJK	1.1	38	10		āi					amuse	KI AI	TAHOMURERU HASHITAME
 5A2E	娮	CJK	1.1	38	10		yán						DEN	
 5A2F	娯	CJK	1.1	38	10		yú	Y				pleasure, enjoyment, amusement	GO KU	TANOSHIMU
 5A30	娰	CJK	1.1	38	10		sì						JI SHI	ANE
@@ -3736,9 +3738,9 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5A39	娹	CJK	1.1	38	11		xián						KEN GEN	
 5A3C	娼	CJK	1.1	38	11		chāng					prostitute, harlot	SHOU	ASOBIME
 5A3E	娾	CJK	1.1	38	11		ǎi						GAI GE GOU KYOU	YOROKOBU MIMEYOI
-5A3F	娿	CJK	1.1	38	10		ē						A	SADAMARANAI SHINAYAKANASAMA
+5A3F	娿	CJK	1.1	38	10		ē					beautiful, graceful	A	SADAMARANAI SHINAYAKANASAMA
 5A40	婀	CJK	1.1	38	11		ē					be beautiful, be graceful	A	TAOYAKA
-5A41	婁	CJK	1.1	38	11		lóu					surname; a constellation; to wear	ROU RU RUI	MUNASHII ARAI OSAMERU
+5A41	婁	CJK	1.1	38	11		lóu					surname; a constellation (sixteenth of the twenty-eight lunar mansions); to wear	ROU RU RUI	MUNASHII ARAI OSAMERU
 5A42	婂	CJK	1.1	38	11		mián							BEN MEN
 5A43	婃	CJK	1.1	38	11		cóng						SOU SU	
 5A44	婄	CJK	1.1	38	11		pǒu					(Cant.) soft, weak; to soak; unreliable	HOU BU BAI	OROKA MINIKUI
@@ -3756,7 +3758,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5A53	婓	CJK	1.1	38	11		fēi						HI	SAMAYOU
 5A55	婕	CJK	1.1	38	11		jié					handsome	SHOU	MIMEYOI
 5A56	婖	CJK	1.1	38	11		tiān						TEN	
-5A57	婗	CJK	1.1	38	11		ní					a new-born child the whimper of an infant	GEI	MIDORIGO AKAGONONAKIGOE
+5A57	婗	CJK	1.1	38	11		ní					a new-born child; the whimper of an infant	GEI	MIDORIGO AKAGONONAKIGOE
 5A58	婘	CJK	1.1	38	11		quán						KEN GEN	MIMEYOI YAKARI
 5A5A	婚	CJK	1.1	38	11		hūn	Y				get married; marriage, wedding	KON	ENGUMI
 5A5B	婛	CJK	1.1	38	11		jīng						KEI KYOU	
@@ -4244,7 +4246,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5CB4	岴	CJK	1.1	46	8		qū						KU	KEWASHII
 5CB5	岵	CJK	1.1	46	8		hù					hill	KO GO	YAMA
 5CB6	岶	CJK	1.1	46	8		pò						HAKU HYAKU	SHIGERU
-5CB7	岷	CJK	1.1	46	8		mín					min mountain, min river	BIN MIN	
+5CB7	岷	CJK	1.1	46	8		mín					Minshan mountain range in northern Sichuan and southern Gansu, Min River	BIN MIN	
 5CB8	岸	CJK	1.1	46	8		àn	Y				bank, shore; beach, coast	GAN	KISHI
 5CBA	岺	CJK	1.1	46	8		líng					mountain ridge, mountain peak	REI	
 5CBB	岻	CJK	1.1	46	8		chí						JI NI	
@@ -4308,7 +4310,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5D0E	崎	CJK	1.1	46	11		qí	Y				rough, uneven, jagged, rugged	KI	SAKI KEWASHII
 5D0F	崏	CJK	1.1	46	11		mín						BIN	
 5D10	崐	CJK	1.1	46	11		kūn					Kunlun mountains in Jiangsu	KON	
-5D11	崑	CJK	1.1	46	11		kūn					Kunlun mountains in Jiang Su province.	KON	
+5D11	崑	CJK	1.1	46	11		kūn					Kunlun mountains in Jiangsu province.	KON	
 5D12	崒	CJK	1.1	46	11		zú					rocky peaks; lofty and dangerous	SHUTSU SHUCHI SOTSU ZOCHI SUI	KEWASHII
 5D14	崔	CJK	1.1	46	11		cuī					high, lofty, towering; surname	SAI SUI SE	MAJIWARU
 5D15	崕	CJK	1.1	46	11		yá					cliff, precipice; precipitous	GAI	GAKE
@@ -4524,7 +4526,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5E28	帨	CJK	1.1	50	10		shuì					handkerchief, kerchief, shawl	SEI SAI ETSU ECHI SUI ZEI	TEHUKI
 5E29	帩	CJK	1.1	50	10		qiào						SEU	HACHIMAKI ZUKIN
 5E2B	師	CJK	1.1	50	10		shī	Y				teacher, master, specialist; multitude, troops	SHI	MIYAKO IKUSA OSA
-5E2C	帬	CJK	1.1	50	10		qún					the skirt of a lady's dress petticoat	KUN GUN	ERIATE HAKAMA
+5E2C	帬	CJK	1.1	50	10		qún					the skirt of a lady's dress; petticoat	KUN GUN	ERIATE HAKAMA
 5E2D	席	CJK	1.1	50	10		xí	Y				seat; mat; take seat; banquet	SEKI	MUSHIRO SEKI
 5E2E	帮	CJK	1.1	50	10		bāng					help, assist; defend; shoe upper	HOU	TASUKERU
 5E2F	帯	CJK	1.1	50	10		dài	Y				belt, girdle, band, strap, zone	TAI	OBI OBIRU MEGURU
@@ -4738,7 +4740,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5F1B	弛	CJK	1.1	57	6		chí		Y			loosen, relax, unstring a bow	SHI CHI	YURUMU
 5F1C	弜	CJK	1.1	57	6		jiàng						KYOU GOU KI	TSUYOI TSUYOIYUMI
 5F1D	弝	CJK	1.1	57	7		bà					the part of a bow grasped when shooting	HA HE	YUZUKA TSUKA
-5F1F	弟	CJK	1.1	57	7		dì	Y				young brother; junior; i, me	TEI DAI	OTOUTO
+5F1F	弟	CJK	1.1	57	7		dì	Y				young brother; junior; I, me	TEI DAI	OTOUTO
 5F21	弡	CJK	1.1	57	8		jué						KUTSU GUCHI CHOU	TSUYOKUISAMASHII
 5F22	弢	CJK	1.1	57	8		tāo					bow case; scabbard; sheathe	TOU	YUMIBUKURO
 5F23	弣	CJK	1.1	57	8		fǔ					middle	FU	YUZUKA
@@ -4801,7 +4803,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5F61	彡	CJK	1.1	59	3		shān					hair; KangXi radical 59	SAN SEN	KAMI
 5F62	形	CJK	1.1	59	7		xíng	Y				form, shape, appearance	KEI GYOU	KATACHI KATA ARAWARERU
 5F63	彣	CJK	1.1	59	7		wén						BUN MON	AYA
-5F64	彤	CJK	1.1	59	7		tóng					red, vermilion; name of ancient	TOU ZU	AKAI
+5F64	彤	CJK	1.1	59	7		tóng					red, vermilion	TOU ZU	AKAI
 5F65	彥	CJK	1.1	59	9		yàn					elegant, handsome; learned	GEN	HIKO
 5F66	彦	CJK	1.1	59	9		yàn		Y			elegant	GEN	HIKO
 5F67	彧	CJK	1.1	59	10		yù					refined, cultured, polished	IKU	AYA
@@ -4870,7 +4872,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5FB1	徱	CJK	1.1	60	14		piào						HYOU	KARUI SUBAYAI
 5FB3	徳	CJK	1.1	60	14		dé	Y				ethics, morality, virtue	TOKU	OSHIE
 5FB4	徴	CJK	1.1	60	14		zhēng	Y				summon, recruit; musical note	CHOU CHI	SHIRUSHI MESU
-5FB5	徵	CJK	1.1	60	15		zhēng		Y	5FB4	徴	summon, recruit; musical note	CHOU CHI	SHIRUSHI MESU
+5FB5	徵	CJK	1.1	60	15		zhǐ		Y	5FB4	徴	summon, recruit; musical note	CHOU CHI	SHIRUSHI MESU
 5FB7	德	CJK	1.1	60	15		dé		Y	5FB3	徳	ethics, morality, virtue	TOKU	OSHIE
 5FB8	徸	CJK	1.1	60	15		chōng						SHOU SHU	YUKUSAMA
 5FB9	徹	CJK	1.1	60	15		chè	Y				penetrate, pervade; penetrating	TETSU	TOORU
@@ -4902,7 +4904,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5FE2	忢	CJK	1.1	61	8		wù						GO	SATORU SATORI
 5FE4	忤	CJK	1.1	61	7		wǔ					insubordinate, stubborn; wrong	GO	SAKARAU
 5FE8	忨	CJK	1.1	61	7		wàn						GAN	MUSABORU
-5FE9	忩	CJK	1.1	61	7		cōng					same as 怱 U+6031, hastily, in haste, hurriedly	SOU	NIWAKA AWATERU
+5FE9	忩	CJK	1.1	61	8		cōng					same as 怱 U+6031, hastily, in haste, hurriedly	SOU	NIWAKA AWATERU
 5FEA	忪	CJK	1.1	61	7		sōng					quiet, calm, tranquil, peaceful	SHOU SHU	ODOROKU
 5FEB	快	CJK	1.1	61	7		kuài	Y				rapid, quick, speedy, fast; soon	KAI	KOKOROYOI
 5FEC	忬	CJK	1.1	61	7		yù						YO SHO	ARAKAJIME YASUNZURU
@@ -4917,7 +4919,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 5FF6	忶	CJK	1.1	61	7		hún						KON GON UN	MODAERU MAYOU
 5FF7	忷	CJK	1.1	61	7		xiōng					variant of 恟 U+605F, scared, nervous	KYOU	OSORERU
 5FF8	忸	CJK	1.1	61	7		niǔ					blush, be bashful, be ashamed	JIKU JUU	HAJIRU
-5FFA	忺	CJK	1.1	61	7		xiān						KEN KON	NOZOMU
+5FFA	忺	CJK	1.1	61	7		xiān					happy	KEN KON	NOZOMU
 5FFB	忻	CJK	1.1	61	7		xīn					delightful, joyful, pleasant	KIN	YOROKOBU
 5FFC	忼	CJK	1.1	61	7		kāng					ardent; generous, magnanimous	KOU HOU HYOU	NAGEKU ANADORU
 5FFD	忽	CJK	1.1	61	8		hū		Y			suddenly, abruptly; neglect	KOTSU	YURUGASENI TACHIMACHI
@@ -4959,7 +4961,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6033	怳	CJK	1.1	61	8		huǎng					wild, mad; flurried	KYOU CHUTSU SHUTSU	KURUU
 6035	怵	CJK	1.1	61	8		chù					fear, be afraid; shy, timid	JUTSU CHUTSU SHUTSU SHUCHI	OSORERU
 603A	怺	CJK	1.1	61	8		yǒng					to endure		KORAERU SHINOBU TAERU
-6040	恀	CJK	1.1	61	9		shì						SHI	TANOMU
+6040	恀	CJK	1.1	61	9		shì					trust	SHI	TANOMU
 6041	恁	CJK	1.1	61	10		nèn					that, like this, thus, so, such	IN JIN NIN	OMOU
 6042	恂	CJK	1.1	61	9		xún					careful, sincere, honest; trust	JUN SHUN	MAKOTO
 6043	恃	CJK	1.1	61	9		shì					rely on, presume on, trust to	JI SHI	TANOMU
@@ -5721,7 +5723,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 64B9	撹	CJK	1.1	64	15		jiǎo					disturb, agitate, stir up	KAKU KOU	MIDASU
 64BB	撻	CJK	1.1	64	16		tà					flog, whip; chastise; (Cant.) classifier for places; a tart (from the English 'tart')	TACHI TATSU	MUCHIUTSU HAYAI
 64BC	撼	CJK	1.1	64	16		hàn					move, shake; (Cant.) to fight	KAN	UGOKASU
-64BD	撽	CJK	1.1	64	16		qiào						KOU KYOU KEKI KYAKU	TATAKU
+64BD	撽	CJK	1.1	64	16		qiào					to strike, attack	KOU KYOU KEKI KYAKU	TATAKU
 64BE	撾	CJK	1.1	64	16		wō					to beat; to strike	TA TE KA	UTSU
 64BF	撿	CJK	1.1	64	16		jiǎn					to pick up	REN KEN	KOMANEKU
 64C1	擁	CJK	1.1	64	16		yōng	Y				embrace, hug, squeeze; crowd	YOU	IDAKU
@@ -5989,7 +5991,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6630	昰	CJK	1.1	72	9		shì					variant of 'to be'; summer; name	SHI	KORE
 6631	昱	CJK	1.1	72	9		yù					bright light, sunlight; dazzling	IKU	AKIRAKA
 6633	昳	CJK	1.1	72	9		dié					the declining sun in the west	TETSU DECHI ITSU	KATAMUKU
-6634	昴	CJK	1.1	72	9		mǎo		Y			one of the 28 constellations	BOU	SUBARU
+6634	昴	CJK	1.1	72	9		mǎo		Y			eighteenth of the twenty-eight lunar mansions (宿)	BOU	SUBARU
 6635	昵	CJK	1.1	72	9		nì					intimate, close; approach	JITSU SHOKU	CHIKAZUKU
 6636	昶	CJK	1.1	72	9		chǎng					a long day. bright. extended. clear	CHOU	NAGAI TOORU NOBIRU
 6637	昷	CJK	1.1	72	9		wēn					to feed a prisoner	ON	MEGUMU
@@ -6044,7 +6046,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6678	晸	CJK	1.1	72	12		zhěng					appearance of the sun	TEI CHOU	
 6679	晹	CJK	1.1	72	12		yì					the sun going behind and out from behind clouds	EKI SEKU SEKI SHAKU	KAGERU
 667A	智	CJK	1.1	72	12		zhì		Y			wisdom, knowledge, intelligence	CHI	CHIE
-667B	晻	CJK	1.1	72	12		àn						AN ON EN	KURAI
+667B	晻	CJK	1.1	72	12		àn					unclear	AN ON EN	KURAI
 667C	晼	CJK	1.1	72	12		wǎn					sunset	EN ON	
 667E	晾	CJK	1.1	72	12		liàng					air-dry; sun-dry	RYOU	SARASU
 667F	晿	CJK	1.1	72	12		chāng						SHOU	
@@ -6123,7 +6125,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 66F1	曱	CJK	1.1	73	5		yuē					(Cant.) cockroach	OU	
 66F2	曲	CJK	1.1	73	6		qū	Y				crooked, bent; wrong, false	KYOKU	MAGARU MAGERU KUMA
 66F3	曳	CJK	1.1	73	6		yè		Y			trail, tow, drag, pull	EI	HIKU
-66F4	更	CJK	1.1	73	7		gèng	Y				more, still further, much more	KOU	SARA FUKERU ARATAMERU
+66F4	更	CJK	1.1	73	7		gèng	Y				more, still further, much more; to change, alter	KOU	SARA FUKERU ARATAMERU
 66F5	曵	CJK	1.1	73	7		yè					trail, tow, drag, pull	EI	HIKU
 66F7	曷	CJK	1.1	73	9		hé					why? what? where?	KATSU	NANI NANZO IZUKUNSO
 66F8	書	CJK	1.1	73	10		shū	Y				book, letter, document; writings	SHO	KAKU FUMI
@@ -6254,14 +6256,14 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 67A2	枢	CJK	1.1	75	8		shū	Y				door hinge; pivot; center of power	SUU SHU	TOBOSO KARAKURI
 67A6	枦	CJK	1.1	75	8		lú						RO	HAZE
 67A9	枩	CJK	1.1	75	8		sōng					pine tree; fir tree	SHOU	MATSU
-67AC	枬	CJK	1.1	75	8		zhān			6960	楠	name of tree, machilus nanmu	NAN	KUSUNOKI
+67AC	枬	CJK	1.1	75	8		zhān			6960	楠	name of tree, Machilus nanmu	NAN	KUSUNOKI
 67AF	枯	CJK	1.1	75	9		kū	Y				dried out, withered, decayed	KO	KARERU KARASU
 67B0	枰	CJK	1.1	75	9		píng					smooth board; chessboard; chess	HEI BYOU	SUGOROKUBAN
 67B1	枱	CJK	1.1	75	9		tái					a table, desk	I SHI JI	SUKI
 67B2	枲	CJK	1.1	75	9		xǐ					male nettle-hemp	SHI	KARAMUSHI
 67B3	枳	CJK	1.1	75	9		zhǐ					trifoliate orange; hedge thorn; (Cant.) a plug	KI SHI	KARATACHI
 67B4	枴	CJK	1.1	75	9		guǎi					cane	KAI TAI KE	TSUE
-67B5	枵	CJK	1.1	75	9		xiāo					hollo stump of a tree; empty, thin	KYOU	UTSURO
+67B5	枵	CJK	1.1	75	9		xiāo					hollow stump of a tree; empty, thin	KYOU	UTSURO
 67B6	架	CJK	1.1	75	9		jià	Y				rack, stand, prop; prop up	KA	KAKERU TANA KAKARU
 67B7	枷	CJK	1.1	75	9		jiā					cangue scaffold	KA	KARAZAO KASE
 67B8	枸	CJK	1.1	75	9		gǒu					kind of aspen found in Sichuan	KU KOU	HIIRAGI KARATACHI MAGARU
@@ -6316,6 +6318,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 67FB	査	CJK	1.1	75	9		zhā	Y				investigate, examine, seek into	SA	SHIRABERU
 67FE	柾	CJK	1.1	75	9		jiù		Y			straight grain	KYUU	MASA
 67FF	柿	CJK	1.1	75	9		shì	Y				persimmon	SHI	KAKI
+6801	栁	CJK	1.1	75	9		liǔ			67F3	柳	willow tree; pleasure	RYUU	YANAGI
 6802	栂	CJK	1.1	75	9	8	méi					a kind of evergreen tree		TOGA TSUGA
 6803	栃	CJK	1.1	75	9		lì	Y				type of oak; stable		TOCHI
 6804	栄	CJK	1.1	75	9		róng	Y				glory, honor; flourish, prosper	EI YOU	SAKAERU HAE
@@ -6386,7 +6389,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6870	桰	CJK	1.1	75	11		kuò						KATSU KACHI	YUDAME
 6871	桱	CJK	1.1	75	11		jìng						KEI KYOU	
 6872	桲	CJK	1.1	75	11		po						HOTSU BOCHI	KARAZAO
-6874	桴	CJK	1.1	75	11		fú					raft; drum stick; ridge pole	FU	BACHI IKADA
+6874	桴	CJK	1.1	75	11		fú					raft; drumstick; ridge pole	FU	BACHI IKADA
 6875	桵	CJK	1.1	75	11		ruí					small thorny bushes	ZUI NI	TARA
 6876	桶	CJK	1.1	75	11		tǒng		Y			pail, bucket, tub; cask, keg	TOU YOU	OKE
 6877	桷	CJK	1.1	75	11		jué					rafter; malus toringo	KAKU	TARUKI
@@ -6406,7 +6409,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 688D	梍	CJK	1.1	75	11		zào					tree name	SOU ZOU	SAIKACHI
 688E	梎	CJK	1.1	75	11		āo					sickle handle, branch	OU YUU YOU	KAMANOE EDA
 688F	梏	CJK	1.1	75	11		gù					handcuffs, manacles, fetters	KOKU KAKU	TEKASE
-6893	梓	CJK	1.1	75	11		zǐ		Y			catalpa ovata	SHI	AZUSA
+6893	梓	CJK	1.1	75	11		zǐ		Y			Chinese catalpa, Catalpa ovata	SHI	AZUSA
 6894	梔	CJK	1.1	75	11		zhī					gardenia	SHI	KUCHINASHI
 6896	梖	CJK	1.1	75	11		bèi					a palm-tree	HAI	BAITARA
 6897	梗	CJK	1.1	75	11		gěng	Y				stem of flower, branch of plant	KOU KYOU	YAMANIRE
@@ -6467,7 +6470,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 68DF	棟	CJK	1.1	75	12		dòng	Y				the main beams supporting a house	TOU	MUNE
 68E0	棠	CJK	1.1	75	12		táng					crab apple tree; wild plums	TOU DOU	YAMANASHI
 68E1	棡	CJK	1.1	75	12		gāng						KOU	
-68E3	棣	CJK	1.1	75	12		dì					kerria japonica plant, cherry	TEI TAI	NIWAZAKURA IKURI NIWAUME
+68E3	棣	CJK	1.1	75	12		dì					Kerria japonica, Japanese rose	TEI TAI	NIWAZAKURA IKURI NIWAUME
 68E5	棥	CJK	1.1	75	12		fán					a railing; a fence an enclosed place	HAN BON	MAGAKI
 68E7	棧	CJK	1.1	75	12		zhàn					warehouse; tavern, inn	SAN SEN	KAKEHASHI TANA
 68E8	棨	CJK	1.1	75	12		qǐ					tally or wooden pass	KEI KEN	TEGATA
@@ -6477,7 +6480,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 68ED	棭	CJK	1.1	75	12		yì						EKI YOKU	NEMUNOKI
 68EE	森	CJK	1.1	75	12		sēn	Y				forest; luxuriant vegetation	SHIN	MORI
 68EF	棯	CJK	1.1	75	12		rěn					jujube tree	JIN DEN SHIN	
-68F0	棰	CJK	1.1	75	12		chuí						SOI TA	SHIE
+68F0	棰	CJK	1.1	75	12		chuí					a mallet, bludgeon, pestle	SOI TA	SHIE
 68F1	棱	CJK	1.1	75	12		léng					squared timber; angle, edge	ROU RYOU CHOU	
 68F2	棲	CJK	1.1	75	12		qī		Y			perch; roost; stay	SEI	SUMU
 68F3	棳	CJK	1.1	75	12		zhuō			68B2	梲	joist; cane, club; king-post	SETSU SECHI TATSU TACHI	TSUKA
@@ -6485,7 +6488,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 68F6	棶	CJK	1.1	75	12		lái						RAI	MUKU
 68F9	棹	CJK	1.1	75	12		zhào					oar; boat	TOU TAKU	SAO KOGU
 68FA	棺	CJK	1.1	75	12		guān	Y				coffin	KAN	HITSUGI
-68FC	棼	CJK	1.1	75	12		fén					beams in the roof of a house confused, disordered	FUN BUN	MUNAGI
+68FC	棼	CJK	1.1	75	12		fén					beams in the roof of a house; confused, disordered	FUN BUN	MUNAGI
 68FD	棽	CJK	1.1	75	12		shēn						CHIN SHIN RIN	
 6900	椀	CJK	1.1	75	12		wǎn		Y			bowl; cup; dish	WAN	HACHI
 6901	椁	CJK	1.1	75	12		guǒ					outer-coffin; vault	KAKU	HITSUGI UWAHITSUGI
@@ -6543,7 +6546,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 695C	楜	CJK	1.1	75	13		hú						KO GO	KOSHOU KURUMI
 695D	楝	CJK	1.1	75	13		liàn					Melia japonica	REN	OUCHI
 695E	楞	CJK	1.1	75	13		léng					used for Ceylon in Buddhist texts	ROU RYOU	KADO
-6960	楠	CJK	1.1	75	13		nán		Y			name of tree, machilus nanmu	NAN	KUSUNOKI
+6960	楠	CJK	1.1	75	13		nán		Y			name of tree, Machilus nanmu	NAN	KUSUNOKI
 6961	楡	CJK	1.1	75	13		yú					elm tree	YU	NIRE
 6962	楢	CJK	1.1	75	13		yóu		Y			tinder	SHUU YUU	NARA
 6963	楣	CJK	1.1	75	13		méi					crossbeam above or under gate	BI MI	HISASHI
@@ -6565,7 +6568,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6974	楴	CJK	1.1	75	13		tì						TEI CHI SHI	KANZASHI NE
 6975	極	CJK	1.1	75	12		jí	Y				extreme, utmost, furthest, final	GOKU KYOKU GOKI	KIWAMERU MUNE KIWAMARU
 6977	楷	CJK	1.1	75	13		kǎi	Y				model style of Chinese writing	KAI	KATA NOTTORU TADASHII
-6978	楸	CJK	1.1	75	13		qiū					mallotus japonicus, deciduous tre	SHUU	HISAGI
+6978	楸	CJK	1.1	75	13		qiū					Mallotus japonicus, East Asian mallotus, (J) akamegashiwa	SHUU	HISAGI
 6979	楹	CJK	1.1	75	13		yíng					column, pillar; numerary adjunct	EI	HASHIRA
 697A	楺	CJK	1.1	75	13		rǒu						JUU NYU	
 697B	楻	CJK	1.1	75	13		huáng						KOU OU	HATAZAO
@@ -6576,7 +6579,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6980	榀	CJK	1.1	75	13		pǐn							KOMAI
 6981	榁	CJK	1.1	75	13		shǐ							MURO
 6982	概	CJK	1.1	75	14	13	gài	Y				generally, approximately	GAI KAI	TOKAKI OOMUNE OMOMUKI
-6985	榅	CJK	1.1	75	13		wēn					pillar, cryptomeria	OTSU OCHI UN	SUGI
+6985	榅	CJK	1.1	75	13		wēn					pillar; Cryptomeria	OTSU OCHI UN	SUGI
 6986	榆	CJK	1.1	75	13		yú					elm tree	YU	NIRE
 698A	榊	CJK	1.1	75	13	14	shén		Y			a sacred Shinto tree		SAKAKI
 698D	榍	CJK	1.1	75	14		xiè						SETSU	
@@ -6601,7 +6604,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 69AE	榮	CJK	1.1	75	14		róng		Y	6804	栄	glory, honor; flourish, prosper	EI YOU	SAKAERU HAE
 69AF	榯	CJK	1.1	75	14		shí						SHI	TATSU
 69B1	榱	CJK	1.1	75	14		cuī					rafter	SUI	TARUKI
-69B2	榲	CJK	1.1	75	14		wēn					pillar, cryptomeria	OTSU OCHI UN	SUGI
+69B2	榲	CJK	1.1	75	14		wēn					pillar; Cryptomeria	OTSU OCHI UN	SUGI
 69B4	榴	CJK	1.1	75	14		liú					pomegranate	RYUU	ZAKURO
 69B7	榷	CJK	1.1	75	14		què					footbridge; toll, levy; monopoly	KAKU KOU KYOU	MARUKIBASHI
 69B8	榸	CJK	1.1	75	14		zhāi						TAI	KAREKINONE KUI
@@ -6622,7 +6625,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 69CD	槍	CJK	1.1	75	14		qiāng		Y			spear, lance; gun, rifle	SOU SHOU	YARI
 69CE	槎	CJK	1.1	75	14		chá					raft; time, occasion; to hew	SA	IKADA
 69D0	槐	CJK	1.1	75	14		huái					locust tree	KAI	ENJU
-69D1	槑	CJK	1.1	75	14		méi						BAI	UME
+69D1	槑	CJK	1.1	75	14		méi					plums, prunes	BAI	UME
 69D3	槓	CJK	1.1	75	14		gàng					lever, pole, crowbar; sharpen; (Cant.) a wardrobe, trunk	KOU	TEKO
 69D4	槔	CJK	1.1	75	14		gāo						KOU	HANETSURUBE
 69D6	槖	CJK	1.1	75	14		tuó					a sack; a stamping sound	TAKU	HUKURO HUIGO
@@ -6741,7 +6744,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6A90	檐	CJK	1.1	75	17		yán					eaves of house; brim, rim	EN TAN	HISASHI
 6A91	檑	CJK	1.1	75	17		léi						RAI	
 6A94	檔	CJK	1.1	75	17		dàng						TOU	
-6A97	檗	CJK	1.1	75	17		bò					tree	HAKU BYAKU	KIWADA
+6A97	檗	CJK	1.1	75	17		bò					a cork tree	HAKU BYAKU	KIWADA
 6A9B	檛	CJK	1.1	75	17		zhuā					a switch, whip	TA TE	TSUE
 6A9C	檜	CJK	1.1	75	17	16	guì		Y	6867	桧	Chinese cypress, Chinese juniper	KAI	HINOKI
 6A9D	檝	CJK	1.1	75	17		jí					oar	SHUU	KAJI
@@ -6989,10 +6992,11 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6C1F	氟	CJK	1.1	84	9		fú					fluorine	FUTSU	
 6C23	氣	CJK	1.1	84	10		qì		Y	6C17	気	air, gas, steam, vapor; spirit	KI KE	IKI
 6C24	氤	CJK	1.1	84	10		yīn					hanging fog, misty	IN	
+6C25	氥	CJK	1.1	84	10		xī			6C19	氙	xenon	SEN	
 6C26	氦	CJK	1.1	84	10		hài					helium	GAI	
 6C27	氧	CJK	1.1	84	10		yǎng					oxygen	YOU	
 6C28	氨	CJK	1.1	84	10		ān					ammonia; hydrogen nitride	AN	
-6C2C	氬	CJK	1.1	84	12		yà					argonium	A	
+6C2C	氬	CJK	1.1	84	12		yà					argon	A	
 6C2E	氮	CJK	1.1	84	12		dàn					nitrogen	TAN	
 6C2F	氯	CJK	1.1	84	12		lǜ			7DA0	綠	green; chlorine	RYOKU ROKU	MIDORI
 6C32	氲	CJK	1.1	84	13		yūn					life giving influences of nature; spirit of harmony; prosperity	UN	SAKAN
@@ -7007,7 +7011,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6C3B	氻	CJK	1.1	85	5		lè						ROKU	
 6C3C	氼	CJK	1.1	85	6		nì			6EBA	溺	drown; submerge in water; indulge	DEKI JOU NYOU	OBORERU IBARI
 6C3D	氽	CJK	1.1	11	6		tǔn					to float; to deep fry; (Cant.) to turn inside-out	TON	UKABERU
-6C3E	氾	CJK	1.1	85	5		fàn	Y				overflow, flood, inundate	HAN	HIROGARU
+6C3E	氾	CJK	1.1	85	5		fán	Y				overflow, flood, inundate	HAN	HIROGARU
 6C3F	氿	CJK	1.1	85	5		guǐ					spring	KI KYUU GU	OZUMI WAKIMIZU
 6C40	汀	CJK	1.1	85	5		tīng		Y			sandbar, beach, bank, shore	TEI	MIGIWA NAGISA
 6C41	汁	CJK	1.1	85	5		zhī	Y				juice, liquor, fluid, sap, gravy, sauce	JUU	SHIRU
@@ -7028,7 +7032,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6C5C	汜	CJK	1.1	85	6		sì					a stream which leaves the main branch then later returns	SHI JI I	KAWA
 6C5D	汝	CJK	1.1	85	6		rǔ		Y			you	JO	NANJI
 6C5E	汞	CJK	1.1	85	7		gǒng					element mercury	KOU	MIZUGANE
-6C5F	江	CJK	1.1	85	6		jiāng	Y				large river; yangzi; surname	KOU	E
+6C5F	江	CJK	1.1	85	6		jiāng	Y				large river; the Yangzi; surname	KOU	E
 6C60	池	CJK	1.1	85	6		chí	Y				pool, pond; moat; cistern	CHI TA	IKE
 6C61	污	CJK	1.1	85	6		wū					filthy, dirty, impure, polluted	O	KEGASU KEGARERU YOGOSU KITANAI
 6C62	汢	CJK	1.1	85	6		tu							TSUCHI
@@ -7056,7 +7060,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6C85	沅	CJK	1.1	85	7		yuán					name of a river in western Hunan that flows into Dongting lake	GEN	MINAMOTO
 6C86	沆	CJK	1.1	85	7		hàng					a ferry; fog; flowing	KOU GOU	HIROI
 6C87	沇	CJK	1.1	85	7		yǎn					flowing and engulfing; brimming	EN I	NAGARERU
-6C88	沈	CJK	1.1	85	7		chén	Y				sink, submerge; addicted to; surname	CHIN JIN SHIN	SHIZUMU SHIZUMERU
+6C88	沈	CJK	1.1	85	7		shěn	Y				sink, submerge; addicted to; surname	CHIN JIN SHIN	SHIZUMU SHIZUMERU
 6C89	沉	CJK	1.1	85	7		chén					sink, submerge; addicted to	CHIN	SHIZUUMU SHIZUUMERU
 6C8C	沌	CJK	1.1	85	7		dùn		Y			chaotic, confused; turbid, murky	TON	FUSAGARU KURAI OROKA
 6C8D	沍	CJK	1.1	85	7		hù					freezing; stopped up, closed off	GO	KARERU
@@ -7133,7 +7137,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6CF2	泲	CJK	1.1	85	7		jǐ					kind of white wine; rivers in Hebei and Shandong	SEI SAI	
 6CF3	泳	CJK	1.1	85	8		yǒng	Y				dive; swim	EI	OYOGU
 6CF4	泴	CJK	1.1	85	9		guàn						KAN	KIYOMERU
-6CF5	泵	CJK	1.1	112	9		bèng					pump	RYUU	
+6CF5	泵	CJK	1.1	112	9		bèng					pump (English loan word)	RYUU	
 6D04	洄	CJK	1.1	85	9		huí					a back-water; an eddy a whirlpool	KAI GAI	SAKANOBORU
 6D07	洇	CJK	1.1	85	9		yīn						IN ETSU ECHI	SHIZUMU
 6D0A	洊	CJK	1.1	85	9		jiàn					flowing water	SEN ZEN SON ZON	ITARU
@@ -7153,7 +7157,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6D24	洤	CJK	1.1	85	9		quán			6CC9	泉	spring, fountain; wealth, money	SEN	IZUMI ZENI
 6D25	津	CJK	1.1	85	9		jīn	Y				ferry; saliva; ford	SHIN	TSU
 6D26	洦	CJK	1.1	85	9		pò						BAKU MYAKU HAKU HYAKU	
-6D27	洧	CJK	1.1	85	9		wěi					name of a river in honan	I	
+6D27	洧	CJK	1.1	85	9		wěi					name of a river in Honan	I	
 6D28	洨	CJK	1.1	85	9		xiáo					river in Hebei province	KOU KYOU	
 6D29	洩	CJK	1.1	85	9		xiè					leak, drip; vent or release	EI SETSU	NOBIRU MORERU
 6D2A	洪	CJK	1.1	85	9		hóng	Y				vast, immense; flood, deluge	KOU	OUMIZU
@@ -7233,7 +7237,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6DBF	涿	CJK	1.1	85	11		zhuō					drip, dribble, trickle	TOKU DOKU TAKU	
 6DC0	淀	CJK	1.1	85	11		diàn		Y			shallow water, swamp; swampy	TEN DEN	YODO YODOMU
 6DC4	淄	CJK	1.1	85	11		zī					river in Shandong province	SHI	
-6DC5	淅	CJK	1.1	85	11		xī					water used wash rice; to wash ric	SEKI	YONAGU KASHONE
+6DC5	淅	CJK	1.1	85	11		xī					water used wash rice; to wash rice	SEKI	YONAGU KASHONE
 6DC6	淆	CJK	1.1	85	11		xiáo					confused, in disarray, mixed up	KOU	MAJIRU
 6DC7	淇	CJK	1.1	85	11		qí					river in Henan province	KI GI	
 6DC8	淈	CJK	1.1	85	11		gǔ						KOTSU KOCHI	NIGOSU
@@ -7246,7 +7250,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6DD2	淒	CJK	1.1	85	11		qī					bitter cold, miserable, dreary	SEI SAI	SAMUI
 6DD5	淕	CJK	1.1	85	11		lù						RIKU ROKU	
 6DD6	淖	CJK	1.1	85	11		nào					slush; mud	DOU NYOU	DORU
-6DD8	淘	CJK	1.1	85	11		táo					wash in sieve; weed out	TOU	YONAGERU
+6DD8	淘	CJK	1.1	85	11		táo					wash in a sieve; weed out	TOU	YONAGERU
 6DD9	淙	CJK	1.1	85	11		cóng					gurgling sound of water	SOU SU	SOSOGU
 6DDA	淚	CJK	1.1	85	11		lèi		Y	6D99	涙	tears; weep, cry	RUI REI	NAMIDA
 6DDB	淛	CJK	1.1	85	11		zhè						SEI SETSU SECHI	
@@ -7254,7 +7258,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 6DDD	淝	CJK	1.1	85	11		féi					name of an affluent of the Poyang Lake	HI BI	
 6DDE	淞	CJK	1.1	85	11		sōng					name of a river in Jiangsu	SHOU SHU	
 6DDF	淟	CJK	1.1	85	11		tiǎn					turbid; muddy	TEN TON	NIGORU
-6DE0	淠	CJK	1.1	85	11		pì						HI HEI HAI	
+6DE0	淠	CJK	1.1	85	11		pì					name of a river in Anhui	HI HEI HAI	
 6DE1	淡	CJK	1.1	85	11		dàn	Y				weak, watery; insipid, tasteless	TAN EN	AWAI USUI
 6DE2	淢	CJK	1.1	85	11		yù					ditch	YOKU IKI ITSU ICHI	HAYAI
 6DE4	淤	CJK	1.1	85	11		yū					mud, sediment; clog up, silt up	YO O	DORO
@@ -7921,7 +7925,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 72A8	犨	CJK	1.1	93	20		chōu					panting of cow; grunting of ox	SHUU SHU	
 72AC	犬	CJK	1.1	94	4		quǎn	Y				dog; radical number 94	KEN	INU
 72AD	犭	CJK	1.1	94	3		quǎn					dog; radical number 94		KEMONOHEN
-72AE	犮	CJK	1.1	94	4		bá					to pull up	HATSU BACHI	
+72AE	犮	CJK	1.1	94	5		bá					to pull up	HATSU BACHI	
 72AF	犯	CJK	1.1	94	5		fàn	Y				commit crime, violate; criminal	HAN BON	OKASU
 72B1	犱	CJK	1.1	94	6		jǐ						KEKI KYAKU	
 72B2	犲	CJK	1.1	94	6		chái					wolf; cruel, wicked, mean	SAI	YAMAINU
@@ -8594,7 +8598,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 76C6	盆	CJK	1.1	108	9		pén	Y				basin, tub, pot, bowl	BON HON	HACHI
 76C7	盇	CJK	1.1	108	9		hé			76CD	盍	what? why not?	KOU GOU	OOU NANZO
 76C8	盈	CJK	1.1	108	9	8	yíng					fill; full, overflowing; surplus	EI	MICHIRU
-76C9	盉	CJK	1.1	108	10		hé						KA WA	TOTONOERU
+76C9	盉	CJK	1.1	108	10		hé					to compound	KA WA	TOTONOERU
 76CA	益	CJK	1.1	108	10		yì	Y				profit, benefit; advantage	EKI YAKU	MASU MASUMASU
 76CB	盋	CJK	1.1	108	10		bō						HATSU HACHI	WAN
 76CC	盌	CJK	1.1	108	10		wǎn					bowl, basin, cup	WAN	
@@ -8730,7 +8734,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 77A7	瞧	CJK	1.1	109	17		qiáo					glance at, look at, see	SHOU JOU	NUSUMIMIRU
 77AA	瞪	CJK	1.1	109	17		dèng					stare at	DOU TOU	MIHARU
 77AC	瞬	CJK	1.1	109	18		shùn	Y				wink, blink; in a wink, a flash	SHUN	MATATAKU MATATAKI
-77AD	瞭	CJK	1.1	109	17		liǎo	Y				bright, clear; clear-sighted	RYOU	AKIRAKA
+77AD	瞭	CJK	1.1	109	17		liào	Y				bright, clear; clear-sighted	RYOU	AKIRAKA
 77AE	瞮	CJK	1.1	109	17		chè						TETSU TECHI	AKIRAKA
 77AF	瞯	CJK	1.1	109	17		xián					to peep; to spy	KAN GEN KEN	UWAMEZUKAI NAGASHIME
 77B0	瞰	CJK	1.1	109	17		kàn					watch, spy; overlook; look down	KAN	MIRU
@@ -8884,7 +8888,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 78C9	磉	CJK	1.1	112	15		sǎng					the stone base or plinth of a pillar	SOU	ISHIZUE
 78CA	磊	CJK	1.1	112	15		lěi					pile of rocks or stones; great	RAI	
 78CB	磋	CJK	1.1	112	15		cuō					polish, buff; scrutinize	SA	MIGAKU
-78CC	磌	CJK	1.1	112	15		tián						TEN DEN SHIN	
+78CC	磌	CJK	1.1	112	15		tián					rumbling sound	TEN DEN SHIN	
 78CE	磎	CJK	1.1	112	15		xī					mountain stream, creek	KEI	TANI
 78D0	磐	CJK	1.1	112	15		pán		Y			large rock, boulder; firm	HAN BAN	IWA
 78D1	磑	CJK	1.1	112	15		wéi					stone mill; grind; break apart	GAI	USU
@@ -8982,7 +8986,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 7965	祥	CJK	1.1	113	10		xiáng	Y				good luck	SHOU	SAIWAI
 7967	祧	CJK	1.1	113	11		tiāo					an ancestral hall	CHOU	
 7968	票	CJK	1.1	113	11		piào	Y				slip of paper or bamboo; ticket	HYOU	FUDA
-7969	祩	CJK	1.1	113	11		zhù						SHU CHU	NOROU
+7969	祩	CJK	1.1	113	11		zhù					red or short garments	SHU CHU	NOROU
 796B	祫	CJK	1.1	113	11		xiá					triennial sacrifice to one's ancestors	KOU GYOU	MATSURU
 796D	祭	CJK	1.1	113	11		jì	Y				sacrifice to, worship	SAI	MATSURU MATSURI
 7972	祲	CJK	1.1	113	12		jìn					ominous or sinister spirit; vigor	SHIN	
@@ -9063,7 +9067,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 79E2	秢	CJK	1.1	115	10		líng						REI RYOU	YOHAI
 79E3	秣	CJK	1.1	115	10		mò					fodder, horse feed; feed horse	MATSU BATSU	MAGUSA MAGUSAKAU
 79E4	秤	CJK	1.1	115	10		chèng		Y			balance, scale, steelyard	SHOU	HAKARI
-79E5	秥	CJK	1.1	115	10		nián						DEN NEN	INE
+79E5	秥	CJK	1.1	115	10		nián					white rice	DEN NEN	INE
 79E6	秦	CJK	1.1	115	10		qín		Y			feudal state of Qin; the Qin dynasty (from which the name 'China' comes)	SHIN JIN	
 79E7	秧	CJK	1.1	115	10		yāng					rice seedlings, young rice plants	OU	NAE UERU
 79E9	秩	CJK	1.1	115	10		zhì	Y				order; orderly; salary; decade	CHITSU	TSUIDE FUCHI
@@ -9078,7 +9082,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 79FC	秼	CJK	1.1	115	11		zhū						SHU	NOROFU
 7A00	稀	CJK	1.1	115	12		xī		Y			rare, unusual, scarce; sparse	KI KE	MARE MABARA
 7A02	稂	CJK	1.1	115	12		láng					grass; weeds	ROU RYOU	IMIGARA
-7A03	稃	CJK	1.1	115	12		fū						FU FUU BU	MOMIGARA
+7A03	稃	CJK	1.1	115	12		fū					rich-bran; seed capsules	FU FUU BU	MOMIGARA
 7A05	稅	CJK	1.1	115	12		shuì					taxes, revenue, duty; tax	ZEI DATSU ETSU	MITSUGI
 7A07	稇	CJK	1.1	115	12		kǔn					to bind, as faggots of sheaves	KON	URERU KUKURU
 7A08	稈	CJK	1.1	115	12		gǎn					stalk of grain; straw	KAN	WARA
@@ -9158,7 +9162,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 7A74	穴	CJK	1.1	116	5		xué	Y				cave, den, hole; KangXi radical 116	KETSU	ANA
 7A75	穵	CJK	1.1	116	6		wā					deep hollow;, gouge, dig out	ATSU ECHI	ANA
 7A76	究	CJK	1.1	116	7		jiū	Y				examine, investigate	KYUU	KIWAMERU KIWAMARU
-7A78	穸	CJK	1.1	116	8		xī					the gloom of the grave a tomb or grave; death	SEKI JOKU KYUU	YORU
+7A78	穸	CJK	1.1	116	8		xī					the gloom of the grave; a tomb or grave; death	SEKI JOKU KYUU	YORU
 7A79	穹	CJK	1.1	116	8		qióng		Y			high and vast; elevated; arched	KYUU	SORA AME
 7A7A	空	CJK	1.1	116	8		kōng	Y				empty, hollow, bare, deserted	KUU	KARA AKU SORA
 7A7D	穽	CJK	1.1	116	9		jǐng					hole; pitfall, trap	SEI	OTOSHIANA
@@ -9494,7 +9498,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 7C70	籰	CJK	1.1	118	26		yuè						WAKU YOKU IKI	ITOWAKU
 7C72	籲	CJK	1.1	118	32		yù					appeal; request; implore	YU YAKU	YOBU
 7C73	米	CJK	1.1	119	6		mǐ	Y				hulled or husked uncooked rice	BEI MAI ME	KOME YONE MEETORU
-7C75	籵	CJK	1.1	119	8		fán					dm (decimetre, decimeter)		DEKAMEETORU
+7C75	籵	CJK	1.1	119	8		fán					decimetre		DEKAMEETORU
 7C79	籹	CJK	1.1	119	9		nǚ					cake	JO NYO	
 7C7C	籼	CJK	1.1	119	9		xiān					non-glutinous long grain rice	SEN	URUCHI
 7C7D	籽	CJK	1.1	119	9		zǐ					seed, pip, pit, stone	SHI	
@@ -10148,7 +10152,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 80AA	肪	CJK	1.1	130	8		fáng	Y				animal fat	BOU HOU	KOERU ABURA
 80AB	肫	CJK	1.1	130	8		zhūn					the gizzard of a fowl; honest, sincere	SHUN SAI SUI	HOOBONE
 80AC	肬	CJK	1.1	130	8		yóu					wart; tumor; goiter; papule	YUU	IBO
-80AD	肭	CJK	1.1	130	8		nà					fat; seal (moon radical DKW: 14342 is different)	DOTSU NACHI DATSU	KOERU
+80AD	肭	CJK	1.1	130	8		nà					fat; seal	DOTSU NACHI DATSU	KOERU
 80AF	肯	CJK	1.1	130	8		kěn	Y				willing; consent to, permit	KOU KAI	UBENAU GAENJI AETE
 80B1	肱	CJK	1.1	130	8		gōng					forearm	KOU	HIJI
 80B2	育	CJK	1.1	130	8		yù	Y				produce, give birth to; educate	IKU	SODATERU HAGUKUMU SODATSU
@@ -10450,7 +10454,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 8280	芀	CJK	1.1	140	5		tiáo					clover; pea	SHOU JOU	
 8281	芁	CJK	1.1	140	5		jiāo						KOU	
 8283	芃	CJK	1.1	140	6		péng					luxuriant growth	HOU BU FUU	SAKAN
-8284	芄	CJK	1.1	140	6		wán						KAN GAN	GAGAIMO
+8284	芄	CJK	1.1	140	6		wán					a sedgy plant	KAN GAN	GAGAIMO
 8287	芇	CJK	1.1	140	6		mián						BEN MEN BAN MAN	ATARU JIGO
 8288	芈	CJK	1.1	140	7		mǐ					bleat of sheep; surname	BA MA BI MI	
 8289	芉	CJK	1.1	140	6		gān						KAI KAN	HATOMUGI
@@ -10482,7 +10486,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 82AC	芬	CJK	1.1	140	7		fēn					fragrance, aroma; perfume	FUN	KOUBASHII KAORI
 82AD	芭	CJK	1.1	140	7		bā		Y			plantain or banana palm; fragrant	BA HA	HANA
 82AE	芮	CJK	1.1	140	7		ruì					tiny, small; water's edge	ZEI NEI ZETSU NECHI	
-82AF	芯	CJK	1.1	140	7		xīn	Y				pith from rush (juncus effusus)	SHIN	HOSOI TOUSHINGU
+82AF	芯	CJK	1.1	140	7		xīn	Y				pith from rush (Juncus effusus)	SHIN	HOSOI TOUSHINGU
 82B0	芰	CJK	1.1	140	7		jì					water caltrop	KI GI	HISHI
 82B1	花	CJK	1.1	140	7		huā	Y				flower; blossoms	KA	HANA
 82B2	芲	CJK	1.1	140	7		huā						KUWA KA	HANA
@@ -10549,7 +10553,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 830B	茋	CJK	1.1	140	8		zhǐ						SHI	TSURIGANESOU
 830D	茍	CJK	1.1	140	9		jì					to be circumspect, cautious in one's behaviour (distinguish DKW 30790 gou3)	KYOKU	
 830E	茎	CJK	1.1	140	8		jīng	Y				stem, stalk	KEI KOU	KUKI
-8316	茖	CJK	1.1	140	9		gé					allium victorialis	KAKU	YAMANIRA
+8316	茖	CJK	1.1	140	9		gé					Allium victorialis, Alpine leek	KAKU	YAMANIRA
 8317	茗	CJK	1.1	140	9		míng					tea; tea plant	MEI BEI MYOU	CHA
 8318	茘	CJK	1.1	140	9		lì					a scallion, small onion	RI REI REN	OONIRA
 831B	茛	CJK	1.1	140	9		gèn					ranunculus	KON KEN	TORIKABUTO
@@ -10636,7 +10640,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 839F	莟	CJK	1.1	140	10		hàn					a bud	KAN GAN	TSUBOMI HANASHIBE
 83A0	莠	CJK	1.1	140	10		yǒu					weeds, tares; undesirable, evil	YUU SHUU	HAGUSA MINIKUI
 83A2	莢	CJK	1.1	140	10		jiá					pods of leguminous plants; pods	KYOU	SAYA
-83A6	莦	CJK	1.1	140	10		shāo						SOU SHOU	MIDARERU
+83A6	莦	CJK	1.1	140	10		shāo					jungle grass; lair	SOU SHOU	MIDARERU
 83A7	莧	CJK	1.1	140	10		xiàn					edible greens; amaranth	KAN GEN KEN	HIYU
 83A8	莨	CJK	1.1	140	10		làng					herb, Scopolia japonica	ROU	TABAKO
 83A9	莩	CJK	1.1	140	10		fú					membrane lining inside of reed	FU	
@@ -11015,7 +11019,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 861A	蘚	CJK	1.1	140	20		xiǎn					moss, lichen	SEN	KOKE
 861B	蘛	CJK	1.1	140	20		yú						IKU YU	SHIGERU
 861E	蘞	CJK	1.1	140	20		liǎn					wild vine, vitis pentaphylla	REN KEN KON	YABUKARASHI
-8621	蘡	CJK	1.1	140	20		yīng						OU YOU EI	
+8621	蘡	CJK	1.1	140	20		yīng					a wild grape	OU YOU EI	
 8622	蘢	CJK	1.1	140	19		lóng					tall grass; water-weeds	ROU RYOU	OUKETADE
 8624	蘤	CJK	1.1	140	20		huā			82B1	花	flower; blossoms	KA	HANA
 8627	蘧	CJK	1.1	140	20		qú					a plant which resembles wheat but has no edible grain	KU GU KYO	
@@ -11404,7 +11408,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 8898	袘	CJK	1.1	145	10		yí						I TA DA	MIGORO
 8899	袙	CJK	1.1	145	10		pà						HA BATSU	AKOME
 889A	袚	CJK	1.1	145	10		bō					greave; knee-pads; buskins	HATSU HACHI HI	HUKU
-889B	袛	CJK	1.1	145	10		dī						TEI TAI SHI	
+889B	袛	CJK	1.1	145	10		dī					used for U+53EA 只	TEI TAI SHI	
 889C	袜	CJK	1.1	145	10		wà					socks, stockings	BATSU MACHI	TABI
 889E	袞	CJK	1.1	145	11		gǔn					ceremonial dress worn by the emperor	KON	OUGI
 889F	袟	CJK	1.1	145	10		zhì					book cover; satchel or bag	CHITSU JICHI	SAYA
@@ -11420,7 +11424,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 88B3	袳	CJK	1.1	145	11		chǐ					spread one's clothes	SHI	KIMONOHIROGARU
 88B4	袴	CJK	1.1	145	11		kù		Y			pants; trousers; panties	KO	HAKAMA
 88B5	袵	CJK	1.1	145	11		rèn					lapel; hidden lapel of coat	JIN NIN	OKUMI
-88B7	袷	CJK	1.1	145	11		jiá					lined garment	KOU KYOU	AWASE
+88B7	袷	CJK	1.1	145	11		qiā					lined garment	KOU KYOU	AWASE
 88BA	袺	CJK	1.1	145	11		jié					hold up	KETSU KECHI KATSU	TSUMADORU
 88BD	袽	CJK	1.1	145	11		rú					clothes	JO NYO	YABUREGOROMO
 88BE	袾	CJK	1.1	145	11		zhū						CHU SHU	MIGORO
@@ -11471,7 +11475,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 8901	褁	CJK	1.1	145	12		guǒ						SEKI SHAKU	HUKURO
 8902	褂	CJK	1.1	145	13		guà					jacket, overcoat, coat; gown	KAI KE	UCHIKAKE UWAGI
 8904	褄	CJK	1.1	145	13		qī					a skirt		TSUMA
-8906	褆	CJK	1.1	145	14		tí						SHI JI TEI DAI	
+8906	褆	CJK	1.1	145	14		tí					handsomely dressed	SHI JI TEI DAI	
 8907	複	CJK	1.1	145	14		fù	Y				repeat, double, overlap	FUKU	KASANERU FUTATABI
 890A	褊	CJK	1.1	145	14		biǎn					cramped, narrow, crowded; mean	HEN	SEMAI
 890C	褌	CJK	1.1	145	14		kūn					trousers, pants, shorts, drawers	KON	FUNDOSHI
@@ -12177,7 +12181,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 8DFA	跺	CJK	1.1	157	13		duò					stamp feet, step	TA	YUKU
 8DFC	跼	CJK	1.1	157	14		jú					bent, stooped, crouched; contract	KYOKU	HIZAMAZU
 8DFD	跽	CJK	1.1	157	14		jì					to kneel for a long time, to go down on hands and knees	KI GI	HIZAMAZUKU
-8DFF	跿	CJK	1.1	157	14		tú						TO ZU	
+8DFF	跿	CJK	1.1	157	14		tú					to jump about	TO ZU	
 8E01	踁	CJK	1.1	157	14		jìng					tinkling, obstinate	KEI	SUNE
 8E04	踄	CJK	1.1	157	14		bù						HAKU BAKU HO BU	FUMU
 8E05	踅	CJK	1.1	157	14		xué					to walk around; turn back midway	TEI SETSU ZECHI	KENKEN
@@ -12203,7 +12207,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 8E2A	踪	CJK	1.1	157	15		zōng	Y				footprints, traces, tracks	SHOU SOU	ATO
 8E30	踰	CJK	1.1	157	16		yú					exceed, transgress; cross over	YU YOU	KOERU
 8E31	踱	CJK	1.1	157	16		duó					stroll, pace, walk slowly	TAKU DAKU JAKU	HADASHI
-8E33	踳	CJK	1.1	157	16		chuǎn						SHUN SEN	SOMUKU
+8E33	踳	CJK	1.1	157	16		chuǎn					mixed; obstinate	SHUN SEN	SOMUKU
 8E34	踴	CJK	1.1	157	16		yǒng					leap, jump	YOU	ODORU
 8E35	踵	CJK	1.1	157	16		zhǒng					heel; follow; visit, call on	SHOU	TSUGU KUBISU
 8E36	踶	CJK	1.1	157	16		dì					paw	TEI DAI CHI JI	FUMU
@@ -12222,7 +12226,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 8E4B	蹋	CJK	1.1	157	17		tà					step on, tread on; stumble, slip	TOU DOU	HUMU
 8E4C	蹌	CJK	1.1	157	17		qiāng					walk rapidly	SHOU SOU	UGOKU YOROMEKU
 8E4D	蹍	CJK	1.1	157	17		niǎn					upper millstone; to grind, roll, triturate	TEN DEN NEN	HUMU
-8E4E	蹎	CJK	1.1	157	17		diān						TEN	TSUMAZUKU
+8E4E	蹎	CJK	1.1	157	17		diān					to stumble, trip	TEN	TSUMAZUKU
 8E4F	蹏	CJK	1.1	157	17		tí					hoof; leg of pork; little witch a horse	TEI	HIZUME
 8E50	蹐	CJK	1.1	157	17		jí					take short steps	SEKI	NUKIASHI SASHIASHI
 8E54	蹔	CJK	1.1	157	18		zàn					temporary; fleeting; ephemeral	SAN ZAN	TOTSUSHINSURU
@@ -12811,7 +12815,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 91CD	重	CJK	1.1	166	9		zhòng	Y				heavy, weighty; double	CHOU JUU	OMOI KASANERU E
 91CE	野	CJK	1.1	166	11		yě	Y				open country, field; wilderness	YA SHO	NO
 91CF	量	CJK	1.1	166	12		liàng	Y				measure, quantity, capacity	RYOU	HAKARU
-91D0	釐	CJK	1.1	166	18		lí					manage, control; thousandth part of tael	RI KI RAI	OSAMERU
+91D0	釐	CJK	1.1	166	18		xī					manage, control; thousandth part of tael	RI KI RAI	OSAMERU
 91D1	金	CJK	1.1	167	8		jīn	Y				gold; metals in general; money	KIN KON	KANE
 91D2	釒	CJK	1.1	167	8		jīn			91D1	金	gold; metals in general; money	KIN KON	KANE
 91D3	釓	CJK	1.1	167	9		qiú					gadolinium	HYUU GU	ISHIYUMI
@@ -13006,7 +13010,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 92E3	鋣	CJK	1.1	167	16		yé					sword	YA	
 92E4	鋤	CJK	1.1	167	15		chú					hoe; eradicate	JO SO	KUWA SUKU SUKI
 92E5	鋥	CJK	1.1	167	15		zèng					polish	TOU JOU	MIGAKU TOGU
-92E7	鋧	CJK	1.1	167	15		xiàn						KEN GEN	
+92E7	鋧	CJK	1.1	167	15		xiàn					small chisel	KEN GEN	
 92E8	鋨	CJK	1.1	167	15		tiě					an ancient name for iron; osmium	TETSU	KUROGANE
 92E9	鋩	CJK	1.1	167	14		máng					point of sword; sharp point	BOU MOU	HOKOSAKI KITSUSAKI
 92EA	鋪	CJK	1.1	167	15		pù					spread out, arrange; shop, store; place to sleep, bed	HO FU	SHIKU MISE
@@ -13371,7 +13375,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 963A	阺	CJK	1.1	170	8		dǐ						KYO KO	ORI
 963B	阻	CJK	1.1	170	8		zǔ	Y				impede, hinder, obstruct; oppose	SO SHO	HABAMU KEWASHII HEDATERU
 963C	阼	CJK	1.1	170	8		zuò					the steps leading to the eastern door	SO ZO SAKU ZAKU	KIZAHASHI
-963D	阽	CJK	1.1	170	8		diàn						EN TEN	KUZUREKAKARU
+963D	阽	CJK	1.1	170	8		diàn					wall ready to fall; danger	EN TEN	KUZUREKAKARU
 963F	阿	CJK	1.1	170	8		ā		Y			prefix for people's names; used in transliteration	A	KUMA OMONERU O
 9640	陀	CJK	1.1	170	8		tuó		Y			steep bank, rough terrain	DA TA	KEWASHII
 9641	陁	CJK	1.1	170	8		tuó					a steep bank, a declivity	TA DA CHI JI I	NANAME NANAMENOSAMA
@@ -13400,6 +13404,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 9666	陦	CJK	1.1	170	10		dǎo						TOU	
 966A	陪	CJK	1.1	170	11		péi	Y				accompany, be with, keep company	BAI HAI	SHITAGAU
 966C	陬	CJK	1.1	170	11		zōu					corner, cranny, nook, niche	SUU SOU SHUU	SUMI
+966D	陭	CJK	1.1	170	10		yì			2550E	𥔎	cape; spit; promontory		SAKI
 966E	陮	CJK	1.1	170	11		duì						TAI TE	TAKAI AYAFUI
 9670	陰	CJK	1.1	170	11		yīn	Y				'female' principle; dark; secret	IN ON AN	KAGE KAGERU KURAI
 9672	陲	CJK	1.1	170	11		chuí					frontier, border	SUI	HOTORI
@@ -13414,7 +13419,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 967C	陼	CJK	1.1	170	12		zhǔ					islet	SHO TO TSU ZU	SHIMA
 967D	陽	CJK	1.1	170	12		yáng	Y				'male' principle; light; sun	YOU	HI ITSUWARU
 967E	陾	CJK	1.1	170	12		réng					in file	JOU NYOU JI NI	OOI
-967F	陿	CJK	1.1	170	12		xiá						KYOU	SEMAI
+967F	陿	CJK	1.1	170	12		xiá					narrow	KYOU	SEMAI
 9681	隁	CJK	1.1	170	12		yàn						EN	TSUTSUMI
 9682	隂	CJK	1.1	170	12		yīn					shady, secret, dark; mysterious; cold; the negative of female principle in nature	IN	KAGE KAGEERU
 9683	隃	CJK	1.1	170	12		shù					to exceed; a state in Shanxi province	SHU YU YOU	KOERU
@@ -13535,7 +13540,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 9727	霧	CJK	1.1	173	19		wù	Y				fog, mist, vapor, fine spray	MU BU	KIRI
 9728	霨	CJK	1.1	173	19		wèi					clouding	I	
 972A	霪	CJK	1.1	173	19		yín					long and heavy rain	IN	
-9730	霰	CJK	1.1	173	20		sǎn					hail, sleet	SAN SEN	ARARE
+9730	霰	CJK	1.1	173	20		xiàn					hail, sleet	SAN SEN	ARARE
 9731	霱	CJK	1.1	173	20		yù					cloud	ITSU ICHI	MEDETAIKUMO
 9732	露	CJK	1.1	173	21		lù	Y				dew; bare, open, exposed	RO	TSUYU ARAWARERU
 9733	霳	CJK	1.1	173	20		lóng						RYUU RYU	
@@ -14274,7 +14279,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 9C11	鰑	CJK	1.1	195	20		yáng						YOU	UNAGI SURUME
 9C12	鰒	CJK	1.1	195	20		fù					abalone	FUKU	AWABI FUGU
 9C13	鰓	CJK	1.1	195	20		sāi					fish gills	SAI SHI	ERA
-9C14	鰔	CJK	1.1	195	20		gǎn						KAN KON GEN	TARA KAREI
+9C14	鰔	CJK	1.1	195	20		gǎn					a kind of fish	KAN KON GEN	TARA KAREI
 9C15	鰕	CJK	1.1	195	20		xiā					shrimp, prawn	KA	EBI
 9C16	鰖	CJK	1.1	195	20		tuǒ						TA	
 9C18	鰘	CJK	1.1	195	20		shì							MUROAJI
@@ -14745,7 +14750,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Joyo	Jinmei	LinkCode	Lin
 9FA5	龥	CJK	1.1	214	26		yù					beg, appeal for help	YAKU YU	YOBU
 9FCC	鿌	CJK	6.1	85	12					6DBC	涼	cool, cold; disheartened	RYOU	SUZUSHII USUI MAKOTONI
 F900	豈	CJK_Compat_Ideographs	1.1	151	10					8C48	豈	how? what?	KI GAI KAI	ANI
-F901	更	CJK_Compat_Ideographs	1.1	73	7					66F4	更	more, still further, much more	KOU	SARA FUKERU ARATAMERU
+F901	更	CJK_Compat_Ideographs	1.1	73	7					66F4	更	more, still further, much more; to change, alter	KOU	SARA FUKERU ARATAMERU
 F902	車	CJK_Compat_Ideographs	1.1	159	7					8ECA	車	cart, vehicle; carry in cart	SHA KYO	KURUMA
 F903	賈	CJK_Compat_Ideographs	1.1	154	13					8CC8	賈	surname; merchant; buy, trade	KO	AKINAU AKINAI URU
 F904	滑	CJK_Compat_Ideographs	1.1	85	12					6ED1	滑	slip, slide; slippery, polished	KATSU KOTSU	NAMERAKA SUBERU
@@ -15014,11 +15019,12 @@ FA0B	廓	CJK_Compat_Ideographs	1.1	53	14					5ED3	廓	broad, wide, open, empty; 
 FA0C	兀	CJK_Compat_Ideographs	1.1	10	3							duplicate of Big Five A461	KOTSU GOTSU	TAKAI HAGERU ASHIKIRU
 FA0D	嗀	CJK_Compat_Ideographs	1.1	30	13							vomit	KAKU	HAKUSAMA
 FA10	塚	CJK_Compat_Ideographs	1.1	32	13							cemetery; tomb	CHOU	TSUKA
+FA11	﨑	CJK_Compat_Ideographs	1.1	46	12							cape; spit; promontory	KI	SAKI
 FA12	晴	CJK_Compat_Ideographs	1.1	72	12							clear weather	SEI	HARERU HARE HARASU
 FA15	凞	CJK_Compat_Ideographs	1.1	15	15							bright	KI	YAWARAGU
 FA16	猪	CJK_Compat_Ideographs	1.1	94	12				Y	732A	猪	pig	CHO	INOSHISHI I
 FA17	益	CJK_Compat_Ideographs	1.1	108	10							profit	EKI YAKU	MASU MASUMASU
-FA18	礼	CJK_Compat_Ideographs	1.1	113	6							social custom; manners; courtesy	REI RAI	NORI
+FA18	礼	CJK_Compat_Ideographs	1.1	113	6		lǐ					social custom; manners; courtesy; rites	REI RAI	NORI
 FA19	神	CJK_Compat_Ideographs	1.1	113	10				Y	795E	神	spirit	SHIN JIN	KAMI KOU TAMASHII
 FA1A	祥	CJK_Compat_Ideographs	1.1	113	11				Y	7965	祥	good luck	SHOU	SAIWAI
 FA1B	福	CJK_Compat_Ideographs	1.1	113	14				Y	798F	福	happiness	FUKU	SAIWAI HIMOROGI
@@ -15048,7 +15054,7 @@ FA39	塀	CJK_Compat_Ideographs	3.2	32	14					5840	塀	wall, fence	HEI	KAKI
 FA3A	墨	CJK_Compat_Ideographs	3.2	32	15				Y	58A8	墨	ink; writing	BOKU MOKU	SUMI
 FA3B	層	CJK_Compat_Ideographs	3.2	44	15				Y	5C64	層	story, layer, floor, stratum	SOU	KASANARU KASA
 FA3C	屮	CJK_Compat_Ideographs	3.2	45	3					5C6E	屮	sprout; KangXi radical 45	SA	HIDARI HIDARITE
-FA3D	悔	CJK_Compat_Ideographs	3.2	61	11				Y	6094	悔	repent, show remorse, regret	KAI	KUIRU KUYAMU
+FA3D	悔	CJK_Compat_Ideographs	3.2	61	10				Y	6094	悔	repent, show remorse, regret	KAI	KUIRU KUYAMU
 FA3E	慨	CJK_Compat_Ideographs	3.2	61	15					6168	慨	sigh, regret; generous	GAI KAI	NAGEKU
 FA3F	憎	CJK_Compat_Ideographs	3.2	61	15				Y	618E	憎	hate, detest, abhor; hatred	ZOU	NIKUMU NIKUSHIMI NIKUI
 FA40	懲	CJK_Compat_Ideographs	3.2	61	19				Y	61F2	懲	punish, reprimand; warn	CHOU	KORASU KORIRU KORASHIMERU
@@ -15061,7 +15067,7 @@ FA46	渚	CJK_Compat_Ideographs	3.2	85	12				Y	6E1A	渚	small sand bank, islet	SH
 FA47	漢	CJK_Compat_Ideographs	3.2	85	14				Y	6F22	漢	the Chinese people, Chinese language	KAN	KARA
 FA48	煮	CJK_Compat_Ideographs	3.2	86	13				Y	716E	煮	cook	SHA SHO	NIRU NIERU
 FA49	爫	CJK_Compat_Ideographs	3.2	87	4					722B	爫	radical 87		TSUMEKANMURI TSUMEGASHIRA
-FA4A	琢	CJK_Compat_Ideographs	3.2	96	13				Y	7422	琢	polish jade; cut jade	TAKU	MIGAKU
+FA4A	琢	CJK_Compat_Ideographs	3.2	96	12				Y	7422	琢	polish jade; cut jade	TAKU	MIGAKU
 FA4B	碑	CJK_Compat_Ideographs	3.2	112	13				Y	7891	碑	stone tablet; gravestone	HI	TATEISHI ISHIBUMI
 FA4C	社	CJK_Compat_Ideographs	3.2	113	8				Y	793E	社	god of the soil and altars to him; group of families; company, society	SHA JA	YASHIRO KUMIAI KOSO
 FA4D	祉	CJK_Compat_Ideographs	3.2	113	9				Y	7949	祉	happiness, blessings, good luck	SHI CHI	SAIWAI
@@ -15152,7 +15158,7 @@ FAA7	盛	CJK_Compat_Ideographs	4.1	108	12					76DB	盛	abundant, flourishing; co
 FAA8	直	CJK_Compat_Ideographs	4.1	109	8					76F4	直	straight, erect, vertical	CHOKU JIKI	NAOSU TADACHINI NAOI
 FAA9	睊	CJK_Compat_Ideographs	4.1	109	11					774A	睊	see, look, gaze at; askance	EN DAN	NUSUMIMIRU
 FAAA	着	CJK_Compat_Ideographs	4.1	109	11					7740	着	make move, take action	CHAKU JAKU	KIRU TSUKU
-FAAB	磌	CJK_Compat_Ideographs	4.1	112	15					78CC	磌		TEN DEN SHIN	
+FAAB	磌	CJK_Compat_Ideographs	4.1	112	15					78CC	磌	rumbling sound	TEN DEN SHIN	
 FAAD	節	CJK_Compat_Ideographs	4.1	118	13					7BC0	節	knot, node, joint; section	SETSU SECHI	FUSHI MISAO NOTTO
 FAAF	絛	CJK_Compat_Ideographs	4.1	120	12					7D5B	絛	silk braid, sash	JOU TOU	SANADA
 FAB0	練	CJK_Compat_Ideographs	4.1	120	14					7DF4	練	practice, drill, exercise, train	REN	NERU NERIGINU
@@ -15184,8 +15190,9 @@ FACC	頻	CJK_Compat_Ideographs	4.1	181	17					983B	頻	frequently, again and aga
 FACD	鬒	CJK_Compat_Ideographs	4.1	190	20					9B12	鬒	black, glossy hair	SHIN	OOI
 FACE	龜	CJK_Compat_Ideographs	4.1	213	15					9F9C	龜	turtle or tortoise; cuckold	KI KYUU KIN	KAME
 FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NEIKI
-2009D	𠂝	CJK_Ext_B	3.1	4	5					8846	衆	multitude, crowd; masses, public	SHUU SHU	OOI
+2009D	𠂝	CJK_Ext_B	3.1	4	5		zā			531D	匝	full circle; encircle	SOU	MEGURU
 2018C	𠆌	CJK_Ext_B	3.1	8	16		yōng			5EB8	庸	usual, common, ordinary, mediocre	YOU	MOCHIIRU TSUNE ANI
+20228	𠈨	CJK_Ext_B	3.1	9	8					4F5C	作	make; work; compose, write; act, perform	SAKU SA	TSUKURU TSUKURI NASU
 202A7	𠊧	CJK_Ext_B	3.1	9	11		bìng			4F75	併	combine, annex	HEI	AWASERU NARABU SHIKASHI
 20503	𠔃	CJK_Ext_B	3.1	12	4		xī			516E	兮	exclamatory particle	KEI	NO
 20544	𠕄	CJK_Ext_B	3.1	13	5		nà			51F9	凹	concave, hollow, depressed; a pass, valley	OU	KUBOMU KUBOMI
@@ -15213,7 +15220,7 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 22091	𢂑	CJK_Ext_B	3.1	50	9		shì			62ED	拭	wipe away stains with cloth	SHIKI SHOKU	NUGUU FUKU
 2214F	𢅏	CJK_Ext_B	3.1	50	16		lián			7C3E	簾	a blind, screen, curtain	REN	SUDARE SU
 22156	𢅖	CJK_Ext_B	3.1	50	16		lián			7C3E	簾	a blind, screen, curtain	REN	SUDARE SU
-22165	𢅥	CJK_Ext_B	3.1	50	17		chú					variant of 㡡 U+3861, a screen to make a temporary kitchen	JU CHU	
+22165	𢅥	CJK_Ext_B	3.1	50	17		chú					variant of 㡡 U+3861, a screen to make a temporary kitchen; bed curtain	JU CHU	
 22218	𢈘	CJK_Ext_B	3.1	53	9							variant of 鹿 U+9E7F, a deer; surname	ROKU	SHIKA KA
 2228D	𢊍	CJK_Ext_B	3.1	53	13		chú					variant of 厨 U+53A8, a kitchen; a closet; a cupboard	ZU CHUU	KURIYA
 2237A	𢍺	CJK_Ext_B	3.1	56	3					5F0B	弋	catch, arrest; shoot with bow	YOKU	IGURUMI
@@ -15233,29 +15240,36 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 2325E	𣉞	CJK_Ext_B	3.1	72	14					66A0	暠	daybreak; bright and brilliant	KOU	
 233FE	𣏾	CJK_Ext_B	3.1	75	8							(J) non-standard variant of 材 U+6750, material, stuff; timber; talent; (Cant.) a peg, row of pegs	ZAI	MARUTA
 234CC	𣓌	CJK_Ext_B	3.1	75	12		gāo			69F9	槹	spar; well-sweep	KOU	
-2353C	𣔼	CJK_Ext_B	3.1	75	13					7AFF	竿	bamboo pole; penis	KAN	SAO
+2353C	𣔼	CJK_Ext_B	3.1	75	13		gān			7AFF	竿	bamboo pole; penis	KAN	SAO
 237EC	𣟬	CJK_Ext_B	3.1	75	20							same as 欄 U+6B04, a railing, balustrade; an animal pan	RAN	TESURI
 237F1	𣟱	CJK_Ext_B	3.1	75	21							Zelkova tree	KYO	KEYAKI
 2383D	𣠽	CJK_Ext_B	3.1	75	23							same as 欛 U+6B1B, a handle	HA HE	TSUKA
+23A10	𣨐	CJK_Ext_B	3.1	78	11					6B82	殂	to die	SO ZO	SHINU
+23F7D	𣽽	CJK_Ext_B	3.1	85	15					6F78	潸	weep; tears flowing	SAN	
 2418D	𤆍	CJK_Ext_B	3.1	86	7		chì			8D64	赤	red; communist, 'red'; bare	SEKI SHAKU	AKA AKAI
-24360	𤍠	CJK_Ext_B	3.1	86	15					71B1	熱	hot; heat; fever; restless; zeal	NETSU ZETSU NECHI	ATSUI
+24360	𤍠	CJK_Ext_B	3.1	86	15		rè			71B1	熱	hot; heat; fever; restless; zeal	NETSU ZETSU NECHI	ATSUI
 24455	𤑕	CJK_Ext_B	3.1	86	19		xūn			718F	熏	smoke, fog, vapor; smoke, cure	KUN	FUSUBERU KUSUBERU
 2456A	𤕪	CJK_Ext_B	3.1	90	4					723F	爿	half of tree trunk; KangXi radical 90	SHOU	DAI KIGIRE
 2456D	𤕭	CJK_Ext_B	3.1	90	6		jiāng			5C07	將	will, going to, future; general	SHOU SOU	HIKIIRU MOTTE HATA
 2456F	𤕯	CJK_Ext_B	3.1	90	8		jiāng			6F3F	漿	any thick fluid; starch; broth	SHOU	KONZU
 24895	𤢕	CJK_Ext_B	3.1	94	16		duó			6581	斁	dislike; be weary of; explain	EKI SEKU TO ZU	IYANINARU
 248AA	𤢪	CJK_Ext_B	3.1	94	17		liè			7375	獵	hunt; field sports	RYOU	KARI KARU
+2498F	𤦏	CJK_Ext_B	3.1	96	12					7481	璁	turquoise	SOU SU	
 249DA	𤧚	CJK_Ext_B	3.1	96	13		cōng			7481	璁	turquoise	SOU SU	
 24BA8	𤮨	CJK_Ext_B	3.1	98	21					7931	礱	grind, sharpen; mill	ROU RU	TOGU
+24D10	𤴐	CJK_Ext_B	3.1	102	32					96F7	雷	thunder	RAI RUI	KAMINARI IKAZUCHI
+24D99	𤶙	CJK_Ext_B	3.1	104	12					75C4	痄	scrofulous swellings and sores, mumps	SA JA	
 25055	𥁕	CJK_Ext_B	3.1	108	10		wēn			6637	昷	to feed a prisoner	ON	MEGUMU
-25081	𥂁	CJK_Ext_B	3.1	108	13					9E7D	鹽	(same as of U+5869 塩) salt	EN	SHIO
+25081	𥂁	CJK_Ext_B	3.1	108	13		yán			9E7D	鹽	(same as of U+5869 塩) salt	EN	SHIO
 2521F	𥈟	CJK_Ext_B	3.1	109	14		sǒu			778D	瞍	blind; no pupil in the eye	SOU SU SHOU	MEKURA
 25418	𥐘	CJK_Ext_B	3.1	112	7		shí			77F3	石	stone, rock, mineral; rad. 112	SHAKU SEKI KOKU	ISHI
 254FF	𥓿	CJK_Ext_B	3.1	112	14		tuó			9248	鉈	a short spear; thallium	SHA TA	HOKO NATA
 25500	𥔀	CJK_Ext_B	3.1	112	14		hōng			8A07	訇	the sound of a crash	KOU KEN GEN KIN	
+2550E	𥔎	CJK_Ext_B	3.1	112	14							cape; spit; promontory		SAKI
 25535	𥔵	CJK_Ext_B	3.1	112	15							variant of U+78C1 磁, magnetic; magnetism; porcelain	JI SHI	JISHAKU YAKIMONO
 2570C	𥜌	CJK_Ext_B	3.1	113	17		ǎo			8956	襖	outer garments; coat, jacket	OU	AO FUSUMA
 25762	𥝢	CJK_Ext_B	3.1	115	8		lì			5229	利	gains, advantage, profit, merit	RI	KIKU YOI SURUDOI
+25874	𥡴	CJK_Ext_B	3.1	115	16		jì					surname	KEI	TODOMERU KANGAERU
 25945	𥥅	CJK_Ext_B	3.1	116	9		kǒng			7AC9	竉	a hole; a cleft; empty	ROU RU	ANA
 25AF1	𥫱	CJK_Ext_B	3.1	118	10		dùn			56E4	囤	grain basket, bin for grain	TON DON	ZARU
 25D5A	𥵚	CJK_Ext_B	3.1	118	19					7AFB	竻	thorns, brambles	ROKU KIN KON	SOJI
@@ -15276,7 +15290,7 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 26CB7	𦲷	CJK_Ext_B	3.1	140	12					849E	蒞	reach, arrive; manage	RI REI	TSUKU NOZOMU
 26DDD	𦷝	CJK_Ext_B	3.1	140	14		chú			82BB	芻	mow, cut grass; hay, fodder	SUU SU SHUU	MAGUSA
 26F4A	𦽊	CJK_Ext_B	3.1	140	17		huá			9A4A	驊	an excellent horse	KA GE	AKAKURIGE
-27039	𧀹	CJK_Ext_B	3.1	140	19					8517	蔗	sugar cane	SHO SHA	SATOUKIBI
+27039	𧀹	CJK_Ext_B	3.1	140	19		zhè			8517	蔗	sugar cane	SHO SHA	SATOUKIBI
 272CD	𧋍	CJK_Ext_B	3.1	142	13		dì			8707	蜇	jellyfish	TETSU TECHI	SASU
 27313	𧌓	CJK_Ext_B	3.1	142	14		fù			86D7	蛗	a grasshopper, locust	FUU BU	
 27405	𧐅	CJK_Ext_B	3.1	142	17		qū			86C6	蛆	maggots	SHO SO	UJI
@@ -15286,11 +15300,12 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 27602	𧘂	CJK_Ext_B	3.1	144	18		chōng			885D	衝	rush against, charge ahead	SHOU	TSUKU
 27A59	𧩙	CJK_Ext_B	3.1	149	15					8A95	誕	to bear children, give birth; birth	TAN	ITSUWARU
 27B28	𧬨	CJK_Ext_B	3.1	149	20		huì			5666	噦	belch; vomit	ETSU OCHI ECHI KI KE KEI KAI	SHAKURI AKARUI
-27C0A	𧰊	CJK_Ext_B	3.1	151	19		tián			78CC	磌		TEN DEN SHIN	
-27C27	𧰧	CJK_Ext_B	3.1	152	7							to assemble	SHUU	
-27DB6	𧶶	CJK_Ext_B	3.1	154	16					8CA9	販	peddler, hawker, street merchant	HAN	AKINAU
+27C0A	𧰊	CJK_Ext_B	3.1	151	19		tián			78CC	磌	rumbling sound	TEN DEN SHIN	
+27C27	𧰧	CJK_Ext_B	3.1	152	6							to assemble	SHUU	
+27DB6	𧶶	CJK_Ext_B	3.1	154	16		fàn			8CA9	販	peddler, hawker, street merchant	HAN	AKINAU
 27E16	𧸖	CJK_Ext_B	3.1	154	20		zhuàn			8D03	贃	to earn, to make a profit; (Cant.) to enjoy oneself	WAN	SUKASU
 27FF9	𧿹	CJK_Ext_B	3.1	157	12		mǔ			62C7	拇	thumb; big toe	BO BOU	OYAYUBI
+28054	𨁔	CJK_Ext_B	3.1	157	14					8DF3	跳	jump, leap, vault, bounce; dance	CHOU TOU	HANERU TOBU ODORU
 28373	𨍳	CJK_Ext_B	3.1	159	17		yáo			8EFA	軺	small light carriage	YOU SHOU JOU CHOU	
 28452	𨑒	CJK_Ext_B	3.1	162	6		tú			5F92	徒	disciple, follower; go on foot	TO	KACHI TOMOGARA ITAZURANI
 288E6	𨣦	CJK_Ext_B	3.1	164	21		xù			85C7	藇	fine	SHO JO YO	UTSUKUSHII
@@ -15300,7 +15315,9 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 28EF2	𨻲	CJK_Ext_B	3.1	170	13		xià			7F45	罅	crack, fissure, split	KA KE	HIBI SUKI
 28EF6	𨻶	CJK_Ext_B	3.1	170	14							a crevice, fissure; time, leisure; unpreparedness	GEKI	SUKASU HIMA
 290B3	𩂳	CJK_Ext_B	3.1	173	14							non-standard variant of 靈 U+9748, a spirit, soul; the spiritual world	REI RYOU	TAMA
+291D3	𩇓	CJK_Ext_B	3.1	173	40					96F7	雷	thunder	RAI RUI	KAMINARI IKAZUCHI
 292D8	𩋘	CJK_Ext_B	3.1	177	17		xié			978B	鞋	shoes, footwear in general	AI KAI	WARAJI
+29516	𩔖	CJK_Ext_B	3.1	181	18					985E	類	class, group, kind, category	RUI RAI	TAGUI
 29517	𩔗	CJK_Ext_B	3.1	181	18		lèi			985E	類	class, group, kind, category	RUI RAI	TAGUI
 29811	𩠑	CJK_Ext_B	3.1	185	11		dǐng			9802	頂	top, peak; carry on head; very	CHOU TEI	ITADAKI ITADAKU
 298B2	𩢲	CJK_Ext_B	3.1	187	16					99DB	駛	sail, drive, pilot; fast, quick	SHI	HASERU HAYAI
@@ -15312,7 +15329,9 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 2A502	𪔂	CJK_Ext_B	3.1	206	12		dǐng			9F0E	鼎	large, three-legged bronze caldron	TEI	KANAE MASANI
 2A599	𪖙	CJK_Ext_B	3.1	209	18		hōu			9F41	齁	snore loudly; very, extremely	KOU KU KO	KAGIBANA
 2AA9D	𪪝	CJK_Ext_C	5.2	53	13		yōng			96DD	雝	marsh; pool; harmonious	YOU YU	YAWARAGU
-2BF6E	𫽮	CJK_Ext_E	8.0	64	13					6529	攩	to obstruct; shut out; shelter from; keep off; stop; resist	TOU KOU OU	TOMO TATAKU
+2B88A	𫢊	CJK_Ext_E	8.0	9	5					9322	錢	money, currency, coins	SEN	ZENI SEN
+2BF6E	𫽮	CJK_Ext_E	8.0	64	13		dǎng			6529	攩	to obstruct; shut out; shelter from; keep off; stop; resist	TOU KOU OU	TOMO TATAKU
+2C454	𬑔	CJK_Ext_E	8.0	109	11		zhòng			8846	衆	multitude, crowd; masses, public	SHUU SHU	OOI
 2F800	丽	CJK_Compat_Ideographs_Sup	3.1	1	8					4E3D	丽	beautiful, magnificent, elegant	REI	URUWASHI
 2F801	丸	CJK_Compat_Ideographs_Sup	3.1	3	3					4E38	丸	small round object; pellet, pill	GAN	MARUI MARUMERU TAMA
 2F802	乁	CJK_Compat_Ideographs_Sup	3.1	4	1					4E41	乁		I	NAGARERU
@@ -15355,7 +15374,7 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 2F831	卿	CJK_Compat_Ideographs_Sup	3.1	26	11					537F	卿	noble, high officer	KYOU KEI	KIMI
 2F832	卿	CJK_Compat_Ideographs_Sup	3.1	26	11					537F	卿	noble, high officer	KYOU KEI	KIMI
 2F833	卿	CJK_Compat_Ideographs_Sup	3.1	26	12					537F	卿	noble, high officer	KYOU KEI	KIMI
-2F835	灰	CJK_Compat_Ideographs_Sup	3.1	27	6					7070	灰	ashes; dust; lime, mortar	KAI	HAI
+2F835	灰	CJK_Compat_Ideographs_Sup	3.1	27	6		huī			7070	灰	ashes; dust; lime, mortar	KAI	HAI
 2F836	及	CJK_Compat_Ideographs_Sup	3.1	29	3					53CA	及	extend; reach; come up to; and	KYUU	OYOBU OYOBI OYOBOSU
 2F837	叟	CJK_Compat_Ideographs_Sup	3.1	29	7					53DF	叟	old man; elder	SOU SHUU	OKINA
 2F839	叫	CJK_Compat_Ideographs_Sup	3.1	30	5					53EB	叫	cry, shout; hail, greet, call	KYOU	SAKEBU
@@ -15469,7 +15488,7 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 2F8D3	冕	CJK_Compat_Ideographs_Sup	3.1	13	11					5195	冕	crown; ceremonial cap	BEN MEN	KANMURI
 2F8D4	最	CJK_Compat_Ideographs_Sup	3.1	73	12					6700	最	most, extremely, exceedingly	SAI	MOTTOMO MO
 2F8D5	暜	CJK_Compat_Ideographs_Sup	3.1	72	14					669C	暜		FU	AMANESHI
-2F8D6	肭	CJK_Compat_Ideographs_Sup	3.1	130	8					80AD	肭	fat; seal (moon radical DKW: 14342 is different)	DOTSU NACHI DATSU	KOERU
+2F8D6	肭	CJK_Compat_Ideographs_Sup	3.1	130	8					80AD	肭	fat; seal	DOTSU NACHI DATSU	KOERU
 2F8D8	朗	CJK_Compat_Ideographs_Sup	3.1	74	11					6717	朗	clear, bright; distinct	ROU	HOGARAKA AKIRAKA
 2F8D9	望	CJK_Compat_Ideographs_Sup	3.1	74	11					671B	望	to look at, look forward; to hope, expect	BOU MOU	NOZOMU NOZOMI MOCHI
 2F8DB	杞	CJK_Compat_Ideographs_Sup	3.1	75	7					675E	杞	willow; medlar tree; a small feudal state (Qi)	KO KI	SUKI FUGO MOKKO
@@ -15535,7 +15554,7 @@ FAD8	齃	CJK_Compat_Ideographs	4.1	209	22					9F43	齃		KATSU KACHI ATSU ACHI	NE
 2F94A	瞋	CJK_Compat_Ideographs_Sup	3.1	109	15					778B	瞋	glare with anger	SHIN	IKARASU IKARU
 2F94E	硎	CJK_Compat_Ideographs_Sup	3.1	112	13					784E	硎	whetstone	KEI	TOISHI
 2F94F	碌	CJK_Compat_Ideographs_Sup	3.1	112	13					788C	碌	rough, uneven, rocky; mediocre	ROKU	
-2F950	磌	CJK_Compat_Ideographs_Sup	3.1	112	15					78CC	磌		TEN DEN SHIN	
+2F950	磌	CJK_Compat_Ideographs_Sup	3.1	112	15					78CC	磌	rumbling sound	TEN DEN SHIN	
 2F953	祖	CJK_Compat_Ideographs_Sup	3.1	113	9					7956	祖	ancestor, forefather; grandfather	SO	JIJI HAJIME
 2F956	福	CJK_Compat_Ideographs_Sup	3.1	113	14					798F	福	happiness	FUKU	SAIWAI HIMOROGI
 2F957	秫	CJK_Compat_Ideographs_Sup	3.1	115	10					79EB	秫	glutinous variety of millet	JOTSU SHUTSU CHUTSU	MOCHIAWA

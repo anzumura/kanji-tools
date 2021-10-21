@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14..3.20)
+cmake_minimum_required(VERSION 3.14..3.21)
 project(kanji VERSION 1.0
               DESCRIPTION "Kanji Lists"
               LANGUAGES CXX)

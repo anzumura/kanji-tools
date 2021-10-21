@@ -191,7 +191,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
 
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
-  EXPECT_EQ(ucd.size(), 15627);
+  EXPECT_EQ(ucd.size(), 15646);
   int jouyou = 0, jinmei = 0, jinmeiLinks = 0, otherLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
@@ -232,7 +232,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jouyou, _data.jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
-  EXPECT_EQ(otherLinks, 2175);
+  EXPECT_EQ(otherLinks, 2190);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
