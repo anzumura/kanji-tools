@@ -1,15 +1,15 @@
-#include <kanji/Choice.h>
-#include <kanji/Kana.h>
-#include <kanji/KanaConvert.h>
-#include <kanji/MBUtils.h>
-#include <kanji/Table.h>
+#include <kanji_tools/kana/Kana.h>
+#include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/utils/Choice.h>
+#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Table.h>
 
 #include <filesystem>
 
 #include <stdio.h>
 #include <unistd.h>
 
-using namespace kanji;
+using namespace kanji_tools;
 namespace fs = std::filesystem;
 
 class ConvertMain {

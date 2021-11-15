@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14..3.21)
-project(kanji VERSION 1.0
-              DESCRIPTION "Kanji Lists"
-              LANGUAGES CXX)
+project(kanji_tools VERSION 1.0
+                    DESCRIPTION "Tools for working with Japanesse Kana and Kanji"
+                    LANGUAGES CXX)
 
 ### Require out-of-source builds
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
@@ -31,9 +31,17 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_subdirectory(src)
+add_subdirectory(src/kana)  # source files for 'kana' lib (depends on 'utils')
+add_subdirectory(src/kanji) # source files for 'kanji' lib (depends on 'kana')
+add_subdirectory(src/quiz)  # source files for 'quiz' lib (depends on 'kanji')
+add_subdirectory(src/stats) # source files for 'stats' lib (depends on 'kanji')
+add_subdirectory(src/utils) # source files for 'utils' lib
 add_subdirectory(apps)
 
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
-  add_subdirectory(tests)
+  add_subdirectory(tests/kana)
+  add_subdirectory(tests/kanji)
+  add_subdirectory(tests/quiz)
+  add_subdirectory(tests/stats)
+  add_subdirectory(tests/utils)
 endif()

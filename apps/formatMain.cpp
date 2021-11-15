@@ -1,11 +1,11 @@
-#include <kanji/MBUtils.h>
+#include <kanji_tools/utils/MBUtils.h>
 
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <regex>
 
-using namespace kanji;
+using namespace kanji_tools;
 namespace fs = std::filesystem;
 
 int main(int argc, const char** argv) {

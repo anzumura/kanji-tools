@@ -1,7 +1,7 @@
-#include <kanji/KanjiData.h>
-#include <kanji/Quiz.h>
+#include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/quiz/Quiz.h>
 
-using namespace kanji;
+using namespace kanji_tools;
 
 int main(int argc, const char** argv) {
   try {

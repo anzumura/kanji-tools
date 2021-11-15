@@ -1,6 +1,7 @@
 # C++ kanji
 
 This repository contains code for four 'main' programs:
+
 - **kanaConvert**: program that converts between Hiragana, Katakana and Rōmaji
 - **kanjiFormat**: program used to format test/sample-data/books files (from 青空文庫 - see below)
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
@@ -9,7 +10,8 @@ This repository contains code for four 'main' programs:
 The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify Japanese **kanji** (漢字) characters into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code already created for the *stats* program.
 
 The *kanaConvert* program was created to parse the UniHan XML files (from Unicode Consortium) which have 'On' (音) and 'Kun' (訓) readings, but only in Rōmaji. The program can read stdin and parse command line args:
-```
+
+```bash
 $ kanaConvert atatakai
 あたたかい
 $ kanaConvert kippu
@@ -33,11 +35,15 @@ $ kanaConvert -k qarutetto  # supports multiple romaji variants:
 $ kanaConvert -k kwarutetto
 クァルテット
 ```
+
 The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see Table.h for more details). However, the output isn't aligned properly in a Markdown code block (wide to narrow character ratio isn't exactly 2:1) so there's also a '-m' option to print using markdown formatting.
+
 - Note: the terminal output (-p) puts a border line between sections (sections for the kana chart table are groups of related kana symbols, i.e., 'a', 'ka', 'sa', etc.), but for markdown (-m) the rows are in bold instead:
 
 ## **Kana Conversion Chart**
+
 ### **Notes:**
+
 - Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
 - Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases
 - Hepb and Kunr are only populated when they would produce different output
@@ -266,12 +272,14 @@ The program also supports various flags for controlling conversion (like Hepburn
 | 208 | N |  | ゞ | ヾ | 309E | 30FE |  |  |  |
 
 ### **Totals:**
+
 - **Monograph:**  86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
 - **Digraphs:** 118 (Plain=71, Dakuten=42, HanDakuten=5)
 - **All Kana:** 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55
 - **Types:** 208 (P=131, D=63, H=10, N=4), N types are not included in 'All Kana'
 
 To support these programs, *KanjiData* class loads and breaks down kanji into the following categories:
+
 - **Jouyou**: 2136 official Jōyō (常用) kanji
 - **Jinmei**: 633 official Jinmeiyō (人名用) kanji
 - **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
@@ -284,6 +292,7 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 The program also loads the 214 official kanji radicals (部首).
 
 The **data** directory contains the following files:
+
 - **jouyou.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_jōyō_kanji) - note, the radicals in this list reflect the original radicals from **Kāngxī Zìdiǎn / 康煕字典（こうきじてん）** so a few characters have the radicals of their old form, i.e., 円 has radical 口 (from the old form 圓).
 - **jinmei.txt**: loaded from [here](https://ja.wikipedia.org/wiki/人名用漢字一覧) and most of the readings from [here](https://ca.wikipedia.org/w/index.php?title=Jinmeiyō_kanji)
 - **linked-jinmei.txt**: loaded from [here](https://en.wikipedia.org/wiki/Jinmeiyō_kanji)
@@ -301,9 +310,10 @@ The **data** directory contains the following files:
 
 No external databases are used so far, but while writing some of the code (like in *MBUtils.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
 
-There is also a **tests/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
+There is also a **tests/stats/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
 
 The books pulled from Aozora were in Shift JIS format so the following steps were used on *macOS* to convert them to UTF-8:
+
 - Load the HTML version of the book in **Safari**
 - Select All, then Copy-Paste to **Notes** - this keeps the *furigana*, but puts it on a separate line
 - Open *file1* in **Terminal** using *vi* and paste in the text from **Notes**, then save and exit.
@@ -315,6 +325,7 @@ The books pulled from Aozora were in Shift JIS format so the following steps wer
 - run 'fold *file2*>*file1*' to split up the really long lines to 80 columns.
 
 Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new kanji for the level (as opposed to some N2 and N1 lists on the web that repeat some kanji from earlier levels). Currently the levels have the following number of kanji:
+
 - N5: 103 -- all Jōyō
 - N4: 181 -- all Jōyō
 - N3: 361 -- all Jōyō
@@ -328,7 +339,7 @@ Grade | Total | N5  | N4  | N3  | N2  | N1  | None
 ----- | ----- | --- | --- | --- | --- | --- | ----
 **1** | 80    | 57  | 15  | 8   |     |     |
 **2** | 160   | 43  | 74  | 43  |     |     |
-**3** | 200   | 3   | 67  | 130 |     |     |     
+**3** | 200   | 3   | 67  | 130 |     |     |
 **4** | 200   |     | 20  | 180 |     |     |
 **5** | 185   |     | 2   |     | 149 | 34  |
 **6** | 181   |     | 3   |     | 105 | 73  |
@@ -338,7 +349,8 @@ Total | 2136  | 103 | 181 | 361 | 415 | 911 | 165
 Total for all grades is the same as the total Jōyō (2136) and all are in the Top 2501 frequency list except for 99 *S* (Secondary School) kanjis.
 
 Helpful commands for re-ordering columns, re-numbering (assuming header and first column should be numbered starting at 1) and converting double byte to single byte:
-```
+
+```bash
 awk -F'[\t]' -v OFS="\t" '{print $1,$2,$4,$5,$3,$6,$7,$8,$9}' file
 awk -F'[\t]' -v OFS="\t" 'NR==1{print}NR>1{for(i=1;i<=NF;i++) printf "%s",(i>1 ? OFS $i : NR-1);print ""}' file
 cat file|tr '１２３４５６７８９０' '1234567890'|tr -d '画'
