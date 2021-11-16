@@ -3,8 +3,8 @@
 declare -r program='parseEastAsiaWidth.sh'
 
 # This script parses the Unicode 'EastAsiaWidth.txt' file and outputs C++ code
-# that can be used in 'MBUtils.h' for calculating 'displayLength' of a string,
-# i.e., wide characters take two columns on a terminal.
+# that can be used in 'utils/DisplayLength.h' for calculating 'displayLength' of
+# a string, i.e., wide characters take two columns on a terminal.
 # https://unicode.org/reports/tr11 - more details about widths
 # https://www.unicode.org/Public/zipped/14.0.0 - EastAsiaWidth.txt (in UCD.zip)
 

@@ -1,7 +1,7 @@
 #include <kanji_tools/quiz/Group.h>
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/utils/MBChar.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/DisplayLength.h>
 
 #include <fstream>
 #include <sstream>

@@ -308,7 +308,7 @@ The **data** directory contains the following files:
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
 - **ucd.txt**: data extracted from Unicode 'UCD' (see *scripts/parseUcdAllFlat.sh* for details and links)
 
-No external databases are used so far, but while writing some of the code (like in *MBUtils.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
+No external databases are used so far, but while writing some of the code (like in *UnicodeBlock.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
 
 There is also a **tests/stats/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
 

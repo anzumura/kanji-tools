@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/UnicodeBlock.h>
 
 #include <filesystem>
 #include <fstream>

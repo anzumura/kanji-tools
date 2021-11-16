@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Table.h>
+#include <kanji_tools/utils/DisplayLength.h>
 
 #include <iomanip>
 

@@ -1,6 +1,6 @@
 #include <kanji_tools/quiz/Group.h>
 #include <kanji_tools/quiz/Quiz.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/DisplayLength.h>
 
 #include <random>
 
