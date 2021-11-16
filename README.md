@@ -11,7 +11,7 @@ The initial goal for this project was to create a program that could parse multi
 
 The *kanaConvert* program was created to parse the UniHan XML files (from Unicode Consortium) which have 'On' (音) and 'Kun' (訓) readings, but only in Rōmaji. The program can read stdin and parse command line args:
 
-```bash
+```;
 $ kanaConvert atatakai
 あたたかい
 $ kanaConvert kippu
