@@ -1,11 +1,11 @@
 add_executable(kanaConvert convertMain.cpp)
-target_link_libraries(kanaConvert PRIVATE kanji_tools_kana)
+target_link_libraries(kanaConvert PRIVATE kanjiToolsKana)
 
 add_executable(kanjiFormat formatMain.cpp)
-target_link_libraries(kanjiFormat PRIVATE kanji_tools_utils)
+target_link_libraries(kanjiFormat PRIVATE kanjiToolsUtils)
 
 add_executable(kanjiQuiz quizMain.cpp)
-target_link_libraries(kanjiQuiz PRIVATE kanji_tools_quiz)
+target_link_libraries(kanjiQuiz PRIVATE kanjiToolsQuiz)
 
 add_executable(kanjiStats statsMain.cpp)
-target_link_libraries(kanjiStats PRIVATE kanji_tools_stats)
+target_link_libraries(kanjiStats PRIVATE kanjiToolsStats)
