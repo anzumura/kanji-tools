@@ -1,4 +1,4 @@
-# C++ kanji
+# C++ kanji Tools
 
 This repository contains code for four 'main' programs:
 
