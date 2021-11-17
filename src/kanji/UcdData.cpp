@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/Kanji.h>
+#include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/MBUtils.h>
 

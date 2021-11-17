@@ -1,7 +1,7 @@
 #ifndef KANJI_TOOLS_KANJI_DATA_H
 #define KANJI_TOOLS_KANJI_DATA_H
 
-#include <kanji_tools/utils/FileList.h>
+#include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
 
@@ -10,39 +10,7 @@
 
 namespace kanji_tools {
 
-// forward declares
-class Kanji;
-
-// Official Grades for Jouyou kanji
-enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not jouyou
-constexpr std::array AllGrades{Grades::G1, Grades::G2, Grades::G3, Grades::G4,
-                               Grades::G5, Grades::G6, Grades::S,  Grades::None};
-const char* toString(Grades);
-inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os << toString(x); }
-
-// Types represents the type of Kanji:
-// - Jouyou: 2136 official Jouyou kanji
-// - Jinmei: 633 official Jinmei kanji
-// - LinkedJinmei: 230 more Jinmei kanji that are old/variant forms of Jouyou (212) or Jinmei (18)
-// - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
-// - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
-// - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
-// - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't in any of the above types
-// - None: used as a type for a kanji that hasn't been loaded
-enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, Kentei, None };
-constexpr std::array AllTypes{Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
-                              Types::Other,  Types::Extra,  Types::Kentei,       Types::None};
-const char* toString(Types);
-inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
-
-// 'secondLast' is a helper function to get the second last value of an array (useful for AllTypes,
-// AllGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
-template<typename T, size_t S> constexpr inline T secondLast(const std::array<T, S>& x) {
-  static_assert(S > 1);
-  return x[S - 2];
-}
-
-// 'Data': provides methods used by 'Kanji' classes during loading and is the base class for KanjiData
+// 'Data' provides methods used by 'Kanji' classes during loading and is the base class for KanjiData
 class Data {
 public:
   using Entry = std::shared_ptr<Kanji>;

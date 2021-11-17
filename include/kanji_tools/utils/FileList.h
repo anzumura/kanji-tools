@@ -24,6 +24,13 @@ constexpr std::array AllKyus{Kyus::K10, Kyus::K9,  Kyus::K8, Kyus::K7,  Kyus::K6
 const char* toString(Kyus);
 inline std::ostream& operator<<(std::ostream& os, const Kyus& x) { return os << toString(x); }
 
+// 'secondLast' is a helper function to get the second last value of an array (useful for AllTypes,
+// AllGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
+template<typename T, size_t S> constexpr inline T secondLast(const std::array<T, S>& x) {
+  static_assert(S > 1);
+  return x[S - 2];
+}
+
 class FileList {
 public:
   using List = std::vector<std::string>;

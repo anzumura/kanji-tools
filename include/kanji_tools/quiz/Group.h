@@ -1,7 +1,7 @@
 #ifndef KANJI_TOOLS_QUIZ_GROUP_H
 #define KANJI_TOOLS_QUIZ_GROUP_H
 
-#include <kanji_tools/kanji/Kanji.h>
+#include <kanji_tools/kanji/Data.h>
 
 namespace kanji_tools {
 

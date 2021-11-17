@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
