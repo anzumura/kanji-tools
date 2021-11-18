@@ -1,13 +1,9 @@
 #ifndef KANJI_TOOLS_QUIZ_GROUP_DATA_H
 #define KANJI_TOOLS_QUIZ_GROUP_DATA_H
 
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/quiz/Group.h>
 
 namespace kanji_tools {
-
-// forward declares
-class Group;
-enum class GroupType;
 
 class GroupData {
 public:
