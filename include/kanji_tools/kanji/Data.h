@@ -41,7 +41,7 @@ public:
     // data loaded from Unicode.
     throw std::domain_error("UCD entry not found: " + kanjiName);
   }
-  // 'getRadicalByName' is used by 'FileListKanji' classes during construction. It will return
+  // 'getRadicalByName' is used by 'ExtraKanji' classes during construction. It will return
   // the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   virtual const Radical& getRadicalByName(const std::string& radicalName) const { return _radicals.find(radicalName); }
   // 'getPinyin' returns an optional string since not all Kanji have a Pinyin reading.

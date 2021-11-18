@@ -1,5 +1,5 @@
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/kanji/NonLinkedKanji.h>
+#include <kanji_tools/kanji/OtherKanji.h>
 #include <kanji_tools/utils/MBUtils.h>
 
 #include <fstream>
@@ -180,7 +180,7 @@ void Data::loadOtherReadings(const fs::path& file) {
 }
 
 void Data::populateJouyou() {
-  auto results = FileListKanji::fromFile(*this, Types::Jouyou, FileList::getFile(_dataDir, JouyouFile));
+  auto results = ExtraKanji::fromFile(*this, Types::Jouyou, FileList::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != Grades::None);
@@ -217,7 +217,7 @@ void Data::populateJouyou() {
 }
 
 void Data::populateJinmei() {
-  auto results = FileListKanji::fromFile(*this, Types::Jinmei, FileList::getFile(_dataDir, JinmeiFile));
+  auto results = ExtraKanji::fromFile(*this, Types::Jinmei, FileList::getFile(_dataDir, JinmeiFile));
   auto& linkedJinmei = _types[Types::LinkedJinmei];
   for (const auto& i : results) {
     checkInsert(i);
@@ -230,7 +230,7 @@ void Data::populateJinmei() {
 }
 
 void Data::populateExtra() {
-  auto results = FileListKanji::fromFile(*this, Types::Extra, FileList::getFile(_dataDir, ExtraFile));
+  auto results = ExtraKanji::fromFile(*this, Types::Extra, FileList::getFile(_dataDir, ExtraFile));
   for (const auto& i : results)
     checkInsert(i);
   _types.insert(std::make_pair(Types::Extra, std::move(results)));
@@ -257,9 +257,9 @@ void Data::processList(const FileList& list) {
         // not part of JLPT levels)
         auto reading = _otherReadings.find(i);
         if (reading != _otherReadings.end())
-          kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i, reading->second);
+          kanji = std::make_shared<OtherKanji>(*this, ++count, i, reading->second);
         else
-          kanji = std::make_shared<NonLinkedKanji>(*this, ++count, i);
+          kanji = std::make_shared<OtherKanji>(*this, ++count, i);
       }
       _map.insert(std::make_pair(i, kanji));
       newKanji.push_back(kanji);

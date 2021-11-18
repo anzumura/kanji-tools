@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/NonLinkedKanji.h>
+#include <kanji_tools/kanji/OtherKanji.h>
 
 #include <fstream>
 #include <sstream>
@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path& file) {
+Data::List ExtraKanji::fromFile(const Data& data, Types type, const fs::path& file) {
   assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
   int lineNum = 1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
@@ -61,12 +61,12 @@ Data::List FileListKanji::fromFile(const Data& data, Types type, const fs::path&
   return results;
 }
 
-std::array<std::string, FileListKanji::MaxCol> FileListKanji::columns;
-std::map<std::string, int> FileListKanji::ColumnMap = {
+std::array<std::string, ExtraKanji::MaxCol> ExtraKanji::columns;
+std::map<std::string, int> ExtraKanji::ColumnMap = {
   colPair(NumberCol),  colPair(NameCol),  colPair(RadicalCol), colPair(OldNamesCol), colPair(YearCol),
-  colPair(StrokesCol), colPair(GradeCol), colPair(MeaningCol), colPair(ReadingCol), colPair(ReasonCol)};
+  colPair(StrokesCol), colPair(GradeCol), colPair(MeaningCol), colPair(ReadingCol),  colPair(ReasonCol)};
 
-Kanji::OldNames OfficialListKanji::getOldNames() {
+Kanji::OldNames OfficialKanji::getOldNames() {
   OldNames result;
   std::stringstream ss(columns[OldNamesCol]);
   for (std::string token; std::getline(ss, token, ',');)
