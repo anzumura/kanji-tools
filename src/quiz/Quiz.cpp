@@ -151,7 +151,8 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
     quizStyle = _choice.get("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, quizStyle);
     if (quizStyle == QuitOption) return;
   }
-  const std::string prompt = _reviewMode ? reviewPrompt : quizPrompt + (quizStyle == 'k' ? "reading" : "kanji");
+  const std::string prompt(_reviewMode ? reviewPrompt : quizPrompt + (quizStyle == 'k' ? "reading" : "kanji")),
+    questionPrefix(_reviewMode ? "\nKanji " : "\nQuestion ");
 
   List questions;
   for (auto& i : list)
@@ -187,9 +188,10 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
     ++_question;
     bool stopQuiz = false;
     do {
-      out() << (_reviewMode ? "\nKanji " : "\nQuestion ") << _question << '/' << questions.size() << ".  ";
+      out() << questionPrefix << _question << '/' << questions.size() << ".  ";
       if (quizStyle == 'k') {
-        out() << "Kanji:  " << i->name();
+        if (!_reviewMode) out() << "Kanji:  ";
+        out() << i->name();
         auto info = i->info(infoFields);
         if (!info.empty()) out() << "  (" << info << ")";
       } else

@@ -86,6 +86,27 @@ TEST_F(QuizTest, ListQuiz) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
+TEST_F(QuizTest, ListQuizReview) {
+  _is << "r\ng\n1\nb\n";
+  toggleMeanings();
+  runQuiz();
+  std::string line, lastLine;
+  int kanjiCount = 0;
+  int meaningCount = 0;
+  while (std::getline(_os, line)) {
+    if (line == "Kanji 1/80.  一  (Rad 一:1, Strokes 1, Pinyin yī, Level N5, Freq 2, Kyu K10)") ++kanjiCount;
+    if (line == "    Meaning:  one") ++meaningCount;
+    lastLine = line;
+  }
+  EXPECT_EQ(kanjiCount, 2);   // once before toggling meanings on and once after
+  EXPECT_EQ(meaningCount, 1); // in reviewMode meanings are shown on a separate line
+  // test the line sent to _os
+  EXPECT_EQ(lastLine, "  Select (-=hide meanings, .=next, /=quit): ");
+  // should be nothing sent to _es (for errors) and nothing left in _is
+  EXPECT_FALSE(std::getline(_es, line));
+  EXPECT_FALSE(std::getline(_is, line));
+}
+
 TEST_F(QuizTest, FrequencyLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('f', x); };
   EXPECT_EQ(f('1'), "1/500.  Kanji:  日  (Rad 日:72, Strokes 4, Pinyin rì, Grade G1, Level N5, Kyu K10)");
