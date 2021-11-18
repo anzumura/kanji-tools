@@ -30,9 +30,12 @@ constexpr auto HideMeanings = "hide meanings";
 void Quiz::quiz() const {
   reset();
   _choice.setQuit(QuitOption);
-  char c = _choice.get(
-    "Quiz type", {{'f', "freq."}, {'g', "grade"}, {'k', "kyu"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}},
-    'g');
+  char c = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
+  if (c == QuitOption) return;
+  _reviewMode = c == 'r';
+  c = _choice.get("Quiz type",
+                  {{'f', "freq."}, {'g', "grade"}, {'k', "kyu"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}},
+                  'g');
   if (c == 'f') {
     c = _choice.get("Choose list",
                     {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
@@ -122,27 +125,33 @@ void Quiz::toggleMeanings(Choices& choices) const {
   choices[MeaningsOption] = _showMeanings ? HideMeanings : ShowMeanings;
 }
 
-void Quiz::printMeaning(const Entry& k) const {
-  if (_showMeanings && k->hasMeaning()) out() << " : " << k->meaning();
+void Quiz::printMeaning(const Entry& k, bool useNewLine) const {
+  if (_showMeanings && k->hasMeaning()) out() << (useNewLine ? "\n    Meaning:  " : " : ") << k->meaning();
   out() << '\n';
 }
 
 // List Based Quiz
 
 void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const {
+  static const std::string reviewPrompt("  Select"), quizPrompt("  Select correct ");
   if (listOrder == ListOrder::Quit) return;
   Choices choices;
-  for (int i = 2; i < 10; ++i)
-    choices['0' + i] = "";
-  const char c = _choice.get("Number of choices", choices, '4');
-  if (c == QuitOption) return;
-  const int numberOfChoicesPerQuestion = c - '0';
-  choices = getDefaultChoices(list.size());
-  for (int i = 0; i < numberOfChoicesPerQuestion; ++i)
-    choices['1' + i] = "";
-  const char quizStyle = _choice.get("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, 'k');
-  if (quizStyle == QuitOption) return;
-  const std::string prompt = std::string("  Select correct ") + (quizStyle == 'k' ? "reading" : "kanji");
+  int numberOfChoicesPerQuestion = 1;
+  char quizStyle = 'k';
+  if (!_reviewMode) {
+    // in quiz mode, numberOfChoicesPerQuestion should be a value from 2 to 9
+    for (int i = 2; i < 10; ++i)
+      choices['0' + i] = "";
+    const char c = _choice.get("Number of choices", choices, '4');
+    if (c == QuitOption) return;
+    numberOfChoicesPerQuestion = c - '0';
+    choices = getDefaultChoices(list.size());
+    for (int i = 0; i < numberOfChoicesPerQuestion; ++i)
+      choices['1' + i] = "";
+    quizStyle = _choice.get("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, quizStyle);
+    if (quizStyle == QuitOption) return;
+  }
+  const std::string prompt = _reviewMode ? reviewPrompt : quizPrompt + (quizStyle == 'k' ? "reading" : "kanji");
 
   List questions;
   for (auto& i : list)
@@ -152,13 +161,14 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   else if (listOrder == ListOrder::Random)
     std::shuffle(questions.begin(), questions.end(), RandomGen);
 
-  log(true) << "Starting quiz for " << questions.size() << " kanji";
+  log(true) << "Starting " << (_reviewMode ? "review" : "quiz") << " for " << questions.size() << " kanji";
   if (questions.size() < list.size())
     out() << " (original list had " << list.size() << ", but not all entries have readings yet)";
   out() << '\n';
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(1, numberOfChoicesPerQuestion);
-  for (auto& i : questions) {
+  while (_question < questions.size()) {
+    const Data::Entry& i = questions[_question];
     const int correctChoice = randomCorrect(RandomGen);
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
     FileList::Set sameReading = {i->reading()};
@@ -177,27 +187,32 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
     ++_question;
     bool stopQuiz = false;
     do {
-      out() << "\nQuestion " << _question << '/' << questions.size() << ".  ";
+      out() << (_reviewMode ? "\nKanji " : "\nQuestion ") << _question << '/' << questions.size() << ".  ";
       if (quizStyle == 'k') {
         out() << "Kanji:  " << i->name();
         auto info = i->info(infoFields);
         if (!info.empty()) out() << "  (" << info << ")";
       } else
-        out() << "Reading: " << i->reading();
-      printMeaning(i);
-      for (auto& j : answers)
-        out() << "    " << j.first << ".  "
-              << (quizStyle == 'k' ? questions[j.second]->reading() : questions[j.second]->name()) << '\n';
+        out() << "Reading:  " << i->reading();
+      printMeaning(i, _reviewMode);
+      if (_reviewMode) {
+        out() << "    Reading:  " << i->reading() << '\n';
+        choices = getDefaultChoices(questions.size());
+      } else
+        for (auto& j : answers)
+          out() << "    " << j.first << ".  "
+                << (quizStyle == 'k' ? questions[j.second]->reading() : questions[j.second]->name()) << '\n';
       const char answer = _choice.get(prompt, choices);
-      if (answer == SkipOption) break;
       if (answer == QuitOption)
         stopQuiz = true;
       else if (answer == MeaningsOption)
         toggleMeanings(choices);
       else {
-        if (answer - '0' == correctChoice)
+        if (answer == PrevOption)
+          _question -= 2;
+        else if (answer - '0' == correctChoice)
           out() << "  Correct! (" << ++_score << '/' << _question << ")\n";
-        else {
+        else if (answer != SkipOption) {
           out() << "  The correct answer is " << correctChoice << '\n';
           _mistakes.push_back(i->name());
         }
@@ -263,9 +278,6 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, co
 
 void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupData::Map& otherMap,
                      char otherGroup) const {
-  const char mode = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
-  if (mode == QuitOption) return;
-  _reviewMode = mode == 'r';
   bool firstTime = true;
   for (_question = 1; _question <= list.size(); ++_question) {
     auto& i = list[_question - 1];
@@ -289,7 +301,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
     Choices choices = getDefaultChoices(list.size());
     bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
-      out() << (_reviewMode ? "\nReview " : "\nQuestion ") << _question << '/' << list.size() << ".  " << *i << ", ";
+      out() << (_reviewMode ? "\nGroup " : "\nQuestion ") << _question << '/' << list.size() << ".  " << *i << ", ";
       if (questions.size() == i->members().size())
         out() << questions.size();
       else
@@ -355,7 +367,7 @@ bool Quiz::getAnswers(Answers& answers, int totalQuestions, Choices& choices, bo
 }
 
 bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& meanings) const {
-  const static std::string ReviewMsg("  Review mappings"), QuizMsg("  Select reading for Entry: ");
+  const static std::string ReviewMsg("  Select"), QuizMsg("  Select reading for Entry: ");
   const std::string space = (answers.size() < 9 ? " " : "");
   do {
     if (!answers.empty()) {

@@ -29,8 +29,10 @@ private:
   // for a quiz question like skip and quit. It will also populate 'hide/show meanings' option
   // based on the current value of '_showMeanings'.
   Choices getDefaultChoices(int totalQuestions) const;
-  void toggleMeanings(Choices&) const;   // display of English 'meanings' can be toggled on and off
-  void printMeaning(const Entry&) const; // print meaning if _showMeanings is true and meaning exists
+  // display of English 'meanings' can be toggled on and off
+  void toggleMeanings(Choices&) const;
+  // print meaning if _showMeanings is true and meaning exists
+  void printMeaning(const Entry&, bool useNewLine = false) const;
 
   // 'listQuiz' starts a 'list based quiz'. 'infoFields' controls which fields are shown in a 'kanji
   // to reading' quiz (see Kanji.h for more details on 'InfoFields').

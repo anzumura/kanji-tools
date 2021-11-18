@@ -22,27 +22,28 @@ protected:
 
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
+    // 't' for 'test' mode (instead of review mode)
     // 'g' for Grade List Quiz
     // '1' for Grade 1
     // 'b' for Beginning of list (instead of End or Random)
     // '4' for 4 choices
     // 'k' for kanji to reading quiz
-    _is << "g\n1\nb\n4\nk\n";
+    _is << "t\ng\n1\nb\n4\nk\n";
   }
 
   std::string listQuizFirstQuestion(char quizType, char questionList) {
-    _is << quizType << '\n' << questionList << "\nb\n4\nk\n";
+    _is << "t\n" << quizType << '\n' << questionList << "\nb\n4\nk\n";
     std::string line;
     getFirstQuestion(line);
     return line.substr(9);
   }
 
   void meaningGroupQuiz() {
+    // 't' for 'test' mode (instead of review mode)
     // 'm' for Meaning Group Quiz
     // 'b' for Beginning of list (instead of End or Random)
     // '1' for including only Jōyō kanji
-    // 't' for 'test' mode (instead of review mode)
-    _is << "m\nb\n1\nt\n";
+    _is << "t\nm\nb\n1\n";
   }
   void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
   void skip() { _is << ".\n"; }           // '.' is the option to skip a question
@@ -258,7 +259,7 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
 
 TEST_F(QuizTest, PatternListFilters) {
   auto f = [this](char x) {
-    _is << "p\nb\n4\n" << x << "\nt\n";
+    _is << "t\np\nb\n4\n" << x << "\n";
     std::string line;
     getFirstQuestion(line);
     return line.substr(9);
