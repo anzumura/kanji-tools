@@ -172,7 +172,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
     const Data::Entry& i = questions[_question];
     const int correctChoice = randomCorrect(RandomGen);
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
-    FileList::Set sameReading = {i->reading()};
+    DataFile::Set sameReading = {i->reading()};
     std::map<int, int> answers = {{correctChoice, _question}};
     for (int j = 1; j <= numberOfChoicesPerQuestion; ++j) {
       if (j != correctChoice) {

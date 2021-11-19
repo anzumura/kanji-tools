@@ -4,7 +4,7 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
-#include <kanji_tools/utils/FileList.h>
+#include <kanji_tools/utils/DataFile.h>
 
 #include <memory>
 #include <optional>
@@ -19,13 +19,13 @@ public:
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
 
-  static void usage(const std::string& msg) { FileList::usage(msg); }
+  static void usage(const std::string& msg) { DataFile::usage(msg); }
 
   Data(const std::filesystem::path& dataDir, bool debug, std::ostream& out = std::cout, std::ostream& err = std::cerr)
     : _dataDir(dataDir), _debug(debug), _out(out), _err(err) {
-    // Clearing FileList static data is only needed to help test code, for example FileList tests can leave some
+    // Clearing DataFile static data is only needed to help test code, for example DataFile tests can leave some
     // data in these sets before Quiz tests are run (leading to problems loading real files).
-    FileList::clearUniqueCheckData();
+    DataFile::clearUniqueCheckData();
     if (_debug) log(true) << "Begin Loading Data\n>>>\n";
   }
   virtual ~Data() = default;
@@ -167,7 +167,7 @@ protected:
   void populateJouyou();
   void populateJinmei();
   void populateExtra();
-  void processList(const FileList&);
+  void processList(const DataFile&);
 
   // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
   // then this function will print any entries in _strokes that are 'Other' type or not found.

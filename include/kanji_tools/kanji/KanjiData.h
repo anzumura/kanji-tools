@@ -26,11 +26,11 @@ private:
   void printListStats(const std::array<T, S>&, T (Kanji::*)() const, const std::string&, bool showNoFrequency) const;
 
   // '_levels' (for JLPT) are loaded from files under 'data/jlpt'
-  const std::array<const LevelFileList, AllJlptLevels.size() - 1> _levels;
+  const std::array<const LevelDataFile, AllJlptLevels.size() - 1> _levels;
   // '_kyus' (for Kanji Kentei) are loaded from files under 'data/kentei'
-  const std::array<const KyuFileList, AllKenteiKyus.size() - 1> _kyus;
+  const std::array<const KyuDataFile, AllKenteiKyus.size() - 1> _kyus;
   // '_frequency' (for top 2501 frequency kanji) is loaded from data/frequency.txt
-  const FileList _frequency;
+  const DataFile _frequency;
 };
 
 } // namespace kanji_tools

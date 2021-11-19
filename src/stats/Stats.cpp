@@ -132,7 +132,7 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
       log() << "Showing Breakdown for '" << name << "':\n";
       out() << "  " << (showBreakdown ? "Rank  [Val #] Freq, LV, Type (No.) ==" : "[Val #], Missing Unicode,")
             << " Highest Count File\n";
-      FileList::List missing;
+      DataFile::List missing;
       for (const auto& i : frequency) {
         out() << "  ";
         if (showBreakdown) out() << std::left << std::setw(5) << ++rank << ' ';
@@ -153,7 +153,7 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
         }
         out() << '\n';
       }
-      if (showBreakdown) FileList::print(missing, "missing");
+      if (showBreakdown) DataFile::print(missing, "missing");
     }
   }
   return total;

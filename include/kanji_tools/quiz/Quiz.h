@@ -62,7 +62,7 @@ private:
   // used to track progress in quiz:
   mutable int _question;
   mutable int _score;
-  mutable FileList::List _mistakes;
+  mutable DataFile::List _mistakes;
   mutable bool _showMeanings;
   mutable Choice _choice;
   mutable bool _reviewMode;

@@ -18,8 +18,8 @@ const fs::path PatternGroupFile = "pattern-groups.txt";
 } // namespace
 
 GroupData::GroupData(DataPtr data) : _data(data) {
-  loadGroup(FileList::getFile(_data->dataDir(), MeaningGroupFile), _meaningMap, _meaningGroups, GroupType::Meaning);
-  loadGroup(FileList::getFile(_data->dataDir(), PatternGroupFile), _patternMap, _patternGroups, GroupType::Pattern);
+  loadGroup(DataFile::getFile(_data->dataDir(), MeaningGroupFile), _meaningMap, _meaningGroups, GroupType::Meaning);
+  loadGroup(DataFile::getFile(_data->dataDir(), PatternGroupFile), _patternMap, _patternGroups, GroupType::Pattern);
   if (_data->debug()) {
     printGroups(_meaningMap, _meaningGroups);
     printGroups(_patternMap, _patternGroups);
@@ -67,7 +67,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       }
       if (pos != cols.size()) error("not enough columns");
       std::string number(cols[numberCol]), name(cols[nameCol]), token;
-      FileList::List kanjis;
+      DataFile::List kanjis;
       Group::PatternType patternType = Group::PatternType::None;
       if (name.empty()) error("Group must have a name");
       if (isAnySingleByte(name)) error("Group name must be all MB characters");

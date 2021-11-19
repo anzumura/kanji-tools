@@ -36,25 +36,25 @@ const fs::path UcdFile = "ucd.txt";
 
 KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostream& err)
   : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err),
-    _levels{LevelFileList(_dataDir / N5File, JlptLevels::N5, _debug),
-            LevelFileList(_dataDir / N4File, JlptLevels::N4, _debug),
-            LevelFileList(_dataDir / N3File, JlptLevels::N3, _debug),
-            LevelFileList(_dataDir / N2File, JlptLevels::N2, _debug),
-            LevelFileList(_dataDir / N1File, JlptLevels::N1, _debug)},
+    _levels{LevelDataFile(_dataDir / N5File, JlptLevels::N5, _debug),
+            LevelDataFile(_dataDir / N4File, JlptLevels::N4, _debug),
+            LevelDataFile(_dataDir / N3File, JlptLevels::N3, _debug),
+            LevelDataFile(_dataDir / N2File, JlptLevels::N2, _debug),
+            LevelDataFile(_dataDir / N1File, JlptLevels::N1, _debug)},
     _kyus{
-      KyuFileList(_dataDir / K10File, KenteiKyus::K10, _debug), KyuFileList(_dataDir / K9File, KenteiKyus::K9, _debug),
-      KyuFileList(_dataDir / K8File, KenteiKyus::K8, _debug),   KyuFileList(_dataDir / K7File, KenteiKyus::K7, _debug),
-      KyuFileList(_dataDir / K6File, KenteiKyus::K6, _debug),   KyuFileList(_dataDir / K5File, KenteiKyus::K5, _debug),
-      KyuFileList(_dataDir / K4File, KenteiKyus::K4, _debug),   KyuFileList(_dataDir / K3File, KenteiKyus::K3, _debug),
-      KyuFileList(_dataDir / KJ2File, KenteiKyus::KJ2, _debug), KyuFileList(_dataDir / K2File, KenteiKyus::K2, _debug),
-      KyuFileList(_dataDir / KJ1File, KenteiKyus::KJ1, _debug), KyuFileList(_dataDir / K1File, KenteiKyus::K1, _debug)},
+      KyuDataFile(_dataDir / K10File, KenteiKyus::K10, _debug), KyuDataFile(_dataDir / K9File, KenteiKyus::K9, _debug),
+      KyuDataFile(_dataDir / K8File, KenteiKyus::K8, _debug),   KyuDataFile(_dataDir / K7File, KenteiKyus::K7, _debug),
+      KyuDataFile(_dataDir / K6File, KenteiKyus::K6, _debug),   KyuDataFile(_dataDir / K5File, KenteiKyus::K5, _debug),
+      KyuDataFile(_dataDir / K4File, KenteiKyus::K4, _debug),   KyuDataFile(_dataDir / K3File, KenteiKyus::K3, _debug),
+      KyuDataFile(_dataDir / KJ2File, KenteiKyus::KJ2, _debug), KyuDataFile(_dataDir / K2File, KenteiKyus::K2, _debug),
+      KyuDataFile(_dataDir / KJ1File, KenteiKyus::KJ1, _debug), KyuDataFile(_dataDir / K1File, KenteiKyus::K1, _debug)},
     _frequency(_dataDir / FrequencyFile, _debug) {
-  FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
-  _ucd.load(FileList::getFile(_dataDir, UcdFile));
-  _radicals.load(FileList::getFile(_dataDir, RadicalsFile));
-  loadStrokes(FileList::getFile(_dataDir, StrokesFile));
-  loadStrokes(FileList::getFile(_dataDir, WikiStrokesFile), false);
-  loadOtherReadings(FileList::getFile(_dataDir, OtherReadingsFile));
+  DataFile::clearUniqueCheckData(); // cleanup static data used for unique checking
+  _ucd.load(DataFile::getFile(_dataDir, UcdFile));
+  _radicals.load(DataFile::getFile(_dataDir, RadicalsFile));
+  loadStrokes(DataFile::getFile(_dataDir, StrokesFile));
+  loadStrokes(DataFile::getFile(_dataDir, WikiStrokesFile), false);
+  loadOtherReadings(DataFile::getFile(_dataDir, OtherReadingsFile));
   populateJouyou();
   populateJinmei();
   populateExtra();

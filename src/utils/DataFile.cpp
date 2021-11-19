@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/FileList.h>
+#include <kanji_tools/utils/DataFile.h>
 #include <kanji_tools/utils/MBChar.h>
 
 #include <fstream>
@@ -8,14 +8,14 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-fs::path FileList::getFile(const fs::path& dir, const fs::path& file) {
+fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   fs::path p(dir / file);
   if (!fs::exists(p)) usage(dir.string() + " must contain " + file.string());
   if (!fs::is_regular_file(p)) usage(file.string() + " must be a regular file");
   return p;
 }
 
-void FileList::print(const List& l, const std::string& type, const std::string& group, bool isError) {
+void DataFile::print(const List& l, const std::string& type, const std::string& group, bool isError) {
   if (!l.empty()) {
     std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
     if (!group.empty()) std::cout << " in " << group;
@@ -26,7 +26,7 @@ void FileList::print(const List& l, const std::string& type, const std::string& 
   }
 }
 
-FileList::FileList(const fs::path& file, FileType fileType, bool createNewUniqueFile, Set* uniqueTypeNames,
+DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUniqueFile, Set* uniqueTypeNames,
                    const std::string& name)
   : _name(name.empty() ? capitalize(file.stem().string()) : name) {
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
@@ -36,7 +36,7 @@ FileList::FileList(const fs::path& file, FileType fileType, bool createNewUnique
     usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
   };
   std::ifstream f(file);
-  FileList::List good, dups;
+  DataFile::List good, dups;
   for (std::string line; std::getline(f, line); ++lineNumber) {
     std::stringstream ss(line);
     for (std::string token; std::getline(ss, token, ' ');) {
