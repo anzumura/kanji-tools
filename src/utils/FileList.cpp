@@ -8,35 +8,6 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-const char* toString(Levels x) {
-  switch (x) {
-  case Levels::N5: return "N5";
-  case Levels::N4: return "N4";
-  case Levels::N3: return "N3";
-  case Levels::N2: return "N2";
-  case Levels::N1: return "N1";
-  default: return "None";
-  }
-}
-
-const char* toString(Kyus x) {
-  switch (x) {
-  case Kyus::K10: return "K10";
-  case Kyus::K9: return "K9";
-  case Kyus::K8: return "K8";
-  case Kyus::K7: return "K7";
-  case Kyus::K6: return "K6";
-  case Kyus::K5: return "K5";
-  case Kyus::K4: return "K4";
-  case Kyus::K3: return "K3";
-  case Kyus::KJ2: return "KJ2";
-  case Kyus::K2: return "K2";
-  case Kyus::KJ1: return "KJ1";
-  case Kyus::K1: return "K1";
-  default: return "None";
-  }
-}
-
 fs::path FileList::getFile(const fs::path& dir, const fs::path& file) {
   fs::path p(dir / file);
   if (!fs::exists(p)) usage(dir.string() + " must contain " + file.string());

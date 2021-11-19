@@ -37,8 +37,8 @@ protected:
 
 TEST_F(FileListTest, GoodOnePerLine) {
   FileList f(_goodOnePerLine);
-  EXPECT_EQ(f.level(), Levels::None);
-  EXPECT_EQ(f.kyu(), Kyus::None);
+  EXPECT_EQ(f.level(), JlptLevels::None);
+  EXPECT_EQ(f.kyu(), KenteiKyus::None);
   EXPECT_EQ(f.name(), "GoodOnePerLine");
   std::array results = {"北", "海", "道"};
   EXPECT_EQ(f.list().size(), results.size());
@@ -52,9 +52,9 @@ TEST_F(FileListTest, GoodOnePerLine) {
 }
 
 TEST_F(FileListTest, GoodOnePerLineLevel) {
-  LevelFileList f(_goodOnePerLineLevel, Levels::N2);
-  EXPECT_EQ(f.level(), Levels::N2);
-  EXPECT_EQ(f.kyu(), Kyus::None);
+  LevelFileList f(_goodOnePerLineLevel, JlptLevels::N2);
+  EXPECT_EQ(f.level(), JlptLevels::N2);
+  EXPECT_EQ(f.kyu(), KenteiKyus::None);
   EXPECT_EQ(f.name(), "N2");
   std::array results = {"犬", "猫", "虎"};
   EXPECT_EQ(f.list().size(), results.size());
@@ -78,7 +78,7 @@ TEST_F(FileListTest, BadOnePerLine) {
 
 TEST_F(FileListTest, MultiplePerLine) {
   FileList f(_multiplePerLine, FileList::FileType::MultiplePerLine);
-  EXPECT_EQ(f.level(), Levels::None);
+  EXPECT_EQ(f.level(), JlptLevels::None);
   EXPECT_EQ(f.name(), "MultiplePerLine");
   std::array results = {"東", "西", "線"};
   EXPECT_EQ(f.list().size(), results.size());
@@ -102,7 +102,7 @@ TEST_F(FileListTest, GlobalDuplicate) {
 
 TEST_F(FileListTest, GlobalDuplicateLevel) {
   try {
-    LevelFileList f(_goodOnePerLineLevel, Levels::N3);
+    LevelFileList f(_goodOnePerLineLevel, JlptLevels::N3);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"));

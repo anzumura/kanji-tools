@@ -71,7 +71,7 @@ int Stats::Count::frequency() const {
   return entry.has_value() ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
 }
 
-Types Stats::Count::type() const { return entry.has_value() ? (**entry).type() : Types::None; }
+KanjiTypes Stats::Count::type() const { return entry.has_value() ? (**entry).type() : KanjiTypes::None; }
 
 template<typename Pred>
 int Stats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
@@ -160,8 +160,8 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
 }
 
 void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) const {
-  std::map<Types, int> totalKanjiPerType, uniqueKanjiPerType;
-  std::map<Types, std::vector<Count>> found;
+  std::map<KanjiTypes, int> totalKanjiPerType, uniqueKanjiPerType;
+  std::map<KanjiTypes, std::vector<Count>> found;
   for (const auto& i : frequency) {
     auto t = i.type();
     totalKanjiPerType[t] += i.count;
@@ -169,7 +169,7 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
     auto& j = found[t];
     if (j.size() < MaxExamples) j.push_back(i);
   }
-  for (auto t : AllTypes) {
+  for (auto t : AllKanjiTypes) {
     auto i = uniqueKanjiPerType.find(t);
     if (i != uniqueKanjiPerType.end()) {
       int totalForType = totalKanjiPerType[t];

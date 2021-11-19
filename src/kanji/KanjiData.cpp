@@ -36,15 +36,18 @@ const fs::path UcdFile = "ucd.txt";
 
 KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostream& err)
   : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err),
-    _levels{LevelFileList(_dataDir / N5File, Levels::N5, _debug), LevelFileList(_dataDir / N4File, Levels::N4, _debug),
-            LevelFileList(_dataDir / N3File, Levels::N3, _debug), LevelFileList(_dataDir / N2File, Levels::N2, _debug),
-            LevelFileList(_dataDir / N1File, Levels::N1, _debug)},
-    _kyus{KyuFileList(_dataDir / K10File, Kyus::K10, _debug), KyuFileList(_dataDir / K9File, Kyus::K9, _debug),
-          KyuFileList(_dataDir / K8File, Kyus::K8, _debug),   KyuFileList(_dataDir / K7File, Kyus::K7, _debug),
-          KyuFileList(_dataDir / K6File, Kyus::K6, _debug),   KyuFileList(_dataDir / K5File, Kyus::K5, _debug),
-          KyuFileList(_dataDir / K4File, Kyus::K4, _debug),   KyuFileList(_dataDir / K3File, Kyus::K3, _debug),
-          KyuFileList(_dataDir / KJ2File, Kyus::KJ2, _debug), KyuFileList(_dataDir / K2File, Kyus::K2, _debug),
-          KyuFileList(_dataDir / KJ1File, Kyus::KJ1, _debug), KyuFileList(_dataDir / K1File, Kyus::K1, _debug)},
+    _levels{LevelFileList(_dataDir / N5File, JlptLevels::N5, _debug),
+            LevelFileList(_dataDir / N4File, JlptLevels::N4, _debug),
+            LevelFileList(_dataDir / N3File, JlptLevels::N3, _debug),
+            LevelFileList(_dataDir / N2File, JlptLevels::N2, _debug),
+            LevelFileList(_dataDir / N1File, JlptLevels::N1, _debug)},
+    _kyus{
+      KyuFileList(_dataDir / K10File, KenteiKyus::K10, _debug), KyuFileList(_dataDir / K9File, KenteiKyus::K9, _debug),
+      KyuFileList(_dataDir / K8File, KenteiKyus::K8, _debug),   KyuFileList(_dataDir / K7File, KenteiKyus::K7, _debug),
+      KyuFileList(_dataDir / K6File, KenteiKyus::K6, _debug),   KyuFileList(_dataDir / K5File, KenteiKyus::K5, _debug),
+      KyuFileList(_dataDir / K4File, KenteiKyus::K4, _debug),   KyuFileList(_dataDir / K3File, KenteiKyus::K3, _debug),
+      KyuFileList(_dataDir / KJ2File, KenteiKyus::KJ2, _debug), KyuFileList(_dataDir / K2File, KenteiKyus::K2, _debug),
+      KyuFileList(_dataDir / KJ1File, KenteiKyus::KJ1, _debug), KyuFileList(_dataDir / K1File, KenteiKyus::K1, _debug)},
     _frequency(_dataDir / FrequencyFile, _debug) {
   FileList::clearUniqueCheckData(); // cleanup static data used for unique checking
   _ucd.load(FileList::getFile(_dataDir, UcdFile));
@@ -69,23 +72,23 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
     log(true) << "Finished Loading Data\n>>>\n";
     printStats();
     printGrades();
-    printListStats(AllLevels, &Kanji::level, "Level", true);
-    printListStats(AllKyus, &Kanji::kyu, "Kyu", false);
+    printListStats(AllJlptLevels, &Kanji::level, "Level", true);
+    printListStats(AllKenteiKyus, &Kanji::kyu, "Kyu", false);
     _radicals.print(*this);
     _ucd.print(*this);
   }
 }
 
-Levels KanjiData::getLevel(const std::string& k) const {
+JlptLevels KanjiData::getLevel(const std::string& k) const {
   for (auto& i : _levels)
     if (i.exists(k)) return i.level();
-  return Levels::None;
+  return JlptLevels::None;
 }
 
-Kyus KanjiData::getKyu(const std::string& k) const {
+KenteiKyus KanjiData::getKyu(const std::string& k) const {
   for (auto& i : _kyus)
     if (i.exists(k)) return i.kyu();
-  return Kyus::None;
+  return KenteiKyus::None;
 }
 
 void KanjiData::noFreq(int f, bool brackets) const {
@@ -100,8 +103,8 @@ void KanjiData::noFreq(int f, bool brackets) const {
 }
 
 template<typename T> void KanjiData::printCount(const std::string& name, T pred, int printExamples) const {
-  std::vector<std::pair<Types, int>> counts;
-  std::map<Types, std::vector<std::string>> examples;
+  std::vector<std::pair<KanjiTypes, int>> counts;
+  std::map<KanjiTypes, std::vector<std::string>> examples;
   int total = 0;
   for (auto& l : _types) {
     int count = 0;
@@ -138,9 +141,9 @@ void KanjiData::printStats() const {
   _out << ")\n";
   printCount("  Has JLPT level", [](const auto& x) { return x->hasLevel(); });
   printCount("  Has frequency and not in Jouyou or JLPT",
-             [](const auto& x) { return x->frequency() && x->type() != Types::Jouyou && !x->hasLevel(); });
+             [](const auto& x) { return x->frequency() && x->type() != KanjiTypes::Jouyou && !x->hasLevel(); });
   printCount("  Jinmei with no frequency and not JLPT",
-             [](const auto& x) { return x->type() == Types::Jinmei && !x->frequency() && !x->hasLevel(); });
+             [](const auto& x) { return x->type() == KanjiTypes::Jinmei && !x->frequency() && !x->hasLevel(); });
   printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
   printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
   printCount(
@@ -151,8 +154,8 @@ void KanjiData::printStats() const {
 void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   int all = 0;
-  const auto& jouyou = _types.at(Types::Jouyou);
-  for (auto i : AllGrades) {
+  const auto& jouyou = _types.at(KanjiTypes::Jouyou);
+  for (auto i : AllKanjiGrades) {
     auto grade = [i](const auto& x) { return x->grade() == i; };
     auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
     if (gradeCount) {
@@ -162,7 +165,7 @@ void KanjiData::printGrades() const {
         std::count_if(jouyou.begin(), jouyou.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }),
         true);
       _out << " (";
-      for (auto level : AllLevels) {
+      for (auto level : AllJlptLevels) {
         const auto gradeLevelCount = std::count_if(
           jouyou.begin(), jouyou.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
         if (gradeLevelCount) {
@@ -183,7 +186,7 @@ void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() cons
   log() << name << " breakdown:\n";
   int total = 0;
   for (auto i : all) {
-    std::vector<std::pair<Types, int>> counts;
+    std::vector<std::pair<KanjiTypes, int>> counts;
     int iTotal = 0;
     for (const auto& l : _types) {
       int count = std::count_if(l.second.begin(), l.second.end(), [i, &p](const auto& x) { return ((*x).*p)() == i; });

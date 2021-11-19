@@ -14,15 +14,15 @@ public:
 protected:
   LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
     : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name), d.getStrokes(name), d.getPinyin(name),
-            Levels::None, d.getKyu(name), d.getFrequency(name)),
+            JlptLevels::None, d.getKyu(name), d.getFrequency(name)),
       _link(link) {}
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
   static const std::string& checkType(const std::string& name, const Data::Entry& link, bool isJinmei = false) {
-    Types t = link->type();
-    if (t != Types::Jouyou && (!isJinmei || t != Types::Jinmei))
-      throw std::domain_error("LinkedKanji " + name + " wanted type '" + toString(Types::Jouyou) +
-                              (isJinmei ? std::string("' or '") + toString(Types::Jinmei) : std::string()) +
+    KanjiTypes t = link->type();
+    if (t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
+      throw std::domain_error("LinkedKanji " + name + " wanted type '" + toString(KanjiTypes::Jouyou) +
+                              (isJinmei ? std::string("' or '") + toString(KanjiTypes::Jinmei) : std::string()) +
                               "' for link " + link->name() + ", but got '" + toString(t) + "'");
     return name;
   }
@@ -35,7 +35,7 @@ public:
   LinkedJinmeiKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
     : LinkedKanji(d, number, checkType(name, link, true), link) {}
 
-  Types type() const override { return Types::LinkedJinmei; }
+  KanjiTypes type() const override { return KanjiTypes::LinkedJinmei; }
 };
 
 class LinkedOldKanji : public LinkedKanji {
@@ -43,7 +43,7 @@ public:
   LinkedOldKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
     : LinkedKanji(d, number, checkType(name, link), link) {}
 
-  Types type() const override { return Types::LinkedOld; }
+  KanjiTypes type() const override { return KanjiTypes::LinkedOld; }
 };
 
 } // namespace kanji_tools

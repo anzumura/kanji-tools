@@ -3,34 +3,8 @@
 
 namespace kanji_tools {
 
-const char* toString(Grades x) {
-  switch (x) {
-  case Grades::S: return "S";
-  case Grades::G6: return "G6";
-  case Grades::G5: return "G5";
-  case Grades::G4: return "G4";
-  case Grades::G3: return "G3";
-  case Grades::G2: return "G2";
-  case Grades::G1: return "G1";
-  default: return "None";
-  }
-}
-
-const char* toString(Types x) {
-  switch (x) {
-  case Types::Jouyou: return "Jouyou";
-  case Types::Jinmei: return "Jinmei";
-  case Types::LinkedJinmei: return "LinkedJinmei";
-  case Types::LinkedOld: return "LinkedOld";
-  case Types::Other: return "Other";
-  case Types::Extra: return "Extra";
-  case Types::Kentei: return "Kentei";
-  default: return "None";
-  }
-}
-
 Kanji::Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical,
-             int strokes, const OptString& pinyin, Levels level, Kyus kyu, int frequency)
+             int strokes, const OptString& pinyin, JlptLevels level, KenteiKyus kyu, int frequency)
   : _number(number), _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
     _nonVariantName(MBChar::withoutVariationSelector(name)), _compatibilityName(compatibilityName), _radical(radical),
     _strokes(strokes), _pinyin(pinyin), _level(level), _kyu(kyu), _frequency(frequency) {

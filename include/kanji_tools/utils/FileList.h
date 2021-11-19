@@ -1,9 +1,10 @@
 #ifndef KANJI_TOOLS_UTILS_FILE_LIST_H
 #define KANJI_TOOLS_UTILS_FILE_LIST_H
 
-#include <array>
+#include <kanji_tools/utils/JlptLevels.h>
+#include <kanji_tools/utils/KenteiKyus.h>
+
 #include <filesystem>
-#include <iostream>
 #include <map>
 #include <set>
 #include <string>
@@ -11,21 +12,8 @@
 
 namespace kanji_tools {
 
-// JLPT Levels, None=not a JLPT kanji
-enum class Levels { N5, N4, N3, N2, N1, None };
-constexpr std::array AllLevels{Levels::N5, Levels::N4, Levels::N3, Levels::N2, Levels::N1, Levels::None};
-const char* toString(Levels);
-inline std::ostream& operator<<(std::ostream& os, const Levels& x) { return os << toString(x); }
-
-// Kanji Kentei (漢字検定) Kyū (級), K = Kanken (漢検), J=Jun (準), None=not a Kentei kanji
-enum class Kyus { K10, K9, K8, K7, K6, K5, K4, K3, KJ2, K2, KJ1, K1, None };
-constexpr std::array AllKyus{Kyus::K10, Kyus::K9,  Kyus::K8, Kyus::K7,  Kyus::K6, Kyus::K5,  Kyus::K4,
-                             Kyus::K3,  Kyus::KJ2, Kyus::K2, Kyus::KJ1, Kyus::K1, Kyus::None};
-const char* toString(Kyus);
-inline std::ostream& operator<<(std::ostream& os, const Kyus& x) { return os << toString(x); }
-
-// 'secondLast' is a helper function to get the second last value of an array (useful for AllTypes,
-// AllGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
+// 'secondLast' is a helper function to get the second last value of an array (useful for AllKanjiTypes,
+// AllKanjiGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
 template<typename T, size_t S> constexpr inline T secondLast(const std::array<T, S>& x) {
   static_assert(S > 1);
   return x[S - 2];
@@ -61,8 +49,8 @@ public:
     return i != _map.end() ? i->second : 0;
   }
   const std::string& name() const { return _name; }
-  virtual Levels level() const { return Levels::None; }
-  virtual Kyus kyu() const { return Kyus::None; }
+  virtual JlptLevels level() const { return JlptLevels::None; }
+  virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   const List& list() const { return _list; }
   size_t size() const { return _list.size(); }
   // 'toString' returns the full contents of this list into a string (with no separates)
@@ -86,7 +74,7 @@ private:
   Map _map;
 };
 
-// For now there are TypeFileLists for 'Levels' and 'Kyus'
+// For now there are TypeFileLists for 'JlptLevels' and 'KenteiKyus'
 template<typename T> class TypeFileList : public FileList {
 protected:
   TypeFileList(const std::filesystem::path& p, T type, bool createNewUniqueFile = false)
@@ -98,20 +86,20 @@ private:
   inline static Set UniqueTypeNames;
 };
 
-class LevelFileList : public TypeFileList<Levels> {
+class LevelFileList : public TypeFileList<JlptLevels> {
 public:
-  LevelFileList(const std::filesystem::path& p, Levels level, bool createNewUniqueFile = false)
+  LevelFileList(const std::filesystem::path& p, JlptLevels level, bool createNewUniqueFile = false)
     : TypeFileList(p, level, createNewUniqueFile) {}
 
-  Levels level() const override { return _type; }
+  JlptLevels level() const override { return _type; }
 };
 
-class KyuFileList : public TypeFileList<Kyus> {
+class KyuFileList : public TypeFileList<KenteiKyus> {
 public:
-  KyuFileList(const std::filesystem::path& p, Kyus kyu, bool createNewUniqueFile = false)
+  KyuFileList(const std::filesystem::path& p, KenteiKyus kyu, bool createNewUniqueFile = false)
     : TypeFileList(p, kyu, createNewUniqueFile) {}
 
-  Kyus kyu() const override { return _type; }
+  KenteiKyus kyu() const override { return _type; }
 };
 
 inline std::string capitalize(const std::string& s) {

@@ -4,6 +4,7 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
+#include <kanji_tools/utils/FileList.h>
 
 #include <memory>
 #include <optional>
@@ -32,8 +33,8 @@ public:
 
   // Functions used by 'Kanji' classes during construction, each takes a kanji name.
   virtual int getFrequency(const std::string&) const = 0;
-  virtual Levels getLevel(const std::string&) const = 0;
-  virtual Kyus getKyu(const std::string&) const = 0;
+  virtual JlptLevels getLevel(const std::string&) const = 0;
+  virtual KenteiKyus getKyu(const std::string&) const = 0;
   virtual const Radical& ucdRadical(const std::string& kanjiName) const {
     const Ucd* u = _ucd.find(kanjiName);
     if (u) return _radicals.find(u->radical());
@@ -71,18 +72,18 @@ public:
   }
 
   // get kanji lists
-  const List& jouyouKanji() const { return _types.at(Types::Jouyou); }
-  const List& jinmeiKanji() const { return _types.at(Types::Jinmei); }
-  const List& linkedJinmeiKanji() const { return _types.at(Types::LinkedJinmei); }
-  const List& linkedOldKanji() const { return _types.at(Types::LinkedOld); }
-  const List& otherKanji() const { return _types.at(Types::Other); }
-  const List& extraKanji() const { return _types.at(Types::Extra); }
+  const List& jouyouKanji() const { return _types.at(KanjiTypes::Jouyou); }
+  const List& jinmeiKanji() const { return _types.at(KanjiTypes::Jinmei); }
+  const List& linkedJinmeiKanji() const { return _types.at(KanjiTypes::LinkedJinmei); }
+  const List& linkedOldKanji() const { return _types.at(KanjiTypes::LinkedOld); }
+  const List& otherKanji() const { return _types.at(KanjiTypes::Other); }
+  const List& extraKanji() const { return _types.at(KanjiTypes::Extra); }
 
-  const List& typeList(Types type) const {
+  const List& typeList(KanjiTypes type) const {
     auto i = _types.find(type);
     return i != _types.end() ? i->second : _emptyList;
   }
-  size_t typeTotal(Types type) const { return typeList(type).size(); }
+  size_t typeTotal(KanjiTypes type) const { return typeList(type).size(); }
 
   OptEntry findKanji(const std::string& s) const {
     auto i = _compatibilityNameMap.find(s);
@@ -90,25 +91,25 @@ public:
     if (j == _map.end()) return {};
     return j->second;
   }
-  Types getType(const std::string& name) const;
+  KanjiTypes getType(const std::string& name) const;
 
-  const List& gradeList(Grades grade) const {
+  const List& gradeList(KanjiGrades grade) const {
     auto i = _grades.find(grade);
     return i != _grades.end() ? i->second : _emptyList;
   }
-  size_t gradeTotal(Grades grade) const { return gradeList(grade).size(); }
+  size_t gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
 
-  const List& levelList(Levels level) const {
+  const List& levelList(JlptLevels level) const {
     auto i = _levels.find(level);
     return i != _levels.end() ? i->second : _emptyList;
   }
-  size_t levelTotal(Levels level) const { return levelList(level).size(); }
+  size_t levelTotal(JlptLevels level) const { return levelList(level).size(); }
 
-  const List& kyuList(Kyus kyu) const {
+  const List& kyuList(KenteiKyus kyu) const {
     auto i = _kyus.find(kyu);
     return i != _kyus.end() ? i->second : _emptyList;
   }
-  size_t kyuTotal(Kyus kyu) const { return kyuList(kyu).size(); }
+  size_t kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
 
   // See comment for '_frequencies' private data member for more details about frequency lists
   enum Values { FrequencyBuckets = 5 };
@@ -198,11 +199,11 @@ protected:
   // number of strokes.
   std::map<std::string, int> _strokes;
 
-  // lists of kanji corresponding to 'Types', 'Grades', 'Levels' and 'Kyus' (excluding the 'None' enum values)
-  std::map<Types, List> _types;
-  std::map<Grades, List> _grades;
-  std::map<Levels, List> _levels;
-  std::map<Kyus, List> _kyus;
+  // lists of kanji corresponding to Levels, Grades, Types and Kyus (excluding the 'None' enum values)
+  std::map<JlptLevels, List> _levels;
+  std::map<KanjiGrades, List> _grades;
+  std::map<KanjiTypes, List> _types;
+  std::map<KenteiKyus, List> _kyus;
 
   // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500, 1501-2000, 2001-2501.
   // The last list is one longer in order to hold the full frequency list (of 2501 kanji).

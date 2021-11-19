@@ -7,8 +7,8 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-Data::List ExtraKanji::fromFile(const Data& data, Types type, const fs::path& file) {
-  assert(type == Types::Jouyou || type == Types::Jinmei || type == Types::Extra);
+Data::List ExtraKanji::fromFile(const Data& data, KanjiTypes type, const fs::path& file) {
+  assert(type == KanjiTypes::Jouyou || type == KanjiTypes::Jinmei || type == KanjiTypes::Extra);
   int lineNum = 1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
@@ -41,16 +41,16 @@ Data::List ExtraKanji::fromFile(const Data& data, Types type, const fs::path& fi
       };
       check(requiredColumns);
       switch (type) {
-      case Types::Jouyou: check(jouyouRequiredColumns); break;
-      case Types::Jinmei: check(jinmeiRequiredColumns); break;
+      case KanjiTypes::Jouyou: check(jouyouRequiredColumns); break;
+      case KanjiTypes::Jinmei: check(jinmeiRequiredColumns); break;
       default: check(extraRequiredColumns);
       }
     } else {
       if (pos < MaxCol && colMap[pos] != -1) error("not enough columns");
       try {
         switch (type) {
-        case Types::Jouyou: results.push_back(std::make_shared<JouyouKanji>(data)); break;
-        case Types::Jinmei: results.push_back(std::make_shared<JinmeiKanji>(data)); break;
+        case KanjiTypes::Jouyou: results.push_back(std::make_shared<JouyouKanji>(data)); break;
+        case KanjiTypes::Jinmei: results.push_back(std::make_shared<JinmeiKanji>(data)); break;
         default: results.push_back(std::make_shared<ExtraKanji>(data)); break;
         }
       } catch (const std::exception& e) {
@@ -82,15 +82,15 @@ JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
   return Reasons::Other;
 }
 
-Grades JouyouKanji::getGrade(const std::string& s) {
-  if (s == "S") return Grades::S;
-  if (s == "6") return Grades::G6;
-  if (s == "5") return Grades::G5;
-  if (s == "4") return Grades::G4;
-  if (s == "3") return Grades::G3;
-  if (s == "2") return Grades::G2;
-  if (s == "1") return Grades::G1;
-  return Grades::None;
+KanjiGrades JouyouKanji::getGrade(const std::string& s) {
+  if (s == "S") return KanjiGrades::S;
+  if (s == "6") return KanjiGrades::G6;
+  if (s == "5") return KanjiGrades::G5;
+  if (s == "4") return KanjiGrades::G4;
+  if (s == "3") return KanjiGrades::G3;
+  if (s == "2") return KanjiGrades::G2;
+  if (s == "1") return KanjiGrades::G1;
+  return KanjiGrades::None;
 }
 
 } // namespace kanji_tools

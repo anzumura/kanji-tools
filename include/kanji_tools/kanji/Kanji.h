@@ -1,33 +1,15 @@
 #ifndef KANJI_TOOLS_KANJI_KANJI_H
 #define KANJI_TOOLS_KANJI_KANJI_H
 
-#include <kanji_tools/utils/FileList.h>
+#include <kanji_tools/utils/JlptLevels.h>
+#include <kanji_tools/utils/KanjiGrades.h>
+#include <kanji_tools/utils/KanjiTypes.h>
+#include <kanji_tools/utils/KenteiKyus.h>
 #include <kanji_tools/utils/Radical.h>
 
+#include <optional>
+
 namespace kanji_tools {
-
-// 'Grades' represents the official school grade for all Jouyou kanji
-enum class Grades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not Jouyou
-constexpr std::array AllGrades{Grades::G1, Grades::G2, Grades::G3, Grades::G4,
-                               Grades::G5, Grades::G6, Grades::S,  Grades::None};
-const char* toString(Grades);
-inline std::ostream& operator<<(std::ostream& os, const Grades& x) { return os << toString(x); }
-
-// 'Types' is used to identify which official group (Jouyou or Jinmei) a kanji belongs to (or has a link to)
-// as well as a few more groups for less common kanji:
-// - Jouyou: 2136 official Jouyou kanji
-// - Jinmei: 633 official Jinmei kanji
-// - LinkedJinmei: 230 more Jinmei kanji that are old/variant forms of Jouyou (212) or Jinmei (18)
-// - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
-// - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
-// - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
-// - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't in any of the above types
-// - None: used as a type for a kanji that hasn't been loaded
-enum class Types { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, Kentei, None };
-constexpr std::array AllTypes{Types::Jouyou, Types::Jinmei, Types::LinkedJinmei, Types::LinkedOld,
-                              Types::Other,  Types::Extra,  Types::Kentei,       Types::None};
-const char* toString(Types);
-inline std::ostream& operator<<(std::ostream& os, const Types& x) { return os << toString(x); }
 
 // 'KanjiLegend' is meant to be used in output to briefly describe the suffix added to a kanji when
 // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
@@ -37,15 +19,15 @@ class Kanji {
 public:
   using OptString = std::optional<std::string>;
   using OldNames = std::vector<std::string>;
-  static bool hasLink(Types t) { return t == Types::LinkedJinmei || t == Types::LinkedOld; }
+  static bool hasLink(KanjiTypes t) { return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld; }
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
 
-  virtual Types type() const = 0;
+  virtual KanjiTypes type() const = 0;
   virtual const std::string& meaning() const = 0;
   virtual const std::string& reading() const = 0;
-  virtual Grades grade() const { return Grades::None; }
+  virtual KanjiGrades grade() const { return KanjiGrades::None; }
 
   // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
   // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁 has 辨, 瓣 and 辯)
@@ -72,15 +54,15 @@ public:
   const Radical& radical() const { return _radical; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
   const OptString& pinyin() const { return _pinyin; }
-  Levels level() const { return _level; }
-  Kyus kyu() const { return _kyu; }
+  JlptLevels level() const { return _level; }
+  KenteiKyus kyu() const { return _kyu; }
   int frequency() const { return _frequency; }
   int frequencyOrDefault(int x) const { return _frequency ? _frequency : x; }
 
-  bool is(Types t) const { return type() == t; }
-  bool hasLevel() const { return _level != Levels::None; }
-  bool hasKyu() const { return _kyu != Kyus::None; }
-  bool hasGrade() const { return grade() != Grades::None; }
+  bool is(KanjiTypes t) const { return type() == t; }
+  bool hasLevel() const { return _level != JlptLevels::None; }
+  bool hasKyu() const { return _kyu != KenteiKyus::None; }
+  bool hasGrade() const { return grade() != KanjiGrades::None; }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasReading() const { return !reading().empty(); }
 
@@ -121,19 +103,19 @@ public:
   std::string qualifiedName() const {
     auto t = type();
     return _name +
-      (t == Types::Jouyou           ? ' '
-         : hasLevel()               ? '\''
-         : _frequency               ? '"'
-         : t == Types::Jinmei       ? '^'
-         : t == Types::LinkedJinmei ? '~'
-         : t == Types::LinkedOld    ? '%'
-         : t == Types::Extra        ? '+'
-         : kyu() != Kyus::K1        ? '#'
-                                    : '*');
+      (t == KanjiTypes::Jouyou           ? ' '
+         : hasLevel()                    ? '\''
+         : _frequency                    ? '"'
+         : t == KanjiTypes::Jinmei       ? '^'
+         : t == KanjiTypes::LinkedJinmei ? '~'
+         : t == KanjiTypes::LinkedOld    ? '%'
+         : t == KanjiTypes::Extra        ? '+'
+         : kyu() != KenteiKyus::K1       ? '#'
+                                         : '*');
   }
 protected:
   Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
-        const OptString& pinyin, Levels level, Kyus kyu, int frequency);
+        const OptString& pinyin, JlptLevels level, KenteiKyus kyu, int frequency);
 private:
   inline static const OldNames EmptyOldNames{};
   const int _number;
@@ -144,8 +126,8 @@ private:
   const Radical _radical;
   const int _strokes;
   const OptString _pinyin;
-  const Levels _level;
-  const Kyus _kyu;
+  const JlptLevels _level;
+  const KenteiKyus _kyu;
   const int _frequency;
 };
 

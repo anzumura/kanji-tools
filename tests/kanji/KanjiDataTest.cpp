@@ -106,7 +106,7 @@ protected:
 
 TEST_F(KanjiDataTest, SanityChecks) {
   // basic checks
-  EXPECT_EQ(_data.getLevel("院"), Levels::N4);
+  EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
   EXPECT_EQ(_data.getStrokes("廳"), 25);
   // radical
@@ -119,16 +119,16 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto result = _data.findKanji("響︀");
   ASSERT_TRUE(result.has_value());
   auto& k = **result;
-  EXPECT_EQ(k.type(), Types::LinkedJinmei);
+  EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ(k.name(), "響︀");
   EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
-  EXPECT_EQ(k.level(), Levels::None);
-  EXPECT_EQ(k.grade(), Grades::None);
+  EXPECT_EQ(k.level(), JlptLevels::None);
+  EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.frequency(), 0);
   EXPECT_TRUE(k.variant());
   auto result2 = _data.findKanji("逸︁");
   EXPECT_TRUE((**result2).variant());
-  EXPECT_EQ((**result2).type(), Types::LinkedJinmei);
+  EXPECT_EQ((**result2).type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ((**result2).nonVariantName(), "逸");
   // kanji with 3 old names
   auto result3 = _data.findKanji("弁");
@@ -138,24 +138,24 @@ TEST_F(KanjiDataTest, SanityChecks) {
   for (auto& i : (**result3).oldNames()) {
     auto old = _data.findKanji(i);
     ASSERT_TRUE(old.has_value());
-    ASSERT_EQ((**old).type(), Types::LinkedOld);
+    ASSERT_EQ((**old).type(), KanjiTypes::LinkedOld);
     EXPECT_EQ(static_cast<const LinkedKanji&>(**old).link(), result3);
   }
   // totals
-  EXPECT_EQ(_data.gradeTotal(Grades::G1), 80);
-  EXPECT_EQ(_data.gradeTotal(Grades::G2), 160);
-  EXPECT_EQ(_data.gradeTotal(Grades::G3), 200);
-  EXPECT_EQ(_data.gradeTotal(Grades::G4), 200);
-  EXPECT_EQ(_data.gradeTotal(Grades::G5), 185);
-  EXPECT_EQ(_data.gradeTotal(Grades::G6), 181);
-  EXPECT_EQ(_data.gradeTotal(Grades::S), 1130);
-  EXPECT_EQ(_data.gradeTotal(Grades::None), 0);
-  EXPECT_EQ(_data.levelTotal(Levels::N5), 103);
-  EXPECT_EQ(_data.levelTotal(Levels::N4), 181);
-  EXPECT_EQ(_data.levelTotal(Levels::N3), 361);
-  EXPECT_EQ(_data.levelTotal(Levels::N2), 415);
-  EXPECT_EQ(_data.levelTotal(Levels::N1), 1162);
-  EXPECT_EQ(_data.levelTotal(Levels::None), 0);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::G1), 80);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::G2), 160);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::G3), 200);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::G4), 200);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::G5), 185);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::G6), 181);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::S), 1130);
+  EXPECT_EQ(_data.gradeTotal(KanjiGrades::None), 0);
+  EXPECT_EQ(_data.levelTotal(JlptLevels::N5), 103);
+  EXPECT_EQ(_data.levelTotal(JlptLevels::N4), 181);
+  EXPECT_EQ(_data.levelTotal(JlptLevels::N3), 361);
+  EXPECT_EQ(_data.levelTotal(JlptLevels::N2), 415);
+  EXPECT_EQ(_data.levelTotal(JlptLevels::N1), 1162);
+  EXPECT_EQ(_data.levelTotal(JlptLevels::None), 0);
   EXPECT_EQ(_data.frequencyTotal(-1), 0);
   EXPECT_EQ(_data.frequencyTotal(0), 500);
   EXPECT_EQ(_data.frequencyTotal(1), 500);
@@ -236,9 +236,9 @@ TEST_F(KanjiDataTest, UcdLinks) {
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
-    if (link.type() == Types::Jouyou)
+    if (link.type() == KanjiTypes::Jouyou)
       ++officialLinksToJouyou;
-    else if (link.type() == Types::Jinmei)
+    else if (link.type() == KanjiTypes::Jinmei)
       ++officialLinksToJinmei;
     else
       FAIL() << "official link from " << link << " is type " << link.type();

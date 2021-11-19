@@ -46,13 +46,13 @@ void Quiz::quiz() const {
     c = _choice.get("Choose grade", '1', '6', {{'s', "Secondary School"}}, 's');
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
-    listQuiz(getListOrder(), data().gradeList(AllGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
+    listQuiz(getListOrder(), data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
   } else if (c == 'k') {
     c = _choice.get("Choose kyu", '1', '9', {{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}, '2');
     if (c == QuitOption) return;
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     listQuiz(getListOrder(),
-             data().kyuList(AllKyus[c == 'a'     ? 0
+             data().kyuList(AllKenteiKyus[c == 'a'     ? 0
                                       : c == 'c' ? 8
                                       : c == '2' ? 9
                                       : c == 'b' ? 10
@@ -63,7 +63,7 @@ void Quiz::quiz() const {
     c = _choice.get("Choose level", {{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
     if (c == QuitOption) return;
     // suppress printing 'Level' since it's the same for every kanji in the list
-    listQuiz(getListOrder(), data().levelList(AllLevels[4 - (c - '1')]), Kanji::AllFields ^ Kanji::LevelField);
+    listQuiz(getListOrder(), data().levelList(AllJlptLevels[4 - (c - '1')]), Kanji::AllFields ^ Kanji::LevelField);
   } else if (c == 'm')
     prepareGroupQuiz(getListOrder(), _groupData.meaningGroups(), _groupData.patternMap(), 'p');
   else if (c == 'p')
@@ -232,7 +232,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
 // Group Based Quiz
 
 bool Quiz::includeMember(const Entry& k, MemberType type) {
-  return k->hasReading() && (k->is(Types::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
+  return k->hasReading() && (k->is(KanjiTypes::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
 }
 
 void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, const GroupData::Map& otherMap,

@@ -14,8 +14,8 @@ public:
 
   // Implementations of the 'Data' base class functions used during Kanji construction
   int getFrequency(const std::string& s) const override { return _frequency.get(s); }
-  Levels getLevel(const std::string&) const override;
-  Kyus getKyu(const std::string&) const override;
+  JlptLevels getLevel(const std::string&) const override;
+  KenteiKyus getKyu(const std::string&) const override;
 private:
   // functions to print loaded data if _debug is true
   void noFreq(int f, bool brackets = false) const; // 'noFreq' is a helper function for printing no-frequency counts
@@ -26,9 +26,9 @@ private:
   void printListStats(const std::array<T, S>&, T (Kanji::*)() const, const std::string&, bool showNoFrequency) const;
 
   // '_levels' (for JLPT) are loaded from files under 'data/jlpt'
-  const std::array<const LevelFileList, AllLevels.size() - 1> _levels;
+  const std::array<const LevelFileList, AllJlptLevels.size() - 1> _levels;
   // '_kyus' (for Kanji Kentei) are loaded from files under 'data/kentei'
-  const std::array<const KyuFileList, AllKyus.size() - 1> _kyus;
+  const std::array<const KyuFileList, AllKenteiKyus.size() - 1> _kyus;
   // '_frequency' (for top 2501 frequency kanji) is loaded from data/frequency.txt
   const FileList _frequency;
 };

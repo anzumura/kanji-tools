@@ -1,6 +1,7 @@
 #ifndef KANJI_TOOLS_UTILS_RADICAL_H
 #define KANJI_TOOLS_UTILS_RADICAL_H
 
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <vector>

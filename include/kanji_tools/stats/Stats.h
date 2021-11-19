@@ -29,7 +29,7 @@ public:
         (count == x.count && frequency() < x.frequency() || frequency() == x.frequency() && name < x.name);
     }
     int frequency() const;
-    Types type() const;
+    KanjiTypes type() const;
     std::string toHex() const;
 
     int count;

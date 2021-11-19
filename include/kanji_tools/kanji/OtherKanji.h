@@ -12,13 +12,13 @@ public:
   // constructor used for 'Other' kanji with readings from 'other-readings.txt'
   OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading)
     : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name), d.getStrokes(name), d.getPinyin(name),
-            Levels::None, d.getKyu(name), d.getFrequency(name)),
+            JlptLevels::None, d.getKyu(name), d.getFrequency(name)),
       _meaning(d.ucd().getMeaning(name)), _reading(reading) {}
   // constructor used for 'Other' kanji without a reading (will look up from UCD instead)
   OtherKanji(const Data& d, int number, const std::string& name)
     : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name)) {}
 
-  Types type() const override { return Types::Other; }
+  KanjiTypes type() const override { return KanjiTypes::Other; }
   const std::string& meaning() const override { return _meaning; }
   const std::string& reading() const override { return _reading; }
 protected:
@@ -41,7 +41,7 @@ class KenteiKanji : public OtherKanji {
 public:
   KenteiKanji(const Data& d, int number, const std::string& name) : OtherKanji(d, number, name) {}
 
-  Types type() const override { return Types::Kentei; }
+  KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
 
 // 'ExtraKanji' is used for kanji loaded from 'extra.txt'. It is also the base class for 'OfficialKanji'
@@ -51,13 +51,13 @@ class ExtraKanji : public OtherKanji {
 public:
   ExtraKanji(const Data& d) : ExtraKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]) {}
 
-  Types type() const override { return Types::Extra; }
+  KanjiTypes type() const override { return KanjiTypes::Extra; }
 
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
   // - 'file' must have tab separated lines that have the right number of columns for the given type
   // - the first line of 'file' should have column header names that match the names in the 'Columns' enum
-  static Data::List fromFile(const Data&, Types type, const std::filesystem::path& file);
+  static Data::List fromFile(const Data&, KanjiTypes type, const std::filesystem::path& file);
 protected:
   // list of all supported columns in files
   enum Columns {
@@ -131,7 +131,7 @@ public:
   JinmeiKanji(const Data& d)
     : OfficialKanji(d, d.getStrokes(columns[NameCol])), _reason(getReason(columns[ReasonCol])) {}
 
-  Types type() const override { return Types::Jinmei; }
+  KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   Reasons reason() const { return _reason; }
 private:
   static Reasons getReason(const std::string&);
@@ -143,11 +143,11 @@ public:
   JouyouKanji(const Data& d)
     : OfficialKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]), _grade(getGrade(columns[GradeCol])) {}
 
-  Types type() const override { return Types::Jouyou; }
-  Grades grade() const override { return _grade; }
+  KanjiTypes type() const override { return KanjiTypes::Jouyou; }
+  KanjiGrades grade() const override { return _grade; }
 private:
-  static Grades getGrade(const std::string&);
-  const Grades _grade;
+  static KanjiGrades getGrade(const std::string&);
+  const KanjiGrades _grade;
 };
 
 } // namespace kanji_tools

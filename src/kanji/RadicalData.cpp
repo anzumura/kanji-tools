@@ -1,5 +1,4 @@
 #include <kanji_tools/kanji/Data.h>
-#include <kanji_tools/kanji/Kanji.h>
 
 #include <fstream>
 #include <numeric>
@@ -61,24 +60,24 @@ void RadicalData::load(const std::filesystem::path& file) {
 
 void RadicalData::print(const Data& data) const {
   data.log() << "Radical breakdown - Total (";
-  for (auto i : AllTypes) {
+  for (auto i : AllKanjiTypes) {
     data.out() << i;
-    if (i == secondLast(AllTypes)) break;
+    if (i == secondLast(AllKanjiTypes)) break;
     data.out() << ' ';
   }
   data.out() << "):\n";
   std::map<Radical, Data::List> radicals;
   for (auto& i : data.map())
     radicals[i.second->radical()].push_back(i.second);
-  using Count = std::map<Types, int>;
+  using Count = std::map<KanjiTypes, int>;
   Count total;
   auto printCounts = [&data](const Count& c, bool summary = false) {
     const int t = std::accumulate(c.begin(), c.end(), 0, [](const auto& x, const auto& y) { return x + y.second; });
     data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
-    for (auto i : AllTypes) {
+    for (auto i : AllKanjiTypes) {
       auto j = c.find(i);
       data.out() << std::setw(summary ? 5 : 4) << (j == c.end() ? 0 : j->second);
-      if (i == secondLast(AllTypes)) break;
+      if (i == secondLast(AllKanjiTypes)) break;
     }
     data.out() << (summary ? ")\n" : ") :");
   };
