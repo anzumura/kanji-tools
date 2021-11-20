@@ -231,10 +231,11 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
 }
 
 void Quiz::printReviewDetails(const Entry& kanji) const {
+  static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
   out() << "    Reading:  " << kanji->reading() << '\n';
   auto print = [this](const std::string& name, const JukugoData::List& list) {
     out() << "    " << name << ':';
-    if (list.size() < 4)
+    if (list.size() <= JukugoPerLine)
       for (auto& i : list)
         out() << "  " << i->nameAndReading();
     else {
@@ -247,19 +248,23 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
     }
     out() << '\n';
   };
-  auto& jukugo = _jukugoData.find(kanji->name());
-  if (!jukugo.empty()) {
-    if (kanji->grade() != KanjiGrades::None) {
-      JukugoData::List currentGrade, otherGrades;
-      for (auto& i : jukugo)
-        if (kanji->grade() == i->grade())
-          currentGrade.push_back(i);
-        else
-          otherGrades.push_back(i);
-      print(std::string("Jukugo for grade ") + toString(kanji->grade()), currentGrade);
-      print("Jukugo for other grades", otherGrades);
+  auto& list = _jukugoData.find(kanji->name());
+  if (!list.empty()) {
+    // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two lists, one for the same
+    // grade of the given kanji and one for other grades. For example, 一生（いっしょう） is a grade 1
+    // Jukugo for '一', but 一縷（いちる） is a secondary school Jukugo (which also contains '一').
+    if (kanji->grade() != KanjiGrades::None && list.size() > JukugoPerLine) {
+      JukugoData::List same, other;
+      for (auto& i : list)
+        (kanji->grade() == i->grade() ? same : other).push_back(i);
+      if (other.empty())
+        print(jukugo, list);
+      else {
+        print(sameGrade, same);
+        print(otherGrade, other);
+      }
     } else
-      print(" Jukugo", jukugo);
+      print(jukugo, list);
   }
   out() << '\n';
 }

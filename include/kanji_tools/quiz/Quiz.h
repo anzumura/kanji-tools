@@ -15,6 +15,7 @@ public:
   // 'quiz' is the top level method for choosing quiz type (List or Group based)
   void quiz() const;
 private:
+  enum Values { JukugoPerLine = 3 };
   const Data& data() const { return _groupData.data(); }
   std::ostream& out() const { return data().out(); }
   std::ostream& log(bool heading = false) const { return data().log(heading); }
