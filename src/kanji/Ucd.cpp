@@ -1,5 +1,5 @@
+#include <kanji_tools/kanji/Ucd.h>
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Ucd.h>
 
 namespace kanji_tools {
 

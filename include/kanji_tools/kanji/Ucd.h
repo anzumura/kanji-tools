@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_UTILS_UCD_H
-#define KANJI_TOOLS_UTILS_UCD_H
+#ifndef KANJI_TOOLS_KANJI_UCD_H
+#define KANJI_TOOLS_KANJI_UCD_H
 
 #include <string>
 
@@ -64,4 +64,4 @@ private:
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_UTILS_UCD_H
+#endif // KANJI_TOOLS_KANJI_UCD_H

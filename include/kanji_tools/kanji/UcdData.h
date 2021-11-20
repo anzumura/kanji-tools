@@ -2,7 +2,7 @@
 #define KANJI_TOOLS_KANJI_UCD_DATA_H
 
 #include <kanji_tools/kana/KanaConvert.h>
-#include <kanji_tools/utils/Ucd.h>
+#include <kanji_tools/kanji/Ucd.h>
 
 #include <filesystem>
 
@@ -42,11 +42,11 @@ public:
 private:
   Map _map;
 
-  // '_ucdLinked...' are maps from standard Kanji to variant forms loaded from 'ucd.txt'
+  // '_linked...' are maps from standard Kanji to variant forms loaded from 'ucd.txt'
   // For example, FA67 (逸) is a variant of 9038 (逸) which can also be constructed by a
   // variation selector, i.e., L"\u9038\uFE01" (逸︁). Note:
-  // - if a variant is marked as 'Jinmei' it will be put in '_ucdLinkedJinmei'
-  // - otherwise it will be put in '_ucdLinkedOther'
+  // - if a variant is marked as 'Jinmei' it will be put in '_linkedJinmei'
+  // - otherwise it will be put in '_linkedOther'
   std::map<std::string, std::string> _linkedJinmei;
   std::map<std::string, std::vector<std::string>> _linkedOther;
 

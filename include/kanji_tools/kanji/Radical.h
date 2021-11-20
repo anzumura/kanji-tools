@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_UTILS_RADICAL_H
-#define KANJI_TOOLS_UTILS_RADICAL_H
+#ifndef KANJI_TOOLS_KANJI_RADICAL_H
+#define KANJI_TOOLS_KANJI_RADICAL_H
 
 #include <iomanip>
 #include <iostream>
@@ -38,4 +38,4 @@ inline std::ostream& operator<<(std::ostream& os, const Radical& r) {
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_UTILS_RADICAL_H
+#endif // KANJI_TOOLS_KANJI_RADICAL_H
