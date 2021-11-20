@@ -46,18 +46,19 @@ void Quiz::quiz() const {
     c = _choice.get("Choose grade", '1', '6', {{'s', "Secondary School"}}, 's');
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
-    listQuiz(getListOrder(), data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
+    listQuiz(getListOrder(), data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']),
+             Kanji::AllFields ^ Kanji::GradeField);
   } else if (c == 'k') {
     c = _choice.get("Choose kyu", '1', '9', {{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}, '2');
     if (c == QuitOption) return;
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     listQuiz(getListOrder(),
              data().kyuList(AllKenteiKyus[c == 'a'     ? 0
-                                      : c == 'c' ? 8
-                                      : c == '2' ? 9
-                                      : c == 'b' ? 10
-                                      : c == '1' ? 11
-                                                 : 7 - (c - '3')]),
+                                            : c == 'c' ? 8
+                                            : c == '2' ? 9
+                                            : c == 'b' ? 10
+                                            : c == '1' ? 11
+                                                       : 7 - (c - '3')]),
              Kanji::AllFields ^ Kanji::KyuField);
   } else if (c == 'l') {
     c = _choice.get("Choose level", {{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
@@ -198,7 +199,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
         out() << "Reading:  " << i->reading();
       printMeaning(i, _reviewMode);
       if (_reviewMode) {
-        out() << "    Reading:  " << i->reading() << '\n';
+        printReviewDetails(i);
         choices = getDefaultChoices(questions.size());
       } else
         for (auto& j : answers)
@@ -229,10 +230,45 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   }
 }
 
+void Quiz::printReviewDetails(const Entry& kanji) const {
+  out() << "    Reading:  " << kanji->reading() << '\n';
+  auto print = [this](const std::string& name, const JukugoData::List& list) {
+    out() << "    " << name << ':';
+    if (list.size() < 4)
+      for (auto& i : list)
+        out() << "  " << i->nameAndReading();
+    else {
+      out() << ' ' << list.size();
+      for (int i = 0; i < list.size(); ++i) {
+        if (i % 3 == 0) out() << '\n';
+        auto s = list[i]->nameAndReading();
+        out() << std::left << std::setw(wideSetw(s, 30)) << s;
+      }
+    }
+    out() << '\n';
+  };
+  auto& jukugo = _jukugoData.find(kanji->name());
+  if (!jukugo.empty()) {
+    if (kanji->grade() != KanjiGrades::None) {
+      JukugoData::List currentGrade, otherGrades;
+      for (auto& i : jukugo)
+        if (kanji->grade() == i->grade())
+          currentGrade.push_back(i);
+        else
+          otherGrades.push_back(i);
+      print(std::string("Jukugo for grade ") + toString(kanji->grade()), currentGrade);
+      print("Jukugo for other grades", otherGrades);
+    } else
+      print(" Jukugo", jukugo);
+  }
+  out() << '\n';
+}
+
 // Group Based Quiz
 
 bool Quiz::includeMember(const Entry& k, MemberType type) {
-  return k->hasReading() && (k->is(KanjiTypes::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
+  return k->hasReading() &&
+    (k->is(KanjiTypes::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
 }
 
 void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, const GroupData::Map& otherMap,

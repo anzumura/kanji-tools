@@ -13,18 +13,19 @@ class JukugoData {
 public:
   using Entry = std::shared_ptr<Jukugo>;
   using List = std::vector<Entry>;
-  using Map = std::map<std::string, List>;
   JukugoData(const Data&);
   JukugoData(const JukugoData&) = delete;
 
   const List& find(const std::string& kanji) const {
-    auto i = _map.find(kanji);
-    return i != _map.end() ? i->second : _emptyList;
+    auto i = _kanjiToJukugo.find(kanji);
+    return i != _kanjiToJukugo.end() ? i->second : _emptyList;
   }
 private:
+  using JukugoKey = std::pair<std::string, std::string>;
   int loadFile(const std::filesystem::path&, KanjiGrades);
 
-  Map _map;
+  std::map<JukugoKey, Entry> _uniqueJukugo;
+  std::map<std::string, List> _kanjiToJukugo;
   inline static const List _emptyList;
 };
 

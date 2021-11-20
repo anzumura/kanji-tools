@@ -11,6 +11,7 @@ public:
 
   const std::string& name() const { return _name; }
   const std::string& reading() const { return _reading; }
+  std::string nameAndReading() const { return _name + "（" + _reading + "）"; }
   KanjiGrades grade() const { return _grade; }
 private:
   const std::string _name;
