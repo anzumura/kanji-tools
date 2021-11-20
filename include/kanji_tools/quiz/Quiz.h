@@ -2,6 +2,7 @@
 #define KANJI_TOOLS_QUIZ_QUIZ_H
 
 #include <kanji_tools/quiz/GroupData.h>
+#include <kanji_tools/quiz/JukugoData.h>
 #include <kanji_tools/utils/Choice.h>
 
 namespace kanji_tools {
@@ -9,7 +10,7 @@ namespace kanji_tools {
 class Quiz {
 public:
   Quiz(const GroupData& groupData, std::istream* in = 0)
-    : _groupData(groupData), _question(0), _score(0), _showMeanings(false), _reviewMode(false),
+    : _groupData(groupData), _jukugoData(groupData.data()), _question(0), _score(0), _showMeanings(false), _reviewMode(false),
       _choice(groupData.out(), in) {}
   // 'quiz' is the top level method for choosing quiz type (List or Group based)
   void quiz() const;
@@ -68,6 +69,7 @@ private:
   mutable bool _reviewMode;
 
   const GroupData& _groupData;
+  const JukugoData _jukugoData;
 };
 
 } // namespace kanji_tools

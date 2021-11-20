@@ -301,6 +301,7 @@ The **data** directory contains the following files:
 - **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
 - **frequency.txt**: top 2501 frequency kanji loaded from [KanjiCards](https://kanjicards.org/kanji-list-by-freq.html)
 - **jlpt/n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
+- **jukugo/*.txt**: loaded from [here](https://sites.google.com/a/h7a.org/kanjicompounds/)
 - **kentei/k\*.txt**: loaded from [here](https://kanjijoho.com/cat/kyu.html)
 - **extra.txt**: meant to hold any extra kanji of interest not in other files
 - **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
