@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_UTILS_KANJI_TYPES_H
-#define KANJI_TOOLS_UTILS_KANJI_TYPES_H
+#ifndef KANJI_TOOLS_KANJI_KANJI_TYPES_H
+#define KANJI_TOOLS_KANJI_KANJI_TYPES_H
 
 #include <array>
 #include <iostream>
@@ -38,4 +38,4 @@ inline std::ostream& operator<<(std::ostream& os, const KanjiTypes& x) { return 
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_UTILS_KANJI_TYPES_H
+#endif // KANJI_TOOLS_KANJI_KANJI_TYPES_H

@@ -1,10 +1,10 @@
 #ifndef KANJI_TOOLS_KANJI_KANJI_H
 #define KANJI_TOOLS_KANJI_KANJI_H
 
+#include <kanji_tools/kanji/KanjiGrades.h>
+#include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/utils/JlptLevels.h>
-#include <kanji_tools/utils/KanjiGrades.h>
-#include <kanji_tools/utils/KanjiTypes.h>
 #include <kanji_tools/utils/KenteiKyus.h>
 
 #include <optional>

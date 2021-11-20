@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_UTILS_KANJI_GRADES_H
-#define KANJI_TOOLS_UTILS_KANJI_GRADES_H
+#ifndef KANJI_TOOLS_KANJI_KANJI_GRADES_H
+#define KANJI_TOOLS_KANJI_KANJI_GRADES_H
 
 #include <array>
 #include <iostream>
@@ -28,4 +28,4 @@ inline std::ostream& operator<<(std::ostream& os, const KanjiGrades& x) { return
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_UTILS_KANJI_GRADES_H
+#endif // KANJI_TOOLS_KANJI_KANJI_GRADES_H

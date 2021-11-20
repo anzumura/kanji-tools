@@ -1,7 +1,7 @@
 #ifndef KANJI_TOOLS_QUIZ_JUKUGO_H
 #define KANJI_TOOLS_QUIZ_JUKUGO_H
 
-#include <kanji_tools/utils/KanjiGrades.h>
+#include <kanji_tools/kanji/KanjiGrades.h>
 
 namespace kanji_tools {
 
