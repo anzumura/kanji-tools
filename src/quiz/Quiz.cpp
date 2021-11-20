@@ -240,10 +240,19 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
         out() << "  " << i->nameAndReading();
     else {
       out() << ' ' << list.size();
+      std::array<int, JukugoPerLine> colWidths;
+      colWidths.fill(0);
+      // make each column wide enough to hold the longest entry plus 2 spaces (upto MaxJukugoLength)
+      for (int i = 0; i < list.size(); ++i)
+        if (colWidths[i % JukugoPerLine] < MaxJukugoLength) {
+          const int length = displayLength(list[i]->nameAndReading()) + 2;
+          if (length > colWidths[i % JukugoPerLine])
+            colWidths[i % JukugoPerLine] = length < MaxJukugoLength ? length : MaxJukugoLength;
+        }
       for (int i = 0; i < list.size(); ++i) {
-        if (i % 3 == 0) out() << '\n';
+        if (i % JukugoPerLine == 0) out() << '\n';
         auto s = list[i]->nameAndReading();
-        out() << std::left << std::setw(wideSetw(s, 30)) << s;
+        out() << std::left << std::setw(wideSetw(s, colWidths[i % JukugoPerLine])) << s;
       }
     }
     out() << '\n';
