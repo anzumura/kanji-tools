@@ -38,10 +38,10 @@ declare -r program="parseUcdAllFlat.sh"
 # standard Jōyō + Jinmei. Examples: 4EE5 (以) and 4F3C (似) have kTotalStrokes of
 # 4 and 6 respectively, but in Japanese they should be 5 and 7.
 #
-# In addition to Adobe refs, also pull in any kanji that have a Morohashi ID or
-# are compatibility/variants of any kanji that had an on/kun reading. Note,
+# In addition to Adobe refs, also pull in any kanji that have a Morohashi ID in
+# to get compatibility/variants of any kanji that have an on/kun reading. Note,
 # 'kMorohashi' has 18,168 entries (12,965 with On/Kun) which is more than Adobe
-# so it pull in a few hundred more entries (including some Kentei Kanji).
+# so it pulls in a few hundred more entries (including some Kentei Kanji).
 # Some counts as of Unicode 13.0:
 # - has both Adobe and Morohashi: 12,447
 # - has Morohashi, but not Adobe: 5,721
@@ -119,14 +119,12 @@ EOF
 # link to an entry that has an 'On' and/or 'Kun' reading.
 declare -r onKun='kJapanese[OK].*n="[^"]'
 
-# 'printResults' loop uses 'onKun' as well as the following (plus variants):
+# 'printResults' loop uses 'onKun' as well as the following (for variants):
 declare -r morohashi='kMorohashi="[^"]'         # has a Morohashi ID
 declare -r adobe='kRSAdobe_Japan1_6="[^"]'      # has an Adobe ID
 declare -r official='kJ.*yoKanji="[^"]'         # is Joyo or Jinmeiyo (for 𠮟)
-declare -r compat='kCompatibilityVariant="[^"]' # compatibility variant
-declare -r semantic='kSemanticVariant="[^"]'    # semantic variant
 
-printResulsFilter="$onKun|$morohashi|$adobe|$official|$compat|$semantic"
+printResulsFilter="$onKun|$morohashi|$adobe|$official"
 
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
