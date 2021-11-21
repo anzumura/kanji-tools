@@ -168,6 +168,7 @@ protected:
   void populateJinmei();
   void populateExtra();
   void processList(const DataFile&);
+  void processUcd(); // should be called after processing all other types
 
   // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
   // then this function will print any entries in _strokes that are 'Other' type or not found.

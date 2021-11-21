@@ -60,13 +60,14 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   populateExtra();
   for (auto& i : _levels)
     processList(i);
-  // Process '_frequency' before '_kyus' in order create 'Other' type first before creating
+  // Process '_frequency' before '_kyus' in order to create 'Other' type first before creating
   // 'Kentei' kanji. This way, the 'Other' type is more meaningful since it indicates kanji
   // in the top 2501 frequency list, but not in other more official types like Jouyou or
   // Jinmei. 'Kentei' has many rare kanji so keep it as the last type to be processed.
   processList(_frequency);
   for (auto& i : _kyus)
     processList(i);
+  processUcd();
   checkStrokes();
   if (_debug) {
     log(true) << "Finished Loading Data\n>>>\n";

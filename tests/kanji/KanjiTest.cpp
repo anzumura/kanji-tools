@@ -132,6 +132,42 @@ TEST_F(KanjiTest, OtherKanjiWithReading) {
   EXPECT_EQ(k.reading(), "トン、ドン、の-む");
 }
 
+TEST_F(KanjiTest, KenteiKanji) {
+  KenteiKyus kyu = KenteiKyus::K1;
+  EXPECT_CALL(_data, getKyu("蘋")).WillOnce(Return(kyu));
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical(_)).WillOnce(ReturnRef(rad));
+  KenteiKanji k(_data, 2, "蘋");
+  EXPECT_EQ(k.type(), KanjiTypes::Kentei);
+  EXPECT_EQ(k.name(), "蘋");
+  EXPECT_EQ(k.radical(), rad);
+  EXPECT_EQ(k.number(), 2);
+  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.level(), JlptLevels::None);
+  EXPECT_EQ(k.grade(), KanjiGrades::None);
+  EXPECT_EQ(k.kyu(), kyu);
+  EXPECT_EQ(k.info(), "Rad TestRadical:1, Kyu K1");
+  EXPECT_FALSE(k.hasMeaning());
+  EXPECT_FALSE(k.hasReading());
+}
+
+TEST_F(KanjiTest, UcdKanji) {
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical(_)).WillOnce(ReturnRef(rad));
+  UcdKanji k(_data, 3, "侭");
+  EXPECT_EQ(k.type(), KanjiTypes::Ucd);
+  EXPECT_EQ(k.name(), "侭");
+  EXPECT_EQ(k.radical(), rad);
+  EXPECT_EQ(k.number(), 3);
+  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_EQ(k.level(), JlptLevels::None);
+  EXPECT_EQ(k.grade(), KanjiGrades::None);
+  EXPECT_EQ(k.kyu(), KenteiKyus::None);
+  EXPECT_EQ(k.info(), "Rad TestRadical:1");
+  EXPECT_FALSE(k.hasMeaning());
+  EXPECT_FALSE(k.hasReading());
+}
+
 TEST_F(KanjiTest, ExtraFile) {
   writeTestFile("\
 Number\tName\tRadical\tStrokes\tMeaning\tReading\n\

@@ -9,12 +9,14 @@ namespace kanji_tools {
 // and 'ExtraKanji'
 class OtherKanji : public Kanji {
 public:
-  // constructor used for 'Other' kanji with readings from 'other-readings.txt'
-  OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading)
+  // constructor used for 'Other' kanji with readings from 'other-readings.txt' and also called by other
+  // public constructor without a reading and derived KenteiKanji and UcdKanji classes
+  OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading, bool findFrequency = true,
+             bool findKyu = true)
     : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name), d.getStrokes(name), d.getPinyin(name),
-            JlptLevels::None, d.getKyu(name), d.getFrequency(name)),
+            JlptLevels::None, findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
       _meaning(d.ucd().getMeaning(name)), _reading(reading) {}
-  // constructor used for 'Other' kanji without a reading (will look up from UCD instead)
+  // constructor used for 'Other' kanji without a reading
   OtherKanji(const Data& d, int number, const std::string& name)
     : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name)) {}
 
@@ -39,9 +41,19 @@ private:
 // 'KenteiKanji' is for kanji in kentei/k*.txt files that aren't already pulled in from other files
 class KenteiKanji : public OtherKanji {
 public:
-  KenteiKanji(const Data& d, int number, const std::string& name) : OtherKanji(d, number, name) {}
+  KenteiKanji(const Data& d, int number, const std::string& name)
+    : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name), false) {}
 
   KanjiTypes type() const override { return KanjiTypes::Kentei; }
+};
+
+// 'UcdKanji' is for kanji in ucd.txt file that aren't already pulled in from other files
+class UcdKanji : public OtherKanji {
+public:
+  UcdKanji(const Data& d, int number, const std::string& name)
+    : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name), false, false) {}
+
+  KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };
 
 // 'ExtraKanji' is used for kanji loaded from 'extra.txt'. It is also the base class for 'OfficialKanji'

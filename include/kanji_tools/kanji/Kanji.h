@@ -13,7 +13,7 @@ namespace kanji_tools {
 
 // 'KanjiLegend' is meant to be used in output to briefly describe the suffix added to a kanji when
 // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
-inline constexpr auto KanjiLegend = "'=JLPT \"=Freq ^=Jinmei ~=LinkedJinmei %=LinkedOld +=Extra #=<K1-Kentei, *=Kentei";
+inline constexpr auto KanjiLegend = "'=JLPT \"=Freq ^=Jinmei ~=LinkJ %=LinkO +=Extra @=Kentei #=KenteiK1 *=Ucd";
 
 class Kanji {
 public:
@@ -98,8 +98,9 @@ public:
   //     ~ = Linked Jinmei  : 218 Linked Jinmei (with no frequency)
   //     % = Linked Old     : 211 Linked Old (with no frequency)
   //     + = Extra          : all kanji loaded from 'extra.txt' file
-  //     # = <K1 Kentei     : 268 non-K1 Kentei Kanji that aren't in the above categories
-  //     * = K1 Kentei      : 2554 K1 Kentei Kanji that aren't in the above categories
+  //     @ = <K1 Kentei     : 268 non-K1 Kentei Kanji that aren't in the above categories
+  //     # = K1 Kentei      : 2554 K1 Kentei Kanji that aren't in the above categories
+  //     * = Ucd            : all kanji loaded from 'ucd.txt' file that aren't in the above categories
   std::string qualifiedName() const {
     auto t = type();
     return _name +
@@ -110,8 +111,9 @@ public:
          : t == KanjiTypes::LinkedJinmei ? '~'
          : t == KanjiTypes::LinkedOld    ? '%'
          : t == KanjiTypes::Extra        ? '+'
-         : kyu() != KenteiKyus::K1       ? '#'
-                                         : '*');
+         : t == KanjiTypes::Ucd          ? '*'
+         : kyu() != KenteiKyus::K1       ? '@'
+                                         : '#');
   }
 protected:
   Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,

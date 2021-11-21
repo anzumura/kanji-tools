@@ -301,6 +301,17 @@ void Data::processList(const DataFile& list) {
   }
 }
 
+void Data::processUcd() {
+  auto& newKanji = _types[KanjiTypes::Ucd];
+  int count = 0;
+  for (auto& i : _ucd.map())
+    if (!findKanji(i.first).has_value()) {
+      auto kanji = std::make_shared<UcdKanji>(*this, ++count, i.first);
+      _map.insert(std::make_pair(i.first, kanji));
+      newKanji.push_back(kanji);
+    }
+}
+
 void Data::checkStrokes() const {
   DataFile::List strokesOther, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
   for (const auto& i : _strokes) {

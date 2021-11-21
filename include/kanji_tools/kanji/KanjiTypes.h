@@ -15,11 +15,12 @@ namespace kanji_tools {
 // - Other: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 // - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
 // - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't in any of the above types
+// - Ucd: kanji loaded from 'ucd.txt' file that aren't in any of the above types
 // - None: used as a type for a kanji that hasn't been loaded
-enum class KanjiTypes { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, Kentei, None };
+enum class KanjiTypes { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Other, Extra, Kentei, Ucd, None };
 constexpr std::array AllKanjiTypes{KanjiTypes::Jouyou,    KanjiTypes::Jinmei, KanjiTypes::LinkedJinmei,
                                    KanjiTypes::LinkedOld, KanjiTypes::Other,  KanjiTypes::Extra,
-                                   KanjiTypes::Kentei,    KanjiTypes::None};
+                                   KanjiTypes::Kentei,    KanjiTypes::Ucd,    KanjiTypes::None};
 
 constexpr const char* toString(KanjiTypes x) {
   switch (x) {
@@ -30,6 +31,7 @@ constexpr const char* toString(KanjiTypes x) {
   case KanjiTypes::Other: return "Other";
   case KanjiTypes::Extra: return "Extra";
   case KanjiTypes::Kentei: return "Kentei";
+  case KanjiTypes::Ucd: return "Ucd";
   default: return "None";
   }
 }

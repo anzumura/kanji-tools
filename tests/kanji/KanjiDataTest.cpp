@@ -109,6 +109,24 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
   EXPECT_EQ(_data.getStrokes("廳"), 25);
+  // Kentei Kanji
+  auto apple = _data.findKanji("蘋");
+  ASSERT_TRUE(apple.has_value());
+  EXPECT_EQ((**apple).type(), KanjiTypes::Kentei);
+  EXPECT_EQ((**apple).grade(), KanjiGrades::None);
+  EXPECT_EQ((**apple).level(), JlptLevels::None);
+  EXPECT_EQ((**apple).kyu(), KenteiKyus::K1);
+  EXPECT_EQ((**apple).reading(), "ヒン、ビン、うきくさ、でんじそ");
+  EXPECT_EQ((**apple).meaning(), "apple");
+  // Ucd Kanji
+  auto complete = _data.findKanji("侭");
+  ASSERT_TRUE(complete.has_value());
+  EXPECT_EQ((**complete).type(), KanjiTypes::Ucd);
+  EXPECT_EQ((**complete).grade(), KanjiGrades::None);
+  EXPECT_EQ((**complete).level(), JlptLevels::None);
+  EXPECT_EQ((**complete).kyu(), KenteiKyus::None);
+  EXPECT_EQ((**complete).reading(), "ジン、ことごとく、まま");
+  EXPECT_EQ((**complete).meaning(), "complete, utmost");
   // radical
   auto radical = _data.getRadicalByName("鹿");
   EXPECT_EQ(radical.number(), 198);
@@ -191,7 +209,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
 
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
-  EXPECT_EQ(ucd.size(), 15646);
+  EXPECT_EQ(ucd.size(), 15108);
   int jouyou = 0, jinmei = 0, jinmeiLinks = 0, otherLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
@@ -232,7 +250,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jouyou, _data.jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
-  EXPECT_EQ(otherLinks, 2190);
+  EXPECT_EQ(otherLinks, 1652);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
