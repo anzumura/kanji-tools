@@ -7,10 +7,10 @@
 
 namespace kanji_tools {
 
-const Ucd* UcdData::find(const std::string& s) const {
-  std::string r = s;
-  if (MBChar::isMBCharWithVariationSelector(s)) {
-    auto nonVariant = MBChar::withoutVariationSelector(s);
+const Ucd* UcdData::find(const std::string& kanjiName) const {
+  std::string r = kanjiName;
+  if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
+    auto nonVariant = MBChar::withoutVariationSelector(kanjiName);
     // check for linked Jinmei variant first
     auto i = _linkedJinmei.find(nonVariant);
     if (i == _linkedJinmei.end()) {
@@ -27,8 +27,7 @@ const Ucd* UcdData::find(const std::string& s) const {
   return i == _map.end() ? nullptr : &i->second;
 }
 
-std::string UcdData::getReadingsAsKana(const std::string& s) const {
-  const Ucd* u = find(s);
+std::string UcdData::getReadingsAsKana(const Ucd* u) const {
   if (u) {
     std::string reading = u->onReading();
     std::replace(reading.begin(), reading.end(), ' ', ',');

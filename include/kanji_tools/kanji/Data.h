@@ -31,12 +31,13 @@ public:
   virtual ~Data() = default;
   Data(const Data&) = delete;
 
+  const UcdData& ucd() const { return _ucd; }
+  const Ucd* findUcd(const std::string& kanjiName) const { return _ucd.find(kanjiName); }
   // Functions used by 'Kanji' classes during construction, each takes a kanji name.
   virtual int getFrequency(const std::string&) const = 0;
   virtual JlptLevels getLevel(const std::string&) const = 0;
   virtual KenteiKyus getKyu(const std::string&) const = 0;
-  virtual const Radical& ucdRadical(const std::string& kanjiName) const {
-    const Ucd* u = _ucd.find(kanjiName);
+  virtual const Radical& ucdRadical(const std::string& kanjiName, const Ucd* u) const {
     if (u) return _radicals.find(u->radical());
     // 'throw' should never happen - every 'Kanji' class instance should have also exist in the
     // data loaded from Unicode.
@@ -46,8 +47,7 @@ public:
   // the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   virtual const Radical& getRadicalByName(const std::string& radicalName) const { return _radicals.find(radicalName); }
   // 'getPinyin' returns an optional string since not all Kanji have a Pinyin reading.
-  std::optional<std::string> getPinyin(const std::string& kanjiName) const {
-    const Ucd* u = _ucd.find(kanjiName);
+  std::optional<std::string> getPinyin(const Ucd* u) const {
     if (u && !u->pinyin().empty()) return u->pinyin();
     return {};
   }
@@ -60,15 +60,13 @@ public:
     return kanjiName;
   }
 
-  const UcdData& ucd() const { return _ucd; }
-
-  int getStrokes(const std::string& s, bool variant = false, bool onlyUcd = false) const {
+  int getStrokes(const std::string& kanjiName) const { return getStrokes(kanjiName, findUcd(kanjiName)); }
+  int getStrokes(const std::string& kanjiName, const Ucd* u, bool variant = false, bool onlyUcd = false) const {
     if (!onlyUcd) {
-      auto i = _strokes.find(s);
+      auto i = _strokes.find(kanjiName);
       if (i != _strokes.end()) return i->second;
     }
-    auto i = _ucd.find(s);
-    return i ? i->getStrokes(variant) : 0;
+    return u ? u->getStrokes(variant) : 0;
   }
 
   // get kanji lists

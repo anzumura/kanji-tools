@@ -12,8 +12,8 @@ public:
   const Data::Entry& link() const { return _link; }
   OptString newName() const override { return _link->name(); }
 protected:
-  LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
-    : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name), d.getStrokes(name), d.getPinyin(name),
+  LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link, const Ucd* u)
+    : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getPinyin(u),
             JlptLevels::None, d.getKyu(name), d.getFrequency(name)),
       _link(link) {}
 
@@ -33,7 +33,7 @@ private:
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
   LinkedJinmeiKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
-    : LinkedKanji(d, number, checkType(name, link, true), link) {}
+    : LinkedKanji(d, number, checkType(name, link, true), link, d.findUcd(name)) {}
 
   KanjiTypes type() const override { return KanjiTypes::LinkedJinmei; }
 };
@@ -41,7 +41,7 @@ public:
 class LinkedOldKanji : public LinkedKanji {
 public:
   LinkedOldKanji(const Data& d, int number, const std::string& name, const Data::Entry& link)
-    : LinkedKanji(d, number, checkType(name, link), link) {}
+    : LinkedKanji(d, number, checkType(name, link), link, d.findUcd(name)) {}
 
   KanjiTypes type() const override { return KanjiTypes::LinkedOld; }
 };

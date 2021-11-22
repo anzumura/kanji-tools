@@ -18,21 +18,20 @@ public:
   UcdData() {}
   UcdData(const UcdData&) = delete;
 
-  // 'getMeaning' returns 'meaning' loaded from UCD file for 's'. Almost all kanji
-  // from UCD have meanings, but a few are empty. Return empty string if not found.
-  const std::string& getMeaning(const std::string& s) const {
-    auto u = find(s);
+  // 'getMeaning' returns 'meaning' loaded from UCD file
+  const std::string& getMeaning(const std::string& kanjiName) const { return getMeaning(find(kanjiName)); }
+  const std::string& getMeaning(const Ucd* u) const {
     return u ? u->meaning() : Ucd::EmptyString;
   }
 
-  // 'getReadingsAsKana' finds UCD entry for 's' and returns one string starting with
-  // 'onReading' converted Katakana followed by 'kunReading' converted to Hiragana.
-  std::string getReadingsAsKana(const std::string& s) const;
+  // 'getReadingsAsKana' returns string starting with 'onReading' converted Katakana followed
+  // by 'kunReading' converted to Hiragana
+  std::string getReadingsAsKana(const Ucd*) const;
 
-  // 'find' will return a pointer to a Ucd instance if 's' is in _ucdMap. If 's' has a
-  // 'variation selector' then _linkedJinmei then _linkedOther maps are used to get
-  // a Ucd variant (variant returned is the same displayed character for Jinmei ones)
-  const Ucd* find(const std::string& s) const;
+  // 'find' returns a pointer to a Ucd instance if 'kanjiName' is in _ucdMap. If 'kanjiName'
+  // has a 'variation selector' then _linkedJinmei then _linkedOther maps are used to get a
+  // Ucd variant (variant returned is the same displayed character for Jinmei ones)
+  const Ucd* find(const std::string& kanjiName) const;
 
   const Map& map() const { return _map; }
 

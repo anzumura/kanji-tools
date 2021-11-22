@@ -9,26 +9,31 @@ namespace kanji_tools {
 // and 'ExtraKanji'
 class OtherKanji : public Kanji {
 public:
-  // constructor used for 'Other' kanji with readings from 'other-readings.txt' and also called by other
-  // public constructor without a reading and derived KenteiKanji and UcdKanji classes
-  OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading, bool findFrequency = true,
-             bool findKyu = true)
-    : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name), d.getStrokes(name), d.getPinyin(name),
-            JlptLevels::None, findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
-      _meaning(d.ucd().getMeaning(name)), _reading(reading) {}
+  // constructor used for 'Other' kanji with readings from 'other-readings.txt'
+  OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading)
+    : OtherKanji(d, number, name, reading, d.findUcd(name)) {}
   // constructor used for 'Other' kanji without a reading
-  OtherKanji(const Data& d, int number, const std::string& name)
-    : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name)) {}
+  OtherKanji(const Data& d, int number, const std::string& name) : OtherKanji(d, number, name, d.findUcd(name)) {}
 
   KanjiTypes type() const override { return KanjiTypes::Other; }
   const std::string& meaning() const override { return _meaning; }
   const std::string& reading() const override { return _reading; }
 protected:
-  // protected constructors used by derived ExtraKanji class (allows controlling strokes and frequency)
+  // constructors called by public constructors and derived KenteiKanji and UcdKanji classes
+  OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading, const Ucd* u,
+             bool findFrequency = true, bool findKyu = true)
+    : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getPinyin(u),
+            JlptLevels::None, findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
+      _meaning(d.ucd().getMeaning(u)), _reading(reading) {}
+  OtherKanji(const Data& d, int number, const std::string& name, const Ucd* u, bool findFrequency = true,
+             bool findKyu = true)
+    : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(u), u, findFrequency, findKyu) {}
+
+  // constructors used by derived ExtraKanji class (allows controlling strokes and frequency)
   OtherKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& meaning,
              const std::string& reading, int strokes, bool findFrequency)
-    : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(name), d.getLevel(name),
-            d.getKyu(name), findFrequency ? d.getFrequency(name) : 0),
+    : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(d.findUcd(name)),
+            d.getLevel(name), d.getKyu(name), findFrequency ? d.getFrequency(name) : 0),
       _meaning(meaning), _reading(reading) {}
   OtherKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& reading,
              int strokes, bool findFrequency)
@@ -42,7 +47,7 @@ private:
 class KenteiKanji : public OtherKanji {
 public:
   KenteiKanji(const Data& d, int number, const std::string& name)
-    : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name), false) {}
+    : OtherKanji(d, number, name, d.findUcd(name), false) {}
 
   KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
@@ -50,8 +55,7 @@ public:
 // 'UcdKanji' is for kanji in ucd.txt file that aren't already pulled in from other files
 class UcdKanji : public OtherKanji {
 public:
-  UcdKanji(const Data& d, int number, const std::string& name)
-    : OtherKanji(d, number, name, d.ucd().getReadingsAsKana(name), false, false) {}
+  UcdKanji(const Data& d, int number, const Ucd& u) : OtherKanji(d, number, u.name(), &u, false, false) {}
 
   KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };

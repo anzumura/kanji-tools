@@ -306,7 +306,7 @@ void Data::processUcd() {
   int count = 0;
   for (auto& i : _ucd.map())
     if (!findKanji(i.first).has_value()) {
-      auto kanji = std::make_shared<UcdKanji>(*this, ++count, i.first);
+      auto kanji = std::make_shared<UcdKanji>(*this, ++count, i.second);
       _map.insert(std::make_pair(i.first, kanji));
       newKanji.push_back(kanji);
     }
@@ -315,7 +315,8 @@ void Data::processUcd() {
 void Data::checkStrokes() const {
   DataFile::List strokesOther, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
   for (const auto& i : _strokes) {
-    const int ucdStrokes = getStrokes(i.first, false, true);
+    const Ucd* u = findUcd(i.first);
+    const int ucdStrokes = getStrokes(i.first, u, false, true);
     auto k = findKanji(i.first);
     if (ucdStrokes) {
       // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,
@@ -323,7 +324,7 @@ void Data::checkStrokes() const {
       // the actual stroke count comes from 'jouyou.txt', 'jinmei.txt' or 'extra.txt'
       if (k.has_value()) {
         if ((**k).variant()) {
-          if ((**k).strokes() != getStrokes(i.first, true, true)) vStrokeDiffs.push_back(i.first);
+          if ((**k).strokes() != getStrokes(i.first, u, true, true)) vStrokeDiffs.push_back(i.first);
         } else if ((**k).strokes() != ucdStrokes)
           strokeDiffs.push_back(i.first);
       } else if (i.second != ucdStrokes)
