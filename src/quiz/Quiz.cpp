@@ -289,7 +289,7 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
     out() << "    " << name << ':';
     if (list.size() <= JukugoPerLine)
       for (auto& i : list)
-        out() << "  " << i->nameAndReading();
+        out() << " " << i->nameAndReading();
     else {
       out() << ' ' << list.size();
       std::array<int, JukugoPerLine> colWidths;
