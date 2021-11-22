@@ -234,9 +234,8 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
     ++_question;
     bool stopQuiz = false;
     do {
-      out() << questionPrefix << _question << '/' << questions.size() << ".  ";
+      out() << questionPrefix << _question << '/' << questions.size() << ":  ";
       if (quizStyle == 'k') {
-        if (!_reviewMode) out() << "Kanji:  ";
         out() << i->name();
         auto info = i->info(infoFields);
         if (!info.empty()) out() << "  " << info;
@@ -405,7 +404,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
     Choices choices = getDefaultChoices(list.size());
     bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
     do {
-      out() << (_reviewMode ? "\nGroup " : "\nQuestion ") << _question << '/' << list.size() << ".  " << *i << ", ";
+      out() << (_reviewMode ? "\nGroup " : "\nQuestion ") << _question << '/' << list.size() << ":  " << *i << ", ";
       if (questions.size() == i->members().size())
         out() << questions.size();
       else
