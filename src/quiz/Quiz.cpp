@@ -1,6 +1,7 @@
 #include <kanji_tools/quiz/Group.h>
 #include <kanji_tools/quiz/Quiz.h>
 #include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/MBChar.h>
 
 #include <random>
 
@@ -23,11 +24,55 @@ constexpr char QuitOption = '/';
 constexpr auto ShowMeanings = "show meanings";
 constexpr auto HideMeanings = "hide meanings";
 
+constexpr auto HelpMessage = "\
+kanjiQuiz [-h] [kanji]:\n\
+  -h: show help message for command-line options\n\
+  kanji: show details about a kanji instead of starting a quiz\n";
+
 } // namespace
 
-// Top level 'quiz' function
+Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
+  : _groupData(data), _jukugoData(*data), _question(0), _score(0), _showMeanings(false), _reviewMode(false),
+    _choice(data->out(), in) {
+  bool endOptions = false;
+  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) {
+    std::string arg = argv[i];
+    if (!endOptions && arg.starts_with("-")) {
+      if (arg == "-h") {
+        out() << HelpMessage;
+        return;
+      }
+      if (arg == "--")
+        endOptions = true;
+      else
+        Data::usage("illegal option '" + arg + "' use -h for help");
+    } else {
+      if (MBChar::length(arg) != 1 || !isKanji(arg)) Data::usage("'" + arg + "' must be a single UTF-8 kanji");
+      printDetails(arg);
+      return;
+    }
+  }
+  if (!data->debug() && !in) start();
+}
 
-void Quiz::quiz() const {
+void Quiz::printDetails(const std::string& arg) const {
+  out() << "Showing details for " << arg << " [" << toUnicode(arg) << "]";
+  auto ucd = data().ucd().find(arg);
+  if (ucd) {
+    out() << ", Block " << ucd->block() << ", Version " << ucd->version();
+    auto k = data().findKanji(arg);
+    if (k.has_value()) {
+      out() << ", Type " << (**k).type() << '\n' << (**k).info();
+      _showMeanings = true;
+      printMeaning(*k, true);
+      printReviewDetails(*k);
+    } else // should never happen since all kanji in ucd.txt should be loaded
+      out() << " --- Kanji not loaded'\n";
+  } else // can happen for rare kanji that have aren't supported (see parseUcdAllFlat.sh for details)
+    out() << " --- Not found in 'ucd.txt'\n";
+}
+
+void Quiz::start() const {
   reset();
   _choice.setQuit(QuitOption);
   char c = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
@@ -127,7 +172,7 @@ void Quiz::toggleMeanings(Choices& choices) const {
 }
 
 void Quiz::printMeaning(const Entry& k, bool useNewLine) const {
-  if (_showMeanings && k->hasMeaning()) out() << (useNewLine ? "\n    Meaning:  " : " : ") << k->meaning();
+  if (_showMeanings && k->hasMeaning()) out() << (useNewLine ? "\n    Meaning: " : " : ") << k->meaning();
   out() << '\n';
 }
 
@@ -194,7 +239,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
         if (!_reviewMode) out() << "Kanji:  ";
         out() << i->name();
         auto info = i->info(infoFields);
-        if (!info.empty()) out() << "  (" << info << ")";
+        if (!info.empty()) out() << "  " << info;
       } else
         out() << "Reading:  " << i->reading();
       printMeaning(i, _reviewMode);
@@ -232,10 +277,10 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
 
 void Quiz::printReviewDetails(const Entry& kanji) const {
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
-  out() << "    Reading:  " << kanji->reading() << '\n';
+  out() << "    Reading: " << kanji->reading() << '\n';
   auto i = _groupData.patternMap().find(kanji->name());
   if (i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
-    out() << "    Similar: ";
+    out() << "    Similar:";
     for (auto& j : i->second->members())
       if (j != kanji) out() << ' ' << j->name();
     out() << '\n';

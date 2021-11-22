@@ -60,7 +60,7 @@ Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
       else
         Data::usage("illegal option '" + arg + "' use -h for help");
     } else
-      files.push_back(argv[i]);
+      files.push_back(arg);
   }
   if (!data->debug() && files.empty()) Data::usage("please specify at least one option or '-h' for help");
   for (auto& i : files)

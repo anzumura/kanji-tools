@@ -13,7 +13,7 @@ public:
   using OptEntry = Data::OptEntry;
   // Command line options must specify one or more files and 'data' class is used to lookup kanji
   // found in files - see HelpMessage in Stats.cpp for more details on command line options.
-  Stats(int argc, const char** argv, DataPtr data);
+  Stats(int argc, const char** argv, DataPtr);
   Stats(const Stats&) = delete;
   // helper class for ordering and printing out kanji found in files
   class Count {

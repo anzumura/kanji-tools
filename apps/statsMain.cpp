@@ -1,5 +1,5 @@
-#include <kanji_tools/stats/Stats.h>
 #include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/stats/Stats.h>
 
 using namespace kanji_tools;
 

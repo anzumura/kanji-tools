@@ -9,13 +9,16 @@ namespace kanji_tools {
 
 class Quiz {
 public:
-  Quiz(const GroupData& groupData, std::istream* in = 0)
-    : _groupData(groupData), _jukugoData(groupData.data()), _question(0), _score(0), _showMeanings(false), _reviewMode(false),
-      _choice(groupData.out(), in) {}
-  // 'quiz' is the top level method for choosing quiz type (List or Group based)
-  void quiz() const;
+  // An istream 'in' can be provided for testing purposes (instead of reading std::cin) and
+  // if given, 'start' must be explicitly called to start a quiz.
+  Quiz(int argc, const char** argv, DataPtr, std::istream* in = 0);
+  // 'start' is the top level method for starting a quiz or doing a review (List or Group based)
+  void start() const;
 private:
   enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
+  // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
+  void printDetails(const std::string&) const;
+
   const Data& data() const { return _groupData.data(); }
   std::ostream& out() const { return data().out(); }
   std::ostream& log(bool heading = false) const { return data().log(heading); }
@@ -71,7 +74,7 @@ private:
   mutable Choice _choice;
   mutable bool _reviewMode;
 
-  const GroupData& _groupData;
+  const GroupData _groupData;
   const JukugoData _jukugoData;
 };
 
