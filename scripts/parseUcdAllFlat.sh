@@ -25,7 +25,7 @@ declare -r program="parseUcdAllFlat.sh"
 # This script was used to create 'data/ucd.txt'.
 #
 # There are over 140K characters in 'ucd.all.flat.txt' and most of them aren't
-# relevant to the current functionality of this 'kanji' project so apply some
+# relevant to the current functionality of 'kanji-tools' project so apply some
 # filtering before parsing (also significantly reduces the time to parse).
 #
 # Filtering on kIRG_JSource being populated cuts the set to 16,226 entries (IRG
@@ -38,10 +38,10 @@ declare -r program="parseUcdAllFlat.sh"
 # standard Jōyō + Jinmei. Examples: 4EE5 (以) and 4F3C (似) have kTotalStrokes of
 # 4 and 6 respectively, but in Japanese they should be 5 and 7.
 #
-# In addition to Adobe refs, also pull in any kanji that have a Morohashi ID in
-# to get compatibility/variants of any kanji that have an on/kun reading. Note,
-# 'kMorohashi' has 18,168 entries (12,965 with On/Kun) which is more than Adobe
-# so it pulls in a few hundred more entries (including some Kentei Kanji).
+# In addition to Adobe, also pull in kanji that have a Morohashi ID to help get
+# compatibility/variants of kanji that have on/kun readings. Note, 'kMorohashi'
+# has 18,168 entries (12,965 with On/Kun) which is more than Adobe so it pulls
+# in a few hundred more entries (including some Kentei Kanji).
 # Some counts as of Unicode 13.0:
 # - has both Adobe and Morohashi: 12,447
 # - has Morohashi, but not Adobe: 5,721
@@ -120,9 +120,9 @@ EOF
 declare -r onKun='kJapanese[OK].*n="[^"]'
 
 # 'printResults' loop uses 'onKun' as well as the following (for variants):
-declare -r morohashi='kMorohashi="[^"]'         # has a Morohashi ID
-declare -r adobe='kRSAdobe_Japan1_6="[^"]'      # has an Adobe ID
-declare -r official='kJ.*yoKanji="[^"]'         # is Joyo or Jinmeiyo (for 𠮟)
+declare -r morohashi='kMorohashi="[^"]'    # has a Morohashi ID
+declare -r adobe='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
+declare -r official='kJ.*yoKanji="[^"]'    # is Joyo or Jinmeiyo (for 𠮟)
 
 printResulsFilter="$onKun|$morohashi|$adobe|$official"
 
@@ -130,11 +130,12 @@ printResulsFilter="$onKun|$morohashi|$adobe|$official"
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
 function findVariantLinks() {
   local -r defStart='kDefinition=\"\('
+  local -r nonAscii='[^\x00-\x7F]{1,}'
   for type in 'a variant of' 'interchangeable' 'same as' 'non-classical'; do
     local secondEntry=false
     printResulsFilter="$printResulsFilter|$defStrat$type "
-    for i in $(grep -E "$defStart$type .*" $ucdFile |
-      sed "s/.*cp=\"\([^\"]*\).*($type [-a-z0-9UA-Z+ ]*\([^ ,)]*\).*/\1 \2/"); do
+    for i in $(grep -E "$defStart$type ($nonAscii\)|U\+[A-F0-9]{4,5} $nonAscii)" $ucdFile |
+      sed 's/ U+[A-F0-9]*//g' | sed "s/.*cp=\"\([^\"]*\).*($type \([^ ,)]*\).*/\1 \2/"); do
       if $secondEntry; then
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
         local s=$(echo -n ${i:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
