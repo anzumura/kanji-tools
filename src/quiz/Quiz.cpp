@@ -233,6 +233,13 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
 void Quiz::printReviewDetails(const Entry& kanji) const {
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
   out() << "    Reading:  " << kanji->reading() << '\n';
+  auto i = _groupData.patternMap().find(kanji->name());
+  if (i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
+    out() << "    Similar: ";
+    for (auto& j : i->second->members())
+      if (j != kanji) out() << ' ' << j->name();
+    out() << '\n';
+  }
   auto print = [this](const std::string& name, const JukugoData::List& list) {
     out() << "    " << name << ':';
     if (list.size() <= JukugoPerLine)
