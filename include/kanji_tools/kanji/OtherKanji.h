@@ -144,10 +144,24 @@ public:
   // - Moved: moved out of Jouyou into Jinmei
   // - Other: reason listed as その他
   enum class Reasons { Names, Print, Variant, Moved, Other };
+  static constexpr const char* toString(Reasons x) {
+    switch (x) {
+    case Reasons::Names: return "Names";
+    case Reasons::Print: return "Print";
+    case Reasons::Variant: return "Variant";
+    case Reasons::Moved: return "Moved";
+    default: return "Other";
+    }
+  }
+
   JinmeiKanji(const Data& d)
     : OfficialKanji(d, d.getStrokes(columns[NameCol])), _reason(getReason(columns[ReasonCol])) {}
 
   KanjiTypes type() const override { return KanjiTypes::Jinmei; }
+  OptString extraTypeInfo() const override {
+    // year should always be populated for Jinmei kanji
+    return year().has_value() ? std::optional(std::to_string(*year()) + ' ' + toString(_reason)) : std::nullopt;
+  }
   Reasons reason() const { return _reason; }
 private:
   static Reasons getReason(const std::string&);
@@ -160,6 +174,9 @@ public:
     : OfficialKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]), _grade(getGrade(columns[GradeCol])) {}
 
   KanjiTypes type() const override { return KanjiTypes::Jouyou; }
+  OptString extraTypeInfo() const override {
+    return year().has_value() ? std::optional(std::to_string(*year())) : std::nullopt;
+  }
   KanjiGrades grade() const override { return _grade; }
 private:
   static KanjiGrades getGrade(const std::string&);

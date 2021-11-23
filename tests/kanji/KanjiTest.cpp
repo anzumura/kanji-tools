@@ -75,7 +75,8 @@ protected:
     EXPECT_FALSE(k.hasMeaning());
     EXPECT_EQ(k.strokes(), 6);
     ASSERT_EQ(k.type(), KanjiTypes::Jinmei);
-    EXPECT_EQ(k.info(), "Rad 二(1), Strokes 6, Level N1, Freq 1728, Old 亙, Kyu KJ1");
+    EXPECT_EQ(k.extraTypeInfo(), "1951 Names");
+    EXPECT_EQ(k.info(), "Rad 二(1), Strokes 6, N1, Frq 1728, Old 亙, Kyu KJ1");
     auto& e = static_cast<const JinmeiKanji&>(k);
     EXPECT_EQ(e.radical().name(), "二");
     EXPECT_EQ(e.oldNames(), Kanji::OldNames{"亙"});
@@ -104,7 +105,7 @@ TEST_F(KanjiTest, OtherKanji) {
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.kyu(), kyu);
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), Freq 2362, Kyu KJ1");
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Frq 2362, Kyu KJ1");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_FALSE(k.hasReading());
 }
@@ -126,7 +127,7 @@ TEST_F(KanjiTest, OtherKanjiWithReading) {
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.kyu(), kyu);
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), Freq 2362, Kyu KJ1");
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Frq 2362, Kyu KJ1");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_TRUE(k.hasReading());
   EXPECT_EQ(k.reading(), "トン、ドン、の-む");
@@ -291,6 +292,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
   ASSERT_EQ(k.type(), KanjiTypes::Jinmei);
   EXPECT_EQ(k.radical().name(), "二");
+  EXPECT_EQ(k.extraTypeInfo(), "2004 Print");
   auto& e = static_cast<const JinmeiKanji&>(k);
   EXPECT_TRUE(e.oldNames().empty());
   EXPECT_EQ(e.year(), 2004);
@@ -383,9 +385,10 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.meaning(), "love");
       EXPECT_EQ(k.reading(), "アイ");
       EXPECT_EQ(k.radical().name(), "心");
-      EXPECT_EQ(k.info(), "Rad 心(1), Strokes 13, Grade G4, Level N3, Freq 640, Kyu K7");
+      EXPECT_EQ(k.info(), "Rad 心(1), Strokes 13, Grade G4, N3, Frq 640, Kyu K7");
       EXPECT_TRUE(e.oldNames().empty());
       EXPECT_EQ(e.year(), std::nullopt);
+      EXPECT_EQ(e.extraTypeInfo(), std::nullopt);
     } else {
       EXPECT_EQ(k.number(), 103);
       EXPECT_EQ(k.grade(), KanjiGrades::S);
@@ -399,16 +402,17 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.radical().name(), "色");
       EXPECT_EQ(e.oldNames(), Kanji::OldNames{"艷"});
       EXPECT_EQ(e.year(), 2010);
-      EXPECT_EQ(k.info(), "Rad 色(2), Strokes 19, Grade S, Level N1, Freq 2207, Old 艷, Kyu K2");
+      EXPECT_EQ(e.extraTypeInfo(), "2010");
+      EXPECT_EQ(k.info(), "Rad 色(2), Strokes 19, Grade S, N1, Frq 2207, Old 艷, Kyu K2");
       EXPECT_EQ(k.info(Kanji::RadicalField), "Rad 色(2)");
       EXPECT_EQ(k.info(Kanji::StrokesField), "Strokes 19");
       EXPECT_EQ(k.info(Kanji::GradeField), "Grade S");
-      EXPECT_EQ(k.info(Kanji::LevelField), "Level N1");
+      EXPECT_EQ(k.info(Kanji::LevelField), "N1");
       EXPECT_EQ(k.info(Kanji::KyuField), "Kyu K2");
       EXPECT_EQ(k.info(Kanji::OldField), "Old 艷");
       EXPECT_EQ(k.info(Kanji::NewField), "");
       EXPECT_EQ(k.info(Kanji::GradeField | Kanji::OldField), "Grade S, Old 艷");
-      EXPECT_EQ(k.info(Kanji::StrokesField | Kanji::LevelField), "Strokes 19, Level N1");
+      EXPECT_EQ(k.info(Kanji::StrokesField | Kanji::LevelField), "Strokes 19, N1");
     }
   }
 }

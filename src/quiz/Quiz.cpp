@@ -25,9 +25,11 @@ constexpr auto ShowMeanings = "show meanings";
 constexpr auto HideMeanings = "hide meanings";
 
 constexpr auto HelpMessage = "\
-kanjiQuiz [-h] [kanji]:\n\
+kanjiQuiz [-hmr] [kanji]:\n\
   -h: show help message for command-line options\n\
-  kanji: show details about a kanji instead of starting a quiz\n";
+  -m: show English meanings by default (can be toggled on/off later)\n\
+  -r: start in review mode instead of being prompted\n\
+  kanji: show details about a kanji instead of starting a review or test\n";
 
 } // namespace
 
@@ -44,6 +46,10 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
       }
       if (arg == "--")
         endOptions = true;
+      else if (arg == "-m")
+        _showMeanings = true;
+      else if (arg == "-r")
+        _reviewMode = true;
       else
         Data::usage("illegal option '" + arg + "' use -h for help");
     } else {
@@ -62,7 +68,8 @@ void Quiz::printDetails(const std::string& arg) const {
     out() << ", Block " << ucd->block() << ", Version " << ucd->version();
     auto k = data().findKanji(arg);
     if (k.has_value()) {
-      out() << ", Type " << (**k).type() << '\n' << (**k).info();
+      printExtraTypeInfo(*k);
+      out() << '\n' << (**k).info();
       _showMeanings = true;
       printMeaning(*k, true);
       printReviewDetails(*k);
@@ -75,25 +82,30 @@ void Quiz::printDetails(const std::string& arg) const {
 void Quiz::start() const {
   reset();
   _choice.setQuit(QuitOption);
-  char c = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
-  if (c == QuitOption) return;
-  _reviewMode = c == 'r';
-  c = _choice.get("Quiz type",
-                  {{'f', "freq."}, {'g', "grade"}, {'k', "kyu"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}},
-                  'g');
-  if (c == 'f') {
+  char c;
+  if (!_reviewMode) {
+    c = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
+    if (c == QuitOption) return;
+    _reviewMode = c == 'r';
+  }
+  switch (_choice.get(
+    "Quiz type", {{'f', "freq."}, {'g', "grade"}, {'k', "kyu"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}},
+    'g')) {
+  case 'f':
     c = _choice.get("Choose list",
                     {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
     if (c == QuitOption) return;
     // suppress printing 'Freq' since this would work against showing the list in a random order.
     listQuiz(getListOrder(), data().frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
-  } else if (c == 'g') {
+    break;
+  case 'g':
     c = _choice.get("Choose grade", '1', '6', {{'s', "Secondary School"}}, 's');
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']),
              Kanji::AllFields ^ Kanji::GradeField);
-  } else if (c == 'k') {
+    break;
+  case 'k':
     c = _choice.get("Choose kyu", '1', '9', {{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}, '2');
     if (c == QuitOption) return;
     // suppress printing 'Kyu' since it's the same for every kanji in the list
@@ -105,17 +117,16 @@ void Quiz::start() const {
                                             : c == '1' ? 11
                                                        : 7 - (c - '3')]),
              Kanji::AllFields ^ Kanji::KyuField);
-  } else if (c == 'l') {
+    break;
+  case 'l':
     c = _choice.get("Choose level", {{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
     if (c == QuitOption) return;
     // suppress printing 'Level' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().levelList(AllJlptLevels[4 - (c - '1')]), Kanji::AllFields ^ Kanji::LevelField);
-  } else if (c == 'm')
-    prepareGroupQuiz(getListOrder(), _groupData.meaningGroups(), _groupData.patternMap(), 'p');
-  else if (c == 'p')
-    prepareGroupQuiz(getListOrder(), _groupData.patternGroups(), _groupData.meaningMap(), 'm');
-  else
-    return;
+    break;
+  case 'm': prepareGroupQuiz(getListOrder(), _groupData.meaningGroups(), _groupData.patternMap(), 'p'); break;
+  case 'p': prepareGroupQuiz(getListOrder(), _groupData.patternGroups(), _groupData.meaningMap(), 'm'); break;
+  }
   if (!_reviewMode) finalScore();
 }
 
@@ -152,7 +163,6 @@ void Quiz::reset() const {
   _question = 0;
   _score = 0;
   _mistakes.clear();
-  _showMeanings = false;
 }
 
 Choice::Choices Quiz::getDefaultChoices(int totalQuestions) const {
@@ -174,6 +184,12 @@ void Quiz::toggleMeanings(Choices& choices) const {
 void Quiz::printMeaning(const Entry& k, bool useNewLine) const {
   if (_showMeanings && k->hasMeaning()) out() << (useNewLine ? "\n    Meaning: " : " : ") << k->meaning();
   out() << '\n';
+}
+
+void Quiz::printExtraTypeInfo(const Entry& k) const {
+  out() << ", " << k->type();
+  auto extraTypeInfo = k->extraTypeInfo();
+  if (extraTypeInfo.has_value()) out() << " (" << *extraTypeInfo << ')';
 }
 
 // List Based Quiz
@@ -198,7 +214,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
     if (quizStyle == QuitOption) return;
   }
   const std::string prompt(_reviewMode ? reviewPrompt : quizPrompt + (quizStyle == 'k' ? "reading" : "kanji")),
-    questionPrefix(_reviewMode ? "\nKanji " : "\nQuestion ");
+    questionPrefix(_reviewMode ? "\n" : "\nQuestion ");
 
   List questions;
   for (auto& i : list)
@@ -239,6 +255,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
         out() << i->name();
         auto info = i->info(infoFields);
         if (!info.empty()) out() << "  " << info;
+        if (_reviewMode) printExtraTypeInfo(i);
       } else
         out() << "Reading:  " << i->reading();
       printMeaning(i, _reviewMode);

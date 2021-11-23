@@ -39,6 +39,7 @@ private:
   // print meaning if _showMeanings is true and meaning exists
   void printMeaning(const Entry&, bool useNewLine = false) const;
 
+  void printExtraTypeInfo(const Entry&) const;
   void printReviewDetails(const Entry&) const;
 
   // 'listQuiz' starts a 'list based quiz'. 'infoFields' controls which fields are shown in a 'kanji

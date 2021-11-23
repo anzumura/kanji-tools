@@ -40,6 +40,10 @@ public:
   virtual const OldNames& oldNames() const { return EmptyOldNames; }
   // Only LinkedKanji have a 'newName', i.e., the name of the linked kanji which is the new (or more standard) version
   virtual OptString newName() const { return std::nullopt; }
+  // Only Jouyou and Jinmei Kanji have 'extraTypeInfo':
+  // - Jouyou: returns nullopt or the year the kanji was added to the official list
+  // - Jinmei: returns the year the kanji was added as well as the 'reason' (see JinmeiKanji class)
+  virtual OptString extraTypeInfo() const { return std::nullopt; }
 
   int number() const { return _number; }
   const std::string& name() const { return _name; }
