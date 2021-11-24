@@ -293,23 +293,23 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 Class Hierarchy for Kanji (* = abstract class):
 
 ```;
-             Kanji*
-               |
-               +----------------------------------+
-               |                                  |
-         NonLinkedKanji*                     LinkedKanji*
-               |                                  |
-    +----------+-----------+---------+            +---------------+
-    |          |           |         |            |               |
-FileKanji* OtherKanji KenteiKanji UcdKanji LinkedJinmeiKanji LinkedOldKanji
-    |
-    +--------------+
-    |              |
-OfficialKanji* ExtraKanji
-    |
-    +-----------+
-    |           |
-JouyouKanji JinmeiKanji
+              Kanji*
+                |
+                +----------------------------------+
+                |                                  |
+          NonLinkedKanji*                     LinkedKanji*
+                |                                  |
+    +-----------+---------+---------+              +---------------+
+    |           |         |         |              |               |
+OtherKanji KenteiKanji UcdKanji FileKanji* LinkedJinmeiKanji LinkedOldKanji
+                                    |
+                                    +------------+
+                                    |            |
+                                ExtraKanji OfficialKanji*
+                                                 |
+                                                 +-----------+
+                                                 |           |
+                                            JouyouKanji JinmeiKanji
 ```
 
 The program also loads the 214 official kanji radicals (部首).
