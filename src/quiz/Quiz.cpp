@@ -226,8 +226,15 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
 
   log(true) << "Starting " << (_reviewMode ? "review" : "quiz") << " for " << questions.size() << " kanji";
   if (questions.size() < list.size())
-    out() << " (original list had " << list.size() << ", but not all entries have readings yet)";
+    out() << " (original list had " << list.size() << ", but not all entries have readings)";
   out() << '\n';
+  if (quizStyle == 'k') {
+    log() << "Legend:";
+    if (infoFields & Kanji::LevelField) out() << " 'N[1-5]'=JLPT Level";
+    if (infoFields & Kanji::KyuField) out() << " 'K[1-10]'=Kentei Kyu";
+    if (infoFields & Kanji::GradeField) out() << " 'G[1-6]'=Grade ('S'=Secondary School)";
+    out() << '\n';
+  }
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(1, numberOfChoicesPerQuestion);
   while (_question < questions.size()) {

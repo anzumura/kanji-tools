@@ -12,8 +12,7 @@ Kanji::Kanji(int number, const std::string& name, const std::string& compatibili
 }
 
 std::string Kanji::info(int infoFields) const {
-  static const std::string Rad("Rad "), Strokes("Strokes "), Grade("Grade "), Freq("Frq "), New("New "), Old("Old "),
-    Kyu("Kyu ");
+  static const std::string Rad("Rad "), Strokes("Strokes "), Freq("Frq "), New("New "), Old("Old ");
   std::string result;
   auto add = [&result](const auto& x) {
     if (!result.empty()) result += ", ";
@@ -23,7 +22,7 @@ std::string Kanji::info(int infoFields) const {
   if (infoFields & RadicalField) add(Rad + radical().name() + '(' + std::to_string(radical().number()) + ')');
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
   if (infoFields & PinyinField && pinyin().has_value()) add(*pinyin());
-  if (infoFields & GradeField && hasGrade()) add(Grade + toString(grade()));
+  if (infoFields & GradeField && hasGrade()) add(toString(grade()));
   if (infoFields & LevelField && hasLevel()) add(toString(level()));
   if (infoFields & FreqField && frequency()) add(Freq + std::to_string(frequency()));
   // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both. Check for
@@ -39,7 +38,7 @@ std::string Kanji::info(int infoFields) const {
     }
     add(Old + s);
   }
-  if (infoFields & KyuField && hasKyu()) add(Kyu + toString(kyu()));
+  if (infoFields & KyuField && hasKyu()) add(toString(kyu()));
   return result;
 }
 

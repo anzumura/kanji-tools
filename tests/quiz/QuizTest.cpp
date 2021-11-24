@@ -23,8 +23,8 @@ protected:
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
     // 't' for 'test' mode (instead of review mode)
-    // 'g' for Grade List Quiz
-    // '1' for Grade 1
+    // 'g' for List Quiz
+    // '1' for 1
     // 'b' for Beginning of list (instead of End or Random)
     // '4' for 4 choices
     // 'k' for kanji to reading quiz
@@ -93,7 +93,7 @@ TEST_F(QuizTest, ListQuizReview) {
   int kanjiCount = 0;
   int meaningCount = 0;
   while (std::getline(_os, line)) {
-    if (line == "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, Kyu K10, Jouyou")
+    if (line == "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10, Jouyou")
       ++kanjiCount;
     else if (line == "    Meaning: one")
       ++meaningCount;
@@ -111,47 +111,47 @@ TEST_F(QuizTest, ListQuizReview) {
 
 TEST_F(QuizTest, FrequencyLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('f', x); };
-  EXPECT_EQ(f('1'), "1/500:  日  Rad 日(72), Strokes 4, rì, Grade G1, N5, Kyu K10");
-  EXPECT_EQ(f('2'), "1/500:  良  Rad 艮(138), Strokes 7, liáng, Grade G4, N3, Kyu K7");
-  EXPECT_EQ(f('3'), "1/500:  贈  Rad 貝(154), Strokes 18, zèng, Grade S, N2, Old 贈, Kyu K4");
-  EXPECT_EQ(f('4'), "1/500:  添  Rad 水(85), Strokes 11, tiān, Grade S, N1, Kyu K4");
-  EXPECT_EQ(f('5'), "1/501:  炒  Rad 火(86), Strokes 8, chǎo, Kyu K1");
+  EXPECT_EQ(f('1'), "1/500:  日  Rad 日(72), Strokes 4, rì, G1, N5, K10");
+  EXPECT_EQ(f('2'), "1/500:  良  Rad 艮(138), Strokes 7, liáng, G4, N3, K7");
+  EXPECT_EQ(f('3'), "1/500:  贈  Rad 貝(154), Strokes 18, zèng, S, N2, Old 贈, K4");
+  EXPECT_EQ(f('4'), "1/500:  添  Rad 水(85), Strokes 11, tiān, S, N1, K4");
+  EXPECT_EQ(f('5'), "1/501:  炒  Rad 火(86), Strokes 8, chǎo, K1");
 }
 
 TEST_F(QuizTest, GradeLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('g', x); };
-  EXPECT_EQ(f('1'), "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, Kyu K10");
-  EXPECT_EQ(f('2'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, N4, Frq 218, Kyu K9");
-  EXPECT_EQ(f('3'), "1/200:  悪  Rad 心(61), Strokes 11, è, N4, Frq 530, Old 惡, Kyu K8");
-  EXPECT_EQ(f('4'), "1/200:  愛  Rad 心(61), Strokes 13, ài, N3, Frq 640, Kyu K7");
-  EXPECT_EQ(f('5'), "1/185:  圧  Rad 土(32), Strokes 5, yā, N2, Frq 718, Old 壓, Kyu K6");
-  EXPECT_EQ(f('6'), "1/181:  異  Rad 田(102), Strokes 11, yì, N2, Frq 631, Kyu K5");
-  EXPECT_EQ(f('s'), "1/1130:  亜  Rad 二(7), Strokes 7, yà, N1, Frq 1509, Old 亞, Kyu KJ2");
+  EXPECT_EQ(f('1'), "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
+  EXPECT_EQ(f('2'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, N4, Frq 218, K9");
+  EXPECT_EQ(f('3'), "1/200:  悪  Rad 心(61), Strokes 11, è, N4, Frq 530, Old 惡, K8");
+  EXPECT_EQ(f('4'), "1/200:  愛  Rad 心(61), Strokes 13, ài, N3, Frq 640, K7");
+  EXPECT_EQ(f('5'), "1/185:  圧  Rad 土(32), Strokes 5, yā, N2, Frq 718, Old 壓, K6");
+  EXPECT_EQ(f('6'), "1/181:  異  Rad 田(102), Strokes 11, yì, N2, Frq 631, K5");
+  EXPECT_EQ(f('s'), "1/1130:  亜  Rad 二(7), Strokes 7, yà, N1, Frq 1509, Old 亞, KJ2");
 }
 
 TEST_F(QuizTest, KyuLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('k', x); };
-  EXPECT_EQ(f('a'), "1/80:  一  Rad 一(1), Strokes 1, yī, Grade G1, N5, Frq 2");
-  EXPECT_EQ(f('9'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, Grade G2, N4, Frq 218");
-  EXPECT_EQ(f('8'), "1/200:  悪  Rad 心(61), Strokes 11, è, Grade G3, N4, Frq 530, Old 惡");
-  EXPECT_EQ(f('7'), "1/202:  愛  Rad 心(61), Strokes 13, ài, Grade G4, N3, Frq 640");
-  EXPECT_EQ(f('6'), "1/193:  圧  Rad 土(32), Strokes 5, yā, Grade G5, N2, Frq 718, Old 壓");
-  EXPECT_EQ(f('5'), "1/191:  異  Rad 田(102), Strokes 11, yì, Grade G6, N2, Frq 631");
-  EXPECT_EQ(f('4'), "1/313:  握  Rad 手(64), Strokes 12, wò, Grade S, N1, Frq 1003");
-  EXPECT_EQ(f('3'), "1/284:  哀  Rad 口(30), Strokes 9, āi, Grade S, N1, Frq 1715");
-  EXPECT_EQ(f('c'), "1/328:  亜  Rad 二(7), Strokes 7, yà, Grade S, N1, Frq 1509, Old 亞");
-  EXPECT_EQ(f('2'), "1/188:  挨  Rad 手(64), Strokes 10, āi, Grade S, Frq 2258");
+  EXPECT_EQ(f('a'), "1/80:  一  Rad 一(1), Strokes 1, yī, G1, N5, Frq 2");
+  EXPECT_EQ(f('9'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, G2, N4, Frq 218");
+  EXPECT_EQ(f('8'), "1/200:  悪  Rad 心(61), Strokes 11, è, G3, N4, Frq 530, Old 惡");
+  EXPECT_EQ(f('7'), "1/202:  愛  Rad 心(61), Strokes 13, ài, G4, N3, Frq 640");
+  EXPECT_EQ(f('6'), "1/193:  圧  Rad 土(32), Strokes 5, yā, G5, N2, Frq 718, Old 壓");
+  EXPECT_EQ(f('5'), "1/191:  異  Rad 田(102), Strokes 11, yì, G6, N2, Frq 631");
+  EXPECT_EQ(f('4'), "1/313:  握  Rad 手(64), Strokes 12, wò, S, N1, Frq 1003");
+  EXPECT_EQ(f('3'), "1/284:  哀  Rad 口(30), Strokes 9, āi, S, N1, Frq 1715");
+  EXPECT_EQ(f('c'), "1/328:  亜  Rad 二(7), Strokes 7, yà, S, N1, Frq 1509, Old 亞");
+  EXPECT_EQ(f('2'), "1/188:  挨  Rad 手(64), Strokes 10, āi, S, Frq 2258");
   EXPECT_EQ(f('b'), "1/940:  唖  Rad 口(30), Strokes 10, yǎ");
   EXPECT_EQ(f('1'), "1/2780:  芦  Rad 艸(140), Strokes 7, lú, Frq 1733");
 }
 
 TEST_F(QuizTest, LevelLists) {
   auto f = [this](char x) { return listQuizFirstQuestion('l', x); };
-  EXPECT_EQ(f('5'), "1/103:  一  Rad 一(1), Strokes 1, yī, Grade G1, Frq 2, Kyu K10");
-  EXPECT_EQ(f('4'), "1/181:  不  Rad 一(1), Strokes 4, bù, Grade G4, Frq 101, Kyu K7");
-  EXPECT_EQ(f('3'), "1/361:  丁  Rad 一(1), Strokes 2, dīng, Grade G3, Frq 1312, Kyu K8");
-  EXPECT_EQ(f('2'), "1/415:  腕  Rad 肉(130), Strokes 12, wàn, Grade S, Frq 1163, Kyu K4");
-  EXPECT_EQ(f('1'), "1/1162:  統  Rad 糸(120), Strokes 12, tǒng, Grade G5, Frq 125, Kyu K6");
+  EXPECT_EQ(f('5'), "1/103:  一  Rad 一(1), Strokes 1, yī, G1, Frq 2, K10");
+  EXPECT_EQ(f('4'), "1/181:  不  Rad 一(1), Strokes 4, bù, G4, Frq 101, K7");
+  EXPECT_EQ(f('3'), "1/361:  丁  Rad 一(1), Strokes 2, dīng, G3, Frq 1312, K8");
+  EXPECT_EQ(f('2'), "1/415:  腕  Rad 肉(130), Strokes 12, wàn, S, Frq 1163, K4");
+  EXPECT_EQ(f('1'), "1/1162:  統  Rad 糸(120), Strokes 12, tǒng, G5, Frq 125, K6");
 }
 
 TEST_F(QuizTest, SkipListQuestions) {
@@ -183,7 +183,7 @@ TEST_F(QuizTest, ToggleListMeanings) {
   std::string line;
   bool meaningsOn = false;
   int found = 0;
-  std::string expected("Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, Kyu K10");
+  std::string expected("Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
   while (std::getline(_os, line)) {
     if (line.starts_with("Question")) {
       ++found;
