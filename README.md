@@ -287,7 +287,30 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 - **Other**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 - **Extra**: kanji loaded from 'extra.txt' - shouldn't be in any of the above types
 - **Kentei**: kanji loaded from 'kentei/*' - Kanji Kentei (漢字検定) that aren't any of the above types
+- **Ucd**: used to classify kanji that are in 'ucd.txt' that aren't already one of the above types
 - **None**: used to classify kanji that haven't been loaded from any files
+
+Class Hierarchy for Kanji (* = abstract class):
+
+```;
+              Kanji*
+                |
+                +--------------------------------------+
+                |                                      |
+          NonLinkedKanji*                         LinkedKanji*
+                |                                      |
+    +-----------+-----------+----------+               +----------------+
+    |           |           |          |               |                |
+FileKanji*  OtherKanji  KenteiKanji  UcdKanji  LinkedJinmeiKanji  LinkedOldKanji
+    |
+    +---------------+
+    |               |
+OfficialKanji*  ExtraKanji
+    |
+    +------------+
+    |            |
+JouyouKanji  JinmeiKanji
+```
 
 The program also loads the 214 official kanji radicals (部首).
 
