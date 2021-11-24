@@ -181,9 +181,7 @@ void UcdData::print(const Data& data) const {
   auto print = [&data](const char* s, int x, int y, int z) {
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x << ", Jinmei " << y << ", Other " << z << ")\n";
   };
-  Count joyo;
-  Count jinmei;
-  Count other;
+  Count joyo, jinmei, other;
   data.log() << "Kanji Loaded from Unicode 'ucd' file:\n";
   for (const auto& i : _map) {
     const auto& k = i.second;

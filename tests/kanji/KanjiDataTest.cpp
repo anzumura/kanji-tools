@@ -210,7 +210,9 @@ TEST_F(KanjiDataTest, UcdChecks) {
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
   EXPECT_EQ(ucd.size(), 15023);
-  int jouyou = 0, jinmei = 0, jinmeiLinks = 0, otherLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0;
+  int jouyou = 0, jinmei = 0, jinmeiLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0, meaningDiffs = 0,
+      kunDiffs = 0;
+  std::map<KanjiTypes, int> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     const Ucd& k = i.second;
@@ -226,6 +228,10 @@ TEST_F(KanjiDataTest, UcdLinks) {
       EXPECT_NE(k.name(), k.linkName());
       auto link = ucd.find(k.linkName());
       ASSERT_NE(link, ucd.end()) << k.linkCodeAndName();
+      EXPECT_EQ(k.onReading(), link->second.onReading());
+      // meaning and kunReadings can occasionally differ (link usually has less values)
+      if (k.meaning() != link->second.meaning()) ++meaningDiffs;
+      if (k.kunReading() != link->second.kunReading()) ++kunDiffs;
     }
     if (k.joyo()) {
       EXPECT_FALSE(k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
@@ -245,12 +251,19 @@ TEST_F(KanjiDataTest, UcdLinks) {
         if (link.hasLink()) EXPECT_NE(link.linkName(), k.name());
       }
     } else if (k.hasLink())
-      ++otherLinks;
+      ++otherLinks[_data.getType(k.name())];
   }
   EXPECT_EQ(jouyou, _data.jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
-  EXPECT_EQ(otherLinks, 1567);
+  EXPECT_EQ(otherLinks[KanjiTypes::Extra], 0);
+  EXPECT_EQ(otherLinks[KanjiTypes::Other], 0);
+  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 5);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1553);
+  EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0);
+  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 9);
+  EXPECT_EQ(meaningDiffs, 2);
+  EXPECT_EQ(kunDiffs, 3);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
