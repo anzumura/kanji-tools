@@ -292,6 +292,12 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 
 Class Hierarchy for Kanji (* = abstract class):
 
+- NonLinkedKanji: has *meaning* and *reading* fields
+- LinkedKanji: has *link* field that points to new/standard kanji
+- OfficialKanji: has optional *year* field (when kanji was added to official list)
+- JouyouKanji: has *grade* field (school grade when the kanji is introduced)
+- JinmeiKanji: has *reason* field (official reason for inclusion in Jinmeiyoō list)
+
 ```;
               Kanji*
                 |
