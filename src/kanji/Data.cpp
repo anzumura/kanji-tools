@@ -20,8 +20,20 @@ const fs::path ExtraFile = "extra.txt";
 } // namespace
 
 KanjiTypes Data::getType(const std::string& name) const {
-  auto i = findKanji(name);
+  auto i = findKanjiByName(name);
   return i.has_value() ? (**i).type() : KanjiTypes::None;
+}
+
+Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
+  if (u && !u->nelsonIds().empty()) {
+    Kanji::NelsonIds ids;
+    std::stringstream ss(u->nelsonIds());
+    int id;
+    while (ss >> id)
+      ids.push_back(id);
+    return ids;
+  }
+  return _emptyNelsonIds;
 }
 
 fs::path Data::getDataDir(int argc, const char** argv) {
@@ -80,40 +92,41 @@ int Data::nextArg(int argc, const char** argv, int currentArg) {
   return result;
 }
 
-bool Data::checkInsert(const Entry& i) {
-  if (_map.insert(std::make_pair(i->name(), i)).second) {
-    auto error = [this, &i](const std::string& s) {
+bool Data::checkInsert(const Entry& kanji) {
+  if (_kanjiNameMap.insert(std::make_pair(kanji->name(), kanji)).second) {
+    auto error = [this, &kanji](const std::string& s) {
       std::string v;
-      if (i->variant()) v = " (non-variant: " + i->nonVariantName() + ")";
-      printError(i->name() + " [" + toUnicode(i->name()) + "] " + v + " " + s + " in _ucd");
+      if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
+      printError(kanji->name() + " [" + toUnicode(kanji->name()) + "] " + v + " " + s + " in _ucd");
     };
-    if (i->frequency() >= _maxFrequency) _maxFrequency = i->frequency() + 1;
-    auto t = i->type();
-    auto j = _ucd.find(i->name());
-    if (!j)
+    if (kanji->frequency() >= _maxFrequency) _maxFrequency = kanji->frequency() + 1;
+    auto type = kanji->type();
+    auto ucd = _ucd.find(kanji->name());
+    if (!ucd)
       error("not found");
-    else if (t == KanjiTypes::Jouyou && !j->joyo())
+    else if (type == KanjiTypes::Jouyou && !ucd->joyo())
       error("not marked as 'Joyo'");
-    else if (t == KanjiTypes::Jinmei && !j->jinmei())
+    else if (type == KanjiTypes::Jinmei && !ucd->jinmei())
       error("not marked as 'Jinmei'");
-    else if (t == KanjiTypes::LinkedJinmei && !j->jinmei())
+    else if (type == KanjiTypes::LinkedJinmei && !ucd->jinmei())
       error("with link not marked as 'Jinmei'");
-    else if (t == KanjiTypes::LinkedJinmei && !j->hasLink())
-      error("missing 'JinmeiLink' for " + j->codeAndName());
+    else if (type == KanjiTypes::LinkedJinmei && !ucd->hasLink())
+      error("missing 'JinmeiLink' for " + ucd->codeAndName());
     // skipping radical and strokes checks for now
-    if (i->variant()) {
-      auto k = _compatibilityNameMap.insert(std::make_pair(i->compatibilityName(), i->name()));
-      if (!k.second) printError("failed to insert variant " + i->name() + " into map");
-    }
+    if (kanji->variant() &&
+        !_compatibilityNameMap.insert(std::make_pair(kanji->compatibilityName(), kanji->name())).second)
+      printError("failed to insert variant " + kanji->name() + " into map");
+    for (int id : kanji->nelsonIds())
+      _nelsonMap[id].push_back(kanji);
     return true;
   }
-  printError("failed to insert " + i->name() + " into map");
+  printError("failed to insert " + kanji->name() + " into map");
   return false;
 }
 
-bool Data::checkInsert(List& s, const Entry& i) {
-  if (!checkInsert(i)) return false;
-  s.push_back(i);
+bool Data::checkInsert(List& s, const Entry& kanji) {
+  if (!checkInsert(kanji)) return false;
+  s.push_back(kanji);
   return true;
 }
 
@@ -196,8 +209,8 @@ void Data::populateJouyou() {
   for (std::string line; std::getline(f, line);) {
     std::stringstream ss(line);
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
-      const auto i = _map.find(jouyou);
-      if (i == _map.end())
+      const auto i = _kanjiNameMap.find(jouyou);
+      if (i == _kanjiNameMap.end())
         printError("can't find " + jouyou + " while processing " + file.string());
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
@@ -209,9 +222,9 @@ void Data::populateJouyou() {
   // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not LinkedJinmei created above)
   count = 0;
   auto& linkedOld = _types[KanjiTypes::LinkedOld];
-  for (const auto& i : _map)
+  for (const auto& i : _kanjiNameMap)
     for (auto& j : i.second->oldNames())
-      if (!findKanji(j)) {
+      if (!findKanjiByName(j)) {
         auto k = std::make_shared<LinkedOldKanji>(*this, ++count, j, i.second);
         checkInsert(linkedOld, k);
       }
@@ -244,7 +257,7 @@ void Data::processList(const DataFile& list) {
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Other];
   auto count = newKanji.size();
   for (const auto& i : list.list()) {
-    auto j = findKanji(i);
+    auto j = findKanjiByName(i);
     Entry kanji;
     if (j.has_value()) {
       kanji = *j;
@@ -253,7 +266,7 @@ void Data::processList(const DataFile& list) {
       if (kenteiList)
         kanji = std::make_shared<KenteiKanji>(*this, ++count, i);
       else {
-        // kanji wasn't already in _map so it only exists in the 'frequency.txt' file - these kanjis
+        // kanji wasn't already in _kanjiNameMap so it only exists in the 'frequency.txt' file - these kanjis
         // are considered 'Other' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
         auto reading = _otherReadings.find(i);
@@ -262,8 +275,7 @@ void Data::processList(const DataFile& list) {
         else
           kanji = std::make_shared<OtherKanji>(*this, ++count, i);
       }
-      _map.insert(std::make_pair(i, kanji));
-      newKanji.push_back(kanji);
+      checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types
       if (_debug && !kenteiList) created.push_back(i);
     }
@@ -305,12 +317,12 @@ void Data::processList(const DataFile& list) {
 void Data::processUcd() {
   auto& newKanji = _types[KanjiTypes::Ucd];
   int count = 0;
+  // Calling 'findKanjiByName' also checks for a 'variation selector' version of the given 'name'
+  // so use it instead of just checking for a match in _kanjiNameMap directly (this avoids 52
+  // redundant kanji getting created when processing 'ucd.txt').
   for (auto& i : _ucd.map())
-    if (!findKanji(i.first).has_value()) {
-      auto kanji = std::make_shared<UcdKanji>(*this, ++count, i.second);
-      _map.insert(std::make_pair(i.first, kanji));
-      newKanji.push_back(kanji);
-    }
+    if (!findKanjiByName(i.second.name()).has_value())
+      checkInsert(newKanji, std::make_shared<UcdKanji>(*this, ++count, i.second));
 }
 
 void Data::checkStrokes() const {
@@ -318,7 +330,7 @@ void Data::checkStrokes() const {
   for (const auto& i : _strokes) {
     const Ucd* u = findUcd(i.first);
     const int ucdStrokes = getStrokes(i.first, u, false, true);
-    auto k = findKanji(i.first);
+    auto k = findKanjiByName(i.first);
     if (ucdStrokes) {
       // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,
       // there are some incorrect stroke counts in 'wiki-strokes.txt', but they aren't used because

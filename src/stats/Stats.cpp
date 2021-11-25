@@ -92,7 +92,7 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
   int total = 0, rank = 0;
   for (const auto& i : m) {
     total += i.second;
-    frequency.emplace(i.second, i.first, isKanji ? _data->findKanji(i.first) : std::nullopt);
+    frequency.emplace(i.second, i.first, isKanji ? _data->findKanjiByName(i.first) : std::nullopt);
   }
   if (total) {
     if (firstCount) {

@@ -1,7 +1,6 @@
 #include <kanji_tools/quiz/Group.h>
 #include <kanji_tools/quiz/Quiz.h>
 #include <kanji_tools/utils/DisplayLength.h>
-#include <kanji_tools/utils/MBChar.h>
 
 #include <random>
 
@@ -29,7 +28,10 @@ kanjiQuiz [-hmr] [kanji]:\n\
   -h: show help message for command-line options\n\
   -m: show English meanings by default (can be toggled on/off later)\n\
   -r: start in review mode instead of being prompted\n\
-  kanji: show details about a kanji instead of starting a review or test\n";
+  kanji: show details for a kanji instead of starting a review or test\n\
+\n\
+Note: 'kanji' should be a UTF-8 kanji or a 'Classic Nelson ID'. For example\n\
+'kanjiQuiz 奉' and 'kanjiQuiz 212' produce the same output.\n";
 
 } // namespace
 
@@ -53,8 +55,16 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
       else
         Data::usage("illegal option '" + arg + "' use -h for help");
     } else {
-      if (MBChar::length(arg) != 1 || !isKanji(arg)) Data::usage("'" + arg + "' must be a single UTF-8 kanji");
-      printDetails(arg);
+      if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
+        auto& i = data->findKanjisByNelsonId(std::stoi(arg));
+        if (i.size() != 1)
+          out() << "Found " << i.size() << " matches for Nelson ID " << arg << (i.size() ? ":\n\n" : "\n");
+        for (auto& kanji : i)
+          printDetails(kanji->name());
+      } else if (isKanji(arg))
+        printDetails(arg);
+      else
+        Data::usage("'" + arg + "' must be a single UTF-8 kanji or a numeric Nelson ID");
       return;
     }
   }
@@ -66,7 +76,7 @@ void Quiz::printDetails(const std::string& arg) const {
   auto ucd = data().ucd().find(arg);
   if (ucd) {
     out() << ", Block " << ucd->block() << ", Version " << ucd->version();
-    auto k = data().findKanji(arg);
+    auto k = data().findKanjiByName(arg);
     if (k.has_value()) {
       printExtraTypeInfo(*k);
       out() << '\n' << (**k).info();
@@ -301,11 +311,17 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
 void Quiz::printReviewDetails(const Entry& kanji) const {
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
   out() << "    Reading: " << kanji->reading() << '\n';
-  auto i = _groupData.patternMap().find(kanji->name());
-  if (i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
+  if (auto i = _groupData.patternMap().find(kanji->name());
+      i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
     for (auto& j : i->second->members())
       if (j != kanji) out() << ' ' << j->name();
+    out() << '\n';
+  }
+  if (kanji->hasNelsonIds()) {
+    out() << "     Nelson:";
+    for (auto& i : kanji->nelsonIds())
+      out() << ' ' << i;
     out() << '\n';
   }
   auto print = [this](const std::string& name, const JukugoData::List& list) {

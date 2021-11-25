@@ -156,7 +156,7 @@ TEST_F(KanjiTest, KenteiKanji) {
 TEST_F(KanjiTest, UcdKanji) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", false, false, 0, "", "", "", "");
+  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "", false, false, 0, "", "", "", "");
   UcdKanji k(_data, 3, ucd);
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");

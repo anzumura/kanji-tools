@@ -4,7 +4,7 @@ declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
-# the following 15 values:
+# the following 16 values:
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in utf8
 # - Block: name of the Unicode block (from the 'blk' tag)
@@ -13,6 +13,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - Strokes: total strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: most customary pīnyīn (拼音) reading (from 'kMandarin' tag)
+# - Nelson: optional list of space-separated 'Classic Nelson' ids
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
 # - LinkCode: 230 Jinmei (of the 863 total) are variants of other Jōyō/Jinmei
@@ -47,9 +48,12 @@ declare -r program="parseUcdAllFlat.sh"
 # - has Morohashi, but not Adobe: 5,721
 # - has Adobe, but not Morohashi: 1,010
 #
+# As of Unicode 14.0 there are 5,399 entries with a non-empty 'kNelson' (Classic
+# 'Nelson Japanese-English Character Dictionary') field. Load these ids to show
+# in info output and also for looking up kanji from the command-line line (see
+# kanjiQuiz -h for details).
+#
 # Here are other 'Japan' type source tags that are not used by this script:
-# - 'kNelson' (Classic 'Nelson Japanese-English Character Dictionary') has 5,398
-#   entries (5,330 with On/Kun), but missed 7 Jōyō and 48 Jinmei Kanji.
 # - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
 # - 'kIRGDaiKanwaZiten' has 17,864 (12,942 with On/Kun). There's also a proposal
 #   to remove this property (and expand 'kMorohashi') so it's probably best not
@@ -190,7 +194,7 @@ function populateOnKun() {
 
 function printResults() {
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
-Joyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
+Nelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
   while read -r i; do
     get cp "$i"
     get kJoyoKanji "$i"
@@ -322,10 +326,13 @@ Joyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
     get blk "$i" # Block
     get age "$i" # Version
     getFirst kMandarin "$i"
+    get kNelson "$i"
+    # remove leading 0's from Nelson ids
+    [[ -n $kNelson ]] && kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
-$kMandarin\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t$localDef\t\
-$resultOn\t$resultKun"
+$kMandarin\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t\
+$localDef\t$resultOn\t$resultKun"
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 

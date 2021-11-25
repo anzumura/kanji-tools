@@ -86,7 +86,7 @@ protected:
       if (i->variant()) {
         EXPECT_NE(i->name(), i->nonVariantName());
         EXPECT_NE(i->name(), i->compatibilityName());
-        auto j = _data.findKanji(i->compatibilityName());
+        auto j = _data.findKanjiByName(i->compatibilityName());
         EXPECT_TRUE(j.has_value());
         if (j.has_value()) {
           EXPECT_EQ((**j).type(), i->type());
@@ -105,12 +105,13 @@ protected:
 };
 
 TEST_F(KanjiDataTest, SanityChecks) {
+  EXPECT_EQ(_data.kanjiNameMap().size(), 15023);
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
   EXPECT_EQ(_data.getStrokes("廳"), 25);
   // Kentei Kanji
-  auto apple = _data.findKanji("蘋");
+  auto apple = _data.findKanjiByName("蘋");
   ASSERT_TRUE(apple.has_value());
   EXPECT_EQ((**apple).type(), KanjiTypes::Kentei);
   EXPECT_EQ((**apple).grade(), KanjiGrades::None);
@@ -119,7 +120,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**apple).reading(), "ヒン、ビン、うきくさ、でんじそ");
   EXPECT_EQ((**apple).meaning(), "apple");
   // Ucd Kanji
-  auto complete = _data.findKanji("侭");
+  auto complete = _data.findKanjiByName("侭");
   ASSERT_TRUE(complete.has_value());
   EXPECT_EQ((**complete).type(), KanjiTypes::Ucd);
   EXPECT_EQ((**complete).grade(), KanjiGrades::None);
@@ -134,7 +135,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(radical.longName(), "鹿部（ろくぶ）");
   EXPECT_EQ(radical.reading(), "しか");
   // find
-  auto result = _data.findKanji("響︀");
+  auto result = _data.findKanjiByName("響︀");
   ASSERT_TRUE(result.has_value());
   auto& k = **result;
   EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
@@ -144,17 +145,17 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.frequency(), 0);
   EXPECT_TRUE(k.variant());
-  auto result2 = _data.findKanji("逸︁");
+  auto result2 = _data.findKanjiByName("逸︁");
   EXPECT_TRUE((**result2).variant());
   EXPECT_EQ((**result2).type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ((**result2).nonVariantName(), "逸");
   // kanji with 3 old names
-  auto result3 = _data.findKanji("弁");
+  auto result3 = _data.findKanjiByName("弁");
   ASSERT_TRUE(result3.has_value());
   EXPECT_EQ((**result3).oldNames(), Kanji::OldNames({"辨", "瓣", "辯"}));
   EXPECT_EQ((**result3).info(Kanji::OldField), "Old 辨／瓣／辯");
   for (auto& i : (**result3).oldNames()) {
-    auto old = _data.findKanji(i);
+    auto old = _data.findKanjiByName(i);
     ASSERT_TRUE(old.has_value());
     ASSERT_EQ((**old).type(), KanjiTypes::LinkedOld);
     EXPECT_EQ(static_cast<const LinkedKanji&>(**old).link(), result3);
@@ -194,17 +195,25 @@ TEST_F(KanjiDataTest, SanityChecks) {
 TEST_F(KanjiDataTest, UcdChecks) {
   // 'shrimp' is a Jinmei kanji, but 'jinmei.txt' doesn't include a Meaning column so the
   // value is pulled from UCD.
-  auto& shrimp = **_data.findKanji("蝦");
+  auto& shrimp = **_data.findKanjiByName("蝦");
   EXPECT_EQ(shrimp.meaning(), "shrimp, prawn");
   // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and reading are all
   // pulled from UCD (and readings are converted to Kana).
-  auto& dull = **_data.findKanji("呆");
+  auto& dull = **_data.findKanjiByName("呆");
   EXPECT_EQ(dull.radical(), _data.getRadicalByName("口"));
   EXPECT_EQ(dull.strokes(), 7);
   EXPECT_EQ(dull.meaning(), "dull; dull-minded, simple, stupid");
   // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD unfortunately
   // don't have a dash before the Okurigana.
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
+  // Kanji with multiple Nelson Ids
+  const Ucd* ucdNelson = _data.ucd().find("㡡");
+  ASSERT_NE(ucdNelson, nullptr);
+  EXPECT_EQ(ucdNelson->nelsonIds(), "1487 1491");
+  auto& kanjiNelson = **_data.findKanjiByName(ucdNelson->name());
+  EXPECT_EQ(kanjiNelson.nelsonIds(), Kanji::NelsonIds({1487, 1491}));
+  auto& ids = _data.findKanjisByNelsonId(1491);
+  ASSERT_EQ(ids.size(), 3);
 }
 
 TEST_F(KanjiDataTest, UcdLinks) {

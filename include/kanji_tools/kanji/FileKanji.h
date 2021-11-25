@@ -35,10 +35,10 @@ protected:
 
   FileKanji(const Data& d, int strokes, bool findFrequency = true)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     columns[ReadingCol], strokes, findFrequency) {}
+                     columns[ReadingCol], strokes, findFrequency, d.findUcd(columns[NameCol])) {}
   FileKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     meaning, columns[ReadingCol], strokes, findFrequency) {}
+                     meaning, columns[ReadingCol], strokes, findFrequency, d.findUcd(columns[NameCol])) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};

@@ -51,6 +51,8 @@ public:
     if (u && !u->pinyin().empty()) return u->pinyin();
     return {};
   }
+  // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
+  Kanji::NelsonIds getNelsonIds(const Ucd*) const;
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given 'kanjiName' if it
   // exists (_ucd.find method takes care of checking whether kanjiName has a variation selector).
@@ -83,11 +85,15 @@ public:
   }
   size_t typeTotal(KanjiTypes type) const { return typeList(type).size(); }
 
-  OptEntry findKanji(const std::string& s) const {
+  OptEntry findKanjiByName(const std::string& s) const {
     auto i = _compatibilityNameMap.find(s);
-    auto j = _map.find(i != _compatibilityNameMap.end() ? i->second : s);
-    if (j == _map.end()) return {};
+    auto j = _kanjiNameMap.find(i != _compatibilityNameMap.end() ? i->second : s);
+    if (j == _kanjiNameMap.end()) return {};
     return j->second;
+  }
+  const List& findKanjisByNelsonId(int id) const {
+    auto i = _nelsonMap.find(id);
+    return i != _nelsonMap.end() ? i->second : _emptyList;
   }
   KanjiTypes getType(const std::string& name) const;
 
@@ -122,7 +128,7 @@ public:
   std::ostream& err() const { return _err; }
   const std::filesystem::path& dataDir() const { return _dataDir; }
   bool debug() const { return _debug; }
-  const Map& map() const { return _map; }
+  const Map& kanjiNameMap() const { return _kanjiNameMap; }
 
   // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
   std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
@@ -153,10 +159,6 @@ protected:
   // 'getDebug' looks for '-debug' flag in 'argv' list and returns true if it's found
   static bool getDebug(int argc, const char** argv);
 
-  // helper functions for checking and inserting into '_map'
-  bool checkInsert(const Entry&);
-  bool checkInsert(List&, const Entry&);
-
   // 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
   void loadOtherReadings(const std::filesystem::path&);
@@ -173,16 +175,25 @@ protected:
   // It also compares strokes that were loaded from other files to strokes in 'ucd.txt'
   void checkStrokes() const;
 
-  std::ostream& _out;
-  std::ostream& _err;
-  const std::filesystem::path _dataDir;
-  const bool _debug;
-
   // '_radicals' holds the 214 official Kanji Radicals
   RadicalData _radicals;
-
   // '_ucd' is used to supplement Kanji attributes like radical, meaning and reading
   UcdData _ucd;
+  // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
+  // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
+  // contains stroke counts followed by one or more lines each with a single kanji that has the given
+  // number of strokes.
+  std::map<std::string, int> _strokes;
+  std::map<KanjiTypes, List> _types;
+private:
+  // helper functions for checking and inserting into '_kanjiNameMap'
+  bool checkInsert(const Entry&);
+  bool checkInsert(List&, const Entry&);
+
+  const std::filesystem::path _dataDir;
+  const bool _debug;
+  std::ostream& _out;
+  std::ostream& _err;
 
   // '_compatibilityNameMap' maps from a UCD 'compatibility' code name to a 'variation selector'
   // style name. This map only has entries for recognized kanji that were loaded with a selector.
@@ -192,29 +203,23 @@ protected:
   // that aren't part of any other group (so not Jouyou or Jinmei).
   std::map<std::string, std::string> _otherReadings;
 
-  // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
-  // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
-  // contains stroke counts followed by one or more lines each with a single kanji that has the given
-  // number of strokes.
-  std::map<std::string, int> _strokes;
-
   // lists of kanji corresponding to Levels, Grades, Types and Kyus (excluding the 'None' enum values)
   std::map<JlptLevels, List> _levels;
   std::map<KanjiGrades, List> _grades;
-  std::map<KanjiTypes, List> _types;
   std::map<KenteiKyus, List> _kyus;
 
   // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500, 1501-2000, 2001-2501.
   // The last list is one longer in order to hold the full frequency list (of 2501 kanji).
-
-  // allow lookup by name
   std::array<List, FrequencyBuckets> _frequencies;
-  Map _map;
 
-  // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_map'
+  Map _kanjiNameMap;              // allow lookup by UTF-8 name
+  std::map<int, List> _nelsonMap; // allow lookup by Nelson ID
+
+  // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_kanjiNameMap'
   inline static int _maxFrequency = 0;
 
   inline static const List _emptyList;
+  inline static const Kanji::NelsonIds _emptyNelsonIds;
 };
 
 using DataPtr = std::shared_ptr<const Data>;

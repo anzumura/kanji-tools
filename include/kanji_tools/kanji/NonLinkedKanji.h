@@ -16,7 +16,8 @@ protected:
   NonLinkedKanji(const Data& d, int number, const std::string& name, const std::string& reading, const Ucd* u,
                  bool findFrequency = true, bool findKyu = true)
     : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getPinyin(u),
-            JlptLevels::None, findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
+            d.getNelsonIds(u), JlptLevels::None, findKyu ? d.getKyu(name) : KenteiKyus::None,
+            findFrequency ? d.getFrequency(name) : 0),
       _meaning(d.ucd().getMeaning(u)), _reading(reading) {}
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Ucd* u, bool findFrequency = true,
                  bool findKyu = true)
@@ -24,13 +25,13 @@ protected:
 
   // constructors used by FileKanji class (allows controlling strokes and frequency)
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& meaning,
-                 const std::string& reading, int strokes, bool findFrequency)
-    : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(d.findUcd(name)),
+                 const std::string& reading, int strokes, bool findFrequency, const Ucd* u)
+    : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(u), d.getNelsonIds(u),
             d.getLevel(name), d.getKyu(name), findFrequency ? d.getFrequency(name) : 0),
       _meaning(meaning), _reading(reading) {}
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& reading,
-                 int strokes, bool findFrequency)
-    : NonLinkedKanji(d, number, name, radical, d.ucd().getMeaning(name), reading, strokes, findFrequency) {}
+                 int strokes, bool findFrequency, const Ucd* u)
+    : NonLinkedKanji(d, number, name, radical, d.ucd().getMeaning(u), reading, strokes, findFrequency, u) {}
 private:
   const std::string _meaning;
   const std::string _reading;

@@ -19,6 +19,7 @@ class Kanji {
 public:
   using OptString = std::optional<std::string>;
   using OldNames = std::vector<std::string>;
+  using NelsonIds = std::vector<int>;
   static bool hasLink(KanjiTypes t) { return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld; }
 
   virtual ~Kanji() = default;
@@ -58,6 +59,7 @@ public:
   const Radical& radical() const { return _radical; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
   const OptString& pinyin() const { return _pinyin; }
+  const NelsonIds& nelsonIds() const { return _nelsonIds; }
   JlptLevels level() const { return _level; }
   KenteiKyus kyu() const { return _kyu; }
   int frequency() const { return _frequency; }
@@ -69,6 +71,7 @@ public:
   bool hasGrade() const { return grade() != KanjiGrades::None; }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasReading() const { return !reading().empty(); }
+  bool hasNelsonIds() const { return !_nelsonIds.empty(); }
 
   // 'InfoFields' members can be used to select which fields are printed by 'info'
   // method. For example 'GradeField | LevelField | FreqField' will print grade and
@@ -121,7 +124,7 @@ public:
   }
 protected:
   Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
-        const OptString& pinyin, JlptLevels level, KenteiKyus kyu, int frequency);
+        const OptString& pinyin, const NelsonIds& nelsonIds, JlptLevels level, KenteiKyus kyu, int frequency);
 private:
   inline static const OldNames EmptyOldNames{};
   const int _number;
@@ -132,6 +135,7 @@ private:
   const Radical _radical;
   const int _strokes;
   const OptString _pinyin;
+  const NelsonIds _nelsonIds;
   const JlptLevels _level;
   const KenteiKyus _kyu;
   const int _frequency;

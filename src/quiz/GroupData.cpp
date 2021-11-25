@@ -1,6 +1,6 @@
 #include <kanji_tools/quiz/GroupData.h>
-#include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/MBChar.h>
 
 #include <fstream>
 #include <sstream>
@@ -82,7 +82,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
         kanjis.emplace_back(token);
       Data::List memberKanjis;
       for (const auto& i : kanjis) {
-        const auto memberKanji = _data->findKanji(i);
+        const auto memberKanji = _data->findKanjiByName(i);
         if (memberKanji.has_value())
           memberKanjis.push_back(*memberKanji);
         else

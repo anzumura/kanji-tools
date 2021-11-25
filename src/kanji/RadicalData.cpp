@@ -67,7 +67,7 @@ void RadicalData::print(const Data& data) const {
   }
   data.out() << "):\n";
   std::map<Radical, Data::List> radicals;
-  for (auto& i : data.map())
+  for (auto& i : data.kanjiNameMap())
     radicals[i.second->radical()].push_back(i.second);
   using Count = std::map<KanjiTypes, int>;
   Count total;

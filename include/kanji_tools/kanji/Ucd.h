@@ -10,12 +10,12 @@ namespace kanji_tools {
 class Ucd {
 public:
   Ucd(wchar_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
-      int strokes, int variantStrokes, const std::string& pinyin, bool joyo, bool jinmei, wchar_t linkCode,
-      const std::string& linkName, const std::string& meaning, const std::string& onReading,
+      int strokes, int variantStrokes, const std::string& pinyin, const std::string& nelsonIds, bool joyo, bool jinmei,
+      wchar_t linkCode, const std::string& linkName, const std::string& meaning, const std::string& onReading,
       const std::string& kunReading)
-    : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _radical(radical), _strokes(strokes),
-      _variantStrokes(variantStrokes), _joyo(joyo), _jinmei(jinmei), _linkCode(linkCode), _linkName(linkName),
-      _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
+    : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _nelsonIds(nelsonIds),
+      _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo), _jinmei(jinmei),
+      _linkCode(linkCode), _linkName(linkName), _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
 
   wchar_t code() const { return _code; }
   const std::string& name() const { return _name; }
@@ -25,6 +25,7 @@ public:
   int strokes(bool variant = false) const { return _strokes; }
   int variantStrokes() const { return _variantStrokes; }
   const std::string& pinyin() const { return _pinyin; }
+  const std::string& nelsonIds() const { return _nelsonIds; }
   bool joyo() const { return _joyo; }
   bool jinmei() const { return _jinmei; }
   // 'linkCode' returns 0 if there is no link (this is the same concept as LinkedjinmeiKanji class)
@@ -53,6 +54,7 @@ private:
   const int _strokes;
   const int _variantStrokes;
   const std::string _pinyin;
+  const std::string _nelsonIds;
   const bool _joyo;
   const bool _jinmei;
   const wchar_t _linkCode;

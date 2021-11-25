@@ -14,7 +14,7 @@ public:
 protected:
   LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link, const Ucd* u)
     : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getPinyin(u),
-            JlptLevels::None, d.getKyu(name), d.getFrequency(name)),
+            d.getNelsonIds(u), JlptLevels::None, d.getKyu(name), d.getFrequency(name)),
       _link(link) {}
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
