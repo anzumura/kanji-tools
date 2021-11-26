@@ -79,36 +79,29 @@ public:
   const List& otherKanji() const { return _types.at(KanjiTypes::Other); }
   const List& extraKanji() const { return _types.at(KanjiTypes::Extra); }
 
+  // get list by KanjiType
   const List& typeList(KanjiTypes type) const {
     auto i = _types.find(type);
     return i != _types.end() ? i->second : _emptyList;
   }
   size_t typeTotal(KanjiTypes type) const { return typeList(type).size(); }
-
-  OptEntry findKanjiByName(const std::string& s) const {
-    auto i = _compatibilityNameMap.find(s);
-    auto j = _kanjiNameMap.find(i != _compatibilityNameMap.end() ? i->second : s);
-    if (j == _kanjiNameMap.end()) return {};
-    return j->second;
-  }
-  const List& findKanjisByNelsonId(int id) const {
-    auto i = _nelsonMap.find(id);
-    return i != _nelsonMap.end() ? i->second : _emptyList;
-  }
   KanjiTypes getType(const std::string& name) const;
 
+  // get list by KanjiGrade
   const List& gradeList(KanjiGrades grade) const {
     auto i = _grades.find(grade);
     return i != _grades.end() ? i->second : _emptyList;
   }
   size_t gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
 
+  // get list by JLPT Level
   const List& levelList(JlptLevels level) const {
     auto i = _levels.find(level);
     return i != _levels.end() ? i->second : _emptyList;
   }
   size_t levelTotal(JlptLevels level) const { return levelList(level).size(); }
 
+  // get list by Kentei Kyu
   const List& kyuList(KenteiKyus kyu) const {
     auto i = _kyus.find(kyu);
     return i != _kyus.end() ? i->second : _emptyList;
@@ -116,11 +109,33 @@ public:
   size_t kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
 
   // See comment for '_frequencies' private data member for more details about frequency lists
-  enum Values { FrequencyBuckets = 5 };
+  enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
   const List& frequencyList(int range) const {
     return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : _emptyList;
   }
   size_t frequencyTotal(int range) const { return frequencyList(range).size(); }
+
+  // 'findKanjiByName' supports finding a Kanji by UTF-8 string including 'variation selectors', i.e., the
+  // same result is returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
+  OptEntry findKanjiByName(const std::string& s) const {
+    auto i = _compatibilityNameMap.find(s);
+    auto j = _kanjiNameMap.find(i != _compatibilityNameMap.end() ? i->second : s);
+    if (j == _kanjiNameMap.end()) return {};
+    return j->second;
+  }
+  // 'findKanjiByFrequency' returns the Kanji with the given 'frequency' (should be a value from 1 to 2501)
+  OptEntry findKanjiByFrequency(int frequency) const {
+    if (frequency < 1 || frequency >= _maxFrequency) return {};
+    int bucket = --frequency / FrequencyBucketEntries;
+    if (bucket == FrequencyBuckets) --bucket; // last bucket contains FrequencyBucketEntries + 1
+    return _frequencies[bucket][frequency - bucket * FrequencyBucketEntries];
+  }
+  // 'findKanjisByNelsonId' can return more than one entry since a 'Classic Nelson ID' can sometimes be
+  // assigned to more than one Kanji for rare variants. For example, id '1491' maps to 㡡, 幮 and 𢅥.
+  const List& findKanjisByNelsonId(int id) const {
+    auto i = _nelsonMap.find(id);
+    return i != _nelsonMap.end() ? i->second : _emptyList;
+  }
 
   void printError(const std::string&) const;
 

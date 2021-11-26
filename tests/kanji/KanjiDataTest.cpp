@@ -134,33 +134,9 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(radical.name(), "鹿");
   EXPECT_EQ(radical.longName(), "鹿部（ろくぶ）");
   EXPECT_EQ(radical.reading(), "しか");
-  // find
-  auto result = _data.findKanjiByName("響︀");
-  ASSERT_TRUE(result.has_value());
-  auto& k = **result;
-  EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
-  EXPECT_EQ(k.name(), "響︀");
-  EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
-  EXPECT_EQ(k.level(), JlptLevels::None);
-  EXPECT_EQ(k.grade(), KanjiGrades::None);
-  EXPECT_EQ(k.frequency(), 0);
-  EXPECT_TRUE(k.variant());
-  auto result2 = _data.findKanjiByName("逸︁");
-  EXPECT_TRUE((**result2).variant());
-  EXPECT_EQ((**result2).type(), KanjiTypes::LinkedJinmei);
-  EXPECT_EQ((**result2).nonVariantName(), "逸");
-  // kanji with 3 old names
-  auto result3 = _data.findKanjiByName("弁");
-  ASSERT_TRUE(result3.has_value());
-  EXPECT_EQ((**result3).oldNames(), Kanji::OldNames({"辨", "瓣", "辯"}));
-  EXPECT_EQ((**result3).info(Kanji::OldField), "Old 辨／瓣／辯");
-  for (auto& i : (**result3).oldNames()) {
-    auto old = _data.findKanjiByName(i);
-    ASSERT_TRUE(old.has_value());
-    ASSERT_EQ((**old).type(), KanjiTypes::LinkedOld);
-    EXPECT_EQ(static_cast<const LinkedKanji&>(**old).link(), result3);
-  }
-  // totals
+}
+
+TEST_F(KanjiDataTest, TotalsChecks) {
   EXPECT_EQ(_data.gradeTotal(KanjiGrades::G1), 80);
   EXPECT_EQ(_data.gradeTotal(KanjiGrades::G2), 160);
   EXPECT_EQ(_data.gradeTotal(KanjiGrades::G3), 200);
@@ -190,6 +166,43 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(checkKanji(_data.linkedOldKanji()), 0);
   EXPECT_EQ(checkKanji(_data.extraKanji()), 0);
   EXPECT_EQ(checkKanji(_data.otherKanji()), 0);
+}
+
+TEST_F(KanjiDataTest, FindChecks) {
+  auto result = _data.findKanjiByName("響︀");
+  ASSERT_TRUE(result.has_value());
+  auto& k = **result;
+  EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
+  EXPECT_EQ(k.name(), "響︀");
+  EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
+  EXPECT_EQ(k.level(), JlptLevels::None);
+  EXPECT_EQ(k.grade(), KanjiGrades::None);
+  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_TRUE(k.variant());
+  auto result2 = _data.findKanjiByName("逸︁");
+  EXPECT_TRUE((**result2).variant());
+  EXPECT_EQ((**result2).type(), KanjiTypes::LinkedJinmei);
+  EXPECT_EQ((**result2).nonVariantName(), "逸");
+  // findKanjiByFrequency
+  ASSERT_FALSE(_data.findKanjiByFrequency(-1).has_value());
+  ASSERT_FALSE(_data.findKanjiByFrequency(0).has_value());
+  ASSERT_FALSE(_data.findKanjiByFrequency(2502).has_value());
+  for (int i = 1; i < 2502; ++i)
+    ASSERT_TRUE(_data.findKanjiByFrequency(i).has_value());
+  EXPECT_EQ((**_data.findKanjiByFrequency(1)).name(), "日");
+  EXPECT_EQ((**_data.findKanjiByFrequency(2001)).name(), "炒");
+  EXPECT_EQ((**_data.findKanjiByFrequency(2501)).name(), "蝦");
+  // kanji with 3 old names
+  auto result3 = _data.findKanjiByName("弁");
+  ASSERT_TRUE(result3.has_value());
+  EXPECT_EQ((**result3).oldNames(), Kanji::OldNames({"辨", "瓣", "辯"}));
+  EXPECT_EQ((**result3).info(Kanji::OldField), "Old 辨／瓣／辯");
+  for (auto& i : (**result3).oldNames()) {
+    auto old = _data.findKanjiByName(i);
+    ASSERT_TRUE(old.has_value());
+    ASSERT_EQ((**old).type(), KanjiTypes::LinkedOld);
+    EXPECT_EQ(static_cast<const LinkedKanji&>(**old).link(), result3);
+  }
 }
 
 TEST_F(KanjiDataTest, UcdChecks) {

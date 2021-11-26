@@ -284,7 +284,7 @@ void Data::processList(const DataFile& list) {
       _kyus[list.kyu()].push_back(kanji);
     } else if (list.level() == JlptLevels::None) {
       assert(kanji->frequency() != 0);
-      int index = (kanji->frequency() - 1) / 500;
+      int index = (kanji->frequency() - 1) / FrequencyBucketEntries;
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
     } else {
       assert(kanji->level() == list.level());
