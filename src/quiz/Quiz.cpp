@@ -30,8 +30,13 @@ kanjiQuiz [-hmr] [kanji]:\n\
   -r: start in review mode instead of being prompted\n\
   kanji: show details for a kanji instead of starting a review or test\n\
 \n\
-Note: 'kanji' should be a UTF-8 kanji or a 'Classic Nelson ID'. For example\n\
-'kanjiQuiz 奉' and 'kanjiQuiz 212' produce the same output.\n";
+Note: 'kanji' can be a UTF-8 kanji, a frequency number (between 1 and 2501),\n\
+'n' followed by a Classic Nelson ID or 'u' followed by a Unicode value. For\n\
+example, all of the following produce the same output:\n\
+  kanjiQuiz 奉\n\
+  kanjiQuiz 1624\n\
+  kanjiQuiz n212\n\
+  kanjiQuiz u5949\n";
 
 } // namespace
 
@@ -56,15 +61,28 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
         Data::usage("illegal option '" + arg + "' use -h for help");
     } else {
       if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
+        auto kanji = data->findKanjiByFrequency(std::stoi(arg));
+        if (!kanji.has_value()) Data::usage("invalid frequency '" + arg + "'");
+        printDetails((**kanji).name());
+      } else if (arg.starts_with("n") && arg.length() > 1) {
+        arg = arg.substr(1);
+        if (!std::all_of(arg.begin(), arg.end(), ::isdigit)) Data::usage("invalid Nelson ID '" + arg + "'");
         auto& i = data->findKanjisByNelsonId(std::stoi(arg));
         if (i.size() != 1)
           out() << "Found " << i.size() << " matches for Nelson ID " << arg << (i.size() ? ":\n\n" : "\n");
         for (auto& kanji : i)
           printDetails(kanji->name());
+      } else if (arg.starts_with("u") && arg.length() > 1) {
+        arg = arg.substr(1);
+        // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit must be a 1 or 2)
+        if (arg.length() < 4 || arg.length() > 5 || (arg.length() == 5 && arg[0] != '1' && arg[0] != '2') ||
+            !std::all_of(arg.begin(), arg.end(), ::ishexnumber))
+          Data::usage("invalid Unicode value '" + arg + "'");
+        printDetails(toUtf8(std::strtol(arg.c_str(), nullptr, 16)));
       } else if (isKanji(arg))
         printDetails(arg);
       else
-        Data::usage("'" + arg + "' must be a single UTF-8 kanji or a numeric Nelson ID");
+        Data::usage("unrecognized 'kanji' value '" + arg + "' use -h for help");
       return;
     }
   }
