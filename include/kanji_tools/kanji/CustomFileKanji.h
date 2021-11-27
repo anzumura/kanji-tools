@@ -37,9 +37,9 @@ protected:
   CustomFileKanji(const Data& d, int strokes, bool findFrequency = true)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
                      columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency) {}
-  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true)
+  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true, bool findLevel = true)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     meaning, columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency) {}
+                     meaning, columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency, findLevel) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
@@ -54,10 +54,12 @@ private:
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
 };
 
-// 'ExtraKanji' is used for kanji loaded from 'extra.txt'
+// 'ExtraKanji' is used for kanji loaded from 'extra.txt'. 'extra.txt' is meant to hold 'fairly common'
+// kanji, but kanji that are outside of the official lists (Jouyou, Jinmei and their linked kanji). They
+// should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(const Data& d) : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]) {}
+  ExtraKanji(const Data& d) : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol], false, false) {}
 
   KanjiTypes type() const override { return KanjiTypes::Extra; }
 };

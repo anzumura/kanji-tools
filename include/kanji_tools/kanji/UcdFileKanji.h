@@ -6,9 +6,10 @@
 namespace kanji_tools {
 
 // 'UcdFileKanji' is for kanji with attributes mainly loaded from 'data/ucd.txt' (as opposed to
-// kanji loaded from jouyou.txt, jinmei.txt, linked-jinmei.txt and extra.txt). It has an optional
+// kanji loaded from jouyou.txt, jinmei.txt, linked-jinmei.txt and extra.txt). There is an optional
 // 'newName' field for supporting ucd links and is the base class for OtherKanji, KenteiKanji
-// and UcdKanji.
+// and UcdKanji. 'UcdFileKanji' should not have a JLPT level and are meant to hold less common kanji
+// that haven't already been loaded from a custom file (see CustomFileKanji.h).
 class UcdFileKanji : public NonLinkedKanji {
 public:
   OptString newName() const override { return _newName; }

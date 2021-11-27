@@ -175,7 +175,6 @@ TEST_F(KanjiTest, ExtraFile) {
   writeTestFile("\
 Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
 1\t霙\t雨\t16\tsleet\tエイ、ヨウ、みぞれ");
-  EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(JlptLevels::None));
   EXPECT_CALL(_data, getKyu(_)).WillOnce(Return(KenteiKyus::K1));
   Radical rad(1, "雨", {}, "", "");
   EXPECT_CALL(_data, getRadicalByName("雨")).WillOnce(ReturnRef(rad));
@@ -188,7 +187,6 @@ TEST_F(KanjiTest, ExtraFileWithDifferentColumnOrder) {
   writeTestFile("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
-  EXPECT_CALL(_data, getLevel(_)).WillOnce(Return(JlptLevels::None));
   EXPECT_CALL(_data, getKyu(_)).WillOnce(Return(KenteiKyus::K1));
   Radical rad(1, "雨", {}, "", "");
   EXPECT_CALL(_data, getRadicalByName("雨")).WillOnce(ReturnRef(rad));
