@@ -28,9 +28,10 @@ std::string Kanji::info(int infoFields) const {
   if (infoFields & FreqField && frequency()) add(Freq + std::to_string(frequency()));
   // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both. Check for
   // linked types first (since oldName is a top level optional field on all kanji).
-  if (hasLink(t)) {
+  auto optNewName = newName();
+  if (optNewName.has_value()) {
     assert(oldNames().empty());
-    if (infoFields & NewField) add(New + *newName());
+    if (infoFields & NewField) add(New + *optNewName);
   } else if (infoFields & OldField && !oldNames().empty()) {
     std::string s;
     for (auto& i : oldNames()) {

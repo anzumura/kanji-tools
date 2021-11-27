@@ -1,14 +1,15 @@
-#ifndef KANJI_TOOLS_KANJI_FILE_KANJI_H
-#define KANJI_TOOLS_KANJI_FILE_KANJI_H
+#ifndef KANJI_TOOLS_KANJI_CUSTOM_FILE_KANJI_H
+#define KANJI_TOOLS_KANJI_CUSTOM_FILE_KANJI_H
 
 #include <kanji_tools/kanji/NonLinkedKanji.h>
 
 namespace kanji_tools {
 
-// 'FileKanji' supports loading Kanji for tab separated files and is the base class for ExtraKanji and OfficialKanji
+// 'CustomFileKanji' is the base class for ExtraKanji and OfficialKanji and supports loading data from
+// column based customized local files.
 // - Each file contains the same first 4 columns: 'Number', 'Name', 'Radical' and 'Reading'
 // - Jouyou and Extra files contain 'Strokes' column, Jinmei strokes come from 'strokes.txt' or 'ucd.txt'
-class FileKanji : public NonLinkedKanji {
+class CustomFileKanji : public NonLinkedKanji {
 public:
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
@@ -33,12 +34,12 @@ protected:
   // 'columns' contains list of values for each column after parsing a line (used by 'fromString' method)
   static std::array<std::string, MaxCol> columns;
 
-  FileKanji(const Data& d, int strokes, bool findFrequency = true)
+  CustomFileKanji(const Data& d, int strokes, bool findFrequency = true)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     columns[ReadingCol], strokes, findFrequency, d.findUcd(columns[NameCol])) {}
-  FileKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true)
+                     columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency) {}
+  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     meaning, columns[ReadingCol], strokes, findFrequency, d.findUcd(columns[NameCol])) {}
+                     meaning, columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
@@ -54,24 +55,25 @@ private:
 };
 
 // 'ExtraKanji' is used for kanji loaded from 'extra.txt'
-class ExtraKanji : public FileKanji {
+class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(const Data& d) : FileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]) {}
+  ExtraKanji(const Data& d) : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]) {}
 
   KanjiTypes type() const override { return KanjiTypes::Extra; }
 };
 
 // 'OfficialKanji' contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
-class OfficialKanji : public FileKanji {
+class OfficialKanji : public CustomFileKanji {
 public:
   using OptInt = std::optional<int>;
 
   const OldNames& oldNames() const override { return _oldNames; }
   OptInt year() const { return _year; }
 protected:
-  OfficialKanji(const Data& d, int s) : FileKanji(d, s), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
+  OfficialKanji(const Data& d, int s)
+    : CustomFileKanji(d, s), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
   OfficialKanji(const Data& d, int s, const std::string& meaning)
-    : FileKanji(d, s, meaning), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
+    : CustomFileKanji(d, s, meaning), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
 private:
   static OldNames getOldNames();
 
@@ -134,4 +136,4 @@ private:
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_KANJI_FILE_KANJI_H
+#endif // KANJI_TOOLS_KANJI_CUSTOM_FILE_KANJI_H

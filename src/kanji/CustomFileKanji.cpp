@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/FileKanji.h>
+#include <kanji_tools/kanji/CustomFileKanji.h>
 
 #include <fstream>
 #include <sstream>
@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-Data::List FileKanji::fromFile(const Data& data, KanjiTypes type, const fs::path& file) {
+Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes type, const fs::path& file) {
   assert(type == KanjiTypes::Jouyou || type == KanjiTypes::Jinmei || type == KanjiTypes::Extra);
   int lineNum = 1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
@@ -61,8 +61,8 @@ Data::List FileKanji::fromFile(const Data& data, KanjiTypes type, const fs::path
   return results;
 }
 
-std::array<std::string, FileKanji::MaxCol> FileKanji::columns;
-std::map<std::string, int> FileKanji::ColumnMap = {
+std::array<std::string, CustomFileKanji::MaxCol> CustomFileKanji::columns;
+std::map<std::string, int> CustomFileKanji::ColumnMap = {
   colPair(NumberCol),  colPair(NameCol),  colPair(RadicalCol), colPair(OldNamesCol), colPair(YearCol),
   colPair(StrokesCol), colPair(GradeCol), colPair(MeaningCol), colPair(ReadingCol),  colPair(ReasonCol)};
 

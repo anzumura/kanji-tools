@@ -1,6 +1,6 @@
-#include <kanji_tools/kanji/FileKanji.h>
+#include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/kanji/OtherKanji.h>
+#include <kanji_tools/kanji/UcdFileKanji.h>
 #include <kanji_tools/utils/MBUtils.h>
 
 #include <fstream>
@@ -194,7 +194,7 @@ void Data::loadOtherReadings(const fs::path& file) {
 }
 
 void Data::populateJouyou() {
-  auto results = FileKanji::fromFile(*this, KanjiTypes::Jouyou, DataFile::getFile(_dataDir, JouyouFile));
+  auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Jouyou, DataFile::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(i->grade() != KanjiGrades::None);
@@ -231,7 +231,7 @@ void Data::populateJouyou() {
 }
 
 void Data::populateJinmei() {
-  auto results = FileKanji::fromFile(*this, KanjiTypes::Jinmei, DataFile::getFile(_dataDir, JinmeiFile));
+  auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Jinmei, DataFile::getFile(_dataDir, JinmeiFile));
   auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei];
   for (const auto& i : results) {
     checkInsert(i);
@@ -244,7 +244,7 @@ void Data::populateJinmei() {
 }
 
 void Data::populateExtra() {
-  auto results = FileKanji::fromFile(*this, KanjiTypes::Extra, DataFile::getFile(_dataDir, ExtraFile));
+  auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Extra, DataFile::getFile(_dataDir, ExtraFile));
   for (const auto& i : results)
     checkInsert(i);
   _types.insert(std::make_pair(KanjiTypes::Extra, std::move(results)));

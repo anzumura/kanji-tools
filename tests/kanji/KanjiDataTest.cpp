@@ -227,6 +227,19 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ(kanjiNelson.nelsonIds(), Kanji::NelsonIds({1487, 1491}));
   auto& ids = _data.findKanjisByNelsonId(1491);
   ASSERT_EQ(ids.size(), 3);
+  // Ucd links map to 'newName'
+  std::string north("北"), variantNorth("北");
+  EXPECT_EQ(toUnicode(north), "5317");
+  EXPECT_EQ(toUnicode(variantNorth), "F963");
+  EXPECT_NE(north, variantNorth);
+  auto variantNorthKanji = _data.findKanjiByName(variantNorth);
+  ASSERT_TRUE(variantNorthKanji.has_value());
+  EXPECT_EQ((**variantNorthKanji).type(), KanjiTypes::Ucd);
+  EXPECT_EQ((**variantNorthKanji).name(), variantNorth);
+  EXPECT_EQ((**variantNorthKanji).newName(), north);
+  auto northKanji = _data.findKanjiByName(north);
+  ASSERT_TRUE(northKanji.has_value());
+  EXPECT_EQ((**northKanji).type(), KanjiTypes::Jouyou);
 }
 
 TEST_F(KanjiDataTest, UcdLinks) {

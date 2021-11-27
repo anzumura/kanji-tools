@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <kanji_tools/kanji/FileKanji.h>
+#include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/kanji/OtherKanji.h>
+#include <kanji_tools/kanji/UcdFileKanji.h>
 
 #include <fstream>
 

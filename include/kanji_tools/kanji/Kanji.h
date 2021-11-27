@@ -39,7 +39,8 @@ public:
   //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName'
   // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
   virtual const OldNames& oldNames() const { return EmptyOldNames; }
-  // Only LinkedKanji have a 'newName', i.e., the name of the linked kanji which is the new (or more standard) version
+  // UcdFileKanji have an optional 'newName' field (based on Link field loaded from ucd.txt). LinkedKanji
+  // also have a 'newName', i.e., the linked kanji name which is the new (or more standard) version.
   virtual OptString newName() const { return std::nullopt; }
   // Only Jouyou and Jinmei Kanji have 'extraTypeInfo':
   // - Jouyou: returns nullopt or the year the kanji was added to the official list
