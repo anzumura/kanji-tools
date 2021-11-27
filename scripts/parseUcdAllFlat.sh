@@ -125,21 +125,22 @@ declare -r onKun='kJapanese[OK].*n="[^"]'
 
 # 'printResults' loop uses 'onKun' as well as the following (for variants):
 declare -r morohashi='kMorohashi="[^"]'    # has a Morohashi ID
+declare -r nelson='kNelson="[^"]'          # has a Nelson ID
 declare -r adobe='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
 declare -r official='kJ.*yoKanji="[^"]'    # is Joyo or Jinmeiyo (for 𠮟)
 
-printResulsFilter="$onKun|$morohashi|$adobe|$official"
+printResulsFilter="$onKun|$morohashi|$nelson|$adobe|$official"
 
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
 function findVariantLinks() {
-  local -r defStart='kDefinition=\"\('
+  local -r defStart='kDefinition=\"[(]*'
   local -r nonAscii='[^\x00-\x7F]{1,}'
-  for type in 'a variant of' 'interchangeable' 'same as' 'non-classical'; do
+  for type in 'a variant of' 'interchangeable' 'same as' 'non-classical' 'Variant of'; do
     local secondEntry=false
     printResulsFilter="$printResulsFilter|$defStrat$type "
     for i in $(grep -E "$defStart$type ($nonAscii\)|U\+[A-F0-9]{4,5} $nonAscii)" $ucdFile |
-      sed 's/ U+[A-F0-9]*//g' | sed "s/.*cp=\"\([^\"]*\).*($type \([^ ,)]*\).*/\1 \2/"); do
+      sed 's/ U+[A-F0-9]*//g' | sed "s/.*cp=\"\([^\"]*\).*$type \([^ ,)]*\).*/\1 \2/"); do
       if $secondEntry; then
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
         local s=$(echo -n ${i:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
@@ -159,6 +160,7 @@ function findVariantLinks() {
   variantLink[3D4E]=6F97 # link 㵎 to 澗
   variantLink[5ECF]=5ED0 # link 廏 to 廐
   variantLink[9D25]=9D2A # link 鴥 to 鴪
+  variantLink[6AA8]=69D8 # link 檨 to 様 (Nelson 2363)
 }
 
 # 'populateOnKun': populates arrays for all kanji having 'on' or 'kun' readings.
@@ -228,6 +230,10 @@ Nelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
         linkTo=$loadFrom
       else
         get kSemanticVariant "$i"
+        if [[ -z $kSemanticVariant ]]; then
+          get kTraditionalVariant "$i"
+          kSemanticVariant="$kTraditionalVariant"
+        fi
         if [[ $kSemanticVariant =~ U+ ]]; then
           kSemanticVariant=${kSemanticVariant##*+} # remove leading U+
           loadFrom=${kSemanticVariant%%&*}         # remove any trailing &lt ...
@@ -241,20 +247,27 @@ Nelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
       resultKun=${kun[$loadFrom]}
     fi
     if [[ -z $resultOn$resultKun ]]; then
-      # Support a few more cases where UCD is missing on/kun for Kentei kanjis.
-      # If a special case is used then also clear any 'linkTo' value since that
-      # value didn't result in an on/kun getting loaded. The first one is not
+      # Support cases where UCD is missing on/kun for Kentei kanji or kanji with
+      # Nelson IDs. If a special case is used then also clear any 'linkTo' value
+      # since that value didn't result in an on/kun getting loaded. 4BC2 is not
       # Kentei, but it's in 'wiki-stokes.txt' file.
       case $cp in
+      34E4) setOnKun "KATSU" ;;                        # 㓤 (Nelson 677)
+      3C7E) setOnKun "KAI" ;;                          # 㱾 (Nelson 2453)
+      3C83) setOnKun "KYUU" ;;                         # 㲃 (Nelson 2459)
       4BC2) setOnKun "SHIN" ;;                         # 䯂
+      6479) setOnKun "BO" "MO" ;;                      # 摹 (Nelson 4035)
+      6532) setOnKun "KI" "KATAMUKU SOBADATERU" ;;     # 攲 (Nelson 2041)
       6FDB) setOnKun "BOU MOU" "KOSAME" ;;             # 濛
       6663) setOnKun "SEI SETSU" "AKIRAKA KASHIKOI" ;; # 晣
       69D4) setOnKun "KOU" "HANETSURUBE" ;;            # 槔
-      6A94) setOnKun "TOU" ;;                          # 檔 (not in adobe)
+      6A94) setOnKun "TOU" ;;                          # 檔
       7B53) setOnKun "KEI" "KOUGAI KANZASHI" ;;        # 筓
       7CF1) setOnKun "GETSU" "KOUJI MOYASHI" ;;        # 糱
+      83C6) setOnKun "SHU" ;;                          # 菆 (Nelson 3961)
       *) continue ;;                                   # skip if no readings
       esac
+      # UCD data doesn't have entries for these Nelson IDs: 125, 149, 489, 1639
       linkTo=
     fi
     #
