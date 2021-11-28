@@ -31,10 +31,12 @@ kanjiQuiz [-hmr] [kanji]:\n\
   kanji: show details for a kanji instead of starting a review or test\n\
 \n\
 Note: 'kanji' can be a UTF-8 kanji, a frequency number (between 1 and 2501),\n\
-'n' followed by a Classic Nelson ID or 'u' followed by a Unicode value. For\n\
-example, all of the following produce the same output:\n\
+'m' followed by a Morohashi ID (index number in Dai Kan-Wa Jiten), 'n' followed\n\
+by a Classic Nelson ID or 'u' followed by a Unicode value. For example, all of\n\
+the following produce the same output:\n\
   kanjiQuiz 奉\n\
   kanjiQuiz 1624\n\
+  kanjiQuiz m5894\n\
   kanjiQuiz n212\n\
   kanjiQuiz u5949\n";
 
@@ -64,6 +66,17 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
         auto kanji = data->findKanjiByFrequency(std::stoi(arg));
         if (!kanji.has_value()) Data::usage("invalid frequency '" + arg + "'");
         printDetails((**kanji).name());
+      } else if (arg.starts_with("m") && arg.length() > 1) {
+        arg = arg.substr(1);
+        // a valid Morohashi ID should be numeric followed by an optional 'P'
+        if (std::string nonPrimeIndex = arg.ends_with("P") ? arg.substr(0, arg.length() - 1) : arg;
+            !std::all_of(nonPrimeIndex.begin(), nonPrimeIndex.end(), ::isdigit))
+          Data::usage("invalid Morohashi ID '" + arg + "'");
+        auto& i = data->findKanjisByMorohashiId(arg);
+        if (i.size() != 1)
+          out() << "Found " << i.size() << " matches for Morohashi ID " << arg << (i.size() ? ":\n\n" : "\n");
+        for (auto& kanji : i)
+          printDetails(kanji->name());
       } else if (arg.starts_with("n") && arg.length() > 1) {
         arg = arg.substr(1);
         if (!std::all_of(arg.begin(), arg.end(), ::isdigit)) Data::usage("invalid Nelson ID '" + arg + "'");
@@ -336,6 +349,7 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
       if (j != kanji) out() << ' ' << j->name();
     out() << '\n';
   }
+  if (kanji->hasMorohashId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
   if (kanji->hasNelsonIds()) {
     out() << "     Nelson:";
     for (auto& i : kanji->nelsonIds())

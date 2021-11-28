@@ -15,9 +15,9 @@ protected:
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& meaning,
                  const std::string& reading, int strokes, const Ucd* u, bool findFrequency, bool findLevel = true,
                  bool findKyu = true)
-    : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(u), d.getNelsonIds(u),
-            findLevel ? d.getLevel(name) : JlptLevels::None, findKyu ? d.getKyu(name) : KenteiKyus::None,
-            findFrequency ? d.getFrequency(name) : 0),
+    : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(u), d.getMorohashiId(u),
+            d.getNelsonIds(u), findLevel ? d.getLevel(name) : JlptLevels::None,
+            findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
       _meaning(meaning), _reading(reading) {}
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& reading,
                  int strokes, const Ucd* u, bool findFrequency, bool findLevel = true, bool findKyu = true)

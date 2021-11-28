@@ -10,12 +10,13 @@ namespace kanji_tools {
 class Ucd {
 public:
   Ucd(wchar_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
-      int strokes, int variantStrokes, const std::string& pinyin, const std::string& nelsonIds, bool joyo, bool jinmei,
-      wchar_t linkCode, const std::string& linkName, const std::string& meaning, const std::string& onReading,
-      const std::string& kunReading)
-    : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _nelsonIds(nelsonIds),
-      _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo), _jinmei(jinmei),
-      _linkCode(linkCode), _linkName(linkName), _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
+      int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
+      const std::string& nelsonIds, bool joyo, bool jinmei, wchar_t linkCode, const std::string& linkName,
+      const std::string& meaning, const std::string& onReading, const std::string& kunReading)
+    : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _morohashiId(morohashiId),
+      _nelsonIds(nelsonIds), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo),
+      _jinmei(jinmei), _linkCode(linkCode), _linkName(linkName), _meaning(meaning), _onReading(onReading),
+      _kunReading(kunReading) {}
 
   wchar_t code() const { return _code; }
   const std::string& name() const { return _name; }
@@ -25,17 +26,17 @@ public:
   int strokes(bool variant = false) const { return _strokes; }
   int variantStrokes() const { return _variantStrokes; }
   const std::string& pinyin() const { return _pinyin; }
+  const std::string& morohashiId() const { return _morohashiId; }
   const std::string& nelsonIds() const { return _nelsonIds; }
   bool joyo() const { return _joyo; }
   bool jinmei() const { return _jinmei; }
-  // 'linkCode' returns 0 if there is no link (this is the same concept as LinkedjinmeiKanji class)
   wchar_t linkCode() const { return _linkCode; }
   const std::string& linkName() const { return _linkName; }
-  bool hasLink() const { return _linkCode != 0; }
   const std::string& meaning() const { return _meaning; }
   const std::string& onReading() const { return _onReading; }
   const std::string& kunReading() const { return _kunReading; }
-  // '_variantStrokes' is set to 0 if there are no variants (see 'parseUcdAllFlat.sh' for more details)
+  // 'has' methods
+  bool hasLink() const { return _linkCode != 0; }
   bool hasVariantStrokes() const { return _variantStrokes != 0; }
   // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
   // it falls back to just return '_strokes'
@@ -52,12 +53,13 @@ private:
   const std::string _version;
   const int _radical;
   const int _strokes;
-  const int _variantStrokes;
+  const int _variantStrokes; // 0 if there are no variants (see 'parseUcdAllFlat.sh' for more details)
   const std::string _pinyin;
+  const std::string _morohashiId;
   const std::string _nelsonIds;
   const bool _joyo;
   const bool _jinmei;
-  const wchar_t _linkCode;
+  const wchar_t _linkCode; // 0 for 'no link'
   const std::string _linkName;
   const std::string _meaning;
   const std::string _onReading;

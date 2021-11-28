@@ -116,6 +116,7 @@ bool Data::checkInsert(const Entry& kanji) {
     if (kanji->variant() &&
         !_compatibilityNameMap.insert(std::make_pair(kanji->compatibilityName(), kanji->name())).second)
       printError("failed to insert variant " + kanji->name() + " into map");
+    if (kanji->morohashiId().has_value()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
     for (int id : kanji->nelsonIds())
       _nelsonMap[id].push_back(kanji);
     return true;

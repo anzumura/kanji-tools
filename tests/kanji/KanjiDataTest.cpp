@@ -192,6 +192,17 @@ TEST_F(KanjiDataTest, FindChecks) {
   EXPECT_EQ((**_data.findKanjiByFrequency(1)).name(), "日");
   EXPECT_EQ((**_data.findKanjiByFrequency(2001)).name(), "炒");
   EXPECT_EQ((**_data.findKanjiByFrequency(2501)).name(), "蝦");
+  // findKanjisByMorohashiId
+  auto& morohashi = _data.findKanjisByMorohashiId("4138");
+  ASSERT_EQ(morohashi.size(), 1);
+  EXPECT_EQ(morohashi[0]->name(), "嗩");
+  auto& morohashiPrime = _data.findKanjisByMorohashiId("4138P");
+  ASSERT_EQ(morohashiPrime.size(), 1);
+  EXPECT_EQ(morohashiPrime[0]->name(), "嘆");
+  auto& multiMorohashi = _data.findKanjisByMorohashiId("3089");
+  ASSERT_EQ(multiMorohashi.size(), 2);
+  EXPECT_EQ(multiMorohashi[0]->name(), "叁"); // Unicode 53C1
+  EXPECT_EQ(multiMorohashi[1]->name(), "叄"); // Unicode 53C4
   // findKanjisByNelsonId
   ASSERT_TRUE(_data.findKanjisByNelsonId(-1).empty());
   ASSERT_TRUE(_data.findKanjisByNelsonId(0).empty());

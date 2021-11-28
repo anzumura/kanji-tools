@@ -4,7 +4,7 @@ declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
-# the following 16 values:
+# the following 17 values:
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in utf8
 # - Block: name of the Unicode block (from the 'blk' tag)
@@ -13,6 +13,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - Strokes: total strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: most customary pīnyīn (拼音) reading (from 'kMandarin' tag)
+# - Morohashi: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
 # - Nelson: optional list of space-separated 'Classic Nelson' ids
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
@@ -21,6 +22,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - Meaning: semicolin separated English definitions
 # - On: space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: space-separated Japanese Kun readings (in all-caps Rōmaji)
+#
 # Location of 'ucd.all.flat.zip': https://unicode.org/Public/UCD/latest/ucdxml
 # More info on UCD file: https://unicode.org/reports/tr38/
 # This script was used to create 'data/ucd.txt'.
@@ -48,10 +50,15 @@ declare -r program="parseUcdAllFlat.sh"
 # - has Morohashi, but not Adobe: 5,721
 # - has Adobe, but not Morohashi: 1,010
 #
-# As of Unicode 14.0 there are 5,399 entries with a non-empty 'kNelson' (Classic
-# 'Nelson Japanese-English Character Dictionary') field. Load these ids to show
-# in info output and also for looking up kanji from the command-line line (see
+# Nelson: As of Unicode 14.0 there are 5,399 entries with a non-empty 'kNelson'
+# (Classic 'Nelson Japanese-English Character Dictionary') field. Load these ids
+# to show in 'review mode' and also for looking up from the command-line (see
 # kanjiQuiz -h for details).
+#
+# Morohashi: As of Unicode 14.0 there are 18,169 entries with a non-empty
+# 'kMorohashi' field. This property holds index numbers into Dai Kan-Wa Jiten (a
+# massive Chinese-Japanese dictionary compiled by Tetsuji Morohashi). There are
+# plans to cleanup/expand this property to cover ~50K entries by Unicode 16.0.
 #
 # Here are other 'Japan' type source tags that are not used by this script:
 # - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
@@ -59,11 +66,20 @@ declare -r program="parseUcdAllFlat.sh"
 #   to remove this property (and expand 'kMorohashi') so it's probably best not
 #   to use it: https://www.unicode.org/L2/L2021/21032-unihan-kmorohashi.pdf
 
-if [[ $# -lt 1 ]]; then
-  echo "please specify 'ucd.all.flat.xml' file to parse"
+if [[ $# -lt 2 ]]; then
+  echo "usage: parseUcdAllFlat.sh 'input file' 'output file'"
+  echo "  input file: ucd.all.flat.xml file (see script comments for details)"
+  echo "  output file: where to write output (for example, data/ucd.txt)"
   exit 1
 fi
 declare -r ucdFile=$1
+declare -r outFile=$2
+
+function log() {
+  echo "$(date +%T): $1"
+}
+
+log "Begin parsing UCD data from: $ucdFile"
 
 # 'get' gets a tag ($1) from an XML string ($2) - the value is put in a variable
 # with the same name as the tag.
@@ -133,13 +149,15 @@ printResulsFilter="$onKun|$morohashi|$nelson|$adobe"
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
 function findVariantLinks() {
-  local -r defStart='kDefinition=\"[(]*'
+  local -r def='kDefinition=\"[(]*'
   local -r nonAscii='[^\x00-\x7F]{1,}'
-  for type in 'a variant of' 'interchangeable' 'same as' 'non-classical' 'Variant of'; do
+  for type in 'a variant of' 'interchangeable' 'same as' 'non-classical' \
+    'Variant of'; do
     local secondEntry=false
-    printResulsFilter="$printResulsFilter|$defStrat$type "
-    for i in $(grep -E "$defStart$type ($nonAscii\)|U\+[A-F0-9]{4,5} $nonAscii)" $ucdFile |
-      sed 's/ U+[A-F0-9]*//g' | sed "s/.*cp=\"\([^\"]*\).*$type \([^ ,)]*\).*/\1 \2/"); do
+    printResulsFilter="$printResulsFilter|$type "
+    for i in $(grep -E "$def$type ($nonAscii\)|U\+[A-F0-9]{4,5} $nonAscii)" \
+      $ucdFile | sed 's/ U+[A-F0-9]*//g' |
+      sed "s/.*cp=\"\([^\"]*\).*$type \([^ ,)]*\).*/\1 \2/"); do
       if $secondEntry; then
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
         local s=$(echo -n ${i:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
@@ -193,9 +211,11 @@ function populateOnKun() {
   done < <(grep $onKun $ucdFile)
 }
 
+declare -i entries=0 # keep a count of entries written to 'outFile'
+
 function printResults() {
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
-Nelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
+Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
   while read -r i; do
     get cp "$i"
     get kJoyoKanji "$i"
@@ -289,7 +309,7 @@ Nelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
       s=${s##*+}                        # remove the 'C+num+' prefix
       s=${s#*\.}                        # get 'y.z' (by removing prefix to .)
       local -i strokes=$((${s/\./ + })) # y + z
-      # If there are mutiple Adobe refs then check get 'VStrokes' from the second
+      # If there are mutiple Adobe refs then check 'VStrokes' from the second
       # one in the list. Some have more than two refs like 傑 (5091) having:
       # -  kRSAdobe_Japan1_6="C+1852+9.2.11 V+13433+9.2.11 V+13743+9.2.10"
       # If strokes and vstrokes aren't the same then check to see if they should
@@ -340,14 +360,25 @@ Nelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun"
     getFirst kMandarin "$i"
     get kNelson "$i"
     # remove leading 0's from Nelson ids
-    [[ -n $kNelson ]] && kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
+    [[ -n $kNelson ]] && kNelson=$(echo $kNelson |
+      sed -e 's/^0*//' -e 's/ 0*/ /g')
+    get kMorohashi "$i"
+    # Remove leading 0's and change single quotes to 'P' (Prime) so that 04138
+    # changes to 4138 (maps to 嗩) and 04138' changes to 4138P (maps to 嘆).
+    [[ -n $kMorohashi ]] && kMorohashi=$(echo $kMorohashi |
+      sed -e 's/^0*//' -e "s/'/P/g")
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
-$kMandarin\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t$s\t\
-$localDef\t$resultOn\t$resultKun"
+$kMandarin\t$kMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
+$linkTo\t$s\t$localDef\t$resultOn\t$resultKun" >>$outFile
+    entries=$((entries + 1))
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 
+log "Finding variant links"
 findVariantLinks
+log "Populating On/Kun arrays"
 populateOnKun
+log "Printing results to: $outFile"
 printResults
+log "Complete - wrote $entries entries"

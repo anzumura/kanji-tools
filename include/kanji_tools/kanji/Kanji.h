@@ -60,6 +60,7 @@ public:
   const Radical& radical() const { return _radical; }
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
   const OptString& pinyin() const { return _pinyin; }
+  const OptString& morohashiId() const { return _morohashiId; }
   const NelsonIds& nelsonIds() const { return _nelsonIds; }
   JlptLevels level() const { return _level; }
   KenteiKyus kyu() const { return _kyu; }
@@ -72,6 +73,7 @@ public:
   bool hasGrade() const { return grade() != KanjiGrades::None; }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasReading() const { return !reading().empty(); }
+  bool hasMorohashId() const { return _morohashiId.has_value(); }
   bool hasNelsonIds() const { return !_nelsonIds.empty(); }
 
   // 'InfoFields' members can be used to select which fields are printed by 'info'
@@ -125,7 +127,8 @@ public:
   }
 protected:
   Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
-        const OptString& pinyin, const NelsonIds& nelsonIds, JlptLevels level, KenteiKyus kyu, int frequency);
+        const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
+        KenteiKyus kyu, int frequency);
 private:
   inline static const OldNames EmptyOldNames{};
   const int _number;
@@ -136,6 +139,7 @@ private:
   const Radical _radical;
   const int _strokes;
   const OptString _pinyin;
+  const OptString _morohashiId;
   const NelsonIds _nelsonIds;
   const JlptLevels _level;
   const KenteiKyus _kyu;

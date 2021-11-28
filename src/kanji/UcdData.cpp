@@ -46,8 +46,8 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 
 void UcdData::load(const std::filesystem::path& file) {
   int lineNum = 1, codeCol = -1, nameCol = -1, blockCol = -1, versionCol = -1, radicalCol = -1, strokesCol = -1,
-      variantStrokesCol = -1, pinyinCol = -1, nelsonCol = -1, joyoCol = -1, jinmeiCol = -1, linkCodeCol = -1,
-      linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
+      variantStrokesCol = -1, pinyinCol = -1, morohashiCol = -1, nelsonCol = -1, joyoCol = -1, jinmeiCol = -1,
+      linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
                 ", file: " + file.string());
@@ -69,7 +69,7 @@ void UcdData::load(const std::filesystem::path& file) {
     col = pos;
   };
   std::ifstream f(file);
-  std::array<std::string, 16> cols;
+  std::array<std::string, 17> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
@@ -91,6 +91,8 @@ void UcdData::load(const std::filesystem::path& file) {
           setCol(variantStrokesCol, pos);
         else if (token == "Pinyin")
           setCol(pinyinCol, pos);
+        else if (token == "Morohashi")
+          setCol(morohashiCol, pos);
         else if (token == "Nelson")
           setCol(nelsonCol, pos);
         else if (token == "Joyo")
@@ -146,8 +148,8 @@ void UcdData::load(const std::filesystem::path& file) {
       if (!_map
              .emplace(std::piecewise_construct, std::make_tuple(name),
                       std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
-                                      cols[pinyinCol], cols[nelsonCol], joyo, jinmei, linkCode, cols[linkNameCol],
-                                      cols[meaningCol], cols[onCol], cols[kunCol]))
+                                      cols[pinyinCol], cols[morohashiCol], cols[nelsonCol], joyo, jinmei, linkCode,
+                                      cols[linkNameCol], cols[meaningCol], cols[onCol], cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
       if (linkCode > 0) {
