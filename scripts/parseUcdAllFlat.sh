@@ -127,9 +127,8 @@ declare -r onKun='kJapanese[OK].*n="[^"]'
 declare -r morohashi='kMorohashi="[^"]'    # has a Morohashi ID
 declare -r nelson='kNelson="[^"]'          # has a Nelson ID
 declare -r adobe='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
-declare -r official='kJ.*yoKanji="[^"]'    # is Joyo or Jinmeiyo (for 𠮟)
 
-printResulsFilter="$onKun|$morohashi|$nelson|$adobe|$official"
+printResulsFilter="$onKun|$morohashi|$nelson|$adobe"
 
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
