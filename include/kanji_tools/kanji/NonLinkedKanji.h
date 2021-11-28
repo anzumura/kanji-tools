@@ -6,7 +6,7 @@
 namespace kanji_tools {
 
 // 'NonLinkedKanji' contains meaning and reading fields and is the base class for CustomFileKanji (an abstract
-// base class for JouyouKanji, JinmeiKanji and ExtraKanji), OtherKanji, KenteiKanji and UcdKanji
+// base class for JouyouKanji, JinmeiKanji and ExtraKanji), FrequencyKanji, KenteiKanji and UcdKanji
 class NonLinkedKanji : public Kanji {
 public:
   const std::string& meaning() const override { return _meaning; }

@@ -159,7 +159,7 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
     }
 }
 
-void Data::loadOtherReadings(const fs::path& file) {
+void Data::loadFrequencyReadings(const fs::path& file) {
   int lineNum = 1, nameCol = -1, readingCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
@@ -188,7 +188,7 @@ void Data::loadOtherReadings(const fs::path& file) {
         cols[pos] = token;
       }
       if (pos != cols.size()) error("not enough columns");
-      if (!_otherReadings.insert(std::make_pair(cols[nameCol], cols[readingCol])).second) error("duplicate name");
+      if (!_frequencyReadings.insert(std::make_pair(cols[nameCol], cols[readingCol])).second) error("duplicate name");
     }
   }
 }
@@ -254,7 +254,7 @@ void Data::processList(const DataFile& list) {
   const bool kenteiList = list.kyu() != KenteiKyus::None;
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
-  auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Other];
+  auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
   auto count = newKanji.size();
   for (const auto& i : list.list()) {
     auto j = findKanjiByName(i);
@@ -267,13 +267,13 @@ void Data::processList(const DataFile& list) {
         kanji = std::make_shared<KenteiKanji>(*this, ++count, i);
       else {
         // kanji wasn't already in _kanjiNameMap so it only exists in the 'frequency.txt' file - these kanjis
-        // are considered 'Other' type and by definition are not part of Jouyou or Jinmei (so also
+        // are considered 'Frequency' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
-        auto reading = _otherReadings.find(i);
-        if (reading != _otherReadings.end())
-          kanji = std::make_shared<OtherKanji>(*this, ++count, i, reading->second);
+        auto reading = _frequencyReadings.find(i);
+        if (reading != _frequencyReadings.end())
+          kanji = std::make_shared<FrequencyKanji>(*this, ++count, i, reading->second);
         else
-          kanji = std::make_shared<OtherKanji>(*this, ++count, i);
+          kanji = std::make_shared<FrequencyKanji>(*this, ++count, i);
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types
@@ -326,7 +326,7 @@ void Data::processUcd() {
 }
 
 void Data::checkStrokes() const {
-  DataFile::List strokesOther, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
+  DataFile::List strokesFrequency, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
   for (const auto& i : _strokes) {
     const Ucd* u = findUcd(i.first);
     const int ucdStrokes = getStrokes(i.first, u, false, true);
@@ -345,13 +345,13 @@ void Data::checkStrokes() const {
     } else
       missingUcd.push_back(i.first);
     if (k.has_value()) {
-      if ((**k).type() == KanjiTypes::Other) strokesOther.push_back(i.first);
+      if ((**k).type() == KanjiTypes::Frequency) strokesFrequency.push_back(i.first);
     } else
       strokesNotFound.push_back(i.first);
   }
   if (_debug) {
-    DataFile::print(strokesOther, "Kanji in 'Other' group", "_strokes");
-    DataFile::print(strokesNotFound, "Kanji without other groups", "_strokes");
+    DataFile::print(strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
+    DataFile::print(strokesNotFound, "Kanji not loaded", "_strokes");
     DataFile::print(strokeDiffs, "Kanji with differrent strokes", "_ucd");
     DataFile::print(vStrokeDiffs, "Variant kanji with differrent strokes", "_ucd");
     DataFile::print(missingDiffs, "'_stokes only' Kanji with differrent strokes", "_ucd");

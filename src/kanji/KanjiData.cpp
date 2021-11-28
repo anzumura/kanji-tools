@@ -26,10 +26,10 @@ const fs::path K2File = "kentei/k2.txt";
 const fs::path KJ1File = "kentei/kj1.txt";
 const fs::path K1File = "kentei/k1.txt";
 const fs::path FrequencyFile = "frequency.txt";
+const fs::path FrequencyReadingsFile = "frequency-readings.txt";
 const fs::path RadicalsFile = "radicals.txt";
 const fs::path StrokesFile = "strokes.txt";
 const fs::path WikiStrokesFile = "wiki-strokes.txt";
-const fs::path OtherReadingsFile = "other-readings.txt";
 const fs::path UcdFile = "ucd.txt";
 
 } // namespace
@@ -59,16 +59,16 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));
   loadStrokes(DataFile::getFile(dataDir(), StrokesFile));
   loadStrokes(DataFile::getFile(dataDir(), WikiStrokesFile), false);
-  loadOtherReadings(DataFile::getFile(dataDir(), OtherReadingsFile));
+  loadFrequencyReadings(DataFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
   populateJinmei();
   populateExtra();
   for (auto& i : _levels)
     processList(i);
-  // Process '_frequency' before '_kyus' in order to create 'Other' type first before creating
-  // 'Kentei' kanji. This way, the 'Other' type is more meaningful since it indicates kanji
-  // in the top 2501 frequency list, but not in other more official types like Jouyou or
-  // Jinmei. 'Kentei' has many rare kanji so keep it as the last type to be processed.
+  // Process '_frequency' before '_kyus' in order to create 'Frequency' type first before creating
+  // 'Kentei' kanji. This way, the 'Frequency' type is more meaningful since it indicates kanji
+  // in the top 2501 frequency list, but not in the other more official types like Jouyou or Jinmei.
+  // 'Kentei' has many rare kanji so keep it as the last type to be processed (before UcdKanji).
   processList(_frequency);
   for (auto& i : _kyus)
     processList(i);

@@ -90,15 +90,15 @@ protected:
   MockData _data;
 };
 
-TEST_F(KanjiTest, OtherKanji) {
+TEST_F(KanjiTest, FrequencyKanji) {
   int frequency = 2362;
   KenteiKyus kyu = KenteiKyus::KJ1;
   EXPECT_CALL(_data, getFrequency("呑")).WillOnce(Return(frequency));
   EXPECT_CALL(_data, getKyu("呑")).WillOnce(Return(kyu));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  OtherKanji k(_data, 4, "呑");
-  EXPECT_EQ(k.type(), KanjiTypes::Other);
+  FrequencyKanji k(_data, 4, "呑");
+  EXPECT_EQ(k.type(), KanjiTypes::Frequency);
   EXPECT_EQ(k.name(), "呑");
   EXPECT_EQ(k.radical(), rad);
   EXPECT_EQ(k.number(), 4);
@@ -111,16 +111,16 @@ TEST_F(KanjiTest, OtherKanji) {
   EXPECT_FALSE(k.hasReading());
 }
 
-TEST_F(KanjiTest, OtherKanjiWithReading) {
+TEST_F(KanjiTest, FrequencyKanjiWithReading) {
   int frequency = 2362;
   KenteiKyus kyu = KenteiKyus::KJ1;
   EXPECT_CALL(_data, getFrequency("呑")).WillOnce(Return(frequency));
   EXPECT_CALL(_data, getKyu("呑")).WillOnce(Return(kyu));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  OtherKanji k(_data, 4, "呑", "トン、ドン、の-む");
-  EXPECT_EQ(k.type(), KanjiTypes::Other);
-  EXPECT_TRUE(k.is(KanjiTypes::Other));
+  FrequencyKanji k(_data, 4, "呑", "トン、ドン、の-む");
+  EXPECT_EQ(k.type(), KanjiTypes::Frequency);
+  EXPECT_TRUE(k.is(KanjiTypes::Frequency));
   EXPECT_EQ(k.name(), "呑");
   EXPECT_EQ(k.radical(), rad);
   EXPECT_EQ(k.number(), 4);
@@ -327,12 +327,13 @@ TEST_F(KanjiTest, BadLinkedJinmei) {
   EXPECT_CALL(_data, getFrequency(_)).WillOnce(Return(2362));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical("呑", _)).WillOnce(ReturnRef(rad));
-  auto other = std::make_shared<OtherKanji>(_data, 4, "呑");
+  auto frequencyKanji = std::make_shared<FrequencyKanji>(_data, 4, "呑");
   try {
-    LinkedJinmeiKanji k(_data, 7, "亙", other);
+    LinkedJinmeiKanji k(_data, 7, "亙", frequencyKanji);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()), "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but got 'Other'");
+    EXPECT_EQ(std::string(err.what()),
+              "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but got 'Frequency'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -448,12 +449,12 @@ TEST_F(KanjiTest, BadLinkedOld) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   std::string name("呑");
   EXPECT_CALL(_data, ucdRadical(name, _)).WillOnce(ReturnRef(rad));
-  auto other = std::make_shared<OtherKanji>(_data, 4, name);
+  auto frequencyKanji = std::make_shared<FrequencyKanji>(_data, 4, name);
   try {
-    LinkedOldKanji k(_data, 7, "艷", other);
+    LinkedOldKanji k(_data, 7, "艷", frequencyKanji);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()), "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got 'Other'");
+    EXPECT_EQ(std::string(err.what()), "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got 'Frequency'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }

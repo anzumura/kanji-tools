@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <kanji_tools/stats/Stats.h>
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/stats/Stats.h>
 
 #include <sstream>
 
@@ -36,7 +36,7 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
     ">>>        [Jinmei] :     98, unique:   48,   1.01%  (柏 9, 幌 8, 篇 7, 斐 7, 浩 6)",
     ">>>  [LinkedJinmei] :     13, unique:    7,   0.13%  (龍 7, 眞 1, 兒 1, 曾 1, 槇 1)",
     ">>>     [LinkedOld] :      3, unique:    3,   0.03%  (澤 1, 會 1, 讀 1)",
-    ">>>         [Other] :      6, unique:    4,   0.06%  (嘘 3, 聯 1, 噺 1, 噛 1)",
+    ">>>     [Frequency] :      6, unique:    4,   0.06%  (嘘 3, 聯 1, 噺 1, 噛 1)",
     ">>>         [Extra] :     22, unique:    7,   0.23%  (蝕 4, 邯 4, 鄲 4, 哭 3, 嘯 3)",
     ">>>        [Kentei] :     12, unique:    9,   0.12%  (蘋 2, 遽 2, 鶫 2, 揄 1, 揶 1)",
     ">>>           [Ucd] :      2, unique:    1,   0.02%  (聰 2)",
@@ -65,7 +65,7 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
     ">>>        [Jinmei] :    742, unique:  189,   1.64%  (之 60, 彦 52, 篇 27, 祐 20, 伊 18)",
     ">>>  [LinkedJinmei] :     59, unique:   21,   0.13%  (峯 11, 龍 7, 藝 5, 瀧 5, 眞 4)",
     ">>>     [LinkedOld] :     44, unique:    8,   0.10%  (澤 36, 齋 2, 會 1, 濱 1, 畫 1)",
-    ">>>         [Other] :     56, unique:   19,   0.12%  (渕 24, 倶 5, 嘘 4, 娼 3, 諌 3)",
+    ">>>     [Frequency] :     56, unique:   19,   0.12%  (渕 24, 倶 5, 嘘 4, 娼 3, 諌 3)",
     ">>>         [Extra] :     61, unique:   23,   0.13%  (婬 18, 妾 4, 蝕 4, 邯 4, 鄲 4)",
     ">>>        [Kentei] :    124, unique:   81,   0.27%  (剪 10, 畸 9, 滸 4, 薛 3, 闍 3)",
     ">>>           [Ucd] :     12, unique:   10,   0.03%  (畀 2, 聰 2, 侔 1, 偪 1, 揜 1)",
@@ -104,7 +104,7 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
     ">>>        [Jinmei] :   1663, unique:  306,   1.73%  (坐 62, 之 60, 厨 55, 彦 52, 廻 51)",
     ">>>  [LinkedJinmei] :     87, unique:   24,   0.09%  (燈 20, 峯 12, 龍 7, 藝 5, 瀧 5)",
     ">>>     [LinkedOld] :     47, unique:   11,   0.05%  (澤 36, 齋 2, 嶽 1, 挾 1, 插 1)",
-    ">>>         [Other] :    148, unique:   37,   0.15%  (渕 24, 苅 24, 呑 17, 嘘 14, 叱 10)",
+    ">>>     [Frequency] :    148, unique:   37,   0.15%  (渕 24, 苅 24, 呑 17, 嘘 14, 叱 10)",
     ">>>         [Extra] :    233, unique:   56,   0.24%  (厭 36, 婬 18, 椒 14, 掻 13, 婢 12)",
     ">>>        [Kentei] :    520, unique:  257,   0.54%  (掟 11, 剪 10, 烟 9, 畸 9, 竟 8)",
     ">>>           [Ucd] :     39, unique:   25,   0.04%  (樏 5, 筯 5, 譃 3, 欝 2, 畀 2)",

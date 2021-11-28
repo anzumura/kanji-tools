@@ -76,7 +76,7 @@ public:
   const List& jinmeiKanji() const { return _types.at(KanjiTypes::Jinmei); }
   const List& linkedJinmeiKanji() const { return _types.at(KanjiTypes::LinkedJinmei); }
   const List& linkedOldKanji() const { return _types.at(KanjiTypes::LinkedOld); }
-  const List& otherKanji() const { return _types.at(KanjiTypes::Other); }
+  const List& frequencyKanji() const { return _types.at(KanjiTypes::Frequency); }
   const List& extraKanji() const { return _types.at(KanjiTypes::Extra); }
 
   // get list by KanjiType
@@ -174,9 +174,9 @@ protected:
   // 'getDebug' looks for '-debug' flag in 'argv' list and returns true if it's found
   static bool getDebug(int argc, const char** argv);
 
-  // 'loadStrokes' and 'loadOtherReadings' must be called before calling 'populate Lists' functions
+  // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling 'populate Lists' functions
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
-  void loadOtherReadings(const std::filesystem::path&);
+  void loadFrequencyReadings(const std::filesystem::path&);
 
   // populate Lists (_types datastructure)
   void populateJouyou();
@@ -186,7 +186,7 @@ protected:
   void processUcd(); // should be called after processing all other types
 
   // 'checkStrokes' should be called after all lists are populated. If debug is enabled (-debug)
-  // then this function will print any entries in _strokes that are 'Other' type or not found.
+  // then this function will print any entries in _strokes that are 'Frequency' type or not found.
   // It also compares strokes that were loaded from other files to strokes in 'ucd.txt'
   void checkStrokes() const;
 
@@ -214,9 +214,9 @@ private:
   // style name. This map only has entries for recognized kanji that were loaded with a selector.
   std::map<std::string, std::string> _compatibilityNameMap;
 
-  // 'otherReadings' holds readings loaded from other-readings.txt - these are for Top Frequency kanji
-  // that aren't part of any other group (so not Jouyou or Jinmei).
-  std::map<std::string, std::string> _otherReadings;
+  // '_frequencyReadings' holds readings loaded from frequency-readings.txt - these are for Top Frequency
+  // kanji that aren't part of any other group (so not Jouyou or Jinmei).
+  std::map<std::string, std::string> _frequencyReadings;
 
   // lists of kanji corresponding to Levels, Grades, Types and Kyus (excluding the 'None' enum values)
   std::map<JlptLevels, List> _levels;

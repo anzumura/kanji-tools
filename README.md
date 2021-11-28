@@ -284,7 +284,7 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 - **Jinmei**: 633 official Jinmeiyō (人名用) kanji
 - **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
 - **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'Linked Jinmei'
-- **Other**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
+- **Frequency**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 - **Extra**: kanji loaded from 'extra.txt' - shouldn't be in any of the above types
 - **Kentei**: kanji loaded from 'kentei/*' - Kanji Kentei (漢字検定) that aren't any of the above types
 - **Ucd**: kanji that are in 'ucd.txt', but not already one of the above types
@@ -300,23 +300,23 @@ Class Hierarchy for Kanji (* = abstract class):
 - JinmeiKanji: adds *reason* field (official reason for inclusion in Jinmeiyoō list)
 
 ```;
-    Kanji*
-      |
-      +---------------------------------------+
-      |                                       |
-NonLinkedKanji*                          LinkedKanji*
-      |                                       |
-      +-----------------------+               +---------------+
-      |                       |               |               |
-CustomFileKanji*         UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
-      |                       |
-      +------------+          +----------+----------+
-      |            |          |          |          |
-OfficialKanji* ExtraKanji OtherKanji KenteiKanji UcdKanji
-      |
-      +-----------+
-      |           |
- JouyouKanji JinmeiKanji
+     Kanji*
+       |
+       +------------------------------------------+
+       |                                          |
+ NonLinkedKanji*                             LinkedKanji*
+       |                                          |
+       +-------------------------+                +---------------+
+       |                         |                |               |
+CustomFileKanji*            UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
+       |                         |
+       +------------+            +----------+----------+
+       |            |            |          |          |
+ OfficialKanji* ExtraKanji FrequencyKanji KenteiKanji UcdKanji
+       |
+       +-----------+
+       |           |
+  JouyouKanji JinmeiKanji
 ```
 
 The program also loads the 214 official kanji radicals (部首).
@@ -326,18 +326,18 @@ The **data** directory contains the following files:
 - **jouyou.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_jōyō_kanji) - note, the radicals in this list reflect the original radicals from **Kāngxī Zìdiǎn / 康煕字典（こうきじてん）** so a few characters have the radicals of their old form, i.e., 円 has radical 口 (from the old form 圓).
 - **jinmei.txt**: loaded from [here](https://ja.wikipedia.org/wiki/人名用漢字一覧) and most of the readings from [here](https://ca.wikipedia.org/w/index.php?title=Jinmeiyō_kanji)
 - **linked-jinmei.txt**: loaded from [here](https://en.wikipedia.org/wiki/Jinmeiyō_kanji)
-- **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō kanji and some old forms.
-- **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Other' type Kanji.
-- **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
 - **frequency.txt**: top 2501 frequency kanji loaded from [KanjiCards](https://kanjicards.org/kanji-list-by-freq.html)
+- **extra.txt**: holds details for 'extra kanji of interest' not already in the above four files
+- **ucd.txt**: data extracted from Unicode 'UCD' (see *scripts/parseUcdAllFlat.sh* for details and links)
+- **frequency-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
+- **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
+- **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō kanji and some old forms.
+- **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Frequency' type Kanji.
 - **jlpt/n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
-- **jukugo/*.txt**: loaded from [here](https://sites.google.com/a/h7a.org/kanjicompounds/)
 - **kentei/k\*.txt**: loaded from [here](https://kanjijoho.com/cat/kyu.html)
-- **extra.txt**: meant to hold any extra kanji of interest not in other files
-- **other-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
+- **jukugo/*.txt**: loaded from [here](https://sites.google.com/a/h7a.org/kanjicompounds/)
 - **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
-- **ucd.txt**: data extracted from Unicode 'UCD' (see *scripts/parseUcdAllFlat.sh* for details and links)
 
 No external databases are used so far, but while writing some of the code (like in *UnicodeBlock.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
 

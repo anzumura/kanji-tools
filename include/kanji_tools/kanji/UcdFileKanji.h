@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 // 'UcdFileKanji' is for kanji with attributes mainly loaded from 'data/ucd.txt' (as opposed to
 // kanji loaded from jouyou.txt, jinmei.txt, linked-jinmei.txt and extra.txt). There is an optional
-// 'newName' field for supporting ucd links and is the base class for OtherKanji, KenteiKanji
+// 'newName' field for supporting ucd links and is the base class for FrequencyKanji, KenteiKanji
 // and UcdKanji. 'UcdFileKanji' should not have a JLPT level and are meant to hold less common kanji
 // that haven't already been loaded from a custom file (see CustomFileKanji.h).
 class UcdFileKanji : public NonLinkedKanji {
@@ -30,16 +30,16 @@ private:
   const OptString _newName;
 };
 
-// 'OtherKanji' is for kanji from 'frequency.txt' that aren't already loaded from jouyou or jinmei files
-class OtherKanji : public UcdFileKanji {
+// 'FrequencyKanji' is for kanji from 'frequency.txt' that aren't already loaded from jouyou or jinmei files
+class FrequencyKanji : public UcdFileKanji {
 public:
-  // constructor used for 'Other' kanji with readings from 'other-readings.txt'
-  OtherKanji(const Data& d, int number, const std::string& name, const std::string& reading)
+  // constructor used for 'FrequencyKanji' with readings from 'frequency-readings.txt'
+  FrequencyKanji(const Data& d, int number, const std::string& name, const std::string& reading)
     : UcdFileKanji(d, number, name, reading, d.findUcd(name)) {}
-  // constructor used for 'Other' kanji without a reading
-  OtherKanji(const Data& d, int number, const std::string& name) : UcdFileKanji(d, number, name, d.findUcd(name)) {}
+  // constructor used for 'FrequencyKanji' without a reading
+  FrequencyKanji(const Data& d, int number, const std::string& name) : UcdFileKanji(d, number, name, d.findUcd(name)) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Other; }
+  KanjiTypes type() const override { return KanjiTypes::Frequency; }
 };
 
 // 'KenteiKanji' is for kanji in 'kentei/k*.txt' files that aren't already pulled in from other files

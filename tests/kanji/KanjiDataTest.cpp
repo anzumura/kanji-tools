@@ -165,7 +165,7 @@ TEST_F(KanjiDataTest, TotalsChecks) {
   EXPECT_EQ(checkKanji(_data.linkedJinmeiKanji()), 52);
   EXPECT_EQ(checkKanji(_data.linkedOldKanji()), 0);
   EXPECT_EQ(checkKanji(_data.extraKanji()), 0);
-  EXPECT_EQ(checkKanji(_data.otherKanji()), 0);
+  EXPECT_EQ(checkKanji(_data.frequencyKanji()), 0);
 }
 
 TEST_F(KanjiDataTest, FindChecks) {
@@ -192,6 +192,17 @@ TEST_F(KanjiDataTest, FindChecks) {
   EXPECT_EQ((**_data.findKanjiByFrequency(1)).name(), "日");
   EXPECT_EQ((**_data.findKanjiByFrequency(2001)).name(), "炒");
   EXPECT_EQ((**_data.findKanjiByFrequency(2501)).name(), "蝦");
+  // findKanjisByNelsonId
+  ASSERT_TRUE(_data.findKanjisByNelsonId(-1).empty());
+  ASSERT_TRUE(_data.findKanjisByNelsonId(0).empty());
+  ASSERT_TRUE(_data.findKanjisByNelsonId(5447).empty());
+  std::vector<int> missingNelsonIds;
+  for (int i = 1; i < 5447; ++i)
+    if (_data.findKanjisByNelsonId(i).empty()) missingNelsonIds.push_back(i);
+  // There are a few Nelson IDs that are missing from UCD data
+  EXPECT_EQ(missingNelsonIds, std::vector({125, 149, 489, 1639}));
+  EXPECT_EQ(_data.findKanjisByNelsonId(1)[0]->name(), "一");
+  EXPECT_EQ(_data.findKanjisByNelsonId(5446)[0]->name(), "龠");
   // kanji with 3 old names
   auto result3 = _data.findKanjiByName("弁");
   ASSERT_TRUE(result3.has_value());
@@ -292,7 +303,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 0);
-  EXPECT_EQ(otherLinks[KanjiTypes::Other], 0);
+  EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 0);
   EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 5);
   EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1671);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0);
