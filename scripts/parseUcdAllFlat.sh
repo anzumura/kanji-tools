@@ -80,6 +80,10 @@ function log() {
 
 log "Begin parsing UCD data from '$ucdFile'"
 
+function inc() {
+  eval $1=$(($1 + 1))
+}
+
 function setOnKun() {
   resultOn="$1"
   resultKun="$2"
@@ -195,8 +199,11 @@ function populateOnKun() {
   done < <(grep $onKun $ucdFile)
 }
 
-# keep a counts of entries written to 'outFile'
-declare -i total=0 jouyou=0 jinmei=0 linkedJinmei=0
+# All entries have 'cp', 'age', 'blk', 'radical' and 'strokes' as well as at
+# least one of 'resultOn' or 'resultKun' so no need to count them, but count
+# some other optional fields of interest.
+declare -i total=0 totalMeaning=0 totalPinyin=0 totalMorohashi=0 totalNelson=0 \
+  totalJoyo=0 totalJinmei=0 totalLinkedJinmei=0
 
 function printResults() {
   log "Print results to '$outFile'"
@@ -216,7 +223,7 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
     resultKun=${kun[$cp]}
     if [[ -n $kJoyoKanji ]]; then
       # unset kJoyoKanji if official version is the 'link' entry
-      [[ $kJoyoKanji =~ U+ ]] && unset -v kJoyoKanji || jouyou=$((jouyou + 1))
+      [[ $kJoyoKanji =~ U+ ]] && unset -v kJoyoKanji || inc totalJoyo
     elif [[ -n $kJinmeiyoKanji ]]; then
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
         loadFrom=${kJinmeiyoKanji#*+}
@@ -224,7 +231,7 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
       else
         linkTo=${linkBack[$cp]}
       fi
-      [[ -z $linkTo ]] && jinmei=$((jinmei + 1)) || linkedJinmei=$((linkedJinmei + 1))
+      [[ -z $linkTo ]] && inc totalJinmei || inc totalLinkedJinmei
     elif [[ -z $resultOn$resultKun ]]; then
       if [[ $kCompatibilityVariant =~ U+ ]]; then
         loadFrom=${kCompatibilityVariant#*+}
@@ -334,31 +341,45 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
     fi
     # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
     [[ -n $linkTo ]] && s="\U$linkTo" || s=
-    kMandarin=${kMandarin%% *}
-    # Remove leading 0's and change single quotes to 'P' (Prime) so that 04138
-    # changes to 4138 (maps to 嗩) and 04138' changes to 4138P (maps to 嘆).
-    [[ -n $kMorohashi ]] && kMorohashi=$(echo $kMorohashi |
-      sed -e 's/^0*//' -e "s/'/P/g")
-    # remove leading 0's from Nelson ids
-    [[ -n $kNelson ]] && kNelson=$(echo $kNelson |
-      sed -e 's/^0*//' -e 's/ 0*/ /g')
+    [[ -n $localDef ]] && inc totalMeaning
+    if [[ -n $kMandarin ]]; then
+      # for kanji with multiple Pinyin readings just keep the first for now
+      kMandarin=${kMandarin%% *}
+      inc totalPinyin
+    fi
+    if [[ -n $kMorohashi ]]; then
+      # Remove leading 0's and change single quotes to 'P' (Prime) so that 04138
+      # changes to 4138 (maps to 嗩) and 04138' changes to 4138P (maps to 嘆).
+      kMorohashi=$(echo $kMorohashi | sed -e 's/^0*//' -e "s/'/P/g")
+      # there are a few kMorohashi values that are all 0's so check if non-empty
+      # again before incrementing
+      [[ -n $kMorohashi ]] && inc totalMorohashi
+    fi
+    if [[ -n $kNelson ]]; then
+      # remove leading 0's from all Nelson ids in the list
+      kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
+      inc totalNelson
+    fi
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
 $kMandarin\t$kMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
 $linkTo\t$s\t$localDef\t$resultOn\t$resultKun" >>$outFile
-    total=$((total + 1))
+    inc total
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 
 findVariantLinks
 populateOnKun
 printResults
-log "Total $total, Jouyou $jouyou, Jinmei $jinmei, LinkedJinmei $linkedJinmei"
+
+log "Total $total (Meaning $totalMeaning, Pinyin $totalPinyin, Morohashi \
+$totalMorohashi, Nelson $totalNelson)"
 
 function checkTotal() {
-  [[ $1 -ne $2 ]] && echo "  WARNING: found $1 $3 entries - expected $2"
+  echo -n "  $1: $2"
+  [[ $2 -eq $3 ]] && echo "/$3" || echo " *** expected $3 ***"
 }
 
-checkTotal $jouyou 2136 Jouyou
-checkTotal $jinmei 633 Jinmei
-checkTotal $linkedJinmei 230 LinkedJinmei
+checkTotal Jouyou $totalJoyo 2136
+checkTotal Jinmei $totalJinmei 633
+checkTotal LinkedJinmei $totalLinkedJinmei 230
