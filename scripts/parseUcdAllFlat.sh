@@ -50,15 +50,15 @@ declare -r program="parseUcdAllFlat.sh"
 # - has Morohashi, but not Adobe: 5,721
 # - has Adobe, but not Morohashi: 1,010
 #
-# Nelson: As of Unicode 14.0 there are 5,399 entries with a non-empty 'kNelson'
-# (Classic 'Nelson Japanese-English Character Dictionary') field. Load these ids
-# to show in 'review mode' and also for looking up from the command-line (see
-# kanjiQuiz -h for details).
-#
 # Morohashi: As of Unicode 14.0 there are 18,169 entries with a non-empty
 # 'kMorohashi' field. This property holds index numbers into Dai Kan-Wa Jiten (a
 # massive Chinese-Japanese dictionary compiled by Tetsuji Morohashi). There are
 # plans to cleanup/expand this property to cover ~50K entries by Unicode 16.0.
+#
+# Nelson: As of Unicode 14.0 there are 5,399 entries with a non-empty 'kNelson'
+# (Classic 'Nelson Japanese-English Character Dictionary') field. Load these ids
+# to show in 'review mode' and also for looking up from the command-line (see
+# kanjiQuiz -h for details).
 #
 # Here are other 'Japan' type source tags that are not used by this script:
 # - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
@@ -134,6 +134,7 @@ printResulsFilter="$onKun|$morohashi|$nelson|$adobe"
 # 'findVairantLinks': find links based on 'kDefinition' field. For example, if
 # the field starts with '(same as X' then store a link from 'cp' to 'X'.
 function findVariantLinks() {
+  log "Find variant links"
   local -r def='kDefinition=\"[(]*'
   local -r nonAscii='[^\x00-\x7F]{1,}'
   for type in 'a variant of' 'interchangeable' 'same as' 'non-classical' \
@@ -169,6 +170,7 @@ function findVariantLinks() {
 # Note, a link can point to an entry later in the file like 5DE2 (巢) which
 # links to 5DE3 (巣) so populate on/kun first before calling 'printResults'.
 function populateOnKun() {
+  log "Populate On/Kun arrays"
   while read -r i; do
     unset -v kJoyoKanji kJinmeiyoKanji kDefinition kJapaneseOn kJapaneseKun
     i=${i:6}
@@ -197,6 +199,7 @@ function populateOnKun() {
 declare -i total=0 jouyou=0 jinmei=0 linkedJinmei=0
 
 function printResults() {
+  log "Print results to '$outFile'"
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
 Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
   while read -r i; do
@@ -206,18 +209,14 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
       kTraditionalVariant kRSAdobe_Japan1_6 kMandarin kMorohashi kNelson
     i=${i:6}
     eval ${i%/>}
-    local localDef=${definition[$cp]}
+    local localDef=${definition[$cp]} loadFrom= linkTo=
     # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also
     # be set by the 'setOnKun' function so they can't be local variables.
     resultOn=${on[$cp]}
     resultKun=${kun[$cp]}
-    local loadFrom=
-    local linkTo=
     if [[ -n $kJoyoKanji ]]; then
-      if [[ $kJoyoKanji =~ U+ ]]; then
-        # Need to unset kJoyoKanji since official version is the 'link' entry.
-        unset -v kJoyoKanji
-      fi
+      # unset kJoyoKanji if official version is the 'link' entry
+      [[ $kJoyoKanji =~ U+ ]] && unset -v kJoyoKanji || jouyou=$((jouyou + 1))
     elif [[ -n $kJinmeiyoKanji ]]; then
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
         loadFrom=${kJinmeiyoKanji#*+}
@@ -225,6 +224,7 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
       else
         linkTo=${linkBack[$cp]}
       fi
+      [[ -z $linkTo ]] && jinmei=$((jinmei + 1)) || linkedJinmei=$((linkedJinmei + 1))
     elif [[ -z $resultOn$resultKun ]]; then
       if [[ $kCompatibilityVariant =~ U+ ]]; then
         loadFrom=${kCompatibilityVariant#*+}
@@ -233,9 +233,7 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
         loadFrom=${variantLink[$cp]}
         linkTo=$loadFrom
       else
-        if [[ -z $kSemanticVariant ]]; then
-          kSemanticVariant="$kTraditionalVariant"
-        fi
+        [[ -z $kSemanticVariant ]] && kSemanticVariant="$kTraditionalVariant"
         if [[ $kSemanticVariant =~ U+ ]]; then
           kSemanticVariant=${kSemanticVariant##*+} # remove leading U+
           loadFrom=${kSemanticVariant%%&*}         # remove any trailing &lt ...
@@ -349,17 +347,18 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
 $kMandarin\t$kMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
 $linkTo\t$s\t$localDef\t$resultOn\t$resultKun" >>$outFile
     total=$((total + 1))
-    [[ -n $kJoyoKanji ]] && jouyou=$((jouyou + 1))
-    if [[ -n $kJinmeiyoKanji ]]; then
-      [[ -n $linkTo ]] && linkedJinmei=$((linkedJinmei + 1)) || jinmei=$((jinmei + 1))
-    fi
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 
-log "Find variant links"
 findVariantLinks
-log "Populate On/Kun arrays"
 populateOnKun
-log "Print results to '$outFile'"
 printResults
 log "Total $total, Jouyou $jouyou, Jinmei $jinmei, LinkedJinmei $linkedJinmei"
+
+function checkTotal() {
+  [[ $1 -ne $2 ]] && echo "  WARNING: found $1 $3 entries - expected $2"
+}
+
+checkTotal $jouyou 2136 Jouyou
+checkTotal $jinmei 633 Jinmei
+checkTotal $linkedJinmei 230 LinkedJinmei
