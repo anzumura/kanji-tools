@@ -72,28 +72,13 @@ if [[ $# -lt 2 ]]; then
   echo "  output file: where to write output (for example, data/ucd.txt)"
   exit 1
 fi
-declare -r ucdFile=$1
-declare -r outFile=$2
+declare -r ucdFile=$1 outFile=$2
 
 function log() {
   echo "$(date +%T): $1"
 }
 
-log "Begin parsing UCD data from: $ucdFile"
-
-# 'get' gets a tag ($1) from an XML string ($2) - the value is put in a variable
-# with the same name as the tag.
-function get() {
-  unset -v $1
-  eval $(echo "$2" | grep -o " $1=\"[^\"]*\"")
-}
-# 'getFirst' is similar to 'get', but it will only take up to the first space if
-# value has spaces (so it gets the value up to the first space)
-function getFirst() {
-  unset -v $1
-  local -r s=$(echo "$2" | grep -o " $1=\"[^\" ]*")
-  [[ -n $s ]] && eval $s\"
-}
+log "Begin parsing UCD data from '$ucdFile'"
 
 function setOnKun() {
   resultOn="$1"
@@ -185,24 +170,21 @@ function findVariantLinks() {
 # links to 5DE3 (巣) so populate on/kun first before calling 'printResults'.
 function populateOnKun() {
   while read -r i; do
-    get cp "$i"
-    get kJoyoKanji "$i"
+    unset -v kJoyoKanji kJinmeiyoKanji kDefinition kJapaneseOn kJapaneseKun
+    i=${i:6}
+    eval ${i%/>}
     if [[ -n $kJoyoKanji ]]; then
       # There are 4 entries with a Joyo link: 5265, 53F1, 586B and 982C. Store
       # definition/on/kun since since they are missing for some linked Jinmeiyo
       # Kanji as well as Joyo 𠮟 (U+20B9F) which replaces 叱 (53F1) しか-る.
       [[ $kJoyoKanji =~ U+ ]] && cp="$cp ${kJoyoKanji#U+}"
     else
-      get kJinmeiyoKanji "$i"
       if [[ $kJinmeiyoKanji =~ U+ ]]; then
         kJinmeiyoKanji=${kJinmeiyoKanji#*+}
         linkBack[$kJinmeiyoKanji]=$cp
         cp="$cp $kJinmeiyoKanji"
       fi
     fi
-    get kDefinition "$i"
-    get kJapaneseOn "$i"
-    get kJapaneseKun "$i"
     for link in $cp; do
       definition[$link]="$kDefinition"
       on[$link]="$kJapaneseOn"
@@ -211,15 +193,19 @@ function populateOnKun() {
   done < <(grep $onKun $ucdFile)
 }
 
-declare -i entries=0 # keep a count of entries written to 'outFile'
+# keep a counts of entries written to 'outFile'
+declare -i total=0 jouyou=0 jinmei=0 linkedJinmei=0
 
 function printResults() {
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
 Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
   while read -r i; do
-    get cp "$i"
-    get kJoyoKanji "$i"
-    get kJinmeiyoKanji "$i"
+    # No need to unset fields that are in every record such as 'cp', 'age' and
+    # 'blk', but need to unset all of the optional fields used below.
+    unset -v kJoyoKanji kJinmeiyoKanji kCompatibilityVariant kSemanticVariant \
+      kTraditionalVariant kRSAdobe_Japan1_6 kMandarin kMorohashi kNelson
+    i=${i:6}
+    eval ${i%/>}
     local localDef=${definition[$cp]}
     # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also
     # be set by the 'setOnKun' function so they can't be local variables.
@@ -240,7 +226,6 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
         linkTo=${linkBack[$cp]}
       fi
     elif [[ -z $resultOn$resultKun ]]; then
-      get kCompatibilityVariant "$i"
       if [[ $kCompatibilityVariant =~ U+ ]]; then
         loadFrom=${kCompatibilityVariant#*+}
         linkTo=$loadFrom
@@ -248,9 +233,7 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
         loadFrom=${variantLink[$cp]}
         linkTo=$loadFrom
       else
-        get kSemanticVariant "$i"
         if [[ -z $kSemanticVariant ]]; then
-          get kTraditionalVariant "$i"
           kSemanticVariant="$kTraditionalVariant"
         fi
         if [[ $kSemanticVariant =~ U+ ]]; then
@@ -292,14 +275,12 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
     #
     # Radical and Strokes
     #
-    getFirst kRSUnicode "$i"
+    kRSUnicode=${kRSUnicode%% *}
     # some kRSUnicode entries have ' after the radical like 4336 (䌶): 120'.3
     kRSUnicode=${kRSUnicode/\'/}
-    local -i radical=${kRSUnicode%\.*}
-    local -i vstrokes=0
-    get kRSAdobe_Japan1_6 "$i"
+    local -i radical=${kRSUnicode%\.*} vstrokes=0
     if [[ -z ${kRSAdobe_Japan1_6} ]]; then
-      getFirst kTotalStrokes "$i"
+      kTotalStrokes=${kTotalStrokes%% *}
       local -i strokes=$kTotalStrokes
     else
       # Some characters have multiple adobe references so start with first one
@@ -322,7 +303,7 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
       # swapping there are 57 differences).
       if [[ ${kRSAdobe_Japan1_6} =~ ' ' ]]; then
         s=${kRSAdobe_Japan1_6#*\ } # remove the first adobe ref
-        getFirst kTotalStrokes "$i"
+        kTotalStrokes=${kTotalStrokes%% *}
         # Only allow flipping strokes up to the second entry for now. Strokes
         # and radicals mostly match official Joyo and Jinmei charts, but there
         # are still some differences and trying to get exact matches from ucd
@@ -355,30 +336,30 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
     fi
     # put utf-8 version of 'linkTo' code into 's' if 'linkTo' is populated
     [[ -n $linkTo ]] && s="\U$linkTo" || s=
-    get blk "$i" # Block
-    get age "$i" # Version
-    getFirst kMandarin "$i"
-    get kNelson "$i"
-    # remove leading 0's from Nelson ids
-    [[ -n $kNelson ]] && kNelson=$(echo $kNelson |
-      sed -e 's/^0*//' -e 's/ 0*/ /g')
-    get kMorohashi "$i"
+    kMandarin=${kMandarin%% *}
     # Remove leading 0's and change single quotes to 'P' (Prime) so that 04138
     # changes to 4138 (maps to 嗩) and 04138' changes to 4138P (maps to 嘆).
     [[ -n $kMorohashi ]] && kMorohashi=$(echo $kMorohashi |
       sed -e 's/^0*//' -e "s/'/P/g")
+    # remove leading 0's from Nelson ids
+    [[ -n $kNelson ]] && kNelson=$(echo $kNelson |
+      sed -e 's/^0*//' -e 's/ 0*/ /g')
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
 $kMandarin\t$kMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
 $linkTo\t$s\t$localDef\t$resultOn\t$resultKun" >>$outFile
-    entries=$((entries + 1))
+    total=$((total + 1))
+    [[ -n $kJoyoKanji ]] && jouyou=$((jouyou + 1))
+    if [[ -n $kJinmeiyoKanji ]]; then
+      [[ -n $linkTo ]] && linkedJinmei=$((linkedJinmei + 1)) || jinmei=$((jinmei + 1))
+    fi
   done < <(grep -E "($printResulsFilter)" $ucdFile)
 }
 
-log "Finding variant links"
+log "Find variant links"
 findVariantLinks
-log "Populating On/Kun arrays"
+log "Populate On/Kun arrays"
 populateOnKun
-log "Printing results to: $outFile"
+log "Print results to '$outFile'"
 printResults
-log "Complete - wrote $entries entries"
+log "Total $total, Jouyou $jouyou, Jinmei $jinmei, LinkedJinmei $linkedJinmei"
