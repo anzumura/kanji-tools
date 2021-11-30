@@ -78,11 +78,12 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 356B	㕫	CJK_Ext_A	3.0	30	7		fǎng					4EFF	仿	imitate, copy; as if	HOU BOU	SAMAYOU NARAU KURABERU
 356D	㕭	CJK_Ext_A	3.0	30	7		āo					54AC	咬	bite, gnaw	KOU GOU YOU	KAMU
 3582	㖂	CJK_Ext_A	3.0	30	9		yì					8A4D	詍		EI SETSU SECHI	SHIYABIRU
-3583	㖃	CJK_Ext_A	3.0	30	9		hǒu					8A6C	詬	abuse, scold, berate, insult	KOU KU	HAZUKASHIME HAJI
+3583	㖃	CJK_Ext_A	3.0	30	9		hǒu					543C	吼	roar, shout; bark, howl	KOU KU	HOERU
 3598	㖘	CJK_Ext_A	3.0	30	10		zhēn					5507	唇	lips	SHIN	KUCHIBIRU
 35A0	㖠	CJK_Ext_A	3.0	30	11		nuò					90A3	那	that, that one, those	DA NA	NANZO NANI
 35A3	㖣	CJK_Ext_A	3.0	30	11		tòu					5485	咅	to spit out	TOU	TSUBAOHAITEINAMU
 35AD	㖭	CJK_Ext_A	3.0	30	11		tiǎn					8214	舔	lick with tongue; taste	TEN	NAMERU
+35B6	㖶	CJK_Ext_A	3.0	30	12		yān					6357	捗	make progress	HO CHOKU	HAKADORU
 35B8	㖸	CJK_Ext_A	3.0	30	12		xué					5671	噱	laugh heartily, laugh aloud	KYAKU GAKU	
 35BC	㖼	CJK_Ext_A	3.0	30	12		duǒ					8B00	謀	plan, scheme; stratagem	BOU MU	HAKARU HAKARIGOTO
 35BE	㖾	CJK_Ext_A	3.0	30	12		è					54A2	咢	sound; drumming	GAKU	ODOROKU
@@ -101,7 +102,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3627	㘧	CJK_Ext_A	3.0	32	7		xù					5E8F	序	series, serial order, sequence	JO	TSUIDE NOBERU
 362A	㘪	CJK_Ext_A	3.0	32	7		hào					8017	耗	consume, use up; waste, squander	MOU KOU	HERU
 362B	㘫	CJK_Ext_A	3.0	32	7		jǐng					9631	阱	pitfall, trap, snare	SEI JOU	ANA
-362C	㘬	CJK_Ext_A	3.0	32	7		ào					7269	物	thing, substance, creature	MOTSU BUTSU	MONO
+362C	㘬	CJK_Ext_A	3.0	32	7		ào					5773	坳	a hollow in the ground, a cavity, depression; undulating, depressed	AU EU	KUBOMI
 362D	㘭	CJK_Ext_A	3.0	32	7		ào					5773	坳	a hollow in the ground, a cavity, depression; undulating, depressed	AU EU	KUBOMI
 3630	㘰	CJK_Ext_A	3.0	32	7		zhēn					659F	斟	to pour wine or tea into a cup; to gauge	SHIN	KUMU KUMIKAWASU
 3631	㘱	CJK_Ext_A	3.0	32	8		tān					574D	坍	collapse; landslide	TAN TON	
@@ -131,13 +132,14 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 369D	㚝	CJK_Ext_A	3.0	37	11		zhuī					594E	奎	stride of man; one of the twenty-eight lunar mansions	KEI KI	MATA
 36A7	㚧	CJK_Ext_A	3.0	38	6		yǎn					5B10	嬐		SEN GEN GIN GON	SUBAYAI TSUTSUSHIMUSAMA
 36B0	㚰	CJK_Ext_A	3.0	38	8		pēi					80DA	胚	embryo; unfinished things	HAI	HARAMU
-36B6	㚶	CJK_Ext_A	3.0	38	8		sì					59EC	姬	beauty; imperial concubine	KI	HIME
+36B6	㚶	CJK_Ext_A	3.0	38	8		sì					59D2	姒	wife of elder brother	SHI JI	ANE
 36B7	㚷	CJK_Ext_A	3.0	38	8		ěr					5B2D	嬭	milk; suckle; breasts	DAI NE DEI NAI JI NI	HAHA HAGUKUMU ANE
+36B9	㚹	CJK_Ext_A	3.0	38	8		mǎo					5A8C	媌		BOU MYOU BOKU MOKU	MIMEYOI
 36D4	㛔	CJK_Ext_A	3.0	38	10		fēng					59A6	妦		HOU FU	MIMEYOI
 36DB	㛛	CJK_Ext_A	3.0	38	10		xìn					5A20	娠	pregnant	SHIN	HARAMU
 36E9	㛩	CJK_Ext_A	3.0	38	11		zhóu					59AF	妯	wives of one's brothers; sister-i	CHUU JIKU ROKU TOKU DOKU	AIYOME UGOKU SAWAGU ITAMU
 36EE	㛮	CJK_Ext_A	3.0	38	12		sǎo					5AC2	嫂	sister-in-law, elder brother's wife	SOU	ANYOME
-36EF	㛯	CJK_Ext_A	3.0	38	12		fàn					5A29	娩	give birth child; complaisant	BEN HAN	UMU
+36EF	㛯	CJK_Ext_A	3.0	38	12		fàn					5B14	嬔	baby rabbit	FU	
 36F0	㛰	CJK_Ext_A	3.0	38	12							5A5A	婚	get married; marriage, wedding	KON	ENGUMI
 36F2	㛲	CJK_Ext_A	3.0	38	12		fà					9AEE	髮	hair	HATSU	KAMI
 36F4	㛴	CJK_Ext_A	3.0	38	12		nǎo					60F1	惱	angered, filled with hate	NOU	NAYAMU
@@ -189,7 +191,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 37E9	㟩	CJK_Ext_A	3.0	46	12		mín					5CB7	岷	Minshan mountain range in northern Sichuan and southern Gansu, Min River	BIN MIN	
 37EB	㟫	CJK_Ext_A	3.0	46	12		quán					6CC9	泉	spring, fountain; wealth, money	SEN	IZUMI ZENI
 37ED	㟭	CJK_Ext_A	3.0	46	12		mín					5CB7	岷	Minshan mountain range in northern Sichuan and southern Gansu, Min River	BIN MIN	
-37FB	㟻	CJK_Ext_A	3.0	46	14		qiàn					5D84	嶄	high, steep, precipitous; new	SAN ZAN	KEWASHII
+37FB	㟻	CJK_Ext_A	3.0	46	14		qiàn					5879	塹	moat, trench, pit, cavity	ZAN SEN	HORI
 3800	㠀	CJK_Ext_A	3.0	46	14		dǎo		5343			5CF6	島	island	TOU	SHIMA
 380A	㠊	CJK_Ext_A	3.0	46	15		qū					5D87	嶇	steep, sheer; rugged, rough	KU	KEWASHII
 380B	㠋	CJK_Ext_A	3.0	46	15		è					5D3F	崿	cliffs	GAKU	GAKE KISHI
@@ -202,7 +204,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3829	㠩	CJK_Ext_A	3.0	47	6							8292	芒	Miscanthus sinensis	BOU MOU KOU	NOGI SUSUKI
 382F	㠯	CJK_Ext_A	3.0	49	5		yǐ					4EE5	以	by means of; thereby, therefore; consider as; in order to	I	OMOU YUENI MOTTE
 3836	㠶	CJK_Ext_A	3.0	50	6		fán					5E06	帆	sail; boat	HAN	HO
-3838	㠸	CJK_Ext_A	3.0	50	7		kù					8932	褲	trousers, pants	KO	ZUBON
 383B	㠻	CJK_Ext_A	3.0	50	7							5E0C	希	rare; hope, expect, strive for	KI	MARE KOINEGAU
 384A	㡊	CJK_Ext_A	3.0	50	11		qià					5E22	帢		KAHU	
 384C	㡌	CJK_Ext_A	3.0	50	11		mào		1476			5E3D	帽	hat, cap; cap-like tops	BOU MOU	BOUSHI
@@ -254,11 +255,11 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 396B	㥫	CJK_Ext_A	3.0	61	12							60C7	惇	be kind, cordial, sincere	TON JUN	ATSUI MAKOTO
 3971	㥱	CJK_Ext_A	3.0	61	13		fěi					60B1	悱	to be desirous of speaking	HI	IINAYAMU
 3975	㥵	CJK_Ext_A	3.0	61	13		hùn					6141	慁	dishonor, disobey; insult	KON GON	UREERU
-3976	㥶	CJK_Ext_A	3.0	61	14		sè					6106	愆	a fault, mistake, error, transgression	KEN	AYAMARU
+3976	㥶	CJK_Ext_A	3.0	61	14		sè					585E	塞	stop up, block, seal, cork; pass, frontier; fortress	SOKU SAI	FUSAGU MICHIRU TORIDE
 397F	㥿	CJK_Ext_A	3.0	61	15		ào					6160	慠		GOU	OGORU UREERU
 3985	㦅	CJK_Ext_A	3.0	61	14		diē					6178	慸		TEI DAI SEI TAI	TAKAI KIWAMARU OTORU
 398D	㦍	CJK_Ext_A	3.0	61	15		è					6115	愕	startled, alarmed, astonished	GAKU	ODOROKU
-3994	㦔	CJK_Ext_A	3.0	61	16		yàn					53AD	厭	dislike, detest, reject; satiate	EN OU YOU	AKIRU ITOU
+3994	㦔	CJK_Ext_A	3.0	61	16		yàn					61D5	懕	satiated; contented	EN YOU	YASURAKA TARIRU YURUSU
 3996	㦖	CJK_Ext_A	3.0	61	15		mèn					61E3	懣	be sick at heart, sorrowful, sad	MON MAN	MODAERU
 399E	㦞	CJK_Ext_A	3.0	61	18		chóu					61E4	懤	grieved, pained	CHYUU JIU TAU TOU	HOGARAKA UREHERU
 39A8	㦨	CJK_Ext_A	3.0	61	20		lán					5B3E	嬾	lazy, languid, listless	RAN	OKOTARU MONOUI
@@ -268,7 +269,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 39C3	㧃	CJK_Ext_A	3.0	64	5		shōu					6536	收	gather together, collect; harvest	SHUU	OSAMERU
 39C8	㧈	CJK_Ext_A	3.0	64	6		yǐn					5F15	引	to pull, draw out, attract; to stretch	IN	HIKU
 39CC	㧌	CJK_Ext_A	3.0	64	7		mào					6BDB	毛	hair, fur, feathers; coarse	MOU BOU	KE
-39CD	㧍	CJK_Ext_A	3.0	64	7		fǎng					6412	搒	pole; beat	HOU HYOU BYOU	OOU
+39CD	㧍	CJK_Ext_A	3.0	64	7		fǎng					4EFF	仿	imitate, copy; as if	HOU BOU	SAMAYOU NARAU KURABERU
 39F1	㧱	CJK_Ext_A	3.0	64	10		chèn					62FF	拿	take, hold, grasp; bring; with	DA NA	HIKU
 3A00	㨀	CJK_Ext_A	3.0	64	11		bǐng					62A6	抦	(Cant.) to beat	HEI HYOU	MOTSU
 3A09	㨉	CJK_Ext_A	3.0	64	12		mín					62BF	抿	pucker up lips in smile; press	BIN MIN	NADERU
@@ -281,6 +282,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3A36	㨶	CJK_Ext_A	3.0	64	14		dǎo					6417	搗	hull; thresh; beat, attack	TOU	TSUKU
 3A3F	㨿	CJK_Ext_A	3.0	64	14		jù					64DA	據	to occupy, take possession of; a base	KYO KO KEKI	YORU AKASHI HIKU
 3A40	㩀	CJK_Ext_A	3.0	64	14		jù					64DA	據	to occupy, take possession of; a base	KYO KO KEKI	YORU AKASHI HIKU
+3A49	㩉	CJK_Ext_A	3.0	64	15		dá					6428	搨	rub, make rubbings of inscription	TOU	UTSU SURU
 3A4E	㩎	CJK_Ext_A	3.0	64	15		yè					64EA	擪	to tuck in, to put the finger into, to put in, to stow away	YOU CHOU JOU NYOU OU EN	OSAERU MOTSU
 3A52	㩒	CJK_Ext_A	3.0	64	16		qín					64D2	擒	catch, capture, seize, arrest	KIN	TORAERU TORIKO
 3A55	㩕	CJK_Ext_A	3.0	64	16							62CE	拎	to haul; to lift; to take	REI RYOU	KAKERU
@@ -290,11 +292,12 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3A63	㩣	CJK_Ext_A	3.0	64	18							63EE	揮	direct; wipe away; squander	KI	FURUU
 3A66	㩦	CJK_Ext_A	3.0	64	18		xié					651C	攜	lead by hand, take with; carry	KEI	TAZUSAERU
 3A85	㪅	CJK_Ext_A	3.0	66	9		gèng					66F4	更	more, still further, much more; to change, alter	KOU	SARA FUKERU ARATAMERU
+3A8B	㪋	CJK_Ext_A	3.0	66	11		hàn					625E	扞	ward off, withstand, resist	KAN	FUSEGU
 3A8D	㪍	CJK_Ext_A	3.0	66	11		bó					52C3	勃	suddenly, sudden, quick	BOTSU HOTSU	NIWAKANI OKORU
 3A8F	㪏	CJK_Ext_A	3.0	66	12		bǐ					636D	捭	to open; to spread out	HAI HA HEI	
 3A94	㪔	CJK_Ext_A	3.0	66	12		sàn					6563	散	scatter, disperse, break up	SAN	CHIRU CHIRASU CHIRAKASU
 3A9A	㪚	CJK_Ext_A	3.0	66	12		sàn					6563	散	scatter, disperse, break up	SAN	CHIRU CHIRASU CHIRAKASU
-3A9C	㪜	CJK_Ext_A	3.0	66	13		chuǎi					6376	捶	strike with stick, lash, beat	SUI TA	MUCHIUTSU UTSU TSUKU
+3A9C	㪜	CJK_Ext_A	3.0	66	13		chuǎi					63E3	揣	put things under clothes	SHI SUI TAN	HAKARU KOKOROMIRU SADAMERU
 3A9F	㪟	CJK_Ext_A	3.0	66	13							6566	敦	esteem; honest, candid, sincere	TON DAN CHOU	ATSUI
 3AA2	㪢	CJK_Ext_A	3.0	66	14		shǎo					634E	捎	to select; to take; to carry	SOU SHOU	TORU
 3AAF	㪯	CJK_Ext_A	3.0	67	7		chá					8209	舉	raise, lift up; recommend	KYO	AGERU KOZORU
@@ -316,6 +319,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3AFC	㫼	CJK_Ext_A	3.0	72	12		dié					6662	晢	light of stars; shine	SETSU SEI	AKIRAKA
 3B06	㬆	CJK_Ext_A	3.0	72	13		mǐn					6E63	湣	mixed, confused; pity	BIN MIN BEN MEN	
 3B09	㬉	CJK_Ext_A	3.0	72	13		nuǎn					6696	暖	warm, genial	DAN KEN NON	ATATAKAI ATATAMERU ATATAMARU
+3B10	㬐	CJK_Ext_A	3.0	72	14		jìn					6649	晉	advance, increase; promote	SHIN SEN	SUSUMU OSAERU TSUTSUSHIMU
 3B17	㬗	CJK_Ext_A	3.0	72	16		xiàn					665B	晛	sunlight	KEN GEN DEN NEN	HIGAARAWARERU HIZA
 3B1C	㬜	CJK_Ext_A	3.0	72	16		jìn					6649	晉	advance, increase; promote	SHIN SEN	SUSUMU OSAERU TSUTSUSHIMU
 3B21	㬡	CJK_Ext_A	3.0	72	17		líng					6624	昤	sunshine	REI RYOU	
@@ -333,7 +337,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3B8F	㮏	CJK_Ext_A	3.0	75	13		nài					67F0	柰	crab-apple tree; endure, bear	NA DAI	KARANASHI
 3B93	㮓	CJK_Ext_A	3.0	75	13		gèn					4E99	亙	extend across, through; from	KOU	WATARU WATARI
 3B97	㮗	CJK_Ext_A	3.0	75	13		qín					77DC	矜	pity, feel sorry for, show sympathy	KIN KEI KAN	AWAREMU TSUTSUSHIMU HOKORU
-3B9B	㮛	CJK_Ext_A	3.0	75	13		chí					6938	椸	rack	I	KOROMOKAKE
+3B9B	㮛	CJK_Ext_A	3.0	75	13		chí					5319	匙	spoon; surname	SHI JI	SAJI
 3BA1	㮡	CJK_Ext_A	3.0	86	13		guàn					721F	爟	fire	KAN KEN GEN	YAKU
 3BA3	㮣	CJK_Ext_A	3.0	75	13		gài					6982	概	generally, approximately	GAI KAI	TOKAKI OOMUNE OMOMUKI
 3BB4	㮴	CJK_Ext_A	3.0	75	14							8258	艘	counter for ships, vessels	SOU	FUNE
@@ -367,15 +371,15 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3C1E	㰞	CJK_Ext_A	3.0	76	7		chī					86A9	蚩	worm; ignorant, rustic; laugh	SHI	WARAU ANADORU OROKA
 3C1F	㰟	CJK_Ext_A	3.0	76	8		jì					5180	冀	hope for; wish; Hebei province	KI	KOINEGAU KOINEGAWA
 3C31	㰱	CJK_Ext_A	3.0	76	11		shà					6B43	歃	smear one's mouth with blood of a victim when taking an oath	SOU SHOU KOU	SUSURU
-3C40	㱀	CJK_Ext_A	3.0	76	14		chǐ					562C	嘬	to lap; to suck	SAI SE SEI	KAMU MUSABORU
 3C4B	㱋	CJK_Ext_A	3.0	76	20		què					5859	塙	truly	KAKU KOU	KATAI HANAWA
 3C54	㱔	CJK_Ext_A	3.0	77	9		xiē					4E9B	些	little, few; rather, somewhat	SA SHA	ISASAKA
 3C58	㱘	CJK_Ext_A	3.0	77	18		àn					9B58	魘	nightmare, bad dreams	EN YOU	OSOWARERU OSOU UNASARERU
-3C59	㱙	CJK_Ext_A	3.0	78	6		xiǔ					54BC	咼	chat, jaw, gossip, talk; mouth	KA KAI	YOKOSHIMA
+3C59	㱙	CJK_Ext_A	3.0	78	6		xiǔ					673D	朽	decayed, rotten; rot, decay	KYUU	KUCHIRU
 3C5A	㱚	CJK_Ext_A	3.0	78	8		cán					6B98	殘	injure, spoil; oppress; broken	ZAN SAN	NOKORU
 3C68	㱨	CJK_Ext_A	3.0	78	12		liàn					6BAE	殮	dress corpse for burial	REN	OSAMERU
 3C7A	㱺	CJK_Ext_A	3.0	78	20		lú					81DA	臚	arrange in order; display	RYO RO	KAWA TSURANERU TSUTAERU
 3C7E	㱾	CJK_Ext_A	3.0	79	10		gāi		2453						KAI	
+3C7F	㱿	CJK_Ext_A	3.0	79	10		què					6BBC	殼	casing, shell, husk, hull, skin	KAKU KOKU	KARA
 3C83	㲃	CJK_Ext_A	3.0	79	12		jiù		2459						KYUU	
 3C88	㲈	CJK_Ext_A	3.0	79	16		sháo					97F6	韶	music of the emperor Shun; beautiful	SHOU JOU	TSUGU
 3C93	㲓	CJK_Ext_A	3.0	82	10		róng					7D68	絨	silk, cotton, or woolen fabric	JUU	NERIITO KEORI
@@ -389,7 +393,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3CD2	㳒	CJK_Ext_A	3.0	85	8		biàn					6CD5	法	law, rule, regulation, statute; France, French	HOU HATSU HOTSU	NORI OKITE NOTTORU
 3CEE	㳮	CJK_Ext_A	3.0	85	10		niào					5C3F	尿	urine; urinate	NYOU	IBARI
 3CF0	㳰	CJK_Ext_A	3.0	85	10							6E9D	溝	ditch, drain, narrow waterway	KOU	MIZO
-3CFC	㳼	CJK_Ext_A	3.0	85	12		bì					6DE2	淢	ditch	YOKU IKI ITSU ICHI	HAYAI
+3CFC	㳼	CJK_Ext_A	3.0	85	12		bì					6EED	滭		HITSU HICHI	WAKU
 3CFF	㳿	CJK_Ext_A	3.0	85	11		xiè					6E2B	渫	beating of ocean; surging of water	SETSU CHOU	SARAU CHIRU YAMERU
 3D03	㴃	CJK_Ext_A	3.0	85	11		lèi					6DDA	淚	tears; weep, cry	RUI REI	NAMIDA
 3D06	㴆	CJK_Ext_A	3.0	85	11		jìn					6D78	浸	soak, immerse, dip, percolate	SHIN	HITASU HITARU YAYA
@@ -398,7 +402,8 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3D0A	㴊	CJK_Ext_A	3.0	85	11							6DF5	淵	gulf, abyss, deep	EN	FUCHI
 3D0B	㴋	CJK_Ext_A	3.0	85	11		sù					6F5A	潚	gay; deep	SHUKU SHOU SHUU	KIYOI
 3D11	㴑	CJK_Ext_A	3.0	85	12		sù					6CDD	泝	go upstream; trace source; formerly	SO	SAKANOBORU
-3D16	㴖	CJK_Ext_A	3.0	85	12		luò					6CCA	泊	anchor vessel; lie at anchor	HAKU	TOMARU TOMERU TOMARI
+3D14	㴔	CJK_Ext_A	3.0	85	12		xī					6F5D	潝	agree	KYUU KOU OU YOU	
+3D16	㴖	CJK_Ext_A	3.0	85	12		luò					6FFC	濼	river in Shandong province	ROKU HOKU	
 3D1C	㴜	CJK_Ext_A	3.0	85	12		biàn					904D	遍	everywhere, all over, throughout	HEN	AMANESHI
 3D1D	㴝	CJK_Ext_A	3.0	85	12		lí					9ECE	黎	surname; numerous, many; black	REI RI	KUROI
 3D1E	㴞	CJK_Ext_A	3.0	85	12							6ED4	滔	overflow; rushing water, a torrent	TOU	HABIKORU
@@ -451,7 +456,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3E45	㹅	CJK_Ext_A	3.0	93	13		zǒng					7E3D	總	collect; overall, altogether	SOU	FUSA SUBERU SUBETE
 3E56	㹖	CJK_Ext_A	3.0	93	17		huàn					8C62	豢	domestic animals; feed, raise	KEN KAN	YASHINAU
 3E5C	㹜	CJK_Ext_A	3.0	94	8		yín					72BE	犾		GIN	
-3E5E	㹞	CJK_Ext_A	3.0	94	7		yín					5540	啀	gnaw; (Cant.) to shout, yell, scold	GAI	IGAMU
+3E5E	㹞	CJK_Ext_A	3.0	94	7		yín					72FA	狺	the snarling of dogs	GEN GON	
 3E60	㹠	CJK_Ext_A	3.0	94	7		tún					8C5A	豚	small pig, suckling pig; suffle	TON	BUTA
 3E64	㹤	CJK_Ext_A	3.0	94	8		qiè					602F	怯	lacking in courage, afraid	KYOU	OBIERU OJIRU
 3E6F	㹯	CJK_Ext_A	3.0	94	9							8C85	貅	brave, fierce, courageous	KYUU	
@@ -477,7 +482,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3EED	㻭	CJK_Ext_A	3.0	96	15		sè					74B1	璱		SHITSU SHICHI	AZAYAKA
 3EFD	㻽	CJK_Ext_A	3.0	96	17		suì					74BF	璿	fine jade	SEN ZEN KEI KE	
 3F04	㼄	CJK_Ext_A	3.0	96	19							74A3	璣	pearl that is not quite round	KI KE GE GI	TAMA
-3F07	㼇	CJK_Ext_A	3.0	96	20		qióng					74CA	瓊	jade; rare, precious; elegant	KEI	TAMA
 3F1C	㼜	CJK_Ext_A	3.0	98	10		àng					76CE	盎	cup; pot; bowl; abundant	OU	HACHI
 3F1D	㼝	CJK_Ext_A	3.0	98	10		fàn					76CC	盌	bowl, basin, cup	WAN	
 3F2D	㼭	CJK_Ext_A	3.0	98	13		diàn					588A	墊	advance money, pay for another	TEN TEU DEU	OCHIIRU OBORERU NAYAMU
@@ -513,7 +517,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4021	䀡	CJK_Ext_A	3.0	109	10		chàn					8998	覘	peek; spy on, watch; investigate	TEN	UKAGAU
 4022	䀢	CJK_Ext_A	3.0	109	10		shùn					77AC	瞬	wink, blink; in a wink, a flash	SHUN	MATATAKU MATATAKI
 4035	䀵	CJK_Ext_A	3.0	109	12		shùn					77AC	瞬	wink, blink; in a wink, a flash	SHUN	MATATAKU MATATAKI
-4039	䀹	CJK_Ext_A	3.0	109	12		jié					776B	睫	eyelashes	SHOU	MATSUGE
+4039	䀹	CJK_Ext_A	3.0	109	12		jié					7728	眨	wink	SOU SHOU	MATATAKU
 405F	䁟	CJK_Ext_A	3.0	109	15		chá					5DEE	差	to differ; different, wrong; nearly, almost; an officer	SHI SA	SASU TAGAU TAGAI
 4062	䁢	CJK_Ext_A	3.0	109	16		xuán					5AD9	嫙		SEN ZEN	MIMEYOI
 4066	䁦	CJK_Ext_A	3.0	109	16		qù					89B7	覷	peep at; watch, spy on	SHU SU SHO	UKAGAU
@@ -521,16 +525,14 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4071	䁱	CJK_Ext_A	3.0	109	17		kōu					7717	眗		KU KOU	
 4079	䁹	CJK_Ext_A	3.0	109	18		bì					7765	睥	look askance at, glare at	HEI	NAGASHIME
 4096	䂖	CJK_Ext_A	3.0	112	6		shí		28			77F3	石	stone, rock, mineral; rad. 112	SHAKU SEKI KOKU	ISHI
-409D	䂝	CJK_Ext_A	3.0	112	9		jié					78D4	磔	to dismember, tear apart; downward stroke slanting right	TAKU	SAKU HARITSUKE
 409E	䂞	CJK_Ext_A	3.0	112	9		zhè					67D8	柘	a thorny tree; sugarcane	SHA	YAMAGUWA TSUGE
 40A5	䂥	CJK_Ext_A	3.0	112	10		mín					8CE8	賨	tribute paid in cloth by the tribes in Szechwan and Yunnan under the Han dynasty	SOU ZU	MITSUGI
-40A9	䂩	CJK_Ext_A	3.0	112	11		yàn					785C	硜	the sound of stones knocking together	KOU KYOU KEI	
+40A9	䂩	CJK_Ext_A	3.0	112	11		yàn					786F	硯	inkstone	KEN GEN	SUZURI
 40AA	䂪	CJK_Ext_A	3.0	112	11		qiǎo					78FD	磽	barren land; sandy soil	KOU KYOU	
 40AB	䂫	CJK_Ext_A	3.0	112	11		hāng					592F	夯	heavy load, burden; lift up	KOU	KATSUGU NINAU
 40B2	䂲	CJK_Ext_A	3.0	112	12		fǎ					781D	砝	balance weights	KYOU KOU HOU	KATAI
 40B4	䂴	CJK_Ext_A	3.0	112	12		yán					7814	研	grind, rub; study, research	KEN	TOGU MIGAKU
 40C9	䃉	CJK_Ext_A	3.0	112	14		mín					8CE8	賨	tribute paid in cloth by the tribes in Szechwan and Yunnan under the Han dynasty	SOU ZU	MITSUGI
-40D1	䃑	CJK_Ext_A	3.0	112	15		bān					78D0	磐	large rock, boulder; firm	HAN BAN	IWA
 40D6	䃖	CJK_Ext_A	3.0	112	15		wù					5862	塢	entrenchment, bank, low wall	O U	TORIDE MURA
 40D8	䃘	CJK_Ext_A	3.0	112	16		kēng					785C	硜	the sound of stones knocking together	KOU KYOU KEI	
 40DB	䃛	CJK_Ext_A	3.0	112	16		lián					93C8	鏈	chain, wire, cable; chain, shack	REN TEN	KUSARI
@@ -544,18 +546,18 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 410D	䄍	CJK_Ext_A	3.0	113	13		zhà					8721	蜡	wax; candle; waxy, glazed; maggot; as a non-simplified form sometimes used as an equivalent to U+410D 䄍, meaning imperial harvest	SHO WA JA SEKI SHAKU	UJIMUSHI
 410E	䄎	CJK_Ext_A	3.0	113	13		qǐ					5A4D	婍		KI	MIMEYOI
 410F	䄏	CJK_Ext_A	3.0	113	13		yú					7945	祅	calamities, disasters; Ormazda	YOU	WAZAWAI
-4122	䄢	CJK_Ext_A	3.0	113	19		qí					9F4A	齊	even, uniform, of equal length	SEI ZAI SAI	SOROU HITOSHII HITOSHIKU
+4122	䄢	CJK_Ext_A	3.0	113	19		qí					9F4B	齋	vegetarian diet; study; to fast, abstain	SAI SHI	MONOIMI TSUTSUSHIMU
 412B	䄫	CJK_Ext_A	3.0	115	8		qǐ					8291	芑	white millet	KI GI	CHISA
 412C	䄬	CJK_Ext_A	3.0	115	8		yí					79FB	移	change place, shift; move about	I	UTSURU UTSUSU
 412D	䄭	CJK_Ext_A	3.0	115	8		nián					5E74	年	year; new-years; person's age	NEN	TOSHI MINORU YOWAI
 4137	䄷	CJK_Ext_A	3.0	115	10		shí					77F3	石	stone, rock, mineral; rad. 112	SHAKU SEKI KOKU	ISHI
 4139	䄹	CJK_Ext_A	3.0	115	10		nián					5E74	年	year; new-years; person's age	NEN	TOSHI MINORU YOWAI
-413A	䄺	CJK_Ext_A	3.0	115	11		zhì					7A0A	稊	darnels, tares	TEI DAI	INUBIE
+413A	䄺	CJK_Ext_A	3.0	115	11		zhì					7A1A	稚	young, immature; childhood	CHI	OSANAI ITOKENAI
 413D	䄽	CJK_Ext_A	3.0	115	11		tiǎn					79C8	秈	non-glutinous long grain rice	SEN	URUCHI
 4152	䅒	CJK_Ext_A	3.0	115	12		máng					8292	芒	Miscanthus sinensis	BOU MOU KOU	NOGI SUSUKI
 4168	䅨	CJK_Ext_A	3.0	115	14							9999	香	fragrant, sweet-smelling; incense	KOU KYOU	KAORI KA
 4179	䅹	CJK_Ext_A	3.0	115	16		lǒu					802C	耬	drill for sowing grain	ROU RU	
-417D	䅽	CJK_Ext_A	3.0	115	16		xīn					6996	榖	paper mulberry	KOKU KOU KU	KOUZO
+417D	䅽	CJK_Ext_A	3.0	115	16		xīn					99A8	馨	fragrant, aromatic; distant fragrance	KEI KYOU	KAORU KAORI
 4180	䆀	CJK_Ext_A	3.0	115	17		měi					9709	霉	mildew, mold; moldy, mildewed	BAI ME	TSUYU SHIMERI SHIMI
 41A3	䆣	CJK_Ext_A	3.0	116	12		chén					5BB8	宸	imperial; imperial palace	SHIN	NOKI
 41A4	䆤	CJK_Ext_A	3.0	116	12							7A7F	穿	penetrate, pierce, drill; wear	SEN	UGATSU
@@ -566,30 +568,29 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 41BF	䆿	CJK_Ext_A	3.0	116	19		yì					5BF1	寱		GEI	NEGOTO ODOROKU
 41C3	䇃	CJK_Ext_A	3.0	117	8		sì					7AE2	竢	wait for, wait until, as soon as	SHI	MATSU
 41D0	䇐	CJK_Ext_A	3.0	117	13		lì					642F	搯	take out, pull out	TOU	TORIDASU
-41DA	䇚	CJK_Ext_A	3.0	118	10							64B2	撲	pound, beat, strike; attack	BOKU HAKU HOKU	UTSU
+41DA	䇚	CJK_Ext_A	3.0	118	10							6534	攴	rap, tap lightly; KangXi radical 66	HOKU HAKU	UTSU
 41DF	䇟	CJK_Ext_A	3.0	118	11		jiàn					8171	腱	tendons	KEN KIN	KEN
 41E1	䇡	CJK_Ext_A	3.0	118	11		zhù					677C	杼	shuttle of loom; narrow; long-headed; a scrub oak; thin	CHO SHO	HI DONGURI
-41E5	䇥	CJK_Ext_A	3.0	118	11		zé					7B70	筰	cable	SAKU ZAKU SHAKU	SEMARU
+41E5	䇥	CJK_Ext_A	3.0	118	11		zé					7B2E	笮	boards which support tiles on roof	SAKU SHAKU ZAKU	SEMAI
 41F2	䇲	CJK_Ext_A	3.0	118	12		cè					7B74	筴	type of grass used in divination; to divine; pincers	KYOU SAKU	MEDOGI
 41F9	䇹	CJK_Ext_A	3.0	118	13		jùn					7B98	箘	fine bamboo	KIN	SHINODAKE YA TAKENOKO
 41FA	䇺	CJK_Ext_A	3.0	118	13		dòu					8C46	豆	beans, peas; bean-shaped	TOU ZU	MAME TAKATSUKI
 4205	䈅	CJK_Ext_A	3.0	118	14		yù					7C46	籆		WAKU	ITOWAKU
 4207	䈇	CJK_Ext_A	3.0	118	14		zhào					7F69	罩	basket for catching fish; cover	TOU	KOMERU
-4209	䈉	CJK_Ext_A	3.0	118	14		shà					7FE3	翣	feathers used decorate coffin; large wooden fan	SOU SHOU	HITSUGIKAZARI
+4209	䈉	CJK_Ext_A	3.0	118	14		shà					7B91	箑	fan	SOU SHOU JOU	OUGI
 420E	䈎	CJK_Ext_A	3.0	118	15		yè					8449	葉	leaf, petal; page of book; period	YOU SHOU	HA
 4214	䈔	CJK_Ext_A	3.0	118	15							7B33	笳	a reed leaf whistle	KA	ASHIBUE
 421E	䈞	CJK_Ext_A	3.0	118	15		dǔ					7AFA	竺	India; bamboo; surname	TOKU CHIKU JIKU	TAKE ATSUI
 4224	䈤	CJK_Ext_A	3.0	118	15		qián					9257	鉗	pincers, pliers, tongs	KAN KEN	KUBIKASE
 4239	䈹	CJK_Ext_A	3.0	118	17		sǒu					7C54	籔	bamboo basket	SU SOU SHU	KOMEAGESA
 423C	䈼	CJK_Ext_A	3.0	118	17		miè					7BFE	篾	bamboo splints or slats	BETSU MECHI	
-423E	䈾	CJK_Ext_A	3.0	118	17		shāo					68A2	梢	pointed tip of something long like a branch; rudder	SHOU	KOZUE
+423E	䈾	CJK_Ext_A	3.0	118	17		shāo					7A0D	稍	little, slightly; rather	SOU SHOU	YOUYAKU YAYA
 4249	䉉	CJK_Ext_A	3.0	118	18		gū					89DA	觚	jug, winecup, goblet; square	KO	SAKAZUKI
-4252	䉒	CJK_Ext_A	3.0	118	18		fán					85E9	藩	fence; boundary; outlying border	HAN	MAGAKI
+4252	䉒	CJK_Ext_A	3.0	118	18		fán					7C53	籓	sieve; basket	HAN HON	
 4256	䉖	CJK_Ext_A	3.0	118	18		líng					7B2D	笭	bamboo screen	REI RYOU	CHIRIYOKE
 4264	䉤	CJK_Ext_A	3.0	118	19		sǒu					7C54	籔	bamboo basket	SU SOU SHU	KOMEAGESA
 4275	䉵	CJK_Ext_A	3.0	184	23		zhuàn					994C	饌	feed, support, provide for; food; fine meats, delicacies	SEN ZEN	SONAERU
 427F	䉿	CJK_Ext_A	3.0	119	11		hú					7CCA	糊	paste, stick on with paste	KO GO	NORI
-4280	䊀	CJK_Ext_A	3.0	119	11		hú					7CCA	糊	paste, stick on with paste	KO GO	NORI
 4287	䊇	CJK_Ext_A	3.0	119	13		bù					9914	餔	eat; dinner time; sunset	HO FU	YUUMESHI KUU
 4288	䊈	CJK_Ext_A	3.0	119	13		méi					9176	酶	enzymes; (Cant.) soft	BAI ME	SAKENOMOTO SAKADANE
 428B	䊋	CJK_Ext_A	3.0	119	13							599D	妝	to adorn oneself, dress up, use make-up	SOU SHOU	YOSOOU
@@ -602,11 +603,10 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 42A2	䊢	CJK_Ext_A	3.0	119	17							6F3F	漿	any thick fluid; starch; broth	SHOU	KONZU
 42A7	䊧	CJK_Ext_A	3.0	119	18		bì					5C41	屁	break wind; fart; buttocks	HI	HE
 42B6	䊶	CJK_Ext_A	3.0	120	9		zhèn					7D16	紖	a rope for leading cattle or horse	CHIN JIN IN	
-42B7	䊷	CJK_Ext_A	3.0	120	9							7D14	純	pure, clean, simple	SHUN JUN TON	KIITO MOPPARA
+42B7	䊷	CJK_Ext_A	3.0	120	9							7DC7	緇	black silk	SHI	KURO
 42C4	䋄	CJK_Ext_A	3.0	120	10		wǎng					7DB2	網	net, web; network	MOU BOU	AMI
 42CB	䋋	CJK_Ext_A	3.0	120	11		mín					7F60	罠	animal trap	BIN MIN	AMI WANA
 42D5	䋕	CJK_Ext_A	3.0	120	12		rèn					7D1D	紝	weave, lay warp	JIN NIN	HATAITO
-42D7	䋗	CJK_Ext_A	3.0	120	12							5805	堅	hard, strong, firm; resolute	KEN	KATAI KATAKU
 42D8	䋘	CJK_Ext_A	3.0	120	12		chuò					7E0B	縋	climb down rope; hang by rope	TSUI	SUGARU
 42DA	䋚	CJK_Ext_A	3.0	120	12		yì					7FFC	翼	wings; fins on fish; shelter	YOKU	TSUBASA TASUKERU
 42DC	䋜	CJK_Ext_A	3.0	120	12		qìng					7DAE	綮	embroidered banner	KEI	HATAJIRUSHI MUSUBIME
@@ -617,6 +617,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 42F2	䋲	CJK_Ext_A	3.0	120	14		chě					7E69	繩	rope, string, cord; measure, restrain	JOU BIN YOU	NAWA TADASU
 42F3	䋳	CJK_Ext_A	3.0	120	15		běi					8919	褙	paper or cloth pasted together	HAI	HADAGI
 42F9	䋹	CJK_Ext_A	3.0	120	15		fú					5E45	幅	piece, strip, breadth of, hem	FUKU HYOKU	HABA
+42FA	䋺	CJK_Ext_A	3.0	120	15							97A6	鞦	leather stap; swing	SHUU	SHIRIGAI
 4302	䌂	CJK_Ext_A	3.0	120	15		òu					63E1	握	grasp, hold fast, take by hand	AKU	NIGIRU NIGIRI
 4303	䌃	CJK_Ext_A	3.0	120	15		xiāo					7D83	綃	raw silk fabric	SHOU SOU	KIITO
 4311	䌑	CJK_Ext_A	3.0	120	17		jiān					5805	堅	hard, strong, firm; resolute	KEN	KATAI KATAKU
@@ -648,14 +649,13 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 43E9	䏩	CJK_Ext_A	3.0	130	10		xī					8105	脅	ribs; armpits; flank; threaten	KYOU KOU KYUU	OBYAKASU ODOSU ODOKASU
 43EF	䏯	CJK_Ext_A	3.0	130	11		zhì					75E3	痣	spots, moles; birthmark	SHI	HOKURO AZA
 43FB	䏻	CJK_Ext_A	3.0	130	11		néng					80FD	能	to be able; can, permitted to; ability	NOU DAI	ATAU YOKUSURU
-440A	䐊	CJK_Ext_A	3.0	130	12		kūn					991B	餛	dumpling soup, wonton	KON GON	
-4417	䐗	CJK_Ext_A	3.0	130	13		zhū					809A	肚	belly; abdomen; bowels	TO	HARA
+4417	䐗	CJK_Ext_A	3.0	130	13		zhū					8C6C	豬	pig, hog	CHO	INOSHISHI I
 4419	䐙	CJK_Ext_A	3.0	130	13		gé					8188	膈	diaphragm	KAKU	MUNENOUCHI TSURIGI
 4421	䐡	CJK_Ext_A	3.0	130	16		qí					81CD	臍	abdominal area of crab; navel	SEI SAI	HOZO HESO
-4427	䐧	CJK_Ext_A	3.0	130	14		kào					81DB	臛	broth	KOKU KAKU	ATSUMONO
+4427	䐧	CJK_Ext_A	3.0	130	14		kào					7292	犒	entertain victorious soldiers	KOU	NEGIRAU
 4430	䐰	CJK_Ext_A	3.0	130	15		xiū					7F9E	羞	disgrace, shame; ashamed; shy	SHUU	SUSUMERU HAJIRU
 4433	䐳	CJK_Ext_A	3.0	130	15		yú					9B5A	魚	fish; surname; KangXi radical 195	GYO	UO SAKANA SUNADORU
-444D	䑍	CJK_Ext_A	3.0	130	21		yān					766D	癭	swelling, goiter	EI YOU	KOBU
+444D	䑍	CJK_Ext_A	3.0	130	21		yān					54BD	咽	throat; pharynx	IN ETSU	NODO
 4453	䑓	CJK_Ext_A	3.0	133	13		tái					81FA	臺	tower, lookout; stage, platform	TAI DAI	UTENA YOROKOBU
 445E	䑞	CJK_Ext_A	3.0	136	16		shùn					821C	舜	legendary ruler	SHUN	HIRUGAO MUKUGE SATOI
 4461	䑡	CJK_Ext_A	3.0	137	9							8256	艖	raft; boat; skiff	SA SHA SAI SE	KOBUNE FUNE
@@ -665,7 +665,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 447A	䑺	CJK_Ext_A	3.0	137	15							5E06	帆	sail; boat	HAN	HO
 4483	䒃	CJK_Ext_A	3.0	137	17		cào					9020	造	construct, build, make, begin; prepare	ZOU	TSUKURU ITARU NARU
 4492	䒒	CJK_Ext_A	3.0	140	8		tiáo					8280	芀	clover; pea	SHOU JOU	
-4498	䒘	CJK_Ext_A	3.0	140	9							8470	葰		SUI SA SE SHUN	SHIYUUGA
 44A0	䒠	CJK_Ext_A	3.0	140	10		fēng					4E30	丰	abundant, lush, bountiful, plenty	HOU FU FUU BU	MIMEYOI SHIGERU
 44A3	䒣	CJK_Ext_A	3.0	140	10		rǎn					82D2	苒	lush; successively, in order	ZEN	
 44AD	䒭	CJK_Ext_A	3.0	140	11		děng					7B49	等	rank, grade; wait; equal; 'etc.'	TOU	HITOSHII NADO RA
@@ -673,7 +672,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 44B3	䒳	CJK_Ext_A	3.0	140	9		duǒ					6735	朵	cluster of flowers; earlobe	DA TA	EDA
 44BC	䒼	CJK_Ext_A	3.0	140	12		qū					66F2	曲	crooked, bent; wrong, false	KYOKU	MAGARU MAGERU KUMA
 44C5	䓅	CJK_Ext_A	3.0	140	13		qí					82B9	芹	celery	KIN	SERI
-44D1	䓑	CJK_Ext_A	3.0	140	13		píng					840D	萍	duckweed; wandering, traveling	HEI	UKIKUSA YOMOGI
+44D1	䓑	CJK_Ext_A	3.0	140	13		píng					8353	荓		HEI	BYOU
 44D2	䓒	CJK_Ext_A	3.0	140	13		kuǎi					84AF	蒯	a rush, of which various things are made	KAI KE	
 44D7	䓗	CJK_Ext_A	3.0	140	14		cōng					8471	葱	scallions, leeks, green onions	SOU	NEGI
 44E6	䓦	CJK_Ext_A	3.0	140	14		diǎn					5178	典	law, canon; documentation; classic, scripture	TEN	NORI TSUKASADORU SAKAN
@@ -746,7 +745,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 46B9	䚹	CJK_Ext_A	3.0	149	11		pǐ					5E80	庀	to prepare; to regulate to hand up	HI HEI HAI	OSAMERU
 46BD	䚽	CJK_Ext_A	3.0	149	11		hào					8017	耗	consume, use up; waste, squander	MOU KOU	HERU
 46C1	䛁	CJK_Ext_A	3.0	149	11		nán					5583	喃	keep talking, chattering; mumble	NAN	NOU
-46C2	䛂	CJK_Ext_A	3.0	149	11		yāo					8A51	詑	cheat	TA I	AZAMUKU UNUBORERU ASAHAKA
+46C2	䛂	CJK_Ext_A	3.0	149	11		yāo					8A83	誃	part	SHI CHI JI I	WAKARERU
 46C8	䛈	CJK_Ext_A	3.0	149	12		shì					8A93	誓	swear, pledge; oath	SEI ZEI	CHIKAU CHIKAI
 46D0	䛐	CJK_Ext_A	3.0	149	12		cí					8A5E	詞	words; phrase, expression	SHI JI	KOTOBA
 46D1	䛑	CJK_Ext_A	3.0	149	12		mì					8B10	謐	calm, quiet, still; cautious	HITSU BITSU	SHIZUKA
@@ -762,11 +761,10 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4701	䜁	CJK_Ext_A	3.0	149	17		xì					8B11	謑	shame, disgrace	KEI GEI KA KE	HAJI
 4708	䜈	CJK_Ext_A	3.0	149	18		chāo					52E6	勦	destroy, exterminate, annihilate	SOU SHOU	TSUKARERU TSUKUSU
 470A	䜊	CJK_Ext_A	3.0	149	18		zāo					5608	嘈	noisy	SAU SOU SEU ZEU	KAMABISUSHII
-4711	䜑	CJK_Ext_A	3.0	149	19		wù					60E1	惡	evil, wicked, bad, foul	O AKU	WARUI
 4718	䜘	CJK_Ext_A	3.0	149	20		jǐng					8B66	警	guard, watch; alert, alarm	KEI KYOU	IMASHIMERU IMASHIME
 4723	䜣	CJK_Ext_A	3.0	149	11		xīn					8A22	訢	pleased, delighted; happy	KIN KON KI GIN GON	YOROKOBU
 472C	䜬	CJK_Ext_A	3.0	150	12		sǒng					5CAB	岫	mountain peak; cave, cavern	SHUU YUU	KUKI MINE
-472D	䜭	CJK_Ext_A	3.0	150	12		jùn					777F	睿	shrewd, astute, clever, keen	EI	AKIRAKA
+472D	䜭	CJK_Ext_A	3.0	150	12		jùn					6FEC	濬	dredge, dig; profound, deep	SHUN	SARAU FUKAI TONAERU
 473B	䜻	CJK_Ext_A	3.0	151	16		chǐ					8C49	豉	fermented beans	SHI JI	MISO
 4742	䝂	CJK_Ext_A	3.0	151	17		shù					8C4E	豎	vertical; perpendicular; upright	JU	TATSU KOBITO
 4753	䝓	CJK_Ext_A	3.0	152	22		liè					9B23	鬣	horse's mane; fin; human whiskers	RYOU	TATEGAMI
@@ -787,7 +785,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 47B3	䞳	CJK_Ext_A	3.0	156	15		bó					8E23	踣	to stumble and fall prone stiff in death	HOU BOKU HAI BAI	TAORERU
 47BC	䞼	CJK_Ext_A	3.0	156	16		chuǐ					7AC4	竄	run away; revise, edit; expel	ZAN SAN	KAKURERU NOGARERU
 47BF	䞿	CJK_Ext_A	3.0	156	17		qiān					8E47	蹇	lame, crippled; unlucky	KEN	ASHINAE NAYAMU
-47D4	䟔	CJK_Ext_A	3.0	157	9		fù					8E23	踣	to stumble and fall prone stiff in death	HOU BOKU HAI BAI	TAORERU
+47D4	䟔	CJK_Ext_A	3.0	157	9		fù					8D74	赴	go to; attend, be present	FU	OMOMUKU
 47DA	䟚	CJK_Ext_A	3.0	157	11		qí					8E11	踑		KI GI	ASHIATO
 47E5	䟥	CJK_Ext_A	3.0	157	12		méng					9AF3	髳	state	BOU MU MOU	TAREGAMI
 47EE	䟮	CJK_Ext_A	3.0	157	13		fú					5310	匐	fall prostrate; crawl	HOKU FUKU BOKU	HARABAU
@@ -806,7 +804,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 486E	䡮	CJK_Ext_A	3.0	159	18							8E64	蹤	footprints, traces, tracks	SHOU	ATO
 4877	䡷	CJK_Ext_A	3.0	159	21		kài					8F44	轄	linchpin of wheel; control	KATSU	KUSABI
 4879	䡹	CJK_Ext_A	3.0	159	21		zhì					8F0A	輊	low rear portion of cart	CHI	HIKUI OMOI
-487B	䡻	CJK_Ext_A	3.0	159	22		mín					8ED2	軒	carriage; high; wide; balcony; surname of the Yellow Emperor	KEN	NOKI
 487C	䡼	CJK_Ext_A	3.0	159	24		líng					8EE8	軨	wooden cross-piece on front inside of carriage box	REI RYOU	TESORI
 487F	䡿	CJK_Ext_A	3.0	159	31		líng					8EE8	軨	wooden cross-piece on front inside of carriage box	REI RYOU	TESORI
 4885	䢅	CJK_Ext_A	3.0	161	13		chén					6668	晨	early morning, daybreak	SHIN	ASHITA TOKI
@@ -830,8 +827,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 48D1	䣑	CJK_Ext_A	3.0	163	12		chán					5EDB	廛	a store, shop; ground allotted to a retainer	TEN	YASHIKI MISE
 48DC	䣜	CJK_Ext_A	3.0	163	14		cuó					9147	酇	collect; small administration	SAN ZAN SA ZA	ATSUMARU
 48E3	䣣	CJK_Ext_A	3.0	163	23		dǎng					9EE8	黨	political party, gang, faction	TOU	NAKAMA MURA
-48E8	䣨	CJK_Ext_A	3.0	164	10		chún					9187	醇	rich, good as wine; pure, unmixed	SHUN JUN	MOPPARA
-48E9	䣩	CJK_Ext_A	3.0	164	11		chún					9187	醇	rich, good as wine; pure, unmixed	SHUN JUN	MOPPARA
+48E9	䣩	CJK_Ext_A	3.0	164	11		chún					7D14	純	pure, clean, simple	SHUN JUN TON	KIITO MOPPARA
 48F0	䣰	CJK_Ext_A	3.0	164	12		jù					91B5	醵	contribute for drinks; pool money	KYO	SAKAMORI ATSUMERU
 48F1	䣱	CJK_Ext_A	3.0	164	13		xù					9157	酗	drunk, to become violent under the influence of alcohol	KU	
 4908	䤈	CJK_Ext_A	3.0	164	16							91AF	醯	vinegar; pickle; acid	KEI KAI	SU
@@ -906,7 +902,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4A37	䨷	CJK_Ext_A	3.0	173	24		xiàn					9730	霰	hail, sleet	SAN SEN	ARARE
 4A4A	䩊	CJK_Ext_A	3.0	176	17		wǎn					5A49	婉	amiable, congenial; restrained	EN	UTSUKUSHII
 4A57	䩗	CJK_Ext_A	3.0	177	13		bà					9738	霸	rule by might rather than right	HAKU HYAKU HA	HATAGASHIRA KASHIRA
-4A58	䩘	CJK_Ext_A	3.0	177	13		dì					97AE	鞮	leather shoes	TEI TAI DAI	KAWAGUSHI
+4A58	䩘	CJK_Ext_A	3.0	177	13		dì					976A	靪	to cobble, to patch	TEI CHOU DAI	OGINAU
 4A5A	䩚	CJK_Ext_A	3.0	177	14		dì					976A	靪	to cobble, to patch	TEI CHOU DAI	OGINAU
 4A5C	䩜	CJK_Ext_A	3.0	177	14		zhòu					5191	冑	helmet	CHUU	KABUTO YOROI
 4A68	䩨	CJK_Ext_A	3.0	177	17		chàng					97D4	韔	a wrapper or case for bow	CHOU RYOU	YUMIBUKURO
@@ -921,7 +917,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4AA1	䪡	CJK_Ext_A	3.0	179	19							9F4F	齏	break or smash into pieces, pulverize; hash	SEI SAI	NAMASU
 4AA9	䪩	CJK_Ext_A	3.0	180	13		yín					541F	吟	sing, hum; recite; type of poetry	GIN KIN	UTAU NAKU
 4AB0	䪰	CJK_Ext_A	3.0	180	22		yī					566B	噫	belch; alas	I AI OKU	AU OKUBI
-4AB1	䪱	CJK_Ext_A	3.0	181	12		gǎi					5B69	孩	baby, child; children	KAI GAI	CHINOMIGO
+4AB1	䪱	CJK_Ext_A	3.0	181	12		gǎi					80F2	胲		KAI	OYAYUBI
 4AB2	䪲	CJK_Ext_A	3.0	181	12		kūn					9811	頑	obstinate, stubborn; recalcitrant	GAN GEN	KATAKUNA
 4ABF	䪿	CJK_Ext_A	3.0	181	15		shěng					56DF	囟	top of the head; skull	SHIN SHI	HIYOMEKI
 4AC7	䫇	CJK_Ext_A	3.0	181	16		rán					9AEF	髯	beard; mustache	ZEN	HIGE
@@ -933,7 +929,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4AF7	䫷	CJK_Ext_A	3.0	181	25		è					984E	顎	jaw	GAKU	AGO
 4B03	䬃	CJK_Ext_A	3.0	182	14		sà					98AF	颯	the sound of the wind; bleak; melancholy	SATSU SOU	HISHIGU HAYATE MIDARERU
 4B19	䬙	CJK_Ext_A	3.0	182	19		yáo					98BB	颻	floating in air, drifting with wind	YOU	
-4B1A	䬚	CJK_Ext_A	3.0	182	19							5E06	帆	sail; boat	HAN	HO
+4B1A	䬚	CJK_Ext_A	3.0	182	19							98BF	颿	sail	HAN BON HEN	HASHIRU
 4B22	䬢	CJK_Ext_A	3.0	184	11							9955	饕	gluttonous, greedy, covetous	TOU	MUSABORU
 4B23	䬣	CJK_Ext_A	3.0	184	12		xì					993C	餼	sacrificial victim; gift; grain	KI KE	OKURIMONO
 4B29	䬩	CJK_Ext_A	3.0	184	13							9F4B	齋	vegetarian diet; study; to fast, abstain	SAI SHI	MONOIMI TSUTSUSHIMU
@@ -941,7 +937,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4B34	䬴	CJK_Ext_A	3.0	184	14		mò					79E3	秣	fodder, horse feed; feed horse	MATSU BATSU	MAGUSA MAGUSAKAU
 4B39	䬹	CJK_Ext_A	3.0	184	15		zhì					928D	銍	a sickle	CHITSU CHICHI SHITSU SHICHI	KAMA
 4B47	䭇	CJK_Ext_A	3.0	184	17		yē					564E	噎	choke; hiccup	ITSU ETSU	MUSEBU
-4B48	䭈	CJK_Ext_A	3.0	184	18		jiàn					9958	饘	gruel	SEN	KAYU
 4B4B	䭋	CJK_Ext_A	3.0	184	18		bǎo					98FD	飽	eat heartily; eat one's fill	HOU	AKIRU
 4B4C	䭌	CJK_Ext_A	3.0	184	18		hú					992C	餬	porridge, gruel, congee; paste	KO	KAYU
 4B5E	䭞	CJK_Ext_A	3.0	184	22		yì					7E79	繹	to unravel or unreel silk; to interpret, explain	EKI YAKU	NUKU TAZUNERU
@@ -957,7 +952,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4BAF	䮯	CJK_Ext_A	3.0	187	21		ào					9A41	驁	wild horse, mustang; wild	GOU GYOU	OGORU
 4BB6	䮶	CJK_Ext_A	3.0	187	22							9A6B	驫	horses	HYUU SHUU HYOU	
 4BBD	䮽	CJK_Ext_A	3.0	187	25		biāo					9463	鑣	bit, bridle; ride	HYOU	KUTSUWA
-4BBE	䮾	CJK_Ext_A	3.0	187	26		lóng					9F8D	龍	dragon; symbolic of emperor	RYUU ROU	TATSU
+4BBE	䮾	CJK_Ext_A	3.0	187	26		lóng					9F90	龐	disorderly, messy; huge, big	HOU BOU ROU RU	TAKADONO
 4BBF	䮿	CJK_Ext_A	3.0	187	27		jiǎn					8E47	蹇	lame, crippled; unlucky	KEN	ASHINAE NAYAMU
 4BC2	䯂	CJK_Ext_A	3.0	187	34		shēn								SHIN	
 4BC3	䯃	CJK_Ext_A	3.0	187	16							978D	鞍	saddle; any saddle-shaped object	AN	KURA
@@ -989,7 +984,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4C70	䱰	CJK_Ext_A	3.0	195	20		zhòng					9BA6	鮦	snakefish	TOU ZU	KATSUO
 4C73	䱳	CJK_Ext_A	3.0	195	20		zhān					9C63	鱣	sturgeon	TAN SEN ZEN DAN	KOI
 4C77	䱷	CJK_Ext_A	3.0	195	21		yú					9B5A	魚	fish; surname; KangXi radical 195	GYO	UO SAKANA SUNADORU
-4C84	䲄	CJK_Ext_A	3.0	195	22		mín					9C35	鰵	codfish	BIN MIN	ISHIMOCHI
+4C84	䲄	CJK_Ext_A	3.0	195	22		mín					9BB8	鮸	Sciaena albiflora; Otolithoides miiuy	BEN MEN BAN MAN	NIBE ISHIMOCHI
 4C92	䲒	CJK_Ext_A	3.0	195	24		xiè					87F9	蟹	crab, brachyura	KAI	KANI
 4C9D	䲝	CJK_Ext_A	3.0	195	15							9BE7	鯧	the silvery pomfret, Stromateoides argenteus	SHOU	MANAGATSUO
 4CA5	䲥	CJK_Ext_A	3.0	196	13							9CE9	鳩	pigeon, dove; collect, assemble	KYUU KU	HATO ATSUMERU
@@ -997,7 +992,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4CA9	䲩	CJK_Ext_A	3.0	196	14							9CF2	鳲	turtledove, cuckoo	SHI	YOBUKODORI
 4CB4	䲴	CJK_Ext_A	3.0	196	15		zhèn					9D06	鴆	a bird resembling the secretary falcon	CHIN	
 4CB5	䲵	CJK_Ext_A	3.0	196	15		què					96C0	雀	sparrow	JAKU SAKU	SUZUME
-4CC4	䳄	CJK_Ext_A	3.0	196	17		cí					96CC	雌	female; feminine; gentle, soft	SHI	MESU ME
+4CC4	䳄	CJK_Ext_A	3.0	196	17		cí					9D1C	鴜		SHI	HAHADORI
 4CC7	䳇	CJK_Ext_A	3.0	196	16		wǔ					9D61	鵡	species of parrot	BU MU	
 4CC8	䳈	CJK_Ext_A	3.0	196	16		bǎo					9D07	鴇	bustard; procuress; Otis species (various)	HOU	NOGAN TOKI
 4CDB	䳛	CJK_Ext_A	3.0	196	18		yàn					9DC3	鷃	quail	AN EN	UZURA
@@ -1005,7 +1000,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4CE8	䳨	CJK_Ext_A	3.0	196	20		huáng					51F0	凰	female phoenix	KOU OU	OOTORI
 4CEC	䳬	CJK_Ext_A	3.0	196	20		è					9DCA	鷊	pheasant	GEKI GYAKU	
 4CF0	䳰	CJK_Ext_A	3.0	196	20		bǎo					9D07	鴇	bustard; procuress; Otis species (various)	HOU	NOGAN TOKI
-4CF6	䳶	CJK_Ext_A	3.0	196	21		xī					96DE	雞	chickens; domestic fowl	KEI	NIWATORI
 4CFA	䳺	CJK_Ext_A	3.0	196	22		yàn					9D6A	鵪	quail; Coturnix coturnix	AN ON	UZURA
 4D0F	䴏	CJK_Ext_A	3.0	196	27		yàn					71D5	燕	swallow (bird); comfort, enjoy	EN	TSUBAME
 4D12	䴒	CJK_Ext_A	3.0	196	35		líng					9D12	鴒	species of lark; wagtail; Motacilla species (various)	REI RYOU	
@@ -1015,11 +1009,13 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4D35	䴵	CJK_Ext_A	3.0	199	17		bǐng					9905	餅	rice-cakes, biscuits	HEI HYOU	MOCHI
 4D39	䴹	CJK_Ext_A	3.0	199	19		guǒ					991C	餜	cakes, biscuits, pastry	KA	MOCHI
 4D45	䵅	CJK_Ext_A	3.0	199	22		áo					71AC	熬	cook down, to boil; endure	GOU	IRU
+4D6B	䵫	CJK_Ext_A	3.0	203	20		xūn					7E81	纁	light red, pink	KUN	USUIAKAIRO
 4D6F	䵯	CJK_Ext_A	3.0	203	21		tuǎn					757D	畽	ground	TON TAN TOU TSU	SOROWANAI
 4D77	䵷	CJK_Ext_A	3.0	205	19		wā					9F03	鼃	the edible water-frog	WAI KAI	KAERU
 4D7A	䵺	CJK_Ext_A	3.0	206	16		tǐng					5722	圢	paths between fields	TEI CHOU TEN	TAIRAKA
 4D8C	䶌	CJK_Ext_A	3.0	209	19		pào					76B0	皰	pimples	HOU	NIKIBI MOGASA
 4D8D	䶍	CJK_Ext_A	3.0	209	20		dì					568F	嚏	sneeze	TEI	KUSAME KUSHAMI
+4D8F	䶏	CJK_Ext_A	3.0	209	21		tì					6D1F	洟	snivel, mucus from nose	I TEI	HANAJIRU
 4DA5	䶥	CJK_Ext_A	3.0	211	26		zhā					9F5F	齟	irregular teeth; discord	SO SHO SA	KAMU
 4DA7	䶧	CJK_Ext_A	3.0	211	27		yǎo					54AC	咬	bite, gnaw	KOU GOU YOU	KAMU
 4DB4	䶴	CJK_Ext_A	3.0	214	25							5439	吹	blow; puff; brag, boast	SUI	FUKU

@@ -105,7 +105,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, SanityChecks) {
-  EXPECT_EQ(_data.kanjiNameMap().size(), 15147);
+  EXPECT_EQ(_data.kanjiNameMap().size(), 15143);
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
@@ -316,7 +316,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 0);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 0);
   EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 5);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1671);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1667);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 9);
   EXPECT_EQ(meaningDiffs, 2);
