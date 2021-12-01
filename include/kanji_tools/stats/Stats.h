@@ -23,13 +23,17 @@ public:
     // means the kanji is more common, but a frequency of '0' means the kanji isn't in the top
     // frequency list so use 'frequencyOrDefault' to return a large number for no-frequency
     // kanji and consider 'not-found' kanji to have even higher (worse) frequency. If kanjis
-    // both have the same 'count' and 'frequency' then sort by name.
+    // both have the same 'count' and 'frequency' then sort by type then hex (use 'hex' instead of
+    // 'name' since sorting by UTF-8 is less consistent).
     bool operator<(const Count& x) const {
       return count > x.count ||
-        (count == x.count && frequency() < x.frequency() || frequency() == x.frequency() && name < x.name);
+        (count == x.count && frequency() < x.frequency() ||
+         (frequency() == x.frequency() && type() < x.type() || (type() == x.type() && toHex() < x.toHex())));
     }
-    int frequency() const;
-    KanjiTypes type() const;
+    int frequency() const {
+      return entry.has_value() ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
+    }
+    KanjiTypes type() const { return entry.has_value() ? (**entry).type() : KanjiTypes::None; }
     std::string toHex() const;
 
     int count;

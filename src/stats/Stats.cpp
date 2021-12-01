@@ -67,12 +67,6 @@ Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
     countKanji(i, breakdown, verbose);
 }
 
-int Stats::Count::frequency() const {
-  return entry.has_value() ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
-}
-
-KanjiTypes Stats::Count::type() const { return entry.has_value() ? (**entry).type() : KanjiTypes::None; }
-
 template<typename Pred>
 int Stats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
                         bool& firstCount, bool verbose) const {
