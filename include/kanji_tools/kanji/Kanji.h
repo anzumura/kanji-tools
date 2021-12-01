@@ -18,7 +18,7 @@ inline constexpr auto KanjiLegend = "'=JLPT \"=Freq ^=Jinmei ~=LinkJ %=LinkO +=E
 class Kanji {
 public:
   using OptString = std::optional<std::string>;
-  using OldNames = std::vector<std::string>;
+  using LinkNames = std::vector<std::string>;
   using NelsonIds = std::vector<int>;
   static bool hasLink(KanjiTypes t) { return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld; }
 
@@ -38,7 +38,7 @@ public:
   //   - 8 are different alternate forms of Jōyō kanji (薗 駈 嶋 盃 冨 峯 埜 凉)
   //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName'
   // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
-  virtual const OldNames& oldNames() const { return EmptyOldNames; }
+  virtual const LinkNames& oldNames() const { return EmptyLinkNames; }
   // UcdFileKanji have an optional 'newName' field (based on Link field loaded from ucd.txt). LinkedKanji
   // also have a 'newName', i.e., the linked kanji name which is the new (or more standard) version.
   virtual OptString newName() const { return std::nullopt; }
@@ -129,8 +129,8 @@ protected:
   Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
         const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
         KenteiKyus kyu, int frequency);
+  inline static const LinkNames EmptyLinkNames{};
 private:
-  inline static const OldNames EmptyOldNames{};
   const int _number;
   const std::string _name;
   const bool _variant;

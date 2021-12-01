@@ -80,7 +80,7 @@ protected:
     EXPECT_EQ(k.info(), "Rad 二(1), Strokes 6, N1, Frq 1728, Old 亙, KJ1");
     auto& e = static_cast<const JinmeiKanji&>(k);
     EXPECT_EQ(e.radical().name(), "二");
-    EXPECT_EQ(e.oldNames(), Kanji::OldNames{"亙"});
+    EXPECT_EQ(e.oldNames(), Kanji::LinkNames{"亙"});
     EXPECT_EQ(e.year(), 1951);
     EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Names);
   }
@@ -156,7 +156,7 @@ TEST_F(KanjiTest, KenteiKanji) {
 TEST_F(KanjiTest, UcdKanji) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", false, false, 0, "", "utmost", "JIN", "MAMA");
+  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", false, false, 0, "", "", "utmost", "JIN", "MAMA");
   UcdKanji k(_data, 3, ucd);
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");
@@ -402,7 +402,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.reading(), "エン、つや");
       EXPECT_EQ(k.strokes(), 19);
       EXPECT_EQ(k.radical().name(), "色");
-      EXPECT_EQ(e.oldNames(), Kanji::OldNames{"艷"});
+      EXPECT_EQ(e.oldNames(), Kanji::LinkNames{"艷"});
       EXPECT_EQ(e.year(), 2010);
       EXPECT_EQ(e.extraTypeInfo(), "2010");
       EXPECT_EQ(k.info(), "Rad 色(2), Strokes 19, S, N1, Frq 2207, Old 艷, K2");

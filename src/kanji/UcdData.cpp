@@ -47,7 +47,7 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 void UcdData::load(const std::filesystem::path& file) {
   int lineNum = 1, codeCol = -1, nameCol = -1, blockCol = -1, versionCol = -1, radicalCol = -1, strokesCol = -1,
       variantStrokesCol = -1, pinyinCol = -1, morohashiCol = -1, nelsonCol = -1, joyoCol = -1, jinmeiCol = -1,
-      linkCodeCol = -1, linkNameCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
+      linkCodeCol = -1, linkNameCol = -1, linkTypeCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
                 ", file: " + file.string());
@@ -69,7 +69,7 @@ void UcdData::load(const std::filesystem::path& file) {
     col = pos;
   };
   std::ifstream f(file);
-  std::array<std::string, 17> cols;
+  std::array<std::string, 18> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
     std::stringstream ss(line);
@@ -103,6 +103,8 @@ void UcdData::load(const std::filesystem::path& file) {
           setCol(linkCodeCol, pos);
         else if (token == "LinkName")
           setCol(linkNameCol, pos);
+        else if (token == "LinkType")
+          setCol(linkTypeCol, pos);
         else if (token == "Meaning")
           setCol(meaningCol, pos);
         else if (token == "On")
@@ -149,7 +151,8 @@ void UcdData::load(const std::filesystem::path& file) {
              .emplace(std::piecewise_construct, std::make_tuple(name),
                       std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
                                       cols[pinyinCol], cols[morohashiCol], cols[nelsonCol], joyo, jinmei, linkCode,
-                                      cols[linkNameCol], cols[meaningCol], cols[onCol], cols[kunCol]))
+                                      cols[linkNameCol], cols[linkTypeCol], cols[meaningCol], cols[onCol],
+                                      cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
       if (linkCode > 0) {
@@ -173,6 +176,7 @@ void UcdData::print(const Data& data) const {
     int meaning = 0;
     int onReading = 0;
     int kunReading = 0;
+    int morohashi = 0;
     int nelson = 0;
     void add(const Ucd& k) {
       ++count;
@@ -181,6 +185,7 @@ void UcdData::print(const Data& data) const {
       if (!k.meaning().empty()) ++meaning;
       if (!k.onReading().empty()) ++onReading;
       if (!k.kunReading().empty()) ++kunReading;
+      if (!k.morohashiId().empty()) ++morohashi;
       if (!k.nelsonIds().empty()) ++nelson;
     }
   };
@@ -206,12 +211,31 @@ void UcdData::print(const Data& data) const {
   print("Meanings", joyo.meaning, jinmei.meaning, other.meaning);
   print("On Readdings", joyo.onReading, jinmei.onReading, other.onReading);
   print("Kun Readings", joyo.kunReading, jinmei.kunReading, other.kunReading);
+  print("Morohashi Ids", joyo.morohashi, jinmei.morohashi, other.morohashi);
   print("Nelson Ids", joyo.nelson, jinmei.nelson, other.nelson);
+  auto printLinks = [this, &data](const std::string& name, const auto& list) {
+    int count = std::count_if(list.begin(), list.end(), [this](const auto& i) {
+      auto j = _map.find(i->name());
+      return j != _map.end() && j->second.hasLink();
+    });
+    data.log() << name << " Kanji with links " << count << ":\n";
+    for (auto& i : list) {
+      auto j = _map.find(i->name());
+      if (j != _map.end()) {
+        if (j->second.hasLink())
+          data.out() << "  " << j->second.codeAndName() << " -> " << j->second.linkCodeAndName() << ' '
+                     << j->second.linkType() << '\n';
+      } else
+        data.out() << "  ERROR: " << i->name() << " not found in UCD\n";
+    }
+  };
+  printLinks("Frequency", data.frequencyKanji());
+  printLinks("Extra", data.extraKanji());
   data.log() << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
   int count = 0;
   data.log() << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
   data.log() << "    -      ----------------------------    -----------------------\n";
-  for (const auto& i : data.kanjiNameMap()) {
+  for (auto& i : data.kanjiNameMap()) {
     const Kanji& k = *i.second;
     if (k.variant()) {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    ["

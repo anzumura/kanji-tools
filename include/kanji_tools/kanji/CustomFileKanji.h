@@ -11,6 +11,7 @@ namespace kanji_tools {
 // - Jouyou and Extra files contain 'Strokes' column, Jinmei strokes come from 'strokes.txt' or 'ucd.txt'
 class CustomFileKanji : public NonLinkedKanji {
 public:
+  const LinkNames& oldNames() const override { return _oldNames; }
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
   // - 'file' must have tab separated lines that have the right number of columns for the given type
@@ -33,13 +34,20 @@ protected:
   };
   // 'columns' contains list of values for each column after parsing a line (used by 'fromString' method)
   static std::array<std::string, MaxCol> columns;
-
-  CustomFileKanji(const Data& d, int strokes, bool findFrequency = true)
+  // Constructor used by 'ExtraKanji'
+  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const Ucd* u)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency) {}
-  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, bool findFrequency = true, bool findLevel = true)
+                     meaning, columns[ReadingCol], strokes, u, false, false),
+      _oldNames(u && u->hasLink() ? LinkNames({u->linkName()}) : EmptyLinkNames) {}
+  // Constructors used by 'OfficialKanji'
+  CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     meaning, columns[ReadingCol], strokes, d.findUcd(columns[NameCol]), findFrequency, findLevel) {}
+                     columns[ReadingCol], strokes, d.findUcd(columns[NameCol])),
+      _oldNames(oldNames) {}
+  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames)
+    : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
+                     meaning, columns[ReadingCol], strokes, d.findUcd(columns[NameCol])),
+      _oldNames(oldNames) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
@@ -52,6 +60,8 @@ private:
                                           "Strokes", "Grade", "Meaning", "Reading",  "Reason"};
   static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
+
+  const LinkNames _oldNames;
 };
 
 // 'ExtraKanji' is used for kanji loaded from 'extra.txt'. 'extra.txt' is meant to hold 'fairly common'
@@ -59,7 +69,8 @@ private:
 // should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(const Data& d) : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol], false, false) {}
+  ExtraKanji(const Data& d)
+    : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol], d.findUcd(columns[NameCol])) {}
 
   KanjiTypes type() const override { return KanjiTypes::Extra; }
 };
@@ -69,22 +80,19 @@ class OfficialKanji : public CustomFileKanji {
 public:
   using OptInt = std::optional<int>;
 
-  const OldNames& oldNames() const override { return _oldNames; }
   OptInt year() const { return _year; }
 protected:
-  OfficialKanji(const Data& d, int s)
-    : CustomFileKanji(d, s), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
+  OfficialKanji(const Data& d, int s) : CustomFileKanji(d, s, getOldNames()), _year(optInt(columns[YearCol])) {}
   OfficialKanji(const Data& d, int s, const std::string& meaning)
-    : CustomFileKanji(d, s, meaning), _oldNames(getOldNames()), _year(optInt(columns[YearCol])) {}
+    : CustomFileKanji(d, s, meaning, getOldNames()), _year(optInt(columns[YearCol])) {}
 private:
-  static OldNames getOldNames();
+  static LinkNames getOldNames();
 
   static OptInt optInt(const std::string& s) {
     if (s.empty()) return {};
     return Data::toInt(s);
   }
 
-  const OldNames _oldNames;
   const OptInt _year;
 };
 

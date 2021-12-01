@@ -66,8 +66,8 @@ std::map<std::string, int> CustomFileKanji::ColumnMap = {
   colPair(NumberCol),  colPair(NameCol),  colPair(RadicalCol), colPair(OldNamesCol), colPair(YearCol),
   colPair(StrokesCol), colPair(GradeCol), colPair(MeaningCol), colPair(ReadingCol),  colPair(ReasonCol)};
 
-Kanji::OldNames OfficialKanji::getOldNames() {
-  OldNames result;
+Kanji::LinkNames OfficialKanji::getOldNames() {
+  LinkNames result;
   std::stringstream ss(columns[OldNamesCol]);
   for (std::string token; std::getline(ss, token, ',');)
     result.push_back(token);

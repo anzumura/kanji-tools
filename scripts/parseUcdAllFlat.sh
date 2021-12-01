@@ -4,7 +4,7 @@ declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
-# the following 17 values:
+# the following 18 values:
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in utf8
 # - Block: name of the Unicode block (from the 'blk' tag)
@@ -19,6 +19,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
 # - LinkCode: 230 Jinmei (of the 863 total) are variants of other Jōyō/Jinmei
 # - LinkName: link character in utf8
+# - LinkType: how the link was loaded: Jinmei, Traditional, Compatibility, ...
 # - Meaning: semicolin separated English definitions
 # - On: space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: space-separated Japanese Kun readings (in all-caps Rōmaji)
@@ -142,10 +143,10 @@ declare -r adobe='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
 
 printResulsFilter="$onKun|$morohashi|$nelson|$adobe"
 
-# 'findVairantLinks': find links based on 'kDefinition' field. For example, if
-# the field starts with '(same as X' then store a link from 'cp' to 'X'.
-function findVariantLinks() {
-  log "Find variant links ... " -n
+# 'findDefinitionLinks': find links based on 'kDefinition' field. For example,
+# if the field starts with '(same as X' then store a link from 'cp' to 'X'.
+function findDefinitionLinks() {
+  log "Find definition links ... " -n
   local -r def='kDefinition=\"[(]*' nonAscii='[^\x00-\x7F]{1,}'
   count=0 dup=0
   for type in 'a variant of' interchangeable 'same as' non-classical \
@@ -211,23 +212,22 @@ function populateOnKun() {
 # All entries have 'cp', 'age', 'blk', 'radical' and 'strokes' as well as at
 # least one of 'resultOn' or 'resultKun' so no need to count them, but count
 # some other optional fields of interest.
-declare -i totalMeaning=0 totalPinyin=0 totalMorohashi=0 totalNelson=0 \
-  totalJoyo=0 totalJinmei=0 totalLinkedJinmei=0
+declare -i traditionalLinks=0 compatibilityLinks=0 definitionLinks=0 \
+  semanticLinks=0 totalMeaning=0 totalPinyin=0 totalMorohashi=0 \
+  totalNelson=0 totalJoyo=0 totalJinmei=0 totalLinkedJinmei=0
 
 function printResults() {
   log "Print results to '$outFile' ... " -n
   count=0
-  local localDef loadFrom linkTo
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
-Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
+Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tLinkType\tMeaning\tOn\t\
+Kun" >$outFile
   while read -r i; do
     # No need to unset fields that are in every record such as 'cp', 'age' and
     # 'blk', but need to unset all the optional fields used below.
     setVars "$i" kCompatibilityVariant kSemanticVariant kTraditionalVariant \
       kRSAdobe_Japan1_6 kMandarin kMorohashi kNelson
-    localDef=${definition[$cp]}
-    loadFrom=
-    linkTo=
+    local localDef=${definition[$cp]} loadFrom= linkTo= linkType=
     # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also
     # be set by the 'setOnKun' function so they can't be local variables.
     resultOn=${on[$cp]}
@@ -243,50 +243,82 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
         linkTo=${linkBack[$cp]}
       fi
       [[ -z $linkTo ]] && inc totalJinmei || inc totalLinkedJinmei
-    elif [[ -z $resultOn$resultKun ]]; then
-      if [[ $kCompatibilityVariant =~ U+ ]]; then
-        loadFrom=${kCompatibilityVariant#*+}
-        linkTo=$loadFrom
-      elif [[ -n ${variantLink[$cp]} ]]; then
-        loadFrom=${variantLink[$cp]}
-        linkTo=$loadFrom
-      else
-        [[ -z $kSemanticVariant ]] && kSemanticVariant="$kTraditionalVariant"
-        if [[ $kSemanticVariant =~ U+ ]]; then
-          kSemanticVariant=${kSemanticVariant##*+} # remove leading U+
-          loadFrom=${kSemanticVariant%%&*}         # remove any trailing &lt ...
-          linkTo=$loadFrom
+    else
+      # For non-Jouyou/non-Jinmei kanji try to find meaningful links based on
+      # kTraditionalVariant, kCompatibilityVariant or kSemanticVariant fields or
+      # from 'variantLink' array (based on kDefinition field). Only populate a
+      # link if it refers to a kanji with an 'on' and/or 'kun' reading.
+      for s in $kTraditionalVariant; do
+        loadFrom=${s#*+} # remove leading U+
+        # Skip if kTraditionalVariant refers to the same cp being processed. For
+        # example, cp 5413 (吓) has kTraditionalVariant="U+5413 U+5687".
+        if [[ $loadFrom != $cp && -n ${on[$loadFrom]}${kun[$loadFrom]} ]]; then
+          linkType=Traditional
+          break
         fi
+      done
+      if [[ -z $linkType && $kCompatibilityVariant =~ U+ ]]; then
+        # kCompatibilityVariant never has more than one value
+        loadFrom=${kCompatibilityVariant#*+} # remove leading U+
+        [[ -n ${on[$loadFrom]}${kun[$loadFrom]} ]] && linkType=Compatibility
       fi
-    fi
-    if [[ -n $loadFrom ]]; then
-      localDef=${definition[$loadFrom]}
-      resultOn=${on[$loadFrom]}
-      resultKun=${kun[$loadFrom]}
+      if [[ -z $linkType && -n ${variantLink[$cp]} ]]; then
+        loadFrom=${variantLink[$cp]}
+        [[ -n ${on[$loadFrom]}${kun[$loadFrom]} ]] && linkType=Definition
+      fi
+      # Only use semantic links if there's no on/kun readings since these can
+      # sometimes result in linking together kanji that don't seem related.
+      if [[ -z $linkType && -z $resultOn$resultKun ]]; then
+        # kSemanticVariant can be a Unicode value like "U+8209", but some have
+        # compound values like "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews" or
+        # "U+57FC U+5D0E&lt;kMorohashi:TZ U+5D5C U+7895 U+966D U+FA11 U+2550E".
+        for s in $kSemanticVariant; do
+          s=${s#*+} # remove leading U+
+          loadFrom=${s%%&*}
+          if [[ -n ${on[$loadFrom]}${kun[$loadFrom]} ]]; then
+            linkType=Semantic
+            break
+          fi
+        done
+      fi
+      [[ -n $linkType ]] && linkTo=$loadFrom || loadFrom=
     fi
     if [[ -z $resultOn$resultKun ]]; then
-      # Support cases where UCD is missing on/kun for Kentei kanji or kanji with
-      # Nelson IDs. If a special case is used then also clear any 'linkTo' value
-      # since that value didn't result in an on/kun getting loaded. 4BC2 is not
-      # Kentei, but it's in 'wiki-stokes.txt' file.
-      case $cp in
-      34E4) setOnKun "KATSU" ;;                        # 㓤 (Nelson 677)
-      3C7E) setOnKun "KAI" ;;                          # 㱾 (Nelson 2453)
-      3C83) setOnKun "KYUU" ;;                         # 㲃 (Nelson 2459)
-      4BC2) setOnKun "SHIN" ;;                         # 䯂
-      6479) setOnKun "BO" "MO" ;;                      # 摹 (Nelson 4035)
-      6532) setOnKun "KI" "KATAMUKU SOBADATERU" ;;     # 攲 (Nelson 2041)
-      6FDB) setOnKun "BOU MOU" "KOSAME" ;;             # 濛
-      6663) setOnKun "SEI SETSU" "AKIRAKA KASHIKOI" ;; # 晣
-      69D4) setOnKun "KOU" "HANETSURUBE" ;;            # 槔
-      6A94) setOnKun "TOU" ;;                          # 檔
-      7B53) setOnKun "KEI" "KOUGAI KANZASHI" ;;        # 筓
-      7CF1) setOnKun "GETSU" "KOUJI MOYASHI" ;;        # 糱
-      83C6) setOnKun "SHU" ;;                          # 菆 (Nelson 3961)
-      *) continue ;;                                   # skip if no readings
+      if [[ -n $loadFrom ]]; then
+        localDef=${definition[$loadFrom]}
+        resultOn=${on[$loadFrom]}
+        resultKun=${kun[$loadFrom]}
+      fi
+      # Support cases where on/kun is missing for Kentei kanji or kanji with
+      # Nelson IDs. 4BC2 is not Kentei, but it's in 'wiki-stokes.txt' file.
+      if [[ -z $resultOn$resultKun ]]; then
+        case $cp in
+        34E4) setOnKun "KATSU" ;;                        # 㓤 (Nelson 677)
+        3C7E) setOnKun "KAI" ;;                          # 㱾 (Nelson 2453)
+        3C83) setOnKun "KYUU" ;;                         # 㲃 (Nelson 2459)
+        4BC2) setOnKun "SHIN" ;;                         # 䯂
+        6479) setOnKun "BO" "MO" ;;                      # 摹 (Nelson 4035)
+        6532) setOnKun "KI" "KATAMUKU SOBADATERU" ;;     # 攲 (Nelson 2041)
+        6FDB) setOnKun "BOU MOU" "KOSAME" ;;             # 濛
+        6663) setOnKun "SEI SETSU" "AKIRAKA KASHIKOI" ;; # 晣
+        69D4) setOnKun "KOU" "HANETSURUBE" ;;            # 槔
+        6A94) setOnKun "TOU" ;;                          # 檔
+        7B53) setOnKun "KEI" "KOUGAI KANZASHI" ;;        # 筓
+        7CF1) setOnKun "GETSU" "KOUJI MOYASHI" ;;        # 糱
+        83C6) setOnKun "SHU" ;;                          # 菆 (Nelson 3961)
+        *) continue ;;                                   # skip if no readings
+        esac
+        # UCD data doesn't have entries for these Nelson IDs: 125, 149, 489, 1639
+      fi
+    fi
+    if [[ -n $linkTo ]]; then
+      case $linkType in
+      Compatibility) inc compatibilityLinks ;;
+      Semantic) inc semanticLinks ;;
+      Traditional) inc traditionalLinks ;;
+      Definition) inc definitionLinks ;;
+      *) linkType=Jinmei ;;
       esac
-      linkTo=
-      # UCD data doesn't have entries for these Nelson IDs: 125, 149, 489, 1639
     fi
     #
     # Radical and Strokes
@@ -372,18 +404,21 @@ Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tMeaning\tOn\tKun" >$outFile
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
 $kMandarin\t$kMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
-$linkTo\t${linkTo:+\U$linkTo}\t$localDef\t$resultOn\t$resultKun" >>$outFile
+$linkTo\t${linkTo:+\U$linkTo}\t$linkType\t$localDef\t$resultOn\t$resultKun" \
+      >>$outFile
     inc count
   done < <(grep -E "($printResulsFilter)" $ucdFile)
   echo "wrote $count"
 }
 
-findVariantLinks
+findDefinitionLinks
 populateOnKun
 printResults
 
 log Done
 
+echo "   Links: Traditional $traditionalLinks, Compatibility \
+$compatibilityLinks, Definition $definitionLinks, Semantic $semanticLinks"
 echo "  Totals: Meaning $totalMeaning, Pinyin $totalPinyin, Morohashi \
 $totalMorohashi, Nelson $totalNelson"
 

@@ -13,14 +13,14 @@ public:
   const std::string& reading() const override { return _reading; }
 protected:
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& meaning,
-                 const std::string& reading, int strokes, const Ucd* u, bool findFrequency, bool findLevel = true,
+                 const std::string& reading, int strokes, const Ucd* u, bool findFrequency = true, bool findLevel = true,
                  bool findKyu = true)
     : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(u), d.getMorohashiId(u),
             d.getNelsonIds(u), findLevel ? d.getLevel(name) : JlptLevels::None,
             findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
       _meaning(meaning), _reading(reading) {}
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& reading,
-                 int strokes, const Ucd* u, bool findFrequency, bool findLevel = true, bool findKyu = true)
+                 int strokes, const Ucd* u, bool findFrequency = true, bool findLevel = true, bool findKyu = true)
     : NonLinkedKanji(d, number, name, radical, d.ucd().getMeaning(u), reading, strokes, u, findFrequency, findLevel,
                      findKyu) {}
 private:
