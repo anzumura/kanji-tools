@@ -182,6 +182,21 @@ TEST_F(KanjiDataTest, TotalsChecks) {
   EXPECT_EQ(_data.frequencyTotal(3), 500);
   EXPECT_EQ(_data.frequencyTotal(4), 501);
   EXPECT_EQ(_data.frequencyTotal(5), 0);
+  // Check sorting and printing by qualified name
+  std::vector<std::string> list({"弓", "弖", "窮", "弼", "穹", "躬"});
+  Data::List kanjis;
+  for (const auto& i : list) {
+    auto k = _data.findKanjiByName(i);
+    ASSERT_TRUE(k.has_value());
+    kanjis.push_back(*k);
+  }
+  std::sort(kanjis.begin(), kanjis.end(), Data::orderByQualifiedName);
+  std::string sorted;
+  for (const auto& i : kanjis) {
+    if (!sorted.empty()) sorted += ' ';
+    sorted += i->qualifiedName();
+  }
+  EXPECT_EQ(sorted, "弓. 窮. 穹^ 弼@ 弖# 躬#");
   // Make sure all Kanji are in Kanji related Unicode blocks
   EXPECT_EQ(checkKanji(_data.jouyouKanji()), 0);
   EXPECT_EQ(checkKanji(_data.jinmeiKanji()), 0);

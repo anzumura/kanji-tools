@@ -348,7 +348,7 @@ void Quiz::printInfoLegend(int infoFields) const {
     if (!fields.empty()) fields += ',';
     fields += " G[1-6]=Grade (S=Secondary School)";
   }
-  log() << "Legend:\n  Fields:" << fields << "\n  Suffix: " << KanjiLegend << '\n';
+  log() << "Legend:\n  Fields:" << fields << "\n  Suffix: " << Kanji::Legend << '\n';
 }
 
 void Quiz::printReviewDetails(const Entry& kanji) const {
@@ -357,7 +357,9 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
   if (auto i = _groupData.patternMap().find(kanji->name());
       i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
-    for (auto& j : i->second->members())
+    Data::List sorted(i->second->members());
+    std::sort(sorted.begin(), sorted.end(), Data::orderByQualifiedName);
+    for (auto& j : sorted)
       if (j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
   }
@@ -481,7 +483,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
     if (firstTime) {
       log(true) << "Starting " << (_reviewMode ? "review" : "quiz") << " for " << list.size() << ' ' << i->type()
                 << " groups\n";
-      if (type) log() << "  " << KanjiLegend << '\n';
+      if (type) log() << "  " << Kanji::Legend << '\n';
       firstTime = false;
     }
     Answers answers;

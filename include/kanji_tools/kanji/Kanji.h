@@ -6,14 +6,11 @@
 #include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/utils/JlptLevels.h>
 #include <kanji_tools/utils/KenteiKyus.h>
+#include <kanji_tools/utils/MBUtils.h>
 
 #include <optional>
 
 namespace kanji_tools {
-
-// 'KanjiLegend' is meant to be used in output to briefly describe the suffix added to a kanji when
-// using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
-inline constexpr auto KanjiLegend = ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 
 class Kanji {
 public:
@@ -111,26 +108,50 @@ public:
   //     @ = <K1 Kentei     : 268 non-K1 Kentei Kanji that aren't in the above categories
   //     # = K1 Kentei      : 2554 K1 Kentei Kanji that aren't in the above categories
   //     * = Ucd            : all kanji loaded from 'ucd.txt' file that aren't in the above categories
-  std::string qualifiedName() const {
-    auto t = type();
-    return _name +
-      (t == KanjiTypes::Jouyou           ? '.'
-         : hasLevel()                    ? '\''
-         : _frequency                    ? '"'
-         : t == KanjiTypes::Jinmei       ? '^'
-         : t == KanjiTypes::LinkedJinmei ? '~'
-         : t == KanjiTypes::LinkedOld    ? '%'
-         : t == KanjiTypes::Extra        ? '+'
-         : t == KanjiTypes::Ucd          ? '*'
-         : kyu() != KenteiKyus::K1       ? '@'
-                                         : '#');
+  std::string qualifiedName() const { return _name + QualifiedNames[qualifiedNameRank()]; }
+
+  // 'orderByQualifiedName' can be used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
+  // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the same 'qualifiedNameRank' then
+  // sort by strokes, frequency, variant and (unicode) compatibilityName.
+  bool orderByQualifiedName(const Kanji& x) const {
+    return qualifiedNameRank() < x.qualifiedNameRank() ||
+      qualifiedNameRank() == x.qualifiedNameRank() &&
+      (strokes() < x.strokes() ||
+       strokes() == x.strokes() &&
+         (frequency() < x.frequency() ||
+          frequency() == x.frequency() &&
+            (variant() < x.variant() ||
+             variant() == x.variant() && toUnicode(compatibilityName()) < toUnicode(x.compatibilityName()))));
   }
+
+  // 'Legend' is meant to be used in output to briefly describe the suffix added to a kanji when
+  // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
+  static constexpr auto Legend = ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 protected:
   Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
         const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
         KenteiKyus kyu, int frequency);
   inline static const LinkNames EmptyLinkNames{};
 private:
+  // 'QualifiedNames' stores the suffixes for qualified names in order of most common to least common (see
+  // comments for 'qualifiedName' method and 'Legend' string above for more details).
+  static constexpr std::array QualifiedNames = {'.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
+
+  int qualifiedNameRank() const {
+    auto t = type();
+    // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd (so the least common)
+    return t == KanjiTypes::Jouyou    ? 0
+      : hasLevel()                    ? 1
+      : _frequency                    ? 2
+      : t == KanjiTypes::Jinmei       ? 3
+      : t == KanjiTypes::LinkedJinmei ? 4
+      : t == KanjiTypes::LinkedOld    ? 5
+      : t == KanjiTypes::Extra        ? 6
+      : t == KanjiTypes::Ucd          ? 9
+      : kyu() != KenteiKyus::K1       ? 7
+                                      : 8;
+  }
+
   const int _number;
   const std::string _name;
   const bool _variant;

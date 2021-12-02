@@ -106,7 +106,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
 }
 
 void GroupData::printGroups(const Map& groups, const List& groupList) const {
-  log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << KanjiLegend
+  log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << Kanji::Legend
         << "\nName (number of entries)   Parent Member : Other Members\n";
   const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4;
   std::map<KanjiTypes, std::vector<std::string>> types;

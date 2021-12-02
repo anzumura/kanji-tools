@@ -20,6 +20,7 @@ public:
   using Map = std::map<std::string, Entry>;
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
+  inline static auto orderByQualifiedName = [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); };
 
   Data(const std::filesystem::path& dataDir, bool debug, std::ostream& out = std::cout, std::ostream& err = std::cerr)
     : _dataDir(dataDir), _debug(debug), _out(out), _err(err) {
