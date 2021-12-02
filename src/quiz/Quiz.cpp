@@ -45,6 +45,17 @@ the following produce the same output:\n\
 Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
   : _groupData(data), _jukugoData(*data), _question(0), _score(0), _showMeanings(false), _reviewMode(false),
     _choice(data->out(), in) {
+  auto printDetailsForList = [this](const auto& list, const auto& name, const auto& arg) {
+    if (list.size() != 1) {
+      if (list.size() > 1) {
+        printInfoLegend();
+        out() << '\n';
+      }
+      out() << "Found " << list.size() << " matches for " << name << " ID " << arg << (list.size() ? ":\n\n" : "\n");
+    }
+    for (auto& kanji : list)
+      printDetails(kanji->name(), list.size() == 1);
+  };
   bool endOptions = false;
   for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) {
     std::string arg = argv[i];
@@ -72,19 +83,11 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
         if (std::string nonPrimeIndex = arg.ends_with("P") ? arg.substr(0, arg.length() - 1) : arg;
             !std::all_of(nonPrimeIndex.begin(), nonPrimeIndex.end(), ::isdigit))
           Data::usage("invalid Morohashi ID '" + arg + "'");
-        auto& i = data->findKanjisByMorohashiId(arg);
-        if (i.size() != 1)
-          out() << "Found " << i.size() << " matches for Morohashi ID " << arg << (i.size() ? ":\n\n" : "\n");
-        for (auto& kanji : i)
-          printDetails(kanji->name());
+        printDetailsForList(data->findKanjisByMorohashiId(arg), "Morohashi", arg);
       } else if (arg.starts_with("n") && arg.length() > 1) {
         arg = arg.substr(1);
         if (!std::all_of(arg.begin(), arg.end(), ::isdigit)) Data::usage("invalid Nelson ID '" + arg + "'");
-        auto& i = data->findKanjisByNelsonId(std::stoi(arg));
-        if (i.size() != 1)
-          out() << "Found " << i.size() << " matches for Nelson ID " << arg << (i.size() ? ":\n\n" : "\n");
-        for (auto& kanji : i)
-          printDetails(kanji->name());
+        printDetailsForList(data->findKanjisByNelsonId(std::stoi(arg)), "Nelson", arg);
       } else if (arg.starts_with("u") && arg.length() > 1) {
         arg = arg.substr(1);
         // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit must be a 1 or 2)
@@ -102,7 +105,8 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
   if (!data->debug() && !in) start();
 }
 
-void Quiz::printDetails(const std::string& arg) const {
+void Quiz::printDetails(const std::string& arg, bool showLegend) const {
+  if (showLegend) printInfoLegend();
   out() << "Showing details for " << arg << " [" << toUnicode(arg) << "]";
   auto ucd = data().ucd().find(arg);
   if (ucd) {
@@ -269,13 +273,7 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   if (questions.size() < list.size())
     out() << " (original list had " << list.size() << ", but not all entries have readings)";
   out() << '\n';
-  if (quizStyle == 'k') {
-    log() << "Legend:";
-    if (infoFields & Kanji::LevelField) out() << " 'N[1-5]'=JLPT Level";
-    if (infoFields & Kanji::KyuField) out() << " 'K[1-10]'=Kentei Kyu";
-    if (infoFields & Kanji::GradeField) out() << " 'G[1-6]'=Grade ('S'=Secondary School)";
-    out() << '\n';
-  }
+  if (quizStyle == 'k') printInfoLegend(infoFields);
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(1, numberOfChoicesPerQuestion);
   while (_question < questions.size()) {
@@ -339,6 +337,20 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   }
 }
 
+void Quiz::printInfoLegend(int infoFields) const {
+  std::string fields;
+  if (infoFields & Kanji::LevelField) fields += " N[1-5]=JLPT Level";
+  if (infoFields & Kanji::KyuField) {
+    if (!fields.empty()) fields += ',';
+    fields += " K[1-10]=Kentei Kyu";
+  }
+  if (infoFields & Kanji::GradeField) {
+    if (!fields.empty()) fields += ',';
+    fields += " G[1-6]=Grade (S=Secondary School)";
+  }
+  log() << "Legend:\n  Fields:" << fields << "\n  Suffix: " << KanjiLegend << '\n';
+}
+
 void Quiz::printReviewDetails(const Entry& kanji) const {
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
   out() << "    Reading: " << kanji->reading() << '\n';
@@ -346,7 +358,7 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
       i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
     for (auto& j : i->second->members())
-      if (j != kanji) out() << ' ' << j->name();
+      if (j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
   }
   if (kanji->hasMorohashId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';

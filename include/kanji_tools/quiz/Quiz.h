@@ -17,7 +17,7 @@ public:
 private:
   enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
   // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
-  void printDetails(const std::string&) const;
+  void printDetails(const std::string&, bool showLegend = true) const;
 
   const Data& data() const { return _groupData.data(); }
   std::ostream& out() const { return data().out(); }
@@ -39,6 +39,7 @@ private:
   // print meaning if _showMeanings is true and meaning exists
   void printMeaning(const Entry&, bool useNewLine = false) const;
 
+  void printInfoLegend(int infoFields = Kanji::AllFields) const;
   void printExtraTypeInfo(const Entry&) const;
   void printReviewDetails(const Entry&) const;
 
