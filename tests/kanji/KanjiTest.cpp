@@ -153,10 +153,12 @@ TEST_F(KanjiTest, KenteiKanji) {
   EXPECT_FALSE(k.hasReading());
 }
 
-TEST_F(KanjiTest, UcdKanji) {
+TEST_F(KanjiTest, UcdKanjiWithNewName) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", false, false, 0, "", "", "utmost", "JIN", "MAMA");
+  const std::string sampleLink("sampleLink");
+  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", false, false, Ucd::Links({Ucd::Link(1, sampleLink)}),
+          Ucd::LinkTypes::Simplified, "utmost", "JIN", "MAMA");
   UcdKanji k(_data, 3, ucd);
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");
@@ -166,11 +168,24 @@ TEST_F(KanjiTest, UcdKanji) {
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.kyu(), KenteiKyus::None);
-  EXPECT_EQ(k.info(), "Rad TestRadical(1)");
   EXPECT_EQ(k.morohashiId(), Kanji::OptString("123P"));
   EXPECT_EQ(k.nelsonIds(), Kanji::NelsonIds({456, 789}));
   EXPECT_EQ(k.meaning(), "utmost");
   EXPECT_EQ(k.reading(), "ジン、まま");
+  ASSERT_TRUE(k.newName().has_value());
+  EXPECT_EQ(*k.newName(), sampleLink);
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), New sampleLink");
+}
+
+TEST_F(KanjiTest, UcdKanjiWithOldNames) {
+  Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
+  EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
+  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "", "", false, false, Ucd::Links({Ucd::Link(1, "old1"), Ucd::Link(2, "old2")}),
+          Ucd::LinkTypes::Traditional, "utmost", "JIN", "MAMA");
+  UcdKanji k(_data, 3, ucd);
+  ASSERT_FALSE(k.newName().has_value());
+  EXPECT_EQ(k.oldNames(), Kanji::LinkNames({"old1", "old2"}));
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Old old1／old2");
 }
 
 TEST_F(KanjiTest, ExtraFile) {

@@ -52,8 +52,7 @@ void UcdData::load(const std::filesystem::path& file) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
                 ", file: " + file.string());
   };
-  auto getWchar = [&error](const std::string& col, const auto& s, bool allowEmpty = false) -> wchar_t {
-    if (s.empty() && allowEmpty) return 0;
+  auto getWchar = [&error](const std::string& col, const auto& s) -> wchar_t {
     if (s.length() != 4 && s.length() != 5) error(col + " length must be 4 or 5 '" + s + "'");
     for (char c : s)
       if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("invalid '" + col + "' string '" + s + "'");
@@ -137,30 +136,41 @@ void UcdData::load(const std::filesystem::path& file) {
       const bool joyo = getBool("Joyo", cols[joyoCol]);
       const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
       if (joyo && jinmei) error("can't be both joyo and jinmei");
-      const wchar_t linkCode = getWchar("LinkCode", cols[linkCodeCol], true);
-      if (linkCode > 0) {
-        if (cols[linkNameCol].empty()) error("missing link name");
+      Ucd::Links links;
+      if (!cols[linkNameCol].empty()) {
+        std::stringstream names(cols[linkNameCol]);
+        std::stringstream codes(cols[linkCodeCol]);
+        for (std::string linkName; std::getline(names, linkName, ',');) {
+          if (std::string linkCode; std::getline(codes, linkCode, ','))
+            links.emplace_back(getWchar("LinkCode", linkCode), linkName);
+          else
+            error("LinkName has more values than LinkCode");
+        }
         // Joyo are standard Kanji so they shouldn't have a link back to a standard form. However,
-        // Some Jinmei do have links since they are 'officially allowed variants/old forms'.
-        if (joyo) error("joyo shouldn't have a link");
-      }
+        // Some Jinmei do have links since they are 'officially allowed variants/old forms'. There
+        // are links in raw XML data for joyo, but the parse script ignores them.
+        if (joyo) error("joyo shouldn't have links");
+        if (cols[linkTypeCol].empty()) error("LinkName has a value, but LinkType is empty");
+      } else if (!cols[linkTypeCol].empty())
+        error("LinkType has a value, but LinkName is empty");
+      else if (!cols[linkCodeCol].empty())
+        error("LinkCode has a value, but LinkName is empty");
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
       if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
       if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
       if (!_map
              .emplace(std::piecewise_construct, std::make_tuple(name),
                       std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
-                                      cols[pinyinCol], cols[morohashiCol], cols[nelsonCol], joyo, jinmei, linkCode,
-                                      cols[linkNameCol], cols[linkTypeCol], cols[meaningCol], cols[onCol],
-                                      cols[kunCol]))
+                                      cols[pinyinCol], cols[morohashiCol], cols[nelsonCol], joyo, jinmei, links,
+                                      Ucd::toLinkType(cols[linkTypeCol]), cols[meaningCol], cols[onCol], cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
-      if (linkCode > 0) {
+      for (const auto& link : links) {
         if (jinmei) {
-          auto i = _linkedJinmei.insert(std::make_pair(cols[linkNameCol], name));
-          if (!i.second) error("jinmei link " + cols[linkNameCol] + " to " + name + " failed - has " + i.first->second);
+          auto i = _linkedJinmei.insert(std::make_pair(link.name(), name));
+          if (!i.second) error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
         } else
-          _linkedOther[cols[linkNameCol]].push_back(name);
+          _linkedOther[link.name()].push_back(name);
       }
     }
   }
@@ -180,7 +190,7 @@ void UcdData::print(const Data& data) const {
     int nelson = 0;
     void add(const Ucd& k) {
       ++count;
-      if (k.hasLink()) ++link;
+      if (k.hasLinks()) ++link;
       if (k.hasVariantStrokes()) ++variantStrokes;
       if (!k.meaning().empty()) ++meaning;
       if (!k.onReading().empty()) ++onReading;
@@ -216,14 +226,14 @@ void UcdData::print(const Data& data) const {
   auto printLinks = [this, &data](const std::string& name, const auto& list) {
     int count = std::count_if(list.begin(), list.end(), [this](const auto& i) {
       auto j = _map.find(i->name());
-      return j != _map.end() && j->second.hasLink();
+      return j != _map.end() && j->second.hasLinks();
     });
     data.log() << name << " Kanji with links " << count << ":\n";
     for (auto& i : list) {
       auto j = _map.find(i->name());
       if (j != _map.end()) {
-        if (j->second.hasLink())
-          data.out() << "  " << j->second.codeAndName() << " -> " << j->second.linkCodeAndName() << ' '
+        if (j->second.hasLinks())
+          data.out() << "  " << j->second.codeAndName() << " -> " << j->second.linkCodeAndNames() << ' '
                      << j->second.linkType() << '\n';
       } else
         data.out() << "  ERROR: " << i->name() << " not found in UCD\n";
@@ -243,7 +253,7 @@ void UcdData::print(const Data& data) const {
       auto u = find(k.name());
       if (u) {
         data.out() << u->codeAndName();
-        if (u->hasLink()) data.out() << " variant of " << u->linkCodeAndName();
+        if (u->hasLinks()) data.out() << " variant of " << u->linkCodeAndNames();
       } else
         data.out() << "UCD not found";
       data.out() << '\n';

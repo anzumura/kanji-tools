@@ -1,7 +1,9 @@
 #ifndef KANJI_TOOLS_KANJI_UCD_H
 #define KANJI_TOOLS_KANJI_UCD_H
 
+#include <iostream>
 #include <string>
+#include <vector>
 
 namespace kanji_tools {
 
@@ -9,15 +11,31 @@ namespace kanji_tools {
 // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
+  // LinkTypes represents how a Ucd link was loaded (from which XML property - see parse script for details)
+  enum class LinkTypes { Compatibility, Definition, Jinmei, Semantic, Simplified, Traditional, None };
+  static LinkTypes toLinkType(const std::string&);
+  static const std::string& toString(LinkTypes);
+
+  class Link {
+  public:
+    Link(wchar_t code, const std::string& name) : _code(code), _name(name) {}
+    wchar_t code() const { return _code; }
+    const std::string& name() const { return _name; }
+    std::string codeAndName() const;
+  private:
+    const wchar_t _code;
+    const std::string _name;
+  };
+  using Links = std::vector<Link>;
+
   Ucd(wchar_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
       int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
-      const std::string& nelsonIds, bool joyo, bool jinmei, wchar_t linkCode, const std::string& linkName,
-      const std::string& linkType, const std::string& meaning, const std::string& onReading,
-      const std::string& kunReading)
+      const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, LinkTypes linkType,
+      const std::string& meaning, const std::string& onReading, const std::string& kunReading)
     : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _morohashiId(morohashiId),
       _nelsonIds(nelsonIds), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo),
-      _jinmei(jinmei), _linkCode(linkCode), _linkName(linkName), _linkType(linkType), _meaning(meaning),
-      _onReading(onReading), _kunReading(kunReading) {}
+      _jinmei(jinmei), _links(links), _linkType(linkType), _meaning(meaning), _onReading(onReading),
+      _kunReading(kunReading) {}
 
   wchar_t code() const { return _code; }
   const std::string& name() const { return _name; }
@@ -31,21 +49,22 @@ public:
   const std::string& nelsonIds() const { return _nelsonIds; }
   bool joyo() const { return _joyo; }
   bool jinmei() const { return _jinmei; }
-  wchar_t linkCode() const { return _linkCode; }
-  const std::string& linkName() const { return _linkName; }
-  const std::string& linkType() const { return _linkType; }
+  const Links& links() const { return _links; }
+  LinkTypes linkType() const { return _linkType; }
   const std::string& meaning() const { return _meaning; }
   const std::string& onReading() const { return _onReading; }
   const std::string& kunReading() const { return _kunReading; }
   // 'has' methods
-  bool hasLink() const { return _linkCode != 0; }
+  bool hasLinks() const { return !_links.empty(); }
+  bool hasTraditionalLinks() const { return _linkType == LinkTypes::Traditional; }
+  bool hasNonTraditionalLinks() const { return hasLinks() && _linkType != LinkTypes::Traditional; }
   bool hasVariantStrokes() const { return _variantStrokes != 0; }
   // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
   // it falls back to just return '_strokes'
   int getStrokes(bool variant) const { return variant && hasVariantStrokes() ? _variantStrokes : _strokes; }
   // 'codeAndName' methods return the Unicode in square brackets plus the name, e.g.: [FA30] 侮
   std::string codeAndName() const;
-  std::string linkCodeAndName() const;
+  std::string linkCodeAndNames() const;
   // 'EmptyString' can be returned by 'linkCodeAndName' and is used by other classes as well
   static const std::string EmptyString;
 private:
@@ -61,13 +80,14 @@ private:
   const std::string _nelsonIds;
   const bool _joyo;
   const bool _jinmei;
-  const wchar_t _linkCode; // 0 for 'no link'
-  const std::string _linkName;
-  const std::string _linkType;
+  const Links _links;
+  const LinkTypes _linkType;
   const std::string _meaning;
   const std::string _onReading;
   const std::string _kunReading;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Ucd::LinkTypes& x) { return os << Ucd::toString(x); }
 
 } // namespace kanji_tools
 

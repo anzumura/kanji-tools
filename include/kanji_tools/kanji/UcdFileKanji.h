@@ -12,17 +12,16 @@ namespace kanji_tools {
 // that haven't already been loaded from a custom file (see CustomFileKanji.h).
 class UcdFileKanji : public NonLinkedKanji {
 public:
-  const LinkNames& oldNames() const override { return _isOldLink ? _linkNames : EmptyLinkNames; }
+  const LinkNames& oldNames() const override { return _hasOldLinks ? _linkNames : EmptyLinkNames; }
   OptString newName() const override {
-    return !_linkNames.empty() && !_isOldLink ? OptString(_linkNames[0]) : std::nullopt;
+    return _linkNames.empty() || _hasOldLinks ? std::nullopt : OptString(_linkNames[0]);
   }
 protected:
   UcdFileKanji(const Data& d, int number, const std::string& name, const std::string& reading, const Ucd* u,
                bool findFrequency = true, bool findKyu = true)
     : NonLinkedKanji(d, number, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u, findFrequency, false,
                      findKyu),
-      _isOldLink(u && u->linkType() == "Traditional"),
-      _linkNames(u && u->hasLink() ? LinkNames({u->linkName()}) : EmptyLinkNames) {}
+      _hasOldLinks(u && u->hasTraditionalLinks()), _linkNames(getLinkNames(u)) {}
   UcdFileKanji(const Data& d, int number, const std::string& name, const Ucd* u, bool findFrequency = true,
                bool findKyu = true)
     : UcdFileKanji(d, number, name, d.ucd().getReadingsAsKana(u), u, findFrequency, findKyu) {}
@@ -31,7 +30,7 @@ private:
   // 'ucd links' are more arbitrary than the standard 'official' jinmei and jouyou linked kanji (ie official
   // variants). Ucd links can potentially even be circular depending on how the source data is parsed and
   // there are also cases of links to another ucd kanji with a link.
-  const bool _isOldLink;
+  const bool _hasOldLinks;
   const LinkNames _linkNames;
 };
 

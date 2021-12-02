@@ -12,9 +12,17 @@ public:
   const std::string& meaning() const override { return _meaning; }
   const std::string& reading() const override { return _reading; }
 protected:
+  // 'getLinkNames' is used by UcdFileKanji and ExtraKanji to populate links from Ucd data
+  static LinkNames getLinkNames(const Ucd* u) {
+    LinkNames result;
+    if (u && u->hasLinks())
+      std::transform(u->links().begin(), u->links().end(), std::back_inserter(result),
+                     [](const auto& i) { return i.name(); });
+    return result;
+  }
   NonLinkedKanji(const Data& d, int number, const std::string& name, const Radical& radical, const std::string& meaning,
-                 const std::string& reading, int strokes, const Ucd* u, bool findFrequency = true, bool findLevel = true,
-                 bool findKyu = true)
+                 const std::string& reading, int strokes, const Ucd* u, bool findFrequency = true,
+                 bool findLevel = true, bool findKyu = true)
     : Kanji(number, name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(u), d.getMorohashiId(u),
             d.getNelsonIds(u), findLevel ? d.getLevel(name) : JlptLevels::None,
             findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),

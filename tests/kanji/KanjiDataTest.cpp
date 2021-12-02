@@ -105,7 +105,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, SanityChecks) {
-  EXPECT_EQ(_data.kanjiNameMap().size(), 15153);
+  EXPECT_EQ(_data.kanjiNameMap().size(), 15106);
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
@@ -303,41 +303,42 @@ TEST_F(KanjiDataTest, UcdLinks) {
       EXPECT_TRUE(isCommonKanji(k.name())) << k.codeAndName();
     else
       EXPECT_TRUE(isKanji(k.name())) << k.codeAndName();
-    // if a link is present make sure it points to another valid UCD entry
-    if (k.hasLink()) {
-      EXPECT_NE(k.name(), k.linkName());
-      auto link = ucd.find(k.linkName());
-      ASSERT_NE(link, ucd.end()) << k.linkCodeAndName();
+    // make sure links point to other valid UCD entries
+    for (auto& i : k.links()) {
+      EXPECT_NE(k.name(), i.name());
+      auto link = ucd.find(i.name());
+      ASSERT_NE(link, ucd.end()) << i.name();
     }
     if (k.joyo()) {
       EXPECT_FALSE(k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
-      EXPECT_FALSE(k.hasLink()) << k.codeAndName() << " joyo has a link";
+      EXPECT_FALSE(k.hasLinks()) << k.codeAndName() << " joyo has a link";
       ++jouyou;
     } else if (k.jinmei()) {
       ++jinmei;
-      if (k.hasLink()) {
+      if (k.hasLinks()) {
+        EXPECT_EQ(k.links().size(), 1) << k.name();
         ++jinmeiLinks;
-        auto& link = ucd.find(k.linkName())->second;
+        auto& link = ucd.find(k.links()[0].name())->second;
         if (link.joyo())
           ++jinmeiLinksToJouyou;
         else if (link.jinmei())
           ++jinmeiLinksToJinmei;
         else
           FAIL() << "jinmei '" << k.name() << "' shouldn't have non-official link";
-        if (link.hasLink()) EXPECT_NE(link.linkName(), k.name());
+        if (link.hasLinks()) EXPECT_NE(link.links()[0].name(), k.name());
       }
-    } else if (k.hasLink())
+    } else if (k.hasLinks())
       ++otherLinks[_data.getType(k.name())];
   }
   EXPECT_EQ(jouyou, _data.jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data.jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
-  EXPECT_EQ(otherLinks[KanjiTypes::Extra], 3);
-  EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 9);
-  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 65);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1936);
+  EXPECT_EQ(otherLinks[KanjiTypes::Extra], 8);
+  EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 13);
+  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 185);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1983);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // these are captured in 'jinmeiLinks'
-  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 11);
+  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 83);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();

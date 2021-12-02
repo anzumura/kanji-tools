@@ -85,11 +85,21 @@ function inc() {
   eval $1=$(($1 + 1))
 }
 
+declare -i radical
+
+# 'setVars' sets global vars for each property in the XML record passed in. It
+# will also unset any vars specified after the XML string. The exit status is 0
+# if the record should be processed.
 function setVars() {
   local -r xml=${1:6} # strip leading '<char '
   shift               # more 'vars to unset' can be specified after $1 (xml arg)
   unset -v kJoyoKanji kJinmeiyoKanji $*
   eval ${xml%/>} # strip trailing '/>' and set vars from remaining XML string
+  radical=${kRSUnicode%%[.\']*}
+  # Simplified radicals, i.e., a value ending with a single quote, shouldn't be
+  # processed unless the radical is 199 (麥 麦). For example, 4336 (䌶) has
+  # kRSUnicode="120'.3" so it will result in a non-zero exit code.
+  [[ $radical -eq 199 || ! $kRSUnicode =~ ^[0-9]*\' ]]
 }
 
 function setOnKun() {
@@ -188,7 +198,7 @@ function populateOnKun() {
   log "Populate On/Kun arrays ... " -n
   count=0
   while read -r i; do
-    setVars "$i" kDefinition kJapaneseOn kJapaneseKun
+    setVars "$i" kDefinition kJapaneseOn kJapaneseKun || continue
     if [[ -n $kJoyoKanji ]]; then
       # There are 4 entries with a Joyo link: 5265, 53F1, 586B and 982C. Store
       # definition/on/kun since since they are missing for some linked Jinmeiyo
@@ -212,9 +222,9 @@ function populateOnKun() {
 # All entries have 'cp', 'age', 'blk', 'radical' and 'strokes' as well as at
 # least one of 'resultOn' or 'resultKun' so no need to count them, but count
 # some other optional fields of interest.
-declare -i traditionalLinks=0 compatibilityLinks=0 definitionLinks=0 \
-  semanticLinks=0 totalMeaning=0 totalPinyin=0 totalMorohashi=0 \
-  totalNelson=0 totalJoyo=0 totalJinmei=0 totalLinkedJinmei=0
+declare -i traditionalLinks=0 simplifiedLinks=0 compatibilityLinks=0 \
+  definitionLinks=0 semanticLinks=0 totalMeaning=0 totalPinyin=0 \
+  totalMorohashi=0 totalNelson=0 totalJoyo=0 totalJinmei=0 totalLinkedJinmei=0
 
 function printResults() {
   log "Print results to '$outFile' ... " -n
@@ -225,8 +235,9 @@ Kun" >$outFile
   while read -r i; do
     # No need to unset fields that are in every record such as 'cp', 'age' and
     # 'blk', but need to unset all the optional fields used below.
-    setVars "$i" kCompatibilityVariant kSemanticVariant kTraditionalVariant \
-      kRSAdobe_Japan1_6 kMandarin kMorohashi kNelson
+    setVars "$i" kTraditionalVariant kSimplifiedVariant kCompatibilityVariant \
+      kSemanticVariant kRSAdobe_Japan1_6 kMandarin kMorohashi kNelson ||
+      continue
     local localDef=${definition[$cp]} loadFrom= linkTo= linkType=
     # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also
     # be set by the 'setOnKun' function so they can't be local variables.
@@ -249,22 +260,32 @@ Kun" >$outFile
       # from 'variantLink' array (based on kDefinition field). Only populate a
       # link if it refers to a kanji with an 'on' and/or 'kun' reading.
       for s in $kTraditionalVariant; do
-        loadFrom=${s#*+} # remove leading U+
+        s=${s#*+} # remove leading U+
         # Skip if kTraditionalVariant refers to the same cp being processed. For
         # example, cp 5413 (吓) has kTraditionalVariant="U+5413 U+5687".
-        if [[ $loadFrom != $cp && -n ${on[$loadFrom]}${kun[$loadFrom]} ]]; then
+        if [[ $s != $cp && -n ${on[$s]}${kun[$s]} ]]; then
           linkType=Traditional
-          break
+          # allow storing multiple traditional links
+          [[ -z $linkTo ]] && linkTo=$s || linkTo=$linkTo,$s
         fi
       done
+      if [[ -z $linkType ]]; then
+        for s in $kSimplifiedVariant; do
+          linkTo=${s#*+} # remove leading U+
+          if [[ -n ${on[$linkTo]}${kun[$linkTo]} ]]; then
+            linkType=Simplified
+            break
+          fi
+        done
+      fi
       if [[ -z $linkType && $kCompatibilityVariant =~ U+ ]]; then
         # kCompatibilityVariant never has more than one value
-        loadFrom=${kCompatibilityVariant#*+} # remove leading U+
-        [[ -n ${on[$loadFrom]}${kun[$loadFrom]} ]] && linkType=Compatibility
+        linkTo=${kCompatibilityVariant#*+} # remove leading U+
+        [[ -n ${on[$linkTo]}${kun[$linkTo]} ]] && linkType=Compatibility
       fi
       if [[ -z $linkType && -n ${variantLink[$cp]} ]]; then
-        loadFrom=${variantLink[$cp]}
-        [[ -n ${on[$loadFrom]}${kun[$loadFrom]} ]] && linkType=Definition
+        linkTo=${variantLink[$cp]}
+        [[ -n ${on[$linkTo]}${kun[$linkTo]} ]] && linkType=Definition
       fi
       # Only use semantic links if there's no on/kun readings since these can
       # sometimes result in linking together kanji that don't seem related.
@@ -274,14 +295,14 @@ Kun" >$outFile
         # "U+57FC U+5D0E&lt;kMorohashi:TZ U+5D5C U+7895 U+966D U+FA11 U+2550E".
         for s in $kSemanticVariant; do
           s=${s#*+} # remove leading U+
-          loadFrom=${s%%&*}
-          if [[ -n ${on[$loadFrom]}${kun[$loadFrom]} ]]; then
+          linkTo=${s%%&*}
+          if [[ -n ${on[$linkTo]}${kun[$linkTo]} ]]; then
             linkType=Semantic
             break
           fi
         done
       fi
-      [[ -n $linkType ]] && linkTo=$loadFrom || loadFrom=
+      [[ -n $linkType ]] && loadFrom=${linkTo%%,*} || linkTo=
     fi
     if [[ -z $resultOn$resultKun ]]; then
       if [[ -n $loadFrom ]]; then
@@ -313,20 +334,18 @@ Kun" >$outFile
     fi
     if [[ -n $linkTo ]]; then
       case $linkType in
-      Compatibility) inc compatibilityLinks ;;
-      Semantic) inc semanticLinks ;;
       Traditional) inc traditionalLinks ;;
+      Simplified) inc simplifiedLinks ;;
+      Compatibility) inc compatibilityLinks ;;
       Definition) inc definitionLinks ;;
+      Semantic) inc semanticLinks ;;
       *) linkType=Jinmei ;;
       esac
     fi
     #
     # Radical and Strokes
     #
-    kRSUnicode=${kRSUnicode%% *}
-    # some kRSUnicode entries have ' after the radical like 4336 (䌶): 120'.3
-    kRSUnicode=${kRSUnicode/\'/}
-    local -i radical=${kRSUnicode%\.*} vstrokes=0
+    local -i vstrokes=0
     if [[ -z ${kRSAdobe_Japan1_6} ]]; then
       kTotalStrokes=${kTotalStrokes%% *}
       local -i strokes=$kTotalStrokes
@@ -404,8 +423,8 @@ Kun" >$outFile
     # don't print 'vstrokes' if it's 0
     echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
 $kMandarin\t$kMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
-$linkTo\t${linkTo:+\U$linkTo}\t$linkType\t$localDef\t$resultOn\t$resultKun" \
-      >>$outFile
+$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\t$linkType\t$localDef\t$resultOn\t\
+$resultKun" >>$outFile
     inc count
   done < <(grep -E "($printResulsFilter)" $ucdFile)
   echo "wrote $count"
@@ -417,8 +436,9 @@ printResults
 
 log Done
 
-echo "   Links: Traditional $traditionalLinks, Compatibility \
-$compatibilityLinks, Definition $definitionLinks, Semantic $semanticLinks"
+echo "   Links: Traditional $traditionalLinks, Simplified $simplifiedLinks, \
+Compatibility $compatibilityLinks, Definition $definitionLinks, Semantic \
+$semanticLinks"
 echo "  Totals: Meaning $totalMeaning, Pinyin $totalPinyin, Morohashi \
 $totalMorohashi, Nelson $totalNelson"
 

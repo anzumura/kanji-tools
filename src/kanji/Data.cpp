@@ -110,7 +110,7 @@ bool Data::checkInsert(const Entry& kanji) {
       error("not marked as 'Jinmei'");
     else if (type == KanjiTypes::LinkedJinmei && !ucd->jinmei())
       error("with link not marked as 'Jinmei'");
-    else if (type == KanjiTypes::LinkedJinmei && !ucd->hasLink())
+    else if (type == KanjiTypes::LinkedJinmei && !ucd->hasLinks())
       error("missing 'JinmeiLink' for " + ucd->codeAndName());
     // skipping radical and strokes checks for now
     if (kanji->variant() &&

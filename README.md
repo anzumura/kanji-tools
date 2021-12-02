@@ -290,15 +290,7 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 - **Ucd**: kanji that are in 'ucd.txt', but not already one of the above types
 - **None**: kanji that haven't been loaded from any files
 
-Class Hierarchy for Kanji (* = abstract class):
-
-- NonLinkedKanji: adds *meaning* and *reading* fields
-- LinkedKanji: adds *link* field that points to a new/standard kanji
-- UcdFileKanji: adds optional *isOldLink* and *linkNames* fields
-- CustomFileKanji: adds *oldNames* field
-- OfficialKanji: adds optional *year* field (when kanji was added to official list)
-- JouyouKanji: adds *grade* field (school grade when the kanji is introduced)
-- JinmeiKanji: adds *reason* field (official reason for inclusion in Jinmeiyoō list)
+Class Hierarchy for **Kanji** class (* = abstract class):
 
 ```;
      Kanji*
@@ -319,6 +311,17 @@ CustomFileKanji*            UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
        |           |
   JouyouKanji JinmeiKanji
 ```
+
+The classes derived from **Kanji** add the following fields:
+
+- **NonLinkedKanji**: *meaning* and *reading*
+- **LinkedKanji**: *link* (points to the new/standard kanji)
+- **CustomFileKanji**: *oldNames*
+- **UcdFileKanji**: *hasOldLinks* and *linkNames*
+- **OfficialKanji**: optional *year* (when kanji was added to official list)
+- **ExtraKanji**: optional *newName*
+- **JouyouKanji**: *grade* (school grade when the kanji is introduced)
+- **JinmeiKanji**: *reason* (official reason for inclusion in Jinmeiyoō list)
 
 The program also loads the 214 official kanji radicals (部首).
 

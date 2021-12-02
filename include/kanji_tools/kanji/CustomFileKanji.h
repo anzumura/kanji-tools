@@ -35,10 +35,10 @@ protected:
   // 'columns' contains list of values for each column after parsing a line (used by 'fromString' method)
   static std::array<std::string, MaxCol> columns;
   // Constructor used by 'ExtraKanji'
-  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const Ucd* u)
+  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames, const Ucd* u)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
                      meaning, columns[ReadingCol], strokes, u, false, false),
-      _oldNames(u && u->hasLink() ? LinkNames({u->linkName()}) : EmptyLinkNames) {}
+      _oldNames(oldNames) {}
   // Constructors used by 'OfficialKanji'
   CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames)
     : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
@@ -69,10 +69,16 @@ private:
 // should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(const Data& d)
-    : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol], d.findUcd(columns[NameCol])) {}
+  ExtraKanji(const Data& d) : ExtraKanji(d, d.findUcd(columns[NameCol])) {}
 
   KanjiTypes type() const override { return KanjiTypes::Extra; }
+  OptString newName() const override { return _newName; }
+private:
+  ExtraKanji(const Data& d, const Ucd* u)
+    : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol],
+                      u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
+      _newName(u && u->hasNonTraditionalLinks() ? OptString(u->links()[0].name()) : std::nullopt) {}
+  const OptString _newName;
 };
 
 // 'OfficialKanji' contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
