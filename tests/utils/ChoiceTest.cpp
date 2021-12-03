@@ -77,7 +77,7 @@ TEST_F(ChoiceTest, ChoiceWithDefault) {
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}, '1'), '1');
   std::string line;
   std::getline(_os, line);
-  EXPECT_EQ(line, "(1-2) default '1': ");
+  EXPECT_EQ(line, "(1-2) def '1': ");
 }
 
 TEST_F(ChoiceTest, ChooseNonDefault) {
@@ -85,7 +85,7 @@ TEST_F(ChoiceTest, ChooseNonDefault) {
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}, '1'), '2');
   std::string line;
   std::getline(_os, line);
-  EXPECT_EQ(line, "(1-2) default '1': ");
+  EXPECT_EQ(line, "(1-2) def '1': ");
   EXPECT_FALSE(std::getline(_os, line));
 }
 
@@ -94,7 +94,7 @@ TEST_F(ChoiceTest, RangeWithDefault) {
   EXPECT_EQ(_choice.get("", '1', '4', '1'), '1');
   std::string line;
   std::getline(_os, line);
-  EXPECT_EQ(line, "(1-4) default '1': ");
+  EXPECT_EQ(line, "(1-4) def '1': ");
 }
 
 TEST_F(ChoiceTest, RangeWithNoDefault) {
@@ -120,7 +120,7 @@ TEST_F(ChoiceTest, RangeChoicesAndDefault) {
   EXPECT_EQ(_choice.get("pick", 'a', 'f', {{'g', "good"}, {'y', "yes"}}, 'y'), 'y');
   std::string line;
   std::getline(_os, line);
-  EXPECT_EQ(line, "pick (a-f, g=good, y=yes) default 'y': ");
+  EXPECT_EQ(line, "pick (a-f, g=good, y=yes) def 'y': ");
   EXPECT_FALSE(std::getline(_os, line));
 }
 
@@ -150,7 +150,7 @@ TEST_F(ChoiceTest, ChooseBadOptionWithDefault) {
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}, '1'), '2');
   std::string line;
   std::getline(_os, line);
-  EXPECT_EQ(line, "(1-2) default '1': (1-2) default '1': ");
+  EXPECT_EQ(line, "(1-2) def '1': (1-2) def '1': ");
   EXPECT_FALSE(std::getline(_os, line));
 }
 

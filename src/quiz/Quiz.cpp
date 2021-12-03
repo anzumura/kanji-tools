@@ -134,7 +134,7 @@ void Quiz::start() const {
     _reviewMode = c == 'r';
   }
   switch (_choice.get(
-    "Quiz type", {{'f', "freq."}, {'g', "grade"}, {'k', "kyu"}, {'l', "level"}, {'m', "meanings"}, {'p', "patterns"}},
+    "Type", {{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}},
     'g')) {
   case 'f':
     c = _choice.get("Choose list",
@@ -348,7 +348,7 @@ void Quiz::printInfoLegend(int infoFields) const {
     if (!fields.empty()) fields += ',';
     fields += " G[1-6]=Grade (S=Secondary School)";
   }
-  log() << "Legend:\n  Fields:" << fields << "\n  Suffix: " << Kanji::Legend << '\n';
+  log() << "Legend:\nFields:" << fields << "\nSuffix: " << Kanji::Legend << '\n';
 }
 
 void Quiz::printReviewDetails(const Entry& kanji) const {

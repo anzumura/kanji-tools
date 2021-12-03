@@ -68,7 +68,7 @@ char Choice::get(const std::string& msg, const Choices& choicesIn, std::optional
   add(prompt, choices);
   if (def.has_value()) {
     assert(choices.find(*def) != choices.end());
-    prompt += ") default '";
+    prompt += ") def '";
     prompt += *def;
     prompt += "': ";
   } else
