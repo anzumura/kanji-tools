@@ -185,7 +185,7 @@ function hasReading() {
 # if the field starts with '(same as X' then store a link from 'cp' to 'X'.
 function findDefinitionLinks() {
   log "Find definition links ... " -n
-  local -r def='kDefinition=\"[(]*' nonAscii='[^\x00-\x7F]{1,}'
+  local -r def='kDefinition=\"[^\";,)]*' nonAscii='[^\x00-\x7F]{1,}'
   for type in 'a variant of' interchangeable 'same as' non-classical \
     'Variant of'; do
     printResulsFilter="$printResulsFilter|$type "
@@ -286,23 +286,25 @@ Kun" >$outFile
         linkTo=${kCompatibilityVariant#*+} # remove leading U+
         canLinkTo $linkTo && linkType=Compatibility
       fi
-      if [[ -z $linkType && -n ${definitionLink[$cp]} ]]; then
-        linkTo=${definitionLink[$cp]}
-        linkType=Definition
-      elif [[ -z $linkType && -z $resultOn$resultKun ]]; then
-        # Only use semantic links if there's no on/kun readings since these can
-        # sometimes result in linking together kanji that don't seem related.
-        # kSemanticVariant can be a Unicode value like "U+8209", but some have
-        # compound values like "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews" or
-        # "U+57FC U+5D0E&lt;kMorohashi:TZ U+5D5C U+7895 U+966D U+FA11 U+2550E".
-        for s in $kSemanticVariant; do
-          s=${s#*+} # remove leading U+
-          linkTo=${s%%&*}
-          if canLinkTo $linkTo; then
-            linkType=Semantic
-            break
-          fi
-        done
+      # Only use definition and semantic links if there's no reading since these
+      # can sometimes result in linking together kanji that don't seem related.
+      if [[ -z $linkType && -z $resultOn$resultKun ]]; then
+        if [[ -n ${definitionLink[$cp]} ]]; then
+          linkTo=${definitionLink[$cp]}
+          linkType=Definition
+        else
+          # kSemanticVariant can Unicode like "U+8209" or a compound value like
+          # "U+57FC U+5D0E&lt;kMorohashi:TZ U+5D5C U+7895 U+966D U+FA11 U+2550E"
+          # or "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews"
+          for s in $kSemanticVariant; do
+            s=${s#*+} # remove leading U+
+            linkTo=${s%%&*}
+            if canLinkTo $linkTo; then
+              linkType=Semantic
+              break
+            fi
+          done
+        fi
       fi
       [[ -n $linkType ]] && loadFrom=${linkTo%%,*} || linkTo=
     fi
