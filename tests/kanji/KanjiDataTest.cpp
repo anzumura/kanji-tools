@@ -105,7 +105,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, SanityChecks) {
-  EXPECT_EQ(_data.kanjiNameMap().size(), 15106);
+  EXPECT_EQ(_data.kanjiNameMap().size(), 15437);
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
@@ -322,7 +322,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
     for (auto& i : k.links()) {
       EXPECT_NE(k.name(), i.name());
       auto link = ucd.find(i.name());
-      ASSERT_NE(link, ucd.end()) << i.name();
+      ASSERT_FALSE(link == ucd.end()) << i.name();
     }
     if (k.joyo()) {
       EXPECT_FALSE(k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
@@ -350,8 +350,8 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 8);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 13);
-  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 185);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 1983);
+  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 187);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2320);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // these are captured in 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 83);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
