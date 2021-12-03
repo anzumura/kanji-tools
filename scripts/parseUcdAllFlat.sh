@@ -195,9 +195,9 @@ function findDefinitionLinks() {
     #   the elder of twins; a Chinese family name, (same as 姬) a handsome girl;
     #   a charming girl; a concubine; a Chinese family name
     for i in '' '[^\"]*[;,)][^\";,)]*' '[^\"]*[;,)][;,)][^\";,)]*'; do
-      for j in $(grep -E "$def$i$type ($nonAscii\)|U[^ ]* $nonAscii)" $ucdFile |
+      for j in $(grep -E "$def$i$type ($nonAscii|U[^ ]* $nonAscii)" $ucdFile |
         grep -v "kRSUnicode=\"[0-9]*'" | sed 's/ U+[A-F0-9]*//g' |
-        sed "s/.*cp=\"\([^\"]*\).*$def$i$type \([^ ,)]*\).*/\2:\1/"); do
+        sed "s/.*cp=\"\([^\"]*\).*$def$i$type \([^ ;,)]*\).*/\2:\1/"); do
         local cp=${j#*:}
         [[ -n $i && -n ${definitionLink[$cp]} ]] && continue
         # 's' can occur more than once if there are multiple variants for it.
@@ -218,8 +218,60 @@ function findDefinitionLinks() {
   echo "found ${#definitionLink[@]}"
 }
 
+# 'canLinkTo' has an exit status of 0 (true) if the value passed in can be used
+# as a link, i.e., it refers to a kanji with an 'on' or 'kun' reading or refers
+# to a definitionLink entry.
 function canLinkTo() {
   hasReading $1 || [[ -n ${definitionLink[$1]} ]]
+}
+
+# 'getLinks' sets 'linkTo' to one on more link values and sets 'linkType' if the
+# links point to valid links (using 'canLinkTo'). This function can only be used
+# after calling 'setVars' and it also looks at 'resultOn' and 'resultKun'.
+function getLinks() {
+  # For non-Jouyou/non-Jinmei kanji, try to find meaningful links based on
+  # kTraditionalVariant, kCompatibilityVariant or kSemanticVariant fields or
+  # from 'definitionLink' array (based on kDefinition field).
+  for s in $kTraditionalVariant; do
+    s=${s#*+} # remove leading U+
+    # Skip if kTraditionalVariant is the same as current record being processed.
+    # For example, 'cp' 5413 (吓) has kTraditionalVariant="U+5413 U+5687".
+    if [[ $s != $cp ]] && canLinkTo $s; then
+      linkType=Traditional
+      # allow storing multiple traditional links
+      [[ -z $linkTo ]] && linkTo=$s || linkTo=$linkTo,$s
+    fi
+  done
+  if [[ -z $linkType ]]; then
+    for s in $kSimplifiedVariant; do
+      linkTo=${s#*+} # remove leading U+
+      canLinkTo $linkTo && linkType=Simplified && break
+    done
+    if [[ -z $linkType ]]; then
+      if [[ $kCompatibilityVariant =~ U+ ]]; then
+        # kCompatibilityVariant never has more than one value
+        linkTo=${kCompatibilityVariant#*+} # remove leading U+
+        canLinkTo $linkTo && linkType=Compatibility
+      fi
+      # Only use definition and semantic links if there's no reading since they
+      # can result in linking together kanji that don't seem related.
+      if [[ -z $linkType && -z $resultOn$resultKun ]]; then
+        if [[ -n ${definitionLink[$cp]} ]]; then
+          linkTo=${definitionLink[$cp]}
+          linkType=Definition
+        else
+          # kSemanticVariant can be Unicode like "U+8209" or a compound like
+          # "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews" so need to strip '&'
+          for s in $kSemanticVariant; do
+            s=${s#*+} # remove leading U+
+            linkTo=${s%%&*}
+            canLinkTo $linkTo && linkType=Semantic && break
+          done
+        fi
+      fi
+    fi
+  fi
+  [[ -n $linkType ]]
 }
 
 # All entries have 'cp', 'age', 'blk', 'radical' and 'strokes' as well as at
@@ -241,11 +293,14 @@ Kun" >$outFile
     setVars "$i" kTraditionalVariant kSimplifiedVariant kCompatibilityVariant \
       kSemanticVariant kRSAdobe_Japan1_6 kMandarin kMorohashi kNelson ||
       continue
-    local localDef=${definition[$cp]} loadFrom= linkTo= linkType=
+    local localDef=${definition[$cp]} loadFrom=
     # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also
-    # be set by the 'setOnKun' function so they can't be local variables.
+    # be set by 'setOnKun' and are used by 'getLinks' so they can't be local
     resultOn=${on[$cp]}
     resultKun=${kun[$cp]}
+    # 'linkTo' and 'linkType' can be modified by 'getLinks' function
+    linkTo=
+    linkType=
     if [[ -n $kJoyoKanji ]]; then
       # unset kJoyoKanji if official version is the 'link' entry
       [[ $kJoyoKanji =~ U+ ]] && unset -v kJoyoKanji || totalJoyo=++totalJoyo
@@ -258,55 +313,7 @@ Kun" >$outFile
       fi
       [[ -z $linkTo ]] && totalJinmei=++totalJinmei || linkType=Jinmei
     else
-      # For non-Jouyou/non-Jinmei kanji try to find meaningful links based on
-      # kTraditionalVariant, kCompatibilityVariant or kSemanticVariant fields or
-      # from 'definitionLink' array (based on kDefinition field). Only populate
-      # a link if it refers to a kanji with an 'on' or 'kun' reading.
-      for s in $kTraditionalVariant; do
-        s=${s#*+} # remove leading U+
-        # Skip if kTraditionalVariant refers to the same cp being processed. For
-        # example, cp 5413 (吓) has kTraditionalVariant="U+5413 U+5687".
-        if [[ $s != $cp ]] && canLinkTo $s; then
-          linkType=Traditional
-          # allow storing multiple traditional links
-          [[ -z $linkTo ]] && linkTo=$s || linkTo=$linkTo,$s
-        fi
-      done
-      if [[ -z $linkType ]]; then
-        for s in $kSimplifiedVariant; do
-          linkTo=${s#*+} # remove leading U+
-          if canLinkTo $linkTo; then
-            linkType=Simplified
-            break
-          fi
-        done
-      fi
-      if [[ -z $linkType && $kCompatibilityVariant =~ U+ ]]; then
-        # kCompatibilityVariant never has more than one value
-        linkTo=${kCompatibilityVariant#*+} # remove leading U+
-        canLinkTo $linkTo && linkType=Compatibility
-      fi
-      # Only use definition and semantic links if there's no reading since these
-      # can sometimes result in linking together kanji that don't seem related.
-      if [[ -z $linkType && -z $resultOn$resultKun ]]; then
-        if [[ -n ${definitionLink[$cp]} ]]; then
-          linkTo=${definitionLink[$cp]}
-          linkType=Definition
-        else
-          # kSemanticVariant can Unicode like "U+8209" or a compound value like
-          # "U+57FC U+5D0E&lt;kMorohashi:TZ U+5D5C U+7895 U+966D U+FA11 U+2550E"
-          # or "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews"
-          for s in $kSemanticVariant; do
-            s=${s#*+} # remove leading U+
-            linkTo=${s%%&*}
-            if canLinkTo $linkTo; then
-              linkType=Semantic
-              break
-            fi
-          done
-        fi
-      fi
-      [[ -n $linkType ]] && loadFrom=${linkTo%%,*} || linkTo=
+      getLinks && loadFrom=${linkTo%%,*} || linkTo=
     fi
     if [[ -z $resultOn$resultKun ]]; then
       if [[ -n $loadFrom ]]; then
@@ -320,6 +327,7 @@ Kun" >$outFile
       else
         # Support cases where on/kun is missing for Kentei kanji or kanji with
         # Nelson IDs. 4BC2 is not Kentei, but it's in 'wiki-stokes.txt' file.
+        # UCD data doesn't have entries for Nelson IDs: 125, 149, 489 and 1639
         case $cp in
         34E4) setOnKun "KATSU" ;;                        # 㓤 (Nelson 677)
         3C7E) setOnKun "KAI" ;;                          # 㱾 (Nelson 2453)
@@ -336,9 +344,9 @@ Kun" >$outFile
         83C6) setOnKun "SHU" ;;                          # 菆 (Nelson 3961)
         *) continue ;;                                   # skip if no readings
         esac
-        # UCD data doesn't have entries for these Nelson IDs: 125, 149, 489, 1639
       fi
     fi
+    # count each link type (for summary info when processing is done)
     if [[ -n $linkTo ]]; then
       case $linkType in
       Jinmei) jinmeiLinks=++jinmeiLinks ;;

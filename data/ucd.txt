@@ -414,6 +414,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3B36	㬶	CJK_Ext_A	3.0	74	11		hào					6D69	浩	Definition	great, numerous, vast, abundant	KOU	HIROI OOKII
 3B4B	㭋	CJK_Ext_A	3.0	75	8		bàng					68D2	棒	Definition	stick, club, truncheon; hit	BOU HOU	TSUE
 3B4C	㭌	CJK_Ext_A	3.0	75	8		móu					6859	桙	Definition		U BOU	HOKO
+3B4D	㭍	CJK_Ext_A	3.0	75	8							4E03	七	Definition	seven	SHICHI SHITSU	NANATSU NANATABI
 3B4E	㭎	CJK_Ext_A	3.0	75	8		gāng					68E1	棡	Traditional		KOU	
 3B4F	㭏	CJK_Ext_A	3.0	75	8		wěi					694E	楎	Definition	peg	KON GON KI KUN	KARA SUKI
 3B64	㭤	CJK_Ext_A	3.0	75	10		niǎo					6A22	樢	Traditional		BOKU CHOU MOKU	TSUTA
@@ -985,6 +986,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 46C0	䛀	CJK_Ext_A	3.0	149	11		fǎn					5476	呶	Definition	talkative; clamour; hubbub	DO DOU	KAMABISUSHI
 46C1	䛁	CJK_Ext_A	3.0	149	11		nán					5583	喃	Definition	keep talking, chattering; mumble	NAN	NOU
 46C2	䛂	CJK_Ext_A	3.0	149	11		yāo					8A83	誃	Definition	part	SHI CHI JI I	WAKARERU
+46C6	䛆	CJK_Ext_A	3.0	149	12		zhòu					5492	咒	Definition	curse, damn, incantation	SHU SHUU JU	NOROU NOROI
 46C8	䛈	CJK_Ext_A	3.0	149	12		shì					8A93	誓	Definition	swear, pledge; oath	SEI ZEI	CHIKAU CHIKAI
 46CF	䛏	CJK_Ext_A	3.0	149	12		ní					6CE5	泥	Definition	mud, mire; earth, clay; plaster	DEI	DORO NAZUMU
 46D0	䛐	CJK_Ext_A	3.0	149	12		cí					8A5E	詞	Definition	words; phrase, expression	SHI JI	KOTOBA
@@ -1199,6 +1201,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4A75	䩵	CJK_Ext_A	3.0	177	18		yùn					97D7	韗	Definition		UN KUN KEN KAN	KUTSU
 4A77	䩷	CJK_Ext_A	3.0	177	19		bāng					5E6B	幫	Definition	to help, assist; to defend; shoe upper	HOU	TASUKERU
 4A78	䩸	CJK_Ext_A	3.0	177	19		róng					6C04	氄	Definition	down	JUU NYU	MUKUGE
+4A79	䩹	CJK_Ext_A	3.0	177	19		é					97B9	鞹	Definition	skin	KAKU	
 4A7B	䩻	CJK_Ext_A	3.0	177	19		bà					9738	霸	Definition	rule by might rather than right	HAKU HYAKU HA	HATAGASHIRA KASHIRA
 4A7F	䩿	CJK_Ext_A	3.0	177	21		fén					9F16	鼖	Definition	drum	FUN	OOTSUZUMI
 4A82	䪂	CJK_Ext_A	3.0	177	21		gé					9769	革	Definition	leather, animal hides; rad. 177	KAKU KYOKU	KAWA ARATAMARU ARATAMERU
@@ -6560,6 +6563,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 67F5	柵	CJK	1.1	75	9		shān	14665	2229	Y					fence; palisade; grid	SAKU SAN	YARAI SHIGARAMI
 67F6	柶	CJK	1.1	75	9		sì	14666							ladle	SHI	SAJI
 67F7	柷	CJK	1.1	75	9		chù	14667							instrument	SHUKU	
+67F8	柸	CJK	1.1	75	9		pēi	14669				676F	杯	Definition	glass, cup	HAI	SAKAZUKI
 67F9	柹	CJK	1.1	75	8		shì	14582	2231						persimmon	SHI	KAKI
 67FB	査	CJK	1.1	75	9		zhā	14643	2235	Y					investigate, examine, seek into	SA	SHIRABERU
 67FD	柽	CJK	1.1	75	9		chēng	14672				6A89	檉	Traditional	type of willow; tamarisk	TEI CHOU	KAWARAYANAGI
@@ -15378,6 +15382,7 @@ FA6D	舘	CJK_Compat_Ideographs	5.2	30	16							8218	舘	Compatibility	a mansion;
 22165	𢅥	CJK_Ext_B	3.1	50	17		chú		1491						variant of 㡡 U+3861, a screen to make a temporary kitchen; bed curtain	JU CHU	
 22218	𢈘	CJK_Ext_B	3.1	53	9				1510						variant of 鹿 U+9E7F, a deer; surname	ROKU	SHIKA KA
 2228D	𢊍	CJK_Ext_B	3.1	53	13		chú		1527						variant of 厨 U+53A8, a kitchen; a closet; a cupboard	ZU CHUU	KURIYA
+2295E	𢥞	CJK_Ext_B	3.1	61	21		chōng					5FE1	忡	Definition	a sad, uneasy countenance	CHUU CHU SHUU SHU	UREERU
 22AE6	𢫦	CJK_Ext_B	3.1	64	9				1886						variant of 拍, to clap, tap, beat; a beat or rhythm	HAKU HYOU	UTSU
 22B46	𢭆	CJK_Ext_B	3.1	64	10		chōu					62BD	抽	Semantic	draw out, pull out; sprout	CHUU	NUKU HIKU
 22B4F	𢭏	CJK_Ext_B	3.1	64	10		dǎo					64E3	擣	Traditional	hull; thresh; beat, attack	TOU CHUU	TSUKU UTSU FURERU
@@ -15386,6 +15391,7 @@ FA6D	舘	CJK_Compat_Ideographs	5.2	30	16							8218	舘	Compatibility	a mansion;
 237F1	𣟱	CJK_Ext_B	3.1	75	21				2405						Zelkova tree	KYO	KEYAKI
 2383D	𣠽	CJK_Ext_B	3.1	75	23				2406						same as 欛 U+6B1B, a handle	HA HE	TSUKA
 24AE9	𤫩	CJK_Ext_B	3.1	96	28		líng					3ECF	㻏	Simplified	tinkling of jade	REI ROU	
+24BF3	𤯳	CJK_Ext_B	3.1	100	14				68			7526	甦	Definition	be reborn; resuscitate, revive	SO	YOMIGAERU
 24FF2	𤿲	CJK_Ext_B	3.1	107	12							9EAC	麬	Traditional		FU	FUSUMA
 25055	𥁕	CJK_Ext_B	3.1	108	10		wēn					6637	昷	Semantic	to feed a prisoner	ON	MEGUMU
 2550E	𥔎	CJK_Ext_B	3.1	112	14										cape; spit; promontory		SAKI
