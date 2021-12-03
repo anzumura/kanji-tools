@@ -106,7 +106,10 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
 }
 
 void Quiz::printDetails(const std::string& arg, bool showLegend) const {
-  if (showLegend) printInfoLegend();
+  if (showLegend) {
+    printInfoLegend();
+    out() << '\n';
+  } 
   out() << "Showing details for " << arg << " [" << toUnicode(arg) << "]";
   auto ucd = data().ucd().find(arg);
   if (ucd) {
