@@ -203,7 +203,7 @@ void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() cons
     }
     if (iTotal) {
       total += iTotal;
-      log() << "  Total for " << name << i << ": " << iTotal << " (";
+      log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
       for (const auto& j : counts) {
         out() << j.first << ' ' << j.second;
         const auto& l = _types.at(j.first);
