@@ -76,7 +76,11 @@ void RadicalData::print(const Data& data) const {
     data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
     for (auto i : AllKanjiTypes) {
       auto j = c.find(i);
-      data.out() << std::setw(summary ? 5 : 4) << (j == c.end() ? 0 : j->second);
+      if (summary) {
+        if (i != AllKanjiTypes[0]) data.out() << ' ';
+        data.out() << (j == c.end() ? 0 : j->second);
+      } else
+        data.out() << std::setw(4) << (j == c.end() ? 0 : j->second);
       if (i == secondLast(AllKanjiTypes)) break;
     }
     data.out() << (summary ? ")\n" : ") :");
