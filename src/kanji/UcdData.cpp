@@ -157,7 +157,8 @@ void UcdData::load(const std::filesystem::path& file) {
         error("LinkCode has a value, but LinkName is empty");
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
       if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
-      if (cols[onCol].empty() && cols[kunCol].empty()) error("one of 'on' or 'kun' must be populated");
+      if (cols[onCol].empty() && cols[kunCol].empty() && cols[morohashiCol].empty())
+        error("one of 'On', 'Kun' or 'Morohashi' must be populated");
       if (!_map
              .emplace(std::piecewise_construct, std::make_tuple(name),
                       std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
