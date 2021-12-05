@@ -108,7 +108,7 @@ function setOnKun() {
 }
 
 # global arrays to help support links for variant and compat kanjis
-declare -A morohashi definition on kun linkBack noLink readingLink morohashiLink
+declare -A morohashi definition on kun linkBack noLink readingLink
 
 # there are 18 Jinmeiyō Kanji that link to other Jinmei, but unfortunately UCD
 # data seems to have some mistakes (where the link points from the standard to
@@ -206,15 +206,8 @@ function canLinkTo() {
   hasReading $1 || [[ -n ${readingLink[$1]} ]]
 }
 
-# 'canLinkToMorohashi' has an exit status of 0 (true) if the value passed in has
-# has a morohashi id or refers to a kanji with a 'morohashiLink' entry.
-function canLinkToMorohashi() {
-  hasMorohashi $1 || [[ -n ${morohashiLink[$1]} ]]
-}
-
 # 'findDefinitionLinksForType' finds links based on type ($1) string matches in
-# 'kDefinition' field. The second arg should be 'true' or 'false' and indicates
-# if the links should point at other kanji having a reading or not.
+# 'kDefinition' field.
 function findDefinitionLinksForType() {
   local -r def='kDefinition=\"[^\";,)]*' nonAscii='[^\x00-\x7F]{1,}'
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
@@ -227,17 +220,13 @@ function findDefinitionLinksForType() {
       grep -v "kRSUnicode=\"[0-9]*'" | sed 's/ U+[A-F0-9]*//g' |
       sed "s/.*cp=\"\([^\"]*\).*$def$i$1 \([^ ;,)]*\).*/\2:\1/"); do
       local cp=${j#*:}
-      if [[ -z ${readingLink[$cp]} && -z ${morohashiLink[$cp]} ]]; then
+      if [[ -z ${readingLink[$cp]} ]]; then
         # 's' can occur more than once if there are multiple variants for it.
         # This is true for '64DA (據)' which has '3A3F (㨿)' and '3A40 (㩀)'.
         local s=$(echo -n ${j:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
         s=$(printf '%04X' 0x$s)
-        if $2; then
-          hasReading $s && readingLink[$cp]=$s
-        elif hasMorohashi $s; then
-          morohashiLink[$cp]=$s
-        fi
+        hasReading $s && readingLink[$cp]=$s
       fi
     done
   done
@@ -245,15 +234,13 @@ function findDefinitionLinksForType() {
 
 # 'findDefinitionLinks': find links based on 'kDefinition' field. For example,
 # if the field starts with '(same as X' then store a link from 'cp' to 'X'. This
-# function populates 'readingLink' and 'morohashiLink' arrays
+# function populates 'readingLink' array.
 function findDefinitionLinks() {
   log "Find definition links ... " -n
-  for reading in true false; do
-    for type in 'a variant of' interchangeable 'same as' non-classical \
-      'Variant of'; do
-      $reading && printResulsFilter="$printResulsFilter|$type "
-      findDefinitionLinksForType "$type" $reading
-    done
+  for type in 'a variant of' interchangeable 'same as' non-classical \
+    'Variant of'; do
+    printResulsFilter="$printResulsFilter|$type "
+    findDefinitionLinksForType "$type"
   done
   # Pull in some Kentei kanji that are missing on/kun via links (the links have
   # the same definitions and expected on/kun).
@@ -261,7 +248,7 @@ function findDefinitionLinks() {
   readingLink[5ECF]=5ED0 # link 廏 to 廐
   readingLink[9D25]=9D2A # link 鴥 to 鴪
   readingLink[6AA8]=69D8 # link 檨 to 様 (Nelson 2363)
-  echo "found ${#readingLink[@]} reading and ${#morohashiLink[@]} morohashi"
+  echo "found ${#readingLink[@]}"
 }
 
 declare -i strokes vstrokes
@@ -329,7 +316,7 @@ function getTraditionalLinks() {
     s=${s#*+} # remove leading U+
     # Skip if kTraditionalVariant is the same as current record being processed.
     # For example, 'cp' 5413 (吓) has kTraditionalVariant="U+5413 U+5687".
-    if [[ $s != $cp && ! ,$linkTo, =~ ,$s, ]] && $1 $s; then
+    if [[ ! ,$cp,$linkTo, =~ ,$s, ]] && $1 $s; then
       linkType=Traditional
       # allow storing multiple traditional links
       [[ -z $linkTo ]] && linkTo=$s || linkTo=$linkTo,$s
@@ -339,7 +326,7 @@ function getTraditionalLinks() {
 
 # 'getLinks' sets 'linkTo' to one on more link values and sets 'linkType' if the
 # links point to a value that satisfies the function passed in $1 ('canLinkTo'
-# or 'canLinkToMorohashi'). This function can only be used after 'setVars' and
+# or 'hasMorohashi'). This function can only be used after 'setVars' and
 # it also looks at 'resultOn' and 'resultKun'.
 function getLinks() {
   # For non-Jouyou/non-Jinmei kanji, try to find meaningful links based on
@@ -358,9 +345,8 @@ function getLinks() {
         $1 $linkTo && linkType=Compatibility
       fi
       # Only use definition and semantic links if there's no reading since they
-      # can result in linking together kanji that don't seem related. Also, only
-      # support reading links (not morohashi).
-      if [[ -z $linkType && -z $resultOn$resultKun && $1 == canLinkTo ]]; then
+      # can result in linking together kanji that don't seem related.
+      if [[ $1$linkType == canLinkTo && -z $resultOn$resultKun ]]; then
         if [[ -n ${readingLink[$cp]} ]]; then
           linkTo=${readingLink[$cp]}
           linkType=Definition
@@ -370,14 +356,14 @@ function getLinks() {
           for s in $kSemanticVariant; do
             s=${s#*+} # remove leading U+
             linkTo=${s%%&*}
-            canLinkTo $linkTo && linkType=Semantic && break
+            $1 $linkTo && linkType=Semantic && break
           done
         fi
       fi
     fi
   elif [[ $1 == canLinkTo ]]; then
     # allow adding morohashi traditional links if reading ones are found
-    getTraditionalLinks canLinkToMorohashi
+    getTraditionalLinks hasMorohashi
   fi
   if [[ -z $linkType ]]; then
     linkTo=
@@ -429,7 +415,7 @@ function processRecord() {
     fi
     [[ -z $linkTo ]] && totalJinmei=++totalJinmei || linkType=Jinmei
   else
-    getLinks canLinkTo && loadFrom=${linkTo%%,*} || getLinks canLinkToMorohashi
+    getLinks canLinkTo && loadFrom=${linkTo%%,*} || getLinks hasMorohashi
   fi
   if [[ -z $resultOn$resultKun ]]; then
     if [[ -n $loadFrom ]]; then
