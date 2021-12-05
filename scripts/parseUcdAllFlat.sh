@@ -87,12 +87,12 @@ log "Begin parsing '$ucdFile'"
 
 declare -i radical
 
-# 'setVars' sets global vars for each property in the XML record passed in. It
+# 'setVars': sets global vars for each property in the XML record passed in. It
 # will also unset any vars specified after the XML string. The exit status is 0
 # if the record should be processed.
 function setVars() {
   local -r xml=${1:6} # strip leading '<char '
-  shift               # more 'vars to unset' can be specified after $1 (xml arg)
+  shift               # more 'vars to unset' can be specified after $1 (XML arg)
   unset -v kJoyoKanji kJinmeiyoKanji kMorohashi $*
   eval ${xml%/>} # strip trailing '/>' and set vars from remaining XML string
   radical=${kRSUnicode%%[.\']*}
@@ -103,8 +103,8 @@ function setVars() {
 }
 
 function setOnKun() {
-  resultOn="$1"
-  resultKun="$2"
+  resultOn=$1
+  resultKun=$2
 }
 
 # global arrays to help support links for variant and compat kanjis
@@ -142,11 +142,11 @@ done <<EOF
 9065 遥
 EOF
 
-# 'onKun' is used as a filter by 'populateVariantLinks' since we only want to
-# link to an entry that has an 'On' and/or 'Kun' reading.
+# 'onKunRegex' is used as a filter by 'populateArrays' function since we only
+# want to link to an entry that has an 'On' and/or 'Kun' reading.
 declare -r onKunRegex='kJapanese[OK].*n="[^"]'
 
-# 'printResults' loop uses 'onKun' as well as the following (for variants):
+# 'printResults' loop uses 'onKunRegex' as well as the following regexes:
 declare -r morohashiRegex='kMorohashi="[^"]'    # has a Morohashi ID
 declare -r nelsonRegex='kNelson="[^"]'          # has a Nelson ID
 declare -r adobeRegex='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
@@ -157,7 +157,7 @@ printResulsFilter="$onKunRegex|$morohashiRegex|$nelsonRegex|$adobeRegex"
 # Arrays need to be populated before 'printResults' to handle links to entries
 # later in the file like '5DE2 (巢)' which links to '5DE3 (巣)'.
 function populateArrays() {
-  log "Populate arrays ... " -n
+  log 'Populate arrays ... ' -n
   local -i count=0
   while read -r i; do
     setVars "$i" kDefinition kJapaneseOn kJapaneseKun || continue
@@ -173,18 +173,18 @@ function populateArrays() {
       # There are 4 entries with a Joyo link: 5265, 53F1, 586B and 982C. Store
       # definition/on/kun since since they are missing for some linked Jinmeiyo
       # Kanji as well as Joyo 𠮟 (U+20B9F) which replaces 叱 (53F1) しか-る.
-      [[ $kJoyoKanji =~ U+ ]] && cp="$cp ${kJoyoKanji#U+}"
+      [[ $kJoyoKanji =~ U+ ]] && cp+=" ${kJoyoKanji#U+}"
     elif [[ $kJinmeiyoKanji =~ U+ ]]; then
       kJinmeiyoKanji=${kJinmeiyoKanji#*+}
       linkBack[$kJinmeiyoKanji]=$cp
-      cp="$cp $kJinmeiyoKanji"
+      cp+=" $kJinmeiyoKanji"
     fi
     if [[ -n $kJapaneseOn$kJapaneseKun ]]; then
       for link in $cp; do
-        definition[$link]="$kDefinition"
-        on[$link]="$kJapaneseOn"
-        kun[$link]="$kJapaneseKun"
-        count=++count
+        definition[$link]=$kDefinition
+        on[$link]=$kJapaneseOn
+        kun[$link]=$kJapaneseKun
+        count+=1
       done
     fi
   done < <(grep -E "($onKunRegex|$morohashiRegex)" $ucdFile)
@@ -199,26 +199,33 @@ function hasMorohashi() {
   [[ -n ${morohashi[$1]} ]]
 }
 
-# 'canLinkTo' has an exit status of 0 (true) if the value passed in can be used
-# as a link, i.e., it refers to a kanji with an 'on' or 'kun' reading or refers
-# to a 'readingLink' entry.
-function canLinkTo() {
+# 'canLoadFrom': has exit status of 0 (true) if '$1' in refers to a kanji with
+# an 'On' or 'Kun' reading or has a 'readingLink'. Thus 'readings' can be loaded
+# from the '$1' if required.
+function canLoadFrom() {
   hasReading $1 || [[ -n ${readingLink[$1]} ]]
 }
 
-# 'findDefinitionLinksForType' finds links based on type ($1) string matches in
+# 'findDefinitionLinksForType': finds links based on type ($1) string matches in
 # 'kDefinition' field.
 function findDefinitionLinksForType() {
-  local -r def='kDefinition=\"[^\";,)]*' nonAscii='[^\x00-\x7F]{1,}'
+  # kDefinition can have multiple values separated by ';', but there are cases
+  # where just brackets or commas are used. For example, 4CFD (䳽) has:
+  #   (non-classical form of 鸖) (same as 鶴) crane
+  local -r separatorChars=';,)'
+  local -r endChars=$separatorChars'\"'
+  # define some regexes for the loops below
+  local -r start='[^\"]*' sep=[$separatorChars] end=[^$endChars]*
+  local -r def='kDefinition=\"'$end nonAscii='[^\x00-\x7F]{1,}'
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
   #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
   #   elder of twins; a Chinese family name, (same as 姬) a handsome girl; a
   #   charming girl; a concubine; a Chinese family name
-  for i in '' '[^\"]*[;,)][^\";,)]*' '[^\"]*[;,)][;,)][^\";,)]*'; do
-    for j in $(grep -E "$def$i$1 ($nonAscii|U[^ ]* $nonAscii)" $ucdFile |
-      grep -v "kRSUnicode=\"[0-9]*'" | sed 's/ U+[A-F0-9]*//g' |
-      sed "s/.*cp=\"\([^\"]*\).*$def$i$1 \([^ ;,)]*\).*/\2:\1/"); do
+  for i in '' $start$sep$end $start$sep$sep$end; do
+    for j in $(grep -E "$def$i$1 ($nonAscii|U\+[A-F0-9]* $nonAscii)" $ucdFile |
+      grep -Ev "(kRSUnicode=\"[0-9]*'|$onKunRegex)" | sed 's/ U+[A-F0-9]*//g' |
+      sed "s/.*cp=\"\($start\).*$def$i$1 \([^ $endChars]*\).*/\2:\1/"); do
       local cp=${j#*:}
       if [[ -z ${readingLink[$cp]} ]]; then
         # 's' can occur more than once if there are multiple variants for it.
@@ -236,12 +243,16 @@ function findDefinitionLinksForType() {
 # if the field starts with '(same as X' then store a link from 'cp' to 'X'. This
 # function populates 'readingLink' array.
 function findDefinitionLinks() {
-  log "Find definition links ... " -n
+  log 'Find definition links ... ' -n
   for type in 'a variant of' interchangeable 'same as' non-classical \
     'Variant of'; do
-    printResulsFilter="$printResulsFilter|$type "
+    printResulsFilter+="|$type "
     findDefinitionLinksForType "$type"
   done
+  # No need to update 'printResultsFilter' for these longer 'type' strings since
+  # they are covered by the shorter versions in the above 'for loop'.
+  findDefinitionLinksForType 'interchangeable with'
+  findDefinitionLinksForType 'non-classical form of'
   # Pull in some Kentei kanji that are missing on/kun via links (the links have
   # the same definitions and expected on/kun).
   readingLink[3D4E]=6F97 # link 㵎 to 澗
@@ -253,7 +264,7 @@ function findDefinitionLinks() {
 
 declare -i strokes vstrokes
 
-# 'getStrokesFromAdobeRef' tries to find the correct stroke count for Japanese
+# 'getStrokesFromAdobeRef': tries to find the correct stroke count for Japanese
 # characters by looking at the 'kRSAdobe_Japan1_6' property as well as 'radical'
 # and 'kTotalStrokes' that are set by the 'setVars' function. Results are put in
 # global 'strokes' and 'vstrokes' variables.
@@ -308,7 +319,7 @@ function getStrokesFromAdobeRef() {
   fi
 }
 
-# 'getTraditionalLinks' sets 'linkTo' based on kTraditionalVariant field. More
+# 'getTraditionalLinks': sets 'linkTo' based on kTraditionalVariant field. More
 # than one link can exist, but must satisfy the function passed in $1 (see
 # 'getLinks' function below).
 function getTraditionalLinks() {
@@ -319,13 +330,13 @@ function getTraditionalLinks() {
     if [[ ! ,$cp,$linkTo, =~ ,$s, ]] && $1 $s; then
       linkType=Traditional
       # allow storing multiple traditional links
-      [[ -z $linkTo ]] && linkTo=$s || linkTo=$linkTo,$s
+      [[ -z $linkTo ]] && linkTo=$s || linkTo+=,$s
     fi
   done
 }
 
-# 'getLinks' sets 'linkTo' to one on more link values and sets 'linkType' if the
-# links point to a value that satisfies the function passed in $1 ('canLinkTo'
+# 'getLinks': sets 'linkTo' to one on more values and sets 'linkType' if the
+# links point to a value that satisfies the function passed in $1 ('canLoadFrom'
 # or 'hasMorohashi'). This function can only be used after 'setVars' and
 # it also looks at 'resultOn' and 'resultKun'.
 function getLinks() {
@@ -338,30 +349,32 @@ function getLinks() {
       linkTo=${s#*+} # remove leading U+
       $1 $linkTo && linkType=Simplified && break
     done
-    if [[ -z $linkType ]]; then
+    # Only use Compatibility, Definition and Semantic links if they refer to
+    # another kanji with an On/Kun reading, i.e., if 'canLoadFrom' is true.
+    if [[ $1$linkType == canLoadFrom ]]; then
       if [[ $kCompatibilityVariant =~ U+ ]]; then
         # kCompatibilityVariant never has more than one value
         linkTo=${kCompatibilityVariant#*+} # remove leading U+
         $1 $linkTo && linkType=Compatibility
       fi
-      # Only use definition and semantic links if there's no reading since they
-      # can result in linking together kanji that don't seem related.
-      if [[ $1$linkType == canLinkTo && -z $resultOn$resultKun ]]; then
+      if [[ -z $linkType ]]; then
         if [[ -n ${readingLink[$cp]} ]]; then
           linkTo=${readingLink[$cp]}
           linkType=Definition
-        else
-          # kSemanticVariant can be Unicode like "U+8209" or a compound like
-          # "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews" so need to strip '&'
+        elif [[ -z $resultOn$resultKun ]]; then
+          # Only use semantic links if there's no readings for the current kanji
+          # being processed since they can result in linking together kanji that
+          # don't seem related. kSemanticVariant can be Unicode like "U+8209" or
+          # a compound like "U+71D0&lt;kMatthews U+7CA6&lt;kMatthews".
           for s in $kSemanticVariant; do
-            s=${s#*+} # remove leading U+
-            linkTo=${s%%&*}
+            s=${s#*+}       # remove leading U+
+            linkTo=${s%%&*} # strip trailing &lt
             $1 $linkTo && linkType=Semantic && break
           done
         fi
       fi
     fi
-  elif [[ $1 == canLinkTo ]]; then
+  elif [[ $1 == canLoadFrom ]]; then
     # allow adding morohashi traditional links if reading ones are found
     getTraditionalLinks hasMorohashi
   fi
@@ -371,9 +384,8 @@ function getLinks() {
   fi
 }
 
-# All entries have 'cp', 'age', 'blk', 'radical' and 'strokes' as well as at
-# least one of 'resultOn' or 'resultKun' so no need to count them, but count
-# some other optional fields of interest.
+# All entries have 'cp', 'age', 'blk', 'radical' and 'strokes' so no need to
+# count them, but count some other optional fields of interest.
 declare -i totalJoyo=0 totalJinmei=0 jinmeiLinks=0 traditionalLinks=0 \
   simplifiedLinks=0 compatibilityLinks=0 definitionLinks=0 semanticLinks=0 \
   totalMeaning=0 totalPinyin=0 totalReading=0
@@ -381,12 +393,12 @@ declare -i totalJoyo=0 totalJinmei=0 jinmeiLinks=0 traditionalLinks=0 \
 # 'countLinkType' increments totals for each link type (used in summary info)
 function countLinkType() {
   case $linkType in
-  Jinmei) jinmeiLinks=++jinmeiLinks ;;
-  Traditional) traditionalLinks=++traditionalLinks ;;
-  Simplified) simplifiedLinks=++simplifiedLinks ;;
-  Compatibility) compatibilityLinks=++compatibilityLinks ;;
-  Definition) definitionLinks=++definitionLinks ;;
-  Semantic) semanticLinks=++semanticLinks ;;
+  Jinmei) jinmeiLinks+=1 ;;
+  Traditional) traditionalLinks+=1 ;;
+  Simplified) simplifiedLinks+=1 ;;
+  Compatibility) compatibilityLinks+=1 ;;
+  Definition) definitionLinks+=1 ;;
+  Semantic) semanticLinks+=1 ;;
   *) ;;
   esac
 }
@@ -396,16 +408,13 @@ declare -A uniqueMorohashi uniqueNelson
 function processRecord() {
   local -r localMorohashi=${morohashi[$cp]}
   local localDefinition=${definition[$cp]} loadFrom
-  # 'resultOn' and 'resultKun' come from 'on' and 'kun' arrays, but can also be
-  # set by 'setOnKun' and are used by 'getLinks' so they can't be local
-  resultOn=${on[$cp]}
-  resultKun=${kun[$cp]}
+  setOnKun "${on[$cp]}" "${kun[$cp]}"
   # 'linkTo' and 'linkType' can be modified by 'getLinks' function
   linkTo=
   linkType=
   if [[ -n $kJoyoKanji ]]; then
     # unset kJoyoKanji if official version is the 'link' entry
-    [[ $kJoyoKanji =~ U+ ]] && unset -v kJoyoKanji || totalJoyo=++totalJoyo
+    [[ $kJoyoKanji =~ U+ ]] && unset -v kJoyoKanji || totalJoyo+=1
   elif [[ -n $kJinmeiyoKanji ]]; then
     if [[ $kJinmeiyoKanji =~ U+ ]]; then
       loadFrom=${kJinmeiyoKanji#*+}
@@ -413,9 +422,9 @@ function processRecord() {
     else
       linkTo=${linkBack[$cp]}
     fi
-    [[ -z $linkTo ]] && totalJinmei=++totalJinmei || linkType=Jinmei
+    [[ -z $linkTo ]] && totalJinmei+=1 || linkType=Jinmei
   else
-    getLinks canLinkTo && loadFrom=${linkTo%%,*} || getLinks hasMorohashi
+    getLinks canLoadFrom && loadFrom=${linkTo%%,*} || getLinks hasMorohashi
   fi
   if [[ -z $resultOn$resultKun ]]; then
     if [[ -n $loadFrom ]]; then
@@ -431,19 +440,19 @@ function processRecord() {
       # Nelson IDs. 4BC2 is not Kentei, but it's in 'wiki-stokes.txt' file. UCD
       # data doesn't have entries for Nelson IDs: 125, 149, 489 and 1639
       case $cp in
-      34E4) setOnKun "KATSU" ;;                        # 㓤 (Nelson 677)
-      3C7E) setOnKun "KAI" ;;                          # 㱾 (Nelson 2453)
-      3C83) setOnKun "KYUU" ;;                         # 㲃 (Nelson 2459)
-      4BC2) setOnKun "SHIN" ;;                         # 䯂
-      6479) setOnKun "BO" "MO" ;;                      # 摹 (Nelson 4035)
-      6532) setOnKun "KI" "KATAMUKU SOBADATERU" ;;     # 攲 (Nelson 2041)
-      6FDB) setOnKun "BOU MOU" "KOSAME" ;;             # 濛
-      6663) setOnKun "SEI SETSU" "AKIRAKA KASHIKOI" ;; # 晣
-      69D4) setOnKun "KOU" "HANETSURUBE" ;;            # 槔
-      6A94) setOnKun "TOU" ;;                          # 檔
-      7B53) setOnKun "KEI" "KOUGAI KANZASHI" ;;        # 筓
-      7CF1) setOnKun "GETSU" "KOUJI MOYASHI" ;;        # 糱
-      83C6) setOnKun "SHU" ;;                          # 菆 (Nelson 3961)
+      34E4) setOnKun KATSU ;;                          # 㓤 (Nelson 677)
+      3C7E) setOnKun KAI ;;                            # 㱾 (Nelson 2453)
+      3C83) setOnKun KYUU ;;                           # 㲃 (Nelson 2459)
+      4BC2) setOnKun SHIN ;;                           # 䯂
+      6479) setOnKun BO MO ;;                          # 摹 (Nelson 4035)
+      6532) setOnKun KI 'KATAMUKU SOBADATERU' ;;       # 攲 (Nelson 2041)
+      6FDB) setOnKun 'BOU MOU' KOSAME ;;               # 濛
+      6663) setOnKun 'SEI SETSU' 'AKIRAKA KASHIKOI' ;; # 晣
+      69D4) setOnKun KOU HANETSURUBE ;;              # 槔
+      6A94) setOnKun TOU ;;                            # 檔
+      7B53) setOnKun KEI 'KOUGAI KANZASHI' ;;          # 筓
+      7CF1) setOnKun GETSU 'KOUJI MOYASHI' ;;          # 糱
+      83C6) setOnKun SHU ;;                            # 菆 (Nelson 3961)
       # if there are no readings and no Morohashi ID then skip this record
       *) [[ -n $localMorohashi ]] || return 1 ;;
       esac
@@ -456,12 +465,12 @@ function processRecord() {
   else
     getStrokesFromAdobeRef
   fi
-  [[ -n $localDefinition ]] && totalMeaning=++totalMeaning
-  [[ -n $resultOn$resultKun ]] && totalReading=++totalReading
+  [[ -n $localDefinition ]] && totalMeaning+=1
+  [[ -n $resultOn$resultKun ]] && totalReading+=1
   if [[ -n $kMandarin ]]; then
     # for kanji with multiple Pinyin readings just keep the first for now
     kMandarin=${kMandarin%% *}
-    totalPinyin=++totalPinyin
+    totalPinyin+=1
   fi
   [[ -n $localMorohashi && -z ${uniqueMorohashi[$localMorohashi]} ]] &&
     uniqueMorohashi[$localMorohashi]=1
@@ -491,7 +500,7 @@ Kun" >$outFile
     # 'blk', but need to unset all the optional fields used in 'processRecord'.
     setVars "$i" kTraditionalVariant kSimplifiedVariant kCompatibilityVariant \
       kSemanticVariant kRSAdobe_Japan1_6 kMandarin kNelson || continue
-    processRecord "$i" && count=++count
+    processRecord "$i" && count+=1
   done < <(grep -E "($printResulsFilter)" $ucdFile)
   echo "wrote $count"
 }
@@ -507,14 +516,14 @@ function checkTotal() {
   [[ $2 -eq $3 ]] && echo "/$3" || echo " *** expected $3 ***"
 }
 
-checkTotal "Unique Morohashi" ${#uniqueMorohashi[@]} 17830
-checkTotal "Unique Nelson ID" ${#uniqueNelson[@]} 5442
-checkTotal "Total Jouyou" $totalJoyo 2136
-checkTotal "Total Jinmei" $totalJinmei 633
-checkTotal "Jinmei Links" $jinmeiLinks 230
+checkTotal 'Unique Morohashi' ${#uniqueMorohashi[@]} 17830
+checkTotal 'Unique Nelson ID' ${#uniqueNelson[@]} 5442
+checkTotal 'Total Jouyou' $totalJoyo 2136
+checkTotal 'Total Jinmei' $totalJinmei 633
+checkTotal 'Jinmei Links' $jinmeiLinks 230
 
-echo -e "Other Links:\n  Traditional $traditionalLinks, Simplified $simplifiedLinks, \
-Compatibility $compatibilityLinks, Definition $definitionLinks, Semantic \
-$semanticLinks"
+echo -e "Other Links:\n  Traditional $traditionalLinks, Simplified \
+$simplifiedLinks, Compatibility $compatibilityLinks, Definition \
+$definitionLinks, Semantic $semanticLinks"
 echo -e "Other Fields:\n  Meaning $totalMeaning, Pinyin $totalPinyin, Reading \
 $totalReading"
