@@ -2,6 +2,10 @@
 
 declare -r program="parseUcdAllFlat.sh"
 
+# Ensure locale is UTF-8 so that things like ${j:0:1} gets a single utf8 value
+# instead of just a single byte.
+export LC_ALL=en_US.UTF-8
+
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
 # the following 18 values:
@@ -220,7 +224,7 @@ function findDefinitionLinksForType() {
   # define some regexes for the loops below
   local -r start='[^\"]*' sep=[$separatorChars] end=[^$endChars]*
   local -r def='kDefinition=\"'$end nonAscii='[^ -~]' cp=".*cp=\"\($start\).*"
-  local -r simplified="kRSUnicode=\"[0-9]*'"
+  local -r filter="(kRSUnicode=\"[0-9]*'|$onKunRegex)"
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
   #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
@@ -233,8 +237,8 @@ function findDefinitionLinksForType() {
   for i in '' $start$sep$end $start$sep$sep$end; do
     s="$def$i$1[-\'a-z0-9 ]*"
     # loop to handle strings like 'same as X' where X is a UTF-8 kanji
-    for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -v $simplified |
-      grep -v $onKunRegex | sed "s/$cp$s\($nonAscii*\).*/\2:\1/"); do
+    for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -Ev $filter |
+      sed "s/$cp$s\($nonAscii*\).*/\2:\1/"); do
       linkFrom=${j#*:}
       if [[ -z ${readingLink[$linkFrom]} ]]; then
         link=$(echo -n ${j:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
@@ -244,8 +248,8 @@ function findDefinitionLinksForType() {
       fi
     done
     # loop to handle strings like 'same as U+ABCD ...' (so no conversion needed)
-    for j in $(grep -E "${s}U\+[A-F0-9]*" $ucdFile | grep -v $simplified |
-      grep -v $onKunRegex | sed "s/$cp${s}U+\([A-F0-9]*\).*/\2:\1/"); do
+    for j in $(grep -E "${s}U\+[A-F0-9]*" $ucdFile | grep -Ev $filter |
+      sed "s/$cp${s}U+\([A-F0-9]*\).*/\2:\1/"); do
       linkFrom=${j#*:}
       if [[ -z ${readingLink[$linkFrom]} ]]; then
         link=${j%:*}
