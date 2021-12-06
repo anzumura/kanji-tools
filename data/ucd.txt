@@ -297,7 +297,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3855	㡕	CJK_Ext_A	3.0	50	12		yīng					592E	央	Definition	center, conclude, run out; beg	OU	NAKABA
 3856	㡖	CJK_Ext_A	3.0	50	12		chuáng					5E62	幢	Definition	carriage curtain; sun screen	TOU DOU	HATA
 3858	㡘	CJK_Ext_A	3.0	50	13		lián					7E11	縑	Definition	fine silk	KEN	KINU
-3861	㡡	CJK_Ext_A	3.0	50	15		chú		1487 1491						(a variant of 幮 U+5E6E, 𢅥 U+22165) a screen used to make a temporary kitchen	CHU JIU	TOBARI KAYA
+3861	㡡	CJK_Ext_A	3.0	50	15		chú		1487 1491			5E6E	幮	Definition	(a variant of 幮 U+5E6E, 𢅥 U+22165) a screen used to make a temporary kitchen	CHU JIU	TOBARI KAYA
 3862	㡢	CJK_Ext_A	3.0	50	16		màn					5E54	幔	Definition	curtain, screen, tent	BAN MAN	MAKU
 3863	㡣	CJK_Ext_A	3.0	50	16		lóng					9F8D	龍	Definition	dragon; symbolic of emperor	RYUU ROU	TATSU
 3867	㡧	CJK_Ext_A	3.0	50	20		zhèng					5E40	幀	Definition	picture, scroll; one of pair of	TEI TOU CHOU	KAKEMONO
@@ -1537,6 +1537,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4CF0	䳰	CJK_Ext_A	3.0	196	20		bǎo					9D07	鴇	Definition	bustard; procuress; Otis species (various)	HOU	NOGAN TOKI
 4CF1	䳱	CJK_Ext_A	3.0	196	21		wù					9DA9	鶩	Definition	duck	BOKU BU	AHIRU
 4CF6	䳶	CJK_Ext_A	3.0	196	21		xī					96DE	雞	Definition	chickens; domestic fowl	KEI	NIWATORI
+4CF9	䳹	CJK_Ext_A	3.0	196	22		kòu					9CE9	鳩	Definition	pigeon, dove; collect, assemble	KYUU KU	HATO ATSUMERU
 4CFA	䳺	CJK_Ext_A	3.0	196	22		yàn					9D6A	鵪	Definition	quail; Coturnix coturnix	AN ON	UZURA
 4CFD	䳽	CJK_Ext_A	3.0	196	22		hè					9DB4	鶴	Definition	crane; Grus species (various)	KAKU	TSURU
 4D07	䴇	CJK_Ext_A	3.0	196	24		líng					9D12	鴒	Definition	species of lark; wagtail; Motacilla species (various)	REI RYOU	
@@ -1981,7 +1982,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4FE1	信	CJK	1.1	9	9		xìn	707	454	Y					trust, believe; letter	SHIN	MAKOTO TAYORI MAKASERU
 4FE2	俢	CJK	1.1	9	9		xiū	716								SHUU	OSAMERU OSAMARU
 4FE3	俣	CJK	1.1	9	9		yǔ	718	437		Y				big		MATA
-4FE4	俤	CJK	1.1	9	9		dì	719	435						(J) same as 面影 U+9762 U+5F71, visage, face; trace, shadow; memory		OMOKAGE
+4FE4	俤	CJK	1.1	9	9		dì	719	435			9762	面	Definition	(J) same as 面影 U+9762 U+5F71, visage, face; trace, shadow; memory		OMOKAGE
 4FE5	俥	CJK	1.1	9	9		chē	720	436			4F21	伡	Simplified	rickshaw, cart, vehicle; name of piece in Chinese chess		KURUMA
 4FE6	俦	CJK	1.1	9	9		chóu					5114	儔	Traditional	companion, mate, colleague	CHUU JU	TOMOGARA
 4FEB	俫	CJK	1.1	9	9		lái					5008	倈	Traditional	to induce to come; to encourage	RAI	
@@ -1989,7 +1990,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 4FEF	俯	CJK	1.1	9	10		fǔ	722	484						bow down, face down, look down	FU	FUSERU
 4FF0	俰	CJK	1.1	9	10		huò	723								KA WA	YAWARAGU
 4FF1	俱	CJK	1.1	9	10		jù		477		Y				all, together; accompany	KU	TOMONI
-4FF2	俲	CJK	1.1	9	10		xiào	725	459						same as 傚 U+509A, imitate, mimic	KOU	NARAU
+4FF2	俲	CJK	1.1	9	10		xiào	725	459			509A	傚	Definition	same as 傚 U+509A, imitate, mimic	KOU	NARAU
 4FF3	俳	CJK	1.1	9	10		pái	726	485	Y					actor; vaudeville show; insincere	HAI	WAZAOGI
 4FF4	俴	CJK	1.1	9	10		jiàn	727							thin	SEN ZEN	ASAI HADAKA
 4FF5	俵	CJK	1.1	9	10		biào	730	467	Y					divide, distribute	HYOU	TAWARA
@@ -2121,7 +2122,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 5077	偷	CJK	1.1	9	11		tōu								to steal, burglar, thief	CHUU TOU	NUSUMU
 5078	偸	CJK	1.1	9	11		tōu	901	504						to steal	CHUU TOU	NUSUMU
 5079	偹	CJK	1.1	9	11		bèi	922							prepare, ready, perfect	BI	SONAERU SONAWARU SONAE
-507A	偺	CJK	1.1	9	11		zá	923							(same as U+54B1 咱) we, us	SAN	
+507A	偺	CJK	1.1	9	11		zá	923				54B1	咱	Definition	(same as U+54B1 咱) we, us	SAN	
 507B	偻	CJK	1.1	9	11		lóu	924				50C2	僂	Traditional	humpback; surname	ROU	
 507C	偼	CJK	1.1	9	11		jié	925									
 507D	偽	CJK	1.1	9	11		wěi	927P	510	Y					false, counterfeit, bogus	GI KA	ITSUWARU NISE ITSUWARI
@@ -2365,7 +2366,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 5179	兹	CJK	1.1	12	9		zī		592			8332	茲	Traditional	now, here; this; time, year	JI SHI	SHIGERU MASU MUSHIRO
 517B	养	CJK	1.1	12	10		yǎng					990A	養	Traditional	raise, rear, bring up; support	YOU	YASHINAU YASHINAI
 517C	兼	CJK	1.1	12	10		jiān	1483	598	Y					unite, combine; connect; and	KEN	KANERU KANETE
-517E	兾	CJK	1.1	12	13		jì	1494	608						same as 冀 U+5180 to hope for; to wish	KI	KOINEGAU
+517E	兾	CJK	1.1	12	13		jì	1494	608			5180	冀	Definition	same as 冀 U+5180 to hope for; to wish	KI	KOINEGAU
 5180	冀	CJK	1.1	12	16		jì	1500	614						hope for; wish; Hebei province	KI	KOINEGAU KOINEGAWA
 5182	冂	CJK	1.1	13	2		jiōng	1506							wide; KangXi radical 13	KEI KYOU	TOOI
 5183	冃	CJK	1.1	13	4		mào	1508								BOU MOU	ZUKIN OOU
@@ -2785,7 +2786,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 5348	午	CJK	1.1	24	4		wǔ	2703	162	Y					noon; 7th terrestrial branch	GO	UMA
 5349	卉	CJK	1.1	24	5		huì	2706	85 771						general term for plants; myriads	KI	KUSA
 534A	半	CJK	1.1	24	5		bàn	2707	132 167	Y					half	HAN	NAKABA NAKABASURU
-534B	卋	CJK	1.1	24	6		shì	2714	84 98						same as 世 U+4E16, generation; world; era	SEI	YO
+534B	卋	CJK	1.1	24	6		shì	2714	84 98			4E16	世	Definition	same as 世 U+4E16, generation; world; era	SEI	YO
 534C	卌	CJK	1.1	24	5		xì	2712	87						forty, fortieth	SHUU	YONJUU
 534D	卍	CJK	1.1	24	6		wàn	2724	79						swastika, one of the auspicious signs recognized (e.g. in Chinese Tathagata Buddhism) as being on the chest of Buddha (and variously seen in statuary on the chest, soles of the feet, or palms of the hands)	BAN MAN	MANJI
 5350	卐	CJK	1.1	24	4		wàn		12						swastika, one of the auspicious signs recognized (e.g. in Chinese Tathagata Buddhism) as being on the chest of Buddha (and variously seen in statuary on the chest, soles of the feet, or palms of the hands)	BAN MAN	MANJI
@@ -3371,7 +3372,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 55E9	嗩	CJK	1.1	30	13		suǒ	4138							flute-like musical instrument	SA	
 55F6	嗶	CJK	1.1	30	14		bì	4139							used in transliterations	HITSU HICHI	
 55F7	嗷	CJK	1.1	30	14		áo	4142	979						loud clamor; sound of wailing	GOU	KAMABISUSHI
-55F8	嗸	CJK	1.1	30	14		áo	4143	979						same as 嗷 U+55F7, noisy	GOU	
+55F8	嗸	CJK	1.1	30	14		áo	4143	979			55F7	嗷	Definition	same as 嗷 U+55F7, noisy	GOU	
 55F9	嗹	CJK	1.1	30	14		lián	4148							chatter	REN	
 55FA	嗺	CJK	1.1	30	14		zuī	4149								SUI SAI SE	NAGEKU
 55FB	嗻	CJK	1.1	30	14		zhē	4151							to screen. loquacious; (Cant.) final particle used to defend oneself or protest against others	SHA SHO	SAEGIRU
@@ -5696,7 +5697,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 5FE6	忦	CJK	1.1	61	7		jiá	10360									
 5FE7	忧	CJK	1.1	61	7		yōu	10362				6182	憂	Traditional	sad, grieved; grief, melancholy	YUU	UREERU UREI UI
 5FE8	忨	CJK	1.1	61	7		wàn	10365								GAN	MUSABORU
-5FE9	忩	CJK	1.1	61	8		cōng	10366	586						same as 怱 U+6031, hastily, in haste, hurriedly	SOU	NIWAKA AWATERU
+5FE9	忩	CJK	1.1	61	8		cōng	10366	586			6031	怱	Definition	same as 怱 U+6031, hastily, in haste, hurriedly	SOU	NIWAKA AWATERU
 5FEA	忪	CJK	1.1	61	7		sōng	10367							quiet, calm, tranquil, peaceful	SHOU SHU	ODOROKU
 5FEB	快	CJK	1.1	61	7		kuài	10369	1654	Y					rapid, quick, speedy, fast; soon	KAI	KOKOROYOI
 5FEC	忬	CJK	1.1	61	7		yù	10371								YO SHO	ARAKAJIME YASUNZURU
@@ -8372,7 +8373,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 6B3D	欽	CJK	1.1	76	12		qīn	16104	4829		Y				respect, admire; respectful	KIN KON	TSUTSUSHIMU
 6B3E	款	CJK	1.1	76	12		kuǎn	16107	2418	Y					item, article; clause; fund	KAN	MAKOTO SHIRUSU
 6B3F	欿	CJK	1.1	76	12		kǎn	16111							discontented; sad; gloomy	TAN TON KAN KON	MOTOMERU
-6B40	歀	CJK	1.1	76	13		kuǎn	16125	2420						same as 款 U+6B3E, an item, article; clause, fund	KAN	MAKOTO SHIRUSU
+6B40	歀	CJK	1.1	76	13		kuǎn	16125	2420			6B3E	款	Definition	same as 款 U+6B3E, an item, article; clause, fund	KAN	MAKOTO SHIRUSU
 6B41	歁	CJK	1.1	76	13		kǎn	16126									
 6B42	歂	CJK	1.1	76	13		chuǎn	16127									
 6B43	歃	CJK	1.1	76	13		shà	16131							smear one's mouth with blood of a victim when taking an oath	SOU SHOU KOU	SUSURU
@@ -9838,7 +9839,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 7193	熓	CJK	1.1	86	14		wǔ	19306									
 7194	熔	CJK	1.1	86	14		róng	19319	2786						melt, smelt, fuse; mold	YOU	IGATA TOKERU
 7195	熕	CJK	1.1	86	14		gōng	19321								KOU	OOZUTSU
-7196	熖	CJK	1.1	86	14		yàn		2787						same as 燄 U+71C4, flame; blazing, brilliant	EN	HONOO
+7196	熖	CJK	1.1	86	14		yàn		2787			71C4	燄	Definition	same as 燄 U+71C4, flame; blazing, brilliant	EN	HONOO
 7199	熙	CJK	1.1	86	15		xī				Y				bright, splendid, glorious	KI	HIKARI HIKARU
 719A	熚	CJK	1.1	86	15		bì	19324								HITSU HICHI	
 719B	熛	CJK	1.1	86	15		biāo	19325							blaze	HYOU	
@@ -12897,7 +12898,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 7E7C	繼	CJK	1.1	120	20		jì	27997	3620						continue, maintain, carry on	KEI	TSUGU
 7E7D	繽	CJK	1.1	120	20		bīn	27999							flourishing, thriving, abundant	HIN	
 7E7E	繾	CJK	1.1	120	20		qiǎn	28006							attached to, inseparable; entangled	TEN KIN	TEATSUI
-7E7F	繿	CJK	1.1	120	21		lán	28009							(same as U+8964 襤) clothes without hem; ragged garments; sloppily dressed	RAN	
+7E7F	繿	CJK	1.1	120	21		lán	28009				8964	襤	Definition	(same as U+8964 襤) clothes without hem; ragged garments; sloppily dressed	RAN	
 7E80	纀	CJK	1.1	120	20		pú	28010									
 7E81	纁	CJK	1.1	120	20		xūn	28011							light red, pink	KUN	USUIAKAIRO
 7E82	纂	CJK	1.1	120	20		zuǎn	28012	3454		Y				edit, compile; topknot, chignon	SAN	ATSUMERU
@@ -13029,7 +13030,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 7FA0	羠	CJK	1.1	123	12		yí	28481									
 7FA1	羡	CJK	1.1	123	12		xiàn	28493							envy, admire; praise; covet	SEN EN	URAYAMU AMARI
 7FA2	羢	CJK	1.1	123	12		róng	28494							fine woolen fabrics	JOU NYU	
-7FA3	羣	CJK	1.1	123	13		qún	28497							(same as U+7FA4 群) group, crowd, multitude, mob	GUN KUN	MURAGARU MURERU
+7FA3	羣	CJK	1.1	123	13		qún	28497				7FA4	群	Definition	(same as U+7FA4 群) group, crowd, multitude, mob	GUN KUN	MURAGARU MURERU
 7FA4	群	CJK	1.1	123	13		qún	28498	3667	Y					(same as U+7FA3 羣) group, crowd, multitude, mob	GUN KUN	MURAGARU MURERU
 7FA5	羥	CJK	1.1	123	13		qiǎng	28499									
 7FA6	羦	CJK	1.1	123	13		huán	28500								KAN GAN	
@@ -15026,7 +15027,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 8837	蠷	CJK	1.1	142	24		qú	33893									
 8838	蠸	CJK	1.1	142	23		quán	33894									
 8839	蠹	CJK	1.1	142	24		dù	33896	4202						moth; insects which eat into clot	TO TSU	KIKUIMUSHI SHIMI
-883A	蠺	CJK	1.1	142	24		cán	33891	74						same as 蚕 U+8695 silkworms	SAN	KAIKO
+883A	蠺	CJK	1.1	142	24		cán	33891	74			8695	蚕	Definition	same as 蚕 U+8695 silkworms	SAN	KAIKO
 883B	蠻	CJK	1.1	142	25		mán	33914	4204			86EE	蛮	Simplified	barbarians; barbarous, savage	BAN	EBISU
 883C	蠼	CJK	1.1	142	26		qú	33928								KYAKU KAKU KEKI KU	OOZARU
 883D	蠽	CJK	1.1	142	27		jié	33932									
@@ -16493,7 +16494,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 8F1E	輞	CJK	1.1	159	15		wǎng	38373							exterior rim of wheel, felly	BOU MOU	WA
 8F1F	輟	CJK	1.1	159	15		chuò	38374							stop, suspend, halt	TETSU	YAMERU
 8F20	輠	CJK	1.1	159	15		guǒ	38380							grease pot hung under axle of cart	KA WA GA GE	ABURATSUBO
-8F21	輡	CJK	1.1	159	15		kǎn	38381	4627						same as 轗 U+8F57, to fail; a difficulty, misfortune	KAN KON	
+8F21	輡	CJK	1.1	159	15		kǎn	38381	4627			8F57	轗	Definition	same as 轗 U+8F57, to fail; a difficulty, misfortune	KAN KON	
 8F22	輢	CJK	1.1	159	15		yǐ	38386									
 8F23	輣	CJK	1.1	159	15		péng	38389								HOU BYOU BOU	IKUSAGURUMU
 8F24	輤	CJK	1.1	159	15		qiàn	38390									
@@ -17236,7 +17237,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 9265	鉥	CJK	1.1	167	13		shù	40320							needle	SHUTSU JUCHI SHUCHI	NAGAIBARI
 9266	鉦	CJK	1.1	167	13		zhēng	40322	4839						kind of gong used in ancient times by troops on the march	SEI SHOU	KANE
 9267	鉧	CJK	1.1	167	13		mǔ	40323								BOU	KERA
-9268	鉨	CJK	1.1	167	13		xǐ	40325							[nǐ] nihonium (element 113); silk string; [niè] (same as U+9477 鑷) tweezers; [xǐ] (same as U+9269 鉩) a seal	DEI NAI	ITOMAONOASHI
+9268	鉨	CJK	1.1	167	13		xǐ	40325				9269	鉩	Definition	[nǐ] nihonium (element 113); silk string; [niè] (same as U+9477 鑷) tweezers; [xǐ] (same as U+9269 鉩) a seal	DEI NAI	ITOMAONOASHI
 9269	鉩	CJK	1.1	167	13		xǐ	40328								JOU NOU	TADASHII KOBAKO
 926A	鉪	CJK	1.1	167	13		dì	40329									
 926B	鉫	CJK	1.1	167	13		jiā	40335									
@@ -19562,7 +19563,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 9E7A	鹺	CJK	1.1	197	21		cuó	47563							salty; salt	SA ZA SHI JI	SHIO
 9E7B	鹻	CJK	1.1	197	21		jiǎn	47564							impure carbonate of sodium of natron	KAN KEN	SHIOKE
 9E7C	鹼	CJK	1.1	197	24		jiǎn	47576	5374						alkaline, alkali, lye, salt	KEN KAN SEN	AKU
-9E7D	鹽	CJK	1.1	197	25		yán	47579	3126						(same as of U+5869 塩) salt	EN	SHIO
+9E7D	鹽	CJK	1.1	197	25		yán	47579	3126			5869	塩	Definition	(same as of U+5869 塩) salt	EN	SHIO
 9E7F	鹿	CJK	1.1	198	11		lù	47586	1510 5375	Y					deer; surname; KangXi radical 198	ROKU	SHIKA KA
 9E80	麀	CJK	1.1	198	13		yōu	47588							female deer; roe, doe	YUU YU	MEJIKA
 9E81	麁	CJK	1.1	198	13		cū	47591							rough, thick, course; rude	SO	ARAI
@@ -20197,9 +20198,9 @@ FA6D	舘	CJK_Compat_Ideographs	5.2	30	16							8218	舘	Compatibility	a mansion;
 22B46	𢭆	CJK_Ext_B	3.1	64	10		chōu					62BD	抽	Semantic	draw out, pull out; sprout	CHUU	NUKU HIKU
 22B4F	𢭏	CJK_Ext_B	3.1	64	10		dǎo					64E3	擣	Traditional	hull; thresh; beat, attack	TOU CHUU	TSUKU UTSU FURERU
 233FE	𣏾	CJK_Ext_B	3.1	75	8				2193						(J) non-standard variant of 材 U+6750, material, stuff; timber; talent; (Cant.) a peg, row of pegs	ZAI	MARUTA
-237EC	𣟬	CJK_Ext_B	3.1	75	20				2402						same as 欄 U+6B04, a railing, balustrade; an animal pan	RAN	TESURI
+237EC	𣟬	CJK_Ext_B	3.1	75	20				2402			6B04	欄	Definition	same as 欄 U+6B04, a railing, balustrade; an animal pan	RAN	TESURI
 237F1	𣟱	CJK_Ext_B	3.1	75	21				2405						Zelkova tree	KYO	KEYAKI
-2383D	𣠽	CJK_Ext_B	3.1	75	23				2406						same as 欛 U+6B1B, a handle	HA HE	TSUKA
+2383D	𣠽	CJK_Ext_B	3.1	75	23				2406			6B1B	欛	Definition	same as 欛 U+6B1B, a handle	HA HE	TSUKA
 24AE9	𤫩	CJK_Ext_B	3.1	96	28		líng					3ECF	㻏	Simplified	tinkling of jade	REI ROU	
 24BF3	𤯳	CJK_Ext_B	3.1	100	14				68			7526	甦	Definition	be reborn; resuscitate, revive	SO	YOMIGAERU
 24FF2	𤿲	CJK_Ext_B	3.1	107	12							9EAC	麬	Traditional		FU	FUSUMA
@@ -20210,7 +20211,7 @@ FA6D	舘	CJK_Compat_Ideographs	5.2	30	16							8218	舘	Compatibility	a mansion;
 25AF1	𥫱	CJK_Ext_B	3.1	118	10		dùn					56E4	囤	Semantic	grain basket, bin for grain	TON DON	ZARU
 264B7	𦒷	CJK_Ext_B	3.1	125	9				3686						senility	BOU MOU	
 26999	𦦙	CJK_Ext_B	3.1	134	17				3854						variant of 挙 U+6319, to raise, lift up; to recommend	KYO	AGERU AGARU KOZORU
-275D7	𧗗	CJK_Ext_B	3.1	143	20				4212						same as 衄 U+8844, a nosebleed	JIKU	HANAJI
+275D7	𧗗	CJK_Ext_B	3.1	143	20				4212			8844	衄	Definition	same as 衄 U+8844, a nosebleed	JIKU	HANAJI
 275F7	𧗷	CJK_Ext_B	3.1	144	13				1629						(J) non-standard variant of 術 U+8853, art, skill, special feat; method	JUTSU	MICHI SUBE WAZA
 27C27	𧰧	CJK_Ext_B	3.1	152	6				180						to assemble	SHUU	
 28EF6	𨻶	CJK_Ext_B	3.1	170	14				5017						a crevice, fissure; time, leisure; unpreparedness	GEKI	SUKASU HIMA

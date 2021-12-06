@@ -105,7 +105,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, SanityChecks) {
-  EXPECT_EQ(_data.kanjiNameMap().size(), 20267);
+  EXPECT_EQ(_data.kanjiNameMap().size(), 20268);
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
@@ -350,10 +350,10 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jinmeiLinks, _data.linkedJinmeiKanji().size());
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 9);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 14);
-  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 220);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2573);
+  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 221);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2591);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // these are captured in 'jinmeiLinks'
-  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 88);
+  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 89);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();

@@ -2,10 +2,6 @@
 
 declare -r program="parseUcdAllFlat.sh"
 
-# Ensure locale is UTF-8 so that things like ${j:0:1} gets a single utf8 value
-# instead of just a single byte.
-export LC_ALL=en_US.UTF-8
-
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun) and prints out a tab-separated line with
 # the following 18 values:
@@ -74,6 +70,15 @@ export LC_ALL=en_US.UTF-8
 # - 'kIRGDaiKanwaZiten' has 17,864 (12,942 with On/Kun). There's a proposal to
 #   remove this property (and expand 'kMorohashi') so it's probably best not to
 #   use it: https://www.unicode.org/L2/L2021/21032-unihan-kmorohashi.pdf
+
+# Ensure LANG is 'UTF-8' so things like ${j:0:1} get a single utf8 value instead
+# of just a single byte.
+if [[ ! $LANG =~ UTF-8 ]]; then
+  for s in jp_JP en_US; do
+    locale -a | grep -q $s.UTF-8 && export LANG=$s.UTF-8 && break
+  done
+  [[ ! $LANG =~ UTF-8 ]] && echo "failed to find a UTF-8 locale" && exit 1
+fi
 
 if [[ $# -lt 2 ]]; then
   echo "usage: parseUcdAllFlat.sh 'input file' 'output file'"
@@ -212,6 +217,7 @@ function canLoadFrom() {
 }
 
 declare -A defTypeUtf defTypeCode
+declare -a linkErrors
 
 # 'findDefinitionLinksForType': finds links based on type ($1) string matches in
 # 'kDefinition' field and updates 'defType' arrays.
@@ -219,12 +225,10 @@ function findDefinitionLinksForType() {
   # kDefinition can have multiple values separated by ';', but there are cases
   # where just brackets or commas are used. For example, 4CFD (䳽) has:
   #   (non-classical form of 鸖) (same as 鶴) crane
-  local -r separatorChars=';,)'
-  local -r endChars=$separatorChars'\"'
-  # define some regexes for the loops below
-  local -r start='[^\"]*' sep=[$separatorChars] end=[^$endChars]*
-  local -r def='kDefinition=\"'$end nonAscii='[^ -~]' cp=".*cp=\"\($start\).*"
-  local -r filter="(kRSUnicode=\"[0-9]*'|$onKunRegex)"
+  local -r recordFilter="kRSUnicode=\"[0-9]*'" delim=';,)' unicode=[A-F0-9] \
+    sedEnd='*\).*/linkFrom=\1:link=\2/' start='[^\"]*' nonAscii='[^ -~]'
+  local -r sedStart="s/.*cp=\"\($start\).*" sep=[$delim] end=[^$delim'\"']*
+  local -r definitionStart='kDefinition=\"'$end
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
   #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
@@ -233,26 +237,36 @@ function findDefinitionLinksForType() {
   # Note: 'link' can occur more than once if there are multiple variants for it.
   # This is true for '64DA (據)' which has '3A3F (㨿)' and '3A40 (㩀)'.
   local -i utf=0 code=0
-  local i j s linkFrom link
+  local i j k s linkFrom link
   for i in '' $start$sep$end $start$sep$sep$end; do
-    s="$def$i$1[-\'a-z0-9 ]*"
+    s="$definitionStart$i$1[-\'a-z0-9 ]*"
     # loop to handle strings like 'same as X' where X is a UTF-8 kanji
-    for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -Ev $filter |
-      sed "s/$cp$s\($nonAscii*\).*/\2:\1/"); do
-      linkFrom=${j#*:}
-      if [[ -z ${readingLink[$linkFrom]} ]]; then
-        link=$(echo -n ${j:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
-        # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
-        printf -v link '%04X' 0x$link
-        hasReading $link && readingLink[$linkFrom]=$link && utf+=1
+    for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -v $recordFilter |
+      sed "$sedStart$s\($nonAscii$sedEnd"); do
+      eval ${j/:/ }
+      if [[ -z $link ]]; then
+        linkErrors+=("[UTF cp=$linkFrom]")
+      elif [[ -z ${readingLink[$linkFrom]} ]]; then
+        # some kanji have multiple links like 4640 (䙀) which has 'same as 綳繃'
+        while read -r -n 1 k; do
+          # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 link
+          if link=$(echo -n $k | iconv -s -f UTF-8 -t UTF-32BE | xxd -p); then
+            printf -v link '%04X' 0x$link 2>/dev/null && hasReading $link &&
+              readingLink[$linkFrom]=$link && utf+=1 && break ||
+              linkErrors+=("[cp=$linkFrom link=$k iconv=$link")
+          else
+            linkErrors+=("[cp=$linkFrom link=$k]")
+          fi
+        done < <(echo -n $link)
       fi
     done
     # loop to handle strings like 'same as U+ABCD ...' (so no conversion needed)
-    for j in $(grep -E "${s}U\+[A-F0-9]*" $ucdFile | grep -Ev $filter |
-      sed "s/$cp${s}U+\([A-F0-9]*\).*/\2:\1/"); do
-      linkFrom=${j#*:}
-      if [[ -z ${readingLink[$linkFrom]} ]]; then
-        link=${j%:*}
+    for j in $(grep -E "${s}U\+$unicode*" $ucdFile | grep -v $recordFilter |
+      sed "$sedStart${s}U+\($unicode$sedEnd"); do
+      eval ${j/:/ }
+      if [[ -z $link ]]; then
+        linkErrors+=("[CODE cp=$linkFrom]")
+      elif [[ -z ${readingLink[$linkFrom]} ]]; then
         hasReading $link && readingLink[$linkFrom]=$link && code+=1
       fi
     done
@@ -276,7 +290,9 @@ function printDefinitionLinkCounts {
     printf "  %-${len}s : %4d (utf8 %4d, code %d)\n" "'$s'" $count $utf $code
     total+=count
   done < <(echo -e "$types" | sort -u)
-  printf "  %-${len}s : %4d\n" Other $((${#readingLink[@]} - total))
+  printf "  %-${len}s : %4d (manually set)\n" '' $((${#readingLink[@]} - total))
+  [[ ${#convertErrors[@]} -gt 0 ]] && printf "  %-${len}s : %4d %s\n" \
+    'Convert Errors' ${#convertErrors[@]} "${convertErrors[@]}"
 }
 
 # 'findDefinitionLinks': find links based on 'kDefinition' field. For example,
