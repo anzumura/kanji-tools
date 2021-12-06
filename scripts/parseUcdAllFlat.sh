@@ -159,8 +159,9 @@ printResulsFilter="$onKunRegex|$morohashiRegex|$nelsonRegex|$adobeRegex"
 function populateArrays() {
   log 'Populate arrays ... ' -n
   local -i count=0
-  while read -r i; do
-    setVars "$i" kDefinition kJapaneseOn kJapaneseKun || continue
+  local s
+  while read -r s; do
+    setVars "$s" kDefinition kJapaneseOn kJapaneseKun || continue
     if [[ -n $kMorohashi ]]; then
       # Remove leading 0's and change single quotes to 'P' (Prime) so that 04138
       # changes to 4138 (maps to 嗩) and 04138' changes to 4138P (maps to 嘆).
@@ -206,8 +207,10 @@ function canLoadFrom() {
   hasReading $1 || [[ -n ${readingLink[$1]} ]]
 }
 
+declare -A defTypeUtf defTypeCode
+
 # 'findDefinitionLinksForType': finds links based on type ($1) string matches in
-# 'kDefinition' field.
+# 'kDefinition' field and updates 'defType' arrays.
 function findDefinitionLinksForType() {
   # kDefinition can have multiple values separated by ';', but there are cases
   # where just brackets or commas are used. For example, 4CFD (䳽) has:
@@ -216,27 +219,60 @@ function findDefinitionLinksForType() {
   local -r endChars=$separatorChars'\"'
   # define some regexes for the loops below
   local -r start='[^\"]*' sep=[$separatorChars] end=[^$endChars]*
-  local -r def='kDefinition=\"'$end nonAscii='[^\x00-\x7F]{1,}'
+  local -r def='kDefinition=\"'$end nonAscii='[^ -~]' cp=".*cp=\"\($start\).*"
+  local -r simplified="kRSUnicode=\"[0-9]*'"
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
   #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
   #   elder of twins; a Chinese family name, (same as 姬) a handsome girl; a
   #   charming girl; a concubine; a Chinese family name
+  # Note: 'link' can occur more than once if there are multiple variants for it.
+  # This is true for '64DA (據)' which has '3A3F (㨿)' and '3A40 (㩀)'.
+  local -i utf=0 code=0
+  local i j s linkFrom link
   for i in '' $start$sep$end $start$sep$sep$end; do
-    for j in $(grep -E "$def$i$1 ($nonAscii|U\+[A-F0-9]* $nonAscii)" $ucdFile |
-      grep -Ev "(kRSUnicode=\"[0-9]*'|$onKunRegex)" | sed 's/ U+[A-F0-9]*//g' |
-      sed "s/.*cp=\"\($start\).*$def$i$1 \([^ $endChars]*\).*/\2:\1/"); do
-      local cp=${j#*:}
-      if [[ -z ${readingLink[$cp]} ]]; then
-        # 's' can occur more than once if there are multiple variants for it.
-        # This is true for '64DA (據)' which has '3A3F (㨿)' and '3A40 (㩀)'.
-        local s=$(echo -n ${j:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
+    s="$def$i$1[-\'a-z0-9 ]*"
+    # loop to handle strings like 'same as X' where X is a UTF-8 kanji
+    for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -v $simplified |
+      grep -v $onKunRegex | sed "s/$cp$s\($nonAscii*\).*/\2:\1/"); do
+      linkFrom=${j#*:}
+      if [[ -z ${readingLink[$linkFrom]} ]]; then
+        link=$(echo -n ${j:0:1} | iconv -f UTF-8 -t UTF-32BE | xxd -p)
         # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 kanji
-        s=$(printf '%04X' 0x$s)
-        hasReading $s && readingLink[$cp]=$s
+        printf -v link '%04X' 0x$link
+        hasReading $link && readingLink[$linkFrom]=$link && utf+=1
+      fi
+    done
+    # loop to handle strings like 'same as U+ABCD ...' (so no conversion needed)
+    for j in $(grep -E "${s}U\+[A-F0-9]*" $ucdFile | grep -v $simplified |
+      grep -v $onKunRegex | sed "s/$cp${s}U+\([A-F0-9]*\).*/\2:\1/"); do
+      linkFrom=${j#*:}
+      if [[ -z ${readingLink[$linkFrom]} ]]; then
+        link=${j%:*}
+        hasReading $link && readingLink[$linkFrom]=$link && code+=1
       fi
     done
   done
+  defTypeUtf[$1]=$utf
+  defTypeCode[$1]=$code
+}
+
+function printDefinitionLinkCounts {
+  local -i total=0 len=0 utf code count
+  local s types
+  for s in "${!defTypeUtf[@]}" "${!defTypeCode[@]}"; do
+    [[ ${#s} -gt $len ]] && len=${#s}
+    [[ -z $types ]] && types=$s || types+="\n$s"
+  done
+  len+=2
+  while read -r s; do
+    utf=${defTypeUtf[$s]}
+    code=${defTypeCode[$s]}
+    count=$((utf + code))
+    printf "  %-${len}s : %4d (utf8 %4d, code %d)\n" "'$s'" $count $utf $code
+    total+=count
+  done < <(echo -e "$types" | sort -u)
+  printf "  %-${len}s : %4d\n" Other $((${#readingLink[@]} - total))
 }
 
 # 'findDefinitionLinks': find links based on 'kDefinition' field. For example,
@@ -244,15 +280,11 @@ function findDefinitionLinksForType() {
 # function populates 'readingLink' array.
 function findDefinitionLinks() {
   log 'Find definition links ... ' -n
-  for type in 'a variant of' interchangeable 'same as' non-classical \
-    'Variant of'; do
-    printResulsFilter+="|$type "
-    findDefinitionLinksForType "$type"
+  local s
+  for s in 'a variant' interchangeable 'same as' non-classical Variant; do
+    printResulsFilter+="|$s "
+    findDefinitionLinksForType "$s"
   done
-  # No need to update 'printResultsFilter' for these longer 'type' strings since
-  # they are covered by the shorter versions in the above 'for loop'.
-  findDefinitionLinksForType 'interchangeable with'
-  findDefinitionLinksForType 'non-classical form of'
   # Pull in some Kentei kanji that are missing on/kun via links (the links have
   # the same definitions and expected on/kun).
   readingLink[3D4E]=6F97 # link 㵎 to 澗
@@ -260,6 +292,7 @@ function findDefinitionLinks() {
   readingLink[9D25]=9D2A # link 鴥 to 鴪
   readingLink[6AA8]=69D8 # link 檨 to 様 (Nelson 2363)
   echo "found ${#readingLink[@]}"
+  printDefinitionLinkCounts
 }
 
 declare -i strokes vstrokes
@@ -323,6 +356,7 @@ function getStrokesFromAdobeRef() {
 # than one link can exist, but must satisfy the function passed in $1 (see
 # 'getLinks' function below).
 function getTraditionalLinks() {
+  local s
   for s in $kTraditionalVariant; do
     s=${s#*+} # remove leading U+
     # Skip if kTraditionalVariant is the same as current record being processed.
@@ -340,6 +374,7 @@ function getTraditionalLinks() {
 # or 'hasMorohashi'). This function can only be used after 'setVars' and
 # it also looks at 'resultOn' and 'resultKun'.
 function getLinks() {
+  local s
   # For non-Jouyou/non-Jinmei kanji, try to find meaningful links based on
   # kTraditionalVariant, kCompatibilityVariant or kSemanticVariant fields or
   # from 'readingLink' array (based on kDefinition field).
@@ -448,7 +483,7 @@ function processRecord() {
       6532) setOnKun KI 'KATAMUKU SOBADATERU' ;;       # 攲 (Nelson 2041)
       6FDB) setOnKun 'BOU MOU' KOSAME ;;               # 濛
       6663) setOnKun 'SEI SETSU' 'AKIRAKA KASHIKOI' ;; # 晣
-      69D4) setOnKun KOU HANETSURUBE ;;              # 槔
+      69D4) setOnKun KOU HANETSURUBE ;;                # 槔
       6A94) setOnKun TOU ;;                            # 檔
       7B53) setOnKun KEI 'KOUGAI KANZASHI' ;;          # 筓
       7CF1) setOnKun GETSU 'KOUJI MOYASHI' ;;          # 糱
@@ -475,6 +510,7 @@ function processRecord() {
   [[ -n $localMorohashi && -z ${uniqueMorohashi[$localMorohashi]} ]] &&
     uniqueMorohashi[$localMorohashi]=1
   if [[ -n $kNelson ]]; then
+    local s
     # remove leading 0's from all Nelson ids in the list
     kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
     for s in $kNelson; do
@@ -491,16 +527,17 @@ $resultOn\t$resultKun" >>$outFile
 
 function printResults() {
   log "Print results to '$outFile' ... " -n
-  local -i count=0
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
 Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tLinkType\tMeaning\tOn\t\
 Kun" >$outFile
-  while read -r i; do
+  local s
+  local -i count=0
+  while read -r s; do
     # No need to unset fields that are in every record such as 'cp', 'age' and
     # 'blk', but need to unset all the optional fields used in 'processRecord'.
-    setVars "$i" kTraditionalVariant kSimplifiedVariant kCompatibilityVariant \
-      kSemanticVariant kRSAdobe_Japan1_6 kMandarin kNelson || continue
-    processRecord "$i" && count+=1
+    setVars "$s" kTraditionalVariant kSimplifiedVariant kCompatibilityVariant \
+      kSemanticVariant kRSAdobe_Japan1_6 kMandarin kNelson &&
+      processRecord "$s" && count+=1
   done < <(grep -E "($printResulsFilter)" $ucdFile)
   echo "wrote $count"
 }
