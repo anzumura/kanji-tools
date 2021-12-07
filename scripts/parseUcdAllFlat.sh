@@ -249,9 +249,9 @@ function findDefinitionLinksForType() {
   #   (non-classical form of 鸖) (same as 鶴) crane
   # so set these 3 chars in 'delim' to split up longer definitions. 'sep' is a
   # regex based on 'delim' and 'end' is similar, but also includes ".
-  local -r notSimplified="kRSUnicode=\"[0-9]*\..*" delim=';,)' start='[^\"]*' \
+  local -r notSimplified="kRSUnicode=\"[0-9]*\." delim=';,)' start='[^\"]*' \
     unicode=[A-F0-9] sedEnd='*\).*/\1:\2/' nonAscii='[^ -~]'
-  local -r sedStart="s/.*cp=\"\($start\).*" sep=[$delim] end=[^$delim'\"']*
+  local -r sedStart="s/.*cp=\"\($start\)" sep=[$delim] end=[^$delim'\"']*
 
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
@@ -263,7 +263,7 @@ function findDefinitionLinksForType() {
   local -i utf=0 code=0
   local i j s
   for i in '' $start$sep$end $start$sep$sep$end; do
-    s="kDefinition=\"$end$i$1[-\'a-z0-9 ]*"
+    s=".*kDefinition=\"$end$i$1[-\'a-z0-9 ]*"
     # loop to handle strings like 'same as X' where X is a UTF-8 kanji
     for j in $(grep -E "$notSimplified$s$nonAscii{1,}" $ucdFile |
       sed "$sedStart$s\($nonAscii$sedEnd"); do
