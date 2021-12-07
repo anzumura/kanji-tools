@@ -219,56 +219,61 @@ function canLoadFrom() {
 declare -A defTypeUtf defTypeCode
 declare -a linkErrors
 
+function processUtfLinks() {
+  if [[ -z ${readingLink[$1]} ]]; then
+    local s link
+    # some kanji have multiple links like 4640 (䙀) which has 'same as 綳繃'
+    while read -r -n 1 s; do
+      # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 link
+      if link=$(echo -n $s | iconv -s -f UTF-8 -t UTF-32BE | xxd -p); then
+	printf -v link '%04X' 0x$link 2>/dev/null && hasReading $link &&
+	  readingLink[$1]=$link && return 0 ||
+	  linkErrors+=("[cp=$1 link=$s iconv=$link")
+      else
+	linkErrors+=("[cp=$1 link=$s]")
+      fi
+    done < <(echo -n $2)
+  fi
+  return 1
+}
+
+function processCodeLink() {
+  [[ -z ${readingLink[$1]} ]] && hasReading $2 && readingLink[$1]=$2
+}
+
 # 'findDefinitionLinksForType': finds links based on type ($1) string matches in
 # 'kDefinition' field and updates 'defType' arrays.
 function findDefinitionLinksForType() {
   # kDefinition can have multiple values separated by ';', but there are cases
   # where just brackets or commas are used. For example, 4CFD (䳽) has:
   #   (non-classical form of 鸖) (same as 鶴) crane
+  # so set these 3 chars in 'delim' to slpit up longer definitions. 'sep' is a
+  # regex based on 'delim' and 'end' is similar, but also includes ".
   local -r recordFilter="kRSUnicode=\"[0-9]*'" delim=';,)' unicode=[A-F0-9] \
-    sedEnd='*\).*/linkFrom=\1:link=\2/' start='[^\"]*' nonAscii='[^ -~]'
+    sedEnd='*\).*/\1:\2/' start='[^\"]*' nonAscii='[^ -~]'
   local -r sedStart="s/.*cp=\"\($start\).*" sep=[$delim] end=[^$delim'\"']*
   local -r definitionStart='kDefinition=\"'$end
+
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
   #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
   #   elder of twins; a Chinese family name, (same as 姬) a handsome girl; a
   #   charming girl; a concubine; a Chinese family name
-  # Note: 'link' can occur more than once if there are multiple variants for it.
+  # Note: a link can occur more than once if there are multiple variants for it.
   # This is true for '64DA (據)' which has '3A3F (㨿)' and '3A40 (㩀)'.
   local -i utf=0 code=0
-  local i j k s linkFrom link
+  local i j s
   for i in '' $start$sep$end $start$sep$sep$end; do
     s="$definitionStart$i$1[-\'a-z0-9 ]*"
     # loop to handle strings like 'same as X' where X is a UTF-8 kanji
     for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -v $recordFilter |
       sed "$sedStart$s\($nonAscii$sedEnd"); do
-      eval ${j/:/ }
-      if [[ -z $link ]]; then
-        linkErrors+=("[UTF cp=$linkFrom]")
-      elif [[ -z ${readingLink[$linkFrom]} ]]; then
-        # some kanji have multiple links like 4640 (䙀) which has 'same as 綳繃'
-        while read -r -n 1 k; do
-          # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 link
-          if link=$(echo -n $k | iconv -s -f UTF-8 -t UTF-32BE | xxd -p); then
-            printf -v link '%04X' 0x$link 2>/dev/null && hasReading $link &&
-              readingLink[$linkFrom]=$link && utf+=1 && break ||
-              linkErrors+=("[cp=$linkFrom link=$k iconv=$link")
-          else
-            linkErrors+=("[cp=$linkFrom link=$k]")
-          fi
-        done < <(echo -n $link)
-      fi
+      processUtfLinks ${j/:/ } && utf+=1
     done
     # loop to handle strings like 'same as U+ABCD ...' (so no conversion needed)
     for j in $(grep -E "${s}U\+$unicode*" $ucdFile | grep -v $recordFilter |
       sed "$sedStart${s}U+\($unicode$sedEnd"); do
-      eval ${j/:/ }
-      if [[ -z $link ]]; then
-        linkErrors+=("[CODE cp=$linkFrom]")
-      elif [[ -z ${readingLink[$linkFrom]} ]]; then
-        hasReading $link && readingLink[$linkFrom]=$link && code+=1
-      fi
+      processCodeLink ${j/:/ } && code+=1
     done
   done
   defTypeUtf[$1]=$utf
