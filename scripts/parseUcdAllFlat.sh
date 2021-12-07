@@ -216,8 +216,49 @@ function canLoadFrom() {
   hasReading $1 || [[ -n ${readingLink[$1]} ]]
 }
 
-declare -A defTypeUtf defTypeCode
+declare -A defTypeUtf defTypeUni
 declare -a linkErrors
+# 'defTypePasses' controls the number of links separated by delimiters to check
+# for in kDefinition. Increasing by 1 adds about 30 seconds to script run time.
+# For now set it to '3' since setting to '4', '5' or '6' doesn't find any more.
+declare -r -i defTypePasses=3
+
+function printDefinitionLinkCounts {
+  local -i total=0 maxLen=0 utf uni i j
+  local s types utfCounts uniCounts headers fmt2='  '
+  local -a pass
+  for s in "${!defTypeUtf[@]}"; do
+    [[ ${#s} -gt $maxLen ]] && maxLen=${#s}
+    [[ -z $types ]] && types=$s || types+="\n$s"
+  done
+  maxLen+=2
+  local -r fmt1="  %-${maxLen}s"
+  while read -r s; do
+    utfCounts=${defTypeUtf[$s]}
+    uniCounts=${defTypeUni[$s]}
+    i=0
+    pass=()
+    for ((j = 1; j <= $defTypePasses; ++j)); do
+      utf=$(echo $utfCounts | cut -d, -f$j)
+      uni=$(echo $uniCounts | cut -d, -f$j)
+      i+=$((utf + uni))
+      pass+=("'$(printf '(%3d,%3d)' $utf $uni)'")
+      if [[ $total -eq 0 ]]; then
+        fmt2+='%-11s'
+        headers+=" ' utf uni'"
+      fi
+    done
+    if [[ $total -eq 0 ]]; then
+      fmt2+='\n'
+      eval printf "'${fmt1}Total$fmt2'" Type$headers
+    fi
+    eval printf "'$fmt1 %4d$fmt2'" \"\'$s\'\" $i "${pass[@]}"
+    total+=$i
+  done < <(echo -e "$types" | sort)
+  printf "$fmt1 %4d  (manual)\n" '' $((${#readingLink[@]} - total))
+  [[ ${#convertErrors[@]} -gt 0 ]] && printf "  %-${len}s : %4d %s\n" \
+    'Convert Errors' ${#convertErrors[@]} "${convertErrors[@]}"
+}
 
 function processUtfLinks() {
   if [[ -z ${readingLink[$1]} ]]; then
@@ -226,95 +267,77 @@ function processUtfLinks() {
     while read -r -n 1 s; do
       # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 link
       if link=$(echo -n $s | iconv -s -f UTF-8 -t UTF-32BE | xxd -p); then
-	printf -v link '%04X' 0x$link 2>/dev/null && hasReading $link &&
-	  readingLink[$1]=$link && return 0 ||
-	  linkErrors+=("[cp=$1 link=$s iconv=$link")
+        printf -v link '%04X' 0x$link 2>/dev/null && hasReading $link &&
+          readingLink[$1]=$link && return 0 ||
+          linkErrors+=("[cp=$1 link=$s iconv=$link")
       else
-	linkErrors+=("[cp=$1 link=$s]")
+        linkErrors+=("[cp=$1 link=$s]")
       fi
     done < <(echo -n $2)
   fi
   return 1
 }
 
-function processCodeLink() {
+function processUniLink() {
   [[ -z ${readingLink[$1]} ]] && hasReading $2 && readingLink[$1]=$2
 }
 
 # 'findDefinitionLinksForType': finds links based on type ($1) string matches in
 # 'kDefinition' field and updates 'defType' arrays.
 function findDefinitionLinksForType() {
-  # kDefinition can have multiple values separated by ';', but there are cases
-  # where just brackets or commas are used. For example, 4CFD (䳽) has:
-  #   (non-classical form of 鸖) (same as 鶴) crane
-  # so set these 3 chars in 'delim' to split up longer definitions. 'sep' is a
-  # regex based on 'delim' and 'end' is similar, but also includes ".
-  local -r notSimplified="kRSUnicode=\"[0-9]*\." delim=';,)' start='[^\"]*' \
-    unicode=[A-F0-9] sedEnd='*\).*/\1:\2/' nonAscii='[^ -~]'
-  local -r sedStart="s/.*cp=\"\($start\)" sep=[$delim] end=[^$delim'\"']*
-
-  # Some kanji have multiple 'type' strings in their kDefinition. For now just
-  # check the first 3. For example, 36B3 (㚶) has kDefinition:
-  #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
-  #   elder of twins; a Chinese family name, (same as 姬) a handsome girl; a
-  #   charming girl; a concubine; a Chinese family name
-  # Note: a link can occur more than once if there are multiple variants for it.
-  # This is true for '64DA (據)' which has '3A3F (㨿)' and '3A40 (㩀)'.
-  local -i utf=0 code=0
-  local i j s
-  for i in '' $start$sep$end $start$sep$sep$end; do
-    s=".*kDefinition=\"$end$i$1[-\'a-z0-9 ]*"
-    # loop to handle strings like 'same as X' where X is a UTF-8 kanji
-    for j in $(grep -E "$notSimplified$s$nonAscii{1,}" $ucdFile |
-      sed "$sedStart$s\($nonAscii$sedEnd"); do
-      processUtfLinks ${j/:/ } && utf+=1
-    done
-    # loop to handle strings like 'same as U+ABCD ...' (so no conversion needed)
-    for j in $(grep -E "$notSimplified${s}U\+$unicode*" $ucdFile |
-      sed "$sedStart${s}U+\($unicode$sedEnd"); do
-      processCodeLink ${j/:/ } && code+=1
-    done
+  local -r notSimplified="kRSUnicode=\"[0-9]*\." nonAscii='[^ -~]' \
+    unicode=[A-F0-9] def=".*kDefinition=\"$2$1[-\'a-z0-9 ]*" \
+    sedStart="s/.*cp=\"\([^\"]*\)" sedEnd='*\).*/\1:\2/'
+  local -i utf=0 uni=0
+  local s
+  # loop to handle strings like 'same as X' where X is a UTF-8 kanji
+  for s in $(grep -E "$notSimplified$def$nonAscii{1,}" $ucdFile |
+    sed "$sedStart$def\($nonAscii$sedEnd"); do
+    processUtfLinks ${s/:/ } && utf+=1
   done
-  defTypeUtf[$1]=$utf
-  defTypeCode[$1]=$code
-}
-
-function printDefinitionLinkCounts {
-  local -i total=0 len=0 utf code count
-  local s types
-  for s in "${!defTypeUtf[@]}" "${!defTypeCode[@]}"; do
-    [[ ${#s} -gt $len ]] && len=${#s}
-    [[ -z $types ]] && types=$s || types+="\n$s"
+  # loop to handle strings like 'same as U+ABCD ...' (can use Unicode directly)
+  for s in $(grep -E "$notSimplified${def}U\+$unicode*" $ucdFile |
+    sed "$sedStart${def}U+\($unicode$sedEnd"); do
+    processUniLink ${s/:/ } && uni+=1
   done
-  len+=2
-  while read -r s; do
-    utf=${defTypeUtf[$s]}
-    code=${defTypeCode[$s]}
-    count=$((utf + code))
-    printf "  %-${len}s : %4d (utf8 %4d, code %d)\n" "'$s'" $count $utf $code
-    total+=count
-  done < <(echo -e "$types" | sort -u)
-  printf "  %-${len}s : %4d (manually set)\n" '' $((${#readingLink[@]} - total))
-  [[ ${#convertErrors[@]} -gt 0 ]] && printf "  %-${len}s : %4d %s\n" \
-    'Convert Errors' ${#convertErrors[@]} "${convertErrors[@]}"
+  defTypeUtf[$1]+=$utf,
+  defTypeUni[$1]+=$uni,
 }
 
 # 'findDefinitionLinks': find links based on 'kDefinition' field. For example,
-# if the field starts with '(same as X' then store a link from 'cp' to 'X'. This
-# function populates 'readingLink' array.
+# if a record for 'cp' has '(same as X' in its definition then store a link from
+# 'cp' to 'X'. This function populates 'readingLink' array. Links can occur more
+# than once like '64DA (據)' which is a link for '3A3F (㨿)' and '3A40 (㩀)'.
 function findDefinitionLinks() {
   log 'Find definition links ... ' -n
-  local s
-  for s in 'a variant' interchangeable 'same as' non-classical Variant; do
-    printResulsFilter+="|$s "
-    findDefinitionLinksForType "$s"
+  # kDefinition can have multiple values separated by ';', but there are cases
+  # where just brackets are used. For example, 4CFD (䳽) has:
+  #   (non-classical form of 鸖) (same as 鶴) crane
+  # Another example is '36B3 (㚶)':
+  #   (same as 姒) wife of one's husband's elder brother; (in ancient China) the
+  #   elder of twins; a Chinese family name, (same as 姬) a handsome girl; a
+  #   charming girl; a concubine; a Chinese family name
+  local -r delim=')'        # char used to split up definitions
+  local -r end=[^$delim\"]* # regex that excludes 'delim' as well as "
+  local link s
+  local -i i
+  for link in 'a variant' interchangeable 'same as' non-classical Variant; do
+    printResulsFilter+="|$link "
+    # check the first 'defTypePasses' potential occurances of 'link' text.
+    s=
+    for ((i = 0; i < $defTypePasses; ++i)); do
+      findDefinitionLinksForType "$link" "$end$s"
+      s+=[$delim]$end # one 'delim' followed by non-delim (ie 'end')
+    done
   done
+
   # Pull in some Kentei kanji that are missing on/kun via links (the links have
   # the same definitions and expected on/kun).
   readingLink[3D4E]=6F97 # link 㵎 to 澗
   readingLink[5ECF]=5ED0 # link 廏 to 廐
   readingLink[9D25]=9D2A # link 鴥 to 鴪
   readingLink[6AA8]=69D8 # link 檨 to 様 (Nelson 2363)
+
   echo "found ${#readingLink[@]}"
   printDefinitionLinkCounts
 }
