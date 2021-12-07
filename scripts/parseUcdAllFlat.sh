@@ -247,12 +247,11 @@ function findDefinitionLinksForType() {
   # kDefinition can have multiple values separated by ';', but there are cases
   # where just brackets or commas are used. For example, 4CFD (䳽) has:
   #   (non-classical form of 鸖) (same as 鶴) crane
-  # so set these 3 chars in 'delim' to slpit up longer definitions. 'sep' is a
+  # so set these 3 chars in 'delim' to split up longer definitions. 'sep' is a
   # regex based on 'delim' and 'end' is similar, but also includes ".
-  local -r recordFilter="kRSUnicode=\"[0-9]*'" delim=';,)' unicode=[A-F0-9] \
-    sedEnd='*\).*/\1:\2/' start='[^\"]*' nonAscii='[^ -~]'
+  local -r notSimplified="kRSUnicode=\"[0-9]*\..*" delim=';,)' start='[^\"]*' \
+    unicode=[A-F0-9] sedEnd='*\).*/\1:\2/' nonAscii='[^ -~]'
   local -r sedStart="s/.*cp=\"\($start\).*" sep=[$delim] end=[^$delim'\"']*
-  local -r definitionStart='kDefinition=\"'$end
 
   # Some kanji have multiple 'type' strings in their kDefinition. For now just
   # check the first 3. For example, 36B3 (㚶) has kDefinition:
@@ -264,14 +263,14 @@ function findDefinitionLinksForType() {
   local -i utf=0 code=0
   local i j s
   for i in '' $start$sep$end $start$sep$sep$end; do
-    s="$definitionStart$i$1[-\'a-z0-9 ]*"
+    s="kDefinition=\"$end$i$1[-\'a-z0-9 ]*"
     # loop to handle strings like 'same as X' where X is a UTF-8 kanji
-    for j in $(grep -E "$s$nonAscii{1,}" $ucdFile | grep -v $recordFilter |
+    for j in $(grep -E "$notSimplified$s$nonAscii{1,}" $ucdFile |
       sed "$sedStart$s\($nonAscii$sedEnd"); do
       processUtfLinks ${j/:/ } && utf+=1
     done
     # loop to handle strings like 'same as U+ABCD ...' (so no conversion needed)
-    for j in $(grep -E "${s}U\+$unicode*" $ucdFile | grep -v $recordFilter |
+    for j in $(grep -E "$notSimplified${s}U\+$unicode*" $ucdFile |
       sed "$sedStart${s}U+\($unicode$sedEnd"); do
       processCodeLink ${j/:/ } && code+=1
     done
