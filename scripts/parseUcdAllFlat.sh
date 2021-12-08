@@ -219,12 +219,16 @@ function canLoadFrom() {
   hasReading $1 || [[ -n ${readingLink[$1]} ]]
 }
 
-declare -A defTypeUtf defTypeUni
-declare -a linkErrors
 # 'defTypePasses' controls the number of links separated by delimiters to check
 # for in kDefinition. Increasing by 1 adds about 40 seconds to script run time.
 # For now set it to '3' since setting to '4', '5' or '6' doesn't find any more.
 declare -r -i defTypePasses=3
+# 'defType' arrays hold comma separated counts of definition links found per
+# 'type' string. 'Utf' = links from UTF-8 characters and 'Uni' = links from
+# Unicode values, i.e., U+ABCD.
+declare -A defTypeUtf defTypeUni
+# 'linkErrors' holds any errors found during link processing
+declare -a linkErrors
 
 function printDefinitionLinkCounts {
   local -i total=0 maxLen=0 utf uni i j
@@ -234,7 +238,7 @@ function printDefinitionLinkCounts {
     [[ ${#s} -gt $maxLen ]] && maxLen=${#s}
     [[ -z $types ]] && types=$s || types+="\n$s"
   done
-  maxLen+=2
+  maxLen+=4 # add 4 to account for 2 space indent and wrapping in single quotes
   local -r fmt1="  %-${maxLen}s"
   while read -r s; do
     utfCounts=${defTypeUtf[$s]}
@@ -253,14 +257,18 @@ function printDefinitionLinkCounts {
     done
     if [[ $total -eq 0 ]]; then
       fmt2+='\n'
-      eval printf "'${fmt1}Total$fmt2'" Type$headers
+      eval printf "'${fmt1}Total$fmt2'" \"Types: ${#defTypeUtf[@]}\" $headers
     fi
-    eval printf "'$fmt1 %4d$fmt2'" \"\'$s\'\" $i "${pass[@]}"
+    eval printf "'$fmt1 %4d$fmt2'" "\"  '$s'\"" $i "${pass[@]}"
     total+=$i
   done < <(echo -e "$types" | sort)
-  printf "$fmt1 %4d  (manual)\n" '' $((${#readingLink[@]} - total))
-  [[ ${#convertErrors[@]} -gt 0 ]] && printf "  %-${len}s : %4d %s\n" \
-    'Convert Errors' ${#convertErrors[@]} "${convertErrors[@]}"
+  printf "$fmt1 %4d\n" '  (directly set)' $((${#readingLink[@]} - total))
+  if [[ ${#linkErrors[@]} -gt 0 ]]; then
+    echo "  Errors: ${#linkErrors[@]}"
+    for s in "${linkErrors[@]}"; do
+      echo "    $s"
+    done
+  fi
 }
 
 function processUtfLinks() {
@@ -270,11 +278,13 @@ function processUtfLinks() {
     while read -r -n 1 s; do
       # get the Unicode (4 of 5 digit hex with caps) value from UTF-8 link
       if link=$(echo -n $s | iconv -s -f UTF-8 -t UTF-32BE | xxd -p); then
-        printf -v link '%04X' 0x$link 2>/dev/null && hasReading $link &&
-          readingLink[$1]=$link && return 0 ||
-          linkErrors+=("[cp=$1 link=$s iconv=$link")
+        if printf -v link '%04X' 0x$link 2>/dev/null; then
+          hasReading $link && readingLink[$1]=$link && return 0
+        else
+          linkErrors+=("printf failed: cp=$1 link=$s 0x$link")
+        fi
       else
-        linkErrors+=("[cp=$1 link=$s]")
+        linkErrors+=("iconv falied: cp=$1 link=$s")
       fi
     done < <(echo -n $2)
   fi
