@@ -321,8 +321,9 @@ function findDefinitionLinks() {
   local -r end=[^$delim\"]* # regex that excludes 'delim' as well as "
   local link s
   local -i i
-  for link in 'a variant' interchangeable 'same as' non-classical Variant; do
-    printResulsFilter+="|$link "
+  for link in variant interchangeable same non-classical Variant standard \
+    simplified ancient; do
+    printResulsFilter+="|kDefinition=.*$link "
     # check the first 'defTypePasses' potential occurances of 'link' text.
     s=
     for ((i = 0; i < $defTypePasses; ++i)); do
