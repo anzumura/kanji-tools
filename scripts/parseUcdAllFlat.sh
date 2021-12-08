@@ -24,6 +24,9 @@ declare -r program="parseUcdAllFlat.sh"
 # - On: optional space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: optional space-separated Japanese Kun readings (in all-caps Rōmaji)
 #
+# 'linkType' is followed by '*' if the first link in 'LinkName' list was used to
+# pull in On/Kun values (only happens when the current entry has no readings).
+#
 # Location of 'ucd.all.flat.zip': https://unicode.org/Public/UCD/latest/ucdxml
 # More info on UCD file: https://unicode.org/reports/tr38/
 # This script was used to create 'data/ucd.txt'.
@@ -219,7 +222,7 @@ function canLoadFrom() {
 declare -A defTypeUtf defTypeUni
 declare -a linkErrors
 # 'defTypePasses' controls the number of links separated by delimiters to check
-# for in kDefinition. Increasing by 1 adds about 30 seconds to script run time.
+# for in kDefinition. Increasing by 1 adds about 40 seconds to script run time.
 # For now set it to '3' since setting to '4', '5' or '6' doesn't find any more.
 declare -r -i defTypePasses=3
 
@@ -320,18 +323,20 @@ function findDefinitionLinks() {
   local -r delim=')'        # char used to split up definitions
   local -r end=[^$delim\"]* # regex that excludes 'delim' as well as "
   local link s
-  local -i i
+  local -i i=0
+  printResulsFilter+='|kDefinition="[^"]*('
   for link in variant interchangeable same non-classical Variant standard \
     simplified ancient; do
-    printResulsFilter+="|kDefinition=.*$link "
-    # check the first 'defTypePasses' potential occurances of 'link' text.
+    [[ i -ne 0 ]] && printResulsFilter+='|'
+    printResulsFilter+=$link
     s=
+    # check the first 'defTypePasses' potential occurances of 'link' value.
     for ((i = 0; i < $defTypePasses; ++i)); do
       findDefinitionLinksForType "$link" "$end$s"
       s+=[$delim]$end # one 'delim' followed by non-delim (ie 'end')
     done
   done
-
+  printResulsFilter+=' )'
   # Pull in some Kentei kanji that are missing on/kun via links (the links have
   # the same definitions and expected on/kun).
   readingLink[3D4E]=6F97 # link 㵎 to 澗
@@ -475,7 +480,7 @@ declare -i totalJoyo=0 totalJinmei=0 jinmeiLinks=0 traditionalLinks=0 \
 
 # 'countLinkType' increments totals for each link type (used in summary info)
 function countLinkType() {
-  case $linkType in
+  case ${linkType/\*/} in
   Jinmei) jinmeiLinks+=1 ;;
   Traditional) traditionalLinks+=1 ;;
   Simplified) simplifiedLinks+=1 ;;
@@ -518,6 +523,10 @@ function processRecord() {
       # This should never happen, but keep as a sanity check
       [[ -z $resultOn$resultKun ]] &&
         echo "ERROR: link not found for cp $cp (link $linkType $loadFrom)"
+      # Loading readings from a link can potentially lead to incorrect and/or
+      # confusing results for some less common kanji so add a '*' to 'linkType'
+      # to make it clear that the data is less trustworthy.
+      linkType+=*
     else
       # Support cases where on/kun is missing for Kentei kanji or kanji with
       # Nelson IDs. 4BC2 is not Kentei, but it's in 'wiki-stokes.txt' file. UCD

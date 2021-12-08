@@ -155,6 +155,8 @@ void UcdData::load(const std::filesystem::path& file) {
         error("LinkType has a value, but LinkName is empty");
       else if (!cols[linkCodeCol].empty())
         error("LinkCode has a value, but LinkName is empty");
+      const bool linkedReadings = cols[linkTypeCol].ends_with("*");
+      if (linkedReadings) cols[linkTypeCol].pop_back();
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
       if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
       if (cols[onCol].empty() && cols[kunCol].empty() && cols[morohashiCol].empty())
@@ -163,7 +165,8 @@ void UcdData::load(const std::filesystem::path& file) {
              .emplace(std::piecewise_construct, std::make_tuple(name),
                       std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
                                       cols[pinyinCol], cols[morohashiCol], cols[nelsonCol], joyo, jinmei, links,
-                                      Ucd::toLinkType(cols[linkTypeCol]), cols[meaningCol], cols[onCol], cols[kunCol]))
+                                      Ucd::toLinkType(cols[linkTypeCol]), linkedReadings, cols[meaningCol], cols[onCol],
+                                      cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
       for (const auto& link : links) {

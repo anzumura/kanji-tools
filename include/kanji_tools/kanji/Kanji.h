@@ -26,6 +26,8 @@ public:
   virtual const std::string& meaning() const = 0;
   virtual const std::string& reading() const = 0;
   virtual KanjiGrades grade() const { return KanjiGrades::None; }
+  // 'linkedReadings' returns true if readings were loaded from a linked kanji
+  virtual bool linkedReadings() const { return false; }
 
   // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
   // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁 has 辨, 瓣 and 辯)
@@ -90,11 +92,10 @@ public:
   };
 
   // 'info' returns a comma separated string with extra info (if present) including:
-  //   Radical, Strokes, Grade, Level, Freq, New, Old
+  //   Radical, Strokes, Pinyin, Grade, Level, Freq, New, Old and Kyu
   // 'infoFields' can be used to control inclusion of fields (include all by default).
-  // Note: some Jouyou and Jinmei kanji have multiple old/variant forms, but at most
-  // one will be displayed. 'New' is for 'Linked' type kanji and will show the official
-  // 'standard' form in the Jouyou or Jinmei list.
+  // Note: multiple 'Old' links are separated by '／' (wide slash) and a link is followed
+  // by '*' if it was used to pull in readings.
   std::string info(int infoFields = AllFields) const;
 
   // 'qualifiedName' returns 'name' plus an extra marker to show additional information:

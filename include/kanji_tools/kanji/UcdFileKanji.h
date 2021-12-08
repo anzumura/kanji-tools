@@ -16,12 +16,14 @@ public:
   OptString newName() const override {
     return _linkNames.empty() || _hasOldLinks ? std::nullopt : OptString(_linkNames[0]);
   }
+  bool linkedReadings() const override { return _linkedReadings; }
 protected:
   UcdFileKanji(const Data& d, int number, const std::string& name, const std::string& reading, const Ucd* u,
                bool findFrequency = true, bool findKyu = true)
     : NonLinkedKanji(d, number, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u, findFrequency, false,
                      findKyu),
-      _hasOldLinks(u && u->hasTraditionalLinks()), _linkNames(getLinkNames(u)) {}
+      _hasOldLinks(u && u->hasTraditionalLinks()), _linkNames(getLinkNames(u)),
+      _linkedReadings(u && u->linkedReadings()) {}
   UcdFileKanji(const Data& d, int number, const std::string& name, const Ucd* u, bool findFrequency = true,
                bool findKyu = true)
     : UcdFileKanji(d, number, name, d.ucd().getReadingsAsKana(u), u, findFrequency, findKyu) {}
@@ -32,6 +34,7 @@ private:
   // there are also cases of links to another ucd kanji with a link.
   const bool _hasOldLinks;
   const LinkNames _linkNames;
+  const bool _linkedReadings;
 };
 
 // 'FrequencyKanji' is for kanji from 'frequency.txt' that aren't already loaded from jouyou or jinmei files

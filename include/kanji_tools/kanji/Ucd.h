@@ -30,12 +30,12 @@ public:
 
   Ucd(wchar_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
       int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
-      const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, LinkTypes linkType,
+      const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, LinkTypes linkType, bool linkedReadings,
       const std::string& meaning, const std::string& onReading, const std::string& kunReading)
     : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _morohashiId(morohashiId),
       _nelsonIds(nelsonIds), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo),
-      _jinmei(jinmei), _links(links), _linkType(linkType), _meaning(meaning), _onReading(onReading),
-      _kunReading(kunReading) {}
+      _jinmei(jinmei), _links(links), _linkType(linkType), _linkedReadings(linkedReadings), _meaning(meaning),
+      _onReading(onReading), _kunReading(kunReading) {}
 
   wchar_t code() const { return _code; }
   const std::string& name() const { return _name; }
@@ -51,6 +51,7 @@ public:
   bool jinmei() const { return _jinmei; }
   const Links& links() const { return _links; }
   LinkTypes linkType() const { return _linkType; }
+  bool linkedReadings() const { return _linkedReadings; }
   const std::string& meaning() const { return _meaning; }
   const std::string& onReading() const { return _onReading; }
   const std::string& kunReading() const { return _kunReading; }
@@ -82,6 +83,7 @@ private:
   const bool _jinmei;
   const Links _links;
   const LinkTypes _linkType;
+  const bool _linkedReadings;
   const std::string _meaning;
   const std::string _onReading;
   const std::string _kunReading;

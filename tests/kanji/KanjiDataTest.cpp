@@ -105,7 +105,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, SanityChecks) {
-  EXPECT_EQ(_data.kanjiNameMap().size(), 20505);
+  EXPECT_EQ(_data.kanjiNameMap().size(), 20507);
   // basic checks
   EXPECT_EQ(_data.getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
@@ -143,6 +143,8 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**apple).kyu(), KenteiKyus::K1);
   EXPECT_EQ((**apple).reading(), "ヒン、ビン、うきくさ、でんじそ");
   EXPECT_EQ((**apple).meaning(), "apple");
+  EXPECT_EQ((**apple).newName(), "苹");
+  EXPECT_FALSE((**apple).linkedReadings());
   // Ucd Kanji
   auto complete = _data.findKanjiByName("侭");
   ASSERT_TRUE(complete.has_value());
@@ -152,6 +154,11 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**complete).kyu(), KenteiKyus::None);
   EXPECT_EQ((**complete).reading(), "ジン、ことごとく、まま");
   EXPECT_EQ((**complete).meaning(), "complete, utmost");
+  EXPECT_FALSE((**complete).linkedReadings());
+  auto shape = _data.findKanjiByName("檨");
+  ASSERT_TRUE(shape.has_value());
+  EXPECT_EQ((**shape).type(), KanjiTypes::Ucd);
+  EXPECT_TRUE((**shape).linkedReadings());
   // radical
   auto radical = _data.getRadicalByName("鹿");
   EXPECT_EQ(radical.number(), 198);
@@ -351,7 +358,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 9);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 15);
   EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 224);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2875);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2877);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // these are captured in 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 89);
   int officialLinksToJinmei = 0, officialLinksToJouyou = 0;

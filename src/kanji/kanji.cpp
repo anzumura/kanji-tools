@@ -32,12 +32,14 @@ std::string Kanji::info(int infoFields) const {
   auto optNewName = newName();
   if (optNewName.has_value()) {
     assert(oldNames().empty());
-    if (infoFields & NewField) add(New + *optNewName);
+    if (infoFields & NewField) add(New + *optNewName + (linkedReadings() ? "*" : ""));
   } else if (infoFields & OldField && !oldNames().empty()) {
     std::string s;
     for (auto& i : oldNames()) {
-      if (!s.empty()) s += "／";
-      s += i;
+      if (s.empty())
+        s = i + (linkedReadings() ? "*" : "");
+      else
+        s += "／" + i;
     }
     add(Old + s);
   }

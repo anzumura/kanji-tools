@@ -11,6 +11,7 @@ public:
   const std::string& reading() const override { return _link->reading(); }
   const Data::Entry& link() const { return _link; }
   OptString newName() const override { return _link->name(); }
+  bool linkedReadings() const override { return true; }
 protected:
   LinkedKanji(const Data& d, int number, const std::string& name, const Data::Entry& link, const Ucd* u)
     : Kanji(number, name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getPinyin(u),

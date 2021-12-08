@@ -158,7 +158,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
   const std::string sampleLink("sampleLink");
   Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", false, false, Ucd::Links({Ucd::Link(1, sampleLink)}),
-          Ucd::LinkTypes::Simplified, "utmost", "JIN", "MAMA");
+          Ucd::LinkTypes::Simplified, false, "utmost", "JIN", "MAMA");
   UcdKanji k(_data, 3, ucd);
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");
@@ -177,15 +177,15 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_EQ(k.info(), "Rad TestRadical(1), New sampleLink");
 }
 
-TEST_F(KanjiTest, UcdKanjiWithOldNames) {
+TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
   Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "", "", false, false, Ucd::Links({Ucd::Link(1, "old1"), Ucd::Link(2, "old2")}),
-          Ucd::LinkTypes::Traditional, "utmost", "JIN", "MAMA");
+          Ucd::LinkTypes::Traditional, true, "utmost", "JIN", "MAMA");
   UcdKanji k(_data, 3, ucd);
   ASSERT_FALSE(k.newName().has_value());
   EXPECT_EQ(k.oldNames(), Kanji::LinkNames({"old1", "old2"}));
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), Old old1／old2");
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Old old1*／old2");
 }
 
 TEST_F(KanjiTest, ExtraFile) {
@@ -335,7 +335,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.frequency(), 0);
   EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
-  EXPECT_EQ(k.info(Kanji::NewField), "New 亘");
+  EXPECT_EQ(k.info(Kanji::NewField), "New 亘*");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_EQ(k.link(), results[0]);
 }
@@ -458,7 +458,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_EQ(k.reading(), "エン、つや");
   EXPECT_EQ(k.meaning(), "glossy");
   EXPECT_EQ(k.link(), results[0]);
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), New 艶");
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), New 艶*");
 }
 
 TEST_F(KanjiTest, BadLinkedOld) {
