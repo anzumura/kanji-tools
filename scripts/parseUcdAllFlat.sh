@@ -304,7 +304,7 @@ function findDefinitionLinksForType() {
   local -i utf=0 uni=0
   local s
   # loop to handle strings like 'same as X' where X is a UTF-8 kanji
-  for s in $(grep -E "$notSimplified$def$nonAscii{1,}" $ucdFile |
+  for s in $(grep -E "$notSimplified$def$nonAscii" $ucdFile |
     sed "$sedStart$def\($nonAscii$sedEnd"); do
     processUtfLinks ${s/:/ } && utf+=1
   done
