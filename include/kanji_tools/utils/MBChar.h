@@ -80,6 +80,9 @@ public:
   static std::string withoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
   }
+  static std::optional<std::string> optionalWithoutVariationSelector(const std::string& s) {
+    return isMBCharWithVariationSelector(s) ? std::optional(s.substr(0, s.length() - 3)) : std::nullopt;
+  }
 
   // 'getFirst' returns the first MBChar from 's' (including any variation selector that might follow).
   // If 's' doesn't start with a multi-byte sequence then empty string is returned.

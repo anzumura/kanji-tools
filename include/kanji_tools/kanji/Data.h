@@ -59,10 +59,9 @@ public:
   Kanji::NelsonIds getNelsonIds(const Ucd*) const;
   // 'getCompatibilityName' returns the UCD compatibility code for the given 'kanjiName' if it
   // exists (_ucd.find method takes care of checking whether kanjiName has a variation selector).
-  const std::string& getCompatibilityName(const std::string& kanjiName) const {
+  Kanji::OptString getCompatibilityName(const std::string& kanjiName) const {
     const Ucd* u = _ucd.find(kanjiName);
-    if (u && u->name() != kanjiName) return u->name();
-    return kanjiName;
+    return u && u->name() != kanjiName ? Kanji::OptString(u->name()) : std::nullopt;
   }
 
   int getStrokes(const std::string& kanjiName) const { return getStrokes(kanjiName, findUcd(kanjiName)); }

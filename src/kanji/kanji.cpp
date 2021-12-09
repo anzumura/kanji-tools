@@ -3,11 +3,10 @@
 
 namespace kanji_tools {
 
-Kanji::Kanji(const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
+Kanji::Kanji(const std::string& name, const OptString& compatibilityName, const Radical& radical, int strokes,
              const OptString& morohashiId, const NelsonIds& nelsonIds, const OptString& pinyin)
-  : _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
-    _nonVariantName(MBChar::withoutVariationSelector(name)), _compatibilityName(compatibilityName), _radical(radical),
-    _strokes(strokes), _morohashiId(morohashiId), _nelsonIds(nelsonIds), _pinyin(pinyin) {
+  : _name(name), _compatibilityName(compatibilityName), _nonVariantName(MBChar::optionalWithoutVariationSelector(name)),
+    _radical(radical), _strokes(strokes), _morohashiId(morohashiId), _nelsonIds(nelsonIds), _pinyin(pinyin) {
   assert(MBChar::length(_name) == 1);
 }
 

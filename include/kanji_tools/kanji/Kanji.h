@@ -59,9 +59,9 @@ public:
   // 'variant' is true if _name includes a Unicode 'variation selector'. In this case 'nonVariantName'
   // returns the non-variant name and 'compatibilityName' returns the UCD 'compatibility' code (which
   // is a single MB char without a variation selector).
-  bool variant() const { return _variant; }
-  const std::string& nonVariantName() const { return _nonVariantName; }
-  const std::string& compatibilityName() const { return _compatibilityName; }
+  bool variant() const { return _nonVariantName.has_value(); }
+  std::string nonVariantName() const { return _nonVariantName.value_or(_name); }
+  std::string compatibilityName() const { return _compatibilityName.value_or(_name); }
 
   int frequencyOrDefault(int x) const { return frequency().has_value() ? *frequency() : x; }
   int frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
@@ -137,7 +137,7 @@ public:
   // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
   static constexpr auto Legend = ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 protected:
-  Kanji(const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
+  Kanji(const std::string& name, const OptString& compatibilityName, const Radical& radical, int strokes,
         const OptString& morohashiId, const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames{};
 private:
@@ -161,9 +161,8 @@ private:
   }
   // name related fields
   const std::string _name;
-  const bool _variant;
-  const std::string _nonVariantName;    // same as _name if _variant is false
-  const std::string _compatibilityName; // same as _name if _variant is false
+  const OptString _nonVariantName;
+  const OptString _compatibilityName;
   // all kanji have radical and strokes
   const Radical _radical;
   const int _strokes;
