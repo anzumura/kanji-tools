@@ -60,7 +60,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 34AA	㒪	CJK_Ext_A	3.0	9	26							932B	錫	Definition*	tin, stannum; bestow, confer	SEKI SHAKU SHI	SUZU
 34AB	㒫	CJK_Ext_A	3.0	10	6		jì					65E1	旡	Definition*	choke on something eaten	KI KE	MUSEBU
 34AD	㒭	CJK_Ext_A	3.0	10	10							6606	昆	Definition*	elder brother; descendants	KON	ANI
-34B0	㒰	CJK_Ext_A	3.0	11	5		quán					5168	全	Semantic*	maintain, keep whole or intact	ZEN SEN	MATTAKU MATTAI MATTOUSURU
+34B0	㒰	CJK_Ext_A	3.0	11	5		quán					5168	全	Definition*	maintain, keep whole or intact	ZEN SEN	MATTAKU MATTAI MATTOUSURU
 34B2	㒲	CJK_Ext_A	3.0	11	6		cái					8CA1	財	Definition*	wealth, valuables, riches	ZAI SAI	TAKARA WAZUKA
 34B3	㒳	CJK_Ext_A	3.0	11	7		liǎng					5169	兩	Definition*	two, both, pair, couple; ounce	RYOU	FUTATSU
 34B5	㒵	CJK_Ext_A	3.0	12	7		mào					8C8C	貌	Definition*	countenance, appearance	BOU BAKU	KATACHI KATADORU
@@ -510,7 +510,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3A3C	㨼	CJK_Ext_A	3.0	64	15		lüè					63A0	掠	Definition*	rob, ransack, plunder; pass by	RYAKU RYOU	KASUMERU
 3A3F	㨿	CJK_Ext_A	3.0	64	14		jù					64DA	據	Definition*	to occupy, take possession of; a base	KYO KO KEKI	YORU AKASHI HIKU
 3A40	㩀	CJK_Ext_A	3.0	64	14		jù					64DA	據	Definition*	to occupy, take possession of; a base	KYO KO KEKI	YORU AKASHI HIKU
-3A41	㩁	CJK_Ext_A	3.0	64	14		què					6409	搉	Semantic*	knock; pick out; ridicule	KAKU	UTSU
 3A45	㩅	CJK_Ext_A	3.0	64	15							62BD	抽	Definition*	draw out, pull out; sprout	CHUU	NUKU HIKU
 3A49	㩉	CJK_Ext_A	3.0	64	15		dá					6428	搨	Definition*	rub, make rubbings of inscription	TOU	UTSU SURU
 3A4E	㩎	CJK_Ext_A	3.0	64	15		yè					64EA	擪	Definition*	to tuck in, to put the finger into, to put in, to stow away	YOU CHOU JOU NYOU OU EN	OSAERU MOTSU
@@ -691,6 +690,7 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	Nelson	Joyo	Ji
 3C93	㲓	CJK_Ext_A	3.0	82	10		róng					7D68	絨	Definition*	silk, cotton, or woolen fabric	JUU	NERIITO KEORI
 3C99	㲙	CJK_Ext_A	3.0	82	11							6BF9	毹	Definition*		YU SU JU	KEMUSHIRO
 3C9C	㲜	CJK_Ext_A	3.0	82	12		tán					6BEF	毯	Definition*	rug, carpet, blanket	TAN DAN	KEMUSHIRO
+3CA0	㲠	CJK_Ext_A	3.0	82	13		máo					6C02	氂	Definition*	tail; hair; yak	RI BOU MOU RAI	
 3CB1	㲱	CJK_Ext_A	3.0	82	19		liè					9B23	鬣	Definition*	horse's mane; fin; human whiskers	RYOU	TATEGAMI
 3CB5	㲵	CJK_Ext_A	3.0	84	11							9704	霄	Definition*	sky; clouds, mist; night	SHOU	SORA
 3CB9	㲹	CJK_Ext_A	3.0	85	5		guǐ					6C3F	氿	Definition*	spring	KI KYUU GU	OZUMI WAKIMIZU

@@ -220,8 +220,7 @@ function canLoadFrom() {
 }
 
 # 'defTypePasses' controls the number of links separated by delimiters to check
-# for in kDefinition. Increasing by 1 adds about 40 seconds to script run time.
-# For now set it to '3' since setting to '4', '5' or '6' doesn't find any more.
+# for in kDefinition. Set to '3' for now since '4', '5' or '6' didn't find more.
 declare -r -i defTypePasses=3
 # 'defType' arrays hold comma separated counts of definition links found per
 # 'type' string. 'Utf' = links from UTF-8 characters and 'Uni' = links from
@@ -262,7 +261,7 @@ function printDefinitionLinkCounts {
     eval printf "'$fmt1 %4d$fmt2'" "\"  '$s'\"" $i "${pass[@]}"
     total+=$i
   done < <(echo -e "$types" | sort)
-  printf "$fmt1 %4d\n" '  (directly set)' $((${#readingLink[@]} - total))
+  printf "$fmt1 %4d\n" '  (manually set)' $((${#readingLink[@]} - total))
   if [[ ${#linkErrors[@]} -gt 0 ]]; then
     echo "  Errors: ${#linkErrors[@]}"
     for s in "${linkErrors[@]}"; do
@@ -298,23 +297,20 @@ function processUniLink() {
 # 'findDefinitionLinksForType': finds links based on type ($1) string matches in
 # 'kDefinition' field and updates 'defType' arrays.
 function findDefinitionLinksForType() {
-  local -r notSimplified="kRSUnicode=\"[0-9]*\." nonAscii='[^ -~]' \
-    unicode=[A-F0-9] def=".*kDefinition=\"$2$1[-\'a-z0-9 ]*" \
-    sedStart="s/.*cp=\"\([^\"]*\)" sedEnd='*\).*/\1:\2/'
-  local -i utf=0 uni=0
+  local -r def="kDefinition=\"$2$1[-,a-z0-9 ]*" utf='[^ -~]' uni=[A-F0-9]
+  local -r start='s/.*cp="\([^"]*\).*'$def end='*\).*/\1:\2/'
+  local -i utfCount=0 uniCount=0
   local s
   # loop to handle strings like 'same as X' where X is a UTF-8 kanji
-  for s in $(grep -E "$notSimplified$def$nonAscii" $ucdFile |
-    sed "$sedStart$def\($nonAscii$sedEnd"); do
-    processUtfLinks ${s/:/ } && utf+=1
+  for s in $(grep "$def$utf" $outFile | sed "$start\($utf$end"); do
+    processUtfLinks ${s/:/ } && utfCount+=1
   done
   # loop to handle strings like 'same as U+ABCD ...' (can use Unicode directly)
-  for s in $(grep -E "$notSimplified${def}U\+$unicode*" $ucdFile |
-    sed "$sedStart${def}U+\($unicode$sedEnd"); do
-    processUniLink ${s/:/ } && uni+=1
+  for s in $(grep "${def}U\+$uni*" $outFile | sed "${start}U+\($uni$end"); do
+    processUniLink ${s/:/ } && uniCount+=1
   done
-  defTypeUtf[$1]+=$utf,
-  defTypeUni[$1]+=$uni,
+  defTypeUtf[$1]+=$utfCount,
+  defTypeUni[$1]+=$uniCount,
 }
 
 # 'findDefinitionLinks': find links based on 'kDefinition' field. For example,
@@ -323,6 +319,14 @@ function findDefinitionLinksForType() {
 # than once like '64DA (據)' which is a link for '3A3F (㨿)' and '3A40 (㩀)'.
 function findDefinitionLinks() {
   log 'Find definition links ... ' -n
+  local -r types="variant interchangeable same non-classical Variant standard \
+simplified ancient"
+  local link s='kDefinition="[^"]*('${types// /|}')[ ,]'
+  printResulsFilter+="|$s"
+  # Use 'outFile' to temporarily hold the ~2K records that might have definition
+  # links to speed up processing (instead of 'ucdFile' which has >150K records).
+  # This reduces the time to run 3 passes on 8 types from ~120 secs to ~12 secs.
+  grep -E "kRSUnicode=\"[0-9]*\..*$s" $ucdFile >$outFile
   # kDefinition can have multiple values separated by ';', but there are cases
   # where just brackets are used. For example, 4CFD (䳽) has:
   #   (non-classical form of 鸖) (same as 鶴) crane
@@ -332,28 +336,21 @@ function findDefinitionLinks() {
   #   charming girl; a concubine; a Chinese family name
   local -r delim=')'        # char used to split up definitions
   local -r end=[^$delim\"]* # regex that excludes 'delim' as well as "
-  local link s
   local -i i=0
-  printResulsFilter+='|kDefinition="[^"]*('
-  for link in variant interchangeable same non-classical Variant standard \
-    simplified ancient; do
-    [[ i -ne 0 ]] && printResulsFilter+='|'
-    printResulsFilter+=$link
+  for link in $types; do
     s=
     # check the first 'defTypePasses' potential occurances of 'link' value.
     for ((i = 0; i < $defTypePasses; ++i)); do
-      findDefinitionLinksForType "$link" "$end$s"
+      findDefinitionLinksForType $link "$end$s"
       s+=[$delim]$end # one 'delim' followed by non-delim (ie 'end')
     done
   done
-  printResulsFilter+=' )'
-  # Pull in some Kentei kanji that are missing on/kun via links (the links have
-  # the same definitions and expected on/kun).
+  # Pull in some Kentei and Nelson ID kanji that are missing On/Kun (links have
+  # the same definitions and expected readings).
   readingLink[3D4E]=6F97 # link 㵎 to 澗
   readingLink[5ECF]=5ED0 # link 廏 to 廐
   readingLink[9D25]=9D2A # link 鴥 to 鴪
   readingLink[6AA8]=69D8 # link 檨 to 様 (Nelson 2363)
-
   echo "found ${#readingLink[@]}"
   printDefinitionLinkCounts
 }
@@ -486,7 +483,7 @@ function getLinks() {
 # count them, but count some other optional fields of interest.
 declare -i totalJoyo=0 totalJinmei=0 jinmeiLinks=0 traditionalLinks=0 \
   simplifiedLinks=0 compatibilityLinks=0 definitionLinks=0 semanticLinks=0 \
-  totalMeaning=0 totalPinyin=0 totalReading=0
+  totalMeaning=0 totalPinyin=0 totalReading=0 directReading=0 linkedReading=0
 
 # 'countLinkType' increments totals for each link type (used in summary info)
 function countLinkType() {
@@ -524,41 +521,40 @@ function processRecord() {
   else
     getLinks canLoadFrom && loadFrom=${linkTo%%,*} || getLinks hasMorohashi
   fi
-  if [[ -z $resultOn$resultKun ]]; then
-    if [[ -n $loadFrom ]]; then
-      hasReading $loadFrom || loadFrom=${readingLink[$loadFrom]}
-      localDefinition=${definition[$loadFrom]}
-      resultOn=${on[$loadFrom]}
-      resultKun=${kun[$loadFrom]}
-      # This should never happen, but keep as a sanity check
-      [[ -z $resultOn$resultKun ]] &&
-        echo "ERROR: link not found for cp $cp (link $linkType $loadFrom)"
-      # Loading readings from a link can potentially lead to incorrect and/or
-      # confusing results for some less common kanji so add a '*' to 'linkType'
-      # to make it clear that the data is less trustworthy.
-      linkType+=*
-    else
-      # Support cases where on/kun is missing for Kentei kanji or kanji with
-      # Nelson IDs. 4BC2 is not Kentei, but it's in 'wiki-stokes.txt' file. UCD
-      # data doesn't have entries for Nelson IDs: 125, 149, 489 and 1639
-      case $cp in
-      34E4) setOnKun KATSU ;;                          # 㓤 (Nelson 677)
-      3C7E) setOnKun KAI ;;                            # 㱾 (Nelson 2453)
-      3C83) setOnKun KYUU ;;                           # 㲃 (Nelson 2459)
-      4BC2) setOnKun SHIN ;;                           # 䯂
-      6479) setOnKun BO MO ;;                          # 摹 (Nelson 4035)
-      6532) setOnKun KI 'KATAMUKU SOBADATERU' ;;       # 攲 (Nelson 2041)
-      6FDB) setOnKun 'BOU MOU' KOSAME ;;               # 濛
-      6663) setOnKun 'SEI SETSU' 'AKIRAKA KASHIKOI' ;; # 晣
-      69D4) setOnKun KOU HANETSURUBE ;;                # 槔
-      6A94) setOnKun TOU ;;                            # 檔
-      7B53) setOnKun KEI 'KOUGAI KANZASHI' ;;          # 筓
-      7CF1) setOnKun GETSU 'KOUJI MOYASHI' ;;          # 糱
-      83C6) setOnKun SHU ;;                            # 菆 (Nelson 3961)
-      # if there are no readings and no Morohashi ID then skip this record
-      *) [[ -n $localMorohashi ]] || return 1 ;;
-      esac
-    fi
+  if [[ -n $resultOn$resultKun ]]; then
+    directReading+=1
+  elif [[ -n $loadFrom ]]; then
+    hasReading $loadFrom || loadFrom=${readingLink[$loadFrom]}
+    localDefinition=${definition[$loadFrom]}
+    resultOn=${on[$loadFrom]}
+    resultKun=${kun[$loadFrom]}
+    # This should never happen, but keep as a sanity check
+    [[ -z $resultOn$resultKun ]] &&
+      echo "ERROR: link not found for cp $cp (link $linkType $loadFrom)"
+    # Loading readings from a link can potentially lead to incorrect and/or
+    # confusing results for some less common kanji so add a '*' to 'linkType'
+    # to make it clear that the data is less trustworthy.
+    linkType+=*
+    linkedReading+=1
+  else
+    # Support cases where on/kun is missing for Kentei kanji or kanji with
+    # Nelson IDs. 4BC2 is not Kentei, but it's in 'wiki-stokes.txt' file. UCD
+    # data doesn't have entries for Nelson IDs: 125, 149, 489 and 1639
+    case $cp in
+    34E4) setOnKun KATSU ;;                          # 㓤 (Nelson 677)
+    3C7E) setOnKun KAI ;;                            # 㱾 (Nelson 2453)
+    3C83) setOnKun KYUU ;;                           # 㲃 (Nelson 2459)
+    4BC2) setOnKun SHIN ;;                           # 䯂
+    6479) setOnKun BO MO ;;                          # 摹 (Nelson 4035)
+    6532) setOnKun KI 'KATAMUKU SOBADATERU' ;;       # 攲 (Nelson 2041)
+    6663) setOnKun 'SEI SETSU' 'AKIRAKA KASHIKOI' ;; # 晣
+    69D4) setOnKun KOU HANETSURUBE ;;                # 槔
+    7B53) setOnKun KEI 'KOUGAI KANZASHI' ;;          # 筓
+    7CF1) setOnKun GETSU 'KOUJI MOYASHI' ;;          # 糱
+    83C6) setOnKun SHU ;;                            # 菆 (Nelson 3961)
+    # if there are no readings and no Morohashi ID then skip this record
+    *) [[ -n $localMorohashi ]] || return 1 ;;
+    esac
   fi
   vstrokes=0
   if [[ -z ${kRSAdobe_Japan1_6} ]]; then
@@ -630,4 +626,5 @@ echo -e "Other Links:\n  Traditional $traditionalLinks, Simplified \
 $simplifiedLinks, Compatibility $compatibilityLinks, Definition \
 $definitionLinks, Semantic $semanticLinks"
 echo -e "Other Fields:\n  Meaning $totalMeaning, Pinyin $totalPinyin, Reading \
-$totalReading"
+$totalReading (Direct $directReading Linked $linkedReading Manual \
+$((totalReading - directReading - linkedReading)))"
