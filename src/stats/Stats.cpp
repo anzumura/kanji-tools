@@ -14,7 +14,7 @@ namespace {
 std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
   os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
   if (c.entry.has_value())
-    os << std::setw(5) << (**c.entry).frequency() << ", "
+    os << std::setw(5) << (**c.entry).frequencyOrDefault(0) << ", "
        << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type();
   else
     os << ", " << c.toHex();

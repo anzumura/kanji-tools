@@ -95,7 +95,10 @@
     "stop_token": "cpp",
     "cinttypes": "cpp",
     "filesystem": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "__availability": "cpp",
+    "__undef_macros": "cpp",
+    "__memory": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "cSpell.words": [

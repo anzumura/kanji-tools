@@ -8,12 +8,14 @@
 #include <kanji_tools/utils/KenteiKyus.h>
 #include <kanji_tools/utils/MBUtils.h>
 
+#include <limits>
 #include <optional>
 
 namespace kanji_tools {
 
 class Kanji {
 public:
+  using OptInt = std::optional<int>;
   using OptString = std::optional<std::string>;
   using LinkNames = std::vector<std::string>;
   using NelsonIds = std::vector<int>;
@@ -25,6 +27,8 @@ public:
   virtual KanjiTypes type() const = 0;
   virtual const std::string& meaning() const = 0;
   virtual const std::string& reading() const = 0;
+
+  virtual OptInt frequency() const { return std::nullopt; }
   virtual KanjiGrades grade() const { return KanjiGrades::None; }
   // 'linkedReadings' returns true if readings were loaded from a linked kanji
   virtual bool linkedReadings() const { return false; }
@@ -38,9 +42,11 @@ public:
   //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName'
   // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
   virtual const LinkNames& oldNames() const { return EmptyLinkNames; }
+
   // UcdFileKanji have an optional 'newName' field (based on Link field loaded from ucd.txt). LinkedKanji
   // also have a 'newName', i.e., the linked kanji name which is the new (or more standard) version.
   virtual OptString newName() const { return std::nullopt; }
+
   // Only CustomFileKanji have 'extraTypeInfo'. They have a 'number' (from 'Number' column) plus:
   // - Jouyou: optionally adds the year the kanji was added to the official list
   // - Jinmei: adds the year the kanji was added as well as the 'reason' (see JinmeiKanji class)
@@ -55,24 +61,27 @@ public:
   const std::string& nonVariantName() const { return _nonVariantName; }
   const std::string& compatibilityName() const { return _compatibilityName; }
 
-  const Radical& radical() const { return _radical; }
-  int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
-  const OptString& pinyin() const { return _pinyin; }
+  int frequencyOrDefault(int x) const { return frequency().has_value() ? *frequency() : x; }
+  int frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
+  KenteiKyus kyu() const { return _kyu; }
+  JlptLevels level() const { return _level; }
   const OptString& morohashiId() const { return _morohashiId; }
   const NelsonIds& nelsonIds() const { return _nelsonIds; }
-  JlptLevels level() const { return _level; }
-  KenteiKyus kyu() const { return _kyu; }
-  int frequency() const { return _frequency; }
-  int frequencyOrDefault(int x) const { return _frequency ? _frequency : x; }
+  const OptString& pinyin() const { return _pinyin; }
+  const Radical& radical() const { return _radical; }
+  int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
 
   bool is(KanjiTypes t) const { return type() == t; }
+  bool hasFrequency() const { return frequency().has_value(); }
+  bool hasGrade() const { return grade() != KanjiGrades::None; }
   bool hasLevel() const { return _level != JlptLevels::None; }
   bool hasKyu() const { return _kyu != KenteiKyus::None; }
-  bool hasGrade() const { return grade() != KanjiGrades::None; }
   bool hasMeaning() const { return !meaning().empty(); }
-  bool hasReading() const { return !reading().empty(); }
   bool hasMorohashId() const { return _morohashiId.has_value(); }
   bool hasNelsonIds() const { return !_nelsonIds.empty(); }
+  bool hasNewName() const { return newName().has_value(); }
+  bool hasPinyin() const { return _pinyin.has_value(); }
+  bool hasReading() const { return !reading().empty(); }
 
   // 'InfoFields' members can be used to select which fields are printed by 'info'
   // method. For example 'GradeField | LevelField | FreqField' will print grade and
@@ -118,8 +127,8 @@ public:
       qualifiedNameRank() == x.qualifiedNameRank() &&
       (strokes() < x.strokes() ||
        strokes() == x.strokes() &&
-         (frequency() < x.frequency() ||
-          frequency() == x.frequency() &&
+         (frequencyOrMax() < x.frequencyOrMax() ||
+          frequencyOrMax() == x.frequencyOrMax() &&
             (variant() < x.variant() ||
              variant() == x.variant() && toUnicode(compatibilityName()) < toUnicode(x.compatibilityName()))));
   }
@@ -130,7 +139,7 @@ public:
 protected:
   Kanji(const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
         const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
-        KenteiKyus kyu, int frequency);
+        KenteiKyus kyu);
   inline static const LinkNames EmptyLinkNames{};
 private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most common to least common (see
@@ -142,7 +151,7 @@ private:
     // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd (so the least common)
     return t == KanjiTypes::Jouyou    ? 0
       : hasLevel()                    ? 1
-      : _frequency                    ? 2
+      : hasFrequency()                ? 2
       : t == KanjiTypes::Jinmei       ? 3
       : t == KanjiTypes::LinkedJinmei ? 4
       : t == KanjiTypes::LinkedOld    ? 5
@@ -163,7 +172,6 @@ private:
   const NelsonIds _nelsonIds;
   const JlptLevels _level;
   const KenteiKyus _kyu;
-  const int _frequency;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }

@@ -21,15 +21,14 @@ protected:
     return result;
   }
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical, const std::string& meaning,
-                 const std::string& reading, int strokes, const Ucd* u, bool findFrequency = true,
-                 bool findLevel = true, bool findKyu = true)
+                 const std::string& reading, int strokes, const Ucd* u, bool findLevel = true, bool findKyu = true)
     : Kanji(name, d.getCompatibilityName(name), radical, strokes, d.getPinyin(u), d.getMorohashiId(u),
             d.getNelsonIds(u), findLevel ? d.getLevel(name) : JlptLevels::None,
-            findKyu ? d.getKyu(name) : KenteiKyus::None, findFrequency ? d.getFrequency(name) : 0),
+            findKyu ? d.getKyu(name) : KenteiKyus::None),
       _meaning(meaning), _reading(reading) {}
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical, const std::string& reading,
-                 int strokes, const Ucd* u, bool findFrequency = true, bool findLevel = true, bool findKyu = true)
-    : NonLinkedKanji(d, name, radical, d.ucd().getMeaning(u), reading, strokes, u, findFrequency, findLevel, findKyu) {}
+                 int strokes, const Ucd* u, bool findLevel = true, bool findKyu = true)
+    : NonLinkedKanji(d, name, radical, d.ucd().getMeaning(u), reading, strokes, u, findLevel, findKyu) {}
 private:
   const std::string _meaning;
   const std::string _reading;

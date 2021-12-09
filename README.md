@@ -315,13 +315,14 @@ CustomFileKanji*            UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
 The classes derived from **Kanji** add the following fields:
 
 - **NonLinkedKanji**: *meaning* and *reading*
-- **LinkedKanji**: *link* (points to the new/standard kanji)
+- **LinkedKanji**: optional *frequency* and *link* (points to new/standard kanji)
 - **CustomFileKanji**: *number* and *oldNames*
-- **UcdFileKanji**: *linkedReadings*, *hasOldLinks* and *linkNames*
-- **OfficialKanji**: optional *year* (when kanji was added to official list)
+- **UcdFileKanji**: *hasOldLinks* and *linkNames*, *linkedReadings*
+- **OfficialKanji**: optional *frequency* and optional *year* (when added to list)
 - **ExtraKanji**: optional *newName*
 - **JouyouKanji**: *grade* (school grade when the kanji is introduced)
 - **JinmeiKanji**: *reason* (official reason for inclusion in Jinmeiyoō list)
+- **FrequencyKanji**: *frequency*
 
 The program also loads the 214 official kanji radicals (部首).
 

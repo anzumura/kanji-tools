@@ -99,7 +99,7 @@ bool Data::checkInsert(const Entry& kanji) {
       if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
       printError(kanji->name() + " [" + toUnicode(kanji->name()) + "] " + v + " " + s + " in _ucd");
     };
-    if (kanji->frequency() >= _maxFrequency) _maxFrequency = kanji->frequency() + 1;
+    if (kanji->hasFrequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
     auto type = kanji->type();
     auto ucd = _ucd.find(kanji->name());
     if (!ucd)
@@ -254,35 +254,36 @@ void Data::processList(const DataFile& list) {
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
-  for (const auto& i : list.list()) {
-    auto j = findKanjiByName(i);
+  for (int i = 0; i < list.list().size(); ++i) {
+    const auto& name = list.list()[i];
+    auto j = findKanjiByName(name);
     Entry kanji;
     if (j.has_value()) {
       kanji = *j;
-      if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(i);
+      if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
     } else {
       if (kenteiList)
-        kanji = std::make_shared<KenteiKanji>(*this, i);
+        kanji = std::make_shared<KenteiKanji>(*this, name);
       else {
         // kanji wasn't already in _kanjiNameMap so it only exists in the 'frequency.txt' file - these kanjis
         // are considered 'Frequency' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
-        auto reading = _frequencyReadings.find(i);
+        auto reading = _frequencyReadings.find(name);
         if (reading != _frequencyReadings.end())
-          kanji = std::make_shared<FrequencyKanji>(*this, i, reading->second);
+          kanji = std::make_shared<FrequencyKanji>(*this, name, i + 1, reading->second);
         else
-          kanji = std::make_shared<FrequencyKanji>(*this, i);
+          kanji = std::make_shared<FrequencyKanji>(*this, name, i + 1);
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types
-      if (_debug && !kenteiList) created.push_back(i);
+      if (_debug && !kenteiList) created.push_back(name);
     }
     if (kenteiList) {
       assert(kanji->kyu() == list.kyu());
       _kyus[list.kyu()].push_back(kanji);
     } else if (list.level() == JlptLevels::None) {
-      assert(kanji->frequency() != 0);
-      int index = (kanji->frequency() - 1) / FrequencyBucketEntries;
+      assert(kanji->hasFrequency());
+      int index = (*kanji->frequency() - 1) / FrequencyBucketEntries;
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
     } else {
       assert(kanji->level() == list.level());

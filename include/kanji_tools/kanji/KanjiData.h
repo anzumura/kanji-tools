@@ -13,7 +13,10 @@ public:
   KanjiData(int argc, const char** argv, std::ostream& out = std::cout, std::ostream& err = std::cerr);
 
   // Implementations of the 'Data' base class functions used during Kanji construction
-  int getFrequency(const std::string& s) const override { return _frequency.get(s); }
+  Kanji::OptInt getFrequency(const std::string& s) const override {
+    auto x = _frequency.get(s);
+    return x ? Kanji::OptInt(x) : std::nullopt;
+  }
   JlptLevels getLevel(const std::string&) const override;
   KenteiKyus getKyu(const std::string&) const override;
 private:

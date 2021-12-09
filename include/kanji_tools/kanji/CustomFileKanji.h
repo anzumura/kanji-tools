@@ -41,7 +41,7 @@ protected:
   // Constructor used by 'ExtraKanji'
   CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames, const Ucd* u)
     : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
-                     strokes, u, false, false),
+                     strokes, u, false),
       _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
   // Constructors used by 'OfficialKanji'
   CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames)
@@ -89,18 +89,21 @@ private:
 // 'OfficialKanji' contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
 class OfficialKanji : public CustomFileKanji {
 public:
-  using OptInt = std::optional<int>;
-
   OptString extraTypeInfo() const override {
     return _year.has_value() ? std::optional(*CustomFileKanji::extraTypeInfo() + ' ' + std::to_string(*_year))
                              : CustomFileKanji::extraTypeInfo();
   }
 
+  OptInt frequency() const override { return _frequency; }
+
   OptInt year() const { return _year; }
 protected:
-  OfficialKanji(const Data& d, int s) : CustomFileKanji(d, s, getOldNames()), _year(optInt(columns[YearCol])) {}
+  OfficialKanji(const Data& d, int s)
+    : CustomFileKanji(d, s, getOldNames()), _frequency(d.getFrequency(columns[NameCol])),
+      _year(optInt(columns[YearCol])) {}
   OfficialKanji(const Data& d, int s, const std::string& meaning)
-    : CustomFileKanji(d, s, meaning, getOldNames()), _year(optInt(columns[YearCol])) {}
+    : CustomFileKanji(d, s, meaning, getOldNames()), _frequency(d.getFrequency(columns[NameCol])),
+      _year(optInt(columns[YearCol])) {}
 private:
   static LinkNames getOldNames();
 
@@ -109,6 +112,7 @@ private:
     return Data::toInt(s);
   }
 
+  const OptInt _frequency;
   const OptInt _year;
 };
 

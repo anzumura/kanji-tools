@@ -129,7 +129,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**grab).grade(), KanjiGrades::None);
   EXPECT_EQ((**grab).level(), JlptLevels::None);
   EXPECT_EQ((**grab).kyu(), KenteiKyus::KJ1);
-  EXPECT_EQ((**grab).frequency(), 0);
+  EXPECT_FALSE((**grab).hasFrequency());
   EXPECT_FALSE((**grab).newName().has_value());
   EXPECT_EQ((**grab).oldNames(), Kanji::LinkNames({"摑"}));
   EXPECT_EQ((**grab).reading(), "カク、つか-む、つか-まえる、つか-まる");
@@ -223,7 +223,7 @@ TEST_F(KanjiDataTest, FindChecks) {
   EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
-  EXPECT_EQ(k.frequency(), 0);
+  EXPECT_FALSE(k.hasFrequency());
   EXPECT_TRUE(k.variant());
   auto result2 = _data.findKanjiByName("逸︁");
   EXPECT_TRUE((**result2).variant());

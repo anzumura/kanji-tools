@@ -46,7 +46,6 @@ public:
   DataFile(const DataFile&) = delete;
 
   bool exists(const std::string& s) const { return _map.find(s) != _map.end(); }
-  // return 0 for 'not found'
   int get(const std::string& name) const {
     auto i = _map.find(name);
     return i != _map.end() ? i->second : 0;

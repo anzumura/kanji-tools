@@ -18,13 +18,12 @@ public:
   }
   bool linkedReadings() const override { return _linkedReadings; }
 protected:
-  UcdFileKanji(const Data& d, const std::string& name, const std::string& reading, const Ucd* u,
-               bool findFrequency = true, bool findKyu = true)
-    : NonLinkedKanji(d, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u, findFrequency, false, findKyu),
+  UcdFileKanji(const Data& d, const std::string& name, const std::string& reading, const Ucd* u, bool findKyu = true)
+    : NonLinkedKanji(d, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u, false, findKyu),
       _hasOldLinks(u && u->hasTraditionalLinks()), _linkNames(getLinkNames(u)),
       _linkedReadings(u && u->linkedReadings()) {}
-  UcdFileKanji(const Data& d, const std::string& name, const Ucd* u, bool findFrequency = true, bool findKyu = true)
-    : UcdFileKanji(d, name, d.ucd().getReadingsAsKana(u), u, findFrequency, findKyu) {}
+  UcdFileKanji(const Data& d, const std::string& name, const Ucd* u, bool findKyu = true)
+    : UcdFileKanji(d, name, d.ucd().getReadingsAsKana(u), u, findKyu) {}
 private:
   // Use 'LinkNames' instead of trying to hold an OptEntry (shared pointer to another loaded kanji) since
   // 'ucd links' are more arbitrary than the standard 'official' jinmei and jouyou linked kanji (ie official
@@ -39,18 +38,22 @@ private:
 class FrequencyKanji : public UcdFileKanji {
 public:
   // constructor used for 'FrequencyKanji' with readings from 'frequency-readings.txt'
-  FrequencyKanji(const Data& d, const std::string& name, const std::string& reading)
-    : UcdFileKanji(d, name, reading, d.findUcd(name)) {}
+  FrequencyKanji(const Data& d, const std::string& name, int frequency, const std::string& reading)
+    : UcdFileKanji(d, name, reading, d.findUcd(name)), _frequency(frequency) {}
   // constructor used for 'FrequencyKanji' without a reading
-  FrequencyKanji(const Data& d, const std::string& name) : UcdFileKanji(d, name, d.findUcd(name)) {}
+  FrequencyKanji(const Data& d, const std::string& name, int frequency)
+    : UcdFileKanji(d, name, d.findUcd(name)), _frequency(frequency) {}
 
   KanjiTypes type() const override { return KanjiTypes::Frequency; }
+  OptInt frequency() const override { return OptInt(_frequency); }
+private:
+  const int _frequency;
 };
 
 // 'KenteiKanji' is for kanji in 'kentei/k*.txt' files that aren't already pulled in from other files
 class KenteiKanji : public UcdFileKanji {
 public:
-  KenteiKanji(const Data& d, const std::string& name) : UcdFileKanji(d, name, d.findUcd(name), false) {}
+  KenteiKanji(const Data& d, const std::string& name) : UcdFileKanji(d, name, d.findUcd(name)) {}
 
   KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
@@ -58,7 +61,7 @@ public:
 // 'UcdKanji' is for kanji in 'ucd.txt' file that aren't already pulled in from any other files
 class UcdKanji : public UcdFileKanji {
 public:
-  UcdKanji(const Data& d, const Ucd& u) : UcdFileKanji(d, u.name(), &u, false, false) {}
+  UcdKanji(const Data& d, const Ucd& u) : UcdFileKanji(d, u.name(), &u, false) {}
 
   KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };

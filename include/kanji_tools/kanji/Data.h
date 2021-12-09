@@ -35,7 +35,7 @@ public:
   const UcdData& ucd() const { return _ucd; }
   const Ucd* findUcd(const std::string& kanjiName) const { return _ucd.find(kanjiName); }
   // Functions used by 'Kanji' classes during construction, each takes a kanji name.
-  virtual int getFrequency(const std::string&) const = 0;
+  virtual Kanji::OptInt getFrequency(const std::string&) const = 0;
   virtual JlptLevels getLevel(const std::string&) const = 0;
   virtual KenteiKyus getKyu(const std::string&) const = 0;
   virtual const Radical& ucdRadical(const std::string& kanjiName, const Ucd* u) const {
