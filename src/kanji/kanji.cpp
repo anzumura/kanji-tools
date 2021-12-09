@@ -3,10 +3,10 @@
 
 namespace kanji_tools {
 
-Kanji::Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical,
-             int strokes, const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds,
-             JlptLevels level, KenteiKyus kyu, int frequency)
-  : _number(number), _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
+Kanji::Kanji(const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
+             const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
+             KenteiKyus kyu, int frequency)
+  : _name(name), _variant(MBChar::isMBCharWithVariationSelector(name)),
     _nonVariantName(MBChar::withoutVariationSelector(name)), _compatibilityName(compatibilityName), _radical(radical),
     _strokes(strokes), _pinyin(pinyin), _morohashiId(morohashiId), _nelsonIds(nelsonIds), _level(level), _kyu(kyu),
     _frequency(frequency) {

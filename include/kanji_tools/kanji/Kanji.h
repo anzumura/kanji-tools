@@ -41,12 +41,11 @@ public:
   // UcdFileKanji have an optional 'newName' field (based on Link field loaded from ucd.txt). LinkedKanji
   // also have a 'newName', i.e., the linked kanji name which is the new (or more standard) version.
   virtual OptString newName() const { return std::nullopt; }
-  // Only Jouyou and Jinmei Kanji have 'extraTypeInfo':
-  // - Jouyou: returns nullopt or the year the kanji was added to the official list
-  // - Jinmei: returns the year the kanji was added as well as the 'reason' (see JinmeiKanji class)
+  // Only CustomFileKanji have 'extraTypeInfo'. They have a 'number' (from 'Number' column) plus:
+  // - Jouyou: optionally adds the year the kanji was added to the official list
+  // - Jinmei: adds the year the kanji was added as well as the 'reason' (see JinmeiKanji class)
   virtual OptString extraTypeInfo() const { return std::nullopt; }
 
-  int number() const { return _number; }
   const std::string& name() const { return _name; }
 
   // 'variant' is true if _name includes a Unicode 'variation selector'. In this case 'nonVariantName'
@@ -129,7 +128,7 @@ public:
   // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
   static constexpr auto Legend = ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 protected:
-  Kanji(int number, const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
+  Kanji(const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
         const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
         KenteiKyus kyu, int frequency);
   inline static const LinkNames EmptyLinkNames{};
@@ -153,7 +152,6 @@ private:
                                       : 8;
   }
 
-  const int _number;
   const std::string _name;
   const bool _variant;
   const std::string _nonVariantName;    // same as _name if _variant is false

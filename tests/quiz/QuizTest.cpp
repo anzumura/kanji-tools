@@ -93,7 +93,7 @@ TEST_F(QuizTest, ListQuizReview) {
   int kanjiCount = 0;
   int meaningCount = 0;
   while (std::getline(_os, line)) {
-    if (line == "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10, Jouyou")
+    if (line == "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10, Jouyou (#41)")
       ++kanjiCount;
     else if (line == "    Meaning: one")
       ++meaningCount;

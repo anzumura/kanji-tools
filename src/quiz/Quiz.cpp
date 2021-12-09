@@ -109,7 +109,7 @@ void Quiz::printDetails(const std::string& arg, bool showLegend) const {
   if (showLegend) {
     printInfoLegend();
     out() << '\n';
-  } 
+  }
   out() << "Showing details for " << arg << " [" << toUnicode(arg) << "]";
   auto ucd = data().ucd().find(arg);
   if (ucd) {
@@ -137,8 +137,7 @@ void Quiz::start() const {
     _reviewMode = c == 'r';
   }
   switch (_choice.get(
-    "Type", {{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}},
-    'g')) {
+    "Type", {{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}}, 'g')) {
   case 'f':
     c = _choice.get("Choose list",
                     {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
@@ -236,8 +235,8 @@ void Quiz::printMeaning(const Entry& k, bool useNewLine) const {
 
 void Quiz::printExtraTypeInfo(const Entry& k) const {
   out() << ", " << k->type();
-  auto extraTypeInfo = k->extraTypeInfo();
-  if (extraTypeInfo.has_value()) out() << " (" << *extraTypeInfo << ')';
+  auto i = k->extraTypeInfo();
+  if (i.has_value()) out() << " (" << *i << ')';
 }
 
 // List Based Quiz

@@ -11,7 +11,11 @@ namespace kanji_tools {
 // - Jouyou and Extra files contain 'Strokes' column, Jinmei strokes come from 'strokes.txt' or 'ucd.txt'
 class CustomFileKanji : public NonLinkedKanji {
 public:
+  OptString extraTypeInfo() const override { return '#' + std::to_string(_number); }
   const LinkNames& oldNames() const override { return _oldNames; }
+
+  int number() const { return _number; }
+
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
   // - 'file' must have tab separated lines that have the right number of columns for the given type
@@ -36,18 +40,18 @@ protected:
   static std::array<std::string, MaxCol> columns;
   // Constructor used by 'ExtraKanji'
   CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames, const Ucd* u)
-    : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     meaning, columns[ReadingCol], strokes, u, false, false),
-      _oldNames(oldNames) {}
+    : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
+                     strokes, u, false, false),
+      _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
   // Constructors used by 'OfficialKanji'
   CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames)
-    : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     columns[ReadingCol], strokes, d.findUcd(columns[NameCol])),
-      _oldNames(oldNames) {}
+    : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), columns[ReadingCol], strokes,
+                     d.findUcd(columns[NameCol])),
+      _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
   CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames)
-    : NonLinkedKanji(d, Data::toInt(columns[NumberCol]), columns[NameCol], d.getRadicalByName(columns[RadicalCol]),
-                     meaning, columns[ReadingCol], strokes, d.findUcd(columns[NameCol])),
-      _oldNames(oldNames) {}
+    : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
+                     strokes, d.findUcd(columns[NameCol])),
+      _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
@@ -61,6 +65,7 @@ private:
   static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
 
+  const int _number;
   const LinkNames _oldNames;
 };
 
@@ -85,6 +90,11 @@ private:
 class OfficialKanji : public CustomFileKanji {
 public:
   using OptInt = std::optional<int>;
+
+  OptString extraTypeInfo() const override {
+    return _year.has_value() ? std::optional(*CustomFileKanji::extraTypeInfo() + ' ' + std::to_string(*_year))
+                             : CustomFileKanji::extraTypeInfo();
+  }
 
   OptInt year() const { return _year; }
 protected:
@@ -126,8 +136,7 @@ public:
 
   KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   OptString extraTypeInfo() const override {
-    // year should always be populated for Jinmei kanji
-    return year().has_value() ? std::optional(std::to_string(*year()) + ' ' + toString(_reason)) : std::nullopt;
+    return std::optional(*OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']');
   }
   Reasons reason() const { return _reason; }
 private:
@@ -141,9 +150,6 @@ public:
     : OfficialKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]), _grade(getGrade(columns[GradeCol])) {}
 
   KanjiTypes type() const override { return KanjiTypes::Jouyou; }
-  OptString extraTypeInfo() const override {
-    return year().has_value() ? std::optional(std::to_string(*year())) : std::nullopt;
-  }
   KanjiGrades grade() const override { return _grade; }
 private:
   static KanjiGrades getGrade(const std::string&);

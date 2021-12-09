@@ -316,7 +316,7 @@ The classes derived from **Kanji** add the following fields:
 
 - **NonLinkedKanji**: *meaning* and *reading*
 - **LinkedKanji**: *link* (points to the new/standard kanji)
-- **CustomFileKanji**: *oldNames*
+- **CustomFileKanji**: *number* and *oldNames*
 - **UcdFileKanji**: *linkedReadings*, *hasOldLinks* and *linkNames*
 - **OfficialKanji**: optional *year* (when kanji was added to official list)
 - **ExtraKanji**: optional *newName*

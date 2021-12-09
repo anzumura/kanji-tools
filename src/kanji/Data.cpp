@@ -205,7 +205,6 @@ void Data::populateJouyou() {
   // populate _linkedJinmeiKanji that are linked to Jouyou
   fs::path file = DataFile::getFile(_dataDir, LinkedJinmeiFile);
   std::ifstream f(file);
-  int count = 0;
   auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei];
   for (std::string line; std::getline(f, line);) {
     std::stringstream ss(line);
@@ -214,19 +213,18 @@ void Data::populateJouyou() {
       if (i == _kanjiNameMap.end())
         printError("can't find " + jouyou + " while processing " + file.string());
       else {
-        auto k = std::make_shared<LinkedJinmeiKanji>(*this, ++count, linked, i->second);
+        auto k = std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second);
         checkInsert(linkedJinmei, k);
       }
     } else
       printError("bad line in " + file.string() + ": " + line);
   }
   // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not LinkedJinmei created above)
-  count = 0;
   auto& linkedOld = _types[KanjiTypes::LinkedOld];
   for (const auto& i : _kanjiNameMap)
     for (auto& j : i.second->oldNames())
       if (!findKanjiByName(j)) {
-        auto k = std::make_shared<LinkedOldKanji>(*this, ++count, j, i.second);
+        auto k = std::make_shared<LinkedOldKanji>(*this, j, i.second);
         checkInsert(linkedOld, k);
       }
 }
@@ -237,7 +235,7 @@ void Data::populateJinmei() {
   for (const auto& i : results) {
     checkInsert(i);
     for (auto& j : i->oldNames()) {
-      auto k = std::make_shared<LinkedJinmeiKanji>(*this, linkedJinmei.size(), j, i);
+      auto k = std::make_shared<LinkedJinmeiKanji>(*this, j, i);
       checkInsert(linkedJinmei, k);
     }
   }
@@ -256,7 +254,6 @@ void Data::processList(const DataFile& list) {
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
-  auto count = newKanji.size();
   for (const auto& i : list.list()) {
     auto j = findKanjiByName(i);
     Entry kanji;
@@ -265,16 +262,16 @@ void Data::processList(const DataFile& list) {
       if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(i);
     } else {
       if (kenteiList)
-        kanji = std::make_shared<KenteiKanji>(*this, ++count, i);
+        kanji = std::make_shared<KenteiKanji>(*this, i);
       else {
         // kanji wasn't already in _kanjiNameMap so it only exists in the 'frequency.txt' file - these kanjis
         // are considered 'Frequency' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
         auto reading = _frequencyReadings.find(i);
         if (reading != _frequencyReadings.end())
-          kanji = std::make_shared<FrequencyKanji>(*this, ++count, i, reading->second);
+          kanji = std::make_shared<FrequencyKanji>(*this, i, reading->second);
         else
-          kanji = std::make_shared<FrequencyKanji>(*this, ++count, i);
+          kanji = std::make_shared<FrequencyKanji>(*this, i);
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types
@@ -317,13 +314,12 @@ void Data::processList(const DataFile& list) {
 
 void Data::processUcd() {
   auto& newKanji = _types[KanjiTypes::Ucd];
-  int count = 0;
   // Calling 'findKanjiByName' also checks for a 'variation selector' version of the given 'name'
   // so use it instead of just checking for a match in _kanjiNameMap directly (this avoids 52
   // redundant kanji getting created when processing 'ucd.txt').
   for (auto& i : _ucd.map())
     if (!findKanjiByName(i.second.name()).has_value())
-      checkInsert(newKanji, std::make_shared<UcdKanji>(*this, ++count, i.second));
+      checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
 }
 
 void Data::checkStrokes() const {
