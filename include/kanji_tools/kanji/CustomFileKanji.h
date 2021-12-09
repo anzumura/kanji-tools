@@ -41,7 +41,7 @@ protected:
   // Constructor used by 'ExtraKanji'
   CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames, const Ucd* u)
     : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
-                     strokes, u, false),
+                     strokes, u),
       _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
   // Constructors used by 'OfficialKanji'
   CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames)
@@ -95,15 +95,16 @@ public:
   }
 
   OptInt frequency() const override { return _frequency; }
+  JlptLevels level() const override { return _level; }
 
   OptInt year() const { return _year; }
 protected:
   OfficialKanji(const Data& d, int s)
     : CustomFileKanji(d, s, getOldNames()), _frequency(d.getFrequency(columns[NameCol])),
-      _year(optInt(columns[YearCol])) {}
+      _level(d.getLevel(columns[NameCol])), _year(optInt(columns[YearCol])) {}
   OfficialKanji(const Data& d, int s, const std::string& meaning)
     : CustomFileKanji(d, s, meaning, getOldNames()), _frequency(d.getFrequency(columns[NameCol])),
-      _year(optInt(columns[YearCol])) {}
+      _level(d.getLevel(columns[NameCol])), _year(optInt(columns[YearCol])) {}
 private:
   static LinkNames getOldNames();
 
@@ -113,6 +114,7 @@ private:
   }
 
   const OptInt _frequency;
+  const JlptLevels _level;
   const OptInt _year;
 };
 

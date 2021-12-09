@@ -19,7 +19,7 @@ public:
   bool linkedReadings() const override { return _linkedReadings; }
 protected:
   UcdFileKanji(const Data& d, const std::string& name, const std::string& reading, const Ucd* u, bool findKyu = true)
-    : NonLinkedKanji(d, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u, false, findKyu),
+    : NonLinkedKanji(d, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u, findKyu),
       _hasOldLinks(u && u->hasTraditionalLinks()), _linkNames(getLinkNames(u)),
       _linkedReadings(u && u->linkedReadings()) {}
   UcdFileKanji(const Data& d, const std::string& name, const Ucd* u, bool findKyu = true)

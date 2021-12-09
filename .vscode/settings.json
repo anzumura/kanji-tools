@@ -98,7 +98,8 @@
     "regex": "cpp",
     "__availability": "cpp",
     "__undef_macros": "cpp",
-    "__memory": "cpp"
+    "__memory": "cpp",
+    "__bits": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "cSpell.words": [

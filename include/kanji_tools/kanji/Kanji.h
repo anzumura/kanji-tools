@@ -29,7 +29,8 @@ public:
   virtual const std::string& reading() const = 0;
 
   virtual OptInt frequency() const { return std::nullopt; }
-  virtual KanjiGrades grade() const { return KanjiGrades::None; }
+  virtual KanjiGrades grade() const { return KanjiGrades::None; } // 'grade' is implemented in JouyouKanji
+  virtual JlptLevels level() const { return JlptLevels::None; }   // 'level' is implemented in OfficialKanji
   // 'linkedReadings' returns true if readings were loaded from a linked kanji
   virtual bool linkedReadings() const { return false; }
 
@@ -64,7 +65,6 @@ public:
   int frequencyOrDefault(int x) const { return frequency().has_value() ? *frequency() : x; }
   int frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
   KenteiKyus kyu() const { return _kyu; }
-  JlptLevels level() const { return _level; }
   const OptString& morohashiId() const { return _morohashiId; }
   const NelsonIds& nelsonIds() const { return _nelsonIds; }
   const OptString& pinyin() const { return _pinyin; }
@@ -74,7 +74,7 @@ public:
   bool is(KanjiTypes t) const { return type() == t; }
   bool hasFrequency() const { return frequency().has_value(); }
   bool hasGrade() const { return grade() != KanjiGrades::None; }
-  bool hasLevel() const { return _level != JlptLevels::None; }
+  bool hasLevel() const { return level() != JlptLevels::None; }
   bool hasKyu() const { return _kyu != KenteiKyus::None; }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasMorohashId() const { return _morohashiId.has_value(); }
@@ -138,8 +138,7 @@ public:
   static constexpr auto Legend = ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 protected:
   Kanji(const std::string& name, const std::string& compatibilityName, const Radical& radical, int strokes,
-        const OptString& pinyin, const OptString& morohashiId, const NelsonIds& nelsonIds, JlptLevels level,
-        KenteiKyus kyu);
+        KenteiKyus kyu, const OptString& morohashiId, const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames{};
 private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most common to least common (see
@@ -160,18 +159,20 @@ private:
       : kyu() != KenteiKyus::K1       ? 7
                                       : 8;
   }
-
+  // name related fields
   const std::string _name;
   const bool _variant;
   const std::string _nonVariantName;    // same as _name if _variant is false
   const std::string _compatibilityName; // same as _name if _variant is false
+  // all kanji have radical and strokes
   const Radical _radical;
   const int _strokes;
-  const OptString _pinyin;
+  // all kanji except 'UcdKanji' can have a Kentei 'kyu'
+  const KenteiKyus _kyu;
+  // optional fields
   const OptString _morohashiId;
   const NelsonIds _nelsonIds;
-  const JlptLevels _level;
-  const KenteiKyus _kyu;
+  const OptString _pinyin;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }

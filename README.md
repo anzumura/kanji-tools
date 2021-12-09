@@ -312,14 +312,14 @@ CustomFileKanji*            UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
   JouyouKanji JinmeiKanji
 ```
 
-The classes derived from **Kanji** add the following fields:
+The classes derived from **Kanji** add the following fields (* = optional):
 
-- **NonLinkedKanji**: *meaning* and *reading*
-- **LinkedKanji**: optional *frequency* and *link* (points to new/standard kanji)
-- **CustomFileKanji**: *number* and *oldNames*
-- **UcdFileKanji**: *hasOldLinks* and *linkNames*, *linkedReadings*
-- **OfficialKanji**: optional *frequency* and optional *year* (when added to list)
-- **ExtraKanji**: optional *newName*
+- **NonLinkedKanji**: *meaning*, *reading*
+- **LinkedKanji**: *frequency*\*, *link* (points to new/standard kanji)
+- **CustomFileKanji**: *number*, *oldNames*
+- **UcdFileKanji**: *hasOldLinks*, *linkNames*, *linkedReadings*
+- **OfficialKanji**: *frequency*\*, *level*, *year*\*
+- **ExtraKanji**: *newName*\*
 - **JouyouKanji**: *grade* (school grade when the kanji is introduced)
 - **JinmeiKanji**: *reason* (official reason for inclusion in Jinmeiyoō list)
 - **FrequencyKanji**: *frequency*

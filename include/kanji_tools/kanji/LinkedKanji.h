@@ -16,8 +16,8 @@ public:
   bool linkedReadings() const override { return true; }
 protected:
   LinkedKanji(const Data& d, const std::string& name, const Data::Entry& link, const Ucd* u)
-    : Kanji(name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getPinyin(u),
-            d.getMorohashiId(u), d.getNelsonIds(u), JlptLevels::None, d.getKyu(name)),
+    : Kanji(name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getKyu(name),
+            d.getMorohashiId(u), d.getNelsonIds(u), d.getPinyin(u)),
       _frequency(d.getFrequency(name)), _link(link) {}
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
