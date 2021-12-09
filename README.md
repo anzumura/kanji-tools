@@ -282,8 +282,8 @@ To support these programs, *KanjiData* class loads and breaks down kanji into th
 
 - **Jouyou**: 2136 official Jōyō (常用) kanji
 - **Jinmei**: 633 official Jinmeiyō (人名用) kanji
-- **Linked Jinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
-- **Linked Old**: 213 old/variant Jōyō kanji that aren't in 'Linked Jinmei'
+- **LinkedJinmei**: 230 more Jinmei kanji that are old/variant forms of Jōyō (212) or Jinmei (18)
+- **LinkedOld**: 213 old/variant Jōyō kanji that aren't in 'Linked Jinmei'
 - **Frequency**: kanji that are in the top 2501 frequency list, but not one of the first 4 types
 - **Extra**: kanji loaded from 'extra.txt' - shouldn't be in any of the above types
 - **Kentei**: kanji loaded from 'kentei/*' - Kanji Kentei (漢字検定) that aren't any of the above types
@@ -295,31 +295,32 @@ Class Hierarchy for **Kanji** class (* = abstract class):
 ```;
      Kanji*
        |
-       +------------------------------------------+
-       |                                          |
- NonLinkedKanji*                             LinkedKanji*
-       |                                          |
-       +-------------------------+                +---------------+
-       |                         |                |               |
-CustomFileKanji*            UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
-       |                         |
-       +------------+            +----------+----------+
-       |            |            |          |          |
- OfficialKanji* ExtraKanji FrequencyKanji KenteiKanji UcdKanji
-       |
-       +-----------+
-       |           |
-  JouyouKanji JinmeiKanji
+       +----------------------------------------+
+       |                                        |
+ NonLinkedKanji*                           LinkedKanji*
+       |                                        |
+       +------------------------+               +---------------+
+       |                        |               |               |
+CustomFileKanji*          UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
+       |                        |
+       +------------+           +------------+
+       |            |           |            |
+ OfficialKanji* ExtraKanji StandardKanji* UcdKanji
+       |                        |
+       +-----------+            +------------+
+       |           |            |            |
+  JouyouKanji JinmeiKanji FrequencyKanji KenteiKanji
 ```
 
 The classes derived from **Kanji** add the following fields (* = optional):
 
 - **NonLinkedKanji**: *meaning*, *reading*
-- **LinkedKanji**: *frequency*\*, *link* (points to new/standard kanji)
-- **CustomFileKanji**: *number*, *oldNames*
+- **LinkedKanji**: *frequency*\*, *kyu*, *link* (points to new/standard kanji)
+- **CustomFileKanji**: *kyu*, *number*, *oldNames*
 - **UcdFileKanji**: *hasOldLinks*, *linkNames*, *linkedReadings*
 - **OfficialKanji**: *frequency*\*, *level*, *year*\*
 - **ExtraKanji**: *newName*\*
+- **StandardKanji**: *kyu*
 - **JouyouKanji**: *grade* (school grade when the kanji is introduced)
 - **JinmeiKanji**: *reason* (official reason for inclusion in Jinmeiyoō list)
 - **FrequencyKanji**: *frequency*

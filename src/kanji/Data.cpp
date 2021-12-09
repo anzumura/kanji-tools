@@ -263,16 +263,16 @@ void Data::processList(const DataFile& list) {
       if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
     } else {
       if (kenteiList)
-        kanji = std::make_shared<KenteiKanji>(*this, name);
+        kanji = std::make_shared<KenteiKanji>(*this, name, list.kyu());
       else {
         // kanji wasn't already in _kanjiNameMap so it only exists in the 'frequency.txt' file - these kanjis
         // are considered 'Frequency' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
         auto reading = _frequencyReadings.find(name);
-        if (reading != _frequencyReadings.end())
-          kanji = std::make_shared<FrequencyKanji>(*this, name, i + 1, reading->second);
-        else
+        if (reading == _frequencyReadings.end())
           kanji = std::make_shared<FrequencyKanji>(*this, name, i + 1);
+        else
+          kanji = std::make_shared<FrequencyKanji>(*this, name, reading->second, i + 1);
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types

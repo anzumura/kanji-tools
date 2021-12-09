@@ -115,7 +115,7 @@ TEST_F(KanjiTest, FrequencyKanjiWithReading) {
   EXPECT_CALL(_data, getKyu("呑")).WillOnce(Return(kyu));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  FrequencyKanji k(_data, "呑", frequency, "トン、ドン、の-む");
+  FrequencyKanji k(_data, "呑", "トン、ドン、の-む", frequency);
   EXPECT_EQ(k.type(), KanjiTypes::Frequency);
   EXPECT_TRUE(k.is(KanjiTypes::Frequency));
   EXPECT_EQ(k.name(), "呑");
@@ -132,10 +132,9 @@ TEST_F(KanjiTest, FrequencyKanjiWithReading) {
 
 TEST_F(KanjiTest, KenteiKanji) {
   KenteiKyus kyu = KenteiKyus::K1;
-  EXPECT_CALL(_data, getKyu("蘋")).WillOnce(Return(kyu));
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  KenteiKanji k(_data, "蘋");
+  KenteiKanji k(_data, "蘋", kyu);
   EXPECT_EQ(k.type(), KanjiTypes::Kentei);
   EXPECT_EQ(k.name(), "蘋");
   EXPECT_EQ(k.radical(), rad);

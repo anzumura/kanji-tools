@@ -11,6 +11,7 @@ namespace kanji_tools {
 // - Jouyou and Extra files contain 'Strokes' column, Jinmei strokes come from 'strokes.txt' or 'ucd.txt'
 class CustomFileKanji : public NonLinkedKanji {
 public:
+  KenteiKyus kyu() const override { return _kyu; }
   OptString extraTypeInfo() const override { return '#' + std::to_string(_number); }
   const LinkNames& oldNames() const override { return _oldNames; }
 
@@ -42,16 +43,16 @@ protected:
   CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames, const Ucd* u)
     : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
                      strokes, u),
-      _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
+      _kyu(d.getKyu(columns[NameCol])), _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
   // Constructors used by 'OfficialKanji'
   CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames)
     : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), columns[ReadingCol], strokes,
                      d.findUcd(columns[NameCol])),
-      _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
+      _kyu(d.getKyu(columns[NameCol])), _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
   CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames)
     : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
                      strokes, d.findUcd(columns[NameCol])),
-      _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
+      _kyu(d.getKyu(columns[NameCol])), _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
 private:
   // all kanji files must have at least the following columns
   static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
@@ -65,25 +66,9 @@ private:
   static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
   static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
 
+  const KenteiKyus _kyu;
   const int _number;
   const LinkNames _oldNames;
-};
-
-// 'ExtraKanji' is used for kanji loaded from 'extra.txt'. 'extra.txt' is meant to hold 'fairly common'
-// kanji, but kanji that are outside of the official lists (Jouyou, Jinmei and their linked kanji). They
-// should also not be in 'frequency.txt' or have a JLPT level.
-class ExtraKanji : public CustomFileKanji {
-public:
-  ExtraKanji(const Data& d) : ExtraKanji(d, d.findUcd(columns[NameCol])) {}
-
-  KanjiTypes type() const override { return KanjiTypes::Extra; }
-  OptString newName() const override { return _newName; }
-private:
-  ExtraKanji(const Data& d, const Ucd* u)
-    : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol],
-                      u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
-      _newName(u && u->hasNonTraditionalLinks() ? OptString(u->links()[0].name()) : std::nullopt) {}
-  const OptString _newName;
 };
 
 // 'OfficialKanji' contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
@@ -160,6 +145,23 @@ public:
 private:
   static KanjiGrades getGrade(const std::string&);
   const KanjiGrades _grade;
+};
+
+// 'ExtraKanji' is used for kanji loaded from 'extra.txt'. 'extra.txt' is meant to hold 'fairly common'
+// kanji, but kanji that are outside of the official lists (Jouyou, Jinmei and their linked kanji). They
+// should also not be in 'frequency.txt' or have a JLPT level.
+class ExtraKanji : public CustomFileKanji {
+public:
+  ExtraKanji(const Data& d) : ExtraKanji(d, d.findUcd(columns[NameCol])) {}
+
+  KanjiTypes type() const override { return KanjiTypes::Extra; }
+  OptString newName() const override { return _newName; }
+private:
+  ExtraKanji(const Data& d, const Ucd* u)
+    : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol],
+                      u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
+      _newName(u && u->hasNonTraditionalLinks() ? OptString(u->links()[0].name()) : std::nullopt) {}
+  const OptString _newName;
 };
 
 } // namespace kanji_tools
