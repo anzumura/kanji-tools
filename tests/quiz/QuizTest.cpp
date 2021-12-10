@@ -32,9 +32,14 @@ protected:
   }
 
   std::string listQuizFirstQuestion(char quizType, char questionList) {
+    std::string line, lineFromArgs;
+    // run with quizType and questionList coming from stdin
     _is << "t\n" << quizType << '\n' << questionList << "\nb\n4\nk\n";
-    std::string line;
     getFirstQuestion(line);
+    // run explicitly passing in quizType and questionList (so not from stdin)
+    _is << "t\nb\n4\nk\n";
+    getFirstQuestion(lineFromArgs, quizType, questionList);
+    EXPECT_EQ(line, lineFromArgs);
     return line.substr(9);
   }
 
@@ -48,18 +53,19 @@ protected:
   void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
   void skip() { _is << ".\n"; }           // '.' is the option to skip a question
   void toggleMeanings() { _is << "-\n"; } // '-' is the option to toggle meanings
-  void startQuiz() {
+  void startQuiz(Quiz::OptChar quizType = std::nullopt, Quiz::OptChar questionList = std::nullopt) {
     // clear eofbit and failbit for output streams in case quiz is run more than once during a test
     _os.clear();
     _es.clear();
     // final input needs to be '/' to 'quit' the quiz, otherwise test code will hang while quiz
     // is waiting for more input.
     _is << "/\n";
-    _quiz.start();
+    _quiz.start(quizType, questionList);
   }
 
-  void getFirstQuestion(std::string& line) {
-    startQuiz();
+  void getFirstQuestion(std::string& line, Quiz::OptChar quizType = std::nullopt,
+                        Quiz::OptChar questionList = std::nullopt) {
+    startQuiz(quizType, questionList);
     while (std::getline(_os, line))
       if (line.starts_with("Question 1/")) break;
     if (_os.eof()) FAIL() << "couldn't find first Question";

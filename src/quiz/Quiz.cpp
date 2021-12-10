@@ -24,21 +24,36 @@ constexpr auto ShowMeanings = "show meanings";
 constexpr auto HideMeanings = "hide meanings";
 
 constexpr auto HelpMessage = "\
-kanjiQuiz [-hmr] [kanji]:\n\
-  -h: show help message for command-line options\n\
-  -m: show English meanings by default (can be toggled on/off later)\n\
-  -r: start in review mode instead of being prompted\n\
-  kanji: show details for a kanji instead of starting a review or test\n\
-\n\
-Note: 'kanji' can be a UTF-8 kanji, a frequency number (between 1 and 2501),\n\
-'m' followed by a Morohashi ID (index number in Dai Kan-Wa Jiten), 'n' followed\n\
-by a Classic Nelson ID or 'u' followed by a Unicode value. For example, all of\n\
-the following produce the same output:\n\
+kanjiQuiz [-hm] [-r[num]] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5]] [kanji]:\n\
+    -h   show this help message for command-line options\n\
+    -m   show English meanings by default (can be toggled on/off later)\n\
+    -r   review (instead of quiz) optionally followed by entry num to start at\n\
+  The following options allow choosing the quiz/review type optionally followed\n\
+  by subtype (grade, level, etc.) instead of being prompted:\n\
+    -f   'frequency' (optional frequency group '1-5')\n\
+    -g   'grade' (optional grade '1-6', 's' = Secondary School)\n\
+    -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級\n\
+    -l   'level' (optional JLPT level number '1-5')\n\n\
+  kanji  show details for a kanji instead of starting a review or test\n\n\
+Examples:\n\
+  kanjiQuiz -f        # start 'frequency' quiz (prompts for 'bucket' number)\n\
+  kanjiQuiz -r40 -l1  # start 'JLPT N1' review beginning at the 40th entry\n\n\
+Note: 'kanji' can be UTF-8, frequency (between 1 and 2501), 'm' followed by\n\
+Morohashi ID (index in Dai Kan-Wa Jiten), 'n' followed by Classic Nelson ID\n\
+or 'u' followed by Unicode. For example, theses all produce the same output:\n\
   kanjiQuiz 奉\n\
   kanjiQuiz 1624\n\
   kanjiQuiz m5894\n\
   kanjiQuiz n212\n\
-  kanjiQuiz u5949\n";
+  kanjiQuiz u5949\n\n";
+
+static const Choice::Choices
+  QuizTypeChoices({{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}});
+static const Choice::Choices
+  FrequencyChoices({{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
+static const Choice::Choices GradeChoices({{'s', "Secondary School"}});
+static const Choice::Choices KyuChoices({{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}});
+static const Choice::Choices LevelChoices({{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
 
 } // namespace
 
@@ -56,6 +71,19 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
     for (auto& kanji : list)
       printDetails(kanji->name(), list.size() == 1);
   };
+
+  OptChar quizType, questionList;
+  // checkQuizType is called to check for -f, -g, -l and -k args (so ok to assume length is at least 2)
+  auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,
+                                                  OptChar end = std::nullopt) {
+    quizType = arg[1];
+    const char c = arg[2];
+    if (arg.length() == 3 && (choices.contains(c) || (start.has_value() && *start <= c && end.value_or(c) >= c)))
+      questionList = c;
+    else if (arg.length() > 2)
+      Data::usage("invalid format for " + arg.substr(0, 2) + ", use -h for help");
+  };
+
   bool endOptions = false;
   for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) {
     std::string arg = argv[i];
@@ -68,8 +96,21 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
         endOptions = true;
       else if (arg == "-m")
         _showMeanings = true;
-      else if (arg == "-r")
+      else if (arg.starts_with("-r")) {
         _reviewMode = true;
+        if (arg.length() > 2) {
+          arg = arg.substr(2);
+          if (!std::all_of(arg.begin(), arg.end(), ::isdigit)) Data::usage("invalid format for -r, use -h for help");
+          _question = std::stoi(arg);
+        }
+      } else if (arg.starts_with("-f"))
+        checkQuizType(arg, FrequencyChoices);
+      else if (arg.starts_with("-g"))
+        checkQuizType(arg, GradeChoices, '1', '6');
+      else if (arg.starts_with("-k"))
+        checkQuizType(arg, KyuChoices, '1', '9');
+      else if (arg.starts_with("-l"))
+        checkQuizType(arg, LevelChoices);
       else
         Data::usage("illegal option '" + arg + "' use -h for help");
     } else {
@@ -102,7 +143,7 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
       return;
     }
   }
-  if (!data->debug() && !in) start();
+  if (!data->debug() && !in) start(quizType, questionList);
 }
 
 void Quiz::printDetails(const std::string& arg, bool showLegend) const {
@@ -127,8 +168,7 @@ void Quiz::printDetails(const std::string& arg, bool showLegend) const {
     out() << " --- Not found in 'ucd.txt'\n";
 }
 
-void Quiz::start() const {
-  reset();
+void Quiz::start(OptChar quizType, OptChar questionList) const {
   _choice.setQuit(QuitOption);
   char c;
   if (!_reviewMode) {
@@ -136,24 +176,24 @@ void Quiz::start() const {
     if (c == QuitOption) return;
     _reviewMode = c == 'r';
   }
-  switch (_choice.get(
-    "Type", {{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}}, 'g')) {
+  // can replace this with 'or_else' when C++23 is available
+  c = quizType ? *quizType : _choice.get("Type", QuizTypeChoices, 'g');
+  switch (c) {
   case 'f':
-    c = _choice.get("Choose list",
-                    {{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
+    c = questionList ? *questionList : _choice.get("Choose list", FrequencyChoices);
     if (c == QuitOption) return;
     // suppress printing 'Freq' since this would work against showing the list in a random order.
     listQuiz(getListOrder(), data().frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
     break;
   case 'g':
-    c = _choice.get("Choose grade", '1', '6', {{'s', "Secondary School"}}, 's');
+    c = questionList ? *questionList : _choice.get("Choose grade", '1', '6', GradeChoices, 's');
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']),
              Kanji::AllFields ^ Kanji::GradeField);
     break;
   case 'k':
-    c = _choice.get("Choose kyu", '1', '9', {{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}, '2');
+    c = questionList ? *questionList : _choice.get("Choose kyu", '1', '9', KyuChoices, '2');
     if (c == QuitOption) return;
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     listQuiz(getListOrder(),
@@ -166,7 +206,7 @@ void Quiz::start() const {
              Kanji::AllFields ^ Kanji::KyuField);
     break;
   case 'l':
-    c = _choice.get("Choose level", {{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
+    c = questionList ? *questionList : _choice.get("Choose level", LevelChoices);
     if (c == QuitOption) return;
     // suppress printing 'Level' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().levelList(AllJlptLevels[4 - (c - '1')]), Kanji::AllFields ^ Kanji::LevelField);
@@ -175,11 +215,14 @@ void Quiz::start() const {
   case 'p': prepareGroupQuiz(getListOrder(), _groupData.patternGroups(), _groupData.meaningMap(), 'm'); break;
   }
   if (!_reviewMode) finalScore();
+  reset();
 }
 
 // Helper functions for both List and Group quizzes
 
 Quiz::ListOrder Quiz::getListOrder() const {
+  // '_question' can be set to non-zero in 'reviewMode'. In this case, don't prompt for list order.
+  if (_question) return ListOrder::FromBeginning;
   switch (_choice.get("List order", {{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}, 'r')) {
   case 'b': return ListOrder::FromBeginning;
   case 'e': return ListOrder::FromEnd;
@@ -271,10 +314,18 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   else if (listOrder == ListOrder::Random)
     std::shuffle(questions.begin(), questions.end(), RandomGen);
 
+  // _question can be set to non-zero for review mode, report an error if it's out of range, otherwise
+  // subtract on since 'question' list index starts at zero.
+  if (_question) {
+    if (_question > questions.size()) Data::usage("review mode num '" + std::to_string(_question) +
+     "' is larger than number of questions: " + std::to_string(questions.size()));
+    --_question;
+  }
+
   log(true) << "Starting " << (_reviewMode ? "review" : "quiz") << " for " << questions.size() << " kanji";
   if (questions.size() < list.size())
     out() << " (original list had " << list.size() << ", but not all entries have readings)";
-  out() << '\n';
+  out() << "\n>>>\n";
   if (quizStyle == 'k') printInfoLegend(infoFields);
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(1, numberOfChoicesPerQuestion);
@@ -365,6 +416,8 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
       if (j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
   }
+  if (auto i = _groupData.meaningMap().find(kanji->name()); i != _groupData.meaningMap().end())
+    out() << "   Category: " << i->second->name() << '\n';
   if (kanji->hasMorohashId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
   if (kanji->hasNelsonIds()) {
     out() << "     Nelson:";

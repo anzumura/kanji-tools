@@ -9,11 +9,16 @@ namespace kanji_tools {
 
 class Quiz {
 public:
+  using OptChar = std::optional<char>;
+
   // An istream 'in' can be provided for testing purposes (instead of reading std::cin) and
   // if given, 'start' must be explicitly called to start a quiz.
   Quiz(int argc, const char** argv, DataPtr, std::istream* in = 0);
-  // 'start' is the top level method for starting a quiz or doing a review (List or Group based)
-  void start() const;
+
+  // 'start' is the top level method for starting a quiz or doing a review (List or Group based).
+  // 'quizType' can be one of 'f', 'g', 'k', or 'l' for the type of quiz/review and 'questionList'
+  // can also be provided (values depend on quiz type - see Quiz.cpp 'HelpMessage' for details).
+  void start(OptChar quizType, OptChar questionList) const;
 private:
   enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
   // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
