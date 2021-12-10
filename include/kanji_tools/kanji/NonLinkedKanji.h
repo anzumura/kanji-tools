@@ -20,11 +20,15 @@ protected:
                      [](const auto& i) { return i.name(); });
     return result;
   }
+
+  // constructor used by 'CustomFileKanji': has 'meaning' and 'reading'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical, const std::string& meaning,
                  const std::string& reading, int strokes, const Ucd* u)
     : Kanji(name, d.getCompatibilityName(name), radical, strokes, d.getMorohashiId(u), d.getNelsonIds(u),
             d.getPinyin(u)),
       _meaning(meaning), _reading(reading) {}
+
+  // constructor used by 'CustomFileKanji' and 'UcdFileKanji': has 'reading' and looks up 'meaning'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical, const std::string& reading,
                  int strokes, const Ucd* u)
     : NonLinkedKanji(d, name, radical, d.ucd().getMeaning(u), reading, strokes, u) {}
