@@ -52,7 +52,9 @@ static const Choice::Choices
 static const Choice::Choices
   FrequencyChoices({{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
 static const Choice::Choices GradeChoices({{'s', "Secondary School"}});
+constexpr char GradeStart = '1', GradeEnd = '6';
 static const Choice::Choices KyuChoices({{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}});
+constexpr char KyuStart = '1', KyuEnd = '9';
 static const Choice::Choices LevelChoices({{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
 
 } // namespace
@@ -106,9 +108,9 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
       } else if (arg.starts_with("-f"))
         checkQuizType(arg, FrequencyChoices);
       else if (arg.starts_with("-g"))
-        checkQuizType(arg, GradeChoices, '1', '6');
+        checkQuizType(arg, GradeChoices, GradeStart, GradeEnd);
       else if (arg.starts_with("-k"))
-        checkQuizType(arg, KyuChoices, '1', '9');
+        checkQuizType(arg, KyuChoices, KyuStart, KyuEnd);
       else if (arg.starts_with("-l"))
         checkQuizType(arg, LevelChoices);
       else
@@ -186,14 +188,14 @@ void Quiz::start(OptChar quizType, OptChar questionList) const {
     listQuiz(getListOrder(), data().frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
     break;
   case 'g':
-    c = questionList ? *questionList : _choice.get("Choose grade", '1', '6', GradeChoices, 's');
+    c = questionList ? *questionList : _choice.get("Choose grade", GradeStart, GradeEnd, GradeChoices, 's');
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(getListOrder(), data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']),
              Kanji::AllFields ^ Kanji::GradeField);
     break;
   case 'k':
-    c = questionList ? *questionList : _choice.get("Choose kyu", '1', '9', KyuChoices, '2');
+    c = questionList ? *questionList : _choice.get("Choose kyu", KyuStart, KyuEnd, KyuChoices, '2');
     if (c == QuitOption) return;
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     listQuiz(getListOrder(),
