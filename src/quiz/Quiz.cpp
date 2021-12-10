@@ -32,7 +32,7 @@ kanjiQuiz [-hm] [-r[num]] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5]] [kanji]:\n
   by subtype (grade, level, etc.) instead of being prompted:\n\
     -f   'frequency' (optional frequency group '1-5')\n\
     -g   'grade' (optional grade '1-6', 's' = Secondary School)\n\
-    -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級\n\
+    -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)\n\
     -l   'level' (optional JLPT level number '1-5')\n\n\
   kanji  show details for a kanji instead of starting a review or test\n\n\
 Examples:\n\
