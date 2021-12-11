@@ -15,13 +15,13 @@ constexpr bool toBool(KanjiGrades x) { return x != KanjiGrades::None; }
 
 constexpr const char* toString(KanjiGrades x) {
   switch (x) {
-  case KanjiGrades::S: return "S";
-  case KanjiGrades::G6: return "G6";
-  case KanjiGrades::G5: return "G5";
-  case KanjiGrades::G4: return "G4";
-  case KanjiGrades::G3: return "G3";
-  case KanjiGrades::G2: return "G2";
   case KanjiGrades::G1: return "G1";
+  case KanjiGrades::G2: return "G2";
+  case KanjiGrades::G3: return "G3";
+  case KanjiGrades::G4: return "G4";
+  case KanjiGrades::G5: return "G5";
+  case KanjiGrades::G6: return "G6";
+  case KanjiGrades::S: return "S";
   default: return "None";
   }
 }

@@ -83,13 +83,15 @@ JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
 }
 
 KanjiGrades JouyouKanji::getGrade(const std::string& s) {
-  if (s == "S") return KanjiGrades::S;
-  if (s == "6") return KanjiGrades::G6;
-  if (s == "5") return KanjiGrades::G5;
-  if (s == "4") return KanjiGrades::G4;
-  if (s == "3") return KanjiGrades::G3;
-  if (s == "2") return KanjiGrades::G2;
-  if (s == "1") return KanjiGrades::G1;
+  if (s.length() == 1) switch (s[0]) {
+    case '1': return KanjiGrades::G1;
+    case '2': return KanjiGrades::G2;
+    case '3': return KanjiGrades::G3;
+    case '4': return KanjiGrades::G4;
+    case '5': return KanjiGrades::G5;
+    case '6': return KanjiGrades::G6;
+    case 'S': return KanjiGrades::S;
+    }
   return KanjiGrades::None;
 }
 
