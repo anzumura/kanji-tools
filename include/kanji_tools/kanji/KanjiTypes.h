@@ -22,6 +22,8 @@ constexpr std::array AllKanjiTypes{KanjiTypes::Jouyou,    KanjiTypes::Jinmei,   
                                    KanjiTypes::LinkedOld, KanjiTypes::Frequency, KanjiTypes::Extra,
                                    KanjiTypes::Kentei,    KanjiTypes::Ucd,       KanjiTypes::None};
 
+constexpr bool toBool(KanjiTypes x) { return x != KanjiTypes::None; }
+
 constexpr const char* toString(KanjiTypes x) {
   switch (x) {
   case KanjiTypes::Jouyou: return "Jouyou";

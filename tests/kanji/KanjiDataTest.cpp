@@ -114,8 +114,8 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto yeast = _data.findKanjiByName("麹");
   ASSERT_TRUE(yeast);
   EXPECT_EQ((**yeast).type(), KanjiTypes::Frequency);
-  EXPECT_EQ((**yeast).grade(), KanjiGrades::None);
-  EXPECT_EQ((**yeast).level(), JlptLevels::None);
+  EXPECT_FALSE((**yeast).hasGrade());
+  EXPECT_FALSE((**yeast).hasLevel());
   EXPECT_EQ((**yeast).kyu(), KenteiKyus::KJ1);
   EXPECT_EQ((**yeast).frequency(), 1988);
   EXPECT_FALSE((**yeast).newName());
@@ -126,8 +126,8 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto grab = _data.findKanjiByName("掴");
   ASSERT_TRUE(grab);
   EXPECT_EQ((**grab).type(), KanjiTypes::Extra);
-  EXPECT_EQ((**grab).grade(), KanjiGrades::None);
-  EXPECT_EQ((**grab).level(), JlptLevels::None);
+  EXPECT_FALSE((**grab).hasGrade());
+  EXPECT_FALSE((**grab).hasLevel());
   EXPECT_EQ((**grab).kyu(), KenteiKyus::KJ1);
   EXPECT_FALSE((**grab).frequency());
   EXPECT_FALSE((**grab).newName());
@@ -138,8 +138,8 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto apple = _data.findKanjiByName("蘋");
   ASSERT_TRUE(apple);
   EXPECT_EQ((**apple).type(), KanjiTypes::Kentei);
-  EXPECT_EQ((**apple).grade(), KanjiGrades::None);
-  EXPECT_EQ((**apple).level(), JlptLevels::None);
+  EXPECT_FALSE((**apple).hasGrade());
+  EXPECT_FALSE((**apple).hasLevel());
   EXPECT_EQ((**apple).kyu(), KenteiKyus::K1);
   EXPECT_EQ((**apple).reading(), "ヒン、ビン、うきくさ、でんじそ");
   EXPECT_EQ((**apple).meaning(), "apple");
@@ -149,9 +149,9 @@ TEST_F(KanjiDataTest, SanityChecks) {
   auto complete = _data.findKanjiByName("侭");
   ASSERT_TRUE(complete);
   EXPECT_EQ((**complete).type(), KanjiTypes::Ucd);
-  EXPECT_EQ((**complete).grade(), KanjiGrades::None);
-  EXPECT_EQ((**complete).level(), JlptLevels::None);
-  EXPECT_EQ((**complete).kyu(), KenteiKyus::None);
+  EXPECT_FALSE((**complete).hasGrade());
+  EXPECT_FALSE((**complete).hasLevel());
+  EXPECT_FALSE((**complete).hasKyu());
   EXPECT_EQ((**complete).reading(), "ジン、ことごとく、まま");
   EXPECT_EQ((**complete).meaning(), "complete, utmost");
   EXPECT_FALSE((**complete).linkedReadings());
@@ -221,8 +221,8 @@ TEST_F(KanjiDataTest, FindChecks) {
   EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ(k.name(), "響︀");
   EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
-  EXPECT_EQ(k.level(), JlptLevels::None);
-  EXPECT_EQ(k.grade(), KanjiGrades::None);
+  EXPECT_FALSE(k.hasLevel());
+  EXPECT_FALSE(k.hasGrade());
   EXPECT_FALSE(k.frequency());
   EXPECT_TRUE(k.variant());
   auto result2 = _data.findKanjiByName("逸︁");

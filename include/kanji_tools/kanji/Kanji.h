@@ -72,9 +72,9 @@ public:
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
 
   bool is(KanjiTypes t) const { return type() == t; }
-  bool hasGrade() const { return grade() != KanjiGrades::None; }
-  bool hasKyu() const { return kyu() != KenteiKyus::None; }
-  bool hasLevel() const { return level() != JlptLevels::None; }
+  bool hasGrade() const { return toBool(grade()); }
+  bool hasKyu() const { return toBool(kyu()); }
+  bool hasLevel() const { return toBool(level()); }
   bool hasMeaning() const { return !meaning().empty(); }
   bool hasNelsonIds() const { return !_nelsonIds.empty(); }
   bool hasReading() const { return !reading().empty(); }

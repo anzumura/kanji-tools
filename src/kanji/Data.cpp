@@ -198,7 +198,7 @@ void Data::populateJouyou() {
   auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Jouyou, DataFile::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
-    assert(i->grade() != KanjiGrades::None);
+    assert(toBool(i->grade()));
     if (checkInsert(i)) _grades[i->grade()].push_back(i);
   }
   _types.insert(std::make_pair(KanjiTypes::Jouyou, std::move(results)));
@@ -250,7 +250,7 @@ void Data::populateExtra() {
 }
 
 void Data::processList(const DataFile& list) {
-  const bool kenteiList = list.kyu() != KenteiKyus::None;
+  const bool kenteiList = toBool(list.kyu());
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
@@ -281,26 +281,26 @@ void Data::processList(const DataFile& list) {
     if (kenteiList) {
       assert(kanji->kyu() == list.kyu());
       _kyus[list.kyu()].push_back(kanji);
-    } else if (list.level() == JlptLevels::None) {
+    } else if (toBool(list.level())) {
+      assert(kanji->level() == list.level());
+      _levels[list.level()].push_back(kanji);
+    } else {
       assert(kanji->frequency());
       int index = (*kanji->frequency() - 1) / FrequencyBucketEntries;
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
-    } else {
-      assert(kanji->level() == list.level());
-      _levels[list.level()].push_back(kanji);
     }
   }
   DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-  DataFile::print(created, std::string("non-Jouyou/Jinmei") + (list.level() == JlptLevels::None ? "/JLPT" : ""),
+  DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"),
                   list.name());
   // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
-  if (!kenteiList && list.level() == JlptLevels::None) {
+  if (!kenteiList && !toBool(list.level())) {
     std::vector lists = {std::make_pair(&found[KanjiTypes::Jinmei], ""),
                          std::make_pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
     for (const auto& i : lists) {
       DataFile::List jlptJinmei, otherJinmei;
       for (const auto& j : *i.first)
-        if (getLevel(j) != JlptLevels::None)
+        if (toBool(getLevel(j)))
           jlptJinmei.emplace_back(j);
         else
           otherJinmei.emplace_back(j);

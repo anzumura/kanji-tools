@@ -11,6 +11,8 @@ enum class JlptLevels { N5, N4, N3, N2, N1, None };
 constexpr std::array AllJlptLevels{JlptLevels::N5, JlptLevels::N4, JlptLevels::N3,
                                    JlptLevels::N2, JlptLevels::N1, JlptLevels::None};
 
+constexpr bool toBool(JlptLevels x) { return x != JlptLevels::None; }
+
 constexpr const char* toString(JlptLevels x) {
   switch (x) {
   case JlptLevels::N5: return "N5";

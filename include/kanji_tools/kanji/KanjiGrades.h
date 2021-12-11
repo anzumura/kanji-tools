@@ -11,6 +11,8 @@ enum class KanjiGrades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary schoo
 constexpr std::array AllKanjiGrades{KanjiGrades::G1, KanjiGrades::G2, KanjiGrades::G3, KanjiGrades::G4,
                                     KanjiGrades::G5, KanjiGrades::G6, KanjiGrades::S,  KanjiGrades::None};
 
+constexpr bool toBool(KanjiGrades x) { return x != KanjiGrades::None; }
+
 constexpr const char* toString(KanjiGrades x) {
   switch (x) {
   case KanjiGrades::S: return "S";

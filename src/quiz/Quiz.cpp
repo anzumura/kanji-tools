@@ -456,7 +456,7 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two lists, one for the same
     // grade of the given kanji and one for other grades. For example, 一生（いっしょう） is a grade 1
     // Jukugo for '一', but 一縷（いちる） is a secondary school Jukugo (which also contains '一').
-    if (kanji->grade() != KanjiGrades::None && list.size() > JukugoPerLine) {
+    if (kanji->hasGrade() && list.size() > JukugoPerLine) {
       JukugoData::List same, other;
       for (auto& i : list)
         (kanji->grade() == i->grade() ? same : other).push_back(i);
