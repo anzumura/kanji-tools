@@ -63,7 +63,7 @@ public:
   std::string nonVariantName() const { return _nonVariantName.value_or(_name); }
   std::string compatibilityName() const { return _compatibilityName.value_or(_name); }
 
-  int frequencyOrDefault(int x) const { return frequency().has_value() ? *frequency() : x; }
+  int frequencyOrDefault(int x) const { return frequency().value_or(x); }
   int frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
   const OptString& morohashiId() const { return _morohashiId; }
   const NelsonIds& nelsonIds() const { return _nelsonIds; }
