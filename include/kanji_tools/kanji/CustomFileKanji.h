@@ -76,8 +76,8 @@ private:
 class OfficialKanji : public CustomFileKanji {
 public:
   OptString extraTypeInfo() const override {
-    return _year.has_value() ? std::optional(*CustomFileKanji::extraTypeInfo() + ' ' + std::to_string(*_year))
-                             : CustomFileKanji::extraTypeInfo();
+    return _year ? std::optional(*CustomFileKanji::extraTypeInfo() + ' ' + std::to_string(*_year))
+                 : CustomFileKanji::extraTypeInfo();
   }
 
   OptInt frequency() const override { return _frequency; }

@@ -31,9 +31,9 @@ public:
          (frequency() == x.frequency() && type() < x.type() || (type() == x.type() && toHex() < x.toHex())));
     }
     int frequency() const {
-      return entry.has_value() ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
+      return entry ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
     }
-    KanjiTypes type() const { return entry.has_value() ? (**entry).type() : KanjiTypes::None; }
+    KanjiTypes type() const { return entry ? (**entry).type() : KanjiTypes::None; }
     std::string toHex() const;
 
     int count;

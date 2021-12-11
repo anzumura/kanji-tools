@@ -83,7 +83,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       Data::List memberKanjis;
       for (const auto& i : kanjis) {
         const auto memberKanji = _data->findKanjiByName(i);
-        if (memberKanji.has_value())
+        if (memberKanji)
           memberKanjis.push_back(*memberKanji);
         else
           _data->printError("failed to find member " + i + " in group " + number);

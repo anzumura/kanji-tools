@@ -13,7 +13,7 @@ namespace {
 
 std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
   os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
-  if (c.entry.has_value())
+  if (c.entry)
     os << std::setw(5) << (**c.entry).frequencyOrDefault(0) << ", "
        << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type();
   else
@@ -130,7 +130,7 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
         out() << "  ";
         if (showBreakdown) out() << std::left << std::setw(5) << ++rank << ' ';
         out() << i;
-        if (!i.entry.has_value()) {
+        if (!i.entry) {
           missing.push_back(i.name);
           auto tags = count.tags(i.name);
           if (tags != nullptr) {

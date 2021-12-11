@@ -120,10 +120,10 @@ std::ostream& operator<<(std::ostream& os, const K& k) {
 } // namespace
 
 const std::string& Kana::getRomaji(int flags) const {
-  return (flags & KanaConvert::Hepburn) && _hepburn.has_value() ? *_hepburn
-    : (flags & KanaConvert::Kunrei) && _kunreiVariant           ? _romajiVariants[0]
-    : (flags & KanaConvert::Kunrei) && _kunrei.has_value()      ? *_kunrei
-                                                                : _romaji;
+  return (flags & KanaConvert::Hepburn) && _hepburn   ? *_hepburn
+    : (flags & KanaConvert::Kunrei) && _kunreiVariant ? _romajiVariants[0]
+    : (flags & KanaConvert::Kunrei) && _kunrei        ? *_kunrei
+                                                      : _romaji;
 }
 
 const std::string& Kana::get(CharType t, int flags) const {

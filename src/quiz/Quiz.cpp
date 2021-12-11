@@ -80,7 +80,7 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
                                                   OptChar end = std::nullopt) {
     quizType = arg[1];
     const char c = arg[2];
-    if (arg.length() == 3 && (choices.contains(c) || (start.has_value() && *start <= c && end.value_or(c) >= c)))
+    if (arg.length() == 3 && (choices.contains(c) || (start && *start <= c && end.value_or(c) >= c)))
       questionList = c;
     else if (arg.length() > 2)
       Data::usage("invalid format for " + arg.substr(0, 2) + ", use -h for help");
@@ -118,7 +118,7 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
     } else {
       if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
         auto kanji = data->findKanjiByFrequency(std::stoi(arg));
-        if (!kanji.has_value()) Data::usage("invalid frequency '" + arg + "'");
+        if (!kanji) Data::usage("invalid frequency '" + arg + "'");
         printDetails((**kanji).name());
       } else if (arg.starts_with("m") && arg.length() > 1) {
         arg = arg.substr(1);
@@ -158,7 +158,7 @@ void Quiz::printDetails(const std::string& arg, bool showLegend) const {
   if (ucd) {
     out() << ", Block " << ucd->block() << ", Version " << ucd->version();
     auto k = data().findKanjiByName(arg);
-    if (k.has_value()) {
+    if (k) {
       printExtraTypeInfo(*k);
       out() << '\n' << (**k).info();
       _showMeanings = true;
@@ -281,7 +281,7 @@ void Quiz::printMeaning(const Entry& k, bool useNewLine) const {
 void Quiz::printExtraTypeInfo(const Entry& k) const {
   out() << ", " << k->type();
   auto i = k->extraTypeInfo();
-  if (i.has_value()) out() << " (" << *i << ')';
+  if (i) out() << " (" << *i << ')';
 }
 
 // List Based Quiz
@@ -420,7 +420,7 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
   }
   if (auto i = _groupData.meaningMap().find(kanji->name()); i != _groupData.meaningMap().end())
     out() << "   Category: " << i->second->name() << '\n';
-  if (kanji->hasMorohashId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
+  if (kanji->morohashiId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
   if (kanji->hasNelsonIds()) {
     out() << "     Nelson:";
     for (auto& i : kanji->nelsonIds())
@@ -575,7 +575,7 @@ void Quiz::showGroup(const List& questions, const List& readings, Choices& choic
     const char choice = _reviewMode ? ' ' : (count < 26 ? 'a' + count : 'A' + (count - 26));
     out() << "  Entry: " << std::right << std::setw(3) << count + 1 << "  ";
     auto s = i->qualifiedName();
-    if (i->pinyin().has_value()) {
+    if (i->pinyin()) {
       std::string p = "  (" + *i->pinyin() + ')';
       // need to use 'displayLength' since Pinyin can contain multi-byte chars (for the tones)
       s += p + std::string(NoPinyin.length() - displayLength(p), ' ');

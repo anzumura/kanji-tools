@@ -34,7 +34,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
   };
   for (const auto& i : choices) {
     if (i.second.empty()) {
-      if (!rangeStart.has_value()) {
+      if (!rangeStart) {
         if (i != *choices.begin()) prompt += ", ";
         prompt += i.first;
         rangeStart = i.first;
@@ -47,7 +47,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
       }
     } else {
       // second value isn't empty so complete any ranges if needed
-      if (rangeStart.has_value()) {
+      if (rangeStart) {
         completeRange();
         rangeStart = std::nullopt;
       }
@@ -57,16 +57,16 @@ void Choice::add(std::string& prompt, const Choices& choices) {
     }
     prevChar = i.first;
   }
-  if (rangeStart.has_value()) completeRange();
+  if (rangeStart) completeRange();
 }
 
 char Choice::get(const std::string& msg, const Choices& choicesIn, std::optional<char> def) const {
   // if 'msg' is empty then don't leave a space before listing the choices in brackets.
   std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
   Choices choices(choicesIn);
-  if (_quit.has_value() && choices.find(*_quit) == choices.end()) choices[*_quit] = "quit";
+  if (_quit && choices.find(*_quit) == choices.end()) choices[*_quit] = "quit";
   add(prompt, choices);
-  if (def.has_value()) {
+  if (def) {
     assert(choices.find(*def) != choices.end());
     prompt += ") def '";
     prompt += *def;
@@ -86,7 +86,7 @@ char Choice::get(const std::string& msg, const Choices& choicesIn, std::optional
         line = choice;
       _out << '\n';
     }
-    if (line.empty() && def.has_value()) return *def;
+    if (line.empty() && def) return *def;
   } while (line.length() != 1 || choices.find(line[0]) == choices.end());
   return line[0];
 }

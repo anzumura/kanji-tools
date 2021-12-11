@@ -50,7 +50,7 @@ protected:
   void checkExtraKanji(const Kanji& k) const {
     EXPECT_EQ(k.grade(), KanjiGrades::None);
     EXPECT_EQ(k.level(), JlptLevels::None);
-    EXPECT_FALSE(k.hasFrequency());
+    EXPECT_FALSE(k.frequency());
     EXPECT_EQ(k.kyu(), KenteiKyus::K1);
     EXPECT_EQ(k.name(), "霙");
     EXPECT_EQ(k.strokes(), 16);
@@ -138,7 +138,7 @@ TEST_F(KanjiTest, KenteiKanji) {
   EXPECT_EQ(k.type(), KanjiTypes::Kentei);
   EXPECT_EQ(k.name(), "蘋");
   EXPECT_EQ(k.radical(), rad);
-  EXPECT_FALSE(k.hasFrequency());
+  EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.kyu(), kyu);
@@ -157,7 +157,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");
   EXPECT_EQ(k.radical(), rad);
-  EXPECT_FALSE(k.hasFrequency());
+  EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_EQ(k.kyu(), KenteiKyus::None);
@@ -165,7 +165,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_EQ(k.nelsonIds(), Kanji::NelsonIds({456, 789}));
   EXPECT_EQ(k.meaning(), "utmost");
   EXPECT_EQ(k.reading(), "ジン、まま");
-  ASSERT_TRUE(k.hasNewName());
+  ASSERT_TRUE(k.newName());
   EXPECT_EQ(*k.newName(), sampleLink);
   EXPECT_EQ(k.info(), "Rad TestRadical(1), New sampleLink");
 }
@@ -176,7 +176,7 @@ TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "", "", false, false, Ucd::Links({Ucd::Link(1, "old1"), Ucd::Link(2, "old2")}),
           Ucd::LinkTypes::Traditional, true, "utmost", "JIN", "MAMA");
   UcdKanji k(_data, ucd);
-  ASSERT_FALSE(k.newName().has_value());
+  ASSERT_FALSE(k.newName());
   EXPECT_EQ(k.oldNames(), Kanji::LinkNames({"old1", "old2"}));
   EXPECT_EQ(k.info(), "Rad TestRadical(1), Old old1*／old2");
 }
@@ -298,7 +298,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   auto& k = *results[0];
   EXPECT_EQ(k.grade(), KanjiGrades::None);
   EXPECT_FALSE(k.hasLevel());
-  EXPECT_FALSE(k.hasFrequency());
+  EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.name(), "云");
   EXPECT_EQ(k.strokes(), 6);
   EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
@@ -329,7 +329,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_EQ(k.name(), "亙");
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
-  EXPECT_FALSE(k.hasFrequency());
+  EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
   EXPECT_EQ(k.info(Kanji::NewField), "New 亘*");
   EXPECT_FALSE(k.hasMeaning());
@@ -447,7 +447,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.kyu(), KenteiKyus::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
-  EXPECT_FALSE(k.hasFrequency());
+  EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.reading(), "エン、つや");
   EXPECT_EQ(k.meaning(), "glossy");
   EXPECT_EQ(k.link(), results[0]);

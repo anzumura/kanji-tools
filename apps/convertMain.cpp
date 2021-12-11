@@ -21,7 +21,7 @@ private:
   // true then all options are displayed and the program exits.
   void usage(const std::string& errorMsg = "", bool showAllOptions = true) const;
   void processOneLine(const std::string& s) {
-    std::cout << (_source.has_value() ? _converter.convert(*_source, s) : _converter.convert(s));
+    std::cout << (_source ? _converter.convert(*_source, s) : _converter.convert(s));
   }
   void getInput();
   void setFlag(int value) { _converter.flags(_converter.flags() | value); }
@@ -135,7 +135,7 @@ void ConvertMain::getInput() {
   bool outputCurrentOptions = true;
   do {
     if (_interactive && outputCurrentOptions) {
-      std::cout << ">>> Current options: source=" << (_source.has_value() ? toString(*_source) : "any")
+      std::cout << ">>> Current options: source=" << (_source ? toString(*_source) : "any")
                 << ", target=" << toString(_converter.target()) << ", flags=" << _converter.flagString()
                 << "\n>>> Enter string or 'c'=clear flags, 'f'=set flag, 'q'=quit, 'h'=help or -k|-h|-r|-K|-H|-R:\n";
       outputCurrentOptions = false;

@@ -21,7 +21,7 @@ const fs::path ExtraFile = "extra.txt";
 
 KanjiTypes Data::getType(const std::string& name) const {
   auto i = findKanjiByName(name);
-  return i.has_value() ? (**i).type() : KanjiTypes::None;
+  return i ? (**i).type() : KanjiTypes::None;
 }
 
 Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
@@ -38,7 +38,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 
 fs::path Data::getDataDir(int argc, const char** argv) {
   std::optional<fs::path> found = {};
-  for (int i = 1; !found.has_value() && i < argc; ++i) {
+  for (int i = 1; !found && i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-data") {
       if (i + 1 < argc) {
@@ -53,7 +53,7 @@ fs::path Data::getDataDir(int argc, const char** argv) {
   }
   // If '-data' wasn't provided then search up directories for 'data' and make sure
   // it contains at least one of the required files (jouyou.txt).
-  if (!found.has_value()) {
+  if (!found) {
     if (!argc) usage("need at least one argument, argv[0], to check for a relative 'data' directory");
     auto oldParent = fs::absolute(fs::path(argv[0])).lexically_normal();
     auto dataDir = fs::path("data");
@@ -67,9 +67,9 @@ fs::path Data::getDataDir(int argc, const char** argv) {
         found = data;
       else
         oldParent = parent;
-    } while (!found.has_value());
+    } while (!found);
   }
-  if (!found.has_value()) usage("couldn't find valid 'data' directory");
+  if (!found) usage("couldn't find valid 'data' directory");
   return *found;
 }
 
@@ -99,7 +99,7 @@ bool Data::checkInsert(const Entry& kanji) {
       if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
       printError(kanji->name() + " [" + toUnicode(kanji->name()) + "] " + v + " " + s + " in _ucd");
     };
-    if (kanji->hasFrequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
+    if (kanji->frequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
     auto type = kanji->type();
     auto ucd = _ucd.find(kanji->name());
     if (!ucd)
@@ -116,7 +116,7 @@ bool Data::checkInsert(const Entry& kanji) {
     if (kanji->variant() &&
         !_compatibilityNameMap.insert(std::make_pair(kanji->compatibilityName(), kanji->name())).second)
       printError("failed to insert variant " + kanji->name() + " into map");
-    if (kanji->morohashiId().has_value()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
+    if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
     for (int id : kanji->nelsonIds())
       _nelsonMap[id].push_back(kanji);
     return true;
@@ -258,7 +258,7 @@ void Data::processList(const DataFile& list) {
     const auto& name = list.list()[i];
     auto j = findKanjiByName(name);
     Entry kanji;
-    if (j.has_value()) {
+    if (j) {
       kanji = *j;
       if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
     } else {
@@ -282,7 +282,7 @@ void Data::processList(const DataFile& list) {
       assert(kanji->kyu() == list.kyu());
       _kyus[list.kyu()].push_back(kanji);
     } else if (list.level() == JlptLevels::None) {
-      assert(kanji->hasFrequency());
+      assert(kanji->frequency());
       int index = (*kanji->frequency() - 1) / FrequencyBucketEntries;
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
     } else {
@@ -319,7 +319,7 @@ void Data::processUcd() {
   // so use it instead of just checking for a match in _kanjiNameMap directly (this avoids 52
   // redundant kanji getting created when processing 'ucd.txt').
   for (auto& i : _ucd.map())
-    if (!findKanjiByName(i.second.name()).has_value())
+    if (!findKanjiByName(i.second.name()))
       checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
 }
 
@@ -333,7 +333,7 @@ void Data::checkStrokes() const {
       // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,
       // there are some incorrect stroke counts in 'wiki-strokes.txt', but they aren't used because
       // the actual stroke count comes from 'jouyou.txt', 'jinmei.txt' or 'extra.txt'
-      if (k.has_value()) {
+      if (k) {
         if ((**k).variant()) {
           if ((**k).strokes() != getStrokes(i.first, u, true, true)) vStrokeDiffs.push_back(i.first);
         } else if ((**k).strokes() != ucdStrokes)
@@ -342,7 +342,7 @@ void Data::checkStrokes() const {
         missingDiffs.push_back(i.first);
     } else
       missingUcd.push_back(i.first);
-    if (k.has_value()) {
+    if (k) {
       if ((**k).type() == KanjiTypes::Frequency) strokesFrequency.push_back(i.first);
     } else
       strokesNotFound.push_back(i.first);

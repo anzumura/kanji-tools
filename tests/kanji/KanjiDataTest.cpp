@@ -87,8 +87,8 @@ protected:
         EXPECT_NE(i->name(), i->nonVariantName());
         EXPECT_NE(i->name(), i->compatibilityName());
         auto j = _data.findKanjiByName(i->compatibilityName());
-        EXPECT_TRUE(j.has_value());
-        if (j.has_value()) {
+        EXPECT_TRUE(j);
+        if (j) {
           EXPECT_EQ((**j).type(), i->type());
           EXPECT_EQ((**j).name(), i->name());
         }
@@ -112,31 +112,31 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.getStrokes("廳"), 25);
   // Frequency Kanji
   auto yeast = _data.findKanjiByName("麹");
-  ASSERT_TRUE(yeast.has_value());
+  ASSERT_TRUE(yeast);
   EXPECT_EQ((**yeast).type(), KanjiTypes::Frequency);
   EXPECT_EQ((**yeast).grade(), KanjiGrades::None);
   EXPECT_EQ((**yeast).level(), JlptLevels::None);
   EXPECT_EQ((**yeast).kyu(), KenteiKyus::KJ1);
   EXPECT_EQ((**yeast).frequency(), 1988);
-  EXPECT_FALSE((**yeast).newName().has_value());
+  EXPECT_FALSE((**yeast).newName());
   EXPECT_EQ((**yeast).oldNames(), Kanji::LinkNames({"麴"}));
   EXPECT_EQ((**yeast).reading(), "キク、こうじ");
   EXPECT_EQ((**yeast).meaning(), "yeast, leaven; surname");
   // Extra Kanji
   auto grab = _data.findKanjiByName("掴");
-  ASSERT_TRUE(grab.has_value());
+  ASSERT_TRUE(grab);
   EXPECT_EQ((**grab).type(), KanjiTypes::Extra);
   EXPECT_EQ((**grab).grade(), KanjiGrades::None);
   EXPECT_EQ((**grab).level(), JlptLevels::None);
   EXPECT_EQ((**grab).kyu(), KenteiKyus::KJ1);
-  EXPECT_FALSE((**grab).hasFrequency());
-  EXPECT_FALSE((**grab).newName().has_value());
+  EXPECT_FALSE((**grab).frequency());
+  EXPECT_FALSE((**grab).newName());
   EXPECT_EQ((**grab).oldNames(), Kanji::LinkNames({"摑"}));
   EXPECT_EQ((**grab).reading(), "カク、つか-む、つか-まえる、つか-まる");
   EXPECT_EQ((**grab).meaning(), "catch");
   // Kentei Kanji
   auto apple = _data.findKanjiByName("蘋");
-  ASSERT_TRUE(apple.has_value());
+  ASSERT_TRUE(apple);
   EXPECT_EQ((**apple).type(), KanjiTypes::Kentei);
   EXPECT_EQ((**apple).grade(), KanjiGrades::None);
   EXPECT_EQ((**apple).level(), JlptLevels::None);
@@ -147,7 +147,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_FALSE((**apple).linkedReadings());
   // Ucd Kanji
   auto complete = _data.findKanjiByName("侭");
-  ASSERT_TRUE(complete.has_value());
+  ASSERT_TRUE(complete);
   EXPECT_EQ((**complete).type(), KanjiTypes::Ucd);
   EXPECT_EQ((**complete).grade(), KanjiGrades::None);
   EXPECT_EQ((**complete).level(), JlptLevels::None);
@@ -156,7 +156,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**complete).meaning(), "complete, utmost");
   EXPECT_FALSE((**complete).linkedReadings());
   auto shape = _data.findKanjiByName("檨");
-  ASSERT_TRUE(shape.has_value());
+  ASSERT_TRUE(shape);
   EXPECT_EQ((**shape).type(), KanjiTypes::Ucd);
   EXPECT_TRUE((**shape).linkedReadings());
   // radical
@@ -194,7 +194,7 @@ TEST_F(KanjiDataTest, TotalsChecks) {
   Data::List kanjis;
   for (const auto& i : list) {
     auto k = _data.findKanjiByName(i);
-    ASSERT_TRUE(k.has_value());
+    ASSERT_TRUE(k);
     kanjis.push_back(*k);
   }
   std::sort(kanjis.begin(), kanjis.end(), Data::orderByQualifiedName);
@@ -216,25 +216,25 @@ TEST_F(KanjiDataTest, TotalsChecks) {
 
 TEST_F(KanjiDataTest, FindChecks) {
   auto result = _data.findKanjiByName("響︀");
-  ASSERT_TRUE(result.has_value());
+  ASSERT_TRUE(result);
   auto& k = **result;
   EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ(k.name(), "響︀");
   EXPECT_EQ(k.radical(), _data.getRadicalByName("音"));
   EXPECT_EQ(k.level(), JlptLevels::None);
   EXPECT_EQ(k.grade(), KanjiGrades::None);
-  EXPECT_FALSE(k.hasFrequency());
+  EXPECT_FALSE(k.frequency());
   EXPECT_TRUE(k.variant());
   auto result2 = _data.findKanjiByName("逸︁");
   EXPECT_TRUE((**result2).variant());
   EXPECT_EQ((**result2).type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ((**result2).nonVariantName(), "逸");
   // findKanjiByFrequency
-  ASSERT_FALSE(_data.findKanjiByFrequency(-1).has_value());
-  ASSERT_FALSE(_data.findKanjiByFrequency(0).has_value());
-  ASSERT_FALSE(_data.findKanjiByFrequency(2502).has_value());
+  ASSERT_FALSE(_data.findKanjiByFrequency(-1));
+  ASSERT_FALSE(_data.findKanjiByFrequency(0));
+  ASSERT_FALSE(_data.findKanjiByFrequency(2502));
   for (int i = 1; i < 2502; ++i)
-    ASSERT_TRUE(_data.findKanjiByFrequency(i).has_value());
+    ASSERT_TRUE(_data.findKanjiByFrequency(i));
   EXPECT_EQ((**_data.findKanjiByFrequency(1)).name(), "日");
   EXPECT_EQ((**_data.findKanjiByFrequency(2001)).name(), "炒");
   EXPECT_EQ((**_data.findKanjiByFrequency(2501)).name(), "蝦");
@@ -262,12 +262,12 @@ TEST_F(KanjiDataTest, FindChecks) {
   EXPECT_EQ(_data.findKanjisByNelsonId(5446)[0]->name(), "龠");
   // kanji with 3 old names
   auto result3 = _data.findKanjiByName("弁");
-  ASSERT_TRUE(result3.has_value());
+  ASSERT_TRUE(result3);
   EXPECT_EQ((**result3).oldNames(), Kanji::LinkNames({"辨", "瓣", "辯"}));
   EXPECT_EQ((**result3).info(Kanji::OldField), "Old 辨／瓣／辯");
   for (auto& i : (**result3).oldNames()) {
     auto old = _data.findKanjiByName(i);
-    ASSERT_TRUE(old.has_value());
+    ASSERT_TRUE(old);
     ASSERT_EQ((**old).type(), KanjiTypes::LinkedOld);
     EXPECT_EQ(static_cast<const LinkedKanji&>(**old).link(), result3);
   }
@@ -301,12 +301,12 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ(toUnicode(variantNorth), "F963");
   EXPECT_NE(north, variantNorth);
   auto variantNorthKanji = _data.findKanjiByName(variantNorth);
-  ASSERT_TRUE(variantNorthKanji.has_value());
+  ASSERT_TRUE(variantNorthKanji);
   EXPECT_EQ((**variantNorthKanji).type(), KanjiTypes::Ucd);
   EXPECT_EQ((**variantNorthKanji).name(), variantNorth);
   EXPECT_EQ((**variantNorthKanji).newName(), north);
   auto northKanji = _data.findKanjiByName(north);
-  ASSERT_TRUE(northKanji.has_value());
+  ASSERT_TRUE(northKanji);
   EXPECT_EQ((**northKanji).type(), KanjiTypes::Jouyou);
 }
 

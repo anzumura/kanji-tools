@@ -72,15 +72,11 @@ public:
   int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
 
   bool is(KanjiTypes t) const { return type() == t; }
-  bool hasFrequency() const { return frequency().has_value(); }
   bool hasGrade() const { return grade() != KanjiGrades::None; }
   bool hasKyu() const { return kyu() != KenteiKyus::None; }
   bool hasLevel() const { return level() != JlptLevels::None; }
   bool hasMeaning() const { return !meaning().empty(); }
-  bool hasMorohashId() const { return _morohashiId.has_value(); }
   bool hasNelsonIds() const { return !_nelsonIds.empty(); }
-  bool hasNewName() const { return newName().has_value(); }
-  bool hasPinyin() const { return _pinyin.has_value(); }
   bool hasReading() const { return !reading().empty(); }
 
   // 'InfoFields' members can be used to select which fields are printed by 'info'
@@ -150,7 +146,7 @@ private:
     // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd (so the least common)
     return t == KanjiTypes::Jouyou    ? 0
       : hasLevel()                    ? 1
-      : hasFrequency()                ? 2
+      : frequency()                   ? 2
       : t == KanjiTypes::Jinmei       ? 3
       : t == KanjiTypes::LinkedJinmei ? 4
       : t == KanjiTypes::LinkedOld    ? 5

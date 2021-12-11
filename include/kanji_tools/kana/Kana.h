@@ -132,8 +132,6 @@ public:
   const std::string& hiragana() const { return _hiragana; }
   const std::string& katakana() const { return _katakana; }
   const List& romajiVariants() const { return _romajiVariants; }
-  bool hasHepburn() const { return _hepburn.has_value(); }
-  bool hasKunrei() const { return _kunrei.has_value(); }
   bool kunreiVariant() const { return _kunreiVariant; }
 private:
   static Map populate(CharType);

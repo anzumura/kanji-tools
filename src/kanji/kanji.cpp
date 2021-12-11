@@ -20,16 +20,14 @@ std::string Kanji::info(int infoFields) const {
   auto t = type();
   if (infoFields & RadicalField) add(Rad + radical().name() + '(' + std::to_string(radical().number()) + ')');
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
-  if (infoFields & PinyinField && hasPinyin()) add(*pinyin());
+  if (infoFields & PinyinField && pinyin()) add(*pinyin());
   if (infoFields & GradeField && hasGrade()) add(toString(grade()));
   if (infoFields & LevelField && hasLevel()) add(toString(level()));
-  if (infoFields & FreqField && hasFrequency()) add(Freq + std::to_string(*frequency()));
-  // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both. Check for
-  // linked types first (since oldName is a top level optional field on all kanji).
-  auto optNewName = newName();
-  if (optNewName.has_value()) {
+  if (infoFields & FreqField && frequency()) add(Freq + std::to_string(*frequency()));
+  // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both.
+  if (newName()) {
     assert(oldNames().empty());
-    if (infoFields & NewField) add(New + *optNewName + (linkedReadings() ? "*" : ""));
+    if (infoFields & NewField) add(New + *newName() + (linkedReadings() ? "*" : ""));
   } else if (infoFields & OldField && !oldNames().empty()) {
     std::string s;
     for (auto& i : oldNames()) {

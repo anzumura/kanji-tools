@@ -63,7 +63,7 @@ const std::wstring MBCharCount::DefaultReplace(L"$1");
 
 size_t MBCharCount::add(const std::string& s, const std::string& tag) {
   std::string n = s;
-  if (_find.has_value()) {
+  if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
     if (n != s) {
       ++_replaceCount;
@@ -95,7 +95,7 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
   std::string tag = file.filename().string(); // only use the final component of the path
   if (fs::is_regular_file(file)) {
     ++_files;
-    if (_find.has_value())
+    if (_find)
       added = balanceBrackets(file, addTag, tag);
     else {
       std::ifstream f(file);

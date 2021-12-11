@@ -169,7 +169,7 @@ TEST_F(ChoiceTest, ClearQuitOption) {
   _is << "q\n1\n";
   _choice.setQuit('q');
   _choice.clearQuit();
-  EXPECT_FALSE(_choice.quit().has_value());
+  EXPECT_FALSE(_choice.quit());
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), '1');
   std::string line;
   std::getline(_os, line);
