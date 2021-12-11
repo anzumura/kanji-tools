@@ -36,7 +36,7 @@ constexpr const char* toString(KanjiTypes x) {
   }
 }
 
-inline std::ostream& operator<<(std::ostream& os, const KanjiTypes& x) { return os << toString(x); }
+inline std::ostream& operator<<(std::ostream& os, KanjiTypes x) { return os << toString(x); }
 
 } // namespace kanji_tools
 

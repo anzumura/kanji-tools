@@ -30,7 +30,7 @@ constexpr const char* toString(KenteiKyus x) {
   }
 }
 
-inline std::ostream& operator<<(std::ostream& os, const KenteiKyus& x) { return os << toString(x); }
+inline std::ostream& operator<<(std::ostream& os, KenteiKyus x) { return os << toString(x); }
 
 } // namespace kanji_tools
 

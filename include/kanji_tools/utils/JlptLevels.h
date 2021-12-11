@@ -22,7 +22,7 @@ constexpr const char* toString(JlptLevels x) {
   }
 }
 
-inline std::ostream& operator<<(std::ostream& os, const JlptLevels& x) { return os << toString(x); }
+inline std::ostream& operator<<(std::ostream& os, JlptLevels x) { return os << toString(x); }
 
 } // namespace kanji_tools
 
