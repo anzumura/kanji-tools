@@ -342,7 +342,7 @@ The **data** directory contains the following files:
 - **jlpt/n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
 - **kentei/k\*.txt**: loaded from [here](https://kanjijoho.com/cat/kyu.html)
 - **jukugo/*.txt**: loaded from [here](https://sites.google.com/a/h7a.org/kanjicompounds/)
-- **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details)
+- **meaning-groups.txt**: meant to hold groups of kanji with related meanings (see *Group.h* for more details) - some ideas came from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_concept)
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
 
 No external databases are used so far, but while writing some of the code (like in *UnicodeBlock.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
