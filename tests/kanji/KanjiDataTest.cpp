@@ -3,7 +3,7 @@
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/utils/MBChar.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kanji_tools/utils/DisplayLength.h>
 
 #include <type_traits>
 
@@ -318,6 +318,8 @@ TEST_F(KanjiDataTest, UcdLinks) {
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     const Ucd& k = i.second;
+    // every Ucd entry should be a wide character, i.e., have a 'display length' of 2
+    EXPECT_EQ(displayLength(k.name()), 2);
     // if 'variantStrokes' is present it should be different than 'strokes'
     if (k.hasVariantStrokes()) EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
     // make sure MBUtils UCD characters are part of MBUtils unicode blocks
