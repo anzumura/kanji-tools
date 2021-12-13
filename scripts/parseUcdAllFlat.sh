@@ -14,7 +14,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: optional first pīnyīn (拼音) reading from 'kMandarin'
 # - Morohashi: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
-# - NelsonIds: optional list of space-separated 'Classic Nelson' ids
+# - NelsonIds: optional list of comma-separated 'Classic Nelson' ids
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
 # - LinkCodes: optional list of comma-separated link values in Unicode
@@ -583,9 +583,9 @@ function processRecord() {
   countLinkType
   # don't print 'vstrokes' if it's 0
   echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
-$kMandarin\t$localMorohashi\t$kNelson\t${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t\
-$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\t$linkType\t$localDefinition\t\
-$resultOn\t$resultKun" >>$outFile
+$kMandarin\t$localMorohashi\t${kNelson// /,}\t${kJoyoKanji:+Y}\t\
+${kJinmeiyoKanji:+Y}\t$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\t$linkType\t\
+$localDefinition\t$resultOn\t$resultKun" >>$outFile
 }
 
 function printResults() {

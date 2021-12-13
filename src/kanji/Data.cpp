@@ -27,7 +27,9 @@ KanjiTypes Data::getType(const std::string& name) const {
 Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
   if (u && !u->nelsonIds().empty()) {
     Kanji::NelsonIds ids;
-    std::stringstream ss(u->nelsonIds());
+    auto s = u->nelsonIds();
+    std::replace(s.begin(), s.end(), ',', ' ');
+    std::stringstream ss(s);
     int id;
     while (ss >> id)
       ids.push_back(id);

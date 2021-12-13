@@ -290,7 +290,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
   // Kanji with multiple Nelson Ids
   const Ucd* ucdNelson = _data.ucd().find("㡡");
   ASSERT_NE(ucdNelson, nullptr);
-  EXPECT_EQ(ucdNelson->nelsonIds(), "1487 1491");
+  EXPECT_EQ(ucdNelson->nelsonIds(), "1487,1491");
   auto& kanjiNelson = **_data.findKanjiByName(ucdNelson->name());
   EXPECT_EQ(kanjiNelson.nelsonIds(), Kanji::NelsonIds({1487, 1491}));
   auto& ids = _data.findKanjisByNelsonId(1491);
