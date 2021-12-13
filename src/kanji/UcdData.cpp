@@ -46,8 +46,8 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 
 void UcdData::load(const std::filesystem::path& file) {
   int lineNum = 1, codeCol = -1, nameCol = -1, blockCol = -1, versionCol = -1, radicalCol = -1, strokesCol = -1,
-      variantStrokesCol = -1, pinyinCol = -1, morohashiCol = -1, nelsonCol = -1, joyoCol = -1, jinmeiCol = -1,
-      linkCodeCol = -1, linkNameCol = -1, linkTypeCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
+      variantStrokesCol = -1, pinyinCol = -1, morohashiCol = -1, nelsonIdsCol = -1, joyoCol = -1, jinmeiCol = -1,
+      linkCodesCol = -1, linkNamesCol = -1, linkTypeCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
   auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
     Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
                 ", file: " + file.string());
@@ -92,16 +92,16 @@ void UcdData::load(const std::filesystem::path& file) {
           setCol(pinyinCol, pos);
         else if (token == "Morohashi")
           setCol(morohashiCol, pos);
-        else if (token == "Nelson")
-          setCol(nelsonCol, pos);
+        else if (token == "NelsonIds")
+          setCol(nelsonIdsCol, pos);
         else if (token == "Joyo")
           setCol(joyoCol, pos);
         else if (token == "Jinmei")
           setCol(jinmeiCol, pos);
-        else if (token == "LinkCode")
-          setCol(linkCodeCol, pos);
-        else if (token == "LinkName")
-          setCol(linkNameCol, pos);
+        else if (token == "LinkCodes")
+          setCol(linkCodesCol, pos);
+        else if (token == "LinkNames")
+          setCol(linkNamesCol, pos);
         else if (token == "LinkType")
           setCol(linkTypeCol, pos);
         else if (token == "Meaning")
@@ -137,9 +137,9 @@ void UcdData::load(const std::filesystem::path& file) {
       const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
       if (joyo && jinmei) error("can't be both joyo and jinmei");
       Ucd::Links links;
-      if (!cols[linkNameCol].empty()) {
-        std::stringstream names(cols[linkNameCol]);
-        std::stringstream codes(cols[linkCodeCol]);
+      if (!cols[linkNamesCol].empty()) {
+        std::stringstream names(cols[linkNamesCol]);
+        std::stringstream codes(cols[linkCodesCol]);
         for (std::string linkName; std::getline(names, linkName, ',');) {
           if (std::string linkCode; std::getline(codes, linkCode, ','))
             links.emplace_back(getWchar("LinkCode", linkCode), linkName);
@@ -153,7 +153,7 @@ void UcdData::load(const std::filesystem::path& file) {
         if (cols[linkTypeCol].empty()) error("LinkName has a value, but LinkType is empty");
       } else if (!cols[linkTypeCol].empty())
         error("LinkType has a value, but LinkName is empty");
-      else if (!cols[linkCodeCol].empty())
+      else if (!cols[linkCodesCol].empty())
         error("LinkCode has a value, but LinkName is empty");
       const bool linkedReadings = cols[linkTypeCol].ends_with("*");
       if (linkedReadings) cols[linkTypeCol].pop_back();
@@ -164,7 +164,7 @@ void UcdData::load(const std::filesystem::path& file) {
       if (!_map
              .emplace(std::piecewise_construct, std::make_tuple(name),
                       std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
-                                      cols[pinyinCol], cols[morohashiCol], cols[nelsonCol], joyo, jinmei, links,
+                                      cols[pinyinCol], cols[morohashiCol], cols[nelsonIdsCol], joyo, jinmei, links,
                                       Ucd::toLinkType(cols[linkTypeCol]), linkedReadings, cols[meaningCol], cols[onCol],
                                       cols[kunCol]))
              .second)

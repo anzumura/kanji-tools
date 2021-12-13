@@ -14,11 +14,11 @@ declare -r program="parseUcdAllFlat.sh"
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: optional first pīnyīn (拼音) reading from 'kMandarin'
 # - Morohashi: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
-# - Nelson: optional list of space-separated 'Classic Nelson' ids
+# - NelsonIds: optional list of space-separated 'Classic Nelson' ids
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
-# - LinkCode: optional list of comma-separated link values in Unicode
-# - LinkName: optional list of comma-separated link values in UTF-8
+# - LinkCodes: optional list of comma-separated link values in Unicode
+# - LinkNames: optional list of comma-separated link values in UTF-8
 # - LinkType: optional single value for the type of all the links
 # - Meaning: optional semicolin separated English definitions
 # - On: optional space-separated Japanese On readings (in all-caps Rōmaji)
@@ -591,8 +591,8 @@ $resultOn\t$resultKun" >>$outFile
 function printResults() {
   log "Print results to '$outFile' ... " -n
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
-Morohashi\tNelson\tJoyo\tJinmei\tLinkCode\tLinkName\tLinkType\tMeaning\tOn\t\
-Kun" >$outFile
+Morohashi\tNelsonIds\tJoyo\tJinmei\tLinkCodes\tLinkNames\tLinkType\tMeaning\t\
+On\tKun" >$outFile
   local s
   local -i count=0
   while read -r s; do
