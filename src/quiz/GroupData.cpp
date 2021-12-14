@@ -92,7 +92,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
       if (memberKanjis.size() == 1) error("group " + number + " must have more than one member");
       if (memberKanjis.size() < kanjis.size()) error("group " + number + " failed to load all members");
       if (memberKanjis.size() > MaxGroupSize)
-        error("group " + number + " has more than " + std::to_string(MaxGroupSize) + "members");
+        error("group " + number + " has more than " + std::to_string(MaxGroupSize) + " members");
       Entry group;
       if (type == GroupType::Meaning)
         group = std::make_shared<MeaningGroup>(Data::toInt(number), name, memberKanjis);
