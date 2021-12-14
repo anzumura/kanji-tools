@@ -225,7 +225,7 @@ private:
   // kanji that aren't part of any other group (so not Jouyou or Jinmei).
   std::map<std::string, std::string> _frequencyReadings;
 
-  // lists of kanji corresponding to Levels, Grades, Types and Kyus (excluding the 'None' enum values)
+  // lists of kanji corresponding to Levels, Grades and Kyus (excluding the 'None' enum values)
   std::map<JlptLevels, List> _levels;
   std::map<KanjiGrades, List> _grades;
   std::map<KenteiKyus, List> _kyus;
@@ -241,6 +241,7 @@ private:
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_kanjiNameMap'
   inline static int _maxFrequency = 0;
 
+  inline static const std::string dataArg = "-data", debugArg = "-debug";
   inline static const List _emptyList;
   inline static const Kanji::NelsonIds _emptyNelsonIds;
 };

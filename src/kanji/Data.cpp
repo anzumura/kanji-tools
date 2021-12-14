@@ -40,19 +40,13 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 
 fs::path Data::getDataDir(int argc, const char** argv) {
   std::optional<fs::path> found = {};
-  for (int i = 1; !found && i < argc; ++i) {
-    std::string arg = argv[i];
-    if (arg == "-data") {
-      if (i + 1 < argc) {
-        auto data = fs::path(argv[i + 1]);
-        if (fs::is_directory(data))
-          found = data;
-        else
-          usage(data.string() + " is not a valid directory");
-      } else
-        usage("'-data' must be followed by a directory name");
+  for (int i = 1; !found && i < argc; ++i)
+    if (argv[i] == dataArg) {
+      if (i + 1 == argc) usage("'-data' must be followed by a directory name");
+      auto data = fs::path(argv[i + 1]);
+      if (!fs::is_directory(data)) usage(data.string() + " is not a valid directory");
+      found = data;
     }
-  }
   // If '-data' wasn't provided then search up directories for 'data' and make sure
   // it contains at least one of the required files (jouyou.txt).
   if (!found) {
@@ -77,7 +71,7 @@ fs::path Data::getDataDir(int argc, const char** argv) {
 
 bool Data::getDebug(int argc, const char** argv) {
   for (int i = 1; i < argc; ++i)
-    if (std::string(argv[i]) == "-debug") return true;
+    if (argv[i] == debugArg) return true;
   return false;
 }
 
@@ -88,8 +82,8 @@ int Data::nextArg(int argc, const char** argv, int currentArg) {
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't followed
     // by a path then an earlier call to 'getDataDir' would have failed with a call to
     // 'usage' which ends the program.
-    if (arg == "-data") return nextArg(argc, argv, result + 1);
-    if (arg == "-debug") return nextArg(argc, argv, result);
+    if (arg == dataArg) return nextArg(argc, argv, result + 1);
+    if (arg == debugArg) return nextArg(argc, argv, result);
   }
   return result;
 }
@@ -225,10 +219,7 @@ void Data::populateJouyou() {
   auto& linkedOld = _types[KanjiTypes::LinkedOld];
   for (const auto& i : _kanjiNameMap)
     for (auto& j : i.second->oldNames())
-      if (!findKanjiByName(j)) {
-        auto k = std::make_shared<LinkedOldKanji>(*this, j, i.second);
-        checkInsert(linkedOld, k);
-      }
+      if (!findKanjiByName(j)) checkInsert(linkedOld, std::make_shared<LinkedOldKanji>(*this, j, i.second));
 }
 
 void Data::populateJinmei() {
@@ -236,10 +227,8 @@ void Data::populateJinmei() {
   auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei];
   for (const auto& i : results) {
     checkInsert(i);
-    for (auto& j : i->oldNames()) {
-      auto k = std::make_shared<LinkedJinmeiKanji>(*this, j, i);
-      checkInsert(linkedJinmei, k);
-    }
+    for (auto& j : i->oldNames())
+      checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
   }
   _types.insert(std::make_pair(KanjiTypes::Jinmei, std::move(results)));
 }
@@ -271,10 +260,9 @@ void Data::processList(const DataFile& list) {
         // are considered 'Frequency' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
         auto reading = _frequencyReadings.find(name);
-        if (reading == _frequencyReadings.end())
-          kanji = std::make_shared<FrequencyKanji>(*this, name, i + 1);
-        else
-          kanji = std::make_shared<FrequencyKanji>(*this, name, reading->second, i + 1);
+        kanji = reading == _frequencyReadings.end()
+          ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
+          : std::make_shared<FrequencyKanji>(*this, name, reading->second, i + 1);
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types
@@ -293,8 +281,7 @@ void Data::processList(const DataFile& list) {
     }
   }
   DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-  DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"),
-                  list.name());
+  DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"), list.name());
   // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
   if (!kenteiList && !toBool(list.level())) {
     std::vector lists = {std::make_pair(&found[KanjiTypes::Jinmei], ""),
@@ -302,10 +289,7 @@ void Data::processList(const DataFile& list) {
     for (const auto& i : lists) {
       DataFile::List jlptJinmei, otherJinmei;
       for (const auto& j : *i.first)
-        if (toBool(getLevel(j)))
-          jlptJinmei.emplace_back(j);
-        else
-          otherJinmei.emplace_back(j);
+        (toBool(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
       DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", list.name());
       DataFile::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", list.name());
     }
@@ -321,8 +305,7 @@ void Data::processUcd() {
   // so use it instead of just checking for a match in _kanjiNameMap directly (this avoids 52
   // redundant kanji getting created when processing 'ucd.txt').
   for (auto& i : _ucd.map())
-    if (!findKanjiByName(i.second.name()))
-      checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
+    if (!findKanjiByName(i.second.name())) checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
 }
 
 void Data::checkStrokes() const {
