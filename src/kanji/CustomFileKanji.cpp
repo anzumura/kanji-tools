@@ -1,5 +1,6 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
 
+#include <bitset>
 #include <fstream>
 #include <sstream>
 

@@ -1,6 +1,8 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/utils/MBChar.h>
 
+#include <cassert>
+
 namespace kanji_tools {
 
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName, const Radical& radical, int strokes,
