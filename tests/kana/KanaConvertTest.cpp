@@ -275,10 +275,9 @@ TEST_F(KanaConvertTest, ConvertAllToOneType) {
 }
 
 TEST_F(KanaConvertTest, HepburnVersusKunrei) {
-  // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki sometimes in
-  // order to be unique for round-trips (plus there are a lot of extra wāpuro entries). Below
-  // are the entries from the Differences among romanizations table from:
-  // https://en.wikipedia.org/wiki/Romanization_of_Japanese
+  // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki sometimes in order to be
+  // unique for round-trips (plus there are a lot of extra wāpuro entries). Below are the entries from the
+  // Differences among romanizations table from:  https://en.wikipedia.org/wiki/Romanization_of_Japanese
   // -- A
   check("あ", "ア", "a");
   check("い", "イ", "i");
