@@ -20,8 +20,7 @@ void RadicalData::load(const std::filesystem::path& file) {
   std::array<std::string, 4> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
-    std::stringstream ss(line);
-    if (numberCol == -1) {
+    if (std::stringstream ss(line); numberCol == -1) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
         if (token == "Number")
           setCol(numberCol, pos);

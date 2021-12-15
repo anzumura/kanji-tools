@@ -47,8 +47,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
   std::array<std::string, 3> cols;
   for (std::string line; std::getline(f, line); ++lineNumber) {
     int pos = 0;
-    std::stringstream ss(line);
-    if (numberCol == -1) {
+    if (std::stringstream ss(line); numberCol == -1) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
         if (token == "Number")
           setCol(numberCol, pos);
@@ -139,30 +138,25 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
     out() << '\n';
   }
   out() << "Type Breakdown (showing up to " << MissingTypeExamples << " missing examples per type)\n";
-  for (auto i : AllKanjiTypes) {
-    auto j = types.find(i);
-    if (j != types.end()) {
+  for (auto i : AllKanjiTypes)
+    if (auto j = types.find(i); j != types.end()) {
       const Data::List& list = _data->typeList(i);
       out() << std::right << std::setw(14) << i << ": " << j->second.size() << " / " << list.size();
-      const int missing = list.size() - j->second.size();
-      if (missing < 0)
+      if (int missing = list.size() - j->second.size(); missing < 0)
         out() << " -- ERROR: negative missing values"; // shouldn't be possible
       else if (missing > 0) {
         std::sort(j->second.begin(), j->second.end());
         out() << " (";
-        int count = 0;
-        for (auto& k : list) {
+        for (int count = 0; auto& k : list)
           if (!std::binary_search(j->second.begin(), j->second.end(), k->name())) {
             if (count) out() << ' ';
             out() << k->name();
             if (++count == missing || count == MissingTypeExamples) break;
           }
-        }
         out() << ')';
       }
       out() << '\n';
     }
-  }
 }
 
 } // namespace kanji_tools

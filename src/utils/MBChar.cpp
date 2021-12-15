@@ -127,8 +127,7 @@ size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addT
   std::string line, prevLine;
   bool prevOpenEnded = false;
   auto unclosed = [&prevLine, &prevOpenEnded] {
-    auto open = prevLine.rfind(openWideBracket);
-    if (open != std::string::npos) {
+    if (auto open = prevLine.rfind(openWideBracket); open != std::string::npos) {
       auto close = prevLine.rfind(closeWideBracket);
       prevOpenEnded = (close == std::string::npos || close < open);
     } else
@@ -150,20 +149,16 @@ size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addT
       unclosed();
       continue;
     } else if (prevOpenEnded) {
-      auto close = line.find(closeWideBracket);
-      if (close != std::string::npos) {
-        auto open = line.find(openWideBracket);
-        if (close < open) {
+      if (auto close = line.find(closeWideBracket); close != std::string::npos) {
+        if (auto open = line.find(openWideBracket); close < open) {
           processPartial(close);
           continue;
         }
       }
     } else {
-      auto open = line.find(openWideBracket);
       // special case for line starting with open bracket
-      if (open == 0) {
-        auto close = line.find(closeWideBracket);
-        if (close != std::string::npos) {
+      if (auto open = line.find(openWideBracket); open == 0) {
+        if (auto close = line.find(closeWideBracket); close != std::string::npos) {
           processPartial(close);
           continue;
         }

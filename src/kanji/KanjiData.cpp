@@ -160,11 +160,9 @@ void KanjiData::printStats() const {
 void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   int all = 0;
-  const auto& jouyou = _types.at(KanjiTypes::Jouyou);
-  for (auto i : AllKanjiGrades) {
+  for (const auto& jouyou = _types.at(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
     auto grade = [i](const auto& x) { return x->grade() == i; };
-    auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
-    if (gradeCount) {
+    if (auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade); gradeCount) {
       all += gradeCount;
       log() << "  Total for grade " << i << ": " << gradeCount;
       noFreq(

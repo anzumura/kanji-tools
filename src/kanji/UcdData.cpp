@@ -12,8 +12,7 @@ const Ucd* UcdData::find(const std::string& kanjiName) const {
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
     auto nonVariant = MBChar::withoutVariationSelector(kanjiName);
     // check for linked Jinmei variant first
-    auto i = _linkedJinmei.find(nonVariant);
-    if (i == _linkedJinmei.end()) {
+    if (auto i = _linkedJinmei.find(nonVariant); i == _linkedJinmei.end()) {
       auto j = _linkedOther.find(nonVariant);
       if (j == _linkedOther.end()) return nullptr;
       // if j exists it should never by an empty vector
@@ -71,8 +70,7 @@ void UcdData::load(const std::filesystem::path& file) {
   std::array<std::string, 18> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
-    std::stringstream ss(line);
-    if (codeCol == -1) {
+    if (std::stringstream ss(line); codeCol == -1) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
         if (token == "Code")
           setCol(codeCol, pos);
@@ -169,13 +167,11 @@ void UcdData::load(const std::filesystem::path& file) {
                                       cols[kunCol]))
              .second)
         error("duplicate entry '" + name + "'");
-      for (const auto& link : links) {
-        if (jinmei) {
-          auto i = _linkedJinmei.insert(std::make_pair(link.name(), name));
-          if (!i.second) error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
-        } else
+      for (const auto& link : links)
+        if (!jinmei)
           _linkedOther[link.name()].push_back(name);
-      }
+        else if (auto i = _linkedJinmei.insert(std::make_pair(link.name(), name)); !i.second)
+          error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
     }
   }
 }

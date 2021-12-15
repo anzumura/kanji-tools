@@ -116,7 +116,7 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
       break;
     }
     result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
-    if (const char delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
+    if (char delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
       result += _narrowDelims.at(delim);
     oldPos = pos + 1;
   } while (true);
@@ -186,8 +186,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
       // got non-hiragana letter so flush any letters and preserve the new letter unconverted
       done(false);
       if (_target == CharType::Romaji) {
-        auto i = _wideDelims.find(c);
-        if (i != _wideDelims.end())
+        if (auto i = _wideDelims.find(c); i != _wideDelims.end())
           result += i->second;
         else
           result += c;

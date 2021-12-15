@@ -53,8 +53,7 @@ int JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
   // in the same grade file (and report an error if a duplicate is found in a different file).
   auto create = [this, &error, grade](const std::string& name, const std::string& reading) {
     JukugoKey key{name, reading};
-    auto i = _uniqueJukugo.find(key);
-    if (i == _uniqueJukugo.end()) {
+    if (auto i = _uniqueJukugo.find(key); i == _uniqueJukugo.end()) {
       MBChar n(name), r(reading);
       int count = 0;
       std::string x;
@@ -72,8 +71,7 @@ int JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
       error("jukugo '" + name + "' found in more than one grade file");
   };
   for (std::string line; std::getline(f, line); ++lineNumber) {
-    auto i = line.find(stripPrefix);
-    if (i == std::string::npos) {
+    if (auto i = line.find(stripPrefix); i == std::string::npos) {
       // line has one entry with a space between the Jukugo and its bracketed reading (so g*.txt files)
       i = line.find(openBracket);
       if (i == std::string::npos) error("failed to find open bracket");

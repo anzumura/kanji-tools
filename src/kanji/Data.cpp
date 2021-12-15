@@ -58,8 +58,7 @@ fs::path Data::getDataDir(int argc, const char** argv) {
       // 'has_parent_path' seems to always return true, i.e., the parent of '/' is
       // '/' so break if new 'parent' is equal to 'oldParent'.
       if (parent == oldParent) break;
-      auto data = parent / dataDir;
-      if (fs::is_directory(data) && fs::is_regular_file(data / JouyouFile))
+      if (auto data = parent / dataDir; fs::is_directory(data) && fs::is_regular_file(data / JouyouFile))
         found = data;
       else
         oldParent = parent;
@@ -97,8 +96,7 @@ bool Data::checkInsert(const Entry& kanji) {
     };
     if (kanji->frequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
     auto type = kanji->type();
-    auto ucd = _ucd.find(kanji->name());
-    if (!ucd)
+    if (auto ucd = _ucd.find(kanji->name()); !ucd)
       error("not found");
     else if (type == KanjiTypes::Jouyou && !ucd->joyo())
       error("not marked as 'Joyo'");
@@ -144,15 +142,13 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
     } else {
       assert(strokes != 0); // first line must have a stroke count
       std::stringstream ss(line);
-      for (std::string token; std::getline(ss, token, ' ');) {
-        auto i = _strokes.insert(std::pair(token, strokes));
-        if (!i.second) {
+      for (std::string token; std::getline(ss, token, ' ');)
+        if (auto i = _strokes.insert(std::pair(token, strokes)); !i.second) {
           if (checkDuplicates)
             printError("duplicate entry in " + file.string() + ": " + token);
           else if (i.first->second != strokes)
             printError("found entry with different count in " + file.string() + ": " + token);
         }
-      }
     }
 }
 
@@ -169,8 +165,7 @@ void Data::loadFrequencyReadings(const fs::path& file) {
   std::array<std::string, 2> cols;
   for (std::string line; std::getline(f, line); ++lineNum) {
     int pos = 0;
-    std::stringstream ss(line);
-    if (nameCol == -1) {
+    if (std::stringstream ss(line); nameCol == -1) {
       for (std::string token; std::getline(ss, token, '\t'); ++pos)
         if (token == "Name")
           setCol(nameCol, pos);
@@ -205,8 +200,7 @@ void Data::populateJouyou() {
   for (std::string line; std::getline(f, line);) {
     std::stringstream ss(line);
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
-      const auto i = _kanjiNameMap.find(jouyou);
-      if (i == _kanjiNameMap.end())
+      if (const auto i = _kanjiNameMap.find(jouyou); i == _kanjiNameMap.end())
         printError("can't find " + jouyou + " while processing " + file.string());
       else {
         auto k = std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second);
@@ -216,16 +210,14 @@ void Data::populateJouyou() {
       printError("bad line in " + file.string() + ": " + line);
   }
   // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not LinkedJinmei created above)
-  auto& linkedOld = _types[KanjiTypes::LinkedOld];
-  for (const auto& i : _kanjiNameMap)
+  for (auto& linkedOld = _types[KanjiTypes::LinkedOld]; const auto& i : _kanjiNameMap)
     for (auto& j : i.second->oldNames())
       if (!findKanjiByName(j)) checkInsert(linkedOld, std::make_shared<LinkedOldKanji>(*this, j, i.second));
 }
 
 void Data::populateJinmei() {
   auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Jinmei, DataFile::getFile(_dataDir, JinmeiFile));
-  auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei];
-  for (const auto& i : results) {
+  for (auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei]; const auto& i : results) {
     checkInsert(i);
     for (auto& j : i->oldNames())
       checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
@@ -247,9 +239,8 @@ void Data::processList(const DataFile& list) {
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
   for (int i = 0; i < list.list().size(); ++i) {
     const auto& name = list.list()[i];
-    auto j = findKanjiByName(name);
     Entry kanji;
-    if (j) {
+    if (auto j = findKanjiByName(name); j) {
       kanji = *j;
       if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
     } else {
