@@ -33,6 +33,7 @@ const std::string& Ucd::toString(LinkTypes x) {
   case LinkTypes::Traditional: return Traditional;
   case LinkTypes::None: return None;
   }
+  __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
 }
 
 std::string Ucd::codeAndName() const { return toHex(_code, true, true) + " " + _name; }
