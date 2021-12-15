@@ -88,27 +88,42 @@ public:
 private:
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
+
   using Set = std::set<std::string>;
+
+  // 'insertUnique' performs and insert and ensures the value was added by using 'assert' - this can't be
+  // done in a single line like 'assert(s.insert(x).second)' since that would result in the code not getting
+  // executed when compiling in with asserts disabled, i.e., a 'Release' build.
+  static void insertUnique(Set& s, const std::string& x) {
+    auto i = s.insert(x);
+    assert(i.second);
+  }
+
   std::string convertFromKana(const std::string& input, CharType source, const Set& afterN, const Set& smallKana) const;
   std::string kanaLetters(const std::string& letterGroup, CharType source, int count, const Kana*& prevKana,
                           bool prolong = false) const;
   std::string convertFromRomaji(const std::string& input) const;
   void romajiLetters(std::string& letterGroup, std::string& result) const;
+
   // Either '_apostrophe' or '_dash' can be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used. Note,
   // dash is used in 'Traditional Hepburn' whereas apostrophe is used in 'Modern (revised) Hepburn'.
   const char _apostrophe = '\'';
   const char _dash = '-';
+
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
+
   // '_markAfterN...' sets contain the 8 kana symbols (5 vowels and 3 y's) that should be proceedeed
   // with _apostrophe when producing Romaji output if they follow 'n'.
   Set _markAfterNHiragana;
   Set _markAfterNKatakana;
+
   // '_digraphSecond...' sets contain the 9 small kana symbols (5 vowels, 3 y's, and 'wa') that form
   // the second parts of digraphs.
   Set _digraphSecondHiragana;
   Set _digraphSecondKatakana;
+
   // Punctuation and word delimiter handling
   std::string _narrowDelimList;
   NarrowDelims _narrowDelims;

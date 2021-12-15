@@ -150,8 +150,7 @@ Kana::Map Kana::populate(CharType t) {
   Kana::Map result;
   int duplicates = 0;
   auto insert = [&result, &duplicates, t](auto& k, auto& v) {
-    auto i = result.insert(std::make_pair(k, &v));
-    if (!i.second) {
+    if (auto i = result.insert(std::make_pair(k, &v)); !i.second) {
       std::cerr << "key '" << k << "' already in " << toString(t) << " map: " << i.first->second << '\n';
       ++duplicates;
     }
@@ -192,12 +191,9 @@ std::string Kana::RepeatMark::get(CharType target, int flags, const Kana* prevKa
   if (!prevKana) return "";
   const Kana* k = prevKana;
   if (_dakuten) {
-    auto accented = prevKana->dakutenKana();
-    if (accented) k = accented;
-  } else {
-    auto unaccented = prevKana->plainKana();
-    if (unaccented) k = unaccented;
-  }
+    if (auto accented = prevKana->dakutenKana(); accented) k = accented;
+  } else if (auto unaccented = prevKana->plainKana(); unaccented)
+    k = unaccented;
   return k->getRomaji(flags);
 }
 
@@ -205,10 +201,7 @@ const Kana::Map Kana::_romajiMap(Kana::populate(CharType::Romaji));
 const Kana::Map Kana::_hiraganaMap(Kana::populate(CharType::Hiragana));
 const Kana::Map Kana::_katakanaMap(Kana::populate(CharType::Katakana));
 
-const Kana::RepeatMark Kana::RepeatPlain("ゝ", "ヽ");
-const Kana::RepeatMark Kana::RepeatAccented("ゞ", "ヾ", true);
 const Kana& Kana::SmallTsu(KanaList[KanaList.size() - 2]);
 const Kana& Kana::N(KanaList[KanaList.size() - 1]);
-const std::string Kana::ProlongMark("ー");
 
 } // namespace kanji_tools

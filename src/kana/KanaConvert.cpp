@@ -12,28 +12,26 @@ namespace {
 using P = std::pair<char, const char*>;
 constexpr std::array Delimiters{
   P(' ', "　"), P('.', "。"), P(',', "、"), P(':', "："), P(';', "；"), P('/', "・"), P('!', "！"), P('?', "？"),
-  P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"), P('*', "＊"), P('~', "〜"),   P('=', "＝"), P('+', "＋"),
-  P('@', "＠"), P('#', "＃"), P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"),   P('{', "『"), P('}', "』"),
-  P('|', "｜"), P('"', "”"),  P('`', "｀"), P('<', "＜"), P('>', "＞"), P('_', "＿"),   P('\\', "￥")};
+  P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"), P('*', "＊"), P('~', "〜"), P('=', "＝"), P('+', "＋"),
+  P('@', "＠"), P('#', "＃"), P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"), P('{', "『"), P('}', "』"),
+  P('|', "｜"), P('"', "”"),  P('`', "｀"), P('<', "＜"), P('>', "＞"), P('_', "＿"), P('\\', "￥")};
 
 } // namespace
 
 KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(flags) {
-  for (auto& i : Kana::getMap(CharType::Hiragana)) {
-    auto r = i.second->romaji();
-    if (!r.starts_with("n")) {
+  for (auto& i : Kana::getMap(CharType::Hiragana))
+    if (auto r = i.second->romaji(); !r.starts_with("n")) {
       if (r.length() == 1 || r == "ya" || r == "yu" || r == "yo") {
-        assert(_markAfterNHiragana.insert(i.second->hiragana()).second);
-        assert(_markAfterNKatakana.insert(i.second->katakana()).second);
+        insertUnique(_markAfterNHiragana, i.second->hiragana());
+        insertUnique(_markAfterNKatakana, i.second->katakana());
       } else if (r.starts_with("l")) {
         if (*i.second != Kana::SmallTsu && !r.starts_with("lk")) {
-          assert(_digraphSecondHiragana.insert(i.second->hiragana()).second);
-          assert(_digraphSecondKatakana.insert(i.second->katakana()).second);
+          insertUnique(_digraphSecondHiragana, i.second->hiragana());
+          insertUnique(_digraphSecondKatakana, i.second->katakana());
         }
       } else
         _repeatingConsonents.insert(r[0]);
     }
-  }
   for (auto& i : Delimiters) {
     _narrowDelimList += i.first;
     _narrowDelims[i.first] = i.second;
@@ -113,15 +111,14 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
   const bool keepSpaces = !(_flags & RemoveSpaces);
   do {
     const size_t pos = input.find_first_of(_narrowDelimList, oldPos);
-    if (pos != std::string::npos) {
-      result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
-      const char delim = input[pos];
-      if (delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' ')) result += _narrowDelims.at(delim);
-      oldPos = pos + 1;
-    } else {
+    if (pos == std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos));
       break;
     }
+    result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
+    if (const char delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
+      result += _narrowDelims.at(delim);
+    oldPos = pos + 1;
   } while (true);
   return result;
 }
@@ -268,8 +265,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
     else if (c == "ō")
       macron('o', "お");
     else if (isSingleByte(c)) {
-      char letter = std::tolower(c[0]);
-      if (letter != 'n') {
+      if (const char letter = std::tolower(c[0]); letter != 'n') {
         letterGroup += letter;
         romajiLetters(letterGroup, result);
       } else {
@@ -303,21 +299,16 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
 
 void KanaConvert::romajiLetters(std::string& letterGroup, std::string& result) const {
   auto& sourceMap = Kana::getMap(CharType::Romaji);
-  auto i = sourceMap.find(letterGroup);
-  if (i != sourceMap.end()) {
+  if (auto i = sourceMap.find(letterGroup); i != sourceMap.end()) {
     result += i->second->get(_target, _flags);
     letterGroup.clear();
   } else if (letterGroup.length() == 3) {
-    if (letterGroup[0] == 'n')
-      result += Kana::N.get(_target, _flags);
-    else if (letterGroup[0] == letterGroup[1] || letterGroup[0] == 't' && letterGroup[1] == 'c') {
-      // convert first letter to small tsu if letter repeats and is a valid consonant
-      if (_repeatingConsonents.contains(letterGroup[0]))
-        result += Kana::SmallTsu.get(_target, _flags);
-      else // error: first letter not valid
-        result += letterGroup[0];
-    } else // error: no romaji is longer than 3 chars so output the first letter unconverted
-      result += letterGroup[0];
+    // convert first letter to small tsu if letter repeats and is a valid consonant (also allow 'tc' combination)
+    result += letterGroup[0] == 'n' ? Kana::N.get(_target, _flags)
+      : letterGroup[0] == letterGroup[1] || letterGroup[0] == 't' && letterGroup[1] == 'c'
+      ? _repeatingConsonents.contains(letterGroup[0]) ? Kana::SmallTsu.get(_target, _flags)
+                                                      : letterGroup.substr(0, 1) // error: first letter not valid
+      : letterGroup.substr(0, 1); // error: no romaji is longer than 3 chars so output the first letter unconverted
     letterGroup = letterGroup.substr(1);
     romajiLetters(letterGroup, result); // try converting the shortened letterGroup
   }
