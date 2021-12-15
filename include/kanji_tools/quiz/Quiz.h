@@ -65,11 +65,11 @@ private:
   // 'groupQuiz' starts a Group Quiz (callled by 'prepareGroupQuiz')
   void groupQuiz(const GroupData::List&, MemberType, const GroupData::Map& otherMap, char otherGroup) const;
 
-  void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion,
-                 const GroupData::Map& otherMap, char otherGroup) const;
   using Answers = std::vector<char>;
+  void showGroup(const List& questions, const Answers&, const List& readings, Choices&, bool repeatQuestion,
+                 const GroupData::Map& otherMap, char otherGroup) const;
   bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
-  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& meanings) const;
+  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& refresh) const;
   void editAnswer(Answers&, Choices&) const;
   void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name) const;
 

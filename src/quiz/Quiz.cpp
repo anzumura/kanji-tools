@@ -14,6 +14,7 @@ std::mt19937 RandomGen(RandomDevice());
 // Below are some options used in for quiz questions. These are all ascii symbols that come
 // before letters and numbers so that 'Choice::get' method displays them at the beginning
 // of the list (assuming the other choices are just letters and/or numbers).
+constexpr char RefreshOption = '\'';
 constexpr char EditOption = '*';
 constexpr char MeaningsOption = '-';
 constexpr char PrevOption = ',';
@@ -319,8 +320,9 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   // _question can be set to non-zero for review mode, report an error if it's out of range, otherwise
   // subtract on since 'question' list index starts at zero.
   if (_question) {
-    if (_question > questions.size()) Data::usage("review mode num '" + std::to_string(_question) +
-     "' is larger than number of questions: " + std::to_string(questions.size()));
+    if (_question > questions.size())
+      Data::usage("review mode num '" + std::to_string(_question) +
+                  "' is larger than number of questions: " + std::to_string(questions.size()));
     --_question;
   }
 
@@ -524,8 +526,8 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, co
 
 void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupData::Map& otherMap,
                      char otherGroup) const {
-  bool firstTime = true;
-  for (_question = 1; _question <= list.size(); ++_question) {
+  bool firstTime = true, stopQuiz = false;
+  for (_question = 1; _question <= list.size() && !stopQuiz; ++_question) {
     auto& i = list[_question - 1];
     List questions, readings;
     for (auto& j : i->members())
@@ -545,7 +547,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
     }
     Answers answers;
     Choices choices = getDefaultChoices(list.size());
-    bool repeatQuestion = false, skipGroup = false, stopQuiz = false;
+    bool repeatQuestion = false, skipGroup = false;
     do {
       out() << (_reviewMode ? "\nGroup " : "\nQuestion ") << _question << '/' << list.size() << ":  " << *i << ", ";
       if (questions.size() == i->members().size())
@@ -553,27 +555,24 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
       else
         out() << "showing " << questions.size() << " out of " << i->members().size();
       out() << " members\n";
-      showGroup(questions, readings, choices, repeatQuestion, otherMap, otherGroup);
+      showGroup(questions, answers, readings, choices, repeatQuestion, otherMap, otherGroup);
       if (getAnswers(answers, questions.size(), choices, skipGroup, stopQuiz)) {
         checkAnswers(answers, questions, readings, i->name());
         break;
       }
       repeatQuestion = true;
     } while (!stopQuiz && !skipGroup);
-    if (stopQuiz) {
-      --_question;
-      break;
-    }
   }
+  if (stopQuiz) _question -= 2;
 }
 
-void Quiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion,
-                     const GroupData::Map& otherMap, char otherGroup) const {
+void Quiz::showGroup(const List& questions, const Answers& answers, const List& readings, Choices& choices,
+                     bool repeatQuestion, const GroupData::Map& otherMap, char otherGroup) const {
   static const std::string NoPinyin(12, ' ');
   int count = 0;
   for (auto& i : questions) {
     const char choice = _reviewMode ? ' ' : (count < 26 ? 'a' + count : 'A' + (count - 26));
-    out() << "  Entry: " << std::right << std::setw(3) << count + 1 << "  ";
+    out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s = i->qualifiedName();
     if (i->pinyin()) {
       std::string p = "  (" + *i->pinyin() + ')';
@@ -589,7 +588,15 @@ void Quiz::showGroup(const List& questions, const List& readings, Choices& choic
         s += std::to_string(j->second->number());
       }
     }
-    out() << std::left << std::setw(wideSetw(s, 22)) << s << choice << ":  " << readings[count]->reading();
+    out() << std::left << std::setw(wideSetw(s, 22)) << s;
+    int j = 0;
+    for (j = 0; j < answers.size(); ++j)
+      if (answers[j] == choice) {
+        out() << std::right << std::setw(2) << j + 1 << "->";
+        break;
+      }
+    if (j == answers.size()) out() << "    ";
+    out() << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count]);
     if (!repeatQuestion && !_reviewMode) choices[choice] = "";
     ++count;
@@ -599,21 +606,18 @@ void Quiz::showGroup(const List& questions, const List& readings, Choices& choic
 
 bool Quiz::getAnswers(Answers& answers, int totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) const {
   for (int i = answers.size(); i < totalQuestions; ++i) {
-    bool meanings = false;
-    if (!getAnswer(answers, choices, skipGroup, meanings)) {
-      if (meanings)
-        toggleMeanings(choices);
-      else if (!skipGroup)
-        // set 'stopQuiz' to break out of top quiz loop if user quit in the middle of providing answers
-        stopQuiz = true;
+    bool refresh = false;
+    if (!getAnswer(answers, choices, skipGroup, refresh)) {
+      // set 'stopQuiz' to break out of top quiz loop if user quit in the middle of providing answers
+      if (!refresh && !skipGroup) stopQuiz = true;
       return false;
     }
   }
   return true;
 }
 
-bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& meanings) const {
-  const static std::string ReviewMsg("  Select"), QuizMsg("  Select reading for Entry: ");
+bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& refresh) const {
+  const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for Entry: ");
   const std::string space = (answers.size() < 9 ? " " : "");
   do {
     if (!answers.empty()) {
@@ -624,23 +628,29 @@ bool Quiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& 
     }
     const char answer =
       _choice.get(_reviewMode ? ReviewMsg : QuizMsg + space + std::to_string(answers.size() + 1), choices);
-    if (answer == QuitOption) break;
-    if (answer == MeaningsOption)
-      meanings = true;
-    else if (answer == PrevOption) {
+    switch (answer) {
+    case QuitOption: return false;
+    case RefreshOption: refresh = true; break;
+    case MeaningsOption:
+      refresh = true;
+      toggleMeanings(choices);
+      break;
+    case PrevOption:
       _question -= 2;
       skipGroup = true;
-    } else if (answer == SkipOption)
-      skipGroup = true;
-    else if (answer == EditOption)
-      editAnswer(answers, choices);
-    else {
+      break;
+    case SkipOption: skipGroup = true; break;
+    case EditOption: editAnswer(answers, choices); break;
+    default:
       answers.push_back(answer);
       choices.erase(answer);
-      if (answers.size() == 1) choices[EditOption] = "edit";
+      if (answers.size() == 1) {
+        choices[EditOption] = "edit";
+        choices[RefreshOption] = "refresh";
+      }
       return true;
     }
-  } while (!skipGroup && !meanings);
+  } while (!skipGroup && !refresh);
   return false;
 }
 

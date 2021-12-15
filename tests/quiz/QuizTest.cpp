@@ -239,7 +239,7 @@ TEST_F(QuizTest, ToggleGroupMeanings) {
   std::string line, expected("みなみ");
   std::string expectedWithMeaning = expected + " : south";
   while (std::getline(_os, line)) {
-    if (line.starts_with("  Entry") && line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
+    if (line.erase(0, 4).starts_with(":  ") && line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
       ++found;
       meaningsOn = !meaningsOn;
     }
