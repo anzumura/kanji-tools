@@ -80,11 +80,12 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
   auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,
                                                   OptChar end = std::nullopt) {
     quizType = arg[1];
-    const char c = arg[2];
-    if (arg.length() == 3 && (choices.contains(c) || (start && *start <= c && end.value_or(c) >= c)))
-      questionList = c;
-    else if (arg.length() > 2)
-      Data::usage("invalid format for " + arg.substr(0, 2) + ", use -h for help");
+    if (arg.length() > 2) {
+      if (char c = arg[2]; arg.length() == 3 && (choices.contains(c) || (start && *start <= c && end.value_or(c) >= c)))
+        questionList = c;
+      else
+        Data::usage("invalid format for " + arg.substr(0, 2) + ", use -h for help");
+    }
   };
 
   bool endOptions = false;
@@ -155,11 +156,9 @@ void Quiz::printDetails(const std::string& arg, bool showLegend) const {
     out() << '\n';
   }
   out() << "Showing details for " << arg << " [" << toUnicode(arg) << "]";
-  auto ucd = data().ucd().find(arg);
-  if (ucd) {
+  if (auto ucd = data().ucd().find(arg); ucd) {
     out() << ", Block " << ucd->block() << ", Version " << ucd->version();
-    auto k = data().findKanjiByName(arg);
-    if (k) {
+    if (auto k = data().findKanjiByName(arg); k) {
       printExtraTypeInfo(*k);
       out() << '\n' << (**k).info();
       _showMeanings = true;
@@ -241,8 +240,7 @@ void Quiz::finalScore() const {
   else if (_score == _question)
     out() << " - Perfect!\n";
   else {
-    int skipped = _question - _score - _mistakes.size();
-    if (skipped) out() << ", skipped: " << skipped;
+    if (int skipped = _question - _score - _mistakes.size(); skipped) out() << ", skipped: " << skipped;
     if (!_mistakes.empty()) {
       out() << " - mistakes:";
       for (auto& i : _mistakes)
@@ -333,9 +331,10 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
   if (quizStyle == 'k') printInfoLegend(infoFields);
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(1, numberOfChoicesPerQuestion);
-  while (_question < questions.size()) {
-    const Data::Entry& i = questions[_question];
+  bool stopQuiz = false;
+  while (!stopQuiz && _question < questions.size()) {
     const int correctChoice = randomCorrect(RandomGen);
+    const Data::Entry& i = questions[_question];
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
     DataFile::Set sameReading = {i->reading()};
     std::map<int, int> answers = {{correctChoice, _question}};
@@ -351,7 +350,6 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
       }
     }
     ++_question;
-    bool stopQuiz = false;
     do {
       out() << questionPrefix << _question << '/' << questions.size() << ":  ";
       if (quizStyle == 'k') {
@@ -386,12 +384,9 @@ void Quiz::listQuiz(ListOrder listOrder, const List& list, int infoFields) const
         break;
       }
     } while (!stopQuiz);
-    if (stopQuiz) {
-      // when quitting don't count the current question in the final score
-      --_question;
-      break;
-    }
   }
+  // when quitting don't count the current question in the final score
+  if (stopQuiz) --_question;
 }
 
 void Quiz::printInfoLegend(int infoFields) const {
@@ -453,13 +448,11 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
     }
     out() << '\n';
   };
-  auto& list = _jukugoData.find(kanji->name());
-  if (!list.empty()) {
+  if (auto& list = _jukugoData.find(kanji->name()); !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two lists, one for the same
     // grade of the given kanji and one for other grades. For example, 一生（いっしょう） is a grade 1
     // Jukugo for '一', but 一縷（いちる） is a secondary school Jukugo (which also contains '一').
-    if (kanji->hasGrade() && list.size() > JukugoPerLine) {
-      JukugoData::List same, other;
+    if (JukugoData::List same, other; kanji->hasGrade() && list.size() > JukugoPerLine) {
       for (auto& i : list)
         (kanji->grade() == i->grade() ? same : other).push_back(i);
       if (other.empty())
@@ -502,14 +495,12 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, co
   else {
     GroupData::List newList;
     const bool filterHasEnd = filter >= 0 && filter < filters.size();
-    bool startIncluding = filter <= 0;
-    for (const auto& i : list) {
+    for (bool startIncluding = filter <= 0; const auto& i : list) {
       if (startIncluding) {
         if (filterHasEnd && i->name().find(filters[filter]) != std::string::npos) break;
       } else if (i->name().find(filters[filter - 1]) != std::string::npos)
         startIncluding = true;
-      if (startIncluding) {
-        int memberCount = 0;
+      if (int memberCount = 0; startIncluding) {
         for (auto& j : i->members())
           if (includeMember(j, type)) ++memberCount;
         // only include groups that have 2 or more members after applying the 'include member' filter
@@ -569,8 +560,7 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
 void Quiz::showGroup(const List& questions, const Answers& answers, const List& readings, Choices& choices,
                      bool repeatQuestion, const GroupData::Map& otherMap, char otherGroup) const {
   static const std::string NoPinyin(12, ' ');
-  int count = 0;
-  for (auto& i : questions) {
+  for (int count = 0; auto& i : questions) {
     const char choice = _reviewMode ? ' ' : (count < 26 ? 'a' + count : 'A' + (count - 26));
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s = i->qualifiedName();
