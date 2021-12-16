@@ -415,13 +415,20 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
       if (j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
   }
-  if (auto i = _groupData.meaningMap().find(kanji->name()); i != _groupData.meaningMap().end())
-    out() << "   Category: " << i->second->name() << '\n';
   if (kanji->morohashiId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
   if (kanji->hasNelsonIds()) {
-    out() << "     Nelson:";
+    out() << (kanji->nelsonIds().size() == 1 ? "  Nelson ID:" : " Nelson IDs:");
     for (auto& i : kanji->nelsonIds())
       out() << ' ' << i;
+    out() << '\n';
+  }
+  if (auto i = _groupData.meaningMap().equal_range(kanji->name()); i.first != i.second) {
+    auto j = ++i.first;
+    out() << (j == i.second ? "   Category: " : " Categories: ");
+    for (j = i.first; j != i.second; ++j) {
+      if (j != i.first) out() << ", ";
+      out() << '[' << j->second->name() << ']';
+    }
     out() << '\n';
   }
   auto print = [this](const std::string& name, const JukugoData::List& list) {
@@ -474,7 +481,8 @@ bool Quiz::includeMember(const Entry& k, MemberType type) {
     (k->is(KanjiTypes::Jouyou) || type && k->hasLevel() || type > 1 && k->frequency() || type > 2);
 }
 
-void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, const GroupData::Map& otherMap,
+template<typename T>
+void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, const T& otherMap,
                             char otherGroup) const {
   static const std::array filters{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
   if (listOrder == ListOrder::Quit) return;
@@ -515,8 +523,8 @@ void Quiz::prepareGroupQuiz(ListOrder listOrder, const GroupData::List& list, co
   }
 }
 
-void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupData::Map& otherMap,
-                     char otherGroup) const {
+template<typename T>
+void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const T& otherMap, char otherGroup) const {
   bool firstTime = true, stopQuiz = false;
   for (_question = 1; _question <= list.size() && !stopQuiz; ++_question) {
     auto& i = list[_question - 1];
@@ -557,8 +565,9 @@ void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const GroupDa
   if (stopQuiz) _question -= 2;
 }
 
+template<typename T>
 void Quiz::showGroup(const List& questions, const Answers& answers, const List& readings, Choices& choices,
-                     bool repeatQuestion, const GroupData::Map& otherMap, char otherGroup) const {
+                     bool repeatQuestion, const T& otherMap, char otherGroup) const {
   static const std::string NoPinyin(12, ' ');
   for (int count = 0; auto& i : questions) {
     const char choice = _reviewMode ? ' ' : (count < 26 ? 'a' + count : 'A' + (count - 26));

@@ -21,6 +21,7 @@ public:
   void start(OptChar quizType, OptChar questionList) const;
 private:
   enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
+
   // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
   void printDetails(const std::string&, bool showLegend = true) const;
 
@@ -35,12 +36,15 @@ private:
   using Choices = Choice::Choices;
   using Entry = Data::Entry;
   using List = Data::List;
+
   // 'getDefaultChoices' returns a Choices structure populated with just the common values
   // for a quiz question like skip and quit. It will also populate 'hide/show meanings' option
   // based on the current value of '_showMeanings'.
   Choices getDefaultChoices(int totalQuestions) const;
+
   // display of English 'meanings' can be toggled on and off
   void toggleMeanings(Choices&) const;
+
   // print meaning if _showMeanings is true and meaning exists
   void printMeaning(const Entry&, bool useNewLine = false) const;
 
@@ -52,22 +56,27 @@ private:
   // to reading' quiz (see Kanji.h for more details on 'InfoFields').
   void listQuiz(ListOrder listOrder, const List&, int infoFields) const;
 
-  void prepareGroupQuiz(ListOrder, const GroupData::List&, const GroupData::Map& otherMap, char otherGroup) const;
+  template<typename T>
+  void prepareGroupQuiz(ListOrder, const GroupData::List&, const T& otherMap, char otherGroup) const;
+
   // 'MemberType' if used to determine which members of a group should be included in a quiz:
   // - Jouyou: include if member is a Jouyou type
   // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
   // - Frequency: include if the member is Jouyou or JLPT or in the Top Frequency
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
+
   // 'includeMember' returns true if a member can be included in group quiz question. The member must
   // have a reading as well as meet the criteria of the given MemberType.
   static bool includeMember(const Entry&, MemberType);
+
   // 'groupQuiz' starts a Group Quiz (callled by 'prepareGroupQuiz')
-  void groupQuiz(const GroupData::List&, MemberType, const GroupData::Map& otherMap, char otherGroup) const;
+  template<typename T> void groupQuiz(const GroupData::List&, MemberType, const T& otherMap, char otherGroup) const;
 
   using Answers = std::vector<char>;
+  template<typename T>
   void showGroup(const List& questions, const Answers&, const List& readings, Choices&, bool repeatQuestion,
-                 const GroupData::Map& otherMap, char otherGroup) const;
+                 const T& otherMap, char otherGroup) const;
   bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
   bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& refresh) const;
   void editAnswer(Answers&, Choices&) const;

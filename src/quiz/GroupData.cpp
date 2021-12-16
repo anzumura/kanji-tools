@@ -33,7 +33,19 @@ bool GroupData::checkInsert(const std::string& name, Map& groups, const Entry& g
   return i.second;
 }
 
-void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& list, GroupType type) {
+bool GroupData::checkInsert(const std::string& name, MultiMap& groups, const Entry& group) const {
+  auto i = groups.equal_range(name);
+  for (auto j = i.first; j != i.second; ++j)
+    if (j->second->number() == group->number()) {
+      _data->printError(name + " from Group " + std::to_string(group->number()) + " already in same group");
+      return false;
+    }
+  groups.insert(std::make_pair(name, group));
+  return true;
+}
+
+template<typename T>
+void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& list, GroupType type) {
   static const std::string wideColon("：");
   int lineNumber = 1, numberCol = -1, nameCol = -1, membersCol = -1;
   auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
@@ -104,11 +116,12 @@ void GroupData::loadGroup(const std::filesystem::path& file, Map& groups, List& 
   }
 }
 
-void GroupData::printGroups(const Map& groups, const List& groupList) const {
+template<typename T> void GroupData::printGroups(const T& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << Kanji::Legend
         << "\nName (number of entries)   Parent Member : Other Members\n";
   const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4;
   std::map<KanjiTypes, std::vector<std::string>> types;
+  std::set<std::string> uniqueNames;
   for (const auto& i : groupList) {
     out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
     if (i->type() == GroupType::Meaning) {
@@ -120,7 +133,8 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
             << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")   :";
       for (const auto& j : i->members()) {
         out() << ' ' << j->qualifiedName();
-        types[j->type()].push_back(j->name());
+        // the same kanji can be in more than one meaning group so check uniqueness to avoid overcounting
+        if (uniqueNames.insert(j->name()).second) types[j->type()].push_back(j->name());
       }
     } else {
       out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
@@ -137,6 +151,7 @@ void GroupData::printGroups(const Map& groups, const List& groupList) const {
     }
     out() << '\n';
   }
+  if (!uniqueNames.empty()) log() << "Unique kanji: " << uniqueNames.size() << '\n';
   out() << "Type Breakdown (showing up to " << MissingTypeExamples << " missing examples per type)\n";
   for (auto i : AllKanjiTypes)
     if (auto j = types.find(i); j != types.end()) {

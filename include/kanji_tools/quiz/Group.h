@@ -10,22 +10,25 @@ inline std::ostream& operator<<(std::ostream& os, const GroupType& x) {
   return os << (x == GroupType::Meaning ? "Meaning" : "Pattern");
 }
 
-// 'Group' is meant to hold a group of 'related' kanji from 'meaning-groups.txt' or
-// 'pattern-groups.txt' for study purposes. Meaning groups are intended to be used
-// for meaning categories such as 'Animal', 'Plant', etc. whereas Pattern groups are
-// intended to be organized by 'non-radical' parts in order to help see related kanji
-// that only differ by radical. Right now a kanji can only belong to at most one
-// group per type (Meaning or Pattern) which makes the 'group' concept arbitrary at
-// best since more complex kanji could have more than one pattern (and many kanjis
-// have more than one meaning).
+// 'Group' holds kanji groups loaded from 'meaning-groups.txt' and 'pattern-groups.txt' files.
+// Meaning groups are intended to be used for meaning categories like 'Animal', 'Plant', etc.
+// whereas Pattern groups are mostly organized by 'non-radical' parts in order to help see
+// related kanji that often have the same pronunciation.
+//
+// The 'GroupData' class prevents a kanji from being in multiple Pattern groups which can be
+// ambiguous for some more complex kanji. In these fairly rare cases, the pattern that best
+// fits related pronunciation was chosen (as well as preferring grouping by 'non-radical').
+// This restriction doesn't apply to Meaning groups since choosing only one meaning for some
+// (even very common) kanji would make other groups seem incomplete, e.g., if '金' was only
+// in the '色' group then the '時間：曜日' group would be missing a day.
 class Group {
 public:
-  // 'PatternType' is 'None' for Meaning groups, but for a Pattern Group it can be one
-  // of three values:
-  // - 'Family': a pattern where the first character is a parent of all the other members,
-  //   for example: 太 -> 太, 駄, 汰, i.e., 'parent' is a sub-component of each member.
-  //   Radicals can form families, but the focus of pattern groups is on phonetic components
-  //   so in general 'parent' should correspond to the 'non-radical' part of the members.
+  // 'PatternType' is 'None' for Meaning groups, but for a Pattern Group it can be one of
+  // three values:
+  // - 'Family': a pattern where the first character is a parent of the other members, for
+  //   example: 太 -> 太, 駄, 汰, i.e., 'parent' is a sub-component of each member. Radicals
+  //   can form families, but the focus of pattern groups is on phonetic components so in
+  //   general 'parent' should correspond to the 'non-radical' part of the members.
   // - 'Peer': each member has a common part contributing to common pronunciation if possible,
   //   for example: 粋, 枠 and 砕 all have a common 'non-radical' component.
   // - 'Reading': this type is used as a final catch-all for characters that don't logically
