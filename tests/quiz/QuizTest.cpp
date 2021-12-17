@@ -75,7 +75,7 @@ protected:
   std::stringstream _es;
   std::stringstream _is;
   const DataPtr _data;
-  const Quiz _quiz;
+  Quiz _quiz;
 };
 
 TEST_F(QuizTest, ListQuiz) {

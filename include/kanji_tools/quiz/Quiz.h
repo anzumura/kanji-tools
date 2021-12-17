@@ -16,23 +16,34 @@ public:
   Quiz(int argc, const char** argv, DataPtr, std::istream* in = 0);
 
   // 'start' is the top level method for starting a quiz or doing a review (List or Group based).
-  // 'quizType' can be one of 'f', 'g', 'k', or 'l' for the type of quiz/review and 'questionList'
+  // 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the type of quiz/review and 'questionList'
   // can also be provided (values depend on quiz type - see Quiz.cpp 'HelpMessage' for details).
-  void start(OptChar quizType, OptChar questionList) const;
+  void start(OptChar quizType, OptChar questionList);
 private:
   enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
-
-  // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
-  void printDetails(const std::string&, bool showLegend = true) const;
 
   const Data& data() const { return _groupData.data(); }
   std::ostream& out() const { return data().out(); }
   std::ostream& log(bool heading = false) const { return data().log(heading); }
 
-  enum class ListOrder { FromBeginning, FromEnd, Random, Quit };
-  ListOrder getListOrder() const;
+  enum class ListOrder { FromBeginning, FromEnd, Random, NotAssigned };
+  enum class Mode { Review, Test, NotAssigned };
+
+  void parseModeArg(const std::string& arg);
+  void parseKanjiArg(const std::string& arg) const;
+
+  // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
+  void printDetails(const Data::List&, const std::string& name, const std::string& arg) const;
+  void printDetails(const std::string&, bool showLegend = true) const;
+
+  bool getListOrder();
+  void reset();
+
+  std::ostream& beginQuizMessage(int totalQuestions); // can modify '_questions'
+  std::ostream& beginQuestionMessage(int totalQuestions) const;
+  bool isTestMode() const { return _mode == Mode::Test; }
   void finalScore() const;
-  void reset() const;
+
   using Choices = Choice::Choices;
   using Entry = Data::Entry;
   using List = Data::List;
@@ -43,21 +54,22 @@ private:
   Choices getDefaultChoices(int totalQuestions) const;
 
   // display of English 'meanings' can be toggled on and off
-  void toggleMeanings(Choices&) const;
+  void toggleMeanings(Choices&);
 
   // print meaning if _showMeanings is true and meaning exists
   void printMeaning(const Entry&, bool useNewLine = false) const;
 
-  void printInfoLegend(int infoFields = Kanji::AllFields) const;
+  void printLegend(int infoFields = Kanji::AllFields) const;
   void printExtraTypeInfo(const Entry&) const;
   void printReviewDetails(const Entry&) const;
+  void printJukugoList(const std::string& name, const JukugoData::List&) const;
 
   // 'listQuiz' starts a 'list based quiz'. 'infoFields' controls which fields are shown in a 'kanji
   // to reading' quiz (see Kanji.h for more details on 'InfoFields').
-  void listQuiz(ListOrder listOrder, const List&, int infoFields) const;
+  void listQuiz(const List&, int infoFields);
 
   template<typename T>
-  void prepareGroupQuiz(ListOrder, const GroupData::List&, const T& otherMap, char otherGroup) const;
+  void prepareGroupQuiz(const GroupData::List&, const T& otherMap, char otherGroup, OptChar questionList);
 
   // 'MemberType' if used to determine which members of a group should be included in a quiz:
   // - Jouyou: include if member is a Jouyou type
@@ -71,24 +83,27 @@ private:
   static bool includeMember(const Entry&, MemberType);
 
   // 'groupQuiz' starts a Group Quiz (callled by 'prepareGroupQuiz')
-  template<typename T> void groupQuiz(const GroupData::List&, MemberType, const T& otherMap, char otherGroup) const;
+  template<typename T> void groupQuiz(const GroupData::List&, MemberType, const T& otherMap, char otherGroup);
 
   using Answers = std::vector<char>;
   template<typename T>
   void showGroup(const List& questions, const Answers&, const List& readings, Choices&, bool repeatQuestion,
                  const T& otherMap, char otherGroup) const;
-  bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz) const;
-  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& refresh) const;
-  void editAnswer(Answers&, Choices&) const;
-  void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name) const;
+  bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
+  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& refresh);
+  void editAnswer(Answers&, Choices&);
+  void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name);
 
-  // used to track progress in quiz:
-  mutable int _question;
-  mutable int _score;
-  mutable DataFile::List _mistakes;
-  mutable bool _showMeanings;
-  mutable Choice _choice;
-  mutable bool _reviewMode;
+  // '_listOrder' and '_mode' can be set via the command line, otherwise the user is prompted at the start
+  ListOrder _listOrder;
+  Mode _mode;
+
+  // the following attributes are updated throughout the quiz
+  Choice _choice;
+  DataFile::List _mistakes;
+  int _question;
+  int _score;
+  bool _showMeanings;
 
   const GroupData _groupData;
   const JukugoData _jukugoData;
