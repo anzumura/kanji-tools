@@ -35,7 +35,7 @@ const fs::path UcdFile = "ucd.txt";
 } // namespace
 
 KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostream& err)
-  : Data(getDataDir(argc, argv), getDebug(argc, argv), out, err),
+  : Data(getDataDir(argc, argv), getDebugMode(argc, argv), out, err),
     _levels{LevelDataFile(dataDir() / N5File, JlptLevels::N5, debug()),
             LevelDataFile(dataDir() / N4File, JlptLevels::N4, debug()),
             LevelDataFile(dataDir() / N3File, JlptLevels::N3, debug()),
@@ -75,13 +75,15 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   processUcd();
   checkStrokes();
   if (debug()) {
-    log(true) << "Finished Loading Data\n>>>\n";
+    if (fullDebug()) log(true) << "Finished Loading Data\n>>>\n";
     printStats();
     printGrades();
-    printListStats(AllJlptLevels, &Kanji::level, "Level", true);
-    printListStats(AllKenteiKyus, &Kanji::kyu, "Kyu", false);
-    _radicals.print(*this);
-    _ucd.print(*this);
+    if (fullDebug()) {
+      printListStats(AllJlptLevels, &Kanji::level, "Level", true);
+      printListStats(AllKenteiKyus, &Kanji::kyu, "Kyu", false);
+      _radicals.print(*this);
+      _ucd.print(*this);
+    }
   }
 }
 
@@ -145,16 +147,18 @@ void KanjiData::printStats() const {
     out() << i.first << ' ' << i.second.size();
   }
   out() << ")\n";
-  printCount("  Has JLPT level", [](const auto& x) { return x->hasLevel(); });
-  printCount("  Has frequency and not in Jouyou or JLPT",
-             [](const auto& x) { return x->frequency() && x->type() != KanjiTypes::Jouyou && !x->hasLevel(); });
-  printCount("  Jinmei with no frequency and not JLPT",
-             [](const auto& x) { return x->type() == KanjiTypes::Jinmei && !x->frequency() && !x->hasLevel(); });
-  printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
-  printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
-  printCount(
-    "  Has Variation Selectors", [](const auto& x) { return x->variant(); }, 5);
-  printCount("Old Forms", [](const auto& x) { return !x->oldNames().empty(); });
+  if (fullDebug()) {
+    printCount("  Has JLPT level", [](const auto& x) { return x->hasLevel(); });
+    printCount("  Has frequency and not in Jouyou or JLPT",
+               [](const auto& x) { return x->frequency() && x->type() != KanjiTypes::Jouyou && !x->hasLevel(); });
+    printCount("  Jinmei with no frequency and not JLPT",
+               [](const auto& x) { return x->type() == KanjiTypes::Jinmei && !x->frequency() && !x->hasLevel(); });
+    printCount("  NF (no-frequency)", [](const auto& x) { return !x->frequency(); });
+    printCount("  Has Strokes", [](const auto& x) { return x->strokes() != 0; });
+    printCount(
+      "  Has Variation Selectors", [](const auto& x) { return x->variant(); }, 5);
+    printCount("Old Forms", [](const auto& x) { return !x->oldNames().empty(); });
+  }
 }
 
 void KanjiData::printGrades() const {

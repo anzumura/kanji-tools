@@ -117,41 +117,65 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& li
 }
 
 template<typename T> void GroupData::printGroups(const T& groups, const List& groupList) const {
-  log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n>>> " << Kanji::Legend
-        << "\nName (number of entries)   Parent Member : Other Members\n";
+  log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n";
+  if (fullDebug()) log() << Kanji::Legend << "\nName (number of entries)   Parent Member : Other Members\n";
   const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4;
   std::map<KanjiTypes, std::vector<std::string>> types;
   std::set<std::string> uniqueNames;
   for (const auto& i : groupList) {
-    out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
+    if (fullDebug()) out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
     if (i->type() == GroupType::Meaning) {
-      auto len = MBChar::length(i->name());
-      out() << i->name()
-            << (len == 1     ? "　　"
-                  : len == 2 ? "　"
-                             : "")
-            << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")   :";
+      if (fullDebug()) {
+        auto len = MBChar::length(i->name());
+        out() << i->name()
+              << (len == 1     ? "　　"
+                    : len == 2 ? "　"
+                               : "")
+              << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")   :";
+      }
       for (const auto& j : i->members()) {
-        out() << ' ' << j->qualifiedName();
+        if (fullDebug()) out() << ' ' << j->qualifiedName();
         // the same kanji can be in more than one meaning group so check uniqueness to avoid overcounting
         if (uniqueNames.insert(j->name()).second) types[j->type()].push_back(j->name());
       }
     } else {
-      out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size() << ")   ";
+      if (fullDebug())
+        out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size()
+              << ")   ";
       for (const auto& j : i->members()) {
         types[j->type()].push_back(j->name());
-        if (j == i->members()[0]) switch (i->patternType()) {
-          case Group::PatternType::Peer: out() << "　 : " << j->qualifiedName(); break;
-          case Group::PatternType::Reading: out() << j->qualifiedName(); break;
-          default: out() << j->qualifiedName() << ':';
-          }
-        else
-          out() << ' ' << j->qualifiedName();
+        if (fullDebug()) {
+          if (j == i->members()[0]) switch (i->patternType()) {
+            case Group::PatternType::Peer: out() << "　 : " << j->qualifiedName(); break;
+            case Group::PatternType::Reading: out() << j->qualifiedName(); break;
+            default: out() << j->qualifiedName() << ':';
+            }
+          else
+            out() << ' ' << j->qualifiedName();
+        }
       }
     }
-    out() << '\n';
+    if (fullDebug()) out() << '\n';
   }
-  if (!uniqueNames.empty()) log() << "Unique kanji: " << uniqueNames.size() << '\n';
+  if (!uniqueNames.empty() && uniqueNames.size() < groups.size()) {
+    std::map<std::string, int> multipleGroups;
+    std::string prevKey;
+    int maxGroups = 0;
+    for (auto i = groups.begin(); i != groups.end(); ++i)
+      if (i->first == prevKey) {
+        int j = ++multipleGroups[i->first];
+        if (j > maxGroups) maxGroups = j;
+      } else
+        prevKey = i->first;
+    log() << "Unique kanji: " << uniqueNames.size() << " (once " << uniqueNames.size() - multipleGroups.size()
+          << ", multi " << multipleGroups.size() << ")\n";
+    for (int i = 1; i <= maxGroups; ++i) {
+      out() << "  Kanji in " << i + 1 << " groups:";
+      for (auto j = multipleGroups.begin(); j != multipleGroups.end(); ++j)
+        if (j->second == i) out() << ' ' << j->first;
+      out() << '\n';
+    }
+  }
   out() << "Type Breakdown (showing up to " << MissingTypeExamples << " missing examples per type)\n";
   for (auto i : AllKanjiTypes)
     if (auto j = types.find(i); j != types.end()) {

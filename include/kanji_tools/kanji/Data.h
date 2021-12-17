@@ -19,15 +19,20 @@ public:
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
 
+  // 'DebugMode' is controlled by command-line options:
+  //   -debug: sets '_debugMode' to 'Full' to print all debug output
+  //   -info:  sets '_debugMode' to 'Info' to print some summary debug output
+  enum class DebugMode { Full, Info, None };
+
   static void usage(const std::string& msg) { DataFile::usage(msg); }
   inline static auto orderByQualifiedName = [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); };
 
-  Data(const std::filesystem::path& dataDir, bool debug, std::ostream& out = std::cout, std::ostream& err = std::cerr)
-    : _dataDir(dataDir), _debug(debug), _out(out), _err(err) {
+  Data(const std::filesystem::path& dataDir, DebugMode debugMode, std::ostream& out = std::cout, std::ostream& err = std::cerr)
+    : _dataDir(dataDir), _debugMode(debugMode), _out(out), _err(err) {
     // Clearing DataFile static data is only needed to help test code, for example DataFile tests can leave some
     // data in these sets before Quiz tests are run (leading to problems loading real files).
     DataFile::clearUniqueCheckData();
-    if (_debug) log(true) << "Begin Loading Data\n>>>\n";
+    if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
   }
   virtual ~Data() = default;
   Data(const Data&) = delete;
@@ -146,10 +151,13 @@ public:
 
   void printError(const std::string&) const;
 
+  bool debug() const { return _debugMode != DebugMode::None; }
+  bool fullDebug() const { return _debugMode == DebugMode::Full; }
+  bool infoDebug() const { return _debugMode == DebugMode::Info; }
+
   std::ostream& out() const { return _out; }
   std::ostream& err() const { return _err; }
   const std::filesystem::path& dataDir() const { return _dataDir; }
-  bool debug() const { return _debug; }
   const Map& kanjiNameMap() const { return _kanjiNameMap; }
 
   // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
@@ -178,8 +186,8 @@ protected:
   // name can also be used as an override.
   static std::filesystem::path getDataDir(int argc, const char** argv);
 
-  // 'getDebug' looks for '-debug' flag in 'argv' list and returns true if it's found
-  static bool getDebug(int argc, const char** argv);
+  // 'getDebugMode' looks for '-debug' or '-info' flags in 'argv' list (see 'DebugMode' above)
+  static DebugMode getDebugMode(int argc, const char** argv);
 
   // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling 'populate Lists' functions
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
@@ -213,7 +221,7 @@ private:
   bool checkInsert(List&, const Entry&);
 
   const std::filesystem::path _dataDir;
-  const bool _debug;
+  const DebugMode _debugMode;
   std::ostream& _out;
   std::ostream& _err;
 
@@ -241,7 +249,7 @@ private:
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_kanjiNameMap'
   inline static int _maxFrequency = 0;
 
-  inline static const std::string dataArg = "-data", debugArg = "-debug";
+  inline static const std::string dataArg = "-data", debugArg = "-debug", infoArg = "-info";
   inline static const List _emptyList;
   inline static const Kanji::NelsonIds _emptyNelsonIds;
 };

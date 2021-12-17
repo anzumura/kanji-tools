@@ -68,10 +68,18 @@ fs::path Data::getDataDir(int argc, const char** argv) {
   return *found;
 }
 
-bool Data::getDebug(int argc, const char** argv) {
+Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
+  DebugMode result = DebugMode::None;
+  auto setResult = [&result](DebugMode x) {
+    if (result != DebugMode::None) usage("can only specify one '-debug' or '-info' option");
+    result = x;
+  };
   for (int i = 1; i < argc; ++i)
-    if (argv[i] == debugArg) return true;
-  return false;
+    if (argv[i] == debugArg)
+      setResult(DebugMode::Full);
+    else if (argv[i] == infoArg)
+      setResult(DebugMode::Info);
+  return result;
 }
 
 int Data::nextArg(int argc, const char** argv, int currentArg) {
@@ -82,7 +90,7 @@ int Data::nextArg(int argc, const char** argv, int currentArg) {
     // by a path then an earlier call to 'getDataDir' would have failed with a call to
     // 'usage' which ends the program.
     if (arg == dataArg) return nextArg(argc, argv, result + 1);
-    if (arg == debugArg) return nextArg(argc, argv, result);
+    if (arg == debugArg || arg == infoArg) return nextArg(argc, argv, result);
   }
   return result;
 }
@@ -242,7 +250,7 @@ void Data::processList(const DataFile& list) {
     Entry kanji;
     if (auto j = findKanjiByName(name); j) {
       kanji = *j;
-      if (_debug && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
+      if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
     } else {
       if (kenteiList)
         kanji = std::make_shared<KenteiKanji>(*this, name, list.kyu());
@@ -257,7 +265,7 @@ void Data::processList(const DataFile& list) {
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of the other types
-      if (_debug && !kenteiList) created.push_back(name);
+      if (debug() && !kenteiList) created.push_back(name);
     }
     if (kenteiList) {
       assert(kanji->kyu() == list.kyu());
@@ -271,22 +279,24 @@ void Data::processList(const DataFile& list) {
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
     }
   }
-  DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-  DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"), list.name());
-  // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
-  if (!kenteiList && !toBool(list.level())) {
-    std::vector lists = {std::make_pair(&found[KanjiTypes::Jinmei], ""),
-                         std::make_pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
-    for (const auto& i : lists) {
-      DataFile::List jlptJinmei, otherJinmei;
-      for (const auto& j : *i.first)
-        (toBool(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
-      DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", list.name());
-      DataFile::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", list.name());
+  if (fullDebug()) {
+    DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
+    DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"), list.name());
+    // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
+    if (!kenteiList && !toBool(list.level())) {
+      std::vector lists = {std::make_pair(&found[KanjiTypes::Jinmei], ""),
+                           std::make_pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
+      for (const auto& i : lists) {
+        DataFile::List jlptJinmei, otherJinmei;
+        for (const auto& j : *i.first)
+          (toBool(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
+        DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", list.name());
+        DataFile::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", list.name());
+      }
+    } else {
+      DataFile::print(found[KanjiTypes::Jinmei], "Jinmei", list.name());
+      DataFile::print(found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
     }
-  } else {
-    DataFile::print(found[KanjiTypes::Jinmei], "Jinmei", list.name());
-    DataFile::print(found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
   }
 }
 
@@ -323,13 +333,15 @@ void Data::checkStrokes() const {
     } else
       strokesNotFound.push_back(i.first);
   }
-  if (_debug) {
-    DataFile::print(strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
+  if (debug()) {
     DataFile::print(strokesNotFound, "Kanji not loaded", "_strokes");
-    DataFile::print(strokeDiffs, "Kanji with differrent strokes", "_ucd");
     DataFile::print(vStrokeDiffs, "Variant kanji with differrent strokes", "_ucd");
     DataFile::print(missingDiffs, "'_stokes only' Kanji with differrent strokes", "_ucd");
     DataFile::print(missingUcd, "Kanji in _strokes, but not found", "_ucd");
+    if (fullDebug()) {
+      DataFile::print(strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
+      DataFile::print(strokeDiffs, "Kanji with differrent strokes", "_ucd");
+    }
   }
 }
 

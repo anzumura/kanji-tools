@@ -38,6 +38,8 @@ private:
 
   template<typename T> void printGroups(const T&, const List&) const;
 
+  bool fullDebug() const { return _data->fullDebug(); }
+
   // '_meaningMap' and '_meaningGroups' are populated from 'meaning-groups.txt'
   MultiMap _meaningMap;
   List _meaningGroups;
