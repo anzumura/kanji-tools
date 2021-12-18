@@ -54,17 +54,16 @@ or 'u' followed by Unicode. For example, theses all produce the same output:\n\
   kanjiQuiz n212\n\
   kanjiQuiz u5949\n\n";
 
-static const Choice::Choices
-  QuizTypeChoices({{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}});
-static const Choice::Choices
-  FrequencyChoices({{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}});
-static const Choice::Choices GradeChoices({{'s', "Secondary School"}});
-constexpr char GradeStart = '1', GradeEnd = '6';
-static const Choice::Choices KyuChoices({{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}});
-constexpr char KyuStart = '1', KyuEnd = '9';
-static const Choice::Choices LevelChoices({{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}});
-static const Choice::Choices GroupKanjiChoices({{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}});
-static const Choice::Choices ListOrderChoices({{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}});
+static const Choice::Choices QuizModeChoices({{'r', "review"}, {'t', "test"}}),
+  QuizTypeChoices({{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}}),
+  FrequencyChoices({{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}}),
+  GradeChoices({{'s', "Secondary School"}}), KyuChoices({{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}),
+  LevelChoices({{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}}),
+  ListOrderChoices({{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}),
+  ListQuizStyleChoices({{'k', "kanji to reading"}, {'r', "reading to kanji"}}),
+  GroupKanjiChoices({{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}}),
+  PatternGroupChoices({{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}});
+constexpr char GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9';
 
 } // namespace
 
@@ -123,7 +122,7 @@ void Quiz::start(OptChar quizType, OptChar questionList) {
   _choice.setQuit(QuitOption);
   char c;
   if (_mode == Mode::NotAssigned) {
-    c = _choice.get("Mode", {{'r', "review"}, {'t', "test"}}, 't');
+    c = _choice.get("Mode", QuizModeChoices, 't');
     if (c == QuitOption) return;
     _mode = c == 'r' ? Mode::Review : Mode::Test;
   }
@@ -442,7 +441,7 @@ void Quiz::listQuiz(const List& list, int infoFields) {
     choices = getDefaultChoices(list.size());
     for (int i = 0; i < numberOfChoicesPerQuestion; ++i)
       choices['1' + i] = "";
-    quizStyle = _choice.get("Quiz style", {{'k', "kanji to reading"}, {'r', "reading to kanji"}}, quizStyle);
+    quizStyle = _choice.get("Quiz style", ListQuizStyleChoices, quizStyle);
     if (quizStyle == QuitOption) return;
   }
   const std::string prompt(isTestMode() ? quizPrompt + (quizStyle == 'k' ? "reading" : "kanji") : reviewPrompt);
@@ -538,9 +537,7 @@ void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char
   int filter = -1;
   // for 'pattern' groups, allow choosing a smaller subset based on the name reading
   if (otherGroup == 'm') {
-    const char f =
-      _choice.get("Pattern name",
-                  {{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}}, '1');
+    const char f = _choice.get("Pattern name", PatternGroupChoices, '1');
     if (f == QuitOption) return;
     filter = f - '1';
   }
