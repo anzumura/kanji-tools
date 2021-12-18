@@ -213,7 +213,7 @@ void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() cons
           noFreq(
             std::count_if(l.begin(), l.end(), [i, &p](const auto& x) { return ((*x).*p)() == i && !x->frequency(); }));
         iTotal -= j.second;
-        if (iTotal) std::cout << ", ";
+        if (iTotal) out() << ", ";
       }
       out() << ")\n";
     }

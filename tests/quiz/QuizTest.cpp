@@ -258,7 +258,6 @@ TEST_F(QuizTest, EditAfterOneAnswer) {
   int found = 0;
   std::string line;
   while (std::getline(_os, line)) {
-    std::cout << line << '\n';
     if (!found) {
       if (line.ends_with("1->a")) ++found;
     } else if (line.ends_with("1->b"))
@@ -277,7 +276,6 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
   int found = 0;
   std::string line;
   while (std::getline(_os, line)) {
-    std::cout << line << '\n';
     if (!found) {
       if (line.ends_with("1->a 2->b")) ++found; // before edit
     } else if (line.ends_with("1->c 2->b"))     // after edit
