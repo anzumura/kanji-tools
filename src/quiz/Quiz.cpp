@@ -69,8 +69,8 @@ static const Choice::Choices ListOrderChoices({{'b', "from beginning"}, {'e', "f
 } // namespace
 
 Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
-  : _groupData(data), _jukugoData(*data), _question(0), _score(0), _showMeanings(false), _mode(Mode::NotAssigned),
-    _choice(data->out(), in) {
+  : _listOrder(ListOrder::NotAssigned), _mode(Mode::NotAssigned), _question(0), _score(0), _showMeanings(false),
+    _choice(data->out(), in), _groupData(data), _jukugoData(*data) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume length is at least 2)
   auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,

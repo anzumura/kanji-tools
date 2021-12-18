@@ -99,12 +99,12 @@ private:
   Mode _mode;
 
   // the following attributes are updated throughout the quiz
-  Choice _choice;
   DataFile::List _mistakes;
   int _question;
   int _score;
   bool _showMeanings;
 
+  Choice _choice;
   const GroupData _groupData;
   const JukugoData _jukugoData;
 };
