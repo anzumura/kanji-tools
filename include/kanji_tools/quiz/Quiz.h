@@ -64,9 +64,11 @@ private:
   void printReviewDetails(const Entry&) const;
   void printJukugoList(const std::string& name, const JukugoData::List&) const;
 
-  // 'listQuiz' starts a 'list based quiz'. 'infoFields' controls which fields are shown in a 'kanji
-  // to reading' quiz (see Kanji.h for more details on 'InfoFields').
-  void listQuiz(const List&, int infoFields);
+  void prepareListQuiz(const List&, int infoFields);
+
+  // 'listQuiz' starts a 'list based quiz' (called by 'prepareListQuiz'). 'infoFields' controls which
+  // fields are shown in a 'kanji to reading' quiz (see Kanji.h for more details on 'InfoFields').
+  void listQuiz(const List&, int infoFields, int numberOfChoicesPerQuestion, char quizStyle);
 
   template<typename T>
   void prepareGroupQuiz(const GroupData::List&, const T& otherMap, char otherGroup, OptChar questionList);
