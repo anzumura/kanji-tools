@@ -26,7 +26,7 @@ private:
   std::ostream& out() const { return data().out(); }
   std::ostream& log(bool heading = false) const { return data().log(heading); }
 
-  enum class ListOrder { FromBeginning, FromEnd, Random, NotAssigned };
+  enum class QuestionOrder { FromBeginning, FromEnd, Random, NotAssigned };
   enum class Mode { Review, Test, NotAssigned };
 
   void parseModeArg(const std::string& arg);
@@ -36,7 +36,7 @@ private:
   void printDetails(const Data::List&, const std::string& name, const std::string& arg) const;
   void printDetails(const std::string&, bool showLegend = true) const;
 
-  bool getListOrder();
+  bool getQuestionOrder();
   void reset();
 
   std::ostream& beginQuizMessage(int totalQuestions); // can modify '_questions'
@@ -71,10 +71,10 @@ private:
   template<typename T>
   void prepareGroupQuiz(const GroupData::List&, const T& otherMap, char otherGroup, OptChar questionList);
 
-  // 'MemberType' if used to determine which members of a group should be included in a quiz:
-  // - Jouyou: include if member is a Jouyou type
-  // - JLPT: include if member is Jouyou or JLPT (there are 251 non-Jouyou kanji in JLPT)
-  // - Frequency: include if the member is Jouyou or JLPT or in the Top Frequency
+  // 'MemberType' is used to determine which members of a group should be included in a quiz:
+  // - Jouyou: include if member is one of the standard 2,136 Jōyō kanji
+  // - JLPT: include if member is Jōyō or JLPT (N5 - N2 are all Jōyō, but N1 also contains 251 Jinmeiyō kanji)
+  // - Frequency: include if member is Jōyō or JLPT or in the Top 2501 Frequency list (adds another 294 kanji)
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
 
@@ -95,7 +95,7 @@ private:
   void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name);
 
   // '_listOrder' and '_mode' can be set via the command line, otherwise the user is prompted at the start
-  ListOrder _listOrder;
+  QuestionOrder _listOrder;
   Mode _mode;
 
   // the following attributes are updated throughout the quiz

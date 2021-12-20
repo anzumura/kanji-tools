@@ -65,10 +65,19 @@ static const Choice::Choices QuizModeChoices({{'r', "review"}, {'t', "test"}}),
   PatternGroupChoices({{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}});
 constexpr char GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9';
 
+// Default options are offered for some of the above 'Choices' (when prompting the user for input):
+constexpr char DefaultQuizMode = 't', DefaultQuizType = 'g', DefaultGrade = '6', DefaultKyu = '2',
+               DefaultQuestionOrder = 'r', DefaultListQuizAnswers = '4', DefaultListQuizStyle = 'k',
+               DefaultGroupKanji = '2', DefaultPatternGroup = '1';
+
+// Since there are over 1000 pattern groups, split them into 6 buckets based on reading. The first bucket starts
+// at 'ア', the second bucket starts at 'カ' and so on (see 'PatternBucketChoices' above).
+constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
+
 } // namespace
 
 Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
-  : _listOrder(ListOrder::NotAssigned), _mode(Mode::NotAssigned), _question(0), _score(0), _showMeanings(false),
+  : _listOrder(QuestionOrder::NotAssigned), _mode(Mode::NotAssigned), _question(0), _score(0), _showMeanings(false),
     _choice(data->out(), in), _groupData(data), _jukugoData(*data) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume length is at least 2)
@@ -122,12 +131,12 @@ void Quiz::start(OptChar quizType, OptChar questionList) {
   _choice.setQuit(QuitOption);
   char c;
   if (_mode == Mode::NotAssigned) {
-    c = _choice.get("Mode", QuizModeChoices, 't');
+    c = _choice.get("Mode", QuizModeChoices, DefaultQuizMode);
     if (c == QuitOption) return;
     _mode = c == 'r' ? Mode::Review : Mode::Test;
   }
   // can replace this with 'or_else' when C++23 is available
-  c = quizType ? *quizType : _choice.get("Type", QuizTypeChoices, 'g');
+  c = quizType ? *quizType : _choice.get("Type", QuizTypeChoices, DefaultQuizType);
   switch (c) {
   case 'f':
     c = questionList ? *questionList : _choice.get("Choose list", FrequencyChoices);
@@ -136,13 +145,13 @@ void Quiz::start(OptChar quizType, OptChar questionList) {
     listQuiz(data().frequencyList(c - '1'), Kanji::AllFields ^ Kanji::FreqField);
     break;
   case 'g':
-    c = questionList ? *questionList : _choice.get("Choose grade", GradeStart, GradeEnd, GradeChoices, 's');
+    c = questionList ? *questionList : _choice.get("Choose grade", GradeStart, GradeEnd, GradeChoices, DefaultGrade);
     if (c == QuitOption) return;
     // suppress printing 'Grade' since it's the same for every kanji in the list
     listQuiz(data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']), Kanji::AllFields ^ Kanji::GradeField);
     break;
   case 'k':
-    c = questionList ? *questionList : _choice.get("Choose kyu", KyuStart, KyuEnd, KyuChoices, '2');
+    c = questionList ? *questionList : _choice.get("Choose kyu", KyuStart, KyuEnd, KyuChoices, DefaultKyu);
     if (c == QuitOption) return;
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     listQuiz(data().kyuList(AllKenteiKyus[c == 'a'     ? 0
@@ -171,14 +180,14 @@ void Quiz::parseModeArg(const std::string& arg) {
   _mode = arg[1] == 'r' ? Mode::Review : Mode::Test;
   if (arg.length() > 2) {
     if (arg.length() == 3 && arg[2] == '0')
-      _listOrder = ListOrder::Random;
+      _listOrder = QuestionOrder::Random;
     else {
       int offset = 2;
       if (arg[2] == '-') {
-        _listOrder = ListOrder::FromEnd;
+        _listOrder = QuestionOrder::FromEnd;
         offset = 3;
       } else {
-        _listOrder = ListOrder::FromBeginning;
+        _listOrder = QuestionOrder::FromBeginning;
         if (arg[2] == '+') offset = 3;
       }
       auto numArg = arg.substr(offset);
@@ -251,18 +260,19 @@ void Quiz::printDetails(const std::string& arg, bool showLegend) const {
 
 // Helper functions for both List and Group quizzes
 
-bool Quiz::getListOrder() {
-  if (_listOrder == ListOrder::NotAssigned) switch (_choice.get("List order", ListOrderChoices, 'r')) {
-    case 'b': _listOrder = ListOrder::FromBeginning; break;
-    case 'e': _listOrder = ListOrder::FromEnd; break;
-    case 'r': _listOrder = ListOrder::Random; break;
+bool Quiz::getQuestionOrder() {
+  if (_listOrder == QuestionOrder::NotAssigned)
+    switch (_choice.get("List order", ListOrderChoices, DefaultQuestionOrder)) {
+    case 'b': _listOrder = QuestionOrder::FromBeginning; break;
+    case 'e': _listOrder = QuestionOrder::FromEnd; break;
+    case 'r': _listOrder = QuestionOrder::Random; break;
     default: return false;
     }
   return true;
 }
 
 void Quiz::reset() {
-  _listOrder = ListOrder::NotAssigned;
+  _listOrder = QuestionOrder::NotAssigned;
   _mode = Mode::NotAssigned;
   _question = 0;
   _score = 0;
@@ -427,15 +437,15 @@ void Quiz::printJukugoList(const std::string& name, const JukugoData::List& list
 
 void Quiz::listQuiz(const List& list, int infoFields) {
   static const std::string reviewPrompt("  Select"), quizPrompt("  Select correct ");
-  if (!getListOrder()) return;
+  if (!getQuestionOrder()) return;
   Choices choices;
   int numberOfChoicesPerQuestion = 1;
-  char quizStyle = 'k';
+  char quizStyle = DefaultListQuizStyle;
   if (isTestMode()) {
     // in quiz mode, numberOfChoicesPerQuestion should be a value from 2 to 9
     for (int i = 2; i < 10; ++i)
       choices['0' + i] = "";
-    const char c = _choice.get("Number of choices", choices, '4');
+    const char c = _choice.get("Number of choices", choices, DefaultListQuizAnswers);
     if (c == QuitOption) return;
     numberOfChoicesPerQuestion = c - '0';
     choices = getDefaultChoices(list.size());
@@ -449,9 +459,9 @@ void Quiz::listQuiz(const List& list, int infoFields) {
   List questions;
   for (auto& i : list)
     if (i->hasReading()) questions.push_back(i);
-  if (_listOrder == ListOrder::FromEnd)
+  if (_listOrder == QuestionOrder::FromEnd)
     std::reverse(questions.begin(), questions.end());
-  else if (_listOrder == ListOrder::Random)
+  else if (_listOrder == QuestionOrder::Random)
     std::shuffle(questions.begin(), questions.end(), RandomGen);
 
   beginQuizMessage(questions.size()) << "kanji";
@@ -529,27 +539,26 @@ bool Quiz::includeMember(const Entry& k, MemberType type) {
 
 template<typename T>
 void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char otherGroup, OptChar questionList) {
-  static const std::array filters{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
-  if (!getListOrder()) return;
-  const char c = questionList ? *questionList : _choice.get("Kanji type", GroupKanjiChoices, '2');
+  if (!getQuestionOrder()) return;
+  const char c = questionList ? *questionList : _choice.get("Kanji type", GroupKanjiChoices, DefaultGroupKanji);
   if (c == QuitOption) return;
   const MemberType type = static_cast<MemberType>(c - '1');
-  int filter = -1;
+  int bucket = -1;
   // for 'pattern' groups, allow choosing a smaller subset based on the name reading
   if (otherGroup == 'm') {
-    const char f = _choice.get("Pattern name", PatternGroupChoices, '1');
+    const char f = _choice.get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
     if (f == QuitOption) return;
-    filter = f - '1';
+    bucket = f - '1';
   }
-  if (_listOrder == ListOrder::FromBeginning && type == All && filter == -1)
+  if (_listOrder == QuestionOrder::FromBeginning && type == All && bucket == -1)
     groupQuiz(list, type, otherMap, otherGroup);
   else {
     GroupData::List newList;
-    const bool filterHasEnd = filter >= 0 && filter < filters.size();
-    for (bool startIncluding = filter <= 0; const auto& i : list) {
+    const bool bucketHasEnd = bucket >= 0 && bucket < PatternGroupBuckets.size();
+    for (bool startIncluding = bucket <= 0; const auto& i : list) {
       if (startIncluding) {
-        if (filterHasEnd && i->name().find(filters[filter]) != std::string::npos) break;
-      } else if (i->name().find(filters[filter - 1]) != std::string::npos)
+        if (bucketHasEnd && i->name().find(PatternGroupBuckets[bucket]) != std::string::npos) break;
+      } else if (i->name().find(PatternGroupBuckets[bucket - 1]) != std::string::npos)
         startIncluding = true;
       if (int memberCount = 0; startIncluding) {
         for (auto& j : i->members())
@@ -558,9 +567,9 @@ void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char
         if (memberCount > 1) newList.push_back(i);
       }
     }
-    if (_listOrder == ListOrder::FromEnd)
+    if (_listOrder == QuestionOrder::FromEnd)
       std::reverse(newList.begin(), newList.end());
-    else if (_listOrder == ListOrder::Random)
+    else if (_listOrder == QuestionOrder::Random)
       std::shuffle(newList.begin(), newList.end(), RandomGen);
     groupQuiz(newList, type, otherMap, otherGroup);
   }

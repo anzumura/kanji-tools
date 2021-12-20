@@ -31,15 +31,21 @@ protected:
     _is << "t\ng\n1\nb\n4\nk\n";
   }
 
-  std::string listQuizFirstQuestion(char quizType, char questionList) {
-    std::string line, lineFromArgs;
+  std::string listQuizFirstQuestion(char quizType, char questionList, bool checkDefault = false) {
+    std::string line, otherLine;
     // run with quizType and questionList coming from stdin
     _is << "t\n" << quizType << '\n' << questionList << "\nb\n4\nk\n";
     getFirstQuestion(line);
+    if (checkDefault) {
+      // run again using just '\n' for questionList to check if it's the default option
+      _is << "t\n" << quizType << "\n\nb\n4\nk\n";
+      getFirstQuestion(otherLine);
+      EXPECT_EQ(line, otherLine);
+    }
     // run explicitly passing in quizType and questionList (so not from stdin)
     _is << "t\nb\n4\nk\n";
-    getFirstQuestion(lineFromArgs, quizType, questionList);
-    EXPECT_EQ(line, lineFromArgs);
+    getFirstQuestion(otherLine, quizType, questionList);
+    EXPECT_EQ(line, otherLine);
     return line.substr(9);
   }
 
@@ -91,6 +97,30 @@ TEST_F(QuizTest, ListQuiz) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
+TEST_F(QuizTest, ListQuizDefaults) {
+  auto run = [this](std::string& out) {
+    startQuiz();
+    std::string line;
+    // collect all lines after ">>>" (the start of the quiz), but don't add the readings for the choices
+    // since they are randomly selected (instead just get the first 8 chars, i.e., the "    #.  " part)
+    while (std::getline(_os, line))
+      if (!out.empty() || line.starts_with(">>>")) out += line.starts_with("    ") ? line.substr(0, 8) : line;
+  };
+  std::string all, allWithDefaults;
+  gradeListQuiz();
+  run(all);
+  ASSERT_FALSE(all.empty());
+  // run quiz again with defaults for the following choices and expect the same results:
+  // - quiz mode: 't' (test)
+  // - quiz type: 'g' (grade)
+  // - list quiz answers: '4'
+  // - list quiz style: 'k' (kanji to reading)
+  // still need to specify '1' (for grade) and 'b' (for beginning of list) since these aren't defaults
+  _is << "\n\n1\nb\n\n\n";
+  run(allWithDefaults);
+  EXPECT_EQ(all, allWithDefaults);
+}
+
 TEST_F(QuizTest, ListQuizReview) {
   _is << "r\ng\n1\nb\n";
   toggleMeanings();
@@ -125,18 +155,18 @@ TEST_F(QuizTest, FrequencyLists) {
 }
 
 TEST_F(QuizTest, GradeLists) {
-  auto f = [this](char x) { return listQuizFirstQuestion('g', x); };
+  auto f = [this](char x, bool checkDefault = false) { return listQuizFirstQuestion('g', x, checkDefault); };
   EXPECT_EQ(f('1'), "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
   EXPECT_EQ(f('2'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, N4, Frq 218, K9");
   EXPECT_EQ(f('3'), "1/200:  悪  Rad 心(61), Strokes 11, è, N4, Frq 530, Old 惡, K8");
   EXPECT_EQ(f('4'), "1/200:  愛  Rad 心(61), Strokes 13, ài, N3, Frq 640, K7");
   EXPECT_EQ(f('5'), "1/185:  圧  Rad 土(32), Strokes 5, yā, N2, Frq 718, Old 壓, K6");
-  EXPECT_EQ(f('6'), "1/181:  異  Rad 田(102), Strokes 11, yì, N2, Frq 631, K5");
+  EXPECT_EQ(f('6', true), "1/181:  異  Rad 田(102), Strokes 11, yì, N2, Frq 631, K5");
   EXPECT_EQ(f('s'), "1/1130:  亜  Rad 二(7), Strokes 7, yà, N1, Frq 1509, Old 亞, KJ2");
 }
 
 TEST_F(QuizTest, KyuLists) {
-  auto f = [this](char x) { return listQuizFirstQuestion('k', x); };
+  auto f = [this](char x, bool checkDefault = false) { return listQuizFirstQuestion('k', x, checkDefault); };
   EXPECT_EQ(f('a'), "1/80:  一  Rad 一(1), Strokes 1, yī, G1, N5, Frq 2");
   EXPECT_EQ(f('9'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, G2, N4, Frq 218");
   EXPECT_EQ(f('8'), "1/200:  悪  Rad 心(61), Strokes 11, è, G3, N4, Frq 530, Old 惡");
@@ -146,7 +176,7 @@ TEST_F(QuizTest, KyuLists) {
   EXPECT_EQ(f('4'), "1/313:  握  Rad 手(64), Strokes 12, wò, S, N1, Frq 1003");
   EXPECT_EQ(f('3'), "1/284:  哀  Rad 口(30), Strokes 9, āi, S, N1, Frq 1715");
   EXPECT_EQ(f('c'), "1/328:  亜  Rad 二(7), Strokes 7, yà, S, N1, Frq 1509, Old 亞");
-  EXPECT_EQ(f('2'), "1/188:  挨  Rad 手(64), Strokes 10, āi, S, Frq 2258");
+  EXPECT_EQ(f('2', true), "1/188:  挨  Rad 手(64), Strokes 10, āi, S, Frq 2258");
   EXPECT_EQ(f('b'), "1/940:  唖  Rad 口(30), Strokes 10, yǎ");
   EXPECT_EQ(f('1'), "1/2780:  芦  Rad 艸(140), Strokes 7, lú, Frq 1733");
 }
@@ -284,7 +314,7 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
   EXPECT_EQ(found, 2);
 }
 
-TEST_F(QuizTest, PatternListFilters) {
+TEST_F(QuizTest, PatternGroupBuckets) {
   auto f = [this](char x) {
     _is << "t\np\nb\n4\n" << x << "\n";
     std::string line;
@@ -297,6 +327,17 @@ TEST_F(QuizTest, PatternListFilters) {
   EXPECT_EQ(f('4'), "1/143:  [朶：タ], 2 members");
   EXPECT_EQ(f('5'), "1/144:  [巴：ハ、ヒ], 8 members");
   EXPECT_EQ(f('6'), "1/111:  [耶：ヤ], 4 members");
+}
+
+TEST_F(QuizTest, GroupQuizDefaults) {
+  _is << "t\np\nb\n2\n1\n";
+  std::string line, lineWithDefaults;
+  getFirstQuestion(line);
+  EXPECT_EQ(line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");  
+  // check that the default 'member filter' is '2' and the default 'bucket' is '1'
+  _is << "t\np\nb\n\n\n";
+  getFirstQuestion(lineWithDefaults);
+  EXPECT_EQ(line, lineWithDefaults);
 }
 
 } // namespace kanji_tools
