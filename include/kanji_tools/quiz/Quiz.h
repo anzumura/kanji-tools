@@ -26,10 +26,10 @@ private:
   std::ostream& out() const { return data().out(); }
   std::ostream& log(bool heading = false) const { return data().log(heading); }
 
+  enum class ProgramMode { Review, Test, NotAssigned };
   enum class QuestionOrder { FromBeginning, FromEnd, Random, NotAssigned };
-  enum class Mode { Review, Test, NotAssigned };
 
-  void parseModeArg(const std::string& arg);
+  void parseProgramModeArg(const std::string& arg);
   void parseKanjiArg(const std::string& arg) const;
 
   // 'printDetails' prints info about a kanji provided on the command line (instead of running a quiz)
@@ -41,7 +41,7 @@ private:
 
   std::ostream& beginQuizMessage(int totalQuestions); // can modify '_questions'
   std::ostream& beginQuestionMessage(int totalQuestions) const;
-  bool isTestMode() const { return _mode == Mode::Test; }
+  bool isTestMode() const { return _programMode == ProgramMode::Test; }
   void finalScore() const;
 
   using Choices = Choice::Choices;
@@ -94,9 +94,9 @@ private:
   void editAnswer(Answers&, Choices&);
   void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name);
 
-  // '_listOrder' and '_mode' can be set via the command line, otherwise the user is prompted at the start
-  QuestionOrder _listOrder;
-  Mode _mode;
+  // '_programMode' and '_questionOrder' can be set via the command line, otherwise they are obtained interactively
+  ProgramMode _programMode;
+  QuestionOrder _questionOrder;
 
   // the following attributes are updated throughout the quiz
   DataFile::List _mistakes;

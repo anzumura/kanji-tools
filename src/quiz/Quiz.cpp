@@ -54,7 +54,7 @@ or 'u' followed by Unicode. For example, theses all produce the same output:\n\
   kanjiQuiz n212\n\
   kanjiQuiz u5949\n\n";
 
-static const Choice::Choices QuizModeChoices({{'r', "review"}, {'t', "test"}}),
+static const Choice::Choices ProgramModeChoices({{'r', "review"}, {'t', "test"}}),
   QuizTypeChoices({{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}}),
   FrequencyChoices({{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"}, {'4', "1501-2000"}, {'5', "2001-2501"}}),
   GradeChoices({{'s', "Secondary School"}}), KyuChoices({{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}),
@@ -66,7 +66,7 @@ static const Choice::Choices QuizModeChoices({{'r', "review"}, {'t', "test"}}),
 constexpr char GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9';
 
 // Default options are offered for some of the above 'Choices' (when prompting the user for input):
-constexpr char DefaultQuizMode = 't', DefaultQuizType = 'g', DefaultGrade = '6', DefaultKyu = '2',
+constexpr char DefaultProgramMode = 't', DefaultQuizType = 'g', DefaultGrade = '6', DefaultKyu = '2',
                DefaultQuestionOrder = 'r', DefaultListQuizAnswers = '4', DefaultListQuizStyle = 'k',
                DefaultGroupKanji = '2', DefaultPatternGroup = '1';
 
@@ -77,8 +77,8 @@ constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ",
 } // namespace
 
 Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
-  : _listOrder(QuestionOrder::NotAssigned), _mode(Mode::NotAssigned), _question(0), _score(0), _showMeanings(false),
-    _choice(data->out(), in), _groupData(data), _jukugoData(*data) {
+  : _programMode(ProgramMode::NotAssigned), _questionOrder(QuestionOrder::NotAssigned), _question(0), _score(0),
+    _showMeanings(false), _choice(data->out(), in), _groupData(data), _jukugoData(*data) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume length is at least 2)
   auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,
@@ -94,9 +94,8 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
   };
 
   bool endOptions = false;
-  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) {
-    std::string arg = argv[i];
-    if (!endOptions && arg.starts_with("-") && arg.length() > 1) {
+  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+    if (std::string arg = argv[i]; !endOptions && arg.starts_with("-") && arg.length() > 1) {
       if (arg == "-h") {
         out() << HelpMessage;
         return;
@@ -108,7 +107,7 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
       else
         switch (arg[1]) {
         case 'r': // intentional fallthrough
-        case 't': parseModeArg(arg); break;
+        case 't': parseProgramModeArg(arg); break;
         case 'f': checkQuizType(arg, FrequencyChoices); break;
         case 'g': checkQuizType(arg, GradeChoices, GradeStart, GradeEnd); break;
         case 'k': checkQuizType(arg, KyuChoices, KyuStart, KyuEnd); break;
@@ -123,17 +122,16 @@ Quiz::Quiz(int argc, const char** argv, DataPtr data, std::istream* in)
       parseKanjiArg(arg);
       return;
     }
-  }
   if (!data->debug() && !in) start(quizType, questionList);
 }
 
 void Quiz::start(OptChar quizType, OptChar questionList) {
   _choice.setQuit(QuitOption);
   char c;
-  if (_mode == Mode::NotAssigned) {
-    c = _choice.get("Mode", QuizModeChoices, DefaultQuizMode);
+  if (_programMode == ProgramMode::NotAssigned) {
+    c = _choice.get("Mode", ProgramModeChoices, DefaultProgramMode);
     if (c == QuitOption) return;
-    _mode = c == 'r' ? Mode::Review : Mode::Test;
+    _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Test;
   }
   // can replace this with 'or_else' when C++23 is available
   c = quizType ? *quizType : _choice.get("Type", QuizTypeChoices, DefaultQuizType);
@@ -175,19 +173,20 @@ void Quiz::start(OptChar quizType, OptChar questionList) {
   reset();
 }
 
-void Quiz::parseModeArg(const std::string& arg) {
-  if (_mode != Mode::NotAssigned) Data::usage("only one mode (-r or -t) can be specified, use -h for help");
-  _mode = arg[1] == 'r' ? Mode::Review : Mode::Test;
+void Quiz::parseProgramModeArg(const std::string& arg) {
+  if (_programMode != ProgramMode::NotAssigned)
+    Data::usage("only one mode (-r or -t) can be specified, use -h for help");
+  _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
   if (arg.length() > 2) {
     if (arg.length() == 3 && arg[2] == '0')
-      _listOrder = QuestionOrder::Random;
+      _questionOrder = QuestionOrder::Random;
     else {
       int offset = 2;
       if (arg[2] == '-') {
-        _listOrder = QuestionOrder::FromEnd;
+        _questionOrder = QuestionOrder::FromEnd;
         offset = 3;
       } else {
-        _listOrder = QuestionOrder::FromBeginning;
+        _questionOrder = QuestionOrder::FromBeginning;
         if (arg[2] == '+') offset = 3;
       }
       auto numArg = arg.substr(offset);
@@ -203,18 +202,18 @@ void Quiz::parseKanjiArg(const std::string& arg) const {
     auto kanji = _groupData.data().findKanjiByFrequency(std::stoi(arg));
     if (!kanji) Data::usage("invalid frequency '" + arg + "'");
     printDetails((**kanji).name());
-  } else if (arg.starts_with("m") && arg.length() > 1) {
+  } else if (arg.starts_with("m")) {
     auto id = arg.substr(1);
     // a valid Morohashi ID should be numeric followed by an optional 'P'
     if (std::string nonPrimeIndex = id.ends_with("P") ? id.substr(0, id.length() - 1) : id;
-        !std::all_of(nonPrimeIndex.begin(), nonPrimeIndex.end(), ::isdigit))
+        id.empty() || !std::all_of(nonPrimeIndex.begin(), nonPrimeIndex.end(), ::isdigit))
       Data::usage("invalid Morohashi ID '" + id + "'");
     printDetails(_groupData.data().findKanjisByMorohashiId(id), "Morohashi", id);
-  } else if (arg.starts_with("n") && arg.length() > 1) {
+  } else if (arg.starts_with("n")) {
     auto id = arg.substr(1);
-    if (!std::all_of(id.begin(), id.end(), ::isdigit)) Data::usage("invalid Nelson ID '" + id + "'");
+    if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit)) Data::usage("invalid Nelson ID '" + id + "'");
     printDetails(_groupData.data().findKanjisByNelsonId(std::stoi(id)), "Nelson", id);
-  } else if (arg.starts_with("u") && arg.length() > 1) {
+  } else if (arg.starts_with("u")) {
     auto id = arg.substr(1);
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit must be a 1 or 2)
     if (id.length() < 4 || id.length() > 5 || (id.length() == 5 && id[0] != '1' && id[0] != '2') ||
@@ -261,19 +260,19 @@ void Quiz::printDetails(const std::string& arg, bool showLegend) const {
 // Helper functions for both List and Group quizzes
 
 bool Quiz::getQuestionOrder() {
-  if (_listOrder == QuestionOrder::NotAssigned)
+  if (_questionOrder == QuestionOrder::NotAssigned)
     switch (_choice.get("List order", ListOrderChoices, DefaultQuestionOrder)) {
-    case 'b': _listOrder = QuestionOrder::FromBeginning; break;
-    case 'e': _listOrder = QuestionOrder::FromEnd; break;
-    case 'r': _listOrder = QuestionOrder::Random; break;
+    case 'b': _questionOrder = QuestionOrder::FromBeginning; break;
+    case 'e': _questionOrder = QuestionOrder::FromEnd; break;
+    case 'r': _questionOrder = QuestionOrder::Random; break;
     default: return false;
     }
   return true;
 }
 
 void Quiz::reset() {
-  _listOrder = QuestionOrder::NotAssigned;
-  _mode = Mode::NotAssigned;
+  _programMode = ProgramMode::NotAssigned;
+  _questionOrder = QuestionOrder::NotAssigned;
   _question = 0;
   _score = 0;
   _mistakes.clear();
@@ -349,13 +348,11 @@ void Quiz::printLegend(int infoFields) const {
 
 void Quiz::printExtraTypeInfo(const Entry& k) const {
   out() << ", " << k->type();
-  auto i = k->extraTypeInfo();
-  if (i) out() << " (" << *i << ')';
+  if (auto i = k->extraTypeInfo(); i) out() << " (" << *i << ')';
 }
 
 void Quiz::printReviewDetails(const Entry& kanji) const {
   out() << "    Reading: " << kanji->reading() << '\n';
-
   // Similar Kanji
   if (auto i = _groupData.patternMap().find(kanji->name());
       i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
@@ -366,7 +363,6 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
       if (j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
   }
-
   // Morohashi and Nelson IDs
   if (kanji->morohashiId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
   if (kanji->hasNelsonIds()) {
@@ -375,7 +371,6 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
       out() << ' ' << i;
     out() << '\n';
   }
-
   // Categories
   if (auto i = _groupData.meaningMap().equal_range(kanji->name()); i.first != i.second) {
     auto j = i.first;
@@ -386,7 +381,6 @@ void Quiz::printReviewDetails(const Entry& kanji) const {
     }
     out() << '\n';
   }
-
   // Jukugo Lists
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
   if (auto& list = _jukugoData.find(kanji->name()); !list.empty()) {
@@ -459,9 +453,9 @@ void Quiz::listQuiz(const List& list, int infoFields) {
   List questions;
   for (auto& i : list)
     if (i->hasReading()) questions.push_back(i);
-  if (_listOrder == QuestionOrder::FromEnd)
+  if (_questionOrder == QuestionOrder::FromEnd)
     std::reverse(questions.begin(), questions.end());
-  else if (_listOrder == QuestionOrder::Random)
+  else if (_questionOrder == QuestionOrder::Random)
     std::shuffle(questions.begin(), questions.end(), RandomGen);
 
   beginQuizMessage(questions.size()) << "kanji";
@@ -479,17 +473,13 @@ void Quiz::listQuiz(const List& list, int infoFields) {
     // 'sameReading' set is used to prevent more than one choice having the exact same reading
     DataFile::Set sameReading = {i->reading()};
     std::map<int, int> answers = {{correctChoice, _question}};
-    for (int j = 1; j <= numberOfChoicesPerQuestion; ++j) {
-      if (j != correctChoice) {
-        do {
-          const int choice = randomReading(RandomGen);
-          if (sameReading.insert(questions[choice]->reading()).second) {
+    for (int j = 1; j <= numberOfChoicesPerQuestion; ++j)
+      if (j != correctChoice) do {
+          if (int choice = randomReading(RandomGen); sameReading.insert(questions[choice]->reading()).second) {
             answers[j] = choice;
             break;
           }
         } while (true);
-      }
-    }
     do {
       beginQuestionMessage(questions.size());
       if (quizStyle == 'k') {
@@ -550,7 +540,7 @@ void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char
     if (f == QuitOption) return;
     bucket = f - '1';
   }
-  if (_listOrder == QuestionOrder::FromBeginning && type == All && bucket == -1)
+  if (_questionOrder == QuestionOrder::FromBeginning && type == All && bucket == -1)
     groupQuiz(list, type, otherMap, otherGroup);
   else {
     GroupData::List newList;
@@ -567,9 +557,9 @@ void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char
         if (memberCount > 1) newList.push_back(i);
       }
     }
-    if (_listOrder == QuestionOrder::FromEnd)
+    if (_questionOrder == QuestionOrder::FromEnd)
       std::reverse(newList.begin(), newList.end());
-    else if (_listOrder == QuestionOrder::Random)
+    else if (_questionOrder == QuestionOrder::Random)
       std::shuffle(newList.begin(), newList.end(), RandomGen);
     groupQuiz(newList, type, otherMap, otherGroup);
   }
@@ -577,8 +567,8 @@ void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char
 
 template<typename T>
 void Quiz::groupQuiz(const GroupData::List& list, MemberType type, const T& otherMap, char otherGroup) {
-  bool firstTime = true, stopQuiz = false;
-  for (; _question < list.size() && !stopQuiz; ++_question) {
+  bool stopQuiz = false;
+  for (bool firstTime = true; _question < list.size() && !stopQuiz; ++_question) {
     auto& i = list[_question];
     List questions, readings;
     for (auto& j : i->members())
@@ -655,14 +645,12 @@ void Quiz::showGroup(const List& questions, const Answers& answers, const List& 
 }
 
 bool Quiz::getAnswers(Answers& answers, int totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) {
-  for (int i = answers.size(); i < totalQuestions; ++i) {
-    bool refresh = false;
-    if (!getAnswer(answers, choices, skipGroup, refresh)) {
+  for (int i = answers.size(); i < totalQuestions; ++i)
+    if (bool refresh = false; !getAnswer(answers, choices, skipGroup, refresh)) {
       // set 'stopQuiz' to break out of top quiz loop if user quit in the middle of providing answers
       if (!refresh && !skipGroup) stopQuiz = true;
       return false;
     }
-  }
   return true;
 }
 

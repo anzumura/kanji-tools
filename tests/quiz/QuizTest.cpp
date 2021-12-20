@@ -110,8 +110,8 @@ TEST_F(QuizTest, ListQuizDefaults) {
   gradeListQuiz();
   run(all);
   ASSERT_FALSE(all.empty());
-  // run quiz again with defaults for the following choices and expect the same results:
-  // - quiz mode: 't' (test)
+  // run quiz again using defaults for the following choices and expect the same results:
+  // - program mode: 't' (test)
   // - quiz type: 'g' (grade)
   // - list quiz answers: '4'
   // - list quiz style: 'k' (kanji to reading)
