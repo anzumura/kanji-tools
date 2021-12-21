@@ -2,7 +2,7 @@
 
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
-#include <kanji_tools/quiz/Quiz.h>
+#include <kanji_tools/quiz/QuizLauncher.h>
 
 #include <sstream>
 
@@ -59,7 +59,7 @@ protected:
   void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
   void skip() { _is << ".\n"; }           // '.' is the option to skip a question
   void toggleMeanings() { _is << "-\n"; } // '-' is the option to toggle meanings
-  void startQuiz(Quiz::OptChar quizType = std::nullopt, Quiz::OptChar questionList = std::nullopt) {
+  void startQuiz(QuizLauncher::OptChar quizType = std::nullopt, QuizLauncher::OptChar questionList = std::nullopt) {
     // clear eofbit and failbit for output streams in case quiz is run more than once during a test
     _os.clear();
     _es.clear();
@@ -69,8 +69,8 @@ protected:
     _quiz.start(quizType, questionList);
   }
 
-  void getFirstQuestion(std::string& line, Quiz::OptChar quizType = std::nullopt,
-                        Quiz::OptChar questionList = std::nullopt) {
+  void getFirstQuestion(std::string& line, QuizLauncher::OptChar quizType = std::nullopt,
+                        QuizLauncher::OptChar questionList = std::nullopt) {
     startQuiz(quizType, questionList);
     while (std::getline(_os, line))
       if (line.starts_with("Question 1/")) break;
@@ -81,7 +81,7 @@ protected:
   std::stringstream _es;
   std::stringstream _is;
   const DataPtr _data;
-  Quiz _quiz;
+  QuizLauncher _quiz;
 };
 
 TEST_F(QuizTest, ListQuiz) {
@@ -333,7 +333,7 @@ TEST_F(QuizTest, GroupQuizDefaults) {
   _is << "t\nb\np\n2\n1\n";
   std::string line, lineWithDefaults;
   getFirstQuestion(line);
-  EXPECT_EQ(line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");  
+  EXPECT_EQ(line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");
   // check that the default 'member filter' is '2' and the default 'bucket' is '1'
   _is << "t\nb\np\n\n\n";
   getFirstQuestion(lineWithDefaults);
