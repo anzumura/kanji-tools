@@ -33,8 +33,8 @@ private:
   bool _suppressNewLine = false;
   std::optional<CharType> _source = std::nullopt;
   std::vector<std::string> _strings;
-  Choice _choice;
   KanaConvert _converter;
+  const Choice _choice;
   const std::string _program;
 };
 

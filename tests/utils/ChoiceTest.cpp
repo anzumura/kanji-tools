@@ -12,7 +12,7 @@ protected:
 
   std::stringstream _os;
   std::stringstream _is;
-  Choice _choice;
+  const Choice _choice;
 };
 
 TEST_F(ChoiceTest, SingleChoice) {

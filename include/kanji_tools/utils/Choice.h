@@ -17,10 +17,11 @@ public:
   Choice(std::ostream& out, std::istream* in = 0) : _out(out), _in(in) {}
 
   // Provide special support for 'quitChoice'. If it has a value then it will be added to
-  // the 'choices' provided to the below 'get' methods.
+  // the 'choices' provided to the below 'get' methods. '_quit' is mutable so that these
+  // methods can be used on a const instance of 'Choice'.
   std::optional<char> quit() const { return _quit; }
-  void setQuit(char c) { _quit = c; }
-  void clearQuit() { _quit = {}; }
+  void setQuit(char c) const { _quit = c; }
+  void clearQuit() const { _quit = {}; }
 
   // 'get' will prompt the use to enter one of the choices in the 'choices' structure. If
   // an optional default choice is provided it must correspond to an entry in 'choices'.
@@ -48,7 +49,7 @@ private:
   static char getOneChar();
   std::ostream& _out;
   std::istream* _in;
-  std::optional<char> _quit = {};
+  mutable std::optional<char> _quit = {};
 };
 
 } // namespace kanji_tools
