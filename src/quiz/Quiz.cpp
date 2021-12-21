@@ -133,6 +133,7 @@ void Quiz::start(OptChar quizType, OptChar questionList) {
     if (c == QuitOption) return;
     _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Test;
   }
+  if (!getQuestionOrder()) return;
   // can replace this with 'or_else' when C++23 is available
   c = quizType ? *quizType : _choice.get("Type", QuizTypeChoices, DefaultQuizType);
   switch (c) {
@@ -430,7 +431,6 @@ void Quiz::printJukugoList(const std::string& name, const JukugoData::List& list
 // List Based Quiz
 
 void Quiz::prepareListQuiz(const List& list, int infoFields) {
-  if (!getQuestionOrder()) return;
   int numberOfChoicesPerQuestion = 1;
   char quizStyle = DefaultListQuizStyle;
   if (Choices choices; isTestMode()) {
@@ -532,7 +532,6 @@ bool Quiz::includeMember(const Entry& k, MemberType type) {
 
 template<typename T>
 void Quiz::prepareGroupQuiz(const GroupData::List& list, const T& otherMap, char otherGroup, OptChar questionList) {
-  if (!getQuestionOrder()) return;
   const char c = questionList ? *questionList : _choice.get("Kanji type", GroupKanjiChoices, DefaultGroupKanji);
   if (c == QuitOption) return;
   const MemberType type = static_cast<MemberType>(c - '1');

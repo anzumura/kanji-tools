@@ -23,22 +23,22 @@ protected:
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
     // 't' for 'test' mode (instead of review mode)
+    // 'b' for Beginning of list (instead of End or Random)
     // 'g' for List Quiz
     // '1' for 1
-    // 'b' for Beginning of list (instead of End or Random)
     // '4' for 4 choices
     // 'k' for kanji to reading quiz
-    _is << "t\ng\n1\nb\n4\nk\n";
+    _is << "t\nb\ng\n1\n4\nk\n";
   }
 
   std::string listQuizFirstQuestion(char quizType, char questionList, bool checkDefault = false) {
     std::string line, otherLine;
     // run with quizType and questionList coming from stdin
-    _is << "t\n" << quizType << '\n' << questionList << "\nb\n4\nk\n";
+    _is << "t\nb\n" << quizType << '\n' << questionList << "\n4\nk\n";
     getFirstQuestion(line);
     if (checkDefault) {
       // run again using just '\n' for questionList to check if it's the default option
-      _is << "t\n" << quizType << "\n\nb\n4\nk\n";
+      _is << "t\nb\n" << quizType << "\n\n4\nk\n";
       getFirstQuestion(otherLine);
       EXPECT_EQ(line, otherLine);
     }
@@ -51,10 +51,10 @@ protected:
 
   void meaningGroupQuiz() {
     // 't' for 'test' mode (instead of review mode)
-    // 'm' for Meaning Group Quiz
     // 'b' for Beginning of list (instead of End or Random)
+    // 'm' for Meaning Group Quiz
     // '1' for including only Jōyō kanji
-    _is << "t\nm\nb\n1\n";
+    _is << "t\nb\nm\n1\n";
   }
   void edit() { _is << "*\n"; }           // '*' is the option to edit an answer
   void skip() { _is << ".\n"; }           // '.' is the option to skip a question
@@ -116,13 +116,13 @@ TEST_F(QuizTest, ListQuizDefaults) {
   // - list quiz answers: '4'
   // - list quiz style: 'k' (kanji to reading)
   // still need to specify '1' (for grade) and 'b' (for beginning of list) since these aren't defaults
-  _is << "\n\n1\nb\n\n\n";
+  _is << "\nb\n\n1\n\n\n";
   run(allWithDefaults);
   EXPECT_EQ(all, allWithDefaults);
 }
 
 TEST_F(QuizTest, ListQuizReview) {
-  _is << "r\ng\n1\nb\n";
+  _is << "r\nb\ng\n1\n";
   toggleMeanings();
   startQuiz();
   std::string line, lastLine;
@@ -316,7 +316,7 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
 
 TEST_F(QuizTest, PatternGroupBuckets) {
   auto f = [this](char x) {
-    _is << "t\np\nb\n4\n" << x << "\n";
+    _is << "t\nb\np\n4\n" << x << "\n";
     std::string line;
     getFirstQuestion(line);
     return line.substr(9);
@@ -330,12 +330,12 @@ TEST_F(QuizTest, PatternGroupBuckets) {
 }
 
 TEST_F(QuizTest, GroupQuizDefaults) {
-  _is << "t\np\nb\n2\n1\n";
+  _is << "t\nb\np\n2\n1\n";
   std::string line, lineWithDefaults;
   getFirstQuestion(line);
   EXPECT_EQ(line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");  
   // check that the default 'member filter' is '2' and the default 'bucket' is '1'
-  _is << "t\np\nb\n\n\n";
+  _is << "t\nb\np\n\n\n";
   getFirstQuestion(lineWithDefaults);
   EXPECT_EQ(line, lineWithDefaults);
 }
