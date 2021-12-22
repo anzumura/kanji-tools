@@ -28,7 +28,7 @@ protected:
   virtual ~Quiz();
 
   // the following methods are shotcuts for calling '_launcher' methods
-  char getChoice(const std::string& msg, const Choices& choices, OptChar def = std::nullopt, bool useQuit = true) {
+  char get(const std::string& msg, const Choices& choices, OptChar def = std::nullopt, bool useQuit = true) const {
     return _launcher.choice().get(msg, useQuit, choices, def);
   }
   bool isQuit(char c) const { return _launcher.isQuit(c); }

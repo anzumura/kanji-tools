@@ -21,7 +21,7 @@ constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ",
 
 constexpr char RefreshOption = '\'', EditOption = '*';
 
-const std::string AnswerToEdit("    Answer to edit: "), NewReadingForEntry("    New reading for Entry: ");
+constexpr int TotalLetters = 'z' - 'a';
 
 } // namespace
 
@@ -36,7 +36,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanin
   int bucket = -1;
   // for 'pattern' groups, allow choosing a smaller subset based on the name reading
   if (otherGroup == 'm') {
-    const char c = getChoice("Pattern name", PatternGroupChoices, DefaultPatternGroup);
+    const char c = get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
     if (isQuit(c)) return;
     bucket = c - '1';
   }
@@ -63,6 +63,30 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanin
       std::shuffle(newList.begin(), newList.end(), RandomGen);
     start(newList, memberType);
   }
+}
+
+void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
+  static const std::string NoPinyin(PinyinWidth, ' ');
+  if (kanji->pinyin()) {
+    std::string p = "  (" + *kanji->pinyin() + ')';
+    // need to use 'displayLength' since Pinyin can contain multi-byte chars (for the tones)
+    s += p + std::string(PinyinWidth - displayLength(p), ' ');
+  } else
+    s += NoPinyin;
+}
+
+void GroupQuiz::addOtherGroupName(const std::string& name, std::string& s) const {
+  auto add = [this, &name, &s](const auto& map) {
+    if (auto j = map.find(name); j != map.end()) {
+      s += _otherGroup;
+      s += ':';
+      s += std::to_string(j->second->number());
+    }
+  };
+  if (_otherGroup == 'm')
+    add(_launcher.groupData().meaningMap());
+  else
+    add(_launcher.groupData().patternMap());
 }
 
 void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
@@ -105,47 +129,31 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
   if (stopQuiz) --_question;
 }
 
-void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) const {
-  static const std::string NoPinyin(PinyinLength, ' ');
-  if (kanji->pinyin()) {
-    std::string p = "  (" + *kanji->pinyin() + ')';
-    // need to use 'displayLength' since Pinyin can contain multi-byte chars (for the tones)
-    s += p + std::string(PinyinLength - displayLength(p), ' ');
-  } else
-    s += NoPinyin;
+void GroupQuiz::printAssignedAnswers(const Answers& answers) const {
+  if (!answers.empty()) {
+    out() << "   ";
+    for (int i = 0; i < answers.size(); ++i)
+      out() << ' ' << i + 1 << "->" << answers[i];
+    out() << '\n';
+  }
 }
 
-void GroupQuiz::addOtherGroupName(const std::string& name, std::string& s) const {
-  auto add = [this, &name, &s](const auto& map) {
-    if (auto j = map.find(name); j != map.end()) {
-      s += _otherGroup;
-      s += ':';
-      s += std::to_string(j->second->number());
-    }
-  };
-  if (_otherGroup == 'm')
-    add(_launcher.groupData().meaningMap());
-  else
-    add(_launcher.groupData().patternMap());
+std::ostream& GroupQuiz::printAssignedAnswer(const Answers& answers, char choice) const {
+  for (int i = 0; i < answers.size(); ++i)
+    if (answers[i] == choice) return out() << std::right << std::setw(2) << i + 1 << "->";
+  return out() << "    ";
 }
 
 void GroupQuiz::showGroup(const List& questions, const Answers& answers, const List& readings, Choices& choices,
                           bool repeatQuestion) const {
   for (int count = 0; auto& i : questions) {
-    const char choice = isTestMode() ? count < 26 ? 'a' + count : 'A' + (count - 26) : ' ';
+    const char choice = isTestMode() ? count < TotalLetters ? 'a' + count : 'A' + (count - TotalLetters) : ' ';
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s = i->qualifiedName();
     addPinyin(i, s);
     if (!isTestMode()) addOtherGroupName(i->name(), s);
-    out() << std::left << std::setw(wideSetw(s, 22)) << s;
-    int j = 0;
-    for (j = 0; j < answers.size(); ++j)
-      if (answers[j] == choice) {
-        out() << std::right << std::setw(2) << j + 1 << "->";
-        break;
-      }
-    if (j == answers.size()) out() << "    ";
-    out() << choice << ":  " << readings[count]->reading();
+    out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
+    printAssignedAnswer(answers, choice) << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count]);
     if (!repeatQuestion && isTestMode()) choices[choice] = "";
     ++count;
@@ -167,14 +175,8 @@ bool GroupQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, b
   const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for Entry: ");
   const std::string space = (answers.size() < 9 ? " " : "");
   do {
-    if (!answers.empty()) {
-      out() << "   ";
-      for (int k = 0; k < answers.size(); ++k)
-        out() << ' ' << k + 1 << "->" << answers[k];
-      out() << '\n';
-    }
-    const char answer =
-      getChoice(isTestMode() ? QuizMsg + space + std::to_string(answers.size() + 1) : ReviewMsg, choices);
+    printAssignedAnswers(answers);
+    const char answer = get(isTestMode() ? QuizMsg + space + std::to_string(answers.size() + 1) : ReviewMsg, choices);
     switch (answer) {
     case RefreshOption: refresh = true; break;
     case MeaningsOption:
@@ -202,31 +204,36 @@ bool GroupQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, b
 }
 
 void GroupQuiz::editAnswer(Answers& answers, Choices& choices) {
-  auto getEntry = [this, &answers]() {
-    std::map<char, std::string> answersToEdit;
-    for (auto k : answers)
-      answersToEdit[k] = "";
-    const auto index = std::find(answers.begin(), answers.end(), getChoice(AnswerToEdit, answersToEdit, {}, false));
-    assert(index != answers.end());
-    return std::distance(answers.begin(), index);
-  };
-  const int entry = answers.size() == 1 ? 0 : getEntry();
-  // put the answer back as a choice
-  choices[answers[entry]] = "";
+  static const std::string NewReadingForEntry("    New reading for Entry: ");
+
+  const int entry = getAnswerToEdit(answers);
+  choices[answers[entry]] = ""; // put the answer back as a choice
   auto newChoices = choices;
   newChoices.erase(EditOption);
   newChoices.erase(MeaningsOption);
   newChoices.erase(SkipOption);
-  const char answer = getChoice(NewReadingForEntry + std::to_string(entry + 1), newChoices, answers[entry], false);
+  const char answer = get(NewReadingForEntry + std::to_string(entry + 1), newChoices, answers[entry], false);
   answers[entry] = answer;
   choices.erase(answer);
+}
+
+int GroupQuiz::getAnswerToEdit(const Answers& answers) const {
+  static const std::string AnswerToEdit("    Answer to edit: ");
+
+  if (answers.size() == 1) return 0;
+  std::map<char, std::string> answersToEdit;
+  for (auto k : answers)
+    answersToEdit[k] = "";
+  const auto index = std::find(answers.begin(), answers.end(), get(AnswerToEdit, answersToEdit, {}, false));
+  assert(index != answers.end());
+  return std::distance(answers.begin(), index);
 }
 
 void GroupQuiz::checkAnswers(const Answers& answers, const List& questions, const List& readings,
                              const std::string& name) {
   int count = 0;
   for (auto i : answers) {
-    int index = (i <= 'z' ? i - 'a' : i - 'A' + 26);
+    int index = (i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
     // Only match on readings (and meanings if '_showMeanings' is true) instead of making
     // sure the kanji is exactly the same since many kanjis have identical readings
     // especially in the 'patterns' groups (and the user has no way to distinguish).

@@ -23,10 +23,10 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings
     // in quiz mode, numberOfChoicesPerQuestion should be a value from 2 to 9
     for (int i = 2; i < 10; ++i)
       choices['0' + i] = "";
-    const char c = getChoice("Number of choices", choices, DefaultListQuizAnswers);
+    const char c = get("Number of choices", choices, DefaultListQuizAnswers);
     if (isQuit(c)) return;
     numberOfChoicesPerQuestion = c - '0';
-    quizStyle = getChoice("Quiz style", ListQuizStyleChoices, quizStyle);
+    quizStyle = get("Quiz style", ListQuizStyleChoices, quizStyle);
     if (isQuit(quizStyle)) return;
   }
 
@@ -87,7 +87,7 @@ void ListQuiz::start(const List& questions, int numberOfChoicesPerQuestion, char
                 << (quizStyle == 'k' ? questions[j.second]->reading() : questions[j.second]->name()) << '\n';
       } else
         _launcher.printReviewDetails(i);
-      const char answer = getChoice(prompt, choices);
+      const char answer = get(prompt, choices);
       if (isQuit(answer))
         stopQuiz = true;
       else if (answer == MeaningsOption)
