@@ -44,7 +44,13 @@ std::ostream& Quiz::beginQuestionMessage(int totalQuestions) const {
   return out() << (isTestMode() ? "\nQuestion " : "\n") << _question + 1 << '/' << totalQuestions << ":  ";
 }
 
-void Quiz::correctAnswerMessage() { out() << "  Correct! (" << ++_correctAnswers << '/' << _question + 1 << ")\n"; }
+void Quiz::correctMessage() { out() << "  Correct! (" << ++_correctAnswers << '/' << _question + 1 << ")\n"; }
+
+std::ostream& Quiz::incorrectMessage(const std::string& name) {
+  _mistakes.push_back(name);
+  return out() << "  Incorrect";
+}
+
 
 Choice::Choices Quiz::getDefaultChoices(int totalQuestions) const {
   Choice::Choices c = {{MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},

@@ -50,11 +50,13 @@ constexpr char GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9';
 constexpr char DefaultProgramMode = 't', DefaultQuestionOrder = 'r', DefaultQuizType = 'g', DefaultGrade = '6',
                DefaultKyu = '2', DefaultGroupKanji = '2';
 
+constexpr char QuitOption = '/';
+
 } // namespace
 
 QuizLauncher::QuizLauncher(int argc, const char** argv, DataPtr data, std::istream* in)
-  : _programMode(ProgramMode::NotAssigned), _questionOrder(QuestionOrder::NotAssigned), _choice(data->out(), in),
-    _groupData(data), _jukugoData(*data) {
+  : _programMode(ProgramMode::NotAssigned), _questionOrder(QuestionOrder::NotAssigned),
+    _choice(data->out(), in, QuitOption), _groupData(data), _jukugoData(*data) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume length is at least 2)
   auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,
@@ -102,10 +104,9 @@ QuizLauncher::QuizLauncher(int argc, const char** argv, DataPtr data, std::istre
 }
 
 void QuizLauncher::start(OptChar quizType, OptChar questionList, int question, bool showMeanings) {
-  _choice.setQuit(QuitOption);
   if (_programMode == ProgramMode::NotAssigned) {
     char c = _choice.get("Mode", ProgramModeChoices, DefaultProgramMode);
-    if (c == QuitOption) return;
+    if (isQuit(c)) return;
     _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Test;
   }
   if (!getQuestionOrder()) return;
@@ -115,7 +116,7 @@ void QuizLauncher::start(OptChar quizType, OptChar questionList, int question, b
   };
   auto groupQuiz = [this, question, showMeanings, questionList](const GroupData::List& list, char otherGroup) {
     if (char c = questionList ? *questionList : _choice.get("Kanji type", GroupKanjiChoices, DefaultGroupKanji);
-        c != QuitOption)
+        !isQuit(c))
       GroupQuiz(*this, question, showMeanings, list, otherGroup, static_cast<GroupQuiz::MemberType>(c - '1'));
   };
 
@@ -123,20 +124,20 @@ void QuizLauncher::start(OptChar quizType, OptChar questionList, int question, b
   switch (quizType ? *quizType : _choice.get("Type", QuizTypeChoices, DefaultQuizType)) {
   case 'f':
     // suppress printing 'Freq' since this would work against showing the list in a random order.
-    if (char c = questionList ? *questionList : _choice.get("Choose list", FrequencyChoices); c != QuitOption)
+    if (char c = questionList ? *questionList : _choice.get("Choose list", FrequencyChoices); !isQuit(c))
       listQuiz(data().frequencyList(c - '1'), Kanji::FreqField);
     break;
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
     if (char c =
           questionList ? *questionList : _choice.get("Choose grade", GradeStart, GradeEnd, GradeChoices, DefaultGrade);
-        c != QuitOption)
+        !isQuit(c))
       listQuiz(data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']), Kanji::GradeField);
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     if (char c = questionList ? *questionList : _choice.get("Choose kyu", KyuStart, KyuEnd, KyuChoices, DefaultKyu);
-        c != QuitOption)
+        !isQuit(c))
       listQuiz(data().kyuList(AllKenteiKyus[c == 'a'     ? 0
                                               : c == 'c' ? 8
                                               : c == '2' ? 9
@@ -147,7 +148,7 @@ void QuizLauncher::start(OptChar quizType, OptChar questionList, int question, b
     break;
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
-    if (char c = questionList ? *questionList : _choice.get("Choose level", LevelChoices); c != QuitOption)
+    if (char c = questionList ? *questionList : _choice.get("Choose level", LevelChoices); !isQuit(c))
       listQuiz(data().levelList(AllJlptLevels[4 - (c - '1')]), Kanji::LevelField);
     break;
   case 'm': groupQuiz(_groupData.meaningGroups(), 'p'); break;

@@ -12,9 +12,9 @@ namespace kanji_tools {
 class QuizLauncher {
 public:
   using Choices = Choice::Choices;
+  using OptChar = Choice::OptChar;
   using Entry = Data::Entry;
   using List = Data::List;
-  using OptChar = std::optional<char>;
 
   static constexpr char QuitOption = '/';
 
@@ -36,6 +36,7 @@ public:
   bool isTestMode() const { return _programMode == ProgramMode::Test; }
   QuestionOrder questionOrder() const { return _questionOrder; }
   const Choice& choice() const { return _choice; }
+  bool isQuit(char c) const { return _choice.isQuit(c); }
   const GroupData& groupData() const { return _groupData; }
 
   void printExtraTypeInfo(const Entry&) const;

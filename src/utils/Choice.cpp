@@ -24,7 +24,7 @@ char Choice::getOneChar() {
 }
 
 void Choice::add(std::string& prompt, const Choices& choices) {
-  std::optional<char> rangeStart = std::nullopt;
+  OptChar rangeStart = {};
   char prevChar;
   auto completeRange = [&prompt, &rangeStart, &prevChar]() {
     if (prevChar != *rangeStart) {
@@ -60,11 +60,11 @@ void Choice::add(std::string& prompt, const Choices& choices) {
   if (rangeStart) completeRange();
 }
 
-char Choice::get(const std::string& msg, const Choices& choicesIn, std::optional<char> def) const {
+char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn, OptChar def) const {
   // if 'msg' is empty then don't leave a space before listing the choices in brackets.
   std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
   Choices choices(choicesIn);
-  if (_quit && choices.find(*_quit) == choices.end()) choices[*_quit] = "quit";
+  if (useQuit && _quit && choices.find(*_quit) == choices.end()) choices[*_quit] = "quit";
   add(prompt, choices);
   if (def) {
     assert(choices.find(*def) != choices.end());

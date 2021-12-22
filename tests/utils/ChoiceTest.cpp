@@ -12,7 +12,7 @@ protected:
 
   std::stringstream _os;
   std::stringstream _is;
-  const Choice _choice;
+  Choice _choice;
 };
 
 TEST_F(ChoiceTest, SingleChoice) {
@@ -156,13 +156,33 @@ TEST_F(ChoiceTest, ChooseBadOptionWithDefault) {
 
 TEST_F(ChoiceTest, QuitOption) {
   _is << "q\n";
+  EXPECT_FALSE(_choice.quit());
+  EXPECT_FALSE(_choice.isQuit('q'));
   _choice.setQuit('q');
-  EXPECT_EQ(*_choice.quit(), 'q');
+  EXPECT_TRUE(_choice.isQuit('q'));
+  EXPECT_EQ(_choice.quit(), 'q');
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), 'q');
   std::string line;
   std::getline(_os, line);
   EXPECT_EQ(line, "(1-2, q=quit): ");
   EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, UseQuitOption) {
+  _is << "q\n";
+  _choice.setQuit('q');
+  EXPECT_EQ(_choice.get("", true, {{'1', ""}, {'2', ""}}), 'q');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-2, q=quit): ");
+  EXPECT_TRUE(_os.eof());
+  _os.clear(); // need to clear 'eof' state on _os before calling 'get' again
+  ASSERT_FALSE(_os.eof());
+  _is << "2\n";
+  // specify false for 'useSkip' parameter to skip using quit option
+  EXPECT_EQ(_choice.get("", false, {{'1', ""}, {'2', ""}}), '2');
+  EXPECT_TRUE(std::getline(_os, line));
+  EXPECT_EQ(line, "(1-2): ");
 }
 
 TEST_F(ChoiceTest, ClearQuitOption) {

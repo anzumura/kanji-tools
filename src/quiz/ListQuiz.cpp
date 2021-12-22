@@ -24,10 +24,10 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings
     for (int i = 2; i < 10; ++i)
       choices['0' + i] = "";
     const char c = getChoice("Number of choices", choices, DefaultListQuizAnswers);
-    if (c == QuizLauncher::QuitOption) return;
+    if (isQuit(c)) return;
     numberOfChoicesPerQuestion = c - '0';
     quizStyle = getChoice("Quiz style", ListQuizStyleChoices, quizStyle);
-    if (quizStyle == QuizLauncher::QuitOption) return;
+    if (isQuit(quizStyle)) return;
   }
 
   List questions;
@@ -88,7 +88,7 @@ void ListQuiz::start(const List& questions, int numberOfChoicesPerQuestion, char
       } else
         _launcher.printReviewDetails(i);
       const char answer = getChoice(prompt, choices);
-      if (answer == QuizLauncher::QuitOption)
+      if (isQuit(answer))
         stopQuiz = true;
       else if (answer == MeaningsOption)
         toggleMeanings(choices);
@@ -96,11 +96,9 @@ void ListQuiz::start(const List& questions, int numberOfChoicesPerQuestion, char
         if (answer == PrevOption)
           _question -= 2;
         else if (answer - '0' == correctChoice)
-          correctAnswerMessage();
-        else if (answer != SkipOption) {
-          out() << "  The correct answer is " << correctChoice << '\n';
-          _mistakes.push_back(i->name());
-        }
+          correctMessage();
+        else if (answer != SkipOption)
+          incorrectMessage(i->name()) << "  (correct answer is " << correctChoice << ")\n";
         break;
       }
     } while (!stopQuiz);

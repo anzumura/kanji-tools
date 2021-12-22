@@ -14,13 +14,18 @@ public:
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
 
-  GroupQuiz(const QuizLauncher&, int question, bool showMeanings, const GroupData::List&, char otherGroup, MemberType type);
+  GroupQuiz(const QuizLauncher&, int question, bool showMeanings, const GroupData::List&, char otherGroup, MemberType);
 private:
+  enum Values { PinyinLength = 12 };
+
   // 'includeMember' returns true if a member can be included in group quiz question. The member must
   // have a reading as well as meet the criteria of the given MemberType.
   static bool includeMember(const Entry&, MemberType);
 
   void start(const GroupData::List&, MemberType);
+
+  // 'addPinyin' adds optional pinyin for 'kanji' to 's' padded to 'PinyinLength'
+  void addPinyin(const Entry& kanji, std::string& s) const;
 
   // 'addOtherGroupName' is used in review mode to show other groups that 'name' may belong to. 'z:y' is
   // optionally added to 's' where 'x' is the value of '_otherGroup' (so either 'm' or 'p') and 'y' is
