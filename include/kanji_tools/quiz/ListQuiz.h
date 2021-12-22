@@ -11,7 +11,18 @@ public:
   // details on 'InfoFields').
   ListQuiz(const QuizLauncher&, int question, bool showMeanings, const List&, int infoFields);
 private:
-  void start(const List&, int numberOfChoicesPerQuestion, char quizStyle);
+  void start(const List&, int choiceCount, char quizStyle);
+
+  using Answers = std::map<int, int>;
+
+  int populateAnswers(const Entry&, Answers&, const List& questions, int choiceCount) const;
+  void printQuestion(const Entry&, char quizStyle) const;
+  void printChoices(const Entry&, Choices&, int choiceCount, char quizStyle, const List& questions,
+                    const Answers&) const;
+
+  // 'getAnswer' prompts user for an answer and processes the result. This method only returns 'false' if the
+  // question should be repeated (for toggling meanings), otherwise it returns 'true'.
+  bool getAnswer(const std::string& prompt, Choices&, bool& stopQuiz, int correctChoice, const std::string& name);
 
   const int _infoFields;
 };
