@@ -25,17 +25,12 @@ constexpr int TotalLetters = 'z' - 'a';
 
 } // namespace
 
-bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
-  return k->hasReading() &&
-    (k->is(KanjiTypes::Jouyou) || memberType && k->hasLevel() || memberType > 1 && k->frequency() || memberType > 2);
-}
-
 GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const GroupData::List& list,
-                     char otherGroup, MemberType memberType)
-  : Quiz(launcher, question, showMeanings), _otherGroup(otherGroup) {
+                     MemberType memberType)
+  : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
   int bucket = -1;
   // for 'pattern' groups, allow choosing a smaller subset based on the name reading
-  if (otherGroup == 'm') {
+  if (_groupType == GroupType::Pattern) {
     const char c = get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
     if (isQuit(c)) return;
     bucket = c - '1';
@@ -65,6 +60,16 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanin
   }
 }
 
+GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
+  auto i = list.begin();
+  return i != list.end() ? (**i).type() : throw std::domain_error("empty group list");
+}
+
+bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
+  return k->hasReading() &&
+    (k->is(KanjiTypes::Jouyou) || memberType && k->hasLevel() || memberType > 1 && k->frequency() || memberType > 2);
+}
+
 void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
   if (kanji->pinyin()) {
@@ -78,20 +83,23 @@ void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
 void GroupQuiz::addOtherGroupName(const std::string& name, std::string& s) const {
   auto add = [this, &name, &s](const auto& map) {
     if (auto j = map.find(name); j != map.end()) {
-      s += _otherGroup;
+      s += _groupType == GroupType::Meaning ? 'p' : 'm';
       s += ':';
       s += std::to_string(j->second->number());
     }
   };
-  if (_otherGroup == 'm')
-    add(_launcher.groupData().meaningMap());
-  else
+  if (_groupType == GroupType::Meaning)
     add(_launcher.groupData().patternMap());
+  else
+    add(_launcher.groupData().meaningMap());
 }
 
 void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
+  beginQuizMessage(list.size()) << _groupType << " groups\n";
+  if (memberType) log() << "  " << Kanji::Legend << '\n';
+
   bool stopQuiz = false;
-  for (bool firstTime = true; _question < list.size() && !stopQuiz; ++_question) {
+  for (; _question < list.size() && !stopQuiz; ++_question) {
     auto& i = list[_question];
     List questions, readings;
     for (auto& j : i->members())
@@ -102,11 +110,6 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
     if (isTestMode()) {
       std::shuffle(questions.begin(), questions.end(), RandomGen);
       std::shuffle(readings.begin(), readings.end(), RandomGen);
-    }
-    if (firstTime) {
-      beginQuizMessage(list.size()) << i->type() << " groups\n";
-      if (memberType) log() << "  " << Kanji::Legend << '\n';
-      firstTime = false;
     }
     Answers answers;
     Choices choices = getDefaultChoices(list.size());
@@ -154,9 +157,8 @@ void GroupQuiz::showGroup(const List& questions, const Answers& answers, const L
     if (!isTestMode()) addOtherGroupName(i->name(), s);
     out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
     printAssignedAnswer(answers, choice) << choice << ":  " << readings[count]->reading();
-    printMeaning(readings[count]);
+    printMeaning(readings[count++]);
     if (!repeatQuestion && isTestMode()) choices[choice] = "";
-    ++count;
   }
   out() << '\n';
 }

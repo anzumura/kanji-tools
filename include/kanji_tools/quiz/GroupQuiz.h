@@ -14,10 +14,13 @@ public:
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
 
-  GroupQuiz(const QuizLauncher&, int question, bool showMeanings, const GroupData::List&, char otherGroup, MemberType);
+  GroupQuiz(const QuizLauncher&, int question, bool showMeanings, const GroupData::List&, MemberType);
 private:
   // 'GroupEntryWidth' is the width required for 'qualified name', 'pinyin' and 'other group name'
   enum Values { PinyinWidth = 12, GroupEntryWidth = 22 };
+
+  // 'getGroupType' returns the type of first group in the given list (the list should all have the same type)
+  static GroupType getGroupType(const GroupData::List&);
 
   // 'includeMember' returns true if a member can be included in group quiz question. The member must
   // have a reading as well as meet the criteria of the given MemberType.
@@ -27,7 +30,7 @@ private:
   static void addPinyin(const Entry& kanji, std::string& s);
 
   // 'addOtherGroupName' is used in review mode to show other groups that 'name' may belong to. 'z:y' is
-  // optionally added to 's' where 'x' is the value of '_otherGroup' (so either 'm' or 'p') and 'y' is
+  // optionally added to 's' where 'x' is either 'm' or 'p' (based on opposite of _groupType) and 'y' is
   // the number of the other group that contains 'name'. For example, while reviewing 'meaning groups'
   // values like 'p:123' will be displayed if 'name' is a member of 'pattern group' number 123.
   void addOtherGroupName(const std::string& name, std::string& s) const;
@@ -49,7 +52,7 @@ private:
   int getAnswerToEdit(const Answers&) const;
   void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name);
 
-  const char _otherGroup;
+  const GroupType _groupType;
 };
 
 } // namespace kanji_tools

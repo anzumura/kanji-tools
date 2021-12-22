@@ -114,10 +114,10 @@ void QuizLauncher::start(OptChar quizType, OptChar questionList, int question, b
   auto listQuiz = [this, question, showMeanings](const List& list, int excludeFields) {
     ListQuiz(*this, question, showMeanings, list, Kanji::AllFields ^ excludeFields);
   };
-  auto groupQuiz = [this, question, showMeanings, questionList](const GroupData::List& list, char otherGroup) {
+  auto groupQuiz = [this, question, showMeanings, questionList](const GroupData::List& list) {
     if (char c = questionList ? *questionList : _choice.get("Kanji type", GroupKanjiChoices, DefaultGroupKanji);
         !isQuit(c))
-      GroupQuiz(*this, question, showMeanings, list, otherGroup, static_cast<GroupQuiz::MemberType>(c - '1'));
+      GroupQuiz(*this, question, showMeanings, list, static_cast<GroupQuiz::MemberType>(c - '1'));
   };
 
   // can replace below 'quizType' turnary operator with 'or_else' when C++23 is available
@@ -151,8 +151,8 @@ void QuizLauncher::start(OptChar quizType, OptChar questionList, int question, b
     if (char c = questionList ? *questionList : _choice.get("Choose level", LevelChoices); !isQuit(c))
       listQuiz(data().levelList(AllJlptLevels[4 - (c - '1')]), Kanji::LevelField);
     break;
-  case 'm': groupQuiz(_groupData.meaningGroups(), 'p'); break;
-  case 'p': groupQuiz(_groupData.patternGroups(), 'm'); break;
+  case 'm': groupQuiz(_groupData.meaningGroups()); break;
+  case 'p': groupQuiz(_groupData.patternGroups()); break;
   }
   // reset mode and question order in case 'start' is called again
   _programMode = ProgramMode::NotAssigned;
