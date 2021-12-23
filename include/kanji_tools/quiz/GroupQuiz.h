@@ -37,20 +37,21 @@ private:
 
   void start(const GroupData::List&, MemberType);
 
-  using Answers = std::vector<char>;
-
   // 'printAssignedAnswers' prints all currently assigned choices on one line in the form: 1->a, 2->c, ...
-  void printAssignedAnswers(const Answers&) const;
+  void printAssignedAnswers() const;
 
   // 'printAssignedAnswer' prints ' x->' if 'choice' is assigned to entry 'x', otherwise prints 4 spaces
-  std::ostream& printAssignedAnswer(const Answers&, char choice) const;
+  std::ostream& printAssignedAnswer(char choice) const;
 
-  void showGroup(const List& questions, const Answers&, const List& readings, Choices&, bool repeatQuestion) const;
-  bool getAnswers(Answers&, int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
-  bool getAnswer(Answers&, Choices&, bool& skipGroup, bool& refresh);
-  void editAnswer(Answers&, Choices&);
-  int getAnswerToEdit(const Answers&) const;
-  void checkAnswers(const Answers&, const List& questions, const List& readings, const std::string& name);
+  void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
+  bool getAnswers(int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
+  bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
+  void editAnswer(Choices&);
+  int getAnswerToEdit() const;
+  void checkAnswers(const List& questions, const List& readings, const std::string& name);
+
+  // '_answers' holds answers for the current question, i.e., the reading selected for each group member
+  std::vector<char> _answers;
 
   const GroupType _groupType;
 };

@@ -111,7 +111,7 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
       std::shuffle(questions.begin(), questions.end(), RandomGen);
       std::shuffle(readings.begin(), readings.end(), RandomGen);
     }
-    Answers answers;
+    _answers.clear();
     Choices choices = getDefaultChoices(list.size());
     bool repeatQuestion = false, skipGroup = false;
     do {
@@ -121,9 +121,9 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
       else
         out() << "showing " << questions.size() << " out of " << i->members().size();
       out() << " members\n";
-      showGroup(questions, answers, readings, choices, repeatQuestion);
-      if (getAnswers(answers, questions.size(), choices, skipGroup, stopQuiz)) {
-        checkAnswers(answers, questions, readings, i->name());
+      showGroup(questions, readings, choices, repeatQuestion);
+      if (getAnswers(questions.size(), choices, skipGroup, stopQuiz)) {
+        checkAnswers(questions, readings, i->name());
         break;
       }
       repeatQuestion = true;
@@ -132,23 +132,22 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
   if (stopQuiz) --_question;
 }
 
-void GroupQuiz::printAssignedAnswers(const Answers& answers) const {
-  if (!answers.empty()) {
+void GroupQuiz::printAssignedAnswers() const {
+  if (!_answers.empty()) {
     out() << "   ";
-    for (int i = 0; i < answers.size(); ++i)
-      out() << ' ' << i + 1 << "->" << answers[i];
+    for (int i = 0; i < _answers.size(); ++i)
+      out() << ' ' << i + 1 << "->" << _answers[i];
     out() << '\n';
   }
 }
 
-std::ostream& GroupQuiz::printAssignedAnswer(const Answers& answers, char choice) const {
-  for (int i = 0; i < answers.size(); ++i)
-    if (answers[i] == choice) return out() << std::right << std::setw(2) << i + 1 << "->";
+std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
+  for (int i = 0; i < _answers.size(); ++i)
+    if (_answers[i] == choice) return out() << std::right << std::setw(2) << i + 1 << "->";
   return out() << "    ";
 }
 
-void GroupQuiz::showGroup(const List& questions, const Answers& answers, const List& readings, Choices& choices,
-                          bool repeatQuestion) const {
+void GroupQuiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion) const {
   for (int count = 0; auto& i : questions) {
     const char choice = isTestMode() ? count < TotalLetters ? 'a' + count : 'A' + (count - TotalLetters) : ' ';
     out() << std::right << std::setw(4) << count + 1 << ":  ";
@@ -156,16 +155,16 @@ void GroupQuiz::showGroup(const List& questions, const Answers& answers, const L
     addPinyin(i, s);
     if (!isTestMode()) addOtherGroupName(i->name(), s);
     out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
-    printAssignedAnswer(answers, choice) << choice << ":  " << readings[count]->reading();
+    printAssignedAnswer(choice) << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count++]);
     if (!repeatQuestion && isTestMode()) choices[choice] = "";
   }
   out() << '\n';
 }
 
-bool GroupQuiz::getAnswers(Answers& answers, int totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) {
-  for (int i = answers.size(); i < totalQuestions; ++i)
-    if (bool refresh = false; !getAnswer(answers, choices, skipGroup, refresh)) {
+bool GroupQuiz::getAnswers(int totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) {
+  for (int i = _answers.size(); i < totalQuestions; ++i)
+    if (bool refresh = false; !getAnswer(choices, skipGroup, refresh)) {
       // set 'stopQuiz' to break out of top quiz loop if user quit in the middle of providing answers
       if (!refresh && !skipGroup) stopQuiz = true;
       return false;
@@ -173,12 +172,11 @@ bool GroupQuiz::getAnswers(Answers& answers, int totalQuestions, Choices& choice
   return true;
 }
 
-bool GroupQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, bool& refresh) {
-  const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for Entry: ");
-  const std::string space = (answers.size() < 9 ? " " : "");
+bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
+  const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for: ");
   do {
-    printAssignedAnswers(answers);
-    const char answer = get(isTestMode() ? QuizMsg + space + std::to_string(answers.size() + 1) : ReviewMsg, choices);
+    printAssignedAnswers();
+    const char answer = get(isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg, choices);
     switch (answer) {
     case RefreshOption: refresh = true; break;
     case MeaningsOption:
@@ -190,12 +188,12 @@ bool GroupQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, b
       skipGroup = true;
       break;
     case SkipOption: skipGroup = true; break;
-    case EditOption: editAnswer(answers, choices); break;
+    case EditOption: editAnswer(choices); break;
     default:
       if (isQuit(answer)) return false;
-      answers.push_back(answer);
+      _answers.push_back(answer);
       choices.erase(answer);
-      if (answers.size() == 1) {
+      if (_answers.size() == 1) {
         choices[EditOption] = "edit";
         choices[RefreshOption] = "refresh";
       }
@@ -205,36 +203,36 @@ bool GroupQuiz::getAnswer(Answers& answers, Choices& choices, bool& skipGroup, b
   return false;
 }
 
-void GroupQuiz::editAnswer(Answers& answers, Choices& choices) {
+void GroupQuiz::editAnswer(Choices& choices) {
   static const std::string NewReadingForEntry("    New reading for Entry: ");
 
-  const int entry = getAnswerToEdit(answers);
-  choices[answers[entry]] = ""; // put the answer back as a choice
+  const int entry = getAnswerToEdit();
+  choices[_answers[entry]] = ""; // put the answer back as a choice
   auto newChoices = choices;
   newChoices.erase(EditOption);
   newChoices.erase(MeaningsOption);
+  newChoices.erase(RefreshOption);
   newChoices.erase(SkipOption);
-  const char answer = get(NewReadingForEntry + std::to_string(entry + 1), newChoices, answers[entry], false);
-  answers[entry] = answer;
+  const char answer = get(NewReadingForEntry + std::to_string(entry + 1), newChoices, _answers[entry], false);
+  _answers[entry] = answer;
   choices.erase(answer);
 }
 
-int GroupQuiz::getAnswerToEdit(const Answers& answers) const {
+int GroupQuiz::getAnswerToEdit() const {
   static const std::string AnswerToEdit("    Answer to edit: ");
 
-  if (answers.size() == 1) return 0;
+  if (_answers.size() == 1) return 0;
   std::map<char, std::string> answersToEdit;
-  for (auto k : answers)
+  for (auto k : _answers)
     answersToEdit[k] = "";
-  const auto index = std::find(answers.begin(), answers.end(), get(AnswerToEdit, answersToEdit, {}, false));
-  assert(index != answers.end());
-  return std::distance(answers.begin(), index);
+  const auto index = std::find(_answers.begin(), _answers.end(), get(AnswerToEdit, answersToEdit, {}, false));
+  assert(index != _answers.end());
+  return std::distance(_answers.begin(), index);
 }
 
-void GroupQuiz::checkAnswers(const Answers& answers, const List& questions, const List& readings,
-                             const std::string& name) {
+void GroupQuiz::checkAnswers(const List& questions, const List& readings, const std::string& name) {
   int count = 0;
-  for (auto i : answers) {
+  for (auto i : _answers) {
     int index = (i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
     // Only match on readings (and meanings if '_showMeanings' is true) instead of making
     // sure the kanji is exactly the same since many kanjis have identical readings
@@ -243,10 +241,10 @@ void GroupQuiz::checkAnswers(const Answers& answers, const List& questions, cons
         (!showMeanings() || questions[count]->meaning() == readings[index]->meaning()))
       ++count;
   }
-  if (count == answers.size())
+  if (count == _answers.size())
     correctMessage();
   else
-    incorrectMessage(name) << " (got " << count << " right out of " << answers.size() << ")\n";
+    incorrectMessage(name) << " (got " << count << " right out of " << _answers.size() << ")\n";
 }
 
 } // namespace kanji_tools

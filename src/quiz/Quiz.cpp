@@ -51,14 +51,12 @@ std::ostream& Quiz::incorrectMessage(const std::string& name) {
   return out() << "  Incorrect";
 }
 
-
 Choice::Choices Quiz::getDefaultChoices(int totalQuestions) const {
   Choice::Choices c = {{MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
                        {SkipOption,
                         _question + 1 == totalQuestions ? "finish"
                           : !isTestMode()               ? "next"
-                                                        : "skip"},
-                       {QuizLauncher::QuitOption, "quit"}};
+                                                        : "skip"}};
   if (!isTestMode() && _question) c[PrevOption] = "prev";
   return c;
 }
