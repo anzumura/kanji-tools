@@ -18,8 +18,8 @@ constexpr char ChoiceStart = '1';
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const List& list, int infoFields,
                    int choiceCount, QuizStyle quizStyle)
-  : Quiz(launcher, question, showMeanings), _answers(choiceCount, 0), _infoFields(infoFields), _choiceCount(choiceCount), _quizStyle(quizStyle),
-    _prompt(isTestMode() ? QuizPrompt + (isKanjiToReading() ? "reading" : "kanji") : Prompt),
+  : Quiz(launcher, question, showMeanings), _answers(choiceCount), _infoFields(infoFields), _choiceCount(choiceCount),
+    _quizStyle(quizStyle), _prompt(isTestMode() ? QuizPrompt + (isKanjiToReading() ? "reading" : "kanji") : Prompt),
     _choiceEnd('0' + _choiceCount) {
   List questions;
   for (auto& i : list)
