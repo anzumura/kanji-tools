@@ -23,15 +23,17 @@ private:
 
   int populateAnswers(const Entry&, Answers&, const List& questions) const;
   void printQuestion(const Entry&) const;
-  void printChoices(const Entry&, Choices&, const List& questions, const Answers&) const;
+  void printChoices(const Entry&, const List& questions, const Answers&) const;
 
   // 'getAnswer' prompts user for an answer and processes the result. This method only returns 'false' if the
   // question should be repeated (for toggling meanings), otherwise it returns 'true'.
-  bool getAnswer(const std::string& prompt, Choices&, bool& stopQuiz, int correctChoice, const std::string& name);
+  bool getAnswer(Choices&, bool& stopQuiz, int correctChoice, const std::string& name);
 
   const int _infoFields;
   const int _choiceCount;
   const QuizStyle _quizStyle;
+  const std::string _prompt;
+  const char _choiceEnd; // '0' + _choiceCount
 };
 
 } // namespace kanji_tools

@@ -9,11 +9,18 @@ namespace {
 std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
+const std::string Prompt("  Select");
+const std::string QuizPrompt = Prompt + " correct ";
+
+constexpr char ChoiceStart = '1';
+
 } // namespace
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const List& list, int infoFields,
                    int choiceCount, QuizStyle quizStyle)
-  : Quiz(launcher, question, showMeanings), _infoFields(infoFields), _choiceCount(choiceCount), _quizStyle(quizStyle) {
+  : Quiz(launcher, question, showMeanings), _infoFields(infoFields), _choiceCount(choiceCount), _quizStyle(quizStyle),
+    _prompt(isTestMode() ? QuizPrompt + (isKanjiToReading() ? "reading" : "kanji") : Prompt),
+    _choiceEnd('0' + _choiceCount) {
   List questions;
   for (auto& i : list)
     if (i->hasReading()) questions.push_back(i);
@@ -32,21 +39,17 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings
 }
 
 void ListQuiz::start(const List& questions) {
-  static const std::string reviewPrompt("  Select"), quizPrompt("  Select correct ");
-  const std::string prompt(isTestMode() ? quizPrompt + (isKanjiToReading() ? "reading" : "kanji")
-                                        : reviewPrompt);
-
   bool stopQuiz = false;
   for (Choices choices; !stopQuiz && _question < questions.size(); ++_question) {
     const Entry& i = questions[_question];
+    choices = getDefaultChoices(questions.size());
     Answers answers;
     const int correctChoice = populateAnswers(i, answers, questions);
     do {
       beginQuestionMessage(questions.size());
       printQuestion(i);
-      choices = getDefaultChoices(questions.size());
-      printChoices(i, choices, questions, answers);
-    } while (!getAnswer(prompt, choices, stopQuiz, correctChoice, i->name()));
+      printChoices(i, questions, answers);
+    } while (!getAnswer(choices, stopQuiz, correctChoice, i->name()));
   }
   // when quitting don't count the current question in the final score
   if (stopQuiz) --_question;
@@ -81,21 +84,17 @@ void ListQuiz::printQuestion(const Entry& kanji) const {
   printMeaning(kanji, !isTestMode());
 }
 
-void ListQuiz::printChoices(const Entry& kanji, Choices& choices, const List& questions, const Answers& answers) const {
-  if (isTestMode()) {
-    for (int i = 0; i < _choiceCount; ++i)
-      choices['1' + i] = "";
+void ListQuiz::printChoices(const Entry& kanji, const List& questions, const Answers& answers) const {
+  if (isTestMode())
     for (auto& i : answers)
       out() << "    " << i.first << ".  "
-            << (isKanjiToReading() ? questions[i.second]->reading() : questions[i.second]->name())
-            << '\n';
-  } else
+            << (isKanjiToReading() ? questions[i.second]->reading() : questions[i.second]->name()) << '\n';
+  else
     _launcher.printReviewDetails(kanji);
 }
 
-bool ListQuiz::getAnswer(const std::string& prompt, Choices& choices, bool& stopQuiz, int correctChoice,
-                         const std::string& name) {
-  const char answer = get(prompt, choices);
+bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, int correctChoice, const std::string& name) {
+  const char answer = isTestMode() ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices) : get(_prompt, choices);
   if (answer == MeaningsOption) {
     toggleMeanings(choices);
     return false;
