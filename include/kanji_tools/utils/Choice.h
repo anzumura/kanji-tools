@@ -18,49 +18,35 @@ public:
   // istream can be passed in instead (good for testing).
   Choice(std::ostream& out, std::istream* in = 0, OptChar quit = std::nullopt) : _out(out), _in(in), _quit(quit) {}
 
-  // Provide special support for 'quitChoice'. If it has a value then it will be added to
-  // the 'choices' provided to the below 'get' methods.
+  // Provide special support for '_quit' choice. If it has a value then it will be added to
+  // the 'choices' provided to the below 'get' methods with a description of "quit".
   OptChar quit() const { return _quit; }
   void setQuit(char c) { _quit = c; }
   void clearQuit() { _quit = {}; }
   bool isQuit(char c) const { return _quit == c; }
 
-  // 'get' will prompt the use to enter one of the choices in the 'choices' structure. If
-  // an optional default choice is provided it must correspond to an entry in 'choices'.
-  // If 'choices' contains two or more consecutive ascii values with empty descriptions
-  // then they will be displayed as a range, i.e., 1-9, a-c, F-J, etc. - see ChoiceTest.cpp
-  // for examples of how to use this class and expected output. 'useQuit' can be set to false
-  // to skip providing '_quit' value (has no effect if '_quit' is nullopt).
-  char get(const std::string& msg, const Choices& choices) const {
-    return get(msg, choices, {});
-  }
-  char get(const std::string& msg, const Choices& choices, OptChar def) const {
-    return get(msg, true, choices, def);
-  }
+  // 'get' prompts for one of the choices in the 'choices' structure. If a default choice is provided
+  // it must correspond to an entry in 'choices', otherwise an exception is thrown. If 'choices' contains
+  // two or more consecutive ascii values with empty descriptions then they will be displayed as a range,
+  // i.e., 1-9, a-c, F-J, etc. - see ChoiceTest.cpp for examples of how to use this class and expected output.
+  // 'useQuit' can be set to false to skip providing '_quit' value (has no effect if '_quit' isn't set).
+  char get(const std::string& msg, const Choices& choices) const { return get(msg, choices, {}); }
+  char get(const std::string& msg, const Choices& choices, OptChar def) const { return get(msg, true, choices, def); }
   char get(const std::string& msg, bool useQuit, const Choices& choices) const {
     return get(msg, useQuit, choices, {});
   }
   char get(const std::string& msg, bool useQuit, const Choices& choices, OptChar def) const;
 
   // 'get' with ranges are convenience methods when there is a range with no descriptions
-  char get(const std::string& msg, char first, char last) const {
-    return get(msg, first, last, {}, {});
-  }
-  char get(const std::string& msg, char first, char last, OptChar def) const {
-    return get(msg, first, last, {}, def);
-  }
+  char get(const std::string& msg, char first, char last) const { return get(msg, first, last, {}, {}); }
+  char get(const std::string& msg, char first, char last, OptChar def) const { return get(msg, first, last, {}, def); }
   char get(const std::string& msg, char first, char last, const Choices& choices) const {
     return get(msg, first, last, choices, {});
   }
   char get(const std::string& msg, char first, char last, const Choices& choices, OptChar def) const {
     return get(msg, true, first, last, choices, def);
   }
-  char get(const std::string& msg, bool useQuit, char first, char last, const Choices& choices, OptChar def) const {
-    Choices c(choices);
-    while (first <= last)
-      c[first++] = "";
-    return get(msg, useQuit, c, def);
-  }
+  char get(const std::string& msg, bool useQuit, char first, char last, const Choices& choices, OptChar def) const;
 private:
   static void add(std::string& prompt, const Choices& choices);
   static char getOneChar();

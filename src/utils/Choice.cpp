@@ -7,6 +7,12 @@
 
 namespace kanji_tools {
 
+namespace {
+
+const std::string AlreadyInChoices("' already in choices");
+
+} // namespace
+
 char Choice::getOneChar() {
   char result = 0;
   struct termios settings = {0};
@@ -61,13 +67,18 @@ void Choice::add(std::string& prompt, const Choices& choices) {
 }
 
 char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn, OptChar def) const {
+  static const std::string QuitError("quit option '"), DefaultError("default option '");
+
   // if 'msg' is empty then don't leave a space before listing the choices in brackets.
   std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
   Choices choices(choicesIn);
-  if (useQuit && _quit && choices.find(*_quit) == choices.end()) choices[*_quit] = "quit";
+  if (_quit) {
+    if (choices.contains(*_quit)) throw std::domain_error(QuitError + *_quit + AlreadyInChoices);
+    if (useQuit) choices[*_quit] = "quit";
+  }
   add(prompt, choices);
   if (def) {
-    assert(choices.find(*def) != choices.end());
+    if (!choices.contains(*def)) throw std::domain_error(DefaultError + *def + "' not in choices");
     prompt += ") def '";
     prompt += *def;
     prompt += "': ";
@@ -89,6 +100,18 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
     if (line.empty() && def) return *def;
   } while (line.length() != 1 || choices.find(line[0]) == choices.end());
   return line[0];
+}
+
+char Choice::get(const std::string& msg, bool useQuit, char first, char last, const Choices& choices,
+                 OptChar def) const {
+  static const std::string RangeError("range option '");
+
+  Choices c(choices);
+  while (first <= last) {
+    if (c.contains(first)) throw std::domain_error(RangeError + first + AlreadyInChoices);
+    c[first++] = "";
+  }
+  return get(msg, useQuit, c, def);
 }
 
 } // namespace kanji_tools

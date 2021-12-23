@@ -197,4 +197,42 @@ TEST_F(ChoiceTest, ClearQuitOption) {
   EXPECT_FALSE(std::getline(_os, line));
 }
 
+TEST_F(ChoiceTest, MissingDefaultOption) {
+  try {
+    _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e');
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("default option 'e' not in choices"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ChoiceTest, DuplicateQuitOption) {
+  _choice.setQuit('q');
+  for (bool useQuit : {false, true})
+    try {
+      _choice.get("", useQuit, {{'q', "abc"}});
+      FAIL() << "Expected std::domain_error";
+    } catch (std::domain_error& err) {
+      EXPECT_EQ(err.what(), std::string("quit option 'q' already in choices"));
+    } catch (...) {
+      FAIL() << "Expected std::domain_error";
+    }
+}
+
+TEST_F(ChoiceTest, DuplicateRangeOption) {
+  Choice::Choices choices = {{'a', "12"}, {'c', "34"}};
+  const std::string start("range option '"), end("' already in choices");
+  for (char rangeStart : {'a', 'b'})
+    try {
+      _choice.get("", rangeStart, 'c', choices);
+      FAIL() << "Expected std::domain_error";
+    } catch (std::domain_error& err) {
+      EXPECT_EQ(err.what(), start + (rangeStart == 'a' ? 'a' : 'c') + end);
+    } catch (...) {
+      FAIL() << "Expected std::domain_error";
+    }
+}
+
 } // namespace kanji_tools
