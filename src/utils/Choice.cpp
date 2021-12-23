@@ -1,7 +1,5 @@
 #include <kanji_tools/utils/Choice.h>
 
-#include <cassert>
-
 #include <termios.h>
 #include <unistd.h>
 
