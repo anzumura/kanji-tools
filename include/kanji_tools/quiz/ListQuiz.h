@@ -19,15 +19,20 @@ private:
 
   bool isKanjiToReading() const { return _quizStyle == QuizStyle::KanjiToReading; }
 
-  using Answers = std::map<int, int>;
+  // 'populateAnswers' populates '_answers' and returns the position corresponding to the current
+  // question, i.e., the correct answer for 'kanji'.
+  int populateAnswers(const Entry& kanji, const List& questions);
 
-  int populateAnswers(const Entry&, Answers&, const List& questions) const;
-  void printQuestion(const Entry&) const;
-  void printChoices(const Entry&, const List& questions, const Answers&) const;
+  void printQuestion(const Entry& kanji) const;
+  void printChoices(const Entry& kanji, const List& questions) const;
 
-  // 'getAnswer' prompts user for an answer and processes the result. This method only returns 'false' if the
-  // question should be repeated (for toggling meanings), otherwise it returns 'true'.
-  bool getAnswer(Choices&, bool& stopQuiz, int correctChoice, const std::string& name);
+  // 'getAnswer' prompts for an answer and processes the result. This method only returns 'false'
+  // if the question should be repeated (for toggling meanings), otherwise it returns 'true'.
+  bool getAnswer(Choices& choices, bool& stopQuiz, int correctChoice, const std::string& name);
+
+  // '_answers' contains '_choiceCount' entries and is repopulated for each question (one index
+  // has the correct answer and others are randomly chosen from the full question list).
+  std::vector<int> _answers;
 
   const int _infoFields;
   const int _choiceCount;
