@@ -53,9 +53,8 @@ constexpr std::array WideBlocks = {
 // 'displayLength' returns the length of 's' in terms of how many columns would be required for
 // display on a terminal, i.e, 1 column for a normal sized character and 2 for a wide character.
 inline size_t displayLength(const std::string& s) {
-  auto w = fromUtf8(s);
   size_t result = 0;
-  for (auto i : w)
+  for (auto w = fromUtf8(s); auto i : w)
     if (inRange(i, WideBlocks))
       result += 2;
     else if (!inRange(i, NonSpacingBlocks))

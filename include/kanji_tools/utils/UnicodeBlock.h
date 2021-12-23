@@ -105,10 +105,9 @@ template<typename... T> inline bool inWCharRange(const std::string& s, bool chec
 
 // Return true if all characers are in the given blocks, empty string will also return true
 template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
-  auto w = fromUtf8(s);
   // an 'inRange' character can be followed by a 'variation selector'
   bool allowNonSpacing = false;
-  for (auto i : w) {
+  for (auto w = fromUtf8(s); auto i : w) {
     if (allowNonSpacing && inRange(i, NonSpacingBlocks))
       allowNonSpacing = false;
     else if (inRange(i, t...))

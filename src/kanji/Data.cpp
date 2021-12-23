@@ -301,11 +301,10 @@ void Data::processList(const DataFile& list) {
 }
 
 void Data::processUcd() {
-  auto& newKanji = _types[KanjiTypes::Ucd];
   // Calling 'findKanjiByName' also checks for a 'variation selector' version of the given 'name'
   // so use it instead of just checking for a match in _kanjiNameMap directly (this avoids 52
   // redundant kanji getting created when processing 'ucd.txt').
-  for (auto& i : _ucd.map())
+  for (auto& newKanji = _types[KanjiTypes::Ucd]; auto& i : _ucd.map())
     if (!findKanjiByName(i.second.name())) checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
 }
 

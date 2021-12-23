@@ -118,8 +118,7 @@ void ConvertMain::run() {
   if (std::string line; _strings.empty())
     getInput();
   else {
-    bool outputSpace = false;
-    for (const auto& i : _strings) {
+    for (bool outputSpace = false; const auto& i : _strings) {
       if (outputSpace)
         std::cout << (_converter.target() == CharType::Romaji ? " " : "　");
       else
@@ -220,7 +219,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
   const std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when there are small letters
   // that should be included, i.e., 'la' (ぁ) comes right before 'a' (あ).
-  std::set<std::string> groups{"la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
+  const std::set<std::string> groups{"la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i = *entry.second;
     romajiVariants += i.romajiVariants().size();
