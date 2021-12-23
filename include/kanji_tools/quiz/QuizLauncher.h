@@ -48,6 +48,9 @@ private:
 
   const Data& data() const { return _groupData.data(); }
 
+  void startListQuiz(int question, bool showMeanings, int excludeField, const List&) const;
+  void startGroupQuiz(int question, bool showMeanings, OptChar questionList, const GroupData::List& list) const;
+
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets '_programMode'. It can also
   // set '_questionOrder' depending on the value of 'arg' and returns the question to start from.
   int processProgramModeArg(const std::string& arg);
