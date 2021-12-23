@@ -11,14 +11,18 @@ namespace kanji_tools {
 class Stats {
 public:
   using OptEntry = Data::OptEntry;
+
   // Command line options must specify one or more files and 'data' class is used to lookup kanji
   // found in files - see HelpMessage in Stats.cpp for more details on command line options.
-  Stats(int argc, const char** argv, DataPtr);
+  Stats(int argc, const char** argv, DataPtr data);
+
   Stats(const Stats&) = delete;
+
   // helper class for ordering and printing out kanji found in files
   class Count {
   public:
     Count(int f, const std::string& n, OptEntry e) : count(f), name(n), entry(e) {}
+
     // Sort to have largest 'count' first followed by lowest frequency number. Lower frequency
     // means the kanji is more common, but a frequency of '0' means the kanji isn't in the top
     // frequency list so use 'frequencyOrDefault' to return a large number for no-frequency
@@ -30,6 +34,7 @@ public:
         (count == x.count && frequency() < x.frequency() ||
          (frequency() == x.frequency() && type() < x.type() || (type() == x.type() && toHex() < x.toHex())));
     }
+
     int frequency() const {
       return entry ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
     }
@@ -43,13 +48,22 @@ public:
 private:
   // 'MaxExamples' is the maximum number of examples to show for each kanji type when printing stats
   enum Values { MaxExamples = 5 };
+
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
   std::ostream& out() const { return _data->out(); }
+
   void countKanji(const std::filesystem::path& top, bool showBreakdown, bool verbose) const;
+
   template<typename Pred>
   int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool&, bool) const;
-  void printKanjiTypeCounts(const std::set<Count>&, int total) const;
+
+  using CountSet = std::set<Count>;
+
+  void printHeaderInfo(const std::filesystem::path&, const class MBCharCount&) const;
   void printTotalAndUnique(const std::string& name, int total, int unique) const;
+  void printKanjiTypeCounts(const std::set<Count>&, int total) const;
+  void printExamples(const CountSet&) const;
+  void printBreakdown(const std::string& name, bool showBreakdown, const CountSet&, const MBCharCount&) const;
 
   const DataPtr _data;
 };
