@@ -27,6 +27,8 @@ kanjiStats [-bhv] file [file ...]:\n\
   -h: show help message for command-line options\n\
   -v: show 'before' and 'after' versions of lines that changed due to furigana removal\n";
 
+constexpr double asPercent(int amount, int total) { return amount * 100. / total; }
+
 } // namespace
 
 std::string Stats::Count::toHex() const {
@@ -85,7 +87,7 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
     for (int i = 0; i < IncludeInTotals; ++i)
       if (totals[i].first) {
         if (totals[i].second != totals[0].second) out() << ", ";
-        out() << totals[i].second << ": " << totals[i].first * 100. / total << "%";
+        out() << totals[i].second << ": " << asPercent(totals[i].first, total) << "%";
       }
     out() << ')';
   }
@@ -144,7 +146,7 @@ void Stats::printHeaderInfo(const fs::path& top, const MBCharCount& count) const
 
 void Stats::printTotalAndUnique(const std::string& name, int total, int unique) const {
   log() << std::right << std::setw(TypeNameWidth) << name << ": " << std::setw(TotalCountWidth) << total
-        << ", unique: " << std::setw(4) << unique;
+        << ", unique: " << std::setw(UniqueCountWidth) << unique;
 }
 
 void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) const {
@@ -160,7 +162,8 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
     if (auto i = uniqueKanjiPerType.find(t); i != uniqueKanjiPerType.end()) {
       int totalForType = totalKanjiPerType[t];
       printTotalAndUnique(std::string("[") + toString(t) + "] ", totalForType, i->second);
-      out() << ", " << std::setw(6) << std::fixed << std::setprecision(2) << totalForType * 100. / total << "%  (";
+      out() << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
+            << asPercent(totalForType, total) << "%  (";
       auto& j = found[t];
       for (int k = 0; k < j.size(); ++k) {
         if (k) out() << ", ";

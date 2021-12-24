@@ -48,7 +48,11 @@ public:
 private:
   // 'IncludeInTotals' of 4 indicates only Kanji and full-width kana should be included in totals and percents
   // 'MaxExamples' is the maximum number of examples to show for each kanji type when printing stats
-  enum Values { IncludeInTotals = 4, MaxExamples = 5, TotalCountWidth = 6, TypeNameWidth = 16 };
+  enum Values { IncludeInTotals = 4, MaxExamples = 5 };
+
+  // 'DisplayValues' are for ostream 'set' functions
+  enum IntDisplayValues { UniqueCountWidth = 4, TotalCountWidth = 6, TypeNameWidth = 16 };
+  enum PercentDisplayValues { PercentPrecision = 2, PercentWidth = 6 };
 
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
   std::ostream& out() const { return _data->out(); }
