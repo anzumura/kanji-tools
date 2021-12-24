@@ -6,6 +6,13 @@
 
 namespace kanji_tools {
 
+namespace {
+
+const std::string OpenWideBracket("（"), CloseWideBracket("）");
+const int CloseWideBracketLength = CloseWideBracket.length();
+
+} // namespace
+
 bool MBChar::next(std::string& result, bool onlyMB) {
   for (; *_location; ++_location) {
     const unsigned char firstOfGroup = *_location;
@@ -112,64 +119,53 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
   return added;
 }
 
-// In order to help with 'furigana removal', if a line would end with an open wide bracket
-// (optionally followed more text) then join with the next line up until a closing wide
-// bracket before processing. Since a file could have globally unbalanced brackets don't
-// keep looking beyond the next line (also, furigana should only be a few characters long).
-// added += addTag ? add(line, tag) : add(line);
+bool MBCharCount::isOpenEnded(const std::string& line) {
+  if (auto open = line.rfind(OpenWideBracket); open != std::string::npos) {
+    auto close = line.rfind(CloseWideBracket);
+    return (close == std::string::npos || close < open);
+  }
+  return false;
+}
+
+bool MBCharCount::processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added, bool addTag,
+                                 const std::string& tag) {
+  const auto end = pos + CloseWideBracketLength;
+  const std::string s = prevLine + line.substr(0, end);
+  added += addTag ? add(s, tag) : add(s);
+  // set 'prevLine' to the unprocessed portion of 'line'
+  prevLine = line.substr(end);
+  return isOpenEnded(prevLine);
+}
+
 size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag) {
-  static const std::string openWideBracket("（"), closeWideBracket("）");
   size_t added = 0;
   std::string line, prevLine;
   bool prevOpenEnded = false;
-
-  // 'calculatePrevOpenEnded' sets 'prevOpenEnded' to 'true' if the previous line has an open bracket without
-  // a closing bracket (searching back from the end), otherwise it will set to 'false'.
-  auto calculatePrevOpenEnded = [&prevLine, &prevOpenEnded] {
-    if (auto open = prevLine.rfind(openWideBracket); open != std::string::npos) {
-      auto close = prevLine.rfind(closeWideBracket);
-      prevOpenEnded = (close == std::string::npos || close < open);
-    } else
-      prevOpenEnded = false;
-  };
-
-  // 'processPartial' processes the previous line plus current line up until closing bracket
-  auto processPartial = [this, &tag, &added, &line, &prevLine, &calculatePrevOpenEnded, addTag](size_t close) {
-    auto end = close + closeWideBracket.length();
-    std::string s = prevLine + line.substr(0, end);
-    added += addTag ? add(s, tag) : add(s);
-    // save the remaider of the current line for the next loop iteration
-    prevLine = line.substr(end);
-    calculatePrevOpenEnded();
-  };
 
   for (std::ifstream f(file); std::getline(f, line);) {
     if (prevLine.empty()) {
       // special case for first line - don't process in case next line stars with open bracket.
       prevLine = line;
-      calculatePrevOpenEnded();
+      prevOpenEnded = isOpenEnded(prevLine);
       continue;
     } else if (prevOpenEnded) {
-      if (auto close = line.find(closeWideBracket); close != std::string::npos) {
-        if (auto open = line.find(openWideBracket); close < open) {
-          processPartial(close);
+      if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
+        if (auto open = line.find(OpenWideBracket); close < open) {
+          prevOpenEnded = processPartial(prevLine, close, line, added, addTag, tag);
           continue;
         }
       }
-    } else {
+    } else if (auto open = line.find(OpenWideBracket); open == 0)
       // special case for line starting with open bracket
-      if (auto open = line.find(openWideBracket); open == 0) {
-        if (auto close = line.find(closeWideBracket); close != std::string::npos) {
-          processPartial(close);
-          continue;
-        }
+      if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
+        prevOpenEnded = processPartial(prevLine, close, line, added, addTag, tag);
+        continue;
       }
-    }
     // A new open bracket came before 'close' or no 'close' at all on line so give up on
     // trying to balance and just process prevLine.
     added += addTag ? add(prevLine, tag) : add(prevLine);
     prevLine = line;
-    calculatePrevOpenEnded();
+    prevOpenEnded = isOpenEnded(prevLine);
   }
   if (!prevLine.empty()) added += addTag ? add(prevLine, tag) : add(prevLine);
   return added;

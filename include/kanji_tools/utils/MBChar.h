@@ -102,6 +102,7 @@ public:
     MBCharTooLong,     // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
     MBCharMissingBytes // returned when there are not enough continuation bytes
   };
+
   // 'valid' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
   // well-formed 'multi-byte symbol'. Examples:
   // - valid("") = NotMBChar
@@ -141,11 +142,13 @@ public:
     _errors = 0;
     _variants = 0;
   }
+
   // 'next' populates 'result' with the full multi-byte character (so could be more than one byte)
   // returns true if result was populated. This function also supports 'variation selectors', i.e.,
   // when a multi-byte character is added to 'result' the next character is also inspected and if
   // it's a variation selector it will be added as well.
   bool next(std::string& result, bool onlyMB = true);
+
   // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
   bool peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
   int errors() const { return _errors; }
@@ -157,12 +160,11 @@ private:
   // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
   // in these cases it only matters if the following value is a 'variation selector'.
   bool doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall = false) const;
+
   const std::string _data;
   const char* _location = _data.c_str();
-  // '_errors' keeps track of how many invalid bytes were encountered during iteration
-  int _errors = 0;
-  // '_variants' keeps track of how many 'Variation Selector's were found
-  int _variants = 0;
+  int _errors = 0;   // '_errors' keeps track of how many invalid bytes were encountered during iteration
+  int _variants = 0; // '_variants' keeps track of how many 'Variation Selector's were found
 };
 
 // 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
@@ -226,9 +228,23 @@ public:
   const Map& map() const { return _map; }
   bool debug() const { return _debug; }
 private:
+  // 'isOpenEnded' returns true if 'line' has an open bracket without a closing bracket (searching
+  // back from the end), otherwise it returns false.
+  static bool isOpenEnded(const std::string& line);
+
+  // 'processPartial' processes 'prevline' up until 'pos' in 'line' and sets 'prevLine' to the
+  // unprocessed remainder of 'line'. 'added' is updated the result of 'isOpenEnded' is returned.
+  bool processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added, bool addTag,
+                      const std::string& tag);
+
+  // 'balanceBrackets' uses 'isOpenEnded' and 'processPartial' functions to remove furigana, i.e., if
+  // a line ends with an open bracket (and possibly more text) then join with the next line until a
+  // close bracket before processing. Since a file could have globally unbalanced brackets don't keep
+  // looking beyond the next line (also, furigana should only be a few characters long).
+  size_t balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag);
+
   virtual bool allowAdd(const std::string&) const { return true; }
   size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
-  size_t balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag);
 
   Map _map;
   TagMap _tags;
