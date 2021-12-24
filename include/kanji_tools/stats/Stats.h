@@ -46,8 +46,9 @@ public:
     OptEntry entry;
   };
 private:
+  // 'IncludeInTotals' of 4 indicates only Kanji and full-width kana should be included in totals and percents
   // 'MaxExamples' is the maximum number of examples to show for each kanji type when printing stats
-  enum Values { MaxExamples = 5 };
+  enum Values { IncludeInTotals = 4, MaxExamples = 5, TotalCountWidth = 6, TypeNameWidth = 16 };
 
   std::ostream& log(bool heading = false) const { return _data->log(heading); }
   std::ostream& out() const { return _data->out(); }
@@ -55,7 +56,7 @@ private:
   void countKanji(const std::filesystem::path& top, bool showBreakdown, bool verbose) const;
 
   template<typename Pred>
-  int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool&, bool) const;
+  int processCount(const std::filesystem::path&, const Pred&, const std::string&, bool, bool, bool) const;
 
   using CountSet = std::set<Count>;
 

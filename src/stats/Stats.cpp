@@ -64,12 +64,10 @@ Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
 }
 
 void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
-  static const int IncludeInTotals = 4; // only include Kanji and full-width kana in total and percents
-  bool firstCount = true;
-  auto f = [this, &top, showBreakdown, verbose, &firstCount](const auto& x, const auto& y) {
-    return std::make_pair(this->processCount(top, x, y, showBreakdown, firstCount, verbose), y);
+  auto f = [this, &top, showBreakdown, verbose](const auto& x, const auto& y, bool firstCount = false) {
+    return std::make_pair(processCount(top, x, y, showBreakdown, firstCount, verbose), y);
   };
-  std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana"),
+  std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
                     f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
                     f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
@@ -96,7 +94,7 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
 
 template<typename Pred>
 int Stats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
-                        bool& firstCount, bool verbose) const {
+                        bool firstCount, bool verbose) const {
   const bool isKanji(name.ends_with("Kanji")), isHiragana(name == "Hiragana"), isUnrecognized(name == "Unrecognized");
   const bool isCommonKanji(isKanji && name.starts_with("Common"));
 
@@ -109,27 +107,24 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
   MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt,
                       MBCharCount::DefaultReplace, isHiragana && verbose);
   count.addFile(top, isKanji || isUnrecognized || isHiragana && verbose);
+  if (firstCount) printHeaderInfo(top, count);
   CountSet frequency;
   int total = 0;
   for (const auto& i : count.map()) {
     total += i.second;
     frequency.emplace(i.second, i.first, isKanji ? _data->findKanjiByName(i.first) : std::nullopt);
   }
-  if (!total) return 0;
-  if (firstCount) {
-    printHeaderInfo(top, count);
-    firstCount = false;
+  if (total) {
+    printTotalAndUnique(name, total, frequency.size());
+    if (isCommonKanji) { // only show percentage and type breakdown for 'Common Kanji'
+      out() << ", 100.00%\n";
+      printKanjiTypeCounts(frequency, total);
+    } else if (isKanji) // for 'Rare' and 'Non-UCD' Kanji show up to 'MaxExamples' entries in a single line
+      printExamples(frequency);
+    else
+      out() << '\n';
+    if (isUnrecognized || isKanji && showBreakdown) printBreakdown(name, showBreakdown, frequency, count);
   }
-  printTotalAndUnique(name, total, frequency.size());
-  if (isCommonKanji) { // only show percentage and type breakdown for 'Common Kanji'
-    out() << ", 100.00%\n";
-    printKanjiTypeCounts(frequency, total);
-  } else if (isKanji) // for 'Rare' and 'Non-UCD' Kanji show up to 'MaxExamples' entries in a single line
-    printExamples(frequency);
-  else
-    out() << '\n';
-  // print line-by-line breakdown
-  if (isUnrecognized || isKanji && showBreakdown) printBreakdown(name, showBreakdown, frequency, count);
   return total;
 }
 
@@ -148,8 +143,8 @@ void Stats::printHeaderInfo(const fs::path& top, const MBCharCount& count) const
 }
 
 void Stats::printTotalAndUnique(const std::string& name, int total, int unique) const {
-  log() << std::right << std::setw(16) << name << ": " << std::setw(6) << total << ", unique: " << std::setw(4)
-        << unique;
+  log() << std::right << std::setw(TypeNameWidth) << name << ": " << std::setw(TotalCountWidth) << total
+        << ", unique: " << std::setw(4) << unique;
 }
 
 void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) const {
