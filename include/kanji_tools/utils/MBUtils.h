@@ -50,7 +50,7 @@ template<> inline std::string toHex(char x, bool caps, bool squareBrackets) {
 // 'toUnicode' converts a UTF-8 string into space-separated Unicode code point values
 inline std::string toUnicode(const std::string& s, bool caps = true) {
   std::string result;
-  for (auto w = fromUtf8(s); auto i : w) {
+  for (auto i : fromUtf8(s)) {
     if (!result.empty()) result += ' ';
     result += toHex(i, caps);
   }

@@ -95,26 +95,23 @@ template<typename T, typename... Ts> inline bool inRange(char32_t c, const T& t,
 // Return true if the first 'MB character' is in the given blocks, empty string will return false and
 // a string longer than one 'MB characer' will also return false unless 'checkLengthOne' is false.
 template<typename... T> inline bool inWCharRange(const std::string& s, bool checkLengthOne, T... t) {
-  if (s.length() > 1 && (!checkLengthOne || s.length() < 9)) {
-    auto w = fromUtf8(s);
-    if (checkLengthOne ? w.length() == 1 || w.length() == 2 && inRange(w[1], NonSpacingBlocks) : w.length() >= 1)
+  if (s.length() > 1 && (!checkLengthOne || s.length() < 9))
+    if (auto w = fromUtf8(s);
+        checkLengthOne ? w.length() == 1 || w.length() == 2 && inRange(w[1], NonSpacingBlocks) : w.length() >= 1)
       return inRange(w[0], t...);
-  }
   return false;
 }
 
 // Return true if all characers are in the given blocks, empty string will also return true
 template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
   // an 'inRange' character can be followed by a 'variation selector'
-  bool allowNonSpacing = false;
-  for (auto w = fromUtf8(s); auto i : w) {
+  for (bool allowNonSpacing = false; auto i : fromUtf8(s))
     if (allowNonSpacing && inRange(i, NonSpacingBlocks))
       allowNonSpacing = false;
     else if (inRange(i, t...))
       allowNonSpacing = true;
     else
       return false;
-  }
   return true;
 }
 

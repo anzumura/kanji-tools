@@ -9,8 +9,7 @@ namespace kanji_tools {
 bool MBChar::next(std::string& result, bool onlyMB) {
   for (; *_location; ++_location) {
     const unsigned char firstOfGroup = *_location;
-    unsigned char x = firstOfGroup & Mask;
-    if (!x || x == Bit2) { // not a multi byte character
+    if (unsigned char x = firstOfGroup & Mask; !x || x == Bit2) { // not a multi byte character
       if (!onlyMB) {
         result = *_location++;
         return true;
@@ -36,8 +35,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall) const {
   for (; *location; ++location) {
     const unsigned char firstOfGroup = *location;
-    unsigned char x = firstOfGroup & Mask;
-    if (!x || x == Bit2) { // not a multi byte character
+    if (unsigned char x = firstOfGroup & Mask; !x || x == Bit2) { // not a multi byte character
       if (internalCall) return false;
       if (!onlyMB) {
         result = *location;
@@ -99,8 +97,7 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
       added = balanceBrackets(file, addTag, tag);
     else {
       std::ifstream f(file);
-      std::string line;
-      while (std::getline(f, line))
+      for (std::string line; std::getline(f, line);)
         added += addTag ? add(line, tag) : add(line);
     }
   } else if (fs::is_directory(file)) {
@@ -123,30 +120,34 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
 size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag) {
   static const std::string openWideBracket("（"), closeWideBracket("）");
   size_t added = 0;
-  std::ifstream f(file);
   std::string line, prevLine;
   bool prevOpenEnded = false;
-  auto unclosed = [&prevLine, &prevOpenEnded] {
+
+  // 'calculatePrevOpenEnded' sets 'prevOpenEnded' to 'true' if the previous line has an open bracket without
+  // a closing bracket (searching back from the end), otherwise it will set to 'false'.
+  auto calculatePrevOpenEnded = [&prevLine, &prevOpenEnded] {
     if (auto open = prevLine.rfind(openWideBracket); open != std::string::npos) {
       auto close = prevLine.rfind(closeWideBracket);
       prevOpenEnded = (close == std::string::npos || close < open);
     } else
       prevOpenEnded = false;
   };
-  // process the previous line plus current line up until closing bracket
-  auto processPartial = [this, &tag, &added, &line, &prevLine, &unclosed, addTag](size_t close) {
+
+  // 'processPartial' processes the previous line plus current line up until closing bracket
+  auto processPartial = [this, &tag, &added, &line, &prevLine, &calculatePrevOpenEnded, addTag](size_t close) {
     auto end = close + closeWideBracket.length();
     std::string s = prevLine + line.substr(0, end);
     added += addTag ? add(s, tag) : add(s);
     // save the remaider of the current line for the next loop iteration
     prevLine = line.substr(end);
-    unclosed();
+    calculatePrevOpenEnded();
   };
-  while (std::getline(f, line)) {
+
+  for (std::ifstream f(file); std::getline(f, line);) {
     if (prevLine.empty()) {
       // special case for first line - don't process in case next line stars with open bracket.
       prevLine = line;
-      unclosed();
+      calculatePrevOpenEnded();
       continue;
     } else if (prevOpenEnded) {
       if (auto close = line.find(closeWideBracket); close != std::string::npos) {
@@ -168,7 +169,7 @@ size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addT
     // trying to balance and just process prevLine.
     added += addTag ? add(prevLine, tag) : add(prevLine);
     prevLine = line;
-    unclosed();
+    calculatePrevOpenEnded();
   }
   if (!prevLine.empty()) added += addTag ? add(prevLine, tag) : add(prevLine);
   return added;

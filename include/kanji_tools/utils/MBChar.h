@@ -211,8 +211,7 @@ public:
   // return an optional Map of 'tag to count' for the given MBChar 's'
   const Map* tags(const std::string& s) const {
     auto i = _tags.find(s);
-    if (i != _tags.end()) return &i->second;
-    return nullptr;
+    return i != _tags.end() ? &i->second : nullptr;
   }
 
   size_t uniqueEntries() const { return _map.size(); }
