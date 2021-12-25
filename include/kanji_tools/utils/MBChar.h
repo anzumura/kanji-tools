@@ -173,6 +173,7 @@ public:
   using Map = std::map<std::string, int>;
   using TagMap = std::map<std::string, Map>;
   using OptRegex = std::optional<std::wregex>;
+  using OptString = std::optional<std::string>;
 
   // 'RemoveFurigana' is a regex for removing furigana from text files - it can be passed
   // to MBCharCount constructor. Furigana in a .txt file is usually a Kanji followed by one
@@ -192,8 +193,8 @@ public:
   virtual ~MBCharCount() = default;
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added. If 'tag'
-  // is non-empty then '_tags' will be updated (which contains a count per tag per unique token).
-  size_t add(const std::string& s, const std::string& tag = "");
+  // is provided then '_tags' will be updated (which contains a count per tag per unique token).
+  size_t add(const std::string& s, const OptString& tag = {});
 
   // 'addFile' adds strings from given 'file' or from all files in directory (if file is 'directory').
   // 'fileNames' controls whether the name of the file (or directory) should also be included
@@ -234,14 +235,13 @@ private:
 
   // 'processPartial' processes 'prevline' up until 'pos' in 'line' and sets 'prevLine' to the
   // unprocessed remainder of 'line'. 'added' is updated the result of 'isOpenEnded' is returned.
-  bool processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added, bool addTag,
-                      const std::string& tag);
+  bool processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added, const OptString& tag);
 
   // 'balanceBrackets' uses 'isOpenEnded' and 'processPartial' functions to remove furigana, i.e., if
   // a line ends with an open bracket (and possibly more text) then join with the next line until a
   // close bracket before processing. Since a file could have globally unbalanced brackets don't keep
   // looking beyond the next line (also, furigana should only be a few characters long).
-  size_t balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag);
+  size_t balanceBrackets(const std::filesystem::path& file, const OptString& tag);
 
   virtual bool allowAdd(const std::string&) const { return true; }
   size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);

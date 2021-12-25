@@ -66,15 +66,15 @@ namespace fs = std::filesystem;
 const std::wregex MBCharCount::RemoveFurigana(std::wstring(L"([") + KanjiRange + L"]{1})（[" + KanaRange + L"]+）");
 const std::wstring MBCharCount::DefaultReplace(L"$1");
 
-size_t MBCharCount::add(const std::string& s, const std::string& tag) {
+size_t MBCharCount::add(const std::string& s, const OptString& tag) {
   std::string n = s;
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
     if (n != s) {
       ++_replaceCount;
-      if (!tag.empty() && tag != _lastReplaceTag) {
-        if (_debug) std::cout << ">>> Tag: " << tag << '\n';
-        _lastReplaceTag = tag;
+      if (tag && tag != _lastReplaceTag) {
+        if (_debug) std::cout << ">>> Tag: " << *tag << '\n';
+        _lastReplaceTag = *tag;
       }
       if (_debug) {
         auto count = std::to_string(_replaceCount);
@@ -88,7 +88,7 @@ size_t MBCharCount::add(const std::string& s, const std::string& tag) {
     if (allowAdd(token)) {
       ++_map[token];
       ++added;
-      if (!tag.empty()) ++_tags[token][tag];
+      if (tag) ++_tags[token][*tag];
     }
   _errors += c.errors();
   _variants += c.variants();
@@ -97,15 +97,16 @@ size_t MBCharCount::add(const std::string& s, const std::string& tag) {
 
 size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
   size_t added = 0;
-  std::string tag = file.filename().string(); // only use the final component of the path
+  const std::string fileName = file.filename().string(); // only use the final component of the path
+  const OptString tag = addTag ? OptString(fileName) : std::nullopt;
   if (fs::is_regular_file(file)) {
     ++_files;
     if (_find)
-      added = balanceBrackets(file, addTag, tag);
+      added = balanceBrackets(file, tag);
     else {
       std::ifstream f(file);
       for (std::string line; std::getline(f, line);)
-        added += addTag ? add(line, tag) : add(line);
+        added += add(line, tag);
     }
   } else if (fs::is_directory(file)) {
     ++_directories;
@@ -115,7 +116,7 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
                                         : 0;
   } else // skip if not a regular file or directory
     return 0;
-  if (fileNames) added += addTag ? add(tag, tag) : add(tag);
+  if (fileNames) added += add(fileName, tag);
   return added;
 }
 
@@ -127,17 +128,17 @@ bool MBCharCount::isOpenEnded(const std::string& line) {
   return false;
 }
 
-bool MBCharCount::processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added, bool addTag,
-                                 const std::string& tag) {
+bool MBCharCount::processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added,
+                                 const OptString& tag) {
   const auto end = pos + CloseWideBracketLength;
   const std::string s = prevLine + line.substr(0, end);
-  added += addTag ? add(s, tag) : add(s);
+  added += add(s, tag);
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);
   return isOpenEnded(prevLine);
 }
 
-size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addTag, const std::string& tag) {
+size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, const OptString& tag) {
   size_t added = 0;
   std::string line, prevLine;
   bool prevOpenEnded = false;
@@ -151,23 +152,23 @@ size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, bool addT
     } else if (prevOpenEnded) {
       if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
         if (auto open = line.find(OpenWideBracket); close < open) {
-          prevOpenEnded = processPartial(prevLine, close, line, added, addTag, tag);
+          prevOpenEnded = processPartial(prevLine, close, line, added, tag);
           continue;
         }
       }
     } else if (auto open = line.find(OpenWideBracket); open == 0)
       // special case for line starting with open bracket
       if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
-        prevOpenEnded = processPartial(prevLine, close, line, added, addTag, tag);
+        prevOpenEnded = processPartial(prevLine, close, line, added, tag);
         continue;
       }
     // A new open bracket came before 'close' or no 'close' at all on line so give up on
     // trying to balance and just process prevLine.
-    added += addTag ? add(prevLine, tag) : add(prevLine);
+    added += add(prevLine, tag);
     prevLine = line;
     prevOpenEnded = isOpenEnded(prevLine);
   }
-  if (!prevLine.empty()) added += addTag ? add(prevLine, tag) : add(prevLine);
+  if (!prevLine.empty()) added += add(prevLine, tag);
   return added;
 }
 
