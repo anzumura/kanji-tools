@@ -20,7 +20,7 @@ public:
   const char32_t start;
   const char32_t end;
   // 'range' returns the number of code points in the block (inclusive of start and end)
-  size_t range() const { return end - start + 1; }
+  int range() const { return end - start + 1; }
   // 'opterator()' returns true if the given character is in this block
   bool operator()(char32_t x) const { return x >= start && x <= end; }
   bool operator<(const UnicodeBlock& rhs) const { return start < rhs.start; }

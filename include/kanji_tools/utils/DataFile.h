@@ -54,7 +54,7 @@ public:
   virtual JlptLevels level() const { return JlptLevels::None; }
   virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   const List& list() const { return _list; }
-  size_t size() const { return _list.size(); }
+  int size() const { return _list.size(); }
   // 'toString' returns the full contents of this list into a string (with no separates)
   std::string toString() const {
     std::string result;

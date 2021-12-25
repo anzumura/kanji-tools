@@ -91,7 +91,7 @@ public:
     auto i = _types.find(type);
     return i != _types.end() ? i->second : _emptyList;
   }
-  size_t typeTotal(KanjiTypes type) const { return typeList(type).size(); }
+  int typeTotal(KanjiTypes type) const { return typeList(type).size(); }
   KanjiTypes getType(const std::string& name) const;
 
   // get list by KanjiGrade
@@ -99,28 +99,28 @@ public:
     auto i = _grades.find(grade);
     return i != _grades.end() ? i->second : _emptyList;
   }
-  size_t gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
+  int gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
 
   // get list by JLPT Level
   const List& levelList(JlptLevels level) const {
     auto i = _levels.find(level);
     return i != _levels.end() ? i->second : _emptyList;
   }
-  size_t levelTotal(JlptLevels level) const { return levelList(level).size(); }
+  int levelTotal(JlptLevels level) const { return levelList(level).size(); }
 
   // get list by Kentei Kyu
   const List& kyuList(KenteiKyus kyu) const {
     auto i = _kyus.find(kyu);
     return i != _kyus.end() ? i->second : _emptyList;
   }
-  size_t kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
+  int kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
 
   // See comment for '_frequencies' private data member for more details about frequency lists
   enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
   const List& frequencyList(int range) const {
     return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : _emptyList;
   }
-  size_t frequencyTotal(int range) const { return frequencyList(range).size(); }
+  int frequencyTotal(int range) const { return frequencyList(range).size(); }
 
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including 'variation selectors', i.e., the
   // same result is returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).

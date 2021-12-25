@@ -43,7 +43,7 @@ public:
   // other html type sequences).
   void printMarkdown(std::ostream& os = std::cout) const;
 private:
-  using Widths = std::vector<size_t>;
+  using Widths = std::vector<int>;
   void print(std::ostream&, const Widths&, const Row&, char fill = ' ', char delim = '|') const;
   // 'border' prints a horizontal border row
   void border(std::ostream& os, const Widths& w) const { print(os, w, {}, '-', '+'); }

@@ -107,10 +107,10 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
   // When source is Romaji break input up into words separated by any of _narrowDelimList and process
   // each word. This helps deal with words ending in 'n'.
   std::string result;
-  size_t oldPos = 0;
+  int oldPos = 0;
   const bool keepSpaces = !(_flags & RemoveSpaces);
   do {
-    const size_t pos = input.find_first_of(_narrowDelimList, oldPos);
+    const int pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos));
       break;

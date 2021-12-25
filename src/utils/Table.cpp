@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/Table.h>
 #include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/Table.h>
 
 #include <iomanip>
 
@@ -16,7 +16,7 @@ void Table::add(const Row& row, bool startNewSection) {
 }
 
 void Table::print(std::ostream& os) const {
-  std::vector<size_t> widths;
+  std::vector<int> widths;
   for (auto& i : _title)
     widths.push_back(displayLength(i));
   for (auto& row : _rows) {
