@@ -40,8 +40,8 @@ public:
   // - length("大blue空", false) = 6
   // Note: some Kanji can be followed by a 'variation selector' - these are not counted by default
   // since they are considered part of the previous 'MB character' (as a modifier).
-  static size_t length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
-    size_t len = 0;
+  static int length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
+    int len = 0;
     // doing one 'reinterpret_cast' at the beginning saves doing a bunch of static_casts when checking
     // if the next 3 bytes represent a 'variation selector'
     if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
@@ -55,7 +55,7 @@ public:
     }
     return len;
   }
-  static size_t length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
+  static int length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
     return length(s.c_str(), onlyMB, skipVariationSelectors);
   }
 
@@ -153,7 +153,7 @@ public:
   bool peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
   int errors() const { return _errors; }
   int variants() const { return _variants; }
-  size_t length(bool onlyMB = true) const { return length(_data, onlyMB); }
+  int length(bool onlyMB = true) const { return length(_data, onlyMB); }
   Results valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
   bool isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
 private:
@@ -194,19 +194,19 @@ public:
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added. If 'tag'
   // is provided then '_tags' will be updated (which contains a count per tag per unique token).
-  size_t add(const std::string& s, const OptString& tag = {});
+  int add(const std::string& s, const OptString& tag = {});
 
   // 'addFile' adds strings from given 'file' or from all files in directory (if file is 'directory').
   // 'fileNames' controls whether the name of the file (or directory) should also be included
   // in the count and 'recurse' determines if subdirectories are also searched. By default, file names
   // are used as 'tag' values when calling 'add'.
-  size_t addFile(const std::filesystem::path& file, bool addTag = true, bool fileNames = true, bool recurse = true) {
+  int addFile(const std::filesystem::path& file, bool addTag = true, bool fileNames = true, bool recurse = true) {
     if (!std::filesystem::exists(file)) throw std::domain_error("file not found: " + file.string());
     return doAddFile(file, addTag, fileNames, recurse);
   }
 
   // return count for given string or 0 if not found
-  size_t count(const std::string& s) const {
+  int count(const std::string& s) const {
     auto i = _map.find(s);
     return i != _map.end() ? i->second : 0;
   }
@@ -217,7 +217,7 @@ public:
     return i != _tags.end() ? &i->second : nullptr;
   }
 
-  size_t uniqueEntries() const { return _map.size(); }
+  int uniqueEntries() const { return _map.size(); }
   int files() const { return _files; }
   int directories() const { return _directories; }
   // 'replaceCount' returns number of lines that were changed due to 'replace' regex
@@ -229,22 +229,24 @@ public:
   const Map& map() const { return _map; }
   bool debug() const { return _debug; }
 private:
-  // 'isOpenEnded' returns true if 'line' has an open bracket without a closing bracket (searching
-  // back from the end), otherwise it returns false.
-  static bool isOpenEnded(const std::string& line);
+  // 'hasUnclosedBrackets' returns true if 'line' has an open bracket without a closing
+  // bracket (searching back from the end), otherwise it returns false.
+  static bool hasUnclosedBrackets(const std::string& line);
 
-  // 'processPartial' processes 'prevline' up until 'pos' in 'line' and sets 'prevLine' to the
-  // unprocessed remainder of 'line'. 'added' is updated the result of 'isOpenEnded' is returned.
-  bool processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added, const OptString& tag);
+  // 'processJoinedLine' increments 'added' with the count from processing 'prevline' plus
+  // 'line' (until 'pos') and sets 'prevLine' to the unprocessed remainder of 'line'. The
+  // result of calling 'hasUnclosedBrackets(prevLine)' is returned.
+  bool processJoinedLine(std::string& prevLine, const std::string& line, int pos, int& added, const OptString& tag);
 
-  // 'balanceBrackets' uses 'isOpenEnded' and 'processPartial' functions to remove furigana, i.e., if
-  // a line ends with an open bracket (and possibly more text) then join with the next line until a
-  // close bracket before processing. Since a file could have globally unbalanced brackets don't keep
-  // looking beyond the next line (also, furigana should only be a few characters long).
-  size_t balanceBrackets(const std::filesystem::path& file, const OptString& tag);
+  // 'processFile' returns the MBChar count from 'file'. If '_find' is not set then each line
+  // is processed independently, otherwise 'hasUnclosedBrackets' and 'processJoinedLine' are
+  // used to join up to two lines together before calling 'add' to help '_find' match against
+  // larger sets of data. The focus on brackets is to help the use case of removing furigana
+  // which is in brackets after a kanji and can potentially span across lines of a text file.
+  int processFile(const std::filesystem::path& file, const OptString& tag);
 
   virtual bool allowAdd(const std::string&) const { return true; }
-  size_t doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
+  int doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
 
   Map _map;
   TagMap _tags;

@@ -66,7 +66,7 @@ namespace fs = std::filesystem;
 const std::wregex MBCharCount::RemoveFurigana(std::wstring(L"([") + KanjiRange + L"]{1})（[" + KanaRange + L"]+）");
 const std::wstring MBCharCount::DefaultReplace(L"$1");
 
-size_t MBCharCount::add(const std::string& s, const OptString& tag) {
+int MBCharCount::add(const std::string& s, const OptString& tag) {
   std::string n = s;
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
@@ -83,7 +83,7 @@ size_t MBCharCount::add(const std::string& s, const OptString& tag) {
     }
   }
   MBChar c(n);
-  size_t added = 0;
+  int added = 0;
   for (std::string token; c.next(token);)
     if (allowAdd(token)) {
       ++_map[token];
@@ -95,19 +95,13 @@ size_t MBCharCount::add(const std::string& s, const OptString& tag) {
   return added;
 }
 
-size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
-  size_t added = 0;
+int MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
+  int added = 0;
   const std::string fileName = file.filename().string(); // only use the final component of the path
   const OptString tag = addTag ? OptString(fileName) : std::nullopt;
   if (fs::is_regular_file(file)) {
     ++_files;
-    if (_find)
-      added = balanceBrackets(file, tag);
-    else {
-      std::ifstream f(file);
-      for (std::string line; std::getline(f, line);)
-        added += add(line, tag);
-    }
+    added += processFile(file, tag);
   } else if (fs::is_directory(file)) {
     ++_directories;
     for (fs::directory_entry i : fs::directory_iterator(file))
@@ -120,55 +114,57 @@ size_t MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
   return added;
 }
 
-bool MBCharCount::isOpenEnded(const std::string& line) {
+bool MBCharCount::hasUnclosedBrackets(const std::string& line) {
   if (auto open = line.rfind(OpenWideBracket); open != std::string::npos) {
     auto close = line.rfind(CloseWideBracket);
-    return (close == std::string::npos || close < open);
+    return close == std::string::npos || close < open;
   }
   return false;
 }
 
-bool MBCharCount::processPartial(std::string& prevLine, size_t pos, const std::string& line, size_t& added,
-                                 const OptString& tag) {
+bool MBCharCount::processJoinedLine(std::string& prevLine, const std::string& line, int pos, int& added,
+                                    const OptString& tag) {
   const auto end = pos + CloseWideBracketLength;
-  const std::string s = prevLine + line.substr(0, end);
-  added += add(s, tag);
+  const std::string joinedLine = prevLine + line.substr(0, end);
+  added += add(joinedLine, tag);
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);
-  return isOpenEnded(prevLine);
+  return hasUnclosedBrackets(prevLine);
 }
 
-size_t MBCharCount::balanceBrackets(const std::filesystem::path& file, const OptString& tag) {
-  size_t added = 0;
-  std::string line, prevLine;
-  bool prevOpenEnded = false;
-
-  for (std::ifstream f(file); std::getline(f, line);) {
-    if (prevLine.empty()) {
-      // special case for first line - don't process in case next line stars with open bracket.
-      prevLine = line;
-      prevOpenEnded = isOpenEnded(prevLine);
-      continue;
-    } else if (prevOpenEnded) {
-      if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
-        if (auto open = line.find(OpenWideBracket); close < open) {
-          prevOpenEnded = processPartial(prevLine, close, line, added, tag);
+int MBCharCount::processFile(const fs::path& file, const OptString& tag) {
+  int added = 0;
+  std::string line;
+  if (std::fstream f(file); _find) {
+    std::string prevLine;
+    for (bool prevUnclosed = false; std::getline(f, line); prevUnclosed = hasUnclosedBrackets(prevLine)) {
+      if (prevLine.empty()) {
+        // case for first line - don't process in case next line stars with open bracket.
+        prevLine = line;
+        prevUnclosed = hasUnclosedBrackets(prevLine);
+        continue;
+      } else if (prevUnclosed) {
+        // case for previous line having unclosed brackets
+        if (auto close = line.find(CloseWideBracket); close != std::string::npos)
+          if (auto open = line.find(OpenWideBracket); close < open) {
+            prevUnclosed = processJoinedLine(prevLine, line, close, added, tag);
+            continue;
+          }
+      } else if (auto open = line.find(OpenWideBracket); open == 0)
+        // case for line starting with open bracket
+        if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
+          prevUnclosed = processJoinedLine(prevLine, line, close, added, tag);
           continue;
         }
-      }
-    } else if (auto open = line.find(OpenWideBracket); open == 0)
-      // special case for line starting with open bracket
-      if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
-        prevOpenEnded = processPartial(prevLine, close, line, added, tag);
-        continue;
-      }
-    // A new open bracket came before 'close' or no 'close' at all on line so give up on
-    // trying to balance and just process prevLine.
-    added += add(prevLine, tag);
-    prevLine = line;
-    prevOpenEnded = isOpenEnded(prevLine);
-  }
-  if (!prevLine.empty()) added += add(prevLine, tag);
+      // A new open bracket came before 'close' or no 'close' at all on line so give up on
+      // trying to balance and just process prevLine.
+      added += add(prevLine, tag);
+      prevLine = line;
+    }
+    if (!prevLine.empty()) added += add(prevLine, tag);
+  } else
+    while (std::getline(f, line))
+      added += add(line, tag);
   return added;
 }
 
