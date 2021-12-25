@@ -233,10 +233,9 @@ private:
   // bracket (searching back from the end), otherwise it returns false.
   static bool hasUnclosedBrackets(const std::string& line);
 
-  // 'processJoinedLine' increments 'added' with the count from processing 'prevline' plus
-  // 'line' (until 'pos') and sets 'prevLine' to the unprocessed remainder of 'line'. The
-  // result of calling 'hasUnclosedBrackets(prevLine)' is returned.
-  bool processJoinedLine(std::string& prevLine, const std::string& line, int pos, int& added, const OptString& tag);
+  // 'processJoinedLine' returns count from processing 'prevline' plus 'line' up until 'pos'
+  // (plus size of close bracket) and sets 'prevLine' to the unprocessed remainder of 'line'.
+  int processJoinedLine(std::string& prevLine, const std::string& line, int pos, const OptString& tag);
 
   // 'processFile' returns the MBChar count from 'file'. If '_find' is not set then each line
   // is processed independently, otherwise 'hasUnclosedBrackets' and 'processJoinedLine' are

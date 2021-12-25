@@ -122,14 +122,13 @@ bool MBCharCount::hasUnclosedBrackets(const std::string& line) {
   return false;
 }
 
-bool MBCharCount::processJoinedLine(std::string& prevLine, const std::string& line, int pos, int& added,
+int MBCharCount::processJoinedLine(std::string& prevLine, const std::string& line, int pos,
                                     const OptString& tag) {
   const auto end = pos + CloseWideBracketLength;
   const std::string joinedLine = prevLine + line.substr(0, end);
-  added += add(joinedLine, tag);
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);
-  return hasUnclosedBrackets(prevLine);
+  return add(joinedLine, tag);;
 }
 
 int MBCharCount::processFile(const fs::path& file, const OptString& tag) {
@@ -141,19 +140,18 @@ int MBCharCount::processFile(const fs::path& file, const OptString& tag) {
       if (prevLine.empty()) {
         // case for first line - don't process in case next line stars with open bracket.
         prevLine = line;
-        prevUnclosed = hasUnclosedBrackets(prevLine);
         continue;
       } else if (prevUnclosed) {
         // case for previous line having unclosed brackets
         if (auto close = line.find(CloseWideBracket); close != std::string::npos)
           if (auto open = line.find(OpenWideBracket); close < open) {
-            prevUnclosed = processJoinedLine(prevLine, line, close, added, tag);
+            added += processJoinedLine(prevLine, line, close, tag);
             continue;
           }
       } else if (auto open = line.find(OpenWideBracket); open == 0)
         // case for line starting with open bracket
         if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
-          prevUnclosed = processJoinedLine(prevLine, line, close, added, tag);
+          added += processJoinedLine(prevLine, line, close, tag);
           continue;
         }
       // A new open bracket came before 'close' or no 'close' at all on line so give up on
