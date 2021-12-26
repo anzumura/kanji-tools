@@ -7,11 +7,11 @@
 namespace kanji_tools {
 
 void RadicalData::load(const std::filesystem::path& file) {
-  ColumnFile::Column number("Number"), name("Name"), longName("LongName"), reading("Reading");
-  for (ColumnFile f(file, {number, name, longName, reading}); f.nextRow();) {
-    const int radicalNumber = Data::toInt(f.get(number));
+  ColumnFile::Column numberCol("Number"), nameCol("Name"), longNameCol("LongName"), readingCol("Reading");
+  for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol}); f.nextRow();) {
+    const int radicalNumber = f.getInt(numberCol);
     if (radicalNumber != f.currentRow()) f.error("radicals must be ordered by 'number'");
-    std::stringstream radicals(f.get(name));
+    std::stringstream radicals(f.get(nameCol));
     Radical::AltForms altForms;
     std::string name, token;
     while (std::getline(radicals, token, ' '))
@@ -19,7 +19,7 @@ void RadicalData::load(const std::filesystem::path& file) {
         name = token;
       else
         altForms.emplace_back(token);
-    _radicals.emplace_back(radicalNumber, name, altForms, f.get(longName), f.get(reading));
+    _radicals.emplace_back(radicalNumber, name, altForms, f.get(longNameCol), f.get(readingCol));
     _map[name] = radicalNumber - 1;
   }
 }
