@@ -1,11 +1,12 @@
 #ifndef KANJI_TOOLS_KANJI_RADICAL_DATA_H
 #define KANJI_TOOLS_KANJI_RADICAL_DATA_H
 
+#include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Radical.h>
 
 #include <filesystem>
-#include <iostream>
 #include <map>
+#include <memory>
 
 namespace kanji_tools {
 
