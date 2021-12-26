@@ -1,8 +1,8 @@
 #include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/MBUtils.h>
 
-#include <fstream>
 #include <sstream>
 
 namespace kanji_tools {
@@ -44,135 +44,67 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 }
 
 void UcdData::load(const std::filesystem::path& file) {
-  int lineNum = 1, codeCol = -1, nameCol = -1, blockCol = -1, versionCol = -1, radicalCol = -1, strokesCol = -1,
-      variantStrokesCol = -1, pinyinCol = -1, morohashiCol = -1, nelsonIdsCol = -1, joyoCol = -1, jinmeiCol = -1,
-      linkCodesCol = -1, linkNamesCol = -1, linkTypeCol = -1, meaningCol = -1, onCol = -1, kunCol = -1;
-  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
-    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNum) : Ucd::EmptyString) +
-                ", file: " + file.string());
-  };
-  auto getWchar = [&error](const std::string& col, const auto& s) -> wchar_t {
-    if (s.length() != 4 && s.length() != 5) error(col + " length must be 4 or 5 '" + s + "'");
-    for (char c : s)
-      if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("invalid '" + col + "' string '" + s + "'");
-    return std::strtol(s.c_str(), nullptr, 16);
-  };
-  auto getBool = [&error](const std::string& col, const auto& s) {
-    if (s == "Y") return true;
-    if (!s.empty()) error("unrecognized '" + col + "' value '" + s + "'");
-    return false;
-  };
-  auto setCol = [&file, &error](int& col, int pos) {
-    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
-    col = pos;
-  };
-  std::ifstream f(file);
-  std::array<std::string, 18> cols;
-  for (std::string line; std::getline(f, line); ++lineNum) {
-    int pos = 0;
-    if (std::stringstream ss(line); codeCol == -1) {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Code")
-          setCol(codeCol, pos);
-        else if (token == "Name")
-          setCol(nameCol, pos);
-        else if (token == "Block")
-          setCol(blockCol, pos);
-        else if (token == "Version")
-          setCol(versionCol, pos);
-        else if (token == "Radical")
-          setCol(radicalCol, pos);
-        else if (token == "Strokes")
-          setCol(strokesCol, pos);
-        else if (token == "VStrokes")
-          setCol(variantStrokesCol, pos);
-        else if (token == "Pinyin")
-          setCol(pinyinCol, pos);
-        else if (token == "Morohashi")
-          setCol(morohashiCol, pos);
-        else if (token == "NelsonIds")
-          setCol(nelsonIdsCol, pos);
-        else if (token == "Joyo")
-          setCol(joyoCol, pos);
-        else if (token == "Jinmei")
-          setCol(jinmeiCol, pos);
-        else if (token == "LinkCodes")
-          setCol(linkCodesCol, pos);
-        else if (token == "LinkNames")
-          setCol(linkNamesCol, pos);
-        else if (token == "LinkType")
-          setCol(linkTypeCol, pos);
-        else if (token == "Meaning")
-          setCol(meaningCol, pos);
-        else if (token == "On")
-          setCol(onCol, pos);
-        else if (token == "Kun")
-          setCol(kunCol, pos);
+  ColumnFile::Column codeCol("Code"), nameCol("Name"), blockCol("Block"), versionCol("Version"), radicalCol("Radical"),
+    strokesCol("Strokes"), vStrokesCol("VStrokes"), pinyinCol("Pinyin"), morohashiCol("Morohashi"),
+    nelsonIdsCol("NelsonIds"), joyoCol("Joyo"), jinmeiCol("Jinmei"), linkCodesCol("LinkCodes"),
+    linkNamesCol("LinkNames"), linkTypeCol("LinkType"), meaningCol("Meaning"), onCol("On"), kunCol("Kun");
+  for (ColumnFile f(file,
+                    {codeCol, nameCol, blockCol, versionCol, radicalCol, strokesCol, vStrokesCol, pinyinCol,
+                     morohashiCol, nelsonIdsCol, joyoCol, jinmeiCol, linkCodesCol, linkNamesCol, linkTypeCol,
+                     meaningCol, onCol, kunCol});
+       f.nextRow();) {
+    const wchar_t code = f.getWChar(codeCol);
+    const auto& name = f.get(nameCol);
+    if (name.length() > 4) f.error("name greater than 4");
+    const int radical = f.getInt(radicalCol);
+    if (radical < 1 || radical > 214) f.error("radical out of range");
+    const int strokes = f.getInt(strokesCol);
+    // 9F98 (龘) has 48 strokes
+    if (strokes < 1 || strokes > 48) f.error("strokes out of range");
+    if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
+    const int vStrokes = f.isEmpty(vStrokesCol) ? 0 : Data::toInt(f.get(vStrokesCol));
+    if (vStrokes < 0 || vStrokes == 1 || vStrokes > 33) f.error("variant strokes out of range");
+    const bool joyo = f.getBool(joyoCol);
+    const bool jinmei = f.getBool(jinmeiCol);
+    if (joyo && jinmei) f.error("can't be both joyo and jinmei");
+    Ucd::Links links;
+    if (!f.isEmpty(linkNamesCol)) {
+      std::stringstream names(f.get(linkNamesCol));
+      std::stringstream codes(f.get(linkCodesCol));
+      for (std::string linkName; std::getline(names, linkName, ',');)
+        if (std::string linkCode; std::getline(codes, linkCode, ','))
+          links.emplace_back(f.getWChar(linkCodesCol, linkCode), linkName);
         else
-          error("unrecognized column '" + token + "'", false);
-      if (pos != cols.size()) error("not enough columns", false);
-    } else {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) error("too many columns");
-        cols[pos] = token;
-      }
-      if (pos == cols.size() - 1)
-        cols[pos] = "";
-      else if (pos != cols.size())
-        error("not enough columns - got " + std::to_string(pos) + ", wanted " + std::to_string(cols.size()));
-      const wchar_t code = getWchar("Unicode", cols[codeCol]);
-      const auto& name = cols[nameCol];
-      if (name.length() > 4) error("name greater than 4");
-      const int radical = Data::toInt(cols[radicalCol]);
-      if (radical < 1 || radical > 214) error("radical out of range");
-      const int strokes = Data::toInt(cols[strokesCol]);
-      // 9F98 (龘) has 48 strokes
-      if (strokes < 1 || strokes > 48) error("strokes out of range");
-      if (cols[variantStrokesCol] == "0") error("VStrokes shouldn't be 0");
-      const int variantStrokes = cols[variantStrokesCol].empty() ? 0 : Data::toInt(cols[variantStrokesCol]);
-      if (variantStrokes < 0 || variantStrokes == 1 || variantStrokes > 33) error("variant strokes out of range");
-      const bool joyo = getBool("Joyo", cols[joyoCol]);
-      const bool jinmei = getBool("Jinmei", cols[jinmeiCol]);
-      if (joyo && jinmei) error("can't be both joyo and jinmei");
-      Ucd::Links links;
-      if (!cols[linkNamesCol].empty()) {
-        std::stringstream names(cols[linkNamesCol]);
-        std::stringstream codes(cols[linkCodesCol]);
-        for (std::string linkName; std::getline(names, linkName, ',');) {
-          if (std::string linkCode; std::getline(codes, linkCode, ','))
-            links.emplace_back(getWchar("LinkCode", linkCode), linkName);
-          else
-            error("LinkName has more values than LinkCode");
-        }
-        // Joyo are standard Kanji so they shouldn't have a link back to a standard form. However,
-        // Some Jinmei do have links since they are 'officially allowed variants/old forms'. There
-        // are links in raw XML data for joyo, but the parse script ignores them.
-        if (joyo) error("joyo shouldn't have links");
-        if (cols[linkTypeCol].empty()) error("LinkName has a value, but LinkType is empty");
-      } else if (!cols[linkTypeCol].empty())
-        error("LinkType has a value, but LinkName is empty");
-      else if (!cols[linkCodesCol].empty())
-        error("LinkCode has a value, but LinkName is empty");
-      const bool linkedReadings = cols[linkTypeCol].ends_with("*");
-      if (linkedReadings) cols[linkTypeCol].pop_back();
-      // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
-      if (joyo && cols[meaningCol].empty()) error("meaning is empty for Joyo Kanji");
-      if (cols[onCol].empty() && cols[kunCol].empty() && cols[morohashiCol].empty())
-        error("one of 'On', 'Kun' or 'Morohashi' must be populated");
-      if (!_map
-             .emplace(std::piecewise_construct, std::make_tuple(name),
-                      std::make_tuple(code, name, cols[blockCol], cols[versionCol], radical, strokes, variantStrokes,
-                                      cols[pinyinCol], cols[morohashiCol], cols[nelsonIdsCol], joyo, jinmei, links,
-                                      Ucd::toLinkType(cols[linkTypeCol]), linkedReadings, cols[meaningCol], cols[onCol],
-                                      cols[kunCol]))
-             .second)
-        error("duplicate entry '" + name + "'");
-      for (const auto& link : links)
-        if (!jinmei)
-          _linkedOther[link.name()].push_back(name);
-        else if (auto i = _linkedJinmei.insert(std::make_pair(link.name(), name)); !i.second)
-          error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
-    }
+          f.error("LinkName has more values than LinkCode");
+      // Joyo are standard Kanji so they shouldn't have a link back to a standard form. However,
+      // Some Jinmei do have links since they are 'officially allowed variants/old forms'. There
+      // are links in raw XML data for joyo, but the parse script ignores them.
+      if (joyo) f.error("joyo shouldn't have links");
+      if (f.isEmpty(linkTypeCol)) f.error("LinkName has a value, but LinkType is empty");
+    } else if (!f.isEmpty(linkTypeCol))
+      f.error("LinkType has a value, but LinkName is empty");
+    else if (!f.isEmpty(linkCodesCol))
+      f.error("LinkCode has a value, but LinkName is empty");
+    std::string linkType = f.get(linkTypeCol);
+    const bool linkedReadings = linkType.ends_with("*");
+    if (linkedReadings) linkType.pop_back();
+    // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
+    if (joyo && f.isEmpty(meaningCol)) f.error("meaning is empty for Joyo Kanji");
+    if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
+      f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
+    if (!_map
+           .emplace(std::piecewise_construct, std::make_tuple(name),
+                    std::make_tuple(code, name, f.get(blockCol), f.get(versionCol), radical, strokes, vStrokes,
+                                    f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol), joyo, jinmei, links,
+                                    Ucd::toLinkType(linkType), linkedReadings, f.get(meaningCol), f.get(onCol),
+                                    f.get(kunCol)))
+           .second)
+      f.error("duplicate entry '" + name + "'");
+    for (const auto& link : links)
+      if (!jinmei)
+        _linkedOther[link.name()].push_back(name);
+      else if (auto i = _linkedJinmei.insert(std::make_pair(link.name(), name)); !i.second)
+        f.error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
   }
 }
 
@@ -229,25 +161,25 @@ void UcdData::print(const Data& data) const {
       return j != _map.end() && j->second.hasLinks();
     });
     data.log() << name << " Kanji with links " << count << ":\n";
-    for (auto& i : list) {
-      auto j = _map.find(i->name());
-      if (j != _map.end()) {
+    for (auto& i : list)
+      if (auto j = _map.find(i->name()); j != _map.end()) {
         if (j->second.hasLinks())
           data.out() << "  " << j->second.codeAndName() << " -> " << j->second.linkCodeAndNames() << ' '
                      << j->second.linkType() << '\n';
       } else
         data.out() << "  ERROR: " << i->name() << " not found in UCD\n";
-    }
   };
   printLinks("Frequency", data.frequencyKanji());
   printLinks("Extra", data.extraKanji());
+  printVariationSelectorKanji(data);
+}
+
+void UcdData::printVariationSelectorKanji(const Data& data) const {
   data.log() << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
-  int count = 0;
   data.log() << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
   data.log() << "    -      ----------------------------    -----------------------\n";
-  for (auto& i : data.kanjiNameMap()) {
-    const Kanji& k = *i.second;
-    if (k.variant()) {
+  for (int count = 0; auto& i : data.kanjiNameMap())
+    if (const Kanji& k = *i.second; k.variant()) {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    ["
                  << toUnicode(k.name()) << "] " << k.name() << " variant of " << k.nonVariantName() << "    ";
       auto u = find(k.name());
@@ -258,7 +190,6 @@ void UcdData::print(const Data& data) const {
         data.out() << "UCD not found";
       data.out() << '\n';
     }
-  }
 }
 
 } // namespace kanji_tools

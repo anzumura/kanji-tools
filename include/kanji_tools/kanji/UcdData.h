@@ -8,8 +8,6 @@
 
 namespace kanji_tools {
 
-class Data;
-
 // 'UcdData': holds data loaded from Unicode UCD XML
 class UcdData {
 public:
@@ -37,8 +35,10 @@ public:
 
   // 'load' and 'print' are called by 'KanjiData'
   void load(const std::filesystem::path&);
-  void print(const Data&) const;
+  void print(const class Data&) const;
 private:
+  void printVariationSelectorKanji(const Data&) const;
+
   Map _map;
 
   // '_linked...' are maps from standard Kanji to variant forms loaded from 'ucd.txt'
