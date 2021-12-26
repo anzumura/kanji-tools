@@ -14,9 +14,8 @@ namespace kanji_tools {
 class ColumnFile {
 public:
   // 'Column' has a name that must match a column header in the file being processed. The set of
-  // columns for a 'ColumnFile' are passed into the constructor and then the 'Column' instances
-  // are used to efficiently get values from each row. A 'Column' can be used across multiple
-  // 'ColumnFile' instances.
+  // columns for a 'ColumnFile' are passed into its constructor and the same column instances are
+  // used to get values from each row. A 'Column' can be used across multiple 'ColumnFile' instances.
   class Column {
   public:
     Column(const std::string& name) : _name(name), _number(ColumnFile::getColumnNumber(name)) {}
@@ -37,32 +36,33 @@ public:
   // file can be in a different order than 'columns', but the names must all be found.
   ColumnFile(const std::filesystem::path& p, const Columns& columns);
 
-  // 'nextRow' must be called before using 'get' function. An exception is thrown if the
-  // next row has too few or too many columns. This function returns 'false' when there are
-  // no more rows in the file.
+  // 'nextRow' must be called before using 'get'. An exception is thrown if the next row has too
+  // few or too many columns. 'nextRow' returns 'false' when there are no more rows in the file.
   bool nextRow();
 
-  // 'get' returns the value for the given column for the current row. An exception is
-  // thrown if 'nextRow' hasn't been called yet or if the given column was not passed in
-  // to the constructor.
+  // 'get' returns the value for the given column for the current row. An exception is thrown if
+  // 'nextRow' hasn't been called yet or if the given column was not passed in to the constructor.
   const std::string& get(const Column&) const;
+
+  int columns() const { return _rowValues.size(); }
+  int currentRow() const { return _currentRow; }
+  const std::string& name() const { return _name; }
 private:
   // 'getColumnNumber' is used by 'Column' class constructor
   static int getColumnNumber(const std::string& name);
   friend Column;
 
-  // 'error' throws a 'domain_error' exception conataining 'msg' plus '_file' name (and
-  // '_rowCount' if applicable).
+  // 'error' throws a 'domain_error' exception with 'what' string made from 'msg' plus '_name'.
+  // '_currentRow' is also added if it's not zero.
   void error(const std::string& msg) const;
 
   std::fstream _file;
-  
-  // '_fileName' holds the 'last component name' of the file being processed and is only used
-  // by 'error' function.
-  const std::string _fileName;
 
-  // '_rowCount' starts at 0 and is incremented each time 'nextRow' is called
-  int _rowCount = 0;
+  // '_name' holds the 'last component name' of the file being processed.
+  const std::string _name;
+
+  // '_currentRow' starts at 0 and is incremented each time 'nextRow' is called
+  int _currentRow = 0;
 
   // '_rowValues' is updated each time a new row is processed by 'nextRow'
   std::vector<std::string> _rowValues;
