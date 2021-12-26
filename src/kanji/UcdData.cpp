@@ -7,6 +7,33 @@
 
 namespace kanji_tools {
 
+namespace {
+
+// 'PrintCount' is used for debug printing. Some combinations are prevented by 'load' function (like Joyo
+// with a link or missing meaning), but count all cases for completeness.
+struct PrintCount {
+  int count = 0;
+  int link = 0;
+  int variantStrokes = 0;
+  int meaning = 0;
+  int onReading = 0;
+  int kunReading = 0;
+  int morohashi = 0;
+  int nelson = 0;
+  void add(const Ucd& k) {
+    ++count;
+    if (k.hasLinks()) ++link;
+    if (k.hasVariantStrokes()) ++variantStrokes;
+    if (!k.meaning().empty()) ++meaning;
+    if (!k.onReading().empty()) ++onReading;
+    if (!k.kunReading().empty()) ++kunReading;
+    if (!k.morohashiId().empty()) ++morohashi;
+    if (!k.nelsonIds().empty()) ++nelson;
+  }
+};
+
+} // namespace
+
 const Ucd* UcdData::find(const std::string& kanjiName) const {
   std::string r = kanjiName;
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
@@ -53,24 +80,29 @@ void UcdData::load(const std::filesystem::path& file) {
                      morohashiCol, nelsonIdsCol, joyoCol, jinmeiCol, linkCodesCol, linkNamesCol, linkTypeCol,
                      meaningCol, onCol, kunCol});
        f.nextRow();) {
-    const wchar_t code = f.getWChar(codeCol);
+    if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
+      f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
     const auto& name = f.get(nameCol);
     if (name.length() > 4) f.error("name greater than 4");
-    const int radical = f.getInt(radicalCol);
+    if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
+
+    const int radical = f.getInt(radicalCol), strokes = f.getInt(strokesCol),
+              vStrokes = f.isEmpty(vStrokesCol) ? 0 : Data::toInt(f.get(vStrokesCol));
     if (radical < 1 || radical > 214) f.error("radical out of range");
-    const int strokes = f.getInt(strokesCol);
     // 9F98 (龘) has 48 strokes
     if (strokes < 1 || strokes > 48) f.error("strokes out of range");
-    if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
-    const int vStrokes = f.isEmpty(vStrokesCol) ? 0 : Data::toInt(f.get(vStrokesCol));
     if (vStrokes < 0 || vStrokes == 1 || vStrokes > 33) f.error("variant strokes out of range");
-    const bool joyo = f.getBool(joyoCol);
-    const bool jinmei = f.getBool(jinmeiCol);
-    if (joyo && jinmei) f.error("can't be both joyo and jinmei");
+
+    const bool joyo = f.getBool(joyoCol), jinmei = f.getBool(jinmeiCol);
+    if (joyo) {
+      if (jinmei) f.error("can't be both joyo and jinmei");
+      // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for Joyo
+      if (f.isEmpty(meaningCol)) f.error("meaning is empty for Joyo Kanji");
+    }
+
     Ucd::Links links;
     if (!f.isEmpty(linkNamesCol)) {
-      std::stringstream names(f.get(linkNamesCol));
-      std::stringstream codes(f.get(linkCodesCol));
+      std::stringstream names(f.get(linkNamesCol)), codes(f.get(linkCodesCol));
       for (std::string linkName; std::getline(names, linkName, ',');)
         if (std::string linkCode; std::getline(codes, linkCode, ','))
           links.emplace_back(f.getWChar(linkCodesCol, linkCode), linkName);
@@ -85,18 +117,16 @@ void UcdData::load(const std::filesystem::path& file) {
       f.error("LinkType has a value, but LinkName is empty");
     else if (!f.isEmpty(linkCodesCol))
       f.error("LinkCode has a value, but LinkName is empty");
+
     std::string linkType = f.get(linkTypeCol);
     const bool linkedReadings = linkType.ends_with("*");
     if (linkedReadings) linkType.pop_back();
-    // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for a Joyo
-    if (joyo && f.isEmpty(meaningCol)) f.error("meaning is empty for Joyo Kanji");
-    if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
-      f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
+
     if (!_map
            .emplace(std::piecewise_construct, std::make_tuple(name),
-                    std::make_tuple(code, name, f.get(blockCol), f.get(versionCol), radical, strokes, vStrokes,
-                                    f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol), joyo, jinmei, links,
-                                    Ucd::toLinkType(linkType), linkedReadings, f.get(meaningCol), f.get(onCol),
+                    std::make_tuple(f.getWChar(codeCol), name, f.get(blockCol), f.get(versionCol), radical, strokes,
+                                    vStrokes, f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol), joyo, jinmei,
+                                    links, Ucd::toLinkType(linkType), linkedReadings, f.get(meaningCol), f.get(onCol),
                                     f.get(kunCol)))
            .second)
       f.error("duplicate entry '" + name + "'");
@@ -109,44 +139,18 @@ void UcdData::load(const std::filesystem::path& file) {
 }
 
 void UcdData::print(const Data& data) const {
-  // Some combinations are prevented by 'load' function (like Joyo with a link or missing
-  // meaning), but count all cases here for completeness.
-  struct Count {
-    int count = 0;
-    int link = 0;
-    int variantStrokes = 0;
-    int meaning = 0;
-    int onReading = 0;
-    int kunReading = 0;
-    int morohashi = 0;
-    int nelson = 0;
-    void add(const Ucd& k) {
-      ++count;
-      if (k.hasLinks()) ++link;
-      if (k.hasVariantStrokes()) ++variantStrokes;
-      if (!k.meaning().empty()) ++meaning;
-      if (!k.onReading().empty()) ++onReading;
-      if (!k.kunReading().empty()) ++kunReading;
-      if (!k.morohashiId().empty()) ++morohashi;
-      if (!k.nelsonIds().empty()) ++nelson;
-    }
-  };
   auto print = [&data](const char* s, int x, int y, int z) {
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x << ", Jinmei " << y << ", Other " << z << ")\n";
   };
-  Count joyo, jinmei, other;
+  PrintCount joyo, jinmei, other;
   data.log() << "Kanji Loaded from Unicode 'ucd' file:\n";
-  for (const auto& i : _map) {
-    const auto& k = i.second;
-    if (k.joyo())
+  for (const auto& i : _map)
+    if (const auto& k = i.second; k.joyo())
       joyo.add(k);
-    else {
-      if (k.jinmei())
-        jinmei.add(k);
-      else
-        other.add(k);
-    }
-  }
+    else if (k.jinmei())
+      jinmei.add(k);
+    else
+      other.add(k);
   print("Total", joyo.count, jinmei.count, other.count);
   print("Links", joyo.link, jinmei.link, other.link);
   print("VStrokes", joyo.variantStrokes, jinmei.variantStrokes, other.variantStrokes);
