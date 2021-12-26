@@ -144,6 +144,21 @@ TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
   }
 }
 
+TEST_F(ColumnFileTest, DuplicateColumnError) {
+  std::ofstream of(_testFile);
+  of << "HeaderName\n";
+  of.close();
+  ColumnFile::Column col1("Col1"), col2("Col2");
+  try {
+    ColumnFile f(_testFile, {col1, col2, col1});
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("duplicate column 'Col1' - file: testFile.txt"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
 TEST_F(ColumnFileTest, OneMissingColumnError) {
   std::ofstream of(_testFile);
   of << "Col1\n";

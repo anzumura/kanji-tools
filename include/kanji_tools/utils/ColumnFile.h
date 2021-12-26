@@ -44,6 +44,10 @@ public:
   // 'nextRow' hasn't been called yet or if the given column was not passed in to the constructor.
   const std::string& get(const Column&) const;
 
+  // 'error' throws a 'domain_error' exception with 'what' string made from 'msg' plus '_name'.
+  // '_currentRow' is also added if it's not zero.
+  void error(const std::string& msg) const;
+
   int columns() const { return _rowValues.size(); }
   int currentRow() const { return _currentRow; }
   const std::string& name() const { return _name; }
@@ -51,10 +55,6 @@ private:
   // 'getColumnNumber' is used by 'Column' class constructor
   static int getColumnNumber(const std::string& name);
   friend Column;
-
-  // 'error' throws a 'domain_error' exception with 'what' string made from 'msg' plus '_name'.
-  // '_currentRow' is also added if it's not zero.
-  void error(const std::string& msg) const;
 
   std::fstream _file;
 
