@@ -9,8 +9,6 @@
 
 namespace kanji_tools {
 
-class Data;
-
 // 'RadicalData': holds data loaded from 'radicals.txt' (the 214 official Kanji Radicals).
 class RadicalData {
 public:
@@ -33,11 +31,20 @@ public:
 
   // 'load' and 'print' are called by 'KanjiData'
   void load(const std::filesystem::path&);
-  void print(const Data&) const;
+  void print(const class Data&) const;
 private:
   // 'MaxExamples' controls how many examples are printed for each radical by the above 'print'
   // function (examples are sorted by assending stroke count).
   enum Values { MaxExamples = 12 };
+
+  using Count = std::map<KanjiTypes, int>;
+  using KanjiList = std::vector<std::shared_ptr<class Kanji>>;
+  using RadicalLists = std::map<Radical, KanjiList>;
+
+  void printRadicalLists(const Data&, RadicalLists&) const;
+  void printMissingRadicals(const Data&, const RadicalLists&) const;
+  void printCounts(const Data&, const Count&, bool summary = false) const;
+
   // '_radicals' is populated from radicals.txt and the index in the vector is one less than
   // the actual Radical.number().
   List _radicals;
