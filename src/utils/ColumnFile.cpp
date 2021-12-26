@@ -48,11 +48,15 @@ bool ColumnFile::nextRow() {
   if (std::string line; std::getline(_file, line)) {
     ++_currentRow;
     int pos = 0;
-    for (std::stringstream ss(line); std::getline(ss, line, '\t'); ++pos) {
+    std::string field;
+    for (std::stringstream ss(line); std::getline(ss, field, '\t'); ++pos) {
       if (pos == _rowValues.size()) error("too many columns");
-      _rowValues[pos] = line;
+      _rowValues[pos] = field;
     }
-    if (pos != _rowValues.size()) error("not enough columns");
+    // 'getline' will return failure if it only reads a delimiter and then reaches the end of input
+    // so need a special case for handing an empty final column.
+    if (pos == _rowValues.size() - 1 && line.ends_with("\t")) _rowValues[_rowValues.size() - 1] = EmptyString;
+    else if (pos < _rowValues.size()) error("not enough columns");
     return true;
   }
   return false;
@@ -66,10 +70,34 @@ const std::string& ColumnFile::get(const Column& column) const {
   return _rowValues[position];
 }
 
-void ColumnFile::error(const std::string& msg) const {
-  auto errorMsg = msg + " - file: " + _name;
-  if (_currentRow) errorMsg += ", row: " + std::to_string(_currentRow);
-  throw std::domain_error(errorMsg);
+int ColumnFile::getInt(const Column& column) const {
+  const std::string& s = get(column);
+  int result;
+  try {
+    result = std::stoi(s);
+  } catch (...) {
+    error("failed to convert to int", column, s);
+  }
+  return result;
+}
+
+bool ColumnFile::getBool(const Column& column) const {
+  const std::string& s = get(column);
+  if (s.length() == 1) switch (s[0]) {
+    case 'Y':
+    case 'T': return true;
+    case 'N':
+    case 'F': return false;
+    }
+  if (!s.empty()) error("failed to convert to bool", column, s);
+  return false;
+}
+
+wchar_t ColumnFile::getWChar(const Column& column, const std::string& s) const {
+  if (s.length() < 4 || s.length() > 5) error("failed to convert to wchar_t, length must be 4 or 5", column, s);
+  for (char c : s)
+    if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("failed to convert to wchar_t, invalid hex", column, s);
+  return std::strtol(s.c_str(), nullptr, 16);
 }
 
 } // namespace kanji_tools

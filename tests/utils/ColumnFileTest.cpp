@@ -23,6 +23,7 @@ TEST(ColumnFileColumnTest, SameNumberForSameName) {
 
 class ColumnFileTest : public ::testing::Test {
 protected:
+  inline static const std::string convertError = "failed to convert to ";
   void SetUp() override {
     if (fs::exists(_testDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(_testDir));
@@ -66,6 +67,20 @@ TEST_F(ColumnFileTest, GetValueFromMultipleColumns) {
   EXPECT_EQ(f.get(col1), "Val1");
   EXPECT_EQ(f.get(col2), "Val2");
   EXPECT_EQ(f.get(col3), "Val3");
+}
+
+TEST_F(ColumnFileTest, AllowGettingEmptyValues) {
+  std::ofstream of(_testFile);
+  of << "Col1\tCol2\tCol3\tCol4\n\tVal2\t\t\n";
+  of.close();
+  ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3"), col4("Col4");
+  ColumnFile f(_testFile, {col1, col2, col3, col4});
+  ASSERT_TRUE(f.nextRow());
+  EXPECT_TRUE(f.isEmpty(col1));
+  EXPECT_FALSE(f.isEmpty(col2));
+  EXPECT_TRUE(f.isEmpty(col3));
+  EXPECT_TRUE(f.isEmpty(col4));
+  EXPECT_EQ(f.get(col2), "Val2");
 }
 
 TEST_F(ColumnFileTest, HeaderColumnOrderDifferentThanConstructor) {
@@ -276,6 +291,97 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
     EXPECT_EQ(err.what(), std::string("invalid column 'Not Included' - file: testFile.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ColumnFileTest, GetInt) {
+  std::ofstream of(_testFile);
+  of << "Col\n123\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  f.nextRow();
+  EXPECT_EQ(f.getInt(col), 123);
+}
+
+TEST_F(ColumnFileTest, GetIntError) {
+  std::ofstream of(_testFile);
+  of << "Col\nblah\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  f.nextRow();
+  try {
+    f.getInt(col);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ColumnFileTest, GetBool) {
+  std::ofstream of(_testFile);
+  of << "1\t2\t3\t4\t5\nY\tT\tN\tF\t\n";
+  of.close();
+  ColumnFile::Column c1("1"), c2("2"), c3("3"), c4("4"), c5("5");
+  ColumnFile f(_testFile, {c1, c2, c3, c4, c5});
+  f.nextRow();
+  EXPECT_TRUE(f.getBool(c1));
+  EXPECT_TRUE(f.getBool(c2));
+  EXPECT_FALSE(f.getBool(c3));
+  EXPECT_FALSE(f.getBool(c4));
+  EXPECT_FALSE(f.getBool(c5));
+}
+
+TEST_F(ColumnFileTest, GetBoolError) {
+  std::ofstream of(_testFile);
+  of << "Col\nx\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  f.nextRow();
+  try {
+    f.getBool(col);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), convertError + "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'");
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ColumnFileTest, GetWChar) {
+  std::ofstream of(_testFile);
+  of << "1\t2\n898B\t20B9F\n";
+  of.close();
+  ColumnFile::Column c1("1"), c2("2");
+  ColumnFile f(_testFile, {c1, c2});
+  f.nextRow();
+  EXPECT_EQ(f.getWChar(c1), 35211);
+  EXPECT_EQ(f.getWChar(c2), 134047);
+}
+
+TEST_F(ColumnFileTest, GetWCharError) {
+  std::ofstream of(_testFile);
+  of << "Col\nAAA\n123456\nABCd\nDEFG\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  for (auto i : {std::string("length must be 4 or 5 - file: testFile.txt, row: 1, column: 'Col', value: 'AAA'"),
+                 std::string("length must be 4 or 5 - file: testFile.txt, row: 2, column: 'Col', value: '123456'"),
+                 std::string("invalid hex - file: testFile.txt, row: 3, column: 'Col', value: 'ABCd'"),
+                 std::string("invalid hex - file: testFile.txt, row: 4, column: 'Col', value: 'DEFG'")}) {
+    f.nextRow();
+    try {
+      f.getWChar(col);
+      FAIL() << "Expected std::domain_error";
+    } catch (std::domain_error& err) {
+      EXPECT_EQ(err.what(), convertError + "wchar_t, " + i);
+    } catch (...) {
+      FAIL() << "Expected std::domain_error";
+    }
   }
 }
 
