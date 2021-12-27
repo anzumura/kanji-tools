@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -27,11 +28,12 @@ public:
     const std::string& name() const { return _name; }
     int number() const { return _number; }
   private:
-    const std::string _name;
-    const int _number; // globally unique number per column based on '_name'
+    std::string _name;
+    int _number; // globally unique number per column based on '_name'
   };
 
   using Columns = std::vector<Column>;
+  using OptInt = std::optional<int>;
 
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a regular file) or
   // if the list of 'columns' doesn't match the first row of the file. Note, the columns in the
@@ -50,6 +52,9 @@ public:
 
   // 'getInt' convert to 'int' or calls 'error'
   int getInt(const Column&) const;
+
+  // 'getOptInt' returns std::nullopt if column is empty or returns an optional int (or calls 'error')
+  OptInt getOptInt(const Column&) const;
 
   // 'getBool' converts 'Y' or 'T' to true, 'N' or 'F' (or empty) to false or calls 'error'
   bool getBool(const Column&) const;
@@ -78,6 +83,11 @@ private:
   // 'getColumnNumber' is used by 'Column' class constructor
   static int getColumnNumber(const std::string& name);
   friend Column;
+
+  using ColNames = std::map<std::string, Column>;
+
+  void processHeaderRow(const std::string&, ColNames&);
+  void verifyHeaderColumns(const ColNames&) const;
 
   std::string errorMsg(const std::string& msg) const {
     std::string result = msg + " - file: " + _name;

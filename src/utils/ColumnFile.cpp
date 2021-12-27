@@ -1,5 +1,6 @@
 #include <kanji_tools/utils/ColumnFile.h>
 
+#include <set>
 #include <sstream>
 
 namespace kanji_tools {
@@ -21,18 +22,31 @@ ColumnFile::ColumnFile(const fs::path& p, const Columns& columns)
     _columnToPosition(_allColumns.size(), -1) {
   if (!fs::exists(p)) error("doesn't exist");
   if (!fs::is_regular_file(p)) error("not regular file");
-  std::string line;
-  if (!std::getline(_file, line)) error("missing header row");
-  std::map<std::string, Column> colNames;
-  for (auto& c : columns)
-    if (!colNames.insert(std::make_pair(c.name(), c)).second) error("duplicate column '" + c.name() + "'");
+  if (std::string headerRow; std::getline(_file, headerRow)) {
+    ColNames colNames;
+    for (auto& c : columns)
+      if (!colNames.insert(std::make_pair(c.name(), c)).second) error("duplicate column '" + c.name() + "'");
+    processHeaderRow(headerRow, colNames);
+    verifyHeaderColumns(colNames);
+  } else
+    error("missing header row");
+}
+
+void ColumnFile::processHeaderRow(const std::string& headerRow, ColNames& colNames) {
   int pos = 0;
-  for (std::stringstream ss(line); std::getline(ss, line, '\t'); ++pos) {
-    auto i = colNames.find(line);
-    if (i == colNames.end()) error("unrecognized header '" + line + "'");
+  std::set<std::string> foundCols;
+  std::string header;
+  for (std::stringstream ss(headerRow); std::getline(ss, header, '\t'); ++pos) {
+    if (foundCols.contains(header)) error("duplicate header '" + header + "'");
+    auto i = colNames.find(header);
+    if (i == colNames.end()) error("unrecognized header '" + header + "'");
     _columnToPosition[i->second.number()] = pos;
+    foundCols.insert(header);
     colNames.erase(i);
   }
+}
+
+void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
   if (colNames.size() == 1) error("column '" + (*colNames.begin()).first + "' not found");
   if (colNames.size() > 1) {
     std::string msg;
@@ -55,8 +69,10 @@ bool ColumnFile::nextRow() {
     }
     // 'getline' will return failure if it only reads a delimiter and then reaches the end of input
     // so need a special case for handing an empty final column.
-    if (pos == _rowValues.size() - 1 && line.ends_with("\t")) _rowValues[_rowValues.size() - 1] = EmptyString;
-    else if (pos < _rowValues.size()) error("not enough columns");
+    if (pos == _rowValues.size() - 1 && (pos ? line.ends_with("\t") : line.empty()))
+      _rowValues[_rowValues.size() - 1] = EmptyString;
+    else if (pos < _rowValues.size())
+      error("not enough columns");
     return true;
   }
   return false;
@@ -72,6 +88,18 @@ const std::string& ColumnFile::get(const Column& column) const {
 
 int ColumnFile::getInt(const Column& column) const {
   const std::string& s = get(column);
+  int result;
+  try {
+    result = std::stoi(s);
+  } catch (...) {
+    error("failed to convert to int", column, s);
+  }
+  return result;
+}
+
+ColumnFile::OptInt ColumnFile::getOptInt(const Column& column) const {
+  const std::string& s = get(column);
+  if (s.empty()) return std::nullopt;
   int result;
   try {
     result = std::stoi(s);

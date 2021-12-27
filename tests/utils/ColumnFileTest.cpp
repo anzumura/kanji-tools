@@ -57,6 +57,16 @@ TEST_F(ColumnFileTest, GetValueFromOneColumn) {
   EXPECT_EQ(f.currentRow(), 1);
 }
 
+TEST_F(ColumnFileTest, GetEmptyValueFromOneColumn) {
+  std::ofstream of(_testFile);
+  of << "Col\n\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  ASSERT_TRUE(f.nextRow());
+  EXPECT_TRUE(f.isEmpty(col));
+}
+
 TEST_F(ColumnFileTest, GetValueFromMultipleColumns) {
   std::ofstream of(_testFile);
   of << "Col1\tCol2\tCol3\nVal1\tVal2\tVal3\n";
@@ -154,6 +164,21 @@ TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("unrecognized header 'HeaderName' - file: testFile.txt"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ColumnFileTest, DuplicateHeaderError) {
+  std::ofstream of(_testFile);
+  of << "Col\tCol\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  try {
+    ColumnFile f(_testFile, {col});
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("duplicate header 'Col' - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -313,6 +338,35 @@ TEST_F(ColumnFileTest, GetIntError) {
   f.nextRow();
   try {
     f.getInt(col);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ColumnFileTest, GetOptInt) {
+  std::ofstream of(_testFile);
+  of << "Col\n123\n\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  f.nextRow();
+  EXPECT_EQ(f.getOptInt(col), 123);
+  EXPECT_TRUE(f.nextRow());
+  EXPECT_FALSE(f.getOptInt(col));
+}
+
+TEST_F(ColumnFileTest, GetOptIntError) {
+  std::ofstream of(_testFile);
+  of << "Col\nblah\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(_testFile, {col});
+  f.nextRow();
+  try {
+    f.getOptInt(col);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
