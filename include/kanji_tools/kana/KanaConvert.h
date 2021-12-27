@@ -2,6 +2,7 @@
 #define KANJI_TOOLS_KANA_KANA_CONVERT_H
 
 #include <kanji_tools/kana/Kana.h>
+
 #include <set>
 
 namespace kanji_tools {
@@ -63,6 +64,7 @@ public:
   int flags() const { return _flags; }
   std::string flagString() const; // return a | separated string representation of current flags or 'none'
   void flags(int flags) { _flags = flags; }
+
   // Support converting most non-letter ascii from narrow to wide values. These values are also used
   // as delimiters for splitting up input strings when converting from Rōmaji to Kana. Use a '*' for
   // katakana middle dot '・' to keep round-trip translations as non-lossy as possible. For now, don't
@@ -70,6 +72,7 @@ public:
   // separation handling after 'n' in Romaji output. Backslash maps to ￥ as per usual keyboard input.
   using NarrowDelims = std::map<char, std::string>;
   using WideDelims = std::map<std::string, char>;
+
   const NarrowDelims& narrowDelims() const { return _narrowDelims; }
   const WideDelims& wideDelims() const { return _wideDelims; }
 
