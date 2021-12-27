@@ -1,8 +1,8 @@
 #include <kanji_tools/quiz/GroupData.h>
+#include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/DisplayLength.h>
 #include <kanji_tools/utils/MBChar.h>
 
-#include <fstream>
 #include <sstream>
 
 namespace kanji_tools {
@@ -13,6 +13,8 @@ namespace {
 
 const fs::path MeaningGroupFile = "meaning-groups.txt";
 const fs::path PatternGroupFile = "pattern-groups.txt";
+
+const std::string WideColon("：");
 
 } // namespace
 
@@ -45,137 +47,121 @@ bool GroupData::checkInsert(const std::string& name, MultiMap& groups, const Ent
 }
 
 template<typename T>
-void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& list, GroupType type) {
-  static const std::string wideColon("：");
-  int lineNumber = 1, numberCol = -1, nameCol = -1, membersCol = -1;
-  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    Data::usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
-  };
-  auto setCol = [&file, &error](int& col, int pos) {
-    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name", false);
-    col = pos;
-  };
-  std::ifstream f(file);
-  std::array<std::string, 3> cols;
-  for (std::string line; std::getline(f, line); ++lineNumber) {
-    int pos = 0;
-    if (std::stringstream ss(line); numberCol == -1) {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Number")
-          setCol(numberCol, pos);
-        else if (token == "Name")
-          setCol(nameCol, pos);
-        else if (token == "Members")
-          setCol(membersCol, pos);
-        else
-          error("unrecognized column '" + token + "'", false);
-      if (pos != cols.size()) error("not enough columns", false);
-    } else {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) error("too many columns");
-        cols[pos] = token;
-      }
-      if (pos != cols.size()) error("not enough columns");
-      std::string number(cols[numberCol]), name(cols[nameCol]), token;
-      DataFile::List kanjis;
-      Group::PatternType patternType = Group::PatternType::None;
-      if (name.empty()) error("Group must have a name");
-      if (isAnySingleByte(name)) error("Group name must be all MB characters");
-      if (type == GroupType::Pattern) {
-        patternType = name.starts_with(wideColon)     ? Group::PatternType::Peer
-          : name.find(wideColon) != std::string::npos ? Group::PatternType::Family
-                                                      : Group::PatternType::Reading;
-        // 'name' before the colon is the first member of a 'family'
-        if (patternType == Group::PatternType::Family) kanjis.push_back(MBChar::getFirst(name));
-      }
-      if (cols[membersCol].ends_with(",")) error("members ends with ,");
-      for (std::stringstream members(cols[membersCol]); std::getline(members, token, ',');)
-        kanjis.emplace_back(token);
-      Data::List memberKanjis;
-      for (const auto& i : kanjis) {
-        const auto memberKanji = _data->findKanjiByName(i);
-        if (memberKanji)
-          memberKanjis.push_back(*memberKanji);
-        else
-          _data->printError("failed to find member " + i + " in group " + number);
-      }
-      if (memberKanjis.empty()) error("group " + number + " has no valid members");
-      if (memberKanjis.size() == 1) error("group " + number + " must have more than one member");
-      if (memberKanjis.size() < kanjis.size()) error("group " + number + " failed to load all members");
-      if (memberKanjis.size() > MaxGroupSize)
-        error("group " + number + " has more than " + std::to_string(MaxGroupSize) + " members");
-      Entry group;
-      if (type == GroupType::Meaning)
-        group = std::make_shared<MeaningGroup>(Data::toInt(number), name, memberKanjis);
-      else
-        group = std::make_shared<PatternGroup>(Data::toInt(number), name, memberKanjis, patternType);
-      for (const auto& i : memberKanjis)
-        checkInsert(i->name(), groups, group);
-      list.push_back(group);
+void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& list, GroupType groupType) {
+  ColumnFile::Column numberCol("Number"), nameCol("Name"), membersCol("Members");
+  for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
+    const std::string &name(f.get(nameCol)), members(f.get(membersCol));
+    if (name.empty()) f.error("group must have a name");
+    if (isAnySingleByte(name)) f.error("group name must be all MB characters");
+    if (members.ends_with(",")) f.error("members ends with ,");
+
+    DataFile::List kanjiNames;
+    Group::PatternType patternType = Group::PatternType::None;
+    if (groupType == GroupType::Pattern) {
+      patternType = name.starts_with(WideColon)     ? Group::PatternType::Peer
+        : name.find(WideColon) != std::string::npos ? Group::PatternType::Family
+                                                    : Group::PatternType::Reading;
+      // 'name' before the colon is the first member of a 'family'
+      if (patternType == Group::PatternType::Family) kanjiNames.push_back(MBChar::getFirst(name));
     }
+    std::string member;
+    for (std::stringstream ss(members); std::getline(ss, member, ',');)
+      kanjiNames.emplace_back(member);
+    Data::List memberKanji;
+    for (const auto& i : kanjiNames)
+      if (auto k = _data->findKanjiByName(i); k)
+        memberKanji.push_back(*k);
+      else
+        _data->printError("failed to find member " + i + " in group: '" + name + "', number: " + f.get(numberCol));
+    if (memberKanji.empty()) f.error("group has no valid members");
+    if (memberKanji.size() == 1) f.error("group must have more than one member");
+    if (memberKanji.size() < kanjiNames.size()) f.error("group failed to load all members");
+    if (memberKanji.size() > MaxGroupSize) f.error("group has more than " + std::to_string(MaxGroupSize) + " members");
+
+    Entry group = createGroup(f.getInt(numberCol), name, memberKanji, patternType);
+    for (const auto& i : memberKanji)
+      checkInsert(i->name(), groups, group);
+    list.push_back(group);
   }
+}
+
+GroupData::Entry GroupData::createGroup(int number, const std::string& name, const Data::List& members,
+                                        Group::PatternType patternType) const {
+  if (patternType == Group::PatternType::None) return std::make_shared<MeaningGroup>(number, name, members);
+  return std::make_shared<PatternGroup>(number, name, members, patternType);
 }
 
 template<typename T> void GroupData::printGroups(const T& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size() << " groups\n";
   if (fullDebug()) log() << Kanji::Legend << "\nName (number of entries)   Parent Member : Other Members\n";
-  const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4;
-  std::map<KanjiTypes, std::vector<std::string>> types;
-  std::set<std::string> uniqueNames;
-  for (const auto& i : groupList) {
+  TypeMap types;
+  StringSet uniqueNames;
+  for (const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4; auto& i : groupList) {
     if (fullDebug()) out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
-    if (i->type() == GroupType::Meaning) {
-      if (fullDebug()) {
-        auto len = MBChar::length(i->name());
-        out() << i->name()
-              << (len == 1     ? "　　"
-                    : len == 2 ? "　"
-                               : "")
-              << " (" << std::setw(2) << std::setfill(' ') << i->members().size() << ")   :";
-      }
-      for (const auto& j : i->members()) {
-        if (fullDebug()) out() << ' ' << j->qualifiedName();
-        // the same kanji can be in more than one meaning group so check uniqueness to avoid overcounting
-        if (uniqueNames.insert(j->name()).second) types[j->type()].push_back(j->name());
-      }
-    } else {
-      if (fullDebug())
-        out() << std::setw(wideSetw(i->name(), 25)) << i->name() << '(' << std::setw(2) << i->members().size()
-              << ")   ";
-      for (const auto& j : i->members()) {
-        types[j->type()].push_back(j->name());
-        if (fullDebug()) {
-          if (j == i->members()[0]) switch (i->patternType()) {
-            case Group::PatternType::Peer: out() << "　 : " << j->qualifiedName(); break;
-            case Group::PatternType::Reading: out() << j->qualifiedName(); break;
-            default: out() << j->qualifiedName() << ':';
-            }
-          else
-            out() << ' ' << j->qualifiedName();
-        }
-      }
-    }
+    if (i->type() == GroupType::Meaning)
+      printMeaningGroup(*i, types, uniqueNames);
+    else
+      printPatternGroup(*i, types);
     if (fullDebug()) out() << '\n';
   }
-  if (!uniqueNames.empty() && uniqueNames.size() < groups.size()) {
-    std::map<std::string, int> multipleGroups;
-    std::string prevKey;
-    int maxGroups = 0;
-    for (auto i = groups.begin(); i != groups.end(); ++i)
-      if (i->first == prevKey) {
-        int j = ++multipleGroups[i->first];
-        if (j > maxGroups) maxGroups = j;
-      } else
-        prevKey = i->first;
-    log() << "Unique kanji: " << uniqueNames.size() << " (once " << uniqueNames.size() - multipleGroups.size()
-          << ", multi " << multipleGroups.size() << ")\n";
-    for (int i = 1; i <= maxGroups; ++i) {
-      out() << "  Kanji in " << i + 1 << " groups:";
-      for (auto j = multipleGroups.begin(); j != multipleGroups.end(); ++j)
-        if (j->second == i) out() << ' ' << j->first;
-      out() << '\n';
+  if (!uniqueNames.empty() && uniqueNames.size() < groups.size()) printUniqueNames(groups, uniqueNames);
+  printTypeBreakdown(types);
+}
+
+void GroupData::printMeaningGroup(const Group& group, TypeMap& types, StringSet& uniqueNames) const {
+  if (fullDebug()) {
+    auto len = MBChar::length(group.name());
+    out() << group.name()
+          << (len == 1     ? "　　"
+                : len == 2 ? "　"
+                           : "")
+          << " (" << std::setw(2) << std::setfill(' ') << group.members().size() << ")   :";
+  }
+  for (const auto& i : group.members()) {
+    if (fullDebug()) out() << ' ' << i->qualifiedName();
+    // the same kanji can be in more than one meaning group so check uniqueness to avoid overcounting
+    if (uniqueNames.insert(i->name()).second) types[i->type()].push_back(i->name());
+  }
+}
+
+void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
+  if (fullDebug())
+    out() << std::setw(wideSetw(group.name(), 25)) << group.name() << '(' << std::setw(2) << group.members().size()
+          << ")   ";
+  for (const auto& i : group.members()) {
+    types[i->type()].push_back(i->name());
+    if (fullDebug()) {
+      if (i == group.members()[0]) switch (group.patternType()) {
+        case Group::PatternType::Peer: out() << "　 : " << i->qualifiedName(); break;
+        case Group::PatternType::Reading: out() << i->qualifiedName(); break;
+        default: out() << i->qualifiedName() << ':';
+        }
+      else
+        out() << ' ' << i->qualifiedName();
     }
   }
+}
+
+template<typename T> void GroupData::printUniqueNames(const T& groups, const StringSet& uniqueNames) const {
+  std::map<std::string, int> multipleGroups;
+  std::string prevKey;
+  int maxBelongsTo = 0; // will hold the maximum number of groups a kanji belongs to
+  for (auto i = groups.begin(); i != groups.end(); ++i)
+    if (i->first == prevKey) {
+      if (int belongsTo = ++multipleGroups[i->first]; belongsTo > maxBelongsTo) maxBelongsTo = belongsTo;
+    } else
+      prevKey = i->first;
+  log() << "Unique kanji: " << uniqueNames.size() << " (once " << uniqueNames.size() - multipleGroups.size()
+        << ", multi " << multipleGroups.size() << ")\n";
+  for (int i = 1; i <= maxBelongsTo; ++i) {
+    out() << "  Kanji in " << i + 1 << " groups:";
+    for (auto j = multipleGroups.begin(); j != multipleGroups.end(); ++j)
+      if (j->second == i) out() << ' ' << j->first;
+    out() << '\n';
+  }
+}
+
+void GroupData::printTypeBreakdown(TypeMap& types) const {
   out() << "Type Breakdown (showing up to " << MissingTypeExamples << " missing examples per type)\n";
   for (auto i : AllKanjiTypes)
     if (auto j = types.find(i); j != types.end()) {

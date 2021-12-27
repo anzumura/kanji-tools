@@ -16,6 +16,7 @@ public:
   using MultiMap = std::multimap<std::string, Entry>;
   using Map = std::map<std::string, Entry>;
   using List = std::vector<Entry>;
+
   GroupData(DataPtr);
   GroupData(const GroupData&) = delete;
 
@@ -36,7 +37,17 @@ private:
   // 'loadGroups' loads from '-groups.txt' files
   template<typename T> void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
 
+  Entry createGroup(int number, const std::string& name, const Data::List& members, Group::PatternType) const;
+
   template<typename T> void printGroups(const T&, const List&) const;
+
+  using TypeMap = std::map<KanjiTypes, std::vector<std::string>>;
+  using StringSet = std::set<std::string>;
+
+  void printMeaningGroup(const Group&, TypeMap&, StringSet&) const;
+  void printPatternGroup(const Group&, TypeMap&) const;
+  template<typename T> void printUniqueNames(const T&, const StringSet&) const;
+  void printTypeBreakdown(TypeMap&) const;
 
   bool fullDebug() const { return _data->fullDebug(); }
 
