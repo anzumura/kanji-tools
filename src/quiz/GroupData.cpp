@@ -7,12 +7,10 @@
 
 namespace kanji_tools {
 
-namespace fs = std::filesystem;
-
 namespace {
 
-const fs::path MeaningGroupFile = "meaning-groups.txt";
-const fs::path PatternGroupFile = "pattern-groups.txt";
+const std::filesystem::path MeaningGroupFile = "meaning-groups.txt";
+const std::filesystem::path PatternGroupFile = "pattern-groups.txt";
 
 const std::string WideColon("：");
 
