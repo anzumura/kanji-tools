@@ -213,7 +213,7 @@ Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("unrecognized column: Rdical, file: testDir/test.txt"));
+    EXPECT_EQ(err.what(), std::string("unrecognized header 'Rdical' - file: test.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -227,7 +227,7 @@ Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("duplicate column: Name, file: testDir/test.txt"));
+    EXPECT_EQ(err.what(), std::string("duplicate header 'Name' - file: test.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -241,7 +241,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("too many columns - line: 2, file: testDir/test.txt"));
+    EXPECT_EQ(err.what(), std::string("too many columns - file: test.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -255,7 +255,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("not enough columns - line: 2, file: testDir/test.txt"));
+    EXPECT_EQ(err.what(), std::string("not enough columns - file: test.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -273,7 +273,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(std::string(err.what()),
-              "got exception while creating kanji 'failed to convert to int: a' - line: 2, file: testDir/test.txt");
+              "failed to convert to int - file: test.txt, row: 1, column: 'Number', value: 'a'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -359,7 +359,7 @@ Number\tName\tRadical\tOldNames\tYear\tReading\n\
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Jinmei, _testFile);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()), "missing required column: Reason, file: testDir/test.txt");
+    EXPECT_EQ(std::string(err.what()), "column 'Reason' not found - file: test.txt");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }

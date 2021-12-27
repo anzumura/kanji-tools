@@ -2,6 +2,7 @@
 #define KANJI_TOOLS_KANJI_CUSTOM_FILE_KANJI_H
 
 #include <kanji_tools/kanji/NonLinkedKanji.h>
+#include <kanji_tools/utils/ColumnFile.h>
 
 namespace kanji_tools {
 
@@ -20,52 +21,33 @@ public:
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
   // - 'file' must have tab separated lines that have the right number of columns for the given type
-  // - the first line of 'file' should have column header names that match the names in the 'Columns' enum
+  // - first line of 'file' must have header names that match the static 'Column' instances below
   static Data::List fromFile(const Data&, KanjiTypes type, const std::filesystem::path& file);
 protected:
-  // list of all supported columns in files
-  enum Columns {
-    NumberCol,
-    NameCol,
-    RadicalCol,
-    OldNamesCol,
-    YearCol,
-    StrokesCol,
-    GradeCol,
-    MeaningCol,
-    ReadingCol,
-    ReasonCol,
-    MaxCol
-  };
+  inline static ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"}, RadicalCol{"Radical"}, OldNamesCol{"OldNames"},
+    YearCol{"Year"}, StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"}, ReadingCol{"Reading"},
+    ReasonCol{"Reason"};
 
-  // 'columns' contains list of values for each column after parsing a line (used by 'fromString' method)
-  static std::array<std::string, MaxCol> columns;
-
-  static const Ucd* findUcd(const Data& d) { return d.findUcd(columns[NameCol]); }
+  static const Ucd* findUcd(const Data& d, const std::string& name) { return d.findUcd(name); }
 
   // Constructor used by 'CustomFileKanji' and 'ExtraKanji': calls base with 'meaning' field
-  CustomFileKanji(const Data& d, int strokes, const std::string& meaning, const LinkNames& oldNames, const Ucd* u)
-    : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), meaning, columns[ReadingCol],
-                     strokes, u),
-      _kyu(d.getKyu(columns[NameCol])), _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
+  CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name, int strokes, const std::string& meaning,
+                  const LinkNames& oldNames, const Ucd* u)
+    : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)), meaning, f.get(ReadingCol), strokes, u),
+      _kyu(d.getKyu(name)), _number(f.getInt(NumberCol)), _oldNames(oldNames) {}
 
   // Constructor used by 'OfficialKanji': calls base without 'meaning' field
-  CustomFileKanji(const Data& d, int strokes, const LinkNames& oldNames, const Ucd* u)
-    : NonLinkedKanji(d, columns[NameCol], d.getRadicalByName(columns[RadicalCol]), columns[ReadingCol], strokes, u),
-      _kyu(d.getKyu(columns[NameCol])), _number(Data::toInt(columns[NumberCol])), _oldNames(oldNames) {}
+  CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name, int strokes, const LinkNames& oldNames)
+    : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)), f.get(ReadingCol), strokes, findUcd(d, name)),
+      _kyu(d.getKyu(name)), _number(f.getInt(NumberCol)), _oldNames(oldNames) {}
 private:
   // all kanji files must have at least the following columns
-  static constexpr std::array requiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
+  inline static const std::vector RequiredColumns{NumberCol, NameCol, RadicalCol, ReadingCol};
 
   // specific types require additional columns
-  static constexpr std::array jouyouRequiredColumns{OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
-  static constexpr std::array jinmeiRequiredColumns{OldNamesCol, YearCol, ReasonCol};
-  static constexpr std::array extraRequiredColumns{StrokesCol, MeaningCol};
-  static constexpr std::array ColumnNames{"Number",  "Name",  "Radical", "OldNames", "Year",
-                                          "Strokes", "Grade", "Meaning", "Reading",  "Reason"};
-
-  static std::pair<std::string, int> colPair(int x) { return std::make_pair(ColumnNames[x], x); }
-  static std::map<std::string, int> ColumnMap; // maps column names to Column enum values
+  inline static const std::vector JouyouRequiredColumns{OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
+  inline static const std::vector JinmeiRequiredColumns{OldNamesCol, YearCol, ReasonCol};
+  inline static const std::vector ExtraRequiredColumns{StrokesCol, MeaningCol};
 
   const KenteiKyus _kyu;
   const int _number;
@@ -86,21 +68,16 @@ public:
   OptInt year() const { return _year; }
 protected:
   // constructor used by 'JinmeiKanji' calls base without 'meaning' field
-  OfficialKanji(const Data& d, int s)
-    : CustomFileKanji(d, s, getOldNames(), findUcd(d)), _frequency(d.getFrequency(columns[NameCol])),
-      _level(d.getLevel(columns[NameCol])), _year(optInt(columns[YearCol])) {}
+  OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name)
+    : CustomFileKanji(d, f, name, d.getStrokes(name), getOldNames(f)), _frequency(d.getFrequency(name)),
+      _level(d.getLevel(name)), _year(f.getOptInt(YearCol)) {}
 
-  // constructor used by 'JinmeiKanji' calls base with 'meaning' field
-  OfficialKanji(const Data& d, int s, const std::string& meaning)
-    : CustomFileKanji(d, s, meaning, getOldNames(), findUcd(d)), _frequency(d.getFrequency(columns[NameCol])),
-      _level(d.getLevel(columns[NameCol])), _year(optInt(columns[YearCol])) {}
+  // constructor used by 'JouyouKanji' calls base with 'meaning' field
+  OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name, int s, const std::string& meaning)
+    : CustomFileKanji(d, f, name, s, meaning, getOldNames(f), findUcd(d, name)), _frequency(d.getFrequency(name)),
+      _level(d.getLevel(name)), _year(f.getOptInt(YearCol)) {}
 private:
-  static LinkNames getOldNames();
-
-  static OptInt optInt(const std::string& s) {
-    if (s.empty()) return {};
-    return Data::toInt(s);
-  }
+  static LinkNames getOldNames(const ColumnFile&);
 
   const OptInt _frequency;
   const JlptLevels _level;
@@ -126,8 +103,8 @@ public:
     }
   }
 
-  JinmeiKanji(const Data& d)
-    : OfficialKanji(d, d.getStrokes(columns[NameCol])), _reason(getReason(columns[ReasonCol])) {}
+  JinmeiKanji(const Data& d, const ColumnFile& f)
+    : OfficialKanji(d, f, f.get(NameCol)), _reason(getReason(f.get(ReasonCol))) {}
 
   KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   OptString extraTypeInfo() const override {
@@ -141,8 +118,8 @@ private:
 
 class JouyouKanji : public OfficialKanji {
 public:
-  JouyouKanji(const Data& d)
-    : OfficialKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol]), _grade(getGrade(columns[GradeCol])) {}
+  JouyouKanji(const Data& d, const ColumnFile& f)
+    : OfficialKanji(d, f, f.get(NameCol), f.getInt(StrokesCol), f.get(MeaningCol)), _grade(getGrade(f.get(GradeCol))) {}
 
   KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   KanjiGrades grade() const override { return _grade; }
@@ -156,13 +133,14 @@ private:
 // should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(const Data& d) : ExtraKanji(d, findUcd(d)) {}
+  ExtraKanji(const Data& d, const ColumnFile& f) : ExtraKanji(d, f, f.get(NameCol)) {}
 
   KanjiTypes type() const override { return KanjiTypes::Extra; }
   OptString newName() const override { return _newName; }
 private:
-  ExtraKanji(const Data& d, const Ucd* u)
-    : CustomFileKanji(d, Data::toInt(columns[StrokesCol]), columns[MeaningCol],
+  ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name) : ExtraKanji(d, f, name, findUcd(d, name)) {}
+  ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name, const Ucd* u)
+    : CustomFileKanji(d, f, name, f.getInt(StrokesCol), f.get(MeaningCol),
                       u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
       _newName(u && u->hasNonTraditionalLinks() ? OptString(u->links()[0].name()) : std::nullopt) {}
   const OptString _newName;
