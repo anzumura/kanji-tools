@@ -6,7 +6,6 @@
 #include <kanji_tools/kanji/UcdData.h>
 #include <kanji_tools/utils/DataFile.h>
 
-#include <memory>
 #include <optional>
 
 namespace kanji_tools {
@@ -39,6 +38,7 @@ public:
 
   const UcdData& ucd() const { return _ucd; }
   const Ucd* findUcd(const std::string& kanjiName) const { return _ucd.find(kanjiName); }
+
   // Functions used by 'Kanji' classes during construction, each takes a kanji name.
   virtual Kanji::OptInt getFrequency(const std::string&) const = 0;
   virtual JlptLevels getLevel(const std::string&) const = 0;
@@ -49,19 +49,24 @@ public:
     // data loaded from Unicode.
     throw std::domain_error("UCD entry not found: " + kanjiName);
   }
+
   // 'getRadicalByName' is used by 'ExtraKanji' classes during construction. It will return
   // the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   virtual const Radical& getRadicalByName(const std::string& radicalName) const { return _radicals.find(radicalName); }
+
   // 'getPinyin' returns an optional string since not all Kanji have a Pinyin reading.
   Kanji::OptString getPinyin(const Ucd* u) const {
     return u && !u->pinyin().empty() ? Kanji::OptString(u->pinyin()) : std::nullopt;
   }
+
   // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see comments in scripts/parseUcdAllFlat.sh)
   Kanji::OptString getMorohashiId(const Ucd* u) const {
     return u && !u->morohashiId().empty() ? Kanji::OptString(u->morohashiId()) : std::nullopt;
   }
+
   // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
   Kanji::NelsonIds getNelsonIds(const Ucd*) const;
+
   // 'getCompatibilityName' returns the UCD compatibility code for the given 'kanjiName' if it
   // exists (_ucd.find method takes care of checking whether kanjiName has a variation selector).
   Kanji::OptString getCompatibilityName(const std::string& kanjiName) const {
@@ -130,6 +135,7 @@ public:
     if (j == _kanjiNameMap.end()) return {};
     return j->second;
   }
+
   // 'findKanjiByFrequency' returns the Kanji with the given 'frequency' (should be a value from 1 to 2501)
   OptEntry findKanjiByFrequency(int frequency) const {
     if (frequency < 1 || frequency >= _maxFrequency) return {};
@@ -137,12 +143,14 @@ public:
     if (bucket == FrequencyBuckets) --bucket; // last bucket contains FrequencyBucketEntries + 1
     return _frequencies[bucket][frequency - bucket * FrequencyBucketEntries];
   }
+
   // 'findKanjisByMorohashiId' can return more than one entry. The ids are usually plain just numeric, but they can
   // also be an index number followed by a 'P'. For example, '4138' maps to 嗩 and '4138P' maps to 嘆.
   const List& findKanjisByMorohashiId(const std::string& id) const {
     auto i = _morohashiMap.find(id);
     return i != _morohashiMap.end() ? i->second : _emptyList;
   }
+
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491 maps to 㡡, 幮 and 𢅥.
   const List& findKanjisByNelsonId(int id) const {
     auto i = _nelsonMap.find(id);
@@ -162,15 +170,6 @@ public:
 
   // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
   std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
-
-  // 'toInt' is a helper method used during file loading
-  static int toInt(const std::string& s) {
-    try {
-      return std::stoi(s);
-    } catch (...) {
-      throw std::invalid_argument("failed to convert to int: " + s);
-    }
-  }
 
   static int maxFrequency() { return _maxFrequency; }
 
@@ -207,13 +206,16 @@ protected:
 
   // '_radicals' holds the 214 official Kanji Radicals
   RadicalData _radicals;
+
   // '_ucd' is used to supplement Kanji attributes like radical, meaning and reading
   UcdData _ucd;
+
   // '_strokes' is populated from strokes.txt and is meant to supplement jinmei kanji (file doesn't
   // have a 'Strokes' column) as well as old kanjis from both jouyou and jinmei files. This file
   // contains stroke counts followed by one or more lines each with a single kanji that has the given
   // number of strokes.
   std::map<std::string, int> _strokes;
+
   std::map<KanjiTypes, List> _types;
 private:
   // helper functions for checking and inserting into '_kanjiNameMap'
