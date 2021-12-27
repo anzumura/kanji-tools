@@ -1,9 +1,9 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/kanji/UcdFileKanji.h>
+#include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/MBUtils.h>
 
-#include <fstream>
 #include <sstream>
 
 namespace kanji_tools {
@@ -161,36 +161,9 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
 }
 
 void Data::loadFrequencyReadings(const fs::path& file) {
-  int lineNum = 1, nameCol = -1, readingCol = -1;
-  auto error = [&lineNum, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") + ", file: " + file.string());
-  };
-  auto setCol = [&file, &error](int& col, int pos) {
-    if (col != -1) error("column " + std::to_string(pos) + " has duplicate name");
-    col = pos;
-  };
-  std::ifstream f(file);
-  std::array<std::string, 2> cols;
-  for (std::string line; std::getline(f, line); ++lineNum) {
-    int pos = 0;
-    if (std::stringstream ss(line); nameCol == -1) {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos)
-        if (token == "Name")
-          setCol(nameCol, pos);
-        else if (token == "Reading")
-          setCol(readingCol, pos);
-        else
-          error("unrecognized column '" + token + "'", false);
-      if (pos != cols.size()) error("not enough columns", false);
-    } else {
-      for (std::string token; std::getline(ss, token, '\t'); ++pos) {
-        if (pos == cols.size()) error("too many columns");
-        cols[pos] = token;
-      }
-      if (pos != cols.size()) error("not enough columns");
-      if (!_frequencyReadings.insert(std::make_pair(cols[nameCol], cols[readingCol])).second) error("duplicate name");
-    }
-  }
+  ColumnFile::Column nameCol("Name"), readingCol("Reading");
+  for (ColumnFile f(file, {nameCol, readingCol}); f.nextRow();)
+    if (!_frequencyReadings.insert(std::make_pair(f.get(nameCol), f.get(readingCol))).second) f.error("duplicate name");
 }
 
 void Data::populateJouyou() {
