@@ -87,7 +87,7 @@ void UcdData::load(const std::filesystem::path& file) {
     if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
 
     const int radical = f.getInt(radicalCol), strokes = f.getInt(strokesCol),
-              vStrokes = f.isEmpty(vStrokesCol) ? 0 : Data::toInt(f.get(vStrokesCol));
+              vStrokes = f.isEmpty(vStrokesCol) ? 0 : f.getInt(vStrokesCol);
     if (radical < 1 || radical > 214) f.error("radical out of range");
     // 9F98 (龘) has 48 strokes
     if (strokes < 1 || strokes > 48) f.error("strokes out of range");
