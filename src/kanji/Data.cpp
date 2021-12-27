@@ -96,41 +96,49 @@ int Data::nextArg(int argc, const char** argv, int currentArg) {
 }
 
 bool Data::checkInsert(const Entry& kanji) {
-  if (_kanjiNameMap.insert(std::make_pair(kanji->name(), kanji)).second) {
-    auto error = [this, &kanji](const std::string& s) {
-      std::string v;
-      if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
-      printError(kanji->name() + " [" + toUnicode(kanji->name()) + "] " + v + " " + s + " in _ucd");
-    };
-    if (kanji->frequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
-    auto type = kanji->type();
-    if (auto ucd = _ucd.find(kanji->name()); !ucd)
-      error("not found");
-    else if (type == KanjiTypes::Jouyou && !ucd->joyo())
-      error("not marked as 'Joyo'");
-    else if (type == KanjiTypes::Jinmei && !ucd->jinmei())
-      error("not marked as 'Jinmei'");
-    else if (type == KanjiTypes::LinkedJinmei && !ucd->jinmei())
-      error("with link not marked as 'Jinmei'");
-    else if (type == KanjiTypes::LinkedJinmei && !ucd->hasLinks())
-      error("missing 'JinmeiLink' for " + ucd->codeAndName());
-    // skipping radical and strokes checks for now
-    if (kanji->variant() &&
-        !_compatibilityNameMap.insert(std::make_pair(kanji->compatibilityName(), kanji->name())).second)
-      printError("failed to insert variant " + kanji->name() + " into map");
-    if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
-    for (int id : kanji->nelsonIds())
-      _nelsonMap[id].push_back(kanji);
-    return true;
+  if (!_kanjiNameMap.insert(std::make_pair(kanji->name(), kanji)).second) {
+    printError("failed to insert " + kanji->name() + " into map");
+    return false;
   }
-  printError("failed to insert " + kanji->name() + " into map");
-  return false;
+  // Perform some sanity checks on newly created kanji, failures result in error messages getting printed to
+  // stderr, but the program is allowed to continue since it can be helpful to see more than one error printed
+  // out if something goes wrong. Any failures should be fixed right away.
+  insertSanityChecks(kanji);
+  // update _maxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if applicable
+  if (kanji->frequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
+  if (kanji->variant() && !_compatibilityMap.insert(std::make_pair(kanji->compatibilityName(), kanji->name())).second)
+    printError("failed to insert variant " + kanji->name() + " into map");
+  if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
+  for (int id : kanji->nelsonIds())
+    _nelsonMap[id].push_back(kanji);
+  return true;
 }
 
 bool Data::checkInsert(List& s, const Entry& kanji) {
   if (!checkInsert(kanji)) return false;
   s.push_back(kanji);
   return true;
+}
+
+void Data::insertSanityChecks(const Entry& kanji) const {
+  auto error = [this, &kanji](const std::string& s) {
+    std::string v;
+    if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
+    printError(kanji->name() + " [" + toUnicode(kanji->name()) + "] " + v + " " + s + " in _ucd");
+  };
+
+  auto kanjiType = kanji->type();
+  if (auto ucd = _ucd.find(kanji->name()); !ucd)
+    error("not found");
+  else if (kanjiType == KanjiTypes::Jouyou && !ucd->joyo())
+    error("not marked as 'Joyo'");
+  else if (kanjiType == KanjiTypes::Jinmei && !ucd->jinmei())
+    error("not marked as 'Jinmei'");
+  else if (kanjiType == KanjiTypes::LinkedJinmei && !ucd->jinmei())
+    error("with link not marked as 'Jinmei'");
+  else if (kanjiType == KanjiTypes::LinkedJinmei && !ucd->hasLinks())
+    error("missing 'JinmeiLink' for " + ucd->codeAndName());
+  // skipping radical and strokes checks for now
 }
 
 void Data::printError(const std::string& msg) const {
@@ -140,22 +148,20 @@ void Data::printError(const std::string& msg) const {
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
-  std::string line;
   int strokes = 0;
-  while (std::getline(f, line))
+  for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
       auto newStrokes = std::stoi(line);
       assert(newStrokes > strokes);
       strokes = newStrokes;
     } else {
       assert(strokes != 0); // first line must have a stroke count
-      std::stringstream ss(line);
-      for (std::string token; std::getline(ss, token, ' ');)
-        if (auto i = _strokes.insert(std::pair(token, strokes)); !i.second) {
+      for (std::stringstream ss(line); std::getline(ss, line, ' ');)
+        if (auto i = _strokes.insert(std::pair(line, strokes)); !i.second) {
           if (checkDuplicates)
-            printError("duplicate entry in " + file.string() + ": " + token);
+            printError("duplicate entry in " + file.string() + ": " + line);
           else if (i.first->second != strokes)
-            printError("found entry with different count in " + file.string() + ": " + token);
+            printError("found entry with different count in " + file.string() + ": " + line);
         }
     }
 }

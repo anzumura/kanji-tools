@@ -130,8 +130,8 @@ public:
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including 'variation selectors', i.e., the
   // same result is returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
   OptEntry findKanjiByName(const std::string& s) const {
-    auto i = _compatibilityNameMap.find(s);
-    auto j = _kanjiNameMap.find(i != _compatibilityNameMap.end() ? i->second : s);
+    auto i = _compatibilityMap.find(s);
+    auto j = _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s);
     if (j == _kanjiNameMap.end()) return {};
     return j->second;
   }
@@ -221,15 +221,16 @@ private:
   // helper functions for checking and inserting into '_kanjiNameMap'
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
+  void insertSanityChecks(const Entry&) const;
 
   const std::filesystem::path _dataDir;
   const DebugMode _debugMode;
   std::ostream& _out;
   std::ostream& _err;
 
-  // '_compatibilityNameMap' maps from a UCD 'compatibility' code name to a 'variation selector'
+  // '_compatibilityMap' maps from a UCD 'compatibility' code name to a 'variation selector'
   // style name. This map only has entries for recognized kanji that were loaded with a selector.
-  std::map<std::string, std::string> _compatibilityNameMap;
+  std::map<std::string, std::string> _compatibilityMap;
 
   // '_frequencyReadings' holds readings loaded from frequency-readings.txt - these are for Top Frequency
   // kanji that aren't part of any other group (so not Jouyou or Jinmei).
