@@ -49,7 +49,9 @@ TEST(MBUtilsTest, ToHex) {
 
 TEST(MBUtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode("ぁ"), "3041");
+  EXPECT_EQ(toUnicode("ぁ", true), "[3041]");
   EXPECT_EQ(toUnicode("すずめ"), "3059 305A 3081");
+  EXPECT_EQ(toUnicode("すずめ", true), "[3059 305A 3081]");
 }
 
 TEST(MBUtilsTest, ToBinary) {

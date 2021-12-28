@@ -318,7 +318,7 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
     printLegend();
     out() << '\n';
   }
-  out() << "Showing details for " << arg << " [" << toUnicode(arg) << "]";
+  out() << "Showing details for " << arg << ' ' << toUnicode(arg, true);
   if (auto ucd = data().ucd().find(arg); ucd) {
     out() << ", Block " << ucd->block() << ", Version " << ucd->version();
     if (auto k = data().findKanjiByName(arg); k) {

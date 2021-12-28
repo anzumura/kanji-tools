@@ -66,15 +66,17 @@ template<> inline std::string toHex(char x, bool caps, bool squareBrackets, bool
 }
 
 // 'toUnicode' converts a 'wchar_t' into a Unicode code point (so hex with caps and no initial padding)
-inline std::string toUnicode(wchar_t s) { return toHex(s, true, false, false); }
+inline std::string toUnicode(wchar_t s, bool squareBrackets = false) { return toHex(s, true, squareBrackets, false); }
 
-// 'toUnicode' converts a UTF-8 string into space-separated Unicode code points
-inline std::string toUnicode(const std::string& s) {
+// 'toUnicode' converts a UTF-8 string into space-separated Unicode code points. Note: setting
+// 'squareBrackets' to true puts brackets around the whole string instead of each entry.
+inline std::string toUnicode(const std::string& s, bool squareBrackets = false) {
   std::string result;
   for (auto i : fromUtf8(s)) {
     if (!result.empty()) result += ' ';
     result += toUnicode(i);
   }
+  if (squareBrackets) result = '[' + result + ']';
   return result;
 }
 
