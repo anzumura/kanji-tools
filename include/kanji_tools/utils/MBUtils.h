@@ -8,6 +8,7 @@
 namespace kanji_tools {
 
 // Helper functions to convert between 'utf8' strings and 'char32_t' wstrings
+
 inline std::wstring fromUtf8(const std::string& s) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
   return conv.from_bytes(s);
@@ -28,38 +29,35 @@ inline std::string toUtf8(const std::wstring& s) {
 // the same length for a given type, i.e., if 'x' is char then toHex returns a string of length 2
 // and toBinary returns a string of length 8. 'minSize' is ignored if it's less than 'result' size.
 
-template<typename T> inline std::string toBinary(T x, int minSize = -1) {
-  std::string result;
-  for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + x % 2);
-  if (minSize == -1) minSize = sizeof(T) * 8;
+inline void addLeadingZeroes(std::string& result, int minSize) {
   if (result.length() < minSize)
     result = std::string(minSize - result.length(), '0') + result;
   else if (result.empty())
     result = "0";
+}
+
+template<typename T> inline std::string toBinary(T x, int minSize = -1) {
+  std::string result;
+  for (; x > 0; x >>= 1)
+    result.insert(result.begin(), '0' + x % 2);
+  addLeadingZeroes(result, minSize == -1 ? sizeof(T) * 8 : minSize);
   return result;
 }
 
-template<typename T>
-inline std::string toHex(T x, bool caps = false, bool squareBrackets = false, int minSize = -1) {
+template<typename T> inline std::string toHex(T x, bool caps = false, bool squareBrackets = false, int minSize = -1) {
   std::string result;
   for (; x > 0; x >>= 4) {
     const auto i = x % 16;
     result.insert(result.begin(), (i < 10 ? '0' + i : (caps ? 'A' : 'a') + i - 10));
   }
-  if (minSize == -1) minSize = sizeof(T) * 2;
-  if (result.length() < minSize)
-    result = std::string(minSize - result.length(), '0') + result;
-  else if (result.empty())
-    result = "0";
+  addLeadingZeroes(result, minSize == -1 ? sizeof(T) * 2 : minSize);
   if (squareBrackets) result = '[' + result + ']';
   return result;
 }
 
 // provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
-template<> inline std::string toBinary(char x, int minSize) {
-  return toBinary(static_cast<unsigned char>(x), minSize);
-}
+
+template<> inline std::string toBinary(char x, int minSize) { return toBinary(static_cast<unsigned char>(x), minSize); }
 template<> inline std::string toHex(char x, bool caps, bool squareBrackets, int minSize) {
   return toHex(static_cast<unsigned char>(x), caps, squareBrackets, minSize);
 }
