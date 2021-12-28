@@ -23,6 +23,29 @@ TEST_F(ChoiceTest, SingleChoice) {
   EXPECT_EQ(line, "(a): ");
 }
 
+TEST_F(ChoiceTest, NoChoicesError) {
+  try {
+    _choice.get("", {});
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("must specify at least one choice"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ChoiceTest, NonPrintableError) {
+  try {
+    char escape = 27;
+    _choice.get("", {{escape, ""}});
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("option is non-printable: 0x1b"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
 TEST_F(ChoiceTest, TwoChoices) {
   _is << "a\n";
   EXPECT_EQ(_choice.get("", {{'a', ""}, {'b', ""}}), 'a');
@@ -97,6 +120,39 @@ TEST_F(ChoiceTest, RangeWithDefault) {
   EXPECT_EQ(line, "(1-4) def '1': ");
 }
 
+TEST_F(ChoiceTest, InvalidRange) {
+  try {
+    _choice.get("", '2', '1');
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("first range option '2' is greater than last '1'"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ChoiceTest, NonPrintableFirstRange) {
+  try {
+    _choice.get("", {}, 'a');
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("first range option is non-printable: 0x0"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ChoiceTest, NonPrintableLastRange) {
+  try {
+    _choice.get("", 'a', 10);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("last range option is non-printable: 0xa"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
 TEST_F(ChoiceTest, RangeWithNoDefault) {
   _is << "b\n";
   EXPECT_EQ(_choice.get("pick", 'a', 'z'), 'b');
@@ -166,6 +222,17 @@ TEST_F(ChoiceTest, QuitOption) {
   std::getline(_os, line);
   EXPECT_EQ(line, "(1-2, q=quit): ");
   EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, NonPrintableQuitError) {
+  try {
+    _choice.setQuit(22);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("quit option is non-printable: 0x16"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
 }
 
 TEST_F(ChoiceTest, UseQuitOption) {

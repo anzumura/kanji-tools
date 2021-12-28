@@ -16,12 +16,17 @@ public:
 
   // By default choices are read from terminal input (without requiring 'return'), but a
   // istream can be passed in instead (good for testing).
-  Choice(std::ostream& out, std::istream* in = 0, OptChar quit = std::nullopt) : _out(out), _in(in), _quit(quit) {}
+  Choice(std::ostream& out, std::istream* in = 0, OptChar quit = std::nullopt) : _out(out), _in(in) {
+    if (quit) setQuit(*quit);
+  }
 
   // Provide special support for '_quit' choice. If it has a value then it will be added to
   // the 'choices' provided to the below 'get' methods with a description of "quit".
   OptChar quit() const { return _quit; }
-  void setQuit(char c) { _quit = c; }
+  void setQuit(char c) {
+    checkPrintableAscii(c, "quit option");
+    _quit = c;
+  }
   void clearQuit() { _quit = {}; }
   bool isQuit(char c) const { return _quit == c; }
 
@@ -37,7 +42,7 @@ public:
   }
   char get(const std::string& msg, bool useQuit, const Choices& choices, OptChar def) const;
 
-  // 'get' with ranges are convenience methods when there is a range with no descriptions
+  // 'get' with ranges are convenience methods when there is a range (inclusive) with no descriptions
   char get(const std::string& msg, char first, char last) const { return get(msg, first, last, {}, {}); }
   char get(const std::string& msg, char first, char last, OptChar def) const { return get(msg, first, last, {}, def); }
   char get(const std::string& msg, char first, char last, const Choices& choices) const {
@@ -50,6 +55,8 @@ public:
 private:
   static void add(std::string& prompt, const Choices& choices);
   static char getOneChar();
+  static void checkPrintableAscii(char x, const std::string& msg);
+  static void error(const std::string& msg) { throw std::domain_error(msg); }
 
   std::ostream& _out;
   std::istream* _in;

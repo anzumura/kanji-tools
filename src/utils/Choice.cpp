@@ -1,4 +1,5 @@
 #include <kanji_tools/utils/Choice.h>
+#include <kanji_tools/utils/MBUtils.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -37,6 +38,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
     }
   };
   for (const auto& i : choices) {
+    checkPrintableAscii(i.first, "option");
     if (i.second.empty()) {
       if (!rangeStart) {
         if (i != *choices.begin()) prompt += ", ";
@@ -67,16 +69,19 @@ void Choice::add(std::string& prompt, const Choices& choices) {
 char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn, OptChar def) const {
   static const std::string QuitError("quit option '"), DefaultError("default option '");
 
-  // if 'msg' is empty then don't leave a space before listing the choices in brackets.
-  std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
   Choices choices(choicesIn);
   if (_quit) {
-    if (choices.contains(*_quit)) throw std::domain_error(QuitError + *_quit + AlreadyInChoices);
+    if (choices.contains(*_quit)) error(QuitError + *_quit + AlreadyInChoices);
     if (useQuit) choices[*_quit] = "quit";
   }
+  if (choices.empty()) error("must specify at least one choice");
+
+  // if 'msg' is empty then don't leave a space before listing the choices in brackets.
+  std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
+
   add(prompt, choices);
   if (def) {
-    if (!choices.contains(*def)) throw std::domain_error(DefaultError + *def + "' not in choices");
+    if (!choices.contains(*def)) error(DefaultError + *def + "' not in choices");
     prompt += ") def '";
     prompt += *def;
     prompt += "': ";
@@ -102,14 +107,22 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
 
 char Choice::get(const std::string& msg, bool useQuit, char first, char last, const Choices& choices,
                  OptChar def) const {
-  static const std::string RangeError("range option '");
+  static const std::string RangeError("range option");
+  static const std::string FirstError("first " + RangeError), LastError("last " + RangeError);
 
+  checkPrintableAscii(first, FirstError);
+  checkPrintableAscii(last, LastError);
+  if (first > last) error(FirstError + " '" + first + "' is greater than last '" + last + "'");
   Choices c(choices);
   while (first <= last) {
-    if (c.contains(first)) throw std::domain_error(RangeError + first + AlreadyInChoices);
+    if (c.contains(first)) error(RangeError + " '" + first + AlreadyInChoices);
     c[first++] = "";
   }
   return get(msg, useQuit, c, def);
+}
+
+void Choice::checkPrintableAscii(char x, const std::string& msg) {
+   if (x < ' ' || x > '~') error(msg + " is non-printable: 0x" + toHex(x));
 }
 
 } // namespace kanji_tools
