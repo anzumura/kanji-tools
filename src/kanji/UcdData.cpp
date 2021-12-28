@@ -71,10 +71,11 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 }
 
 void UcdData::load(const std::filesystem::path& file) {
-  ColumnFile::Column codeCol("Code"), nameCol("Name"), blockCol("Block"), versionCol("Version"), radicalCol("Radical"),
-    strokesCol("Strokes"), vStrokesCol("VStrokes"), pinyinCol("Pinyin"), morohashiCol("Morohashi"),
-    nelsonIdsCol("NelsonIds"), joyoCol("Joyo"), jinmeiCol("Jinmei"), linkCodesCol("LinkCodes"),
-    linkNamesCol("LinkNames"), linkTypeCol("LinkType"), meaningCol("Meaning"), onCol("On"), kunCol("Kun");
+  const ColumnFile::Column codeCol("Code"), nameCol("Name"), blockCol("Block"), versionCol("Version"),
+    radicalCol("Radical"), strokesCol("Strokes"), vStrokesCol("VStrokes"), pinyinCol("Pinyin"),
+    morohashiCol("Morohashi"), nelsonIdsCol("NelsonIds"), joyoCol("Joyo"), jinmeiCol("Jinmei"),
+    linkCodesCol("LinkCodes"), linkNamesCol("LinkNames"), linkTypeCol("LinkType"), meaningCol("Meaning"), onCol("On"),
+    kunCol("Kun");
   for (ColumnFile f(file,
                     {codeCol, nameCol, blockCol, versionCol, radicalCol, strokesCol, vStrokesCol, pinyinCol,
                      morohashiCol, nelsonIdsCol, joyoCol, jinmeiCol, linkCodesCol, linkNamesCol, linkTypeCol,

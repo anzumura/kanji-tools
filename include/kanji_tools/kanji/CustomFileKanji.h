@@ -24,9 +24,9 @@ public:
   // - first line of 'file' must have header names that match the static 'Column' instances below
   static Data::List fromFile(const Data&, KanjiTypes type, const std::filesystem::path& file);
 protected:
-  inline static ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"}, RadicalCol{"Radical"}, OldNamesCol{"OldNames"},
-    YearCol{"Year"}, StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"}, ReadingCol{"Reading"},
-    ReasonCol{"Reason"};
+  inline static const ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"}, RadicalCol{"Radical"},
+    OldNamesCol{"OldNames"}, YearCol{"Year"}, StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"},
+    ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
   static const Ucd* findUcd(const Data& d, const std::string& name) { return d.findUcd(name); }
 

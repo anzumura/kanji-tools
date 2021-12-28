@@ -46,7 +46,7 @@ bool GroupData::checkInsert(const std::string& name, MultiMap& groups, const Ent
 
 template<typename T>
 void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& list, GroupType groupType) {
-  ColumnFile::Column numberCol("Number"), nameCol("Name"), membersCol("Members");
+  const ColumnFile::Column numberCol("Number"), nameCol("Name"), membersCol("Members");
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
     const std::string &name(f.get(nameCol)), members(f.get(membersCol));
     if (name.empty()) f.error("group must have a name");

@@ -7,7 +7,7 @@
 namespace kanji_tools {
 
 void RadicalData::load(const std::filesystem::path& file) {
-  ColumnFile::Column numberCol("Number"), nameCol("Name"), longNameCol("LongName"), readingCol("Reading");
+  const ColumnFile::Column numberCol("Number"), nameCol("Name"), longNameCol("LongName"), readingCol("Reading");
   for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol}); f.nextRow();) {
     const int radicalNumber = f.getInt(numberCol);
     if (radicalNumber != f.currentRow()) f.error("radicals must be ordered by 'number'");

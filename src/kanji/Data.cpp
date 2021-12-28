@@ -167,7 +167,7 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
 }
 
 void Data::loadFrequencyReadings(const fs::path& file) {
-  ColumnFile::Column nameCol("Name"), readingCol("Reading");
+  const ColumnFile::Column nameCol("Name"), readingCol("Reading");
   for (ColumnFile f(file, {nameCol, readingCol}); f.nextRow();)
     if (!_frequencyReadings.insert(std::make_pair(f.get(nameCol), f.get(readingCol))).second) f.error("duplicate name");
 }
