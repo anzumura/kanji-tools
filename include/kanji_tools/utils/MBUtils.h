@@ -26,17 +26,23 @@ inline std::string toUtf8(const std::wstring& s) {
 // Helper functions to print binary or hex versions of an unsigned char
 template<typename T> inline std::string toBinary(T x) {
   std::string result;
-  for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + x % 2);
+  if (x)
+    for (; x > 0; x >>= 1)
+      result.insert(result.begin(), '0' + x % 2);
+  else
+    result = "0";
   return result;
 }
 
 template<typename T> inline std::string toHex(T x, bool caps = false, bool squareBrackets = false) {
   std::string result;
-  for (; x > 0; x >>= 4) {
-    const auto i = x % 16;
-    result.insert(result.begin(), (i < 10 ? '0' + i : (caps ? 'A' : 'a') + i - 10));
-  }
+  if (x)
+    for (; x > 0; x >>= 4) {
+      const auto i = x % 16;
+      result.insert(result.begin(), (i < 10 ? '0' + i : (caps ? 'A' : 'a') + i - 10));
+    }
+  else
+    result = "0";
   if (squareBrackets) result = '[' + result + ']';
   return result;
 }

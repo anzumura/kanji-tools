@@ -38,6 +38,10 @@ TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex(s[2], true), "BC");
   EXPECT_EQ(toHex(s[2], false, true), "[bc]");
   EXPECT_EQ(toHex(s[2], true, true), "[BC]");
+  // test converting 'char' values to hex
+  EXPECT_EQ(toHex('~'), "7e");
+  char nullChar = 0x0;
+  EXPECT_EQ(toHex(nullChar), "0");
 }
 
 TEST(MBUtilsTest, ToUnicode) {
@@ -52,6 +56,10 @@ TEST(MBUtilsTest, ToBinary) {
   EXPECT_EQ(toBinary(s[0]), "11101111");
   EXPECT_EQ(toBinary(s[1]), "10111111");
   EXPECT_EQ(toBinary(s[2]), "10111100");
+  // test converting 'char' values to binary
+  EXPECT_EQ(toBinary('~'), "1111110");
+  char nullChar = 0x0;
+  EXPECT_EQ(toBinary(nullChar), "0");
 }
 
 TEST(MBUtilsTest, CheckSingleByte) {
