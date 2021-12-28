@@ -42,16 +42,17 @@ TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex('~'), "7e");
   char nullChar = 0x0, newline = '\n';
   EXPECT_EQ(toHex(nullChar), "00");
-  EXPECT_EQ(toHex(nullChar, false, false, false), "0");
+  EXPECT_EQ(toHex(nullChar, false, false, 0), "0");
   EXPECT_EQ(toHex(newline), "0a");
-  EXPECT_EQ(toHex(newline, false, false, false), "a");
+  EXPECT_EQ(toHex(newline, false, false, 0), "a");
 }
 
 TEST(MBUtilsTest, ToUnicode) {
+  EXPECT_EQ(toUnicode('a'), "0061");
   EXPECT_EQ(toUnicode("ぁ"), "3041");
   EXPECT_EQ(toUnicode("ぁ", true), "[3041]");
-  EXPECT_EQ(toUnicode("すずめ"), "3059 305A 3081");
-  EXPECT_EQ(toUnicode("すずめ", true), "[3059 305A 3081]");
+  EXPECT_EQ(toUnicode("すずめ-雀"), "3059 305A 3081 002D 96C0");
+  EXPECT_EQ(toUnicode("すずめ-雀", true), "[3059 305A 3081 002D 96C0]");
 }
 
 TEST(MBUtilsTest, ToBinary) {
@@ -66,7 +67,7 @@ TEST(MBUtilsTest, ToBinary) {
   EXPECT_EQ(toBinary('~'), "01111110");
   char nullChar = 0x0;
   EXPECT_EQ(toBinary(nullChar), "00000000");
-  EXPECT_EQ(toBinary(nullChar, false), "0");
+  EXPECT_EQ(toBinary(nullChar, 2), "00");
 }
 
 TEST(MBUtilsTest, CheckSingleByte) {

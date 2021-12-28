@@ -23,50 +23,49 @@ inline std::string toUtf8(const std::wstring& s) {
   return conv.to_bytes(s);
 }
 
-// 'toBinary' and 'toHex' are helper functions to print binary or hex versions of 'x' (must be an integer
-// type). 'padToSize' will cause leading zeroes to be added to make strings the same length for a given
-// type, i.e., if 'x' is char then toHex with padToSize 'true' will always return a string of length 2.
+// 'toBinary' and 'toHex' are helper functions to print binary or hex versions of 'x' (must be
+// integer type). 'minSize' of '-1' (the default) causes leading zeroes to be added to make strings
+// the same length for a given type, i.e., if 'x' is char then toHex returns a string of length 2
+// and toBinary returns a string of length 8. 'minSize' is ignored if it's less than 'result' size.
 
-template<typename T> inline std::string toBinary(T x, bool padToSize = true) {
+template<typename T> inline std::string toBinary(T x, int minSize = -1) {
   std::string result;
   for (; x > 0; x >>= 1)
     result.insert(result.begin(), '0' + x % 2);
-  if (result.length() < sizeof(T) * 8) {
-    if (padToSize)
-      result = std::string(sizeof(T) * 8 - result.length(), '0') + result;
-    else if (result.empty())
-      result = "0";
-  }
+  if (minSize == -1) minSize = sizeof(T) * 8;
+  if (result.length() < minSize)
+    result = std::string(minSize - result.length(), '0') + result;
+  else if (result.empty())
+    result = "0";
   return result;
 }
 
 template<typename T>
-inline std::string toHex(T x, bool caps = false, bool squareBrackets = false, bool padToSize = true) {
+inline std::string toHex(T x, bool caps = false, bool squareBrackets = false, int minSize = -1) {
   std::string result;
   for (; x > 0; x >>= 4) {
     const auto i = x % 16;
     result.insert(result.begin(), (i < 10 ? '0' + i : (caps ? 'A' : 'a') + i - 10));
   }
-  if (result.length() < sizeof(T) * 2) {
-    if (padToSize)
-      result = std::string(sizeof(T) * 2 - result.length(), '0') + result;
-    else if (result.empty())
-      result = "0";
-  }
+  if (minSize == -1) minSize = sizeof(T) * 2;
+  if (result.length() < minSize)
+    result = std::string(minSize - result.length(), '0') + result;
+  else if (result.empty())
+    result = "0";
   if (squareBrackets) result = '[' + result + ']';
   return result;
 }
 
 // provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
-template<> inline std::string toBinary(char x, bool padToSize) {
-  return toBinary(static_cast<unsigned char>(x), padToSize);
+template<> inline std::string toBinary(char x, int minSize) {
+  return toBinary(static_cast<unsigned char>(x), minSize);
 }
-template<> inline std::string toHex(char x, bool caps, bool squareBrackets, bool padToSize) {
-  return toHex(static_cast<unsigned char>(x), caps, squareBrackets, padToSize);
+template<> inline std::string toHex(char x, bool caps, bool squareBrackets, int minSize) {
+  return toHex(static_cast<unsigned char>(x), caps, squareBrackets, minSize);
 }
 
-// 'toUnicode' converts a 'wchar_t' into a Unicode code point (so hex with caps and no initial padding)
-inline std::string toUnicode(wchar_t s, bool squareBrackets = false) { return toHex(s, true, squareBrackets, false); }
+// 'toUnicode' converts a 'wchar_t' into a Unicode code point (so hex with caps and minSize of 4)
+inline std::string toUnicode(wchar_t s, bool squareBrackets = false) { return toHex(s, true, squareBrackets, 4); }
 
 // 'toUnicode' converts a UTF-8 string into space-separated Unicode code points. Note: setting
 // 'squareBrackets' to true puts brackets around the whole string instead of each entry.
