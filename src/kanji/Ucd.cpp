@@ -36,13 +36,13 @@ const std::string& Ucd::toString(LinkTypes x) {
   __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
 }
 
-std::string Ucd::codeAndName() const { return toHex(_code, true, true) + " " + _name; }
+std::string Ucd::codeAndName() const { return toUnicode(_code) + " " + _name; }
 
 std::string Ucd::linkCodeAndNames() const {
   std::string result;
   for (auto& i : _links) {
     if (!result.empty()) result += ", ";
-    result += toHex(i.code(), true, true) + " " + i.name();
+    result += toUnicode(i.code()) + " " + i.name();
   }
   return result;
 }

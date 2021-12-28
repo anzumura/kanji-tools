@@ -29,7 +29,7 @@ TEST(MBUtilsTest, FromUTF8CharArray) {
 }
 
 TEST(MBUtilsTest, ToHex) {
-  EXPECT_EQ(toHex(L'\ufffc'), "fffc");
+  EXPECT_EQ(toHex(L'\ufffc'), "0000fffc");
   auto s = toUtf8(L"\ufffc");
   ASSERT_EQ(s.length(), 3);
   EXPECT_EQ(toHex(s[0]), "ef");
@@ -40,8 +40,11 @@ TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex(s[2], true, true), "[BC]");
   // test converting 'char' values to hex
   EXPECT_EQ(toHex('~'), "7e");
-  char nullChar = 0x0;
-  EXPECT_EQ(toHex(nullChar), "0");
+  char nullChar = 0x0, newline = '\n';
+  EXPECT_EQ(toHex(nullChar), "00");
+  EXPECT_EQ(toHex(nullChar, false, false, false), "0");
+  EXPECT_EQ(toHex(newline), "0a");
+  EXPECT_EQ(toHex(newline, false, false, false), "a");
 }
 
 TEST(MBUtilsTest, ToUnicode) {
@@ -50,16 +53,18 @@ TEST(MBUtilsTest, ToUnicode) {
 }
 
 TEST(MBUtilsTest, ToBinary) {
-  EXPECT_EQ(toBinary(L'\ufffc'), "1111111111111100");
+  EXPECT_EQ(toBinary(L'\ufffc'), "00000000000000001111111111111100");
+  EXPECT_EQ(toBinary(L'\ufffc', false), "1111111111111100");
   auto s = toUtf8(L"\ufffc");
   ASSERT_EQ(s.length(), 3);
   EXPECT_EQ(toBinary(s[0]), "11101111");
   EXPECT_EQ(toBinary(s[1]), "10111111");
   EXPECT_EQ(toBinary(s[2]), "10111100");
   // test converting 'char' values to binary
-  EXPECT_EQ(toBinary('~'), "1111110");
+  EXPECT_EQ(toBinary('~'), "01111110");
   char nullChar = 0x0;
-  EXPECT_EQ(toBinary(nullChar), "0");
+  EXPECT_EQ(toBinary(nullChar), "00000000");
+  EXPECT_EQ(toBinary(nullChar, false), "0");
 }
 
 TEST(MBUtilsTest, CheckSingleByte) {

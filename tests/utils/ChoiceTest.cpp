@@ -136,7 +136,7 @@ TEST_F(ChoiceTest, NonPrintableFirstRange) {
     _choice.get("", {}, 'a');
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("first range option is non-printable: 0x0"));
+    EXPECT_EQ(err.what(), std::string("first range option is non-printable: 0x00"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
@@ -147,7 +147,7 @@ TEST_F(ChoiceTest, NonPrintableLastRange) {
     _choice.get("", 'a', 10);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("last range option is non-printable: 0xa"));
+    EXPECT_EQ(err.what(), std::string("last range option is non-printable: 0x0a"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
