@@ -10,8 +10,8 @@
 
 namespace kanji_tools {
 
-// 'ColumnFile' is a helper class for loading data from a tab separated text file with a
-// header row (containing the column names).
+// 'ColumnFile' is a helper class for loading data from a delimiter (defaults to tab) separated
+// text file with a header row (containing the column names).
 class ColumnFile {
 public:
   static inline const std::string EmptyString;
@@ -38,7 +38,7 @@ public:
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a regular file) or
   // if the list of 'columns' doesn't match the first row of the file. Note, the columns in the
   // file can be in a different order than 'columns', but the names must all be found.
-  ColumnFile(const std::filesystem::path& p, const Columns& columns);
+  ColumnFile(const std::filesystem::path& p, const Columns& columns, char delimiter = '\t');
 
   // 'nextRow' must be called before using 'get'. An exception is thrown if the next row has too
   // few or too many columns. 'nextRow' returns 'false' when there are no more rows in the file.
@@ -96,6 +96,7 @@ private:
   }
 
   std::fstream _file;
+  const char _delimiter;
 
   // '_name' holds the 'last component name' of the file being processed.
   const std::string _name;

@@ -44,6 +44,17 @@ TEST_F(ColumnFileTest, SingleColumnFile) {
   EXPECT_EQ(f.currentRow(), 0);
 }
 
+TEST_F(ColumnFileTest, NoColumnsError) {
+  try {
+    ColumnFile f(_testFile, {});
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("must specify at least one column - file: testFile.txt"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
 TEST_F(ColumnFileTest, GetValueFromOneColumn) {
   std::ofstream of(_testFile);
   of << "Col\nVal\n";
@@ -77,6 +88,19 @@ TEST_F(ColumnFileTest, GetValueFromMultipleColumns) {
   EXPECT_EQ(f.get(col1), "Val1");
   EXPECT_EQ(f.get(col2), "Val2");
   EXPECT_EQ(f.get(col3), "Val3");
+}
+
+TEST_F(ColumnFileTest, UseNonDefaultDelimiter) {
+  std::ofstream of(_testFile);
+  of << "Col1|Col2|Col3\nVal1|Val2|\n";
+  of.close();
+  ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
+  ColumnFile f(_testFile, {col1, col2, col3}, '|');
+  ASSERT_TRUE(f.nextRow());
+  EXPECT_EQ(f.get(col1), "Val1");
+  EXPECT_EQ(f.get(col2), "Val2");
+  // make sure getting a final empty value works for non-default delimiter
+  EXPECT_EQ(f.get(col3), "");
 }
 
 TEST_F(ColumnFileTest, AllowGettingEmptyValues) {

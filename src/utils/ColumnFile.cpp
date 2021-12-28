@@ -17,9 +17,10 @@ int ColumnFile::getColumnNumber(const std::string& name) {
   return i->second;
 }
 
-ColumnFile::ColumnFile(const fs::path& p, const Columns& columns)
-  : _file(std::fstream(p)), _name(p.filename().string()), _rowValues(columns.size()),
+ColumnFile::ColumnFile(const fs::path& p, const Columns& columns, char delimiter)
+  : _file(std::fstream(p)), _delimiter(delimiter), _name(p.filename().string()), _rowValues(columns.size()),
     _columnToPosition(_allColumns.size(), -1) {
+  if (columns.empty()) error("must specify at least one column");
   if (!fs::exists(p)) error("doesn't exist");
   if (!fs::is_regular_file(p)) error("not regular file");
   if (std::string headerRow; std::getline(_file, headerRow)) {
@@ -36,7 +37,7 @@ void ColumnFile::processHeaderRow(const std::string& headerRow, ColNames& colNam
   int pos = 0;
   std::set<std::string> foundCols;
   std::string header;
-  for (std::stringstream ss(headerRow); std::getline(ss, header, '\t'); ++pos) {
+  for (std::stringstream ss(headerRow); std::getline(ss, header, _delimiter); ++pos) {
     if (foundCols.contains(header)) error("duplicate header '" + header + "'");
     auto i = colNames.find(header);
     if (i == colNames.end()) error("unrecognized header '" + header + "'");
@@ -63,13 +64,13 @@ bool ColumnFile::nextRow() {
     ++_currentRow;
     int pos = 0;
     std::string field;
-    for (std::stringstream ss(line); std::getline(ss, field, '\t'); ++pos) {
+    for (std::stringstream ss(line); std::getline(ss, field, _delimiter); ++pos) {
       if (pos == _rowValues.size()) error("too many columns");
       _rowValues[pos] = field;
     }
     // 'getline' will return failure if it only reads a delimiter and then reaches the end of input
     // so need a special case for handing an empty final column.
-    if (pos == _rowValues.size() - 1 && (pos ? line.ends_with("\t") : line.empty()))
+    if (pos == _rowValues.size() - 1 && (pos ? line.ends_with(_delimiter) : line.empty()))
       _rowValues[_rowValues.size() - 1] = EmptyString;
     else if (pos < _rowValues.size())
       error("not enough columns");
