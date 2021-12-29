@@ -124,7 +124,7 @@ void Data::insertSanityChecks(const Entry& kanji) const {
   auto error = [this, &kanji](const std::string& s) {
     std::string v;
     if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
-    printError(kanji->name() + ' ' + toUnicode(kanji->name(), true) + ' ' + v + " " + s + " in _ucd");
+    printError(kanji->name() + ' ' + toUnicode(kanji->name(), BracketType::Square) + ' ' + v + " " + s + " in _ucd");
   };
 
   auto kanjiType = kanji->type();

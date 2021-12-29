@@ -186,7 +186,8 @@ void UcdData::printVariationSelectorKanji(const Data& data) const {
   for (int count = 0; auto& i : data.kanjiNameMap())
     if (const Kanji& k = *i.second; k.variant()) {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    "
-                 << toUnicode(k.name(), true) << ' ' << k.name() << " variant of " << k.nonVariantName() << "    ";
+                 << toUnicode(k.name(), BracketType::Square) << ' ' << k.name() << " variant of " << k.nonVariantName()
+                 << "    ";
       auto u = find(k.name());
       if (u) {
         data.out() << u->codeAndName();

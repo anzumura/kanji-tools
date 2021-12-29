@@ -35,29 +35,32 @@ TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex(s[0]), "ef");
   EXPECT_EQ(toHex(s[1]), "bf");
   EXPECT_EQ(toHex(s[2]), "bc");
-  EXPECT_EQ(toHex(s[2], true), "BC");
-  EXPECT_EQ(toHex(s[2], false, true), "[bc]");
-  EXPECT_EQ(toHex(s[2], true, true), "[BC]");
+  EXPECT_EQ(toHex(s[2], HexCase::Upper), "BC");
+  EXPECT_EQ(toHex(s[2], BracketType::Curly), "{bc}");
+  EXPECT_EQ(toHex(s[2], BracketType::Round), "(bc)");
+  EXPECT_EQ(toHex(s[2], BracketType::Square), "[bc]");
+  EXPECT_EQ(toHex(s[2], BracketType::Square, HexCase::Upper), "[BC]");
   // test converting 'char' values to hex
   EXPECT_EQ(toHex('~'), "7e");
   char nullChar = 0x0, newline = '\n';
   EXPECT_EQ(toHex(nullChar), "00");
-  EXPECT_EQ(toHex(nullChar, false, false, 0), "0");
+  EXPECT_EQ(toHex(nullChar, 1), "0");
   EXPECT_EQ(toHex(newline), "0a");
-  EXPECT_EQ(toHex(newline, false, false, 0), "a");
+  EXPECT_EQ(toHex(newline, 1), "a");
 }
 
 TEST(MBUtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode('a'), "0061");
   EXPECT_EQ(toUnicode("ぁ"), "3041");
-  EXPECT_EQ(toUnicode("ぁ", true), "[3041]");
+  EXPECT_EQ(toUnicode("ぁ", BracketType::Square), "[3041]");
   EXPECT_EQ(toUnicode("すずめ-雀"), "3059 305A 3081 002D 96C0");
-  EXPECT_EQ(toUnicode("すずめ-雀", true), "[3059 305A 3081 002D 96C0]");
+  EXPECT_EQ(toUnicode("すずめ-雀", BracketType::Square), "[3059 305A 3081 002D 96C0]");
 }
 
 TEST(MBUtilsTest, ToBinary) {
   EXPECT_EQ(toBinary(L'\ufffc'), "00000000000000001111111111111100");
-  EXPECT_EQ(toBinary(L'\ufffc', false), "1111111111111100");
+  EXPECT_EQ(toBinary(L'\ufffc', 1), "1111111111111100");
+  EXPECT_EQ(toBinary(L'\ufffc', BracketType::Square, 1), "[1111111111111100]");
   auto s = toUtf8(L"\ufffc");
   ASSERT_EQ(s.length(), 3);
   EXPECT_EQ(toBinary(s[0]), "11101111");
