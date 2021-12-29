@@ -11,7 +11,7 @@
 **[Jōyō Kanji](#Jōyō-Kanji)**\
 **[Data Directory](#Data-Directory)**\
 **[Aozora](#Aozora)**\
-**[Helpful Commands](#Helpful-Commands)**\
+**[Helpful Commands](#Helpful-Commands)**
 
 ## Introduction
 
