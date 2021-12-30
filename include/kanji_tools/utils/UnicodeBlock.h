@@ -13,18 +13,23 @@ namespace kanji_tools {
 class UnicodeBlock {
 public:
   constexpr UnicodeBlock(char32_t s, char32_t e) : start(s), end(e) {}
+
   // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex '0') and
   // end on a value having mod 16 = 15 (so ending in hex 'f'), but some of the 'WideBlocks'
   // used for determining if a character is narrow or wide display can be a single entry.
   constexpr UnicodeBlock(char32_t s) : start(s), end(s) {}
+
+  // 'range' returns the number of code points in the block (inclusive of start and end)
+  constexpr int range() const { return end - start + 1; }
+
+  // 'opterator()' returns true if the given character is in this block
+  constexpr bool operator()(char32_t x) const { return x >= start && x <= end; }
+
+  constexpr bool operator<(const UnicodeBlock& rhs) const { return start < rhs.start; }
+  constexpr bool operator==(const UnicodeBlock& rhs) const { return start == rhs.start && end == rhs.end; }
+
   const char32_t start;
   const char32_t end;
-  // 'range' returns the number of code points in the block (inclusive of start and end)
-  int range() const { return end - start + 1; }
-  // 'opterator()' returns true if the given character is in this block
-  bool operator()(char32_t x) const { return x >= start && x <= end; }
-  bool operator<(const UnicodeBlock& rhs) const { return start < rhs.start; }
-  bool operator==(const UnicodeBlock& rhs) const { return start == rhs.start && end == rhs.end; }
 };
 
 constexpr std::array HiraganaBlocks = {UnicodeBlock{0x3040, 0x309f}};
@@ -89,7 +94,7 @@ constexpr std::array NonSpacingBlocks = {
 
 // 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array 't'. The blocks in 't'
 // are assumed to be in order (order is checked by automated tests for all the arrays defined above).
-template<typename T> inline bool inRange(char32_t c, const T& t) {
+template<typename T> constexpr bool inRange(char32_t c, const T& t) {
   for (auto& i : t) {
     if (c < i.start) break;
     if (i(c)) return true;
@@ -99,7 +104,7 @@ template<typename T> inline bool inRange(char32_t c, const T& t) {
 
 // 'inRange' with more than one 't' (block array) checks each array so there's no requirement for the
 // arrays to be specified in a particular order (which wouldn't work anyway for overlapping ranges).
-template<typename T, typename... Ts> inline bool inRange(char32_t c, const T& t, Ts... args) {
+template<typename T, typename... Ts> constexpr bool inRange(char32_t c, const T& t, Ts... args) {
   return inRange(c, t) || inRange(c, args...);
 }
 

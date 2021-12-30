@@ -102,9 +102,9 @@ inline std::string toUnicode(const std::string& s, BracketType brackets = Bracke
 }
 
 // check if a given char or string is not a 'multi-byte char'
-inline bool isSingleByteChar(char x) { return x >= 0; }
-inline bool isSingleByteChar(wchar_t x) { return x >= 0 && x < 128; }
-inline bool isSingleByteChar(char32_t x) { return x >= 0 && x < 128; }
+constexpr bool isSingleByteChar(char x) { return x >= 0; }
+constexpr bool isSingleByteChar(wchar_t x) { return x >= 0 && x < 128; }
+constexpr bool isSingleByteChar(char32_t x) { return x >= 0 && x < 128; }
 inline bool isSingleByte(const std::string& s, bool checkLengthOne = true) {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
