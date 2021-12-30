@@ -28,13 +28,16 @@ public:
 };
 
 constexpr std::array HiraganaBlocks = {UnicodeBlock{0x3040, 0x309f}};
+
 // Second block is 'Katakana Phonetic Extensions' which contains small letters (for Ainu) like ㇱ
 constexpr std::array KatakanaBlocks = {UnicodeBlock{0x30a0, 0x30ff}, UnicodeBlock{0x31f0, 0x31ff}};
+
 constexpr std::array CommonKanjiBlocks = {
   UnicodeBlock{0x4e00, 0x9fff},  // CJK Unified Ideographs Kanji (ver 1.1 Jun 1992, ~20K)
   UnicodeBlock(0xf900, 0xfaff),  // CJK Compatibility Ideographs (ver 3.2 Mar 2002, 512): 渚, 猪
   UnicodeBlock(0x20000, 0x2a6df) // CJK Extension B (ver 3.1 March 2001, ~42K): 𠮟
 };
+
 // Note: Extensions C, D, E and F are contiguous so combine into one block (more efficient for isKanji
 // functions and wregex). Here are the actual block ranges:
 // - U+2A700 to U+2B73F : CJK Extension C (ver 5.2 Oct 2009, ~4K kanji)
@@ -48,11 +51,13 @@ constexpr std::array RareKanjiBlocks = {
   UnicodeBlock{0x2f800, 0x2fa1f}, // CJK Compatibility Ideographs Supplement (ver 3.1 Mar 2001, ~6K kanji)
   UnicodeBlock{0x30000, 0x3134f}  // CJK Extension G (ver 13.0 Mar 2020, ~5K kanji)
 };
+
 constexpr std::array PunctuationBlocks = {
   UnicodeBlock{0x2000, 0x206f}, // General MB Punctuation: —, ‥, ”, “
   UnicodeBlock{0x3000, 0x303f}, // Wide Punctuation: 、, 。, （
   UnicodeBlock{0xfff0, 0xffff}  // Specials (like Object Replacement, etc.)
 };
+
 // There are a lot more symbol and letter blocks, but they haven't come up in sample files so far
 constexpr std::array SymbolBlocks = {
   UnicodeBlock{0x2100, 0x214f}, // Letterlike Symbols: ℃
@@ -65,6 +70,7 @@ constexpr std::array SymbolBlocks = {
   UnicodeBlock{0x3190, 0x319f}, // Kanbun (Ideographic Annotations): ㆑
   UnicodeBlock{0x31c0, 0x31ef}  // CJK Strokes: ㇁
 };
+
 constexpr std::array LetterBlocks = {
   UnicodeBlock{0x0080, 0x00ff}, // Latin Supplement: ·, ×
   UnicodeBlock{0x0100, 0x017f}, // Latin Extension A
@@ -74,21 +80,27 @@ constexpr std::array LetterBlocks = {
   UnicodeBlock{0x2c60, 0x2c7f}, // Latin Extension C
   UnicodeBlock{0xff00, 0xffef}  // Wide Letters: full width Roman letters and half-width Katakana
 };
+
 // Skip codes in this range when reading in Kanji. They can inform see the following link for more info:
 // http://unicode.org/reports/tr28/tr28-3.html#13_7_variation_selectors
 constexpr std::array NonSpacingBlocks = {
   UnicodeBlock(0xfe00, 0xfe0f) // Variation Selection (comes after some Kanji in jinmei file)
 };
 
+// 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array 't'. The blocks in 't'
+// are assumed to be in order (order is checked by automated tests for all the arrays defined above).
 template<typename T> inline bool inRange(char32_t c, const T& t) {
-  for (auto& i : t)
+  for (auto& i : t) {
+    if (c < i.start) break;
     if (i(c)) return true;
+  }
   return false;
 }
 
+// 'inRange' with more than one 't' (block array) checks each array so there's no requirement for the
+// arrays to be specified in a particular order (which wouldn't work anyway for overlapping ranges).
 template<typename T, typename... Ts> inline bool inRange(char32_t c, const T& t, Ts... args) {
-  for (auto& i : t)
-    if (i(c)) return true;
+  if (inRange(c, t)) return true;
   return inRange(c, args...);
 }
 
@@ -133,6 +145,7 @@ inline bool isKana(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, HiraganaBlocks, KatakanaBlocks);
 }
 inline bool isAllKana(const std::string& s) { return inWCharRange(s, HiraganaBlocks, KatakanaBlocks); }
+
 // kanji
 inline bool isCommonKanji(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, CommonKanjiBlocks);
@@ -146,6 +159,7 @@ inline bool isKanji(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, CommonKanjiBlocks, RareKanjiBlocks);
 }
 inline bool isAllKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks); }
+
 // 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
 inline bool isMBPunctuation(const std::string& s, bool includeSpace = true, bool checkLengthOne = true) {
   return s.starts_with("　") ? (includeSpace && (s.length() < 4 || !checkLengthOne))
@@ -160,6 +174,7 @@ inline bool isMBLetter(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, LetterBlocks);
 }
 inline bool isAllMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
+
 // 'isRecognizedCharacter' returns true if 's' is in any UnicodeBlock defined in this header file (including wide space)
 inline bool isRecognizedCharacter(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks,
@@ -187,6 +202,7 @@ constexpr wchar_t KanjiRange[] = {
   RareKanjiBlocks[4].start, L'-', RareKanjiBlocks[4].end,     // CJK Extension G
   L'\0' // null
 };
+
 // clang-format on
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
