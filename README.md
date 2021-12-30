@@ -3,6 +3,7 @@
 ## Table of Contents
 
 **[Introduction](#Introduction)**\
+**[Project Structure](#Code-Structure)**\
 **[Kana Convert](#Kana-Convert)**\
 **[Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
@@ -23,6 +24,25 @@ This repository contains code for four 'main' programs:
 - **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 
 The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify Japanese **kanji** (漢字) characters into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code already created for the *stats* program.
+
+## Project Structure
+
+The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds 5 libraries, the 4 main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
+
+- **apps**: *cpp* files for the 4 main programs
+- **data**: data files described in **[Kanji Data](#Kanji-Data)** section
+- **include**: *h* files split into 5 directories (one per library)
+- **scripts**: *bash* scripts for working with *Unicode* data
+- **src**: *cpp* files split into 5 directories (one per library)
+- **tests**: *cpp* files split into 5 directories (one per library)
+
+The 5 libraries are:
+
+- **utils**: utility classes used by all 4 main programs
+- **kana**: code used by *kanaConvert* program (depends on **utils** lib)
+- **kanji**: code for loading Kanji and Ucd data (depends on **kana** lib)
+- **stats**: code used by *kanjiStats* program (depends on **kanji** lib)
+- **quiz**: code used by *kanjiQuiz* program (depends on **kanji** lib)
 
 ## Kana Convert
 
