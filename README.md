@@ -3,7 +3,7 @@
 ## Table of Contents
 
 **[Introduction](#Introduction)**\
-**[Project Structure](#Code-Structure)**\
+**[Project Structure](#Project-Structure)**\
 **[Kana Convert](#Kana-Convert)**\
 **[Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
