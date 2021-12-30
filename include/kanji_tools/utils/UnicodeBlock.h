@@ -100,8 +100,7 @@ template<typename T> inline bool inRange(char32_t c, const T& t) {
 // 'inRange' with more than one 't' (block array) checks each array so there's no requirement for the
 // arrays to be specified in a particular order (which wouldn't work anyway for overlapping ranges).
 template<typename T, typename... Ts> inline bool inRange(char32_t c, const T& t, Ts... args) {
-  if (inRange(c, t)) return true;
-  return inRange(c, args...);
+  return inRange(c, t) || inRange(c, args...);
 }
 
 // Return true if the first 'MB character' is in the given blocks, empty string will return false and
