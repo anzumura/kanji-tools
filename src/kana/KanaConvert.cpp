@@ -108,8 +108,7 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
   // each word. This helps deal with words ending in 'n'.
   std::string result;
   int oldPos = 0;
-  const bool keepSpaces = !(_flags & RemoveSpaces);
-  do {
+  for (const bool keepSpaces = !(_flags & RemoveSpaces);;) {
     const int pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos));
@@ -119,7 +118,7 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
     if (char delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
       result += _narrowDelims.at(delim);
     oldPos = pos + 1;
-  } while (true);
+  }
   return result;
 }
 
@@ -132,7 +131,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
   auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &c,
                &afterN](bool startNewGroup = true, bool prolong = false) {
     result += kanaLetters(letterGroup, source, count, prevKana, prolong);
-    if (_target == CharType::Romaji && Kana::N.containsKana(letterGroup) && afterN.contains(c)) result += _apostrophe;
+    if (romajiTarget() && Kana::N.containsKana(letterGroup) && afterN.contains(c)) result += _apostrophe;
     hasSmallTsu = false;
     groupDone = false;
     // if 'startNewGroup' is false then drop the current letter instead of using it to start a new group
@@ -144,13 +143,12 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
       letterGroup.clear();
     }
   };
-  MBChar s(input);
-  while (s.next(c, false)) {
+  for (MBChar s(input); s.next(c, false);) {
     // check prolong mark and repeating marks first since they aren't in 'sourceMap'
-    if (c == Kana::ProlongMark) {
+    if (c == Kana::ProlongMark)
       // this is actually a katakana symbol, but it can also appear in (non-standard) Hiragana.
       done(false, true);
-    } else if (Kana::RepeatPlain.matches(source, c)) {
+    else if (Kana::RepeatPlain.matches(source, c)) {
       done(false);
       result += Kana::RepeatPlain.get(_target, _flags, prevKana);
     } else if (Kana::RepeatAccented.matches(source, c)) {
@@ -185,7 +183,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
     } else {
       // got non-hiragana letter so flush any letters and preserve the new letter unconverted
       done(false);
-      if (_target == CharType::Romaji) {
+      if (romajiTarget()) {
         if (auto i = _wideDelims.find(c); i != _wideDelims.end())
           result += i->second;
         else
@@ -202,7 +200,7 @@ std::string KanaConvert::kanaLetters(const std::string& letterGroup, CharType so
                                      bool prolong) const {
   auto& sourceMap = Kana::getMap(source);
   auto macron = [this, prolong, &prevKana](const Kana* k, bool sokuon = false) {
-    const auto& s = sokuon ? k->getSokuonRomaji(_flags) : k->get(_target, _flags);
+    const auto& s = sokuon ? k->getSokuonRomaji(_flags) : get(*k);
     if (prolong) {
       if (_target != CharType::Romaji) return s + Kana::ProlongMark;
       switch (s[s.length() - 1]) {
@@ -219,19 +217,15 @@ std::string KanaConvert::kanaLetters(const std::string& letterGroup, CharType so
   };
   if (!letterGroup.empty()) {
     prevKana = nullptr;
-    auto i = sourceMap.find(letterGroup);
-    if (i != sourceMap.end()) return macron(i->second);
+    if (auto i = sourceMap.find(letterGroup); i != sourceMap.end()) return macron(i->second);
     // if letter group is an unknown combination, split it up and try processing each part
     if (count > 1) {
       const auto firstLetter = letterGroup.substr(0, 3);
-      i = sourceMap.find(letterGroup.substr(3));
-      if (i != sourceMap.end()) {
-        if (_target == CharType::Romaji && Kana::SmallTsu.containsKana(firstLetter) &&
-            _repeatingConsonents.contains(i->second->romaji()[0]))
-          return macron(i->second, true);
-        auto transformedFirst = kanaLetters(firstLetter, source, 1, prevKana);
-        return transformedFirst + macron(i->second);
-      }
+      if (auto i = sourceMap.find(letterGroup.substr(3)); i != sourceMap.end())
+        return romajiTarget() && Kana::SmallTsu.containsKana(firstLetter) &&
+            _repeatingConsonents.contains(i->second->romaji()[0])
+          ? macron(i->second, true)
+          : kanaLetters(firstLetter, source, 1, prevKana) + macron(i->second);
       // error: couldn't convert second part
       return kanaLetters(firstLetter, source, 1, prevKana) + letterGroup.substr(3);
     }
@@ -247,12 +241,11 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
     letterGroup += x;
     romajiLetters(letterGroup, result);
     if (letterGroup.empty())
-      result += _target == CharType::Hiragana && (_flags & NoProlongMark) ? s : Kana::ProlongMark;
+      result += hiraganaTarget() && (_flags & NoProlongMark) ? s : Kana::ProlongMark;
     else
       result += x; // should never happen ...
   };
-  MBChar s(input);
-  while (s.next(c, false)) {
+  for (MBChar s(input); s.next(c, false);) {
     if (c == "ā")
       macron('a', "あ");
     else if (c == "ī")
@@ -271,7 +264,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
         if (letterGroup.empty())
           letterGroup += letter;
         else if (letterGroup == "n") // got two 'n's in a row so output one, but don't need to clear letterGroup
-          result += Kana::N.get(_target, _flags);
+          result += getN();
         else {
           // error: partial romaji followed by n - output uncoverted partial group
           result += letterGroup;
@@ -285,7 +278,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
   }
   while (!letterGroup.empty()) {
     if (letterGroup == "n") {
-      result += Kana::N.get(_target, _flags); // normal case for a word ending in 'n'
+      result += getN(); // normal case for a word ending in 'n'
       letterGroup.clear();
     } else {
       result += letterGroup[0]; // error: output the unprocessed letter
@@ -299,13 +292,13 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
 void KanaConvert::romajiLetters(std::string& letterGroup, std::string& result) const {
   auto& sourceMap = Kana::getMap(CharType::Romaji);
   if (auto i = sourceMap.find(letterGroup); i != sourceMap.end()) {
-    result += i->second->get(_target, _flags);
+    result += get(*i->second);
     letterGroup.clear();
   } else if (letterGroup.length() == 3) {
     // convert first letter to small tsu if letter repeats and is a valid consonant (also allow 'tc' combination)
-    result += letterGroup[0] == 'n' ? Kana::N.get(_target, _flags)
+    result += letterGroup[0] == 'n' ? getN()
       : letterGroup[0] == letterGroup[1] || letterGroup[0] == 't' && letterGroup[1] == 'c'
-      ? _repeatingConsonents.contains(letterGroup[0]) ? Kana::SmallTsu.get(_target, _flags)
+      ? _repeatingConsonents.contains(letterGroup[0]) ? getSmallTsu()
                                                       : letterGroup.substr(0, 1) // error: first letter not valid
       : letterGroup.substr(0, 1); // error: no romaji is longer than 3 chars so output the first letter unconverted
     letterGroup = letterGroup.substr(1);
