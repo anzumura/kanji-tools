@@ -113,6 +113,7 @@ private:
                           bool prolong = false) const;
   std::string convertFromRomaji(const std::string& input) const;
   void romajiLetters(std::string& letterGroup, std::string& result) const;
+  bool romajiMacronLetter(const std::string& letter, std::string& letterGroup, std::string& result) const;
 
   // Either '_apostrophe' or '_dash' can be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used. Note,
