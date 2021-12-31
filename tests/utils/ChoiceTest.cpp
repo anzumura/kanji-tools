@@ -217,10 +217,26 @@ TEST_F(ChoiceTest, QuitOption) {
   _choice.setQuit('q');
   EXPECT_TRUE(_choice.isQuit('q'));
   EXPECT_EQ(_choice.quit(), 'q');
+  EXPECT_EQ(_choice.quitDescription(), "quit");
   EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), 'q');
   std::string line;
   std::getline(_os, line);
   EXPECT_EQ(line, "(1-2, q=quit): ");
+  EXPECT_FALSE(std::getline(_os, line));
+}
+
+TEST_F(ChoiceTest, QuitDescription) {
+  _is << "s\n";
+  EXPECT_FALSE(_choice.quit());
+  EXPECT_FALSE(_choice.isQuit('s'));
+  _choice.setQuit('s', "終了");
+  EXPECT_TRUE(_choice.isQuit('s'));
+  EXPECT_EQ(_choice.quit(), 's');
+  EXPECT_EQ(_choice.quitDescription(), "終了");
+  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), 's');
+  std::string line;
+  std::getline(_os, line);
+  EXPECT_EQ(line, "(1-2, s=終了): ");
   EXPECT_FALSE(std::getline(_os, line));
 }
 

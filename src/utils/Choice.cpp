@@ -32,15 +32,12 @@ char Choice::getOneChar() {
 }
 
 void Choice::add(std::string& prompt, const Choices& choices) {
-  static const std::string CommaSpace(", "), Equals("=");
+  static const std::string CommaSpace(", "), Equals("="), Dash("-");
 
   OptChar rangeStart = {};
   char prevChar;
   auto completeRange = [&prompt, &rangeStart, &prevChar]() {
-    if (prevChar != *rangeStart) {
-      prompt += '-';
-      prompt += prevChar;
-    }
+    if (rangeStart != prevChar) prompt += Dash + prevChar;
   };
   for (const auto& i : choices) {
     checkPrintableAscii(i.first, "option");
@@ -73,10 +70,8 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   static const std::string QuitError("quit option '"), DefaultError("default option '"), DefaultPrompt(") def '");
 
   Choices choices(choicesIn);
-  if (_quit) {
-    if (choices.contains(*_quit)) error(QuitError + *_quit + AlreadyInChoices);
-    if (useQuit) choices[*_quit] = "quit";
-  }
+  if (_quit && (useQuit ? !choices.insert(std::make_pair(*_quit, _quitDescription)).second : choices.contains(*_quit)))
+    error(QuitError + *_quit + AlreadyInChoices);
   if (choices.empty()) error("must specify at least one choice");
 
   // if 'msg' is empty then don't leave a space before listing the choices in brackets.
@@ -114,7 +109,7 @@ char Choice::get(const std::string& msg, bool useQuit, char first, char last, co
   checkPrintableAscii(last, LastError);
   if (first > last) error(FirstError + " '" + first + "' is greater than last '" + last + "'");
   Choices choices(choicesIn);
-  for (;first <= last; ++first)
+  for (; first <= last; ++first)
     if (!choices.insert(std::make_pair(first, Empty)).second) error(RangeError + " '" + first + AlreadyInChoices);
   return get(msg, useQuit, choices, def);
 }
