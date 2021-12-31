@@ -11,6 +11,7 @@ namespace kanji_tools {
 class Choice {
 public:
   using OptChar = std::optional<char>;
+
   // 'Choices' should map 'char' choices to a description of the choice
   using Choices = std::map<char, std::string>;
 

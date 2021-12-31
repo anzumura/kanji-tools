@@ -13,15 +13,18 @@ const std::string AlreadyInChoices("' already in choices");
 } // namespace
 
 char Choice::getOneChar() {
-  char result = 0;
   struct termios settings = {0};
   if (tcgetattr(0, &settings) < 0) perror("tcsetattr()");
+  // turn raw mode on - allows getting a single char from terminal without waiting 'return'
   settings.c_lflag &= ~ICANON;
   settings.c_lflag &= ~ECHO;
   settings.c_cc[VMIN] = 1;
   settings.c_cc[VTIME] = 0;
   if (tcsetattr(0, TCSANOW, &settings) < 0) perror("tcsetattr() - turning on raw mode");
+  // read a single char
+  char result = 0;
   if (read(0, &result, 1) < 0) perror("read()");
+  // turn raw mode off
   settings.c_lflag |= ICANON;
   settings.c_lflag |= ECHO;
   if (tcsetattr(0, TCSADRAIN, &settings) < 0) perror("tcsetattr() - turning off raw mode");
@@ -29,6 +32,8 @@ char Choice::getOneChar() {
 }
 
 void Choice::add(std::string& prompt, const Choices& choices) {
+  static const std::string CommaSpace(", "), Equals("=");
+
   OptChar rangeStart = {};
   char prevChar;
   auto completeRange = [&prompt, &rangeStart, &prevChar]() {
@@ -41,14 +46,13 @@ void Choice::add(std::string& prompt, const Choices& choices) {
     checkPrintableAscii(i.first, "option");
     if (i.second.empty()) {
       if (!rangeStart) {
-        if (i != *choices.begin()) prompt += ", ";
+        if (i != *choices.begin()) prompt += CommaSpace;
         prompt += i.first;
         rangeStart = i.first;
       } else if (i.first - prevChar > 1) {
         // complete range if there was a jump of more than one value
         completeRange();
-        prompt += ", ";
-        prompt += i.first;
+        prompt += CommaSpace + i.first;
         rangeStart = i.first;
       }
     } else {
@@ -57,9 +61,8 @@ void Choice::add(std::string& prompt, const Choices& choices) {
         completeRange();
         rangeStart = std::nullopt;
       }
-      if (i.first != choices.begin()->first) prompt += ", ";
-      prompt += i.first;
-      prompt += "=" + i.second;
+      if (i.first != choices.begin()->first) prompt += CommaSpace;
+      prompt += i.first + Equals + i.second;
     }
     prevChar = i.first;
   }
@@ -67,7 +70,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
 }
 
 char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn, OptChar def) const {
-  static const std::string QuitError("quit option '"), DefaultError("default option '");
+  static const std::string QuitError("quit option '"), DefaultError("default option '"), DefaultPrompt(") def '");
 
   Choices choices(choicesIn);
   if (_quit) {
@@ -82,9 +85,7 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   add(prompt, choices);
   if (def) {
     if (!choices.contains(*def)) error(DefaultError + *def + "' not in choices");
-    prompt += ") def '";
-    prompt += *def;
-    prompt += "': ";
+    prompt += DefaultPrompt + *def + "': ";
   } else
     prompt += "): ";
   do {
@@ -93,8 +94,7 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
     if (_in)
       std::getline(*_in, line);
     else {
-      char choice = getOneChar();
-      if (choice == '\n')
+      if (const char choice = getOneChar(); choice == '\n')
         line.clear();
       else
         line = choice;
@@ -105,24 +105,22 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   return line[0];
 }
 
-char Choice::get(const std::string& msg, bool useQuit, char first, char last, const Choices& choices,
+char Choice::get(const std::string& msg, bool useQuit, char first, char last, const Choices& choicesIn,
                  OptChar def) const {
-  static const std::string RangeError("range option");
+  static const std::string RangeError("range option"), Empty;
   static const std::string FirstError("first " + RangeError), LastError("last " + RangeError);
 
   checkPrintableAscii(first, FirstError);
   checkPrintableAscii(last, LastError);
   if (first > last) error(FirstError + " '" + first + "' is greater than last '" + last + "'");
-  Choices c(choices);
-  while (first <= last) {
-    if (c.contains(first)) error(RangeError + " '" + first + AlreadyInChoices);
-    c[first++] = "";
-  }
-  return get(msg, useQuit, c, def);
+  Choices choices(choicesIn);
+  for (;first <= last; ++first)
+    if (!choices.insert(std::make_pair(first, Empty)).second) error(RangeError + " '" + first + AlreadyInChoices);
+  return get(msg, useQuit, choices, def);
 }
 
 void Choice::checkPrintableAscii(char x, const std::string& msg) {
-   if (x < ' ' || x > '~') error(msg + " is non-printable: 0x" + toHex(x));
+  if (x < ' ' || x > '~') error(msg + " is non-printable: 0x" + toHex(x));
 }
 
 } // namespace kanji_tools

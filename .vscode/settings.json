@@ -99,7 +99,8 @@
     "__availability": "cpp",
     "__undef_macros": "cpp",
     "__memory": "cpp",
-    "__bits": "cpp"
+    "__bits": "cpp",
+    "__functional_03": "cpp"
   },
   "C_Cpp.errorSquiggles": "Disabled",
   "cSpell.words": [
