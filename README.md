@@ -11,6 +11,9 @@
 **[JLPT Kanji](#JLPT-Kanji)**\
 **[Jōyō Kanji](#Jōyō-Kanji)**\
 **[Data Directory](#Data-Directory)**\
+**[Data Directory](#Data-Directory)**\
+**[Kanji Quiz](#Kanji-Quiz)**\
+**[Kanji Stats](#Kanji-Stats)**\
 **[Aozora](#Aozora)**\
 **[Helpful Commands](#Helpful-Commands)**
 
@@ -27,7 +30,7 @@ The initial goal for this project was to create a program that could parse multi
 
 ## Project Structure
 
-The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds 5 libraries, the 4 main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
+The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds five libraries, the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
 
 - **apps**: *cpp* files for the 4 main programs
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
@@ -36,13 +39,15 @@ The project is build using *cmake* so there is a *CMakeLists.txt* file in the to
 - **src**: *cpp* files split into 5 directories (one per library)
 - **tests**: *cpp* files split into 5 directories (one per library)
 
-The 5 libraries are:
+The five libraries are:
 
 - **utils**: utility classes used by all 4 main programs
 - **kana**: code used by *kanaConvert* program (depends on **utils** lib)
 - **kanji**: code for loading Kanji and Ucd data (depends on **kana** lib)
 - **stats**: code used by *kanjiStats* program (depends on **kanji** lib)
 - **quiz**: code used by *kanjiQuiz* program (depends on **kanji** lib)
+
+The code was written using **[VS Code](https://code.visualstudio.com)** on an *M1 Mac* and compiles with either **clang++** (version 13.0.0) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via *Homebrew*. It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
 
 ## Kana Convert
 
@@ -417,6 +422,88 @@ The **data** directory contains the following files:
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
 
 No external databases are used so far, but while writing some of the code (like in *UnicodeBlock.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
+
+## Kanji Quiz
+
+The **kanjiQuiz** program supports running various types of quizzes (in review or test mode) as well as looking up details of a kanji from the command-line. If no options are provided then the user is prompted for mode, quiz type, etc. or command-line options can be used to jump directly to the desired type of quiz or kanji lookup. The following is the output from the `-h` (help) option:
+
+```;
+kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
+          [-r[num] | -t[num]] [kanji]
+    -h   show this help message for command-line options
+    -s   show English meanings by default (can be toggled on/off later)
+
+  The following options allow choosing the quiz/review type optionally followed
+  by question list type (grade, level, etc.) instead of being prompted:
+    -f   'frequency' (optional frequency group '1-5')
+    -g   'grade' (optional grade '1-6', 's' = Secondary School)
+    -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)
+    -l   'level' (optional JLPT level number '1-5')
+    -m   'meaning' (optional kanji type '1-4')
+    -p   'pattern' (optional kanji type '1-4')
+
+  The following options can be followed by a 'num' to specify where to start in
+  the question list (use negative to start from the end or 0 for random order).
+    -r   review mode
+    -t   test mode
+
+  kanji  show details for a kanji instead of starting a review or test
+
+Examples:
+  kanjiQuiz -f        # start 'frequency' quiz (prompts for 'bucket' number)
+  kanjiQuiz -r40 -l1  # start 'JLPT N1' review beginning at the 40th entry
+
+Note: 'kanji' can be UTF-8, frequency (between 1 and 2501), 'm' followed by
+Morohashi ID (index in Dai Kan-Wa Jiten), 'n' followed by Classic Nelson ID
+or 'u' followed by Unicode. For example, theses all produce the same output:
+  kanjiQuiz 奉
+  kanjiQuiz 1624
+  kanjiQuiz m5894
+  kanjiQuiz n212
+  kanjiQuiz u5949
+```
+
+When using the quiz program to lookup a kanji, the output includes a brief legend followed by some details such as **Radical**, **Strokes**, **Pinyin**, **Frequency**, **Old** or **New** variants, **Meaning**, **Reading**, etc.. The **Similar** list comes from the *pattern-groups.txt* file and (the very ad-hoc) **Category** comes from the *meaning-groups.txt* file. **Morohashi** and **Nelson** IDs are shown if they exist as well as any **Jukugo** examples loaded from *data/jukugo* files (there are only about 18K *Jukugo* entries so these lists are pretty limited).
+
+```;
+~/cdev/kanji-tools $ ./build/apps/kanjiQuiz 龍
+>>> Legend:
+Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
+Suffix: .=常用 '=JLPT "=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd
+
+Showing details for 龍 [9F8D], Block CJK, Version 1.1, LinkedJinmei
+Rad 龍(212), Strokes 16, lóng, Frq 1734, New 竜*
+    Meaning: dragon
+    Reading: リュウ、たつ
+    Similar: 襲. 籠. 寵^ 瀧~ 朧+ 聾@ 壟# 蘢# 隴# 瓏#
+  Morohashi: 48818
+ Nelson IDs: 3351 5440
+   Category: [動物：爬虫類]
+     Jukugo: 龍頭蛇尾（りゅうとうだび） 烏龍茶（うーろんちゃ） 画龍点睛（がりょうてんせい）
+```
+
+## Kanji Stats
+
+The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More details information can also be shown depending on command line options. In order to get more accurate stats about percentages of *kanji*, *hiragana* and *katakana*, the program attempts to strip away all *furigana* before counting.
+
+Here is the output for processing files containing lyrics for *中島みゆき (Miyuki Nakajima)* songs:
+
+```;
+~/cdev/kanji-tools $ ./build/apps/kanjiStats ~/songs
+>>> Stats for: songs (634 files from 62 directories) - showing 5 most frequent kanji per type
+>>>         Hiragana: 146382, unique:   77
+>>>         Katakana:   9317, unique:   79
+>>>     Common Kanji:  52406, unique: 1642, 100.00%
+>>>        [Jouyou] :  50804, unique: 1398,  96.94%  (人 1440, 私 836, 日 785, 見 750, 何 626)
+>>>        [Jinmei] :    986, unique:  114,   1.88%  (逢 95, 叶 68, 淋 56, 此 44, 遥 42)
+>>>  [LinkedJinmei] :     36, unique:    7,   0.07%  (駈 13, 龍 10, 遙 5, 凛 3, 國 2)
+>>>     [Frequency] :    203, unique:   15,   0.39%  (嘘 112, 叩 15, 呑 15, 頬 12, 叱 11)
+>>>         [Extra] :    377, unique:  108,   0.72%  (怯 29, 騙 21, 囁 19, 繋 19, 禿 16)
+>>>   MB-Punctuation:    946, unique:   12
+>>>        MB-Symbol:     13, unique:    2
+>>>        MB-Letter:   1431, unique:   54
+>>> Total Kanji+Kana: 208105 (Hiragana: 70.3%, Katakana: 4.5%, Common Kanji: 25.2%)
+```
 
 ## Aozora
 
