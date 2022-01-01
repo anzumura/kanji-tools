@@ -266,26 +266,18 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
 }
 
 bool KanaConvert::romajiMacronLetter(const std::string& letter, std::string& letterGroup, std::string& result) const {
-  auto macron = [this, &letterGroup, &result](char x, const auto& s) {
-    romajiLetters(letterGroup += x, result);
+  static const std::map<std::string, std::pair<char, std::string>> Macrons = {
+    {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, {"ū", {'u', "う"}}, {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
+
+  if (auto i = Macrons.find(letter); i != Macrons.end()) {
+    romajiLetters(letterGroup += i->second.first, result);
     if (letterGroup.empty())
-      result += hiraganaTarget() && (_flags & NoProlongMark) ? s : Kana::ProlongMark;
+      result += hiraganaTarget() && (_flags & NoProlongMark) ? i->second.second : Kana::ProlongMark;
     else
-      result += x; // should never happen ...
-  };
-  if (letter == "ā")
-    macron('a', "あ");
-  else if (letter == "ī")
-    macron('i', "い");
-  else if (letter == "ū")
-    macron('u', "う");
-  else if (letter == "ē")
-    macron('e', "え");
-  else if (letter == "ō")
-    macron('o', "お");
-  else
-    return false;
-  return true;
+      result += i->second.first; // should never happen ...
+    return true;
+  }
+  return false;
 }
 
 void KanaConvert::romajiLetters(std::string& letterGroup, std::string& result) const {
