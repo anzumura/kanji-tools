@@ -484,9 +484,9 @@ Rad 龍(212), Strokes 16, lóng, Frq 1734, New 竜*
 
 ## Kanji Stats
 
-The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More details information can also be shown depending on command line options. In order to get more accurate stats about percentages of *kanji*, *hiragana* and *katakana*, the program attempts to strip away all *furigana* before counting.
+The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command line options. In order to get more accurate stats about percentages of *kanji*, *hiragana* and *katakana*, the program attempts to strip away all *furigana* before counting.
 
-Here is the output for processing files containing lyrics for *中島みゆき (Miyuki Nakajima)* songs:
+Here is the output from processing a set of files containing lyrics for *中島みゆき (Miyuki Nakajima)* songs:
 
 ```;
 ~/cdev/kanji-tools $ ./build/apps/kanjiStats ~/songs
