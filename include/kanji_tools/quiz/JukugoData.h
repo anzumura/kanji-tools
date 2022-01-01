@@ -21,6 +21,8 @@ public:
     return i != _kanjiToJukugo.end() ? i->second : _emptyList;
   }
 private:
+  template<typename T> void createJukugo(T& error, KanjiGrades, const std::string& name, const std::string& reading);
+
   using JukugoKey = std::pair<std::string, std::string>;
   int loadFile(const std::filesystem::path&, KanjiGrades);
 
