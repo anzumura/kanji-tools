@@ -150,7 +150,7 @@ Kana::Map Kana::populate(CharType t) {
   Kana::Map result;
   int duplicates = 0;
   auto insert = [&result, &duplicates, t](auto& k, auto& v) {
-    if (auto i = result.insert(std::make_pair(k, &v)); !i.second) {
+    if (auto i = result.emplace(k, &v); !i.second) {
       std::cerr << "key '" << k << "' already in " << toString(t) << " map: " << i.first->second << '\n';
       ++duplicates;
     }

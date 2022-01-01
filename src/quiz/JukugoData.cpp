@@ -66,7 +66,7 @@ int JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
       n.reset();
       while (n.next(x))
         if (isKanji(x)) _kanjiToJukugo[x].push_back(jukugo);
-      _uniqueJukugo.insert(std::make_pair(key, jukugo));
+      _uniqueJukugo.emplace(key, jukugo);
     } else if (i->second->grade() != grade)
       error("jukugo '" + name + "' found in more than one grade file");
   };

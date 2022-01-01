@@ -194,8 +194,8 @@ protected:
   void SetUp() override {
     if (fs::exists(_testDir)) TearDown();
     EXPECT_TRUE(fs::create_directories(_testSubDir));
-    std::array files = {std::make_pair(_testFile1, "北海道"), std::make_pair(_testFile2, "南北"),
-                        std::make_pair(_testSubFile1, "東西線"), std::make_pair(_testSubFile2, "東北")};
+    std::array files = {std::pair(_testFile1, "北海道"), std::pair(_testFile2, "南北"),
+                        std::pair(_testSubFile1, "東西線"), std::pair(_testSubFile2, "東北")};
     for (auto& i : files) {
       std::ofstream of(i.first);
       of << i.second;

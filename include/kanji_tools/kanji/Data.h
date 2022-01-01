@@ -218,6 +218,10 @@ protected:
 
   std::map<KanjiTypes, List> _types;
 private:
+  // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data from 'linked-jinmei.txt'
+  // and creates either a LinkedJinmei or a LinkedOld kanji for each entry.
+  void populateLinkedKanji();
+
   // helper functions for checking and inserting into '_kanjiNameMap'
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);

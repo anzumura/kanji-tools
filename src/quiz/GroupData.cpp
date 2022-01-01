@@ -26,7 +26,7 @@ GroupData::GroupData(DataPtr data) : _data(data) {
 }
 
 bool GroupData::checkInsert(const std::string& name, Map& groups, const Entry& group) const {
-  auto i = groups.insert(std::make_pair(name, group));
+  auto i = groups.emplace(name, group);
   if (!i.second)
     _data->printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
                       i.first->second->toString());
@@ -40,7 +40,7 @@ bool GroupData::checkInsert(const std::string& name, MultiMap& groups, const Ent
       _data->printError(name + " from Group " + std::to_string(group->number()) + " already in same group");
       return false;
     }
-  groups.insert(std::make_pair(name, group));
+  groups.emplace(name, group);
   return true;
 }
 

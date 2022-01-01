@@ -67,7 +67,7 @@ Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
 
 void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
   auto f = [this, &top, showBreakdown, verbose](const auto& x, const auto& y, bool firstCount = false) {
-    return std::make_pair(processCount(top, x, y, showBreakdown, firstCount, verbose), y);
+    return std::pair(processCount(top, x, y, showBreakdown, firstCount, verbose), y);
   };
   std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),

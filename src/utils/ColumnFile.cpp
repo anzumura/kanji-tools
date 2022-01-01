@@ -26,7 +26,7 @@ ColumnFile::ColumnFile(const fs::path& p, const Columns& columns, char delimiter
   if (std::string headerRow; std::getline(_file, headerRow)) {
     ColNames colNames;
     for (auto& c : columns)
-      if (!colNames.insert(std::make_pair(c.name(), c)).second) error("duplicate column '" + c.name() + "'");
+      if (!colNames.emplace(c.name(), c).second) error("duplicate column '" + c.name() + "'");
     processHeaderRow(headerRow, colNames);
     verifyHeaderColumns(colNames);
   } else

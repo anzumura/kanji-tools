@@ -134,7 +134,7 @@ void UcdData::load(const std::filesystem::path& file) {
     for (const auto& link : links)
       if (!jinmei)
         _linkedOther[link.name()].push_back(name);
-      else if (auto i = _linkedJinmei.insert(std::make_pair(link.name(), name)); !i.second)
+      else if (auto i = _linkedJinmei.emplace(link.name(), name); !i.second)
         f.error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
   }
 }

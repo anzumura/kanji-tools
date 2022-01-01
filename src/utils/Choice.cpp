@@ -70,7 +70,7 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   static const std::string QuitError("quit option '"), DefaultError("default option '"), DefaultPrompt(") def '");
 
   Choices choices(choicesIn);
-  if (_quit && (useQuit ? !choices.insert(std::make_pair(*_quit, _quitDescription)).second : choices.contains(*_quit)))
+  if (_quit && (useQuit ? !choices.emplace(*_quit, _quitDescription).second : choices.contains(*_quit)))
     error(QuitError + *_quit + AlreadyInChoices);
   if (choices.empty()) error("must specify at least one choice");
 
@@ -110,7 +110,7 @@ char Choice::get(const std::string& msg, bool useQuit, char first, char last, co
   if (first > last) error(FirstError + " '" + first + "' is greater than last '" + last + "'");
   Choices choices(choicesIn);
   for (; first <= last; ++first)
-    if (!choices.insert(std::make_pair(first, Empty)).second) error(RangeError + " '" + first + AlreadyInChoices);
+    if (!choices.emplace(first, Empty).second) error(RangeError + " '" + first + AlreadyInChoices);
   return get(msg, useQuit, choices, def);
 }
 

@@ -13,12 +13,12 @@ protected:
   void SetUp() override {
     if (fs::exists(_testDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(_testDir));
-    std::array files = {std::make_pair(_goodOnePerLine, "北\n海\n道"),
-                        std::make_pair(_goodOnePerLineLevel, "犬\n猫\n虎"),
-                        std::make_pair(_badOnePerLine, "焼 肉"),
-                        std::make_pair(_multiplePerLine, "東 西 線"),
-                        std::make_pair(_badSymbol, "a"),
-                        std::make_pair(_duplicateSymbol, "車\n車")};
+    std::array files = {std::pair(_goodOnePerLine, "北\n海\n道"),
+                        std::pair(_goodOnePerLineLevel, "犬\n猫\n虎"),
+                        std::pair(_badOnePerLine, "焼 肉"),
+                        std::pair(_multiplePerLine, "東 西 線"),
+                        std::pair(_badSymbol, "a"),
+                        std::pair(_duplicateSymbol, "車\n車")};
     for (auto& i : files) {
       std::ofstream of(i.first);
       of << i.second;

@@ -96,7 +96,7 @@ int Data::nextArg(int argc, const char** argv, int currentArg) {
 }
 
 bool Data::checkInsert(const Entry& kanji) {
-  if (!_kanjiNameMap.insert(std::make_pair(kanji->name(), kanji)).second) {
+  if (!_kanjiNameMap.insert({kanji->name(), kanji}).second) {
     printError("failed to insert " + kanji->name() + " into map");
     return false;
   }
@@ -106,7 +106,7 @@ bool Data::checkInsert(const Entry& kanji) {
   insertSanityChecks(kanji);
   // update _maxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if applicable
   if (kanji->frequency() && *kanji->frequency() >= _maxFrequency) _maxFrequency = *kanji->frequency() + 1;
-  if (kanji->variant() && !_compatibilityMap.insert(std::make_pair(kanji->compatibilityName(), kanji->name())).second)
+  if (kanji->variant() && !_compatibilityMap.insert({kanji->compatibilityName(), kanji->name()}).second)
     printError("failed to insert variant " + kanji->name() + " into map");
   if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
   for (int id : kanji->nelsonIds())
@@ -169,7 +169,7 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
 void Data::loadFrequencyReadings(const fs::path& file) {
   const ColumnFile::Column nameCol("Name"), readingCol("Reading");
   for (ColumnFile f(file, {nameCol, readingCol}); f.nextRow();)
-    if (!_frequencyReadings.insert(std::make_pair(f.get(nameCol), f.get(readingCol))).second) f.error("duplicate name");
+    if (!_frequencyReadings.insert({f.get(nameCol), f.get(readingCol)}).second) f.error("duplicate name");
 }
 
 void Data::populateJouyou() {
@@ -179,10 +179,14 @@ void Data::populateJouyou() {
     assert(toBool(i->grade()));
     if (checkInsert(i)) _grades[i->grade()].push_back(i);
   }
-  _types.insert(std::make_pair(KanjiTypes::Jouyou, std::move(results)));
-  // populate _linkedJinmeiKanji that are linked to Jouyou
+  _types.emplace(KanjiTypes::Jouyou, std::move(results));
+  populateLinkedKanji();
+}
+
+void Data::populateLinkedKanji() {
   fs::path file = DataFile::getFile(_dataDir, LinkedJinmeiFile);
   std::ifstream f(file);
+  // populate _linkedJinmeiKanji that are linked to Jouyou
   auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei];
   for (std::string line; std::getline(f, line);) {
     std::stringstream ss(line);
@@ -209,14 +213,14 @@ void Data::populateJinmei() {
     for (auto& j : i->oldNames())
       checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
   }
-  _types.insert(std::make_pair(KanjiTypes::Jinmei, std::move(results)));
+  _types.emplace(KanjiTypes::Jinmei, std::move(results));
 }
 
 void Data::populateExtra() {
   auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Extra, DataFile::getFile(_dataDir, ExtraFile));
   for (const auto& i : results)
     checkInsert(i);
-  _types.insert(std::make_pair(KanjiTypes::Extra, std::move(results)));
+  _types.emplace(KanjiTypes::Extra, std::move(results));
 }
 
 void Data::processList(const DataFile& list) {
@@ -263,8 +267,8 @@ void Data::processList(const DataFile& list) {
     DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"), list.name());
     // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
     if (!kenteiList && !toBool(list.level())) {
-      std::vector lists = {std::make_pair(&found[KanjiTypes::Jinmei], ""),
-                           std::make_pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
+      std::vector lists = {std::pair(&found[KanjiTypes::Jinmei], ""),
+                           std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
       for (const auto& i : lists) {
         DataFile::List jlptJinmei, otherJinmei;
         for (const auto& j : *i.first)

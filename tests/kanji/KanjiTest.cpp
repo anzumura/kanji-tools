@@ -28,7 +28,7 @@ public:
   MOCK_METHOD(const Radical&, ucdRadical, (const std::string&, const Ucd*), (const, override));
   MOCK_METHOD(const Radical&, getRadicalByName, (const std::string&), (const, override));
 private:
-  void strokes(const std::string& kanjiName, int count) { _strokes.insert(std::make_pair(kanjiName, count)); }
+  void strokes(const std::string& kanjiName, int count) { _strokes.emplace(kanjiName, count); }
 };
 
 class KanjiTest : public ::testing::Test {
