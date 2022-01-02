@@ -240,12 +240,31 @@ TEST_F(ChoiceTest, QuitDescription) {
   EXPECT_FALSE(std::getline(_os, line));
 }
 
+TEST_F(ChoiceTest, SetQuitFromConstructor) {
+  Choice choice(_os, 'e');
+  EXPECT_EQ(choice.quit(), 'e');
+  EXPECT_EQ(choice.quitDescription(), "quit"); // default quit description
+  Choice choiceWithQuitDescription(_os, 'e', "end");
+  EXPECT_EQ(choiceWithQuitDescription.quitDescription(), "end");
+}
+
 TEST_F(ChoiceTest, NonPrintableQuitError) {
   try {
     _choice.setQuit(22);
     FAIL() << "Expected std::domain_error";
   } catch (std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("quit option is non-printable: 0x16"));
+  } catch (...) {
+    FAIL() << "Expected std::domain_error";
+  }
+}
+
+TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
+  try {
+    Choice choice(_os, 23);
+    FAIL() << "Expected std::domain_error";
+  } catch (std::domain_error& err) {
+    EXPECT_EQ(err.what(), std::string("quit option is non-printable: 0x17"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
   }
