@@ -24,8 +24,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
     } else if (MBChar::isValid(_location, false)) {
       // only modify 'result' if '_location' is the start of a valid UTF-8 group
       result = *_location++;
-      for (x = Bit2; x && firstOfGroup & x; x >>= 1)
-        result += *_location++;
+      for (x = Bit2; x && firstOfGroup & x; x >>= 1) result += *_location++;
       if (!isVariationSelector(result))
         if (std::string s; doPeek(s, onlyMB, _location, true) && isVariationSelector(s)) {
           result += s;
@@ -51,8 +50,7 @@ bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool
     } else if (MBChar::isValid(location, false)) {
       // only modify 'result' if 'location' is the start of a valid UTF-8 group
       result = *location++;
-      for (x = Bit2; x && firstOfGroup & x; x >>= 1)
-        result += *location++;
+      for (x = Bit2; x && firstOfGroup & x; x >>= 1) result += *location++;
       if (!internalCall && !isVariationSelector(result))
         if (std::string s; doPeek(s, onlyMB, location, true) && isVariationSelector(s)) result += s;
       return true;
@@ -122,13 +120,12 @@ bool MBCharCount::hasUnclosedBrackets(const std::string& line) {
   return false;
 }
 
-int MBCharCount::processJoinedLine(std::string& prevLine, const std::string& line, int pos,
-                                    const OptString& tag) {
+int MBCharCount::processJoinedLine(std::string& prevLine, const std::string& line, int pos, const OptString& tag) {
   const auto end = pos + CloseWideBracketLength;
   const std::string joinedLine = prevLine + line.substr(0, end);
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);
-  return add(joinedLine, tag);;
+  return add(joinedLine, tag);
 }
 
 int MBCharCount::processFile(const fs::path& file, const OptString& tag) {
@@ -161,8 +158,7 @@ int MBCharCount::processFile(const fs::path& file, const OptString& tag) {
     }
     if (!prevLine.empty()) added += add(prevLine, tag);
   } else
-    while (std::getline(f, line))
-      added += add(line, tag);
+    while (std::getline(f, line)) added += add(line, tag);
   return added;
 }
 

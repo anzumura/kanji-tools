@@ -10,8 +10,8 @@ namespace {
 std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
-const Choice::Choices
-  PatternGroupChoices({{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}});
+const Choice::Choices PatternGroupChoices(
+  {{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}});
 
 constexpr char DefaultPatternGroup = '1';
 
@@ -135,8 +135,7 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
 void GroupQuiz::printAssignedAnswers() const {
   if (!_answers.empty()) {
     out() << "   ";
-    for (int i = 0; i < _answers.size(); ++i)
-      out() << ' ' << i + 1 << "->" << _answers[i];
+    for (int i = 0; i < _answers.size(); ++i) out() << ' ' << i + 1 << "->" << _answers[i];
     out() << '\n';
   }
 }
@@ -223,8 +222,7 @@ int GroupQuiz::getAnswerToEdit() const {
 
   if (_answers.size() == 1) return 0;
   std::map<char, std::string> answersToEdit;
-  for (auto k : _answers)
-    answersToEdit[k] = "";
+  for (auto k : _answers) answersToEdit[k] = "";
   const auto index = std::find(_answers.begin(), _answers.end(), get(AnswerToEdit, answersToEdit, {}, false));
   assert(index != _answers.end());
   return std::distance(_answers.begin(), index);

@@ -63,8 +63,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& li
       if (patternType == Group::PatternType::Family) kanjiNames.push_back(MBChar::getFirst(name));
     }
     std::string member;
-    for (std::stringstream ss(members); std::getline(ss, member, ',');)
-      kanjiNames.emplace_back(member);
+    for (std::stringstream ss(members); std::getline(ss, member, ',');) kanjiNames.emplace_back(member);
     Data::List memberKanji;
     for (const auto& i : kanjiNames)
       if (auto k = _data->findKanjiByName(i); k)
@@ -77,8 +76,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& li
     if (memberKanji.size() > MaxGroupSize) f.error("group has more than " + std::to_string(MaxGroupSize) + " members");
 
     Entry group = createGroup(f.getInt(numberCol), name, memberKanji, patternType);
-    for (const auto& i : memberKanji)
-      checkInsert(i->name(), groups, group);
+    for (const auto& i : memberKanji) checkInsert(i->name(), groups, group);
     list.push_back(group);
   }
 }

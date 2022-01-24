@@ -7,7 +7,8 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto HelpMessage = "\
+constexpr auto HelpMessage =
+  "\
 kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]\n\
           [-r[num] | -t[num]] [kanji]\n\
     -h   show this help message for command-line options\n\
@@ -193,8 +194,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   if (kanji->morohashiId()) out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
   if (kanji->hasNelsonIds()) {
     out() << (kanji->nelsonIds().size() == 1 ? "  Nelson ID:" : " Nelson IDs:");
-    for (auto& i : kanji->nelsonIds())
-      out() << ' ' << i;
+    for (auto& i : kanji->nelsonIds()) out() << ' ' << i;
     out() << '\n';
   }
   // Categories
@@ -214,8 +214,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
     // grade of the given kanji and one for other grades. For example, 一生（いっしょう） is a grade 1
     // Jukugo for '一', but 一縷（いちる） is a secondary school Jukugo (which also contains '一').
     if (JukugoData::List same, other; kanji->hasGrade() && list.size() > JukugoPerLine) {
-      for (auto& i : list)
-        (kanji->grade() == i->grade() ? same : other).push_back(i);
+      for (auto& i : list) (kanji->grade() == i->grade() ? same : other).push_back(i);
       if (other.empty())
         printJukugoList(jukugo, list);
       else {
@@ -309,8 +308,7 @@ void QuizLauncher::printDetails(const Data::List& list, const std::string& name,
     }
     out() << "Found " << list.size() << " matches for " << name << " ID " << arg << (list.size() ? ":\n\n" : "\n");
   }
-  for (auto& kanji : list)
-    printDetails(kanji->name(), list.size() == 1);
+  for (auto& kanji : list) printDetails(kanji->name(), list.size() == 1);
 }
 
 void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
@@ -346,8 +344,7 @@ bool QuizLauncher::getQuestionOrder() {
 void QuizLauncher::printJukugoList(const std::string& name, const JukugoData::List& list) const {
   out() << "    " << name << ':';
   if (list.size() <= JukugoPerLine)
-    for (auto& i : list)
-      out() << ' ' << i->nameAndReading();
+    for (auto& i : list) out() << ' ' << i->nameAndReading();
   else {
     out() << ' ' << list.size();
     std::array<int, JukugoPerLine> colWidths;

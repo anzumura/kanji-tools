@@ -3,11 +3,10 @@
 #include <kanji_tools/utils/Choice.h>
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Table.h>
-
-#include <filesystem>
-
 #include <stdio.h>
 #include <unistd.h>
+
+#include <filesystem>
 
 using namespace kanji_tools;
 namespace fs = std::filesystem;

@@ -62,20 +62,15 @@ void KanaConvert::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
   assert(_repeatingConsonents.size() == 18); // 26 - 8 where '8' is 5 vowels + 3 consonents (l, n and x)
-  for (auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
-    assert(_repeatingConsonents.contains(i) == false);
+  for (auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'}) assert(_repeatingConsonents.contains(i) == false);
   assert(_markAfterNHiragana.size() == 8); // 5 vowels plus 3 y's
   assert(_markAfterNHiragana.size() == _markAfterNKatakana.size());
   assert(_digraphSecondHiragana.size() == 9); // 5 small vowels plus 3 small y's plus small 'wa'
   assert(_digraphSecondHiragana.size() == _digraphSecondKatakana.size());
-  for (auto& i : _markAfterNHiragana)
-    assert(isHiragana(i));
-  for (auto& i : _markAfterNKatakana)
-    assert(isKatakana(i));
-  for (auto& i : _digraphSecondHiragana)
-    assert(isHiragana(i));
-  for (auto& i : _digraphSecondKatakana)
-    assert(isKatakana(i));
+  for (auto& i : _markAfterNHiragana) assert(isHiragana(i));
+  for (auto& i : _markAfterNKatakana) assert(isKatakana(i));
+  for (auto& i : _digraphSecondHiragana) assert(isHiragana(i));
+  for (auto& i : _digraphSecondKatakana) assert(isKatakana(i));
   assert(_wideDelims.size() == Delimiters.size());
   assert(_narrowDelims.size() == Delimiters.size());
   assert(_narrowDelimList.length() == Delimiters.size() + 2);
@@ -128,8 +123,8 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
   int count = 0;
   bool hasSmallTsu = false, groupDone = false;
   const Kana* prevKana = nullptr;
-  auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter,
-               &afterN](bool startNewGroup = true, bool prolong = false) {
+  auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter, &afterN](
+                bool startNewGroup = true, bool prolong = false) {
     result += kanaLetters(letterGroup, source, count, prevKana, prolong);
     if (romajiTarget() && Kana::N.containsKana(letterGroup) && afterN.contains(letter)) result += _apostrophe;
     hasSmallTsu = false;

@@ -1,9 +1,8 @@
 #ifndef KANJI_TOOLS_KANA_KANA_H
 #define KANJI_TOOLS_KANA_KANA_H
 
-#include <cassert>
-
 #include <array>
+#include <cassert>
 #include <map>
 #include <optional>
 #include <string>

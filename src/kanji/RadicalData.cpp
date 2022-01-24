@@ -33,8 +33,7 @@ void RadicalData::print(const Data& data) const {
   }
   data.out() << "):\n";
   RadicalLists radicals;
-  for (auto& i : data.kanjiNameMap())
-    radicals[i.second->radical()].push_back(i.second);
+  for (auto& i : data.kanjiNameMap()) radicals[i.second->radical()].push_back(i.second);
   printRadicalLists(data, radicals);
   printMissingRadicals(data, radicals);
 }
@@ -52,8 +51,7 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
     data.out() << i.first << ':';
     printCounts(data, count);
     int j = 0;
-    for (; j < l.size() && j < MaxExamples; ++j)
-      data.out() << ' ' << l[j]->name();
+    for (; j < l.size() && j < MaxExamples; ++j) data.out() << ' ' << l[j]->name();
     if (j < l.size()) data.out() << " ...";
     data.out() << '\n';
   }
@@ -67,8 +65,7 @@ void RadicalData::printMissingRadicals(const Data& data, const RadicalLists& rad
     if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
   if (!missingRadicals.empty()) {
     data.log() << "  Found " << missingRadicals.size() << " radicals with no kanji:";
-    for (const auto& i : missingRadicals)
-      data.out() << ' ' << i;
+    for (const auto& i : missingRadicals) data.out() << ' ' << i;
     data.out() << '\n';
   }
 }

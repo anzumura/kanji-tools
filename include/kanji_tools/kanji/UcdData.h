@@ -18,9 +18,7 @@ public:
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
   const std::string& getMeaning(const std::string& kanjiName) const { return getMeaning(find(kanjiName)); }
-  const std::string& getMeaning(const Ucd* u) const {
-    return u ? u->meaning() : Ucd::EmptyString;
-  }
+  const std::string& getMeaning(const Ucd* u) const { return u ? u->meaning() : Ucd::EmptyString; }
 
   // 'getReadingsAsKana' returns string starting with 'onReading' converted Katakana followed
   // by 'kunReading' converted to Hiragana

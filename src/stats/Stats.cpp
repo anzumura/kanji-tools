@@ -21,7 +21,8 @@ std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
   return os;
 }
 
-constexpr auto HelpMessage = "\
+constexpr auto HelpMessage =
+  "\
 kanjiStats [-bhv] file [file ...]:\n\
   -b: show full kanji breakdown for 'file' (instead of just a summary)\n\
   -h: show help message for command-line options\n\
@@ -61,8 +62,7 @@ Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
     } else
       files.push_back(arg);
   if (!data->debug() && files.empty()) Data::usage("please specify at least one option or '-h' for help");
-  for (auto& i : files)
-    countKanji(i, breakdown, verbose);
+  for (auto& i : files) countKanji(i, breakdown, verbose);
 }
 
 void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
@@ -79,8 +79,7 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
                     f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
   int total = 0;
-  for (int i = 0; i < IncludeInTotals; ++i)
-    total += totals[i].first;
+  for (int i = 0; i < IncludeInTotals; ++i) total += totals[i].first;
   log() << "Total Kanji+Kana: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);

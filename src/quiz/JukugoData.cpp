@@ -27,12 +27,10 @@ JukugoData::JukugoData(const Data& data) {
     data.log() << "Total Kanji with Jukugo: " << _kanjiToJukugo.size() << ", unique jukugo: " << _uniqueJukugo.size()
                << '\n';
     std::map<KanjiTypes, std::vector<std::string>> types;
-    for (auto& i : _kanjiToJukugo)
-      types[data.getType(i.first)].push_back(i.first);
+    for (auto& i : _kanjiToJukugo) types[data.getType(i.first)].push_back(i.first);
     for (auto& i : types) {
       data.out() << std::right << std::setw(14) << i.first << ": " << i.second.size() << ' ';
-      for (int j = 0; j < i.second.size() && j < 12; ++j)
-        data.out() << (j == 0 ? '(' : ' ') << i.second[j];
+      for (int j = 0; j < i.second.size() && j < 12; ++j) data.out() << (j == 0 ? '(' : ' ') << i.second[j];
       data.out() << ")\n";
     }
   }

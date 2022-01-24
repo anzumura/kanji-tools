@@ -249,9 +249,9 @@ private:
   // The last list is one longer in order to hold the full frequency list (of 2501 kanji).
   std::array<List, FrequencyBuckets> _frequencies;
 
-  Map _kanjiNameMap;                 // allow lookup by UTF-8 name
+  Map _kanjiNameMap;                         // allow lookup by UTF-8 name
   std::map<std::string, List> _morohashiMap; // allow lookup by Dai Kan-Wa Jiten index number (aka Morohashi ID)
-  std::map<int, List> _nelsonMap;    // allow lookup by Nelson ID
+  std::map<int, List> _nelsonMap;            // allow lookup by Nelson ID
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji put into '_kanjiNameMap'
   inline static int _maxFrequency = 0;

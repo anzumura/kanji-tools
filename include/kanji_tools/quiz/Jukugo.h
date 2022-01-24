@@ -7,7 +7,8 @@ namespace kanji_tools {
 
 class Jukugo {
 public:
-  Jukugo(const std::string& name, const std::string& reading, KanjiGrades grade) : _name(name), _reading(reading), _grade(grade) {}
+  Jukugo(const std::string& name, const std::string& reading, KanjiGrades grade)
+    : _name(name), _reading(reading), _grade(grade) {}
 
   const std::string& name() const { return _name; }
   const std::string& reading() const { return _reading; }

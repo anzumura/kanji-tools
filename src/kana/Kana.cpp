@@ -136,11 +136,10 @@ const std::string& Kana::get(CharType t, int flags) const {
 }
 
 void Kana::validate() const {
-  for (auto& i : _romajiVariants)
-    assert(!i.empty() && i.length() < 4);                     // must be 1 to 3 chars
-  assert(!_romaji.empty() && _romaji.length() < 4);           // must be 1 to 3 chars
-  assert(_hiragana.length() == 3 || _hiragana.length() == 6); // 3 bytes per character
-  assert(_katakana.length() == 3 || _katakana.length() == 6); // 3 bytes per characer
+  for (auto& i : _romajiVariants) assert(!i.empty() && i.length() < 4); // must be 1 to 3 chars
+  assert(!_romaji.empty() && _romaji.length() < 4);                     // must be 1 to 3 chars
+  assert(_hiragana.length() == 3 || _hiragana.length() == 6);           // 3 bytes per character
+  assert(_katakana.length() == 3 || _katakana.length() == 6);           // 3 bytes per characer
   assert(isAllSingleByte(_romaji));
   assert(isAllHiragana(_hiragana));
   assert(isAllKatakana(_katakana));
@@ -159,16 +158,14 @@ Kana::Map Kana::populate(CharType t) {
     switch (t) {
     case CharType::Romaji:
       insert(k.romaji(), k);
-      for (auto& i : k.romajiVariants())
-        insert(i, k);
+      for (auto& i : k.romajiVariants()) insert(i, k);
       break;
     case CharType::Hiragana: insert(k.hiragana(), k); break;
     case CharType::Katakana: insert(k.katakana(), k); break;
     }
   };
   // process lists (inserting into 'result')
-  for (auto& i : KanaList)
-    processKana(i);
+  for (auto& i : KanaList) processKana(i);
   for (auto& i : DakutenKanaList) {
     processKana(i);
     processKana(*i.dakutenKana());

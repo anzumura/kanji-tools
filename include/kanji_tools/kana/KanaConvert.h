@@ -95,8 +95,8 @@ private:
   bool romajiTarget() const { return _target == CharType::Romaji; }
   bool hiraganaTarget() const { return _target == CharType::Hiragana; }
   const std::string& get(const Kana& k) const { return k.get(_target, _flags); }
-  const std::string& getN() const { return get(Kana::N); } 
-  const std::string& getSmallTsu() const { return get(Kana::SmallTsu); } 
+  const std::string& getN() const { return get(Kana::N); }
+  const std::string& getSmallTsu() const { return get(Kana::SmallTsu); }
 
   using Set = std::set<std::string>;
 

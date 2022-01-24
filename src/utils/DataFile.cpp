@@ -20,8 +20,7 @@ void DataFile::print(const List& l, const std::string& type, const std::string& 
     std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
     if (!group.empty()) std::cout << " in " << group;
     std::cout << ':';
-    for (const auto& i : l)
-      std::cout << ' ' << i;
+    for (const auto& i : l) std::cout << ' ' << i;
     std::cout << '\n';
   }
 }
@@ -67,15 +66,13 @@ DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUnique
       error("found " + std::to_string(dups.size()) + " duplicates in " + _name, false);
     else {
       std::cerr << ">>> found " << dups.size() << " duplicates in " << _name << ":";
-      for (const auto& i : dups)
-        std::cerr << ' ' << i;
+      for (const auto& i : dups) std::cerr << ' ' << i;
       if (createNewUniqueFile) {
         fs::path newFile(file);
         newFile.replace_extension(fs::path("new"));
         std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
         std::ofstream of(newFile);
-        for (const auto& i : good)
-          of << i << '\n';
+        for (const auto& i : good) of << i << '\n';
       }
     }
   }

@@ -63,15 +63,13 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out, std::ostrea
   populateJouyou();
   populateJinmei();
   populateExtra();
-  for (auto& i : _levels)
-    processList(i);
+  for (auto& i : _levels) processList(i);
   // Process '_frequency' before '_kyus' in order to create 'Frequency' type first before creating
   // 'Kentei' kanji. This way, the 'Frequency' type is more meaningful since it indicates kanji
   // in the top 2501 frequency list, but not in the other more official types like Jouyou or Jinmei.
   // 'Kentei' has many rare kanji so keep it as the last type to be processed (before UcdKanji).
   processList(_frequency);
-  for (auto& i : _kyus)
-    processList(i);
+  for (auto& i : _kyus) processList(i);
   processUcd();
   checkStrokes();
   if (debug()) {
@@ -131,8 +129,7 @@ template<typename T> void KanjiData::printCount(const std::string& name, T pred,
     log() << name << ' ' << total << " (";
     for (const auto& i : counts) {
       out() << i.first << ' ' << i.second;
-      for (const auto& j : examples[i.first])
-        out() << ' ' << j;
+      for (const auto& j : examples[i.first]) out() << ' ' << j;
       total -= i.second;
       if (total) out() << ", ";
     }

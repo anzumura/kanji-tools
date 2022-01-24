@@ -34,8 +34,7 @@ public:
   // should be called after loading all lists to clean up unneeded static data
   static void clearUniqueCheckData() {
     UniqueNames.clear();
-    for (auto i : OtherUniqueNames)
-      i->clear();
+    for (auto i : OtherUniqueNames) i->clear();
   }
 
   enum class FileType { MultiplePerLine, OnePerLine };
@@ -60,8 +59,7 @@ public:
     std::string result;
     // reserve for efficiency - make a guess that each entry in the list is a 3 byte utf8 character
     result.reserve(_list.size() * 3);
-    for (const auto& i : _list)
-      result += i;
+    for (const auto& i : _list) result += i;
     return result;
   }
 protected:

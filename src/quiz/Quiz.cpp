@@ -20,8 +20,7 @@ Quiz::~Quiz() {
       if (int skipped = _question - _correctAnswers - _mistakes.size(); skipped) out() << ", skipped: " << skipped;
       if (!_mistakes.empty()) {
         out() << " - mistakes:";
-        for (auto& i : _mistakes)
-          out() << ' ' << i;
+        for (auto& i : _mistakes) out() << ' ' << i;
       }
       out() << '\n';
     }

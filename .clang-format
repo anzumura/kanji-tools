@@ -1,0 +1,17 @@
+---
+Language: Cpp
+BasedOnStyle: Google
+
+# changes from google style
+AlignOperands: false
+AlwaysBreakTemplateDeclarations: MultiLine
+AllowShortCaseLabelsOnASingleLine: true
+AccessModifierOffset: -2
+ColumnLimit: 120
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+EmptyLineBeforeAccessModifier: Never
+IndentCaseLabels: false
+SpaceAfterTemplateKeyword: false
+SpacesBeforeTrailingComments: 1

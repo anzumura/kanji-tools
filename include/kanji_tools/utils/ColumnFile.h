@@ -67,9 +67,7 @@ public:
 
   // 'error' throws a 'domain_error' exception with 'what' string made from 'msg' plus '_name'.
   // '_currentRow' is also added if it's not zero.
-  void error(const std::string& msg) const {
-    throw std::domain_error(errorMsg(msg));
-  }
+  void error(const std::string& msg) const { throw std::domain_error(errorMsg(msg)); }
 
   // 'error' overload for reporting a problem with a specific value for a column
   void error(const std::string& msg, const Column& c, const std::string& s) const {

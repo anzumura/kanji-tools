@@ -30,10 +30,10 @@ enum class BracketType { Curly, Round, Square, None };
 
 inline std::string addBrackets(const std::string& s, BracketType t) {
   switch (t) {
-    case BracketType::Curly: return '{' + s + '}';
-    case BracketType::Round: return '(' + s + ')';
-    case BracketType::Square: return '[' + s + ']';
-    default: break;
+  case BracketType::Curly: return '{' + s + '}';
+  case BracketType::Round: return '(' + s + ')';
+  case BracketType::Square: return '[' + s + ']';
+  default: break;
   }
   return s;
 }

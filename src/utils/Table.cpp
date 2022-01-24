@@ -17,8 +17,7 @@ void Table::add(const Row& row, bool startNewSection) {
 
 void Table::print(std::ostream& os) const {
   std::vector<int> widths;
-  for (auto& i : _title)
-    widths.push_back(displayLength(i));
+  for (auto& i : _title) widths.push_back(displayLength(i));
   for (auto& row : _rows) {
     for (int colNum = 0; colNum < row.size(); ++colNum) {
       if (colNum < widths.size())
@@ -40,8 +39,7 @@ void Table::print(std::ostream& os) const {
 
 void Table::printMarkdown(std::ostream& os) const {
   size_t maxColumns = _title.size();
-  for (auto& i : _rows)
-    maxColumns = std::max(maxColumns, i.size());
+  for (auto& i : _rows) maxColumns = std::max(maxColumns, i.size());
   auto printRow = [&os, maxColumns](const Row& r, bool header = false, bool section = false) {
     for (int i = 0; i < maxColumns; ++i) {
       os << "| ";
@@ -68,8 +66,7 @@ void Table::printMarkdown(std::ostream& os) const {
     // print _title even if it's empty (which will just make and empty set of headers).
     printRow(_title);
     printRow({}, true);
-    for (int i = 0; i < _rows.size(); ++i)
-      printRow(_rows[i], false, _sections.contains(i));
+    for (int i = 0; i < _rows.size(); ++i) printRow(_rows[i], false, _sections.contains(i));
   }
 }
 

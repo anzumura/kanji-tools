@@ -14,8 +14,7 @@ Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes kanjiType, con
   }
   columns.insert(columns.end(), RequiredColumns.begin(), RequiredColumns.end());
   Data::List results;
-  for (ColumnFile f(file, columns); f.nextRow();)
-    switch (kanjiType) {
+  for (ColumnFile f(file, columns); f.nextRow();) switch (kanjiType) {
     case KanjiTypes::Jouyou: results.push_back(std::make_shared<JouyouKanji>(data, f)); break;
     case KanjiTypes::Jinmei: results.push_back(std::make_shared<JinmeiKanji>(data, f)); break;
     default: results.push_back(std::make_shared<ExtraKanji>(data, f)); break;
@@ -26,8 +25,7 @@ Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes kanjiType, con
 Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
   LinkNames result;
   std::stringstream ss(f.get(OldNamesCol));
-  for (std::string token; std::getline(ss, token, ',');)
-    result.push_back(token);
+  for (std::string token; std::getline(ss, token, ',');) result.push_back(token);
   return result;
 }
 

@@ -1,6 +1,5 @@
 #include <kanji_tools/utils/Choice.h>
 #include <kanji_tools/utils/MBUtils.h>
-
 #include <termios.h>
 #include <unistd.h>
 
