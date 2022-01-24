@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/utils/MBChar.h>
 
@@ -132,8 +131,7 @@ TEST(KanaTest, CheckRomaji) {
     auto count = [&i](auto& normal, auto& variant) { i.second->romaji() == i.first ? ++normal : ++variant; };
     ASSERT_FALSE(i.first.empty());
     EXPECT_LT(i.first.length(), 4);
-    for (auto& j : i.second->romajiVariants())
-      romajiVariants.insert(j);
+    for (auto& j : i.second->romajiVariants()) romajiVariants.insert(j);
     if (i.first == "n")
       ++nNum;
     else

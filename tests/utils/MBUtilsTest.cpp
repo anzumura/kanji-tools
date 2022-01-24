@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/utils/MBUtils.h>
 
 namespace kanji_tools {
@@ -24,8 +23,7 @@ TEST(MBUtilsTest, FromUTF8CharArray) {
   EXPECT_EQ(w[0], L'\ufffc');
   auto r = toUtf8(w);
   ASSERT_EQ(r.length(), std::size(s) - 1);
-  for (int i = 0; i < std::size(s) - 1; ++i)
-    EXPECT_EQ(r[i], s[i]);
+  for (int i = 0; i < std::size(s) - 1; ++i) EXPECT_EQ(r[i], s[i]);
 }
 
 TEST(MBUtilsTest, ToHex) {

@@ -1,6 +1,5 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/kanji/UcdFileKanji.h>
@@ -182,7 +181,8 @@ TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
 }
 
 TEST_F(KanjiTest, ExtraFile) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
 1\t霙\t雨\t16\tsleet\tエイ、ヨウ、みぞれ");
   EXPECT_CALL(_data, getKyu(_)).WillOnce(Return(KenteiKyus::K1));
@@ -194,7 +194,8 @@ Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
 }
 
 TEST_F(KanjiTest, ExtraFileWithDifferentColumnOrder) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   EXPECT_CALL(_data, getKyu(_)).WillOnce(Return(KenteiKyus::K1));
@@ -206,7 +207,8 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 }
 
 TEST_F(KanjiTest, ExtraFileWithUnrecognizedColumn) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   try {
@@ -220,7 +222,8 @@ Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
 }
 
 TEST_F(KanjiTest, ExtraFileWithDuplicateColumn) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   try {
@@ -234,7 +237,8 @@ Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
 }
 
 TEST_F(KanjiTest, ExtraFileWithToManyColumns) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16\t16");
   try {
@@ -248,7 +252,8 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 }
 
 TEST_F(KanjiTest, ExtraFileWithNotEnoughColumns) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ");
   try {
@@ -262,7 +267,8 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 }
 
 TEST_F(KanjiTest, ExtraFileWithInvalidData) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\ta\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   EXPECT_CALL(_data, getKyu(_)).WillOnce(Return(KenteiKyus::K1));
@@ -280,7 +286,8 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 }
 
 TEST_F(KanjiTest, JinmeiFile) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 7\t云\t二\t\t2004\tPrint\tウン、い-う、ここに\n\
 8\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
@@ -313,7 +320,8 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 }
 
 TEST_F(KanjiTest, LinkedJinmei) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 1\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
   EXPECT_CALL(_data, getLevel("亘")).WillOnce(Return(JlptLevels::N1));
@@ -352,7 +360,8 @@ TEST_F(KanjiTest, BadLinkedJinmei) {
 }
 
 TEST_F(KanjiTest, JinmeiFileWithMissingReason) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Number\tName\tRadical\tOldNames\tYear\tReading\n\
 1\t亘\t二\t亙\t1951\tコウ、カン、わた-る、もと-める");
   try {
@@ -366,7 +375,8 @@ Number\tName\tRadical\tOldNames\tYear\tReading\n\
 }
 
 TEST_F(KanjiTest, JouyouFile) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 4\t愛\t心\t\t\t13\t4\tlove\tアイ\n\
 103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
@@ -428,7 +438,8 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 }
 
 TEST_F(KanjiTest, LinkedOld) {
-  writeTestFile("\
+  writeTestFile(
+    "\
 Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
   EXPECT_CALL(_data, getLevel("艶")).WillOnce(Return(JlptLevels::N1));

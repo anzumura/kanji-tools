@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/utils/DisplayLength.h>
 
 namespace kanji_tools {

@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
@@ -88,8 +87,7 @@ TEST_F(QuizTest, ListQuiz) {
   gradeListQuiz();
   startQuiz();
   std::string line, lastLine;
-  while (std::getline(_os, line))
-    lastLine = line;
+  while (std::getline(_os, line)) lastLine = line;
   // test the last (non-eof) line sent to _os
   EXPECT_EQ(lastLine, "Final score: 0/0");
   // should be nothing sent to _es (for errors) and nothing left in _is
@@ -193,15 +191,13 @@ TEST_F(QuizTest, LevelLists) {
 TEST_F(QuizTest, SkipListQuestions) {
   for (int i = 2; i < 4; ++i) {
     gradeListQuiz();
-    for (int j = 0; j < i; ++j)
-      skip();
+    for (int j = 0; j < i; ++j) skip();
     startQuiz();
     // make sure _os is in expected 'good' state
     EXPECT_TRUE(_os.good());
     EXPECT_FALSE(_os.eof() || _os.fail() || _os.bad());
     std::string line, lastLine;
-    while (std::getline(_os, line))
-      lastLine = line;
+    while (std::getline(_os, line)) lastLine = line;
     // make sure _os is in expected 'eof' state
     EXPECT_TRUE(_os.eof() && _os.fail());
     EXPECT_FALSE(_os.good() || _os.bad());
@@ -236,8 +232,7 @@ TEST_F(QuizTest, GroupQuiz) {
   meaningGroupQuiz();
   startQuiz();
   std::string line, lastLine;
-  while (std::getline(_os, line))
-    lastLine = line;
+  while (std::getline(_os, line)) lastLine = line;
   // test the line sent to _os
   EXPECT_EQ(lastLine, "Final score: 0/0");
   // should be nothing sent to _es (for errors) and nothing left in _is
@@ -248,12 +243,10 @@ TEST_F(QuizTest, GroupQuiz) {
 TEST_F(QuizTest, SkipGroupQuestions) {
   for (int i = 2; i < 4; ++i) {
     meaningGroupQuiz();
-    for (int j = 0; j < i; ++j)
-      skip();
+    for (int j = 0; j < i; ++j) skip();
     startQuiz();
     std::string line, lastLine;
-    while (std::getline(_os, line))
-      lastLine = line;
+    while (std::getline(_os, line)) lastLine = line;
     auto expected = "Final score: 0/" + std::to_string(i) + ", skipped: " + std::to_string(i);
     EXPECT_EQ(lastLine, expected);
   }

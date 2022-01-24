@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/GroupData.h>
 

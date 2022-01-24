@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/utils/Choice.h>
 
 #include <sstream>
@@ -312,8 +311,7 @@ TEST_F(ChoiceTest, MissingDefaultOption) {
 
 TEST_F(ChoiceTest, DuplicateQuitOption) {
   _choice.setQuit('q');
-  for (bool useQuit : {false, true})
-    try {
+  for (bool useQuit : {false, true}) try {
       _choice.get("", useQuit, {{'q', "abc"}});
       FAIL() << "Expected std::domain_error";
     } catch (std::domain_error& err) {
@@ -326,8 +324,7 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
 TEST_F(ChoiceTest, DuplicateRangeOption) {
   Choice::Choices choices = {{'a', "12"}, {'c', "34"}};
   const std::string start("range option '"), end("' already in choices");
-  for (char rangeStart : {'a', 'b'})
-    try {
+  for (char rangeStart : {'a', 'b'}) try {
       _choice.get("", rangeStart, 'c', choices);
       FAIL() << "Expected std::domain_error";
     } catch (std::domain_error& err) {

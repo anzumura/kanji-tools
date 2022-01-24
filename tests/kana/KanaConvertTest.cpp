@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/kana/KanaConvert.h>
 

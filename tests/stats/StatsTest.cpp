@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/stats/Stats.h>
@@ -87,8 +86,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   Stats stats(std::size(testArgs), testArgs, _data);
   std::string line;
   bool found = false;
-  while (!found && std::getline(_os, line))
-    found = line.starts_with(">>> Stats for: wiki-articles (3 files)");
+  while (!found && std::getline(_os, line)) found = line.starts_with(">>> Stats for: wiki-articles (3 files)");
   EXPECT_TRUE(found);
 }
 

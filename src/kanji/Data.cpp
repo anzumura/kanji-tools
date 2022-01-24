@@ -31,8 +31,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss(s);
     int id;
-    while (ss >> id)
-      ids.push_back(id);
+    while (ss >> id) ids.push_back(id);
     return ids;
   }
   return _emptyNelsonIds;
@@ -109,8 +108,7 @@ bool Data::checkInsert(const Entry& kanji) {
   if (kanji->variant() && !_compatibilityMap.insert({kanji->compatibilityName(), kanji->name()}).second)
     printError("failed to insert variant " + kanji->name() + " into map");
   if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
-  for (int id : kanji->nelsonIds())
-    _nelsonMap[id].push_back(kanji);
+  for (int id : kanji->nelsonIds()) _nelsonMap[id].push_back(kanji);
   return true;
 }
 
@@ -210,16 +208,14 @@ void Data::populateJinmei() {
   auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Jinmei, DataFile::getFile(_dataDir, JinmeiFile));
   for (auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei]; const auto& i : results) {
     checkInsert(i);
-    for (auto& j : i->oldNames())
-      checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
+    for (auto& j : i->oldNames()) checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
   }
   _types.emplace(KanjiTypes::Jinmei, std::move(results));
 }
 
 void Data::populateExtra() {
   auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Extra, DataFile::getFile(_dataDir, ExtraFile));
-  for (const auto& i : results)
-    checkInsert(i);
+  for (const auto& i : results) checkInsert(i);
   _types.emplace(KanjiTypes::Extra, std::move(results));
 }
 
@@ -271,8 +267,7 @@ void Data::processList(const DataFile& list) {
                            std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
       for (const auto& i : lists) {
         DataFile::List jlptJinmei, otherJinmei;
-        for (const auto& j : *i.first)
-          (toBool(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
+        for (const auto& j : *i.first) (toBool(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
         DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", list.name());
         DataFile::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", list.name());
       }

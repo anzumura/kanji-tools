@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
-
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/MBChar.h>
 
 #include <type_traits>
 
@@ -64,8 +63,7 @@ TEST(DataTest, NextArgWithMultipleArgs) {
   const char* argv[] = {arg0, arg1, debugArg, arg3, dataArg, dataDir, arg6};
   int argc = std::size(argv);
   std::vector<const char*> actualArgs;
-  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
-    actualArgs.push_back(argv[i]);
+  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) actualArgs.push_back(argv[i]);
   EXPECT_EQ(actualArgs, std::vector<const char*>({arg1, arg3, arg6}));
 }
 
@@ -233,8 +231,7 @@ TEST_F(KanjiDataTest, FindChecks) {
   ASSERT_FALSE(_data.findKanjiByFrequency(-1));
   ASSERT_FALSE(_data.findKanjiByFrequency(0));
   ASSERT_FALSE(_data.findKanjiByFrequency(2502));
-  for (int i = 1; i < 2502; ++i)
-    ASSERT_TRUE(_data.findKanjiByFrequency(i));
+  for (int i = 1; i < 2502; ++i) ASSERT_TRUE(_data.findKanjiByFrequency(i));
   EXPECT_EQ((**_data.findKanjiByFrequency(1)).name(), "日");
   EXPECT_EQ((**_data.findKanjiByFrequency(2001)).name(), "炒");
   EXPECT_EQ((**_data.findKanjiByFrequency(2501)).name(), "蝦");

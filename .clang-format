@@ -3,7 +3,7 @@ Language: Cpp
 # Run 'clang-format -style=google -dump-config > .clang-format' to see defaults
 BasedOnStyle: Google
 
-# Override the (google style) defaults for the following attributes
+# Override the (google style) values for the following options
 AccessModifierOffset: -2
 AlignOperands: false
 AllowShortCaseLabelsOnASingleLine: true
