@@ -1,12 +1,13 @@
----
 Language: Cpp
+
+# Run 'clang-format -style=google -dump-config > .clang-format' to see defaults
 BasedOnStyle: Google
 
-# changes from google style
-AlignOperands: false
-AlwaysBreakTemplateDeclarations: MultiLine
-AllowShortCaseLabelsOnASingleLine: true
+# Override the (google style) defaults for the following attributes
 AccessModifierOffset: -2
+AlignOperands: false
+AllowShortCaseLabelsOnASingleLine: true
+AlwaysBreakTemplateDeclarations: MultiLine
 ColumnLimit: 120
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 2
