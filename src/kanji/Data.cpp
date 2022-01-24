@@ -19,6 +19,14 @@ const fs::path ExtraFile = "extra.txt";
 
 } // namespace
 
+Data::Data(const std::filesystem::path& dataDir, DebugMode debugMode, std::ostream& out, std::ostream& err)
+  : _dataDir(dataDir), _debugMode(debugMode), _out(out), _err(err) {
+  // Clearing DataFile static data is only needed to help test code, for example DataFile tests can leave some
+  // data in these sets before Quiz tests are run (leading to problems loading real files).
+  DataFile::clearUniqueCheckData();
+  if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
+}
+
 KanjiTypes Data::getType(const std::string& name) const {
   auto i = findKanjiByName(name);
   return i ? (**i).type() : KanjiTypes::None;
@@ -73,7 +81,7 @@ Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
     if (result != DebugMode::None) usage("can only specify one '-debug' or '-info' option");
     result = x;
   };
-  for (int i = 1; i < argc; ++i)
+  for (auto i = 1; i < argc; ++i)
     if (argv[i] == debugArg)
       setResult(DebugMode::Full);
     else if (argv[i] == infoArg)
@@ -82,7 +90,7 @@ Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
 }
 
 int Data::nextArg(int argc, const char** argv, int currentArg) {
-  int result = currentArg + 1;
+  auto result = currentArg + 1;
   if (result < argc) {
     std::string arg = argv[result];
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't followed
@@ -108,7 +116,7 @@ bool Data::checkInsert(const Entry& kanji) {
   if (kanji->variant() && !_compatibilityMap.insert({kanji->compatibilityName(), kanji->name()}).second)
     printError("failed to insert variant " + kanji->name() + " into map");
   if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
-  for (int id : kanji->nelsonIds()) _nelsonMap[id].push_back(kanji);
+  for (auto id : kanji->nelsonIds()) _nelsonMap[id].push_back(kanji);
   return true;
 }
 
@@ -140,7 +148,7 @@ void Data::insertSanityChecks(const Entry& kanji) const {
 }
 
 void Data::printError(const std::string& msg) const {
-  static int count = 0;
+  static auto count = 0;
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- " << msg << std::setfill(' ') << '\n';
 }
 
@@ -224,7 +232,7 @@ void Data::processList(const DataFile& list) {
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
-  for (int i = 0; i < list.list().size(); ++i) {
+  for (auto i = 0; i < list.list().size(); ++i) {
     const auto& name = list.list()[i];
     Entry kanji;
     if (auto j = findKanjiByName(name); j) {
@@ -289,8 +297,8 @@ void Data::processUcd() {
 void Data::checkStrokes() const {
   DataFile::List strokesFrequency, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
   for (const auto& i : _strokes) {
-    const Ucd* u = findUcd(i.first);
-    const int ucdStrokes = getStrokes(i.first, u, false, true);
+    auto u = findUcd(i.first);
+    const auto ucdStrokes = getStrokes(i.first, u, false, true);
     auto k = findKanjiByName(i.first);
     if (ucdStrokes) {
       // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,

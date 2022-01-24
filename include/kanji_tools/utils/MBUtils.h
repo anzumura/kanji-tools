@@ -111,22 +111,22 @@ inline bool isSingleByte(const std::wstring& s, bool checkLengthOne = true) noex
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
 inline bool isAllSingleByte(const std::string& s) noexcept {
-  for (auto& i : s)
+  for (auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
 inline bool isAllSingleByte(const std::wstring& s) noexcept {
-  for (auto& i : s)
+  for (auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
 inline bool isAnySingleByte(const std::string& s) noexcept {
-  for (auto& i : s)
+  for (auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;
 }
 inline bool isAnySingleByte(const std::wstring& s) noexcept {
-  for (auto& i : s)
+  for (auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;
 }

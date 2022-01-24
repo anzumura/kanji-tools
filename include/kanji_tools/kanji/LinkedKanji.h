@@ -12,9 +12,9 @@ public:
   const std::string& meaning() const override { return _link->meaning(); }
   const std::string& reading() const override { return _link->reading(); }
   OptString newName() const override { return _link->name(); }
-
-  const Data::Entry& link() const { return _link; }
   bool linkedReadings() const override { return true; }
+
+  auto& link() const { return _link; }
 protected:
   LinkedKanji(const Data& d, const std::string& name, const Data::Entry& link, const Ucd* u)
     : Kanji(name, d.getCompatibilityName(name), d.ucdRadical(name, u), d.getStrokes(name, u), d.getMorohashiId(u),
@@ -22,7 +22,7 @@ protected:
       _frequency(d.getFrequency(name)), _kyu(d.getKyu(name)), _link(link) {}
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
-  static const std::string& checkType(const std::string& name, const Data::Entry& link, bool isJinmei = false) {
+  static auto& checkType(const std::string& name, const Data::Entry& link, bool isJinmei = false) {
     KanjiTypes t = link->type();
     if (t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
       throw std::domain_error("LinkedKanji " + name + " wanted type '" + toString(KanjiTypes::Jouyou) +

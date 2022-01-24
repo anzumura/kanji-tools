@@ -23,10 +23,10 @@ public:
   public:
     Column(const std::string& name) : _name(name), _number(ColumnFile::getColumnNumber(name)) {}
 
-    bool operator==(const Column& rhs) const { return _number == rhs._number; }
+    auto operator==(const Column& rhs) const { return _number == rhs._number; }
 
-    const std::string& name() const { return _name; }
-    int number() const { return _number; }
+    auto& name() const { return _name; }
+    auto number() const { return _number; }
   private:
     std::string _name;
     int _number; // globally unique number per column based on '_name'
@@ -48,7 +48,7 @@ public:
   // 'nextRow' hasn't been called yet or if the given column was not passed in to the constructor.
   const std::string& get(const Column&) const;
 
-  bool isEmpty(const Column& column) const { return get(column).empty(); }
+  auto isEmpty(const Column& column) const { return get(column).empty(); }
 
   // 'getInt' convert to 'int' or calls 'error'
   int getInt(const Column&) const;
@@ -59,11 +59,11 @@ public:
   // 'getBool' converts 'Y' or 'T' to true, 'N' or 'F' (or empty) to false or calls 'error'
   bool getBool(const Column&) const;
 
-  // 'getWchar' converts from Unicode (4 or 5 hex code) or calls 'error'
-  wchar_t getWChar(const Column& c) const { return getWChar(c, get(c)); }
-
   // 'getWChar' overload for a specific value 's' (can be used for columns with multiple values)
   wchar_t getWChar(const Column&, const ::std::string& s) const;
+
+  // 'getWchar' converts from Unicode (4 or 5 hex code) or calls 'error'
+  auto getWChar(const Column& c) const { return getWChar(c, get(c)); }
 
   // 'error' throws a 'domain_error' exception with 'what' string made from 'msg' plus '_name'.
   // '_currentRow' is also added if it's not zero.
@@ -74,9 +74,9 @@ public:
     throw std::domain_error(errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'");
   }
 
-  int columns() const { return _rowValues.size(); }
-  int currentRow() const { return _currentRow; }
-  const std::string& name() const { return _name; }
+  auto columns() const { return _rowValues.size(); }
+  auto currentRow() const { return _currentRow; }
+  auto& name() const { return _name; }
 private:
   // 'getColumnNumber' is used by 'Column' class constructor
   static int getColumnNumber(const std::string& name);
@@ -88,7 +88,7 @@ private:
   void verifyHeaderColumns(const ColNames&) const;
 
   std::string errorMsg(const std::string& msg) const {
-    std::string result = msg + " - file: " + _name;
+    auto result = msg + " - file: " + _name;
     if (_currentRow) result += ", row: " + std::to_string(_currentRow);
     return result;
   }

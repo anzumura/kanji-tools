@@ -16,14 +16,14 @@ public:
     : _number(number), _name(name), _altForms(altForms), _longName(longName), _reading(reading) {}
   Radical(const Radical&) = default;
   Radical& operator=(const Radical&) = default;
-  bool operator==(const Radical& rhs) const { return _number == rhs._number; }
-  bool operator<(const Radical& rhs) const { return _number < rhs._number; }
+  auto operator==(const Radical& rhs) const { return _number == rhs._number; }
+  auto operator<(const Radical& rhs) const { return _number < rhs._number; }
 
-  int number() const { return _number; }
-  const std::string& name() const { return _name; }
-  const AltForms& altForms() const { return _altForms; }
-  const std::string& longName() const { return _longName; }
-  const std::string& reading() const { return _reading; }
+  auto number() const { return _number; }
+  auto& name() const { return _name; }
+  auto& altForms() const { return _altForms; }
+  auto& longName() const { return _longName; }
+  auto& reading() const { return _reading; }
 private:
   int _number;
   std::string _name;
@@ -32,7 +32,7 @@ private:
   std::string _reading;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Radical& r) {
+inline auto& operator<<(std::ostream& os, const Radical& r) {
   return os << '[' << std::right << std::setfill('0') << std::setw(3) << r.number() << "] " << r.name();
 }
 

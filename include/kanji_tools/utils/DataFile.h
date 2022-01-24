@@ -14,7 +14,7 @@ namespace kanji_tools {
 
 // 'secondLast' is a helper function to get the second last value of an array (useful for AllKanjiTypes,
 // AllKanjiGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
-template<typename T, size_t S> constexpr inline T secondLast(const std::array<T, S>& x) {
+template<typename T, size_t S> constexpr inline auto secondLast(const std::array<T, S>& x) {
   static_assert(S > 1);
   return x[S - 2];
 }
@@ -44,22 +44,22 @@ public:
     : DataFile(p, FileType::OnePerLine, createNewUniqueFile, nullptr) {}
   DataFile(const DataFile&) = delete;
 
-  bool exists(const std::string& s) const { return _map.find(s) != _map.end(); }
-  int get(const std::string& name) const {
+  auto exists(const std::string& s) const { return _map.find(s) != _map.end(); }
+  auto get(const std::string& name) const {
     auto i = _map.find(name);
     return i != _map.end() ? i->second : 0;
   }
-  const std::string& name() const { return _name; }
+  auto& name() const { return _name; }
   virtual JlptLevels level() const { return JlptLevels::None; }
   virtual KenteiKyus kyu() const { return KenteiKyus::None; }
-  const List& list() const { return _list; }
-  int size() const { return _list.size(); }
+  auto& list() const { return _list; }
+  auto size() const { return _list.size(); }
   // 'toString' returns the full contents of this list into a string (with no separates)
-  std::string toString() const {
+  auto toString() const {
     std::string result;
     // reserve for efficiency - make a guess that each entry in the list is a 3 byte utf8 character
     result.reserve(_list.size() * 3);
-    for (const auto& i : _list) result += i;
+    for (auto& i : _list) result += i;
     return result;
   }
 protected:
@@ -103,7 +103,7 @@ public:
   KenteiKyus kyu() const override { return _type; }
 };
 
-inline std::string capitalize(const std::string& s) {
+inline auto capitalize(const std::string& s) {
   if (s.length() && std::islower(s[0])) {
     std::string result(s);
     result[0] = std::toupper(result[0]);

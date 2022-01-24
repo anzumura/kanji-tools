@@ -27,17 +27,17 @@ public:
   // can also be provided (values depend on quiz type - see Quiz.cpp 'HelpMessage' for details).
   void start(OptChar quizType, OptChar questionList, int question = 0, bool showMeanings = false);
 
-  std::ostream& log(bool heading = false) const { return data().log(heading); }
-  std::ostream& out() const { return data().out(); }
+  auto& log(bool heading = false) const { return data().log(heading); }
+  auto& out() const { return data().out(); }
 
   enum class ProgramMode { Review, Test, NotAssigned };
   enum class QuestionOrder { FromBeginning, FromEnd, Random, NotAssigned };
 
-  bool isTestMode() const { return _programMode == ProgramMode::Test; }
-  QuestionOrder questionOrder() const { return _questionOrder; }
-  const Choice& choice() const { return _choice; }
-  bool isQuit(char c) const { return _choice.isQuit(c); }
-  const GroupData& groupData() const { return _groupData; }
+  auto isTestMode() const { return _programMode == ProgramMode::Test; }
+  auto questionOrder() const { return _questionOrder; }
+  auto& choice() const { return _choice; }
+  auto isQuit(char c) const { return _choice.isQuit(c); }
+  auto& groupData() const { return _groupData; }
 
   void printExtraTypeInfo(const Entry&) const;
   void printLegend(int infoFields = Kanji::AllFields) const;

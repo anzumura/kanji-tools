@@ -54,30 +54,30 @@ public:
   // - Jinmei: adds the year the kanji was added as well as the 'reason' (see JinmeiKanji class)
   virtual OptString extraTypeInfo() const { return std::nullopt; }
 
-  const std::string& name() const { return _name; }
+  auto& name() const { return _name; }
 
   // 'variant' is true if _name includes a Unicode 'variation selector'. In this case 'nonVariantName'
   // returns the non-variant name and 'compatibilityName' returns the UCD 'compatibility' code (which
   // is a single MB char without a variation selector).
-  bool variant() const { return _nonVariantName.has_value(); }
-  std::string nonVariantName() const { return _nonVariantName.value_or(_name); }
-  std::string compatibilityName() const { return _compatibilityName.value_or(_name); }
+  auto variant() const { return _nonVariantName.has_value(); }
+  auto nonVariantName() const { return _nonVariantName.value_or(_name); }
+  auto compatibilityName() const { return _compatibilityName.value_or(_name); }
 
-  int frequencyOrDefault(int x) const { return frequency().value_or(x); }
-  int frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
-  const OptString& morohashiId() const { return _morohashiId; }
-  const NelsonIds& nelsonIds() const { return _nelsonIds; }
-  const OptString& pinyin() const { return _pinyin; }
-  const Radical& radical() const { return _radical; }
-  int strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
+  auto frequencyOrDefault(int x) const { return frequency().value_or(x); }
+  auto frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
+  auto& morohashiId() const { return _morohashiId; }
+  auto& nelsonIds() const { return _nelsonIds; }
+  auto& pinyin() const { return _pinyin; }
+  auto& radical() const { return _radical; }
+  auto strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
 
-  bool is(KanjiTypes t) const { return type() == t; }
-  bool hasGrade() const { return toBool(grade()); }
-  bool hasKyu() const { return toBool(kyu()); }
-  bool hasLevel() const { return toBool(level()); }
-  bool hasMeaning() const { return !meaning().empty(); }
-  bool hasNelsonIds() const { return !_nelsonIds.empty(); }
-  bool hasReading() const { return !reading().empty(); }
+  auto is(KanjiTypes t) const { return type() == t; }
+  auto hasGrade() const { return toBool(grade()); }
+  auto hasKyu() const { return toBool(kyu()); }
+  auto hasLevel() const { return toBool(level()); }
+  auto hasMeaning() const { return !meaning().empty(); }
+  auto hasNelsonIds() const { return !_nelsonIds.empty(); }
+  auto hasReading() const { return !reading().empty(); }
 
   // 'InfoFields' members can be used to select which fields are printed by 'info'
   // method. For example 'GradeField | LevelField | FreqField' will print grade and
@@ -113,12 +113,12 @@ public:
   //     @ = <K1 Kentei     : 268 non-K1 Kentei Kanji that aren't in the above categories
   //     # = K1 Kentei      : 2554 K1 Kentei Kanji that aren't in the above categories
   //     * = Ucd            : all kanji loaded from 'ucd.txt' file that aren't in the above categories
-  std::string qualifiedName() const { return _name + QualifiedNames[qualifiedNameRank()]; }
+  auto qualifiedName() const { return _name + QualifiedNames[qualifiedNameRank()]; }
 
   // 'orderByQualifiedName' can be used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
   // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the same 'qualifiedNameRank' then
   // sort by strokes, frequency, variant and (unicode) compatibilityName.
-  bool orderByQualifiedName(const Kanji& x) const {
+  auto orderByQualifiedName(const Kanji& x) const {
     return qualifiedNameRank() < x.qualifiedNameRank() ||
       qualifiedNameRank() == x.qualifiedNameRank() &&
       (strokes() < x.strokes() ||
@@ -168,7 +168,7 @@ private:
   const OptString _pinyin;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
+inline auto& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
 
 } // namespace kanji_tools
 

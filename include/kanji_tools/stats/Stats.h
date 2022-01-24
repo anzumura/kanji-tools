@@ -23,23 +23,23 @@ public:
   public:
     Count(int f, const std::string& n, OptEntry e) : count(f), name(n), entry(e) {}
 
+    auto frequency() const {
+      return entry ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
+    }
+    auto type() const { return entry ? (**entry).type() : KanjiTypes::None; }
+    std::string toHex() const;
+
     // Sort to have largest 'count' first followed by lowest frequency number. Lower frequency
     // means the kanji is more common, but a frequency of '0' means the kanji isn't in the top
     // frequency list so use 'frequencyOrDefault' to return a large number for no-frequency
     // kanji and consider 'not-found' kanji to have even higher (worse) frequency. If kanjis
     // both have the same 'count' and 'frequency' then sort by type then hex (use 'hex' instead of
     // 'name' since sorting by UTF-8 is less consistent).
-    bool operator<(const Count& x) const {
+    auto operator<(const Count& x) const {
       return count > x.count ||
         (count == x.count && frequency() < x.frequency() ||
          (frequency() == x.frequency() && type() < x.type() || (type() == x.type() && toHex() < x.toHex())));
     }
-
-    int frequency() const {
-      return entry ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
-    }
-    KanjiTypes type() const { return entry ? (**entry).type() : KanjiTypes::None; }
-    std::string toHex() const;
 
     int count;
     std::string name;
@@ -54,8 +54,8 @@ private:
   enum IntDisplayValues { UniqueCountWidth = 4, TotalCountWidth = 6, TypeNameWidth = 16 };
   enum PercentDisplayValues { PercentPrecision = 2, PercentWidth = 6 };
 
-  std::ostream& log(bool heading = false) const { return _data->log(heading); }
-  std::ostream& out() const { return _data->out(); }
+  auto& log(bool heading = false) const { return _data->log(heading); }
+  auto& out() const { return _data->out(); }
 
   void countKanji(const std::filesystem::path& top, bool showBreakdown, bool verbose) const;
 

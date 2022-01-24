@@ -6,7 +6,7 @@
 namespace kanji_tools {
 
 enum class GroupType { Meaning, Pattern };
-inline std::ostream& operator<<(std::ostream& os, const GroupType& x) {
+inline auto& operator<<(std::ostream& os, const GroupType& x) {
   return os << (x == GroupType::Meaning ? "Meaning" : "Pattern");
 }
 
@@ -45,9 +45,9 @@ public:
   virtual PatternType patternType() const { return PatternType::None; }
 
   int number() const { return _number; }
-  const std::string& name() const { return _name; }
-  const Data::List& members() const { return _members; }
-  std::string toString() const { return "[" + std::to_string(_number) + ' ' + name() + ']'; }
+  auto& name() const { return _name; }
+  auto& members() const { return _members; }
+  auto toString() const { return "[" + std::to_string(_number) + ' ' + name() + ']'; }
 private:
   const int _number;
   const std::string _name;
@@ -72,7 +72,7 @@ private:
   const PatternType _patternType;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Group& x) {
+inline auto& operator<<(std::ostream& os, const Group& x) {
   os << '[';
   if (x.patternType() == Group::PatternType::Peer) {
     auto i = x.members().begin();

@@ -13,7 +13,7 @@ namespace kanji_tools {
 // 'CharType' is used to specify 'source' and 'target' types for 'KanaConvert::convert' methods
 enum class CharType { Hiragana, Katakana, Romaji };
 constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
-inline const std::string& toString(CharType t) {
+inline auto& toString(CharType t) {
   static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
   switch (t) {
   case CharType::Hiragana: return hiragana;
@@ -34,12 +34,12 @@ public:
   class RepeatMark {
   public:
     RepeatMark(const RepeatMark&) = delete;
-    bool matches(CharType t, const std::string& s) const {
+    auto matches(CharType t, const std::string& s) const {
       return t == CharType::Hiragana && _hiragana == s || t == CharType::Katakana && _katakana == s;
     }
     std::string get(CharType target, int flags, const Kana* prevKana) const;
-    const std::string& hiragana() const { return _hiragana; }
-    const std::string& katakana() const { return _katakana; }
+    auto& hiragana() const { return _hiragana; }
+    auto& katakana() const { return _katakana; }
   private:
     friend Kana; // only Kana class can constuct
     RepeatMark(const char* hiragana, const char* katakana, bool dakuten)
@@ -64,7 +64,7 @@ public:
   inline static const std::string ProlongMark = "ー";
 
   using Map = std::map<std::string, const class Kana*>;
-  static const Map& getMap(CharType t) {
+  static auto& getMap(CharType t) {
     switch (t) {
     case CharType::Romaji: return _romajiMap;
     case CharType::Hiragana: return _hiraganaMap;
@@ -100,23 +100,23 @@ public:
   // instance is already an unaccented version or is a combination that doesn't have an equivalent
   // unaccented 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc.. ウォ can be typed with 'u'
   // then 'lo' to get a small 'o', but this is treated as two separate Kana instances ('u' and 'lo').
-  const Kana* plainKana() const { return _plainKana; }
+  auto plainKana() const { return _plainKana; }
 
   // All small kana have _romaji starting with 'l' (and they are all monographs)
-  bool isSmall() const { return _romaji.starts_with("l"); }
+  auto isSmall() const { return _romaji.starts_with("l"); }
 
   // A 'Kana' instance can either be a single symbol or two symbols. This is enforced by assertions
   // in the constructor as well as unit tests.
-  bool isMonograph() const { return _hiragana.length() == 3; }
-  bool isDigraph() const { return _hiragana.length() == 6; }
+  auto isMonograph() const { return _hiragana.length() == 3; }
+  auto isDigraph() const { return _hiragana.length() == 6; }
 
   // Test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana, i.e., the class of
   // 'this' is 'Kana', but we are a member of a 'DakutenKana' or 'HanDakutenKana' class.
-  bool isDakuten() const {
+  auto isDakuten() const {
     // special case for a few digraphs starting with 'v', but don't have an unaccented version (see above)
     return _romaji.starts_with("v") || _plainKana && _plainKana->dakutenKana() == this;
   }
-  bool isHanDakuten() const { return _plainKana && _plainKana->hanDakutenKana() == this; }
+  auto isHanDakuten() const { return _plainKana && _plainKana->hanDakutenKana() == this; }
 
   // 'getRomaji' returns 'Romaji' value based on flags (see 'ConversionFlags' in KanaConvert.h)
   const std::string& getRomaji(int flags) const;
@@ -130,16 +130,16 @@ public:
 
   const std::string& get(CharType t, int flags) const;
 
-  bool containsKana(const std::string& s) const { return s == _hiragana || s == _katakana; }
-  bool operator==(const Kana& rhs) const {
-    // comparing _romaji is good enough since uniqueness is enforced by the rest of the program
-    return _romaji == rhs._romaji;
-  }
-  const std::string& romaji() const { return _romaji; }
-  const std::string& hiragana() const { return _hiragana; }
-  const std::string& katakana() const { return _katakana; }
-  const List& romajiVariants() const { return _romajiVariants; }
-  bool kunreiVariant() const { return _kunreiVariant; }
+  auto containsKana(const std::string& s) const { return s == _hiragana || s == _katakana; }
+
+  // comparing _romaji is good enough since uniqueness is enforced by the rest of the program
+  auto operator==(const Kana& rhs) const { return _romaji == rhs._romaji; }
+
+  auto& romaji() const { return _romaji; }
+  auto& hiragana() const { return _hiragana; }
+  auto& katakana() const { return _katakana; }
+  auto& romajiVariants() const { return _romajiVariants; }
+  auto kunreiVariant() const { return _kunreiVariant; }
 private:
   static Map populate(CharType);
   static const Map _romajiMap;

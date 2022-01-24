@@ -26,18 +26,12 @@ public:
   static void usage(const std::string& msg) { DataFile::usage(msg); }
   inline static auto orderByQualifiedName = [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); };
 
-  Data(const std::filesystem::path& dataDir, DebugMode debugMode, std::ostream& out = std::cout, std::ostream& err = std::cerr)
-    : _dataDir(dataDir), _debugMode(debugMode), _out(out), _err(err) {
-    // Clearing DataFile static data is only needed to help test code, for example DataFile tests can leave some
-    // data in these sets before Quiz tests are run (leading to problems loading real files).
-    DataFile::clearUniqueCheckData();
-    if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
-  }
+  Data(const std::filesystem::path& dataDir, DebugMode, std::ostream& out = std::cout, std::ostream& err = std::cerr);
   virtual ~Data() = default;
   Data(const Data&) = delete;
 
-  const UcdData& ucd() const { return _ucd; }
-  const Ucd* findUcd(const std::string& kanjiName) const { return _ucd.find(kanjiName); }
+  auto& ucd() const { return _ucd; }
+  auto findUcd(const std::string& kanjiName) const { return _ucd.find(kanjiName); }
 
   // Functions used by 'Kanji' classes during construction, each takes a kanji name.
   virtual Kanji::OptInt getFrequency(const std::string&) const = 0;
@@ -55,12 +49,12 @@ public:
   virtual const Radical& getRadicalByName(const std::string& radicalName) const { return _radicals.find(radicalName); }
 
   // 'getPinyin' returns an optional string since not all Kanji have a Pinyin reading.
-  Kanji::OptString getPinyin(const Ucd* u) const {
+  auto getPinyin(const Ucd* u) const {
     return u && !u->pinyin().empty() ? Kanji::OptString(u->pinyin()) : std::nullopt;
   }
 
   // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see comments in scripts/parseUcdAllFlat.sh)
-  Kanji::OptString getMorohashiId(const Ucd* u) const {
+  auto getMorohashiId(const Ucd* u) const {
     return u && !u->morohashiId().empty() ? Kanji::OptString(u->morohashiId()) : std::nullopt;
   }
 
@@ -69,63 +63,63 @@ public:
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given 'kanjiName' if it
   // exists (_ucd.find method takes care of checking whether kanjiName has a variation selector).
-  Kanji::OptString getCompatibilityName(const std::string& kanjiName) const {
-    const Ucd* u = _ucd.find(kanjiName);
+  auto getCompatibilityName(const std::string& kanjiName) const {
+    auto u = _ucd.find(kanjiName);
     return u && u->name() != kanjiName ? Kanji::OptString(u->name()) : std::nullopt;
   }
 
-  int getStrokes(const std::string& kanjiName) const { return getStrokes(kanjiName, findUcd(kanjiName)); }
-  int getStrokes(const std::string& kanjiName, const Ucd* u, bool variant = false, bool onlyUcd = false) const {
+  auto getStrokes(const std::string& kanjiName, const Ucd* u, bool variant = false, bool onlyUcd = false) const {
     if (!onlyUcd) {
       auto i = _strokes.find(kanjiName);
       if (i != _strokes.end()) return i->second;
     }
     return u ? u->getStrokes(variant) : 0;
   }
+  auto getStrokes(const std::string& kanjiName) const { return getStrokes(kanjiName, findUcd(kanjiName)); }
 
   // get kanji lists
-  const List& jouyouKanji() const { return _types.at(KanjiTypes::Jouyou); }
-  const List& jinmeiKanji() const { return _types.at(KanjiTypes::Jinmei); }
-  const List& linkedJinmeiKanji() const { return _types.at(KanjiTypes::LinkedJinmei); }
-  const List& linkedOldKanji() const { return _types.at(KanjiTypes::LinkedOld); }
-  const List& frequencyKanji() const { return _types.at(KanjiTypes::Frequency); }
-  const List& extraKanji() const { return _types.at(KanjiTypes::Extra); }
+  auto& jouyouKanji() const { return _types.at(KanjiTypes::Jouyou); }
+  auto& jinmeiKanji() const { return _types.at(KanjiTypes::Jinmei); }
+  auto& linkedJinmeiKanji() const { return _types.at(KanjiTypes::LinkedJinmei); }
+  auto& linkedOldKanji() const { return _types.at(KanjiTypes::LinkedOld); }
+  auto& frequencyKanji() const { return _types.at(KanjiTypes::Frequency); }
+  auto& extraKanji() const { return _types.at(KanjiTypes::Extra); }
 
   // get list by KanjiType
-  const List& typeList(KanjiTypes type) const {
+  auto& typeList(KanjiTypes type) const {
     auto i = _types.find(type);
     return i != _types.end() ? i->second : _emptyList;
   }
-  int typeTotal(KanjiTypes type) const { return typeList(type).size(); }
+  auto typeTotal(KanjiTypes type) const { return typeList(type).size(); }
   KanjiTypes getType(const std::string& name) const;
 
   // get list by KanjiGrade
-  const List& gradeList(KanjiGrades grade) const {
+  auto& gradeList(KanjiGrades grade) const {
     auto i = _grades.find(grade);
     return i != _grades.end() ? i->second : _emptyList;
   }
-  int gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
+  auto gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
 
   // get list by JLPT Level
-  const List& levelList(JlptLevels level) const {
+  auto& levelList(JlptLevels level) const {
     auto i = _levels.find(level);
     return i != _levels.end() ? i->second : _emptyList;
   }
-  int levelTotal(JlptLevels level) const { return levelList(level).size(); }
+  auto levelTotal(JlptLevels level) const { return levelList(level).size(); }
 
   // get list by Kentei Kyu
-  const List& kyuList(KenteiKyus kyu) const {
+  auto& kyuList(KenteiKyus kyu) const {
     auto i = _kyus.find(kyu);
     return i != _kyus.end() ? i->second : _emptyList;
   }
-  int kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
+  auto kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
 
   // See comment for '_frequencies' private data member for more details about frequency lists
   enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
-  const List& frequencyList(int range) const {
+  auto& frequencyList(int range) const {
     return range >= 0 && range < FrequencyBuckets ? _frequencies[range] : _emptyList;
   }
-  int frequencyTotal(int range) const { return frequencyList(range).size(); }
+  auto frequencyTotal(int range) const { return frequencyList(range).size(); }
 
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including 'variation selectors', i.e., the
   // same result is returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
@@ -146,32 +140,32 @@ public:
 
   // 'findKanjisByMorohashiId' can return more than one entry. The ids are usually plain just numeric, but they can
   // also be an index number followed by a 'P'. For example, '4138' maps to 嗩 and '4138P' maps to 嘆.
-  const List& findKanjisByMorohashiId(const std::string& id) const {
+  auto& findKanjisByMorohashiId(const std::string& id) const {
     auto i = _morohashiMap.find(id);
     return i != _morohashiMap.end() ? i->second : _emptyList;
   }
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491 maps to 㡡, 幮 and 𢅥.
-  const List& findKanjisByNelsonId(int id) const {
+  auto& findKanjisByNelsonId(int id) const {
     auto i = _nelsonMap.find(id);
     return i != _nelsonMap.end() ? i->second : _emptyList;
   }
 
   void printError(const std::string&) const;
 
-  bool debug() const { return _debugMode != DebugMode::None; }
-  bool fullDebug() const { return _debugMode == DebugMode::Full; }
-  bool infoDebug() const { return _debugMode == DebugMode::Info; }
+  auto debug() const { return _debugMode != DebugMode::None; }
+  auto fullDebug() const { return _debugMode == DebugMode::Full; }
+  auto infoDebug() const { return _debugMode == DebugMode::Info; }
 
-  std::ostream& out() const { return _out; }
-  std::ostream& err() const { return _err; }
-  const std::filesystem::path& dataDir() const { return _dataDir; }
-  const Map& kanjiNameMap() const { return _kanjiNameMap; }
+  auto& out() const { return _out; }
+  auto& err() const { return _err; }
+  auto& dataDir() const { return _dataDir; }
+  auto& kanjiNameMap() const { return _kanjiNameMap; }
 
   // 'log' can be used for putting a standard prefix to output messages (used for some debug messages)
-  std::ostream& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
+  auto& log(bool heading = false) const { return heading ? _out << ">>>\n>>> " : _out << ">>> "; }
 
-  static int maxFrequency() { return _maxFrequency; }
+  static auto maxFrequency() { return _maxFrequency; }
 
   // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not used by this
   // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then

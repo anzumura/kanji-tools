@@ -102,15 +102,15 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
   // When source is Romaji break input up into words separated by any of _narrowDelimList and process
   // each word. This helps deal with words ending in 'n'.
   std::string result;
-  int oldPos = 0;
-  for (const bool keepSpaces = !(_flags & RemoveSpaces);;) {
-    const int pos = input.find_first_of(_narrowDelimList, oldPos);
+  auto oldPos = 0;
+  for (const auto keepSpaces = !(_flags & RemoveSpaces);;) {
+    const auto pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos));
       break;
     }
     result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
-    if (char delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
+    if (auto delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
       result += _narrowDelims.at(delim);
     oldPos = pos + 1;
   }
@@ -120,8 +120,8 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
 std::string KanaConvert::convertFromKana(const std::string& input, CharType source, const Set& afterN,
                                          const Set& smallKana) const {
   std::string result, letterGroup, letter;
-  int count = 0;
-  bool hasSmallTsu = false, groupDone = false;
+  auto count = 0;
+  auto hasSmallTsu = false, groupDone = false;
   const Kana* prevKana = nullptr;
   auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter, &afterN](
                 bool startNewGroup = true, bool prolong = false) {

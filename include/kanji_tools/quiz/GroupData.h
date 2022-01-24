@@ -20,13 +20,13 @@ public:
   GroupData(DataPtr);
   GroupData(const GroupData&) = delete;
 
-  const List& meaningGroups() const { return _meaningGroups; }
-  const List& patternGroups() const { return _patternGroups; }
-  const MultiMap& meaningMap() const { return _meaningMap; }
-  const Map& patternMap() const { return _patternMap; }
-  const Data& data() const { return *_data; }
-  std::ostream& out() const { return _data->out(); }
-  std::ostream& log(bool heading = false) const { return _data->log(heading); }
+  auto& meaningGroups() const { return _meaningGroups; }
+  auto& patternGroups() const { return _patternGroups; }
+  auto& meaningMap() const { return _meaningMap; }
+  auto& patternMap() const { return _patternMap; }
+  auto& data() const { return *_data; }
+  auto& out() const { return _data->out(); }
+  auto& log(bool heading = false) const { return _data->log(heading); }
 private:
   // 'checkInsert' will return false if 'kanji' is already in 'Map'
   bool checkInsert(const std::string& kanji, Map&, const Entry& group) const;
@@ -49,7 +49,7 @@ private:
   template<typename T> void printUniqueNames(const T&, const StringSet&) const;
   void printTypeBreakdown(TypeMap&) const;
 
-  bool fullDebug() const { return _data->fullDebug(); }
+  auto fullDebug() const { return _data->fullDebug(); }
 
   // '_meaningMap' and '_meaningGroups' are populated from 'meaning-groups.txt'
   MultiMap _meaningMap;

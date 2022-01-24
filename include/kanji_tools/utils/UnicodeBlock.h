@@ -20,13 +20,13 @@ public:
   constexpr UnicodeBlock(char32_t s) noexcept : start(s), end(s) {}
 
   // 'range' returns the number of code points in the block (inclusive of start and end)
-  constexpr int range() const noexcept { return end - start + 1; }
+  constexpr auto range() const noexcept { return end - start + 1; }
 
   // 'opterator()' returns true if the given character is in this block
-  constexpr bool operator()(char32_t x) const noexcept { return x >= start && x <= end; }
+  constexpr auto operator()(char32_t x) const noexcept { return x >= start && x <= end; }
 
-  constexpr bool operator<(const UnicodeBlock& rhs) const noexcept { return start < rhs.start; }
-  constexpr bool operator==(const UnicodeBlock& rhs) const noexcept { return start == rhs.start && end == rhs.end; }
+  constexpr auto operator<(const UnicodeBlock& rhs) const noexcept { return start < rhs.start; }
+  constexpr auto operator==(const UnicodeBlock& rhs) const noexcept { return start == rhs.start && end == rhs.end; }
 
   const char32_t start;
   const char32_t end;
@@ -122,7 +122,7 @@ template<typename... T> inline bool inWCharRange(const std::string& s, bool chec
 // Return true if all characers are in the given blocks, empty string will also return true
 template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
   // an 'inRange' character can be followed by a 'variation selector'
-  for (bool allowNonSpacing = false; auto i : fromUtf8(s))
+  for (auto allowNonSpacing = false; auto i : fromUtf8(s))
     if (allowNonSpacing && inRange(i, NonSpacingBlocks))
       allowNonSpacing = false;
     else if (inRange(i, t...))

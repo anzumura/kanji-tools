@@ -16,7 +16,7 @@ public:
   JukugoData(const Data&);
   JukugoData(const JukugoData&) = delete;
 
-  const List& find(const std::string& kanji) const {
+  auto& find(const std::string& kanji) const {
     auto i = _kanjiToJukugo.find(kanji);
     return i != _kanjiToJukugo.end() ? i->second : _emptyList;
   }

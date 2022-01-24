@@ -16,7 +16,7 @@ public:
   OptString extraTypeInfo() const override { return '#' + std::to_string(_number); }
   const LinkNames& oldNames() const override { return _oldNames; }
 
-  int number() const { return _number; }
+  auto number() const { return _number; }
 
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
@@ -28,7 +28,7 @@ protected:
     OldNamesCol{"OldNames"}, YearCol{"Year"}, StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"},
     ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
-  static const Ucd* findUcd(const Data& d, const std::string& name) { return d.findUcd(name); }
+  static auto findUcd(const Data& d, const std::string& name) { return d.findUcd(name); }
 
   // Constructor used by 'CustomFileKanji' and 'ExtraKanji': calls base with 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name, int strokes, const std::string& meaning,
@@ -65,7 +65,7 @@ public:
   OptInt frequency() const override { return _frequency; }
   JlptLevels level() const override { return _level; }
 
-  OptInt year() const { return _year; }
+  auto year() const { return _year; }
 protected:
   // constructor used by 'JinmeiKanji' calls base without 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name)
@@ -93,7 +93,7 @@ public:
   // - Moved: moved out of Jouyou into Jinmei
   // - Other: reason listed as その他
   enum class Reasons { Names, Print, Variant, Moved, Other };
-  static constexpr const char* toString(Reasons x) {
+  static constexpr auto toString(Reasons x) {
     switch (x) {
     case Reasons::Names: return "Names";
     case Reasons::Print: return "Print";
@@ -110,7 +110,7 @@ public:
   OptString extraTypeInfo() const override {
     return std::optional(*OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']');
   }
-  Reasons reason() const { return _reason; }
+  auto reason() const { return _reason; }
 private:
   static Reasons getReason(const std::string&);
   const Reasons _reason;

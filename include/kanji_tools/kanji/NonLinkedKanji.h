@@ -13,7 +13,7 @@ public:
   const std::string& reading() const override { return _reading; }
 protected:
   // 'getLinkNames' is used by UcdFileKanji and ExtraKanji to populate links from Ucd data
-  static LinkNames getLinkNames(const Ucd* u) {
+  static auto getLinkNames(const Ucd* u) {
     LinkNames result;
     if (u && u->hasLinks())
       std::transform(u->links().begin(), u->links().end(), std::back_inserter(result),

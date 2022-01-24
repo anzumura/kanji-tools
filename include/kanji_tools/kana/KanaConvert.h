@@ -61,7 +61,7 @@ public:
 
   CharType target() const { return _target; }
   void target(CharType target) { _target = target; }
-  int flags() const { return _flags; }
+  auto flags() const { return _flags; }
   std::string flagString() const; // return a | separated string representation of current flags or 'none'
   void flags(int flags) { _flags = flags; }
 
@@ -73,8 +73,8 @@ public:
   using NarrowDelims = std::map<char, std::string>;
   using WideDelims = std::map<std::string, char>;
 
-  const NarrowDelims& narrowDelims() const { return _narrowDelims; }
-  const WideDelims& wideDelims() const { return _wideDelims; }
+  auto& narrowDelims() const { return _narrowDelims; }
+  auto& wideDelims() const { return _wideDelims; }
 
   // 'convert' has 4 overloads. The first and second use the current values of '_target' and '_flags'.
   // The first and third convert characters of any source type whereas the second and fourth restrict the
@@ -92,11 +92,11 @@ private:
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
 
-  bool romajiTarget() const { return _target == CharType::Romaji; }
-  bool hiraganaTarget() const { return _target == CharType::Hiragana; }
-  const std::string& get(const Kana& k) const { return k.get(_target, _flags); }
-  const std::string& getN() const { return get(Kana::N); }
-  const std::string& getSmallTsu() const { return get(Kana::SmallTsu); }
+  auto romajiTarget() const { return _target == CharType::Romaji; }
+  auto hiraganaTarget() const { return _target == CharType::Hiragana; }
+  auto& get(const Kana& k) const { return k.get(_target, _flags); }
+  auto& getN() const { return get(Kana::N); }
+  auto& getSmallTsu() const { return get(Kana::SmallTsu); }
 
   using Set = std::set<std::string>;
 

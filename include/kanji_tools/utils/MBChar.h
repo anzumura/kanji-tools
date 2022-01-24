@@ -30,6 +30,19 @@ public:
     Mask = 0b11'00'00'00  // mask for first two bits
   };
 
+  // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
+  // method is used by 'length', 'next' and 'doPeek'.
+  static auto isVariationSelector(const unsigned char* s) {
+    // Checking for variation selectors would be easier if 'i' was wchar_t, but that would involve
+    // calling more expensive conversion functions (like fromUtf8). Note, variation selectors are
+    // range 'fe00' to 'fe0f' in Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
+    return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;
+  }
+  static auto isVariationSelector(const char* s) {
+    return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
+  }
+  static auto isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
+
   // 'length' with onlyMB=true only counts multi-byte 'sequence start' bytes, otherwise length
   // includes both multi-byte sequence starts as well as regular single byte values, i.e.,
   // simply don't add 'continuation' bytes to length (this done by using '11 00 00 00' to grab the
@@ -40,7 +53,7 @@ public:
   // - length("大blue空", false) = 6
   // Note: some Kanji can be followed by a 'variation selector' - these are not counted by default
   // since they are considered part of the previous 'MB character' (as a modifier).
-  static int length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
+  static auto length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
     int len = 0;
     // doing one 'reinterpret_cast' at the beginning saves doing a bunch of static_casts when checking
     // if the next 3 bytes represent a 'variation selector'
@@ -55,38 +68,25 @@ public:
     }
     return len;
   }
-  static int length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
+  static auto length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
     return length(s.c_str(), onlyMB, skipVariationSelectors);
   }
 
-  // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
-  // method is used by 'length', 'next' and 'doPeek'.
-  static bool isVariationSelector(const unsigned char* s) {
-    // Checking for variation selectors would be easier if 'i' was wchar_t, but that would involve
-    // calling more expensive conversion functions (like fromUtf8). Note, variation selectors are
-    // range 'fe00' to 'fe0f' in Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
-    return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;
-  }
-  static bool isVariationSelector(const char* s) {
-    return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
-  }
-  static bool isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
-
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so len 2-4) followed
   // by a variation selector (which are always len 3).
-  static bool isMBCharWithVariationSelector(const std::string& s) {
+  static auto isMBCharWithVariationSelector(const std::string& s) {
     return s.length() > 4 && s.length() < 8 && isVariationSelector(s.substr(s.length() - 3));
   }
-  static std::string withoutVariationSelector(const std::string& s) {
+  static auto withoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
   }
-  static std::optional<std::string> optionalWithoutVariationSelector(const std::string& s) {
+  static auto optionalWithoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s) ? std::optional(s.substr(0, s.length() - 3)) : std::nullopt;
   }
 
   // 'getFirst' returns the first MBChar from 's' (including any variation selector that might follow).
   // If 's' doesn't start with a multi-byte sequence then empty string is returned.
-  static std::string getFirst(const std::string& s) {
+  static auto getFirst(const std::string& s) {
     std::string result;
     MBChar c(s);
     c.next(result);
@@ -112,7 +112,7 @@ public:
   // - valid("雪s") = StringTooLong
   // - valid("吹雪") = StringTooLong
   // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
-  static Results valid(const char* s, bool checkLengthOne = true) {
+  static auto valid(const char* s, bool checkLengthOne = true) {
     if (s) {
       if (const unsigned char x = *s; (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
         if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
@@ -129,8 +129,8 @@ public:
     }
     return Results::NotMBChar;
   }
-  static Results valid(const std::string& s, bool checkLengthOne = true) { return valid(s.c_str(), checkLengthOne); }
-  static bool isValid(const std::string& s, bool checkLengthOne = true) {
+  static auto valid(const std::string& s, bool checkLengthOne = true) { return valid(s.c_str(), checkLengthOne); }
+  static auto isValid(const std::string& s, bool checkLengthOne = true) {
     return valid(s, checkLengthOne) == Results::Valid;
   }
 
@@ -150,12 +150,12 @@ public:
   bool next(std::string& result, bool onlyMB = true);
 
   // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
-  bool peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
-  int errors() const { return _errors; }
-  int variants() const { return _variants; }
-  int length(bool onlyMB = true) const { return length(_data, onlyMB); }
-  Results valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
-  bool isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
+  auto peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
+  auto errors() const { return _errors; }
+  auto variants() const { return _variants; }
+  auto length(bool onlyMB = true) const { return length(_data, onlyMB); }
+  auto valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
+  auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
 private:
   // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
   // in these cases it only matters if the following value is a 'variation selector'.
@@ -206,28 +206,28 @@ public:
   }
 
   // return count for given string or 0 if not found
-  int count(const std::string& s) const {
+  auto count(const std::string& s) const {
     auto i = _map.find(s);
     return i != _map.end() ? i->second : 0;
   }
 
   // return an optional Map of 'tag to count' for the given MBChar 's'
-  const Map* tags(const std::string& s) const {
+  auto tags(const std::string& s) const {
     auto i = _tags.find(s);
     return i != _tags.end() ? &i->second : nullptr;
   }
 
-  int uniqueEntries() const { return _map.size(); }
-  int files() const { return _files; }
-  int directories() const { return _directories; }
+  auto uniqueEntries() const { return _map.size(); }
+  auto files() const { return _files; }
+  auto directories() const { return _directories; }
   // 'replaceCount' returns number of lines that were changed due to 'replace' regex
-  bool replaceCount() const { return _replaceCount; }
+  auto replaceCount() const { return _replaceCount; }
   // 'lastReplaceTag' returns last tag (file name) that had line replaced (if 'addTag' is used)
-  const std::string& lastReplaceTag() const { return _lastReplaceTag; }
-  int errors() const { return _errors; }
-  int variants() const { return _variants; }
-  const Map& map() const { return _map; }
-  bool debug() const { return _debug; }
+  auto& lastReplaceTag() const { return _lastReplaceTag; }
+  auto errors() const { return _errors; }
+  auto variants() const { return _variants; }
+  auto& map() const { return _map; }
+  auto debug() const { return _debug; }
 private:
   // 'hasUnclosedBrackets' returns true if 'line' has an open bracket without a closing
   // bracket (searching back from the end), otherwise it returns false.

@@ -11,9 +11,9 @@ enum class KanjiGrades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary schoo
 constexpr std::array AllKanjiGrades{KanjiGrades::G1, KanjiGrades::G2, KanjiGrades::G3, KanjiGrades::G4,
                                     KanjiGrades::G5, KanjiGrades::G6, KanjiGrades::S,  KanjiGrades::None};
 
-constexpr bool toBool(KanjiGrades x) { return x != KanjiGrades::None; }
+constexpr auto toBool(KanjiGrades x) { return x != KanjiGrades::None; }
 
-constexpr const char* toString(KanjiGrades x) {
+constexpr auto toString(KanjiGrades x) {
   switch (x) {
   case KanjiGrades::G1: return "G1";
   case KanjiGrades::G2: return "G2";
@@ -26,7 +26,7 @@ constexpr const char* toString(KanjiGrades x) {
   }
 }
 
-inline std::ostream& operator<<(std::ostream& os, KanjiGrades x) { return os << toString(x); }
+inline auto& operator<<(std::ostream& os, KanjiGrades x) { return os << toString(x); }
 
 } // namespace kanji_tools
 

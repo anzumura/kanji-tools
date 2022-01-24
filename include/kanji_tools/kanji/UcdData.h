@@ -17,8 +17,8 @@ public:
   UcdData(const UcdData&) = delete;
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
-  const std::string& getMeaning(const std::string& kanjiName) const { return getMeaning(find(kanjiName)); }
-  const std::string& getMeaning(const Ucd* u) const { return u ? u->meaning() : Ucd::EmptyString; }
+  auto& getMeaning(const Ucd* u) const { return u ? u->meaning() : Ucd::EmptyString; }
+  auto& getMeaning(const std::string& kanjiName) const { return getMeaning(find(kanjiName)); }
 
   // 'getReadingsAsKana' returns string starting with 'onReading' converted Katakana followed
   // by 'kunReading' converted to Hiragana
@@ -29,7 +29,7 @@ public:
   // Ucd variant (variant returned is the same displayed character for Jinmei ones)
   const Ucd* find(const std::string& kanjiName) const;
 
-  const Map& map() const { return _map; }
+  auto& map() const { return _map; }
 
   // 'load' and 'print' are called by 'KanjiData'
   void load(const std::filesystem::path&);

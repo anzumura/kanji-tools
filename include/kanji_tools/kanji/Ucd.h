@@ -19,8 +19,8 @@ public:
   class Link {
   public:
     Link(wchar_t code, const std::string& name) : _code(code), _name(name) {}
-    wchar_t code() const { return _code; }
-    const std::string& name() const { return _name; }
+    auto code() const { return _code; }
+    auto& name() const { return _name; }
     std::string codeAndName() const;
   private:
     const wchar_t _code;
@@ -37,32 +37,32 @@ public:
       _jinmei(jinmei), _links(links), _linkType(linkType), _linkedReadings(linkedReadings), _meaning(meaning),
       _onReading(onReading), _kunReading(kunReading) {}
 
-  wchar_t code() const { return _code; }
-  const std::string& name() const { return _name; }
-  const std::string& block() const { return _block; }
-  const std::string& version() const { return _version; }
-  int radical() const { return _radical; }
-  int strokes(bool variant = false) const { return _strokes; }
-  int variantStrokes() const { return _variantStrokes; }
-  const std::string& pinyin() const { return _pinyin; }
-  const std::string& morohashiId() const { return _morohashiId; }
-  const std::string& nelsonIds() const { return _nelsonIds; }
-  bool joyo() const { return _joyo; }
-  bool jinmei() const { return _jinmei; }
-  const Links& links() const { return _links; }
-  LinkTypes linkType() const { return _linkType; }
-  bool linkedReadings() const { return _linkedReadings; }
-  const std::string& meaning() const { return _meaning; }
-  const std::string& onReading() const { return _onReading; }
-  const std::string& kunReading() const { return _kunReading; }
+  auto code() const { return _code; }
+  auto& name() const { return _name; }
+  auto& block() const { return _block; }
+  auto& version() const { return _version; }
+  auto radical() const { return _radical; }
+  auto strokes(bool variant = false) const { return _strokes; }
+  auto variantStrokes() const { return _variantStrokes; }
+  auto& pinyin() const { return _pinyin; }
+  auto& morohashiId() const { return _morohashiId; }
+  auto& nelsonIds() const { return _nelsonIds; }
+  auto joyo() const { return _joyo; }
+  auto jinmei() const { return _jinmei; }
+  auto& links() const { return _links; }
+  auto linkType() const { return _linkType; }
+  auto linkedReadings() const { return _linkedReadings; }
+  auto& meaning() const { return _meaning; }
+  auto& onReading() const { return _onReading; }
+  auto& kunReading() const { return _kunReading; }
   // 'has' methods
-  bool hasLinks() const { return !_links.empty(); }
-  bool hasTraditionalLinks() const { return _linkType == LinkTypes::Traditional; }
-  bool hasNonTraditionalLinks() const { return hasLinks() && _linkType != LinkTypes::Traditional; }
-  bool hasVariantStrokes() const { return _variantStrokes != 0; }
+  auto hasLinks() const { return !_links.empty(); }
+  auto hasTraditionalLinks() const { return _linkType == LinkTypes::Traditional; }
+  auto hasNonTraditionalLinks() const { return hasLinks() && _linkType != LinkTypes::Traditional; }
+  auto hasVariantStrokes() const { return _variantStrokes != 0; }
   // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
   // it falls back to just return '_strokes'
-  int getStrokes(bool variant) const { return variant && hasVariantStrokes() ? _variantStrokes : _strokes; }
+  auto getStrokes(bool variant) const { return variant && hasVariantStrokes() ? _variantStrokes : _strokes; }
   // 'codeAndName' methods return the Unicode in square brackets plus the name, e.g.: [FA30] 侮
   std::string codeAndName() const;
   std::string linkCodeAndNames() const;
@@ -89,7 +89,7 @@ private:
   const std::string _kunReading;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Ucd::LinkTypes& x) { return os << Ucd::toString(x); }
+inline auto& operator<<(std::ostream& os, const Ucd::LinkTypes& x) { return os << Ucd::toString(x); }
 
 } // namespace kanji_tools
 
