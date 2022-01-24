@@ -30,10 +30,10 @@ enum class BracketType { Curly, Round, Square, None };
 
 inline std::string addBrackets(const std::string& s, BracketType t) {
   switch (t) {
-  case BracketType::Curly: return '{' + s + '}';
-  case BracketType::Round: return '(' + s + ')';
-  case BracketType::Square: return '[' + s + ']';
-  default: break;
+    case BracketType::Curly: return '{' + s + '}';
+    case BracketType::Round: return '(' + s + ')';
+    case BracketType::Square: return '[' + s + ']';
+    default: break;
   }
   return s;
 }
@@ -51,8 +51,7 @@ inline std::string addLeadingZeroes(const std::string& result, int minSize) {
 
 template<typename T> inline std::string toBinary(T x, BracketType brackets, int minSize = 0) {
   std::string result;
-  for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + x % 2);
+  for (; x > 0; x >>= 1) result.insert(result.begin(), '0' + x % 2);
   return addBrackets(addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
 }
 template<typename T> inline std::string toBinary(T x, int minSize = 0) {
@@ -102,31 +101,31 @@ inline std::string toUnicode(const std::string& s, BracketType brackets = Bracke
 }
 
 // check if a given char or string is not a 'multi-byte char'
-constexpr bool isSingleByteChar(char x) { return x >= 0; }
-constexpr bool isSingleByteChar(wchar_t x) { return x >= 0 && x < 128; }
-constexpr bool isSingleByteChar(char32_t x) { return x >= 0 && x < 128; }
-inline bool isSingleByte(const std::string& s, bool checkLengthOne = true) {
+constexpr bool isSingleByteChar(char x) noexcept { return x >= 0; }
+constexpr bool isSingleByteChar(wchar_t x) noexcept { return x >= 0 && x < 128; }
+constexpr bool isSingleByteChar(char32_t x) noexcept { return x >= 0 && x < 128; }
+inline bool isSingleByte(const std::string& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
-inline bool isSingleByte(const std::wstring& s, bool checkLengthOne = true) {
+inline bool isSingleByte(const std::wstring& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
-inline bool isAllSingleByte(const std::string& s) {
+inline bool isAllSingleByte(const std::string& s) noexcept {
   for (auto& i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
-inline bool isAllSingleByte(const std::wstring& s) {
+inline bool isAllSingleByte(const std::wstring& s) noexcept {
   for (auto& i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
-inline bool isAnySingleByte(const std::string& s) {
+inline bool isAnySingleByte(const std::string& s) noexcept {
   for (auto& i : s)
     if (isSingleByteChar(i)) return true;
   return false;
 }
-inline bool isAnySingleByte(const std::wstring& s) {
+inline bool isAnySingleByte(const std::wstring& s) noexcept {
   for (auto& i : s)
     if (isSingleByteChar(i)) return true;
   return false;
