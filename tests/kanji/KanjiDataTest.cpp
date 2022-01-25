@@ -11,75 +11,75 @@ namespace kanji_tools {
 namespace fs = std::filesystem;
 
 TEST(DataTest, NextArgWithJustArg0) {
-  const char* arg0 = "program-name";
+  auto arg0 = "program-name";
   // call without final 'currentArg' parameter increments to 1
   EXPECT_EQ(Data::nextArg(1, &arg0), 1);
 }
 
 TEST(DataTest, NextArgWithCurrentArg) {
-  const char* arg0 = "program-name";
-  const char* arg1 = "arg1";
-  const char* arg2 = "arg2";
+  auto arg0 = "program-name";
+  auto arg1 = "arg1";
+  auto arg2 = "arg2";
   const char* argv[] = {arg0, arg1, arg2};
   EXPECT_EQ(Data::nextArg(std::size(argv), argv, 1), 2);
   EXPECT_EQ(Data::nextArg(std::size(argv), argv, 2), 3);
 }
 
 TEST(DataTest, NextArgWithDebugArg) {
-  const char* arg0 = "program-name";
-  const char* debugArg = "-debug";
+  auto arg0 = "program-name";
+  auto debugArg = "-debug";
   const char* argv[] = {arg0, debugArg};
   // skip '-data some-dir'
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 2);
 }
 
 TEST(DataTest, NextArgWithDataArg) {
-  const char* arg0 = "program-name";
-  const char* dataArg = "-data";
-  const char* dataDir = "some-dir";
+  auto arg0 = "program-name";
+  auto dataArg = "-data";
+  auto dataDir = "some-dir";
   const char* argv[] = {arg0, dataArg, dataDir};
   // skip '-data some-dir'
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 3);
 }
 
 TEST(DataTest, NextArgWithDebugAndDataArgs) {
-  const char* arg0 = "program-name";
-  const char* debugArg = "-debug";
-  const char* dataArg = "-data";
-  const char* dataDir = "some-dir";
+  auto arg0 = "program-name";
+  auto debugArg = "-debug";
+  auto dataArg = "-data";
+  auto dataDir = "some-dir";
   const char* argv[] = {arg0, debugArg, dataArg, dataDir};
   // skip '-data some-dir'
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 4);
 }
 
 TEST(DataTest, NextArgWithMultipleArgs) {
-  const char* arg0 = "program-name";
-  const char* arg1 = "arg1";
-  const char* debugArg = "-debug";
-  const char* arg3 = "arg3";
-  const char* dataArg = "-data";
-  const char* dataDir = "some-dir";
-  const char* arg6 = "arg6";
+  auto arg0 = "program-name";
+  auto arg1 = "arg1";
+  auto debugArg = "-debug";
+  auto arg3 = "arg3";
+  auto dataArg = "-data";
+  auto dataDir = "some-dir";
+  auto arg6 = "arg6";
   const char* argv[] = {arg0, arg1, debugArg, arg3, dataArg, dataDir, arg6};
   int argc = std::size(argv);
   std::vector<const char*> actualArgs;
-  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) actualArgs.push_back(argv[i]);
+  for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) actualArgs.push_back(argv[i]);
   EXPECT_EQ(actualArgs, std::vector<const char*>({arg1, arg3, arg6}));
 }
 
 class KanjiDataTest : public ::testing::Test {
 protected:
-  static const char** argv() {
-    static const char* arg0 = "testMain";
-    static const char* arg1 = "-data";
-    static const char* arg2 = "../../../data";
+  static auto argv() {
+    static auto arg0 = "testMain";
+    static auto arg1 = "-data";
+    static auto arg2 = "../../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
   // Contructs KanjiData using the real data files
   KanjiDataTest() : _data(3, argv()) {}
-  int checkKanji(const Data::List& l) const {
-    int variants = 0;
+  auto checkKanji(const Data::List& l) const {
+    auto variants = 0;
     for (auto& i : l) {
       if (i->variant()) {
         EXPECT_NE(i->name(), i->nonVariantName());
@@ -190,14 +190,14 @@ TEST_F(KanjiDataTest, TotalsChecks) {
   // Check sorting and printing by qualified name
   std::vector<std::string> list({"弓", "弖", "窮", "弼", "穹", "躬"});
   Data::List kanjis;
-  for (const auto& i : list) {
+  for (auto& i : list) {
     auto k = _data.findKanjiByName(i);
     ASSERT_TRUE(k);
     kanjis.push_back(*k);
   }
   std::sort(kanjis.begin(), kanjis.end(), Data::orderByQualifiedName);
   std::string sorted;
-  for (const auto& i : kanjis) {
+  for (auto& i : kanjis) {
     if (!sorted.empty()) sorted += ' ';
     sorted += i->qualifiedName();
   }
@@ -231,7 +231,7 @@ TEST_F(KanjiDataTest, FindChecks) {
   ASSERT_FALSE(_data.findKanjiByFrequency(-1));
   ASSERT_FALSE(_data.findKanjiByFrequency(0));
   ASSERT_FALSE(_data.findKanjiByFrequency(2502));
-  for (int i = 1; i < 2502; ++i) ASSERT_TRUE(_data.findKanjiByFrequency(i));
+  for (auto i = 1; i < 2502; ++i) ASSERT_TRUE(_data.findKanjiByFrequency(i));
   EXPECT_EQ((**_data.findKanjiByFrequency(1)).name(), "日");
   EXPECT_EQ((**_data.findKanjiByFrequency(2001)).name(), "炒");
   EXPECT_EQ((**_data.findKanjiByFrequency(2501)).name(), "蝦");
@@ -251,7 +251,7 @@ TEST_F(KanjiDataTest, FindChecks) {
   ASSERT_TRUE(_data.findKanjisByNelsonId(0).empty());
   ASSERT_TRUE(_data.findKanjisByNelsonId(5447).empty());
   std::vector<int> missingNelsonIds;
-  for (int i = 1; i < 5447; ++i)
+  for (auto i = 1; i < 5447; ++i)
     if (_data.findKanjisByNelsonId(i).empty()) missingNelsonIds.push_back(i);
   // There are a few Nelson IDs that are missing from UCD data
   EXPECT_EQ(missingNelsonIds, std::vector({125, 149, 489, 1639}));
@@ -285,7 +285,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
   // don't have a dash before the Okurigana.
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
   // Kanji with multiple Nelson Ids
-  const Ucd* ucdNelson = _data.ucd().find("㡡");
+  auto ucdNelson = _data.ucd().find("㡡");
   ASSERT_NE(ucdNelson, nullptr);
   EXPECT_EQ(ucdNelson->nelsonIds(), "1487,1491");
   auto& kanjiNelson = **_data.findKanjiByName(ucdNelson->name());
@@ -310,11 +310,11 @@ TEST_F(KanjiDataTest, UcdChecks) {
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
   EXPECT_EQ(ucd.size(), _data.kanjiNameMap().size());
-  int jouyou = 0, jinmei = 0, jinmeiLinks = 0, jinmeiLinksToJouyou = 0, jinmeiLinksToJinmei = 0;
+  auto jouyou{0}, jinmei{0}, jinmeiLinks{0}, jinmeiLinksToJouyou{0}, jinmeiLinksToJinmei{0};
   std::map<KanjiTypes, int> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
-    const Ucd& k = i.second;
+    auto& k = i.second;
     // every Ucd entry should be a wide character, i.e., have a 'display length' of 2
     EXPECT_EQ(displayLength(k.name()), 2);
     // if 'variantStrokes' is present it should be different than 'strokes'
@@ -360,7 +360,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2877);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // these are captured in 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 89);
-  int officialLinksToJinmei = 0, officialLinksToJouyou = 0;
+  auto officialLinksToJinmei{0}, officialLinksToJouyou{0};
   for (auto& i : _data.linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
     if (link.type() == KanjiTypes::Jouyou)

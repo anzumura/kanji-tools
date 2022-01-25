@@ -6,22 +6,22 @@ namespace kanji_tools {
 
 class KanaConvertTest : public ::testing::Test {
 protected:
-  std::string romajiToHiragana(const std::string& s, int flags = 0) {
+  auto romajiToHiragana(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Romaji, s, CharType::Hiragana, flags);
   }
-  std::string romajiToKatakana(const std::string& s, int flags = 0) {
+  auto romajiToKatakana(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Romaji, s, CharType::Katakana, flags);
   }
-  std::string hiraganaToRomaji(const std::string& s, int flags = 0) {
+  auto hiraganaToRomaji(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Hiragana, s, CharType::Romaji, flags);
   }
-  std::string hiraganaToKatakana(const std::string& s) {
+  auto hiraganaToKatakana(const std::string& s) {
     return _converter.convert(CharType::Hiragana, s, CharType::Katakana);
   }
-  std::string katakanaToRomaji(const std::string& s, int flags = 0) {
+  auto katakanaToRomaji(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Katakana, s, CharType::Romaji, flags);
   }
-  std::string katakanaToHiragana(const std::string& s) {
+  auto katakanaToHiragana(const std::string& s) {
     return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
   // populate 'romaji' when round trip is lossy (like repeat symbols)
@@ -46,7 +46,7 @@ protected:
     EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Hepburn), hepburn ? hepburn : romaji);
     EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Kunrei), kunrei ? kunrei : romaji);
     EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Kunrei), kunrei ? kunrei : romaji);
-    const char* preferHepburnIfBoth = hepburn ? hepburn : kunrei ? kunrei : romaji;
+    auto preferHepburnIfBoth = hepburn ? hepburn : kunrei ? kunrei : romaji;
     EXPECT_EQ(hiraganaToRomaji(hiragana, KanaConvert::Hepburn | KanaConvert::Kunrei), preferHepburnIfBoth);
     EXPECT_EQ(katakanaToRomaji(katakana, KanaConvert::Hepburn | KanaConvert::Kunrei), preferHepburnIfBoth);
   }

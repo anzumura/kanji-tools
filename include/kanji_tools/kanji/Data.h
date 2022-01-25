@@ -170,7 +170,7 @@ public:
   // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not used by this
   // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then
   // a larger increment is returned to 'skip over' the args, for example:
-  //     for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+  //     for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
   static int nextArg(int argc, const char** argv, int currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt' based on

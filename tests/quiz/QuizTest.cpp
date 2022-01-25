@@ -9,10 +9,10 @@ namespace kanji_tools {
 
 class QuizTest : public ::testing::Test {
 protected:
-  static const char** argv() {
-    static const char* arg0 = "testMain";
-    static const char* arg1 = "-data";
-    static const char* arg2 = "../../../data";
+  static auto argv() {
+    static auto arg0 = "testMain";
+    static auto arg1 = "-data";
+    static auto arg2 = "../../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
@@ -124,8 +124,7 @@ TEST_F(QuizTest, ListQuizReview) {
   toggleMeanings();
   startQuiz();
   std::string line, lastLine;
-  int kanjiCount = 0;
-  int meaningCount = 0;
+  auto kanjiCount{0}, meaningCount{0};
   while (std::getline(_os, line)) {
     if (line == "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10, Jouyou (#41)")
       ++kanjiCount;
@@ -189,9 +188,9 @@ TEST_F(QuizTest, LevelLists) {
 }
 
 TEST_F(QuizTest, SkipListQuestions) {
-  for (int i = 2; i < 4; ++i) {
+  for (auto i = 2; i < 4; ++i) {
     gradeListQuiz();
-    for (int j = 0; j < i; ++j) skip();
+    for (auto j = 0; j < i; ++j) skip();
     startQuiz();
     // make sure _os is in expected 'good' state
     EXPECT_TRUE(_os.good());
@@ -213,8 +212,8 @@ TEST_F(QuizTest, ToggleListMeanings) {
   toggleMeanings(); // turn meanings off
   startQuiz();
   std::string line;
-  bool meaningsOn = false;
-  int found = 0;
+  auto meaningsOn = false;
+  auto found = 0;
   std::string expected("Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
   while (std::getline(_os, line)) {
     if (line.starts_with("Question")) {
@@ -241,9 +240,9 @@ TEST_F(QuizTest, GroupQuiz) {
 }
 
 TEST_F(QuizTest, SkipGroupQuestions) {
-  for (int i = 2; i < 4; ++i) {
+  for (auto i = 2; i < 4; ++i) {
     meaningGroupQuiz();
-    for (int j = 0; j < i; ++j) skip();
+    for (auto j = 0; j < i; ++j) skip();
     startQuiz();
     std::string line, lastLine;
     while (std::getline(_os, line)) lastLine = line;
@@ -257,8 +256,8 @@ TEST_F(QuizTest, ToggleGroupMeanings) {
   toggleMeanings(); // turn meanings on
   toggleMeanings(); // turn meanings off
   startQuiz();
-  bool meaningsOn = false;
-  int found = 0;
+  auto meaningsOn = false;
+  auto found = 0;
   std::string line, expected("みなみ");
   std::string expectedWithMeaning = expected + " : south";
   while (std::getline(_os, line)) {
@@ -278,7 +277,7 @@ TEST_F(QuizTest, EditAfterOneAnswer) {
   edit();
   _is << "b\n"; // change the answer from 'a' to 'b'
   startQuiz();
-  int found = 0;
+  auto found = 0;
   std::string line;
   while (std::getline(_os, line)) {
     if (!found) {
@@ -296,7 +295,7 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
   _is << "a\n"; // pick the answer to change (so 1->a)
   _is << "c\n"; // set to a new value (should now become 1->c and 2 still maps to 'b')
   startQuiz();
-  int found = 0;
+  auto found = 0;
   std::string line;
   while (std::getline(_os, line)) {
     if (!found) {

@@ -6,10 +6,10 @@ namespace kanji_tools {
 
 class GroupDataTest : public ::testing::Test {
 protected:
-  static const char** argv() {
-    static const char* arg0 = "testMain";
-    static const char* arg1 = "-data";
-    static const char* arg2 = "../../../data";
+  static auto argv() {
+    static auto arg0 = "testMain";
+    static auto arg1 = "-data";
+    static auto arg2 = "../../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }

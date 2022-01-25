@@ -15,10 +15,10 @@ enum Values {
   PlainDigraphs = 71,
   RomajiVariants = 55
 };
-constexpr int TotalMonographs = HanDakuten + SmallMonographs + DakutenMonographs + PlainMonographs;
-constexpr int TotalDigraphs = HanDakuten + PlainDigraphs + DakutenDigraphs;
-constexpr int TotalKana = TotalMonographs + TotalDigraphs;
-constexpr int TotalRomaji = TotalKana + RomajiVariants;
+constexpr auto TotalMonographs = HanDakuten + SmallMonographs + DakutenMonographs + PlainMonographs;
+constexpr auto TotalDigraphs = HanDakuten + PlainDigraphs + DakutenDigraphs;
+constexpr auto TotalKana = TotalMonographs + TotalDigraphs;
+constexpr auto TotalRomaji = TotalKana + RomajiVariants;
 
 } // namespace
 
@@ -26,8 +26,8 @@ TEST(KanaTest, CheckHiragana) {
   auto& sourceMap = Kana::getMap(CharType::Hiragana);
   EXPECT_EQ(sourceMap.size(), TotalKana);
   // count various types including smallDigraphs (which should be 0)
-  int hanDakutenMonographs = 0, smallMonographs = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
-      hanDakutenDigraphs = 0, dakutenDigraphs = 0, smallDigraphs = 0;
+  auto hanDakutenMonographs = 0, smallMonographs = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
+       hanDakutenDigraphs = 0, dakutenDigraphs = 0, smallDigraphs = 0;
   for (auto& i : sourceMap) {
     MBChar s(i.first);
     std::string c;
@@ -125,7 +125,7 @@ TEST(KanaTest, CheckKatakana) {
 TEST(KanaTest, CheckRomaji) {
   auto& sourceMap = Kana::getMap(CharType::Romaji);
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
-  int aNum = 0, vaNum = 0, iNum = 0, viNum = 0, uNum = 0, vuNum = 0, eNum = 0, veNum = 0, oNum = 0, voNum = 0, nNum = 0;
+  auto aNum{0}, vaNum{0}, iNum{0}, viNum{0}, uNum{0}, vuNum{0}, eNum{0}, veNum{0}, oNum{0}, voNum{0}, nNum{0};
   std::set<std::string> romajiVariants;
   for (auto& i : sourceMap) {
     auto count = [&i](auto& normal, auto& variant) { i.second->romaji() == i.first ? ++normal : ++variant; };

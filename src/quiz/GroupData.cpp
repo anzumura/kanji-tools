@@ -48,13 +48,14 @@ template<typename T>
 void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& list, GroupType groupType) {
   const ColumnFile::Column numberCol("Number"), nameCol("Name"), membersCol("Members");
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
-    const std::string &name(f.get(nameCol)), members(f.get(membersCol));
+    auto& name(f.get(nameCol));
+    auto& members(f.get(membersCol));
     if (name.empty()) f.error("group must have a name");
     if (isAnySingleByte(name)) f.error("group name must be all MB characters");
     if (members.ends_with(",")) f.error("members ends with ,");
 
     DataFile::List kanjiNames;
-    Group::PatternType patternType = Group::PatternType::None;
+    auto patternType = Group::PatternType::None;
     if (groupType == GroupType::Pattern) {
       patternType = name.starts_with(WideColon)     ? Group::PatternType::Peer
         : name.find(WideColon) != std::string::npos ? Group::PatternType::Family
@@ -65,7 +66,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& li
     std::string member;
     for (std::stringstream ss(members); std::getline(ss, member, ',');) kanjiNames.emplace_back(member);
     Data::List memberKanji;
-    for (const auto& i : kanjiNames)
+    for (auto& i : kanjiNames)
       if (auto k = _data->findKanjiByName(i); k)
         memberKanji.push_back(*k);
       else
@@ -76,7 +77,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups, List& li
     if (memberKanji.size() > MaxGroupSize) f.error("group has more than " + std::to_string(MaxGroupSize) + " members");
 
     Entry group = createGroup(f.getInt(numberCol), name, memberKanji, patternType);
-    for (const auto& i : memberKanji) checkInsert(i->name(), groups, group);
+    for (auto& i : memberKanji) checkInsert(i->name(), groups, group);
     list.push_back(group);
   }
 }
@@ -92,7 +93,7 @@ template<typename T> void GroupData::printGroups(const T& groups, const List& gr
   if (fullDebug()) log() << Kanji::Legend << "\nName (number of entries)   Parent Member : Other Members\n";
   TypeMap types;
   StringSet uniqueNames;
-  for (const int numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4; auto& i : groupList) {
+  for (const auto numberWidth = groupList.size() < 100 ? 2 : groupList.size() < 1000 ? 3 : 4; auto& i : groupList) {
     if (fullDebug()) out() << '[' << std::setw(numberWidth) << std::to_string(i->number()) << "]  ";
     if (i->type() == GroupType::Meaning)
       printMeaningGroup(*i, types, uniqueNames);
@@ -113,7 +114,7 @@ void GroupData::printMeaningGroup(const Group& group, TypeMap& types, StringSet&
                            : "")
           << " (" << std::setw(2) << std::setfill(' ') << group.members().size() << ")   :";
   }
-  for (const auto& i : group.members()) {
+  for (auto& i : group.members()) {
     if (fullDebug()) out() << ' ' << i->qualifiedName();
     // the same kanji can be in more than one meaning group so check uniqueness to avoid overcounting
     if (uniqueNames.insert(i->name()).second) types[i->type()].push_back(i->name());
@@ -124,7 +125,7 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
   if (fullDebug())
     out() << std::setw(wideSetw(group.name(), 25)) << group.name() << '(' << std::setw(2) << group.members().size()
           << ")   ";
-  for (const auto& i : group.members()) {
+  for (auto& i : group.members()) {
     types[i->type()].push_back(i->name());
     if (fullDebug()) {
       if (i == group.members()[0]) switch (group.patternType()) {
@@ -141,7 +142,7 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
 template<typename T> void GroupData::printUniqueNames(const T& groups, const StringSet& uniqueNames) const {
   std::map<std::string, int> multipleGroups;
   std::string prevKey;
-  int maxBelongsTo = 0; // will hold the maximum number of groups a kanji belongs to
+  auto maxBelongsTo = 0; // will hold the maximum number of groups a kanji belongs to
   for (auto i = groups.begin(); i != groups.end(); ++i)
     if (i->first == prevKey) {
       if (int belongsTo = ++multipleGroups[i->first]; belongsTo > maxBelongsTo) maxBelongsTo = belongsTo;
@@ -149,7 +150,7 @@ template<typename T> void GroupData::printUniqueNames(const T& groups, const Str
       prevKey = i->first;
   log() << "Unique kanji: " << uniqueNames.size() << " (once " << uniqueNames.size() - multipleGroups.size()
         << ", multi " << multipleGroups.size() << ")\n";
-  for (int i = 1; i <= maxBelongsTo; ++i) {
+  for (auto i = 1; i <= maxBelongsTo; ++i) {
     out() << "  Kanji in " << i + 1 << " groups:";
     for (auto j = multipleGroups.begin(); j != multipleGroups.end(); ++j)
       if (j->second == i) out() << ' ' << j->first;
@@ -161,14 +162,14 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
   out() << "Type Breakdown (showing up to " << MissingTypeExamples << " missing examples per type)\n";
   for (auto i : AllKanjiTypes)
     if (auto j = types.find(i); j != types.end()) {
-      const Data::List& list = _data->typeList(i);
+      auto& list = _data->typeList(i);
       out() << std::right << std::setw(14) << i << ": " << j->second.size() << " / " << list.size();
       if (int missing = list.size() - j->second.size(); missing < 0)
         out() << " -- ERROR: negative missing values"; // shouldn't be possible
       else if (missing > 0) {
         std::sort(j->second.begin(), j->second.end());
         out() << " (";
-        for (int count = 0; auto& k : list)
+        for (auto count = 0; auto& k : list)
           if (!std::binary_search(j->second.begin(), j->second.end(), k->name())) {
             if (count) out() << ' ';
             out() << k->name();

@@ -41,8 +41,7 @@ TEST_F(DataFileTest, GoodOnePerLine) {
   EXPECT_EQ(f.name(), "GoodOnePerLine");
   std::array results = {"北", "海", "道"};
   EXPECT_EQ(f.list().size(), results.size());
-  int pos = 0;
-  for (auto r : results) {
+  for (auto pos = 0; auto r : results) {
     EXPECT_TRUE(f.exists(r));
     // numbers start at 1
     EXPECT_EQ(f.get(r), ++pos);
@@ -57,8 +56,7 @@ TEST_F(DataFileTest, GoodOnePerLineLevel) {
   EXPECT_EQ(f.name(), "N2");
   std::array results = {"犬", "猫", "虎"};
   EXPECT_EQ(f.list().size(), results.size());
-  int pos = 0;
-  for (auto r : results) {
+  for (auto pos = 0; auto r : results) {
     EXPECT_TRUE(f.exists(r));
     EXPECT_EQ(f.get(r), ++pos);
   }
@@ -81,8 +79,7 @@ TEST_F(DataFileTest, MultiplePerLine) {
   EXPECT_EQ(f.name(), "MultiplePerLine");
   std::array results = {"東", "西", "線"};
   EXPECT_EQ(f.list().size(), results.size());
-  int pos = 0;
-  for (auto r : results) {
+  for (auto pos = 0; auto r : results) {
     EXPECT_TRUE(f.exists(r));
     EXPECT_EQ(f.get(r), ++pos);
   }

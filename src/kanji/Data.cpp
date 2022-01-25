@@ -47,7 +47,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 
 fs::path Data::getDataDir(int argc, const char** argv) {
   std::optional<fs::path> found = {};
-  for (int i = 1; !found && i < argc; ++i)
+  for (auto i = 1; !found && i < argc; ++i)
     if (argv[i] == dataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
       auto data = fs::path(argv[i + 1]);

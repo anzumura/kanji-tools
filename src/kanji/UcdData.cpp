@@ -161,7 +161,7 @@ void UcdData::print(const Data& data) const {
   print("Morohashi Ids", joyo.morohashi, jinmei.morohashi, other.morohashi);
   print("Nelson Ids", joyo.nelson, jinmei.nelson, other.nelson);
   auto printLinks = [this, &data](const std::string& name, const auto& list) {
-    int count = std::count_if(list.begin(), list.end(), [this](const auto& i) {
+    auto count = std::count_if(list.begin(), list.end(), [this](const auto& i) {
       auto j = _map.find(i->name());
       return j != _map.end() && j->second.hasLinks();
     });
@@ -183,8 +183,8 @@ void UcdData::printVariationSelectorKanji(const Data& data) const {
   data.log() << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
   data.log() << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
   data.log() << "    -      ----------------------------    -----------------------\n";
-  for (int count = 0; auto& i : data.kanjiNameMap())
-    if (const Kanji& k = *i.second; k.variant()) {
+  for (auto count = 0; auto& i : data.kanjiNameMap())
+    if (auto& k = *i.second; k.variant()) {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    "
                  << toUnicode(k.name(), BracketType::Square) << ' ' << k.name() << " variant of " << k.nonVariantName()
                  << "    ";

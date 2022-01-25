@@ -7,8 +7,7 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto HelpMessage =
-  "\
+constexpr auto HelpMessage = "\
 kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]\n\
           [-r[num] | -t[num]] [kanji]\n\
     -h   show this help message for command-line options\n\
@@ -76,7 +75,7 @@ QuizLauncher::QuizLauncher(int argc, const char** argv, DataPtr data, std::istre
 
   int question = 0;
   bool endOptions = false, showMeanings = false;
-  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+  for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
     if (std::string arg = argv[i]; !endOptions && arg.starts_with("-") && arg.length() > 1) {
       if (arg == "-h") {
         out() << HelpMessage;
@@ -350,13 +349,13 @@ void QuizLauncher::printJukugoList(const std::string& name, const JukugoData::Li
     std::array<int, JukugoPerLine> colWidths;
     colWidths.fill(0);
     // make each column wide enough to hold the longest entry plus 2 spaces (upto MaxJukugoLength)
-    for (int i = 0; i < list.size(); ++i)
+    for (auto i = 0; i < list.size(); ++i)
       if (colWidths[i % JukugoPerLine] < MaxJukugoLength) {
         const int length = displayLength(list[i]->nameAndReading()) + 2;
         if (length > colWidths[i % JukugoPerLine])
           colWidths[i % JukugoPerLine] = length < MaxJukugoLength ? length : MaxJukugoLength;
       }
-    for (int i = 0; i < list.size(); ++i) {
+    for (auto i = 0; i < list.size(); ++i) {
       if (i % JukugoPerLine == 0) out() << '\n';
       auto s = list[i]->nameAndReading();
       out() << std::left << std::setw(wideSetw(s, colWidths[i % JukugoPerLine])) << s;

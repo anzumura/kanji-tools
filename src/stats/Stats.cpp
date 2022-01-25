@@ -21,8 +21,7 @@ std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
   return os;
 }
 
-constexpr auto HelpMessage =
-  "\
+constexpr auto HelpMessage = "\
 kanjiStats [-bhv] file [file ...]:\n\
   -b: show full kanji breakdown for 'file' (instead of just a summary)\n\
   -h: show help message for command-line options\n\
@@ -45,7 +44,7 @@ std::string Stats::Count::toHex() const {
 Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
   bool breakdown = false, endOptions = false, verbose = false;
   std::vector<std::string> files;
-  for (int i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+  for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
     if (std::string arg = argv[i]; !endOptions && arg.starts_with("-")) {
       if (arg == "-h") {
         out() << HelpMessage;
@@ -79,11 +78,11 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
                     f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
   int total = 0;
-  for (int i = 0; i < IncludeInTotals; ++i) total += totals[i].first;
+  for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].first;
   log() << "Total Kanji+Kana: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);
-    for (int i = 0; i < IncludeInTotals; ++i)
+    for (auto i = 0; i < IncludeInTotals; ++i)
       if (totals[i].first) {
         if (totals[i].second != totals[0].second) out() << ", ";
         out() << totals[i].second << ": " << asPercent(totals[i].first, total) << "%";
@@ -164,7 +163,7 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
       out() << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
             << asPercent(totalForType, total) << "%  (";
       auto& j = found[t];
-      for (int k = 0; k < j.size(); ++k) {
+      for (auto k = 0; k < j.size(); ++k) {
         if (k) out() << ", ";
         out() << j[k].name << ' ' << j[k].count;
       }
@@ -174,7 +173,7 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
 
 void Stats::printExamples(const CountSet& frequency) const {
   out() << std::setw(12) << '(';
-  for (int i = 0; const auto& j : frequency) {
+  for (auto i = 0; const auto& j : frequency) {
     if (i) out() << ", ";
     out() << j.name << ' ' << j.count;
     if (++i == MaxExamples) break;

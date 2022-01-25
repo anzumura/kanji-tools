@@ -9,10 +9,10 @@ namespace kanji_tools {
 
 class StatsTest : public ::testing::Test {
 protected:
-  static const char** argv() {
-    static const char* arg0 = "testMain";
-    static const char* arg1 = "-data";
-    static const char* arg2 = "../../../data";
+  static auto argv() {
+    static auto arg0 = "testMain";
+    static auto arg1 = "-data";
+    static auto arg2 = "../../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
@@ -44,7 +44,7 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
     ">>>        MB-Letter:    244, unique:   11",
     ">>> Total Kanji+Kana: 24807 (Hiragana: 32.2%, Katakana: 28.7%, Common Kanji: 39.1%)"};
   std::string line;
-  int count = 0, maxLines = std::size(expected);
+  int count{0}, maxLines{std::size(expected)};
   while (std::getline(_os, line)) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count++]);
@@ -73,7 +73,7 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
     ">>>        MB-Letter:   1204, unique:   36",
     ">>> Total Kanji+Kana: 112846 (Hiragana: 38.3%, Katakana: 21.7%, Common Kanji: 40.1%)"};
   std::string line;
-  int count = 0, maxLines = std::size(expected);
+  int count{0}, maxLines{std::size(expected)};
   while (std::getline(_os, line)) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count++]);
@@ -85,7 +85,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   const char* testArgs[] = {"", "../../../tests/stats/sample-data/wiki-articles/"};
   Stats stats(std::size(testArgs), testArgs, _data);
   std::string line;
-  bool found = false;
+  auto found = false;
   while (!found && std::getline(_os, line)) found = line.starts_with(">>> Stats for: wiki-articles (3 files)");
   EXPECT_TRUE(found);
 }
@@ -112,7 +112,7 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
     ">>>        MB-Letter:   1704, unique:   39",
     ">>> Total Kanji+Kana: 283386 (Hiragana: 57.4%, Katakana: 8.7%, Common Kanji: 33.9%, Rare Kanji: 0.0%)"};
   std::string line;
-  int count = 0, maxLines = std::size(expected);
+  int count{0}, maxLines{std::size(expected)};
   while (std::getline(_os, line)) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count++]);

@@ -9,7 +9,7 @@ namespace kanji_tools {
 void RadicalData::load(const std::filesystem::path& file) {
   const ColumnFile::Column numberCol("Number"), nameCol("Name"), longNameCol("LongName"), readingCol("Reading");
   for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol}); f.nextRow();) {
-    const int radicalNumber = f.getInt(numberCol);
+    const auto radicalNumber = f.getInt(numberCol);
     if (radicalNumber != f.currentRow()) f.error("radicals must be ordered by 'number'");
     std::stringstream radicals(f.get(nameCol));
     Radical::AltForms altForms;
@@ -44,13 +44,13 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
     KanjiList& l = i.second;
     std::sort(l.begin(), l.end(), [](const auto& x, const auto& y) { return x->strokes() < y->strokes(); });
     Count count;
-    for (const auto& j : l) {
+    for (auto& j : l) {
       ++count[j->type()];
       ++total[j->type()];
     }
     data.out() << i.first << ':';
     printCounts(data, count);
-    int j = 0;
+    auto j = 0;
     for (; j < l.size() && j < MaxExamples; ++j) data.out() << ' ' << l[j]->name();
     if (j < l.size()) data.out() << " ...";
     data.out() << '\n';
@@ -61,17 +61,17 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
 
 void RadicalData::printMissingRadicals(const Data& data, const RadicalLists& radicals) const {
   std::vector<Radical> missingRadicals;
-  for (const auto& i : _radicals)
+  for (auto& i : _radicals)
     if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
   if (!missingRadicals.empty()) {
     data.log() << "  Found " << missingRadicals.size() << " radicals with no kanji:";
-    for (const auto& i : missingRadicals) data.out() << ' ' << i;
+    for (auto& i : missingRadicals) data.out() << ' ' << i;
     data.out() << '\n';
   }
 }
 
 void RadicalData::printCounts(const Data& data, const Count& c, bool summary) const {
-  const int t = std::accumulate(c.begin(), c.end(), 0, [](const auto& x, const auto& y) { return x + y.second; });
+  const auto t = std::accumulate(c.begin(), c.end(), 0, [](const auto& x, const auto& y) { return x + y.second; });
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
   for (auto i : AllKanjiTypes) {
     if (auto j = c.find(i); summary) {

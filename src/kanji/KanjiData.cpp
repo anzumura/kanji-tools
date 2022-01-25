@@ -111,9 +111,9 @@ void KanjiData::noFreq(int f, bool brackets) const {
 template<typename T> void KanjiData::printCount(const std::string& name, T pred, int printExamples) const {
   std::vector<std::pair<KanjiTypes, int>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
-  int total = 0;
+  auto total = 0;
   for (auto& l : _types) {
-    int count = 0;
+    auto count = 0;
     if (printExamples)
       for (auto& i : l.second) {
         if (pred(i) && ++count <= printExamples) examples[l.first].push_back(i->name());
@@ -127,9 +127,9 @@ template<typename T> void KanjiData::printCount(const std::string& name, T pred,
   }
   if (total) {
     log() << name << ' ' << total << " (";
-    for (const auto& i : counts) {
+    for (auto& i : counts) {
       out() << i.first << ' ' << i.second;
-      for (const auto& j : examples[i.first]) out() << ' ' << j;
+      for (auto& j : examples[i.first]) out() << ' ' << j;
       total -= i.second;
       if (total) out() << ", ";
     }
@@ -139,7 +139,7 @@ template<typename T> void KanjiData::printCount(const std::string& name, T pred,
 
 void KanjiData::printStats() const {
   log() << "Loaded " << kanjiNameMap().size() << " Kanji (";
-  for (const auto& i : _types) {
+  for (auto& i : _types) {
     if (i != *_types.begin()) out() << ' ';
     out() << i.first << ' ' << i.second.size();
   }
@@ -160,8 +160,8 @@ void KanjiData::printStats() const {
 
 void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
-  int all = 0;
-  for (const auto& jouyou = _types.at(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
+  auto all = 0;
+  for (auto& jouyou = _types.at(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
     auto grade = [i](const auto& x) { return x->grade() == i; };
     if (auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade); gradeCount) {
       all += gradeCount;
@@ -189,23 +189,23 @@ template<typename T, size_t S>
 void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() const, const std::string& name,
                                bool showNoFrequency) const {
   log() << name << " breakdown:\n";
-  int total = 0;
+  auto total = 0;
   for (auto i : all) {
     std::vector<std::pair<KanjiTypes, int>> counts;
-    int iTotal = 0;
-    for (const auto& l : _types) {
-      int count = std::count_if(l.second.begin(), l.second.end(), [i, &p](const auto& x) { return ((*x).*p)() == i; });
-      if (count) {
+    auto iTotal = 0;
+    for (const auto& l : _types)
+      if (const auto count =
+            std::count_if(l.second.begin(), l.second.end(), [i, &p](const auto& x) { return ((*x).*p)() == i; });
+          count) {
         counts.emplace_back(l.first, count);
         iTotal += count;
       }
-    }
     if (iTotal) {
       total += iTotal;
       log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
-      for (const auto& j : counts) {
+      for (auto& j : counts) {
         out() << j.first << ' ' << j.second;
-        const auto& l = _types.at(j.first);
+        auto& l = _types.at(j.first);
         if (showNoFrequency)
           noFreq(
             std::count_if(l.begin(), l.end(), [i, &p](const auto& x) { return ((*x).*p)() == i && !x->frequency(); }));

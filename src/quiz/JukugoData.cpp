@@ -30,7 +30,7 @@ JukugoData::JukugoData(const Data& data) {
     for (auto& i : _kanjiToJukugo) types[data.getType(i.first)].push_back(i.first);
     for (auto& i : types) {
       data.out() << std::right << std::setw(14) << i.first << ": " << i.second.size() << ' ';
-      for (int j = 0; j < i.second.size() && j < 12; ++j) data.out() << (j == 0 ? '(' : ' ') << i.second[j];
+      for (auto j = 0; j < i.second.size() && j < 12; ++j) data.out() << (j == 0 ? '(' : ' ') << i.second[j];
       data.out() << ")\n";
     }
   }
@@ -77,7 +77,7 @@ void JukugoData::createJukugo(T& error, KanjiGrades grade, const std::string& na
   JukugoKey key{name, reading};
   if (auto i = _uniqueJukugo.find(key); i == _uniqueJukugo.end()) {
     MBChar nameChars(name), readingChars(reading);
-    int count = 0;
+    auto count = 0;
     for (std::string c; nameChars.next(c);)
       if (isKanji(c)) ++count;
     if (count < 2) error("jukugo '" + name + "' must consist of two or more kanji");
