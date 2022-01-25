@@ -7,6 +7,7 @@ BasedOnStyle: Google
 AccessModifierOffset: -2
 AlignOperands: false
 AllowShortCaseLabelsOnASingleLine: true
+AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: MultiLine
 ColumnLimit: 120
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
