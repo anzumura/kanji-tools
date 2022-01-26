@@ -1,8 +1,8 @@
 #ifndef KANJI_TOOLS_QUIZ_JUKUGO_DATA_H
 #define KANJI_TOOLS_QUIZ_JUKUGO_DATA_H
 
-#include <kanji_tools/quiz/Jukugo.h>
 #include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/quiz/Jukugo.h>
 
 #include <map>
 #include <vector>
