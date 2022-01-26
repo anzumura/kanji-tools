@@ -111,7 +111,7 @@ constexpr bool inRange(char32_t c, const std::array<UnicodeBlock, N>& t, Ts... a
 
 // Return true if the first 'MB character' is in the given blocks, empty string will return false and
 // a string longer than one 'MB characer' will also return false unless 'checkLengthOne' is false.
-template<typename... T> inline bool inWCharRange(const std::string& s, bool checkLengthOne, T... t) {
+template<typename... T> inline auto inWCharRange(const std::string& s, bool checkLengthOne, T... t) {
   if (s.length() > 1 && (!checkLengthOne || s.length() < 9))
     if (auto w = fromUtf8(s);
         checkLengthOne ? w.length() == 1 || w.length() == 2 && inRange(w[1], NonSpacingBlocks) : w.length() >= 1)
@@ -120,7 +120,7 @@ template<typename... T> inline bool inWCharRange(const std::string& s, bool chec
 }
 
 // Return true if all characers are in the given blocks, empty string will also return true
-template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
+template<typename... T> inline auto inWCharRange(const std::string& s, T... t) {
   // an 'inRange' character can be followed by a 'variation selector'
   for (auto allowNonSpacing = false; auto i : fromUtf8(s))
     if (allowNonSpacing && inRange(i, NonSpacingBlocks))
@@ -138,58 +138,58 @@ template<typename... T> inline bool inWCharRange(const std::string& s, T... t) {
 // 'true' only if all the characers in the string are the desired type.
 
 // kana
-inline bool isHiragana(const std::string& s, bool checkLengthOne = true) {
+inline auto isHiragana(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, HiraganaBlocks);
 }
-inline bool isAllHiragana(const std::string& s) { return inWCharRange(s, HiraganaBlocks); }
-inline bool isKatakana(const std::string& s, bool checkLengthOne = true) {
+inline auto isAllHiragana(const std::string& s) { return inWCharRange(s, HiraganaBlocks); }
+inline auto isKatakana(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, KatakanaBlocks);
 }
-inline bool isAllKatakana(const std::string& s) { return inWCharRange(s, KatakanaBlocks); }
-inline bool isKana(const std::string& s, bool checkLengthOne = true) {
+inline auto isAllKatakana(const std::string& s) { return inWCharRange(s, KatakanaBlocks); }
+inline auto isKana(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, HiraganaBlocks, KatakanaBlocks);
 }
-inline bool isAllKana(const std::string& s) { return inWCharRange(s, HiraganaBlocks, KatakanaBlocks); }
+inline auto isAllKana(const std::string& s) { return inWCharRange(s, HiraganaBlocks, KatakanaBlocks); }
 
 // kanji
-inline bool isCommonKanji(const std::string& s, bool checkLengthOne = true) {
+inline auto isCommonKanji(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, CommonKanjiBlocks);
 }
-inline bool isAllCommonKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks); }
-inline bool isRareKanji(const std::string& s, bool checkLengthOne = true) {
+inline auto isAllCommonKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks); }
+inline auto isRareKanji(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, RareKanjiBlocks);
 }
-inline bool isAllRareKanji(const std::string& s) { return inWCharRange(s, RareKanjiBlocks); }
-inline bool isKanji(const std::string& s, bool checkLengthOne = true) {
+inline auto isAllRareKanji(const std::string& s) { return inWCharRange(s, RareKanjiBlocks); }
+inline auto isKanji(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, CommonKanjiBlocks, RareKanjiBlocks);
 }
-inline bool isAllKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks); }
+inline auto isAllKanji(const std::string& s) { return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks); }
 
 // 'isMBPunctuation' tests for wide space by default, but also allows not including spaces.
-inline bool isMBPunctuation(const std::string& s, bool includeSpace = true, bool checkLengthOne = true) {
+inline auto isMBPunctuation(const std::string& s, bool includeSpace = true, bool checkLengthOne = true) {
   return s.starts_with("　") ? (includeSpace && (s.length() < 4 || !checkLengthOne))
                              : inWCharRange(s, checkLengthOne, PunctuationBlocks);
 }
-inline bool isAllMBPunctuation(const std::string& s) { return inWCharRange(s, PunctuationBlocks); }
-inline bool isMBSymbol(const std::string& s, bool checkLengthOne = true) {
+inline auto isAllMBPunctuation(const std::string& s) { return inWCharRange(s, PunctuationBlocks); }
+inline auto isMBSymbol(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, SymbolBlocks);
 }
-inline bool isAllMBSymbol(const std::string& s) { return inWCharRange(s, SymbolBlocks); }
-inline bool isMBLetter(const std::string& s, bool checkLengthOne = true) {
+inline auto isAllMBSymbol(const std::string& s) { return inWCharRange(s, SymbolBlocks); }
+inline auto isMBLetter(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, LetterBlocks);
 }
-inline bool isAllMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
+inline auto isAllMBLetter(const std::string& s) { return inWCharRange(s, LetterBlocks); }
 
 // 'isRecognizedCharacter' returns true if 's' is in any UnicodeBlock defined in this header file (including wide space)
-inline bool isRecognizedCharacter(const std::string& s, bool checkLengthOne = true) {
+inline auto isRecognizedCharacter(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks,
                       PunctuationBlocks, SymbolBlocks, LetterBlocks);
 }
-inline bool isAllRecognizedCharacters(const std::string& s) {
+inline auto isAllRecognizedCharacters(const std::string& s) {
   return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks,
                       SymbolBlocks, LetterBlocks);
 }
-inline bool isNonSpacing(const std::string& s, bool checkLengthOne = true) {
+inline auto isNonSpacing(const std::string& s, bool checkLengthOne = true) {
   return inWCharRange(s, checkLengthOne, NonSpacingBlocks);
 }
 
