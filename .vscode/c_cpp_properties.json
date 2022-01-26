@@ -1,25 +1,26 @@
 {
-    "configurations": [
-        {
-            "name": "Mac",
-            "includePath": [
-                "${workspaceFolder}/**"
-            ],
-            "defines": [],
-            "macFrameworkPath": [],
-            "configurationProvider": "ms-vscode.cmake-tools",
-            "compilerArgs": [],
-            "cStandard": "c17",
-            "cppStandard": "c++20",
-            "intelliSenseMode": "macos-clang-arm64",
-            "browse": {
-                "path": [
-                    "${workspaceFolder}"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            },
-            "compilerPath": "/usr/bin/clang++"
-        }
-    ],
-    "version": 4
+  "env": {
+    "deps": "${workspaceFolder}/build/_deps",
+    "tools": "/Library/Developer/CommandLineTools",
+    "sdk": "${tools}/SDKs/MacOSX12.1.sdk/usr/include"
+  },
+  "configurations": [
+    {
+      "name": "Mac",
+      "includePath": [
+        "${workspaceFolder}/include",
+        "${deps}/googletest-src/googletest/include",
+        "${deps}/googletest-src/googlemock/include",
+        "${sdk}/c++/v1",
+        "${sdk}",
+        "${tools}/usr/lib/clang/13.0.0/include"
+      ],
+      "defines": [],
+      "macFrameworkPath": [],
+      "compilerArgs": ["-std=c++2a"],
+      "intelliSenseMode": "macos-clang-arm64",
+      "compilerPath": "/usr/bin/clang++"
+    }
+  ],
+  "version": 4
 }

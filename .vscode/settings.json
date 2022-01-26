@@ -4,7 +4,6 @@
     120
   ],
   "workbench.editor.enablePreview": false,
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "files.associations": {
     "array": "cpp",
     "__bit_reference": "cpp",
@@ -102,7 +101,6 @@
     "__bits": "cpp",
     "__functional_03": "cpp"
   },
-  "C_Cpp.errorSquiggles": "Disabled",
   "cSpell.words": [
     "akai",
     "Aozora",
