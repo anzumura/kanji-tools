@@ -123,8 +123,8 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
   auto count = 0;
   auto hasSmallTsu = false, groupDone = false;
   const Kana* prevKana = nullptr;
-  auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter, &afterN](
-                bool startNewGroup = true, bool prolong = false) {
+  auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter,
+               &afterN](bool startNewGroup = true, bool prolong = false) {
     result += kanaLetters(letterGroup, source, count, prevKana, prolong);
     if (romajiTarget() && Kana::N.containsKana(letterGroup) && afterN.contains(letter)) result += _apostrophe;
     hasSmallTsu = false;
