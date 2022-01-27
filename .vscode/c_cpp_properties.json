@@ -2,7 +2,7 @@
   "env": {
     "deps": "${workspaceFolder}/build/_deps",
     "tools": "/Library/Developer/CommandLineTools",
-    "sdk": "${tools}/SDKs/MacOSX12.1.sdk/usr/include"
+    "sdk": "${tools}/SDKs/MacOSX.sdk/usr/include"
   },
   "configurations": [
     {
