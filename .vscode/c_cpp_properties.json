@@ -1,6 +1,6 @@
 {
   "env": {
-    "google": "${workspaceFolder}/build/_dep/googletest-src",
+    "google": "${workspaceFolder}/build/_deps/googletest-src",
     "tools": "/Library/Developer/CommandLineTools",
     "sdk": "${tools}/SDKs/MacOSX.sdk/usr/include"
   },
