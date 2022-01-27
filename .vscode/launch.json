@@ -1,17 +1,21 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
+  // To debug on an 'M1 Mac' install 'CoreLLDB' extension (as per this link:
+  // https://github.com/microsoft/vscode-cpptools/issues/6779). Also, 'CMake
+  // Tools' currently only supports 'cpptools' so debugging must be started
+  // from the 'Run and Debug' view after setting the default build target (see:
+  // https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html).
   "configurations": [
     {
-      "name": "clang++ - Build and debug active file",
+      "name": "(lldb) Launch",
       "type": "lldb",
       "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
+      "program": "${command:cmake.launchTargetPath}",
       "args": [],
-      "cwd": "${fileDirname}",
-      "preLaunchTask": "C/C++: clang++ build active file"
+      "stopAtEntry": true,
+      "cwd": "${command:cmake.launchTargetDirectory}",
+      "externalConsole": false,
+      "MIMode": "lldb"
     }
   ]
 }
