@@ -16,7 +16,7 @@ void Table::add(const Row& row, bool startNewSection) {
 }
 
 void Table::print(std::ostream& os) const {
-  std::vector<int> widths;
+  Widths widths;
   for (auto& i : _title) widths.push_back(displayLength(i));
   for (auto& row : _rows) {
     for (int colNum = 0; colNum < row.size(); ++colNum) {

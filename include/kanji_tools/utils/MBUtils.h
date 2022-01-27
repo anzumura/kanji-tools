@@ -7,14 +7,14 @@
 
 namespace kanji_tools {
 
-// Helper functions to convert between 'utf8' strings and 'char32_t' wstrings
+// Helper functions to convert between 'utf8' strings and 'wchar_t' wstrings
 
 inline auto fromUtf8(const std::string& s) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
   return conv.from_bytes(s);
 }
 
-inline auto toUtf8(char32_t c) {
+inline auto toUtf8(wchar_t c) {
   static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
   return conv.to_bytes(c);
 }
@@ -38,7 +38,7 @@ inline auto addBrackets(const std::string& s, BracketType t) {
   return s;
 }
 
-inline auto addLeadingZeroes(const std::string& result, int minSize) {
+inline auto addLeadingZeroes(const std::string& result, size_t minSize) {
   static const std::string Zero("0");
   if (result.length() < minSize) return std::string(minSize - result.length(), '0') + result;
   if (result.empty()) return Zero;
@@ -50,40 +50,38 @@ inline auto addLeadingZeroes(const std::string& result, int minSize) {
 // the same length for a given type, i.e., if 'x' is char then toHex returns a string of length 2
 // and toBinary returns a string of length 8. 'minSize' is ignored if it's less than 'result' size.
 
-template<typename T> inline auto toBinary(T x, BracketType brackets, int minSize = 0) {
+template<typename T> inline auto toBinary(T x, BracketType brackets, size_t minSize = 0) {
   std::string result;
   for (; x > 0; x >>= 1) result.insert(result.begin(), '0' + x % 2);
   return addBrackets(addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
 }
-template<typename T> inline auto toBinary(T x, int minSize = 0) {
-  return toBinary(x, BracketType::None, minSize);
-}
+template<typename T> inline auto toBinary(T x, int minSize = 0) { return toBinary(x, BracketType::None, minSize); }
 
 enum class HexCase { Upper, Lower };
 
-template<typename T> inline auto toHex(T x, BracketType brackets, HexCase hexCase, int minSize = 0) {
+template<typename T> inline auto toHex(T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
   std::string result;
   for (; x > 0; x >>= 4) {
-    const auto i = x % 16;
+    const char i = x % 16;
     result.insert(result.begin(), (i < 10 ? '0' + i : (hexCase == HexCase::Upper ? 'A' : 'a') + i - 10));
   }
   return addBrackets(addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 2), brackets);
 }
-template<typename T> inline auto toHex(T x, HexCase hexCase, int minSize = 0) {
+template<typename T> inline auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
   return toHex(x, BracketType::None, hexCase, minSize);
 }
-template<typename T> inline auto toHex(T x, BracketType brackets, int minSize = 0) {
+template<typename T> inline auto toHex(T x, BracketType brackets, size_t minSize = 0) {
   return toHex(x, brackets, HexCase::Lower, minSize);
 }
-template<typename T> inline auto toHex(T x, int minSize = 0) {
+template<typename T> inline auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }
 
 // provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
-template<> inline auto toBinary(char x, BracketType brackets, int minSize) {
+template<> inline auto toBinary(char x, BracketType brackets, size_t minSize) {
   return toBinary(static_cast<unsigned char>(x), brackets, minSize);
 }
-template<> inline auto toHex(char x, BracketType brackets, HexCase hexCase, int minSize) {
+template<> inline auto toHex(char x, BracketType brackets, HexCase hexCase, size_t minSize) {
   return toHex(static_cast<unsigned char>(x), brackets, hexCase, minSize);
 }
 
@@ -104,7 +102,6 @@ inline auto toUnicode(const std::string& s, BracketType brackets = BracketType::
 // check if a given char or string is not a 'multi-byte char'
 constexpr auto isSingleByteChar(char x) noexcept { return x >= 0; }
 constexpr auto isSingleByteChar(wchar_t x) noexcept { return x >= 0 && x < 128; }
-constexpr auto isSingleByteChar(char32_t x) noexcept { return x >= 0 && x < 128; }
 inline auto isSingleByte(const std::string& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }

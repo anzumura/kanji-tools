@@ -103,10 +103,11 @@ public:
   KenteiKyus kyu() const override { return _type; }
 };
 
+// simple function to capitalize first letter of an ascii (non-multibyte) string
 inline auto capitalize(const std::string& s) {
   if (s.length() && std::islower(s[0])) {
     std::string result(s);
-    result[0] = std::toupper(result[0]);
+    result[0] = static_cast<char>(std::toupper(result[0]));
     return result;
   }
   return s;

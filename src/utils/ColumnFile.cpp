@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 int ColumnFile::getColumnNumber(const std::string& name) {
   auto i = _allColumns.find(name);
   if (i == _allColumns.end()) {
-    int n = _allColumns.size();
+    auto n = static_cast<int>(_allColumns.size());
     _allColumns[name] = n;
     return n;
   }

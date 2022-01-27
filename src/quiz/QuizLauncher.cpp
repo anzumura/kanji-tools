@@ -52,13 +52,11 @@ constexpr char GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9', L
 constexpr char DefaultProgramMode = 't', DefaultQuestionOrder = 'r', DefaultQuizType = 'g', DefaultGrade = '6',
                DefaultKyu = '2', DefaultListChoiceCount = '4', DefaultListStyle = 'k', DefaultGroupKanji = '2';
 
-constexpr char QuitOption = '/';
-
 } // namespace
 
 QuizLauncher::QuizLauncher(int argc, const char** argv, DataPtr data, std::istream* in)
   : _programMode(ProgramMode::NotAssigned), _questionOrder(QuestionOrder::NotAssigned),
-    _choice(data->out(), in, QuitOption), _groupData(data), _jukugoData(*data) {
+    _choice(data->out(), in, '/'), _groupData(data), _jukugoData(*data) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume length is at least 2)
   auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,

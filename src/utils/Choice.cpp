@@ -12,11 +12,11 @@ const std::string AlreadyInChoices("' already in choices");
 } // namespace
 
 char Choice::getOneChar() {
-  struct termios settings = {0};
+  struct termios settings{};
   if (tcgetattr(0, &settings) < 0) perror("tcsetattr()");
   // turn raw mode on - allows getting a single char from terminal without waiting 'return'
-  settings.c_lflag &= ~ICANON;
-  settings.c_lflag &= ~ECHO;
+  settings.c_lflag &= ~static_cast<tcflag_t>(ICANON);
+  settings.c_lflag &= ~static_cast<tcflag_t>(ECHO);
   settings.c_cc[VMIN] = 1;
   settings.c_cc[VTIME] = 0;
   if (tcsetattr(0, TCSANOW, &settings) < 0) perror("tcsetattr() - turning on raw mode");

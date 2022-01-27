@@ -113,10 +113,6 @@ std::array HanDakutenKanaList = {H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{
                                  H{"hye", "ひぇ", "ヒェ", K{"bye", "びぇ", "ビェ"}, K{"pye", "ぴぇ", "ピェ"}},
                                  H{"hyo", "ひょ", "ヒョ", K{"byo", "びょ", "ビョ"}, K{"pyo", "ぴょ", "ピョ"}}};
 
-auto& operator<<(std::ostream& os, const K& k) {
-  return os << '[' << k.romaji() << ", " << k.hiragana() << ", " << k.katakana() << ']';
-}
-
 } // namespace
 
 const std::string& Kana::getRomaji(int flags) const {

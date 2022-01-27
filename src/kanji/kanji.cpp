@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName, const Radical& radical, int strokes,
              const OptString& morohashiId, const NelsonIds& nelsonIds, const OptString& pinyin)
-  : _name(name), _compatibilityName(compatibilityName), _nonVariantName(MBChar::optionalWithoutVariationSelector(name)),
+  : _name(name), _nonVariantName(MBChar::optionalWithoutVariationSelector(name)), _compatibilityName(compatibilityName),
     _radical(radical), _strokes(strokes), _morohashiId(morohashiId), _nelsonIds(nelsonIds), _pinyin(pinyin) {
   assert(MBChar::length(_name) == 1);
 }
@@ -19,7 +19,6 @@ std::string Kanji::info(int infoFields) const {
     if (!result.empty()) result += ", ";
     result += x;
   };
-  auto t = type();
   if (infoFields & RadicalField) add(Rad + radical().name() + '(' + std::to_string(radical().number()) + ')');
   if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
   if (infoFields & PinyinField && pinyin()) add(*pinyin());

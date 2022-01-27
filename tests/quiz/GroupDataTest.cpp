@@ -24,7 +24,7 @@ TEST_F(GroupDataTest, SanityChecks) {
   EXPECT_FALSE(_groupData.meaningGroups().empty());
   EXPECT_FALSE(_groupData.patternGroups().empty());
   // numbers are unique and each group member is in 'groupMap'
-  auto checkNumbers = [this](const GroupData::List& list, const auto& groupMap) {
+  auto checkNumbers = [](const GroupData::List& list, const auto& groupMap) {
     std::set<int> uniqueNumbers;
     for (auto i : list) {
       EXPECT_TRUE(uniqueNumbers.insert(i->number()).second) << i->name() << " has duplicate number " << i->number();

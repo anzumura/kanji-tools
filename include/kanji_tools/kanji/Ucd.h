@@ -32,8 +32,8 @@ public:
       int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
       const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, LinkTypes linkType, bool linkedReadings,
       const std::string& meaning, const std::string& onReading, const std::string& kunReading)
-    : _code(code), _name(name), _block(block), _version(version), _pinyin(pinyin), _morohashiId(morohashiId),
-      _nelsonIds(nelsonIds), _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes), _joyo(joyo),
+    : _code(code), _name(name), _block(block), _version(version), _radical(radical), _strokes(strokes),
+      _variantStrokes(variantStrokes), _pinyin(pinyin), _morohashiId(morohashiId), _nelsonIds(nelsonIds), _joyo(joyo),
       _jinmei(jinmei), _links(links), _linkType(linkType), _linkedReadings(linkedReadings), _meaning(meaning),
       _onReading(onReading), _kunReading(kunReading) {}
 

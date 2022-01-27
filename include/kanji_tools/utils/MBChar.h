@@ -114,7 +114,8 @@ public:
   // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
   static auto valid(const char* s, bool checkLengthOne = true) {
     if (s) {
-      if (const unsigned char x = *s; (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
+      if (auto x = static_cast<const unsigned char>(*s);
+          (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
         if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
         if (x & Bit3) {
           if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
