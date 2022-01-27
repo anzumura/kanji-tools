@@ -1,25 +1,23 @@
 {
   "env": {
-    "deps": "${workspaceFolder}/build/_deps",
+    "google": "${workspaceFolder}/build/_dep/googletest-src",
     "tools": "/Library/Developer/CommandLineTools",
     "sdk": "${tools}/SDKs/MacOSX.sdk/usr/include"
   },
   "configurations": [
     {
       "name": "Mac",
+      "compilerPath": "/usr/bin/clang++",
+      "cppStandard": "c++20",
       "includePath": [
         "${workspaceFolder}/include",
-        "${deps}/googletest-src/googletest/include",
-        "${deps}/googletest-src/googlemock/include",
+        "${google}/googletest/include",
+        "${google}/googlemock/include",
         "${sdk}/c++/v1",
         "${sdk}",
         "${tools}/usr/lib/clang/13.0.0/include"
       ],
-      "defines": [],
-      "macFrameworkPath": [],
-      "compilerArgs": ["-std=c++2a"],
-      "intelliSenseMode": "macos-clang-arm64",
-      "compilerPath": "/usr/bin/clang++"
+      "intelliSenseMode": "macos-clang-arm64"
     }
   ],
   "version": 4
