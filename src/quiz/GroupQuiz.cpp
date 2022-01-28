@@ -1,6 +1,7 @@
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <kanji_tools/utils/DisplayLength.h>
 
+#include <optional>
 #include <random>
 
 namespace kanji_tools {
@@ -21,29 +22,29 @@ constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ",
 
 constexpr auto RefreshOption = '\'', EditOption = '*';
 
-constexpr int TotalLetters = 'z' - 'a';
+constexpr auto TotalLetters = 'z' - 'a';
 
 } // namespace
 
 GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const GroupData::List& list,
                      MemberType memberType)
   : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
-  auto bucket = -1;
+  std::optional<size_t> bucket;
   // for 'pattern' groups, allow choosing a smaller subset based on the name reading
   if (_groupType == GroupType::Pattern) {
     const auto c = get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
     if (isQuit(c)) return;
     bucket = c - '1';
   }
-  if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::FromBeginning && memberType == All && bucket == -1)
+  if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::FromBeginning && memberType == All && !bucket)
     start(list, memberType);
   else {
     GroupData::List newList;
-    const auto bucketHasEnd = bucket >= 0 && bucket < PatternGroupBuckets.size();
-    for (auto startIncluding = bucket <= 0; const auto& i : list) {
+    const size_t bucketHasEnd = bucket && *bucket < PatternGroupBuckets.size();
+    for (auto startIncluding = !bucket.value_or(0); const auto& i : list) {
       if (startIncluding) {
-        if (bucketHasEnd && i->name().find(PatternGroupBuckets[bucket]) != std::string::npos) break;
-      } else if (i->name().find(PatternGroupBuckets[bucket - 1]) != std::string::npos)
+        if (bucketHasEnd && i->name().find(PatternGroupBuckets[*bucket]) != std::string::npos) break;
+      } else if (i->name().find(PatternGroupBuckets[*bucket - 1]) != std::string::npos)
         startIncluding = true;
       if (auto memberCount = 0; startIncluding) {
         for (auto& j : i->members())
@@ -135,13 +136,13 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
 void GroupQuiz::printAssignedAnswers() const {
   if (!_answers.empty()) {
     out() << "   ";
-    for (auto i = 0; i < _answers.size(); ++i) out() << ' ' << i + 1 << "->" << _answers[i];
+    for (size_t i = 0; i < _answers.size(); ++i) out() << ' ' << i + 1 << "->" << _answers[i];
     out() << '\n';
   }
 }
 
 std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
-  for (auto i = 0; i < _answers.size(); ++i)
+  for (size_t i = 0; i < _answers.size(); ++i)
     if (_answers[i] == choice) return out() << std::right << std::setw(2) << i + 1 << "->";
   return out() << "    ";
 }
@@ -161,8 +162,8 @@ void GroupQuiz::showGroup(const List& questions, const List& readings, Choices& 
   out() << '\n';
 }
 
-bool GroupQuiz::getAnswers(int totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) {
-  for (auto i = _answers.size(); i < totalQuestions; ++i)
+bool GroupQuiz::getAnswers(size_t totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) {
+  for (size_t i = _answers.size(); i < totalQuestions; ++i)
     if (auto refresh = false; !getAnswer(choices, skipGroup, refresh)) {
       // set 'stopQuiz' to break out of top quiz loop if user quit in the middle of providing answers
       if (!refresh && !skipGroup) stopQuiz = true;
@@ -229,7 +230,7 @@ int GroupQuiz::getAnswerToEdit() const {
 }
 
 void GroupQuiz::checkAnswers(const List& questions, const List& readings, const std::string& name) {
-  auto count = 0;
+  size_t count = 0;
   for (auto i : _answers) {
     auto index = (i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
     // Only match on readings (and meanings if '_showMeanings' is true) instead of making

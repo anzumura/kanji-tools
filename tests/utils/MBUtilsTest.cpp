@@ -23,7 +23,7 @@ TEST(MBUtilsTest, FromUTF8CharArray) {
   EXPECT_EQ(w[0], L'\ufffc');
   auto r = toUtf8(w);
   ASSERT_EQ(r.length(), std::size(s) - 1);
-  for (auto i = 0; i < std::size(s) - 1; ++i) EXPECT_EQ(r[i], s[i]);
+  for (size_t i = 0; i < std::size(s) - 1; ++i) EXPECT_EQ(r[i], s[i]);
 }
 
 TEST(MBUtilsTest, ToHex) {

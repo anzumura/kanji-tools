@@ -27,7 +27,7 @@ Quiz::~Quiz() {
   }
 }
 
-std::ostream& Quiz::beginQuizMessage(int totalQuestions) {
+std::ostream& Quiz::beginQuizMessage(size_t totalQuestions) {
   // _question can be set to non-zero from command line -r or -t options, report an error if it's out
   // of range, otherwise subtract one since 'question' list index starts at zero.
   if (_question) {
@@ -39,7 +39,7 @@ std::ostream& Quiz::beginQuizMessage(int totalQuestions) {
   return log(true) << "Starting " << (isTestMode() ? "quiz" : "review") << " for " << totalQuestions << ' ';
 }
 
-std::ostream& Quiz::beginQuestionMessage(int totalQuestions) const {
+std::ostream& Quiz::beginQuestionMessage(size_t totalQuestions) const {
   return out() << (isTestMode() ? "\nQuestion " : "\n") << _question + 1 << '/' << totalQuestions << ":  ";
 }
 
@@ -50,7 +50,7 @@ std::ostream& Quiz::incorrectMessage(const std::string& name) {
   return out() << "  Incorrect";
 }
 
-Choice::Choices Quiz::getDefaultChoices(int totalQuestions) const {
+Choice::Choices Quiz::getDefaultChoices(size_t totalQuestions) const {
   Choice::Choices c = {{MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
                        {SkipOption,
                         _question + 1 == totalQuestions ? "finish"

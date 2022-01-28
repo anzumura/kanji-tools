@@ -42,7 +42,7 @@ public:
   auto& block() const { return _block; }
   auto& version() const { return _version; }
   auto radical() const { return _radical; }
-  auto strokes(bool variant = false) const { return _strokes; }
+  auto strokes() const { return _strokes; }
   auto variantStrokes() const { return _variantStrokes; }
   auto& pinyin() const { return _pinyin; }
   auto& morohashiId() const { return _morohashiId; }

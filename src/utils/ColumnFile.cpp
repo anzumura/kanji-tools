@@ -62,7 +62,7 @@ void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
 bool ColumnFile::nextRow() {
   if (std::string line; std::getline(_file, line)) {
     ++_currentRow;
-    int pos = 0;
+    size_t pos = 0;
     std::string field;
     for (std::stringstream ss(line); std::getline(ss, field, _delimiter); ++pos) {
       if (pos == _rowValues.size()) error("too many columns");

@@ -30,7 +30,7 @@ JukugoData::JukugoData(const Data& data) {
     for (auto& i : _kanjiToJukugo) types[data.getType(i.first)].push_back(i.first);
     for (auto& i : types) {
       data.out() << std::right << std::setw(14) << i.first << ": " << i.second.size() << ' ';
-      for (auto j = 0; j < i.second.size() && j < 12; ++j) data.out() << (j == 0 ? '(' : ' ') << i.second[j];
+      for (size_t j = 0; j < i.second.size() && j < 12; ++j) data.out() << (j == 0 ? '(' : ' ') << i.second[j];
       data.out() << ")\n";
     }
   }
@@ -38,9 +38,9 @@ JukugoData::JukugoData(const Data& data) {
 
 int JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
   static const std::string stripPrefix("..."), openBracket("("), closeBracket(")");
-  const int previouslyCreated = _uniqueJukugo.size();
+  const auto previouslyCreated = _uniqueJukugo.size();
   std::ifstream f(file);
-  int lineNumber = 1;
+  auto lineNumber = 1;
   auto error = [&lineNumber, &file](const std::string& s) {
     Data::usage(s + " - line: " + std::to_string(lineNumber) + ", file: " + file.string());
   };

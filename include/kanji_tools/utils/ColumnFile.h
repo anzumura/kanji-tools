@@ -29,7 +29,7 @@ public:
     auto number() const { return _number; }
   private:
     std::string _name;
-    int _number; // globally unique number per column based on '_name'
+    size_t _number; // globally unique number per column based on '_name'
   };
 
   using Columns = std::vector<Column>;

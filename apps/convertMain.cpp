@@ -248,7 +248,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
     hepb = romaji == hepb ? empty : ('(' + hepb + ')');
     kunr = romaji == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
     std::string vars;
-    for (auto j = (i.kunreiVariant() ? 1 : 0); j < i.romajiVariants().size(); ++j) {
+    for (size_t j = (i.kunreiVariant() ? 1 : 0); j < i.romajiVariants().size(); ++j) {
       if (!vars.empty()) vars += ", ";
       vars += i.romajiVariants()[j];
     }

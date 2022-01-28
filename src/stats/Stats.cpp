@@ -163,7 +163,7 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
       out() << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
             << asPercent(totalForType, total) << "%  (";
       auto& j = found[t];
-      for (auto k = 0; k < j.size(); ++k) {
+      for (size_t k = 0; k < j.size(); ++k) {
         if (k) out() << ", ";
         out() << j[k].name << ' ' << j[k].count;
       }

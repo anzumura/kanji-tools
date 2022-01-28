@@ -50,7 +50,7 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
     }
     data.out() << i.first << ':';
     printCounts(data, count);
-    auto j = 0;
+    size_t j = 0;
     for (; j < l.size() && j < MaxExamples; ++j) data.out() << ' ' << l[j]->name();
     if (j < l.size()) data.out() << " ...";
     data.out() << '\n';

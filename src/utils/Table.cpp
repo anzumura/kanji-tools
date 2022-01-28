@@ -19,7 +19,7 @@ void Table::print(std::ostream& os) const {
   Widths widths;
   for (auto& i : _title) widths.push_back(displayLength(i));
   for (auto& row : _rows) {
-    for (int colNum = 0; colNum < row.size(); ++colNum) {
+    for (size_t colNum = 0; colNum < row.size(); ++colNum) {
       if (colNum < widths.size())
         widths[colNum] = std::max(widths[colNum], displayLength(row[colNum]));
       else
@@ -29,7 +29,7 @@ void Table::print(std::ostream& os) const {
   if (!widths.empty()) {
     border(os, widths);
     if (!_title.empty()) print(os, widths, _title);
-    for (auto i = 0; i < _rows.size(); ++i) {
+    for (size_t i = 0; i < _rows.size(); ++i) {
       if (_sections.contains(i)) border(os, widths);
       print(os, widths, _rows[i]);
     }
@@ -41,7 +41,7 @@ void Table::printMarkdown(std::ostream& os) const {
   size_t maxColumns = _title.size();
   for (auto& i : _rows) maxColumns = std::max(maxColumns, i.size());
   auto printRow = [&os, maxColumns](const Row& r, bool header = false, bool section = false) {
-    for (auto i = 0; i < maxColumns; ++i) {
+    for (size_t i = 0; i < maxColumns; ++i) {
       os << "| ";
       if (header && r.empty()) os << "---";
       if (i < r.size()) {
@@ -66,7 +66,7 @@ void Table::printMarkdown(std::ostream& os) const {
     // print _title even if it's empty (which will just make and empty set of headers).
     printRow(_title);
     printRow({}, true);
-    for (auto i = 0; i < _rows.size(); ++i) printRow(_rows[i], false, _sections.contains(i));
+    for (size_t i = 0; i < _rows.size(); ++i) printRow(_rows[i], false, _sections.contains(i));
   }
 }
 
@@ -74,7 +74,7 @@ void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill, ch
   static const std::string empty;
   auto cell = [&os, delim, fill](int w, const auto& s) { os << delim << fill << std::setw(w + 1) << s; };
   os << std::left << std::setfill(fill);
-  for (auto i = 0; i < w.size(); ++i)
+  for (size_t i = 0; i < w.size(); ++i)
     if (i < r.size())
       // if string is all narrow chars then nothing will be added, but if there are wide
       // chars then we need to add the difference to get 'setw' to work properly.

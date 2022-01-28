@@ -44,7 +44,7 @@ private:
   std::ostream& printAssignedAnswer(char choice) const;
 
   void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
-  bool getAnswers(int totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
+  bool getAnswers(size_t totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
   bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
   void editAnswer(Choices&);
   int getAnswerToEdit() const;

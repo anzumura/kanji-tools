@@ -40,24 +40,24 @@ protected:
     _launcher.printMeaning(kanji, useNewLine, _showMeanings);
   }
 
-  void correctMessage();                                        // increments '_correctAnswers'
-  std::ostream& incorrectMessage(const std::string& name);      // adds 'name' to '_mistakes'
-  std::ostream& beginQuizMessage(int totalQuestions);           // can modify '_question'
-  std::ostream& beginQuestionMessage(int totalQuestions) const; // 'const' since can be called >1 times per question
+  void correctMessage();                                           // increments '_correctAnswers'
+  std::ostream& incorrectMessage(const std::string& name);         // adds 'name' to '_mistakes'
+  std::ostream& beginQuizMessage(size_t totalQuestions);           // can modify '_question'
+  std::ostream& beginQuestionMessage(size_t totalQuestions) const; // 'const' since can be called >1 times per question
   auto showMeanings() const { return _showMeanings; }
 
   // 'getDefaultChoices' returns a Choices structure populated with just the common values
   // for a quiz question like skip and quit. It will also populate 'hide/show meanings' option
   // based on the current value of '_showMeanings'.
-  Choices getDefaultChoices(int totalQuestions) const;
+  Choices getDefaultChoices(size_t totalQuestions) const;
 
   // display of English 'meanings' can be toggled on and off
   void toggleMeanings(Choices&);
 
   const QuizLauncher& _launcher;
-  int _question;
+  size_t _question;
 private:
-  int _correctAnswers;
+  size_t _correctAnswers;
   DataFile::List _mistakes;
   bool _showMeanings;
 };

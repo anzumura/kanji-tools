@@ -232,7 +232,7 @@ void Data::processList(const DataFile& list) {
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
-  for (auto i = 0; i < list.list().size(); ++i) {
+  for (size_t i = 0; i < list.list().size(); ++i) {
     const auto& name = list.list()[i];
     Entry kanji;
     if (auto j = findKanjiByName(name); j) {
