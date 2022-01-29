@@ -2,7 +2,8 @@
 #define KANJI_TOOLS_UTILS_MBUTILS_H
 
 #include <codecvt> // for codecvt_utf8
-#include <locale>  // for wstring_convert
+#include <concepts>
+#include <locale> // for wstring_convert
 #include <string>
 
 namespace kanji_tools {
@@ -51,6 +52,7 @@ inline auto addLeadingZeroes(const std::string& result, size_t minSize) {
 // and toBinary returns a string of length 8. 'minSize' is ignored if it's less than 'result' size.
 
 template<typename T> inline auto toBinary(T x, BracketType brackets, size_t minSize = 0) {
+  static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 1) result.insert(result.begin(), '0' + x % 2);
   return addBrackets(addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
@@ -60,6 +62,7 @@ template<typename T> inline auto toBinary(T x, int minSize = 0) { return toBinar
 enum class HexCase { Upper, Lower };
 
 template<typename T> inline auto toHex(T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
+  static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 4) {
     const char i = x % 16;
