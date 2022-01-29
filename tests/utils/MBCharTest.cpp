@@ -118,6 +118,11 @@ TEST(MBChar, NotValidWithFiveByte) {
   EXPECT_EQ(MBChar::valid(x), MBChar::Results::MBCharTooLong);
 }
 
+TEST(MBChar, NotValidForOverlong) {
+  std::string x("\0xF0\0x82\0x82\0xAC");
+  //EXPECT_EQ(toHex(x), "F0 82 82 AC");
+}
+
 TEST(MBChar, GetNext) {
   MBChar s("todayトロントの天気is nice。");
   std::string x;
