@@ -19,7 +19,7 @@ public:
   using OptString = std::optional<std::string>;
   using LinkNames = std::vector<std::string>;
   using NelsonIds = std::vector<int>;
-  static bool hasLink(KanjiTypes t) { return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld; }
+  static auto hasLink(KanjiTypes t) { return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld; }
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;

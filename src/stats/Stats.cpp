@@ -33,8 +33,8 @@ constexpr double asPercent(int amount, int total) { return amount * 100. / total
 
 std::string Stats::Count::toHex() const {
   std::string result;
-  if (auto s = fromUtf8(name); s.length() == 1) result = "'\\u" + kanji_tools::toHex(s[0]) + "', ";
-  for (auto i : name) {
+  if (const auto s = fromUtf8(name); s.length() == 1) result = "'\\u" + kanji_tools::toHex(s[0]) + "', ";
+  for (const auto i : name) {
     if (!result.empty()) result += ' ';
     result += "'\\x" + kanji_tools::toHex(i) + "'";
   }
@@ -42,7 +42,7 @@ std::string Stats::Count::toHex() const {
 }
 
 Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
-  bool breakdown = false, endOptions = false, verbose = false;
+  auto breakdown = false, endOptions = false, verbose = false;
   std::vector<std::string> files;
   for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
     if (std::string arg = argv[i]; !endOptions && arg.starts_with("-")) {
@@ -65,7 +65,7 @@ Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
 }
 
 void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
-  auto f = [this, &top, showBreakdown, verbose](const auto& x, const auto& y, bool firstCount = false) {
+  const auto f = [this, &top, showBreakdown, verbose](const auto& x, const auto& y, bool firstCount = false) {
     return std::pair(processCount(top, x, y, showBreakdown, firstCount, verbose), y);
   };
   std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
@@ -151,18 +151,18 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
   std::map<KanjiTypes, int> totalKanjiPerType, uniqueKanjiPerType;
   std::map<KanjiTypes, std::vector<Count>> found;
   for (const auto& i : frequency) {
-    auto t = i.type();
+    const auto t = i.type();
     totalKanjiPerType[t] += i.count;
     uniqueKanjiPerType[t]++;
     if (auto& j = found[t]; j.size() < MaxExamples) j.push_back(i);
   }
-  for (auto t : AllKanjiTypes)
-    if (auto i = uniqueKanjiPerType.find(t); i != uniqueKanjiPerType.end()) {
+  for (const auto t : AllKanjiTypes)
+    if (const auto i = uniqueKanjiPerType.find(t); i != uniqueKanjiPerType.end()) {
       auto totalForType = totalKanjiPerType[t];
       printTotalAndUnique(std::string("[") + toString(t) + "] ", totalForType, i->second);
       out() << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
             << asPercent(totalForType, total) << "%  (";
-      auto& j = found[t];
+      const auto& j = found[t];
       for (size_t k = 0; k < j.size(); ++k) {
         if (k) out() << ", ";
         out() << j[k].name << ' ' << j[k].count;
@@ -173,7 +173,7 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
 
 void Stats::printExamples(const CountSet& frequency) const {
   out() << std::setw(12) << '(';
-  for (auto i = 0; const auto& j : frequency) {
+  for (auto i = 0; auto& j : frequency) {
     if (i) out() << ", ";
     out() << j.name << ' ' << j.count;
     if (++i == MaxExamples) break;
@@ -187,15 +187,15 @@ void Stats::printBreakdown(const std::string& name, bool showBreakdown, const Co
   out() << "  " << (showBreakdown ? "Rank  [Val #] Freq, LV, Type (No.) ==" : "[Val #], Missing Unicode,")
         << " Highest Count File\n";
   DataFile::List missing;
-  for (auto rank = 0; const auto& i : frequency) {
+  for (auto rank = 0; auto& i : frequency) {
     out() << "  ";
     if (showBreakdown) out() << std::left << std::setw(5) << ++rank << ' ';
     out() << i;
     if (!i.entry) {
       missing.push_back(i.name);
-      if (auto tags = count.tags(i.name); tags != nullptr) {
+      if (const auto tags = count.tags(i.name); tags != nullptr) {
         std::string file;
-        for (auto maxCount = 0; const auto& j : *tags)
+        for (auto maxCount = 0; auto& j : *tags)
           if (j.second > maxCount) {
             maxCount = j.second;
             file = j.first;

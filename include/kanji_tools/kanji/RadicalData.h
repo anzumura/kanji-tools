@@ -22,7 +22,7 @@ public:
   // 'find' by the ideograph code in utf8 (not the unicode radical code). For example,
   // Radical number 30 (口) is Unicode 53E3, but has another 'Unicode Radical' value of 2F1D
   auto& find(const std::string& name) const {
-    auto i = _map.find(name);
+    const auto i = _map.find(name);
     if (i == _map.end()) throw std::domain_error("name not found: " + name);
     return _radicals.at(i->second);
   }

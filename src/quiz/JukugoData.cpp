@@ -12,7 +12,7 @@ namespace fs = std::filesystem;
 JukugoData::JukugoData(const Data& data) {
   const std::string jukugoDir("jukugo/");
   auto f = [this, &jukugoDir, &data](const char* file, KanjiGrades grade) {
-    int loaded = loadFile(DataFile::getFile(data.dataDir(), fs::path(jukugoDir + file + ".txt")), grade);
+    const auto loaded = loadFile(DataFile::getFile(data.dataDir(), fs::path(jukugoDir + file + ".txt")), grade);
     if (data.debug()) data.log() << "Loaded " << loaded << " for Grade: " << grade << '\n';
   };
   if (data.debug()) data.log(true) << "Begin Loading Jukugo\n>>>\n";

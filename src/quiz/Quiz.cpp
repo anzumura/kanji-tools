@@ -17,7 +17,8 @@ Quiz::~Quiz() {
     else if (_correctAnswers == _question)
       out() << " - Perfect!\n";
     else {
-      if (int skipped = _question - _correctAnswers - _mistakes.size(); skipped) out() << ", skipped: " << skipped;
+      if (const auto skipped = _question - _correctAnswers - _mistakes.size(); skipped)
+        out() << ", skipped: " << skipped;
       if (!_mistakes.empty()) {
         out() << " - mistakes:";
         for (auto& i : _mistakes) out() << ' ' << i;

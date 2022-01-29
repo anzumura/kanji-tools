@@ -8,7 +8,7 @@ namespace kanji_tools {
 class ListQuiz : public Quiz {
 public:
   enum class QuizStyle { KanjiToReading, ReadingToKanji };
-  static auto toQuizStyle(char c) { return c == 'k' ? QuizStyle::KanjiToReading : QuizStyle::ReadingToKanji; }
+  static constexpr auto toQuizStyle(char c) { return c == 'k' ? QuizStyle::KanjiToReading : QuizStyle::ReadingToKanji; }
 
   // 'infoFields' controls which fields are shown in a 'kanji to reading' quiz (see Kanji.h for more
   // details on 'InfoFields') and 'choiceCount' specifies the number of choices per question (2 to 9).

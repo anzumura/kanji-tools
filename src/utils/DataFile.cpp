@@ -20,7 +20,7 @@ void DataFile::print(const List& l, const std::string& type, const std::string& 
     std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
     if (!group.empty()) std::cout << " in " << group;
     std::cout << ':';
-    for (const auto& i : l) std::cout << ' ' << i;
+    for (auto& i : l) std::cout << ' ' << i;
     std::cout << '\n';
   }
 }
@@ -30,8 +30,8 @@ DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUnique
   : _name(name.empty() ? capitalize(file.stem().string()) : name) {
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
-  int lineNumber = 1;
-  auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
+  auto lineNumber = 1;
+  const auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
     usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
   };
   std::ifstream f(file);
@@ -48,7 +48,7 @@ DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUnique
       if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
       // check uniqueness across files
       if (uniqueTypeNames) {
-        auto i = uniqueTypeNames->insert(token);
+        const auto i = uniqueTypeNames->insert(token);
         if (!i.second) {
           dups.emplace_back(*i.first);
           continue;

@@ -2,7 +2,6 @@
 #define KANJI_TOOLS_UTILS_MBUTILS_H
 
 #include <codecvt> // for codecvt_utf8
-#include <concepts>
 #include <locale> // for wstring_convert
 #include <string>
 
@@ -95,7 +94,7 @@ inline auto toUnicode(wchar_t s, BracketType b = BracketType::None) { return toH
 // 'squareBrackets' to true puts brackets around the whole string instead of each entry.
 inline auto toUnicode(const std::string& s, BracketType brackets = BracketType::None) {
   std::string result;
-  for (auto i : fromUtf8(s)) {
+  for (const auto i : fromUtf8(s)) {
     if (!result.empty()) result += ' ';
     result += toUnicode(i);
   }
@@ -112,22 +111,22 @@ inline auto isSingleByte(const std::wstring& s, bool checkLengthOne = true) noex
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
 inline auto isAllSingleByte(const std::string& s) noexcept {
-  for (auto i : s)
+  for (const auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
 inline auto isAllSingleByte(const std::wstring& s) noexcept {
-  for (auto i : s)
+  for (const auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
 inline auto isAnySingleByte(const std::string& s) noexcept {
-  for (auto i : s)
+  for (const auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;
 }
 inline auto isAnySingleByte(const std::wstring& s) noexcept {
-  for (auto i : s)
+  for (const auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;
 }

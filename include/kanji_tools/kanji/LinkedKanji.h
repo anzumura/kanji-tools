@@ -23,7 +23,7 @@ protected:
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to either Jouyou or Jinmei
   static auto& checkType(const std::string& name, const Data::Entry& link, bool isJinmei = false) {
-    KanjiTypes t = link->type();
+    const auto t = link->type();
     if (t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
       throw std::domain_error("LinkedKanji " + name + " wanted type '" + toString(KanjiTypes::Jouyou) +
                               (isJinmei ? std::string("' or '") + toString(KanjiTypes::Jinmei) : std::string()) +

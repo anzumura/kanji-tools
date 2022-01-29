@@ -14,11 +14,12 @@ namespace kanji_tools {
 enum class CharType { Hiragana, Katakana, Romaji };
 constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
 inline auto& toString(CharType t) {
-  static std::string romaji("Romaji"), hiragana("Hiragana"), katakana("Katakana");
+  static const std::string Romaji("Romaji"), Hiragana("Hiragana"), Katakana("Katakana");
+
   switch (t) {
-  case CharType::Hiragana: return hiragana;
-  case CharType::Katakana: return katakana;
-  case CharType::Romaji: return romaji;
+  case CharType::Hiragana: return Hiragana;
+  case CharType::Katakana: return Katakana;
+  case CharType::Romaji: return Romaji;
   }
   __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
 }

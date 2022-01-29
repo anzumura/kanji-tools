@@ -44,7 +44,7 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
     KanjiList& l = i.second;
     std::sort(l.begin(), l.end(), [](const auto& x, const auto& y) { return x->strokes() < y->strokes(); });
     Count count;
-    for (auto& j : l) {
+    for (const auto& j : l) {
       ++count[j->type()];
       ++total[j->type()];
     }
@@ -65,7 +65,7 @@ void RadicalData::printMissingRadicals(const Data& data, const RadicalLists& rad
     if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
   if (!missingRadicals.empty()) {
     data.log() << "  Found " << missingRadicals.size() << " radicals with no kanji:";
-    for (auto& i : missingRadicals) data.out() << ' ' << i;
+    for (const auto& i : missingRadicals) data.out() << ' ' << i;
     data.out() << '\n';
   }
 }
@@ -73,8 +73,8 @@ void RadicalData::printMissingRadicals(const Data& data, const RadicalLists& rad
 void RadicalData::printCounts(const Data& data, const Count& c, bool summary) const {
   const auto t = std::accumulate(c.begin(), c.end(), 0, [](const auto& x, const auto& y) { return x + y.second; });
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
-  for (auto i : AllKanjiTypes) {
-    if (auto j = c.find(i); summary) {
+  for (const auto i : AllKanjiTypes) {
+    if (const auto j = c.find(i); summary) {
       if (i != AllKanjiTypes[0]) data.out() << ' ';
       data.out() << (j == c.end() ? 0 : j->second);
     } else

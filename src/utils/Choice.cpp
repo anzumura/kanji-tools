@@ -35,10 +35,10 @@ void Choice::add(std::string& prompt, const Choices& choices) {
 
   OptChar rangeStart = {};
   char prevChar;
-  auto completeRange = [&prompt, &rangeStart, &prevChar]() {
+  const auto completeRange = [&prompt, &rangeStart, &prevChar]() {
     if (rangeStart != prevChar) prompt += Dash + prevChar;
   };
-  for (const auto& i : choices) {
+  for (auto& i : choices) {
     checkPrintableAscii(i.first, "option");
     if (i.second.empty()) {
       if (!rangeStart) {

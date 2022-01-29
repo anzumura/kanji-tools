@@ -14,8 +14,9 @@ Kanji::Kanji(const std::string& name, const OptString& compatibilityName, const 
 
 std::string Kanji::info(int infoFields) const {
   static const std::string Rad("Rad "), Strokes("Strokes "), Freq("Frq "), New("New "), Old("Old ");
+
   std::string result;
-  auto add = [&result](const auto& x) {
+  const auto add = [&result](const auto& x) {
     if (!result.empty()) result += ", ";
     result += x;
   };

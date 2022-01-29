@@ -127,9 +127,9 @@ template<typename T> void KanjiData::printCount(const std::string& name, T pred,
   }
   if (total) {
     log() << name << ' ' << total << " (";
-    for (auto& i : counts) {
+    for (const auto& i : counts) {
       out() << i.first << ' ' << i.second;
-      for (auto& j : examples[i.first]) out() << ' ' << j;
+      for (const auto& j : examples[i.first]) out() << ' ' << j;
       total -= i.second;
       if (total) out() << ", ";
     }
@@ -162,7 +162,7 @@ void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   auto all = 0;
   for (auto& jouyou = _types.at(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
-    auto grade = [i](const auto& x) { return x->grade() == i; };
+    const auto grade = [i](const auto& x) { return x->grade() == i; };
     if (auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade); gradeCount) {
       all += gradeCount;
       log() << "  Total for grade " << i << ": " << gradeCount;
@@ -170,7 +170,7 @@ void KanjiData::printGrades() const {
         std::count_if(jouyou.begin(), jouyou.end(), [&grade](const auto& x) { return grade(x) && !x->frequency(); }),
         true);
       out() << " (";
-      for (auto level : AllJlptLevels) {
+      for (const auto level : AllJlptLevels) {
         const auto gradeLevelCount = std::count_if(
           jouyou.begin(), jouyou.end(), [&grade, level](const auto& x) { return grade(x) && x->level() == level; });
         if (gradeLevelCount) {
@@ -190,10 +190,10 @@ void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() cons
                                bool showNoFrequency) const {
   log() << name << " breakdown:\n";
   auto total = 0;
-  for (auto i : all) {
+  for (const auto i : all) {
     std::vector<std::pair<KanjiTypes, int>> counts;
     auto iTotal = 0;
-    for (const auto& l : _types)
+    for (auto& l : _types)
       if (const auto count =
             std::count_if(l.second.begin(), l.second.end(), [i, &p](const auto& x) { return ((*x).*p)() == i; });
           count) {
@@ -203,7 +203,7 @@ void KanjiData::printListStats(const std::array<T, S>& all, T (Kanji::*p)() cons
     if (iTotal) {
       total += iTotal;
       log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
-      for (auto& j : counts) {
+      for (const auto& j : counts) {
         out() << j.first << ' ' << j.second;
         auto& l = _types.at(j.first);
         if (showNoFrequency)

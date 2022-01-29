@@ -104,7 +104,7 @@ private:
   // done in a single line like 'assert(s.insert(x).second)' since that would result in the code not getting
   // executed when compiling in with asserts disabled, i.e., a 'Release' build.
   static void insertUnique(Set& s, const std::string& x) {
-    auto i = s.insert(x);
+    const auto i = s.insert(x);
     assert(i.second);
   }
 

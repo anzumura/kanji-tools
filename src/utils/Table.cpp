@@ -40,14 +40,14 @@ void Table::print(std::ostream& os) const {
 void Table::printMarkdown(std::ostream& os) const {
   size_t maxColumns = _title.size();
   for (auto& i : _rows) maxColumns = std::max(maxColumns, i.size());
-  auto printRow = [&os, maxColumns](const Row& r, bool header = false, bool section = false) {
+  const auto printRow = [&os, maxColumns](const Row& r, bool header = false, bool section = false) {
     for (size_t i = 0; i < maxColumns; ++i) {
       os << "| ";
       if (header && r.empty()) os << "---";
       if (i < r.size()) {
         std::string out;
         out.reserve(r[i].size());
-        for (char c : r[i])
+        for (const auto c : r[i])
           if (c == '|')
             out += "\\|";
           else
@@ -72,7 +72,7 @@ void Table::printMarkdown(std::ostream& os) const {
 
 void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill, char delim) const {
   static const std::string empty;
-  auto cell = [&os, delim, fill](int w, const auto& s) { os << delim << fill << std::setw(w + 1) << s; };
+  const auto cell = [&os, delim, fill](int w, const auto& s) { os << delim << fill << std::setw(w + 1) << s; };
   os << std::left << std::setfill(fill);
   for (size_t i = 0; i < w.size(); ++i)
     if (i < r.size())

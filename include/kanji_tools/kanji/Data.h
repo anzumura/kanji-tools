@@ -24,7 +24,9 @@ public:
   enum class DebugMode { Full, Info, None };
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
-  inline static auto orderByQualifiedName = [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); };
+  inline static const auto orderByQualifiedName = [](const Entry& a, const Entry& b) {
+    return a->orderByQualifiedName(*b);
+  };
 
   Data(const std::filesystem::path& dataDir, DebugMode, std::ostream& out = std::cout, std::ostream& err = std::cerr);
   virtual ~Data() = default;
@@ -64,13 +66,13 @@ public:
   // 'getCompatibilityName' returns the UCD compatibility code for the given 'kanjiName' if it
   // exists (_ucd.find method takes care of checking whether kanjiName has a variation selector).
   auto getCompatibilityName(const std::string& kanjiName) const {
-    auto u = _ucd.find(kanjiName);
+    const auto u = _ucd.find(kanjiName);
     return u && u->name() != kanjiName ? Kanji::OptString(u->name()) : std::nullopt;
   }
 
   auto getStrokes(const std::string& kanjiName, const Ucd* u, bool variant = false, bool onlyUcd = false) const {
     if (!onlyUcd) {
-      auto i = _strokes.find(kanjiName);
+      const auto i = _strokes.find(kanjiName);
       if (i != _strokes.end()) return i->second;
     }
     return u ? u->getStrokes(variant) : 0;
@@ -87,7 +89,7 @@ public:
 
   // get list by KanjiType
   auto& typeList(KanjiTypes type) const {
-    auto i = _types.find(type);
+    const auto i = _types.find(type);
     return i != _types.end() ? i->second : _emptyList;
   }
   auto typeTotal(KanjiTypes type) const { return typeList(type).size(); }
@@ -95,21 +97,21 @@ public:
 
   // get list by KanjiGrade
   auto& gradeList(KanjiGrades grade) const {
-    auto i = _grades.find(grade);
+    const auto i = _grades.find(grade);
     return i != _grades.end() ? i->second : _emptyList;
   }
   auto gradeTotal(KanjiGrades grade) const { return gradeList(grade).size(); }
 
   // get list by JLPT Level
   auto& levelList(JlptLevels level) const {
-    auto i = _levels.find(level);
+    const auto i = _levels.find(level);
     return i != _levels.end() ? i->second : _emptyList;
   }
   auto levelTotal(JlptLevels level) const { return levelList(level).size(); }
 
   // get list by Kentei Kyu
   auto& kyuList(KenteiKyus kyu) const {
-    auto i = _kyus.find(kyu);
+    const auto i = _kyus.find(kyu);
     return i != _kyus.end() ? i->second : _emptyList;
   }
   auto kyuTotal(KenteiKyus kyu) const { return kyuList(kyu).size(); }
@@ -124,8 +126,8 @@ public:
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including 'variation selectors', i.e., the
   // same result is returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
   OptEntry findKanjiByName(const std::string& s) const {
-    auto i = _compatibilityMap.find(s);
-    auto j = _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s);
+    const auto i = _compatibilityMap.find(s);
+    const auto j = _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s);
     if (j == _kanjiNameMap.end()) return {};
     return j->second;
   }
@@ -133,7 +135,7 @@ public:
   // 'findKanjiByFrequency' returns the Kanji with the given 'frequency' (should be a value from 1 to 2501)
   OptEntry findKanjiByFrequency(int frequency) const {
     if (frequency < 1 || frequency >= _maxFrequency) return {};
-    int bucket = --frequency / FrequencyBucketEntries;
+    auto bucket = --frequency / FrequencyBucketEntries;
     if (bucket == FrequencyBuckets) --bucket; // last bucket contains FrequencyBucketEntries + 1
     return _frequencies[bucket][frequency - bucket * FrequencyBucketEntries];
   }
@@ -141,13 +143,13 @@ public:
   // 'findKanjisByMorohashiId' can return more than one entry. The ids are usually plain just numeric, but they can
   // also be an index number followed by a 'P'. For example, '4138' maps to 嗩 and '4138P' maps to 嘆.
   auto& findKanjisByMorohashiId(const std::string& id) const {
-    auto i = _morohashiMap.find(id);
+    const auto i = _morohashiMap.find(id);
     return i != _morohashiMap.end() ? i->second : _emptyList;
   }
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491 maps to 㡡, 幮 and 𢅥.
   auto& findKanjisByNelsonId(int id) const {
-    auto i = _nelsonMap.find(id);
+    const auto i = _nelsonMap.find(id);
     return i != _nelsonMap.end() ? i->second : _emptyList;
   }
 

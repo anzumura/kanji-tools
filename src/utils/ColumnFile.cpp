@@ -8,9 +8,9 @@ namespace kanji_tools {
 namespace fs = std::filesystem;
 
 int ColumnFile::getColumnNumber(const std::string& name) {
-  auto i = _allColumns.find(name);
+  const auto i = _allColumns.find(name);
   if (i == _allColumns.end()) {
-    auto n = static_cast<int>(_allColumns.size());
+    const auto n = static_cast<int>(_allColumns.size());
     _allColumns[name] = n;
     return n;
   }
@@ -34,12 +34,12 @@ ColumnFile::ColumnFile(const fs::path& p, const Columns& columns, char delimiter
 }
 
 void ColumnFile::processHeaderRow(const std::string& headerRow, ColNames& colNames) {
-  int pos = 0;
+  auto pos = 0;
   std::set<std::string> foundCols;
   std::string header;
   for (std::stringstream ss(headerRow); std::getline(ss, header, _delimiter); ++pos) {
     if (foundCols.contains(header)) error("duplicate header '" + header + "'");
-    auto i = colNames.find(header);
+    const auto i = colNames.find(header);
     if (i == colNames.end()) error("unrecognized header '" + header + "'");
     _columnToPosition[i->second.number()] = pos;
     foundCols.insert(header);
@@ -51,7 +51,7 @@ void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
   if (colNames.size() == 1) error("column '" + (*colNames.begin()).first + "' not found");
   if (colNames.size() > 1) {
     std::string msg;
-    for (auto i : colNames) {
+    for (auto& i : colNames) {
       if (!msg.empty()) msg += ',';
       msg += " '" + i.first + "'";
     }
@@ -82,36 +82,34 @@ bool ColumnFile::nextRow() {
 const std::string& ColumnFile::get(const Column& column) const {
   if (!_currentRow) error("'nextRow' must be called before calling 'get'");
   if (column.number() >= _columnToPosition.size()) error("unrecognized column '" + column.name() + "'");
-  int position = _columnToPosition[column.number()];
+  const auto position = _columnToPosition[column.number()];
   if (position == -1) error("invalid column '" + column.name() + "'");
   return _rowValues[position];
 }
 
 int ColumnFile::getInt(const Column& column) const {
-  const std::string& s = get(column);
-  int result;
+  auto& s = get(column);
   try {
-    result = std::stoi(s);
+    return std::stoi(s);
   } catch (...) {
     error("failed to convert to int", column, s);
   }
-  return result;
+  __builtin_unreachable(); // 'error' function always throws an exception
 }
 
 ColumnFile::OptInt ColumnFile::getOptInt(const Column& column) const {
-  const std::string& s = get(column);
+  auto& s = get(column);
   if (s.empty()) return std::nullopt;
-  int result;
   try {
-    result = std::stoi(s);
+    return std::stoi(s);
   } catch (...) {
     error("failed to convert to int", column, s);
   }
-  return result;
+  __builtin_unreachable(); // 'error' function always throws an exception
 }
 
 bool ColumnFile::getBool(const Column& column) const {
-  const std::string& s = get(column);
+  auto& s = get(column);
   if (s.length() == 1) switch (s[0]) {
     case 'Y':
     case 'T': return true;
@@ -124,7 +122,7 @@ bool ColumnFile::getBool(const Column& column) const {
 
 wchar_t ColumnFile::getWChar(const Column& column, const std::string& s) const {
   if (s.length() < 4 || s.length() > 5) error("failed to convert to wchar_t, length must be 4 or 5", column, s);
-  for (char c : s)
+  for (const char c : s)
     if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("failed to convert to wchar_t, invalid hex", column, s);
   return std::strtol(s.c_str(), nullptr, 16);
 }

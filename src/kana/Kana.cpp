@@ -143,14 +143,14 @@ void Kana::validate() const {
 
 Kana::Map Kana::populate(CharType t) {
   Kana::Map result;
-  int duplicates = 0;
-  auto insert = [&result, &duplicates, t](auto& k, auto& v) {
-    if (auto i = result.emplace(k, &v); !i.second) {
+  auto duplicates = 0;
+  const auto insert = [&result, &duplicates, t](auto& k, auto& v) {
+    if (const auto i = result.emplace(k, &v); !i.second) {
       std::cerr << "key '" << k << "' already in " << toString(t) << " map: " << i.first->second << '\n';
       ++duplicates;
     }
   };
-  auto processKana = [&insert, t](auto& k) {
+  const auto processKana = [&insert, t](auto& k) {
     switch (t) {
     case CharType::Romaji:
       insert(k.romaji(), k);
@@ -184,8 +184,8 @@ std::string Kana::RepeatMark::get(CharType target, int flags, const Kana* prevKa
   if (!prevKana) return "";
   const Kana* k = prevKana;
   if (_dakuten) {
-    if (auto accented = prevKana->dakutenKana(); accented) k = accented;
-  } else if (auto unaccented = prevKana->plainKana(); unaccented)
+    if (const auto accented = prevKana->dakutenKana(); accented) k = accented;
+  } else if (const auto unaccented = prevKana->plainKana(); unaccented)
     k = unaccented;
   return k->getRomaji(flags);
 }

@@ -62,7 +62,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanin
 }
 
 GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
-  auto i = list.begin();
+  const auto i = list.begin();
   return i != list.end() ? (**i).type() : throw std::domain_error("empty group list");
 }
 
@@ -74,7 +74,7 @@ bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
 void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
   if (kanji->pinyin()) {
-    std::string p = "  (" + *kanji->pinyin() + ')';
+    const auto p = "  (" + *kanji->pinyin() + ')';
     // need to use 'displayLength' since Pinyin can contain multi-byte chars (for the tones)
     s += p + std::string(PinyinWidth - displayLength(p), ' ');
   } else

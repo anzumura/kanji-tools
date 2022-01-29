@@ -20,7 +20,7 @@ constexpr std::array Delimiters{
 
 KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(flags) {
   for (auto& i : Kana::getMap(CharType::Hiragana))
-    if (auto r = i.second->romaji(); !r.starts_with("n")) {
+    if (auto& r = i.second->romaji(); !r.starts_with("n")) {
       if (r.length() == 1 || r == "ya" || r == "yu" || r == "yo") {
         insertUnique(_markAfterNHiragana, i.second->hiragana());
         insertUnique(_markAfterNKatakana, i.second->katakana());
@@ -45,7 +45,7 @@ KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(f
 std::string KanaConvert::flagString() const {
   if (!_flags) return "none";
   std::string result;
-  auto flag = [this, &result](int f, const char* v) {
+  const auto flag = [this, &result](int f, const char* v) {
     if (_flags & f) {
       if (!result.empty()) result += '|';
       result += v;
@@ -62,7 +62,7 @@ void KanaConvert::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
   assert(_repeatingConsonents.size() == 18); // 26 - 8 where '8' is 5 vowels + 3 consonents (l, n and x)
-  for (auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'}) assert(_repeatingConsonents.contains(i) == false);
+  for (const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'}) assert(_repeatingConsonents.contains(i) == false);
   assert(_markAfterNHiragana.size() == 8); // 5 vowels plus 3 y's
   assert(_markAfterNHiragana.size() == _markAfterNKatakana.size());
   assert(_digraphSecondHiragana.size() == 9); // 5 small vowels plus 3 small y's plus small 'wa'
@@ -78,7 +78,7 @@ void KanaConvert::verifyData() const {
 
 std::string KanaConvert::convert(const std::string& input) const {
   std::string result(input);
-  for (auto i : CharTypes)
+  for (const auto i : CharTypes)
     if (_target != i) result = convert(i, result);
   return result;
 }
@@ -110,7 +110,7 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
       break;
     }
     result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
-    if (auto delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
+    if (const auto delim = input[pos]; delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
       result += _narrowDelims.at(delim);
     oldPos = pos + 1;
   }
@@ -123,8 +123,8 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
   auto count = 0;
   auto hasSmallTsu = false, groupDone = false;
   const Kana* prevKana = nullptr;
-  auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter,
-               &afterN](bool startNewGroup = true, bool prolong = false) {
+  const auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone, &letterGroup, &letter,
+                     &afterN](bool startNewGroup = true, bool prolong = false) {
     result += kanaLetters(letterGroup, source, count, prevKana, prolong);
     if (romajiTarget() && Kana::N.containsKana(letterGroup) && afterN.contains(letter)) result += _apostrophe;
     hasSmallTsu = false;
@@ -179,7 +179,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
       // got non-hiragana letter so flush any letters and preserve the new letter unconverted
       done(false);
       if (romajiTarget()) {
-        if (auto i = _wideDelims.find(letter); i != _wideDelims.end())
+        if (const auto i = _wideDelims.find(letter); i != _wideDelims.end())
           result += i->second;
         else
           result += letter;
@@ -193,7 +193,7 @@ std::string KanaConvert::convertFromKana(const std::string& input, CharType sour
 std::string KanaConvert::kanaLetters(const std::string& letterGroup, CharType source, int count, const Kana*& prevKana,
                                      bool prolong) const {
   auto& sourceMap = Kana::getMap(source);
-  auto macron = [this, prolong, &prevKana](const Kana* k, bool sokuon = false) {
+  const auto macron = [this, prolong, &prevKana](const Kana* k, bool sokuon = false) {
     const auto& s = sokuon ? k->getSokuonRomaji(_flags) : get(*k);
     if (prolong) {
       if (_target != CharType::Romaji) return s + Kana::ProlongMark;
@@ -211,11 +211,11 @@ std::string KanaConvert::kanaLetters(const std::string& letterGroup, CharType so
   };
   if (!letterGroup.empty()) {
     prevKana = nullptr;
-    if (auto i = sourceMap.find(letterGroup); i != sourceMap.end()) return macron(i->second);
+    if (const auto i = sourceMap.find(letterGroup); i != sourceMap.end()) return macron(i->second);
     // if letter group is an unknown combination, split it up and try processing each part
     if (count > 1) {
       const auto firstLetter = letterGroup.substr(0, 3);
-      if (auto i = sourceMap.find(letterGroup.substr(3)); i != sourceMap.end())
+      if (const auto i = sourceMap.find(letterGroup.substr(3)); i != sourceMap.end())
         return romajiTarget() && Kana::SmallTsu.containsKana(firstLetter) &&
             _repeatingConsonents.contains(i->second->romaji()[0])
           ? macron(i->second, true)
@@ -264,7 +264,7 @@ bool KanaConvert::romajiMacronLetter(const std::string& letter, std::string& let
   static const std::map<std::string, std::pair<char, std::string>> Macrons = {
     {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, {"ū", {'u', "う"}}, {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
 
-  if (auto i = Macrons.find(letter); i != Macrons.end()) {
+  if (const auto i = Macrons.find(letter); i != Macrons.end()) {
     romajiLetters(letterGroup += i->second.first, result);
     if (letterGroup.empty())
       result += hiraganaTarget() && (_flags & NoProlongMark) ? i->second.second : Kana::ProlongMark;
@@ -277,7 +277,7 @@ bool KanaConvert::romajiMacronLetter(const std::string& letter, std::string& let
 
 void KanaConvert::romajiLetters(std::string& letterGroup, std::string& result) const {
   auto& sourceMap = Kana::getMap(CharType::Romaji);
-  if (auto i = sourceMap.find(letterGroup); i != sourceMap.end()) {
+  if (const auto i = sourceMap.find(letterGroup); i != sourceMap.end()) {
     result += get(*i->second);
     letterGroup.clear();
   } else if (letterGroup.length() == 3) {

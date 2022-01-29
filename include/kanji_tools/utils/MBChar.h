@@ -114,7 +114,7 @@ public:
   // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
   static auto valid(const char* s, bool checkLengthOne = true) {
     if (s) {
-      if (auto x = static_cast<const unsigned char>(*s);
+      if (const auto x = static_cast<unsigned char>(*s);
           (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
         if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
         if (x & Bit3) {
@@ -208,13 +208,13 @@ public:
 
   // return count for given string or 0 if not found
   auto count(const std::string& s) const {
-    auto i = _map.find(s);
+    const auto i = _map.find(s);
     return i != _map.end() ? i->second : 0;
   }
 
   // return an optional Map of 'tag to count' for the given MBChar 's'
   auto tags(const std::string& s) const {
-    auto i = _tags.find(s);
+    const auto i = _tags.find(s);
     return i != _tags.end() ? &i->second : nullptr;
   }
 

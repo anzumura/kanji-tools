@@ -58,13 +58,13 @@ int ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
   std::uniform_int_distribution<> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<> randomCorrect(0, _choiceCount - 1);
 
-  const int correctChoice = randomCorrect(RandomGen);
+  const auto correctChoice = randomCorrect(RandomGen);
   // 'sameReading' set is used to prevent more than one choice having the exact same reading
   DataFile::Set sameReading = {kanji->reading()};
   _answers[correctChoice] = _question;
   for (auto i = 0; i < _choiceCount; ++i)
     if (i != correctChoice) do {
-        if (int choice = randomReading(RandomGen); sameReading.insert(questions[choice]->reading()).second) {
+        if (auto choice = randomReading(RandomGen); sameReading.insert(questions[choice]->reading()).second) {
           _answers[i] = choice;
           break;
         }
@@ -93,7 +93,7 @@ void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
 }
 
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, int correctChoice, const std::string& name) {
-  const char answer = isTestMode() ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices) : get(_prompt, choices);
+  const auto answer = isTestMode() ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices) : get(_prompt, choices);
   if (answer == MeaningsOption) {
     toggleMeanings(choices);
     return false;

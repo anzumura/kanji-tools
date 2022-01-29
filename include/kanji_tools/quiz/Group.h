@@ -44,7 +44,7 @@ public:
   virtual GroupType type() const = 0;
   virtual PatternType patternType() const { return PatternType::None; }
 
-  int number() const { return _number; }
+  auto number() const { return _number; }
   auto& name() const { return _name; }
   auto& members() const { return _members; }
   auto toString() const { return "[" + std::to_string(_number) + ' ' + name() + ']'; }
@@ -75,7 +75,7 @@ private:
 inline auto& operator<<(std::ostream& os, const Group& x) {
   os << '[';
   if (x.patternType() == Group::PatternType::Peer) {
-    auto i = x.members().begin();
+    const auto i = x.members().begin();
     os << "Peers ";
     if (i != x.members().end()) os << (**i).name();
   }

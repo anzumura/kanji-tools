@@ -28,7 +28,7 @@ Data::Data(const std::filesystem::path& dataDir, DebugMode debugMode, std::ostre
 }
 
 KanjiTypes Data::getType(const std::string& name) const {
-  auto i = findKanjiByName(name);
+  const auto i = findKanjiByName(name);
   return i ? (**i).type() : KanjiTypes::None;
 }
 
@@ -46,11 +46,13 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 }
 
 fs::path Data::getDataDir(int argc, const char** argv) {
+  static const auto DataDir = fs::path("data");
+
   std::optional<fs::path> found = {};
   for (auto i = 1; !found && i < argc; ++i)
     if (argv[i] == dataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
-      auto data = fs::path(argv[i + 1]);
+      const auto data = fs::path(argv[i + 1]);
       if (!fs::is_directory(data)) usage(data.string() + " is not a valid directory");
       found = data;
     }
@@ -59,13 +61,12 @@ fs::path Data::getDataDir(int argc, const char** argv) {
   if (!found) {
     if (!argc) usage("need at least one argument, argv[0], to check for a relative 'data' directory");
     auto oldParent = fs::absolute(fs::path(argv[0])).lexically_normal();
-    auto dataDir = fs::path("data");
     do {
-      auto parent = oldParent.parent_path();
+      const auto parent = oldParent.parent_path();
       // 'has_parent_path' seems to always return true, i.e., the parent of '/' is
       // '/' so break if new 'parent' is equal to 'oldParent'.
       if (parent == oldParent) break;
-      if (auto data = parent / dataDir; fs::is_directory(data) && fs::is_regular_file(data / JouyouFile))
+      if (const auto data = parent / DataDir; fs::is_directory(data) && fs::is_regular_file(data / JouyouFile))
         found = data;
       else
         oldParent = parent;
@@ -77,7 +78,7 @@ fs::path Data::getDataDir(int argc, const char** argv) {
 
 Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
   DebugMode result = DebugMode::None;
-  auto setResult = [&result](DebugMode x) {
+  const auto setResult = [&result](DebugMode x) {
     if (result != DebugMode::None) usage("can only specify one '-debug' or '-info' option");
     result = x;
   };
@@ -90,7 +91,7 @@ Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
 }
 
 int Data::nextArg(int argc, const char** argv, int currentArg) {
-  auto result = currentArg + 1;
+  const auto result = currentArg + 1;
   if (result < argc) {
     std::string arg = argv[result];
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't followed
@@ -116,7 +117,7 @@ bool Data::checkInsert(const Entry& kanji) {
   if (kanji->variant() && !_compatibilityMap.insert({kanji->compatibilityName(), kanji->name()}).second)
     printError("failed to insert variant " + kanji->name() + " into map");
   if (kanji->morohashiId()) _morohashiMap[*kanji->morohashiId()].push_back(kanji);
-  for (auto id : kanji->nelsonIds()) _nelsonMap[id].push_back(kanji);
+  for (const auto id : kanji->nelsonIds()) _nelsonMap[id].push_back(kanji);
   return true;
 }
 
@@ -127,14 +128,14 @@ bool Data::checkInsert(List& s, const Entry& kanji) {
 }
 
 void Data::insertSanityChecks(const Entry& kanji) const {
-  auto error = [this, &kanji](const std::string& s) {
+  const auto error = [this, &kanji](const std::string& s) {
     std::string v;
     if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
     printError(kanji->name() + ' ' + toUnicode(kanji->name(), BracketType::Square) + ' ' + v + " " + s + " in _ucd");
   };
 
-  auto kanjiType = kanji->type();
-  if (auto ucd = _ucd.find(kanji->name()); !ucd)
+  const auto kanjiType = kanji->type();
+  if (const auto ucd = _ucd.find(kanji->name()); !ucd)
     error("not found");
   else if (kanjiType == KanjiTypes::Jouyou && !ucd->joyo())
     error("not marked as 'Joyo'");
@@ -154,16 +155,16 @@ void Data::printError(const std::string& msg) const {
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
-  int strokes = 0;
+  auto strokes = 0;
   for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
-      auto newStrokes = std::stoi(line);
+      const auto newStrokes = std::stoi(line);
       assert(newStrokes > strokes);
       strokes = newStrokes;
     } else {
       assert(strokes != 0); // first line must have a stroke count
       for (std::stringstream ss(line); std::getline(ss, line, ' ');)
-        if (auto i = _strokes.insert(std::pair(line, strokes)); !i.second) {
+        if (const auto i = _strokes.insert(std::pair(line, strokes)); !i.second) {
           if (checkDuplicates)
             printError("duplicate entry in " + file.string() + ": " + line);
           else if (i.first->second != strokes)
@@ -199,10 +200,8 @@ void Data::populateLinkedKanji() {
     if (std::string jouyou, linked; std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
       if (const auto i = _kanjiNameMap.find(jouyou); i == _kanjiNameMap.end())
         printError("can't find " + jouyou + " while processing " + file.string());
-      else {
-        auto k = std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second);
-        checkInsert(linkedJinmei, k);
-      }
+      else
+        checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second));
     } else
       printError("bad line in " + file.string() + ": " + line);
   }
@@ -228,14 +227,14 @@ void Data::populateExtra() {
 }
 
 void Data::processList(const DataFile& list) {
-  const bool kenteiList = toBool(list.kyu());
+  const auto kenteiList = toBool(list.kyu());
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
   for (size_t i = 0; i < list.list().size(); ++i) {
-    const auto& name = list.list()[i];
+    auto& name = list.list()[i];
     Entry kanji;
-    if (auto j = findKanjiByName(name); j) {
+    if (const auto j = findKanjiByName(name); j) {
       kanji = *j;
       if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou) found[kanji->type()].push_back(name);
     } else {
@@ -245,7 +244,7 @@ void Data::processList(const DataFile& list) {
         // kanji wasn't already in _kanjiNameMap so it only exists in the 'frequency.txt' file - these kanjis
         // are considered 'Frequency' type and by definition are not part of Jouyou or Jinmei (so also
         // not part of JLPT levels)
-        auto reading = _frequencyReadings.find(name);
+        const auto reading = _frequencyReadings.find(name);
         kanji = reading == _frequencyReadings.end()
           ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
           : std::make_shared<FrequencyKanji>(*this, name, reading->second, i + 1);
@@ -262,7 +261,7 @@ void Data::processList(const DataFile& list) {
       _levels[list.level()].push_back(kanji);
     } else {
       assert(kanji->frequency());
-      int index = (*kanji->frequency() - 1) / FrequencyBucketEntries;
+      const auto index = (*kanji->frequency() - 1) / FrequencyBucketEntries;
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1].push_back(kanji);
     }
   }
@@ -290,16 +289,16 @@ void Data::processUcd() {
   // Calling 'findKanjiByName' also checks for a 'variation selector' version of the given 'name'
   // so use it instead of just checking for a match in _kanjiNameMap directly (this avoids 52
   // redundant kanji getting created when processing 'ucd.txt').
-  for (auto& newKanji = _types[KanjiTypes::Ucd]; auto& i : _ucd.map())
+  for (auto& newKanji = _types[KanjiTypes::Ucd]; const auto& i : _ucd.map())
     if (!findKanjiByName(i.second.name())) checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
 }
 
 void Data::checkStrokes() const {
   DataFile::List strokesFrequency, strokesNotFound, strokeDiffs, vStrokeDiffs, missingDiffs, missingUcd;
   for (const auto& i : _strokes) {
-    auto u = findUcd(i.first);
+    const auto u = findUcd(i.first);
     const auto ucdStrokes = getStrokes(i.first, u, false, true);
-    auto k = findKanjiByName(i.first);
+    const auto k = findKanjiByName(i.first);
     if (ucdStrokes) {
       // If a Kanji object exists, prefer to use its 'strokes' since this it's more accurate, i.e.,
       // there are some incorrect stroke counts in 'wiki-strokes.txt', but they aren't used because

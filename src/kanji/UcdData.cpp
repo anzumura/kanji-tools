@@ -37,10 +37,10 @@ struct PrintCount {
 const Ucd* UcdData::find(const std::string& kanjiName) const {
   std::string r = kanjiName;
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
-    auto nonVariant = MBChar::withoutVariationSelector(kanjiName);
+    const auto nonVariant = MBChar::withoutVariationSelector(kanjiName);
     // check for linked Jinmei variant first
-    if (auto i = _linkedJinmei.find(nonVariant); i == _linkedJinmei.end()) {
-      auto j = _linkedOther.find(nonVariant);
+    if (const auto i = _linkedJinmei.find(nonVariant); i == _linkedJinmei.end()) {
+      const auto j = _linkedOther.find(nonVariant);
       if (j == _linkedOther.end()) return nullptr;
       // if j exists it should never by an empty vector
       assert(!j->second.empty());
@@ -49,7 +49,7 @@ const Ucd* UcdData::find(const std::string& kanjiName) const {
     } else
       r = i->second;
   }
-  auto i = _map.find(r);
+  const auto i = _map.find(r);
   return i == _map.end() ? nullptr : &i->second;
 }
 
@@ -83,18 +83,18 @@ void UcdData::load(const std::filesystem::path& file) {
        f.nextRow();) {
     if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
       f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
-    const auto& name = f.get(nameCol);
+    auto& name = f.get(nameCol);
     if (name.length() > 4) f.error("name greater than 4");
     if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
 
-    const int radical = f.getInt(radicalCol), strokes = f.getInt(strokesCol),
-              vStrokes = f.isEmpty(vStrokesCol) ? 0 : f.getInt(vStrokesCol);
+    const auto radical = f.getInt(radicalCol), strokes = f.getInt(strokesCol),
+               vStrokes = f.isEmpty(vStrokesCol) ? 0 : f.getInt(vStrokesCol);
     if (radical < 1 || radical > 214) f.error("radical out of range");
     // 9F98 (龘) has 48 strokes
     if (strokes < 1 || strokes > 48) f.error("strokes out of range");
     if (vStrokes < 0 || vStrokes == 1 || vStrokes > 33) f.error("variant strokes out of range");
 
-    const bool joyo = f.getBool(joyoCol), jinmei = f.getBool(jinmeiCol);
+    const auto joyo = f.getBool(joyoCol), jinmei = f.getBool(jinmeiCol);
     if (joyo) {
       if (jinmei) f.error("can't be both joyo and jinmei");
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it shouldn't be empty for Joyo
@@ -120,7 +120,7 @@ void UcdData::load(const std::filesystem::path& file) {
       f.error("LinkCode has a value, but LinkName is empty");
 
     std::string linkType = f.get(linkTypeCol);
-    const bool linkedReadings = linkType.ends_with("*");
+    const auto linkedReadings = linkType.ends_with("*");
     if (linkedReadings) linkType.pop_back();
 
     if (!_map
@@ -134,19 +134,19 @@ void UcdData::load(const std::filesystem::path& file) {
     for (const auto& link : links)
       if (!jinmei)
         _linkedOther[link.name()].push_back(name);
-      else if (auto i = _linkedJinmei.emplace(link.name(), name); !i.second)
+      else if (const auto i = _linkedJinmei.emplace(link.name(), name); !i.second)
         f.error("jinmei link " + link.name() + " to " + name + " failed - has " + i.first->second);
   }
 }
 
 void UcdData::print(const Data& data) const {
-  auto print = [&data](const char* s, int x, int y, int z) {
+  const auto print = [&data](const char* s, int x, int y, int z) {
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x << ", Jinmei " << y << ", Other " << z << ")\n";
   };
   PrintCount joyo, jinmei, other;
   data.log() << "Kanji Loaded from Unicode 'ucd' file:\n";
-  for (const auto& i : _map)
-    if (const auto& k = i.second; k.joyo())
+  for (auto& i : _map)
+    if (auto& k = i.second; k.joyo())
       joyo.add(k);
     else if (k.jinmei())
       jinmei.add(k);
@@ -160,14 +160,14 @@ void UcdData::print(const Data& data) const {
   print("Kun Readings", joyo.kunReading, jinmei.kunReading, other.kunReading);
   print("Morohashi Ids", joyo.morohashi, jinmei.morohashi, other.morohashi);
   print("Nelson Ids", joyo.nelson, jinmei.nelson, other.nelson);
-  auto printLinks = [this, &data](const std::string& name, const auto& list) {
-    auto count = std::count_if(list.begin(), list.end(), [this](const auto& i) {
-      auto j = _map.find(i->name());
+  const auto printLinks = [this, &data](const std::string& name, const auto& list) {
+    const auto count = std::count_if(list.begin(), list.end(), [this](const auto& i) {
+      const auto j = _map.find(i->name());
       return j != _map.end() && j->second.hasLinks();
     });
     data.log() << name << " Kanji with links " << count << ":\n";
     for (auto& i : list)
-      if (auto j = _map.find(i->name()); j != _map.end()) {
+      if (const auto j = _map.find(i->name()); j != _map.end()) {
         if (j->second.hasLinks())
           data.out() << "  " << j->second.codeAndName() << " -> " << j->second.linkCodeAndNames() << ' '
                      << j->second.linkType() << '\n';
@@ -188,7 +188,7 @@ void UcdData::printVariationSelectorKanji(const Data& data) const {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3) << ++count << "    "
                  << toUnicode(k.name(), BracketType::Square) << ' ' << k.name() << " variant of " << k.nonVariantName()
                  << "    ";
-      auto u = find(k.name());
+      const auto u = find(k.name());
       if (u) {
         data.out() << u->codeAndName();
         if (u->hasLinks()) data.out() << " variant of " << u->linkCodeAndNames();

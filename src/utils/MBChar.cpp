@@ -65,7 +65,7 @@ const std::wregex MBCharCount::RemoveFurigana(std::wstring(L"([") + KanjiRange +
 const std::wstring MBCharCount::DefaultReplace(L"$1");
 
 int MBCharCount::add(const std::string& s, const OptString& tag) {
-  std::string n = s;
+  auto n = s;
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
     if (n != s) {
@@ -75,13 +75,13 @@ int MBCharCount::add(const std::string& s, const OptString& tag) {
         _lastReplaceTag = *tag;
       }
       if (_debug) {
-        auto count = std::to_string(_replaceCount);
+        const auto count = std::to_string(_replaceCount);
         std::cout << count << " : " << s << '\n' << std::setw(count.length() + 3) << ": " << n << '\n';
       }
     }
   }
   MBChar c(n);
-  int added = 0;
+  auto added = 0;
   for (std::string token; c.next(token);)
     if (allowAdd(token)) {
       ++_map[token];
@@ -94,9 +94,9 @@ int MBCharCount::add(const std::string& s, const OptString& tag) {
 }
 
 int MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bool recurse) {
-  int added = 0;
-  const std::string fileName = file.filename().string(); // only use the final component of the path
-  const OptString tag = addTag ? OptString(fileName) : std::nullopt;
+  auto added = 0;
+  const auto fileName = file.filename().string(); // only use the final component of the path
+  const auto tag = addTag ? OptString(fileName) : std::nullopt;
   if (fs::is_regular_file(file)) {
     ++_files;
     added += processFile(file, tag);
@@ -113,8 +113,8 @@ int MBCharCount::doAddFile(const fs::path& file, bool addTag, bool fileNames, bo
 }
 
 bool MBCharCount::hasUnclosedBrackets(const std::string& line) {
-  if (auto open = line.rfind(OpenWideBracket); open != std::string::npos) {
-    auto close = line.rfind(CloseWideBracket);
+  if (const auto open = line.rfind(OpenWideBracket); open != std::string::npos) {
+    const auto close = line.rfind(CloseWideBracket);
     return close == std::string::npos || close < open;
   }
   return false;
@@ -122,32 +122,32 @@ bool MBCharCount::hasUnclosedBrackets(const std::string& line) {
 
 int MBCharCount::processJoinedLine(std::string& prevLine, const std::string& line, int pos, const OptString& tag) {
   const auto end = pos + CloseWideBracketLength;
-  const std::string joinedLine = prevLine + line.substr(0, end);
+  const auto joinedLine = prevLine + line.substr(0, end);
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);
   return add(joinedLine, tag);
 }
 
 int MBCharCount::processFile(const fs::path& file, const OptString& tag) {
-  int added = 0;
+  auto added = 0;
   std::string line;
   if (std::fstream f(file); _find) {
     std::string prevLine;
-    for (bool prevUnclosed = false; std::getline(f, line); prevUnclosed = hasUnclosedBrackets(prevLine)) {
+    for (auto prevUnclosed = false; std::getline(f, line); prevUnclosed = hasUnclosedBrackets(prevLine)) {
       if (prevLine.empty()) {
         // case for first line - don't process in case next line stars with open bracket.
         prevLine = line;
         continue;
       } else if (prevUnclosed) {
         // case for previous line having unclosed brackets
-        if (auto close = line.find(CloseWideBracket); close != std::string::npos)
-          if (auto open = line.find(OpenWideBracket); close < open) {
+        if (const auto close = line.find(CloseWideBracket); close != std::string::npos)
+          if (const auto open = line.find(OpenWideBracket); close < open) {
             added += processJoinedLine(prevLine, line, close, tag);
             continue;
           }
-      } else if (auto open = line.find(OpenWideBracket); open == 0)
+      } else if (const auto open = line.find(OpenWideBracket); open == 0)
         // case for line starting with open bracket
-        if (auto close = line.find(CloseWideBracket); close != std::string::npos) {
+        if (const auto close = line.find(CloseWideBracket); close != std::string::npos) {
           added += processJoinedLine(prevLine, line, close, tag);
           continue;
         }

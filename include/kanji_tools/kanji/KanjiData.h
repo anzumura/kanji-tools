@@ -14,7 +14,7 @@ public:
 
   // Implementations of the 'Data' base class functions used during Kanji construction
   Kanji::OptInt getFrequency(const std::string& s) const override {
-    auto x = _frequency.get(s);
+    const auto x = _frequency.get(s);
     return x ? Kanji::OptInt(x) : std::nullopt;
   }
   JlptLevels getLevel(const std::string&) const override;

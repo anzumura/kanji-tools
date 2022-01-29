@@ -26,7 +26,7 @@ GroupData::GroupData(DataPtr data) : _data(data) {
 }
 
 bool GroupData::checkInsert(const std::string& name, Map& groups, const Entry& group) const {
-  auto i = groups.emplace(name, group);
+  const auto i = groups.emplace(name, group);
   if (!i.second)
     _data->printError(name + " from Group " + std::to_string(group->number()) + " already in group " +
                       i.first->second->toString());
@@ -34,7 +34,7 @@ bool GroupData::checkInsert(const std::string& name, Map& groups, const Entry& g
 }
 
 bool GroupData::checkInsert(const std::string& name, MultiMap& groups, const Entry& group) const {
-  auto i = groups.equal_range(name);
+  const auto i = groups.equal_range(name);
   for (auto j = i.first; j != i.second; ++j)
     if (j->second->number() == group->number()) {
       _data->printError(name + " from Group " + std::to_string(group->number()) + " already in same group");
@@ -107,7 +107,7 @@ template<typename T> void GroupData::printGroups(const T& groups, const List& gr
 
 void GroupData::printMeaningGroup(const Group& group, TypeMap& types, StringSet& uniqueNames) const {
   if (fullDebug()) {
-    auto len = MBChar::length(group.name());
+    const auto len = MBChar::length(group.name());
     out() << group.name()
           << (len == 1     ? "　　"
                 : len == 2 ? "　"
