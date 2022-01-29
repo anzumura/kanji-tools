@@ -98,12 +98,16 @@ public:
     Valid,
     NotMBChar,
     StringTooLong,
-    ContinuationByte,  // returned when the first byte is a continuation byte, i.e., starts with '10'
-    MBCharTooLong,     // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
-    MBCharMissingBytes // returned when there are not enough continuation bytes
+    ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
+    MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
+    MBCharMissingBytes, // returned when there are not enough continuation bytes
+    // 'Overlong' is the case when character is encoded with more bytes than the minimum required, i.e.,
+    // if a characer can be 'UTF-8' encoded in two bytes, but instead is encoded using three or four
+    // bytes (with extra leading zeros - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings)
+    Overlong
   };
 
-  // 'valid' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
+  // 'validateUtf8' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
   // well-formed 'multi-byte symbol'. Examples:
   // - valid("") = NotMBChar
   // - valid("a") = NotMBChar
@@ -112,27 +116,13 @@ public:
   // - valid("雪s") = StringTooLong
   // - valid("吹雪") = StringTooLong
   // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
-  static auto valid(const char* s, bool checkLengthOne = true) {
-    if (s) {
-      if (const auto x = static_cast<unsigned char>(*s);
-          (x & Mask) == Mask) { // first two bits must be '11' to start a sequence
-        if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
-        if (x & Bit3) {
-          if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
-          if (x & Bit4) {
-            if (x & Bit5) return Results::MBCharTooLong;                   // UTF-8 can only have up to 4 bytes
-            if ((*++s & Mask) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
-          }
-        }
-        return (!checkLengthOne || !*++s ? Results::Valid : Results::StringTooLong);
-      } else if ((x & Mask) == Bit1)
-        return Results::ContinuationByte;
-    }
-    return Results::NotMBChar;
+  static Results validateUtf8(const char* s, bool checkLengthOne = true);
+  static auto validateUtf8(const std::string& s, bool checkLengthOne = true) {
+    return validateUtf8(s.c_str(), checkLengthOne);
   }
-  static auto valid(const std::string& s, bool checkLengthOne = true) { return valid(s.c_str(), checkLengthOne); }
+
   static auto isValid(const std::string& s, bool checkLengthOne = true) {
-    return valid(s, checkLengthOne) == Results::Valid;
+    return validateUtf8(s, checkLengthOne) == Results::Valid;
   }
 
   explicit MBChar(const std::string& data) : _data(data) {}
@@ -155,7 +145,7 @@ public:
   auto errors() const { return _errors; }
   auto variants() const { return _variants; }
   auto length(bool onlyMB = true) const { return length(_data, onlyMB); }
-  auto valid(bool checkLengthOne = true) const { return valid(_data, checkLengthOne); }
+  auto valid(bool checkLengthOne = true) const { return validateUtf8(_data, checkLengthOne); }
   auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
 private:
   // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since

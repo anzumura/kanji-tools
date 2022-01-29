@@ -13,6 +13,28 @@ const auto CloseWideBracketLength = CloseWideBracket.length();
 
 } // namespace
 
+MBChar::Results MBChar::validateUtf8(const char* s, bool checkLengthOne) {
+  if (!s || !(*s & Bit1)) return Results::NotMBChar;
+  if ((*s & Mask) == Bit1) return Results::ContinuationByte;
+  const auto* u = reinterpret_cast<const unsigned char*>(s);
+  const unsigned byte1 = *u;
+  if ((*++u & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
+  if (byte1 & Bit3) {
+    const unsigned byte2 = *u ^ Bit1;                              // last 6 bits of the second byte
+    if ((*++u & Mask) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
+    if (byte1 & Bit4) {
+      if (byte1 & Bit5) return Results::MBCharTooLong;               // UTF-8 can only have up to 4 bytes
+      const unsigned byte3 = *u ^ Bit1;                              // last 6 bits of the third byte
+      if ((*++u & Mask) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
+      if (((byte1 ^ 0b11'11'00'00) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1) <= 0xffff)
+        return Results::Overlong; // overlong 4 byte encoding
+    } else if (((byte1 ^ 0b11'10'00'00) << 12) + (byte2 << 6) + (*u ^ Bit1) <= 0x7ffU)
+      return Results::Overlong; // overlong 3 byte encoding
+  } else if ((byte1 ^ Mask) < 2)
+    return Results::Overlong; // overlong 2 byte encoding
+  return !checkLengthOne || !*++u ? Results::Valid : Results::StringTooLong;
+}
+
 bool MBChar::next(std::string& result, bool onlyMB) {
   for (; *_location; ++_location) {
     const unsigned char firstOfGroup = *_location;
