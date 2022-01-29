@@ -77,7 +77,7 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
                     f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
                     f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
-  int total = 0;
+  auto total = 0;
   for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].first;
   log() << "Total Kanji+Kana: " << total;
   if (total) {
@@ -95,12 +95,12 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
 template<typename Pred>
 int Stats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
                         bool firstCount, bool verbose) const {
-  const bool isKanji(name.ends_with("Kanji")), isHiragana(name == "Hiragana"), isUnrecognized(name == "Unrecognized");
-  const bool isCommonKanji(isKanji && name.starts_with("Common"));
+  const auto isKanji(name.ends_with("Kanji")), isHiragana(name == "Hiragana"), isUnrecognized(name == "Unrecognized");
+  const auto isCommonKanji(isKanji && name.starts_with("Common"));
 
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
-  const bool removeFurigana(isHiragana || name == "Katakana" || name == "MB-Letter");
+  const auto removeFurigana(isHiragana || name == "Katakana" || name == "MB-Letter");
 
   if (isHiragana && verbose) log() << "Showing all furigana replacements:\n";
 
@@ -109,7 +109,7 @@ int Stats::processCount(const fs::path& top, const Pred& pred, const std::string
   count.addFile(top, isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(top, count);
   CountSet frequency;
-  int total = 0;
+  auto total = 0;
   for (const auto& i : count.map()) {
     total += i.second;
     frequency.emplace(i.second, i.first, isKanji ? _data->findKanjiByName(i.first) : std::nullopt);
@@ -158,7 +158,7 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
   }
   for (auto t : AllKanjiTypes)
     if (auto i = uniqueKanjiPerType.find(t); i != uniqueKanjiPerType.end()) {
-      int totalForType = totalKanjiPerType[t];
+      auto totalForType = totalKanjiPerType[t];
       printTotalAndUnique(std::string("[") + toString(t) + "] ", totalForType, i->second);
       out() << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
             << asPercent(totalForType, total) << "%  (";
@@ -187,7 +187,7 @@ void Stats::printBreakdown(const std::string& name, bool showBreakdown, const Co
   out() << "  " << (showBreakdown ? "Rank  [Val #] Freq, LV, Type (No.) ==" : "[Val #], Missing Unicode,")
         << " Highest Count File\n";
   DataFile::List missing;
-  for (int rank = 0; const auto& i : frequency) {
+  for (auto rank = 0; const auto& i : frequency) {
     out() << "  ";
     if (showBreakdown) out() << std::left << std::setw(5) << ++rank << ' ';
     out() << i;
@@ -195,7 +195,7 @@ void Stats::printBreakdown(const std::string& name, bool showBreakdown, const Co
       missing.push_back(i.name);
       if (auto tags = count.tags(i.name); tags != nullptr) {
         std::string file;
-        for (int maxCount = 0; const auto& j : *tags)
+        for (auto maxCount = 0; const auto& j : *tags)
           if (j.second > maxCount) {
             maxCount = j.second;
             file = j.first;

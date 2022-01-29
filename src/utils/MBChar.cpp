@@ -9,7 +9,7 @@ namespace kanji_tools {
 namespace {
 
 const std::string OpenWideBracket("（"), CloseWideBracket("）");
-const int CloseWideBracketLength = CloseWideBracket.length();
+const auto CloseWideBracketLength = CloseWideBracket.length();
 
 } // namespace
 
