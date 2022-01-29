@@ -89,26 +89,27 @@ void ConvertMain::usage(const std::string& errorMsg, bool showAllOptions) const 
   auto& os = errorMsg.empty() ? std::cout : std::cerr;
   if (!errorMsg.empty()) os << _program << ": " << errorMsg << '\n';
   if (showAllOptions) os << "usage: " << _program << " [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-m|-n|-p] [string ...]\n";
-  os << "  -h: set conversion output to Hiragana" << (showAllOptions ? " (default)" : "") << "\n\
-  -k: set conversion output to Katakana\n\
-  -r: set conversion output to Romaji\n\
-  -H: restrict conversion input to Hiragana\n\
-  -K: restrict conversion input to Katakana\n\
-  -R: restrict conversion input to Romaji\n";
+  os << "  -h: set conversion output to Hiragana" << (showAllOptions ? " (default)" : "") << R"(
+  -k: set conversion output to Katakana
+  -r: set conversion output to Romaji
+  -H: restrict conversion input to Hiragana
+  -K: restrict conversion input to Katakana
+  -R: restrict conversion input to Romaji
+)";
   if (showAllOptions) {
-    os << "\
-  -?: prints this usage message\n\
-  -f option: set 'option' (-f can be used multiple times to combine options). Valid options are:\n\
-      h: conform Romaji output more closely to 'Modern Hepburn' style\n\
-      k: conform Romaji output more closely to 'Kunrei Shiki' style\n\
-      n: no prolonged sound marks on Hiragana output, i.e., vowels are repeated instead of 'ー'\n\
-      r: remove spaces on output (only applies to Hiragana and Katakana output)\n\
-  -i: interactive mode\n\
-  -m: print kana chart in 'Markdown' format and exit\n\
-  -n: suppress newline on output (for non-interactive mode)\n\
-  -p: print kana chart aligned for terminal output and exit\n\
-  --: finish parsing options, all further arguments will be treated as input files\n\
-  [string ...]: provide one or more strings to convert, no strings means process standard input\n";
+    os << R"(  -?: prints this usage message
+  -f option: set 'option' (-f can be used multiple times to combine options). Valid options are:
+      h: conform Romaji output more closely to 'Modern Hepburn' style
+      k: conform Romaji output more closely to 'Kunrei Shiki' style
+      n: no prolonged sound marks on Hiragana output, i.e., vowels are repeated instead of 'ー'
+      r: remove spaces on output (only applies to Hiragana and Katakana output)
+  -i: interactive mode
+  -m: print kana chart in 'Markdown' format and exit
+  -n: suppress newline on output (for non-interactive mode)
+  -p: print kana chart aligned for terminal output and exit
+  --: finish parsing options, all further arguments will be treated as input files
+  [string ...]: provide one or more strings to convert, no strings means process standard input
+)";
     exit(errorMsg.empty() ? 0 : 1);
   }
 }
@@ -196,22 +197,23 @@ bool ConvertMain::flagArgs(char arg) {
 
 void ConvertMain::printKanaChart(bool markdown) const {
   std::cout << (markdown ? "## **Kana Conversion Chart**\n### **Notes:**" : ">>> Notes:");
-  std::cout << "\n\
-- Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei\n\
-- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases\n\
-- Hepb and Kunr are only populated when they would produce different output\n\
-  - Values in () means 'output-only' since inputting leads to a different kana\n\
-- 'Roma Variants' are alternative keyboard combinations that lead to the same kana\n\
-- When populated, Roma, Hira and Kata columns are unique (no duplicates)\n\
-- Unicode values are only shown for 'monograph' entries\n\
-- Some 'digraphs' may not be in any real words, but they are typable and thus included\n\
-- Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering\n\
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)\n\
-- Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None\n\
-- Type 'N' includes:\n\
-  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match usual IME keyboard entry\n\
-  - Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value\n\
-  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji\n\n";
+  std::cout << R"(
+- Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
+- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases
+- Hepb and Kunr are only populated when they would produce different output
+  - Values in () means 'output-only' since inputting leads to a different kana
+- 'Roma Variants' are alternative keyboard combinations that lead to the same kana
+- When populated, Roma, Hira and Kata columns are unique (no duplicates)
+- Unicode values are only shown for 'monograph' entries
+- Some 'digraphs' may not be in any real words, but they are typable and thus included
+- Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no standard Hiragana or Romaji)
+- Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
+- Type 'N' includes:
+  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match usual IME keyboard entry
+  - Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value
+  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji
+)";
   auto hanDakutenMonographs = 0, small = 0, plainMonographs = 0, dakutenMonographs = 0, plainDigraphs = 0,
        hanDakutenDigraphs = 0, dakutenDigraphs = 0, romajiVariants = 0;
   Table table({"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb", "Kunr", "Roma Variants"}, true);

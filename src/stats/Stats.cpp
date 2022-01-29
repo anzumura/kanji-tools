@@ -21,11 +21,11 @@ std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
   return os;
 }
 
-constexpr auto HelpMessage = "\
-kanjiStats [-bhv] file [file ...]:\n\
-  -b: show full kanji breakdown for 'file' (instead of just a summary)\n\
-  -h: show help message for command-line options\n\
-  -v: show 'before' and 'after' versions of lines that changed due to furigana removal\n";
+constexpr auto HelpMessage = R"(kanjiStats [-bhv] file [file ...]:
+  -b: show full kanji breakdown for 'file' (instead of just a summary)
+  -h: show help message for command-line options
+  -v: show 'before' and 'after' versions of lines that changed due to furigana removal
+)";
 
 constexpr double asPercent(int amount, int total) { return amount * 100. / total; }
 

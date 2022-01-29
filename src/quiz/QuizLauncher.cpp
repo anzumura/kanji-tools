@@ -7,35 +7,40 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto HelpMessage = "\
-kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]\n\
-          [-r[num] | -t[num]] [kanji]\n\
-    -h   show this help message for command-line options\n\
-    -s   show English meanings by default (can be toggled on/off later)\n\n\
-  The following options allow choosing the quiz/review type optionally followed\n\
-  by question list type (grade, level, etc.) instead of being prompted:\n\
-    -f   'frequency' (optional frequency group '1-5')\n\
-    -g   'grade' (optional grade '1-6', 's' = Secondary School)\n\
-    -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)\n\
-    -l   'level' (optional JLPT level number '1-5')\n\
-    -m   'meaning' (optional kanji type '1-4')\n\
-    -p   'pattern' (optional kanji type '1-4')\n\n\
-  The following options can be followed by a 'num' to specify where to start in\n\
-  the question list (use negative to start from the end or 0 for random order).\n\
-    -r   review mode\n\
-    -t   test mode\n\n\
-  kanji  show details for a kanji instead of starting a review or test\n\n\
-Examples:\n\
-  kanjiQuiz -f        # start 'frequency' quiz (prompts for 'bucket' number)\n\
-  kanjiQuiz -r40 -l1  # start 'JLPT N1' review beginning at the 40th entry\n\n\
-Note: 'kanji' can be UTF-8, frequency (between 1 and 2501), 'm' followed by\n\
-Morohashi ID (index in Dai Kan-Wa Jiten), 'n' followed by Classic Nelson ID\n\
-or 'u' followed by Unicode. For example, theses all produce the same output:\n\
-  kanjiQuiz 奉\n\
-  kanjiQuiz 1624\n\
-  kanjiQuiz m5894\n\
-  kanjiQuiz n212\n\
-  kanjiQuiz u5949\n\n";
+constexpr auto HelpMessage = R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
+          [-r[num] | -t[num]] [kanji]
+    -h   show this help message for command-line options
+    -s   show English meanings by default (can be toggled on/off later)
+
+  The following options allow choosing the quiz/review type optionally followed
+  by question list type (grade, level, etc.) instead of being prompted:
+    -f   'frequency' (optional frequency group '1-5')
+    -g   'grade' (optional grade '1-6', 's' = Secondary School)
+    -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)
+    -l   'level' (optional JLPT level number '1-5')
+    -m   'meaning' (optional kanji type '1-4')
+    -p   'pattern' (optional kanji type '1-4')
+
+  The following options can be followed by a 'num' to specify where to start in
+  the question list (use negative to start from the end or 0 for random order).
+    -r   review mode
+    -t   test mode
+
+  kanji  show details for a kanji instead of starting a review or test
+
+Examples:
+  kanjiQuiz -f        # start 'frequency' quiz (prompts for 'bucket' number)
+  kanjiQuiz -r40 -l1  # start 'JLPT N1' review beginning at the 40th entry
+
+Note: 'kanji' can be UTF-8, frequency (between 1 and 2501), 'm' followed by
+Morohashi ID (index in Dai Kan-Wa Jiten), 'n' followed by Classic Nelson ID
+or 'u' followed by Unicode. For example, theses all produce the same output:
+  kanjiQuiz 奉
+  kanjiQuiz 1624
+  kanjiQuiz m5894
+  kanjiQuiz n212
+  kanjiQuiz u5949
+)";
 
 const Choice::Choices ProgramModeChoices({{'r', "review"}, {'t', "test"}}),
   ListOrderChoices({{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}}),
@@ -153,7 +158,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question, bool mea
 
 void QuizLauncher::printExtraTypeInfo(const Entry& k) const {
   out() << ", " << k->type();
-  if (auto i = k->extraTypeInfo(); i) out() << " (" << *i << ')';
+  if (const auto i = k->extraTypeInfo(); i) out() << " (" << *i << ')';
 }
 
 void QuizLauncher::printLegend(int infoFields) const {
