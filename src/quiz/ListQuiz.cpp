@@ -12,7 +12,7 @@ std::mt19937 RandomGen(RandomDevice());
 const std::string Prompt("  Select");
 const std::string QuizPrompt = Prompt + " correct ";
 
-constexpr char ChoiceStart = '1';
+constinit auto ChoiceStart = '1';
 
 } // namespace
 

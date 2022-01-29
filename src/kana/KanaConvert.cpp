@@ -10,7 +10,7 @@ namespace kanji_tools {
 namespace {
 
 using P = std::pair<char, const char*>;
-constexpr std::array Delimiters{
+constinit std::array Delimiters{
   P(' ', "　"), P('.', "。"), P(',', "、"), P(':', "："), P(';', "；"), P('/', "・"), P('!', "！"), P('?', "？"),
   P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"), P('*', "＊"), P('~', "〜"), P('=', "＝"), P('+', "＋"),
   P('@', "＠"), P('#', "＃"), P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"), P('{', "『"), P('}', "』"),

@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto HelpMessage = "\
+constinit auto HelpMessage = "\
 kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]\n\
           [-r[num] | -t[num]] [kanji]\n\
     -h   show this help message for command-line options\n\
@@ -45,11 +45,11 @@ const Choice::Choices ProgramModeChoices({{'r', "review"}, {'t', "test"}}),
   LevelChoices({{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}}),
   ListStyleChoices({{'k', "kanji to reading"}, {'r', "reading to kanji"}}),
   GroupKanjiChoices({{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}});
-constexpr auto GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9', ListChoiceCountStart = '2',
+constinit auto GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9', ListChoiceCountStart = '2',
                ListChoiceCountEnd = '9';
 
 // Default options are offered for some of the above 'Choices' (when prompting the user for input):
-constexpr auto DefaultProgramMode = 't', DefaultQuestionOrder = 'r', DefaultQuizType = 'g', DefaultGrade = '6',
+constinit auto DefaultProgramMode = 't', DefaultQuestionOrder = 'r', DefaultQuizType = 'g', DefaultGrade = '6',
                DefaultKyu = '2', DefaultListChoiceCount = '4', DefaultListStyle = 'k', DefaultGroupKanji = '2';
 
 } // namespace
