@@ -101,9 +101,9 @@ public:
     ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
     MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
     MBCharMissingBytes, // returned when there are not enough continuation bytes
-    // 'Overlong' is the case when character is encoded with more bytes than the minimum required, i.e.,
-    // if a characer can be 'UTF-8' encoded in two bytes, but instead is encoded using three or four
-    // bytes (with extra leading zeros - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings)
+    // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the minimum required, i.e.,
+    // if a characer can be encoded in two bytes, but instead is encoded using three or four bytes (with
+    // extra leading zero bits - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
     Overlong
   };
 
