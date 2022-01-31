@@ -4,6 +4,18 @@
 namespace kanji_tools {
 
 TEST(MBUtilsTest, FromUTF8String) {
+  auto wideSingle = fromUtf8("single");
+  ASSERT_EQ(wideSingle, L"single");
+  // first byte error cases
+  EXPECT_EQ(fromUtf8(std::string({static_cast<char>(Bit1)})), L"\ufffd");
+  EXPECT_EQ(fromUtf8(std::string({static_cast<char>(FiveBits)})), L"\ufffd");
+  // second byte not continuation
+  EXPECT_EQ(fromUtf8(std::string({static_cast<char>(TwoBits), 'a'})), L"\ufffda");
+  const char cont = static_cast<char>(Bit1);
+  // third byte not continuation
+  EXPECT_EQ(fromUtf8(std::string({static_cast<char>(ThreeBits), cont, 'a'})), L"\ufffda");
+  // fourth byte not continuation
+  EXPECT_EQ(fromUtf8(std::string({static_cast<char>(FourBits), cont, cont, 'a'})), L"\ufffda");
   std::string dog("犬");
   auto wideDog = fromUtf8(dog);
   ASSERT_EQ(dog.length(), 3);
@@ -14,6 +26,21 @@ TEST(MBUtilsTest, FromUTF8String) {
   EXPECT_EQ(wideDog[0], L'\u72ac');
   auto newDog = toUtf8(wideDog);
   EXPECT_EQ(dog, newDog);
+}
+
+// see similar tests in MBCharTest.cpp (NotValidForOverlong)
+TEST(MBUtilsTest, ErrorForOverlong) {
+  // overlong single byte ascii
+  const unsigned char bang = 33;
+  EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
+  EXPECT_EQ(fromUtf8(std::string({static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)})), L"\ufffd");
+  // overlong ō with 3 bytes
+  std::string overlongO(
+    {static_cast<char>(ThreeBits), static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)});
+  EXPECT_EQ(fromUtf8(overlongO), L"\ufffd");
+  // overlong Euro symbol with 4 bytes
+  std::string x("\xF0\x82\x82\xAC");
+  EXPECT_EQ(fromUtf8(x), L"\ufffd");
 }
 
 TEST(MBUtilsTest, FromUTF8CharArray) {

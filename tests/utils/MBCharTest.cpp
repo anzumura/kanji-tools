@@ -118,15 +118,13 @@ TEST(MBChar, NotValidWithFiveByte) {
   EXPECT_EQ(MBChar::validateUtf8(x), MBChar::Results::MBCharTooLong);
 }
 
+// see similar tests in MBUtilsTest.cpp (ErrorForOverlong)
 TEST(MBChar, NotValidForOverlong) {
-  const unsigned char mbStart2 = 0b11'00'00'00;
-  const unsigned char mbStart3 = 0b11'10'00'00;
-  const unsigned char mbContinue = 0b10'00'00'00;
   // overlong single byte ascii
   const unsigned char bang = 33;
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
   EXPECT_EQ(MBChar::validateUtf8(std::string({static_cast<char>(bang)})), MBChar::Results::NotMBChar);
-  EXPECT_EQ(MBChar::validateUtf8(std::string({static_cast<char>(mbStart2), static_cast<char>(mbContinue | bang)})),
+  EXPECT_EQ(MBChar::validateUtf8(std::string({static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)})),
             MBChar::Results::Overlong);
   // overlong ō with 3 bytes
   std::string o("ō");
@@ -135,7 +133,7 @@ TEST(MBChar, NotValidForOverlong) {
   EXPECT_EQ(toUnicode(o), "014D");
   EXPECT_EQ(toBinary(0x014d, 16), "0000000101001101");
   std::string overlongO(
-    {static_cast<char>(mbStart3), static_cast<char>(mbContinue | 0b101), static_cast<char>(mbContinue | 0b1101)});
+    {static_cast<char>(ThreeBits), static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)});
   EXPECT_EQ(MBChar::validateUtf8(overlongO), MBChar::Results::Overlong);
   // overlong Euro symbol with 4 bytes
   std::string x("\xF0\x82\x82\xAC");

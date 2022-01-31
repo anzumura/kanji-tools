@@ -15,22 +15,22 @@ const auto CloseWideBracketLength = CloseWideBracket.length();
 
 MBChar::Results MBChar::validateUtf8(const char* s, bool checkLengthOne) {
   if (!s || !(*s & Bit1)) return Results::NotMBChar;
-  if ((*s & Mask) == Bit1) return Results::ContinuationByte;
-  const auto* u = reinterpret_cast<const unsigned char*>(s);
+  if ((*s & TwoBits) == Bit1) return Results::ContinuationByte;
+  auto* u = reinterpret_cast<const unsigned char*>(s);
   const unsigned byte1 = *u;
-  if ((*++u & Mask) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
+  if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
   if (byte1 & Bit3) {
-    const unsigned byte2 = *u ^ Bit1;                              // last 6 bits of the second byte
-    if ((*++u & Mask) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
+    const unsigned byte2 = *u ^ Bit1;                                 // last 6 bits of the second byte
+    if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
     if (byte1 & Bit4) {
-      if (byte1 & Bit5) return Results::MBCharTooLong;               // UTF-8 can only have up to 4 bytes
-      const unsigned byte3 = *u ^ Bit1;                              // last 6 bits of the third byte
-      if ((*++u & Mask) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
-      if (((byte1 ^ 0b11'11'00'00) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1) <= 0xffff)
+      if (byte1 & Bit5) return Results::MBCharTooLong;                  // UTF-8 can only have up to 4 bytes
+      const unsigned byte3 = *u ^ Bit1;                                 // last 6 bits of the third byte
+      if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
+      if (((byte1 ^ FourBits) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1) <= 0xffffU)
         return Results::Overlong; // overlong 4 byte encoding
-    } else if (((byte1 ^ 0b11'10'00'00) << 12) + (byte2 << 6) + (*u ^ Bit1) <= 0x7ffU)
+    } else if (((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1) <= 0x7ffU)
       return Results::Overlong; // overlong 3 byte encoding
-  } else if ((byte1 ^ Mask) < 2)
+  } else if ((byte1 ^ TwoBits) < 2)
     return Results::Overlong; // overlong 2 byte encoding
   return !checkLengthOne || !*++u ? Results::Valid : Results::StringTooLong;
 }
@@ -38,7 +38,7 @@ MBChar::Results MBChar::validateUtf8(const char* s, bool checkLengthOne) {
 bool MBChar::next(std::string& result, bool onlyMB) {
   for (; *_location; ++_location) {
     const unsigned char firstOfGroup = *_location;
-    if (unsigned char x = firstOfGroup & Mask; !x || x == Bit2) { // not a multi byte character
+    if (unsigned char x = firstOfGroup & TwoBits; !x || x == Bit2) { // not a multi byte character
       if (!onlyMB) {
         result = *_location++;
         return true;
@@ -63,7 +63,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall) const {
   for (; *location; ++location) {
     const unsigned char firstOfGroup = *location;
-    if (unsigned char x = firstOfGroup & Mask; !x || x == Bit2) { // not a multi byte character
+    if (unsigned char x = firstOfGroup & TwoBits; !x || x == Bit2) { // not a multi byte character
       if (internalCall) return false;
       if (!onlyMB) {
         result = *location;

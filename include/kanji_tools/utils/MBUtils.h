@@ -1,28 +1,30 @@
 #ifndef KANJI_TOOLS_UTILS_MBUTILS_H
 #define KANJI_TOOLS_UTILS_MBUTILS_H
 
-#include <codecvt> // for codecvt_utf8
-#include <locale> // for wstring_convert
 #include <string>
 
 namespace kanji_tools {
 
 // Helper functions to convert between 'utf8' strings and 'wchar_t' wstrings
 
-inline auto fromUtf8(const std::string& s) {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.from_bytes(s);
-}
+// Bit patterns used for processing UTF-8
+enum Values : unsigned char {
+  Bit5 = 0b00'00'10'00,
+  Bit4 = 0b00'01'00'00,
+  Bit3 = 0b00'10'00'00,
+  Bit2 = 0b01'00'00'00,
+  Bit1 = 0b10'00'00'00,      // continuation pattern
+  TwoBits = 0b11'00'00'00,   // mask for first two bits (starts a multi-byte sequence)
+  ThreeBits = 0b11'10'00'00, // start of a 3 byte multi-byte sequence
+  FourBits = 0b11'11'00'00,  // start of a 4 byte multi-byte sequence
+  FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
+};
 
-inline auto toUtf8(wchar_t c) {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.to_bytes(c);
-}
+std::wstring fromUtf8(const char*);
+inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
 
-inline auto toUtf8(const std::wstring& s) {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return conv.to_bytes(s);
-}
+std::string toUtf8(wchar_t);
+std::string toUtf8(const std::wstring&);
 
 // Helper functions for adding brackets and adding leading zeroes
 

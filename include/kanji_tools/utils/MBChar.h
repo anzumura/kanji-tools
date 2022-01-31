@@ -1,6 +1,8 @@
 #ifndef KANJI_TOOLS_UTILS_MBCHAR_H
 #define KANJI_TOOLS_UTILS_MBCHAR_H
 
+#include <kanji_tools/utils/MBUtils.h>
+
 #include <filesystem>
 #include <map>
 #include <optional>
@@ -21,15 +23,6 @@ namespace kanji_tools {
 //   how many bytes are in the sequence, i.e.: 110 means 2 bytes, 1110 means 3, etc.
 class MBChar {
 public:
-  enum Values : unsigned char {
-    Bit5 = 0b00'00'10'00,
-    Bit4 = 0b00'01'00'00,
-    Bit3 = 0b00'10'00'00,
-    Bit2 = 0b01'00'00'00,
-    Bit1 = 0b10'00'00'00, // continuation pattern
-    Mask = 0b11'00'00'00  // mask for first two bits
-  };
-
   // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
   // method is used by 'length', 'next' and 'doPeek'.
   static auto isVariationSelector(const unsigned char* s) {
@@ -62,9 +55,9 @@ public:
         if (skipVariationSelectors && isVariationSelector(i))
           i += 3;
         else if (onlyMB)
-          len += (*i++ & Mask) == Mask;
+          len += (*i++ & TwoBits) == TwoBits;
         else
-          len += (*i++ & Mask) != Bit1;
+          len += (*i++ & TwoBits) != Bit1;
     }
     return len;
   }
