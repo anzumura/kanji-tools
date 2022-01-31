@@ -5,8 +5,6 @@
 
 namespace kanji_tools {
 
-// Helper functions to convert between 'utf8' strings and 'wchar_t' wstrings
-
 // Bit patterns used for processing UTF-8
 enum Values : unsigned char {
   Bit5 = 0b00'00'10'00,
@@ -19,6 +17,18 @@ enum Values : unsigned char {
   FourBits = 0b11'11'00'00,  // start of a 4 byte multi-byte sequence
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
+
+// Helper functions to convert between 'utf8' strings and 'wchar_t' wstrings were originally
+// implemented using code like the following, but are now coded here to avoid dependencies:
+//
+// #include <codecvt> // for codecvt_utf8
+// #include <locale>  // for wstring_convert
+//
+// static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+//
+// inline auto fromUtf8(const std::string& s) { return conv.from_bytes(s); }
+// inline auto toUtf8(wchar_t c) { return conv.to_bytes(c); }
+// inline auto toUtf8(const std::wstring& s) {return conv.to_bytes(s); }
 
 std::wstring fromUtf8(const char*);
 inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
