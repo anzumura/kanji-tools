@@ -13,7 +13,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_EXTENSIONS OFF)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(WARN_FLAGS "-Werror -Wall -Wextra -Wno-logical-op-parentheses")
+    # enable some warnings and turn them into errors
+    set(WARN_FLAGS "-Werror -Wall -Wextra -Wunused -Wc++20-compat-pedantic -Wdeprecated -Wunreachable-code-aggressive")
+    # disable a warning
+    set(WARN_FLAGS "${WARN_FLAGS} -Wno-logical-op-parentheses")
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls")
     # need to set env for after stack reporting: ASAN_OPTIONS=detect_stack_use_after_return=1
     # set(SANITIZER_STACK_FLAGS "-fsanitize-address-use-after-scope")
