@@ -12,6 +12,7 @@
       "includePath": [
         "${workspaceFolder}/include",
         "${google}/googletest/include",
+        "${google}/googletest",
         "${google}/googlemock/include",
         "${sdk}/c++/v1",
         "${sdk}",
