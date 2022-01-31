@@ -18,17 +18,11 @@ enum Values : unsigned char {
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
 
-// Helper functions to convert between 'utf8' strings and 'wchar_t' wstrings were originally
-// implemented using code like the following, but are now coded here to avoid dependencies:
-//
-// #include <codecvt> // for codecvt_utf8
-// #include <locale>  // for wstring_convert
-//
-// static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-//
-// inline auto fromUtf8(const std::string& s) { return conv.from_bytes(s); }
-// inline auto toUtf8(wchar_t c) { return conv.to_bytes(c); }
-// inline auto toUtf8(const std::wstring& s) {return conv.to_bytes(s); }
+// Helper functions to convert between UTF-8 'char' strings and 'wchar_t' wstrings were originally
+// implemented using 'codecvt', but were changed to local implementations to remove the dependency
+// and allow more flexibility. For example, the local implementaions use 'U+FFFD' for errors instead
+// of throwing a 'range_error'. Uncomment the following line to revert to 'codecvt':
+//#define USE_CODECVT_FOR_UTF_8
 
 std::wstring fromUtf8(const char*);
 inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
