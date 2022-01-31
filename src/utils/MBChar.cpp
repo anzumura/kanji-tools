@@ -26,10 +26,13 @@ MBChar::Results MBChar::validateUtf8(const char* s, bool checkLengthOne) {
       if (byte1 & Bit5) return Results::MBCharTooLong;                  // UTF-8 can only have up to 4 bytes
       const unsigned byte3 = *u ^ Bit1;                                 // last 6 bits of the third byte
       if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
-      if (((byte1 ^ FourBits) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1) <= 0xffffU)
-        return Results::Overlong; // overlong 4 byte encoding
-    } else if (((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1) <= 0x7ffU)
+      const unsigned c = ((byte1 ^ FourBits) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1);
+      if (c <= 0xffffU) return Results::Overlong; // overlong 4 byte encoding
+      if (c > MaxUnicode) return Results::InvalidCodePoint;
+    } else if (const unsigned c = ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1); c <= 0x7ffU)
       return Results::Overlong; // overlong 3 byte encoding
+    else if (c >= MinSurrogate && c <= MaxSurrogate)
+      return Results::InvalidCodePoint;
   } else if ((byte1 ^ TwoBits) < 2)
     return Results::Overlong; // overlong 2 byte encoding
   return !checkLengthOne || !*++u ? Results::Valid : Results::StringTooLong;

@@ -89,15 +89,16 @@ public:
   // 'Results' is used for the return value of the 'valid' method - see comments below for more details.
   enum class Results {
     Valid,
-    NotMBChar,
-    StringTooLong,
     ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
+    InvalidCodePoint,   // returned when the bytes decode to an invalid Unicode code point (see MBUtils.h)
     MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
     MBCharMissingBytes, // returned when there are not enough continuation bytes
+    NotMBChar,
     // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the minimum required, i.e.,
     // if a characer can be encoded in two bytes, but instead is encoded using three or four bytes (with
     // extra leading zero bits - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
-    Overlong
+    Overlong,
+    StringTooLong,
   };
 
   // 'validateUtf8' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single

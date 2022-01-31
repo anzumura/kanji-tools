@@ -14,7 +14,7 @@ auto removeFurigana(const std::wstring& s) {
 
 } // namespace
 
-TEST(MBChar, CheckRemovingFurigana) {
+TEST(MBCharTest, CheckRemovingFurigana) {
   // replace furigana - must be kanji followed by kana in wide brackets
   EXPECT_EQ(removeFurigana(L"犬（いぬ）"), L"犬");
   EXPECT_EQ(removeFurigana(L"犬（イヌ）"), L"犬");
@@ -28,7 +28,7 @@ TEST(MBChar, CheckRemovingFurigana) {
   EXPECT_EQ(removeFurigana(L"子供たちは茫漠（ぼうばく）と見霽（みはる）かす"), L"子供たちは茫漠と見霽かす");
 }
 
-TEST(MBChar, Length) {
+TEST(MBCharTest, Length) {
   EXPECT_EQ(MBChar("").length(), 0);
   EXPECT_EQ(MBChar::length(nullptr), 0);
   EXPECT_EQ(MBChar("abc").length(), 0);
@@ -42,7 +42,7 @@ TEST(MBChar, Length) {
   EXPECT_EQ(MBChar::length(s), 1);
 }
 
-TEST(MBChar, GetFirst) {
+TEST(MBCharTest, GetFirst) {
   EXPECT_EQ(MBChar::getFirst(""), "");
   EXPECT_EQ(MBChar::getFirst("abc"), "");
   EXPECT_EQ(MBChar::getFirst("大blue空"), "大");
@@ -53,7 +53,7 @@ TEST(MBChar, GetFirst) {
   EXPECT_EQ(r, s);
 }
 
-TEST(MBChar, Valid) {
+TEST(MBCharTest, Valid) {
   EXPECT_EQ(MBChar("").valid(), MBChar::Results::NotMBChar);
   EXPECT_EQ(MBChar::validateUtf8(nullptr), MBChar::Results::NotMBChar);
   EXPECT_EQ(MBChar("a").valid(), MBChar::Results::NotMBChar);
@@ -80,7 +80,7 @@ TEST(MBChar, Valid) {
   EXPECT_EQ(MBChar::validateUtf8(x.substr(1, 2)), MBChar::Results::ContinuationByte);
 }
 
-TEST(MBChar, ValidWithTwoByte) {
+TEST(MBCharTest, ValidWithTwoByte) {
   std::string x("©");
   EXPECT_EQ(x.length(), 2);
   EXPECT_TRUE(MBChar(x).isValid());
@@ -89,7 +89,7 @@ TEST(MBChar, ValidWithTwoByte) {
   EXPECT_EQ(MBChar::validateUtf8(x.substr(1)), MBChar::Results::ContinuationByte);
 }
 
-TEST(MBChar, ValidWithFourByte) {
+TEST(MBCharTest, ValidWithFourByte) {
   std::string x("𒀄"); // a four byte sumerian cuneiform symbol
   EXPECT_EQ(x.length(), 4);
   EXPECT_TRUE(MBChar(x).isValid());
@@ -105,7 +105,7 @@ TEST(MBChar, ValidWithFourByte) {
   EXPECT_EQ(MBChar::validateUtf8(x.substr(3, 1)), MBChar::Results::ContinuationByte);
 }
 
-TEST(MBChar, NotValidWithFiveByte) {
+TEST(MBCharTest, NotValidWithFiveByte) {
   std::string x("𒀄");
   EXPECT_EQ(x.length(), 4);
   EXPECT_TRUE(MBChar(x).isValid());
@@ -118,8 +118,35 @@ TEST(MBChar, NotValidWithFiveByte) {
   EXPECT_EQ(MBChar::validateUtf8(x), MBChar::Results::MBCharTooLong);
 }
 
+// see similar tests in MBUtilsTest.cpp
+TEST(MBCharTest, BeyondMaxUnicode) {
+  const wchar_t ok = 0x10ffff;
+  const wchar_t bad = 0x110000;
+  EXPECT_EQ(bad - ok, 1);
+  EXPECT_EQ(toBinary(ok, 21), "100001111111111111111");
+  EXPECT_EQ(toBinary(bad, 21), "100010000000000000000");
+  const char firstByte = static_cast<char>(0b11'11'01'00);
+  const auto okS = std::string(
+    {firstByte, static_cast<char>(0b10'00'11'11), static_cast<char>(0b10'11'11'11), static_cast<char>(0b10'11'11'11)});
+  const auto badS =
+    std::string({firstByte, static_cast<char>(0b10'01'00'00), static_cast<char>(Bit1), static_cast<char>(Bit1)});
+  EXPECT_EQ(MBChar::validateUtf8(okS), MBChar::Results::Valid);
+  EXPECT_EQ(MBChar::validateUtf8(badS), MBChar::Results::InvalidCodePoint);
+}
+
+TEST(MBCharTest, InvalidSurrogateRange) {
+  const auto beforeRange = std::string({'\xED', '\x9F', '\xBF'}); // U+D7FF
+  const auto rangeStart = std::string({'\xED', '\xA0', '\x80'});  // U+D800
+  const auto rangeEnd = std::string({'\xED', '\xBF', '\xBF'});    // U+DFFF
+  const auto afterRange = std::string({'\xEE', '\x80', '\x80'});  // U+E000
+  EXPECT_EQ(MBChar::validateUtf8(beforeRange), MBChar::Results::Valid);
+  EXPECT_EQ(MBChar::validateUtf8(rangeStart), MBChar::Results::InvalidCodePoint);
+  EXPECT_EQ(MBChar::validateUtf8(rangeEnd), MBChar::Results::InvalidCodePoint);
+  EXPECT_EQ(MBChar::validateUtf8(afterRange), MBChar::Results::Valid);
+}
+
 // see similar tests in MBUtilsTest.cpp (ErrorForOverlong)
-TEST(MBChar, NotValidForOverlong) {
+TEST(MBCharTest, NotValidForOverlong) {
   // overlong single byte ascii
   const unsigned char bang = 33;
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
@@ -140,7 +167,7 @@ TEST(MBChar, NotValidForOverlong) {
   EXPECT_EQ(MBChar::validateUtf8(x), MBChar::Results::Overlong);
 }
 
-TEST(MBChar, GetNext) {
+TEST(MBCharTest, GetNext) {
   MBChar s("todayトロントの天気is nice。");
   std::string x;
   std::array expected = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
@@ -151,7 +178,7 @@ TEST(MBChar, GetNext) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBChar, GetNextIncludingSingleByte) {
+TEST(MBCharTest, GetNextIncludingSingleByte) {
   MBChar s("a天気b");
   std::string x;
   std::array expected = {"a", "天", "気", "b"};
@@ -162,7 +189,7 @@ TEST(MBChar, GetNextIncludingSingleByte) {
   EXPECT_FALSE(s.next(x, false));
 }
 
-TEST(MBChar, Reset) {
+TEST(MBCharTest, Reset) {
   MBChar s("a天気b");
   std::string x;
   std::array expected = {"天", "気"};
@@ -179,7 +206,7 @@ TEST(MBChar, Reset) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBChar, ErrorCount) {
+TEST(MBCharTest, ErrorCount) {
   std::string original("甲乙丙丁");
   // there should be 4 '3-byte' characters
   ASSERT_EQ(original.length(), 12);

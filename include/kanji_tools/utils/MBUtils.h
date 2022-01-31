@@ -18,11 +18,22 @@ enum Values : unsigned char {
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
 
+
+// 'Min' and 'Max' Values for determining invalid Unicde code points when doing UTF-8 conversion.
+// Here's a quote from https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
+//   Since RFC 3629 (November 2003), the high and low surrogate halves used by UTF-16 (U+D800
+//   through U+DFFF) and code points not encodable by UTF-16 (those after U+10FFFF) are not legal
+//   Unicode values, and their UTF-8 encoding must be treated as an invalid byte sequence.
+constexpr wchar_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff, MaxUnicode = 0x10ffff, ErrorReplacement = 0xfffd;
+
 // Helper functions to convert between UTF-8 'char' strings and 'wchar_t' wstrings were originally
 // implemented using 'codecvt', but were changed to local implementations to remove the dependency
 // and allow more flexibility. For example, the local implementaions use 'U+FFFD' for errors instead
 // of throwing a 'range_error'. Uncomment the following line to revert to 'codecvt':
 //#define USE_CODECVT_FOR_UTF_8
+
+// UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for invalid code points
+constexpr auto ReplacementCharacter = "\xEF\xBF\xBD";
 
 std::wstring fromUtf8(const char*);
 inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
