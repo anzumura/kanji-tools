@@ -15,15 +15,12 @@ inline auto utf8Converter() {
   return &conv;
 }
 #else
-constexpr char32_t Six = 0b11'11'11, FirstFive = 0b1'11'11 << 6, FirstFour = 0b11'11 << 12, FirstThree = 0b1'11 << 18;
-constexpr char32_t SecondSix = Six << 6, ThirdSix = Six << 12;
 
-template<typename R, typename T = typename R::value_type>
-R convertFromUtf8(const char* s) {
+template<typename R, typename T = typename R::value_type> R convertFromUtf8(const char* s) {
   static_assert(std::is_integral_v<T>);
   static_assert(sizeof(T) == 4);
-  static const T errorReplacement = static_cast<T>(ErrorReplacement), minSurrogate = static_cast<T>(MinSurrogate),
-    maxSurrogate = static_cast<T>(MaxSurrogate), maxUnicode = static_cast<T>(MaxUnicode);
+  static constexpr T errorReplacement = static_cast<T>(ErrorReplacement), minSurrogate = static_cast<T>(MinSurrogate),
+                     maxSurrogate = static_cast<T>(MaxSurrogate), maxUnicode = static_cast<T>(MaxUnicode);
   R result;
   if (!s) return result;
   auto* u = reinterpret_cast<const unsigned char*>(s);
@@ -69,7 +66,9 @@ R convertFromUtf8(const char* s) {
   return result;
 }
 
-inline void convertToUtf8(char32_t c, std::string& s) {
+void convertToUtf8(char32_t c, std::string& s) {
+  static constexpr char32_t Six = 0b11'11'11, FirstFive = 0b1'11'11 << 6, FirstFour = 0b11'11 << 12;
+  static constexpr char32_t FirstThree = 0b1'11 << 18, SecondSix = Six << 6, ThirdSix = Six << 12;
   if (c <= 0x7f)
     s += static_cast<char>(c);
   else if (c <= 0x7ff) {
@@ -96,8 +95,8 @@ inline void convertToUtf8(char32_t c, std::string& s) {
 
 std::u32string fromUtf8(const char* s) {
 #ifdef USE_CODECVT_FOR_UTF_8
-   auto r = utf8Converter()->from_bytes(s);
-   return std::u32string(reinterpret_cast<const char32_t*>(r.c_str()));
+  auto r = utf8Converter()->from_bytes(s);
+  return std::u32string(reinterpret_cast<const char32_t*>(r.c_str()));
 #else
   return convertFromUtf8<std::u32string>(s);
 #endif
