@@ -14,6 +14,8 @@
         "${google}/googletest/include",
         "${google}/googletest",
         "${google}/googlemock/include",
+        // "/opt/icu/include",
+        // "/opt/boost/include",
         "${sdk}/c++/v1",
         "${sdk}",
         "${tools}/usr/lib/clang/13.0.0/include"

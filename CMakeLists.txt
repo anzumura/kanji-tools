@@ -13,9 +13,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_EXTENSIONS OFF)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # enable some warnings and turn them into errors
+    # enable some warnings and turn them into errors (skip -Wdeprecated if using boost)
     set(WARN_FLAGS "-Werror -Wall -Wextra -Wunused -Wc++20-compat-pedantic -Wdeprecated -Wunreachable-code-aggressive")
-    # disable a warning
+    # disable a warning (add -Wno-unused-variable if using boost)
     set(WARN_FLAGS "${WARN_FLAGS} -Wno-logical-op-parentheses")
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls")
     # need to set env for after stack reporting: ASAN_OPTIONS=detect_stack_use_after_return=1
@@ -34,6 +34,34 @@ FetchContent_Declare(
   GIT_TAG release-1.11.0
 )
 FetchContent_MakeAvailable(googletest)
+
+### ICU
+# icu build guide: https://unicode-org.github.io/icu/userguide/icu4c/build.html
+# icu download: https://github.com/unicode-org/icu/releases - get 'Source code (tar.gz)'
+#   tar -xzf Downloads/icu-release-70-1.tar
+#   cd icu-release-70-1/icu4c/source
+#   ./runConfigureICU MacOSX --prefix=/opt/icu
+#   sudo make install
+#
+# link_directories(BEFORE /opt/icu/lib)
+# include_directories(BEFORE /opt/icu/include)
+
+### Boost
+# boost guide: https://www.boost.org/doc/libs/1_78_0/more/getting_started
+# boost download: https://www.boost.org/users/download - get 'tar.gz'
+#   tar -xzf Downloads/boost_1_78_0.tar 
+#   cd boost_1_78_0
+#   ./bootstrap.sh --with-icu=/opt/icu --prefix=/opt/boost
+#   sudo ./b2 install
+#
+# find_package(Boost 1.78.0 REQUIRED regex locale)
+# if(Boost_FOUND)
+#   link_directories(${Boost_LINK_DIR})
+#   include_directories(${Boost_INCLUDE_DIR})
+#   message("-- Boost found: ${Boost_VERSION_STRING}")
+# else()
+#   message(FATAL_ERROR "Boost not found!")
+# endif()
 
 add_subdirectory(src/kana)  # source files for 'kana' lib (depends on 'utils')
 add_subdirectory(src/kanji) # source files for 'kanji' lib (depends on 'kana')
