@@ -20,7 +20,7 @@ public:
 
   // An istream 'in' can be provided for testing purposes (instead of reading std::cin) and
   // if given, 'start' must be explicitly called to start a quiz.
-  QuizLauncher(int argc, const char** argv, DataPtr, std::istream* in = 0);
+  QuizLauncher(size_t argc, const char** argv, DataPtr, std::istream* in = 0);
 
   // 'start' is the top level method for starting a quiz or doing a review (List or Group based).
   // 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the type of quiz/review and 'questionList'

@@ -41,7 +41,7 @@ std::string Stats::Count::toHex() const {
   return result;
 }
 
-Stats::Stats(int argc, const char** argv, DataPtr data) : _data(data) {
+Stats::Stats(size_t argc, const char** argv, DataPtr data) : _data(data) {
   auto breakdown = false, endOptions = false, verbose = false;
   std::vector<std::string> files;
   for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))

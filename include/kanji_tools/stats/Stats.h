@@ -14,7 +14,7 @@ public:
 
   // Command line options must specify one or more files and 'data' class is used to lookup kanji
   // found in files - see HelpMessage in Stats.cpp for more details on command line options.
-  Stats(int argc, const char** argv, DataPtr data);
+  Stats(size_t argc, const char** argv, DataPtr data);
 
   Stats(const Stats&) = delete;
 

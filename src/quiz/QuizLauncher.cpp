@@ -59,7 +59,7 @@ constexpr auto DefaultProgramMode = 't', DefaultQuestionOrder = 'r', DefaultQuiz
 
 } // namespace
 
-QuizLauncher::QuizLauncher(int argc, const char** argv, DataPtr data, std::istream* in)
+QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data, std::istream* in)
   : _programMode(ProgramMode::NotAssigned), _questionOrder(QuestionOrder::NotAssigned), _choice(data->out(), in, '/'),
     _groupData(data), _jukugoData(*data) {
   OptChar quizType, questionList;

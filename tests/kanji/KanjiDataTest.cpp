@@ -8,60 +8,46 @@
 
 namespace kanji_tools {
 
+namespace {
+  constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data", DataDir = "some-dir";
+} // namespace
+
 namespace fs = std::filesystem;
 
 TEST(DataTest, NextArgWithJustArg0) {
-  auto arg0 = "program-name";
   // call without final 'currentArg' parameter increments to 1
-  EXPECT_EQ(Data::nextArg(1, &arg0), 1);
+  EXPECT_EQ(Data::nextArg(1, &Arg0), 1);
 }
 
 TEST(DataTest, NextArgWithCurrentArg) {
-  auto arg0 = "program-name";
-  auto arg1 = "arg1";
-  auto arg2 = "arg2";
-  const char* argv[] = {arg0, arg1, arg2};
+  auto arg1 = "arg1", arg2 = "arg2";
+  const char* argv[] = {Arg0, arg1, arg2};
   EXPECT_EQ(Data::nextArg(std::size(argv), argv, 1), 2);
   EXPECT_EQ(Data::nextArg(std::size(argv), argv, 2), 3);
 }
 
 TEST(DataTest, NextArgWithDebugArg) {
-  auto arg0 = "program-name";
-  auto debugArg = "-debug";
-  const char* argv[] = {arg0, debugArg};
+  const char* argv[] = {Arg0, DebugArg};
   // skip '-data some-dir'
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 2);
 }
 
 TEST(DataTest, NextArgWithDataArg) {
-  auto arg0 = "program-name";
-  auto dataArg = "-data";
-  auto dataDir = "some-dir";
-  const char* argv[] = {arg0, dataArg, dataDir};
+  const char* argv[] = {Arg0, DataArg, DataDir};
   // skip '-data some-dir'
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 3);
 }
 
 TEST(DataTest, NextArgWithDebugAndDataArgs) {
-  auto arg0 = "program-name";
-  auto debugArg = "-debug";
-  auto dataArg = "-data";
-  auto dataDir = "some-dir";
-  const char* argv[] = {arg0, debugArg, dataArg, dataDir};
+  const char* argv[] = {Arg0, DebugArg, DataArg, DataDir};
   // skip '-data some-dir'
   EXPECT_EQ(Data::nextArg(std::size(argv), argv), 4);
 }
 
 TEST(DataTest, NextArgWithMultipleArgs) {
-  auto arg0 = "program-name";
-  auto arg1 = "arg1";
-  auto debugArg = "-debug";
-  auto arg3 = "arg3";
-  auto dataArg = "-data";
-  auto dataDir = "some-dir";
-  auto arg6 = "arg6";
-  const char* argv[] = {arg0, arg1, debugArg, arg3, dataArg, dataDir, arg6};
-  int argc = std::size(argv);
+  auto arg1 = "arg1", arg3 = "arg3", arg6 = "arg6";
+  const char* argv[] = {Arg0, arg1, DebugArg, arg3, DataArg, DataDir, arg6};
+  auto argc = std::size(argv);
   std::vector<const char*> actualArgs;
   for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) actualArgs.push_back(argv[i]);
   EXPECT_EQ(actualArgs, std::vector<const char*>({arg1, arg3, arg6}));
@@ -70,10 +56,8 @@ TEST(DataTest, NextArgWithMultipleArgs) {
 class KanjiDataTest : public ::testing::Test {
 protected:
   static auto argv() {
-    static auto arg0 = "testMain";
-    static auto arg1 = "-data";
     static auto arg2 = "../../../data";
-    static const char* args[] = {arg0, arg1, arg2};
+    static const char* args[] = {Arg0, DataArg, arg2};
     return args;
   }
   // Contructs KanjiData using the real data files
@@ -109,7 +93,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ(_data.getFrequency("蝦"), 2501);
   EXPECT_EQ(_data.getStrokes("廳"), 25);
   // Frequency Kanji
-  auto yeast = _data.findKanjiByName("麹");
+  const auto yeast = _data.findKanjiByName("麹");
   ASSERT_TRUE(yeast);
   EXPECT_EQ((**yeast).type(), KanjiTypes::Frequency);
   EXPECT_FALSE((**yeast).hasGrade());
@@ -121,7 +105,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**yeast).reading(), "キク、こうじ");
   EXPECT_EQ((**yeast).meaning(), "yeast, leaven; surname");
   // Extra Kanji
-  auto grab = _data.findKanjiByName("掴");
+  const auto grab = _data.findKanjiByName("掴");
   ASSERT_TRUE(grab);
   EXPECT_EQ((**grab).type(), KanjiTypes::Extra);
   EXPECT_FALSE((**grab).hasGrade());
@@ -133,7 +117,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**grab).reading(), "カク、つか-む、つか-まえる、つか-まる");
   EXPECT_EQ((**grab).meaning(), "catch");
   // Kentei Kanji
-  auto apple = _data.findKanjiByName("蘋");
+  const auto apple = _data.findKanjiByName("蘋");
   ASSERT_TRUE(apple);
   EXPECT_EQ((**apple).type(), KanjiTypes::Kentei);
   EXPECT_FALSE((**apple).hasGrade());
@@ -144,7 +128,7 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**apple).newName(), "苹");
   EXPECT_FALSE((**apple).linkedReadings());
   // Ucd Kanji
-  auto complete = _data.findKanjiByName("侭");
+  const auto complete = _data.findKanjiByName("侭");
   ASSERT_TRUE(complete);
   EXPECT_EQ((**complete).type(), KanjiTypes::Ucd);
   EXPECT_FALSE((**complete).hasGrade());
@@ -153,12 +137,12 @@ TEST_F(KanjiDataTest, SanityChecks) {
   EXPECT_EQ((**complete).reading(), "ジン、ことごとく、まま");
   EXPECT_EQ((**complete).meaning(), "complete, utmost");
   EXPECT_FALSE((**complete).linkedReadings());
-  auto shape = _data.findKanjiByName("檨");
+  const auto shape = _data.findKanjiByName("檨");
   ASSERT_TRUE(shape);
   EXPECT_EQ((**shape).type(), KanjiTypes::Ucd);
   EXPECT_TRUE((**shape).linkedReadings());
   // radical
-  auto radical = _data.getRadicalByName("鹿");
+  const auto radical = _data.getRadicalByName("鹿");
   EXPECT_EQ(radical.number(), 198);
   EXPECT_EQ(radical.name(), "鹿");
   EXPECT_EQ(radical.longName(), "鹿部（ろくぶ）");

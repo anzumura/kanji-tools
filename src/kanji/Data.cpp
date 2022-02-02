@@ -45,11 +45,11 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
   return _emptyNelsonIds;
 }
 
-fs::path Data::getDataDir(int argc, const char** argv) {
+fs::path Data::getDataDir(size_t argc, const char** argv) {
   static const auto DataDir = fs::path("data");
 
   std::optional<fs::path> found = {};
-  for (auto i = 1; !found && i < argc; ++i)
+  for (size_t i = 1; !found && i < argc; ++i)
     if (argv[i] == dataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
       const auto data = fs::path(argv[i + 1]);
@@ -76,13 +76,13 @@ fs::path Data::getDataDir(int argc, const char** argv) {
   return *found;
 }
 
-Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
+Data::DebugMode Data::getDebugMode(size_t argc, const char** argv) {
   DebugMode result = DebugMode::None;
   const auto setResult = [&result](DebugMode x) {
     if (result != DebugMode::None) usage("can only specify one '-debug' or '-info' option");
     result = x;
   };
-  for (auto i = 1; i < argc; ++i)
+  for (size_t i = 1; i < argc; ++i)
     if (argv[i] == debugArg)
       setResult(DebugMode::Full);
     else if (argv[i] == infoArg)
@@ -90,7 +90,7 @@ Data::DebugMode Data::getDebugMode(int argc, const char** argv) {
   return result;
 }
 
-int Data::nextArg(int argc, const char** argv, int currentArg) {
+size_t Data::nextArg(size_t argc, const char* const* argv, size_t currentArg) {
   const auto result = currentArg + 1;
   if (result < argc) {
     std::string arg = argv[result];

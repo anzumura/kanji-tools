@@ -173,16 +173,16 @@ public:
   // class (ie getDataDir or getDebug). If currentArg + 1 is used by this class then
   // a larger increment is returned to 'skip over' the args, for example:
   //     for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
-  static int nextArg(int argc, const char** argv, int currentArg = 0);
+  static size_t nextArg(size_t argc, const char* const* argv, size_t currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt' based on
   // checking directories starting at 'argv[0]' (the program name) and working up parent
   // directories. Therefore argc must be at least 1. '-data' followed by a directory
   // name can also be used as an override.
-  static std::filesystem::path getDataDir(int argc, const char** argv);
+  static std::filesystem::path getDataDir(size_t argc, const char** argv);
 
   // 'getDebugMode' looks for '-debug' or '-info' flags in 'argv' list (see 'DebugMode' above)
-  static DebugMode getDebugMode(int argc, const char** argv);
+  static DebugMode getDebugMode(size_t argc, const char** argv);
 
   // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling 'populate Lists' functions
   void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
