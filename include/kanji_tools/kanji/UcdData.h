@@ -41,7 +41,7 @@ private:
 
   // '_linked...' are maps from standard Kanji to variant forms loaded from 'ucd.txt'
   // For example, FA67 (逸) is a variant of 9038 (逸) which can also be constructed by a
-  // variation selector, i.e., L"\u9038\uFE01" (逸︁). Note:
+  // variation selector, i.e., U"\u9038\uFE01" (逸︁). Note:
   // - if a variant is marked as 'Jinmei' it will be put in '_linkedJinmei'
   // - otherwise it will be put in '_linkedOther'
   std::map<std::string, std::string> _linkedJinmei;

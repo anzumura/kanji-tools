@@ -20,7 +20,7 @@ int main(int argc, const char** argv) {
   std::string line, prevLine;
   bool prevLineEndedWithKanji = false;
   while (std::getline(f, line)) {
-    if (auto wline = fromUtf8(line); prevLineEndedWithKanji) {
+    if (auto wline = fromUtf8ToWstring(line); prevLineEndedWithKanji) {
       if (std::regex_search(wline, allKana)) {
         prevLineEndedWithKanji = false;
         // The previous line ended with kanji and current line is all hiragana so assume

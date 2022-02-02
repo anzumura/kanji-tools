@@ -26,7 +26,7 @@ public:
   // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
   // method is used by 'length', 'next' and 'doPeek'.
   static auto isVariationSelector(const unsigned char* s) {
-    // Checking for variation selectors would be easier if 'i' was wchar_t, but that would involve
+    // Checking for variation selectors would be easier if 'i' was char32_t, but that would involve
     // calling more expensive conversion functions (like fromUtf8). Note, variation selectors are
     // range 'fe00' to 'fe0f' in Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
     return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;

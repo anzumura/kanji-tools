@@ -36,7 +36,7 @@ TEST(MBCharTest, Length) {
   EXPECT_EQ(MBChar("大blue空").length(), 2);
   EXPECT_EQ(MBChar("大blue空").length(false), 6);
   // variation selectors are considered part of the previous character so don't affect length
-  auto mbCharWithVariant = L"\u9038\ufe01";
+  auto mbCharWithVariant = U"\u9038\ufe01";
   auto s = toUtf8(mbCharWithVariant);
   EXPECT_EQ(s.length(), 6);
   EXPECT_EQ(MBChar::length(s), 1);
@@ -47,7 +47,7 @@ TEST(MBCharTest, GetFirst) {
   EXPECT_EQ(MBChar::getFirst("abc"), "");
   EXPECT_EQ(MBChar::getFirst("大blue空"), "大");
   // variation selectors are considered part of the previous character so get as well
-  auto mbCharWithVariant = L"\u9038\ufe01";
+  auto mbCharWithVariant = U"\u9038\ufe01";
   auto s = toUtf8(mbCharWithVariant);
   auto r = MBChar::getFirst(s);
   EXPECT_EQ(r, s);
@@ -120,8 +120,8 @@ TEST(MBCharTest, NotValidWithFiveByte) {
 
 // see similar tests in MBUtilsTest.cpp
 TEST(MBCharTest, BeyondMaxUnicode) {
-  const wchar_t ok = 0x10ffff;
-  const wchar_t bad = 0x110000;
+  const char32_t ok = 0x10ffff;
+  const char32_t bad = 0x110000;
   EXPECT_EQ(bad - ok, 1);
   EXPECT_EQ(toBinary(ok, 21), "100001111111111111111");
   EXPECT_EQ(toBinary(bad, 21), "100010000000000000000");
@@ -436,7 +436,7 @@ TEST_F(MBCharCountTest, CheckTags) {
 }
 
 TEST_F(MBCharCountTest, Regex) {
-  EXPECT_EQ(sizeof(L'a'), 4);
+  EXPECT_EQ(sizeof(U'a'), 4);
   std::wregex regex(L"（[^）]+）");
   MBCharCount r(regex);
   EXPECT_EQ(r.replaceCount(), 0);

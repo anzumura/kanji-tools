@@ -12,24 +12,28 @@ namespace kanji_tools {
 // all wide chars (so display on a terminal is 2 columns instead of 1). This is
 class UnicodeBlock {
 public:
-  constexpr UnicodeBlock(wchar_t s, wchar_t e) noexcept : start(s), end(e) {}
+  constexpr UnicodeBlock(char32_t s, char32_t e) noexcept : start(s), end(e) {}
 
   // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex '0') and
   // end on a value having mod 16 = 15 (so ending in hex 'f'), but some of the 'WideBlocks'
   // used for determining if a character is narrow or wide display can be a single entry.
-  constexpr UnicodeBlock(wchar_t s) noexcept : start(s), end(s) {}
+  constexpr UnicodeBlock(char32_t s) noexcept : start(s), end(s) {}
 
   // 'range' returns the number of code points in the block (inclusive of start and end)
   constexpr auto range() const noexcept { return end - start + 1; }
 
   // 'opterator()' returns true if the given character is in this block
-  constexpr auto operator()(wchar_t x) const noexcept { return x >= start && x <= end; }
+  constexpr auto operator()(char32_t x) const noexcept { return x >= start && x <= end; }
 
   constexpr auto operator<(const UnicodeBlock& rhs) const noexcept { return start < rhs.start; }
   constexpr auto operator==(const UnicodeBlock& rhs) const noexcept { return start == rhs.start && end == rhs.end; }
 
-  const wchar_t start;
-  const wchar_t end;
+  // 'wStart' and 'wEnd' are needed for wregex (may remove later)
+  constexpr wchar_t wStart() const noexcept { return static_cast<wchar_t>(start); }
+  constexpr wchar_t wEnd() const noexcept { return static_cast<wchar_t>(end); }
+
+  const char32_t start;
+  const char32_t end;
 };
 
 constexpr std::array HiraganaBlocks = {UnicodeBlock{0x3040, 0x309f}};
@@ -94,7 +98,7 @@ constexpr std::array NonSpacingBlocks = {
 
 // 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array 't'. The blocks in 't'
 // are assumed to be in order (order is checked by automated tests for all the arrays defined above).
-template<size_t N> constexpr bool inRange(wchar_t c, const std::array<UnicodeBlock, N>& t) noexcept {
+template<size_t N> constexpr bool inRange(char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
   for (auto& i : t) {
     if (c < i.start) break;
     if (i(c)) return true;
@@ -105,7 +109,7 @@ template<size_t N> constexpr bool inRange(wchar_t c, const std::array<UnicodeBlo
 // 'inRange' with more than one 't' (block array) checks each array so there's no requirement for the
 // arrays to be specified in a particular order (which wouldn't work anyway for overlapping ranges).
 template<size_t N, typename... Ts>
-constexpr bool inRange(wchar_t c, const std::array<UnicodeBlock, N>& t, Ts... args) noexcept {
+constexpr bool inRange(char32_t c, const std::array<UnicodeBlock, N>& t, Ts... args) noexcept {
   return inRange(c, t) || inRange(c, args...);
 }
 
@@ -194,21 +198,23 @@ inline auto isNonSpacing(const std::string& s, bool checkLengthOne = true) {
 }
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as variation selectors.
+constexpr wchar_t WideDash = L'-';
+
 // clang-format off
 constexpr wchar_t KanjiRange[] = {
-  CommonKanjiBlocks[0].start, L'-', CommonKanjiBlocks[0].end, // CJK Unified Ideographs Kanji
-  CommonKanjiBlocks[1].start, L'-', CommonKanjiBlocks[1].end, // CJK Compatibility Ideographs
-  CommonKanjiBlocks[2].start, L'-', CommonKanjiBlocks[2].end, // CJK Extension B
-  NonSpacingBlocks[0].start, L'-', NonSpacingBlocks[0].end,   // Variation Selectors
-  RareKanjiBlocks[0].start, L'-', RareKanjiBlocks[0].end,     // CJK Radicals Supplement
-  RareKanjiBlocks[1].start, L'-', RareKanjiBlocks[1].end,     // CJK Extension A
-  RareKanjiBlocks[2].start, L'-', RareKanjiBlocks[2].end,     // CJK Extension C, D, E and F
-  RareKanjiBlocks[3].start, L'-', RareKanjiBlocks[3].end,     // CJK Compatibility Ideographs Supplement
-  RareKanjiBlocks[4].start, L'-', RareKanjiBlocks[4].end,     // CJK Extension G
+  CommonKanjiBlocks[0].wStart(), WideDash, CommonKanjiBlocks[0].wEnd(), // CJK Unified Ideographs Kanji
+  CommonKanjiBlocks[1].wStart(), WideDash, CommonKanjiBlocks[1].wEnd(), // CJK Compatibility Ideographs
+  CommonKanjiBlocks[2].wStart(), WideDash, CommonKanjiBlocks[2].wEnd(), // CJK Extension B
+  NonSpacingBlocks[0].wStart(), WideDash, NonSpacingBlocks[0].wEnd(),   // Variation Selectors
+  RareKanjiBlocks[0].wStart(), WideDash, RareKanjiBlocks[0].wEnd(),     // CJK Radicals Supplement
+  RareKanjiBlocks[1].wStart(), WideDash, RareKanjiBlocks[1].wEnd(),     // CJK Extension A
+  RareKanjiBlocks[2].wStart(), WideDash, RareKanjiBlocks[2].wEnd(),     // CJK Extension C, D, E and F
+  RareKanjiBlocks[3].wStart(), WideDash, RareKanjiBlocks[3].wEnd(),     // CJK Compatibility Ideographs Supplement
+  RareKanjiBlocks[4].wStart(), WideDash, RareKanjiBlocks[4].wEnd(),     // CJK Extension G
   L'\0' // null
 };
-
 // clang-format on
+
 constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
 constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
 constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";

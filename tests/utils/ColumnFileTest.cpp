@@ -455,7 +455,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
       f.getWChar(col);
       FAIL() << "Expected std::domain_error";
     } catch (std::domain_error& err) {
-      EXPECT_EQ(err.what(), convertError + "wchar_t, " + i);
+      EXPECT_EQ(err.what(), convertError + "char32_t, " + i);
     } catch (...) {
       FAIL() << "Expected std::domain_error";
     }

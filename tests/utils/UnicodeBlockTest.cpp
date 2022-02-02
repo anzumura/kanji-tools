@@ -50,14 +50,14 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   auto checkKanjiRange = [&pos](auto& blocks) {
     for (auto& i : blocks) {
       EXPECT_EQ(KanjiRange[pos++], i.start) << pos;
-      EXPECT_EQ(KanjiRange[pos++], L'-') << pos;
+      EXPECT_EQ(KanjiRange[pos++], U'-') << pos;
       EXPECT_EQ(KanjiRange[pos++], i.end) << pos;
     }
   };
   checkKanjiRange(CommonKanjiBlocks);
   checkKanjiRange(NonSpacingBlocks);
   checkKanjiRange(RareKanjiBlocks);
-  EXPECT_EQ(KanjiRange[pos], L'\0');
+  EXPECT_EQ(KanjiRange[pos], U'\0');
   ASSERT_EQ(std::size(HiraganaRange), 4);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
@@ -124,7 +124,7 @@ TEST(UnicodeBlockTest, IsMBPunctuation) {
   EXPECT_TRUE(isMBPunctuation("　x", true, false)); // checkLengthOne=false
   EXPECT_FALSE(isAllMBPunctuation("　x"));
   EXPECT_TRUE(isAllMBPunctuation("　。　、"));
-  EXPECT_TRUE(isMBPunctuation(toUtf8(L"\ufffc"))); // from Specials block
+  EXPECT_TRUE(isMBPunctuation(toUtf8(U"\ufffc"))); // from Specials block
   EXPECT_TRUE(isRecognizedCharacter("—"));
   EXPECT_TRUE(isRecognizedCharacter("　"));
 }

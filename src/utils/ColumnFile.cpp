@@ -120,10 +120,10 @@ bool ColumnFile::getBool(const Column& column) const {
   return false;
 }
 
-wchar_t ColumnFile::getWChar(const Column& column, const std::string& s) const {
-  if (s.length() < 4 || s.length() > 5) error("failed to convert to wchar_t, length must be 4 or 5", column, s);
+char32_t ColumnFile::getWChar(const Column& column, const std::string& s) const {
+  if (s.length() < 4 || s.length() > 5) error("failed to convert to char32_t, length must be 4 or 5", column, s);
   for (const char c : s)
-    if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("failed to convert to wchar_t, invalid hex", column, s);
+    if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("failed to convert to char32_t, invalid hex", column, s);
   return std::strtol(s.c_str(), nullptr, 16);
 }
 

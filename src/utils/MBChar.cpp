@@ -92,7 +92,7 @@ const std::wstring MBCharCount::DefaultReplace(L"$1");
 int MBCharCount::add(const std::string& s, const OptString& tag) {
   auto n = s;
   if (_find) {
-    n = toUtf8(std::regex_replace(fromUtf8(s), *_find, _replace));
+    n = toUtf8(std::regex_replace(fromUtf8ToWstring(s), *_find, _replace));
     if (n != s) {
       ++_replaceCount;
       if (tag && tag != _lastReplaceTag) {

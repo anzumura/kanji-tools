@@ -60,7 +60,7 @@ public:
   bool getBool(const Column&) const;
 
   // 'getWChar' overload for a specific value 's' (can be used for columns with multiple values)
-  wchar_t getWChar(const Column&, const ::std::string& s) const;
+  char32_t getWChar(const Column&, const ::std::string& s) const;
 
   // 'getWchar' converts from Unicode (4 or 5 hex code) or calls 'error'
   auto getWChar(const Column& c) const { return getWChar(c, get(c)); }

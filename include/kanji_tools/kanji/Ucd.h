@@ -18,17 +18,17 @@ public:
 
   class Link {
   public:
-    Link(wchar_t code, const std::string& name) : _code(code), _name(name) {}
+    Link(char32_t code, const std::string& name) : _code(code), _name(name) {}
     auto code() const { return _code; }
     auto& name() const { return _name; }
     std::string codeAndName() const;
   private:
-    const wchar_t _code;
+    const char32_t _code;
     const std::string _name;
   };
   using Links = std::vector<Link>;
 
-  Ucd(wchar_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
+  Ucd(char32_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
       int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
       const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, LinkTypes linkType, bool linkedReadings,
       const std::string& meaning, const std::string& onReading, const std::string& kunReading)
@@ -69,7 +69,7 @@ public:
   // 'EmptyString' can be returned by 'linkCodeAndName' and is used by other classes as well
   static const std::string EmptyString;
 private:
-  const wchar_t _code;
+  const char32_t _code;
   const std::string _name;
   const std::string _block;
   const std::string _version;

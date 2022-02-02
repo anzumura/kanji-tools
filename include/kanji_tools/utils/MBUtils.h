@@ -5,7 +5,7 @@
 
 namespace kanji_tools {
 
-// Bit patterns used for processing UTF-8
+// bit patterns used for processing UTF-8
 enum Values : unsigned char {
   Bit5 = 0b00'00'10'00,
   Bit4 = 0b00'01'00'00,
@@ -23,27 +23,33 @@ enum Values : unsigned char {
 //   Since RFC 3629 (November 2003), the high and low surrogate halves used by UTF-16 (U+D800
 //   through U+DFFF) and code points not encodable by UTF-16 (those after U+10FFFF) are not legal
 //   Unicode values, and their UTF-8 encoding must be treated as an invalid byte sequence.
-constexpr wchar_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff, MaxUnicode = 0x10ffff, ErrorReplacement = 0xfffd;
+constexpr char32_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff, MaxUnicode = 0x10ffff, ErrorReplacement = 0xfffd;
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for invalid code points
 constexpr auto ReplacementCharacter = "\xEF\xBF\xBD";
 
-// UTF-8 conversion functions (between 'char' strings and 'wchar_t' wstrings) were originally
+// UTF-8 conversion functions (between 'char' strings and 'char32_t' wstrings) were originally
 // implemented using 'codecvt', but this was changed to local implementations to remove the
 // dependency and allow more flexibility. For example, the local implementaions use 'U+FFFD'
 // for errors instead of throwing a 'range_error'. Also, 'wstring_convert' was depecated as of
 // C++17 (see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
 
-// Uncomment the following line to revert to use 'codecvt' (may remove this soon):
-#define USE_CODECVT_FOR_UTF_8
+// uncomment the following line to revert to use 'codecvt' (may remove this soon):
+//#define USE_CODECVT_FOR_UTF_8
 
-std::wstring fromUtf8(const char*);
+std::u32string fromUtf8(const char*);
 inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
 
-std::string toUtf8(wchar_t);
+std::string toUtf8(char32_t);
+std::string toUtf8(const std::u32string&);
+
+// keep wstring versions of conversion functions for now to work with wregex
+
+std::wstring fromUtf8ToWstring(const char*);
+inline auto fromUtf8ToWstring(const std::string& s) { return fromUtf8ToWstring(s.c_str()); }
 std::string toUtf8(const std::wstring&);
 
-// Helper functions for adding brackets and adding leading zeroes
+// helper functions for adding brackets and adding leading zeroes
 
 enum class BracketType { Curly, Round, Square, None };
 
@@ -106,8 +112,8 @@ template<> inline auto toHex(char x, BracketType brackets, HexCase hexCase, size
   return toHex(static_cast<unsigned char>(x), brackets, hexCase, minSize);
 }
 
-// 'toUnicode' converts a 'wchar_t' into a Unicode code point (so hex with caps and minSize of 4)
-inline auto toUnicode(wchar_t s, BracketType b = BracketType::None) { return toHex(s, b, HexCase::Upper, 4); }
+// 'toUnicode' converts a 'char32_t' into a Unicode code point (so hex with caps and minSize of 4)
+inline auto toUnicode(char32_t s, BracketType b = BracketType::None) { return toHex(s, b, HexCase::Upper, 4); }
 
 // 'toUnicode' converts a UTF-8 string into space-separated Unicode code points. Note: setting
 // 'squareBrackets' to true puts brackets around the whole string instead of each entry.
@@ -122,11 +128,11 @@ inline auto toUnicode(const std::string& s, BracketType brackets = BracketType::
 
 // check if a given char or string is not a 'multi-byte char'
 constexpr auto isSingleByteChar(char x) noexcept { return x >= 0; }
-constexpr auto isSingleByteChar(wchar_t x) noexcept { return x >= 0 && x < 128; }
+constexpr auto isSingleByteChar(char32_t x) noexcept { return x >= 0 && x < 128; }
 inline auto isSingleByte(const std::string& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
-inline auto isSingleByte(const std::wstring& s, bool checkLengthOne = true) noexcept {
+inline auto isSingleByte(const std::u32string& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
 inline auto isAllSingleByte(const std::string& s) noexcept {
@@ -134,7 +140,7 @@ inline auto isAllSingleByte(const std::string& s) noexcept {
     if (!isSingleByteChar(i)) return false;
   return true;
 }
-inline auto isAllSingleByte(const std::wstring& s) noexcept {
+inline auto isAllSingleByte(const std::u32string& s) noexcept {
   for (const auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
@@ -144,7 +150,7 @@ inline auto isAnySingleByte(const std::string& s) noexcept {
     if (isSingleByteChar(i)) return true;
   return false;
 }
-inline auto isAnySingleByte(const std::wstring& s) noexcept {
+inline auto isAnySingleByte(const std::u32string& s) noexcept {
   for (const auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;
