@@ -11,7 +11,6 @@ endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
-  set(CMAKE_CXX_EXTENSIONS OFF)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # enable some warnings and turn them into errors (skip -Wdeprecated if using boost)
     set(WARN_FLAGS "-Werror -Wall -Wextra -Wunused -Wc++20-compat-pedantic -Wdeprecated -Wunreachable-code-aggressive")
@@ -43,6 +42,7 @@ FetchContent_MakeAvailable(googletest)
 #   ./runConfigureICU MacOSX --prefix=/opt/icu
 #   sudo make install
 #
+# uncomment the following lines to add ICU
 # link_directories(BEFORE /opt/icu/lib)
 # include_directories(BEFORE /opt/icu/include)
 
@@ -54,6 +54,7 @@ FetchContent_MakeAvailable(googletest)
 #   ./bootstrap.sh --with-icu=/opt/icu --prefix=/opt/boost
 #   sudo ./b2 install
 #
+# uncomment the following lines to add Boost
 # find_package(Boost 1.78.0 REQUIRED regex locale)
 # if(Boost_FOUND)
 #   link_directories(${Boost_LINK_DIR})
