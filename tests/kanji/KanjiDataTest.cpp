@@ -9,7 +9,7 @@
 namespace kanji_tools {
 
 namespace {
-  constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data", DataDir = "some-dir";
+constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data", DataDir = "some-dir";
 } // namespace
 
 namespace fs = std::filesystem;
@@ -245,7 +245,7 @@ TEST_F(KanjiDataTest, FindChecks) {
   auto result3 = _data.findKanjiByName("弁");
   ASSERT_TRUE(result3);
   EXPECT_EQ((**result3).oldNames(), Kanji::LinkNames({"辨", "瓣", "辯"}));
-  EXPECT_EQ((**result3).info(Kanji::OldField), "Old 辨／瓣／辯");
+  EXPECT_EQ((**result3).info(KanjiInfo::Old), "Old 辨／瓣／辯");
   for (auto& i : (**result3).oldNames()) {
     auto old = _data.findKanjiByName(i);
     ASSERT_TRUE(old);

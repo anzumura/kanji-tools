@@ -116,7 +116,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question, bool mea
   }
   if (!getQuestionOrder()) return;
 
-  const auto listQuiz = [this, question, meanings](int f, auto& l) { startListQuiz(question, meanings, f, l); };
+  const auto listQuiz = [this, question, meanings](auto f, auto& l) { startListQuiz(question, meanings, f, l); };
   const auto groupQuiz = [this, question, meanings, qList](auto& l) { startGroupQuiz(question, meanings, qList, l); };
 
   // can replace below 'quizType' turnary operator with 'or_else' when C++23 is available
@@ -124,18 +124,18 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question, bool mea
   case 'f':
     // suppress printing 'Freq' since this would work against showing the list in a random order.
     if (const auto c = qList ? *qList : _choice.get("Choose list", FrequencyChoices); !isQuit(c))
-      listQuiz(Kanji::FreqField, data().frequencyList(c - '1'));
+      listQuiz(KanjiInfo::Freq, data().frequencyList(c - '1'));
     break;
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
     if (const auto c = qList ? *qList : _choice.get("Choose grade", GradeStart, GradeEnd, GradeChoices, DefaultGrade);
         !isQuit(c))
-      listQuiz(Kanji::GradeField, data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']));
+      listQuiz(KanjiInfo::Grade, data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']));
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     if (const auto c = qList ? *qList : _choice.get("Choose kyu", KyuStart, KyuEnd, KyuChoices, DefaultKyu); !isQuit(c))
-      listQuiz(Kanji::KyuField,
+      listQuiz(KanjiInfo::Kyu,
                data().kyuList(AllKenteiKyus[c == 'a'     ? 0
                                               : c == 'c' ? 8
                                               : c == '2' ? 9
@@ -146,7 +146,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question, bool mea
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
     if (const char c = qList ? *qList : _choice.get("Choose level", LevelChoices); !isQuit(c))
-      listQuiz(Kanji::LevelField, data().levelList(AllJlptLevels[4 - (c - '1')]));
+      listQuiz(KanjiInfo::Level, data().levelList(AllJlptLevels[4 - (c - '1')]));
     break;
   case 'm': groupQuiz(_groupData.meaningGroups()); break;
   case 'p': groupQuiz(_groupData.patternGroups()); break;
@@ -161,18 +161,18 @@ void QuizLauncher::printExtraTypeInfo(const Entry& k) const {
   if (const auto i = k->extraTypeInfo(); i) out() << " (" << *i << ')';
 }
 
-void QuizLauncher::printLegend(int infoFields) const {
-  std::string fields;
-  if (infoFields & Kanji::LevelField) fields += " N[1-5]=JLPT Level";
-  if (infoFields & Kanji::KyuField) {
-    if (!fields.empty()) fields += ',';
-    fields += " K[1-10]=Kentei Kyu";
+void QuizLauncher::printLegend(KanjiInfo fields) const {
+  std::string s;
+  if (hasValue(fields & KanjiInfo::Level)) s += " N[1-5]=JLPT Level";
+  if (hasValue(fields & KanjiInfo::Kyu)) {
+    if (!s.empty()) s += ',';
+    s += " K[1-10]=Kentei Kyu";
   }
-  if (infoFields & Kanji::GradeField) {
-    if (!fields.empty()) fields += ',';
-    fields += " G[1-6]=Grade (S=Secondary School)";
+  if (hasValue(fields & KanjiInfo::Grade)) {
+    if (!s.empty()) s += ',';
+    s += " G[1-6]=Grade (S=Secondary School)";
   }
-  log() << "Legend:\nFields:" << fields << "\nSuffix: " << Kanji::Legend << '\n';
+  log() << "Legend:\nFields:" << s << "\nSuffix: " << Kanji::Legend << '\n';
 }
 
 void QuizLauncher::printMeaning(const Entry& k, bool useNewLine, bool showMeaning) const {
@@ -229,7 +229,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   out() << '\n';
 }
 
-void QuizLauncher::startListQuiz(int question, bool showMeanings, int excludeField, const List& list) const {
+void QuizLauncher::startListQuiz(int question, bool showMeanings, KanjiInfo excludeField, const List& list) const {
   auto choiceCount = 1;
   auto quizStyle = DefaultListStyle;
   if (isTestMode()) {
@@ -239,7 +239,7 @@ void QuizLauncher::startListQuiz(int question, bool showMeanings, int excludeFie
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);
     if (isQuit(quizStyle)) return;
   }
-  ListQuiz(*this, question, showMeanings, list, Kanji::AllFields ^ excludeField, choiceCount,
+  ListQuiz(*this, question, showMeanings, list, KanjiInfo::All ^ excludeField, choiceCount,
            ListQuiz::toQuizStyle(quizStyle));
 }
 

@@ -4,6 +4,7 @@
 #include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Radical.h>
+#include <kanji_tools/utils/EnumBitmask.h>
 #include <kanji_tools/utils/JlptLevels.h>
 #include <kanji_tools/utils/KenteiKyus.h>
 #include <kanji_tools/utils/MBUtils.h>
@@ -12,6 +13,25 @@
 #include <optional>
 
 namespace kanji_tools {
+
+// 'KanjiInfo' members can be used to select which fields are printed by 'Kanji::info'
+// method. For example 'Grade | Level | Freq' will print grade and level fields and
+// 'All ^ Strokes' will print all except for strokes.
+enum class KanjiInfo {
+  Radical = 1,
+  Strokes,
+  Pinyin = 4,
+  Grade = 8,
+  Level = 16,
+  Freq = 32,
+  New = 64,
+  Old = 128,
+  Kyu = 256,
+  All = 511
+};
+
+// enable bitwise operators for 'KanjiInfo'
+template<> struct enum_bitmask<KanjiInfo> { static constexpr bool value = true; };
 
 class Kanji {
 public:
@@ -79,28 +99,12 @@ public:
   auto hasNelsonIds() const { return !_nelsonIds.empty(); }
   auto hasReading() const { return !reading().empty(); }
 
-  // 'InfoFields' members can be used to select which fields are printed by 'info'
-  // method. For example 'GradeField | LevelField | FreqField' will print grade and
-  // level fields and 'AllFields ^ StrokesField' will print all except for strokes.
-  enum InfoFields {
-    RadicalField = 1,
-    StrokesField,
-    PinyinField = 4,
-    GradeField = 8,
-    LevelField = 16,
-    FreqField = 32,
-    NewField = 64,
-    OldField = 128,
-    KyuField = 256,
-    AllFields = 511
-  };
-
   // 'info' returns a comma separated string with extra info (if present) including:
   //   Radical, Strokes, Pinyin, Grade, Level, Freq, New, Old and Kyu
-  // 'infoFields' can be used to control inclusion of fields (include all by default).
+  // 'fields' can be used to control inclusion of fields (include all by default).
   // Note: multiple 'Old' links are separated by '／' (wide slash) and a link is followed
   // by '*' if it was used to pull in readings.
-  std::string info(int infoFields = AllFields) const;
+  std::string info(KanjiInfo fields = KanjiInfo::All) const;
 
   // 'qualifiedName' returns 'name' plus an extra marker to show additional information:
   //     . = Jouyou         : 2136 Jouyou

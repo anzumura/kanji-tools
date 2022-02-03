@@ -12,7 +12,7 @@ Kanji::Kanji(const std::string& name, const OptString& compatibilityName, const 
   assert(MBChar::length(_name) == 1);
 }
 
-std::string Kanji::info(int infoFields) const {
+std::string Kanji::info(KanjiInfo fields) const {
   static const std::string Rad("Rad "), Strokes("Strokes "), Freq("Frq "), New("New "), Old("Old ");
 
   std::string result;
@@ -20,17 +20,18 @@ std::string Kanji::info(int infoFields) const {
     if (!result.empty()) result += ", ";
     result += x;
   };
-  if (infoFields & RadicalField) add(Rad + radical().name() + '(' + std::to_string(radical().number()) + ')');
-  if (infoFields & StrokesField && strokes()) add(Strokes + std::to_string(strokes()));
-  if (infoFields & PinyinField && pinyin()) add(*pinyin());
-  if (infoFields & GradeField && hasGrade()) add(toString(grade()));
-  if (infoFields & LevelField && hasLevel()) add(toString(level()));
-  if (infoFields & FreqField && frequency()) add(Freq + std::to_string(*frequency()));
+  if (hasValue(fields & KanjiInfo::Radical))
+    add(Rad + radical().name() + '(' + std::to_string(radical().number()) + ')');
+  if (hasValue(fields & KanjiInfo::Strokes) && strokes()) add(Strokes + std::to_string(strokes()));
+  if (hasValue(fields & KanjiInfo::Pinyin) && pinyin()) add(*pinyin());
+  if (hasValue(fields & KanjiInfo::Grade) && hasGrade()) add(toString(grade()));
+  if (hasValue(fields & KanjiInfo::Level) && hasLevel()) add(toString(level()));
+  if (hasValue(fields & KanjiInfo::Freq) && frequency()) add(Freq + std::to_string(*frequency()));
   // A kanji can possibly have a 'New' value (from a link) or an 'Old' value, but not both.
   if (newName()) {
     assert(oldNames().empty());
-    if (infoFields & NewField) add(New + *newName() + (linkedReadings() ? "*" : ""));
-  } else if (infoFields & OldField && !oldNames().empty()) {
+    if (hasValue(fields & KanjiInfo::New)) add(New + *newName() + (linkedReadings() ? "*" : ""));
+  } else if (hasValue(fields & KanjiInfo::Old) && !oldNames().empty()) {
     std::string s;
     for (auto& i : oldNames()) {
       if (s.empty())
@@ -40,7 +41,7 @@ std::string Kanji::info(int infoFields) const {
     }
     add(Old + s);
   }
-  if (infoFields & KyuField && hasKyu()) add(toString(kyu()));
+  if (hasValue(fields & KanjiInfo::Kyu) && hasKyu()) add(toString(kyu()));
   return result;
 }
 

@@ -8,10 +8,11 @@ namespace kanji_tools {
 // 'Quiz' is the base class for 'ListQuiz' and 'GroupQuiz'. It holds common data for a quiz including
 // the current question number, correct answer count and list of mistakes.
 class Quiz {
+public:
+  using List = QuizLauncher::List;
 protected:
   using Choices = QuizLauncher::Choices;
   using Entry = QuizLauncher::Entry;
-  using List = QuizLauncher::List;
   using OptChar = QuizLauncher::OptChar;
 
   // Below are some options used in for quiz questions. These are all ascii symbols that come

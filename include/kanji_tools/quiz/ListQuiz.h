@@ -10,9 +10,9 @@ public:
   enum class QuizStyle { KanjiToReading, ReadingToKanji };
   static constexpr auto toQuizStyle(char c) { return c == 'k' ? QuizStyle::KanjiToReading : QuizStyle::ReadingToKanji; }
 
-  // 'infoFields' controls which fields are shown in a 'kanji to reading' quiz (see Kanji.h for more
-  // details on 'InfoFields') and 'choiceCount' specifies the number of choices per question (2 to 9).
-  ListQuiz(const QuizLauncher&, int question, bool showMeanings, const List&, int infoFields, int choiceCount,
+  // 'fields' controls which fields are shown in a 'kanji to reading' quiz (see Kanji.h for more
+  // details on 'KanjiInfo') and 'choiceCount' specifies the number of choices per question (2 to 9).
+  ListQuiz(const QuizLauncher&, int question, bool showMeanings, const List&, KanjiInfo fields, int choiceCount,
            QuizStyle);
 private:
   void start(const List&);
@@ -34,7 +34,7 @@ private:
   // has the correct answer and others are randomly chosen from the full question list).
   std::vector<int> _answers;
 
-  const int _infoFields;
+  const KanjiInfo _infoFields;
   const int _choiceCount;
   const QuizStyle _quizStyle;
   const std::string _prompt;

@@ -40,7 +40,7 @@ public:
   auto& groupData() const { return _groupData; }
 
   void printExtraTypeInfo(const Entry&) const;
-  void printLegend(int infoFields = Kanji::AllFields) const;
+  void printLegend(KanjiInfo fields = KanjiInfo::All) const;
   void printMeaning(const Entry&, bool useNewLine = false, bool showMeaning = true) const;
   void printReviewDetails(const Entry&) const;
 private:
@@ -48,7 +48,7 @@ private:
 
   const Data& data() const { return _groupData.data(); }
 
-  void startListQuiz(int question, bool showMeanings, int excludeField, const List&) const;
+  void startListQuiz(int question, bool showMeanings, KanjiInfo excludeField, const List&) const;
   void startGroupQuiz(int question, bool showMeanings, OptChar questionList, const GroupData::List& list) const;
 
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets '_programMode'. It can also

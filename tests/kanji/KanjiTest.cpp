@@ -330,7 +330,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_FALSE(k.hasGrade());
   EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
-  EXPECT_EQ(k.info(Kanji::NewField), "New 亘*");
+  EXPECT_EQ(k.info(KanjiInfo::New), "New 亘*");
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_EQ(k.link(), results[0]);
 }
@@ -413,15 +413,15 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(e.year(), 2010);
       EXPECT_EQ(e.extraTypeInfo(), "#103 2010");
       EXPECT_EQ(k.info(), "Rad 色(2), Strokes 19, S, N1, Frq 2207, Old 艷, K2");
-      EXPECT_EQ(k.info(Kanji::RadicalField), "Rad 色(2)");
-      EXPECT_EQ(k.info(Kanji::StrokesField), "Strokes 19");
-      EXPECT_EQ(k.info(Kanji::GradeField), "S");
-      EXPECT_EQ(k.info(Kanji::LevelField), "N1");
-      EXPECT_EQ(k.info(Kanji::KyuField), "K2");
-      EXPECT_EQ(k.info(Kanji::OldField), "Old 艷");
-      EXPECT_EQ(k.info(Kanji::NewField), "");
-      EXPECT_EQ(k.info(Kanji::GradeField | Kanji::OldField), "S, Old 艷");
-      EXPECT_EQ(k.info(Kanji::StrokesField | Kanji::LevelField), "Strokes 19, N1");
+      EXPECT_EQ(k.info(KanjiInfo::Radical), "Rad 色(2)");
+      EXPECT_EQ(k.info(KanjiInfo::Strokes), "Strokes 19");
+      EXPECT_EQ(k.info(KanjiInfo::Grade), "S");
+      EXPECT_EQ(k.info(KanjiInfo::Level), "N1");
+      EXPECT_EQ(k.info(KanjiInfo::Kyu), "K2");
+      EXPECT_EQ(k.info(KanjiInfo::Old), "Old 艷");
+      EXPECT_EQ(k.info(KanjiInfo::New), "");
+      EXPECT_EQ(k.info(KanjiInfo::Grade | KanjiInfo::Old), "S, Old 艷");
+      EXPECT_EQ(k.info(KanjiInfo::Strokes | KanjiInfo::Level), "Strokes 19, N1");
     }
   }
 }

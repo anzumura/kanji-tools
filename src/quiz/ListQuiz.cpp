@@ -16,9 +16,9 @@ constexpr auto ChoiceStart = '1';
 
 } // namespace
 
-ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const List& list, int infoFields,
+ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const List& list, KanjiInfo fields,
                    int choiceCount, QuizStyle quizStyle)
-  : Quiz(launcher, question, showMeanings), _answers(choiceCount), _infoFields(infoFields), _choiceCount(choiceCount),
+  : Quiz(launcher, question, showMeanings), _answers(choiceCount), _infoFields(fields), _choiceCount(choiceCount),
     _quizStyle(quizStyle), _prompt(isTestMode() ? QuizPrompt + (isKanjiToReading() ? "reading" : "kanji") : Prompt),
     _choiceEnd('0' + _choiceCount) {
   List questions;
@@ -34,7 +34,7 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, int question, bool showMeanings
     out() << " (original list had " << list.size() << ", but not all entries have readings)";
   out() << "\n>>>\n";
 
-  if (isKanjiToReading()) _launcher.printLegend(infoFields);
+  if (isKanjiToReading()) _launcher.printLegend(fields);
   start(questions);
 }
 
