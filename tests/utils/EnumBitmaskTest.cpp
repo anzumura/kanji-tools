@@ -5,7 +5,7 @@
 namespace kanji_tools {
 
 enum class TestEnum { One = 1, Two, Four = 4, Eight = 8, All = 15 };
-template<> struct enum_bitmask<TestEnum> { static constexpr bool value = true; };
+template<> inline constexpr bool is_bitmask<TestEnum> = true;
 
 TEST(EnumBitmaskTest, BitwiseAndOperator) {
   EXPECT_EQ(TestEnum::All & TestEnum::Two, TestEnum::Two);

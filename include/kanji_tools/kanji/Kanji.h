@@ -31,7 +31,7 @@ enum class KanjiInfo {
 };
 
 // enable bitwise operators for 'KanjiInfo'
-template<> struct enum_bitmask<KanjiInfo> { static constexpr bool value = true; };
+template<> inline constexpr bool is_bitmask<KanjiInfo> = true;
 
 class Kanji {
 public:
