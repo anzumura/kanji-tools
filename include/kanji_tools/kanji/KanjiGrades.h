@@ -11,9 +11,9 @@ enum class KanjiGrades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary schoo
 constexpr std::array AllKanjiGrades{KanjiGrades::G1, KanjiGrades::G2, KanjiGrades::G3, KanjiGrades::G4,
                                     KanjiGrades::G5, KanjiGrades::G6, KanjiGrades::S,  KanjiGrades::None};
 
-constexpr auto toBool(KanjiGrades x) { return x != KanjiGrades::None; }
+[[nodiscard]] constexpr auto toBool(KanjiGrades x) { return x != KanjiGrades::None; }
 
-constexpr auto toString(KanjiGrades x) {
+[[nodiscard]] constexpr auto toString(KanjiGrades x) {
   switch (x) {
   case KanjiGrades::G1: return "G1";
   case KanjiGrades::G2: return "G2";

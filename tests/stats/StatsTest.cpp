@@ -9,7 +9,7 @@ namespace kanji_tools {
 
 class StatsTest : public ::testing::Test {
 protected:
-  static auto argv() {
+  [[nodiscard]] static auto argv() {
     static auto arg0 = "testMain", arg1 = "-data", arg2 = "../../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;

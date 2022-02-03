@@ -12,9 +12,9 @@ constexpr std::array AllKenteiKyus{KenteiKyus::K10, KenteiKyus::K9, KenteiKyus::
                                    KenteiKyus::K5,  KenteiKyus::K4, KenteiKyus::K3,  KenteiKyus::KJ2, KenteiKyus::K2,
                                    KenteiKyus::KJ1, KenteiKyus::K1, KenteiKyus::None};
 
-constexpr auto toBool(KenteiKyus x) { return x != KenteiKyus::None; }
+[[nodiscard]] constexpr auto toBool(KenteiKyus x) { return x != KenteiKyus::None; }
 
-constexpr auto toString(KenteiKyus x) {
+[[nodiscard]] constexpr auto toString(KenteiKyus x) {
   switch (x) {
   case KenteiKyus::K10: return "K10";
   case KenteiKyus::K9: return "K9";

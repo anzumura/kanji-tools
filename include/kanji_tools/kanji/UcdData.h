@@ -17,19 +17,19 @@ public:
   UcdData(const UcdData&) = delete;
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
-  auto& getMeaning(const Ucd* u) const { return u ? u->meaning() : Ucd::EmptyString; }
-  auto& getMeaning(const std::string& kanjiName) const { return getMeaning(find(kanjiName)); }
+  [[nodiscard]] auto& getMeaning(const Ucd* u) const { return u ? u->meaning() : Ucd::EmptyString; }
+  [[nodiscard]] auto& getMeaning(const std::string& kanjiName) const { return getMeaning(find(kanjiName)); }
 
   // 'getReadingsAsKana' returns string starting with 'onReading' converted Katakana followed
   // by 'kunReading' converted to Hiragana
-  std::string getReadingsAsKana(const Ucd*) const;
+  [[nodiscard]] std::string getReadingsAsKana(const Ucd*) const;
 
   // 'find' returns a pointer to a Ucd instance if 'kanjiName' is in _ucdMap. If 'kanjiName'
   // has a 'variation selector' then _linkedJinmei then _linkedOther maps are used to get a
   // Ucd variant (variant returned is the same displayed character for Jinmei ones)
-  const Ucd* find(const std::string& kanjiName) const;
+  [[nodiscard]] const Ucd* find(const std::string& kanjiName) const;
 
-  auto& map() const { return _map; }
+  [[nodiscard]] auto& map() const { return _map; }
 
   // 'load' and 'print' are called by 'KanjiData'
   void load(const std::filesystem::path&);

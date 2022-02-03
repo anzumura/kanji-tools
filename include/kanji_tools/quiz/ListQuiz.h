@@ -17,18 +17,18 @@ public:
 private:
   void start(const List&);
 
-  auto isKanjiToReading() const { return _quizStyle == QuizStyle::KanjiToReading; }
+  [[nodiscard]] auto isKanjiToReading() const { return _quizStyle == QuizStyle::KanjiToReading; }
 
   // 'populateAnswers' populates '_answers' and returns the position corresponding to the current
   // question, i.e., the correct answer for 'kanji'.
-  int populateAnswers(const Entry& kanji, const List& questions);
+  [[nodiscard]] int populateAnswers(const Entry& kanji, const List& questions);
 
   void printQuestion(const Entry& kanji) const;
   void printChoices(const Entry& kanji, const List& questions) const;
 
   // 'getAnswer' prompts for an answer and processes the result. This method only returns 'false'
   // if the question should be repeated (for toggling meanings), otherwise it returns 'true'.
-  bool getAnswer(Choices& choices, bool& stopQuiz, int correctChoice, const std::string& name);
+  [[nodiscard]] bool getAnswer(Choices& choices, bool& stopQuiz, int correctChoice, const std::string& name);
 
   // '_answers' contains '_choiceCount' entries and is repopulated for each question (one index
   // has the correct answer and others are randomly chosen from the full question list).

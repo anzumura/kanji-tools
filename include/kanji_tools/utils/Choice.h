@@ -39,9 +39,9 @@ public:
   }
   void clearQuit() { _quit = {}; }
 
-  auto isQuit(char c) const { return _quit == c; }
-  auto quit() const { return _quit; }
-  auto& quitDescription() const { return _quitDescription; }
+  [[nodiscard]] auto isQuit(char c) const { return _quit == c; }
+  [[nodiscard]] auto quit() const { return _quit; }
+  [[nodiscard]] auto& quitDescription() const { return _quitDescription; }
 
   // 'get' prompts for one of the choices in the 'choices' structure. If a default is provided
   // it must correspond to an entry in 'choices', otherwise an exception is thrown. If 'choices'
@@ -68,7 +68,7 @@ public:
   auto get(const std::string& msg, char first, char last, OptChar def) const { return get(msg, first, last, {}, def); }
 private:
   static void add(std::string& prompt, const Choices& choices);
-  static char getOneChar();
+  [[nodiscard]] static char getOneChar();
   static void checkPrintableAscii(char x, const std::string& msg);
   static void error(const std::string& msg) { throw std::domain_error(msg); }
 

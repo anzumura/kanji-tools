@@ -52,7 +52,7 @@ constexpr std::array WideBlocks = {
 
 // 'displayLength' returns the length of 's' in terms of how many columns would be required for
 // display on a terminal, i.e, 1 column for a normal sized character and 2 for a wide character.
-inline auto displayLength(const std::string& s) {
+[[nodiscard]] inline auto displayLength(const std::string& s) {
   size_t result = 0;
   for (const auto i : fromUtf8(s))
     if (inRange(i, WideBlocks))
@@ -68,7 +68,9 @@ inline auto displayLength(const std::string& s) {
 // add 1 space since std::setw only looks at bytes and s already has 3 bytes. However, using
 // this function, i.e., 'os << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by
 // returning '5' (5 is 2 more than the 3 byte length of 's').
-inline auto wideSetw(const std::string& s, size_t setwLen) { return setwLen + s.length() - displayLength(s); }
+[[nodiscard]] inline auto wideSetw(const std::string& s, size_t setwLen) {
+  return setwLen + s.length() - displayLength(s);
+}
 
 } // namespace kanji_tools
 

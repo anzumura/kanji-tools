@@ -23,10 +23,10 @@ public:
   public:
     Column(const std::string& name) : _name(name), _number(ColumnFile::getColumnNumber(name)) {}
 
-    auto operator==(const Column& rhs) const { return _number == rhs._number; }
+    [[nodiscard]] auto operator==(const Column& rhs) const { return _number == rhs._number; }
 
-    auto& name() const { return _name; }
-    auto number() const { return _number; }
+    [[nodiscard]] auto& name() const { return _name; }
+    [[nodiscard]] auto number() const { return _number; }
   private:
     std::string _name;
     size_t _number; // globally unique number per column based on '_name'
@@ -48,7 +48,7 @@ public:
   // 'nextRow' hasn't been called yet or if the given column was not passed in to the constructor.
   const std::string& get(const Column&) const;
 
-  auto isEmpty(const Column& column) const { return get(column).empty(); }
+  [[nodiscard]] auto isEmpty(const Column& column) const { return get(column).empty(); }
 
   // 'getInt' convert to 'int' or calls 'error'
   int getInt(const Column&) const;
@@ -74,12 +74,12 @@ public:
     throw std::domain_error(errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'");
   }
 
-  auto columns() const { return _rowValues.size(); }
-  auto currentRow() const { return _currentRow; }
-  auto& name() const { return _name; }
+  [[nodiscard]] auto columns() const { return _rowValues.size(); }
+  [[nodiscard]] auto currentRow() const { return _currentRow; }
+  [[nodiscard]] auto& name() const { return _name; }
 private:
   // 'getColumnNumber' is used by 'Column' class constructor
-  static int getColumnNumber(const std::string& name);
+  [[nodiscard]] static int getColumnNumber(const std::string& name);
   friend Column;
 
   using ColNames = std::map<std::string, Column>;
@@ -87,7 +87,7 @@ private:
   void processHeaderRow(const std::string&, ColNames&);
   void verifyHeaderColumns(const ColNames&) const;
 
-  std::string errorMsg(const std::string& msg) const {
+  [[nodiscard]] std::string errorMsg(const std::string& msg) const {
     auto result = msg + " - file: " + _name;
     if (_currentRow) result += ", row: " + std::to_string(_currentRow);
     return result;

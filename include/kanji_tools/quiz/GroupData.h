@@ -20,13 +20,13 @@ public:
   GroupData(DataPtr);
   GroupData(const GroupData&) = delete;
 
-  auto& meaningGroups() const { return _meaningGroups; }
-  auto& patternGroups() const { return _patternGroups; }
-  auto& meaningMap() const { return _meaningMap; }
-  auto& patternMap() const { return _patternMap; }
-  auto& data() const { return *_data; }
-  auto& out() const { return _data->out(); }
-  auto& log(bool heading = false) const { return _data->log(heading); }
+  [[nodiscard]] auto& meaningGroups() const { return _meaningGroups; }
+  [[nodiscard]] auto& patternGroups() const { return _patternGroups; }
+  [[nodiscard]] auto& meaningMap() const { return _meaningMap; }
+  [[nodiscard]] auto& patternMap() const { return _patternMap; }
+  [[nodiscard]] auto& data() const { return *_data; }
+  [[nodiscard]] auto& out() const { return _data->out(); }
+  [[nodiscard]] auto& log(bool heading = false) const { return _data->log(heading); }
 private:
   // 'checkInsert' will return false if 'kanji' is already in 'Map'
   bool checkInsert(const std::string& kanji, Map&, const Entry& group) const;
@@ -37,7 +37,8 @@ private:
   // 'loadGroups' loads from '-groups.txt' files
   template<typename T> void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
 
-  Entry createGroup(int number, const std::string& name, const Data::List& members, Group::PatternType) const;
+  [[nodiscard]] Entry createGroup(int number, const std::string& name, const Data::List& members,
+                                  Group::PatternType) const;
 
   template<typename T> void printGroups(const T&, const List&) const;
 
@@ -49,7 +50,7 @@ private:
   template<typename T> void printUniqueNames(const T&, const StringSet&) const;
   void printTypeBreakdown(TypeMap&) const;
 
-  auto fullDebug() const { return _data->fullDebug(); }
+  [[nodiscard]] auto fullDebug() const { return _data->fullDebug(); }
 
   // '_meaningMap' and '_meaningGroups' are populated from 'meaning-groups.txt'
   MultiMap _meaningMap;

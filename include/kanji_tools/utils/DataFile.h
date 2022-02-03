@@ -28,7 +28,8 @@ public:
   using List = std::vector<std::string>;
   using Set = std::set<std::string>;
   // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and then returns the full path
-  static std::filesystem::path getFile(const std::filesystem::path& dir, const std::filesystem::path& file);
+  [[nodiscard]] static std::filesystem::path getFile(const std::filesystem::path& dir,
+                                                     const std::filesystem::path& file);
   static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
   // should be called after loading all lists to clean up unneeded static data
@@ -44,18 +45,18 @@ public:
     : DataFile(p, FileType::OnePerLine, createNewUniqueFile, nullptr) {}
   DataFile(const DataFile&) = delete;
 
-  auto exists(const std::string& s) const { return _map.find(s) != _map.end(); }
-  auto get(const std::string& name) const {
+  [[nodiscard]] auto exists(const std::string& s) const { return _map.find(s) != _map.end(); }
+  [[nodiscard]] auto get(const std::string& name) const {
     auto i = _map.find(name);
     return i != _map.end() ? i->second : 0;
   }
-  auto& name() const { return _name; }
-  virtual JlptLevels level() const { return JlptLevels::None; }
-  virtual KenteiKyus kyu() const { return KenteiKyus::None; }
-  auto& list() const { return _list; }
-  auto size() const { return _list.size(); }
+  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
+  [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
+  [[nodiscard]] auto& list() const { return _list; }
+  [[nodiscard]] auto size() const { return _list.size(); }
   // 'toString' returns the full contents of this list into a string (with no separates)
-  auto toString() const {
+  [[nodiscard]] auto toString() const {
     std::string result;
     // reserve for efficiency - make a guess that each entry in the list is a 3 byte utf8 character
     result.reserve(_list.size() * 3);
@@ -92,7 +93,7 @@ public:
   LevelDataFile(const std::filesystem::path& p, JlptLevels level, bool createNewUniqueFile = false)
     : TypedDataFile(p, level, createNewUniqueFile) {}
 
-  JlptLevels level() const override { return _type; }
+  [[nodiscard]] JlptLevels level() const override { return _type; }
 };
 
 class KyuDataFile : public TypedDataFile<KenteiKyus> {
@@ -100,11 +101,11 @@ public:
   KyuDataFile(const std::filesystem::path& p, KenteiKyus kyu, bool createNewUniqueFile = false)
     : TypedDataFile(p, kyu, createNewUniqueFile) {}
 
-  KenteiKyus kyu() const override { return _type; }
+  [[nodiscard]] KenteiKyus kyu() const override { return _type; }
 };
 
 // simple function to capitalize first letter of an ascii (non-multibyte) string
-inline auto capitalize(const std::string& s) {
+[[nodiscard]] inline auto capitalize(const std::string& s) {
   if (s.length() && std::islower(s[0])) {
     std::string result(s);
     result[0] = static_cast<char>(std::toupper(result[0]));

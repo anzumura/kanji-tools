@@ -13,12 +13,12 @@ public:
   KanjiData(int argc, const char** argv, std::ostream& out = std::cout, std::ostream& err = std::cerr);
 
   // Implementations of the 'Data' base class functions used during Kanji construction
-  Kanji::OptInt getFrequency(const std::string& s) const override {
+  [[nodiscard]] Kanji::OptInt getFrequency(const std::string& s) const override {
     const auto x = _frequency.get(s);
     return x ? Kanji::OptInt(x) : std::nullopt;
   }
-  JlptLevels getLevel(const std::string&) const override;
-  KenteiKyus getKyu(const std::string&) const override;
+  [[nodiscard]] JlptLevels getLevel(const std::string&) const override;
+  [[nodiscard]] KenteiKyus getKyu(const std::string&) const override;
 private:
   // functions to print loaded data if _debug is true
   void noFreq(int f, bool brackets = false) const; // 'noFreq' is a helper function for printing no-frequency counts

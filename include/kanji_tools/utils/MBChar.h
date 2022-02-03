@@ -25,16 +25,16 @@ class MBChar {
 public:
   // 'isVariationSelector' returns true if s points to a UTF-8 variation selector, this
   // method is used by 'length', 'next' and 'doPeek'.
-  static auto isVariationSelector(const unsigned char* s) {
+  [[nodiscard]] static auto isVariationSelector(const unsigned char* s) {
     // Checking for variation selectors would be easier if 'i' was char32_t, but that would involve
     // calling more expensive conversion functions (like fromUtf8). Note, variation selectors are
     // range 'fe00' to 'fe0f' in Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
     return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;
   }
-  static auto isVariationSelector(const char* s) {
+  [[nodiscard]] static auto isVariationSelector(const char* s) {
     return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
   }
-  static auto isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
+  [[nodiscard]] static auto isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
 
   // 'length' with onlyMB=true only counts multi-byte 'sequence start' bytes, otherwise length
   // includes both multi-byte sequence starts as well as regular single byte values, i.e.,
@@ -46,7 +46,7 @@ public:
   // - length("大blue空", false) = 6
   // Note: some Kanji can be followed by a 'variation selector' - these are not counted by default
   // since they are considered part of the previous 'MB character' (as a modifier).
-  static auto length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
+  [[nodiscard]] static auto length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
     int len = 0;
     // doing one 'reinterpret_cast' at the beginning saves doing a bunch of static_casts when checking
     // if the next 3 bytes represent a 'variation selector'
@@ -61,25 +61,25 @@ public:
     }
     return len;
   }
-  static auto length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
+  [[nodiscard]] static auto length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
     return length(s.c_str(), onlyMB, skipVariationSelectors);
   }
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so len 2-4) followed
   // by a variation selector (which are always len 3).
-  static auto isMBCharWithVariationSelector(const std::string& s) {
+  [[nodiscard]] static auto isMBCharWithVariationSelector(const std::string& s) {
     return s.length() > 4 && s.length() < 8 && isVariationSelector(s.substr(s.length() - 3));
   }
-  static auto withoutVariationSelector(const std::string& s) {
+  [[nodiscard]] static auto withoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
   }
-  static auto optionalWithoutVariationSelector(const std::string& s) {
+  [[nodiscard]] static auto optionalWithoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s) ? std::optional(s.substr(0, s.length() - 3)) : std::nullopt;
   }
 
   // 'getFirst' returns the first MBChar from 's' (including any variation selector that might follow).
   // If 's' doesn't start with a multi-byte sequence then empty string is returned.
-  static auto getFirst(const std::string& s) {
+  [[nodiscard]] static auto getFirst(const std::string& s) {
     std::string result;
     MBChar c(s);
     c.next(result);
@@ -110,12 +110,12 @@ public:
   // - valid("雪s") = StringTooLong
   // - valid("吹雪") = StringTooLong
   // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
-  static Results validateUtf8(const char* s, bool checkLengthOne = true);
-  static auto validateUtf8(const std::string& s, bool checkLengthOne = true) {
+  [[nodiscard]] static Results validateUtf8(const char* s, bool checkLengthOne = true);
+  [[nodiscard]] static auto validateUtf8(const std::string& s, bool checkLengthOne = true) {
     return validateUtf8(s.c_str(), checkLengthOne);
   }
 
-  static auto isValid(const std::string& s, bool checkLengthOne = true) {
+  [[nodiscard]] static auto isValid(const std::string& s, bool checkLengthOne = true) {
     return validateUtf8(s, checkLengthOne) == Results::Valid;
   }
 
@@ -135,16 +135,16 @@ public:
   bool next(std::string& result, bool onlyMB = true);
 
   // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
-  auto peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
-  auto errors() const { return _errors; }
-  auto variants() const { return _variants; }
-  auto length(bool onlyMB = true) const { return length(_data, onlyMB); }
-  auto valid(bool checkLengthOne = true) const { return validateUtf8(_data, checkLengthOne); }
-  auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
+  [[nodiscard]] auto peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
+  [[nodiscard]] auto errors() const { return _errors; }
+  [[nodiscard]] auto variants() const { return _variants; }
+  [[nodiscard]] auto length(bool onlyMB = true) const { return length(_data, onlyMB); }
+  [[nodiscard]] auto valid(bool checkLengthOne = true) const { return validateUtf8(_data, checkLengthOne); }
+  [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
 private:
   // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
   // in these cases it only matters if the following value is a 'variation selector'.
-  bool doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall = false) const;
+  [[nodiscard]] bool doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall = false) const;
 
   const std::string _data;
   const char* _location = _data.c_str();
@@ -191,46 +191,46 @@ public:
   }
 
   // return count for given string or 0 if not found
-  auto count(const std::string& s) const {
+  [[nodiscard]] auto count(const std::string& s) const {
     const auto i = _map.find(s);
     return i != _map.end() ? i->second : 0;
   }
 
   // return an optional Map of 'tag to count' for the given MBChar 's'
-  auto tags(const std::string& s) const {
+  [[nodiscard]] auto tags(const std::string& s) const {
     const auto i = _tags.find(s);
     return i != _tags.end() ? &i->second : nullptr;
   }
 
-  auto uniqueEntries() const { return _map.size(); }
-  auto files() const { return _files; }
-  auto directories() const { return _directories; }
+  [[nodiscard]] auto uniqueEntries() const { return _map.size(); }
+  [[nodiscard]] auto files() const { return _files; }
+  [[nodiscard]] auto directories() const { return _directories; }
   // 'replaceCount' returns number of lines that were changed due to 'replace' regex
-  auto replaceCount() const { return _replaceCount; }
+  [[nodiscard]] auto replaceCount() const { return _replaceCount; }
   // 'lastReplaceTag' returns last tag (file name) that had line replaced (if 'addTag' is used)
-  auto& lastReplaceTag() const { return _lastReplaceTag; }
-  auto errors() const { return _errors; }
-  auto variants() const { return _variants; }
-  auto& map() const { return _map; }
-  auto debug() const { return _debug; }
+  [[nodiscard]] auto& lastReplaceTag() const { return _lastReplaceTag; }
+  [[nodiscard]] auto errors() const { return _errors; }
+  [[nodiscard]] auto variants() const { return _variants; }
+  [[nodiscard]] auto& map() const { return _map; }
+  [[nodiscard]] auto debug() const { return _debug; }
 private:
   // 'hasUnclosedBrackets' returns true if 'line' has an open bracket without a closing
   // bracket (searching back from the end), otherwise it returns false.
-  static bool hasUnclosedBrackets(const std::string& line);
+  [[nodiscard]] static bool hasUnclosedBrackets(const std::string& line);
 
   // 'processJoinedLine' returns count from processing 'prevline' plus 'line' up until 'pos'
   // (plus size of close bracket) and sets 'prevLine' to the unprocessed remainder of 'line'.
-  int processJoinedLine(std::string& prevLine, const std::string& line, int pos, const OptString& tag);
+  [[nodiscard]] int processJoinedLine(std::string& prevLine, const std::string& line, int pos, const OptString& tag);
 
   // 'processFile' returns the MBChar count from 'file'. If '_find' is not set then each line
   // is processed independently, otherwise 'hasUnclosedBrackets' and 'processJoinedLine' are
   // used to join up to two lines together before calling 'add' to help '_find' match against
   // larger sets of data. The focus on brackets is to help the use case of removing furigana
   // which is in brackets after a kanji and can potentially span across lines of a text file.
-  int processFile(const std::filesystem::path& file, const OptString& tag);
+  [[nodiscard]] int processFile(const std::filesystem::path& file, const OptString& tag);
 
-  virtual bool allowAdd(const std::string&) const { return true; }
-  int doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
+  [[nodiscard]] virtual bool allowAdd(const std::string&) const { return true; }
+  [[nodiscard]] int doAddFile(const std::filesystem::path& file, bool addTag, bool fileNames, bool recurse = true);
 
   Map _map;
   TagMap _tags;
@@ -252,7 +252,7 @@ public:
                 bool debug = false)
     : MBCharCount(find, replace, debug), _pred(pred) {}
 private:
-  bool allowAdd(const std::string& token) const override { return _pred(token); }
+  [[nodiscard]] bool allowAdd(const std::string& token) const override { return _pred(token); }
   const Pred _pred;
 };
 

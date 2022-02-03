@@ -9,7 +9,7 @@ namespace kanji_tools {
 
 class QuizTest : public ::testing::Test {
 protected:
-  static auto argv() {
+  [[nodiscard]] static auto argv() {
     static auto arg0 = "testMain", arg1 = "-data", arg2 = "../../../data";
     static const char* args[] = {arg0, arg1, arg2};
     return args;
@@ -28,7 +28,7 @@ protected:
     _is << "t\nb\ng\n1\n4\nk\n";
   }
 
-  std::string listQuizFirstQuestion(char quizType, char questionList, bool checkDefault = false) {
+  [[nodiscard]] std::string listQuizFirstQuestion(char quizType, char questionList, bool checkDefault = false) {
     std::string line, otherLine;
     // run with quizType and questionList coming from stdin
     _is << "t\nb\n" << quizType << '\n' << questionList << "\n4\nk\n";

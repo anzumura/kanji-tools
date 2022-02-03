@@ -29,14 +29,15 @@ protected:
   virtual ~Quiz();
 
   // the following methods are shotcuts for calling '_launcher' methods
-  auto& choice() const { return _launcher.choice(); }
-  auto get(const std::string& msg, const Choices& choices, OptChar def = std::nullopt, bool useQuit = true) const {
+  [[nodiscard]] auto& choice() const { return _launcher.choice(); }
+  [[nodiscard]] auto get(const std::string& msg, const Choices& choices, OptChar def = std::nullopt,
+                         bool useQuit = true) const {
     return choice().get(msg, useQuit, choices, def);
   }
-  auto isQuit(char c) const { return _launcher.isQuit(c); }
-  auto isTestMode() const { return _launcher.isTestMode(); }
-  auto& log(bool heading = false) const { return _launcher.log(heading); }
-  auto& out() const { return _launcher.out(); }
+  [[nodiscard]] auto isQuit(char c) const { return _launcher.isQuit(c); }
+  [[nodiscard]] auto isTestMode() const { return _launcher.isTestMode(); }
+  [[nodiscard]] auto& log(bool heading = false) const { return _launcher.log(heading); }
+  [[nodiscard]] auto& out() const { return _launcher.out(); }
   void printMeaning(const Entry& kanji, bool useNewLine = false) const {
     _launcher.printMeaning(kanji, useNewLine, _showMeanings);
   }
@@ -45,12 +46,12 @@ protected:
   std::ostream& incorrectMessage(const std::string& name);         // adds 'name' to '_mistakes'
   std::ostream& beginQuizMessage(size_t totalQuestions);           // can modify '_question'
   std::ostream& beginQuestionMessage(size_t totalQuestions) const; // 'const' since can be called >1 times per question
-  auto showMeanings() const { return _showMeanings; }
+  [[nodiscard]] auto showMeanings() const { return _showMeanings; }
 
   // 'getDefaultChoices' returns a Choices structure populated with just the common values
   // for a quiz question like skip and quit. It will also populate 'hide/show meanings' option
   // based on the current value of '_showMeanings'.
-  Choices getDefaultChoices(size_t totalQuestions) const;
+  [[nodiscard]] Choices getDefaultChoices(size_t totalQuestions) const;
 
   // display of English 'meanings' can be toggled on and off
   void toggleMeanings(Choices&);

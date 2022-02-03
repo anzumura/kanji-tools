@@ -12,23 +12,23 @@ namespace kanji_tools {
 // - Jouyou and Extra files contain 'Strokes' column, Jinmei strokes come from 'strokes.txt' or 'ucd.txt'
 class CustomFileKanji : public NonLinkedKanji {
 public:
-  KenteiKyus kyu() const override { return _kyu; }
-  OptString extraTypeInfo() const override { return '#' + std::to_string(_number); }
-  const LinkNames& oldNames() const override { return _oldNames; }
+  [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
+  [[nodiscard]] OptString extraTypeInfo() const override { return '#' + std::to_string(_number); }
+  [[nodiscard]] const LinkNames& oldNames() const override { return _oldNames; }
 
-  auto number() const { return _number; }
+  [[nodiscard]] auto number() const { return _number; }
 
   // 'fromString' is a factory method that creates a list of kanjis of the given 'type' from the given 'file'
   // - 'type' must be Jouyou, Jinmei or Extra
   // - 'file' must have tab separated lines that have the right number of columns for the given type
   // - first line of 'file' must have header names that match the static 'Column' instances below
-  static Data::List fromFile(const Data&, KanjiTypes type, const std::filesystem::path& file);
+  [[nodiscard]] static Data::List fromFile(const Data&, KanjiTypes type, const std::filesystem::path& file);
 protected:
   inline static const ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"}, RadicalCol{"Radical"},
     OldNamesCol{"OldNames"}, YearCol{"Year"}, StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"},
     ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
-  static auto findUcd(const Data& d, const std::string& name) { return d.findUcd(name); }
+  [[nodiscard]] static auto findUcd(const Data& d, const std::string& name) { return d.findUcd(name); }
 
   // Constructor used by 'CustomFileKanji' and 'ExtraKanji': calls base with 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name, int strokes, const std::string& meaning,
@@ -57,15 +57,15 @@ private:
 // 'OfficialKanji' contains attributes shared by Jouyou and Jinmei kanji, i.e., optional 'Old' and 'Year' values
 class OfficialKanji : public CustomFileKanji {
 public:
-  OptString extraTypeInfo() const override {
+  [[nodiscard]] OptString extraTypeInfo() const override {
     return _year ? std::optional(*CustomFileKanji::extraTypeInfo() + ' ' + std::to_string(*_year))
                  : CustomFileKanji::extraTypeInfo();
   }
 
-  OptInt frequency() const override { return _frequency; }
-  JlptLevels level() const override { return _level; }
+  [[nodiscard]] OptInt frequency() const override { return _frequency; }
+  [[nodiscard]] JlptLevels level() const override { return _level; }
 
-  auto year() const { return _year; }
+  [[nodiscard]] auto year() const { return _year; }
 protected:
   // constructor used by 'JinmeiKanji' calls base without 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name)
@@ -77,7 +77,7 @@ protected:
     : CustomFileKanji(d, f, name, s, meaning, getOldNames(f), findUcd(d, name)), _frequency(d.getFrequency(name)),
       _level(d.getLevel(name)), _year(f.getOptInt(YearCol)) {}
 private:
-  static LinkNames getOldNames(const ColumnFile&);
+  [[nodiscard]] static LinkNames getOldNames(const ColumnFile&);
 
   const OptInt _frequency;
   const JlptLevels _level;
@@ -93,7 +93,7 @@ public:
   // - Moved: moved out of Jouyou into Jinmei
   // - Other: reason listed as その他
   enum class Reasons { Names, Print, Variant, Moved, Other };
-  static constexpr auto toString(Reasons x) {
+  [[nodiscard]] static constexpr auto toString(Reasons x) {
     switch (x) {
     case Reasons::Names: return "Names";
     case Reasons::Print: return "Print";
@@ -106,11 +106,11 @@ public:
   JinmeiKanji(const Data& d, const ColumnFile& f)
     : OfficialKanji(d, f, f.get(NameCol)), _reason(getReason(f.get(ReasonCol))) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Jinmei; }
-  OptString extraTypeInfo() const override {
+  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
+  [[nodiscard]] OptString extraTypeInfo() const override {
     return std::optional(*OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']');
   }
-  auto reason() const { return _reason; }
+  [[nodiscard]] auto reason() const { return _reason; }
 private:
   static Reasons getReason(const std::string&);
   const Reasons _reason;
@@ -121,10 +121,10 @@ public:
   JouyouKanji(const Data& d, const ColumnFile& f)
     : OfficialKanji(d, f, f.get(NameCol), f.getInt(StrokesCol), f.get(MeaningCol)), _grade(getGrade(f.get(GradeCol))) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Jouyou; }
-  KanjiGrades grade() const override { return _grade; }
+  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
+  [[nodiscard]] KanjiGrades grade() const override { return _grade; }
 private:
-  static KanjiGrades getGrade(const std::string&);
+  [[nodiscard]] static KanjiGrades getGrade(const std::string&);
   const KanjiGrades _grade;
 };
 
@@ -135,8 +135,8 @@ class ExtraKanji : public CustomFileKanji {
 public:
   ExtraKanji(const Data& d, const ColumnFile& f) : ExtraKanji(d, f, f.get(NameCol)) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Extra; }
-  OptString newName() const override { return _newName; }
+  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
+  [[nodiscard]] OptString newName() const override { return _newName; }
 private:
   ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name) : ExtraKanji(d, f, name, findUcd(d, name)) {}
   ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name, const Ucd* u)

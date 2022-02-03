@@ -20,11 +20,11 @@ private:
   enum Values { PinyinWidth = 12, GroupEntryWidth = 22 };
 
   // 'getGroupType' returns the type of first group in the given list (the list should all have the same type)
-  static GroupType getGroupType(const GroupData::List&);
+  [[nodiscard]] static GroupType getGroupType(const GroupData::List&);
 
   // 'includeMember' returns true if a member can be included in group quiz question. The member must
   // have a reading as well as meet the criteria of the given MemberType.
-  static bool includeMember(const Entry&, MemberType);
+  [[nodiscard]] static bool includeMember(const Entry&, MemberType);
 
   // 'addPinyin' adds optional pinyin for 'kanji' to 's' padded to 'PinyinWidth'
   static void addPinyin(const Entry& kanji, std::string& s);
@@ -44,10 +44,10 @@ private:
   std::ostream& printAssignedAnswer(char choice) const;
 
   void showGroup(const List& questions, const List& readings, Choices&, bool repeatQuestion) const;
-  bool getAnswers(size_t totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
-  bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
+  [[nodiscard]] bool getAnswers(size_t totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
+  [[nodiscard]] bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
   void editAnswer(Choices&);
-  int getAnswerToEdit() const;
+  [[nodiscard]] int getAnswerToEdit() const;
   void checkAnswers(const List& questions, const List& readings, const std::string& name);
 
   // '_answers' holds answers for the current question, i.e., the reading selected for each group member

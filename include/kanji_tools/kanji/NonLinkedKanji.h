@@ -9,11 +9,11 @@ namespace kanji_tools {
 // base class for JouyouKanji, JinmeiKanji and ExtraKanji), FrequencyKanji, KenteiKanji and UcdKanji
 class NonLinkedKanji : public Kanji {
 public:
-  const std::string& meaning() const override { return _meaning; }
-  const std::string& reading() const override { return _reading; }
+  [[nodiscard]] const std::string& meaning() const override { return _meaning; }
+  [[nodiscard]] const std::string& reading() const override { return _reading; }
 protected:
   // 'getLinkNames' is used by UcdFileKanji and ExtraKanji to populate links from Ucd data
-  static auto getLinkNames(const Ucd* u) {
+  [[nodiscard]] static auto getLinkNames(const Ucd* u) {
     LinkNames result;
     if (u && u->hasLinks())
       std::transform(u->links().begin(), u->links().end(), std::back_inserter(result),

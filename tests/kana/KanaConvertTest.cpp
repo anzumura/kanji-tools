@@ -6,22 +6,22 @@ namespace kanji_tools {
 
 class KanaConvertTest : public ::testing::Test {
 protected:
-  auto romajiToHiragana(const std::string& s, int flags = 0) {
+  [[nodiscard]] auto romajiToHiragana(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Romaji, s, CharType::Hiragana, flags);
   }
-  auto romajiToKatakana(const std::string& s, int flags = 0) {
+  [[nodiscard]] auto romajiToKatakana(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Romaji, s, CharType::Katakana, flags);
   }
-  auto hiraganaToRomaji(const std::string& s, int flags = 0) {
+  [[nodiscard]] auto hiraganaToRomaji(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Hiragana, s, CharType::Romaji, flags);
   }
-  auto hiraganaToKatakana(const std::string& s) {
+  [[nodiscard]] auto hiraganaToKatakana(const std::string& s) {
     return _converter.convert(CharType::Hiragana, s, CharType::Katakana);
   }
-  auto katakanaToRomaji(const std::string& s, int flags = 0) {
+  [[nodiscard]] auto katakanaToRomaji(const std::string& s, int flags = 0) {
     return _converter.convert(CharType::Katakana, s, CharType::Romaji, flags);
   }
-  auto katakanaToHiragana(const std::string& s) {
+  [[nodiscard]] auto katakanaToHiragana(const std::string& s) {
     return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
   // populate 'romaji' when round trip is lossy (like repeat symbols)

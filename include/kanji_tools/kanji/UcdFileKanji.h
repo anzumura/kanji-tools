@@ -12,11 +12,11 @@ namespace kanji_tools {
 // for less common kanji that haven't already been loaded from a custom file (see CustomFileKanji.h).
 class UcdFileKanji : public NonLinkedKanji {
 public:
-  const LinkNames& oldNames() const override { return _hasOldLinks ? _linkNames : EmptyLinkNames; }
-  OptString newName() const override {
+  [[nodiscard]] const LinkNames& oldNames() const override { return _hasOldLinks ? _linkNames : EmptyLinkNames; }
+  [[nodiscard]] OptString newName() const override {
     return _linkNames.empty() || _hasOldLinks ? std::nullopt : OptString(_linkNames[0]);
   }
-  bool linkedReadings() const override { return _linkedReadings; }
+  [[nodiscard]] bool linkedReadings() const override { return _linkedReadings; }
 protected:
   // constructor used by 'StandardKanji': has 'reading'
   UcdFileKanji(const Data& d, const std::string& name, const std::string& reading, const Ucd* u)
@@ -43,7 +43,7 @@ private:
 // recognized as standard Japanese characters.
 class StandardKanji : public UcdFileKanji {
 public:
-  KenteiKyus kyu() const override { return _kyu; }
+  [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
 protected:
   // constructor used by 'FrequencyKanji': has 'reading' and looks up 'kyu'
   StandardKanji(const Data& d, const std::string& name, const std::string& reading)
@@ -70,8 +70,8 @@ public:
   FrequencyKanji(const Data& d, const std::string& name, const std::string& reading, int frequency)
     : StandardKanji(d, name, reading), _frequency(frequency) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Frequency; }
-  OptInt frequency() const override { return OptInt(_frequency); }
+  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Frequency; }
+  [[nodiscard]] OptInt frequency() const override { return OptInt(_frequency); }
 private:
   const int _frequency;
 };
@@ -81,7 +81,7 @@ class KenteiKanji : public StandardKanji {
 public:
   KenteiKanji(const Data& d, const std::string& name, KenteiKyus kyu) : StandardKanji(d, name, kyu) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Kentei; }
+  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
 
 // 'UcdKanji' is for kanji in 'ucd.txt' file that aren't already included in any other 'types'. Many
@@ -91,7 +91,7 @@ class UcdKanji : public UcdFileKanji {
 public:
   UcdKanji(const Data& d, const Ucd& u) : UcdFileKanji(d, u.name(), &u) {}
 
-  KanjiTypes type() const override { return KanjiTypes::Ucd; }
+  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };
 
 } // namespace kanji_tools

@@ -22,9 +22,9 @@ constexpr std::array AllKanjiTypes{KanjiTypes::Jouyou,    KanjiTypes::Jinmei,   
                                    KanjiTypes::LinkedOld, KanjiTypes::Frequency, KanjiTypes::Extra,
                                    KanjiTypes::Kentei,    KanjiTypes::Ucd,       KanjiTypes::None};
 
-constexpr auto toBool(KanjiTypes x) { return x != KanjiTypes::None; }
+[[nodiscard]] constexpr auto toBool(KanjiTypes x) { return x != KanjiTypes::None; }
 
-constexpr auto toString(KanjiTypes x) {
+[[nodiscard]] constexpr auto toString(KanjiTypes x) {
   switch (x) {
   case KanjiTypes::Jouyou: return "Jouyou";
   case KanjiTypes::Jinmei: return "Jinmei";

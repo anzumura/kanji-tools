@@ -55,14 +55,14 @@ TEST(DataTest, NextArgWithMultipleArgs) {
 
 class KanjiDataTest : public ::testing::Test {
 protected:
-  static auto argv() {
+  [[nodiscard]] static auto argv() {
     static auto arg2 = "../../../data";
     static const char* args[] = {Arg0, DataArg, arg2};
     return args;
   }
   // Contructs KanjiData using the real data files
   KanjiDataTest() : _data(3, argv()) {}
-  auto checkKanji(const Data::List& l) const {
+  [[nodiscard]] auto checkKanji(const Data::List& l) const {
     auto variants = 0;
     for (auto& i : l) {
       if (i->variant()) {

@@ -37,23 +37,23 @@ constexpr auto ReplacementCharacter = "\xEF\xBF\xBD";
 // uncomment the following line to revert to use 'codecvt' (may remove this soon):
 //#define USE_CODECVT_FOR_UTF_8
 
-std::u32string fromUtf8(const char*);
-inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
+[[nodiscard]] std::u32string fromUtf8(const char*);
+[[nodiscard]] inline auto fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
 
-std::string toUtf8(char32_t);
-std::string toUtf8(const std::u32string&);
+[[nodiscard]] std::string toUtf8(char32_t);
+[[nodiscard]] std::string toUtf8(const std::u32string&);
 
 // keep wstring versions of conversion functions for now to work with wregex
 
-std::wstring fromUtf8ToWstring(const char*);
-inline auto fromUtf8ToWstring(const std::string& s) { return fromUtf8ToWstring(s.c_str()); }
-std::string toUtf8(const std::wstring&);
+[[nodiscard]] std::wstring fromUtf8ToWstring(const char*);
+[[nodiscard]] inline auto fromUtf8ToWstring(const std::string& s) { return fromUtf8ToWstring(s.c_str()); }
+[[nodiscard]] std::string toUtf8(const std::wstring&);
 
 // helper functions for adding brackets and adding leading zeroes
 
 enum class BracketType { Curly, Round, Square, None };
 
-inline auto addBrackets(const std::string& s, BracketType t) {
+[[nodiscard]] inline auto addBrackets(const std::string& s, BracketType t) {
   switch (t) {
   case BracketType::Curly: return '{' + s + '}';
   case BracketType::Round: return '(' + s + ')';
@@ -63,7 +63,7 @@ inline auto addBrackets(const std::string& s, BracketType t) {
   return s;
 }
 
-inline auto addLeadingZeroes(const std::string& result, size_t minSize) {
+[[nodiscard]] inline auto addLeadingZeroes(const std::string& result, size_t minSize) {
   static const std::string Zero("0");
   if (result.length() < minSize) return std::string(minSize - result.length(), '0') + result;
   if (result.empty()) return Zero;
@@ -75,17 +75,19 @@ inline auto addLeadingZeroes(const std::string& result, size_t minSize) {
 // the same length for a given type, i.e., if 'x' is char then toHex returns a string of length 2
 // and toBinary returns a string of length 8. 'minSize' is ignored if it's less than 'result' size.
 
-template<typename T> inline auto toBinary(T x, BracketType brackets, size_t minSize = 0) {
+template<typename T> [[nodiscard]] inline auto toBinary(T x, BracketType brackets, size_t minSize = 0) {
   static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 1) result.insert(result.begin(), '0' + x % 2);
   return addBrackets(addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
 }
-template<typename T> inline auto toBinary(T x, int minSize = 0) { return toBinary(x, BracketType::None, minSize); }
+template<typename T> [[nodiscard]] inline auto toBinary(T x, int minSize = 0) {
+  return toBinary(x, BracketType::None, minSize);
+}
 
 enum class HexCase { Upper, Lower };
 
-template<typename T> inline auto toHex(T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
+template<typename T> [[nodiscard]] inline auto toHex(T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
   static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 4) {
@@ -94,30 +96,32 @@ template<typename T> inline auto toHex(T x, BracketType brackets, HexCase hexCas
   }
   return addBrackets(addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 2), brackets);
 }
-template<typename T> inline auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
+template<typename T> [[nodiscard]] inline auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
   return toHex(x, BracketType::None, hexCase, minSize);
 }
-template<typename T> inline auto toHex(T x, BracketType brackets, size_t minSize = 0) {
+template<typename T> [[nodiscard]] inline auto toHex(T x, BracketType brackets, size_t minSize = 0) {
   return toHex(x, brackets, HexCase::Lower, minSize);
 }
-template<typename T> inline auto toHex(T x, size_t minSize = 0) {
+template<typename T> [[nodiscard]] inline auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }
 
 // provide specializations for 'char' that cast to 'unsigned char' (which is probably what is expected)
-template<> inline auto toBinary(char x, BracketType brackets, size_t minSize) {
+template<> [[nodiscard]] inline auto toBinary(char x, BracketType brackets, size_t minSize) {
   return toBinary(static_cast<unsigned char>(x), brackets, minSize);
 }
-template<> inline auto toHex(char x, BracketType brackets, HexCase hexCase, size_t minSize) {
+template<> [[nodiscard]] inline auto toHex(char x, BracketType brackets, HexCase hexCase, size_t minSize) {
   return toHex(static_cast<unsigned char>(x), brackets, hexCase, minSize);
 }
 
 // 'toUnicode' converts a 'char32_t' into a Unicode code point (so hex with caps and minSize of 4)
-inline auto toUnicode(char32_t s, BracketType b = BracketType::None) { return toHex(s, b, HexCase::Upper, 4); }
+[[nodiscard]] inline auto toUnicode(char32_t s, BracketType b = BracketType::None) {
+  return toHex(s, b, HexCase::Upper, 4);
+}
 
 // 'toUnicode' converts a UTF-8 string into space-separated Unicode code points. Note: setting
 // 'squareBrackets' to true puts brackets around the whole string instead of each entry.
-inline auto toUnicode(const std::string& s, BracketType brackets = BracketType::None) {
+[[nodiscard]] inline auto toUnicode(const std::string& s, BracketType brackets = BracketType::None) {
   std::string result;
   for (const auto i : fromUtf8(s)) {
     if (!result.empty()) result += ' ';
@@ -127,30 +131,30 @@ inline auto toUnicode(const std::string& s, BracketType brackets = BracketType::
 }
 
 // check if a given char or string is not a 'multi-byte char'
-constexpr auto isSingleByteChar(char x) noexcept { return x >= 0; }
-constexpr auto isSingleByteChar(char32_t x) noexcept { return x >= 0 && x < 128; }
-inline auto isSingleByte(const std::string& s, bool checkLengthOne = true) noexcept {
+[[nodiscard]] constexpr auto isSingleByteChar(char x) noexcept { return x >= 0; }
+[[nodiscard]] constexpr auto isSingleByteChar(char32_t x) noexcept { return x >= 0 && x < 128; }
+[[nodiscard]] inline auto isSingleByte(const std::string& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
-inline auto isSingleByte(const std::u32string& s, bool checkLengthOne = true) noexcept {
+[[nodiscard]] inline auto isSingleByte(const std::u32string& s, bool checkLengthOne = true) noexcept {
   return (checkLengthOne ? s.length() == 1 : s.length() >= 1) && isSingleByteChar(s[0]);
 }
-inline auto isAllSingleByte(const std::string& s) noexcept {
+[[nodiscard]] inline auto isAllSingleByte(const std::string& s) noexcept {
   for (const auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
-inline auto isAllSingleByte(const std::u32string& s) noexcept {
+[[nodiscard]] inline auto isAllSingleByte(const std::u32string& s) noexcept {
   for (const auto i : s)
     if (!isSingleByteChar(i)) return false;
   return true;
 }
-inline auto isAnySingleByte(const std::string& s) noexcept {
+[[nodiscard]] inline auto isAnySingleByte(const std::string& s) noexcept {
   for (const auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;
 }
-inline auto isAnySingleByte(const std::u32string& s) noexcept {
+[[nodiscard]] inline auto isAnySingleByte(const std::u32string& s) noexcept {
   for (const auto i : s)
     if (isSingleByteChar(i)) return true;
   return false;

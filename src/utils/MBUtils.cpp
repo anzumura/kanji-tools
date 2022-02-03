@@ -16,7 +16,7 @@ inline auto utf8Converter() {
 }
 #else
 
-template<typename R, typename T = typename R::value_type> R convertFromUtf8(const char* s) {
+template<typename R, typename T = typename R::value_type> [[nodiscard]] R convertFromUtf8(const char* s) {
   static_assert(std::is_integral_v<T>);
   static_assert(sizeof(T) == 4);
   static constexpr T errorReplacement = static_cast<T>(ErrorReplacement), minSurrogate = static_cast<T>(MinSurrogate),

@@ -27,7 +27,7 @@ constexpr auto HelpMessage = R"(kanjiStats [-bhv] file [file ...]:
   -v: show 'before' and 'after' versions of lines that changed due to furigana removal
 )";
 
-constexpr double asPercent(int amount, int total) { return amount * 100. / total; }
+[[nodiscard]] constexpr double asPercent(int amount, int total) { return amount * 100. / total; }
 
 } // namespace
 

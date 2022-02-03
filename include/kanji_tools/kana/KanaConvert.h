@@ -61,8 +61,8 @@ public:
 
   CharType target() const { return _target; }
   void target(CharType target) { _target = target; }
-  auto flags() const { return _flags; }
-  std::string flagString() const; // return a | separated string representation of current flags or 'none'
+  [[nodiscard]] auto flags() const { return _flags; }
+  [[nodiscard]] std::string flagString() const; // return a | separated string representation of current flags or 'none'
   void flags(int flags) { _flags = flags; }
 
   // Support converting most non-letter ascii from narrow to wide values. These values are also used
@@ -73,8 +73,8 @@ public:
   using NarrowDelims = std::map<char, std::string>;
   using WideDelims = std::map<std::string, char>;
 
-  auto& narrowDelims() const { return _narrowDelims; }
-  auto& wideDelims() const { return _wideDelims; }
+  [[nodiscard]] auto& narrowDelims() const { return _narrowDelims; }
+  [[nodiscard]] auto& wideDelims() const { return _wideDelims; }
 
   // 'convert' has 4 overloads. The first and second use the current values of '_target' and '_flags'.
   // The first and third convert characters of any source type whereas the second and fourth restrict the
@@ -84,19 +84,19 @@ public:
   // versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji, case is ignored so
   // both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConversionFlags' for an explanation of
   // available flags that can be used. The second and third overloads update '_target' and '_flags'
-  std::string convert(const std::string& input) const;
-  std::string convert(CharType source, const std::string& input) const;
-  std::string convert(const std::string& input, CharType target, int flags = 0);
-  std::string convert(CharType source, const std::string& input, CharType target, int flags = 0);
+  [[nodiscard]] std::string convert(const std::string& input) const;
+  [[nodiscard]] std::string convert(CharType source, const std::string& input) const;
+  [[nodiscard]] std::string convert(const std::string& input, CharType target, int flags = 0);
+  [[nodiscard]] std::string convert(CharType source, const std::string& input, CharType target, int flags = 0);
 private:
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
 
-  auto romajiTarget() const { return _target == CharType::Romaji; }
-  auto hiraganaTarget() const { return _target == CharType::Hiragana; }
-  auto& get(const Kana& k) const { return k.get(_target, _flags); }
-  auto& getN() const { return get(Kana::N); }
-  auto& getSmallTsu() const { return get(Kana::SmallTsu); }
+  [[nodiscard]] auto romajiTarget() const { return _target == CharType::Romaji; }
+  [[nodiscard]] auto hiraganaTarget() const { return _target == CharType::Hiragana; }
+  [[nodiscard]] auto& get(const Kana& k) const { return k.get(_target, _flags); }
+  [[nodiscard]] auto& getN() const { return get(Kana::N); }
+  [[nodiscard]] auto& getSmallTsu() const { return get(Kana::SmallTsu); }
 
   using Set = std::set<std::string>;
 
@@ -108,10 +108,11 @@ private:
     assert(i.second);
   }
 
-  std::string convertFromKana(const std::string& input, CharType source, const Set& afterN, const Set& smallKana) const;
-  std::string kanaLetters(const std::string& letterGroup, CharType source, int count, const Kana*& prevKana,
-                          bool prolong = false) const;
-  std::string convertFromRomaji(const std::string& input) const;
+  [[nodiscard]] std::string convertFromKana(const std::string& input, CharType source, const Set& afterN,
+                                            const Set& smallKana) const;
+  [[nodiscard]] std::string kanaLetters(const std::string& letterGroup, CharType source, int count,
+                                        const Kana*& prevKana, bool prolong = false) const;
+  [[nodiscard]] std::string convertFromRomaji(const std::string& input) const;
   void romajiLetters(std::string& letterGroup, std::string& result) const;
   bool romajiMacronLetter(const std::string& letter, std::string& letterGroup, std::string& result) const;
 

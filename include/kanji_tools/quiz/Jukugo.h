@@ -10,10 +10,10 @@ public:
   Jukugo(const std::string& name, const std::string& reading, KanjiGrades grade)
     : _name(name), _reading(reading), _grade(grade) {}
 
-  auto& name() const { return _name; }
-  auto& reading() const { return _reading; }
-  auto nameAndReading() const { return _name + "（" + _reading + "）"; }
-  auto grade() const { return _grade; }
+  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] auto& reading() const { return _reading; }
+  [[nodiscard]] auto nameAndReading() const { return _name + "（" + _reading + "）"; }
+  [[nodiscard]] auto grade() const { return _grade; }
 private:
   const std::string _name;
   const std::string _reading;

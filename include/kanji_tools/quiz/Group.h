@@ -41,13 +41,13 @@ public:
   virtual ~Group() = default;
   Group(const Group&) = delete;
 
-  virtual GroupType type() const = 0;
-  virtual PatternType patternType() const { return PatternType::None; }
+  [[nodiscard]] virtual GroupType type() const = 0;
+  [[nodiscard]] virtual PatternType patternType() const { return PatternType::None; }
 
-  auto number() const { return _number; }
-  auto& name() const { return _name; }
-  auto& members() const { return _members; }
-  auto toString() const { return "[" + std::to_string(_number) + ' ' + name() + ']'; }
+  [[nodiscard]] auto number() const { return _number; }
+  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] auto& members() const { return _members; }
+  [[nodiscard]] auto toString() const { return "[" + std::to_string(_number) + ' ' + name() + ']'; }
 private:
   const int _number;
   const std::string _name;
@@ -58,7 +58,7 @@ class MeaningGroup : public Group {
 public:
   MeaningGroup(int number, const std::string& name, const Data::List& members) : Group(number, name, members) {}
 
-  GroupType type() const override { return GroupType::Meaning; }
+  [[nodiscard]] GroupType type() const override { return GroupType::Meaning; }
 };
 
 class PatternGroup : public Group {
@@ -66,8 +66,8 @@ public:
   PatternGroup(int number, const std::string& name, const Data::List& members, PatternType patternType)
     : Group(number, name, members), _patternType(patternType) {}
 
-  GroupType type() const override { return GroupType::Pattern; }
-  PatternType patternType() const override { return _patternType; }
+  [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }
+  [[nodiscard]] PatternType patternType() const override { return _patternType; }
 private:
   const PatternType _patternType;
 };
