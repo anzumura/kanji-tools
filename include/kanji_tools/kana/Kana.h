@@ -1,6 +1,8 @@
 #ifndef KANJI_TOOLS_KANA_KANA_H
 #define KANJI_TOOLS_KANA_KANA_H
 
+#include <kanji_tools/utils/EnumBitmask.h>
+
 #include <array>
 #include <cassert>
 #include <map>
@@ -13,7 +15,8 @@ namespace kanji_tools {
 // 'CharType' is used to specify 'source' and 'target' types for 'KanaConvert::convert' methods
 enum class CharType { Hiragana, Katakana, Romaji };
 constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
-inline auto& toString(CharType t) {
+
+[[nodiscard]] inline auto& toString(CharType t) {
   static const std::string Romaji("Romaji"), Hiragana("Hiragana"), Katakana("Katakana");
 
   switch (t) {
@@ -23,6 +26,39 @@ inline auto& toString(CharType t) {
   }
   __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
 }
+
+// 'ConvertFlags' can be used to control some aspects of conversion. For example:
+// Hepburn: off by default, only applies to 'romaji' output
+// - convert("つづき", CharType::Romaji) -> "tsuduki"
+// - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
+// Kunrei: off by default, only applies to 'romaji' output
+// - convert("しつ", CharType::Romaji) -> "shitsu"
+// - convert("しつ", CharType::Romaji, Kunrei) -> "situ"
+// NoProlongMark: off by default, only applies to 'hiragana' output
+// - convert("rāmen", CharType::Hiragana) -> "らーめん"
+// - convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
+// RemoveSpaces: off by default, only applies when converting from Romaji:
+// - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with a wide space)
+// - convert("akai kitsune", CharType::Hiragana, RemoveSpaces) returns "あかいきつね"
+//
+// Notes:
+//
+// Prolonged sound marks in hiragana are non-standard, but output them by default in order to
+// support round-trip type conversions, otherwise the above example would map "らあめん" back
+// to "raamen" which doesn't match the initial value.
+// ConvertFlags can be combined the usual way using '|', for example:
+// - convert("rāmen desu.", CharType::Hiragana, ConvertFlags::RemoveSpaces | ConvertFlags::NoProlongMark) ->
+// "らあめんです。"
+//
+// Enabling 'Hepburn' leads to more standard romaji, but the output is ambiguous and leads to
+// different kana if converted back. This affects di (ぢ), dya (ぢゃ), dyo (ぢょ), dyu (ぢゅ),
+// du (づ) and wo (を) - these become ji, ja, ju, jo, zu and o instead. There's also no support
+// for trying to handle は and へ (which in standard Hepburn should map to 'wa' and 'e' if they
+// are used as particles) - instead they simply map to 'ha' and 'he' all the time. If both
+// Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try Kunrei before
+// falling back to the unique '_romaji' value in the Kana class.
+enum class ConvertFlags { None = 0, Hepburn, Kunrei, NoProlongMark = 4, RemoveSpaces = 8 };
+template<> inline constexpr bool is_bitmask<ConvertFlags> = true;
 
 // 'Kana' is used to represent a Kana 'Monograph' or 'Digraph'. It stores Romaji, Hiragana and Katakana
 // as well variant Romaji forms. A 'Monograph' is a single Kana character (large or small) and a 'Digraph'
@@ -38,7 +74,7 @@ public:
     [[nodiscard]] auto matches(CharType t, const std::string& s) const {
       return t == CharType::Hiragana && _hiragana == s || t == CharType::Katakana && _katakana == s;
     }
-    [[nodiscard]] std::string get(CharType target, int flags, const Kana* prevKana) const;
+    [[nodiscard]] std::string get(CharType target, ConvertFlags flags, const Kana* prevKana) const;
     [[nodiscard]] auto& hiragana() const { return _hiragana; }
     [[nodiscard]] auto& katakana() const { return _katakana; }
   private:
@@ -119,17 +155,17 @@ public:
   }
   [[nodiscard]] auto isHanDakuten() const { return _plainKana && _plainKana->hanDakutenKana() == this; }
 
-  // 'getRomaji' returns 'Romaji' value based on flags (see 'ConversionFlags' in KanaConvert.h)
-  [[nodiscard]] const std::string& getRomaji(int flags) const;
+  // 'getRomaji' returns 'Romaji' value based on flags
+  [[nodiscard]] const std::string& getRomaji(ConvertFlags flags) const;
 
   // repeat the first letter of romaji for sokuon (促音) output (special handling for 't' as
   // described in comments above).
-  [[nodiscard]] std::string getSokuonRomaji(int flags) const {
+  [[nodiscard]] std::string getSokuonRomaji(ConvertFlags flags) const {
     auto& r = getRomaji(flags);
     return (r[0] == 'c' ? 't' : r[0]) + r;
   }
 
-  [[nodiscard]] const std::string& get(CharType t, int flags) const;
+  [[nodiscard]] const std::string& get(CharType t, ConvertFlags flags) const;
 
   [[nodiscard]] auto containsKana(const std::string& s) const { return s == _hiragana || s == _katakana; }
 

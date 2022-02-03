@@ -115,14 +115,14 @@ std::array HanDakutenKanaList = {H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{
 
 } // namespace
 
-const std::string& Kana::getRomaji(int flags) const {
-  return (flags & KanaConvert::Hepburn) && _hepburn   ? *_hepburn
-    : (flags & KanaConvert::Kunrei) && _kunreiVariant ? _romajiVariants[0]
-    : (flags & KanaConvert::Kunrei) && _kunrei        ? *_kunrei
-                                                      : _romaji;
+const std::string& Kana::getRomaji(ConvertFlags flags) const {
+  return hasValue(flags & ConvertFlags::Hepburn) && _hepburn   ? *_hepburn
+    : hasValue(flags & ConvertFlags::Kunrei) && _kunreiVariant ? _romajiVariants[0]
+    : hasValue(flags & ConvertFlags::Kunrei) && _kunrei        ? *_kunrei
+                                                               : _romaji;
 }
 
-const std::string& Kana::get(CharType t, int flags) const {
+const std::string& Kana::get(CharType t, ConvertFlags flags) const {
   switch (t) {
   case CharType::Romaji: return getRomaji(flags);
   case CharType::Hiragana: return _hiragana;
@@ -175,7 +175,7 @@ Kana::Map Kana::populate(CharType t) {
   return result;
 }
 
-std::string Kana::RepeatMark::get(CharType target, int flags, const Kana* prevKana) const {
+std::string Kana::RepeatMark::get(CharType target, ConvertFlags flags, const Kana* prevKana) const {
   switch (target) {
   case CharType::Hiragana: return _hiragana;
   case CharType::Katakana: return _katakana;

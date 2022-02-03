@@ -23,47 +23,17 @@ namespace kanji_tools {
 // standard form is used as output).
 class KanaConvert {
 public:
-  // 'ConversionFlags' can be used to control some aspects of conversion. For example:
-  // Hepburn: off by default, only applies to 'romaji' output
-  // - convert("つづき", CharType::Romaji) -> "tsuduki"
-  // - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
-  // Kunrei: off by default, only applies to 'romaji' output
-  // - convert("しつ", CharType::Romaji) -> "shitsu"
-  // - convert("しつ", CharType::Romaji, Kunrei) -> "situ"
-  // NoProlongMark: off by default, only applies to 'hiragana' output
-  // - convert("rāmen", CharType::Hiragana) -> "らーめん"
-  // - convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
-  // RemoveSpaces: off by default, only applies when converting from Romaji:
-  // - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with a wide space)
-  // - convert("akai kitsune", CharType::Hiragana, RemoveSpaces) returns "あかいきつね"
-  //
-  // Notes:
-  //
-  // Prolonged sound marks in hiragana are non-standard, but output them by default in order to
-  // support round-trip type conversions, otherwise the above example would map "らあめん" back
-  // to "raamen" which doesn't match the initial value.
-  // Flags can be combined the usual way using '\', for example:
-  // - convert("rāmen desu.", CharType::Hiragana, RemoveSpaces | NoProlongMark) -> "らあめんです。"
-  //
-  // Enabling 'Hepburn' leads to more standard romaji, but the output is ambiguous and leads to
-  // different kana if converted back. This affects di (ぢ), dya (ぢゃ), dyo (ぢょ), dyu (ぢゅ),
-  // du (づ) and wo (を) - these become ji, ja, ju, jo, zu and o instead. There's also no support
-  // for trying to handle は and へ (which in standard Hepburn should map to 'wa' and 'e' if they
-  // are used as particles) - instead they simply map to 'ha' and 'he' all the time. If both
-  // Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try Kunrei before
-  // falling back to the unique '_romaji' value in the Kana class.
-  enum ConversionFlags { Hepburn = 1, Kunrei = 2, NoProlongMark = 4, RemoveSpaces = 8 };
-
   // 'KanaConvert' constructor defaults the 'target' for conversion to Hiragana and sets 'flags'
-  // to 0 (which means no special conversion flags). Calling the below 'convert' functions can
+  // to None (which means no special conversion flags). Calling the below 'convert' functions can
   // also override these values.
-  KanaConvert(CharType target = CharType::Hiragana, int flags = 0);
+  KanaConvert(CharType target = CharType::Hiragana, ConvertFlags flags = ConvertFlags::None);
 
-  CharType target() const { return _target; }
+  [[nodiscard]] CharType target() const { return _target; }
   void target(CharType target) { _target = target; }
+
   [[nodiscard]] auto flags() const { return _flags; }
-  [[nodiscard]] std::string flagString() const; // return a | separated string representation of current flags or 'none'
-  void flags(int flags) { _flags = flags; }
+  [[nodiscard]] std::string flagString() const; // return a | separated string representation of current flags
+  void flags(ConvertFlags flags) { _flags = flags; }
 
   // Support converting most non-letter ascii from narrow to wide values. These values are also used
   // as delimiters for splitting up input strings when converting from Rōmaji to Kana. Use a '*' for
@@ -82,12 +52,13 @@ public:
   //
   // Note: a number of delimiters are also supported and get converted from narrow to wide and vice
   // versa (see KanaConvert.cpp 'Delimiters'). Also, when converting from Romaji, case is ignored so
-  // both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConversionFlags' for an explanation of
+  // both 'Dare' and 'dARe' would convert to 'だれ'. See 'ConvertFlags' in Kana.h for an explanation of
   // available flags that can be used. The second and third overloads update '_target' and '_flags'
   [[nodiscard]] std::string convert(const std::string& input) const;
   [[nodiscard]] std::string convert(CharType source, const std::string& input) const;
-  [[nodiscard]] std::string convert(const std::string& input, CharType target, int flags = 0);
-  [[nodiscard]] std::string convert(CharType source, const std::string& input, CharType target, int flags = 0);
+  [[nodiscard]] std::string convert(const std::string& input, CharType target, ConvertFlags = ConvertFlags::None);
+  [[nodiscard]] std::string convert(CharType source, const std::string& input, CharType target,
+                                    ConvertFlags = ConvertFlags::None);
 private:
   // 'verifyData' is called by the constructor and performs various 'asserts' on member data.
   void verifyData() const;
@@ -114,7 +85,7 @@ private:
                                         const Kana*& prevKana, bool prolong = false) const;
   [[nodiscard]] std::string convertFromRomaji(const std::string& input) const;
   void romajiLetters(std::string& letterGroup, std::string& result) const;
-  bool romajiMacronLetter(const std::string& letter, std::string& letterGroup, std::string& result) const;
+  [[nodiscard]] bool romajiMacronLetter(const std::string& letter, std::string& letterGroup, std::string& result) const;
 
   // Either '_apostrophe' or '_dash' can be used to separate 'n' in the middle of Romaji words
   // like gin'iro, kan'atsu, kan-i, etc. for input. For Rōmaji output, '_apostrophe' is used. Note,
@@ -142,7 +113,7 @@ private:
 
   // Members for the current conversion
   CharType _target;
-  int _flags;
+  ConvertFlags _flags;
 };
 
 } // namespace kanji_tools

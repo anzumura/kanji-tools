@@ -18,7 +18,7 @@ constexpr std::array Delimiters{
 
 } // namespace
 
-KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(flags) {
+KanaConvert::KanaConvert(CharType target, ConvertFlags flags) : _target(target), _flags(flags) {
   for (auto& i : Kana::getMap(CharType::Hiragana))
     if (auto& r = i.second->romaji(); !r.starts_with("n")) {
       if (r.length() == 1 || r == "ya" || r == "yu" || r == "yo") {
@@ -43,18 +43,18 @@ KanaConvert::KanaConvert(CharType target, int flags) : _target(target), _flags(f
 }
 
 std::string KanaConvert::flagString() const {
-  if (!_flags) return "none";
+  if (_flags == ConvertFlags::None) return "None";
   std::string result;
-  const auto flag = [this, &result](int f, const char* v) {
-    if (_flags & f) {
+  const auto flag = [this, &result](auto f, const char* v) {
+    if (hasValue(_flags & f)) {
       if (!result.empty()) result += '|';
       result += v;
     }
   };
-  flag(Hepburn, "Hepburn");
-  flag(Kunrei, "Kunrei");
-  flag(NoProlongMark, "NoProlongMark");
-  flag(RemoveSpaces, "RemoveSpaces");
+  flag(ConvertFlags::Hepburn, "Hepburn");
+  flag(ConvertFlags::Kunrei, "Kunrei");
+  flag(ConvertFlags::NoProlongMark, "NoProlongMark");
+  flag(ConvertFlags::RemoveSpaces, "RemoveSpaces");
   return result;
 }
 
@@ -83,13 +83,13 @@ std::string KanaConvert::convert(const std::string& input) const {
   return result;
 }
 
-std::string KanaConvert::convert(const std::string& input, CharType target, int flags) {
+std::string KanaConvert::convert(const std::string& input, CharType target, ConvertFlags flags) {
   _target = target;
   _flags = flags;
   return convert(input);
 }
 
-std::string KanaConvert::convert(CharType source, const std::string& input, CharType target, int flags) {
+std::string KanaConvert::convert(CharType source, const std::string& input, CharType target, ConvertFlags flags) {
   _target = target;
   _flags = flags;
   return convert(source, input);
@@ -103,7 +103,7 @@ std::string KanaConvert::convert(CharType source, const std::string& input) cons
   // each word. This helps deal with words ending in 'n'.
   std::string result;
   auto oldPos = 0;
-  for (const auto keepSpaces = !(_flags & RemoveSpaces);;) {
+  for (const auto keepSpaces = !hasValue(_flags & ConvertFlags::RemoveSpaces);;) {
     const auto pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos));
@@ -267,7 +267,8 @@ bool KanaConvert::romajiMacronLetter(const std::string& letter, std::string& let
   if (const auto i = Macrons.find(letter); i != Macrons.end()) {
     romajiLetters(letterGroup += i->second.first, result);
     if (letterGroup.empty())
-      result += hiraganaTarget() && (_flags & NoProlongMark) ? i->second.second : Kana::ProlongMark;
+      result +=
+        hiraganaTarget() && hasValue(_flags & ConvertFlags::NoProlongMark) ? i->second.second : Kana::ProlongMark;
     else
       result += i->second.first; // should never happen ...
     return true;

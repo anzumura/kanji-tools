@@ -31,7 +31,7 @@ TEST(KanaTest, CheckHiragana) {
   for (auto& i : sourceMap) {
     MBChar s(i.first);
     std::string c;
-    auto checkDigraph = [&i, &c](const std::string& a, const std::string& b = "") {
+    const auto checkDigraph = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
                                                     << i.second->romaji() << "', hiragana " << i.first;
     };
@@ -48,7 +48,7 @@ TEST(KanaTest, CheckHiragana) {
       else
         ++plainDigraphs;
       // if there's a second character it must be a small symbol matching the final romaji letter
-      auto romajiLen = i.second->romaji().length();
+      const auto romajiLen = i.second->romaji().length();
       ASSERT_GT(romajiLen, 1);
       if (i.second->romaji() == "qwa") // the only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "くゎ");
@@ -96,7 +96,7 @@ TEST(KanaTest, CheckKatakana) {
     // size) then there's no need to checkDigraph the various counts again.
     EXPECT_TRUE(hiraganaMap.contains(i.second->hiragana()));
     std::string c;
-    auto checkDigraph = [&i, &c](const std::string& a, const std::string& b = "") {
+    const auto checkDigraph = [&i, &c](const std::string& a, const std::string& b = "") {
       EXPECT_TRUE(c == a || (!b.empty() && c == b)) << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
                                                     << i.second->romaji() << "', katakana " << i.first;
     };

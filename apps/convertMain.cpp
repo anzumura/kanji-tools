@@ -1,4 +1,3 @@
-#include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/kana/KanaConvert.h>
 #include <kanji_tools/utils/Choice.h>
 #include <kanji_tools/utils/MBUtils.h>
@@ -23,7 +22,7 @@ private:
     std::cout << (_source ? _converter.convert(*_source, s) : _converter.convert(s));
   }
   void getInput();
-  void setFlag(int value) { _converter.flags(_converter.flags() | value); }
+  void setFlag(ConvertFlags value) { _converter.flags(_converter.flags() | value); }
   bool charTypeArgs(const std::string& arg);
   bool flagArgs(char arg);
   void printKanaChart(bool markdown = false) const;
@@ -118,11 +117,11 @@ void ConvertMain::run() {
   if (std::string line; _strings.empty())
     getInput();
   else {
-    for (bool outputSpace = false; const auto& i : _strings) {
-      if (outputSpace)
+    for (bool space = false; const auto& i : _strings) {
+      if (space)
         std::cout << (_converter.target() == CharType::Romaji ? " " : "　");
       else
-        outputSpace = _converter.target() != CharType::Romaji && !(_converter.flags() & KanaConvert::RemoveSpaces);
+        space = _converter.target() != CharType::Romaji && !hasValue(_converter.flags() & ConvertFlags::RemoveSpaces);
       processOneLine(i);
     }
     std::cout << '\n';
@@ -144,7 +143,7 @@ void ConvertMain::getInput() {
         if (line.empty()) continue;
         if (line == "c" || line == "f" || line == "h" || line.starts_with("-")) {
           if (line == "c")
-            _converter.flags(0);
+            _converter.flags(ConvertFlags::None);
           else if (line == "f")
             flagArgs(_choice.get(">>> Enter flag option", flagChoices));
           else if (line == "h")
@@ -183,13 +182,13 @@ bool ConvertMain::charTypeArgs(const std::string& arg) {
 
 bool ConvertMain::flagArgs(char arg) {
   if (arg == 'h')
-    setFlag(KanaConvert::Hepburn);
+    setFlag(ConvertFlags::Hepburn);
   else if (arg == 'k')
-    setFlag(KanaConvert::Kunrei);
+    setFlag(ConvertFlags::Kunrei);
   else if (arg == 'n')
-    setFlag(KanaConvert::NoProlongMark);
+    setFlag(ConvertFlags::NoProlongMark);
   else if (arg == 'r')
-    setFlag(KanaConvert::RemoveSpaces);
+    setFlag(ConvertFlags::RemoveSpaces);
   else
     return false;
   return true;
@@ -245,8 +244,8 @@ void ConvertMain::printKanaChart(bool markdown) const {
     auto& romaji = i.romaji();
     auto& h = i.hiragana();
     auto& k = i.katakana();
-    std::string hepb(i.getRomaji(KanaConvert::Hepburn));
-    std::string kunr(i.getRomaji(KanaConvert::Kunrei));
+    std::string hepb(i.getRomaji(ConvertFlags::Hepburn));
+    std::string kunr(i.getRomaji(ConvertFlags::Kunrei));
     hepb = romaji == hepb ? empty : ('(' + hepb + ')');
     kunr = romaji == kunr ? empty : i.kunreiVariant() ? kunr : ('(' + kunr + ')');
     std::string vars;
@@ -279,7 +278,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
              plain = small + plainMonographs + plainDigraphs, dakuten = dakutenMonographs + dakutenDigraphs,
              hanDakuten = hanDakutenMonographs + hanDakutenDigraphs;
   const auto types = plain + dakuten + hanDakuten + none;
-  auto out = [markdown](const std::string& s) -> std::ostream& {
+  const auto out = [markdown](const std::string& s) -> std::ostream& {
     if (markdown)
       std::cout << "- **";
     else
