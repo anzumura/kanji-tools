@@ -45,4 +45,11 @@ TEST(EnumBitmaskTest, BitwiseXOrEqualOperator) {
   EXPECT_EQ(x ^= TestEnum::Eight, static_cast<TestEnum>(1 | 2));
 }
 
+TEST(EnumBitmaskTest, HasValue) {
+  EXPECT_TRUE(hasValue(TestEnum::One));
+  auto x = TestEnum::Two;
+  EXPECT_TRUE(hasValue(x));
+  EXPECT_FALSE(hasValue(x ^ TestEnum::Two));
+}
+
 } // namespace kanji_tools

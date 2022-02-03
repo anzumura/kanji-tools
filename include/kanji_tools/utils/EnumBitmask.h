@@ -49,6 +49,11 @@ template<typename T> constexpr T& operator^=(T& x, T y) {
   return x;
 }
 
+// 'hasValue' can help in cases like 'if (hasValue(myEnum & MyEnum::Flag1)) ...'
+template<typename T, std::enable_if_t<enum_bitmask_v<T>, int> = 0> constexpr bool hasValue(T x) {
+  return static_cast<std::underlying_type_t<T>>(x) != 0;
+}
+
 } // namespace kanji_tools
 
 #endif // KANJI_TOOLS_UTILS_ENUM_BITMASK_H
