@@ -9,7 +9,7 @@ void fromUtf8Error(const std::string& s, const std::u32string& result = U"\ufffd
 #ifdef USE_CODECVT_FOR_UTF_8
     FAIL() << "Expected std::range_error";
 #endif
-  } catch (std::range_error& err) {
+  } catch (const std::range_error& err) {
     EXPECT_EQ(err.what(), std::string("wstring_convert: from_bytes error"));
   } catch (...) {
     FAIL() << "Expected std::range_error";
@@ -22,7 +22,7 @@ void toUtf8Error(const std::u32string& s, const std::string& result = "\xEF\xBF\
 #ifdef USE_CODECVT_FOR_UTF_8
     FAIL() << "Expected std::range_error";
 #endif
-  } catch (std::range_error& err) {
+  } catch (const std::range_error& err) {
     EXPECT_EQ(err.what(), std::string("wstring_convert: to_bytes error"));
   } catch (...) {
     FAIL() << "Expected std::range_error";

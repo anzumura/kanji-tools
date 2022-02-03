@@ -211,7 +211,7 @@ Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
   try {
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("unrecognized header 'Rdical' - file: test.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -225,7 +225,7 @@ Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
   try {
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("duplicate header 'Name' - file: test.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -239,7 +239,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   try {
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("too many columns - file: test.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -253,7 +253,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   try {
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("not enough columns - file: test.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -270,7 +270,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   try {
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(std::string(err.what()),
               "failed to convert to int - file: test.txt, row: 1, column: 'Number', value: 'a'");
   } catch (...) {
@@ -342,7 +342,7 @@ TEST_F(KanjiTest, BadLinkedJinmei) {
   try {
     LinkedJinmeiKanji k(_data, "亙", frequencyKanji);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(std::string(err.what()),
               "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but got 'Frequency'");
   } catch (...) {
@@ -357,7 +357,7 @@ Number\tName\tRadical\tOldNames\tYear\tReading\n\
   try {
     auto results = ExtraKanji::fromFile(_data, KanjiTypes::Jinmei, _testFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(std::string(err.what()), "column 'Reason' not found - file: test.txt");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -461,7 +461,7 @@ TEST_F(KanjiTest, BadLinkedOld) {
   try {
     LinkedOldKanji k(_data, "艷", frequencyKanji);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(std::string(err.what()), "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got 'Frequency'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";

@@ -357,7 +357,7 @@ TEST_F(MBCharCountTest, AddMissingFile) {
   try {
     c.addFile(_testDir / "missing");
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("file not found: testDir/missing"));
     EXPECT_EQ(c.files(), 0);
     EXPECT_EQ(c.directories(), 0);

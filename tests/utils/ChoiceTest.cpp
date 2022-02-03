@@ -26,7 +26,7 @@ TEST_F(ChoiceTest, NoChoicesError) {
   try {
     _choice.get("", {});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("must specify at least one choice"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -38,7 +38,7 @@ TEST_F(ChoiceTest, NonPrintableError) {
     char escape = 27;
     _choice.get("", {{escape, ""}});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("option is non-printable: 0x1b"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -123,7 +123,7 @@ TEST_F(ChoiceTest, InvalidRange) {
   try {
     _choice.get("", '2', '1');
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("first range option '2' is greater than last '1'"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -134,7 +134,7 @@ TEST_F(ChoiceTest, NonPrintableFirstRange) {
   try {
     _choice.get("", {}, 'a');
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("first range option is non-printable: 0x00"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -145,7 +145,7 @@ TEST_F(ChoiceTest, NonPrintableLastRange) {
   try {
     _choice.get("", 'a', 10);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("last range option is non-printable: 0x0a"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -251,7 +251,7 @@ TEST_F(ChoiceTest, NonPrintableQuitError) {
   try {
     _choice.setQuit(22);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("quit option is non-printable: 0x16"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -262,7 +262,7 @@ TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
   try {
     Choice choice(_os, 23);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("quit option is non-printable: 0x17"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -302,7 +302,7 @@ TEST_F(ChoiceTest, MissingDefaultOption) {
   try {
     _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e');
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("default option 'e' not in choices"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -314,7 +314,7 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
   for (bool useQuit : {false, true}) try {
       _choice.get("", useQuit, {{'q', "abc"}});
       FAIL() << "Expected std::domain_error";
-    } catch (std::domain_error& err) {
+    } catch (const std::domain_error& err) {
       EXPECT_EQ(err.what(), std::string("quit option 'q' already in choices"));
     } catch (...) {
       FAIL() << "Expected std::domain_error";
@@ -327,7 +327,7 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
   for (char rangeStart : {'a', 'b'}) try {
       _choice.get("", rangeStart, 'c', choices);
       FAIL() << "Expected std::domain_error";
-    } catch (std::domain_error& err) {
+    } catch (const std::domain_error& err) {
       EXPECT_EQ(err.what(), start + (rangeStart == 'a' ? 'a' : 'c') + end);
     } catch (...) {
       FAIL() << "Expected std::domain_error";

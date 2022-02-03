@@ -47,7 +47,7 @@ TEST_F(ColumnFileTest, NoColumnsError) {
   try {
     ColumnFile f(_testFile, {});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("must specify at least one column - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -154,7 +154,7 @@ TEST_F(ColumnFileTest, NotEnoughColumns) {
   try {
     f.nextRow();
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("not enough columns - file: testFile.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -170,7 +170,7 @@ TEST_F(ColumnFileTest, TooManyColumns) {
   try {
     f.nextRow();
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("too many columns - file: testFile.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -185,7 +185,7 @@ TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
   try {
     ColumnFile f(_testFile, {col});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("unrecognized header 'HeaderName' - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -200,7 +200,7 @@ TEST_F(ColumnFileTest, DuplicateHeaderError) {
   try {
     ColumnFile f(_testFile, {col});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("duplicate header 'Col' - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -215,7 +215,7 @@ TEST_F(ColumnFileTest, DuplicateColumnError) {
   try {
     ColumnFile f(_testFile, {col1, col2, col1});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("duplicate column 'Col1' - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -230,7 +230,7 @@ TEST_F(ColumnFileTest, OneMissingColumnError) {
   try {
     ColumnFile f(_testFile, {col1, col2});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("column 'Col2' not found - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -245,7 +245,7 @@ TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
   try {
     ColumnFile f(_testFile, {col1, col2, col3, col4});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("2 columns not found: 'Col2', 'Col4' - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -257,7 +257,7 @@ TEST_F(ColumnFileTest, MissingFileError) {
   try {
     ColumnFile f(_testFile, {col});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("doesn't exist - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -269,7 +269,7 @@ TEST_F(ColumnFileTest, NotRegularFileError) {
   try {
     ColumnFile f(_testDir, {col});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("not regular file - file: testDir"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -284,7 +284,7 @@ TEST_F(ColumnFileTest, MissingHeaderRowError) {
   try {
     ColumnFile f(_testFile, {col});
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("missing header row - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -300,7 +300,7 @@ TEST_F(ColumnFileTest, GetBeforeNextRowError) {
   try {
     f.get(col);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("'nextRow' must be called before calling 'get' - file: testFile.txt"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -318,7 +318,7 @@ TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
   try {
     f.get(columnCreatedAfterConstruction);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("unrecognized column 'Created After' - file: testFile.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -335,7 +335,7 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
   try {
     f.get(columnNotIncludedInFile);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), std::string("invalid column 'Not Included' - file: testFile.txt, row: 1"));
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -362,7 +362,7 @@ TEST_F(ColumnFileTest, GetIntError) {
   try {
     f.getInt(col);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -391,7 +391,7 @@ TEST_F(ColumnFileTest, GetOptIntError) {
   try {
     f.getOptInt(col);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -422,7 +422,7 @@ TEST_F(ColumnFileTest, GetBoolError) {
   try {
     f.getBool(col);
     FAIL() << "Expected std::domain_error";
-  } catch (std::domain_error& err) {
+  } catch (const std::domain_error& err) {
     EXPECT_EQ(err.what(), convertError + "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'");
   } catch (...) {
     FAIL() << "Expected std::domain_error";
@@ -454,7 +454,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
     try {
       f.getWChar(col);
       FAIL() << "Expected std::domain_error";
-    } catch (std::domain_error& err) {
+    } catch (const std::domain_error& err) {
       EXPECT_EQ(err.what(), convertError + "char32_t, " + i);
     } catch (...) {
       FAIL() << "Expected std::domain_error";
