@@ -51,6 +51,16 @@ public:
   OptEntry entry;
 };
 
+std::string Count::toHex() const {
+  std::string result;
+  if (const auto s = fromUtf8(name); s.length() == 1) result = "'\\u" + kanji_tools::toHex(s[0]) + "', ";
+  for (const auto i : name) {
+    if (!result.empty()) result += ' ';
+    result += "'\\x" + kanji_tools::toHex(i) + "'";
+  }
+  return result;
+}
+
 std::ostream& operator<<(std::ostream& os, const Count& c) {
   os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
   if (c.entry)
@@ -63,10 +73,10 @@ std::ostream& operator<<(std::ostream& os, const Count& c) {
 
 // 'IncludeInTotals' of 4 indicates only Kanji and full-width kana should be included in totals and percents
 // 'MaxExamples' is the maximum number of examples to show for each kanji type when printing stats
-enum Values { IncludeInTotals = 4, MaxExamples = 5 };
+constexpr int IncludeInTotals = 4, MaxExamples = 5;
 
-} // namespace
-
+// 'StatsPred' is a helper class for gathering stats matching a predicate (Pred) function across a group of
+// files. The 'run' method is thread-safe and the results can be retrieved via the 'total' and 'str' methods.
 class StatsPred {
 public:
   StatsPred(const DataPtr data, const fs::path& top, const std::string& name, bool showBreakdown)
@@ -97,77 +107,6 @@ private:
   int _total = 0;
   std::stringstream _os;
 };
-
-std::string Count::toHex() const {
-  std::string result;
-  if (const auto s = fromUtf8(name); s.length() == 1) result = "'\\u" + kanji_tools::toHex(s[0]) + "', ";
-  for (const auto i : name) {
-    if (!result.empty()) result += ' ';
-    result += "'\\x" + kanji_tools::toHex(i) + "'";
-  }
-  return result;
-}
-
-Stats::Stats(size_t argc, const char** argv, DataPtr data) : _data(data) {
-  auto breakdown = false, endOptions = false, verbose = false;
-  std::vector<std::string> files;
-  for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
-    if (std::string arg = argv[i]; !endOptions && arg.starts_with("-")) {
-      if (arg == "-h") {
-        out() << HelpMessage;
-        return;
-      }
-      if (arg == "-b")
-        breakdown = true;
-      else if (arg == "-v")
-        verbose = true;
-      else if (arg == "--")
-        endOptions = true;
-      else
-        Data::usage("illegal option '" + arg + "' use -h for help");
-    } else
-      files.push_back(arg);
-  if (!data->debug() && files.empty()) Data::usage("please specify at least one option or '-h' for help");
-  for (auto& i : files) countKanji(i, breakdown, verbose);
-}
-
-void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
-  const auto f = [this, &top, showBreakdown, verbose](const auto& pred, const std::string& name,
-                                                      bool firstCount = false) {
-    auto p = std::make_shared<StatsPred>(_data, top, name, showBreakdown);
-    return std::pair(std::async(std::launch::async, [=] { return p->run(pred, verbose, firstCount); }), p);
-  };
-  std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
-                    f([](const auto& x) { return isKatakana(x); }, "Katakana"),
-                    f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
-                    f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
-                    f([this](const auto& x) { return isKanji(x) && !_data->ucd().find(x); }, "Non-UCD Kanji"),
-                    f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
-                    f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
-                    f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-                    f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
-  for (auto& i : totals) {
-    i.first.wait();
-    out() << i.second->str();
-  }
-  auto total = 0;
-  for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].second->total();
-  log() << "Total Kanji+Kana: " << total;
-  if (total) {
-    out() << " (" << std::fixed << std::setprecision(1);
-    auto totalPrinted = false;
-    for (auto i = 0; i < IncludeInTotals; ++i)
-      if (totals[i].second->total()) {
-        if (totalPrinted)
-          out() << ", ";
-        else
-          totalPrinted = true;
-        out() << totals[i].second->name() << ": " << asPercent(totals[i].second->total(), total) << "%";
-      }
-    out() << ')';
-  }
-  out() << '\n';
-}
 
 template<typename Pred> void StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   const auto isKanji(_name.ends_with("Kanji")), isHiragana(_name == "Hiragana"),
@@ -279,6 +218,69 @@ void StatsPred::printBreakdown(const CountSet& frequency, const MBCharCount& cou
     _os << '\n';
   }
   if (_showBreakdown) DataFile::print(_os, missing, "missing");
+}
+
+} // namespace
+
+Stats::Stats(size_t argc, const char** argv, DataPtr data) : _data(data) {
+  auto breakdown = false, endOptions = false, verbose = false;
+  std::vector<std::string> files;
+  for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i))
+    if (std::string arg = argv[i]; !endOptions && arg.starts_with("-")) {
+      if (arg == "-h") {
+        out() << HelpMessage;
+        return;
+      }
+      if (arg == "-b")
+        breakdown = true;
+      else if (arg == "-v")
+        verbose = true;
+      else if (arg == "--")
+        endOptions = true;
+      else
+        Data::usage("illegal option '" + arg + "' use -h for help");
+    } else
+      files.push_back(arg);
+  if (!data->debug() && files.empty()) Data::usage("please specify at least one option or '-h' for help");
+  for (auto& i : files) countKanji(i, breakdown, verbose);
+}
+
+void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
+  const auto f = [this, &top, showBreakdown, verbose](const auto& pred, const std::string& name,
+                                                      bool firstCount = false) {
+    auto p = std::make_shared<StatsPred>(_data, top, name, showBreakdown);
+    return std::pair(std::async(std::launch::async, [=] { return p->run(pred, verbose, firstCount); }), p);
+  };
+  std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
+                    f([](const auto& x) { return isKatakana(x); }, "Katakana"),
+                    f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
+                    f([](const auto& x) { return isRareKanji(x); }, "Rare Kanji"),
+                    f([this](const auto& x) { return isKanji(x) && !_data->ucd().find(x); }, "Non-UCD Kanji"),
+                    f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),
+                    f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
+                    f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
+                    f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
+  for (auto& i : totals) {
+    i.first.wait();
+    out() << i.second->str();
+  }
+  auto total = 0;
+  for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].second->total();
+  log() << "Total Kanji+Kana: " << total;
+  if (total) {
+    out() << " (" << std::fixed << std::setprecision(1);
+    auto totalPrinted = false;
+    for (auto i = 0; i < IncludeInTotals; ++i)
+      if (totals[i].second->total()) {
+        if (totalPrinted)
+          out() << ", ";
+        else
+          totalPrinted = true;
+        out() << totals[i].second->name() << ": " << asPercent(totals[i].second->total(), total) << "%";
+      }
+    out() << ')';
+  }
+  out() << '\n';
 }
 
 } // namespace kanji_tools
