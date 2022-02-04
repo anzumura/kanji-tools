@@ -39,16 +39,13 @@ template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> [[nodiscard]] con
   return static_cast<T>(~to_underlying(x));
 }
 template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> constexpr T& operator&=(T& x, T y) noexcept {
-  x = x & y;
-  return x;
+  return x = x & y;
 }
 template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> constexpr T& operator|=(T& x, T y) noexcept {
-  x = x | y;
-  return x;
+  return x = x | y;
 }
 template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> constexpr T& operator^=(T& x, T y) noexcept {
-  x = x ^ y;
-  return x;
+  return x = x ^ y;
 }
 
 // 'hasValue' can help in cases like 'if (hasValue(myEnum & MyEnum::Flag1)) ...'
