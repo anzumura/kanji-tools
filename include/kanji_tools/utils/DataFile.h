@@ -30,7 +30,9 @@ public:
   // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and then returns the full path
   [[nodiscard]] static std::filesystem::path getFile(const std::filesystem::path& dir,
                                                      const std::filesystem::path& file);
-  static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false);
+  static void print(const List&, const std::string& type, const std::string& group = "", bool isError = false,
+                    std::ostream& = std::cout);
+  static void print(std::ostream& out, const List& l, const std::string& type) { print(l, type, "", false, out); }
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
   // should be called after loading all lists to clean up unneeded static data
   static void clearUniqueCheckData() {

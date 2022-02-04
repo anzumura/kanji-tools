@@ -15,13 +15,14 @@ fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   return p;
 }
 
-void DataFile::print(const List& l, const std::string& type, const std::string& group, bool isError) {
+void DataFile::print(const List& l, const std::string& type, const std::string& group, bool isError,
+                     std::ostream& out) {
   if (!l.empty()) {
-    std::cout << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
-    if (!group.empty()) std::cout << " in " << group;
-    std::cout << ':';
-    for (auto& i : l) std::cout << ' ' << i;
-    std::cout << '\n';
+    out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
+    if (!group.empty()) out << " in " << group;
+    out << ':';
+    for (auto& i : l) out << ' ' << i;
+    out << '\n';
   }
 }
 
