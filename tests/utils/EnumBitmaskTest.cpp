@@ -31,18 +31,30 @@ TEST(EnumBitmaskTest, BitwiseComplementOperator) {
 TEST(EnumBitmaskTest, BitwiseAndEqualOperator) {
   auto x = TestEnum::One;
   EXPECT_EQ(x &= TestEnum::All, TestEnum::One);
+  // test chaining
+  auto y = TestEnum::All;
+  ((y &= TestEnum::Two) |= TestEnum::Four) &= TestEnum::Two;
+  EXPECT_EQ(y, TestEnum::Two);
 }
 
 TEST(EnumBitmaskTest, BitwiseOrEqualOperator) {
   auto x = TestEnum::Two;
   EXPECT_EQ(x |= TestEnum::One, static_cast<TestEnum>(1 | 2));
   EXPECT_EQ(x |= TestEnum::Four, static_cast<TestEnum>(1 | 2 | 4));
+  // test chaining
+  auto y = TestEnum::One;
+  ((y |= TestEnum::Two) |= TestEnum::Four) |= TestEnum::Eight;
+  EXPECT_EQ(y, TestEnum::All);
 }
 
 TEST(EnumBitmaskTest, BitwiseXOrEqualOperator) {
   auto x = TestEnum::All;
   EXPECT_EQ(x ^= TestEnum::Four, static_cast<TestEnum>(1 | 2 | 8));
   EXPECT_EQ(x ^= TestEnum::Eight, static_cast<TestEnum>(1 | 2));
+  // test chaining
+  auto y = TestEnum::All;
+  ((y ^= TestEnum::Two) ^= TestEnum::Four) ^= TestEnum::Eight;
+  EXPECT_EQ(y, TestEnum::One);
 }
 
 TEST(EnumBitmaskTest, HasValue) {
