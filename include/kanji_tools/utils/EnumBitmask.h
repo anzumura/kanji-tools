@@ -18,7 +18,8 @@ template<typename T, bool B = std::is_enum_v<T>> struct is_scoped_enum : std::fa
 template<typename T>
 struct is_scoped_enum<T, true> : std::integral_constant<bool, !std::is_convertible_v<T, std::underlying_type_t<T>>> {};
 template<typename T> inline constexpr bool is_scoped_enum_v = is_scoped_enum<T>::value;
-template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> constexpr auto to_underlying(T x) {
+template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
+[[nodiscard]] constexpr auto to_underlying(T x) noexcept {
   return static_cast<std::underlying_type_t<T>>(x);
 }
 
