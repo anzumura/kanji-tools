@@ -3,23 +3,15 @@
 #include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
+#include <future>
 #include <numeric>
+#include <sstream>
 
 namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
 namespace {
-
-std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
-  os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
-  if (c.entry)
-    os << std::setw(5) << (**c.entry).frequencyOrDefault(0) << ", "
-       << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type();
-  else
-    os << ", " << c.toHex();
-  return os;
-}
 
 constexpr auto HelpMessage = R"(kanjiStats [-bhv] file [file ...]:
   -b: show full kanji breakdown for 'file' (instead of just a summary)
@@ -29,9 +21,84 @@ constexpr auto HelpMessage = R"(kanjiStats [-bhv] file [file ...]:
 
 [[nodiscard]] constexpr double asPercent(int amount, int total) { return amount * 100. / total; }
 
+// helper class for ordering and printing out kanji found in files
+class Count {
+public:
+  using OptEntry = Data::OptEntry;
+
+  Count(int f, const std::string& n, OptEntry e) : count(f), name(n), entry(e) {}
+
+  [[nodiscard]] auto frequency() const {
+    return entry ? (**entry).frequencyOrDefault(Data::maxFrequency()) : Data::maxFrequency() + 1;
+  }
+  [[nodiscard]] auto type() const { return entry ? (**entry).type() : KanjiTypes::None; }
+  [[nodiscard]] std::string toHex() const;
+
+  // Sort to have largest 'count' first followed by lowest frequency number. Lower frequency
+  // means the kanji is more common, but a frequency of '0' means the kanji isn't in the top
+  // frequency list so use 'frequencyOrDefault' to return a large number for no-frequency
+  // kanji and consider 'not-found' kanji to have even higher (worse) frequency. If kanjis
+  // both have the same 'count' and 'frequency' then sort by type then hex (use 'hex' instead of
+  // 'name' since sorting by UTF-8 is less consistent).
+  [[nodiscard]] auto operator<(const Count& x) const {
+    return count > x.count ||
+      (count == x.count && frequency() < x.frequency() ||
+       (frequency() == x.frequency() && type() < x.type() || (type() == x.type() && toHex() < x.toHex())));
+  }
+
+  int count;
+  std::string name;
+  OptEntry entry;
+};
+
+std::ostream& operator<<(std::ostream& os, const Count& c) {
+  os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
+  if (c.entry)
+    os << std::setw(5) << (**c.entry).frequencyOrDefault(0) << ", "
+       << ((**c.entry).hasLevel() ? toString((**c.entry).level()) : std::string("--")) << ", " << (**c.entry).type();
+  else
+    os << ", " << c.toHex();
+  return os;
+}
+
+// 'IncludeInTotals' of 4 indicates only Kanji and full-width kana should be included in totals and percents
+// 'MaxExamples' is the maximum number of examples to show for each kanji type when printing stats
+enum Values { IncludeInTotals = 4, MaxExamples = 5 };
+
 } // namespace
 
-std::string Stats::Count::toHex() const {
+class StatsPred {
+public:
+  StatsPred(const DataPtr data, const fs::path& top, const std::string& name, bool showBreakdown)
+    : _data(data), _top(top), _name(name), _showBreakdown(showBreakdown) {}
+
+  template<typename Pred> void run(const Pred&, bool verbose, bool firstCount);
+
+  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] auto total() const { return _total; }
+  [[nodiscard]] auto str() const { return _os.str(); }
+private:
+  // 'DisplayValues' are for ostream 'set' functions
+  enum IntDisplayValues { UniqueCountWidth = 4, TotalCountWidth = 6, TypeNameWidth = 16 };
+  enum PercentDisplayValues { PercentPrecision = 2, PercentWidth = 6 };
+
+  using CountSet = std::set<Count>;
+
+  void printHeaderInfo(const MBCharCount&);
+  void printTotalAndUnique(const std::string& name, int total, int unique);
+  void printKanjiTypeCounts(const std::set<Count>&);
+  void printExamples(const CountSet&);
+  void printBreakdown(const CountSet&, const MBCharCount&);
+
+  const DataPtr _data;
+  const fs::path& _top;
+  const std::string _name;
+  const bool _showBreakdown;
+  int _total = 0;
+  std::stringstream _os;
+};
+
+std::string Count::toHex() const {
   std::string result;
   if (const auto s = fromUtf8(name); s.length() == 1) result = "'\\u" + kanji_tools::toHex(s[0]) + "', ";
   for (const auto i : name) {
@@ -65,8 +132,10 @@ Stats::Stats(size_t argc, const char** argv, DataPtr data) : _data(data) {
 }
 
 void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) const {
-  const auto f = [this, &top, showBreakdown, verbose](const auto& x, const auto& y, bool firstCount = false) {
-    return std::pair(processCount(top, x, y, showBreakdown, firstCount, verbose), y);
+  const auto f = [this, &top, showBreakdown, verbose](const auto& pred, const std::string& name,
+                                                      bool firstCount = false) {
+    auto p = std::make_shared<StatsPred>(_data, top, name, showBreakdown);
+    return std::pair(std::async(std::launch::async, [=] { return p->run(pred, verbose, firstCount); }), p);
   };
   std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
@@ -77,77 +146,82 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
                     f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
                     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
                     f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
+  for (auto& i : totals) {
+    i.first.wait();
+    out() << i.second->str();
+  }
   auto total = 0;
-  for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].first;
+  for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].second->total();
   log() << "Total Kanji+Kana: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);
+    auto totalPrinted = false;
     for (auto i = 0; i < IncludeInTotals; ++i)
-      if (totals[i].first) {
-        if (totals[i].second != totals[0].second) out() << ", ";
-        out() << totals[i].second << ": " << asPercent(totals[i].first, total) << "%";
+      if (totals[i].second->total()) {
+        if (totalPrinted)
+          out() << ", ";
+        else
+          totalPrinted = true;
+        out() << totals[i].second->name() << ": " << asPercent(totals[i].second->total(), total) << "%";
       }
     out() << ')';
   }
   out() << '\n';
 }
 
-template<typename Pred>
-int Stats::processCount(const fs::path& top, const Pred& pred, const std::string& name, bool showBreakdown,
-                        bool firstCount, bool verbose) const {
-  const auto isKanji(name.ends_with("Kanji")), isHiragana(name == "Hiragana"), isUnrecognized(name == "Unrecognized");
-  const auto isCommonKanji(isKanji && name.starts_with("Common"));
+template<typename Pred> void StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
+  const auto isKanji(_name.ends_with("Kanji")), isHiragana(_name == "Hiragana"),
+    isUnrecognized(_name == "Unrecognized");
+  const auto isCommonKanji(isKanji && _name.starts_with("Common"));
 
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect on counts, i.e., furigana
   // in .txt files will artificially inflate Hiragana count (and MB-Letter because of the wide brackets)
-  const auto removeFurigana(isHiragana || name == "Katakana" || name == "MB-Letter");
+  const auto removeFurigana(isHiragana || _name == "Katakana" || _name == "MB-Letter");
 
-  if (isHiragana && verbose) log() << "Showing all furigana replacements:\n";
+  if (isHiragana && verbose) _os << ">>> Showing all furigana replacements:\n";
 
   MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt,
                       MBCharCount::DefaultReplace, isHiragana && verbose);
-  count.addFile(top, isKanji || isUnrecognized || isHiragana && verbose);
-  if (firstCount) printHeaderInfo(top, count);
+  count.addFile(_top, isKanji || isUnrecognized || isHiragana && verbose);
+  if (firstCount) printHeaderInfo(count);
   CountSet frequency;
-  auto total = 0;
   for (const auto& i : count.map()) {
-    total += i.second;
+    _total += i.second;
     frequency.emplace(i.second, i.first, isKanji ? _data->findKanjiByName(i.first) : std::nullopt);
   }
-  if (total) {
-    printTotalAndUnique(name, total, frequency.size());
+  if (_total) {
+    printTotalAndUnique(_name, _total, frequency.size());
     if (isCommonKanji) { // only show percentage and type breakdown for 'Common Kanji'
-      out() << ", 100.00%\n";
-      printKanjiTypeCounts(frequency, total);
+      _os << ", 100.00%\n";
+      printKanjiTypeCounts(frequency);
     } else if (isKanji) // for 'Rare' and 'Non-UCD' Kanji show up to 'MaxExamples' entries in a single line
       printExamples(frequency);
     else
-      out() << '\n';
-    if (isUnrecognized || isKanji && showBreakdown) printBreakdown(name, showBreakdown, frequency, count);
+      _os << '\n';
+    if (isUnrecognized || isKanji && _showBreakdown) printBreakdown(frequency, count);
   }
-  return total;
 }
 
-void Stats::printHeaderInfo(const fs::path& top, const MBCharCount& count) const {
-  auto filename = top.filename();
-  log() << "Stats for: " << (filename.has_filename() ? filename.string() : top.parent_path().filename().string());
+void StatsPred::printHeaderInfo(const MBCharCount& count) {
+  auto filename = _top.filename();
+  _os << ">>> Stats for: " << (filename.has_filename() ? filename.string() : _top.parent_path().filename().string());
   if (count.files() > 1) {
-    out() << " (" << count.files() << (count.files() > 1 ? " files" : " file");
-    if (count.directories() > 1) out() << " from " << count.directories() << " directories";
-    out() << ')';
+    _os << " (" << count.files() << (count.files() > 1 ? " files" : " file");
+    if (count.directories() > 1) _os << " from " << count.directories() << " directories";
+    _os << ')';
   }
-  out() << " - showing " << MaxExamples << " most frequent kanji per type";
-  if (count.errors()) out() << ", errors: " << count.errors();
-  if (count.variants()) out() << ", variants: " << count.errors();
-  out() << '\n';
+  _os << " - showing " << MaxExamples << " most frequent kanji per type";
+  if (count.errors()) _os << ", errors: " << count.errors();
+  if (count.variants()) _os << ", variants: " << count.errors();
+  _os << '\n';
 }
 
-void Stats::printTotalAndUnique(const std::string& name, int total, int unique) const {
-  log() << std::right << std::setw(TypeNameWidth) << name << ": " << std::setw(TotalCountWidth) << total
-        << ", unique: " << std::setw(UniqueCountWidth) << unique;
+void StatsPred::printTotalAndUnique(const std::string& name, int total, int unique) {
+  _os << ">>> " << std::right << std::setw(TypeNameWidth) << name << ": " << std::setw(TotalCountWidth) << total
+      << ", unique: " << std::setw(UniqueCountWidth) << unique;
 }
 
-void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) const {
+void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
   std::map<KanjiTypes, int> totalKanjiPerType, uniqueKanjiPerType;
   std::map<KanjiTypes, std::vector<Count>> found;
   for (const auto& i : frequency) {
@@ -160,37 +234,36 @@ void Stats::printKanjiTypeCounts(const std::set<Count>& frequency, int total) co
     if (const auto i = uniqueKanjiPerType.find(t); i != uniqueKanjiPerType.end()) {
       auto totalForType = totalKanjiPerType[t];
       printTotalAndUnique(std::string("[") + toString(t) + "] ", totalForType, i->second);
-      out() << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
-            << asPercent(totalForType, total) << "%  (";
+      _os << ", " << std::setw(PercentWidth) << std::fixed << std::setprecision(PercentPrecision)
+          << asPercent(totalForType, _total) << "%  (";
       const auto& j = found[t];
       for (size_t k = 0; k < j.size(); ++k) {
-        if (k) out() << ", ";
-        out() << j[k].name << ' ' << j[k].count;
+        if (k) _os << ", ";
+        _os << j[k].name << ' ' << j[k].count;
       }
-      out() << ")\n";
+      _os << ")\n";
     }
 }
 
-void Stats::printExamples(const CountSet& frequency) const {
-  out() << std::setw(12) << '(';
+void StatsPred::printExamples(const CountSet& frequency) {
+  _os << std::setw(12) << '(';
   for (auto i = 0; auto& j : frequency) {
-    if (i) out() << ", ";
-    out() << j.name << ' ' << j.count;
+    if (i) _os << ", ";
+    _os << j.name << ' ' << j.count;
     if (++i == MaxExamples) break;
   }
-  out() << ")\n";
+  _os << ")\n";
 }
 
-void Stats::printBreakdown(const std::string& name, bool showBreakdown, const CountSet& frequency,
-                           const MBCharCount& count) const {
-  log() << "Showing Breakdown for '" << name << "':\n";
-  out() << "  " << (showBreakdown ? "Rank  [Val #] Freq, LV, Type (No.) ==" : "[Val #], Missing Unicode,")
-        << " Highest Count File\n";
+void StatsPred::printBreakdown(const CountSet& frequency, const MBCharCount& count) {
+  _os << ">>> Showing Breakdown for '" << _name << "':\n";
+  _os << "  " << (_showBreakdown ? "Rank  [Val #] Freq, LV, Type (No.) ==" : "[Val #], Missing Unicode,")
+      << " Highest Count File\n";
   DataFile::List missing;
   for (auto rank = 0; auto& i : frequency) {
-    out() << "  ";
-    if (showBreakdown) out() << std::left << std::setw(5) << ++rank << ' ';
-    out() << i;
+    _os << "  ";
+    if (_showBreakdown) _os << std::left << std::setw(5) << ++rank << ' ';
+    _os << i;
     if (!i.entry) {
       missing.push_back(i.name);
       if (const auto tags = count.tags(i.name); tags != nullptr) {
@@ -200,12 +273,12 @@ void Stats::printBreakdown(const std::string& name, bool showBreakdown, const Co
             maxCount = j.second;
             file = j.first;
           }
-        out() << (showBreakdown ? " == " : ", ") << file;
+        _os << (_showBreakdown ? " == " : ", ") << file;
       }
     }
-    out() << '\n';
+    _os << '\n';
   }
-  if (showBreakdown) DataFile::print(missing, "missing");
+  if (_showBreakdown) DataFile::print(_os, missing, "missing");
 }
 
 } // namespace kanji_tools
