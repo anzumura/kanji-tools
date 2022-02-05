@@ -155,22 +155,22 @@ TEST_F(StatsTest, NonUcdKanji) {
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
-  writeTestFile("あア西東南巽㵎㐁");
+  writeTestFile("ああア西西東南南南巽㵎㐁");
   const char* testArgs[] = {"", "testDir", "-b"};
   Stats stats(std::size(testArgs), testArgs, _data);
   // clang-format off
   const char* expected[] = {
     ">>> Stats for: testDir - showing 5 most frequent kanji per type",
-    ">>>         Hiragana:      1, unique:    1",
+    ">>>         Hiragana:      2, unique:    1",
     ">>>         Katakana:      1, unique:    1",
-    ">>>     Common Kanji:      4, unique:    4, 100.00%",
-    ">>>        [Jouyou] :      3, unique:    3,  75.00%  (東 1, 西 1, 南 1)",
-    ">>>        [Jinmei] :      1, unique:    1,  25.00%  (巽 1)",
+    ">>>     Common Kanji:      7, unique:    4, 100.00%",
+    ">>>        [Jouyou] :      6, unique:    3,  85.71%  (南 3, 西 2, 東 1)",
+    ">>>        [Jinmei] :      1, unique:    1,  14.29%  (巽 1)",
     ">>> Showing Breakdown for 'Common Kanji':",
     "  Rank  [Val Num] Freq, LV, Type",
-    "  1     [東    1]   37, N5, Jouyou",
-    "  2     [西    1]  259, N5, Jouyou",
-    "  3     [南    1]  341, N5, Jouyou",
+    "  1     [南    3]  341, N5, Jouyou",
+    "  2     [西    2]  259, N5, Jouyou",
+    "  3     [東    1]   37, N5, Jouyou",
     "  4     [巽    1] 2061, N1, Jinmei",
     ">>>       Rare Kanji:      1, unique:    1           (㵎 1)",
     ">>> Showing Breakdown for 'Rare Kanji':",
@@ -180,7 +180,7 @@ TEST_F(StatsTest, ShowBreakdown) {
     ">>> Showing Breakdown for 'Non-UCD Kanji':",
     "  Rank  [Val Num], Unicode, Highest Count File",
     "  1     [㐁    1],  U+3401, test.txt",
-    ">>> Total Kanji+Kana: 8 (Hiragana: 12.5%, Katakana: 12.5%, Common Kanji: 50.0%, Rare Kanji: 12.5%, Non-UCD Kanji: 12.5%)"};
+    ">>> Total Kanji+Kana: 12 (Hiragana: 16.7%, Katakana: 8.3%, Common Kanji: 58.3%, Rare Kanji: 8.3%, Non-UCD Kanji: 8.3%)"};
   // clang-format on
   std::string line;
   int count{0}, maxLines{std::size(expected)};
