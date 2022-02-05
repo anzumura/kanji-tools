@@ -3,9 +3,12 @@
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/stats/Stats.h>
 
+#include <fstream>
 #include <sstream>
 
 namespace kanji_tools {
+
+namespace fs = std::filesystem;
 
 class StatsTest : public ::testing::Test {
 protected:
@@ -14,11 +17,26 @@ protected:
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
-  StatsTest() : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)) {}
+  StatsTest()
+    : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)), _testDir("testDir"), _testFile(_testDir / "test.txt") {}
+
+  void SetUp() override {
+    if (fs::exists(_testDir)) TearDown();
+    EXPECT_TRUE(fs::create_directory(_testDir));
+  }
+  void TearDown() override { fs::remove_all(_testDir); }
+
+  void writeTestFile(const std::string& s) {
+    std::ofstream of(_testFile);
+    of << s;
+    of.close();
+  }
 
   std::stringstream _os;
   std::stringstream _es;
   const DataPtr _data;
+  const fs::path _testDir;
+  const fs::path _testFile;
 };
 
 TEST_F(StatsTest, PrintStatsForOneFile) {
@@ -109,6 +127,61 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
     ">>>        MB-Symbol:     45, unique:    9",
     ">>>        MB-Letter:   1704, unique:   39",
     ">>> Total Kanji+Kana: 283386 (Hiragana: 57.4%, Katakana: 8.7%, Common Kanji: 33.9%, Rare Kanji: 0.0%)"};
+  std::string line;
+  int count{0}, maxLines{std::size(expected)};
+  while (std::getline(_os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expected[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+}
+
+TEST_F(StatsTest, NonUcdKanji) {
+  std::string nonUcd = "㐁";
+  EXPECT_EQ(_data->getType(nonUcd), KanjiTypes::None);
+  writeTestFile(nonUcd);
+  const char* testArgs[] = {"", "testDir"};
+  Stats stats(std::size(testArgs), testArgs, _data);
+  const char* expected[] = {">>> Stats for: testDir - showing 5 most frequent kanji per type",
+                            ">>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)",
+                            ">>> Total Kanji+Kana: 1 (Non-UCD Kanji: 100.0%)"};
+  std::string line;
+  int count{0}, maxLines{std::size(expected)};
+  while (std::getline(_os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expected[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+}
+
+TEST_F(StatsTest, ShowBreakdown) {
+  writeTestFile("あア西東南巽㵎㐁");
+  const char* testArgs[] = {"", "testDir", "-b"};
+  Stats stats(std::size(testArgs), testArgs, _data);
+  // clang-format off
+  const char* expected[] = {
+    ">>> Stats for: testDir - showing 5 most frequent kanji per type",
+    ">>>         Hiragana:      1, unique:    1",
+    ">>>         Katakana:      1, unique:    1",
+    ">>>     Common Kanji:      4, unique:    4, 100.00%",
+    ">>>        [Jouyou] :      3, unique:    3,  75.00%  (東 1, 西 1, 南 1)",
+    ">>>        [Jinmei] :      1, unique:    1,  25.00%  (巽 1)",
+    ">>> Showing Breakdown for 'Common Kanji':",
+    "  Rank  [Val Num] Freq, LV, Type",
+    "  1     [東    1]   37, N5, Jouyou",
+    "  2     [西    1]  259, N5, Jouyou",
+    "  3     [南    1]  341, N5, Jouyou",
+    "  4     [巽    1] 2061, N1, Jinmei",
+    ">>>       Rare Kanji:      1, unique:    1           (㵎 1)",
+    ">>> Showing Breakdown for 'Rare Kanji':",
+    "  Rank  [Val Num] Freq, LV, Type",
+    "  1     [㵎    1]    0, --, Kentei",
+    ">>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)",
+    ">>> Showing Breakdown for 'Non-UCD Kanji':",
+    "  Rank  [Val Num], Unicode, Highest Count File",
+    "  1     [㐁    1],  U+3401, test.txt",
+    ">>> Total Kanji+Kana: 8 (Hiragana: 12.5%, Katakana: 12.5%, Common Kanji: 50.0%, Rare Kanji: 12.5%, Non-UCD Kanji: 12.5%)"};
+  // clang-format on
   std::string line;
   int count{0}, maxLines{std::size(expected)};
   while (std::getline(_os, line)) {
