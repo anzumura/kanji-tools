@@ -84,9 +84,9 @@ protected:
     EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Names);
   }
 
-  fs::path _testDir;
-  fs::path _testFile;
-  MockData _data;
+  const fs::path _testDir;
+  const fs::path _testFile;
+  const MockData _data;
 };
 
 TEST_F(KanjiTest, FrequencyKanji) {
