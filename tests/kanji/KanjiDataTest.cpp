@@ -291,6 +291,24 @@ TEST_F(KanjiDataTest, UcdChecks) {
   EXPECT_EQ((**northKanji).type(), KanjiTypes::Jouyou);
 }
 
+TEST_F(KanjiDataTest, CommonAndRareBlocks) {
+  // Check that only some Ucd (and one Kentei) Kanji are in the 'rare' blocks. All other types (like Jouyou,
+  // Jinmei, etc.) should be in the 'common' bloacks.
+  auto rareUcd = 0;
+  for (auto& i : _data.ucd().map()) {
+    if (isRareKanji(i.first)) {
+      if (auto t = _data.getType(i.first); t == KanjiTypes::Ucd)
+        ++rareUcd;
+      else if (t == KanjiTypes::Kentei)
+        EXPECT_EQ(i.first, "㵎"); // there's one rare Kentei Kanji (but not all sources agree on these lists)
+      else
+        FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);
+    } else if (!isCommonKanji(i.first))
+      FAIL() << "kanji '" << i.first << "' not recognized";
+  }
+  EXPECT_EQ(rareUcd, 1850);
+}
+
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data.ucd().map();
   EXPECT_EQ(ucd.size(), _data.kanjiNameMap().size());
