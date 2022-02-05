@@ -237,7 +237,7 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
   // Jinmei, etc.) are part of the 'Common' blocks (see KanjiDataTest.cpp 'CommonAndRareBlocks').
   std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
-                    f([](const auto& x) { return isCommonKanji(x); }, "Common Kanji"),
+                    f([this](const auto& x) { return isCommonKanji(x) && _data->ucd().find(x); }, "Common Kanji"),
                     f([this](const auto& x) { return isRareKanji(x) && _data->ucd().find(x); }, "Rare Kanji"),
                     f([this](const auto& x) { return isKanji(x) && !_data->ucd().find(x); }, "Non-UCD Kanji"),
                     f([](const auto& x) { return isMBPunctuation(x, false); }, "MB-Punctuation"),

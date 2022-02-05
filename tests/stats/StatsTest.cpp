@@ -137,14 +137,14 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
 }
 
 TEST_F(StatsTest, NonUcdKanji) {
-  std::string nonUcd = "㐁";
-  EXPECT_EQ(_data->getType(nonUcd), KanjiTypes::None);
-  writeTestFile(nonUcd);
+  // 'UCD' here refers to Kanji in 'data/ucd.txt' which is a filtered set of kanji
+  // from the original complete set (see scripts/parseUcdAllFlat.sh for details).
+  writeTestFile("丆㐁"); // include examples from both 'common' and 'rare' unicode blocks 
   const char* testArgs[] = {"", "testDir"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {">>> Stats for: testDir - showing 5 most frequent kanji per type",
-                            ">>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)",
-                            ">>> Total Kanji+Kana: 1 (Non-UCD Kanji: 100.0%)"};
+                            ">>>    Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)",
+                            ">>> Total Kanji+Kana: 2 (Non-UCD Kanji: 100.0%)"};
   std::string line;
   int count{0}, maxLines{std::size(expected)};
   while (std::getline(_os, line)) {
