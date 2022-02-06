@@ -502,7 +502,7 @@ Here is the output from processing a set of files containing lyrics for *中島�
 >>>   MB-Punctuation:    946, unique:   12
 >>>        MB-Symbol:     13, unique:    2
 >>>        MB-Letter:   1431, unique:   54
->>> Total Kanji+Kana: 208105 (Hiragana: 70.3%, Katakana: 4.5%, Common Kanji: 25.2%)
+>>> Total Kana+Kanji: 208105 (Hiragana: 70.3%, Katakana: 4.5%, Kanji: 25.2%)
 ```
 
 ## Aozora
