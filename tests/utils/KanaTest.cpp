@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/Kana.h>
+#include <kanji_tools/utils/Kana.h>
 #include <kanji_tools/utils/MBChar.h>
 
 namespace kanji_tools {
@@ -21,6 +21,19 @@ constexpr auto TotalKana = TotalMonographs + TotalDigraphs;
 constexpr auto TotalRomaji = TotalKana + RomajiVariants;
 
 } // namespace
+
+TEST(KanaTest, FindDakuten) {
+  EXPECT_EQ(Kana::findDakuten("か"), Kana::OptString("が"));
+  EXPECT_EQ(Kana::findDakuten("シ"), Kana::OptString("ジ"));
+  EXPECT_EQ(Kana::findDakuten("う"), Kana::OptString("ゔ"));
+  EXPECT_FALSE(Kana::findDakuten("ま"));
+}
+
+TEST(KanaTest, FindHanDakuten) {
+  EXPECT_EQ(Kana::findHanDakuten("は"), Kana::OptString("ぱ"));
+  EXPECT_EQ(Kana::findHanDakuten("ホ"), Kana::OptString("ポ"));
+  EXPECT_FALSE(Kana::findHanDakuten("さ"));
+}
 
 TEST(KanaTest, CheckHiragana) {
   auto& sourceMap = Kana::getMap(CharType::Hiragana);

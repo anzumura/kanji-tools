@@ -115,12 +115,18 @@ template<size_t N, typename... Ts>
   return inRange(c, t) || inRange(c, args...);
 }
 
+inline constexpr auto CombiningMarkVoiced = U'\x3099', CombiningMarkSemiVoiced = U'\x309a'; 
+
+[[nodiscard]] constexpr auto isNonSpacing(char32_t c) noexcept {
+  return inRange(c, NonSpacingBlocks) || c == CombiningMarkVoiced || c == CombiningMarkSemiVoiced;
+}
+
 // Return true if the first 'MB character' is in the given blocks, empty string will return false and
 // a string longer than one 'MB characer' will also return false unless 'checkLengthOne' is false.
 template<typename... T> [[nodiscard]] inline auto inWCharRange(const std::string& s, bool checkLengthOne, T... t) {
   if (s.length() > 1 && (!checkLengthOne || s.length() < 9))
     if (const auto w = fromUtf8(s);
-        checkLengthOne ? w.length() == 1 || w.length() == 2 && inRange(w[1], NonSpacingBlocks) : w.length() >= 1)
+        checkLengthOne ? w.length() == 1 || w.length() == 2 && isNonSpacing(w[1]) : w.length() >= 1)
       return inRange(w[0], t...);
   return false;
 }
@@ -129,7 +135,7 @@ template<typename... T> [[nodiscard]] inline auto inWCharRange(const std::string
 template<typename... T> [[nodiscard]] inline auto inWCharRange(const std::string& s, T... t) {
   // an 'inRange' character can be followed by a 'variation selector'
   for (auto allowNonSpacing = false; const auto i : fromUtf8(s))
-    if (allowNonSpacing && inRange(i, NonSpacingBlocks))
+    if (allowNonSpacing && isNonSpacing(i))
       allowNonSpacing = false;
     else if (inRange(i, t...))
       allowNonSpacing = true;
@@ -198,7 +204,7 @@ template<typename... T> [[nodiscard]] inline auto inWCharRange(const std::string
                       SymbolBlocks, LetterBlocks);
 }
 [[nodiscard]] inline auto isNonSpacing(const std::string& s, bool checkLengthOne = true) {
-  return inWCharRange(s, checkLengthOne, NonSpacingBlocks);
+  return (checkLengthOne ? s.length() == 1 : s.length() > 0) && isNonSpacing(s[0]);
 }
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as variation selectors.

@@ -55,10 +55,7 @@ constexpr std::array WideBlocks = {
 [[nodiscard]] inline auto displayLength(const std::string& s) {
   size_t result = 0;
   for (const auto i : fromUtf8(s))
-    if (inRange(i, WideBlocks))
-      result += 2;
-    else if (!inRange(i, NonSpacingBlocks))
-      ++result;
+    if (!isNonSpacing(i)) result += inRange(i, WideBlocks) ? 2 : 1;
   return result;
 }
 

@@ -78,6 +78,17 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(KanaRange[5], KatakanaBlocks[1].end);
 }
 
+TEST(UnicodeBlockTest, IsNonSpacing) {
+  auto s = std::u32string(U"\x3078\x3099"); // へ and dakuten combining mark
+  EXPECT_EQ(s.length(), 2);
+  EXPECT_FALSE(isNonSpacing(s[0]));
+  EXPECT_TRUE(isNonSpacing(s[1]));
+  s = std::u32string(U"\x3078\x309a"); // へ and han=dakuten combining mark
+  EXPECT_EQ(s.length(), 2);
+  EXPECT_FALSE(isNonSpacing(s[0]));
+  EXPECT_TRUE(isNonSpacing(s[1]));
+}
+
 TEST(UnicodeBlockTest, IsKana) {
   EXPECT_TRUE(isHiragana("ゑ"));
   EXPECT_FALSE(isHiragana("ゑあ"));

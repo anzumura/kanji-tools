@@ -1,3 +1,4 @@
+#include <kanji_tools/utils/Kana.h>
 #include <kanji_tools/utils/MBChar.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -48,14 +49,34 @@ bool MBChar::next(std::string& result, bool onlyMB) {
       }
     } else if (MBChar::isValid(_location, false)) {
       // only modify 'result' if '_location' is the start of a valid UTF-8 group
-      result = *_location++;
-      for (x = Bit2; x && firstOfGroup & x; x >>= 1) result += *_location++;
-      if (!isVariationSelector(result))
+      std::string r({*_location++});
+      for (x = Bit2; x && firstOfGroup & x; x >>= 1) r += *_location++;
+      if (!isVariationSelector(r)) {
         if (std::string s; doPeek(s, onlyMB, _location, true) && isVariationSelector(s)) {
-          result += s;
+          result = r + s;
           _location += 3;
           ++_variants;
-        }
+        } else if (s == CombiningVoiced) {
+          _location += 3;
+          if (const auto i = Kana::findDakuten(r); i) {
+            ++_combiningMarks;
+            result = *i;
+          } else {
+            result = r;
+            ++_errors;
+          }
+        } else if (s == CombiningSemiVoiced) {
+          _location += 3;
+          if (const auto i = Kana::findHanDakuten(r); i) {
+            ++_combiningMarks;
+            result = *i;
+          } else {
+            result = r;
+            ++_errors;
+          }
+        } else
+          result = r;
+      }
       return true;
     } else
       ++_errors;
@@ -115,6 +136,7 @@ int MBCharCount::add(const std::string& s, const OptString& tag) {
     }
   _errors += c.errors();
   _variants += c.variants();
+  _combiningMarks += c.combiningMarks();
   return added;
 }
 

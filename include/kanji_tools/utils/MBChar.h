@@ -36,6 +36,17 @@ public:
   }
   [[nodiscard]] static auto isVariationSelector(const std::string& s) { return isVariationSelector(s.c_str()); }
 
+  inline static const auto CombiningVoiced = std::string("\xe3\x82\x99");     // U+3099
+  inline static const auto CombiningSemiVoiced = std::string("\xe3\x82\x9a"); // U+309A
+
+  [[nodiscard]] static auto isCombiningMark(const unsigned char* s) {
+    return s && *s++ == 0xe3 && *s++ == 0x82 && (*s == 0x99 || *s == 0x9a);
+  }
+  [[nodiscard]] static auto isCombiningMark(const char* s) {
+    return isCombiningMark(reinterpret_cast<const unsigned char*>(s));
+  }
+  [[nodiscard]] static auto isCombiningMark(const std::string& s) { return isCombiningMark(s.c_str()); }
+
   // 'length' with onlyMB=true only counts multi-byte 'sequence start' bytes, otherwise length
   // includes both multi-byte sequence starts as well as regular single byte values, i.e.,
   // simply don't add 'continuation' bytes to length (this done by using '11 00 00 00' to grab the
@@ -52,7 +63,7 @@ public:
     // if the next 3 bytes represent a 'variation selector'
     if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
       while (*i)
-        if (skipVariationSelectors && isVariationSelector(i))
+        if (isCombiningMark(i) || skipVariationSelectors && isVariationSelector(i))
           i += 3;
         else if (onlyMB)
           len += (*i++ & TwoBits) == TwoBits;
@@ -126,18 +137,21 @@ public:
     _location = _data.c_str();
     _errors = 0;
     _variants = 0;
+    _combiningMarks = 0;
   }
 
   // 'next' populates 'result' with the full multi-byte character (so could be more than one byte)
   // returns true if result was populated. This function also supports 'variation selectors', i.e.,
   // when a multi-byte character is added to 'result' the next character is also inspected and if
-  // it's a variation selector it will be added as well.
+  // it's a variation selector it will be added as well. Plain Kana followed by 'Combining Marks'
+  // (U+3099, U+309A) are converted to single values, i.e., U+306F (は) + U+3099 maps to U+3070 (ば).
   bool next(std::string& result, bool onlyMB = true);
 
   // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
   [[nodiscard]] auto peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
+  [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
   [[nodiscard]] auto length(bool onlyMB = true) const { return length(_data, onlyMB); }
   [[nodiscard]] auto valid(bool checkLengthOne = true) const { return validateUtf8(_data, checkLengthOne); }
   [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
@@ -148,8 +162,9 @@ private:
 
   const std::string _data;
   const char* _location = _data.c_str();
-  int _errors = 0;   // '_errors' keeps track of how many invalid bytes were encountered during iteration
-  int _variants = 0; // '_variants' keeps track of how many 'Variation Selector's were found
+  int _errors = 0;         // '_errors' keeps track of how many invalid bytes were encountered during iteration
+  int _variants = 0;       // '_variants' keeps track of how many 'Variation Selector's were found
+  int _combiningMarks = 0; // '_variants' keeps track of how many 'Combining Marks's were found
 };
 
 // 'MBCharCount' counts unique multi-byte characters in strings passed to the 'add' functions
@@ -211,6 +226,7 @@ public:
   [[nodiscard]] auto& lastReplaceTag() const { return _lastReplaceTag; }
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
+  [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
   [[nodiscard]] auto& map() const { return _map; }
   [[nodiscard]] auto debug() const { return _debug; }
 private:
@@ -239,6 +255,7 @@ private:
   int _directories = 0;
   int _errors = 0;
   int _variants = 0;
+  int _combiningMarks = 0;
   std::string _lastReplaceTag;
   int _replaceCount = 0;
   const OptRegex _find;

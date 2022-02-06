@@ -1,5 +1,4 @@
-#include <kanji_tools/kana/Kana.h>
-#include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/utils/Kana.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 #include <iostream>

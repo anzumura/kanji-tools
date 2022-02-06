@@ -317,6 +317,29 @@ TEST_F(MBCharCountTest, AddWithVariants) {
   EXPECT_EQ(c.variants(), 2);
 }
 
+TEST_F(MBCharCountTest, AddWithCombiningMarks) {
+  std::string s1("て\xe3\x82\x99"); // with dakuten
+  std::string s2("フ\xe3\x82\x9a"); // with han-dakuten
+  EXPECT_EQ(c.add(s1), 1);
+  EXPECT_EQ(c.add(s2), 1);
+  EXPECT_EQ(c.combiningMarks(), 2);
+  std::string bad("や\xe3\x82\x9aく"); // error case, but still adds や and く
+  EXPECT_EQ(c.add(bad), 2);
+  EXPECT_EQ(c.combiningMarks(), 2);
+  EXPECT_EQ(c.errors(), 1);
+  std::string noMarks("愛詞（あいことば）");
+  std::string marks("愛詞（あいことば）");
+  EXPECT_EQ(noMarks.length(), 27);
+  EXPECT_EQ(marks.length(), 30);
+  EXPECT_EQ(MBChar::length(noMarks), 9);
+  EXPECT_EQ(MBChar::length(marks), 9);
+  EXPECT_EQ(c.add(noMarks), 9);
+  EXPECT_EQ(c.combiningMarks(), 2);
+  EXPECT_EQ(c.add(marks), 9);
+  EXPECT_EQ(c.combiningMarks(), 3);
+  EXPECT_EQ(c.errors(), 1);
+}
+
 TEST_F(MBCharCountTest, AddWithPredicate) {
   auto pred = [](const auto& s) { return s != "。" && s != "は"; };
   MBCharCountIf cPred(pred);

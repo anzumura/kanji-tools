@@ -25,6 +25,9 @@ TEST(DisplayLengthTest, DisplayLength) {
   EXPECT_EQ(s.length(), 6);             // two 3-byte sequences
   EXPECT_EQ(toUnicode(s), "9038 FE01"); // 'FE01' is a variation selector
   EXPECT_EQ(displayLength(s), 2);       // should be 2 for the single displayable wide char
+  // don't include combining marks
+  s = "と\xe3\x82\x99ヒ\xe3\x82\x9a";
+  EXPECT_EQ(displayLength(s), 4);
   // try a character beyond BMP
   EXPECT_EQ(displayLength("𠮟"), 2);
 }

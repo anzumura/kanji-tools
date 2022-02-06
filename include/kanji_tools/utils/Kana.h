@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_KANA_KANA_H
-#define KANJI_TOOLS_KANA_KANA_H
+#ifndef KANJI_TOOLS_UTILS_KANA_H
+#define KANJI_TOOLS_UTILS_KANA_H
 
 #include <kanji_tools/utils/EnumBitmask.h>
 
@@ -67,6 +67,36 @@ template<> inline constexpr bool is_bitmask<ConvertFlags> = true;
 // relationships between unaccented (plain) and accented (dakuten and han-dakuten) versions.
 class Kana {
 public:
+  using Map = std::map<std::string, const class Kana*>;
+  [[nodiscard]] static auto& getMap(CharType t) {
+    switch (t) {
+    case CharType::Romaji: return _romajiMap;
+    case CharType::Hiragana: return _hiraganaMap;
+    case CharType::Katakana: return _katakanaMap;
+    }
+    __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
+  }
+
+  using OptString = std::optional<std::string>;
+
+  // find corresponding 'Dakuten' Kana, 's' should be a non-accented single Hiragana or Katakana letter
+  static OptString findDakuten(const std::string& s) {
+    auto i = _hiraganaMap.find(s);
+    if (i != _hiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
+    i = _katakanaMap.find(s);
+    if (i != _katakanaMap.end()) return i->second->dakuten(CharType::Katakana);
+    return std::nullopt;
+  }
+
+  // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single Hiragana or Katakana letter
+  static OptString findHanDakuten(const std::string& s) {
+    auto i = _hiraganaMap.find(s);
+    if (i != _hiraganaMap.end()) return i->second->hanDakuten(CharType::Hiragana);
+    i = _katakanaMap.find(s);
+    if (i != _katakanaMap.end()) return i->second->hanDakuten(CharType::Katakana);
+    return std::nullopt;
+  }
+
   // 'RepeatMark' is for handling repeating Kana marks (一の時点) when source is Hiragana or Katakana.
   class RepeatMark {
   public:
@@ -100,16 +130,6 @@ public:
   // in some (non-standard) Hiragana words like らーめん.
   inline static const std::string ProlongMark = "ー";
 
-  using Map = std::map<std::string, const class Kana*>;
-  [[nodiscard]] static auto& getMap(CharType t) {
-    switch (t) {
-    case CharType::Romaji: return _romajiMap;
-    case CharType::Hiragana: return _hiraganaMap;
-    case CharType::Katakana: return _katakanaMap;
-    }
-    __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
-  }
-
   using List = std::vector<std::string>;
   Kana(const char* romaji, const char* hiragana, const char* katakana, const char* hepburn = nullptr,
        const char* kunrei = nullptr)
@@ -132,6 +152,18 @@ public:
   // 'dakutenKana' and 'hanDakutenKana' are overridden by derived classes to return the accented versions
   [[nodiscard]] virtual const Kana* dakutenKana() const { return nullptr; }
   [[nodiscard]] virtual const Kana* hanDakutenKana() const { return nullptr; }
+
+  [[nodiscard]] OptString dakuten(CharType t) const {
+    auto i = dakutenKana();
+    if (i) return i->get(t, ConvertFlags::None);
+    return {};
+  }
+
+  [[nodiscard]] OptString hanDakuten(CharType t) const {
+    auto i = hanDakutenKana();
+    if (i) return i->get(t, ConvertFlags::None);
+    return {};
+  }
 
   // 'plainKana' returns the unaccented version of a Kana - this will return return 'nullptr' if
   // instance is already an unaccented version or is a combination that doesn't have an equivalent
@@ -262,4 +294,4 @@ private:
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_KANA_KANA_H
+#endif // KANJI_TOOLS_UTILS_KANA_H
