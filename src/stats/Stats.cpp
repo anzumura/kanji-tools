@@ -74,6 +74,7 @@ public:
 
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto total() const { return _total; }
+  [[nodiscard]] auto isKanji() const { return _isKanji; }
 private:
   // 'DisplayValues' are for ostream 'set' functions
   enum IntDisplayValues { UniqueCountWidth = 4, TotalCountWidth = 6, TypeNameWidth = 16 };
@@ -247,19 +248,16 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
   for (auto& i : totals) out() << i.first.get();
   auto total = 0;
   for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].second->total();
-  log() << "Total Kanji+Kana: " << total;
+  log() << "Total Kana+Kanji: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);
-    auto totalPrinted = false;
+    auto totalKanji = 0;
     for (auto i = 0; i < IncludeInTotals; ++i)
-      if (totals[i].second->total()) {
-        if (totalPrinted)
-          out() << ", ";
-        else
-          totalPrinted = true;
-        out() << totals[i].second->name() << ": " << asPercent(totals[i].second->total(), total) << "%";
-      }
-    out() << ')';
+      if (totals[i].second->isKanji())
+        totalKanji += totals[i].second->total();
+      else if (totals[i].second->total())
+        out() << totals[i].second->name() << ": " << asPercent(totals[i].second->total(), total) << "%, ";
+    out() << "Kanji: " << asPercent(totalKanji, total) << "%)";
   }
   out() << '\n';
 }
