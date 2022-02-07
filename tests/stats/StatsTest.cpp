@@ -43,7 +43,8 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
   const char* testArgs[] = {"", "../../../tests/stats/sample-data/wiki-articles/02-中島みゆき.txt"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
-    ">>> Stats for: 02-中島みゆき.txt - showing 5 most frequent kanji per type",
+    ">>> Stats for: '02-中島みゆき.txt' - showing top 5 Kanji per type",
+    ">>> Furigana Removed: 6, Combining Marks Replaced: 0, Variation Selectors: 0",
     ">>>         Hiragana:   7990, unique:   71",
     ">>>         Katakana:   7118, unique:   80",
     ">>>     Common Kanji:   9699, unique: 1034, 100.00%",
@@ -72,7 +73,8 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
   const char* testArgs[] = {"", "../../../tests/stats/sample-data/wiki-articles"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
-    ">>> Stats for: wiki-articles (3 files) - showing 5 most frequent kanji per type",
+    ">>> Stats for: 'wiki-articles' (3 files) - showing top 5 Kanji per type",
+    ">>> Furigana Removed: 39, Combining Marks Replaced: 0, Variation Selectors: 0",
     ">>>         Hiragana:  43197, unique:   79",
     ">>>         Katakana:  24442, unique:   83",
     ">>>     Common Kanji:  45207, unique: 1995, 100.00%",
@@ -102,7 +104,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   Stats stats(std::size(testArgs), testArgs, _data);
   std::string line;
   auto found = false;
-  while (!found && std::getline(_os, line)) found = line.starts_with(">>> Stats for: wiki-articles (3 files)");
+  while (!found && std::getline(_os, line)) found = line.starts_with(">>> Stats for: 'wiki-articles' (3 files)");
   EXPECT_TRUE(found);
 }
 
@@ -110,7 +112,8 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
   const char* testArgs[] = {"", "../../../tests/stats/sample-data"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
-    ">>> Stats for: sample-data (5 files from 3 directories) - showing 5 most frequent kanji per type",
+    ">>> Stats for: 'sample-data' (5 files from 3 directories) - showing top 5 Kanji per type",
+    ">>> Furigana Removed: 3397, Combining Marks Replaced: 0, Variation Selectors: 0",
     ">>>         Hiragana: 162560, unique:   80",
     ">>>         Katakana:  24689, unique:   83",
     ">>>     Common Kanji:  96135, unique: 2634, 100.00%",
@@ -142,7 +145,7 @@ TEST_F(StatsTest, NonUcdKanji) {
   writeTestFile("丆㐁"); // include examples from both 'common' and 'rare' unicode blocks
   const char* testArgs[] = {"", "testDir"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {">>> Stats for: testDir - showing 5 most frequent kanji per type",
+  const char* expected[] = {">>> Stats for: 'testDir' - showing top 5 Kanji per type",
                             ">>>    Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)",
                             ">>> Total Kana+Kanji: 2 (Kanji: 100.0%)"};
   std::string line;
@@ -158,7 +161,7 @@ TEST_F(StatsTest, ShowBreakdown) {
   writeTestFile("ああア西西東南南南巽㵎㐁");
   const char* testArgs[] = {"", "testDir", "-b"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {">>> Stats for: testDir - showing 5 most frequent kanji per type",
+  const char* expected[] = {">>> Stats for: 'testDir' - showing top 5 Kanji per type",
                             ">>>         Hiragana:      2, unique:    1",
                             ">>>         Katakana:      1, unique:    1",
                             ">>>     Common Kanji:      7, unique:    4, 100.00%",

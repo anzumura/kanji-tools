@@ -131,15 +131,17 @@ template<typename Pred> std::string StatsPred::run(const Pred& pred, bool verbos
 
 void StatsPred::printHeaderInfo(const MBCharCount& count) {
   auto filename = _top.filename();
-  _os << ">>> Stats for: " << (filename.has_filename() ? filename.string() : _top.parent_path().filename().string());
+  _os << ">>> Stats for: '" << (filename.has_filename() ? filename : _top.parent_path().filename()).string() << '\'';
   if (count.files() > 1) {
     _os << " (" << count.files() << (count.files() > 1 ? " files" : " file");
     if (count.directories() > 1) _os << " from " << count.directories() << " directories";
     _os << ')';
   }
-  _os << " - showing " << MaxExamples << " most frequent kanji per type";
-  if (count.errors()) _os << ", errors: " << count.errors();
-  if (count.variants()) _os << ", variants: " << count.errors();
+  _os << " - showing top " << MaxExamples << " Kanji per type";
+  if (count.replaceCount() || count.combiningMarks() || count.variants())
+    _os << "\n>>> Furigana Removed: " << count.replaceCount()
+        << ", Combining Marks Replaced: " << count.combiningMarks() << ", Variation Selectors: " << count.variants();
+  if (count.errors()) _os << ", Errors: " << count.errors();
   _os << '\n';
 }
 

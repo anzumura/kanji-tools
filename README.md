@@ -490,7 +490,8 @@ Here is the output from processing a set of files containing lyrics for *中島�
 
 ```;
 ~/cdev/kanji-tools $ ./build/apps/kanjiStats ~/songs
->>> Stats for: songs (634 files from 62 directories) - showing 5 most frequent kanji per type
+>>> Stats for: songs (634 files from 62 directories) - showing top 5 most Kanji per type
+>>> Furigana Removed: 435, Combining Marks Replaced: 253, Variation Selectors: 0
 >>>         Hiragana: 146382, unique:   77
 >>>         Katakana:   9317, unique:   79
 >>>     Common Kanji:  52406, unique: 1642, 100.00%
