@@ -40,6 +40,15 @@ MBChar::Results MBChar::validateUtf8(const char* s, bool checkLengthOne) {
 }
 
 bool MBChar::next(std::string& result, bool onlyMB) {
+  const auto combiningMark = [this](const auto& r, const auto& i) {
+    _location += 3;
+    if (i) {
+      ++_combiningMarks;
+      return *i;
+    }
+    ++_errors;
+    return r;
+  };
   for (; *_location; ++_location) {
     const unsigned char firstOfGroup = *_location;
     if (unsigned char x = firstOfGroup & TwoBits; !x || x == Bit2) { // not a multi byte character
@@ -53,29 +62,13 @@ bool MBChar::next(std::string& result, bool onlyMB) {
       for (x = Bit2; x && firstOfGroup & x; x >>= 1) r += *_location++;
       if (!isVariationSelector(r)) {
         if (std::string s; doPeek(s, onlyMB, _location, true) && isVariationSelector(s)) {
-          result = r + s;
           _location += 3;
           ++_variants;
-        } else if (s == CombiningVoiced) {
-          _location += 3;
-          if (const auto i = Kana::findDakuten(r); i) {
-            ++_combiningMarks;
-            result = *i;
-          } else {
-            result = r;
-            ++_errors;
-          }
-        } else if (s == CombiningSemiVoiced) {
-          _location += 3;
-          if (const auto i = Kana::findHanDakuten(r); i) {
-            ++_combiningMarks;
-            result = *i;
-          } else {
-            result = r;
-            ++_errors;
-          }
+          result = r + s;
         } else
-          result = r;
+          result = s == CombiningVoiced ? combiningMark(r, Kana::findDakuten(r))
+            : s == CombiningSemiVoiced  ? combiningMark(r, Kana::findHanDakuten(r))
+                                        : r;
       }
       return true;
     } else
