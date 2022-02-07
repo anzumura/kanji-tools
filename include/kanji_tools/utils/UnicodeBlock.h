@@ -203,9 +203,6 @@ template<typename... T> [[nodiscard]] inline auto inWCharRange(const std::string
   return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks,
                       SymbolBlocks, LetterBlocks);
 }
-[[nodiscard]] inline auto isNonSpacing(const std::string& s, bool checkLengthOne = true) {
-  return (checkLengthOne ? s.length() == 1 : s.length() > 0) && isNonSpacing(s[0]);
-}
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as variation selectors.
 constexpr wchar_t WideDash = L'-';
