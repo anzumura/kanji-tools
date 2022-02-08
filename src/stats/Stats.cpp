@@ -1,5 +1,5 @@
-#include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/Kanji.h>
+#include <kanji_tools/stats/MBCount.h>
 #include <kanji_tools/stats/Stats.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -82,11 +82,11 @@ private:
 
   using CountSet = std::set<Count>;
 
-  void printHeaderInfo(const MBCharCount&);
+  void printHeaderInfo(const MBCount&);
   void printTotalAndUnique(const std::string& name, int total, int unique);
   void printKanjiTypeCounts(const std::set<Count>&);
   void printExamples(const CountSet&);
-  void printBreakdown(const CountSet&, const MBCharCount&);
+  void printBreakdown(const CountSet&, const MBCount&);
 
   const DataPtr _data;
   const fs::path& _top;
@@ -106,8 +106,8 @@ template<typename Pred> std::string StatsPred::run(const Pred& pred, bool verbos
 
   if (isHiragana && verbose) _os << ">>> Showing all furigana replacements:\n";
 
-  MBCharCountIf count(pred, removeFurigana ? std::optional(MBCharCount::RemoveFurigana) : std::nullopt,
-                      MBCharCount::DefaultReplace, isHiragana && verbose);
+  MBCountIf count(pred, removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt,
+                      MBCount::DefaultReplace, isHiragana && verbose);
   count.addFile(_top, _isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(count);
   CountSet frequency;
@@ -129,7 +129,7 @@ template<typename Pred> std::string StatsPred::run(const Pred& pred, bool verbos
   return _os.str();
 }
 
-void StatsPred::printHeaderInfo(const MBCharCount& count) {
+void StatsPred::printHeaderInfo(const MBCount& count) {
   auto filename = _top.filename();
   _os << ">>> Stats for: '" << (filename.has_filename() ? filename : _top.parent_path().filename()).string() << '\'';
   if (count.files() > 1) {
@@ -184,7 +184,7 @@ void StatsPred::printExamples(const CountSet& frequency) {
   _os << ")\n";
 }
 
-void StatsPred::printBreakdown(const CountSet& frequency, const MBCharCount& count) {
+void StatsPred::printBreakdown(const CountSet& frequency, const MBCount& count) {
   _os << ">>> Showing Breakdown for '" << _name << "':\n  Rank  [Val Num]"
       << (_isKanji && !_name.starts_with("Non-UCD") ? " Freq, LV, Type" : ", Unicode, Highest Count File") << '\n';
   for (auto rank = 0; auto& i : frequency) {
