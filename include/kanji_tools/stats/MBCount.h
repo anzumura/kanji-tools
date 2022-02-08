@@ -7,7 +7,6 @@
 #include <map>
 #include <optional>
 #include <regex>
-#include <string>
 
 namespace kanji_tools {
 
@@ -109,8 +108,7 @@ private:
 
 template<typename Pred> class MBCountIf : public MBCount {
 public:
-  MBCountIf(Pred pred, OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace,
-                bool debug = false)
+  MBCountIf(Pred pred, OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace, bool debug = false)
     : MBCount(find, replace, debug), _pred(pred) {}
 private:
   [[nodiscard]] bool allowAdd(const std::string& token) const override { return _pred(token); }

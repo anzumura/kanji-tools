@@ -3,11 +3,7 @@
 
 #include <kanji_tools/utils/MBUtils.h>
 
-#include <filesystem>
-#include <map>
 #include <optional>
-#include <regex>
-#include <string>
 
 namespace kanji_tools {
 
