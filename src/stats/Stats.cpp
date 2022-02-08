@@ -106,8 +106,8 @@ template<typename Pred> std::string StatsPred::run(const Pred& pred, bool verbos
 
   if (isHiragana && verbose) _os << ">>> Showing all furigana replacements:\n";
 
-  MBCountIf count(pred, removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt,
-                      MBCount::DefaultReplace, isHiragana && verbose);
+  MBCountIf count(pred, removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt, MBCount::DefaultReplace,
+                  isHiragana && verbose);
   count.addFile(_top, _isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(count);
   CountSet frequency;

@@ -12,7 +12,7 @@ const std::string AlreadyInChoices("' already in choices");
 } // namespace
 
 char Choice::getOneChar() {
-  struct termios settings{};
+  struct termios settings {};
   if (tcgetattr(0, &settings) < 0) perror("tcsetattr()");
   // turn raw mode on - allows getting a single char from terminal without waiting 'return'
   settings.c_lflag &= ~static_cast<tcflag_t>(ICANON);
