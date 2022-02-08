@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
+#include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/utils/DisplayLength.h>
-#include <kanji_tools/utils/MBChar.h>
 
 #include <type_traits>
 

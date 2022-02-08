@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/Kana.h>
-#include <kanji_tools/utils/MBChar.h>
+#include <kanji_tools/kana/Kana.h>
+#include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 #include <fstream>

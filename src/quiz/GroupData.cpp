@@ -1,7 +1,7 @@
+#include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/DisplayLength.h>
-#include <kanji_tools/utils/MBChar.h>
 
 #include <sstream>
 

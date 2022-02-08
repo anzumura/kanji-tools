@@ -1,7 +1,7 @@
 #ifndef KANJI_TOOLS_KANA_KANA_CONVERT_H
 #define KANJI_TOOLS_KANA_KANA_CONVERT_H
 
-#include <kanji_tools/utils/Kana.h>
+#include <kanji_tools/kana/Kana.h>
 
 #include <set>
 

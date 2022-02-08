@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/Kana.h>
-#include <kanji_tools/utils/MBChar.h>
+#include <kanji_tools/kana/Kana.h>
+#include <kanji_tools/kana/MBChar.h>
 
 namespace kanji_tools {
 

@@ -1,7 +1,6 @@
 #include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/MBChar.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/kana/MBChar.h>
 
 #include <sstream>
 

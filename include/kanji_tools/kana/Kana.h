@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_UTILS_KANA_H
-#define KANJI_TOOLS_UTILS_KANA_H
+#ifndef KANJI_TOOLS_KANA_KANA_H
+#define KANJI_TOOLS_KANA_KANA_H
 
 #include <kanji_tools/utils/EnumBitmask.h>
 
@@ -294,4 +294,4 @@ private:
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_UTILS_KANA_H
+#endif // KANJI_TOOLS_KANA_KANA_H

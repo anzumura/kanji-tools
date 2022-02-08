@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/MBChar.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/kana/MBChar.h>
 
 #include <fstream>
 
