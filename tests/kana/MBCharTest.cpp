@@ -35,14 +35,50 @@ TEST(MBCharTest, GetFirst) {
   EXPECT_EQ(r, s);
 }
 
-TEST(MBCharTest, GetNext) {
+TEST(MBCharTest, Next) {
   MBChar s("todayトロントの天気is nice。");
   std::string x;
-  std::array expected = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
-  for (const auto& i : expected) {
+  for (const std::array expected = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"}; auto& i : expected) {
+    EXPECT_TRUE(s.peek(x));
+    EXPECT_EQ(x, i);
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
+  EXPECT_FALSE(s.peek(x));
+  EXPECT_FALSE(s.next(x));
+}
+
+TEST(MBCharTest, NextWithVariationSelectors) {
+  MBChar s("憎︀憎む朗︀");
+  std::string x;
+  for (const std::array expected = {"憎︀", "憎", "む", "朗︀"}; auto& i : expected) {
+    EXPECT_TRUE(s.peek(x));
+    EXPECT_EQ(x, i);
+    EXPECT_TRUE(s.next(x));
+    EXPECT_EQ(x, i);
+  }
+  EXPECT_FALSE(s.peek(x));
+  EXPECT_FALSE(s.next(x));
+}
+
+TEST(MBCharTest, NextWithCombiningMarks) {
+  std::string ga("ガ"), gi("ギ"), combinedGi("ギ"), gu("グ"), po("ポ"), combinedPo("ポ");
+  EXPECT_EQ(ga.length(), 3);
+  EXPECT_EQ(combinedGi.length(), 6);
+  EXPECT_EQ(gu.length(), 3);
+  EXPECT_EQ(combinedPo.length(), 6);
+  const std::string c = ga + combinedGi + gu + combinedPo;
+  EXPECT_EQ(c.length(), 18);
+  MBChar s(c);
+  std::string x;
+  // combining marks ashould get replaced by normal versions
+  for (const std::array expected = {ga, gi, gu, po}; auto& i : expected) {
+    EXPECT_TRUE(s.peek(x));
+    EXPECT_EQ(x, i);
+    EXPECT_TRUE(s.next(x));
+    EXPECT_EQ(x, i);
+  }
+  EXPECT_FALSE(s.peek(x));
   EXPECT_FALSE(s.next(x));
 }
 
