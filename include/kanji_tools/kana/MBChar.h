@@ -51,15 +51,15 @@ public:
   // - length("abc", false) = 3
   // - length("大blue空") = 2
   // - length("大blue空", false) = 6
-  // Note: some Kanji can be followed by a 'variation selector' - these are not counted by default
-  // since they are considered part of the previous 'MB character' (as a modifier).
-  [[nodiscard]] static auto length(const char* s, bool onlyMB = true, bool skipVariationSelectors = true) {
+  // Note: some Kanji can be followed by a 'variation selector' or 'combining mark' - these are not
+  // counted since they are considered part of the previous 'MB character' (as a modifier).
+  [[nodiscard]] static auto length(const char* s, bool onlyMB = true) {
     int len = 0;
     // doing one 'reinterpret_cast' at the beginning saves doing a bunch of static_casts when checking
     // if the next 3 bytes represent a 'variation selector'
     if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
       while (*i)
-        if (isCombiningMark(i) || skipVariationSelectors && isVariationSelector(i))
+        if (isCombiningMark(i) || isVariationSelector(i))
           i += 3;
         else if (onlyMB)
           len += (*i++ & TwoBits) == TwoBits;
@@ -68,8 +68,8 @@ public:
     }
     return len;
   }
-  [[nodiscard]] static auto length(const std::string& s, bool onlyMB = true, bool skipVariationSelectors = true) {
-    return length(s.c_str(), onlyMB, skipVariationSelectors);
+  [[nodiscard]] static auto length(const std::string& s, bool onlyMB = true) {
+    return length(s.c_str(), onlyMB);
   }
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so len 2-4) followed
@@ -112,6 +112,7 @@ public:
 
   // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
   [[nodiscard]] auto peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
+
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
   [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
