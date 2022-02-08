@@ -28,6 +28,39 @@ constexpr char32_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff, MaxUnicode = 0x
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for invalid code points
 constexpr auto ReplacementCharacter = "\xEF\xBF\xBD";
 
+// 'MBUtf8Result' is used for the return value of 'validateMBUtf8' - see comments below for more details.
+enum class MBUtf8Result {
+  Valid,
+  ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
+  InvalidCodePoint,   // returned when the bytes decode to an invalid Unicode code point (see MBUtils.h)
+  MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
+  MBCharMissingBytes, // returned when there are not enough continuation bytes
+  NotMBUtf8,          // returned when sequence is not a multi-byte character, i.e, it's regular ASCII
+  // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the minimum required, i.e.,
+  // if a characer can be encoded in two bytes, but instead is encoded using three or four bytes (with
+  // extra leading zero bits - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
+  Overlong,
+  StringTooLong,
+};
+
+// 'validateMBUtf8' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
+// well-formed 'multi-byte symbol'. Examples:
+// - validateMBUtf8("") = NotMBUtf8
+// - validateMBUtf8("a") = NotMBUtf8
+// - validateMBUtf8("a猫") = NotMBUtf8
+// - validateMBUtf8("雪") = Valid
+// - validateMBUtf8("雪s") = StringTooLong
+// - validateMBUtf8("吹雪") = StringTooLong
+// Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
+[[nodiscard]] MBUtf8Result validateMBUtf8(const char* s, bool checkLengthOne = true) noexcept;
+[[nodiscard]] inline auto validateMBUtf8(const std::string& s, bool checkLengthOne = true) noexcept {
+  return validateMBUtf8(s.c_str(), checkLengthOne);
+}
+
+[[nodiscard]] inline auto isValidMBUtf8(const std::string& s, bool checkLengthOne = true) noexcept {
+  return validateMBUtf8(s, checkLengthOne) == MBUtf8Result::Valid;
+}
+
 // UTF-8 conversion functions (between 'char' strings and 'char32_t' wstrings) were originally
 // implemented using 'codecvt', but this was changed to local implementations to remove the
 // dependency and allow more flexibility. For example, the local implementaions use 'U+FFFD'

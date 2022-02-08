@@ -14,31 +14,6 @@ const auto CloseWideBracketLength = CloseWideBracket.length();
 
 } // namespace
 
-MBChar::Results MBChar::validateUtf8(const char* s, bool checkLengthOne) {
-  if (!s || !(*s & Bit1)) return Results::NotMBChar;
-  if ((*s & TwoBits) == Bit1) return Results::ContinuationByte;
-  auto* u = reinterpret_cast<const unsigned char*>(s);
-  const unsigned byte1 = *u;
-  if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // second byte didn't start with '10'
-  if (byte1 & Bit3) {
-    const unsigned byte2 = *u ^ Bit1;                                 // last 6 bits of the second byte
-    if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // third byte didn't start with '10'
-    if (byte1 & Bit4) {
-      if (byte1 & Bit5) return Results::MBCharTooLong;                  // UTF-8 can only have up to 4 bytes
-      const unsigned byte3 = *u ^ Bit1;                                 // last 6 bits of the third byte
-      if ((*++u & TwoBits) != Bit1) return Results::MBCharMissingBytes; // fourth byte didn't start with '10'
-      const unsigned c = ((byte1 ^ FourBits) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1);
-      if (c <= 0xffffU) return Results::Overlong; // overlong 4 byte encoding
-      if (c > MaxUnicode) return Results::InvalidCodePoint;
-    } else if (const unsigned c = ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1); c <= 0x7ffU)
-      return Results::Overlong; // overlong 3 byte encoding
-    else if (c >= MinSurrogate && c <= MaxSurrogate)
-      return Results::InvalidCodePoint;
-  } else if ((byte1 ^ TwoBits) < 2)
-    return Results::Overlong; // overlong 2 byte encoding
-  return !checkLengthOne || !*++u ? Results::Valid : Results::StringTooLong;
-}
-
 bool MBChar::next(std::string& result, bool onlyMB) {
   const auto combiningMark = [this](const auto& r, const auto& i) {
     _location += 3;
@@ -56,7 +31,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
         result = *_location++;
         return true;
       }
-    } else if (MBChar::isValid(_location, false)) {
+    } else if (isValidMBUtf8(_location, false)) {
       // only modify 'result' if '_location' is the start of a valid UTF-8 group
       std::string r({*_location++});
       for (x = Bit2; x && firstOfGroup & x; x >>= 1) r += *_location++;
@@ -86,7 +61,7 @@ bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool
         result = *location;
         return true;
       }
-    } else if (MBChar::isValid(location, false)) {
+    } else if (isValidMBUtf8(location, false)) {
       // only modify 'result' if 'location' is the start of a valid UTF-8 group
       result = *location++;
       for (x = Bit2; x && firstOfGroup & x; x >>= 1) result += *location++;

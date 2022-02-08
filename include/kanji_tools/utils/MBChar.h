@@ -11,9 +11,9 @@
 
 namespace kanji_tools {
 
-// MBChar is a helper class for working with UTF-8 strings. Create an MBChar from a string
-// and then call 'getNext' to get one 'character' at a time. 'getNext' will return false
-// once the end of the original string is reached. Use 'reset' if you want to iterate again.
+// MBChar is a helper class for working with UTF-8 strings. Create MBChar from a string
+// and then call 'next' to get one 'character' at a time. 'next' will return false
+// once the end of the original string is reached. Use 'reset' to iterate again.
 //
 // Note on UTF-8 structure:
 // - UTF-8 uses 1 to 4 bytes per character, depending on the Unicode symbol
@@ -97,39 +97,6 @@ public:
     return result;
   }
 
-  // 'Results' is used for the return value of the 'valid' method - see comments below for more details.
-  enum class Results {
-    Valid,
-    ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
-    InvalidCodePoint,   // returned when the bytes decode to an invalid Unicode code point (see MBUtils.h)
-    MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
-    MBCharMissingBytes, // returned when there are not enough continuation bytes
-    NotMBChar,
-    // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the minimum required, i.e.,
-    // if a characer can be encoded in two bytes, but instead is encoded using three or four bytes (with
-    // extra leading zero bits - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
-    Overlong,
-    StringTooLong,
-  };
-
-  // 'validateUtf8' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
-  // well-formed 'multi-byte symbol'. Examples:
-  // - valid("") = NotMBChar
-  // - valid("a") = NotMBChar
-  // - valid("a猫") = NotMBChar
-  // - valid("雪") = Valid
-  // - valid("雪s") = StringTooLong
-  // - valid("吹雪") = StringTooLong
-  // Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
-  [[nodiscard]] static Results validateUtf8(const char* s, bool checkLengthOne = true);
-  [[nodiscard]] static auto validateUtf8(const std::string& s, bool checkLengthOne = true) {
-    return validateUtf8(s.c_str(), checkLengthOne);
-  }
-
-  [[nodiscard]] static auto isValid(const std::string& s, bool checkLengthOne = true) {
-    return validateUtf8(s, checkLengthOne) == Results::Valid;
-  }
-
   explicit MBChar(const std::string& data) : _data(data) {}
 
   // call reset in order to loop over the string again
@@ -153,8 +120,8 @@ public:
   [[nodiscard]] auto variants() const { return _variants; }
   [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
   [[nodiscard]] auto length(bool onlyMB = true) const { return length(_data, onlyMB); }
-  [[nodiscard]] auto valid(bool checkLengthOne = true) const { return validateUtf8(_data, checkLengthOne); }
-  [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == Results::Valid; }
+  [[nodiscard]] auto valid(bool checkLengthOne = true) const { return validateMBUtf8(_data, checkLengthOne); }
+  [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == MBUtf8Result::Valid; }
 private:
   // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
   // in these cases it only matters if the following value is a 'variation selector'.

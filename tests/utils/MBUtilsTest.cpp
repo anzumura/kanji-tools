@@ -3,6 +3,8 @@
 
 namespace kanji_tools {
 
+namespace {
+
 void fromUtf8Error(const std::string& s, const std::u32string& result = U"\ufffd") {
   try {
     EXPECT_EQ(fromUtf8(s), result);
@@ -27,6 +29,104 @@ void toUtf8Error(const std::u32string& s, const std::string& result = "\xEF\xBF\
   } catch (...) {
     FAIL() << "Expected std::range_error";
   }
+}
+
+} // namespace
+
+TEST(MBUtilsTest, ValidMBUtf8) {
+  EXPECT_EQ(validateMBUtf8(nullptr), MBUtf8Result::NotMBUtf8);
+  std::string x("雪");
+  EXPECT_EQ(x.length(), 3);
+  // badly formed strings:
+  EXPECT_EQ(validateMBUtf8(x.substr(0, 1)), MBUtf8Result::MBCharMissingBytes);
+  EXPECT_EQ(validateMBUtf8(x.substr(0, 2)), MBUtf8Result::MBCharMissingBytes);
+  EXPECT_EQ(validateMBUtf8(x.substr(1, 1)), MBUtf8Result::ContinuationByte);
+  EXPECT_EQ(validateMBUtf8(x.substr(1, 2)), MBUtf8Result::ContinuationByte);
+}
+
+TEST(MBUtilsTest, ValidWithTwoByte) {
+  std::string x("©");
+  EXPECT_EQ(x.length(), 2);
+  EXPECT_TRUE(isValidMBUtf8(x));
+  // badly formed strings:
+  EXPECT_EQ(validateMBUtf8(x.substr(0, 1)), MBUtf8Result::MBCharMissingBytes);
+  EXPECT_EQ(validateMBUtf8(x.substr(1)), MBUtf8Result::ContinuationByte);
+}
+
+TEST(MBUtilsTest, ValidWithFourByte) {
+  std::string x("𒀄"); // a four byte sumerian cuneiform symbol
+  EXPECT_EQ(x.length(), 4);
+  EXPECT_TRUE(isValidMBUtf8(x));
+  // badly formed strings:
+  EXPECT_EQ(validateMBUtf8(x.substr(0, 1)), MBUtf8Result::MBCharMissingBytes);
+  EXPECT_EQ(validateMBUtf8(x.substr(0, 2)), MBUtf8Result::MBCharMissingBytes);
+  EXPECT_EQ(validateMBUtf8(x.substr(0, 3)), MBUtf8Result::MBCharMissingBytes);
+  EXPECT_EQ(validateMBUtf8(x.substr(1, 1)), MBUtf8Result::ContinuationByte);
+  EXPECT_EQ(validateMBUtf8(x.substr(1, 2)), MBUtf8Result::ContinuationByte);
+  EXPECT_EQ(validateMBUtf8(x.substr(1, 3)), MBUtf8Result::ContinuationByte);
+  EXPECT_EQ(validateMBUtf8(x.substr(2, 1)), MBUtf8Result::ContinuationByte);
+  EXPECT_EQ(validateMBUtf8(x.substr(2, 2)), MBUtf8Result::ContinuationByte);
+  EXPECT_EQ(validateMBUtf8(x.substr(3, 1)), MBUtf8Result::ContinuationByte);
+}
+
+TEST(MBUtilsTest, NotValidWithFiveByte) {
+  std::string x("𒀄");
+  EXPECT_EQ(x.length(), 4);
+  EXPECT_TRUE(isValidMBUtf8(x));
+  // try to make a 'fake valid' string with 5 bytes (which is not valid)
+  x[0] = 0b11'11'10'10;
+  EXPECT_EQ(x.length(), 4);
+  EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::MBCharTooLong);
+  x += x[3];
+  EXPECT_EQ(x.length(), 5);
+  EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::MBCharTooLong);
+}
+
+TEST(MBUtilsTest, ValidateMaxUnicode) {
+  const char32_t ok = 0x10ffff;
+  const char32_t bad = 0x110000;
+  EXPECT_EQ(bad - ok, 1);
+  EXPECT_EQ(toBinary(ok, 21), "100001111111111111111");
+  EXPECT_EQ(toBinary(bad, 21), "100010000000000000000");
+  const char firstByte = static_cast<char>(0b11'11'01'00);
+  const auto okS = std::string(
+    {firstByte, static_cast<char>(0b10'00'11'11), static_cast<char>(0b10'11'11'11), static_cast<char>(0b10'11'11'11)});
+  const auto badS =
+    std::string({firstByte, static_cast<char>(0b10'01'00'00), static_cast<char>(Bit1), static_cast<char>(Bit1)});
+  EXPECT_EQ(validateMBUtf8(okS), MBUtf8Result::Valid);
+  EXPECT_EQ(validateMBUtf8(badS), MBUtf8Result::InvalidCodePoint);
+}
+
+TEST(MBUtilsTest, ValidateSurrogateRange) {
+  const auto beforeRange = std::string({'\xED', '\x9F', '\xBF'}); // U+D7FF
+  const auto rangeStart = std::string({'\xED', '\xA0', '\x80'});  // U+D800
+  const auto rangeEnd = std::string({'\xED', '\xBF', '\xBF'});    // U+DFFF
+  const auto afterRange = std::string({'\xEE', '\x80', '\x80'});  // U+E000
+  EXPECT_EQ(validateMBUtf8(beforeRange), MBUtf8Result::Valid);
+  EXPECT_EQ(validateMBUtf8(rangeStart), MBUtf8Result::InvalidCodePoint);
+  EXPECT_EQ(validateMBUtf8(rangeEnd), MBUtf8Result::InvalidCodePoint);
+  EXPECT_EQ(validateMBUtf8(afterRange), MBUtf8Result::Valid);
+}
+
+TEST(MBUtilsTest, NotValidForOverlong) {
+  // overlong single byte ascii
+  const unsigned char bang = 33;
+  EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
+  EXPECT_EQ(validateMBUtf8(std::string({static_cast<char>(bang)})), MBUtf8Result::NotMBUtf8);
+  EXPECT_EQ(validateMBUtf8(std::string({static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)})),
+            MBUtf8Result::Overlong);
+  // overlong ō with 3 bytes
+  std::string o("ō");
+  EXPECT_EQ(o.length(), 2);
+  EXPECT_EQ(validateMBUtf8(o), MBUtf8Result::Valid);
+  EXPECT_EQ(toUnicode(o), "014D");
+  EXPECT_EQ(toBinary(0x014d, 16), "0000000101001101");
+  std::string overlongO(
+    {static_cast<char>(ThreeBits), static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)});
+  EXPECT_EQ(validateMBUtf8(overlongO), MBUtf8Result::Overlong);
+  // overlong Euro symbol with 4 bytes
+  std::string x("\xF0\x82\x82\xAC");
+  EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::Overlong);
 }
 
 TEST(MBUtilsTest, FromUTF8String) {
@@ -54,7 +154,6 @@ TEST(MBUtilsTest, FromUTF8String) {
   EXPECT_EQ(dog, newDog);
 }
 
-// see similar tests in MBCharTest.cpp
 TEST(MBUtilsTest, BeyondMaxUnicode) {
   const char firstByte = static_cast<char>(0b11'11'01'00);
   const auto okS = std::string(
@@ -86,7 +185,6 @@ TEST(MBUtilsTest, InvalidSurrogateRange) {
   EXPECT_EQ(toUtf8(U"\ue000"), afterRange);
 }
 
-// see similar tests in MBCharTest.cpp (NotValidForOverlong)
 TEST(MBUtilsTest, ErrorForOverlong) {
   // overlong single byte ascii
   const unsigned char bang = 33;
