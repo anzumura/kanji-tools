@@ -14,19 +14,16 @@ bool MBChar::next(std::string& result, bool onlyMB) {
     return r;
   };
   while (*_location) {
-    const unsigned char firstOfGroup = *_location;
-    if (unsigned char x = firstOfGroup & TwoBits; !x || x == Bit2) { // not a multi byte character
+    switch (validateMBUtf8(_location)) {
+    case MBUtf8Result::NotMBUtf8:
       if (!onlyMB) {
         result = *_location++;
         return true;
       }
       ++_location; // skip regular ascii when onlyMB is true
-    } else if (isValidMBUtf8(_location, false)) {
-      std::string r({*_location++});
-      for (x = Bit2; x && firstOfGroup & x; x >>= 1) r += *_location++;
-      if (isVariationSelector(r) || isCombiningMark(r))
-        ++_errors; // can't start with a variation selector or a combining mark
-      else {
+      break;
+    case MBUtf8Result::Valid:
+      if (std::string r; validResult(r, _location)) {
         if (std::string s; peekVariant(s, _location)) {
           _location += 3;
           ++_variants;
@@ -37,7 +34,9 @@ bool MBChar::next(std::string& result, bool onlyMB) {
                                         : r;
         return true;
       }
-    } else { // _location doesn't start a valid utf8 sequence so try next byte
+      ++_errors; // can't start with a variation selector or a combining mark
+      break;
+    default: // _location doesn't start a valid utf8 sequence so try next byte
       ++_location;
       ++_errors;
     }
@@ -45,25 +44,19 @@ bool MBChar::next(std::string& result, bool onlyMB) {
   return false;
 }
 
-bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool internal) const {
+bool MBChar::peek(std::string& result, bool onlyMB) const {
   const auto combiningMark = [](const auto& r, const auto& i) { return i ? *i : r; };
-  while (*location) {
-    const unsigned char firstOfGroup = *location;
-    if (unsigned char x = firstOfGroup & TwoBits; !x || x == Bit2) { // not a multi byte character
-      if (internal) return false;
+  for (auto location = _location; *location;) {
+    switch (validateMBUtf8(location)) {
+    case MBUtf8Result::NotMBUtf8:
       if (!onlyMB) {
         result = *location;
         return true;
       }
       ++location;
-    } else if (isValidMBUtf8(location, false)) {
-      // only modify 'result' if 'location' is the start of a valid UTF-8 group
-      std::string r({*location++});
-      for (x = Bit2; x && firstOfGroup & x; x >>= 1) r += *location++;
-      if (internal) {
-        result = r;
-        return true;
-      } else if (!isVariationSelector(r) && !isCombiningMark(r)) {
+      break;
+    case MBUtf8Result::Valid:
+      if (std::string r; validResult(r, location)) {
         if (std::string s; peekVariant(s, location))
           result = r + s;
         else
@@ -72,8 +65,9 @@ bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool
                                         : r;
         return true;
       }
-    } else
-      ++location;
+      break;
+    default: ++location;
+    }
   }
   return false;
 }

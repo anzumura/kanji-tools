@@ -108,8 +108,8 @@ public:
   // (U+3099, U+309A) are converted to single values, i.e., U+306F (は) + U+3099 maps to U+3070 (ば).
   bool next(std::string& result, bool onlyMB = true);
 
-  // 'peek' works the same as 'next', but it doesn't update state (like _location or _errors).
-  [[nodiscard]] auto peek(std::string& result, bool onlyMB = true) const { return doPeek(result, onlyMB, _location); }
+  // 'peek' works like 'next', but it doesn't update state (like _location or _errors).
+  [[nodiscard]] bool peek(std::string& result, bool onlyMB = true) const;
 
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
@@ -118,12 +118,25 @@ public:
   [[nodiscard]] auto valid(bool checkLengthOne = true) const { return validateMBUtf8(_data, checkLengthOne); }
   [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == MBUtf8Result::Valid; }
 private:
-  // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
-  // in these cases it only matters if the following value is a 'variation selector' or 'combining mark'.
-  [[nodiscard]] bool doPeek(std::string& result, bool onlyMB, const char* location, bool internal = false) const;
+  template<typename T>
+  [[nodiscard]] static auto getMBUtf8(T&& location) {
+    const unsigned char firstOfGroup = *location;
+    std::string result({*location++});
+    for (unsigned char x = Bit2; x && firstOfGroup & x; x >>= 1) result += *location++;
+    return result;
+  }
 
-  [[nodiscard]] auto peekVariant(std::string& result, const char* location) const {
-    return doPeek(result, false, location, true) && isVariationSelector(result);
+  // 'validResult' is called from 'next' and 'peek' after determining 'location' points to a
+  // valid multi-byte utf8 sequence. It sets 'result', increments 'location' and returns true
+  // if the result is valid, i.e., not a 'variation selector' or a 'combining mark'.
+  [[nodiscard]] static auto validResult(std::string& result, const char*& location) {
+    return !isVariationSelector(result = getMBUtf8(location)) && !isCombiningMark(result);
+  }
+
+  // 'peekVariant' is called from 'next' and 'peek' methods. It populates 'result' if 'location'
+  // starts a valid multi-byte utf8 sequence and returns true if 'result' is a 'variation selector'.
+  [[nodiscard]] static auto peekVariant(std::string& result, const char* location) {
+    return isValidMBUtf8(location) && isVariationSelector(result = getMBUtf8(location));
   }
 
   const std::string _data;
