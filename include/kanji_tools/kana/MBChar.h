@@ -118,8 +118,8 @@ public:
   [[nodiscard]] auto valid(bool checkLengthOne = true) const { return validateMBUtf8(_data, checkLengthOne); }
   [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == MBUtf8Result::Valid; }
 private:
-  template<typename T>
-  [[nodiscard]] static auto getMBUtf8(T&& location) {
+  // 'getMBUtf8' returns a string containing one multi-byte UTF-8 sequence starting at 'location'
+  [[nodiscard]] static auto getMBUtf8(const char*& location) {
     const unsigned char firstOfGroup = *location;
     std::string result({*location++});
     for (unsigned char x = Bit2; x && firstOfGroup & x; x >>= 1) result += *location++;
