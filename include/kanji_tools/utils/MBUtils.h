@@ -43,21 +43,20 @@ enum class MBUtf8Result {
   StringTooLong,
 };
 
-// 'validateMBUtf8' returns 'Valid' if string contains one proper multi-byte sequence, i.e., a single
-// well-formed 'multi-byte symbol'. Examples:
+// 'validateMBUtf8' returns 'Valid' if 's' starts with a valid 'Multi-Byte' UTF-8 sequence. Examples:
 // - validateMBUtf8("") = NotMBUtf8
 // - validateMBUtf8("a") = NotMBUtf8
 // - validateMBUtf8("a猫") = NotMBUtf8
 // - validateMBUtf8("雪") = Valid
-// - validateMBUtf8("雪s") = StringTooLong
-// - validateMBUtf8("吹雪") = StringTooLong
-// Note, the last two cases can be considered 'valid' if checkLengthOne is set to false
-[[nodiscard]] MBUtf8Result validateMBUtf8(const char* s, bool checkLengthOne = true) noexcept;
-[[nodiscard]] inline auto validateMBUtf8(const std::string& s, bool checkLengthOne = true) noexcept {
+// - validateMBUtf8("雪s", true) = StringTooLong
+// - validateMBUtf8("吹雪", true) = StringTooLong
+// Note, the last two cases would be considered 'valid' if checkLengthOne was false (the default)
+[[nodiscard]] MBUtf8Result validateMBUtf8(const char* s, bool checkLengthOne = false) noexcept;
+[[nodiscard]] inline auto validateMBUtf8(const std::string& s, bool checkLengthOne = false) noexcept {
   return validateMBUtf8(s.c_str(), checkLengthOne);
 }
 
-[[nodiscard]] inline auto isValidMBUtf8(const std::string& s, bool checkLengthOne = true) noexcept {
+[[nodiscard]] inline auto isValidMBUtf8(const std::string& s, bool checkLengthOne = false) noexcept {
   return validateMBUtf8(s, checkLengthOne) == MBUtf8Result::Valid;
 }
 
