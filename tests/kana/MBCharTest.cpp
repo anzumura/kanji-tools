@@ -54,8 +54,11 @@ TEST(MBCharTest, NextWithVariationSelectors) {
   for (const std::array expected = {"憎︀", "憎", "む", "朗︀"}; auto& i : expected) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
+    x .clear();
     EXPECT_TRUE(s.next(x));
+    EXPECT_EQ(s.errors(), 0);
     EXPECT_EQ(x, i);
+    x .clear();
   }
   EXPECT_FALSE(s.peek(x));
   EXPECT_FALSE(s.next(x));
@@ -63,9 +66,7 @@ TEST(MBCharTest, NextWithVariationSelectors) {
 
 TEST(MBCharTest, NextWithCombiningMarks) {
   std::string ga("ガ"), gi("ギ"), combinedGi("ギ"), gu("グ"), po("ポ"), combinedPo("ポ");
-  EXPECT_EQ(ga.length(), 3);
   EXPECT_EQ(combinedGi.length(), 6);
-  EXPECT_EQ(gu.length(), 3);
   EXPECT_EQ(combinedPo.length(), 6);
   const std::string c = ga + combinedGi + gu + combinedPo;
   EXPECT_EQ(c.length(), 18);
@@ -73,10 +74,14 @@ TEST(MBCharTest, NextWithCombiningMarks) {
   std::string x;
   // combining marks ashould get replaced by normal versions
   for (const std::array expected = {ga, gi, gu, po}; auto& i : expected) {
+    EXPECT_EQ(i.length(), 3);
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
+    x.clear();
     EXPECT_TRUE(s.next(x));
+    EXPECT_EQ(s.errors(), 0);
     EXPECT_EQ(x, i);
+    x.clear();
   }
   EXPECT_FALSE(s.peek(x));
   EXPECT_FALSE(s.next(x));
