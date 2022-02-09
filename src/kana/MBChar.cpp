@@ -27,7 +27,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
       if (isVariationSelector(r) || isCombiningMark(r))
         ++_errors; // can't start with a variation selector or a combining mark
       else {
-        if (std::string s; doPeek(s, onlyMB, _location, true) && isVariationSelector(s)) {
+        if (std::string s; peekVariant(s, _location)) {
           _location += 3;
           ++_variants;
           result = r + s;
@@ -45,12 +45,12 @@ bool MBChar::next(std::string& result, bool onlyMB) {
   return false;
 }
 
-bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall) const {
+bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool internal) const {
   const auto combiningMark = [](const auto& r, const auto& i) { return i ? *i : r; };
   while (*location) {
     const unsigned char firstOfGroup = *location;
     if (unsigned char x = firstOfGroup & TwoBits; !x || x == Bit2) { // not a multi byte character
-      if (internalCall) return false;
+      if (internal) return false;
       if (!onlyMB) {
         result = *location;
         return true;
@@ -60,11 +60,11 @@ bool MBChar::doPeek(std::string& result, bool onlyMB, const char* location, bool
       // only modify 'result' if 'location' is the start of a valid UTF-8 group
       std::string r({*location++});
       for (x = Bit2; x && firstOfGroup & x; x >>= 1) r += *location++;
-      if (internalCall) {
+      if (internal) {
         result = r;
         return true;
       } else if (!isVariationSelector(r) && !isCombiningMark(r)) {
-        if (std::string s; doPeek(s, onlyMB, location, true) && isVariationSelector(s))
+        if (std::string s; peekVariant(s, location))
           result = r + s;
         else
           result = s == CombiningVoiced ? combiningMark(r, Kana::findDakuten(r))

@@ -68,9 +68,7 @@ public:
     }
     return len;
   }
-  [[nodiscard]] static auto length(const std::string& s, bool onlyMB = true) {
-    return length(s.c_str(), onlyMB);
-  }
+  [[nodiscard]] static auto length(const std::string& s, bool onlyMB = true) { return length(s.c_str(), onlyMB); }
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so len 2-4) followed
   // by a variation selector (which are always len 3).
@@ -121,8 +119,12 @@ public:
   [[nodiscard]] auto isValid(bool checkLengthOne = true) const { return valid(checkLengthOne) == MBUtf8Result::Valid; }
 private:
   // 'doPeek' can skip some logic if it knows it was called from 'next' or called recursively since
-  // in these cases it only matters if the following value is a 'variation selector'.
-  [[nodiscard]] bool doPeek(std::string& result, bool onlyMB, const char* location, bool internalCall = false) const;
+  // in these cases it only matters if the following value is a 'variation selector' or 'combining mark'.
+  [[nodiscard]] bool doPeek(std::string& result, bool onlyMB, const char* location, bool internal = false) const;
+
+  [[nodiscard]] auto peekVariant(std::string& result, const char* location) const {
+    return doPeek(result, false, location, true) && isVariationSelector(result);
+  }
 
   const std::string _data;
   const char* _location = _data.c_str();
