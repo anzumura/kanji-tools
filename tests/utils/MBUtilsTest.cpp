@@ -1,34 +1,29 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/MBUtils.h>
 
+#ifdef USE_CODECVT_FOR_UTF_8
+#include <kanji_tools/tests/WhatMismatch.h>
+#endif
+
 namespace kanji_tools {
 
 namespace {
 
 void fromUtf8Error(const std::string& s, const std::u32string& result = U"\ufffd") {
-  try {
-    EXPECT_EQ(fromUtf8(s), result);
 #ifdef USE_CODECVT_FOR_UTF_8
-    FAIL() << "Expected std::range_error";
+  // 'result' isn't used by codecvt since it throws an exception, but use it below to avoid a compile warning
+  EXPECT_THROW(call([&] { return fromUtf8(s) + result; }, "wstring_convert: from_bytes error"), std::range_error);
+#else
+  EXPECT_EQ(fromUtf8(s), result);
 #endif
-  } catch (const std::range_error& err) {
-    EXPECT_EQ(err.what(), std::string("wstring_convert: from_bytes error"));
-  } catch (...) {
-    FAIL() << "Expected std::range_error";
-  }
 }
 
 void toUtf8Error(const std::u32string& s, const std::string& result = "\xEF\xBF\xBD") {
-  try {
-    EXPECT_EQ(toUtf8(s), result);
 #ifdef USE_CODECVT_FOR_UTF_8
-    FAIL() << "Expected std::range_error";
+  EXPECT_THROW(call([&] { return toUtf8(s) + result; }, "wstring_convert: to_bytes error"), std::range_error);
+#else
+  EXPECT_EQ(toUtf8(s), result);
 #endif
-  } catch (const std::range_error& err) {
-    EXPECT_EQ(err.what(), std::string("wstring_convert: to_bytes error"));
-  } catch (...) {
-    FAIL() << "Expected std::range_error";
-  }
 }
 
 } // namespace

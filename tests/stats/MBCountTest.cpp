@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/stats/MBCount.h>
+#include <kanji_tools/tests/WhatMismatch.h>
 
 #include <fstream>
 
@@ -167,16 +168,9 @@ TEST_F(MBCountTest, AddFileIncludingFile) {
 }
 
 TEST_F(MBCountTest, AddMissingFile) {
-  try {
-    c.addFile(_testDir / "missing");
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("file not found: testDir/missing"));
-    EXPECT_EQ(c.files(), 0);
-    EXPECT_EQ(c.directories(), 0);
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { c.addFile(_testDir / "missing"); }, "file not found: testDir/missing"), std::domain_error);
+  EXPECT_EQ(c.files(), 0);
+  EXPECT_EQ(c.directories(), 0);
 }
 
 TEST_F(MBCountTest, AddDirectoryNoRecurse) {

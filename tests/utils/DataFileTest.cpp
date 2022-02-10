@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <kanji_tools/tests/WhatMismatch.h>
 #include <kanji_tools/utils/DataFile.h>
 
 #include <fstream>
@@ -63,14 +64,9 @@ TEST_F(DataFileTest, GoodOnePerLineLevel) {
 }
 
 TEST_F(DataFileTest, BadOnePerLine) {
-  try {
-    DataFile f(_badOnePerLine);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("got multiple tokens - line: 1, file: testDir/badOnePerLine"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([this] { DataFile f(_badOnePerLine); }, "got multiple tokens - line: 1, file: testDir/badOnePerLine"),
+    std::domain_error);
 }
 
 TEST_F(DataFileTest, MultiplePerLine) {
@@ -86,47 +82,27 @@ TEST_F(DataFileTest, MultiplePerLine) {
 }
 
 TEST_F(DataFileTest, GlobalDuplicate) {
-  try {
-    DataFile f(_multiplePerLine, DataFile::FileType::MultiplePerLine);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("found globally non-unique entry '東' - line: 1, file: testDir/multiplePerLine"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { DataFile f(_multiplePerLine, DataFile::FileType::MultiplePerLine); },
+                    "found globally non-unique entry '東' - line: 1, file: testDir/multiplePerLine"),
+               std::domain_error);
 }
 
 TEST_F(DataFileTest, GlobalDuplicateLevel) {
-  try {
-    LevelDataFile f(_goodOnePerLineLevel, JlptLevels::N3);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { LevelDataFile f(_goodOnePerLineLevel, JlptLevels::N3); },
+                    "found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"),
+               std::domain_error);
 }
 
 TEST_F(DataFileTest, BadSymbol) {
-  try {
-    DataFile f(_badSymbol);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([this] { DataFile f(_badSymbol); }, "invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"),
+    std::domain_error);
 }
 
 TEST_F(DataFileTest, DuplicateSymbol) {
-  try {
-    DataFile f(_duplicateSymbol);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([this] { DataFile f(_duplicateSymbol); }, "got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"),
+    std::domain_error);
 }
 
 } // namespace kanji_tools

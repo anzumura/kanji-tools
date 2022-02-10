@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <kanji_tools/tests/WhatMismatch.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
 #include <fstream>
@@ -44,14 +45,8 @@ TEST_F(ColumnFileTest, SingleColumnFile) {
 }
 
 TEST_F(ColumnFileTest, NoColumnsError) {
-  try {
-    ColumnFile f(_testFile, {});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("must specify at least one column - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { ColumnFile f(_testFile, {}); }, "must specify at least one column - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetValueFromOneColumn) {
@@ -151,14 +146,7 @@ TEST_F(ColumnFileTest, NotEnoughColumns) {
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
   ColumnFile f(_testFile, {col1, col2, col3});
-  try {
-    f.nextRow();
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("not enough columns - file: testFile.txt, row: 1"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&f] { f.nextRow(); }, "not enough columns - file: testFile.txt, row: 1"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, TooManyColumns) {
@@ -167,14 +155,7 @@ TEST_F(ColumnFileTest, TooManyColumns) {
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
   ColumnFile f(_testFile, {col1, col2, col3});
-  try {
-    f.nextRow();
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("too many columns - file: testFile.txt, row: 1"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&f] { f.nextRow(); }, "too many columns - file: testFile.txt, row: 1"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
@@ -182,14 +163,9 @@ TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
   of << "HeaderName\n";
   of.close();
   ColumnFile::Column col("ColumnName");
-  try {
-    ColumnFile f(_testFile, {col});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("unrecognized header 'HeaderName' - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([&, this] { ColumnFile f(_testFile, {col}); }, "unrecognized header 'HeaderName' - file: testFile.txt"),
+    std::domain_error);
 }
 
 TEST_F(ColumnFileTest, DuplicateHeaderError) {
@@ -197,14 +173,8 @@ TEST_F(ColumnFileTest, DuplicateHeaderError) {
   of << "Col\tCol\n";
   of.close();
   ColumnFile::Column col("Col");
-  try {
-    ColumnFile f(_testFile, {col});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("duplicate header 'Col' - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&, this] { ColumnFile f(_testFile, {col}); }, "duplicate header 'Col' - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, DuplicateColumnError) {
@@ -212,14 +182,12 @@ TEST_F(ColumnFileTest, DuplicateColumnError) {
   of << "HeaderName\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2");
-  try {
-    ColumnFile f(_testFile, {col1, col2, col1});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("duplicate column 'Col1' - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call(
+                 [&, this] {
+                   ColumnFile f(_testFile, {col1, col2, col1});
+                 },
+                 "duplicate column 'Col1' - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, OneMissingColumnError) {
@@ -227,14 +195,12 @@ TEST_F(ColumnFileTest, OneMissingColumnError) {
   of << "Col1\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2");
-  try {
-    ColumnFile f(_testFile, {col1, col2});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("column 'Col2' not found - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call(
+                 [&, this] {
+                   ColumnFile f(_testFile, {col1, col2});
+                 },
+                 "column 'Col2' not found - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
@@ -242,38 +208,24 @@ TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
   of << "Col1\tCol3\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3"), col4("Col4");
-  try {
-    ColumnFile f(_testFile, {col1, col2, col3, col4});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("2 columns not found: 'Col2', 'Col4' - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call(
+                 [&, this] {
+                   ColumnFile f(_testFile, {col1, col2, col3, col4});
+                 },
+                 "2 columns not found: 'Col2', 'Col4' - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MissingFileError) {
   ColumnFile::Column col("Col");
-  try {
-    ColumnFile f(_testFile, {col});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("doesn't exist - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&, this] { ColumnFile f(_testFile, {col}); }, "doesn't exist - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, NotRegularFileError) {
   ColumnFile::Column col("Col");
-  try {
-    ColumnFile f(_testDir, {col});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("not regular file - file: testDir"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&, this] { ColumnFile f(_testDir, {col}); }, "not regular file - file: testDir"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MissingHeaderRowError) {
@@ -281,14 +233,8 @@ TEST_F(ColumnFileTest, MissingHeaderRowError) {
   of << "";
   of.close();
   ColumnFile::Column col("Col");
-  try {
-    ColumnFile f(_testFile, {col});
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("missing header row - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&, this] { ColumnFile f(_testFile, {col}); }, "missing header row - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetBeforeNextRowError) {
@@ -297,14 +243,8 @@ TEST_F(ColumnFileTest, GetBeforeNextRowError) {
   of.close();
   ColumnFile::Column col("Col");
   ColumnFile f(_testFile, {col});
-  try {
-    f.get(col);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("'nextRow' must be called before calling 'get' - file: testFile.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&] { f.get(col); }, "'nextRow' must be called before calling 'get' - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
@@ -315,14 +255,9 @@ TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
   ColumnFile f(_testFile, {col});
   f.nextRow();
   ColumnFile::Column columnCreatedAfterConstruction("Created After");
-  try {
-    f.get(columnCreatedAfterConstruction);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("unrecognized column 'Created After' - file: testFile.txt, row: 1"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&] { f.get(columnCreatedAfterConstruction); },
+                    "unrecognized column 'Created After' - file: testFile.txt, row: 1"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetInvalidColumError) {
@@ -332,14 +267,9 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
   ColumnFile::Column col("Col"), columnNotIncludedInFile("Not Included");
   ColumnFile f(_testFile, {col});
   f.nextRow();
-  try {
-    f.get(columnNotIncludedInFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("invalid column 'Not Included' - file: testFile.txt, row: 1"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([&] { f.get(columnNotIncludedInFile); }, "invalid column 'Not Included' - file: testFile.txt, row: 1"),
+    std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetInt) {
@@ -359,14 +289,9 @@ TEST_F(ColumnFileTest, GetIntError) {
   ColumnFile::Column col("Col");
   ColumnFile f(_testFile, {col});
   f.nextRow();
-  try {
-    f.getInt(col);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([&] { f.getInt(col); }, convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
+    std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetOptInt) {
@@ -388,14 +313,9 @@ TEST_F(ColumnFileTest, GetOptIntError) {
   ColumnFile::Column col("Col");
   ColumnFile f(_testFile, {col});
   f.nextRow();
-  try {
-    f.getOptInt(col);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([&] { f.getOptInt(col); }, convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
+    std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetBool) {
@@ -419,14 +339,9 @@ TEST_F(ColumnFileTest, GetBoolError) {
   ColumnFile::Column col("Col");
   ColumnFile f(_testFile, {col});
   f.nextRow();
-  try {
-    f.getBool(col);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), convertError + "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(
+    call([&] { f.getBool(col); }, convertError + "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'"),
+    std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetWChar) {
@@ -451,14 +366,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
                  std::string("invalid hex - file: testFile.txt, row: 3, column: 'Col', value: 'ABCd'"),
                  std::string("invalid hex - file: testFile.txt, row: 4, column: 'Col', value: 'DEFG'")}) {
     f.nextRow();
-    try {
-      f.getWChar(col);
-      FAIL() << "Expected std::domain_error";
-    } catch (const std::domain_error& err) {
-      EXPECT_EQ(err.what(), convertError + "char32_t, " + i);
-    } catch (...) {
-      FAIL() << "Expected std::domain_error";
-    }
+    EXPECT_THROW(call([&] { f.getWChar(col); }, convertError + "char32_t, " + i), std::domain_error);
   }
 }
 

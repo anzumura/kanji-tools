@@ -54,11 +54,11 @@ TEST(MBCharTest, NextWithVariationSelectors) {
   for (const std::array expected = {"憎︀", "憎", "む", "朗︀"}; auto& i : expected) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
-    x .clear();
+    x.clear();
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(s.errors(), 0);
     EXPECT_EQ(x, i);
-    x .clear();
+    x.clear();
   }
   EXPECT_FALSE(s.peek(x));
   EXPECT_FALSE(s.next(x));

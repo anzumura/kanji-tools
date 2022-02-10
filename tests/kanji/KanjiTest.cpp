@@ -3,6 +3,7 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/kanji/UcdFileKanji.h>
+#include <kanji_tools/tests/WhatMismatch.h>
 
 #include <fstream>
 
@@ -208,56 +209,36 @@ TEST_F(KanjiTest, ExtraFileWithUnrecognizedColumn) {
   writeTestFile("\
 Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
-  try {
-    auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("unrecognized header 'Rdical' - file: test.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { return ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile); },
+                    "unrecognized header 'Rdical' - file: test.txt"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, ExtraFileWithDuplicateColumn) {
   writeTestFile("\
 Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
-  try {
-    auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("duplicate header 'Name' - file: test.txt"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { return ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile); },
+                    "duplicate header 'Name' - file: test.txt"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, ExtraFileWithToManyColumns) {
   writeTestFile("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16\t16");
-  try {
-    auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("too many columns - file: test.txt, row: 1"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { return ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile); },
+                    "too many columns - file: test.txt, row: 1"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, ExtraFileWithNotEnoughColumns) {
   writeTestFile("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ");
-  try {
-    auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(err.what(), std::string("not enough columns - file: test.txt, row: 1"));
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { return ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile); },
+                    "not enough columns - file: test.txt, row: 1"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, ExtraFileWithInvalidData) {
@@ -267,15 +248,9 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   EXPECT_CALL(_data, getKyu(_)).WillOnce(Return(KenteiKyus::K1));
   Radical rad(1, "雨", {}, "", "");
   EXPECT_CALL(_data, getRadicalByName("雨")).WillOnce(ReturnRef(rad));
-  try {
-    auto results = ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()),
-              "failed to convert to int - file: test.txt, row: 1, column: 'Number', value: 'a'");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { return ExtraKanji::fromFile(_data, KanjiTypes::Extra, _testFile); },
+                    "failed to convert to int - file: test.txt, row: 1, column: 'Number', value: 'a'"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, JinmeiFile) {
@@ -339,29 +314,18 @@ TEST_F(KanjiTest, BadLinkedJinmei) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical("呑", _)).WillOnce(ReturnRef(rad));
   auto frequencyKanji = std::make_shared<FrequencyKanji>(_data, "呑", 2362);
-  try {
-    LinkedJinmeiKanji k(_data, "亙", frequencyKanji);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()),
-              "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but got 'Frequency'");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&, this] { LinkedJinmeiKanji k(_data, "亙", frequencyKanji); },
+                    "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but got 'Frequency'"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, JinmeiFileWithMissingReason) {
   writeTestFile("\
 Number\tName\tRadical\tOldNames\tYear\tReading\n\
 1\t亘\t二\t亙\t1951\tコウ、カン、わた-る、もと-める");
-  try {
-    auto results = ExtraKanji::fromFile(_data, KanjiTypes::Jinmei, _testFile);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()), "column 'Reason' not found - file: test.txt");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([this] { return ExtraKanji::fromFile(_data, KanjiTypes::Jinmei, _testFile); },
+                    "column 'Reason' not found - file: test.txt"),
+               std::domain_error);
 }
 
 TEST_F(KanjiTest, JouyouFile) {
@@ -458,14 +422,9 @@ TEST_F(KanjiTest, BadLinkedOld) {
   std::string name("呑");
   EXPECT_CALL(_data, ucdRadical(name, _)).WillOnce(ReturnRef(rad));
   auto frequencyKanji = std::make_shared<FrequencyKanji>(_data, name, 2362);
-  try {
-    LinkedOldKanji k(_data, "艷", frequencyKanji);
-    FAIL() << "Expected std::domain_error";
-  } catch (const std::domain_error& err) {
-    EXPECT_EQ(std::string(err.what()), "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got 'Frequency'");
-  } catch (...) {
-    FAIL() << "Expected std::domain_error";
-  }
+  EXPECT_THROW(call([&, this] { LinkedOldKanji k(_data, "艷", frequencyKanji); },
+                    "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got 'Frequency'"),
+               std::domain_error);
 }
 
 } // namespace kanji_tools
