@@ -33,18 +33,19 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   checkRange(NonSpacingBlocks, &allBlocks);
   checkRange(allBlocks);
   // check 'range' strings (used in regex calls to remove furigana)
-  ASSERT_EQ(CommonKanjiBlocks.size(), 3);
-  ASSERT_EQ(RareKanjiBlocks.size(), 5);
+  ASSERT_EQ(CommonKanjiBlocks.size(), 4);
+  ASSERT_EQ(RareKanjiBlocks.size(), 4);
   ASSERT_EQ(NonSpacingBlocks.size(), 1);
   // KanjiRange should include all the common and rare kanji + variant selectors and a null terminator
   ASSERT_EQ(std::size(KanjiRange), (CommonKanjiBlocks.size() + RareKanjiBlocks.size() + 1) * 3 + 1);
-  EXPECT_EQ(CommonKanjiBlocks[0].range(), 20992);
-  EXPECT_EQ(CommonKanjiBlocks[1].range(), 512);
-  EXPECT_EQ(CommonKanjiBlocks[2].range(), 42720);
+  EXPECT_EQ(CommonKanjiBlocks[0].range(), 6592);
+  EXPECT_EQ(CommonKanjiBlocks[1].range(), 20992);
+  EXPECT_EQ(CommonKanjiBlocks[2].range(), 512);
+  EXPECT_EQ(CommonKanjiBlocks[3].range(), 42720);
   EXPECT_EQ(RareKanjiBlocks[0].range(), 128);
-  EXPECT_EQ(RareKanjiBlocks[1].range(), 6592);
-  EXPECT_EQ(RareKanjiBlocks[2].range(), 17648);
-  EXPECT_EQ(RareKanjiBlocks[3].range(), 544);
+  EXPECT_EQ(RareKanjiBlocks[1].range(), 17648);
+  EXPECT_EQ(RareKanjiBlocks[2].range(), 544);
+  EXPECT_EQ(RareKanjiBlocks[3].range(), 4944);
   EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
   int pos = 0;
   auto checkKanjiRange = [&pos](auto& blocks) {
@@ -166,25 +167,25 @@ TEST(UnicodeBlockTest, IsKanji) {
   EXPECT_TRUE(isAllCommonKanji("厭猫"));
   EXPECT_FALSE(isRareKanji("厭"));
   EXPECT_FALSE(isCommonKanji("⺠"));
-  EXPECT_FALSE(isCommonKanji("㐀"));
+  EXPECT_FALSE(isCommonKanji("𫠜"));
   EXPECT_TRUE(isRareKanji("⺠"));
   EXPECT_TRUE(isRareKanji("輸")); // Compatibility Supplement
   EXPECT_FALSE(isRareKanji("⺠h"));
   EXPECT_TRUE(isRareKanji("⺠h", false)); // checkLengthOne=false
   EXPECT_FALSE(isAllRareKanji("⺠h"));
   EXPECT_FALSE(isAllRareKanji("⺠猫"));
-  EXPECT_TRUE(isAllRareKanji("⺠㐀"));
-  EXPECT_TRUE(isRareKanji("㐀"));
+  EXPECT_TRUE(isAllRareKanji("⺠𫠜"));
+  EXPECT_TRUE(isRareKanji("𫠜"));
   EXPECT_TRUE(isKanji("厭"));
   EXPECT_TRUE(isKanji("⺠"));
-  EXPECT_TRUE(isKanji("㐀"));
+  EXPECT_TRUE(isKanji("𫠜"));
   EXPECT_TRUE(isRecognizedCharacter("厭"));
   EXPECT_TRUE(isRecognizedCharacter("⺠"));
-  EXPECT_TRUE(isRecognizedCharacter("㐀"));
-  EXPECT_FALSE(isRecognizedCharacter("㐀馬イヌねこ"));
-  EXPECT_TRUE(isRecognizedCharacter("㐀馬イヌねこ", false));
-  EXPECT_TRUE(isAllRecognizedCharacters("㐀馬イヌねこ"));
-  EXPECT_FALSE(isAllRecognizedCharacters("㐀馬イxヌねこ"));
+  EXPECT_TRUE(isRecognizedCharacter("𫠜"));
+  EXPECT_FALSE(isRecognizedCharacter("𫠜馬イヌねこ"));
+  EXPECT_TRUE(isRecognizedCharacter("𫠜馬イヌねこ", false));
+  EXPECT_TRUE(isAllRecognizedCharacters("𫠜馬イヌねこ"));
+  EXPECT_FALSE(isAllRecognizedCharacters("𫠜馬イxヌねこ"));
 }
 
 } // namespace kanji_tools

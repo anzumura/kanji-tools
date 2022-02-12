@@ -43,13 +43,18 @@ constexpr std::array HiraganaBlocks = {UnicodeBlock{0x3040, 0x309f}};
 // Second block is 'Katakana Phonetic Extensions' which contains small letters (for Ainu) like ㇱ
 constexpr std::array KatakanaBlocks = {UnicodeBlock{0x30a0, 0x30ff}, UnicodeBlock{0x31f0, 0x31ff}};
 
+// Almost all 'common' Japanese Kanji are in the original CJK Unified block. Extension A has one 'Kentei'
+// and about 1000 'Ucd' Kanji. Extension B has an updated Jouyou Kanji '𠮟' (U+20B9F) which used to be
+// '叱' (U+53F1)). The Compatibility block contains many 'single grapheme' versions of old/variant Japanese
+// Kanji that used to require two graphemes, i.e., a base character followed by a variation selector.
 constexpr std::array CommonKanjiBlocks = {
+  UnicodeBlock{0x3400, 0x4dbf},  // CJK Extension A (ver 3.0 Sep 1999, ~6K kanji): 㵎
   UnicodeBlock{0x4e00, 0x9fff},  // CJK Unified Ideographs Kanji (ver 1.1 Jun 1992, ~20K)
   UnicodeBlock(0xf900, 0xfaff),  // CJK Compatibility Ideographs (ver 3.2 Mar 2002, 512): 渚, 猪
   UnicodeBlock(0x20000, 0x2a6df) // CJK Extension B (ver 3.1 March 2001, ~42K): 𠮟
 };
 
-// Note: Extensions C, D, E and F are contiguous so combine into one block (more efficient for isKanji
+// Note: Extensions C, D, E and F are contiguous so combine into one block (more efficient for isKanji)
 // functions and wregex). Here are the actual block ranges:
 // - U+2A700 to U+2B73F : CJK Extension C (ver 5.2 Oct 2009, ~4K kanji)
 // - U+2B740 to U+2B81F : CJK Extension D (ver 6.0 Oct 2010, 222 kanji)
@@ -57,7 +62,6 @@ constexpr std::array CommonKanjiBlocks = {
 // - U+2CEB0 to U+2EBEF : CJK Extension F (ver 10.0 Jun 2016, ~7K kanji)
 constexpr std::array RareKanjiBlocks = {
   UnicodeBlock{0x2e80, 0x2eff},   // CJK Radicals Supplement (ver 3.0 Sep 1999, 128)
-  UnicodeBlock{0x3400, 0x4dbf},   // CJK Extension A (ver 3.0 Sep 1999, ~6K kanji)
   UnicodeBlock{0x2a700, 0x2ebef}, // CJK Extension C, D, E and F (~17K kanji)
   UnicodeBlock{0x2f800, 0x2fa1f}, // CJK Compatibility Ideographs Supplement (ver 3.1 Mar 2001, ~6K kanji)
   UnicodeBlock{0x30000, 0x3134f}  // CJK Extension G (ver 13.0 Mar 2020, ~5K kanji)
@@ -209,15 +213,15 @@ constexpr wchar_t WideDash = L'-';
 
 // clang-format off
 constexpr wchar_t KanjiRange[] = {
-  CommonKanjiBlocks[0].wStart(), WideDash, CommonKanjiBlocks[0].wEnd(), // CJK Unified Ideographs Kanji
-  CommonKanjiBlocks[1].wStart(), WideDash, CommonKanjiBlocks[1].wEnd(), // CJK Compatibility Ideographs
-  CommonKanjiBlocks[2].wStart(), WideDash, CommonKanjiBlocks[2].wEnd(), // CJK Extension B
+  CommonKanjiBlocks[0].wStart(), WideDash, CommonKanjiBlocks[0].wEnd(), // CJK Extension A
+  CommonKanjiBlocks[1].wStart(), WideDash, CommonKanjiBlocks[1].wEnd(), // CJK Unified Ideographs Kanji
+  CommonKanjiBlocks[2].wStart(), WideDash, CommonKanjiBlocks[2].wEnd(), // CJK Compatibility Ideographs
+  CommonKanjiBlocks[3].wStart(), WideDash, CommonKanjiBlocks[3].wEnd(), // CJK Extension B
   NonSpacingBlocks[0].wStart(), WideDash, NonSpacingBlocks[0].wEnd(),   // Variation Selectors
   RareKanjiBlocks[0].wStart(), WideDash, RareKanjiBlocks[0].wEnd(),     // CJK Radicals Supplement
-  RareKanjiBlocks[1].wStart(), WideDash, RareKanjiBlocks[1].wEnd(),     // CJK Extension A
-  RareKanjiBlocks[2].wStart(), WideDash, RareKanjiBlocks[2].wEnd(),     // CJK Extension C, D, E and F
-  RareKanjiBlocks[3].wStart(), WideDash, RareKanjiBlocks[3].wEnd(),     // CJK Compatibility Ideographs Supplement
-  RareKanjiBlocks[4].wStart(), WideDash, RareKanjiBlocks[4].wEnd(),     // CJK Extension G
+  RareKanjiBlocks[1].wStart(), WideDash, RareKanjiBlocks[1].wEnd(),     // CJK Extension C, D, E and F
+  RareKanjiBlocks[2].wStart(), WideDash, RareKanjiBlocks[2].wEnd(),     // CJK Compatibility Ideographs Supplement
+  RareKanjiBlocks[3].wStart(), WideDash, RareKanjiBlocks[3].wEnd(),     // CJK Extension G
   L'\0' // null
 };
 // clang-format on

@@ -116,7 +116,7 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
     ">>> Furigana Removed: 3397, Combining Marks Replaced: 0, Variation Selectors: 0",
     ">>>         Hiragana: 162560, unique:   80",
     ">>>         Katakana:  24689, unique:   83",
-    ">>>     Common Kanji:  96135, unique: 2634, 100.00%",
+    ">>>     Common Kanji:  96137, unique: 2636, 100.00%",
     ">>>        [Jouyou] :  93398, unique: 1918,  97.15%  (私 2747, 年 1838, 日 1299, 人 1168, 郎 999)",
     ">>>        [Jinmei] :   1663, unique:  306,   1.73%  (坐 62, 之 60, 厨 55, 彦 52, 廻 51)",
     ">>>  [LinkedJinmei] :     87, unique:   24,   0.09%  (燈 20, 峯 12, 龍 7, 藝 5, 瀧 5)",
@@ -124,8 +124,7 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
     ">>>     [Frequency] :    148, unique:   37,   0.15%  (渕 24, 苅 24, 呑 17, 嘘 14, 叱 10)",
     ">>>         [Extra] :    233, unique:   56,   0.24%  (厭 36, 婬 18, 椒 14, 掻 13, 婢 12)",
     ">>>        [Kentei] :    520, unique:  257,   0.54%  (掟 11, 剪 10, 烟 9, 畸 9, 竟 8)",
-    ">>>           [Ucd] :     39, unique:   25,   0.04%  (樏 5, 筯 5, 譃 3, 欝 2, 畀 2)",
-    ">>>       Rare Kanji:      2, unique:    2           (㯭 1, 㰏 1)",
+    ">>>           [Ucd] :     41, unique:   27,   0.04%  (樏 5, 筯 5, 譃 3, 欝 2, 畀 2)",
     ">>>   MB-Punctuation:  22102, unique:   23",
     ">>>        MB-Symbol:     45, unique:    9",
     ">>>        MB-Letter:   1704, unique:   39",
@@ -158,7 +157,7 @@ TEST_F(StatsTest, NonUcdKanji) {
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
-  writeTestFile("ああア西西東南南南巽㵎㐁");
+  writeTestFile("ああア西西東南南南巽沿㐁");
   const char* testArgs[] = {"", "testDir", "-b"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {">>> Stats for: 'testDir' - showing top 5 Kanji per type",
@@ -173,10 +172,10 @@ TEST_F(StatsTest, ShowBreakdown) {
                             "  2     [西    2]  259, N5, Jouyou",
                             "  3     [東    1]   37, N5, Jouyou",
                             "  4     [巽    1] 2061, N1, Jinmei",
-                            ">>>       Rare Kanji:      1, unique:    1           (㵎 1)",
+                            ">>>       Rare Kanji:      1, unique:    1           (沿 1)",
                             ">>> Showing Breakdown for 'Rare Kanji':",
                             "  Rank  [Val Num] Freq, LV, Type",
-                            "  1     [㵎    1]    0, --, Kentei",
+                            "  1     [沿    1]    0, --, Ucd",
                             ">>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)",
                             ">>> Showing Breakdown for 'Non-UCD Kanji':",
                             "  Rank  [Val Num], Unicode, Highest Count File",

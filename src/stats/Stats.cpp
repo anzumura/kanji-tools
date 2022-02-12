@@ -236,8 +236,9 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown, bool verbose) co
     auto p = std::make_shared<StatsPred>(_data, top, name, showBreakdown);
     return std::pair(std::async(std::launch::async, [=] { return p->run(pred, verbose, firstCount); }), p);
   };
-  // Only some Ucd (and one Kentei) Kanji are part of the 'Rare' blocks. All other types (like Jouyou,
-  // Jinmei, etc.) are part of the 'Common' blocks (see KanjiDataTest.cpp 'CommonAndRareBlocks').
+  // Only 45 Kanji loaded into this program fall into the 'Rare' blocks (and they are all type 'Ucd'
+  // in the 'CJK_Compat_Ideographs_Sup' block). All other types (like Jouyou, Jinmei, etc.) are in the
+  // 'Common' blocks (see comments in UnicodeBlock.h and KanjiDataTest.cpp 'CommonAndRareBlocks').
   std::array totals{f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
                     f([](const auto& x) { return isKatakana(x); }, "Katakana"),
                     f([this](const auto& x) { return isCommonKanji(x) && _data->ucd().find(x); }, "Common Kanji"),
