@@ -27,30 +27,24 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> inline constexpr bool is_bitmask = false;
 
 // the 7 required bitwise operators: &, |, ^, ~, &=, |= and ^=
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> [[nodiscard]] constexpr T operator&(T x, T y) noexcept {
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T> operator&(T x, T y) noexcept {
   return static_cast<T>(to_underlying(x) & to_underlying(y));
 }
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> [[nodiscard]] constexpr T operator|(T x, T y) noexcept {
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T> operator|(T x, T y) noexcept {
   return static_cast<T>(to_underlying(x) | to_underlying(y));
 }
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> [[nodiscard]] constexpr T operator^(T x, T y) noexcept {
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T> operator^(T x, T y) noexcept {
   return static_cast<T>(to_underlying(x) ^ to_underlying(y));
 }
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> [[nodiscard]] constexpr T operator~(T x) noexcept {
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T> operator~(T x) noexcept {
   return static_cast<T>(~to_underlying(x));
 }
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> constexpr T& operator&=(T& x, T y) noexcept {
-  return x = x & y;
-}
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> constexpr T& operator|=(T& x, T y) noexcept {
-  return x = x | y;
-}
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> constexpr T& operator^=(T& x, T y) noexcept {
-  return x = x ^ y;
-}
+template<typename T> constexpr std::enable_if_t<is_bitmask<T>, T&> operator&=(T& x, T y) noexcept { return x = x & y; }
+template<typename T> constexpr std::enable_if_t<is_bitmask<T>, T&> operator|=(T& x, T y) noexcept { return x = x | y; }
+template<typename T> constexpr std::enable_if_t<is_bitmask<T>, T&> operator^=(T& x, T y) noexcept { return x = x ^ y; }
 
 // 'hasValue' can help in cases like 'if (hasValue(myEnum & MyEnum::Flag1)) ...'
-template<typename T, std::enable_if_t<is_bitmask<T>, int> = 0> [[nodiscard]] constexpr bool hasValue(T x) noexcept {
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, bool> hasValue(T x) noexcept {
   return to_underlying(x);
 }
 
