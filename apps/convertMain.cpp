@@ -121,7 +121,7 @@ void ConvertMain::run() {
       if (space)
         std::cout << (_converter.target() == CharType::Romaji ? " " : "　");
       else
-        space = _converter.target() != CharType::Romaji && !hasValue(_converter.flags() & ConvertFlags::RemoveSpaces);
+        space = _converter.target() != CharType::Romaji && !(_converter.flags() & ConvertFlags::RemoveSpaces);
       processOneLine(i);
     }
     std::cout << '\n';

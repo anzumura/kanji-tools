@@ -48,6 +48,11 @@ template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, boo
   return to_underlying(x);
 }
 
+// 'operator!' can help in cases like 'if (!(myEnum & MyEnum::Flag1)) ...'
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, bool> operator!(T x) noexcept {
+  return !hasValue(x);
+}
+
 } // namespace kanji_tools
 
 #endif // KANJI_TOOLS_UTILS_ENUM_BITMASK_H

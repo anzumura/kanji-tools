@@ -64,4 +64,11 @@ TEST(EnumBitmaskTest, HasValue) {
   EXPECT_FALSE(hasValue(x ^ TestEnum::Two));
 }
 
+TEST(EnumBitmaskTest, NotOperator) {
+  EXPECT_FALSE(!TestEnum::One);
+  auto x = TestEnum::Two;
+  EXPECT_FALSE(!x);
+  EXPECT_TRUE(!(x ^ TestEnum::Two));
+}
+
 } // namespace kanji_tools
