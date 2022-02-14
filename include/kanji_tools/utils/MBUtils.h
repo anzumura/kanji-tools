@@ -5,61 +5,6 @@
 
 namespace kanji_tools {
 
-// bit patterns used for processing UTF-8
-enum Values : unsigned char {
-  Bit5 = 0b00'00'10'00,
-  Bit4 = 0b00'01'00'00,
-  Bit3 = 0b00'10'00'00,
-  Bit2 = 0b01'00'00'00,
-  Bit1 = 0b10'00'00'00,      // continuation pattern
-  TwoBits = 0b11'00'00'00,   // mask for first two bits (starts a multi-byte sequence)
-  ThreeBits = 0b11'10'00'00, // start of a 3 byte multi-byte sequence
-  FourBits = 0b11'11'00'00,  // start of a 4 byte multi-byte sequence
-  FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
-};
-
-// 'Min' and 'Max' Values for determining invalid Unicde code points when doing UTF-8 conversion.
-// Here's a quote from https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
-//   Since RFC 3629 (November 2003), the high and low surrogate halves used by UTF-16 (U+D800
-//   through U+DFFF) and code points not encodable by UTF-16 (those after U+10FFFF) are not legal
-//   Unicode values, and their UTF-8 encoding must be treated as an invalid byte sequence.
-constexpr char32_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff, MaxUnicode = 0x10ffff, ErrorReplacement = 0xfffd;
-
-// UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for invalid code points
-constexpr auto ReplacementCharacter = "\xEF\xBF\xBD";
-
-// 'MBUtf8Result' is used for the return value of 'validateMBUtf8' - see comments below for more details.
-enum class MBUtf8Result {
-  Valid,
-  ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
-  InvalidCodePoint,   // returned when the bytes decode to an invalid Unicode code point (see MBUtils.h)
-  MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
-  MBCharMissingBytes, // returned when there are not enough continuation bytes
-  NotMBUtf8,          // returned when sequence is not a multi-byte character, i.e, it's regular ASCII
-  // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the minimum required, i.e.,
-  // if a characer can be encoded in two bytes, but instead is encoded using three or four bytes (with
-  // extra leading zero bits - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
-  Overlong,
-  StringTooLong,
-};
-
-// 'validateMBUtf8' returns 'Valid' if 's' starts with a valid 'Multi-Byte' UTF-8 sequence. Examples:
-// - validateMBUtf8("") = NotMBUtf8
-// - validateMBUtf8("a") = NotMBUtf8
-// - validateMBUtf8("a猫") = NotMBUtf8
-// - validateMBUtf8("雪") = Valid
-// - validateMBUtf8("雪s", true) = StringTooLong
-// - validateMBUtf8("吹雪", true) = StringTooLong
-// Note, the last two cases would be considered 'valid' if checkLengthOne was false (the default)
-[[nodiscard]] MBUtf8Result validateMBUtf8(const char* s, bool checkLengthOne = false) noexcept;
-[[nodiscard]] inline auto validateMBUtf8(const std::string& s, bool checkLengthOne = false) noexcept {
-  return validateMBUtf8(s.c_str(), checkLengthOne);
-}
-
-[[nodiscard]] inline auto isValidMBUtf8(const std::string& s, bool checkLengthOne = false) noexcept {
-  return validateMBUtf8(s, checkLengthOne) == MBUtf8Result::Valid;
-}
-
 // UTF-8 conversion functions (between 'char' strings and 'char32_t' wstrings) were originally
 // implemented using 'codecvt', but this was changed to local implementations to remove the
 // dependency and allow more flexibility. For example, the local implementaions use 'U+FFFD'
@@ -191,6 +136,51 @@ template<> [[nodiscard]] inline auto toHex(char x, BracketType brackets, HexCase
     if (isSingleByteChar(i)) return true;
   return false;
 }
+
+// 'MBUtf8Result' is used for the return value of 'validateMBUtf8' - see comments below for more details.
+enum class MBUtf8Result {
+  Valid,
+  ContinuationByte,   // returned when the first byte is a continuation byte, i.e., starts with '10'
+  InvalidCodePoint,   // returned when the bytes decode to an invalid Unicode code point (see MBUtils.h)
+  MBCharTooLong,      // returned when the first byte starts with more than 4 1's (so too long for UTF-8)
+  MBCharMissingBytes, // returned when there are not enough continuation bytes
+  NotMBUtf8,          // returned when sequence is not a multi-byte character, i.e, it's regular ASCII
+  // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the minimum required, i.e.,
+  // if a characer can be encoded in two bytes, but instead is encoded using three or four bytes (with
+  // extra leading zero bits - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
+  Overlong,
+  StringTooLong,
+};
+
+// 'validateMBUtf8' returns 'Valid' if 's' starts with a valid 'Multi-Byte' UTF-8 sequence. Examples:
+// - validateMBUtf8("") = NotMBUtf8
+// - validateMBUtf8("a") = NotMBUtf8
+// - validateMBUtf8("a猫") = NotMBUtf8
+// - validateMBUtf8("雪") = Valid
+// - validateMBUtf8("雪s", true) = StringTooLong
+// - validateMBUtf8("吹雪", true) = StringTooLong
+// Note, the last two cases would be considered 'valid' if checkLengthOne was false (the default)
+[[nodiscard]] MBUtf8Result validateMBUtf8(const char* s, bool checkLengthOne = false) noexcept;
+[[nodiscard]] inline auto validateMBUtf8(const std::string& s, bool checkLengthOne = false) noexcept {
+  return validateMBUtf8(s.c_str(), checkLengthOne);
+}
+
+[[nodiscard]] inline auto isValidMBUtf8(const std::string& s, bool checkLengthOne = false) noexcept {
+  return validateMBUtf8(s, checkLengthOne) == MBUtf8Result::Valid;
+}
+
+// bit patterns used for processing UTF-8
+enum BitPatterns : unsigned char {
+  Bit5 = 0b00'00'10'00,
+  Bit4 = 0b00'01'00'00,
+  Bit3 = 0b00'10'00'00,
+  Bit2 = 0b01'00'00'00,
+  Bit1 = 0b10'00'00'00,      // continuation pattern
+  TwoBits = 0b11'00'00'00,   // mask for first two bits (starts a multi-byte sequence)
+  ThreeBits = 0b11'10'00'00, // start of a 3 byte multi-byte sequence
+  FourBits = 0b11'11'00'00,  // start of a 4 byte multi-byte sequence
+  FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
+};
 
 } // namespace kanji_tools
 
