@@ -11,10 +11,29 @@ namespace {
 
 enum class Colors { Red, Green, Blue, None };
 
+// need multiple enums for testing constructor failures since _instance gets set
+// by BaseEnumArray, but the exceptions are throw by derived class constructor
+enum class TestEnum1 { A, B, C, None };
+enum class TestEnum2 { A, B, C, None };
+
 } // namespace
 
 template<> inline constexpr bool is_enumarray<Colors> = true;
 inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green", "Blue");
+
+template<> inline constexpr bool is_enumarray<TestEnum1> = true;
+template<> inline constexpr bool is_enumarray<TestEnum2> = true;
+
+TEST(EnumArrayTest, FailForDuplicateName) {
+  EXPECT_THROW(call([] { auto x = BaseEnumArray<TestEnum1>::create("A", "B", "B"); }, "duplicate name 'B'"),
+               std::domain_error);
+}
+
+TEST(EnumArrayTest, FailForNoneName) {
+  EXPECT_THROW(
+    call([] { auto x = BaseEnumArray<TestEnum2>::create("A", "B", "None"); }, "'None' should not be specified"),
+    std::domain_error);
+}
 
 TEST(EnumArrayTest, Iteration) {
   std::vector<Colors> colors;
@@ -82,6 +101,17 @@ TEST(EnumArrayTest, Stream) {
   std::stringstream s;
   s << Colors::Green << ' ' << Colors::None;
   EXPECT_EQ(s.str(), "Green None");
+}
+
+TEST(EnumArrayTest, FromString) {
+  EXPECT_EQ(AllColors.fromString("Red"), Colors::Red);
+  EXPECT_EQ(AllColors.fromString("Green"), Colors::Green);
+  EXPECT_EQ(AllColors.fromString("Blue"), Colors::Blue);
+  EXPECT_EQ(AllColors.fromString("None"), Colors::None);
+}
+
+TEST(EnumArrayTest, BadFromString) {
+  EXPECT_THROW(call([] { return AllColors.fromString("Blah"); }, "name 'Blah' not found"), std::domain_error);
 }
 
 TEST(EnumArrayTest, HasValue) {

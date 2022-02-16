@@ -6,17 +6,20 @@
 #include <array>
 #include <cassert>
 #include <iostream>
+#include <map>
 #include <string>
 
 namespace kanji_tools {
 
 // EnumArray is a helper class for scoped enums that have contiguous values starting at zero
-// and a final value of 'None'. It provides 'begin' and 'end' methods to allow iterating over
-// the enum values and a 'toString' method that is used by aot-of-class 'toString' and ostream
-// 'operator<<' functions. There are also 'hasValue' and 'operator!' global functions based on
-// T::None. In order to enable this functionality 'is_enumarray' must be set to 'true' and an
-// instance of EnumArray must be created with the string values in the same order as the scoped
-// enum values. For example:
+// and a final value of 'None'. It provides 'size', 'operator[]' and 'fromString' methods as
+// well as 'begin' and 'end' methods for range based iteration over the enum values. There is
+// also a 'toString' method that is used by aot-of-class 'toString' and ostream 'operator<<'
+// functions. There are also 'hasValue' and 'operator!' global functions based on T::None. In
+// order to enable this functionality 'is_enumarray' must be set to 'true' and an instance of
+// EnumArray must be created with string values in the same order as the scoped enum values.
+//
+// Here's an example of how to create an EnumArray:
 //
 // enum class Colors { Red, Green, Blue, None };
 // template<> inline constexpr bool is_enumarray<Colors> = true;
@@ -33,7 +36,7 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> inline cons
 
 template<typename T> class BaseEnumArray {
 public:
-  template<typename... Args> [[nodiscard]] static auto create(Args...) noexcept;
+  template<typename... Args> [[nodiscard]] static auto create(Args...);
 
   [[nodiscard]] static BaseEnumArray<T>& instance() noexcept { return *_instance; }
 
@@ -125,9 +128,18 @@ public:
   [[nodiscard]] auto begin() const noexcept { return Iterator(0); }
   [[nodiscard]] auto end() const noexcept { return Iterator(N + 1); } // 'N' is 'T::None' so end should be N + 1
 
+  [[nodiscard]] constexpr size_t size() const noexcept { return N + 1; }
+
   [[nodiscard]] auto operator[](size_t i) const {
     if (i > N) throw std::out_of_range("index '" + std::to_string(i) + "' is out of range");
     return static_cast<T>(i);
+  }
+
+  [[nodiscard]] auto fromString(const std::string& s) const {
+    if (s == None) return T::None;
+    const auto i = _nameMap.find(s);
+    if (i == _nameMap.end()) throw std::domain_error("name '" + s + "' not found");
+    return i->second;
   }
 
   [[nodiscard]] const std::string& toString(T x) const override {
@@ -135,22 +147,28 @@ public:
     if (i > N) throw std::out_of_range("enum '" + std::to_string(i) + "' is out of range");
     return i < N ? _names[i] : None;
   }
-  [[nodiscard]] constexpr size_t size() const noexcept { return N + 1; }
 private:
   inline const static std::string None = "None";
   friend BaseEnumArray<T>; // static 'EnumArray<T>::initialize' method calls private constructor
 
-  EnumArray(const char* name) noexcept { _names[N - 1] = name; }
+  void insert(const char* name, size_t index) {
+    const auto i = _nameMap.emplace(name, static_cast<T>(index));
+    if (!i.second) throw std::domain_error("duplicate name '" + i.first->first + "'");
+    if (i.first->first == None) throw std::domain_error("'None' should not be specified");
+    _names[index] = i.first->first;
+  }
 
-  template<typename... Args> EnumArray(const char* name, Args... args) noexcept : EnumArray(args...) {
-    static_assert(N > sizeof...(args));
-    _names[N - 1 - sizeof...(args)] = name;
+  EnumArray(const char* name) { insert(name, N - 1); }
+
+  template<typename... Args> EnumArray(const char* name, Args... args) : EnumArray(args...) {
+    insert(name, N - 1 - sizeof...(args));
   }
 
   std::array<std::string, N> _names;
+  std::map<std::string, T> _nameMap;
 };
 
-template<typename T> template<typename... Args> [[nodiscard]] auto BaseEnumArray<T>::create(Args... args) noexcept {
+template<typename T> template<typename... Args> [[nodiscard]] auto BaseEnumArray<T>::create(Args... args) {
   static_assert(is_enumarray<T>, "need to define 'is_enumarray' for T before calling 'initialize'");
   // make sure the scoped enum 'T' has a value of None that is just past the set of string
   // values provided - this will help ensure that any changes to the enum must also be made
