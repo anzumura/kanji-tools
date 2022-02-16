@@ -126,8 +126,8 @@ void UcdData::load(const std::filesystem::path& file) {
            .emplace(std::piecewise_construct, std::make_tuple(name),
                     std::make_tuple(f.getWChar(codeCol), name, f.get(blockCol), f.get(versionCol), radical, strokes,
                                     vStrokes, f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol), joyo, jinmei,
-                                    links, Ucd::toLinkType(linkType), linkedReadings, f.get(meaningCol), f.get(onCol),
-                                    f.get(kunCol)))
+                                    links, AllUcdLinkTypes.fromString(linkType, true), linkedReadings,
+                                    f.get(meaningCol), f.get(onCol), f.get(kunCol)))
            .second)
       f.error("duplicate entry '" + name + "'");
     for (const auto& link : links)

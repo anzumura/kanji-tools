@@ -1,8 +1,8 @@
 #ifndef KANJI_TOOLS_KANJI_UCD_H
 #define KANJI_TOOLS_KANJI_UCD_H
 
-#include <iostream>
-#include <string>
+#include <kanji_tools/kanji/UcdLinkTypes.h>
+
 #include <vector>
 
 namespace kanji_tools {
@@ -11,11 +11,6 @@ namespace kanji_tools {
 // 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
-  // LinkTypes represents how a Ucd link was loaded (from which XML property - see parse script for details)
-  enum class LinkTypes { Compatibility, Definition, Jinmei, Semantic, Simplified, Traditional, None };
-  static LinkTypes toLinkType(const std::string&);
-  static const std::string& toString(LinkTypes);
-
   class Link {
   public:
     Link(char32_t code, const std::string& name) : _code(code), _name(name) {}
@@ -30,8 +25,8 @@ public:
 
   Ucd(char32_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
       int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
-      const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, LinkTypes linkType, bool linkedReadings,
-      const std::string& meaning, const std::string& onReading, const std::string& kunReading)
+      const std::string& nelsonIds, bool joyo, bool jinmei, const Links& links, UcdLinkTypes linkType,
+      bool linkedReadings, const std::string& meaning, const std::string& onReading, const std::string& kunReading)
     : _code(code), _name(name), _block(block), _version(version), _radical(radical), _strokes(strokes),
       _variantStrokes(variantStrokes), _pinyin(pinyin), _morohashiId(morohashiId), _nelsonIds(nelsonIds), _joyo(joyo),
       _jinmei(jinmei), _links(links), _linkType(linkType), _linkedReadings(linkedReadings), _meaning(meaning),
@@ -57,8 +52,8 @@ public:
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
   // 'has' methods
   [[nodiscard]] auto hasLinks() const { return !_links.empty(); }
-  [[nodiscard]] auto hasTraditionalLinks() const { return _linkType == LinkTypes::Traditional; }
-  [[nodiscard]] auto hasNonTraditionalLinks() const { return hasLinks() && _linkType != LinkTypes::Traditional; }
+  [[nodiscard]] auto hasTraditionalLinks() const { return _linkType == UcdLinkTypes::Traditional; }
+  [[nodiscard]] auto hasNonTraditionalLinks() const { return hasLinks() && _linkType != UcdLinkTypes::Traditional; }
   [[nodiscard]] auto hasVariantStrokes() const { return _variantStrokes != 0; }
   // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
   // it falls back to just return '_strokes'
@@ -84,14 +79,12 @@ private:
   const bool _joyo;
   const bool _jinmei;
   const Links _links;
-  const LinkTypes _linkType;
+  const UcdLinkTypes _linkType;
   const bool _linkedReadings;
   const std::string _meaning;
   const std::string _onReading;
   const std::string _kunReading;
 };
-
-inline auto& operator<<(std::ostream& os, const Ucd::LinkTypes& x) { return os << Ucd::toString(x); }
 
 } // namespace kanji_tools
 
