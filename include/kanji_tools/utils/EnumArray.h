@@ -31,16 +31,16 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> inline cons
 
 template<typename T> class EnumArray {
 public:
-  template<typename... Args> [[nodiscard]] static constexpr auto initialize(Args...) noexcept;
+  template<typename... Args> [[nodiscard]] static auto initialize(Args...) noexcept;
 
-  [[nodiscard]] static constexpr EnumArray<T>& instance() noexcept { return *_instance; }
+  [[nodiscard]] static EnumArray<T>& instance() noexcept { return *_instance; }
 
   EnumArray(const EnumArray&) = delete;
   EnumArray& operator=(const EnumArray&) = delete;
 		
   [[nodiscard]] virtual const char* toString(T) const = 0;
 protected:
-  EnumArray() {
+  EnumArray() noexcept {
     // abort if initialized more than once (for a debug build)
     assert(_instance == nullptr);
     _instance = this;
@@ -65,9 +65,6 @@ public:
     // forward iterator requirements (a default constructor)
     Iterator(size_t index = 0) noexcept : _index(index) {}
     // common requirements for iterators
-    Iterator(const Iterator&) = default;
-    Iterator& operator=(const Iterator&) = default;
-    ~Iterator() = default;
     auto& operator++() {
       // entry at 'A' is 'T::None' so allow iterating until index == N to include it
       if (_index > N) throw std::out_of_range("can't increment past end");
@@ -119,22 +116,27 @@ public:
     size_t _index = 0;
   };
 
-  Iterator begin() const { return Iterator(0); }
-  Iterator end() const { return Iterator(N + 1); } // entry at 'N' is 'T::None' so end should be N + 1
+  [[nodiscard]] auto begin() const noexcept { return Iterator(0); }
+  [[nodiscard]] auto end() const noexcept { return Iterator(N + 1); } // entry at 'N' is 'T::None' so end should be N + 1
+
+  [[nodiscard]] auto operator[](size_t i) const {
+    if (i > N) throw std::out_of_range("index value " + std::to_string(i) + " is out of range");
+    return static_cast<T>(i);
+  }
 
   [[nodiscard]] const char* toString(T x) const override {
     size_t i = to_underlying(x);
-    if (i > N) throw std::range_error("enum value " + std::to_string(i) + " is out of range");
+    if (i > N) throw std::out_of_range("enum value " + std::to_string(i) + " is out of range");
     return i < N ? _names[i] : "None";
   }
   [[nodiscard]] size_t size() const noexcept { return N + 1; }
 private:
   friend EnumArray<T>; // static 'EnumArray<T>::initialize' method calls private constructor
 
-  constexpr ConcreteEnumArray(const char* name) noexcept { _names[N - 1] = name; }
+  ConcreteEnumArray(const char* name) noexcept { _names[N - 1] = name; }
 
   template<typename... Args>
-  constexpr ConcreteEnumArray(const char* name, Args... args) noexcept : ConcreteEnumArray(args...) {
+  ConcreteEnumArray(const char* name, Args... args) noexcept : ConcreteEnumArray(args...) {
     static_assert(N > sizeof...(args));
     _names[N - 1 - sizeof...(args)] = name;
   }
@@ -144,7 +146,7 @@ private:
 
 template<typename T>
 template<typename... Args>
-[[nodiscard]] constexpr auto EnumArray<T>::initialize(Args... args) noexcept {
+[[nodiscard]] auto EnumArray<T>::initialize(Args... args) noexcept {
   static_assert(is_enumarray<T>, "need to define 'is_enumarray' for T before calling 'initialize'");
   // make sure the scoped enum 'T' has a value of None that is just past the set of string
   // values provided - this will help ensure that any changes to the enum must also be made

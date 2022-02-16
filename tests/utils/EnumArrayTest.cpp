@@ -17,11 +17,18 @@ template<> inline constexpr bool is_enumarray<Colors> = true;
 const auto AllColors = EnumArray<Colors>::initialize("Red", "Green", "Blue");
 
 TEST(EnumArrayTest, Iteration) {
-  EXPECT_EQ(AllColors.size(), 4);
   std::vector<Colors> colors;
-  for (auto c : AllColors) {
-    colors.push_back(c);
-  }
+  for (size_t i = 0; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
+  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue, Colors::None}));
+}
+
+TEST(EnumArrayTest, BadAccess) {
+  EXPECT_THROW(call([] { return AllColors[4]; }, "index value 4 is out of range"), std::out_of_range);
+}
+
+TEST(EnumArrayTest, RangeBasedForLoop) {
+  std::vector<Colors> colors;
+  for (auto c : AllColors) colors.push_back(c);
   EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue, Colors::None}));
 }
 
@@ -65,7 +72,7 @@ TEST(EnumArrayTest, ToString) {
 
 TEST(EnumArrayTest, BadToString) {
   EXPECT_THROW(call([] { return toString(static_cast<Colors>(37)); }, "enum value 37 is out of range"),
-               std::range_error);
+               std::out_of_range);
 }
 
 TEST(EnumArrayTest, Stream) {
