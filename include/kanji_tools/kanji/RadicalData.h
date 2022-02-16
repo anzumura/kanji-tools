@@ -5,7 +5,6 @@
 #include <kanji_tools/kanji/Radical.h>
 
 #include <filesystem>
-#include <map>
 #include <memory>
 
 namespace kanji_tools {

@@ -10,13 +10,6 @@
 
 namespace kanji_tools {
 
-// 'secondLast' is a helper function to get the second last value of an array (useful for AllKanjiTypes,
-// AllKanjiGrades, etc. where the final entry is 'None' and don't want to include in loops for example).
-template<typename T, size_t S> constexpr inline auto secondLast(const std::array<T, S>& x) {
-  static_assert(S > 1);
-  return x[S - 2];
-}
-
 // 'DataFile' holds data loaded from text files that contain unique 'string' entries (either one per line
 // or multiple per line separated by space). Uniqueness is verified when data is loaded and entries are
 // stored in order in a list. There are derived classes for specific data types, i.e., where all entries

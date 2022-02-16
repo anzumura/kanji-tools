@@ -28,7 +28,7 @@ void RadicalData::print(const Data& data) const {
   data.log() << "Radical breakdown - Total (";
   for (auto i : AllKanjiTypes) {
     data.out() << i;
-    if (i == secondLast(AllKanjiTypes)) break;
+    if (isNextNone(i)) break;
     data.out() << ' ';
   }
   data.out() << "):\n";
@@ -79,7 +79,7 @@ void RadicalData::printCounts(const Data& data, const Count& c, bool summary) co
       data.out() << (j == c.end() ? 0 : j->second);
     } else
       data.out() << std::setw(4) << (j == c.end() ? 0 : j->second);
-    if (i == secondLast(AllKanjiTypes)) break;
+    if (isNextNone(i)) break;
   }
   data.out() << (summary ? ")\n" : ") :");
 }
