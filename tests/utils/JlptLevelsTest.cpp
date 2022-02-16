@@ -4,12 +4,12 @@
 namespace kanji_tools {
 
 TEST(JlptLevelsTest, CheckStrings) {
-  EXPECT_STREQ(toString(JlptLevels::N5), "N5");
-  EXPECT_STREQ(toString(JlptLevels::N4), "N4");
-  EXPECT_STREQ(toString(JlptLevels::N3), "N3");
-  EXPECT_STREQ(toString(JlptLevels::N2), "N2");
-  EXPECT_STREQ(toString(JlptLevels::N1), "N1");
-  EXPECT_STREQ(toString(JlptLevels::None), "None");
+  EXPECT_EQ(toString(JlptLevels::N5), "N5");
+  EXPECT_EQ(toString(JlptLevels::N4), "N4");
+  EXPECT_EQ(toString(JlptLevels::N3), "N3");
+  EXPECT_EQ(toString(JlptLevels::N2), "N2");
+  EXPECT_EQ(toString(JlptLevels::N1), "N1");
+  EXPECT_EQ(toString(JlptLevels::None), "None");
 }
 
 TEST(JlptLevelsTest, CheckValues) {

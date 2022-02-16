@@ -68,10 +68,10 @@ TEST(EnumArrayTest, IteratorCompare) {
 }
 
 TEST(EnumArrayTest, ToString) {
-  EXPECT_STREQ(toString(Colors::Red), "Red");
-  EXPECT_STREQ(toString(Colors::Green), "Green");
-  EXPECT_STREQ(toString(Colors::Blue), "Blue");
-  EXPECT_STREQ(toString(Colors::None), "None");
+  EXPECT_EQ(toString(Colors::Red), "Red");
+  EXPECT_EQ(toString(Colors::Green), "Green");
+  EXPECT_EQ(toString(Colors::Blue), "Blue");
+  EXPECT_EQ(toString(Colors::None), "None");
 }
 
 TEST(EnumArrayTest, BadToString) {

@@ -40,7 +40,7 @@ public:
   BaseEnumArray(const BaseEnumArray&) = delete;
   BaseEnumArray& operator=(const BaseEnumArray&) = delete;
 
-  [[nodiscard]] virtual const char* toString(T) const = 0;
+  [[nodiscard]] virtual const std::string& toString(T) const = 0;
 protected:
   BaseEnumArray() noexcept {
     // abort if initialized more than once (for a debug build)
@@ -130,13 +130,14 @@ public:
     return static_cast<T>(i);
   }
 
-  [[nodiscard]] const char* toString(T x) const override {
+  [[nodiscard]] const std::string& toString(T x) const override {
     size_t i = to_underlying(x);
     if (i > N) throw std::out_of_range("enum '" + std::to_string(i) + "' is out of range");
-    return i < N ? _names[i] : "None";
+    return i < N ? _names[i] : None;
   }
   [[nodiscard]] constexpr size_t size() const noexcept { return N + 1; }
 private:
+  inline const static std::string None = "None";
   friend BaseEnumArray<T>; // static 'EnumArray<T>::initialize' method calls private constructor
 
   EnumArray(const char* name) noexcept { _names[N - 1] = name; }
@@ -146,7 +147,7 @@ private:
     _names[N - 1 - sizeof...(args)] = name;
   }
 
-  std::array<const char*, N> _names;
+  std::array<std::string, N> _names;
 };
 
 template<typename T> template<typename... Args> [[nodiscard]] auto BaseEnumArray<T>::create(Args... args) noexcept {
@@ -158,7 +159,7 @@ template<typename T> template<typename... Args> [[nodiscard]] auto BaseEnumArray
   return EnumArray<T, sizeof...(args)>(args...);
 }
 
-template<typename T> [[nodiscard]] std::enable_if_t<is_enumarray<T>, const char*> toString(T x) {
+template<typename T> [[nodiscard]] std::enable_if_t<is_enumarray<T>, const std::string&> toString(T x) {
   return BaseEnumArray<T>::instance().toString(x);
 }
 
