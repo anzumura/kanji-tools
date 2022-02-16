@@ -4,7 +4,12 @@
 
 namespace kanji_tools {
 
+namespace {
+
 enum class TestEnum { One = 1, Two, Four = 4, Eight = 8, All = 15 };
+
+} // namespace
+
 template<> inline constexpr bool is_bitmask<TestEnum> = true;
 
 TEST(EnumBitmaskTest, BitwiseAndOperator) {
