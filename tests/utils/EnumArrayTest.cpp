@@ -14,7 +14,7 @@ enum class Colors { Red, Green, Blue, None };
 } // namespace
 
 template<> inline constexpr bool is_enumarray<Colors> = true;
-const auto AllColors = EnumArray<Colors>::initialize("Red", "Green", "Blue");
+inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green", "Blue");
 
 TEST(EnumArrayTest, Iteration) {
   std::vector<Colors> colors;

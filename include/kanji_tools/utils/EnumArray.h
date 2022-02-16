@@ -4,6 +4,8 @@
 #include <kanji_tools/utils/EnumTraits.h>
 
 #include <array>
+#include <cassert>
+#include <iostream>
 #include <string>
 
 namespace kanji_tools {
@@ -12,13 +14,13 @@ namespace kanji_tools {
 // and a final value of 'None'. It provides 'begin' and 'end' methods to allow iterating over
 // the enum values and a 'toString' method that is used by aot-of-class 'toString' and ostream
 // 'operator<<' functions. There are also 'hasValue' and 'operator!' global functions based on
-// T::None. In order to enable this functionality 'is_enumarray' must be set to 'true' and
-// EnumArray must be initialized with the string values in the same order as the scoped enum
-// values. For example:
+// T::None. In order to enable this functionality 'is_enumarray' must be set to 'true' and an
+// instance of EnumArray must be created with the string values in the same order as the scoped
+// enum values. For example:
 //
 // enum class Colors { Red, Green, Blue, None };
 // template<> inline constexpr bool is_enumarray<Colors> = true;
-// const auto AllColors = EnumArray<Colors>::initialize("Red", "Green", "Blue");
+// inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green", "Blue");
 //
 // for (auto c : AllColors) { std::cout << c << '\n'; } // prints each color including "None"
 //
@@ -29,27 +31,27 @@ namespace kanji_tools {
 // 'is_enumarray' bool that should be specialized:
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> inline constexpr bool is_enumarray = false;
 
-template<typename T> class EnumArray {
+template<typename T> class BaseEnumArray {
 public:
-  template<typename... Args> [[nodiscard]] static auto initialize(Args...) noexcept;
+  template<typename... Args> [[nodiscard]] static auto create(Args...) noexcept;
 
-  [[nodiscard]] static EnumArray<T>& instance() noexcept { return *_instance; }
+  [[nodiscard]] static BaseEnumArray<T>& instance() noexcept { return *_instance; }
 
-  EnumArray(const EnumArray&) = delete;
-  EnumArray& operator=(const EnumArray&) = delete;
+  BaseEnumArray(const BaseEnumArray&) = delete;
+  BaseEnumArray& operator=(const BaseEnumArray&) = delete;
 
   [[nodiscard]] virtual const char* toString(T) const = 0;
 protected:
-  EnumArray() noexcept {
+  BaseEnumArray() noexcept {
     // abort if initialized more than once (for a debug build)
     assert(_instance == nullptr);
     _instance = this;
   }
 private:
-  inline static EnumArray<T>* _instance = 0;
+  inline static BaseEnumArray<T>* _instance = 0;
 };
 
-template<typename T, size_t N> class ConcreteEnumArray : public EnumArray<T> {
+template<typename T, size_t N> class EnumArray : public BaseEnumArray<T> {
 public:
   // Random access iterator for looping over all values of T (the scoped enum) including the final
   // 'None' entry. This iterator does not allow modifying entries.
@@ -121,9 +123,7 @@ public:
   };
 
   [[nodiscard]] auto begin() const noexcept { return Iterator(0); }
-  [[nodiscard]] auto end() const noexcept {
-    return Iterator(N + 1);
-  } // entry at 'N' is 'T::None' so end should be N + 1
+  [[nodiscard]] auto end() const noexcept { return Iterator(N + 1); } // 'N' is 'T::None' so end should be N + 1
 
   [[nodiscard]] auto operator[](size_t i) const {
     if (i > N) throw std::out_of_range("index '" + std::to_string(i) + "' is out of range");
@@ -135,13 +135,13 @@ public:
     if (i > N) throw std::out_of_range("enum '" + std::to_string(i) + "' is out of range");
     return i < N ? _names[i] : "None";
   }
-  [[nodiscard]] size_t size() const noexcept { return N + 1; }
+  [[nodiscard]] constexpr size_t size() const noexcept { return N + 1; }
 private:
-  friend EnumArray<T>; // static 'EnumArray<T>::initialize' method calls private constructor
+  friend BaseEnumArray<T>; // static 'EnumArray<T>::initialize' method calls private constructor
 
-  ConcreteEnumArray(const char* name) noexcept { _names[N - 1] = name; }
+  EnumArray(const char* name) noexcept { _names[N - 1] = name; }
 
-  template<typename... Args> ConcreteEnumArray(const char* name, Args... args) noexcept : ConcreteEnumArray(args...) {
+  template<typename... Args> EnumArray(const char* name, Args... args) noexcept : EnumArray(args...) {
     static_assert(N > sizeof...(args));
     _names[N - 1 - sizeof...(args)] = name;
   }
@@ -149,17 +149,17 @@ private:
   std::array<const char*, N> _names;
 };
 
-template<typename T> template<typename... Args> [[nodiscard]] auto EnumArray<T>::initialize(Args... args) noexcept {
+template<typename T> template<typename... Args> [[nodiscard]] auto BaseEnumArray<T>::create(Args... args) noexcept {
   static_assert(is_enumarray<T>, "need to define 'is_enumarray' for T before calling 'initialize'");
   // make sure the scoped enum 'T' has a value of None that is just past the set of string
   // values provided - this will help ensure that any changes to the enum must also be made
-  // to the EnumArray and vice versa.
+  // to the BaseEnumArray and vice versa.
   static_assert(to_underlying(T::None) == sizeof...(Args));
-  return ConcreteEnumArray<T, sizeof...(args)>(args...);
+  return EnumArray<T, sizeof...(args)>(args...);
 }
 
 template<typename T> [[nodiscard]] std::enable_if_t<is_enumarray<T>, const char*> toString(T x) {
-  return EnumArray<T>::instance().toString(x);
+  return BaseEnumArray<T>::instance().toString(x);
 }
 
 template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_enumarray<T>, bool> hasValue(T x) noexcept {

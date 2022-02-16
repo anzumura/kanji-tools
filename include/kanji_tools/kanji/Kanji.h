@@ -95,8 +95,8 @@ public:
 
   [[nodiscard]] auto is(KanjiTypes t) const { return type() == t; }
   [[nodiscard]] auto hasGrade() const { return toBool(grade()); }
-  [[nodiscard]] auto hasKyu() const { return toBool(kyu()); }
-  [[nodiscard]] auto hasLevel() const { return toBool(level()); }
+  [[nodiscard]] auto hasKyu() const { return hasValue(kyu()); }
+  [[nodiscard]] auto hasLevel() const { return hasValue(level()); }
   [[nodiscard]] auto hasMeaning() const { return !meaning().empty(); }
   [[nodiscard]] auto hasNelsonIds() const { return !_nelsonIds.empty(); }
   [[nodiscard]] auto hasReading() const { return !reading().empty(); }

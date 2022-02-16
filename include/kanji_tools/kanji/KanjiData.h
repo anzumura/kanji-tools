@@ -26,7 +26,7 @@ private:
   void printStats() const;
   void printGrades() const;
   template<typename T, size_t S>
-  void printListStats(const std::array<T, S>&, T (Kanji::*)() const, const std::string&, bool showNoFrequency) const;
+  void printListStats(const EnumArray<T, S>&, T (Kanji::*)() const, const std::string&, bool showNoFrequency) const;
 
   // '_levels' (for JLPT) are loaded from files under 'data/jlpt'
   const std::array<const LevelDataFile, AllJlptLevels.size() - 1> _levels;

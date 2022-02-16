@@ -227,7 +227,7 @@ void Data::populateExtra() {
 }
 
 void Data::processList(const DataFile& list) {
-  const auto kenteiList = toBool(list.kyu());
+  const auto kenteiList = hasValue(list.kyu());
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji = _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
@@ -256,7 +256,7 @@ void Data::processList(const DataFile& list) {
     if (kenteiList) {
       assert(kanji->kyu() == list.kyu());
       _kyus[list.kyu()].push_back(kanji);
-    } else if (toBool(list.level())) {
+    } else if (hasValue(list.level())) {
       assert(kanji->level() == list.level());
       _levels[list.level()].push_back(kanji);
     } else {
@@ -267,14 +267,14 @@ void Data::processList(const DataFile& list) {
   }
   if (fullDebug()) {
     DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-    DataFile::print(created, std::string("non-Jouyou/Jinmei") + (toBool(list.level()) ? "" : "/JLPT"), list.name());
+    DataFile::print(created, std::string("non-Jouyou/Jinmei") + (hasValue(list.level()) ? "" : "/JLPT"), list.name());
     // list.level is None when processing 'frequency.txt' file (so not a JLPT level file)
-    if (!kenteiList && !toBool(list.level())) {
+    if (!kenteiList && !(list.level())) {
       std::vector lists = {std::pair(&found[KanjiTypes::Jinmei], ""),
                            std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
       for (const auto& i : lists) {
         DataFile::List jlptJinmei, otherJinmei;
-        for (const auto& j : *i.first) (toBool(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
+        for (const auto& j : *i.first) (hasValue(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
         DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei", list.name());
         DataFile::print(otherJinmei, std::string("non-JLPT ") + i.second + "Jinmei", list.name());
       }
