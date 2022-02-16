@@ -108,9 +108,12 @@ TEST(EnumArrayTest, FromString) {
   EXPECT_EQ(AllColors.fromString("Green"), Colors::Green);
   EXPECT_EQ(AllColors.fromString("Blue"), Colors::Blue);
   EXPECT_EQ(AllColors.fromString("None"), Colors::None);
+  // set allowEmptyAsNone to true
+  EXPECT_EQ(AllColors.fromString("", true), Colors::None);
 }
 
 TEST(EnumArrayTest, BadFromString) {
+  EXPECT_THROW(call([] { return AllColors.fromString(""); }, "name '' not found"), std::domain_error);
   EXPECT_THROW(call([] { return AllColors.fromString("Blah"); }, "name 'Blah' not found"), std::domain_error);
 }
 

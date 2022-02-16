@@ -135,8 +135,8 @@ public:
     return static_cast<T>(i);
   }
 
-  [[nodiscard]] auto fromString(const std::string& s) const {
-    if (s == None) return T::None;
+  [[nodiscard]] auto fromString(const std::string& s, bool allowEmptyAsNone = false) const {
+    if (allowEmptyAsNone && s.empty() || s == None) return T::None;
     const auto i = _nameMap.find(s);
     if (i == _nameMap.end()) throw std::domain_error("name '" + s + "' not found");
     return i->second;
