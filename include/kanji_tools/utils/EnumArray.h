@@ -37,7 +37,7 @@ public:
 
   EnumArray(const EnumArray&) = delete;
   EnumArray& operator=(const EnumArray&) = delete;
-		
+
   [[nodiscard]] virtual const char* toString(T) const = 0;
 protected:
   EnumArray() noexcept {
@@ -79,10 +79,14 @@ public:
     // input iterator requirements (except operator->)
     [[nodiscard]] auto operator==(const Iterator& x) const noexcept { return _index == x._index; }
     [[nodiscard]] auto operator!=(const Iterator& x) const noexcept { return !(*this == x); }
-    [[nodiscard]] auto operator*() const noexcept { return static_cast<T>(_index); }
+    [[nodiscard]] auto operator*() const {
+      // exception should only happen when dereferencing 'end' since other methods prevent moving out of range
+      if (_index > N) throw std::out_of_range("index '" + std::to_string(_index) + "' is out of range");
+      return static_cast<T>(_index);
+    }
     // bi-directional iterator requirements
     auto& operator--() {
-      if (_index <= 0) throw std::out_of_range("can't decrement past zero");
+      if (_index == 0) throw std::out_of_range("can't decrement past zero");
       --_index;
       return *this;
     }
@@ -98,7 +102,7 @@ public:
       return *this;
     }
     auto& operator-=(difference_type offset) { return *this += -offset; }
-    T operator[](difference_type offset) const { return (*(*this + offset)); }
+    [[nodiscard]] auto operator[](difference_type offset) const { return *(*this + offset); }
     [[nodiscard]] auto operator+(difference_type offset) const {
       Iterator x = *this;
       return x += offset;
@@ -117,16 +121,18 @@ public:
   };
 
   [[nodiscard]] auto begin() const noexcept { return Iterator(0); }
-  [[nodiscard]] auto end() const noexcept { return Iterator(N + 1); } // entry at 'N' is 'T::None' so end should be N + 1
+  [[nodiscard]] auto end() const noexcept {
+    return Iterator(N + 1);
+  } // entry at 'N' is 'T::None' so end should be N + 1
 
   [[nodiscard]] auto operator[](size_t i) const {
-    if (i > N) throw std::out_of_range("index value " + std::to_string(i) + " is out of range");
+    if (i > N) throw std::out_of_range("index '" + std::to_string(i) + "' is out of range");
     return static_cast<T>(i);
   }
 
   [[nodiscard]] const char* toString(T x) const override {
     size_t i = to_underlying(x);
-    if (i > N) throw std::out_of_range("enum value " + std::to_string(i) + " is out of range");
+    if (i > N) throw std::out_of_range("enum '" + std::to_string(i) + "' is out of range");
     return i < N ? _names[i] : "None";
   }
   [[nodiscard]] size_t size() const noexcept { return N + 1; }
@@ -135,8 +141,7 @@ private:
 
   ConcreteEnumArray(const char* name) noexcept { _names[N - 1] = name; }
 
-  template<typename... Args>
-  ConcreteEnumArray(const char* name, Args... args) noexcept : ConcreteEnumArray(args...) {
+  template<typename... Args> ConcreteEnumArray(const char* name, Args... args) noexcept : ConcreteEnumArray(args...) {
     static_assert(N > sizeof...(args));
     _names[N - 1 - sizeof...(args)] = name;
   }
@@ -144,9 +149,7 @@ private:
   std::array<const char*, N> _names;
 };
 
-template<typename T>
-template<typename... Args>
-[[nodiscard]] auto EnumArray<T>::initialize(Args... args) noexcept {
+template<typename T> template<typename... Args> [[nodiscard]] auto EnumArray<T>::initialize(Args... args) noexcept {
   static_assert(is_enumarray<T>, "need to define 'is_enumarray' for T before calling 'initialize'");
   // make sure the scoped enum 'T' has a value of None that is just past the set of string
   // values provided - this will help ensure that any changes to the enum must also be made

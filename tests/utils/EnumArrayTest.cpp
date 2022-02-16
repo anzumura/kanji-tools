@@ -23,7 +23,7 @@ TEST(EnumArrayTest, Iteration) {
 }
 
 TEST(EnumArrayTest, BadAccess) {
-  EXPECT_THROW(call([] { return AllColors[4]; }, "index value 4 is out of range"), std::out_of_range);
+  EXPECT_THROW(call([] { return AllColors[4]; }, "index '4' is out of range"), std::out_of_range);
 }
 
 TEST(EnumArrayTest, RangeBasedForLoop) {
@@ -34,11 +34,15 @@ TEST(EnumArrayTest, RangeBasedForLoop) {
 
 TEST(EnumArrayTest, BadIncrement) {
   auto i = AllColors.begin();
-  i += 3;
+  i = i + 1;
+  EXPECT_EQ(i[2], Colors::None);
+  i += 2;
   EXPECT_EQ(*i, Colors::None);
   EXPECT_EQ(++i, AllColors.end());
+  EXPECT_THROW(call([&] { return *i; }, "index '4' is out of range"), std::out_of_range);
   EXPECT_THROW(call([&] { i++; }, "can't increment past end"), std::out_of_range);
   EXPECT_THROW(call([&] { i += 1; }, "can't increment past end"), std::out_of_range);
+  EXPECT_THROW(call([&] { return i[1]; }, "can't increment past end"), std::out_of_range);
 }
 
 TEST(EnumArrayTest, BadDecrement) {
@@ -71,8 +75,7 @@ TEST(EnumArrayTest, ToString) {
 }
 
 TEST(EnumArrayTest, BadToString) {
-  EXPECT_THROW(call([] { return toString(static_cast<Colors>(37)); }, "enum value 37 is out of range"),
-               std::out_of_range);
+  EXPECT_THROW(call([] { return toString(static_cast<Colors>(7)); }, "enum '7' is out of range"), std::out_of_range);
 }
 
 TEST(EnumArrayTest, Stream) {
