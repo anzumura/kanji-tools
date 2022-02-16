@@ -124,7 +124,9 @@ public:
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
 private:
-  [[nodiscard]] static KanjiGrades getGrade(const std::string&);
+  [[nodiscard]] static KanjiGrades getGrade(const std::string& s) {
+    return AllKanjiGrades.fromString(s.starts_with("S") ? s : "G" + s);
+  }
   const KanjiGrades _grade;
 };
 

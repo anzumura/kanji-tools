@@ -94,7 +94,7 @@ public:
   [[nodiscard]] auto strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
 
   [[nodiscard]] auto is(KanjiTypes t) const { return type() == t; }
-  [[nodiscard]] auto hasGrade() const { return toBool(grade()); }
+  [[nodiscard]] auto hasGrade() const { return hasValue(grade()); }
   [[nodiscard]] auto hasKyu() const { return hasValue(kyu()); }
   [[nodiscard]] auto hasLevel() const { return hasValue(level()); }
   [[nodiscard]] auto hasMeaning() const { return !meaning().empty(); }

@@ -183,7 +183,7 @@ void Data::populateJouyou() {
   auto results = CustomFileKanji::fromFile(*this, KanjiTypes::Jouyou, DataFile::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
-    assert(toBool(i->grade()));
+    assert(hasValue(i->grade()));
     if (checkInsert(i)) _grades[i->grade()].push_back(i);
   }
   _types.emplace(KanjiTypes::Jouyou, std::move(results));

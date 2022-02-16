@@ -37,17 +37,4 @@ JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
   return Reasons::Other;
 }
 
-KanjiGrades JouyouKanji::getGrade(const std::string& s) {
-  if (s.length() == 1) switch (s[0]) {
-    case '1': return KanjiGrades::G1;
-    case '2': return KanjiGrades::G2;
-    case '3': return KanjiGrades::G3;
-    case '4': return KanjiGrades::G4;
-    case '5': return KanjiGrades::G5;
-    case '6': return KanjiGrades::G6;
-    case 'S': return KanjiGrades::S;
-    }
-  return KanjiGrades::None;
-}
-
 } // namespace kanji_tools
