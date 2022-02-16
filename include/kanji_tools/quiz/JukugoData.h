@@ -4,7 +4,6 @@
 #include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/quiz/Jukugo.h>
 
-#include <map>
 #include <vector>
 
 namespace kanji_tools {

@@ -5,9 +5,7 @@
 #include <kanji_tools/utils/KenteiKyus.h>
 
 #include <filesystem>
-#include <map>
 #include <set>
-#include <string>
 #include <vector>
 
 namespace kanji_tools {
