@@ -181,6 +181,10 @@ template<typename T> [[nodiscard]] std::enable_if_t<is_enumarray<T>, const std::
   return BaseEnumArray<T>::instance().toString(x);
 }
 
+template<typename T> std::enable_if_t<is_enumarray<T>, std::ostream&> operator<<(std::ostream& os, T x) {
+  return os << toString(x);
+}
+
 template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_enumarray<T>, bool> hasValue(T x) noexcept {
   return x != T::None;
 }
@@ -189,8 +193,9 @@ template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_enumarray<T>, b
   return !hasValue(x);
 }
 
-template<typename T> std::enable_if_t<is_enumarray<T>, std::ostream&> operator<<(std::ostream& os, T x) {
-  return os << toString(x);
+// 'isNextNone' returns true if the next value after 'x' is T::None
+template<typename T> [[nodiscard]] constexpr std::enable_if_t<is_enumarray<T>, bool> isNextNone(T x) noexcept {
+  return static_cast<T>(to_underlying(x) + 1) == T::None;
 }
 
 } // namespace kanji_tools

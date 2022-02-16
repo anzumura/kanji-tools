@@ -126,4 +126,12 @@ TEST(EnumArrayTest, OperatorNot) {
   EXPECT_FALSE(!static_cast<Colors>(29)); // bad value
 }
 
+TEST(EnumArrayTest, IsNextNone) {
+  EXPECT_FALSE(isNextNone(Colors::Red));
+  EXPECT_FALSE(isNextNone(Colors::Green));
+  EXPECT_TRUE(isNextNone(Colors::Blue));
+  EXPECT_FALSE(isNextNone(Colors::None));
+  EXPECT_FALSE(isNextNone(static_cast<Colors>(4))); // bad value
+}
+
 } // namespace kanji_tools
