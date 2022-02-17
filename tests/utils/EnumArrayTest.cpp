@@ -38,7 +38,17 @@ TEST(EnumArrayTest, CalÇlInstanceBeforeCreate) {
 }
 
 TEST(EnumArrayTest, CallCreateTwice) {
-  auto x = BaseEnumArray<TestEnum>::create("A", "B", "C");
+  auto enumArray = BaseEnumArray<TestEnum>::create("A", "B", "C");
+  // 'create' returns an 'EnumArray' for the given enum with a second template parameter for the
+  // number of names provided (the actual enum should have one more 'None' value at the end)
+  EXPECT_EQ(typeid(enumArray), typeid(EnumArray<TestEnum, 3>));
+  EXPECT_EQ(enumArray.size(), 4); // 'size' includes the final 'None' value of the enum
+  // 'instance' returns 'const BaseEnumArray&', but the object returned is 'EnumArray'
+  auto& instance = enumArray.instance();
+  EXPECT_EQ(typeid(std::result_of_t<decltype (&BaseEnumArray<TestEnum>::instance)()>),
+            typeid(const BaseEnumArray<TestEnum>&));
+  EXPECT_EQ(typeid(instance), typeid(const EnumArray<TestEnum, 3>&));
+  // calling 'create' again should throw an exception
   EXPECT_THROW(
     call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "C"); }, "'create' should only be called once"),
     std::domain_error);
