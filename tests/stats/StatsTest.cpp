@@ -17,26 +17,31 @@ protected:
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
-  StatsTest()
-    : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)), _testDir("testDir"), _testFile(_testDir / "test.txt") {}
+
+  static void SetUpTestCase() {
+    _data = std::make_shared<KanjiData>(3, argv(), _os);
+  }
+
+  StatsTest() {}
 
   void SetUp() override {
-    if (fs::exists(_testDir)) TearDown();
-    EXPECT_TRUE(fs::create_directory(_testDir));
+    _os.str("");
+    _os.clear();
+    if (fs::exists(TestDir)) TearDown();
+    EXPECT_TRUE(fs::create_directory(TestDir));
   }
-  void TearDown() override { fs::remove_all(_testDir); }
+  void TearDown() override { fs::remove_all(TestDir); }
 
   void writeTestFile(const std::string& s) {
-    std::ofstream of(_testFile);
+    std::ofstream of(TestFile);
     of << s;
     of.close();
   }
 
-  std::stringstream _os;
-  std::stringstream _es;
-  const DataPtr _data;
-  const fs::path _testDir;
-  const fs::path _testFile;
+  inline static std::stringstream _os;
+  inline static DataPtr _data;
+  inline static const fs::path TestDir = "testDir";
+  inline static const fs::path TestFile = TestDir / "test.txt";
 };
 
 TEST_F(StatsTest, PrintStatsForOneFile) {

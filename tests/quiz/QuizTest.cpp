@@ -14,8 +14,13 @@ protected:
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
+
+  static void SetUpTestCase() {
+    _data = std::make_shared<KanjiData>(3, argv(), _os, _es);
+  }
+
   // Contructs Quiz using the real data files
-  QuizTest() : _data(std::make_shared<KanjiData>(3, argv(), _os, _es)), _quiz(3, argv(), _data, &_is) {}
+  QuizTest() : _quiz(3, argv(), _data, &_is) {}
 
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
@@ -74,11 +79,12 @@ protected:
     if (_os.eof()) FAIL() << "couldn't find first Question";
   }
 
-  std::stringstream _os;
-  std::stringstream _es;
   std::stringstream _is;
-  const DataPtr _data;
   QuizLauncher _quiz;
+
+  inline static std::stringstream _os;
+  inline static std::stringstream _es;
+  inline static DataPtr _data;
 };
 
 TEST_F(QuizTest, ListQuiz) {
