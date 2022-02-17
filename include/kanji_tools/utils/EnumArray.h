@@ -4,7 +4,6 @@
 #include <kanji_tools/utils/EnumTraits.h>
 
 #include <array>
-#include <cassert>
 #include <iostream>
 #include <map>
 #include <string>
@@ -36,22 +35,22 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> inline cons
 
 template<typename T> class BaseEnumArray {
 public:
-  template<typename... Args> [[nodiscard]] static auto create(Args...);
+  // must specifiy at least one 'name' when calling 'create' (see comments above)
+  template<typename... Names> [[nodiscard]] static auto create(const char* name, Names...);
 
-  [[nodiscard]] static BaseEnumArray<T>& instance() noexcept { return *_instance; }
+  [[nodiscard]] static const auto& instance() {
+    if (!_instance) throw std::domain_error("must call 'create' before calling 'instance'");
+    return *_instance;
+  }
 
   BaseEnumArray(const BaseEnumArray&) = delete;
   BaseEnumArray& operator=(const BaseEnumArray&) = delete;
 
   [[nodiscard]] virtual const std::string& toString(T) const = 0;
 protected:
-  BaseEnumArray() noexcept {
-    // abort if initialized more than once (for a debug build)
-    assert(_instance == nullptr);
-    _instance = this;
-  }
-private:
-  inline static BaseEnumArray<T>* _instance = 0;
+  BaseEnumArray() {}
+
+  inline static BaseEnumArray<T>* _instance = nullptr;
 };
 
 template<typename T, size_t N> class EnumArray : public BaseEnumArray<T> {
@@ -125,10 +124,10 @@ public:
     size_t _index = 0;
   };
 
-  [[nodiscard]] auto begin() const noexcept { return Iterator(0); }
-  [[nodiscard]] auto end() const noexcept { return Iterator(N + 1); } // 'N' is 'T::None' so end should be N + 1
+  [[nodiscard]] static auto begin() noexcept { return Iterator(0); }
+  [[nodiscard]] static auto end() noexcept { return Iterator(N + 1); } // 'N' is 'T::None' so end should be N + 1
 
-  [[nodiscard]] constexpr size_t size() const noexcept { return N + 1; }
+  [[nodiscard]] static constexpr size_t size() noexcept { return N + 1; }
 
   [[nodiscard]] auto operator[](size_t i) const {
     if (i > N) throw std::out_of_range("index '" + std::to_string(i) + "' is out of range");
@@ -160,21 +159,26 @@ private:
 
   EnumArray(const char* name) { insert(name, N - 1); }
 
-  template<typename... Args> EnumArray(const char* name, Args... args) : EnumArray(args...) {
+  template<typename... Names> EnumArray(const char* name, Names... args) : EnumArray(args...) {
     insert(name, N - 1 - sizeof...(args));
+    // set _instance after processing all 'args' in case an exception is thrown
+    if (sizeof...(args) == N - 1) BaseEnumArray<T>::_instance = this;
   }
 
   std::array<std::string, N> _names;
   std::map<std::string, T> _nameMap;
 };
 
-template<typename T> template<typename... Args> [[nodiscard]] auto BaseEnumArray<T>::create(Args... args) {
+template<typename T>
+template<typename... Names>
+[[nodiscard]] auto BaseEnumArray<T>::create(const char* name, Names... args) {
   static_assert(is_enumarray<T>, "need to define 'is_enumarray' for T before calling 'initialize'");
-  // make sure the scoped enum 'T' has a value of None that is just past the set of string
+  // Make sure the scoped enum 'T' has a value of None that is just past the set of string
   // values provided - this will help ensure that any changes to the enum must also be made
-  // to the BaseEnumArray and vice versa.
-  static_assert(to_underlying(T::None) == sizeof...(Args));
-  return EnumArray<T, sizeof...(args)>(args...);
+  // to the call to 'create' and vice versa.
+  static_assert(static_cast<T>(sizeof...(Names) + 1) == T::None);
+  if (_instance) throw std::domain_error("'create' should only be called once");
+  return EnumArray<T, sizeof...(args) + 1>(name, args...);
 }
 
 template<typename T> [[nodiscard]] std::enable_if_t<is_enumarray<T>, const std::string&> toString(T x) {

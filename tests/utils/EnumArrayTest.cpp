@@ -11,27 +11,36 @@ namespace {
 
 enum class Colors { Red, Green, Blue, None };
 
-// need multiple enums for testing constructor failures since _instance gets set
-// by BaseEnumArray, but the exceptions are throw by derived class constructor
-enum class TestEnum1 { A, B, C, None };
-enum class TestEnum2 { A, B, C, None };
+enum class TestEnum { A, B, C, None };
 
 } // namespace
 
 template<> inline constexpr bool is_enumarray<Colors> = true;
 inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green", "Blue");
 
-template<> inline constexpr bool is_enumarray<TestEnum1> = true;
-template<> inline constexpr bool is_enumarray<TestEnum2> = true;
+template<> inline constexpr bool is_enumarray<TestEnum> = true;
 
 TEST(EnumArrayTest, FailForDuplicateName) {
-  EXPECT_THROW(call([] { auto x = BaseEnumArray<TestEnum1>::create("A", "B", "B"); }, "duplicate name 'B'"),
+  EXPECT_THROW(call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "B"); }, "duplicate name 'B'"),
                std::domain_error);
 }
 
 TEST(EnumArrayTest, FailForNoneName) {
   EXPECT_THROW(
-    call([] { auto x = BaseEnumArray<TestEnum2>::create("A", "B", "None"); }, "'None' should not be specified"),
+    call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "None"); }, "'None' should not be specified"),
+    std::domain_error);
+}
+
+TEST(EnumArrayTest, CalÇlInstanceBeforeCreate) {
+  // 'toString' calls 'instance'
+  EXPECT_THROW(call([] { return toString(TestEnum::A); }, "must call 'create' before calling 'instance'"),
+               std::domain_error);
+}
+
+TEST(EnumArrayTest, CallCreateTwice) {
+  auto x = BaseEnumArray<TestEnum>::create("A", "B", "C");
+  EXPECT_THROW(
+    call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "C"); }, "'create' should only be called once"),
     std::domain_error);
 }
 
