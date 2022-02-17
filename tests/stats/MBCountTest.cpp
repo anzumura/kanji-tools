@@ -6,7 +6,17 @@
 
 namespace kanji_tools {
 
+namespace fs = std::filesystem;
+
 namespace {
+
+const fs::path TestDir = "testDir";
+const fs::path TestFile1 = TestDir / "testFile甲";
+const fs::path TestFile2 = TestDir / "testFile乙";
+const fs::path BracketFile = TestDir / "bracketFile";
+const fs::path TestSubDir = TestDir / "test下";
+const fs::path TestSubFile1 = TestSubDir / "testSubFile1";
+const fs::path TestSubFile2 = TestSubDir / "testSubFile2.txt";
 
 auto removeFurigana(const std::wstring& s) {
   return std::regex_replace(s, MBCount::RemoveFurigana, MBCount::DefaultReplace);
@@ -14,30 +24,21 @@ auto removeFurigana(const std::wstring& s) {
 
 } // namespace
 
-namespace fs = std::filesystem;
-
 class MBCountTest : public ::testing::Test {
 protected:
   void SetUp() override {
-    if (fs::exists(_testDir)) TearDown();
-    EXPECT_TRUE(fs::create_directories(_testSubDir));
-    std::array files = {std::pair(_testFile1, "北海道"), std::pair(_testFile2, "南北"),
-                        std::pair(_testSubFile1, "東西線"), std::pair(_testSubFile2, "東北")};
+    if (fs::exists(TestDir)) TearDown();
+    EXPECT_TRUE(fs::create_directories(TestSubDir));
+    std::array files = {std::pair(TestFile1, "北海道"), std::pair(TestFile2, "南北"), std::pair(TestSubFile1, "東西線"),
+                        std::pair(TestSubFile2, "東北")};
     for (auto& i : files) {
       std::ofstream of(i.first);
       of << i.second;
       of.close();
     }
   }
-  void TearDown() override { fs::remove_all(_testDir); }
+  void TearDown() override { fs::remove_all(TestDir); }
   MBCount c;
-  fs::path _testDir = "testDir";
-  fs::path _testFile1 = _testDir / "testFile甲";
-  fs::path _testFile2 = _testDir / "testFile乙";
-  fs::path _bracketFile = _testDir / "bracketFile";
-  fs::path _testSubDir = _testDir / "test下";
-  fs::path _testSubFile1 = _testSubDir / "testSubFile1";
-  fs::path _testSubFile2 = _testSubDir / "testSubFile2.txt";
 };
 
 TEST_F(MBCountTest, CheckRemovingFurigana) {
@@ -149,7 +150,7 @@ TEST_F(MBCountTest, AddWithPredicate) {
 }
 
 TEST_F(MBCountTest, AddFile) {
-  EXPECT_EQ(c.addFile(_testFile1, false, false, false), 3);
+  EXPECT_EQ(c.addFile(TestFile1, false, false, false), 3);
   EXPECT_EQ(c.uniqueEntries(), 3);
   EXPECT_EQ(c.files(), 1);
   EXPECT_EQ(c.directories(), 0);
@@ -159,7 +160,7 @@ TEST_F(MBCountTest, AddFile) {
 }
 
 TEST_F(MBCountTest, AddFileIncludingFile) {
-  EXPECT_EQ(c.addFile(_testFile1, false, true, false), 4);
+  EXPECT_EQ(c.addFile(TestFile1, false, true, false), 4);
   EXPECT_EQ(c.uniqueEntries(), 4);
   EXPECT_EQ(c.count("北"), 1);
   EXPECT_EQ(c.count("海"), 1);
@@ -168,13 +169,13 @@ TEST_F(MBCountTest, AddFileIncludingFile) {
 }
 
 TEST_F(MBCountTest, AddMissingFile) {
-  EXPECT_THROW(call([this] { c.addFile(_testDir / "missing"); }, "file not found: testDir/missing"), std::domain_error);
+  EXPECT_THROW(call([this] { c.addFile(TestDir / "missing"); }, "file not found: testDir/missing"), std::domain_error);
   EXPECT_EQ(c.files(), 0);
   EXPECT_EQ(c.directories(), 0);
 }
 
 TEST_F(MBCountTest, AddDirectoryNoRecurse) {
-  EXPECT_EQ(c.addFile(_testDir, false, false, false), 5);
+  EXPECT_EQ(c.addFile(TestDir, false, false, false), 5);
   EXPECT_EQ(c.uniqueEntries(), 4);
   EXPECT_EQ(c.files(), 2);
   EXPECT_EQ(c.directories(), 1);
@@ -185,7 +186,7 @@ TEST_F(MBCountTest, AddDirectoryNoRecurse) {
 }
 
 TEST_F(MBCountTest, AddDirectoryNoRecurseIncludingFileNames) {
-  EXPECT_EQ(c.addFile(_testDir, false, true, false), 7);
+  EXPECT_EQ(c.addFile(TestDir, false, true, false), 7);
   EXPECT_EQ(c.uniqueEntries(), 6);
   EXPECT_EQ(c.count("北"), 2);
   EXPECT_EQ(c.count("南"), 1);
@@ -196,7 +197,7 @@ TEST_F(MBCountTest, AddDirectoryNoRecurseIncludingFileNames) {
 }
 
 TEST_F(MBCountTest, AddDirectoryRecurse) {
-  EXPECT_EQ(c.addFile(_testDir, false, false), 10);
+  EXPECT_EQ(c.addFile(TestDir, false, false), 10);
   EXPECT_EQ(c.uniqueEntries(), 7);
   EXPECT_EQ(c.files(), 4);
   EXPECT_EQ(c.directories(), 2);
@@ -210,7 +211,7 @@ TEST_F(MBCountTest, AddDirectoryRecurse) {
 }
 
 TEST_F(MBCountTest, AddDirectoryRecurseIncludingFileNamesButNoTags) {
-  EXPECT_EQ(c.addFile(_testDir, false), 13);
+  EXPECT_EQ(c.addFile(TestDir, false), 13);
   EXPECT_EQ(c.uniqueEntries(), 10);
   EXPECT_EQ(c.count("北"), 3);
   EXPECT_EQ(c.tags("北"), nullptr);
@@ -226,7 +227,7 @@ TEST_F(MBCountTest, AddDirectoryRecurseIncludingFileNamesButNoTags) {
 }
 
 TEST_F(MBCountTest, CheckTags) {
-  EXPECT_EQ(c.addFile(_testDir), 13);
+  EXPECT_EQ(c.addFile(TestDir), 13);
   EXPECT_EQ(c.uniqueEntries(), 10);
   auto tags = c.tags("北");
   ASSERT_TRUE(tags != nullptr);
@@ -258,26 +259,26 @@ TEST_F(MBCountTest, Regex) {
 }
 
 TEST_F(MBCountTest, BracketsAcrossLines) {
-  std::ofstream of(_bracketFile);
+  std::ofstream of(BracketFile);
   of << "安寿が亡きあとはねんごろに弔（\n";
   of << "とむら）われ、また入水した沼の畔（ほとり）には尼寺が立つことになった。\n";
   of.close();
   std::wregex regex(L"（[^）]+）");
   MBCount r(regex);
-  EXPECT_EQ(r.addFile(_bracketFile), 40);
+  EXPECT_EQ(r.addFile(BracketFile), 40);
   EXPECT_EQ(r.count("（"), 0);
   EXPECT_EQ(r.count("）"), 0);
 }
 
 TEST_F(MBCountTest, BracketsAtStartOfLine) {
-  std::ofstream of(_bracketFile);
+  std::ofstream of(BracketFile);
   of << "安寿が亡きあとはねんごろに弔（と\n";
   of << "むら）われ、また入水した沼の畔\n";
   of << "（ほとり）には尼寺が立つことになった。\n";
   of.close();
   std::wregex regex(L"（[^）]+）");
   MBCount r(regex);
-  EXPECT_EQ(r.addFile(_bracketFile), 40);
+  EXPECT_EQ(r.addFile(BracketFile), 40);
   EXPECT_EQ(r.count("（"), 0);
   EXPECT_EQ(r.count("）"), 0);
 }

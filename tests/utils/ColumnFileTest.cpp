@@ -25,36 +25,36 @@ class ColumnFileTest : public ::testing::Test {
 protected:
   inline static const std::string convertError = "failed to convert to ";
   void SetUp() override {
-    if (fs::exists(_testDir)) TearDown();
-    EXPECT_TRUE(fs::create_directory(_testDir));
+    if (fs::exists(TestDir)) TearDown();
+    EXPECT_TRUE(fs::create_directory(TestDir));
   }
-  void TearDown() override { fs::remove_all(_testDir); }
-  fs::path _testDir = "testDir";
-  fs::path _testFile = _testDir / "testFile.txt";
+  void TearDown() override { fs::remove_all(TestDir); }
+  inline static const fs::path TestDir = "testDir";
+  inline static const fs::path TestFile = TestDir / "testFile.txt";
 };
 
 TEST_F(ColumnFileTest, SingleColumnFile) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   EXPECT_EQ(f.name(), "testFile.txt");
   EXPECT_EQ(f.columns(), 1);
   EXPECT_EQ(f.currentRow(), 0);
 }
 
 TEST_F(ColumnFileTest, NoColumnsError) {
-  EXPECT_THROW(call([this] { ColumnFile f(_testFile, {}); }, "must specify at least one column - file: testFile.txt"),
+  EXPECT_THROW(call([] { ColumnFile f(TestFile, {}); }, "must specify at least one column - file: testFile.txt"),
                std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetValueFromOneColumn) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nVal\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   ASSERT_TRUE(f.nextRow());
   EXPECT_EQ(f.currentRow(), 1);
   EXPECT_EQ(f.get(col), "Val");
@@ -63,21 +63,21 @@ TEST_F(ColumnFileTest, GetValueFromOneColumn) {
 }
 
 TEST_F(ColumnFileTest, GetEmptyValueFromOneColumn) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\n\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   ASSERT_TRUE(f.nextRow());
   EXPECT_TRUE(f.isEmpty(col));
 }
 
 TEST_F(ColumnFileTest, GetValueFromMultipleColumns) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol2\tCol3\nVal1\tVal2\tVal3\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
-  ColumnFile f(_testFile, {col1, col2, col3});
+  ColumnFile f(TestFile, {col1, col2, col3});
   ASSERT_TRUE(f.nextRow());
   EXPECT_EQ(f.get(col1), "Val1");
   EXPECT_EQ(f.get(col2), "Val2");
@@ -85,11 +85,11 @@ TEST_F(ColumnFileTest, GetValueFromMultipleColumns) {
 }
 
 TEST_F(ColumnFileTest, UseNonDefaultDelimiter) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1|Col2|Col3\nVal1|Val2|\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
-  ColumnFile f(_testFile, {col1, col2, col3}, '|');
+  ColumnFile f(TestFile, {col1, col2, col3}, '|');
   ASSERT_TRUE(f.nextRow());
   EXPECT_EQ(f.get(col1), "Val1");
   EXPECT_EQ(f.get(col2), "Val2");
@@ -98,11 +98,11 @@ TEST_F(ColumnFileTest, UseNonDefaultDelimiter) {
 }
 
 TEST_F(ColumnFileTest, AllowGettingEmptyValues) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol2\tCol3\tCol4\n\tVal2\t\t\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3"), col4("Col4");
-  ColumnFile f(_testFile, {col1, col2, col3, col4});
+  ColumnFile f(TestFile, {col1, col2, col3, col4});
   ASSERT_TRUE(f.nextRow());
   EXPECT_TRUE(f.isEmpty(col1));
   EXPECT_FALSE(f.isEmpty(col2));
@@ -112,11 +112,11 @@ TEST_F(ColumnFileTest, AllowGettingEmptyValues) {
 }
 
 TEST_F(ColumnFileTest, HeaderColumnOrderDifferentThanConstructor) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol2\tCol3\nVal1\tVal2\tVal3\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
-  ColumnFile f(_testFile, {col3, col2, col1});
+  ColumnFile f(TestFile, {col3, col2, col1});
   ASSERT_TRUE(f.nextRow());
   EXPECT_EQ(f.get(col1), "Val1");
   EXPECT_EQ(f.get(col2), "Val2");
@@ -124,11 +124,11 @@ TEST_F(ColumnFileTest, HeaderColumnOrderDifferentThanConstructor) {
 }
 
 TEST_F(ColumnFileTest, GetMultipleRows) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol2\tCol3\nR11\tR12\tR13\nR21\tR22\tR23\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
-  ColumnFile f(_testFile, {col1, col2, col3});
+  ColumnFile f(TestFile, {col1, col2, col3});
   ASSERT_TRUE(f.nextRow());
   EXPECT_EQ(f.get(col1), "R11");
   EXPECT_EQ(f.get(col2), "R12");
@@ -141,76 +141,75 @@ TEST_F(ColumnFileTest, GetMultipleRows) {
 }
 
 TEST_F(ColumnFileTest, NotEnoughColumns) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol2\tCol3\nVal1\tVal2\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
-  ColumnFile f(_testFile, {col1, col2, col3});
+  ColumnFile f(TestFile, {col1, col2, col3});
   EXPECT_THROW(call([&f] { f.nextRow(); }, "not enough columns - file: testFile.txt, row: 1"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, TooManyColumns) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol2\tCol3\nVal1\tVal2\tVal3\tVal4\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
-  ColumnFile f(_testFile, {col1, col2, col3});
+  ColumnFile f(TestFile, {col1, col2, col3});
   EXPECT_THROW(call([&f] { f.nextRow(); }, "too many columns - file: testFile.txt, row: 1"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "HeaderName\n";
   of.close();
   ColumnFile::Column col("ColumnName");
-  EXPECT_THROW(
-    call([&, this] { ColumnFile f(_testFile, {col}); }, "unrecognized header 'HeaderName' - file: testFile.txt"),
-    std::domain_error);
+  EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); }, "unrecognized header 'HeaderName' - file: testFile.txt"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, DuplicateHeaderError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\tCol\n";
   of.close();
   ColumnFile::Column col("Col");
-  EXPECT_THROW(call([&, this] { ColumnFile f(_testFile, {col}); }, "duplicate header 'Col' - file: testFile.txt"),
+  EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); }, "duplicate header 'Col' - file: testFile.txt"),
                std::domain_error);
 }
 
 TEST_F(ColumnFileTest, DuplicateColumnError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "HeaderName\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2");
   EXPECT_THROW(call(
-                 [&, this] {
-                   ColumnFile f(_testFile, {col1, col2, col1});
+                 [&] {
+                   ColumnFile f(TestFile, {col1, col2, col1});
                  },
                  "duplicate column 'Col1' - file: testFile.txt"),
                std::domain_error);
 }
 
 TEST_F(ColumnFileTest, OneMissingColumnError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2");
   EXPECT_THROW(call(
-                 [&, this] {
-                   ColumnFile f(_testFile, {col1, col2});
+                 [&] {
+                   ColumnFile f(TestFile, {col1, col2});
                  },
                  "column 'Col2' not found - file: testFile.txt"),
                std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col1\tCol3\n";
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3"), col4("Col4");
   EXPECT_THROW(call(
-                 [&, this] {
-                   ColumnFile f(_testFile, {col1, col2, col3, col4});
+                 [&] {
+                   ColumnFile f(TestFile, {col1, col2, col3, col4});
                  },
                  "2 columns not found: 'Col2', 'Col4' - file: testFile.txt"),
                std::domain_error);
@@ -218,41 +217,39 @@ TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
 
 TEST_F(ColumnFileTest, MissingFileError) {
   ColumnFile::Column col("Col");
-  EXPECT_THROW(call([&, this] { ColumnFile f(_testFile, {col}); }, "doesn't exist - file: testFile.txt"),
-               std::domain_error);
+  EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); }, "doesn't exist - file: testFile.txt"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, NotRegularFileError) {
   ColumnFile::Column col("Col");
-  EXPECT_THROW(call([&, this] { ColumnFile f(_testDir, {col}); }, "not regular file - file: testDir"),
-               std::domain_error);
+  EXPECT_THROW(call([&] { ColumnFile f(TestDir, {col}); }, "not regular file - file: testDir"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MissingHeaderRowError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "";
   of.close();
   ColumnFile::Column col("Col");
-  EXPECT_THROW(call([&, this] { ColumnFile f(_testFile, {col}); }, "missing header row - file: testFile.txt"),
+  EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); }, "missing header row - file: testFile.txt"),
                std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetBeforeNextRowError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   EXPECT_THROW(call([&] { f.get(col); }, "'nextRow' must be called before calling 'get' - file: testFile.txt"),
                std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nVal\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   ColumnFile::Column columnCreatedAfterConstruction("Created After");
   EXPECT_THROW(call([&] { f.get(columnCreatedAfterConstruction); },
@@ -261,11 +258,11 @@ TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
 }
 
 TEST_F(ColumnFileTest, GetInvalidColumError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nVal\n";
   of.close();
   ColumnFile::Column col("Col"), columnNotIncludedInFile("Not Included");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
     call([&] { f.get(columnNotIncludedInFile); }, "invalid column 'Not Included' - file: testFile.txt, row: 1"),
@@ -273,21 +270,21 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
 }
 
 TEST_F(ColumnFileTest, GetInt) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\n123\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_EQ(f.getInt(col), 123);
 }
 
 TEST_F(ColumnFileTest, GetIntError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nblah\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
     call([&] { f.getInt(col); }, convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
@@ -295,11 +292,11 @@ TEST_F(ColumnFileTest, GetIntError) {
 }
 
 TEST_F(ColumnFileTest, GetOptInt) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\n123\n\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_EQ(f.getOptInt(col), 123);
   EXPECT_TRUE(f.nextRow());
@@ -307,11 +304,11 @@ TEST_F(ColumnFileTest, GetOptInt) {
 }
 
 TEST_F(ColumnFileTest, GetOptIntError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nblah\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
     call([&] { f.getOptInt(col); }, convertError + "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
@@ -319,11 +316,11 @@ TEST_F(ColumnFileTest, GetOptIntError) {
 }
 
 TEST_F(ColumnFileTest, GetBool) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "1\t2\t3\t4\t5\nY\tT\tN\tF\t\n";
   of.close();
   ColumnFile::Column c1("1"), c2("2"), c3("3"), c4("4"), c5("5");
-  ColumnFile f(_testFile, {c1, c2, c3, c4, c5});
+  ColumnFile f(TestFile, {c1, c2, c3, c4, c5});
   f.nextRow();
   EXPECT_TRUE(f.getBool(c1));
   EXPECT_TRUE(f.getBool(c2));
@@ -333,11 +330,11 @@ TEST_F(ColumnFileTest, GetBool) {
 }
 
 TEST_F(ColumnFileTest, GetBoolError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nx\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
     call([&] { f.getBool(col); }, convertError + "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'"),
@@ -345,22 +342,22 @@ TEST_F(ColumnFileTest, GetBoolError) {
 }
 
 TEST_F(ColumnFileTest, GetWChar) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "1\t2\n898B\t20B9F\n";
   of.close();
   ColumnFile::Column c1("1"), c2("2");
-  ColumnFile f(_testFile, {c1, c2});
+  ColumnFile f(TestFile, {c1, c2});
   f.nextRow();
   EXPECT_EQ(f.getWChar(c1), 35211);
   EXPECT_EQ(f.getWChar(c2), 134047);
 }
 
 TEST_F(ColumnFileTest, GetWCharError) {
-  std::ofstream of(_testFile);
+  std::ofstream of(TestFile);
   of << "Col\nAAA\n123456\nABCd\nDEFG\n";
   of.close();
   ColumnFile::Column col("Col");
-  ColumnFile f(_testFile, {col});
+  ColumnFile f(TestFile, {col});
   for (auto i : {std::string("length must be 4 or 5 - file: testFile.txt, row: 1, column: 'Col', value: 'AAA'"),
                  std::string("length must be 4 or 5 - file: testFile.txt, row: 2, column: 'Col', value: '123456'"),
                  std::string("invalid hex - file: testFile.txt, row: 3, column: 'Col', value: 'ABCd'"),
