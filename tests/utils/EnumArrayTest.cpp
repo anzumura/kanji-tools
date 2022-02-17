@@ -37,6 +37,14 @@ TEST(EnumArrayTest, CalÇlInstanceBeforeCreate) {
                std::domain_error);
 }
 
+TEST(EnumArrayTest, DestructorClearsInstance) {
+  for (auto _ = 2; _--;) {
+    EXPECT_FALSE(BaseEnumArray<TestEnum>::isCreated());
+    auto x = BaseEnumArray<TestEnum>::create("A", "B", "C");
+    EXPECT_TRUE(BaseEnumArray<TestEnum>::isCreated());
+  }
+}
+
 TEST(EnumArrayTest, CallCreateTwice) {
   auto enumArray = BaseEnumArray<TestEnum>::create("A", "B", "C");
   // 'create' returns an 'EnumArray' for the given enum with a second template parameter for the

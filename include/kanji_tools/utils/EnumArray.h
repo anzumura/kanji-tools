@@ -43,12 +43,16 @@ public:
     return *_instance;
   }
 
+  [[nodiscard]] static auto isCreated() noexcept { return _instance != nullptr; }
+
+  virtual ~BaseEnumArray() { _instance = nullptr; }
+
   BaseEnumArray(const BaseEnumArray&) = delete;
   BaseEnumArray& operator=(const BaseEnumArray&) = delete;
 
   [[nodiscard]] virtual const std::string& toString(T) const = 0;
 protected:
-  BaseEnumArray() {}
+  BaseEnumArray() { _instance = this; }
 
   inline static BaseEnumArray<T>* _instance = nullptr;
 };
@@ -161,8 +165,6 @@ private:
 
   template<typename... Names> EnumArray(const char* name, Names... args) : EnumArray(args...) {
     insert(name, N - 1 - sizeof...(args));
-    // set _instance after processing all 'args' in case an exception is thrown
-    if (sizeof...(args) == N - 1) BaseEnumArray<T>::_instance = this;
   }
 
   std::array<std::string, N> _names;
