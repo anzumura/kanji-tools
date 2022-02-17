@@ -18,9 +18,7 @@ protected:
     return args;
   }
 
-  static void SetUpTestCase() {
-    _data = std::make_shared<KanjiData>(3, argv(), _os);
-  }
+  static void SetUpTestCase() { _data = std::make_shared<KanjiData>(3, argv(), _os); }
 
   StatsTest() {}
 

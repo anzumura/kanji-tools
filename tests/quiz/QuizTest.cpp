@@ -15,9 +15,7 @@ protected:
     return args;
   }
 
-  static void SetUpTestCase() {
-    _data = std::make_shared<KanjiData>(3, argv(), _os, _es);
-  }
+  static void SetUpTestCase() { _data = std::make_shared<KanjiData>(3, argv(), _os, _es); }
 
   // Contructs Quiz using the real data files
   QuizTest() : _quiz(3, argv(), _data, &_is) {}
