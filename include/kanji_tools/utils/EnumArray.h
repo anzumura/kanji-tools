@@ -4,6 +4,7 @@
 #include <kanji_tools/utils/EnumTraits.h>
 
 #include <array>
+#include <compare>
 #include <iostream>
 #include <map>
 #include <string>
@@ -72,6 +73,7 @@ public:
 
     // forward iterator requirements (a default constructor)
     Iterator(size_t index = 0) noexcept : _index(index) {}
+
     // common requirements for iterators
     auto& operator++() {
       // entry at 'A' is 'T::None' so allow iterating until index == N to include it
@@ -84,14 +86,18 @@ public:
       ++*this;
       return x;
     }
+
+    // operator<=> enables == and != needed for 'input interator' and <, >, <= and >=
+    // needed for 'random access iterator'
+    [[nodiscard]] auto operator<=>(const Iterator& x) const noexcept = default;
+
     // input iterator requirements (except operator->)
-    [[nodiscard]] auto operator==(const Iterator& x) const noexcept { return _index == x._index; }
-    [[nodiscard]] auto operator!=(const Iterator& x) const noexcept { return !(*this == x); }
     [[nodiscard]] auto operator*() const {
       // exception should only happen when dereferencing 'end' since other methods prevent moving out of range
       if (_index > N) throw std::out_of_range("index '" + std::to_string(_index) + "' is out of range");
       return static_cast<T>(_index);
     }
+
     // bi-directional iterator requirements
     auto& operator--() {
       if (_index == 0) throw std::out_of_range("can't decrement past zero");
@@ -103,6 +109,7 @@ public:
       --*this;
       return x;
     }
+
     // random-access iterator requirements (except non-const operator[])
     auto& operator+=(difference_type offset) {
       if (_index + offset < 0 || _index + offset > N + 1) throw std::out_of_range("can't increment past end");
@@ -120,10 +127,6 @@ public:
       return x -= offset;
     }
     [[nodiscard]] auto operator-(const Iterator& x) const noexcept { return _index - x._index; }
-    [[nodiscard]] auto operator<(const Iterator& x) const noexcept { return _index < x._index; }
-    [[nodiscard]] auto operator>(const Iterator& x) const noexcept { return x < *this; }
-    [[nodiscard]] auto operator<=(const Iterator& x) const noexcept { return !(x < *this); }
-    [[nodiscard]] auto operator>=(const Iterator& x) const noexcept { return !(*this < x); }
   private:
     size_t _index = 0;
   };
