@@ -34,10 +34,10 @@ namespace kanji_tools {
 // 'is_enumarray' bool that should be specialized:
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0> inline constexpr bool is_enumarray = false;
 
-template<typename T> class BaseEnumArray {
+template<typename T, std::enable_if_t<is_enumarray<T>, int> = 0> class BaseEnumArray {
 public:
   // must specifiy at least one 'name' when calling 'create' (see comments above)
-  template<typename... Names> [[nodiscard]] static auto create(const char* name, Names...);
+  template<typename... Names> [[nodiscard]] static auto create(const std::string& name, Names...);
 
   [[nodiscard]] static const auto& instance() {
     if (!_instance) throw std::domain_error("must call 'create' before calling 'instance'");
@@ -157,16 +157,16 @@ private:
   inline const static std::string None = "None";
   friend BaseEnumArray<T>; // static 'EnumArray<T>::initialize' method calls private constructor
 
-  void insert(const char* name, size_t index) {
+  void insert(const std::string& name, size_t index) {
     const auto i = _nameMap.emplace(name, static_cast<T>(index));
     if (!i.second) throw std::domain_error("duplicate name '" + i.first->first + "'");
-    if (i.first->first == None) throw std::domain_error("'None' should not be specified");
-    _names[index] = i.first->first;
+    if (name == None) throw std::domain_error("'None' should not be specified");
+    _names[index] = name;
   }
 
-  EnumArray(const char* name) { insert(name, N - 1); }
+  EnumArray(const std::string& name) { insert(name, N - 1); }
 
-  template<typename... Names> EnumArray(const char* name, Names... args) : EnumArray(args...) {
+  template<typename... Names> EnumArray(const std::string& name, Names... args) : EnumArray(args...) {
     insert(name, N - 1 - sizeof...(args));
   }
 
@@ -174,10 +174,9 @@ private:
   std::map<std::string, T> _nameMap;
 };
 
-template<typename T>
+template<typename T, std::enable_if_t<is_enumarray<T>, int> _>
 template<typename... Names>
-[[nodiscard]] auto BaseEnumArray<T>::create(const char* name, Names... args) {
-  static_assert(is_enumarray<T>, "need to define 'is_enumarray' for T before calling 'initialize'");
+[[nodiscard]] auto BaseEnumArray<T, _>::create(const std::string& name, Names... args) {
   // Make sure the scoped enum 'T' has a value of None that is just past the set of string
   // values provided - this will help ensure that any changes to the enum must also be made
   // to the call to 'create' and vice versa.
