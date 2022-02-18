@@ -31,7 +31,7 @@ TEST(EnumArrayTest, FailForNoneName) {
     std::domain_error);
 }
 
-TEST(EnumArrayTest, CalÇlInstanceBeforeCreate) {
+TEST(EnumArrayTest, CallInstanceBeforeCreate) {
   // 'toString' calls 'instance'
   EXPECT_THROW(call([] { return toString(TestEnum::A); }, "must call 'create' before calling 'instance'"),
                std::domain_error);
