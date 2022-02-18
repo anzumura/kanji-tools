@@ -9,13 +9,13 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-JukugoData::JukugoData(const Data& data) {
+JukugoData::JukugoData(DataPtr data) {
   const std::string jukugoDir("jukugo/");
-  auto f = [this, &jukugoDir, &data](const char* file, KanjiGrades grade) {
-    const auto loaded = loadFile(DataFile::getFile(data.dataDir(), fs::path(jukugoDir + file + ".txt")), grade);
-    if (data.debug()) data.log() << "Loaded " << loaded << " for Grade: " << grade << '\n';
+  auto f = [this, &jukugoDir, data](const char* file, KanjiGrades grade) {
+    const auto loaded = loadFile(DataFile::getFile(data->dataDir(), fs::path(jukugoDir + file + ".txt")), grade);
+    if (data->debug()) data->log() << "Loaded " << loaded << " for Grade: " << grade << '\n';
   };
-  if (data.debug()) data.log(true) << "Begin Loading Jukugo\n>>>\n";
+  if (data->debug()) data->log(true) << "Begin Loading Jukugo\n>>>\n";
   f("g1", KanjiGrades::G1);
   f("g2", KanjiGrades::G2);
   f("g3", KanjiGrades::G3);
@@ -23,15 +23,15 @@ JukugoData::JukugoData(const Data& data) {
   f("g5", KanjiGrades::G5);
   f("g6", KanjiGrades::G6);
   f("other", KanjiGrades::S);
-  if (data.debug()) {
-    data.log() << "Total Kanji with Jukugo: " << _kanjiToJukugo.size() << ", unique jukugo: " << _uniqueJukugo.size()
-               << '\n';
+  if (data->debug()) {
+    data->log() << "Total Kanji with Jukugo: " << _kanjiToJukugo.size() << ", unique jukugo: " << _uniqueJukugo.size()
+                << '\n';
     std::map<KanjiTypes, std::vector<std::string>> types;
-    for (auto& i : _kanjiToJukugo) types[data.getType(i.first)].push_back(i.first);
+    for (auto& i : _kanjiToJukugo) types[data->getType(i.first)].push_back(i.first);
     for (auto& i : types) {
-      data.out() << std::right << std::setw(14) << i.first << ": " << i.second.size() << ' ';
-      for (size_t j = 0; j < i.second.size() && j < 12; ++j) data.out() << (j == 0 ? '(' : ' ') << i.second[j];
-      data.out() << ")\n";
+      data->out() << std::right << std::setw(14) << i.first << ": " << i.second.size() << ' ';
+      for (size_t j = 0; j < i.second.size() && j < 12; ++j) data->out() << (j == 0 ? '(' : ' ') << i.second[j];
+      data->out() << ")\n";
     }
   }
 }

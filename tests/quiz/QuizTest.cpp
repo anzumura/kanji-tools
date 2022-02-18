@@ -15,10 +15,14 @@ protected:
     return args;
   }
 
-  static void SetUpTestCase() { _data = std::make_shared<KanjiData>(3, argv(), _os, _es); }
+  static void SetUpTestCase() {
+    _data = std::make_shared<KanjiData>(3, argv(), _os, _es);
+    _groupData = std::make_shared<GroupData>(_data);
+    _jukugoData = std::make_shared<JukugoData>(_data);
+  }
 
   // Contructs Quiz using the real data files
-  QuizTest() : _quiz(3, argv(), _data, &_is) {}
+  QuizTest() : _quiz(3, argv(), _data, _groupData, _jukugoData, &_is) {}
 
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
@@ -83,6 +87,8 @@ protected:
   inline static std::stringstream _os;
   inline static std::stringstream _es;
   inline static DataPtr _data;
+  inline static GroupDataPtr _groupData;
+  inline static JukugoDataPtr _jukugoData;
 };
 
 TEST_F(QuizTest, ListQuiz) {

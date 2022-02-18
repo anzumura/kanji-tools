@@ -63,6 +63,8 @@ private:
   const DataPtr _data;
 };
 
+using GroupDataPtr = std::shared_ptr<const GroupData>;
+
 } // namespace kanji_tools
 
 #endif // KANJI_TOOLS_QUIZ_GROUP_DATA_H

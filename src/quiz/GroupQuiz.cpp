@@ -90,9 +90,9 @@ void GroupQuiz::addOtherGroupName(const std::string& name, std::string& s) const
     }
   };
   if (_groupType == GroupType::Meaning)
-    add(_launcher.groupData().patternMap());
+    add(_launcher.groupData()->patternMap());
   else
-    add(_launcher.groupData().meaningMap());
+    add(_launcher.groupData()->meaningMap());
 }
 
 void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {

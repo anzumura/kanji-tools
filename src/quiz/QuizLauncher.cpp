@@ -1,3 +1,4 @@
+#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <kanji_tools/quiz/ListQuiz.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
@@ -59,9 +60,15 @@ constexpr auto DefaultProgramMode = 't', DefaultQuestionOrder = 'r', DefaultQuiz
 
 } // namespace
 
-QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data, std::istream* in)
+void QuizLauncher::run(size_t argc, const char** argv) {
+  auto data = std::make_shared<KanjiData>(argc, argv);
+  QuizLauncher(argc, argv, data, std::make_shared<GroupData>(data), std::make_shared<JukugoData>(data));
+}
+
+QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data, GroupDataPtr groupData,
+                           JukugoDataPtr jukugoData, std::istream* in)
   : _programMode(ProgramMode::NotAssigned), _questionOrder(QuestionOrder::NotAssigned), _choice(data->out(), in, '/'),
-    _groupData(data), _jukugoData(*data) {
+    _groupData(groupData), _jukugoData(jukugoData) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume length is at least 2)
   const auto checkQuizType = [&quizType, &questionList](const auto& arg, auto& choices, OptChar start = std::nullopt,
@@ -148,8 +155,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question, bool mea
     if (const char c = qList ? *qList : _choice.get("Choose level", LevelChoices); !isQuit(c))
       listQuiz(KanjiInfo::Level, data().levelList(AllJlptLevels[4 - (c - '1')]));
     break;
-  case 'm': groupQuiz(_groupData.meaningGroups()); break;
-  case 'p': groupQuiz(_groupData.patternGroups()); break;
+  case 'm': groupQuiz(_groupData->meaningGroups()); break;
+  case 'p': groupQuiz(_groupData->patternGroups()); break;
   }
   // reset mode and question order in case 'start' is called again
   _programMode = ProgramMode::NotAssigned;
@@ -183,8 +190,8 @@ void QuizLauncher::printMeaning(const Entry& k, bool useNewLine, bool showMeanin
 void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   out() << "    Reading: " << kanji->reading() << '\n';
   // Similar Kanji
-  if (const auto i = _groupData.patternMap().find(kanji->name());
-      i != _groupData.patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
+  if (const auto i = _groupData->patternMap().find(kanji->name());
+      i != _groupData->patternMap().end() && i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
     Data::List sorted(i->second->members());
     std::sort(sorted.begin(), sorted.end(), Data::orderByQualifiedName);
@@ -200,7 +207,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
     out() << '\n';
   }
   // Categories
-  if (const auto i = _groupData.meaningMap().equal_range(kanji->name()); i.first != i.second) {
+  if (const auto i = _groupData->meaningMap().equal_range(kanji->name()); i.first != i.second) {
     auto j = i.first;
     out() << (++j == i.second ? "   Category: " : " Categories: ");
     for (j = i.first; j != i.second; ++j) {
@@ -211,7 +218,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   }
   // Jukugo Lists
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"), otherGrade("Other Grade Jukugo");
-  if (auto& list = _jukugoData.find(kanji->name()); !list.empty()) {
+  if (auto& list = _jukugoData->find(kanji->name()); !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two lists, one for the same
     // grade of the given kanji and one for other grades. For example, 一生（いっしょう） is a grade 1
     // Jukugo for '一', but 一縷（いちる） is a secondary school Jukugo (which also contains '一').
@@ -275,7 +282,7 @@ int QuizLauncher::processProgramModeArg(const std::string& arg) {
 
 void QuizLauncher::processKanjiArg(const std::string& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
-    const auto kanji = _groupData.data().findKanjiByFrequency(std::stoi(arg));
+    const auto kanji = _groupData->data().findKanjiByFrequency(std::stoi(arg));
     if (!kanji) Data::usage("invalid frequency '" + arg + "'");
     printDetails((**kanji).name());
   } else if (arg.starts_with("m")) {
@@ -284,11 +291,11 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (std::string nonPrimeIndex = id.ends_with("P") ? id.substr(0, id.length() - 1) : id;
         id.empty() || !std::all_of(nonPrimeIndex.begin(), nonPrimeIndex.end(), ::isdigit))
       Data::usage("invalid Morohashi ID '" + id + "'");
-    printDetails(_groupData.data().findKanjisByMorohashiId(id), "Morohashi", id);
+    printDetails(_groupData->data().findKanjisByMorohashiId(id), "Morohashi", id);
   } else if (arg.starts_with("n")) {
     const auto id = arg.substr(1);
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit)) Data::usage("invalid Nelson ID '" + id + "'");
-    printDetails(_groupData.data().findKanjisByNelsonId(std::stoi(id)), "Nelson", id);
+    printDetails(_groupData->data().findKanjisByNelsonId(std::stoi(id)), "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id = arg.substr(1);
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit must be a 1 or 2)

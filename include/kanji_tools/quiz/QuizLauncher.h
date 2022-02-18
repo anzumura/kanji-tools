@@ -11,6 +11,9 @@ namespace kanji_tools {
 // command line args passed in to the constructor.
 class QuizLauncher {
 public:
+  // 'run' is called by main function in 'quizMain.cpp'
+  static void run(size_t argc, const char** argv);
+
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
   using Entry = Data::Entry;
@@ -20,7 +23,7 @@ public:
 
   // An istream 'in' can be provided for testing purposes (instead of reading std::cin) and
   // if given, 'start' must be explicitly called to start a quiz.
-  QuizLauncher(size_t argc, const char** argv, DataPtr, std::istream* in = 0);
+  QuizLauncher(size_t argc, const char** argv, DataPtr, GroupDataPtr, JukugoDataPtr, std::istream* in = 0);
 
   // 'start' is the top level method for starting a quiz or doing a review (List or Group based).
   // 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the type of quiz/review and 'questionList'
@@ -46,7 +49,7 @@ public:
 private:
   enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
 
-  [[nodiscard]] const Data& data() const { return _groupData.data(); }
+  [[nodiscard]] const Data& data() const { return _groupData->data(); }
 
   void startListQuiz(int question, bool showMeanings, KanjiInfo excludeField, const List&) const;
   void startGroupQuiz(int question, bool showMeanings, OptChar questionList, const GroupData::List& list) const;
@@ -71,8 +74,8 @@ private:
   QuestionOrder _questionOrder;
 
   const Choice _choice;
-  const GroupData _groupData;
-  const JukugoData _jukugoData;
+  const GroupDataPtr _groupData;
+  const JukugoDataPtr _jukugoData;
 };
 
 } // namespace kanji_tools

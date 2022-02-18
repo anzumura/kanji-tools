@@ -12,8 +12,9 @@ class JukugoData {
 public:
   using Entry = std::shared_ptr<Jukugo>;
   using List = std::vector<Entry>;
-  JukugoData(const Data&);
+  JukugoData(DataPtr);
   JukugoData(const JukugoData&) = delete;
+  JukugoData& operator=(const JukugoData&) = delete;
 
   [[nodiscard]] auto& find(const std::string& kanji) const {
     const auto i = _kanjiToJukugo.find(kanji);
@@ -29,6 +30,8 @@ private:
   std::map<std::string, List> _kanjiToJukugo;
   inline static const List _emptyList;
 };
+
+using JukugoDataPtr = std::shared_ptr<const JukugoData>;
 
 } // namespace kanji_tools
 
