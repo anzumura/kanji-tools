@@ -110,7 +110,17 @@ TEST(EnumArrayTest, IteratorCompare) {
   EXPECT_LT(i, j);
   EXPECT_GE(j, i);
   EXPECT_GT(j, i);
+  // iterator arithmetic
   EXPECT_EQ(j - i, 2);
+}
+
+TEST(EnumArrayTest, ThreeWayCompare) {
+  auto i = AllColors.begin();
+  auto j = i;
+  EXPECT_EQ(i <=> j, std::strong_ordering::equal);
+  j += 2;
+  EXPECT_EQ(i <=> j, std::strong_ordering::less);
+  EXPECT_EQ(j <=> i, std::strong_ordering::greater);
 }
 
 TEST(EnumArrayTest, ToString) {
