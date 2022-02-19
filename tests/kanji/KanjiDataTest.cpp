@@ -9,7 +9,9 @@
 namespace kanji_tools {
 
 namespace {
+
 constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data", DataDir = "some-dir";
+
 } // namespace
 
 namespace fs = std::filesystem;
@@ -113,6 +115,7 @@ TEST_F(KanjiDataTest, FrequencyKanjiChecks) {
   EXPECT_EQ((**yeast).reading(), "キク、こうじ");
   EXPECT_EQ((**yeast).meaning(), "yeast, leaven; surname");
 }
+
 TEST_F(KanjiDataTest, ExtraKanjiChecks) {
   const auto grab = _data->findKanjiByName("掴");
   ASSERT_TRUE(grab);
@@ -155,6 +158,7 @@ TEST_F(KanjiDataTest, UcdKanjiChecks) {
   EXPECT_EQ((**shape).type(), KanjiTypes::Ucd);
   EXPECT_TRUE((**shape).linkedReadings());
 }
+
 TEST_F(KanjiDataTest, RadicalChecks) {
   const auto radical = _data->getRadicalByName("鹿");
   EXPECT_EQ(radical.number(), 198);
