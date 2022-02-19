@@ -84,7 +84,7 @@ if [[ ! $LANG =~ UTF-8 ]]; then
 fi
 
 if [[ $# -lt 2 ]]; then
-  echo "usage: parseUcdAllFlat.sh 'input file' 'output file'"
+  echo "usage: $program 'input file' 'output file'"
   echo "  input file: ucd.all.flat.xml file (see script comments for details)"
   echo "  output file: where to write output (for example, data/ucd.txt)"
   exit 1
