@@ -7,6 +7,14 @@ declare -r program="ucdDiff.sh"
 # Aliases: http://www.unicode.org/Public/UCD/latest/ucd/PropertyAliases.txt
 # More info on UCD 'Unihan': https://unicode.org/reports/tr38/
 
+# Ensure LANG is 'UTF-8' to enable things like: echo -e "\U72AC"
+if [[ ! $LANG =~ UTF-8 ]]; then
+  for s in jp_JP en_US; do
+    locale -a | grep -q $s.UTF-8 && export LANG=$s.UTF-8 && break
+  done
+  [[ ! $LANG =~ UTF-8 ]] && echo "failed to find a UTF-8 locale" && exit 1
+fi
+
 # default value for UCD file
 declare -r defaultFile=ucd.all.flat.xml
 
@@ -29,7 +37,7 @@ function usage() {
   echo ""
   echo "if only one 'code point' is specified then print all fields, otherwise"
   echo "just print the fields that are different. Note, 'code point' should be"
-  echo "valid hex unicode code points like 3400, 4db5 or 20B9F."
+  echo "unicode values like 3400, 4db5 or 20B9F or a UTF-8 value like 犬 or 猫."
   exit 1
 }
 
@@ -79,9 +87,24 @@ fi
 
 [[ $# -lt 1 ]] && usage "must specify at least one code point"
 
+function getCodePoint() {
+  if echo "$1" | grep -q '[^ -~]'; then
+    [[ ${#1} -gt 1 ]] && usage "code point '$1' should be a single UTF-8 value"
+    # get the Unicode (4 of 5 digit hex with caps) value from UTF-8
+    codePoint=$(echo -n $1 | iconv -s -f UTF-8 -t UTF-32BE | xxd -p) ||
+      usage "failed to get code point from '$1'"
+    printf -v codePoint '%04X' 0x$codePoint 2>/dev/null ||
+      usage "failed to get code point from '$1', hex '$codePoint'"
+  else
+    codePoint=${1^^}
+    echo $codePoint | grep -qE '^[1-9A-E]?[0-9A-F]{4}$' ||
+      usage "invalid code point '$1'"
+  fi
+}
+
 function getXml() {
-  echo $2 | grep -qE '^[1-9A-E]?[0-9A-F]{4}$' || usage "invalid code point '$2'"
-  xml=$(grep "<char cp=\"$2\"" "$1") || usage "'$2' not found in: $1"
+  xml=$(grep "<char cp=\"$codePoint\"" "$1") ||
+    usage "'$codePoint' not found in: $1"
   xml="$(echo "${xml%/>}" | sed 's/" /"\n/g' | grep -v '<char cp=')"
 }
 
@@ -92,12 +115,12 @@ function printFields() {
   echo ""
 }
 
-declare -r firstCode="${1^^}"
-getXml $oldFile $firstCode
+getCodePoint $1
+getXml $oldFile
 
 if [[ $oldFile = $newFile ]]; then
   if [[ $# -lt 2 ]]; then
-    echo -en "Code $firstCode (\U$firstCode)"
+    echo -en "Code $codePoint (\U$codePoint)"
     if $printOnlyCJK; then
       # age='Unicode Version', blk='Unicode Block", sc='Unicode Script', ...
       printFields age blk sc Ideo Radical
@@ -107,16 +130,22 @@ if [[ $oldFile = $newFile ]]; then
     fi | sed 's/="/: /g' | tr -d '"'
     exit 0
   fi
-  secondCode=${2^^}
-  [[ $firstCode = $secondCode ]] && usage "code points are the same"
+  firstCode=$codePoint
+  getCodePoint $2
+  [[ $firstCode = $codePoint ]] && usage "code points are the same"
 else
-  secondCode=$firstCode
+  firstCode=$codePoint
 fi
 
 declare -r firstXml=$xml
-getXml $newFile $secondCode
+getXml $newFile
 
 declare -r diffOut="$(diff <(echo "$firstXml") <(echo "$xml"))"
+
+if [[ -z $diffOut ]]; then
+  echo "no diffs found"
+  exit 0
+fi
 
 function diffs() {
   local -r s="$(echo "$diffOut" | grep "^$1" | sed "s/$1/ /")"
@@ -124,4 +153,4 @@ function diffs() {
 }
 
 diffs '<' $firstCode $oldFile
-diffs '>' $secondCode $newFile
+diffs '>' $codePoint $newFile
