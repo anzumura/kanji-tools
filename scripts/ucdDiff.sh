@@ -6,54 +6,93 @@ declare -r program="ucdDiff.sh"
 # More info on UCD file: https://unicode.org/reports/tr38/
 
 # default value for UCD file
-inputFile=~/ucd/14/ucd.all.flat.xml
+declare -r defaultFile=ucd.all.flat.xml
+
+oldFile=~/ucd/13/$defaultFile
+newFile=~/ucd/14/$defaultFile
 
 function usage() {
-  echo "$1"
+  echo "$program: $1"
   echo ""
   echo "usage: $program [-f 'input file'] 'code point' ['code point']"
-  echo "  code point: valid hex unicode code point like '4db5' or '20B9F'"
-  echo "  input file: ucd.all.flat.xml file (see script comments for details)"
+  echo "       $program -d [-o 'old file'] [-n 'new file'] 'code point'"
+  echo "  -f 'input file': default: '$newFile'"
+  echo "  -d: compare the same code point from two different UCD files (useful"
+  echo "      to see diffs across Unicode versions)."
+  echo "  -o 'old file': default '$oldFile'"
+  echo "  -n 'new file': default '$newFile'"
   echo ""
-  echo "if only one code point is specified then print all fields"
-  echo "if two code points are specified then only print differences"
-  echo "if 'input file' is not specified then it defaults to: $inputFile"
+  echo "if only one 'code point' is specified then print all fields, otherwise"
+  echo "just print the fields that are different. Note, 'code point' should be"
+  echo "valid hex unicode code points like '4db5' or '20B9F'."
   exit 1
 }
 
-if [[ $1 = -f ]]; then
-  [[ $# -lt 2 ]] && usage "'-f' must be followed by a UCD file"
+function checkFile() {
+  [[ $# -lt 2 ]] && usage "'$1' must be followed by a UCD file"
   [[ -f $2 ]] || usage "'$2' ia not a valid file"
-  inputFile="$2"
-  shift 2
+}
+
+if [[ $1 = -d ]]; then
+  shift
+  while true; do
+    if [[ $1 = -o ]]; then
+      checkFile "$@"
+      oldFile=$2
+      shift 2
+    elif [[ $1 = -n ]]; then
+      checkFile "$@"
+      newFile=$2
+      shift 2
+    else
+      break
+    fi
+  done
+  [[ $oldFile = $newFile ]] && usage "'old file' is the same as 'new file'"
+  [[ $# -gt 1 ]] && usage "too many arguments for '-d'"
+else
+  if [[ $1 = -f ]]; then
+    checkFile "$@"
+    oldFile=$2
+    newFile=$2
+    shift 2
+  else
+    oldFile=$newFile
+  fi
+  [[ $# -gt 2 ]] && usage "too many arguments"
 fi
 
 [[ $# -lt 1 ]] && usage "must specify at least one code point"
-[[ $# -gt 2 ]] && usage "too many arguments"
 
 function getXml() {
-  echo $1 | grep -qE '^[1-9A-E]?[0-9A-F]{4}$' || usage "invalid code point '$1'"
-  xml=$(grep "cp=\"$1\"" "$inputFile") || usage "'$1' not found in UCD file"
+  echo $2 | grep -qE '^[1-9A-E]?[0-9A-F]{4}$' || usage "invalid code point '$2'"
+  xml=$(grep "cp=\"$2\"" "$1") || usage "'$2' not found in: $1"
   xml="$(echo "${xml%/>}" | sed 's/" /"\n/g' | grep -v '<char cp=')"
 }
 
 declare -r firstCode="${1^^}"
-getXml "$firstCode"
+getXml $oldFile $firstCode
 
-if [[ $# -lt 2 ]]; then
-  echo "$xml"
-  exit 0
+if [[ $oldFile = $newFile ]]; then
+  if [[ $# -lt 2 ]]; then
+    echo -e "Code $firstCode (\U$firstCode) from '$newFile'\n$xml"
+    exit 0
+  fi
+  secondCode=${2^^}
+  [[ $firstCode = $secondCode ]] && usage "code points are the same"
+else
+  secondCode=$firstCode
 fi
 
-declare -r firstXml="$xml" secondCode="${2^^}"
-getXml "$secondCode"
+declare -r firstXml=$xml
+getXml $newFile $secondCode
 
 declare -r diffOut="$(diff <(echo "$firstXml") <(echo "$xml"))"
 
 function diffs() {
   local -r s="$(echo "$diffOut" | grep "^$1" | sed "s/$1/ /")"
-  [[ -n $s ]] && echo -e "$2\n$s"
+  [[ -n $s ]] && echo -e "Code $2 (\U$2) from '$3'\n$s"
 }
 
-diffs '<' $firstCode
-diffs '>' $secondCode
+diffs '<' $firstCode $oldFile
+diffs '>' $secondCode $newFile
