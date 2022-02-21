@@ -72,13 +72,12 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 void UcdData::load(const std::filesystem::path& file) {
   const ColumnFile::Column codeCol("Code"), nameCol("Name"), blockCol("Block"), versionCol("Version"),
     radicalCol("Radical"), strokesCol("Strokes"), vStrokesCol("VStrokes"), pinyinCol("Pinyin"),
-    morohashiCol("Morohashi"), nelsonIdsCol("NelsonIds"), joyoCol("Joyo"), jinmeiCol("Jinmei"),
-    linkCodesCol("LinkCodes"), linkNamesCol("LinkNames"), linkTypeCol("LinkType"), meaningCol("Meaning"), onCol("On"),
-    kunCol("Kun");
-  for (ColumnFile f(file,
-                    {codeCol, nameCol, blockCol, versionCol, radicalCol, strokesCol, vStrokesCol, pinyinCol,
-                     morohashiCol, nelsonIdsCol, joyoCol, jinmeiCol, linkCodesCol, linkNamesCol, linkTypeCol,
-                     meaningCol, onCol, kunCol});
+    morohashiCol("Morohashi"), nelsonIdsCol("NelsonIds"), sourcesCol("Sources"), jSourceCol("JSource"), joyoCol("Joyo"),
+    jinmeiCol("Jinmei"), linkCodesCol("LinkCodes"), linkNamesCol("LinkNames"), linkTypeCol("LinkType"),
+    meaningCol("Meaning"), onCol("On"), kunCol("Kun");
+  for (ColumnFile f(file, {codeCol,      nameCol,      blockCol,     versionCol, radicalCol, strokesCol, vStrokesCol,
+                           pinyinCol,    morohashiCol, nelsonIdsCol, sourcesCol, jSourceCol, joyoCol,    jinmeiCol,
+                           linkCodesCol, linkNamesCol, linkTypeCol,  meaningCol, onCol,      kunCol});
        f.nextRow();) {
     if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
       f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
@@ -125,9 +124,10 @@ void UcdData::load(const std::filesystem::path& file) {
     if (!_map
            .emplace(std::piecewise_construct, std::make_tuple(name),
                     std::make_tuple(f.getWChar(codeCol), name, f.get(blockCol), f.get(versionCol), radical, strokes,
-                                    vStrokes, f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol), joyo, jinmei,
-                                    links, AllUcdLinkTypes.fromString(linkType, true), linkedReadings,
-                                    f.get(meaningCol), f.get(onCol), f.get(kunCol)))
+                                    vStrokes, f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol),
+                                    f.get(sourcesCol), f.get(jSourceCol), joyo, jinmei, links,
+                                    AllUcdLinkTypes.fromString(linkType, true), linkedReadings, f.get(meaningCol),
+                                    f.get(onCol), f.get(kunCol)))
            .second)
       f.error("duplicate entry '" + name + "'");
     for (const auto& link : links)

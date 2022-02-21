@@ -151,7 +151,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
   const std::string sampleLink("sampleLink");
-  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", false, false, Ucd::Links({Ucd::Link(1, sampleLink)}),
+  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", "", "", false, false, Ucd::Links({Ucd::Link(1, sampleLink)}),
           UcdLinkTypes::Simplified, false, "utmost", "JIN", "MAMA");
   UcdKanji k(_data, ucd);
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
@@ -173,8 +173,11 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
 TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   Radical rad(1, "TestRadical", Radical::AltForms(), "", "");
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "", "", false, false, Ucd::Links({Ucd::Link(1, "old1"), Ucd::Link(2, "old2")}),
-          UcdLinkTypes::Traditional, true, "utmost", "JIN", "MAMA");
+  Ucd ucd(0, "侭", "", "", 0, 0, 0, "", "", "", "GJ", "J0-4B79", false, false,
+          Ucd::Links({Ucd::Link(1, "old1"), Ucd::Link(2, "old2")}), UcdLinkTypes::Traditional, true, "utmost", "JIN",
+          "MAMA");
+  EXPECT_EQ(ucd.sources(), "GJ");
+  EXPECT_EQ(ucd.jSource(), "J0-4B79");
   UcdKanji k(_data, ucd);
   ASSERT_FALSE(k.newName());
   EXPECT_EQ(k.oldNames(), Kanji::LinkNames({"old1", "old2"}));

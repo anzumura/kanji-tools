@@ -3,8 +3,8 @@
 declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
-# have a Japanese reading (On or Kun) and prints out a tab-separated line with
-# the following 18 values:
+# have a Japanese reading (On or Kun) or Morohashi ID and prints a tab-separated
+# line with the following 20 values:
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in UTF-8
 # - Block: name of the Unicode block (from the 'blk' tag)
@@ -15,6 +15,8 @@ declare -r program="parseUcdAllFlat.sh"
 # - Pinyin: optional first pīnyīn (拼音) reading from 'kMandarin'
 # - Morohashi: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
 # - NelsonIds: optional list of comma-separated 'Classic Nelson' ids
+# - Sources: list of sources (see comments at the end of this script)
+# - JSource: from kIRG_JSource (see comments et the end of this script)
 # - Joyo: 'Y' if part of Jōyō list or blank
 # - Jinmei: 'Y' if part of Jinmeiyō list or blank
 # - LinkCodes: optional list of comma-separated link values in Unicode
@@ -24,55 +26,7 @@ declare -r program="parseUcdAllFlat.sh"
 # - On: optional space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: optional space-separated Japanese Kun readings (in all-caps Rōmaji)
 #
-# 'linkType' is followed by '*' if the first link in 'LinkName' list was used to
-# pull in On/Kun values (only happens when the current entry has no readings).
-#
-# Location of 'ucd.all.flat.zip': https://unicode.org/Public/UCD/latest/ucdxml
-# More info on UCD file: https://unicode.org/reports/tr38/
-# This script was used to create 'data/ucd.txt'.
-#
-# There are over 140K characters in 'ucd.all.flat.txt' and most of them aren't
-# relevant to the current functionality of this (kanji-tools) project so apply
-# some filtering before parsing (also significantly reduces the time to parse).
-#
-# Filtering on kIRG_JSource being populated cuts the set to 16,226 entries (IRG
-# = 'Ideographic Research Group') and 12,275 of these have at least one Japanese
-# reading (On/Kun) or a value in kJoyoKanji. However, kRSAdobe_Japan1_6 gets
-# almost the same sized set (12,274, but has a few hundred different entries).
-# The advantage of using Adobe is its value contains more accurate stroke count
-# information. The kTotalStrokes field doesn't always work well for Japanese
-# common characters, i.e., there are over 300 differences in just the 3000 or so
-# standard Jōyō + Jinmei. Examples: 4EE5 (以) and 4F3C (似) have kTotalStrokes
-# of 4 and 6 respectively, but in Japanese they should be 5 and 7.
-#
-# In addition to Adobe, also pull in kanji that have a Morohashi ID to help get
-# compatibility/variants of kanji that have on/kun readings. Note, 'kMorohashi'
-# has 18,168 entries (12,965 with On/Kun) which is more than Adobe so it pulls
-# in a few hundred more entries (including some Kentei Kanji).
-# Some counts as of Unicode 13.0:
-# - has both Adobe and Morohashi: 12,447
-# - has Morohashi, but not Adobe: 5,721
-# - has Adobe, but not Morohashi: 1,010
-#
-# Morohashi: Unicode 14.0 has 17,830 unique values in the 'kMorohashi'. This
-# This property has one or more index numbers into 'Dai Kan-Wa Jiten' (a massive
-# Chinese-Japanese dictionary compiled by Tetsuji Morohashi). There are plans to
-# cleanup/expand this property to cover ~50K entries by Unicode 16.0.
-#
-# Nelson: Unicode 14.0 has 5,442 unique ids in 'kNelson'. This property has one
-# or more ids from the 'Classic Nelson' Japanese-English Character Dictionary.
-# 'Classic Nelson' was first published in 1962 and the ids remained the same for
-# the 'Second Revised Edition' from 1974 (including the Thirtieth Printing in
-# 1989). These ids don't match 'New Nelson' which was first publised in 1997.
-#
-# Morohashi and Nelson ids can be used for looking up kanji by the 'kanjiQuiz'
-# program (see Quiz.cpp or run 'kanjiQuiz -h' for details).
-#
-# Here are some other 'Japan' type properties that aren't used by this script:
-# - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
-# - 'kIRGDaiKanwaZiten' has 17,864 (12,942 with On/Kun). There's a proposal to
-#   remove this property (and expand 'kMorohashi') so it's probably best not to
-#   use it: https://www.unicode.org/L2/L2021/21032-unihan-kmorohashi.pdf
+# Further explanations are in comments at the end of this script.
 
 # Ensure LANG is 'UTF-8' so things like ${j:0:1} get a single utf8 value instead
 # of just a single byte.
@@ -580,19 +534,23 @@ function processRecord() {
       [[ -z ${uniqueNelson[$s]} ]] && uniqueNelson[$s]=1
     done
   fi
+  sources=
+  for s in G H J K T V; do
+    eval [[ -n \$kIRG_${s}Source ]] && sources+=$s
+  done
   countLinkType
   # don't print 'vstrokes' if it's 0
   echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
-$kMandarin\t$localMorohashi\t${kNelson// /,}\t${kJoyoKanji:+Y}\t\
-${kJinmeiyoKanji:+Y}\t$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\t$linkType\t\
-$localDefinition\t$resultOn\t$resultKun" >>$outFile
+$kMandarin\t$localMorohashi\t${kNelson// /,}\t$sources\t$kIRG_JSource\t\
+${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\
+\t$linkType\t$localDefinition\t$resultOn\t$resultKun" >>$outFile
 }
 
 function printResults() {
   log "Print results to '$outFile' ... " -n
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
-Morohashi\tNelsonIds\tJoyo\tJinmei\tLinkCodes\tLinkNames\tLinkType\tMeaning\t\
-On\tKun" >$outFile
+Morohashi\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\tLinkNames\t\
+LinkType\tMeaning\tOn\tKun" >$outFile
   local s
   local -i count=0
   while read -r s; do
@@ -601,6 +559,7 @@ On\tKun" >$outFile
     setVars "$s" kTraditionalVariant kSimplifiedVariant kCompatibilityVariant \
       kSemanticVariant kRSAdobe_Japan1_6 kMandarin kNelson &&
       processRecord "$s" && count+=1
+    # kIRG_xSource fields are also included in all Unihan records ("" if empty)
   done < <(grep -E "($printResulsFilter)" $ucdFile)
   echo "wrote $count"
 }
@@ -628,3 +587,102 @@ $definitionLinks, Semantic $semanticLinks"
 echo -e "Other Fields:\n  Meaning $totalMeaning, Pinyin $totalPinyin, Reading \
 $totalReading (Direct $directReading Linked $linkedReading Manual \
 $((totalReading - directReading - linkedReading)))"
+
+# More details on some fields:
+#
+# 'linkType' is followed by '*' if the first link in 'LinkName' list was used to
+# pull in On/Kun values (only happens when the current entry has no readings).
+#
+# Location of 'ucd.all.flat.zip': https://unicode.org/Public/UCD/latest/ucdxml
+# More info on UCD file: https://unicode.org/reports/tr38/
+# This script was used to create 'data/ucd.txt'.
+#
+# There are over 140K characters in 'ucd.all.flat.txt' and most of them aren't
+# relevant to the current functionality of this (kanji-tools) project so apply
+# some filtering before parsing (also significantly reduces the time to parse).
+#
+# Filtering on kIRG_JSource being populated cuts the set to 16,226 entries (IRG
+# = 'Ideographic Research Group') and 12,275 of these have at least one Japanese
+# reading (On/Kun) or a value in kJoyoKanji. However, kRSAdobe_Japan1_6 gets
+# almost the same sized set (12,274, but has a few hundred different entries).
+# The advantage of using Adobe is its value contains more accurate stroke count
+# information. The kTotalStrokes field doesn't always work well for Japanese
+# common characters, i.e., there are over 300 differences in just the 3000 or so
+# standard Jōyō + Jinmei. Examples: 4EE5 (以) and 4F3C (似) have kTotalStrokes
+# of 4 and 6 respectively, but in Japanese they should be 5 and 7.
+#
+# In addition to Adobe, also pull in kanji that have a Morohashi ID to help get
+# compatibility/variants of kanji that have on/kun readings. Note, 'kMorohashi'
+# has 18,168 entries (12,965 with On/Kun) which is more than Adobe so it pulls
+# in a few hundred more entries (including some Kentei Kanji).
+# Some counts as of Unicode 13.0:
+# - has both Adobe and Morohashi: 12,447
+# - has Morohashi, but not Adobe: 5,721
+# - has Adobe, but not Morohashi: 1,010
+#
+# Morohashi: Unicode 14.0 has 17,830 unique values in the 'kMorohashi'. This
+# This property has one or more index numbers into 'Dai Kan-Wa Jiten' (a massive
+# Chinese-Japanese dictionary compiled by Tetsuji Morohashi). There are plans to
+# cleanup/expand this property to cover ~50K entries by Unicode 16.0.
+#
+# Nelson: Unicode 14.0 has 5,442 unique ids in 'kNelson'. This property has one
+# or more ids from the 'Classic Nelson' Japanese-English Character Dictionary.
+# 'Classic Nelson' was first published in 1962 and the ids remained the same for
+# the 'Second Revised Edition' from 1974 (including the Thirtieth Printing in
+# 1989). These ids don't match 'New Nelson' which was first publised in 1997.
+#
+# Morohashi and Nelson ids can be used for looking up kanji by the 'kanjiQuiz'
+# program (see Quiz.cpp or run 'kanjiQuiz -h' for details).
+#
+# Sources: a list of letters where each letter represents a 'kIRG_xSource' field
+# that has a non-empty value to help determine the country where a charater is
+# used (skip KP, M, S, U, and UK for now since they either don't have many
+# values or don't really represent an East Asian country). The 'kUnihanCore2020'
+# field is similar, but it's missing values like 'V' and 'S' and it's also not
+# always populated even if the source is populated since it's intended to be
+# 'the minimal set of required ideographs for East Asia'. Letters included are:
+#   G: People’s Republic of China and Singapore
+#   H: Hong Kong
+#   J: Japan, i.e., 'kIRG_JSource' has a non-empty value
+#   K: Republic of Korea (South Korea)
+#   T: Taiwan
+#   V: Vietnam
+#
+# JSource (from kIRG_JSource) provides more details on the original source for
+# Japanese characters. This field has the following syntax:
+#   J[014]-[0-9A-F]{4}
+#   | J3A?-[0-9A-F]{4}
+#   | J13A?-[0-9A-F]{4}
+#   | J14-[0-9A-F]{4}
+#   | JA[34]?-[0-9A-F]{4}
+#   | JARIB-[0-9A-F]{4}
+#   | JH-(JT[ABC][0-9A-F]{3}S?|IB\d{4}|\d{6})
+#   | JK-\d{5}
+#   | JMJ-\d{6}
+# With the following description (reformatted to 80 columns with leading -):
+#   The IRG “J” source mapping for this character in hexadecimal or decimal. The
+#   IRG “J” source consists of data from the following national standards and
+#   lists from Japan.
+#   - J0 JIS X 0208-1990
+#   - J1 JIS X 0212-1990
+#   - J4 JIS X 0213:2004 level-4
+#   - J3 JIS X 0213:2004 level-3
+#   - J3A JIS X 0213:2004 level-3 addendum from JIS X 0213:2000 level-3
+#   - J13 JIS X 0213:2004 level-3 characters replacing J1 characters
+#   - J13A JIS X 0213:2004 level-3 character addendum from JIS X 0213:2000
+#     level-3 replacing J1 characters
+#   - J14 JIS X 0213:2004 level-4 characters replacing J1 characters
+#   - JA Unified Japanese IT Vendors Contemporary Ideographs, 1993
+#   - JA3 JIS X 0213:2004 level-3 characters replacing JA characters
+#   - JA4 JIS X 0213:2004 level-4 characters replacing JA characters
+#   - JARIB Association of Radio Industries and Businesses (ARIB) ARIB STD-B24
+#     Version 5.1, March 14 2007
+#   - JH Hanyo-Denshi Program (汎用電子情報交換環境整備プログラム), 2002-2009
+#   - JK Japanese KOKUJI Collection
+#   - JMJ Moji Joho Kiban Project (文字情報基盤整備事業)
+#
+# Here are some other 'Japan' type properties that aren't used by this script:
+# - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
+# - 'kIRGDaiKanwaZiten' has 17,864 (12,942 with On/Kun). There's a proposal to
+#   remove this property (and expand 'kMorohashi') so it's probably best not to
+#   use it: https://www.unicode.org/L2/L2021/21032-unihan-kmorohashi.pdf

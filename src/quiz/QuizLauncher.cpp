@@ -323,11 +323,15 @@ void QuizLauncher::printDetails(const Data::List& list, const std::string& name,
 void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
   if (showLegend) {
     printLegend();
-    out() << '\n';
+    out() << "Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, T=Taiwan, V=Vietnam\n\n";
   }
-  out() << "Showing details for " << arg << ' ' << toUnicode(arg, BracketType::Square);
+  out() << "Details for " << arg << ' ' << toUnicode(arg, BracketType::Square);
   if (const auto ucd = data().ucd().find(arg); ucd) {
-    out() << ", Block " << ucd->block() << ", Version " << ucd->version();
+    out() << ", Blk " << ucd->block() << ", Ver " << ucd->version();
+    if (!ucd->sources().empty()) {
+      out() << ", Sources " << ucd->sources();
+      if (!ucd->jSource().empty()) out() << " (" << ucd->jSource() << ')';
+    }
     if (const auto k = data().findKanjiByName(arg); k) {
       printExtraTypeInfo(*k);
       out() << '\n' << (**k).info();
