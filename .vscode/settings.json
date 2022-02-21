@@ -4,6 +4,17 @@
     120
   ],
   "workbench.editor.enablePreview": false,
+  "editor.tokenColorCustomizations": {
+    "comments": "#525252",
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": {
+          "fontStyle": ""
+        }
+      }
+    ]
+  },
   "files.associations": {
     "array": "cpp",
     "__bit_reference": "cpp",
