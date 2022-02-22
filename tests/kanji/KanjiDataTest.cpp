@@ -322,19 +322,33 @@ TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
   EXPECT_EQ((**northKanji).type(), KanjiTypes::Jouyou);
 }
 
-TEST_F(KanjiDataTest, CommonAndRareBlocks) {
+TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Check that only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou, Jinmei
   // Frequency, Kentei, etc.) should be in the 'common' bloacks.
   auto rareUcd = 0;
+  std::map<KanjiTypes, int> missingJSource;
   for (auto& i : _data->ucd().map()) {
     if (isRareKanji(i.first)) {
+      // no rare kanji have a jSource value
+      EXPECT_TRUE(i.second.jSource().empty());
       if (auto t = _data->getType(i.first); t != KanjiTypes::Ucd)
         FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);
       ++rareUcd;
     } else if (!isCommonKanji(i.first))
       FAIL() << "kanji '" << i.first << "' not recognized";
+    else if (i.second.jSource().empty()) {
+      if (auto t = _data->getType(i.first); t == KanjiTypes::LinkedOld)
+        EXPECT_EQ(i.first, "絕"); // old form of 絶 doesn't have a jSource
+      else
+        ++missingJSource[t]; // other with empty jSource should be Kentei or Ucd (tested below)
+    } else
+      // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
+      EXPECT_NE(i.second.sources().find('J'), std::string::npos);
   }
   EXPECT_EQ(rareUcd, 45);
+  EXPECT_EQ(missingJSource.size(), 2);
+  EXPECT_EQ(missingJSource[KanjiTypes::Kentei], 16);
+  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7485);
 }
 
 TEST_F(KanjiDataTest, UcdLinks) {
