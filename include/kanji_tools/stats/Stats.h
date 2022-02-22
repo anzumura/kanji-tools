@@ -15,6 +15,7 @@ public:
   Stats(size_t argc, const char** argv, DataPtr data);
 
   Stats(const Stats&) = delete;
+  Stats& operator=(const Stats&) = delete;
 private:
   [[nodiscard]] auto& log(bool heading = false) const { return _data->log(heading); }
   [[nodiscard]] auto& out() const { return _data->out(); }

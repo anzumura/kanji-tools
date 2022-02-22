@@ -25,6 +25,9 @@ protected:
   Quiz(const QuizLauncher& launcher, int question, bool showMeanings)
     : _launcher(launcher), _question(question), _correctAnswers(0), _showMeanings(showMeanings) {}
 
+  Quiz(const Quiz&) = delete;
+  Quiz& operator=(const Quiz&) = delete;
+
   // destructor prints the final score when in test mode
   virtual ~Quiz();
 

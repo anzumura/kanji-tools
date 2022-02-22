@@ -40,6 +40,9 @@ public:
   // file can be in a different order than 'columns', but the names must all be found.
   ColumnFile(const std::filesystem::path& p, const Columns& columns, char delimiter = '\t');
 
+  ColumnFile(const ColumnFile&) = delete;
+  ColumnFile& operator=(const ColumnFile&) = delete;
+
   // 'nextRow' must be called before using 'get'. An exception is thrown if the next row has too
   // few or too many columns. 'nextRow' returns 'false' when there are no more rows in the file.
   bool nextRow();

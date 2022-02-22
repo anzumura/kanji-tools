@@ -36,7 +36,9 @@ public:
     : DataFile(p, fileType, createNewUniqueFile, nullptr) {}
   DataFile(const std::filesystem::path& p, bool createNewUniqueFile = false)
     : DataFile(p, FileType::OnePerLine, createNewUniqueFile, nullptr) {}
+
   DataFile(const DataFile&) = delete;
+  DataFile& operator=(const DataFile&) = delete;
 
   [[nodiscard]] auto exists(const std::string& s) const { return _map.find(s) != _map.end(); }
   [[nodiscard]] auto get(const std::string& name) const {
@@ -48,6 +50,7 @@ public:
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   [[nodiscard]] auto& list() const { return _list; }
   [[nodiscard]] auto size() const { return _list.size(); }
+
   // 'toString' returns the full contents of this list into a string (with no separates)
   [[nodiscard]] auto toString() const {
     std::string result;
@@ -60,6 +63,7 @@ protected:
   DataFile(const std::filesystem::path& p, FileType fileType, bool, Set*, const std::string& name = "");
 private:
   using Map = std::map<std::string, int>;
+
   // 'UniqueNames': ensures uniqueness across non-typed DataFiles (currently only frequency.txt)
   inline static Set UniqueNames;
   inline static std::set<Set*> OtherUniqueNames;

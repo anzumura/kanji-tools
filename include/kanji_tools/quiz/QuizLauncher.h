@@ -25,6 +25,9 @@ public:
   // if given, 'start' must be explicitly called to start a quiz.
   QuizLauncher(size_t argc, const char** argv, DataPtr, GroupDataPtr, JukugoDataPtr, std::istream* in = 0);
 
+  QuizLauncher(const QuizLauncher&) = delete;
+  QuizLauncher& operator=(const QuizLauncher&) = delete;
+
   // 'start' is the top level method for starting a quiz or doing a review (List or Group based).
   // 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the type of quiz/review and 'questionList'
   // can also be provided (values depend on quiz type - see Quiz.cpp 'HelpMessage' for details).

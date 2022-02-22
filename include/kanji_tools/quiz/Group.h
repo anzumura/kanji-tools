@@ -38,8 +38,10 @@ public:
 
   Group(int number, const std::string& name, const Data::List& members)
     : _number(number), _name(name), _members(members) {}
-  virtual ~Group() = default;
+
   Group(const Group&) = delete;
+  Group& operator=(const Group&) = delete;
+  virtual ~Group() = default;
 
   [[nodiscard]] virtual GroupType type() const = 0;
   [[nodiscard]] virtual PatternType patternType() const { return PatternType::None; }

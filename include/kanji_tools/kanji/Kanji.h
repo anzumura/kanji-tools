@@ -15,8 +15,8 @@
 namespace kanji_tools {
 
 // 'KanjiInfo' members can be used to select which fields are printed by 'Kanji::info'
-// method. For example 'Grade | Level | Freq' will print grade and level fields and
-// 'All ^ Strokes' will print all except for strokes.
+// method. For example 'Grade | Level | Freq' will print 'grade', 'level' and 'frequency'
+// fields and 'All ^ Strokes' will print all except for strokes.
 enum class KanjiInfo {
   Radical = 1,
   Strokes,
@@ -43,17 +43,17 @@ public:
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
+  Kanji& operator=(const Kanji&) = delete;
 
   [[nodiscard]] virtual KanjiTypes type() const = 0;
   [[nodiscard]] virtual const std::string& meaning() const = 0;
   [[nodiscard]] virtual const std::string& reading() const = 0;
 
   [[nodiscard]] virtual OptInt frequency() const { return std::nullopt; }
-  [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; } // 'grade': JouyouKanji
-  [[nodiscard]] virtual KenteiKyus kyu() const {
-    return KenteiKyus::None;
-  } // 'kyu': CustomFileKanji, StandardKanji, LinkedKanji
-  [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; } // 'level': OfficialKanji
+  [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; } // overridden by 'JouyouKanji'
+  [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }     // overridden by all except 'UcdKanji'
+  [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }   // overridden by 'OfficialKanji'
+
   // 'linkedReadings' returns true if readings were loaded from a linked kanji
   [[nodiscard]] virtual bool linkedReadings() const { return false; }
 
@@ -161,13 +161,16 @@ private:
       : kyu() != KenteiKyus::K1       ? 7
                                       : 8;
   }
+
   // name related fields
   const std::string _name;
   const OptString _nonVariantName;
   const OptString _compatibilityName;
+
   // all kanji have radical and strokes
   const Radical _radical;
   const int _strokes;
+
   // optional fields
   const OptString _morohashiId;
   const NelsonIds _nelsonIds;

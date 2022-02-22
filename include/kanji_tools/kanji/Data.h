@@ -29,8 +29,10 @@ public:
   };
 
   Data(const std::filesystem::path& dataDir, DebugMode, std::ostream& out = std::cout, std::ostream& err = std::cerr);
-  virtual ~Data() = default;
+
   Data(const Data&) = delete;
+  Data& operator=(const Data&) = delete;
+  virtual ~Data() = default;
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
   [[nodiscard]] auto findUcd(const std::string& kanjiName) const { return _ucd.find(kanjiName); }

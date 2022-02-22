@@ -30,8 +30,10 @@ private:
 
   // '_levels' (for JLPT) are loaded from files under 'data/jlpt'
   const std::array<const LevelDataFile, AllJlptLevels.size() - 1> _levels;
+
   // '_kyus' (for Kanji Kentei) are loaded from files under 'data/kentei'
   const std::array<const KyuDataFile, AllKenteiKyus.size() - 1> _kyus;
+
   // '_frequency' (for top 2501 frequency kanji) is loaded from data/frequency.txt
   const DataFile _frequency;
 };

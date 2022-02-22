@@ -28,6 +28,9 @@ public:
   Table(const Row& title = {}, bool countInFirstColumn = false)
     : _title(title), _countInFirstColumn(countInFirstColumn) {}
 
+  Table(const Table&) = delete;
+  Table& operator=(const Table&) = delete;
+
   // 'add' will add 'row' to the table. If 'startNewSection' is true then a horizontal border will be
   // printed before printing the row. Row can have less columns than other rows (or even be empty) -
   // in this case the missing columns are assumed to be empty cells.
@@ -35,6 +38,7 @@ public:
 
   // 'print' will print the table to 'os' with a border at the top and bottom.
   void print(std::ostream& os = std::cout) const;
+
   // 'printMarkdown' will print out the table suitable for putting into a README.md file. Since
   // Markdown tables need a header row, empty values will be used if _title is empty. Also,
   // 'sections' are supported by marking contents of the row as bold (instead of using borders).
@@ -44,7 +48,9 @@ public:
   void printMarkdown(std::ostream& os = std::cout) const;
 private:
   using Widths = std::vector<size_t>;
+
   void print(std::ostream&, const Widths&, const Row&, char fill = ' ', char delim = '|') const;
+
   // 'border' prints a horizontal border row
   void border(std::ostream& os, const Widths& w) const { print(os, w, {}, '-', '+'); }
 

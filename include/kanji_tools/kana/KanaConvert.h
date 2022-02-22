@@ -28,6 +28,9 @@ public:
   // override these values.
   KanaConvert(CharType target = CharType::Hiragana, ConvertFlags flags = ConvertFlags::None);
 
+  KanaConvert(const KanaConvert&) = delete;
+  KanaConvert& operator=(const KanaConvert&) = delete;
+
   [[nodiscard]] CharType target() const { return _target; }
   void target(CharType target) { _target = target; }
 

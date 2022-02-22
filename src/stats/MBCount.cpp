@@ -24,13 +24,13 @@ int MBCount::add(const std::string& s, const OptString& tag) {
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8ToWstring(s), *_find, _replace));
     if (n != s) {
-      ++_replaceCount;
+      ++_replacements;
       if (tag && tag != _lastReplaceTag) {
         if (_debug) std::cout << ">>> Tag: " << *tag << '\n';
         _lastReplaceTag = *tag;
       }
       if (_debug) {
-        const auto count = std::to_string(_replaceCount);
+        const auto count = std::to_string(_replacements);
         std::cout << count << " : " << s << '\n' << std::setw(count.length() + 3) << ": " << n << '\n';
       }
     }

@@ -30,6 +30,9 @@ public:
     if (quit) setQuit(*quit, d);
   }
 
+  Choice(const Choice&) = delete;
+  Choice& operator=(const Choice&) = delete;
+
   // Provide support for a '_quitOption' choice instead of needing to specify it every time when. If
   // it has a value then it will be added to the 'choices' provided to the below 'get' methods.
   void setQuit(char c, const std::string& d = DefaultQuitDescription) {

@@ -101,6 +101,8 @@ public:
   class RepeatMark {
   public:
     RepeatMark(const RepeatMark&) = delete;
+    RepeatMark& operator=(const RepeatMark&) = delete;
+
     [[nodiscard]] auto matches(CharType t, const std::string& s) const {
       return t == CharType::Hiragana && _hiragana == s || t == CharType::Katakana && _katakana == s;
     }
@@ -131,6 +133,7 @@ public:
   inline static const std::string ProlongMark = "ー";
 
   using List = std::vector<std::string>;
+
   Kana(const char* romaji, const char* hiragana, const char* katakana, const char* hepburn = nullptr,
        const char* kunrei = nullptr)
     : _romaji(romaji), _hiragana(hiragana), _katakana(katakana),
@@ -147,6 +150,8 @@ public:
     assert(_kunreiVariant ? !_romajiVariants.empty() : true);
     validate();
   }
+
+  Kana& operator=(const Kana&) = delete; // there is a default private copy constructor
   virtual ~Kana() = default;
 
   // 'dakutenKana' and 'hanDakutenKana' are overridden by derived classes to return the accented versions

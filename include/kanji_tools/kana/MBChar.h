@@ -93,6 +93,9 @@ public:
 
   explicit MBChar(const std::string& data) : _data(data) {}
 
+  MBChar(const MBChar&) = delete;
+  MBChar& operator=(const MBChar&) = delete;
+
   // call reset in order to loop over the string again
   void reset() {
     _location = _data.c_str();

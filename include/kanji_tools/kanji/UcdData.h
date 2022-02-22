@@ -14,7 +14,9 @@ public:
   using Map = std::map<std::string, Ucd>;
 
   UcdData() {}
+
   UcdData(const UcdData&) = delete;
+  UcdData& operator=(const UcdData&) = delete;
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
   [[nodiscard]] auto& getMeaning(const Ucd* u) const { return u ? u->meaning() : Ucd::EmptyString; }

@@ -10,6 +10,9 @@ public:
   Jukugo(const std::string& name, const std::string& reading, KanjiGrades grade)
     : _name(name), _reading(reading), _grade(grade) {}
 
+  Jukugo(const Jukugo&) = delete;
+  Jukugo& operator=(const Jukugo&) = delete;
+
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& reading() const { return _reading; }
   [[nodiscard]] auto nameAndReading() const { return _name + "（" + _reading + "）"; }

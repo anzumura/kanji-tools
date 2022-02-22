@@ -29,6 +29,7 @@ protected:
     : UcdFileKanji(d, name, d.ucd().getReadingsAsKana(u), u) {}
 private:
   const bool _hasOldLinks;
+
   // Use 'LinkNames' instead of trying to hold an OptEntry (shared pointer to another loaded kanji) since
   // 'ucd links' are more arbitrary than the standard 'official' jinmei and jouyou linked kanji (ie official
   // variants). Ucd links can potentially even be circular depending on how the source data is parsed and

@@ -25,6 +25,7 @@ public:
   // part). See MBCharTest.cpp for examples of how the regex works. Note, almost all furigana
   // is hiragana, but very occasionally katakana can also be included like: 護謨製（ゴムせい）
   static const std::wregex RemoveFurigana;
+
   // 'DefaultReplace' is used as the default replacement string in below constructor to
   // replace the contents in brackets with itself (and get rid of the rest of the string). It
   // can be used in combination with 'RemoveFurigana' regex.
@@ -33,6 +34,9 @@ public:
   // if 'regex' is provided it will be applied to strings before they are processed for counting
   MBCount(OptRegex find = std::nullopt, const std::wstring& replace = DefaultReplace, bool debug = false)
     : _find(find), _replace(replace), _debug(debug) {}
+
+  MBCount(const MBCount&) = delete;
+  MBCount& operator=(const MBCount&) = delete;
   virtual ~MBCount() = default;
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the number added. If 'tag'
@@ -63,10 +67,13 @@ public:
   [[nodiscard]] auto uniqueEntries() const { return _map.size(); }
   [[nodiscard]] auto files() const { return _files; }
   [[nodiscard]] auto directories() const { return _directories; }
-  // 'replaceCount' returns number of lines that were changed due to 'replace' regex
-  [[nodiscard]] auto replaceCount() const { return _replaceCount; }
+
+  // 'replacements' returns number of lines that were changed due to 'replace' regex
+  [[nodiscard]] auto replacements() const { return _replacements; }
+
   // 'lastReplaceTag' returns last tag (file name) that had line replaced (if 'addTag' is used)
   [[nodiscard]] auto& lastReplaceTag() const { return _lastReplaceTag; }
+
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
   [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
@@ -93,14 +100,18 @@ private:
 
   Map _map;
   TagMap _tags;
-  // keep counts of number of files and directories processed
+  std::string _lastReplaceTag;
+
+  // counts of files and directories processed
   int _files = 0;
   int _directories = 0;
+
+  // counts of errors, variants, combining marks and replacements done during processing
   int _errors = 0;
   int _variants = 0;
   int _combiningMarks = 0;
-  std::string _lastReplaceTag;
-  int _replaceCount = 0;
+  int _replacements = 0;
+
   const OptRegex _find;
   const std::wstring _replace;
   const bool _debug;

@@ -138,8 +138,8 @@ void StatsPred::printHeaderInfo(const MBCount& count) {
     _os << ')';
   }
   _os << " - showing top " << MaxExamples << " Kanji per type";
-  if (count.replaceCount() || count.combiningMarks() || count.variants())
-    _os << "\n>>> Furigana Removed: " << count.replaceCount()
+  if (count.replacements() || count.combiningMarks() || count.variants())
+    _os << "\n>>> Furigana Removed: " << count.replacements()
         << ", Combining Marks Replaced: " << count.combiningMarks() << ", Variation Selectors: " << count.variants();
   if (count.errors()) _os << ", Errors: " << count.errors();
   _os << '\n';

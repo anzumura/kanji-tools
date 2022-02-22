@@ -12,7 +12,9 @@ class JukugoData {
 public:
   using Entry = std::shared_ptr<Jukugo>;
   using List = std::vector<Entry>;
+
   JukugoData(DataPtr);
+
   JukugoData(const JukugoData&) = delete;
   JukugoData& operator=(const JukugoData&) = delete;
 

@@ -53,19 +53,23 @@ public:
   [[nodiscard]] auto& meaning() const { return _meaning; }
   [[nodiscard]] auto& onReading() const { return _onReading; }
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
+
   // 'has' methods
   [[nodiscard]] auto hasLinks() const { return !_links.empty(); }
   [[nodiscard]] auto hasTraditionalLinks() const { return _linkType == UcdLinkTypes::Traditional; }
   [[nodiscard]] auto hasNonTraditionalLinks() const { return hasLinks() && _linkType != UcdLinkTypes::Traditional; }
   [[nodiscard]] auto hasVariantStrokes() const { return _variantStrokes != 0; }
+
   // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
   // it falls back to just return '_strokes'
   [[nodiscard]] auto getStrokes(bool variant) const {
     return variant && hasVariantStrokes() ? _variantStrokes : _strokes;
   }
+
   // 'codeAndName' methods return the Unicode in square brackets plus the name, e.g.: [FA30] 侮
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
+
   // 'EmptyString' can be returned by 'linkCodeAndName' and is used by other classes as well
   static const std::string EmptyString;
 private:

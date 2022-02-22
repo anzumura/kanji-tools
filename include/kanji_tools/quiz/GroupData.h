@@ -18,7 +18,9 @@ public:
   using List = std::vector<Entry>;
 
   GroupData(DataPtr);
+
   GroupData(const GroupData&) = delete;
+  GroupData& operator=(const GroupData&) = delete;
 
   [[nodiscard]] auto& meaningGroups() const { return _meaningGroups; }
   [[nodiscard]] auto& patternGroups() const { return _patternGroups; }
