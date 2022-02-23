@@ -29,12 +29,4 @@ Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
   return result;
 }
 
-JinmeiKanji::Reasons JinmeiKanji::getReason(const std::string& s) {
-  if (s == "Names") return Reasons::Names;
-  if (s == "Print") return Reasons::Print;
-  if (s == "Moved") return Reasons::Moved;
-  if (s == "Variant") return Reasons::Variant;
-  return Reasons::Other;
-}
-
 } // namespace kanji_tools

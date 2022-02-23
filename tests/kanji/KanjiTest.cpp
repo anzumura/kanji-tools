@@ -82,7 +82,7 @@ protected:
     EXPECT_EQ(e.radical().name(), "二");
     EXPECT_EQ(e.oldNames(), Kanji::LinkNames{"亙"});
     EXPECT_EQ(e.year(), 1951);
-    EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Names);
+    EXPECT_EQ(e.reason(), JinmeiKanjiReasons::Names);
   }
 
   const MockData _data;
@@ -285,7 +285,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   auto& e = static_cast<const JinmeiKanji&>(k);
   EXPECT_TRUE(e.oldNames().empty());
   EXPECT_EQ(e.year(), 2004);
-  EXPECT_EQ(e.reason(), JinmeiKanji::Reasons::Print);
+  EXPECT_EQ(e.reason(), JinmeiKanjiReasons::Print);
   checkJinmeiKanji(*results[1]);
 }
 

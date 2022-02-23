@@ -1,6 +1,7 @@
 #ifndef KANJI_TOOLS_KANJI_CUSTOM_FILE_KANJI_H
 #define KANJI_TOOLS_KANJI_CUSTOM_FILE_KANJI_H
 
+#include <kanji_tools/kanji/JinmeiKanjiReasons.h>
 #include <kanji_tools/kanji/NonLinkedKanji.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
@@ -86,25 +87,8 @@ private:
 
 class JinmeiKanji : public OfficialKanji {
 public:
-  // Reasons enum represents reason kanji was added to Jinmei list:
-  // - Names: for use in names
-  // - Print: for use in publications
-  // - Variant: allowed variant form (異体字)
-  // - Moved: moved out of Jouyou into Jinmei
-  // - Other: reason listed as その他
-  enum class Reasons { Names, Print, Variant, Moved, Other };
-  [[nodiscard]] static constexpr auto toString(Reasons x) {
-    switch (x) {
-    case Reasons::Names: return "Names";
-    case Reasons::Print: return "Print";
-    case Reasons::Variant: return "Variant";
-    case Reasons::Moved: return "Moved";
-    default: return "Other";
-    }
-  }
-
   JinmeiKanji(const Data& d, const ColumnFile& f)
-    : OfficialKanji(d, f, f.get(NameCol)), _reason(getReason(f.get(ReasonCol))) {}
+    : OfficialKanji(d, f, f.get(NameCol)), _reason(AllJinmeiKanjiReasons.fromString(f.get(ReasonCol))) {}
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   [[nodiscard]] OptString extraTypeInfo() const override {
@@ -112,8 +96,7 @@ public:
   }
   [[nodiscard]] auto reason() const { return _reason; }
 private:
-  static Reasons getReason(const std::string&);
-  const Reasons _reason;
+  const JinmeiKanjiReasons _reason;
 };
 
 class JouyouKanji : public OfficialKanji {
