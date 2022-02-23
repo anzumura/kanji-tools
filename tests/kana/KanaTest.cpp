@@ -22,6 +22,19 @@ constexpr auto TotalRomaji = TotalKana + RomajiVariants;
 
 } // namespace
 
+TEST(CharTypeTest, CheckStrings) {
+  EXPECT_EQ(toString(CharType::Hiragana), "Hiragana");
+  EXPECT_EQ(toString(CharType::Katakana), "Katakana");
+  EXPECT_EQ(toString(CharType::Romaji), "Romaji");
+}
+
+TEST(CharTypeTest, CheckValues) {
+  size_t i = 0;
+  EXPECT_EQ(CharTypes[i], CharType::Hiragana);
+  EXPECT_EQ(CharTypes[++i], CharType::Katakana);
+  EXPECT_EQ(CharTypes[++i], CharType::Romaji);
+}
+
 TEST(KanaTest, FindDakuten) {
   EXPECT_EQ(Kana::findDakuten("か"), Kana::OptString("が"));
   EXPECT_EQ(Kana::findDakuten("シ"), Kana::OptString("ジ"));

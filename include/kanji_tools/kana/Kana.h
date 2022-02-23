@@ -1,31 +1,19 @@
 #ifndef KANJI_TOOLS_KANA_KANA_H
 #define KANJI_TOOLS_KANA_KANA_H
 
+#include <kanji_tools/utils/EnumArray.h>
 #include <kanji_tools/utils/EnumBitmask.h>
 
-#include <array>
 #include <cassert>
-#include <map>
 #include <optional>
-#include <string>
 #include <vector>
 
 namespace kanji_tools {
 
 // 'CharType' is used to specify 'source' and 'target' types for 'KanaConvert::convert' methods
 enum class CharType { Hiragana, Katakana, Romaji };
-constexpr std::array CharTypes{CharType::Hiragana, CharType::Katakana, CharType::Romaji};
-
-[[nodiscard]] inline auto& toString(CharType t) {
-  static const std::string Romaji("Romaji"), Hiragana("Hiragana"), Katakana("Katakana");
-
-  switch (t) {
-  case CharType::Hiragana: return Hiragana;
-  case CharType::Katakana: return Katakana;
-  case CharType::Romaji: return Romaji;
-  }
-  __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
-}
+template<> inline constexpr bool is_enumarray<CharType> = true;
+inline const auto CharTypes = BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji");
 
 // 'ConvertFlags' controls some aspects of conversion (by KanaConvert class). For example:
 // Hepburn: off by default, only applies to 'Rōomaji' output
