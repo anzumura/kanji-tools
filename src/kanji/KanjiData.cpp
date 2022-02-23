@@ -186,7 +186,7 @@ void KanjiData::printGrades() const {
 }
 
 template<typename T, size_t S>
-void KanjiData::printListStats(const EnumArray<T, S>& all, T (Kanji::*p)() const, const std::string& name,
+void KanjiData::printListStats(const IterableEnumArray<T, S>& all, T (Kanji::*p)() const, const std::string& name,
                                bool showNoFrequency) const {
   log() << name << " breakdown:\n";
   auto total = 0;

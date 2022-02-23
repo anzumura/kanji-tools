@@ -9,29 +9,35 @@ namespace kanji_tools {
 
 namespace {
 
-enum class Colors { Red, Green, Blue };
+enum class Colors { Red, Green, Blue, None };
 
-enum class TestEnum { A, B, C };
+enum class TestEnum { A, B, C, None };
 
 } // namespace
 
-template<> inline constexpr bool is_enumarray<Colors> = true;
+template<> inline constexpr bool is_enumarray_with_none<Colors> = true;
 inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green", "Blue");
 
-template<> inline constexpr bool is_enumarray<TestEnum> = true;
+template<> inline constexpr bool is_enumarray_with_none<TestEnum> = true;
 
-TEST(EnumArrayTest, FailForDuplicateName) {
+TEST(EnumArrayWithNoneTest, FailForDuplicateName) {
   EXPECT_THROW(call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "B"); }, "duplicate name 'B'"),
                std::domain_error);
 }
 
-TEST(EnumArrayTest, CallInstanceBeforeCreate) {
+TEST(EnumArrayWithNoneTest, FailForNoneName) {
+  EXPECT_THROW(
+    call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "None"); }, "'None' should not be specified"),
+    std::domain_error);
+}
+
+TEST(EnumArrayWithNoneTest, CallInstanceBeforeCreate) {
   // 'toString' calls 'instance'
   EXPECT_THROW(call([] { return toString(TestEnum::A); }, "must call 'create' before calling 'instance'"),
                std::domain_error);
 }
 
-TEST(EnumArrayTest, DestructorClearsInstance) {
+TEST(EnumArrayWithNoneTest, DestructorClearsInstance) {
   for (auto _ = 2; _--;) {
     EXPECT_FALSE(BaseEnumArray<TestEnum>::isCreated());
     auto x = BaseEnumArray<TestEnum>::create("A", "B", "C");
@@ -39,60 +45,60 @@ TEST(EnumArrayTest, DestructorClearsInstance) {
   }
 }
 
-TEST(EnumArrayTest, CallCreateTwice) {
+TEST(EnumArrayWithNoneTest, CallCreateTwice) {
   auto enumArray = BaseEnumArray<TestEnum>::create("A", "B", "C");
   // 'create' returns an 'EnumArray' for the given enum with a second template parameter for the
-  // number of names provided.
-  EXPECT_EQ(typeid(enumArray), typeid(EnumArray<TestEnum, 3>));
-  EXPECT_EQ(enumArray.size(), 3);
-  // 'instance' returns 'const BaseEnumArray&', but the object returned is 'EnumArray'
+  // number of names provided (the actual enum should have one more 'None' value at the end)
+  EXPECT_EQ(typeid(enumArray), typeid(EnumArrayWithNone<TestEnum, 3>));
+  EXPECT_EQ(enumArray.size(), 4); // 'size' includes the final 'None' value of the enum
+  // 'instance' returns 'const BaseEnumArray&', but the object returned is 'EnumArrayWithNone'
   auto& instance = enumArray.instance();
   EXPECT_EQ(typeid(std::result_of_t<decltype (&BaseEnumArray<TestEnum>::instance)()>),
             typeid(const BaseEnumArray<TestEnum>&));
-  EXPECT_EQ(typeid(instance), typeid(const EnumArray<TestEnum, 3>&));
+  EXPECT_EQ(typeid(instance), typeid(const EnumArrayWithNone<TestEnum, 3>&));
   // calling 'create' again should throw an exception
   EXPECT_THROW(
     call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "C"); }, "'create' should only be called once"),
     std::domain_error);
 }
 
-TEST(EnumArrayTest, Iteration) {
+TEST(EnumArrayWithNoneTest, Iteration) {
   std::vector<Colors> colors;
   for (size_t i = 0; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
-  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
+  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue, Colors::None}));
 }
 
-TEST(EnumArrayTest, BadAccess) {
+TEST(EnumArrayWithNoneTest, BadAccess) {
   EXPECT_THROW(call([] { return AllColors[4]; }, "index '4' is out of range"), std::out_of_range);
 }
 
-TEST(EnumArrayTest, RangeBasedForLoop) {
+TEST(EnumArrayWithNoneTest, RangeBasedForLoop) {
   std::vector<Colors> colors;
   for (auto c : AllColors) colors.push_back(c);
-  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
+  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue, Colors::None}));
 }
 
-TEST(EnumArrayTest, BadIncrement) {
+TEST(EnumArrayWithNoneTest, BadIncrement) {
   auto i = AllColors.begin();
   i = i + 1;
-  EXPECT_EQ(i[1], Colors::Blue);
-  i += 1;
-  EXPECT_EQ(*i, Colors::Blue);
+  EXPECT_EQ(i[2], Colors::None);
+  i += 2;
+  EXPECT_EQ(*i, Colors::None);
   EXPECT_EQ(++i, AllColors.end());
-  EXPECT_THROW(call([&] { return *i; }, "index '3' is out of range"), std::out_of_range);
+  EXPECT_THROW(call([&] { return *i; }, "index '4' is out of range"), std::out_of_range);
   EXPECT_THROW(call([&] { i++; }, "can't increment past end"), std::out_of_range);
   EXPECT_THROW(call([&] { i += 1; }, "can't increment past end"), std::out_of_range);
   EXPECT_THROW(call([&] { return i[1]; }, "can't increment past end"), std::out_of_range);
 }
 
-TEST(EnumArrayTest, BadDecrement) {
+TEST(EnumArrayWithNoneTest, BadDecrement) {
   auto i = AllColors.end();
-  i = i - 3;
+  i = i - 4;
   EXPECT_EQ(*i, Colors::Red);
   EXPECT_THROW(call([&] { --i; }, "can't decrement past zero"), std::out_of_range);
 }
 
-TEST(EnumArrayTest, IteratorCompare) {
+TEST(EnumArrayWithNoneTest, IteratorCompare) {
   auto i = AllColors.begin();
   auto j = i;
   EXPECT_EQ(i, j);
@@ -108,7 +114,7 @@ TEST(EnumArrayTest, IteratorCompare) {
   EXPECT_EQ(j - i, 2);
 }
 
-TEST(EnumArrayTest, ThreeWayCompare) {
+TEST(EnumArrayWithNoneTest, ThreeWayCompare) {
   auto i = AllColors.begin();
   auto j = i;
   EXPECT_EQ(i <=> j, std::strong_ordering::equal);
@@ -117,31 +123,55 @@ TEST(EnumArrayTest, ThreeWayCompare) {
   EXPECT_EQ(j <=> i, std::strong_ordering::greater);
 }
 
-TEST(EnumArrayTest, ToString) {
+TEST(EnumArrayWithNoneTest, ToString) {
   EXPECT_EQ(toString(Colors::Red), "Red");
   EXPECT_EQ(toString(Colors::Green), "Green");
   EXPECT_EQ(toString(Colors::Blue), "Blue");
+  EXPECT_EQ(toString(Colors::None), "None");
 }
 
-TEST(EnumArrayTest, BadToString) {
+TEST(EnumArrayWithNoneTest, BadToString) {
   EXPECT_THROW(call([] { return toString(static_cast<Colors>(7)); }, "enum '7' is out of range"), std::out_of_range);
 }
 
-TEST(EnumArrayTest, Stream) {
+TEST(EnumArrayWithNoneTest, Stream) {
   std::stringstream s;
-  s << Colors::Green << ' ' << Colors::Blue;
-  EXPECT_EQ(s.str(), "Green Blue");
+  s << Colors::Green << ' ' << Colors::None;
+  EXPECT_EQ(s.str(), "Green None");
 }
 
-TEST(EnumArrayTest, FromString) {
+TEST(EnumArrayWithNoneTest, FromString) {
   EXPECT_EQ(AllColors.fromString("Red"), Colors::Red);
   EXPECT_EQ(AllColors.fromString("Green"), Colors::Green);
   EXPECT_EQ(AllColors.fromString("Blue"), Colors::Blue);
+  EXPECT_EQ(AllColors.fromString("None"), Colors::None);
+  // set allowEmptyAsNone to true
+  EXPECT_EQ(AllColors.fromString("", true), Colors::None);
 }
 
-TEST(EnumArrayTest, BadFromString) {
+TEST(EnumArrayWithNoneTest, BadFromString) {
   EXPECT_THROW(call([] { return AllColors.fromString(""); }, "name '' not found"), std::domain_error);
   EXPECT_THROW(call([] { return AllColors.fromString("Blah"); }, "name 'Blah' not found"), std::domain_error);
+}
+
+TEST(EnumArrayWithNoneTest, HasValue) {
+  EXPECT_FALSE(hasValue(Colors::None)); // only 'None' is false
+  EXPECT_TRUE(hasValue(Colors::Blue));
+  EXPECT_TRUE(hasValue(static_cast<Colors>(29))); // bad value
+}
+
+TEST(EnumArrayWithNoneTest, OperatorNot) {
+  EXPECT_TRUE(!Colors::None); // only 'None' is true
+  EXPECT_FALSE(!Colors::Blue);
+  EXPECT_FALSE(!static_cast<Colors>(29)); // bad value
+}
+
+TEST(EnumArrayWithNoneTest, IsNextNone) {
+  EXPECT_FALSE(isNextNone(Colors::Red));
+  EXPECT_FALSE(isNextNone(Colors::Green));
+  EXPECT_TRUE(isNextNone(Colors::Blue));
+  EXPECT_FALSE(isNextNone(Colors::None));
+  EXPECT_FALSE(isNextNone(static_cast<Colors>(4))); // bad value
 }
 
 } // namespace kanji_tools

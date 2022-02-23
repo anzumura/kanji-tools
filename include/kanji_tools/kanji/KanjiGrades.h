@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 // 'KanjiGrades' represents the official school grade for all Jouyou kanji
 enum class KanjiGrades { G1, G2, G3, G4, G5, G6, S, None }; // S=secondary school, None=not Jouyou
-template<> inline constexpr bool is_enumarray<KanjiGrades> = true;
+template<> inline constexpr bool is_enumarray_with_none<KanjiGrades> = true;
 inline const auto AllKanjiGrades = BaseEnumArray<KanjiGrades>::create("G1", "G2", "G3", "G4", "G5", "G6", "S");
 
 } // namespace kanji_tools

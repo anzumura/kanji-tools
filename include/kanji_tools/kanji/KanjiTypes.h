@@ -17,7 +17,7 @@ namespace kanji_tools {
 // - Ucd: kanji loaded from 'ucd.txt' file that aren't in any of the above types
 // - None: used as a type for a kanji that hasn't been loaded
 enum class KanjiTypes { Jouyou, Jinmei, LinkedJinmei, LinkedOld, Frequency, Extra, Kentei, Ucd, None };
-template<> inline constexpr bool is_enumarray<KanjiTypes> = true;
+template<> inline constexpr bool is_enumarray_with_none<KanjiTypes> = true;
 inline const auto AllKanjiTypes = BaseEnumArray<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei", "LinkedOld",
                                                                     "Frequency", "Extra", "Kentei", "Ucd");
 
