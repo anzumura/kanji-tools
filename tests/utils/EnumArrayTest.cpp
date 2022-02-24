@@ -45,7 +45,8 @@ TEST(EnumArrayTest, CallCreateTwice) {
   // number of names provided.
   EXPECT_EQ(typeid(enumArray), typeid(EnumArray<TestEnum, 3>));
   EXPECT_EQ(enumArray.size(), 3);
-  // 'instance' returns 'const BaseEnumArray&', but the object returned is 'EnumArray'
+  // 'instance' returns 'const BaseEnumArray&', but the object returned is 'EnumArray' (typeid ignores
+  // 'const', but put it in for clarity)
   auto& instance = enumArray.instance();
   EXPECT_EQ(typeid(std::result_of_t<decltype (&BaseEnumArray<TestEnum>::instance)()>),
             typeid(const BaseEnumArray<TestEnum>&));
