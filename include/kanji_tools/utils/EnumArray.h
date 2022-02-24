@@ -55,7 +55,7 @@ public:
   // must specifiy at least one 'name' when calling 'create' (see comments above)
   template<typename... Names> [[nodiscard]] static auto create(const std::string& name, Names...);
 
-  [[nodiscard]] static const auto& instance() {
+  [[nodiscard]] static auto& instance() {
     if (!_instance) throw std::domain_error("must call 'create' before calling 'instance'");
     return *_instance;
   }
@@ -71,19 +71,18 @@ public:
 protected:
   BaseEnumArray() noexcept { _instance = this; }
 
-  [[nodiscard]] auto find(const std::string& s) const {
-    const auto i = _nameMap.find(s);
-    if (i == _nameMap.end()) throw std::domain_error("name '" + s + "' not found");
+  [[nodiscard]] auto find(const std::string& name) const {
+    const auto i = _nameMap.find(name);
+    if (i == _nameMap.end()) throw std::domain_error("name '" + name + "' not found");
     return i->second;
   }
 
   void insert(const std::string& name, size_t index) {
-    const auto i = _nameMap.emplace(name, static_cast<T>(index));
-    if (!i.second) throw std::domain_error("duplicate name '" + i.first->first + "'");
+    if (!_nameMap.emplace(name, static_cast<T>(index)).second) throw std::domain_error("duplicate name '" + name + "'");
   }
 
   std::map<std::string, T> _nameMap;
-  inline static BaseEnumArray<T>* _instance = nullptr;
+  inline static const BaseEnumArray<T>* _instance = nullptr;
 };
 
 template<typename T, size_t N> class IterableEnumArray : public BaseEnumArray<T> {
@@ -168,8 +167,6 @@ public:
     return static_cast<T>(i);
   }
 protected:
-  IterableEnumArray() = default;
-
   [[nodiscard]] static auto getIndex(T x) {
     size_t i = to_underlying(x);
     if (i >= N) throw std::out_of_range("enum '" + std::to_string(i) + "' is out of range");
@@ -187,16 +184,12 @@ public:
 private:
   friend BaseEnumArray<T>; // 'BaseEnumArray<T>::create' method calls private constructor
 
-  void setName(const std::string& name, size_t index) {
-    base::insert(name, index);
-    _names[index] = name;
-  }
-
   EnumArray(const std::string& name) { setName(name, N - 1); }
-
   template<typename... Names> EnumArray(const std::string& name, Names... args) : EnumArray(args...) {
     setName(name, N - 1 - sizeof...(args));
   }
+
+  void setName(const std::string& name, size_t index) { base::insert(_names[index] = name, index); }
 
   std::array<std::string, N> _names;
 };
@@ -214,23 +207,20 @@ public:
   }
 
   [[nodiscard]] auto fromString(const std::string& s, bool allowEmptyAsNone = false) const {
-    if (allowEmptyAsNone && s.empty() || s == None) return T::None;
-    return base::find(s);
+    return allowEmptyAsNone && s.empty() || s == None ? T::None : base::find(s);
   }
 private:
   inline const static std::string None = "None";
   friend BaseEnumArray<T>; // 'BaseEnumArray<T>::create' method calls private constructor
 
-  void setName(const std::string& name, size_t index) {
-    if (name == None) throw std::domain_error("'None' should not be specified");
-    base::insert(name, index);
-    _names[index] = name;
-  }
-
   EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
-
   template<typename... Names> EnumArrayWithNone(const std::string& name, Names... args) : EnumArrayWithNone(args...) {
     setName(name, N - 1 - sizeof...(args));
+  }
+
+  void setName(const std::string& name, size_t index) {
+    if (name == None) throw std::domain_error("'None' should not be specified");
+    base::insert(_names[index] = name, index);
   }
 
   std::array<std::string, N> _names;
