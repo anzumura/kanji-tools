@@ -69,8 +69,10 @@ TEST_F(DataFileTest, GoodOnePerLineLevel) {
 }
 
 TEST_F(DataFileTest, BadOnePerLine) {
-  EXPECT_THROW(call([] { DataFile f(BadOnePerLine); }, "got multiple tokens - line: 1, file: testDir/badOnePerLine"),
-               std::domain_error);
+  EXPECT_THROW(
+    call([] { DataFile f(BadOnePerLine); },
+         "got multiple tokens - line: 1, file: testDir/badOnePerLine"),
+    std::domain_error);
 }
 
 TEST_F(DataFileTest, MultiplePerLine) {
@@ -86,25 +88,32 @@ TEST_F(DataFileTest, MultiplePerLine) {
 }
 
 TEST_F(DataFileTest, GlobalDuplicate) {
-  EXPECT_THROW(call([] { DataFile f(MultiplePerLine, DataFile::FileType::MultiplePerLine); },
-                    "found globally non-unique entry '東' - line: 1, file: testDir/multiplePerLine"),
-               std::domain_error);
+  EXPECT_THROW(
+    call(
+      [] { DataFile f(MultiplePerLine, DataFile::FileType::MultiplePerLine); },
+      "found globally non-unique entry '東' - line: 1, file: "
+      "testDir/multiplePerLine"),
+    std::domain_error);
 }
 
 TEST_F(DataFileTest, GlobalDuplicateLevel) {
-  EXPECT_THROW(call([] { LevelDataFile f(GoodOnePerLineLevel, JlptLevels::N3); },
-                    "found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"),
-               std::domain_error);
+  EXPECT_THROW(
+    call([] { LevelDataFile f(GoodOnePerLineLevel, JlptLevels::N3); },
+         "found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"),
+    std::domain_error);
 }
 
 TEST_F(DataFileTest, BadSymbol) {
-  EXPECT_THROW(call([] { DataFile f(BadSymbol); }, "invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"),
-               std::domain_error);
+  EXPECT_THROW(
+    call([] { DataFile f(BadSymbol); },
+         "invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"),
+    std::domain_error);
 }
 
 TEST_F(DataFileTest, DuplicateSymbol) {
   EXPECT_THROW(
-    call([] { DataFile f(DuplicateSymbol); }, "got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"),
+    call([] { DataFile f(DuplicateSymbol); },
+         "got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"),
     std::domain_error);
 }
 

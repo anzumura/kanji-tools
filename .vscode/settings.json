@@ -1,7 +1,6 @@
 {
   "editor.rulers": [
-    80,
-    120
+    80
   ],
   "workbench.editor.enablePreview": false,
   "editor.tokenColorCustomizations": {

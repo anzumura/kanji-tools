@@ -12,7 +12,8 @@ protected:
     return args;
   }
   // Contructs GroupData using the real data files
-  GroupDataTest() : _data(std::make_shared<KanjiData>(3, argv())), _groupData(_data) {}
+  GroupDataTest()
+      : _data(std::make_shared<KanjiData>(3, argv())), _groupData(_data) {}
 
   const DataPtr _data;
   const GroupData _groupData;
@@ -25,9 +26,11 @@ TEST_F(GroupDataTest, SanityChecks) {
   auto checkNumbers = [](const GroupData::List& list, const auto& groupMap) {
     std::set<int> uniqueNumbers;
     for (auto i : list) {
-      EXPECT_TRUE(uniqueNumbers.insert(i->number()).second) << i->name() << " has duplicate number " << i->number();
+      EXPECT_TRUE(uniqueNumbers.insert(i->number()).second)
+        << i->name() << " has duplicate number " << i->number();
       for (auto j : i->members())
-        EXPECT_TRUE(groupMap.contains(j->name())) << j->name() << "from group " << i->name() << " missing from map";
+        EXPECT_TRUE(groupMap.contains(j->name()))
+          << j->name() << "from group " << i->name() << " missing from map";
     }
   };
   checkNumbers(_groupData.meaningGroups(), _groupData.meaningMap());

@@ -30,8 +30,9 @@ bool MBChar::next(std::string& result, bool onlyMB) {
           result = r + s;
         } else
           result = s == CombiningVoiced ? combiningMark(r, Kana::findDakuten(r))
-            : s == CombiningSemiVoiced  ? combiningMark(r, Kana::findHanDakuten(r))
-                                        : r;
+                   : s == CombiningSemiVoiced
+                     ? combiningMark(r, Kana::findHanDakuten(r))
+                     : r;
         return true;
       }
       ++_errors; // can't start with a variation selector or a combining mark
@@ -45,7 +46,9 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 }
 
 bool MBChar::peek(std::string& result, bool onlyMB) const {
-  const auto combiningMark = [](const auto& r, const auto& i) { return i ? *i : r; };
+  const auto combiningMark = [](const auto& r, const auto& i) {
+    return i ? *i : r;
+  };
   for (auto location = _location; *location;) {
     switch (validateMBUtf8(location)) {
     case MBUtf8Result::NotMBUtf8:
@@ -61,8 +64,9 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
           result = r + s;
         else
           result = s == CombiningVoiced ? combiningMark(r, Kana::findDakuten(r))
-            : s == CombiningSemiVoiced  ? combiningMark(r, Kana::findHanDakuten(r))
-                                        : r;
+                   : s == CombiningSemiVoiced
+                     ? combiningMark(r, Kana::findHanDakuten(r))
+                     : r;
         return true;
       }
       break;

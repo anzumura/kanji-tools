@@ -9,18 +9,25 @@ namespace kanji_tools {
 
 namespace {
 
-void fromUtf8Error(const std::string& s, const std::u32string& result = U"\ufffd") {
+void fromUtf8Error(const std::string& s,
+                   const std::u32string& result = U"\ufffd") {
 #ifdef USE_CODECVT_FOR_UTF_8
-  // 'result' isn't used by codecvt since it throws an exception, but use it below to avoid a compile warning
-  EXPECT_THROW(call([&] { return fromUtf8(s) + result; }, "wstring_convert: from_bytes error"), std::range_error);
+  // 'result' isn't used by codecvt since it throws an exception, but use it
+  // below to avoid a compile warning
+  EXPECT_THROW(call([&] { return fromUtf8(s) + result; },
+                    "wstring_convert: from_bytes error"),
+               std::range_error);
 #else
   EXPECT_EQ(fromUtf8(s), result);
 #endif
 }
 
-void toUtf8Error(const std::u32string& s, const std::string& result = "\xEF\xBF\xBD") {
+void toUtf8Error(const std::u32string& s,
+                 const std::string& result = "\xEF\xBF\xBD") {
 #ifdef USE_CODECVT_FOR_UTF_8
-  EXPECT_THROW(call([&] { return toUtf8(s) + result; }, "wstring_convert: to_bytes error"), std::range_error);
+  EXPECT_THROW(
+    call([&] { return toUtf8(s) + result; }, "wstring_convert: to_bytes error"),
+    std::range_error);
 #else
   EXPECT_EQ(toUtf8(s), result);
 #endif
@@ -84,10 +91,12 @@ TEST(MBUtilsTest, ValidateMaxUnicode) {
   EXPECT_EQ(toBinary(ok, 21), "100001111111111111111");
   EXPECT_EQ(toBinary(bad, 21), "100010000000000000000");
   const char firstByte = static_cast<char>(0b11'11'01'00);
-  const auto okS = std::string(
-    {firstByte, static_cast<char>(0b10'00'11'11), static_cast<char>(0b10'11'11'11), static_cast<char>(0b10'11'11'11)});
+  const auto okS = std::string({firstByte, static_cast<char>(0b10'00'11'11),
+                                static_cast<char>(0b10'11'11'11),
+                                static_cast<char>(0b10'11'11'11)});
   const auto badS =
-    std::string({firstByte, static_cast<char>(0b10'01'00'00), static_cast<char>(Bit1), static_cast<char>(Bit1)});
+    std::string({firstByte, static_cast<char>(0b10'01'00'00),
+                 static_cast<char>(Bit1), static_cast<char>(Bit1)});
   EXPECT_EQ(validateMBUtf8(okS), MBUtf8Result::Valid);
   EXPECT_EQ(validateMBUtf8(badS), MBUtf8Result::InvalidCodePoint);
 }
@@ -107,8 +116,10 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   // overlong single byte ascii
   const unsigned char bang = 33;
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
-  EXPECT_EQ(validateMBUtf8(std::string({static_cast<char>(bang)})), MBUtf8Result::NotMBUtf8);
-  EXPECT_EQ(validateMBUtf8(std::string({static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)})),
+  EXPECT_EQ(validateMBUtf8(std::string({static_cast<char>(bang)})),
+            MBUtf8Result::NotMBUtf8);
+  EXPECT_EQ(validateMBUtf8(std::string(
+              {static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)})),
             MBUtf8Result::Overlong);
   // overlong ō with 3 bytes
   std::string o("ō");
@@ -116,8 +127,9 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   EXPECT_EQ(validateMBUtf8(o), MBUtf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
   EXPECT_EQ(toBinary(0x014d, 16), "0000000101001101");
-  std::string overlongO(
-    {static_cast<char>(ThreeBits), static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)});
+  std::string overlongO({static_cast<char>(ThreeBits),
+                         static_cast<char>(Bit1 | 0b101),
+                         static_cast<char>(Bit1 | 0b1101)});
   EXPECT_EQ(validateMBUtf8(overlongO), MBUtf8Result::Overlong);
   // overlong Euro symbol with 4 bytes
   std::string x("\xF0\x82\x82\xAC");
@@ -134,9 +146,11 @@ TEST(MBUtilsTest, FromUTF8String) {
   fromUtf8Error(std::string({static_cast<char>(TwoBits), 'a'}), U"\ufffda");
   const char cont = static_cast<char>(Bit1);
   // third byte not continuation
-  fromUtf8Error(std::string({static_cast<char>(ThreeBits), cont, 'a'}), U"\ufffda");
+  fromUtf8Error(std::string({static_cast<char>(ThreeBits), cont, 'a'}),
+                U"\ufffda");
   // fourth byte not continuation
-  fromUtf8Error(std::string({static_cast<char>(FourBits), cont, cont, 'a'}), U"\ufffda");
+  fromUtf8Error(std::string({static_cast<char>(FourBits), cont, cont, 'a'}),
+                U"\ufffda");
   std::string dog("犬");
   auto wideDog = fromUtf8(dog);
   ASSERT_EQ(dog.length(), 3);
@@ -151,10 +165,12 @@ TEST(MBUtilsTest, FromUTF8String) {
 
 TEST(MBUtilsTest, BeyondMaxUnicode) {
   const char firstByte = static_cast<char>(0b11'11'01'00);
-  const auto okS = std::string(
-    {firstByte, static_cast<char>(0b10'00'11'11), static_cast<char>(0b10'11'11'11), static_cast<char>(0b10'11'11'11)});
+  const auto okS = std::string({firstByte, static_cast<char>(0b10'00'11'11),
+                                static_cast<char>(0b10'11'11'11),
+                                static_cast<char>(0b10'11'11'11)});
   const auto badS =
-    std::string({firstByte, static_cast<char>(0b10'01'00'00), static_cast<char>(Bit1), static_cast<char>(Bit1)});
+    std::string({firstByte, static_cast<char>(0b10'01'00'00),
+                 static_cast<char>(Bit1), static_cast<char>(Bit1)});
   // from UTF-8
   EXPECT_EQ(fromUtf8(okS), U"\x10ffff");
   fromUtf8Error(badS);
@@ -184,10 +200,13 @@ TEST(MBUtilsTest, ErrorForOverlong) {
   // overlong single byte ascii
   const unsigned char bang = 33;
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
-  fromUtf8Error(std::string({static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)}), U"\ufffd");
+  fromUtf8Error(
+    std::string({static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)}),
+    U"\ufffd");
   // overlong ō with 3 bytes
-  std::string overlongO(
-    {static_cast<char>(ThreeBits), static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)});
+  std::string overlongO({static_cast<char>(ThreeBits),
+                         static_cast<char>(Bit1 | 0b101),
+                         static_cast<char>(Bit1 | 0b1101)});
   fromUtf8Error(overlongO, U"\ufffd");
   // overlong Euro symbol with 4 bytes
   std::string x("\xF0\x82\x82\xAC");
@@ -230,7 +249,8 @@ TEST(MBUtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode("ぁ"), "3041");
   EXPECT_EQ(toUnicode("ぁ", BracketType::Square), "[3041]");
   EXPECT_EQ(toUnicode("すずめ-雀"), "3059 305A 3081 002D 96C0");
-  EXPECT_EQ(toUnicode("すずめ-雀", BracketType::Square), "[3059 305A 3081 002D 96C0]");
+  EXPECT_EQ(toUnicode("すずめ-雀", BracketType::Square),
+            "[3059 305A 3081 002D 96C0]");
 }
 
 TEST(MBUtilsTest, ToBinary) {
@@ -282,8 +302,9 @@ TEST(MBUtilsTest, SortKatakana) {
   ASSERT_EQ(s.size(), 5);
   auto i = s.begin();
   EXPECT_EQ(*i++, "カ");
-  // The following two entries should be reversed, i.e., "ガ" then "カ、サ" - works fine with bash 'sort'.
-  // Later maybe try using https://github.com/unicode-org/icu collate functions.
+  // The following two entries should be reversed, i.e., "ガ" then "カ、サ" -
+  // works fine with bash 'sort'. Later maybe try using
+  // https://github.com/unicode-org/icu collate functions.
   EXPECT_EQ(*i++, "カ、サ");
   EXPECT_EQ(*i++, "ガ");
   EXPECT_EQ(*i++, "ケン、トウ");
@@ -298,8 +319,9 @@ TEST(MBUtilsTest, SortKanaAndRomaji) {
   // - Katakana: should mix with Hiragana instead of always coming after
   // - Full-width Rōmaji: should probably come before Kana
   // - Half-width Katakana: should mix with other Kana instead
-  std::set<std::string> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ",   "バラ",    "ばら",
-                          "ぱら",   "para",     "じょ", "しょ", "ｐａｒａ"};
+  std::set<std::string> s{"しょう", "Ｐａｒａ", "はら",    "ﾊﾗ",
+                          "バラ",   "ばら",     "ぱら",    "para",
+                          "じょ",   "しょ",     "ｐａｒａ"};
   ASSERT_EQ(s.size(), 11);
   auto i = s.begin();
   EXPECT_EQ(*i++, "para");
@@ -317,35 +339,44 @@ TEST(MBUtilsTest, SortKanaAndRomaji) {
 }
 
 TEST(MBUtilsTest, SortKanji) {
-  // Kanji sort order seems to follow Unicode code points instead of 'radical/stroke' ordering.
-  // Calling std::setlocale with values like ja_JP or ja_JP.UTF-8 doesn't make any difference.
-  std::set<std::string> s{"些", "丑", "云", "丞", "乃", "𠮟", "廿", "⺠", "輸", "鳩"};
+  // Kanji sort order seems to follow Unicode code points instead of
+  // 'radical/stroke' ordering. Calling std::setlocale with values like ja_JP or
+  // ja_JP.UTF-8 doesn't make any difference.
+  std::set<std::string> s{"些", "丑", "云", "丞", "乃",
+                          "𠮟", "廿", "⺠", "輸", "鳩"};
   ASSERT_EQ(s.size(), 10);
   auto i = s.begin();
   EXPECT_EQ(toUnicode(*i), "2EA0"); // Rare Kanji (Radical Supplement)
   EXPECT_EQ(*i++, "⺠");
-  EXPECT_EQ(toUnicode(*i), "4E11"); // Common Kanji with radical 1 (一), strokes 4 (1+3)
+  // Common Kanji with radical 1 (一), strokes 4 (1+3)
+  EXPECT_EQ(toUnicode(*i), "4E11");
   EXPECT_EQ(*i++, "丑");
-  EXPECT_EQ(toUnicode(*i), "4E1E"); // Common Kanji with radical 1 (一), strokes 6 (1+5)
+  // Common Kanji with radical 1 (一), strokes 6 (1+5)
+  EXPECT_EQ(toUnicode(*i), "4E1E");
   EXPECT_EQ(*i++, "丞");
-  EXPECT_EQ(toUnicode(*i), "4E43"); // Common Kanji with radical 4 (丿), strokes 2 (1+1)
+  // Common Kanji with radical 4 (丿), strokes 2 (1+1)
+  EXPECT_EQ(toUnicode(*i), "4E43");
   EXPECT_EQ(*i++, "乃");
-  EXPECT_EQ(toUnicode(*i), "4E91"); // Common Kanji with radical 7 (二), strokes 4 (2+2)
+  // Common Kanji with radical 7 (二), strokes 4 (2+2)
+  EXPECT_EQ(toUnicode(*i), "4E91");
   EXPECT_EQ(*i++, "云");
-  EXPECT_EQ(toUnicode(*i), "4E9B"); // Common Kanji with radical 7 (二), strokes 7 (2+5)
+  // Common Kanji with radical 7 (二), strokes 7 (2+5)
+  EXPECT_EQ(toUnicode(*i), "4E9B");
   EXPECT_EQ(*i++, "些");
-  // 5EFF is a Common Kanji (Jinmei) with radical 55 (廾), strokes 4 (3+1), but it can also
-  // be classified as having radical 24 (十) with strokes 4 (2+2)
+  // 5EFF is a Common Kanji (Jinmei) with radical 55 (廾), strokes 4 (3+1), but
+  // it can also be classified as having radical 24 (十) with strokes 4 (2+2)
   EXPECT_EQ(toUnicode(*i), "5EFF");
   EXPECT_EQ(*i++, "廿");
-  EXPECT_EQ(toUnicode(*i), "9CE9"); // Common kanji with radical 196 (鳥), strokes 13 (11+2)
+  // Common kanji with radical 196 (鳥), strokes 13 (11+2)
+  EXPECT_EQ(toUnicode(*i), "9CE9");
   EXPECT_EQ(*i++, "鳩");
-  // 20B9F is a Common Kanji (in Extension B) with radical 30 (口), strokes 5 (2+3) which would
-  // normally come before the previous two Kanji in the set since it has radical 30.
+  // 20B9F is a Common Kanji (in Extension B) with radical 30 (口), strokes 5
+  // (2+3) which would normally come before the previous two Kanji in the set
+  // since it has radical 30.
   EXPECT_EQ(toUnicode(*i), "20B9F");
   EXPECT_EQ(*i++, "𠮟");
-  // 2F9DF is a Rare Kanji with radical 159 (車), strokes 16 (7+9) which would come before
-  // before '9CE9' if sorting was based on radical numbers.
+  // 2F9DF is a Rare Kanji with radical 159 (車), strokes 16 (7+9) which would
+  // come before before '9CE9' if sorting was based on radical numbers.
   EXPECT_EQ(toUnicode(*i), "2F9DF");
   EXPECT_EQ(*i++, "輸");
   EXPECT_EQ(i, s.end());

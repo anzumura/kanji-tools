@@ -17,27 +17,30 @@ int ColumnFile::getColumnNumber(const std::string& name) {
   return i->second;
 }
 
-ColumnFile::ColumnFile(const fs::path& p, const Columns& columns, char delimiter)
-  : _file(std::fstream(p)), _delimiter(delimiter), _name(p.filename().string()), _rowValues(columns.size()),
-    _columnToPosition(_allColumns.size(), -1) {
+ColumnFile::ColumnFile(const fs::path& p, const Columns& columns,
+                       char delimiter)
+    : _file(std::fstream(p)), _delimiter(delimiter),
+      _name(p.filename().string()), _rowValues(columns.size()),
+      _columnToPosition(_allColumns.size(), -1) {
   if (columns.empty()) error("must specify at least one column");
   if (!fs::exists(p)) error("doesn't exist");
   if (!fs::is_regular_file(p)) error("not regular file");
   if (std::string headerRow; std::getline(_file, headerRow)) {
     ColNames colNames;
     for (auto& c : columns)
-      if (!colNames.emplace(c.name(), c).second) error("duplicate column '" + c.name() + "'");
+      if (!colNames.emplace(c.name(), c).second)
+        error("duplicate column '" + c.name() + "'");
     processHeaderRow(headerRow, colNames);
     verifyHeaderColumns(colNames);
   } else
     error("missing header row");
 }
 
-void ColumnFile::processHeaderRow(const std::string& headerRow, ColNames& colNames) {
+void ColumnFile::processHeaderRow(const std::string& row, ColNames& colNames) {
   auto pos = 0;
   std::set<std::string> foundCols;
   std::string header;
-  for (std::stringstream ss(headerRow); std::getline(ss, header, _delimiter); ++pos) {
+  for (std::stringstream ss(row); std::getline(ss, header, _delimiter); ++pos) {
     if (foundCols.contains(header)) error("duplicate header '" + header + "'");
     const auto i = colNames.find(header);
     if (i == colNames.end()) error("unrecognized header '" + header + "'");
@@ -48,7 +51,8 @@ void ColumnFile::processHeaderRow(const std::string& headerRow, ColNames& colNam
 }
 
 void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
-  if (colNames.size() == 1) error("column '" + (*colNames.begin()).first + "' not found");
+  if (colNames.size() == 1)
+    error("column '" + (*colNames.begin()).first + "' not found");
   if (colNames.size() > 1) {
     std::string msg;
     for (auto& i : colNames) {
@@ -62,17 +66,19 @@ void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
 bool ColumnFile::nextRow() {
   if (std::string line; std::getline(_file, line)) {
     ++_currentRow;
-    size_t pos = 0;
+    size_t i = 0;
     std::string field;
-    for (std::stringstream ss(line); std::getline(ss, field, _delimiter); ++pos) {
-      if (pos == _rowValues.size()) error("too many columns");
-      _rowValues[pos] = field;
+    for (std::stringstream ss(line); std::getline(ss, field, _delimiter); ++i) {
+      if (i == _rowValues.size()) error("too many columns");
+      _rowValues[i] = field;
     }
-    // 'getline' will return failure if it only reads a delimiter and then reaches the end of input
-    // so need a special case for handing an empty final column.
-    if (pos == _rowValues.size() - 1 && (pos ? line.ends_with(_delimiter) : line.empty()))
+    // 'getline' will return failure if it only reads a delimiter and then
+    // reaches the end of input so need a special case for handing an empty
+    // final column.
+    if (i == _rowValues.size() - 1 &&
+        (i ? line.ends_with(_delimiter) : line.empty()))
       _rowValues[_rowValues.size() - 1] = EmptyString;
-    else if (pos < _rowValues.size())
+    else if (i < _rowValues.size())
       error("not enough columns");
     return true;
   }
@@ -81,7 +87,8 @@ bool ColumnFile::nextRow() {
 
 const std::string& ColumnFile::get(const Column& column) const {
   if (!_currentRow) error("'nextRow' must be called before calling 'get'");
-  if (column.number() >= _columnToPosition.size()) error("unrecognized column '" + column.name() + "'");
+  if (column.number() >= _columnToPosition.size())
+    error("unrecognized column '" + column.name() + "'");
   const auto position = _columnToPosition[column.number()];
   if (position == -1) error("invalid column '" + column.name() + "'");
   return _rowValues[position];
@@ -120,10 +127,13 @@ bool ColumnFile::getBool(const Column& column) const {
   return false;
 }
 
-char32_t ColumnFile::getWChar(const Column& column, const std::string& s) const {
-  if (s.length() < 4 || s.length() > 5) error("failed to convert to char32_t, length must be 4 or 5", column, s);
+char32_t ColumnFile::getWChar(const Column& column,
+                              const std::string& s) const {
+  if (s.length() < 4 || s.length() > 5)
+    error("failed to convert to char32_t, length must be 4 or 5", column, s);
   for (const char c : s)
-    if (c < '0' || c > 'F' || (c < 'A' && c > '9')) error("failed to convert to char32_t, invalid hex", column, s);
+    if (c < '0' || c > 'F' || (c < 'A' && c > '9'))
+      error("failed to convert to char32_t, invalid hex", column, s);
   return std::strtol(s.c_str(), nullptr, 16);
 }
 

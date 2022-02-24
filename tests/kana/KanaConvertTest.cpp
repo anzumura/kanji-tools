@@ -5,26 +5,32 @@ namespace kanji_tools {
 
 class KanaConvertTest : public ::testing::Test {
 protected:
-  [[nodiscard]] auto romajiToHiragana(const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+  [[nodiscard]] auto romajiToHiragana(const std::string& s,
+                                      ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Romaji, s, CharType::Hiragana, flags);
   }
-  [[nodiscard]] auto romajiToKatakana(const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+  [[nodiscard]] auto romajiToKatakana(const std::string& s,
+                                      ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Romaji, s, CharType::Katakana, flags);
   }
-  [[nodiscard]] auto hiraganaToRomaji(const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+  [[nodiscard]] auto hiraganaToRomaji(const std::string& s,
+                                      ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Hiragana, s, CharType::Romaji, flags);
   }
   [[nodiscard]] auto hiraganaToKatakana(const std::string& s) {
     return _converter.convert(CharType::Hiragana, s, CharType::Katakana);
   }
-  [[nodiscard]] auto katakanaToRomaji(const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+  [[nodiscard]] auto katakanaToRomaji(const std::string& s,
+                                      ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Katakana, s, CharType::Romaji, flags);
   }
   [[nodiscard]] auto katakanaToHiragana(const std::string& s) {
     return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
   // populate 'romaji' when round trip is lossy (like repeat symbols)
-  void kanaConvertCheck(const std::string& hiragana, const std::string& katakana, const std::string& romaji = "") {
+  void kanaConvertCheck(const std::string& hiragana,
+                        const std::string& katakana,
+                        const std::string& romaji = "") {
     if (romaji.empty()) {
       auto r = hiraganaToRomaji(hiragana);
       EXPECT_EQ(katakanaToRomaji(katakana), r);
@@ -37,28 +43,37 @@ protected:
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
-  void check(const char* hiragana, const char* katakana, const char* romaji, const char* hepburn = nullptr,
-             const char* kunrei = nullptr) {
+  void check(const char* hiragana, const char* katakana, const char* romaji,
+             const char* hepburn = nullptr, const char* kunrei = nullptr) {
     EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
     EXPECT_EQ(katakanaToRomaji(katakana), romaji);
-    EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Hepburn), hepburn ? hepburn : romaji);
-    EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Hepburn), hepburn ? hepburn : romaji);
-    EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Kunrei), kunrei ? kunrei : romaji);
-    EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Kunrei), kunrei ? kunrei : romaji);
+    EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Hepburn),
+              hepburn ? hepburn : romaji);
+    EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Hepburn),
+              hepburn ? hepburn : romaji);
+    EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Kunrei),
+              kunrei ? kunrei : romaji);
+    EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Kunrei),
+              kunrei ? kunrei : romaji);
     auto preferHepburnIfBoth = hepburn ? hepburn : kunrei ? kunrei : romaji;
-    EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Hepburn | ConvertFlags::Kunrei), preferHepburnIfBoth);
-    EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Hepburn | ConvertFlags::Kunrei), preferHepburnIfBoth);
+    EXPECT_EQ(
+      hiraganaToRomaji(hiragana, ConvertFlags::Hepburn | ConvertFlags::Kunrei),
+      preferHepburnIfBoth);
+    EXPECT_EQ(
+      katakanaToRomaji(katakana, ConvertFlags::Hepburn | ConvertFlags::Kunrei),
+      preferHepburnIfBoth);
   }
-  void checkKunrei(const char* hiragana, const char* katakana, const char* romaji, const char* kunrei) {
+  void checkKunrei(const char* hiragana, const char* katakana,
+                   const char* romaji, const char* kunrei) {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
   void checkSmallKana(CharType source, const std::string& s) {
-    // Small letters that don't form part of a digraph are output in 'wāpuro' style favoring
-    // 'l' instead of 'x' as the first letter (note, small tsu is 'ltu').
+    // small letters that don't form part of a digraph are output in 'wāpuro'
+    // style favoring 'l' instead of 'x' as first letter (so small tsu is 'ltu')
     std::string romaji = "lalilulelolkalkelyalyulyoltulwa";
     EXPECT_EQ(_converter.convert(source, s, CharType::Romaji), romaji);
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
-    // Also test 'x' style for input to conversion
+    // also test small letters starting with 'x'
     std::replace(romaji.begin(), romaji.end(), 'l', 'x');
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
   }
@@ -79,15 +94,19 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("burikko"), "ぶりっこ");
   EXPECT_EQ(romajiToHiragana("tte"), "って");
   EXPECT_EQ(romajiToHiragana("ryo"), "りょ");
-  // ō or other macrons map to the same vowel in hiragana which is of course not correct
-  // so in order to preserve round-trip a macron is mapped to a prolonged mark (ー). This
-  // is not standard and can be turned off by a flag (see KanaConvert.h for more details).
-  // 'ou' can be used instead to avoid ambiguity.
+  // ō or other macrons map to the same vowel in hiragana which is of course not
+  // always correct so to preserve round-trip a macron is mapped to a prolonged
+  // mark (ー). This isn't standard and can be turned off by a flag (see
+  // KanaConvert.h for details). 'ou' can be used instead to avoid ambiguity.
   EXPECT_EQ(romajiToHiragana("tōkyō"), "とーきょー");
   EXPECT_EQ(romajiToHiragana("toukyou"), "とうきょう");
-  // This next case is of course incorrect, but it's the standard mapping for modern Hepburn romanization.
-  EXPECT_EQ(romajiToHiragana("tōkyō", ConvertFlags::NoProlongMark), "とおきょお");
-  EXPECT_EQ(romajiToHiragana("rāmen da", ConvertFlags::NoProlongMark | ConvertFlags::RemoveSpaces), "らあめんだ");
+  // This next case is of course incorrect, but it's the standard mapping for
+  // modern Hepburn romanization.
+  EXPECT_EQ(romajiToHiragana("tōkyō", ConvertFlags::NoProlongMark),
+            "とおきょお");
+  EXPECT_EQ(romajiToHiragana("rāmen da", ConvertFlags::NoProlongMark |
+                                           ConvertFlags::RemoveSpaces),
+            "らあめんだ");
   EXPECT_EQ(romajiToHiragana("no"), "の");
   EXPECT_EQ(romajiToHiragana("ken"), "けん");
   EXPECT_EQ(romajiToHiragana("kannon"), "かんのん");
@@ -96,8 +115,11 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("kan-i"), "かんい");
   EXPECT_EQ(romajiToHiragana("ninja samurai"), "にんじゃ　さむらい");
   // case insensitive
-  EXPECT_EQ(romajiToHiragana("Dare desu ka? ngya!"), "だれ　です　か？　んぎゃ！");
-  EXPECT_EQ(romajiToHiragana("Dare dESu ka? kyaa!!", ConvertFlags::RemoveSpaces), "だれですか？きゃあ！！");
+  EXPECT_EQ(romajiToHiragana("Dare desu ka? ngya!"),
+            "だれ　です　か？　んぎゃ！");
+  EXPECT_EQ(
+    romajiToHiragana("Dare dESu ka? kyaa!!", ConvertFlags::RemoveSpaces),
+    "だれですか？きゃあ！！");
   // don't convert non-romaji
   EXPECT_EQ(romajiToHiragana("店じまいdesu."), "店じまいです。");
   EXPECT_EQ(romajiToHiragana("[サメはkowai!]"), "「サメはこわい！」");
@@ -106,7 +128,7 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
 TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
   EXPECT_EQ(romajiToKatakana("i"), "イ");
   EXPECT_EQ(romajiToKatakana("ke"), "ケ");
-  // both the standard way (t+chi) as well as the wāpuro way (c+chi) are supported
+  // support both standard way (t+chi) as well as the wāpuro way (c+chi)
   EXPECT_EQ(romajiToKatakana("matchi"), "マッチ");
   EXPECT_EQ(romajiToKatakana("macchi"), "マッチ");
   // use macrons to get a katakana 'ー'
@@ -131,7 +153,7 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("にいがた"), "niigata");
   EXPECT_EQ(hiraganaToRomaji("かんけいない"), "kankeinai");
   EXPECT_EQ(hiraganaToRomaji("なか・ぐろ"), "naka/guro");
-  // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
+  // add apostrophe before a vowel or 'y' as per Hepburn standard
   EXPECT_EQ(hiraganaToRomaji("かんい"), "kan'i");
   EXPECT_EQ(hiraganaToRomaji("しんよう"), "shin'you");
   // here are the same examples without the apostrophes
@@ -141,12 +163,14 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("きっと"), "kitto");
   EXPECT_EQ(hiraganaToRomaji("べっぴん"), "beppin");
   EXPECT_EQ(hiraganaToRomaji("こっきょう"), "kokkyou");
-  // not sure what to do with a final or repeated small tsu ... for now it falls back to 'wāpuro',
-  // i.e., exactly what you would need to type on a keyboard to reproduce the Hiragana.
+  // not sure what to do with a final or repeated small tsu ... for now it falls
+  // back to 'wāpuro', i.e., exactly what you would need to type on a keyboard
+  // to reproduce the Hiragana.
   EXPECT_EQ(hiraganaToRomaji("いてっ"), "iteltu");
   EXPECT_EQ(hiraganaToRomaji("いっって"), "iltutte");
-  // prolonged sound mark is mainly for Katakana, but also works for Hiragana, for now using this
-  // mark is the only way to get a macron (bar over letter) in Romaji output.
+  // prolonged sound mark is mainly for Katakana, but also works for Hiragana,
+  // for now using this mark is the only way to get a macron (bar over letter)
+  // in Romaji output.
   EXPECT_EQ(hiraganaToRomaji("らーめん"), "rāmen");
   EXPECT_EQ(hiraganaToRomaji("きゃー"), "kyā");
   // ー not following a vowel is left unchanged
@@ -175,22 +199,24 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("テニス"), "tenisu");
   EXPECT_EQ(katakanaToRomaji("カナダ"), "kanada");
   EXPECT_EQ(katakanaToRomaji("ナカ・グロ"), "naka/guro");
-  // add apostrophe before a vowel or 'y' as per Hepburn standard to avoid ambiguity
+  // add apostrophe before a vowel or 'y' as per Hepburn standard
   EXPECT_EQ(katakanaToRomaji("タンイ"), "tan'i");
   EXPECT_EQ(katakanaToRomaji("ポンヨ"), "pon'yo");
   // here are the same examples without the apostrophes
   EXPECT_EQ(katakanaToRomaji("タニ"), "tani");
-  EXPECT_EQ(katakanaToRomaji("ポニョ"), "ponyo"); // BTW, this is the correct name of the movie
+  EXPECT_EQ(katakanaToRomaji("ポニョ"), "ponyo"); // the correct movie name
   // Sokuon handling
   EXPECT_EQ(katakanaToRomaji("アッパ"), "appa");
   EXPECT_EQ(katakanaToRomaji("マッチ"), "matchi");
   EXPECT_EQ(katakanaToRomaji("ジョッキ"), "jokki");
-  // not sure what to do with a final or repeated small tsu ... for now it falls back to 'wāpuro',
-  // i.e., exactly what you would need to type on a keyboard to reproduce the Hiragana.
+  // not sure what to do with a final or repeated small tsu ... for now it falls
+  // back to 'wāpuro', i.e., exactly what you would need to type on a keyboard
+  // to reproduce the Hiragana.
   EXPECT_EQ(katakanaToRomaji("イテッ"), "iteltu");
   EXPECT_EQ(katakanaToRomaji("イッッテ"), "iltutte");
-  // prolonged sound mark is mainly for Katakana, but also works for Hiragana, for now using this
-  // mark is the only way to get a macron (bar over letter) in Romaji output.
+  // prolonged sound mark is mainly for Katakana, but also works for Hiragana,
+  // for now using this mark is the only way to get a macron (bar over letter)
+  // in Romaji output.
   EXPECT_EQ(katakanaToRomaji("ラーメン"), "rāmen");
   EXPECT_EQ(katakanaToRomaji("キャー"), "kyā");
   EXPECT_EQ(katakanaToRomaji("ファーザー"), "fāzā");
@@ -214,19 +240,24 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
   for (auto& i : Kana::getMap(CharType::Hiragana)) {
-    auto r = _converter.convert(CharType::Hiragana, i.first, CharType::Katakana);
+    auto r =
+      _converter.convert(CharType::Hiragana, i.first, CharType::Katakana);
     EXPECT_EQ(r, i.second->katakana());
-    EXPECT_EQ(_converter.convert(CharType::Katakana, r, CharType::Hiragana), i.second->hiragana());
+    EXPECT_EQ(_converter.convert(CharType::Katakana, r, CharType::Hiragana),
+              i.second->hiragana());
   }
   for (auto& i : Kana::getMap(CharType::Katakana)) {
-    auto r = _converter.convert(CharType::Katakana, i.first, CharType::Hiragana);
+    auto r =
+      _converter.convert(CharType::Katakana, i.first, CharType::Hiragana);
     EXPECT_EQ(r, i.second->hiragana());
-    EXPECT_EQ(_converter.convert(CharType::Hiragana, r, CharType::Katakana), i.second->katakana());
+    EXPECT_EQ(_converter.convert(CharType::Hiragana, r, CharType::Katakana),
+              i.second->katakana());
   }
   kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
-  kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？", "ビッグ　バアド、スマール　ハッマー？");
+  kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？",
+                   "ビッグ　バアド、スマール　ハッマー？");
   kanaConvertCheck("じょん・どー", "ジョン・ドー");
 }
 
@@ -253,29 +284,37 @@ TEST_F(KanaConvertTest, RepeatSymbol) {
   EXPECT_EQ(katakanaToHiragana("コゞロ"), "こゞろ");
   EXPECT_EQ(katakanaToRomaji("コゝロ"), "koゝro");
   EXPECT_EQ(katakanaToRomaji("コゞロ"), "koゞro");
-  // currently a digraph will also be repeated - this might not be correct behavior
+  // currently a digraph is also be repeated - this might not be correct
   kanaConvertCheck("きょゝ", "キョヽ", "kyokyo");
   kanaConvertCheck("きょゞ", "キョヾ", "kyogyo");
   // repeating symbol is ignored after 'prolong' mark when target is Romaji
   kanaConvertCheck("はーゝろー", "ハーヽロー", "hārō");
   kanaConvertCheck("ばーゞろー", "バーヾロー", "bārō");
-  // repeating symbol at the begining is an error so drop for romaji, but can still convert for kana
+  // repeating symbol at the begining is an error so drop for romaji, but can
+  // still convert for kana
   kanaConvertCheck("ゝろ", "ヽロ", "ro");
 }
 
 TEST_F(KanaConvertTest, ConvertAllToOneType) {
-  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Romaji), "ima kurisumasu desu.");
-  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Hiragana), "いま　くりすます　です。");
-  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Katakana), "イマ　クリスマス　デス。");
-  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Romaji), "rāmenrāmenrāmen!!");
-  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Hiragana), "らーめんらーめんらーめん！！");
-  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Katakana), "ラーメンラーメンラーメン！！");
+  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Romaji),
+            "ima kurisumasu desu.");
+  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Hiragana),
+            "いま　くりすます　です。");
+  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Katakana),
+            "イマ　クリスマス　デス。");
+  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Romaji),
+            "rāmenrāmenrāmen!!");
+  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Hiragana),
+            "らーめんらーめんらーめん！！");
+  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Katakana),
+            "ラーメンラーメンラーメン！！");
 }
 
 TEST_F(KanaConvertTest, HepburnVersusKunrei) {
-  // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki sometimes in order to be
-  // unique for round-trips (plus there are a lot of extra wāpuro entries). Below are the entries from the
-  // Differences among romanizations table from:  https://en.wikipedia.org/wiki/Romanization_of_Japanese
+  // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki
+  // sometimes in order to be unique for round-trips (plus there are a lot of
+  // extra wāpuro entries). Below are the entries from the Differences among
+  // romanizations table: https://en.wikipedia.org/wiki/Romanization_of_Japanese
   // -- A
   check("あ", "ア", "a");
   check("い", "イ", "i");
@@ -351,12 +390,14 @@ TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   check("りょ", "リョ", "ryo");
   // -- WA and N
   check("わ", "ワ", "wa");
-  // Nihon Shiki for the following rare kana are 'wi' and 'we' respectively, but wāpuro
-  // values are used instead (since 'wi' and 'we' are already used for the more common
-  // diagraphs ウィ and ウェ. Hepburn and Kunrei are both 'i' and 'e' for these.
+  // Nihon Shiki for the following rare kana are 'wi' and 'we' respectively, but
+  // wāpuro values are used instead (since 'wi' and 'we' are already used for
+  // the more common diagraphs ウィ and ウェ. Hepburn and Kunrei are both 'i'
+  // and 'e' for these.
   check("ゐ", "ヰ", "wyi", "i", "i");
   check("ゑ", "ヱ", "wye", "e", "e");
-  // both Hepburn and Kunrei use 'o' for を, but program (and Nihon Shiki) uses 'wo' for uniqueness
+  // both Hepburn and Kunrei use 'o' for を, but program (and Nihon Shiki) uses
+  // 'wo' for uniqueness
   check("を", "ヲ", "wo", "o", "o");
   check("ん", "ン", "n");
   // -- GA
@@ -378,8 +419,9 @@ TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   checkKunrei("じゅ", "ジュ", "ju", "zyu");
   checkKunrei("じょ", "ジョ", "jo", "zyo");
   // -- DA
-  // Lots of differences for this group, for example the mapping for ヂ in Nihon Shiki style
-  // (and default for this program) is 'di', whereas Hepburn is 'ji' and Kunrei is 'zi'.
+  // Lots of differences for this group, for example the mapping for ヂ in Nihon
+  // Shiki style (and default for this program) is 'di', whereas Hepburn is 'ji'
+  // and Kunrei is 'zi'.
   check("だ", "ダ", "da");
   check("ぢ", "ヂ", "di", "ji", "zi");
   check("づ", "ヅ", "du", "zu", "zu");

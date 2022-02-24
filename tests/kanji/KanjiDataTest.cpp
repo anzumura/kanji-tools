@@ -10,7 +10,8 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data", DataDir = "some-dir";
+constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data",
+               DataDir = "some-dir";
 
 } // namespace
 
@@ -51,7 +52,9 @@ TEST(DataTest, NextArgWithMultipleArgs) {
   const char* argv[] = {Arg0, arg1, DebugArg, arg3, DataArg, DataDir, arg6};
   auto argc = std::size(argv);
   std::vector<const char*> actualArgs;
-  for (auto i = Data::nextArg(argc, argv); i < argc; i = Data::nextArg(argc, argv, i)) actualArgs.push_back(argv[i]);
+  for (auto i = Data::nextArg(argc, argv); i < argc;
+       i = Data::nextArg(argc, argv, i))
+    actualArgs.push_back(argv[i]);
   EXPECT_EQ(actualArgs, std::vector<const char*>({arg1, arg3, arg6}));
 }
 
@@ -85,9 +88,12 @@ protected:
         ++variants;
       }
       if (!Kanji::hasLink(i->type()))
-        EXPECT_TRUE(_data->getStrokes(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
-      EXPECT_EQ(MBChar::length(i->name()), 1) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
-      EXPECT_TRUE(isKanji(i->name())) << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+        EXPECT_TRUE(_data->getStrokes(i->name()))
+          << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+      EXPECT_EQ(MBChar::length(i->name()), 1)
+        << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+      EXPECT_TRUE(isKanji(i->name()))
+        << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
     }
     return variants;
   }
@@ -284,18 +290,18 @@ TEST_F(KanjiDataTest, KanjiWithMultipleOldNames) {
 }
 
 TEST_F(KanjiDataTest, UcdChecks) {
-  // 'shrimp' is a Jinmei kanji, but 'jinmei.txt' doesn't include a Meaning column so the
-  // value is pulled from UCD.
+  // 'shrimp' is a Jinmei kanji, but 'jinmei.txt' doesn't include a Meaning
+  // column so the value is pulled from UCD.
   auto& shrimp = **_data->findKanjiByName("蝦");
   EXPECT_EQ(shrimp.meaning(), "shrimp, prawn");
-  // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and reading are all
-  // pulled from UCD (and readings are converted to Kana).
+  // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and reading
+  // are all pulled from UCD (and readings are converted to Kana).
   auto& dull = **_data->findKanjiByName("呆");
   EXPECT_EQ(dull.radical(), _data->getRadicalByName("口"));
   EXPECT_EQ(dull.strokes(), 7);
   EXPECT_EQ(dull.meaning(), "dull; dull-minded, simple, stupid");
-  // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD unfortunately
-  // don't have a dash before the Okurigana.
+  // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD
+  // unfortunately don't have a dash before the Okurigana.
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
   // Kanji with multiple Nelson Ids
   auto ucdNelson = _data->ucd().find("㡡");
@@ -323,8 +329,8 @@ TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
 }
 
 TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
-  // Check that only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou, Jinmei
-  // Frequency, Kentei, etc.) should be in the 'common' bloacks.
+  // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
+  // Jinmei Frequency, Kentei, etc.) should be in the 'common' bloacks.
   auto rareUcd = 0;
   std::map<KanjiTypes, int> missingJSource;
   for (auto& i : _data->ucd().map()) {
@@ -340,7 +346,7 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
       if (auto t = _data->getType(i.first); t == KanjiTypes::LinkedOld)
         EXPECT_EQ(i.first, "絕"); // old form of 絶 doesn't have a jSource
       else
-        ++missingJSource[t]; // other with empty jSource should be Kentei or Ucd (tested below)
+        ++missingJSource[t]; // other with empty jSource should be Kentei or Ucd
     } else
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
       EXPECT_NE(i.second.sources().find('J'), std::string::npos);
@@ -354,15 +360,17 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd = _data->ucd().map();
   EXPECT_EQ(ucd.size(), _data->kanjiNameMap().size());
-  auto jouyou{0}, jinmei{0}, jinmeiLinks{0}, jinmeiLinksToJouyou{0}, jinmeiLinksToJinmei{0};
+  auto jouyou{0}, jinmei{0}, jinmeiLinks{0}, jinmeiLinksToJouyou{0},
+    jinmeiLinksToJinmei{0};
   std::map<KanjiTypes, int> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     auto& k = i.second;
-    // every Ucd entry should be a wide character, i.e., have a 'display length' of 2
+    // every Ucd entry should be a wide character, i.e., have 'display length' 2
     EXPECT_EQ(displayLength(k.name()), 2);
     // if 'variantStrokes' is present it should be different than 'strokes'
-    if (k.hasVariantStrokes()) EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
+    if (k.hasVariantStrokes())
+      EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
     // make sure MBUtils UCD characters are part of MBUtils unicode blocks
     if (k.joyo() || k.jinmei())
       EXPECT_TRUE(isCommonKanji(k.name())) << k.codeAndName();
@@ -389,7 +397,8 @@ TEST_F(KanjiDataTest, UcdLinks) {
         else if (link.jinmei())
           ++jinmeiLinksToJinmei;
         else
-          FAIL() << "jinmei '" << k.name() << "' shouldn't have non-official link";
+          FAIL() << "jinmei '" << k.name()
+                 << "' shouldn't have non-official link";
         if (link.hasLinks()) EXPECT_NE(link.links()[0].name(), k.name());
       }
     } else if (k.hasLinks())
@@ -402,7 +411,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 15);
   EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 224);
   EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2877);
-  EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // these are captured in 'jinmeiLinks'
+  EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // part of 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 89);
   auto officialLinksToJinmei{0}, officialLinksToJouyou{0};
   for (auto& i : _data->linkedJinmeiKanji()) {

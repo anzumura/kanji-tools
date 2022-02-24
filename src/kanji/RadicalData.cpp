@@ -7,10 +7,13 @@
 namespace kanji_tools {
 
 void RadicalData::load(const std::filesystem::path& file) {
-  const ColumnFile::Column numberCol("Number"), nameCol("Name"), longNameCol("LongName"), readingCol("Reading");
-  for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol}); f.nextRow();) {
+  const ColumnFile::Column numberCol("Number"), nameCol("Name"),
+    longNameCol("LongName"), readingCol("Reading");
+  for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol});
+       f.nextRow();) {
     const auto radicalNumber = f.getInt(numberCol);
-    if (radicalNumber != f.currentRow()) f.error("radicals must be ordered by 'number'");
+    if (radicalNumber != f.currentRow())
+      f.error("radicals must be ordered by 'number'");
     std::stringstream radicals(f.get(nameCol));
     Radical::AltForms altForms;
     std::string name, token;
@@ -19,7 +22,8 @@ void RadicalData::load(const std::filesystem::path& file) {
         name = token;
       else
         altForms.emplace_back(token);
-    _radicals.emplace_back(radicalNumber, name, altForms, f.get(longNameCol), f.get(readingCol));
+    _radicals.emplace_back(radicalNumber, name, altForms, f.get(longNameCol),
+                           f.get(readingCol));
     _map[name] = radicalNumber - 1;
   }
 }
@@ -33,16 +37,20 @@ void RadicalData::print(const Data& data) const {
   }
   data.out() << "):\n";
   RadicalLists radicals;
-  for (auto& i : data.kanjiNameMap()) radicals[i.second->radical()].push_back(i.second);
+  for (auto& i : data.kanjiNameMap())
+    radicals[i.second->radical()].push_back(i.second);
   printRadicalLists(data, radicals);
   printMissingRadicals(data, radicals);
 }
 
-void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) const {
+void RadicalData::printRadicalLists(const Data& data,
+                                    RadicalLists& radicals) const {
   Count total;
   for (auto& i : radicals) {
     KanjiList& l = i.second;
-    std::sort(l.begin(), l.end(), [](const auto& x, const auto& y) { return x->strokes() < y->strokes(); });
+    std::sort(l.begin(), l.end(), [](const auto& x, const auto& y) {
+      return x->strokes() < y->strokes();
+    });
     Count count;
     for (const auto& j : l) {
       ++count[j->type()];
@@ -51,7 +59,8 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
     data.out() << i.first << ':';
     printCounts(data, count);
     size_t j = 0;
-    for (; j < l.size() && j < MaxExamples; ++j) data.out() << ' ' << l[j]->name();
+    for (; j < l.size() && j < MaxExamples; ++j)
+      data.out() << ' ' << l[j]->name();
     if (j < l.size()) data.out() << " ...";
     data.out() << '\n';
   }
@@ -59,19 +68,24 @@ void RadicalData::printRadicalLists(const Data& data, RadicalLists& radicals) co
   printCounts(data, total, true);
 }
 
-void RadicalData::printMissingRadicals(const Data& data, const RadicalLists& radicals) const {
+void RadicalData::printMissingRadicals(const Data& data,
+                                       const RadicalLists& radicals) const {
   std::vector<Radical> missingRadicals;
   for (auto& i : _radicals)
     if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
   if (!missingRadicals.empty()) {
-    data.log() << "  Found " << missingRadicals.size() << " radicals with no kanji:";
+    data.log() << "  Found " << missingRadicals.size()
+               << " radicals with no kanji:";
     for (const auto& i : missingRadicals) data.out() << ' ' << i;
     data.out() << '\n';
   }
 }
 
-void RadicalData::printCounts(const Data& data, const Count& c, bool summary) const {
-  const auto t = std::accumulate(c.begin(), c.end(), 0, [](const auto& x, const auto& y) { return x + y.second; });
+void RadicalData::printCounts(const Data& data, const Count& c,
+                              bool summary) const {
+  const auto t =
+    std::accumulate(c.begin(), c.end(), 0,
+                    [](const auto& x, const auto& y) { return x + y.second; });
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
   for (const auto i : AllKanjiTypes) {
     if (const auto j = c.find(i); summary) {

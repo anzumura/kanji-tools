@@ -7,9 +7,10 @@ namespace kanji_tools {
 
 class GroupData {
 public:
-  // For now, set max size for a group to '58' since this is the maximum number of entries
-  // that the group quiz currently supports for entering answers, i.e., a-z, then A-Z, then
-  // 6 more ascii characters following Z (before reaching 'a' again).
+  // For now, set max size for a group to '58' since this is the maximum number
+  // of entries that the group quiz currently supports for entering answers,
+  // i.e., a-z, then A-Z, then 6 more ascii characters following Z (before
+  // reaching 'a' again).
   enum Values { MissingTypeExamples = 12, MaxGroupSize = 58 };
 
   using Entry = std::shared_ptr<Group>;
@@ -28,18 +29,22 @@ public:
   [[nodiscard]] auto& patternMap() const { return _patternMap; }
   [[nodiscard]] auto& data() const { return *_data; }
   [[nodiscard]] auto& out() const { return _data->out(); }
-  [[nodiscard]] auto& log(bool heading = false) const { return _data->log(heading); }
+  [[nodiscard]] auto& log(bool heading = false) const {
+    return _data->log(heading);
+  }
 private:
-  // 'checkInsert' will return false if 'kanji' is already in 'Map'
+  // return false if 'kanji' is already in 'Map'
   bool checkInsert(const std::string& kanji, Map&, const Entry& group) const;
 
-  // 'checkInsert' will return false if 'kanji' is already in 'MultiMap' for the given 'group'
-  bool checkInsert(const std::string& kanji, MultiMap&, const Entry& group) const;
+  // return false if 'kanji' is already in 'MultiMap' for the given 'group'
+  bool checkInsert(const std::string& kanji, MultiMap&,
+                   const Entry& group) const;
 
-  // 'loadGroups' loads from '-groups.txt' files
-  template<typename T> void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
+  template<typename T>
+  void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
 
-  [[nodiscard]] Entry createGroup(int number, const std::string& name, const Data::List& members,
+  [[nodiscard]] Entry createGroup(int number, const std::string& name,
+                                  const Data::List& members,
                                   Group::PatternType) const;
 
   template<typename T> void printGroups(const T&, const List&) const;

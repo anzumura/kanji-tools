@@ -7,8 +7,9 @@
 
 namespace kanji_tools {
 
-// 'Ucd' holds the data loaded from 'ucd.txt' which is an extract from the official Unicode
-// 'ucd.all.flat.xml' file - see comments in scripts/parseUcdAllFlat.sh for more details.
+// 'Ucd' holds the data loaded from 'ucd.txt' which is an extract from the
+// official Unicode 'ucd.all.flat.xml' file - see comments in
+// scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
   class Link {
@@ -23,15 +24,19 @@ public:
   };
   using Links = std::vector<Link>;
 
-  Ucd(char32_t code, const std::string& name, const std::string& block, const std::string& version, int radical,
-      int strokes, int variantStrokes, const std::string& pinyin, const std::string& morohashiId,
-      const std::string& nelsonIds, const std::string& sources, const std::string& jSource, bool joyo, bool jinmei,
-      const Links& links, UcdLinkTypes linkType, bool linkedReadings, const std::string& meaning,
+  Ucd(char32_t code, const std::string& name, const std::string& block,
+      const std::string& version, int radical, int strokes, int variantStrokes,
+      const std::string& pinyin, const std::string& morohashiId,
+      const std::string& nelsonIds, const std::string& sources,
+      const std::string& jSource, bool joyo, bool jinmei, const Links& links,
+      UcdLinkTypes linkType, bool linkedReadings, const std::string& meaning,
       const std::string& onReading, const std::string& kunReading)
-    : _code(code), _name(name), _block(block), _version(version), _radical(radical), _strokes(strokes),
-      _variantStrokes(variantStrokes), _pinyin(pinyin), _morohashiId(morohashiId), _nelsonIds(nelsonIds),
-      _sources(sources), _jSource(jSource), _joyo(joyo), _jinmei(jinmei), _links(links), _linkType(linkType),
-      _linkedReadings(linkedReadings), _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
+      : _code(code), _name(name), _block(block), _version(version),
+        _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes),
+        _pinyin(pinyin), _morohashiId(morohashiId), _nelsonIds(nelsonIds),
+        _sources(sources), _jSource(jSource), _joyo(joyo), _jinmei(jinmei),
+        _links(links), _linkType(linkType), _linkedReadings(linkedReadings),
+        _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
 
   [[nodiscard]] auto code() const { return _code; }
   [[nodiscard]] auto& name() const { return _name; }
@@ -56,21 +61,25 @@ public:
 
   // 'has' methods
   [[nodiscard]] auto hasLinks() const { return !_links.empty(); }
-  [[nodiscard]] auto hasTraditionalLinks() const { return _linkType == UcdLinkTypes::Traditional; }
-  [[nodiscard]] auto hasNonTraditionalLinks() const { return hasLinks() && _linkType != UcdLinkTypes::Traditional; }
+  [[nodiscard]] auto hasTraditionalLinks() const {
+    return _linkType == UcdLinkTypes::Traditional;
+  }
+  [[nodiscard]] auto hasNonTraditionalLinks() const {
+    return hasLinks() && _linkType != UcdLinkTypes::Traditional;
+  }
   [[nodiscard]] auto hasVariantStrokes() const { return _variantStrokes != 0; }
 
-  // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if variant is true), otherise
-  // it falls back to just return '_strokes'
+  // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if
+  // variant is true), otherise it falls back to just return '_strokes'
   [[nodiscard]] auto getStrokes(bool variant) const {
     return variant && hasVariantStrokes() ? _variantStrokes : _strokes;
   }
 
-  // 'codeAndName' methods return the Unicode in square brackets plus the name, e.g.: [FA30] 侮
+  // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
 
-  // 'EmptyString' can be returned by 'linkCodeAndName' and is used by other classes as well
+  // 'EmptyString' can be returned by 'linkCodeAndName'
   static const std::string EmptyString;
 private:
   const char32_t _code;
@@ -79,7 +88,7 @@ private:
   const std::string _version;
   const int _radical;
   const int _strokes;
-  const int _variantStrokes; // 0 if there are no variants (see 'parseUcdAllFlat.sh' for more details)
+  const int _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
   const std::string _pinyin;
   const std::string _morohashiId;
   const std::string _nelsonIds;

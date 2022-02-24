@@ -14,19 +14,21 @@ const std::string AlreadyInChoices("' already in choices");
 char Choice::getOneChar() {
   struct termios settings {};
   if (tcgetattr(0, &settings) < 0) perror("tcsetattr()");
-  // turn raw mode on - allows getting a single char from terminal without waiting 'return'
+  // turn raw mode on - allows getting single char without waiting for 'return'
   settings.c_lflag &= ~static_cast<tcflag_t>(ICANON);
   settings.c_lflag &= ~static_cast<tcflag_t>(ECHO);
   settings.c_cc[VMIN] = 1;
   settings.c_cc[VTIME] = 0;
-  if (tcsetattr(0, TCSANOW, &settings) < 0) perror("tcsetattr() - turning on raw mode");
+  if (tcsetattr(0, TCSANOW, &settings) < 0)
+    perror("tcsetattr() - turning on raw mode");
   // read a single char
   char result = 0;
   if (read(0, &result, 1) < 0) perror("read()");
   // turn raw mode off
   settings.c_lflag |= ICANON;
   settings.c_lflag |= ECHO;
-  if (tcsetattr(0, TCSADRAIN, &settings) < 0) perror("tcsetattr() - turning off raw mode");
+  if (tcsetattr(0, TCSADRAIN, &settings) < 0)
+    perror("tcsetattr() - turning off raw mode");
   return result;
 }
 
@@ -65,20 +67,24 @@ void Choice::add(std::string& prompt, const Choices& choices) {
   if (rangeStart) completeRange();
 }
 
-char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn, OptChar def) const {
-  static const std::string QuitError("quit option '"), DefaultError("default option '"), DefaultPrompt(") def '");
+char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
+                 OptChar def) const {
+  static const std::string QuitError("quit option '"),
+    DefaultError("default option '"), DefaultPrompt(") def '");
 
   Choices choices(choicesIn);
-  if (_quit && (useQuit ? !choices.emplace(*_quit, _quitDescription).second : choices.contains(*_quit)))
+  if (_quit && (useQuit ? !choices.emplace(*_quit, _quitDescription).second
+                        : choices.contains(*_quit)))
     error(QuitError + *_quit + AlreadyInChoices);
   if (choices.empty()) error("must specify at least one choice");
 
-  // if 'msg' is empty then don't leave a space before listing the choices in brackets.
+  // if 'msg' is empty then don't leave space before listing choices in brackets
   std::string line, prompt(msg + (msg.empty() ? "(" : " ("));
 
   add(prompt, choices);
   if (def) {
-    if (!choices.contains(*def)) error(DefaultError + *def + "' not in choices");
+    if (!choices.contains(*def))
+      error(DefaultError + *def + "' not in choices");
     prompt += DefaultPrompt + *def + "': ";
   } else
     prompt += "): ";
@@ -99,17 +105,20 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   return line[0];
 }
 
-char Choice::get(const std::string& msg, bool useQuit, char first, char last, const Choices& choicesIn,
-                 OptChar def) const {
+char Choice::get(const std::string& msg, bool useQuit, char first, char last,
+                 const Choices& choicesIn, OptChar def) const {
   static const std::string RangeError("range option"), Empty;
-  static const std::string FirstError("first " + RangeError), LastError("last " + RangeError);
+  static const std::string FirstError("first " + RangeError),
+    LastError("last " + RangeError);
 
   checkPrintableAscii(first, FirstError);
   checkPrintableAscii(last, LastError);
-  if (first > last) error(FirstError + " '" + first + "' is greater than last '" + last + "'");
+  if (first > last)
+    error(FirstError + " '" + first + "' is greater than last '" + last + "'");
   Choices choices(choicesIn);
   for (; first <= last; ++first)
-    if (!choices.emplace(first, Empty).second) error(RangeError + " '" + first + AlreadyInChoices);
+    if (!choices.emplace(first, Empty).second)
+      error(RangeError + " '" + first + AlreadyInChoices);
   return get(msg, useQuit, choices, def);
 }
 

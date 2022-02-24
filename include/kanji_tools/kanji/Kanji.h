@@ -14,9 +14,9 @@
 
 namespace kanji_tools {
 
-// 'KanjiInfo' members can be used to select which fields are printed by 'Kanji::info'
-// method. For example 'Grade | Level | Freq' will print 'grade', 'level' and 'frequency'
-// fields and 'All ^ Strokes' will print all except for strokes.
+// 'KanjiInfo' members can be used to select which fields are printed by
+// 'Kanji::info' method. For example 'Grade | Level | Freq' will print 'grade',
+// 'level' and 'frequency' fields and 'All ^ Strokes' prints all except strokes.
 enum class KanjiInfo {
   Radical = 1,
   Strokes,
@@ -39,7 +39,9 @@ public:
   using OptString = std::optional<std::string>;
   using LinkNames = std::vector<std::string>;
   using NelsonIds = std::vector<int>;
-  static auto hasLink(KanjiTypes t) { return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld; }
+  static auto hasLink(KanjiTypes t) {
+    return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
+  }
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
@@ -50,48 +52,65 @@ public:
   [[nodiscard]] virtual const std::string& reading() const = 0;
 
   [[nodiscard]] virtual OptInt frequency() const { return std::nullopt; }
-  [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; } // overridden by 'JouyouKanji'
-  [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }     // overridden by all except 'UcdKanji'
-  [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }   // overridden by 'OfficialKanji'
+  [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
+  [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
+  [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
 
   // 'linkedReadings' returns true if readings were loaded from a linked kanji
   [[nodiscard]] virtual bool linkedReadings() const { return false; }
 
   // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
-  // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁 has 辨, 瓣 and 辯)
-  //   - 163 'LinkedOld' type kanji end up getting created (367 - 204 that are linked jinmei)
+  // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁
+  //   has 辨, 瓣 and 辯)
+  // - 163 'LinkedOld' type kanji end up getting created (367 - 204 that are
+  //   linked jinmei)
   // - 230 Jinmeiyō are 'alternate forms' (type is 'LinkedJinmei'):
   //   - 204 are part of the 365 Jōyō oldName set
   //   - 8 are different alternate forms of Jōyō kanji (薗 駈 嶋 盃 冨 峯 埜 凉)
-  //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these will have an 'oldName'
+  //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these
+  //     will have an 'oldName'
   // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
-  [[nodiscard]] virtual const LinkNames& oldNames() const { return EmptyLinkNames; }
+  [[nodiscard]] virtual const LinkNames& oldNames() const {
+    return EmptyLinkNames;
+  }
 
-  // UcdFileKanji have an optional 'newName' field (based on Link field loaded from ucd.txt). LinkedKanji
-  // also have a 'newName', i.e., the linked kanji name which is the new (or more standard) version.
+  // UcdFileKanji have an optional 'newName' field (based on Link field loaded
+  // from ucd.txt). LinkedKanji also have a 'newName', i.e., the linked kanji
+  // name which is the new (or more standard) version.
   [[nodiscard]] virtual OptString newName() const { return std::nullopt; }
 
-  // Only CustomFileKanji have 'extraTypeInfo'. They have a 'number' (from 'Number' column) plus:
+  // Only CustomFileKanji have 'extraTypeInfo'. They have a 'number' (from
+  // 'Number' column) plus:
   // - Jouyou: optionally adds the year the kanji was added to the official list
-  // - Jinmei: adds the year the kanji was added as well as the 'reason' (see JinmeiKanji class)
+  // - Jinmei: adds the year the kanji was added as well as the 'reason' (see
+  // JinmeiKanji class)
   [[nodiscard]] virtual OptString extraTypeInfo() const { return std::nullopt; }
 
   [[nodiscard]] auto& name() const { return _name; }
 
-  // 'variant' is true if _name includes a Unicode 'variation selector'. In this case 'nonVariantName'
-  // returns the non-variant name and 'compatibilityName' returns the UCD 'compatibility' code (which
-  // is a single MB char without a variation selector).
+  // 'variant' is true if _name includes a Unicode 'variation selector'. In this
+  // case 'nonVariantName' returns the non-variant name and 'compatibilityName'
+  // returns the UCD 'compatibility' code (which is a single MB char without a
+  // variation selector).
   [[nodiscard]] auto variant() const { return _nonVariantName.has_value(); }
-  [[nodiscard]] auto nonVariantName() const { return _nonVariantName.value_or(_name); }
-  [[nodiscard]] auto compatibilityName() const { return _compatibilityName.value_or(_name); }
+  [[nodiscard]] auto nonVariantName() const {
+    return _nonVariantName.value_or(_name);
+  }
+  [[nodiscard]] auto compatibilityName() const {
+    return _compatibilityName.value_or(_name);
+  }
 
-  [[nodiscard]] auto frequencyOrDefault(int x) const { return frequency().value_or(x); }
-  [[nodiscard]] auto frequencyOrMax() const { return frequencyOrDefault(std::numeric_limits<int>::max()); }
+  [[nodiscard]] auto frequencyOrDefault(int x) const {
+    return frequency().value_or(x);
+  }
+  [[nodiscard]] auto frequencyOrMax() const {
+    return frequencyOrDefault(std::numeric_limits<int>::max());
+  }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
   [[nodiscard]] auto& pinyin() const { return _pinyin; }
   [[nodiscard]] auto& radical() const { return _radical; }
-  [[nodiscard]] auto strokes() const { return _strokes; } // may be zero for kanjis only loaded from frequency.txt
+  [[nodiscard]] auto strokes() const { return _strokes; }
 
   [[nodiscard]] auto is(KanjiTypes t) const { return type() == t; }
   [[nodiscard]] auto hasGrade() const { return hasValue(grade()); }
@@ -101,65 +120,76 @@ public:
   [[nodiscard]] auto hasNelsonIds() const { return !_nelsonIds.empty(); }
   [[nodiscard]] auto hasReading() const { return !reading().empty(); }
 
-  // 'info' returns a comma separated string with extra info (if present) including:
-  //   Radical, Strokes, Pinyin, Grade, Level, Freq, New, Old and Kyu
-  // 'fields' can be used to control inclusion of fields (include all by default).
-  // Note: multiple 'Old' links are separated by '／' (wide slash) and a link is followed
-  // by '*' if it was used to pull in readings.
+  // 'info' returns a comma separated string with extra info (if present)
+  // including: Radical, Strokes, Pinyin, Grade, Level, Freq, New, Old and Kyu.
+  // 'fields' can be used to control inclusion of fields (include all by
+  // default). Note: multiple 'Old' links are separated by '／' (wide slash) and
+  // a link is followed by '*' if it was used to pull in readings.
   [[nodiscard]] std::string info(KanjiInfo fields = KanjiInfo::All) const;
 
-  // 'qualifiedName' returns 'name' plus an extra marker to show additional information:
-  //     . = Jouyou         : 2136 Jouyou
-  //     ' = JLPT           : 251 Jinmei in JLPT (out of 2222 total - the other 1971 are Jouyou)
-  //     " = Top Frequency  : 296 top frequency not in Jouyou or JLPT
-  //     ^ = Jinmei         : 224 Jinmei not already covered by the above types
-  //     ~ = Linked Jinmei  : 218 Linked Jinmei (with no frequency)
-  //     % = Linked Old     : 211 Linked Old (with no frequency)
-  //     + = Extra          : all kanji loaded from 'extra.txt' file
-  //     @ = <K1 Kentei     : 268 non-K1 Kentei Kanji that aren't in the above categories
-  //     # = K1 Kentei      : 2554 K1 Kentei Kanji that aren't in the above categories
-  //     * = Ucd            : all kanji loaded from 'ucd.txt' file that aren't in the above categories
-  [[nodiscard]] auto qualifiedName() const { return _name + QualifiedNames[qualifiedNameRank()]; }
-
-  // 'orderByQualifiedName' can be used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
-  // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the same 'qualifiedNameRank' then
-  // sort by strokes, frequency, variant and (unicode) compatibilityName.
-  [[nodiscard]] auto orderByQualifiedName(const Kanji& x) const {
-    return qualifiedNameRank() < x.qualifiedNameRank() ||
-      qualifiedNameRank() == x.qualifiedNameRank() &&
-      (strokes() < x.strokes() ||
-       strokes() == x.strokes() &&
-         (frequencyOrMax() < x.frequencyOrMax() ||
-          frequencyOrMax() == x.frequencyOrMax() &&
-            (variant() < x.variant() ||
-             variant() == x.variant() && toUnicode(compatibilityName()) < toUnicode(x.compatibilityName()))));
+  // Return 'name' plus an extra 'suffix' to show more info. Suffixes are:
+  //   . = Jouyou        : 2136 Jouyou
+  //   ' = JLPT          : 251 Jinmei in JLPT - the other 1971 JLPT are Jouyou
+  //   " = Top Frequency : 296 top frequency not in Jouyou or JLPT
+  //   ^ = Jinmei        : 224 Jinmei not already covered by the above types
+  //   ~ = Linked Jinmei : 218 Linked Jinmei (with no frequency)
+  //   % = Linked Old    : 211 Linked Old (with no frequency)
+  //   + = Extra         : all kanji loaded from 'extra.txt' file
+  //   @ = <K1 Kentei    : 268 non-K1 Kentei Kanji that aren't included above
+  //   # = K1 Kentei     : 2554 K1 Kentei Kanji that aren't included above
+  //   * = Ucd           : kanji loaded from 'ucd.txt' not included above
+  [[nodiscard]] auto qualifiedName() const {
+    return _name + QualifiedNames[qualifiedNameRank()];
   }
 
-  // 'Legend' is meant to be used in output to briefly describe the suffix added to a kanji when
-  // using the 'qualifiedName' method. See comments for Kanji::qualifiedName for more details.
-  static constexpr auto Legend = ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
+  // Used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
+  // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the
+  // same 'qualifiedNameRank' then sort by strokes, frequency, variant and
+  // (unicode) compatibilityName.
+  [[nodiscard]] auto orderByQualifiedName(const Kanji& x) const {
+    return qualifiedNameRank() < x.qualifiedNameRank() ||
+           qualifiedNameRank() == x.qualifiedNameRank() &&
+             (strokes() < x.strokes() ||
+              strokes() == x.strokes() &&
+                (frequencyOrMax() < x.frequencyOrMax() ||
+                 frequencyOrMax() == x.frequencyOrMax() &&
+                   (variant() < x.variant() ||
+                    variant() == x.variant() &&
+                      toUnicode(compatibilityName()) <
+                        toUnicode(x.compatibilityName()))));
+  }
+
+  // 'Legend' is meant to be used in output to briefly describe the suffix added
+  // to a kanji when using the 'qualifiedName' method. See comments for
+  // Kanji::qualifiedName for more details.
+  static constexpr auto Legend =
+    ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 protected:
-  Kanji(const std::string& name, const OptString& compatibilityName, const Radical& radical, int strokes,
-        const OptString& morohashiId, const NelsonIds& nelsonIds, const OptString& pinyin);
+  Kanji(const std::string& name, const OptString& compatibilityName,
+        const Radical& radical, int strokes, const OptString& morohashiId,
+        const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames{};
 private:
-  // 'QualifiedNames' stores the suffixes for qualified names in order of most common to least common (see
-  // comments for 'qualifiedName' method and 'Legend' string above for more details).
-  static constexpr std::array QualifiedNames = {'.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
+  // 'QualifiedNames' stores the suffixes for qualified names in order of most
+  // common to least common (see comments for 'qualifiedName' method and
+  // 'Legend' string above for more details).
+  static constexpr std::array QualifiedNames = {'.', '\'', '"', '^', '~',
+                                                '%', '+',  '@', '#', '*'};
 
   [[nodiscard]] int qualifiedNameRank() const {
     auto t = type();
-    // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd (so the least common)
-    return t == KanjiTypes::Jouyou    ? 0
-      : hasLevel()                    ? 1
-      : frequency()                   ? 2
-      : t == KanjiTypes::Jinmei       ? 3
-      : t == KanjiTypes::LinkedJinmei ? 4
-      : t == KanjiTypes::LinkedOld    ? 5
-      : t == KanjiTypes::Extra        ? 6
-      : t == KanjiTypes::Ucd          ? 9
-      : kyu() != KenteiKyus::K1       ? 7
-                                      : 8;
+    // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd
+    // (so the least common)
+    return t == KanjiTypes::Jouyou         ? 0
+           : hasLevel()                    ? 1
+           : frequency()                   ? 2
+           : t == KanjiTypes::Jinmei       ? 3
+           : t == KanjiTypes::LinkedJinmei ? 4
+           : t == KanjiTypes::LinkedOld    ? 5
+           : t == KanjiTypes::Extra        ? 6
+           : t == KanjiTypes::Ucd          ? 9
+           : kyu() != KenteiKyus::K1       ? 7
+                                           : 8;
   }
 
   // name related fields
@@ -177,7 +207,9 @@ private:
   const OptString _pinyin;
 };
 
-inline auto& operator<<(std::ostream& os, const Kanji& k) { return os << k.name(); }
+inline auto& operator<<(std::ostream& os, const Kanji& k) {
+  return os << k.name();
+}
 
 } // namespace kanji_tools
 

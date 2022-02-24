@@ -15,10 +15,12 @@ fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   return p;
 }
 
-void DataFile::print(const List& l, const std::string& type, const std::string& group, bool isError,
+void DataFile::print(const List& l, const std::string& type,
+                     const std::string& group, bool isError,
                      std::ostream& out) {
   if (!l.empty()) {
-    out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' ' << type;
+    out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' '
+        << type;
     if (!group.empty()) out << " in " << group;
     out << ':';
     for (auto& i : l) out << ' ' << i;
@@ -26,14 +28,17 @@ void DataFile::print(const List& l, const std::string& type, const std::string& 
   }
 }
 
-DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUniqueFile, Set* uniqueTypeNames,
+DataFile::DataFile(const fs::path& file, FileType fileType,
+                   bool createNewUniqueFile, Set* uniqueTypeNames,
                    const std::string& name)
-  : _name(name.empty() ? capitalize(file.stem().string()) : name) {
+    : _name(name.empty() ? capitalize(file.stem().string()) : name) {
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
   auto lineNumber = 1;
-  const auto error = [&lineNumber, &file](const std::string& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") + ", file: " + file.string());
+  const auto error = [&lineNumber, &file](const std::string& s,
+                                          bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") +
+          ", file: " + file.string());
   };
   std::ifstream f(file);
   DataFile::List good, dups;
@@ -43,10 +48,12 @@ DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUnique
       if (fileType == FileType::OnePerLine) {
         if (token != line) error("got multiple tokens");
       } else if (token.empty() || token == "　")
-        continue; // skip empty tokens and 'wide spaces' when processing multiple entries per line
-      if (!isValidMBUtf8(token, true)) error("invalid multi-byte token '" + token + "'");
+        continue; // skip empty tokens and 'wide spaces'
+      if (!isValidMBUtf8(token, true))
+        error("invalid multi-byte token '" + token + "'");
       // check uniqueness with file
-      if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
+      if (_map.find(token) != _map.end())
+        error("got duplicate token '" + token);
       // check uniqueness across files
       if (uniqueTypeNames) {
         const auto i = uniqueTypeNames->insert(token);
@@ -58,20 +65,23 @@ DataFile::DataFile(const fs::path& file, FileType fileType, bool createNewUnique
       } else if (!UniqueNames.insert(token).second)
         error("found globally non-unique entry '" + token + "'");
       _list.push_back(token);
-      // _map 'value' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
+      // 'value' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
       _map[token] = _list.size();
     }
   }
   if (!dups.empty()) {
     if (good.empty())
-      error("found " + std::to_string(dups.size()) + " duplicates in " + _name, false);
+      error("found " + std::to_string(dups.size()) + " duplicates in " + _name,
+            false);
     else {
-      std::cerr << ">>> found " << dups.size() << " duplicates in " << _name << ":";
+      std::cerr << ">>> found " << dups.size() << " duplicates in " << _name
+                << ":";
       for (const auto& i : dups) std::cerr << ' ' << i;
       if (createNewUniqueFile) {
         fs::path newFile(file);
         newFile.replace_extension(fs::path("new"));
-        std::cerr << "\n>>> saving " << good.size() << " unique entries to: " << newFile.string() << '\n';
+        std::cerr << "\n>>> saving " << good.size()
+                  << " unique entries to: " << newFile.string() << '\n';
         std::ofstream of(newFile);
         for (const auto& i : good) of << i << '\n';
       }

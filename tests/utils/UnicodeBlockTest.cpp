@@ -7,14 +7,19 @@ namespace {
 
 using BlockSet = std::set<UnicodeBlock>;
 
-template<typename T> void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
+template<typename T>
+void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
   int oldEnd = 0;
   for (const auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
     oldEnd = i.end;
     EXPECT_LT(i.start, i.end);
-    EXPECT_EQ(i.start % 16, 0); // Unicode blocks must start with a value having MOD 16 of zero
-    EXPECT_EQ(i.end % 16, 15);  // Unicode blocks must end with a value having MOD 16 of 15 (hex f)
+    EXPECT_EQ(
+      i.start % 16,
+      0); // Unicode blocks must start with a value having MOD 16 of zero
+    EXPECT_EQ(
+      i.end % 16,
+      15); // Unicode blocks must end with a value having MOD 16 of 15 (hex f)
     if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
   }
 }
@@ -36,8 +41,10 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   ASSERT_EQ(CommonKanjiBlocks.size(), 4);
   ASSERT_EQ(RareKanjiBlocks.size(), 4);
   ASSERT_EQ(NonSpacingBlocks.size(), 1);
-  // KanjiRange should include all the common and rare kanji + variant selectors and a null terminator
-  ASSERT_EQ(std::size(KanjiRange), (CommonKanjiBlocks.size() + RareKanjiBlocks.size() + 1) * 3 + 1);
+  // KanjiRange should include all the common and rare kanji + variant selectors
+  // and a null terminator
+  ASSERT_EQ(std::size(KanjiRange),
+            (CommonKanjiBlocks.size() + RareKanjiBlocks.size() + 1) * 3 + 1);
   EXPECT_EQ(CommonKanjiBlocks[0].range(), 6592);
   EXPECT_EQ(CommonKanjiBlocks[1].range(), 20992);
   EXPECT_EQ(CommonKanjiBlocks[2].range(), 512);
@@ -71,8 +78,8 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(KatakanaRange[5], KatakanaBlocks[1].end);
   ASSERT_EQ(std::size(KanaRange), 7);
   EXPECT_EQ(KanaRange[0], HiraganaBlocks[0].start);
-  // first katakana block immediately follows hiragana block so can use a bigger range
-  // but check the assumption by comparing 'end + 1' to 'start'
+  // first katakana block immediately follows hiragana block so can use a bigger
+  // range but check the assumption by comparing 'end + 1' to 'start'
   EXPECT_EQ(HiraganaBlocks[0].end + 1, KatakanaBlocks[0].start);
   EXPECT_EQ(KanaRange[2], KatakanaBlocks[0].end);
   EXPECT_EQ(KanaRange[3], KatakanaBlocks[1].start);
@@ -93,8 +100,8 @@ TEST(UnicodeBlockTest, IsNonSpacing) {
 TEST(UnicodeBlockTest, IsKana) {
   EXPECT_TRUE(isHiragana("ゑ"));
   EXPECT_FALSE(isHiragana("ゑあ"));
-  EXPECT_TRUE(isHiragana("ゑあ", false)); // checkLengthOne=false
-  EXPECT_TRUE(isHiragana("ゑク", false)); // checkLengthOne=false
+  EXPECT_TRUE(isHiragana("ゑあ", false)); // sizeOne=false
+  EXPECT_TRUE(isHiragana("ゑク", false)); // sizeOne=false
   EXPECT_TRUE(isAllHiragana("ゑあ"));
   EXPECT_FALSE(isAllHiragana("ゑク"));
   EXPECT_FALSE(isKatakana("ゑ"));
@@ -111,10 +118,11 @@ TEST(UnicodeBlockTest, IsMBLetter) {
   EXPECT_FALSE(isKatakana("ｶ"));
   EXPECT_TRUE(isMBLetter("ｶ"));
   EXPECT_FALSE(isMBLetter("ｶＺ"));
-  EXPECT_TRUE(isMBLetter("ｶＺ", false)); // checkLengthOne=false
+  EXPECT_TRUE(isMBLetter("ｶＺ", false)); // sizeOne=false
   EXPECT_TRUE(isAllMBLetter("ｶＺ"));
   EXPECT_FALSE(isAllMBLetter("ｶＺ犬"));
-  // 'isMBLetter' check also includes extended latin letters and enclosed letters
+  // 'isMBLetter' check also includes extended latin letters and enclosed
+  // letters
   EXPECT_TRUE(isMBLetter("ã"));
   EXPECT_TRUE(isMBLetter("⑦"));
   EXPECT_TRUE(isMBLetter("Ⅰ")); // Roman Numeral 'One'
@@ -128,12 +136,12 @@ TEST(UnicodeBlockTest, IsMBPunctuation) {
   EXPECT_TRUE(isMBPunctuation("—"));  // from General Punctuation block
   EXPECT_TRUE(isMBPunctuation("。")); // from Wide Punctuation block
   EXPECT_FALSE(isMBPunctuation("。d"));
-  EXPECT_TRUE(isMBPunctuation("。d", true, false)); // checkLengthOne=false
-  EXPECT_TRUE(isMBPunctuation("、"));               // from Wide Punctuation block
-  EXPECT_TRUE(isMBPunctuation("　"));
-  EXPECT_FALSE(isMBPunctuation("　", false)); // includeSpace=false
+  EXPECT_TRUE(isMBPunctuation("。d", false, false)); // sizeOne=false
+  EXPECT_TRUE(isMBPunctuation("、")); // from Wide Punctuation block
+  EXPECT_TRUE(isMBPunctuation("　", true));
+  EXPECT_FALSE(isMBPunctuation("　")); // includeSpace=false
   EXPECT_FALSE(isMBPunctuation("　x", true));
-  EXPECT_TRUE(isMBPunctuation("　x", true, false)); // checkLengthOne=false
+  EXPECT_TRUE(isMBPunctuation("　x", true, false)); // sizeOne=false
   EXPECT_FALSE(isAllMBPunctuation("　x"));
   EXPECT_TRUE(isAllMBPunctuation("　。　、"));
   EXPECT_TRUE(isMBPunctuation(toUtf8(U"\ufffc"))); // from Specials block
@@ -171,7 +179,7 @@ TEST(UnicodeBlockTest, IsKanji) {
   EXPECT_TRUE(isRareKanji("⺠"));
   EXPECT_TRUE(isRareKanji("輸")); // Compatibility Supplement
   EXPECT_FALSE(isRareKanji("⺠h"));
-  EXPECT_TRUE(isRareKanji("⺠h", false)); // checkLengthOne=false
+  EXPECT_TRUE(isRareKanji("⺠h", false)); // sizeOne=false
   EXPECT_FALSE(isAllRareKanji("⺠h"));
   EXPECT_FALSE(isAllRareKanji("⺠猫"));
   EXPECT_TRUE(isAllRareKanji("⺠𫠜"));

@@ -11,14 +11,20 @@ namespace {
 std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
-const Choice::Choices
-  PatternGroupChoices({{'1', "ア"}, {'2', "カ"}, {'3', "サ"}, {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}});
+const Choice::Choices PatternGroupChoices({{'1', "ア"},
+                                           {'2', "カ"},
+                                           {'3', "サ"},
+                                           {'4', "タ、ナ"},
+                                           {'5', "ハ、マ"},
+                                           {'6', "ヤ、ラ、ワ"}});
 
 constexpr auto DefaultPatternGroup = '1';
 
-// Since there are over 1000 pattern groups, split them into 6 buckets based on reading. The first bucket starts
-// at 'ア', the second bucket starts at 'カ' and so on (see 'PatternBucketChoices' above).
-constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
+// Since there are over 1000 pattern groups, split them into 6 buckets based on
+// reading. The first bucket starts at 'ア', the second bucket starts at 'カ'
+// and so on (see 'PatternBucketChoices' above).
+constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ",
+                                         "：ヤ"};
 
 constexpr auto RefreshOption = '\'', EditOption = '*';
 
@@ -26,30 +32,38 @@ constexpr auto TotalLetters = 'z' - 'a';
 
 } // namespace
 
-GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanings, const GroupData::List& list,
+GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question,
+                     bool showMeanings, const GroupData::List& list,
                      MemberType memberType)
-  : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
+    : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
   std::optional<size_t> bucket;
-  // for 'pattern' groups, allow choosing a smaller subset based on the name reading
+  // for 'pattern' groups, allow choosing a smaller subset based on the name
+  // reading
   if (_groupType == GroupType::Pattern) {
-    const auto c = get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
+    const auto c =
+      get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
     if (isQuit(c)) return;
     bucket = c - '1';
   }
-  if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::FromBeginning && memberType == All && !bucket)
+  if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::FromBeginning &&
+      memberType == All && !bucket)
     start(list, memberType);
   else {
     GroupData::List newList;
     const size_t bucketHasEnd = bucket && *bucket < PatternGroupBuckets.size();
     for (auto startIncluding = !bucket.value_or(0); const auto& i : list) {
       if (startIncluding) {
-        if (bucketHasEnd && i->name().find(PatternGroupBuckets[*bucket]) != std::string::npos) break;
-      } else if (i->name().find(PatternGroupBuckets[*bucket - 1]) != std::string::npos)
+        if (bucketHasEnd &&
+            i->name().find(PatternGroupBuckets[*bucket]) != std::string::npos)
+          break;
+      } else if (i->name().find(PatternGroupBuckets[*bucket - 1]) !=
+                 std::string::npos)
         startIncluding = true;
       if (auto memberCount = 0; startIncluding) {
         for (auto& j : i->members())
           if (includeMember(j, memberType)) ++memberCount;
-        // only include groups that have 2 or more members after applying the 'include member' filter
+        // only include groups that have 2 or more members after applying the
+        // 'include member' filter
         if (memberCount > 1) newList.push_back(i);
       }
     }
@@ -63,25 +77,28 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question, bool showMeanin
 
 GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
   const auto i = list.begin();
-  return i != list.end() ? (**i).type() : throw std::domain_error("empty group list");
+  return i != list.end() ? (**i).type()
+                         : throw std::domain_error("empty group list");
 }
 
 bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
   return k->hasReading() &&
-    (k->is(KanjiTypes::Jouyou) || memberType && k->hasLevel() || memberType > 1 && k->frequency() || memberType > 2);
+         (k->is(KanjiTypes::Jouyou) || memberType && k->hasLevel() ||
+          memberType > 1 && k->frequency() || memberType > 2);
 }
 
 void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
   if (kanji->pinyin()) {
     const auto p = "  (" + *kanji->pinyin() + ')';
-    // need to use 'displayLength' since Pinyin can contain multi-byte chars (for the tones)
+    // use 'displayLength' since Pinyin can contain multi-byte chars (for tones)
     s += p + std::string(PinyinWidth - displayLength(p), ' ');
   } else
     s += NoPinyin;
 }
 
-void GroupQuiz::addOtherGroupName(const std::string& name, std::string& s) const {
+void GroupQuiz::addOtherGroupName(const std::string& name,
+                                  std::string& s) const {
   auto add = [this, &name, &s](const auto& map) {
     if (auto j = map.find(name); j != map.end()) {
       s += _groupType == GroupType::Meaning ? 'p' : 'm';
@@ -120,7 +137,8 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
       if (questions.size() == i->members().size())
         out() << questions.size();
       else
-        out() << "showing " << questions.size() << " out of " << i->members().size();
+        out() << "showing " << questions.size() << " out of "
+              << i->members().size();
       out() << " members\n";
       showGroup(questions, readings, choices, repeatQuestion);
       if (getAnswers(questions.size(), choices, skipGroup, stopQuiz)) {
@@ -136,36 +154,45 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
 void GroupQuiz::printAssignedAnswers() const {
   if (!_answers.empty()) {
     out() << "   ";
-    for (size_t i = 0; i < _answers.size(); ++i) out() << ' ' << i + 1 << "->" << _answers[i];
+    for (size_t i = 0; i < _answers.size(); ++i)
+      out() << ' ' << i + 1 << "->" << _answers[i];
     out() << '\n';
   }
 }
 
 std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
   for (size_t i = 0; i < _answers.size(); ++i)
-    if (_answers[i] == choice) return out() << std::right << std::setw(2) << i + 1 << "->";
+    if (_answers[i] == choice)
+      return out() << std::right << std::setw(2) << i + 1 << "->";
   return out() << "    ";
 }
 
-void GroupQuiz::showGroup(const List& questions, const List& readings, Choices& choices, bool repeatQuestion) const {
+void GroupQuiz::showGroup(const List& questions, const List& readings,
+                          Choices& choices, bool repeatQuestion) const {
   for (auto count = 0; auto& i : questions) {
-    const auto choice = isTestMode() ? count < TotalLetters ? 'a' + count : 'A' + (count - TotalLetters) : ' ';
+    const auto choice =
+      isTestMode()
+        ? count < TotalLetters ? 'a' + count : 'A' + (count - TotalLetters)
+        : ' ';
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s = i->qualifiedName();
     addPinyin(i, s);
     if (!isTestMode()) addOtherGroupName(i->name(), s);
     out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
-    printAssignedAnswer(choice) << choice << ":  " << readings[count]->reading();
+    printAssignedAnswer(choice)
+      << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count++]);
     if (!repeatQuestion && isTestMode()) choices[choice] = "";
   }
   out() << '\n';
 }
 
-bool GroupQuiz::getAnswers(size_t totalQuestions, Choices& choices, bool& skipGroup, bool& stopQuiz) {
+bool GroupQuiz::getAnswers(size_t totalQuestions, Choices& choices,
+                           bool& skipGroup, bool& stopQuiz) {
   for (size_t i = _answers.size(); i < totalQuestions; ++i)
     if (auto refresh = false; !getAnswer(choices, skipGroup, refresh)) {
-      // set 'stopQuiz' to break out of top quiz loop if user quit in the middle of providing answers
+      // set 'stopQuiz' to break out of top quiz loop if user quit in the middle
+      // of providing answers
       if (!refresh && !skipGroup) stopQuiz = true;
       return false;
     }
@@ -176,7 +203,10 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
   const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for: ");
   do {
     printAssignedAnswers();
-    switch (const auto answer = get(isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg, choices);
+    switch (const auto answer =
+              get(isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1)
+                               : ReviewMsg,
+                  choices);
             answer) {
     case RefreshOption: refresh = true; break;
     case MeaningsOption:
@@ -213,7 +243,8 @@ void GroupQuiz::editAnswer(Choices& choices) {
   newChoices.erase(MeaningsOption);
   newChoices.erase(RefreshOption);
   newChoices.erase(SkipOption);
-  const auto answer = get(NewReadingForEntry + std::to_string(entry + 1), newChoices, _answers[entry], false);
+  const auto answer = get(NewReadingForEntry + std::to_string(entry + 1),
+                          newChoices, _answers[entry], false);
   _answers[entry] = answer;
   choices.erase(answer);
 }
@@ -224,26 +255,31 @@ int GroupQuiz::getAnswerToEdit() const {
   if (_answers.size() == 1) return 0;
   std::map<char, std::string> answersToEdit;
   for (auto k : _answers) answersToEdit[k] = "";
-  const auto index = std::find(_answers.begin(), _answers.end(), get(AnswerToEdit, answersToEdit, {}, false));
+  const auto index = std::find(_answers.begin(), _answers.end(),
+                               get(AnswerToEdit, answersToEdit, {}, false));
   assert(index != _answers.end());
   return std::distance(_answers.begin(), index);
 }
 
-void GroupQuiz::checkAnswers(const List& questions, const List& readings, const std::string& name) {
+void GroupQuiz::checkAnswers(const List& questions, const List& readings,
+                             const std::string& name) {
   size_t count = 0;
   for (auto i : _answers) {
     auto index = (i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
-    // Only match on readings (and meanings if '_showMeanings' is true) instead of making
-    // sure the kanji is exactly the same since many kanjis have identical readings
-    // especially in the 'patterns' groups (and the user has no way to distinguish).
+    // Only match on readings (and meanings if '_showMeanings' is true) instead
+    // of making sure the kanji is exactly the same since many kanjis have
+    // identical readings especially in the 'patterns' groups (and the user has
+    // no way to distinguish).
     if (questions[count]->reading() == readings[index]->reading() &&
-        (!showMeanings() || questions[count]->meaning() == readings[index]->meaning()))
+        (!showMeanings() ||
+         questions[count]->meaning() == readings[index]->meaning()))
       ++count;
   }
   if (count == _answers.size())
     correctMessage();
   else
-    incorrectMessage(name) << " (got " << count << " right out of " << _answers.size() << ")\n";
+    incorrectMessage(name) << " (got " << count << " right out of "
+                           << _answers.size() << ")\n";
 }
 
 } // namespace kanji_tools

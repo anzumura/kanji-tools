@@ -10,7 +10,8 @@ TEST(MBCharTest, Length) {
   EXPECT_EQ(MBChar("abc").length(false), 3);
   EXPECT_EQ(MBChar("大blue空").length(), 2);
   EXPECT_EQ(MBChar("大blue空").length(false), 6);
-  // variation selectors are considered part of the previous character so don't affect length
+  // variation selectors are considered part of the previous character so don't
+  // affect length
   auto mbCharWithVariant = U"\u9038\ufe01";
   auto s = toUtf8(mbCharWithVariant);
   EXPECT_EQ(s.length(), 6);
@@ -28,7 +29,7 @@ TEST(MBCharTest, GetFirst) {
   EXPECT_EQ(MBChar::getFirst(""), "");
   EXPECT_EQ(MBChar::getFirst("abc"), "");
   EXPECT_EQ(MBChar::getFirst("大blue空"), "大");
-  // variation selectors are considered part of the previous character so get as well
+  // variation selectors are considered part of a character
   auto mbCharWithVariant = U"\u9038\ufe01";
   auto s = toUtf8(mbCharWithVariant);
   auto r = MBChar::getFirst(s);
@@ -38,7 +39,8 @@ TEST(MBCharTest, GetFirst) {
 TEST(MBCharTest, Next) {
   MBChar s("todayトロントの天気is nice。");
   std::string x;
-  for (const std::array expected = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"}; auto& i : expected) {
+  for (const std::array _ = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
+       auto& i : _) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
     EXPECT_TRUE(s.next(x));
@@ -51,7 +53,8 @@ TEST(MBCharTest, Next) {
 TEST(MBCharTest, NextWithVariationSelectors) {
   MBChar s("憎︀憎む朗︀");
   std::string x;
-  for (const std::array expected = {"憎︀", "憎", "む", "朗︀"}; auto& i : expected) {
+  for (const std::array expected = {"憎︀", "憎", "む", "朗︀"};
+       auto& i : expected) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
     x.clear();
@@ -65,7 +68,8 @@ TEST(MBCharTest, NextWithVariationSelectors) {
 }
 
 TEST(MBCharTest, NextWithCombiningMarks) {
-  std::string ga("ガ"), gi("ギ"), combinedGi("ギ"), gu("グ"), po("ポ"), combinedPo("ポ");
+  std::string ga("ガ"), gi("ギ"), combinedGi("ギ"), gu("グ"), po("ポ"),
+    combinedPo("ポ");
   EXPECT_EQ(combinedGi.length(), 6);
   EXPECT_EQ(combinedPo.length(), 6);
   const std::string c = ga + combinedGi + gu + combinedPo;
@@ -120,8 +124,8 @@ TEST(MBCharTest, ErrorCount) {
   // there should be 4 '3-byte' characters
   ASSERT_EQ(original.length(), 12);
   // introduce some errors
-  original[1] = 'x'; // change the middle of 甲 resulting in 2 errors (first and last bytes)
-  original[6] = 'z'; // change the first byte of 丙 resulting in 2 errors (second and third bytes)
+  original[1] = 'x'; // change middle of 甲 makes 2 errors (first and last byte)
+  original[6] = 'z'; // change first byte of 丙 makes 2 errors (2nd + 3rd bytes)
   MBChar s(original);
   std::string x;
   std::array expected = {"乙", "丁"};
@@ -157,7 +161,7 @@ TEST(MBCharTest, Valid) {
   EXPECT_EQ(MBChar("猫s").valid(), MBUtf8Result::StringTooLong);
   EXPECT_EQ(MBChar("a猫").valid(), MBUtf8Result::NotMBUtf8);
 
-  // however, longer strings can be valid if 'checkLengthOne' is false
+  // however, longer strings can be valid if 'sizeOne' is false
   EXPECT_TRUE(MBChar("吹雪").isValid(false));
   EXPECT_TRUE(MBChar("猫s").isValid(false));
   // but the first char must be a multi-byte
