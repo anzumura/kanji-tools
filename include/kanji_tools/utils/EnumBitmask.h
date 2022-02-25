@@ -13,8 +13,8 @@ namespace kanji_tools {
 // See https://en.cppreference.com/w/cpp/named_req/BitmaskType for details.
 //
 // 'MyEnum' must be a scoped enum with values set to powers of 2. The
-// specialization enables the 7 required bitwise operators plus a 'hasValue'
-// function (see EnumBitmaskTest.cpp for examples).
+// specialization enables the 7 required bitwise operators plus 'hasValue'
+// and 'operator!' global functions (see EnumBitmaskTest.cpp for examples).
 
 // 'is_bitmask' bool that should be specialized:
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>

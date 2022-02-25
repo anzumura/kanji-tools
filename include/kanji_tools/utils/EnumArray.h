@@ -30,13 +30,12 @@ namespace kanji_tools {
 //
 //   for (auto c : AllColors) { std::cout << c << '\n'; }
 //
-// Extra functionality (and compile time checks for consistency) can be enabled
-// for a scoped enum with a final value of 'None' by setting
-// 'is_enumarray_with_none'. Setting this bool enables 'hasValue', 'operator!'
-// and 'isNextNone' globale functions based on T::None. 'None' should not be
-// passed to 'create'. Instead there's a static_assert to check if T::None is
-// the next value after the strings (helps keep the enum and the strings stay in
-// sync).
+// If the enum has a final value of 'None' then extra functionality (and
+// compile checks) can be enabled by setting 'is_enumarray_with_none' instead.
+// Setting this bool enables 'hasValue', 'operator!' and 'isNextNone' global
+// functions based on T::None. 'None' should not be passed to 'create', instead
+// there's a static_assert to check that T::None is the next value after the
+// list of strings (helps keep the enum and the strings in sync).
 //
 // Here's an example of how to create (and use) an EnumArray with 'None':
 //
@@ -45,8 +44,8 @@ namespace kanji_tools {
 //   inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green",
 //     "Blue");
 //
-//   for (auto c : AllColors) { std::cout << c << '\n'; } // prints all Colors
-//   including 'None'
+//   // prints all Colors including 'None'
+//   for (auto c : AllColors) { std::cout << c << '\n'; }
 //
 // A scoped enum can't be both an 'EnumArray' and an 'EnumArrayWithNone'.
 
@@ -67,7 +66,7 @@ enumArrayEnabled() noexcept {
 template<typename T, std::enable_if_t<enumArrayEnabled<T>(), int> = 0>
 class BaseEnumArray {
 public:
-  // must specifiy at least one 'name' (see comments above)
+  // 'create' requires at least one 'name' (see comments above)
   template<typename... Names>
   [[nodiscard]] static auto create(const std::string& name, Names...);
 
@@ -237,9 +236,9 @@ private:
   std::array<std::string, N> _names;
 };
 
-// base 'IterableEnumArray' has size 'N + 1' to account for the final 'None'
+// Base 'IterableEnumArray' has size 'N + 1' to account for the final 'None'
 // value. A string value for 'None' is not stored in '_names' or base class
-// '_nameMap' for safety (in private 'setName') as well as to support the
+// '_nameMap' for safety (see private 'setName') as well as to support the
 // special handling in 'fromString' with 'allowEmptyAsNone'.
 template<typename T, size_t N>
 class EnumArrayWithNone : public IterableEnumArray<T, N + 1> {
