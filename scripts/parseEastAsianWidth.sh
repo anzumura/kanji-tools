@@ -19,7 +19,7 @@ function msg() {
 
 msg begin
 
-echo "constexpr std::array WideBlocks = {"
+echo "inline constexpr std::array WideBlocks = {"
 
 blocks=()
 
