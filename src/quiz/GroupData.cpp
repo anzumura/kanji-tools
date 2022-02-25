@@ -1,7 +1,7 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/DisplaySize.h>
 
 #include <sstream>
 
@@ -137,7 +137,7 @@ void GroupData::printGroups(const T& groups, const List& groupList) const {
 void GroupData::printMeaningGroup(const Group& group, TypeMap& types,
                                   StringSet& uniqueNames) const {
   if (fullDebug()) {
-    const auto len = MBChar::length(group.name());
+    const auto len = MBChar::size(group.name());
     out() << group.name()
           << (len == 1   ? "　　"
               : len == 2 ? "　"

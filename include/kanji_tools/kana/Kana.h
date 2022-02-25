@@ -194,8 +194,8 @@ public:
 
   // A 'Kana' instance can either be a single symbol or two symbols. This is
   // enforced by assertions in the constructor as well as unit tests.
-  [[nodiscard]] auto isMonograph() const { return _hiragana.length() == 3; }
-  [[nodiscard]] auto isDigraph() const { return _hiragana.length() == 6; }
+  [[nodiscard]] auto isMonograph() const { return _hiragana.size() == 3; }
+  [[nodiscard]] auto isDigraph() const { return _hiragana.size() == 6; }
 
   // Test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana,
   // i.e., the class of 'this' is 'Kana', but we are a member of a 'DakutenKana'
@@ -244,7 +244,7 @@ private:
   static const Map _katakanaMap;
 
   // 'validate' uses asserts to make sure the data is valid such as checking
-  // lengths and ensuring '_hiragana' is actually valid Hiragana, etc..
+  // sizes and ensuring '_hiragana' is actually valid Hiragana, etc..
   void validate() const;
 
   // '_romaji' usually holds the Modern Hepburn value, but will sometimes be a

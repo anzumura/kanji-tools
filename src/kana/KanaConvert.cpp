@@ -25,7 +25,7 @@ KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
     : _target(target), _flags(flags) {
   for (auto& i : Kana::getMap(CharType::Hiragana))
     if (auto& r = i.second->romaji(); !r.starts_with("n")) {
-      if (r.length() == 1 || r == "ya" || r == "yu" || r == "yo") {
+      if (r.size() == 1 || r == "ya" || r == "yu" || r == "yo") {
         insertUnique(_markAfterNHiragana, i.second->hiragana());
         insertUnique(_markAfterNKatakana, i.second->katakana());
       } else if (r.starts_with("l")) {
@@ -79,7 +79,7 @@ void KanaConvert::verifyData() const {
   for (auto& i : _digraphSecondKatakana) assert(isKatakana(i));
   assert(_wideDelims.size() == Delimiters.size());
   assert(_narrowDelims.size() == Delimiters.size());
-  assert(_narrowDelimList.length() == Delimiters.size() + 2);
+  assert(_narrowDelimList.size() == Delimiters.size() + 2);
 }
 
 std::string KanaConvert::convert(const std::string& input) const {
@@ -221,12 +221,12 @@ std::string KanaConvert::kanaLetters(const std::string& letterGroup,
     const auto& s = sokuon ? k->getSokuonRomaji(_flags) : get(*k);
     if (prolong) {
       if (_target != CharType::Romaji) return s + Kana::ProlongMark;
-      switch (s[s.length() - 1]) {
-      case 'a': return s.substr(0, s.length() - 1) + "ā";
-      case 'i': return s.substr(0, s.length() - 1) + "ī";
-      case 'u': return s.substr(0, s.length() - 1) + "ū";
-      case 'e': return s.substr(0, s.length() - 1) + "ē";
-      case 'o': return s.substr(0, s.length() - 1) + "ō";
+      switch (s[s.size() - 1]) {
+      case 'a': return s.substr(0, s.size() - 1) + "ā";
+      case 'i': return s.substr(0, s.size() - 1) + "ī";
+      case 'u': return s.substr(0, s.size() - 1) + "ū";
+      case 'e': return s.substr(0, s.size() - 1) + "ē";
+      case 'o': return s.substr(0, s.size() - 1) + "ō";
       default:
         return s + Kana::ProlongMark; // shouldn't happen - output unconverted
       }
@@ -323,7 +323,7 @@ void KanaConvert::romajiLetters(std::string& letterGroup,
   if (const auto i = sourceMap.find(letterGroup); i != sourceMap.end()) {
     result += get(*i->second);
     letterGroup.clear();
-  } else if (letterGroup.length() == 3) {
+  } else if (letterGroup.size() == 3) {
     // convert first letter to small tsu if letter repeats and is a valid
     // consonant (also allow 'tc' combination)
     result +=

@@ -10,7 +10,7 @@ namespace kanji_tools {
 namespace {
 
 const std::string OpenWideBracket("（"), CloseWideBracket("）");
-const auto CloseWideBracketLength = CloseWideBracket.length();
+const auto CloseWideBracketSize = CloseWideBracket.size();
 
 } // namespace
 
@@ -33,7 +33,7 @@ int MBCount::add(const std::string& s, const OptString& tag) {
       if (_debug) {
         const auto count = std::to_string(_replacements);
         std::cout << count << " : " << s << '\n'
-                  << std::setw(count.length() + 3) << ": " << n << '\n';
+                  << std::setw(count.size() + 3) << ": " << n << '\n';
       }
     }
   }
@@ -83,7 +83,7 @@ bool MBCount::hasUnclosedBrackets(const std::string& line) {
 
 int MBCount::processJoinedLine(std::string& prevLine, const std::string& line,
                                int pos, const OptString& tag) {
-  const auto end = pos + CloseWideBracketLength;
+  const auto end = pos + CloseWideBracketSize;
   const auto joinedLine = prevLine + line.substr(0, end);
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);

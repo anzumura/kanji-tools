@@ -167,10 +167,10 @@ const std::string& Kana::get(CharType t, ConvertFlags flags) const {
 
 void Kana::validate() const {
   for (auto& i : _romajiVariants)
-    assert(!i.empty() && i.length() < 4);           // must be 1 to 3 chars
-  assert(!_romaji.empty() && _romaji.length() < 4); // must be 1 to 3 chars
-  assert(_hiragana.length() == 3 || _hiragana.length() == 6);
-  assert(_katakana.length() == 3 || _katakana.length() == 6);
+    assert(!i.empty() && i.size() < 4);           // must be 1 to 3 chars
+  assert(!_romaji.empty() && _romaji.size() < 4); // must be 1 to 3 chars
+  assert(_hiragana.size() == 3 || _hiragana.size() == 6);
+  assert(_katakana.size() == 3 || _katakana.size() == 6);
   assert(isAllSingleByte(_romaji));
   assert(isAllHiragana(_hiragana));
   assert(isAllKatakana(_katakana));

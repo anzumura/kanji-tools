@@ -2,7 +2,7 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/DisplaySize.h>
 
 #include <type_traits>
 
@@ -90,7 +90,7 @@ protected:
       if (!Kanji::hasLink(i->type()))
         EXPECT_TRUE(_data->getStrokes(i->name()))
           << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
-      EXPECT_EQ(MBChar::length(i->name()), 1)
+      EXPECT_EQ(MBChar::size(i->name()), 1)
         << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_TRUE(isKanji(i->name()))
         << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
@@ -366,8 +366,8 @@ TEST_F(KanjiDataTest, UcdLinks) {
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     auto& k = i.second;
-    // every Ucd entry should be a wide character, i.e., have 'display length' 2
-    EXPECT_EQ(displayLength(k.name()), 2);
+    // every Ucd entry should be a wide character, i.e., have 'display size' 2
+    EXPECT_EQ(displaySize(k.name()), 2);
     // if 'variantStrokes' is present it should be different than 'strokes'
     if (k.hasVariantStrokes())
       EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();

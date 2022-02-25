@@ -101,7 +101,7 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
       _out << '\n';
     }
     if (line.empty() && def) return *def;
-  } while (line.length() != 1 || choices.find(line[0]) == choices.end());
+  } while (line.size() != 1 || choices.find(line[0]) == choices.end());
   return line[0];
 }
 

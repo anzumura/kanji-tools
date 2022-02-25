@@ -38,7 +38,7 @@ void toUtf8Error(const std::u32string& s,
 TEST(MBUtilsTest, ValidMBUtf8) {
   EXPECT_EQ(validateMBUtf8(nullptr), MBUtf8Result::NotMBUtf8);
   std::string x("雪");
-  EXPECT_EQ(x.length(), 3);
+  EXPECT_EQ(x.size(), 3);
   // badly formed strings:
   EXPECT_EQ(validateMBUtf8(x.substr(0, 1)), MBUtf8Result::MBCharMissingBytes);
   EXPECT_EQ(validateMBUtf8(x.substr(0, 2)), MBUtf8Result::MBCharMissingBytes);
@@ -48,7 +48,7 @@ TEST(MBUtilsTest, ValidMBUtf8) {
 
 TEST(MBUtilsTest, ValidWithTwoByte) {
   std::string x("©");
-  EXPECT_EQ(x.length(), 2);
+  EXPECT_EQ(x.size(), 2);
   EXPECT_TRUE(isValidMBUtf8(x));
   // badly formed strings:
   EXPECT_EQ(validateMBUtf8(x.substr(0, 1)), MBUtf8Result::MBCharMissingBytes);
@@ -57,7 +57,7 @@ TEST(MBUtilsTest, ValidWithTwoByte) {
 
 TEST(MBUtilsTest, ValidWithFourByte) {
   std::string x("𒀄"); // a four byte sumerian cuneiform symbol
-  EXPECT_EQ(x.length(), 4);
+  EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidMBUtf8(x));
   // badly formed strings:
   EXPECT_EQ(validateMBUtf8(x.substr(0, 1)), MBUtf8Result::MBCharMissingBytes);
@@ -73,14 +73,14 @@ TEST(MBUtilsTest, ValidWithFourByte) {
 
 TEST(MBUtilsTest, NotValidWithFiveByte) {
   std::string x("𒀄");
-  EXPECT_EQ(x.length(), 4);
+  EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidMBUtf8(x));
   // try to make a 'fake valid' string with 5 bytes (which is not valid)
   x[0] = 0b11'11'10'10;
-  EXPECT_EQ(x.length(), 4);
+  EXPECT_EQ(x.size(), 4);
   EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::MBCharTooLong);
   x += x[3];
-  EXPECT_EQ(x.length(), 5);
+  EXPECT_EQ(x.size(), 5);
   EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::MBCharTooLong);
 }
 
@@ -123,7 +123,7 @@ TEST(MBUtilsTest, NotValidForOverlong) {
             MBUtf8Result::Overlong);
   // overlong ō with 3 bytes
   std::string o("ō");
-  EXPECT_EQ(o.length(), 2);
+  EXPECT_EQ(o.size(), 2);
   EXPECT_EQ(validateMBUtf8(o), MBUtf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
   EXPECT_EQ(toBinary(0x014d, 16), "0000000101001101");
@@ -153,11 +153,11 @@ TEST(MBUtilsTest, FromUTF8String) {
                 U"\ufffda");
   std::string dog("犬");
   auto wideDog = fromUtf8(dog);
-  ASSERT_EQ(dog.length(), 3);
+  ASSERT_EQ(dog.size(), 3);
   EXPECT_EQ(dog[0], '\xe7');
   EXPECT_EQ(dog[1], '\x8a');
   EXPECT_EQ(dog[2], '\xac');
-  ASSERT_EQ(wideDog.length(), 1);
+  ASSERT_EQ(wideDog.size(), 1);
   EXPECT_EQ(wideDog[0], U'\u72ac');
   auto newDog = toUtf8(wideDog);
   EXPECT_EQ(dog, newDog);
@@ -216,17 +216,17 @@ TEST(MBUtilsTest, ErrorForOverlong) {
 TEST(MBUtilsTest, FromUTF8CharArray) {
   const char s[] = {'\xef', '\xbf', '\xbc', 0};
   auto w = fromUtf8(s);
-  ASSERT_EQ(w.length(), 1);
+  ASSERT_EQ(w.size(), 1);
   EXPECT_EQ(w[0], U'\ufffc');
   auto r = toUtf8(w);
-  ASSERT_EQ(r.length(), std::size(s) - 1);
+  ASSERT_EQ(r.size(), std::size(s) - 1);
   for (size_t i = 0; i < std::size(s) - 1; ++i) EXPECT_EQ(r[i], s[i]);
 }
 
 TEST(MBUtilsTest, ToHex) {
   EXPECT_EQ(toHex(U'\ufffc'), "0000fffc");
   auto s = toUtf8(U"\ufffc");
-  ASSERT_EQ(s.length(), 3);
+  ASSERT_EQ(s.size(), 3);
   EXPECT_EQ(toHex(s[0]), "ef");
   EXPECT_EQ(toHex(s[1]), "bf");
   EXPECT_EQ(toHex(s[2]), "bc");
@@ -258,7 +258,7 @@ TEST(MBUtilsTest, ToBinary) {
   EXPECT_EQ(toBinary(U'\ufffc', 1), "1111111111111100");
   EXPECT_EQ(toBinary(U'\ufffc', BracketType::Square, 1), "[1111111111111100]");
   auto s = toUtf8(U"\ufffc");
-  ASSERT_EQ(s.length(), 3);
+  ASSERT_EQ(s.size(), 3);
   EXPECT_EQ(toBinary(s[0]), "11101111");
   EXPECT_EQ(toBinary(s[1]), "10111111");
   EXPECT_EQ(toBinary(s[2]), "10111100");

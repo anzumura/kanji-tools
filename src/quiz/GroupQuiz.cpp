@@ -1,5 +1,5 @@
 #include <kanji_tools/quiz/GroupQuiz.h>
-#include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/DisplaySize.h>
 
 #include <optional>
 #include <random>
@@ -91,8 +91,8 @@ void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
   if (kanji->pinyin()) {
     const auto p = "  (" + *kanji->pinyin() + ')';
-    // use 'displayLength' since Pinyin can contain multi-byte chars (for tones)
-    s += p + std::string(PinyinWidth - displayLength(p), ' ');
+    // use 'displaySize' since Pinyin can contain multi-byte chars (for tones)
+    s += p + std::string(PinyinWidth - displaySize(p), ' ');
   } else
     s += NoPinyin;
 }

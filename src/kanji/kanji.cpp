@@ -13,7 +13,7 @@ Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
       _compatibilityName(compatibilityName), _radical(radical),
       _strokes(strokes), _morohashiId(morohashiId), _nelsonIds(nelsonIds),
       _pinyin(pinyin) {
-  assert(MBChar::length(_name) == 1);
+  assert(MBChar::size(_name) == 1);
 }
 
 std::string Kanji::info(KanjiInfo fields) const {

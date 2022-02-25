@@ -48,17 +48,17 @@ enum class BracketType { Curly, Round, Square, None };
 [[nodiscard]] inline auto addLeadingZeroes(const std::string& result,
                                            size_t minSize) {
   static const std::string Zero("0");
-  if (result.length() < minSize)
-    return std::string(minSize - result.length(), '0') + result;
+  if (result.size() < minSize)
+    return std::string(minSize - result.size(), '0') + result;
   if (result.empty()) return Zero;
   return result;
 }
 
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
 // of 'x' ('x' must be integer type). 'minSize' of '0' (the default) causes
-// leading zeroes to be added to make strings the same length for a given type,
-// i.e., if 'x' is char then toHex returns a string of length 2 and toBinary
-// returns a string of length 8. 'minSize' is ignored if it's less than 'result'
+// leading zeroes to be added to make strings the same size for a given type,
+// i.e., if 'x' is char then toHex returns a string of size 2 and toBinary
+// returns a string of size 8. 'minSize' is ignored if it's less than 'result'
 // size.
 
 template<typename T>
@@ -70,6 +70,7 @@ template<typename T>
   return addBrackets(
     addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
 }
+
 template<typename T> [[nodiscard]] inline auto toBinary(T x, int minSize = 0) {
   return toBinary(x, BracketType::None, minSize);
 }
@@ -147,13 +148,11 @@ template<>
 }
 [[nodiscard]] inline auto isSingleByte(const std::string& s,
                                        bool sizeOne = true) noexcept {
-  return (sizeOne ? s.length() == 1 : s.length() >= 1) &&
-         isSingleByteChar(s[0]);
+  return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);
 }
 [[nodiscard]] inline auto isSingleByte(const std::u32string& s,
                                        bool sizeOne = true) noexcept {
-  return (sizeOne ? s.length() == 1 : s.length() >= 1) &&
-         isSingleByteChar(s[0]);
+  return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);
 }
 [[nodiscard]] inline auto isAllSingleByte(const std::string& s) noexcept {
   for (const auto i : s)

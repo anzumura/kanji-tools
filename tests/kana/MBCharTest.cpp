@@ -3,26 +3,26 @@
 
 namespace kanji_tools {
 
-TEST(MBCharTest, Length) {
-  EXPECT_EQ(MBChar("").length(), 0);
-  EXPECT_EQ(MBChar::length(nullptr), 0);
-  EXPECT_EQ(MBChar("abc").length(), 0);
-  EXPECT_EQ(MBChar("abc").length(false), 3);
-  EXPECT_EQ(MBChar("大blue空").length(), 2);
-  EXPECT_EQ(MBChar("大blue空").length(false), 6);
+TEST(MBCharTest, Size) {
+  EXPECT_EQ(MBChar("").size(), 0);
+  EXPECT_EQ(MBChar::size(nullptr), 0);
+  EXPECT_EQ(MBChar("abc").size(), 0);
+  EXPECT_EQ(MBChar("abc").size(false), 3);
+  EXPECT_EQ(MBChar("大blue空").size(), 2);
+  EXPECT_EQ(MBChar("大blue空").size(false), 6);
   // variation selectors are considered part of the previous character so don't
-  // affect length
+  // affect 'size'
   auto mbCharWithVariant = U"\u9038\ufe01";
   auto s = toUtf8(mbCharWithVariant);
-  EXPECT_EQ(s.length(), 6);
-  EXPECT_EQ(MBChar::length(s), 1);
-  // combining marks are not included in length
+  EXPECT_EQ(s.size(), 6);
+  EXPECT_EQ(MBChar::size(s), 1);
+  // combining marks are not included in 'size'
   std::string noMarks("愛詞（あいことば）");
   std::string marks("愛詞（あいことば）");
-  EXPECT_EQ(noMarks.length(), 27);
-  EXPECT_EQ(marks.length(), 30);
-  EXPECT_EQ(MBChar::length(noMarks), 9);
-  EXPECT_EQ(MBChar::length(marks), 9);
+  EXPECT_EQ(noMarks.size(), 27);
+  EXPECT_EQ(marks.size(), 30);
+  EXPECT_EQ(MBChar::size(noMarks), 9);
+  EXPECT_EQ(MBChar::size(marks), 9);
 }
 
 TEST(MBCharTest, GetFirst) {
@@ -70,15 +70,15 @@ TEST(MBCharTest, NextWithVariationSelectors) {
 TEST(MBCharTest, NextWithCombiningMarks) {
   std::string ga("ガ"), gi("ギ"), combinedGi("ギ"), gu("グ"), po("ポ"),
     combinedPo("ポ");
-  EXPECT_EQ(combinedGi.length(), 6);
-  EXPECT_EQ(combinedPo.length(), 6);
+  EXPECT_EQ(combinedGi.size(), 6);
+  EXPECT_EQ(combinedPo.size(), 6);
   const std::string c = ga + combinedGi + gu + combinedPo;
-  EXPECT_EQ(c.length(), 18);
+  EXPECT_EQ(c.size(), 18);
   MBChar s(c);
   std::string x;
   // combining marks ashould get replaced by normal versions
   for (const std::array expected = {ga, gi, gu, po}; auto& i : expected) {
-    EXPECT_EQ(i.length(), 3);
+    EXPECT_EQ(i.size(), 3);
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
     x.clear();
@@ -122,7 +122,7 @@ TEST(MBCharTest, Reset) {
 TEST(MBCharTest, ErrorCount) {
   std::string original("甲乙丙丁");
   // there should be 4 '3-byte' characters
-  ASSERT_EQ(original.length(), 12);
+  ASSERT_EQ(original.size(), 12);
   // introduce some errors
   original[1] = 'x'; // change middle of 甲 makes 2 errors (first and last byte)
   original[6] = 'z'; // change first byte of 丙 makes 2 errors (2nd + 3rd bytes)
@@ -152,7 +152,7 @@ TEST(MBCharTest, Valid) {
   EXPECT_EQ(MBChar("").valid(), MBUtf8Result::NotMBUtf8);
   EXPECT_EQ(MBChar("a").valid(), MBUtf8Result::NotMBUtf8);
   std::string x("雪");
-  EXPECT_EQ(x.length(), 3);
+  EXPECT_EQ(x.size(), 3);
   EXPECT_EQ(MBChar(x).valid(), MBUtf8Result::Valid);
   EXPECT_TRUE(MBChar(x).isValid());
 

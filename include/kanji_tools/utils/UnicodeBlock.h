@@ -160,10 +160,10 @@ inline constexpr auto CombiningMarkVoiced = U'\x3099',
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const std::string& s, bool sizeOne,
                                        T... t) {
-  if (s.length() > 1 && (!sizeOne || s.length() < 9))
+  if (s.size() > 1 && (!sizeOne || s.size() < 9))
     if (const auto w = fromUtf8(s);
-        sizeOne ? w.length() == 1 || w.length() == 2 && isNonSpacing(w[1])
-                : w.length() >= 1)
+        sizeOne ? w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])
+                : w.size() >= 1)
       return inRange(w[0], t...);
   return false;
 }
@@ -237,7 +237,7 @@ template<typename... T>
 [[nodiscard]] inline auto isMBPunctuation(const std::string& s,
                                           bool includeSpace = false,
                                           bool sizeOne = true) {
-  return s.starts_with("　") ? (includeSpace && (s.length() < 4 || !sizeOne))
+  return s.starts_with("　") ? (includeSpace && (s.size() < 4 || !sizeOne))
                              : inWCharRange(s, sizeOne, PunctuationBlocks);
 }
 [[nodiscard]] inline auto isAllMBPunctuation(const std::string& s) {

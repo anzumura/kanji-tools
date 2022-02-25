@@ -142,7 +142,7 @@ std::string toUtf8(const std::u32string& s) {
 #else
   std::string result;
   // result will be bigger than 's' if there are any multibyte chars
-  result.reserve(s.length());
+  result.reserve(s.size());
   for (auto c : s) convertToUtf8(c, result);
   return result;
 #endif
@@ -164,7 +164,7 @@ std::string toUtf8(const std::wstring& s) {
 #else
   std::string result;
   // result will be bigger than 's' if there are any multibyte chars
-  result.reserve(s.length());
+  result.reserve(s.size());
   for (auto c : s) convertToUtf8(static_cast<char32_t>(c), result);
   return result;
 #endif

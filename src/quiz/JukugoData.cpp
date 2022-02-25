@@ -62,14 +62,14 @@ int JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
         error("open bracket should follow a space");
       auto j = line.find(closeBracket);
       if (j == std::string::npos) error("failed to find close bracket");
-      if (j != line.length() - 1)
+      if (j != line.size() - 1)
         error("close bracket should be the last character");
       createJukugo(error, grade, line.substr(0, i - 1),
                    line.substr(i + 1, j - i - 1));
     } else
       // line has multiple space separated Jukugo entries for a given kanji (so
       // other.txt file), i.e.: X ... XA(reading) XB(reading) XC(reading)
-      for (std::stringstream ss(line.substr(i + stripPrefix.length() + 1));
+      for (std::stringstream ss(line.substr(i + stripPrefix.size() + 1));
            std::getline(ss, line, ' ');) {
         i = line.find(openBracket);
         if (i == std::string::npos) error("failed to find open bracket");

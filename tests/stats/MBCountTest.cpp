@@ -81,8 +81,8 @@ TEST_F(MBCountTest, Add) {
 
 TEST_F(MBCountTest, AddWithErrors) {
   std::string s1("hello空は青い"), s2("箱は空です");
-  s1[s1.length() - 2] = 'x'; // mess up い introducing 2 errors
-  s2[0] = 'y';               // mess up 箱 introducing 2 errors
+  s1[s1.size() - 2] = 'x'; // mess up い introducing 2 errors
+  s2[0] = 'y';             // mess up 箱 introducing 2 errors
   EXPECT_EQ(c.add(s1), 3);
   EXPECT_EQ(c.add(s2), 4);
   EXPECT_EQ(c.add("今日は涼しい。good bye"), 7);
@@ -127,8 +127,8 @@ TEST_F(MBCountTest, AddWithCombiningMarks) {
   EXPECT_EQ(c.errors(), 1);
   std::string noMarks("愛詞（あいことば）");
   std::string marks("愛詞（あいことば）");
-  EXPECT_EQ(noMarks.length(), 27);
-  EXPECT_EQ(marks.length(), 30);
+  EXPECT_EQ(noMarks.size(), 27);
+  EXPECT_EQ(marks.size(), 30);
   EXPECT_EQ(c.add(noMarks), 9);
   EXPECT_EQ(c.combiningMarks(), 2);
   EXPECT_EQ(c.add(marks), 9);

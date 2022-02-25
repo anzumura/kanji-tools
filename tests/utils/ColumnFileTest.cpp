@@ -380,9 +380,9 @@ TEST_F(ColumnFileTest, GetWCharError) {
   of.close();
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
-  for (auto i : {std::string("length must be 4 or 5 - file: testFile.txt, row: "
+  for (auto i : {std::string("size must be 4 or 5 - file: testFile.txt, row: "
                              "1, column: 'Col', value: 'AAA'"),
-                 std::string("length must be 4 or 5 - file: testFile.txt, row: "
+                 std::string("size must be 4 or 5 - file: testFile.txt, row: "
                              "2, column: 'Col', value: '123456'"),
                  std::string("invalid hex - file: testFile.txt, row: 3, "
                              "column: 'Col', value: 'ABCd'"),

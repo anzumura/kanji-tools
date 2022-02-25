@@ -1,5 +1,5 @@
-#ifndef KANJI_TOOLS_UTILS_DISPLAY_LENGTH_H
-#define KANJI_TOOLS_UTILS_DISPLAY_LENGTH_H
+#ifndef KANJI_TOOLS_UTILS_DISPLAY_SIZE_H
+#define KANJI_TOOLS_UTILS_DISPLAY_SIZE_H
 
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -70,10 +70,9 @@ constexpr std::array WideBlocks = {
   UnicodeBlock{0x30000, 0x3FFFD}};
 // --- end generated code from 'parseEastAsiaWidth.sh' ---
 
-// 'displayLength' returns the length of 's' in terms of how many columns would
-// be required for display on a terminal, i.e, 1 column for a normal sized
-// character and 2 for a wide character.
-[[nodiscard]] inline auto displayLength(const std::string& s) {
+// Return size of 's' in terms of how many columns would be required for display
+// on a terminal, i.e, 1 for a normal character and 2 for a wide character.
+[[nodiscard]] inline auto displaySize(const std::string& s) {
   size_t result = 0;
   for (const auto i : fromUtf8(s))
     if (!isNonSpacing(i)) result += inRange(i, WideBlocks) ? 2 : 1;
@@ -86,11 +85,11 @@ constexpr std::array WideBlocks = {
 // char plus 2 to get 4). Instead it will add 1 space since std::setw only looks
 // at bytes and s already has 3 bytes. However, using this function, i.e., 'os
 // << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by returning
-// '5' (5 is 2 more than the 3 byte length of 's').
+// '5' (5 is 2 more than the 3 byte size of 's').
 [[nodiscard]] inline auto wideSetw(const std::string& s, size_t setwLen) {
-  return setwLen + s.length() - displayLength(s);
+  return setwLen + s.size() - displaySize(s);
 }
 
 } // namespace kanji_tools
 
-#endif // KANJI_TOOLS_UTILS_DISPLAY_LENGTH_H
+#endif // KANJI_TOOLS_UTILS_DISPLAY_SIZE_H

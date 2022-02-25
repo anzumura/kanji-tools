@@ -64,7 +64,7 @@ ConvertMain::ConvertMain(int argc, const char** argv)
       if (i + 1 < argc) {
         ++i;
         arg = argv[i];
-        if (arg.length() != 1 || !flagArgs(arg[0])) usage("illegal option for -f: " + arg);
+        if (arg.size() != 1 || !flagArgs(arg[0])) usage("illegal option for -f: " + arg);
       } else
         usage("-f must be followed by a flag value");
     } else if (arg.starts_with("-")) {

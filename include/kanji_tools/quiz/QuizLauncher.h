@@ -58,7 +58,7 @@ public:
                     bool showMeaning = true) const;
   void printReviewDetails(const Entry&) const;
 private:
-  enum Values { JukugoPerLine = 3, MaxJukugoLength = 30 };
+  enum Values { JukugoPerLine = 3, MaxJukugoSize = 30 };
 
   [[nodiscard]] const Data& data() const { return _groupData->data(); }
 

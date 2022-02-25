@@ -2,7 +2,7 @@
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <kanji_tools/quiz/ListQuiz.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
-#include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/DisplaySize.h>
 
 namespace kanji_tools {
 
@@ -92,7 +92,7 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
       _groupData(groupData), _jukugoData(jukugoData) {
   OptChar quizType, questionList;
   // checkQuizType is called to check f, g, l, k, m and p args (so ok to assume
-  // length is at least 2)
+  // size is at least 2)
   const auto checkQuizType = [&quizType,
                               &questionList](const auto& arg, auto& choices,
                                              OptChar start = std::nullopt,
@@ -100,10 +100,10 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
     if (quizType)
       Data::usage("only one quiz type can be specified, use -h for help");
     quizType = arg[1];
-    if (arg.length() > 2) {
+    if (arg.size() > 2) {
       if (auto c = arg[2];
-          arg.length() == 3 && (choices.contains(c) ||
-                                (start && *start <= c && end.value_or(c) >= c)))
+          arg.size() == 3 && (choices.contains(c) ||
+                              (start && *start <= c && end.value_or(c) >= c)))
         questionList = c;
       else
         Data::usage("invalid format for " + arg.substr(0, 2) +
@@ -116,7 +116,7 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
   for (auto i = Data::nextArg(argc, argv); i < argc;
        i = Data::nextArg(argc, argv, i))
     if (std::string arg = argv[i];
-        !endOptions && arg.starts_with("-") && arg.length() > 1) {
+        !endOptions && arg.starts_with("-") && arg.size() > 1) {
       if (arg == "-h") {
         out() << HelpMessage;
         return;
@@ -326,8 +326,8 @@ int QuizLauncher::processProgramModeArg(const std::string& arg) {
   if (_programMode != ProgramMode::NotAssigned)
     Data::usage("only one mode (-r or -t) can be specified, use -h for help");
   _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
-  if (arg.length() > 2) {
-    if (arg.length() == 3 && arg[2] == '0')
+  if (arg.size() > 2) {
+    if (arg.size() == 3 && arg[2] == '0')
       _questionOrder = QuestionOrder::Random;
     else {
       auto offset = 2;
@@ -356,7 +356,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
   } else if (arg.starts_with("m")) {
     const auto id = arg.substr(1);
     // a valid Morohashi ID should be numeric followed by an optional 'P'
-    if (auto nonPrime = id.ends_with("P") ? id.substr(0, id.length() - 1) : id;
+    if (auto nonPrime = id.ends_with("P") ? id.substr(0, id.size() - 1) : id;
         id.empty() || !std::all_of(nonPrime.begin(), nonPrime.end(), ::isdigit))
       Data::usage("invalid Morohashi ID '" + id + "'");
     printDetails(_groupData->data().findKanjisByMorohashiId(id), "Morohashi",
@@ -371,8 +371,8 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     const auto id = arg.substr(1);
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit
     // must be a 1 or 2)
-    if (id.length() < 4 || id.length() > 5 ||
-        (id.length() == 5 && id[0] != '1' && id[0] != '2') ||
+    if (id.size() < 4 || id.size() > 5 ||
+        (id.size() == 5 && id[0] != '1' && id[0] != '2') ||
         !std::all_of(id.begin(), id.end(), ::ishexnumber))
       Data::usage("invalid Unicode value '" + id + "'");
     printDetails(toUtf8(std::strtol(id.c_str(), nullptr, 16)));
@@ -441,13 +441,13 @@ void QuizLauncher::printJukugoList(const std::string& name,
     std::array<int, JukugoPerLine> colWidths;
     colWidths.fill(0);
     // make each column wide enough to hold the longest entry plus 2 spaces
-    // (upto MaxJukugoLength)
+    // (upto MaxJukugoSize)
     for (size_t i = 0; i < list.size(); ++i)
-      if (colWidths[i % JukugoPerLine] < MaxJukugoLength)
-        if (const int length = displayLength(list[i]->nameAndReading()) + 2;
-            length > colWidths[i % JukugoPerLine])
+      if (colWidths[i % JukugoPerLine] < MaxJukugoSize)
+        if (const int size = displaySize(list[i]->nameAndReading()) + 2;
+            size > colWidths[i % JukugoPerLine])
           colWidths[i % JukugoPerLine] =
-            length < MaxJukugoLength ? length : MaxJukugoLength;
+            size < MaxJukugoSize ? size : MaxJukugoSize;
     for (size_t i = 0; i < list.size(); ++i) {
       if (i % JukugoPerLine == 0) out() << '\n';
       const auto s = list[i]->nameAndReading();

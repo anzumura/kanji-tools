@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/DisplayLength.h>
+#include <kanji_tools/utils/DisplaySize.h>
 #include <kanji_tools/utils/Table.h>
 
 #include <iomanip>
@@ -17,13 +17,13 @@ void Table::add(const Row& row, bool startNewSection) {
 
 void Table::print(std::ostream& os) const {
   Widths widths;
-  for (auto& i : _title) widths.push_back(displayLength(i));
+  for (auto& i : _title) widths.push_back(displaySize(i));
   for (auto& row : _rows) {
     for (size_t colNum = 0; colNum < row.size(); ++colNum) {
       if (colNum < widths.size())
-        widths[colNum] = std::max(widths[colNum], displayLength(row[colNum]));
+        widths[colNum] = std::max(widths[colNum], displaySize(row[colNum]));
       else
-        widths.push_back(displayLength(row[colNum]));
+        widths.push_back(displaySize(row[colNum]));
     }
   }
   if (!widths.empty()) {
@@ -84,7 +84,7 @@ void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
     if (i < r.size())
       // if string is all narrow then nothing will be added, but if there are
       // wide chars then need to add difference to get 'setw' to work properly
-      cell(w[i] + (r[i].length() - displayLength(r[i])), r[i]);
+      cell(w[i] + (r[i].size() - displaySize(r[i])), r[i]);
     else
       cell(w[i], empty);
   os << delim << '\n';

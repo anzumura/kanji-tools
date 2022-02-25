@@ -79,7 +79,7 @@ TEST(KanaTest, CheckHiragana) {
         ++plainDigraphs;
       // if there's a second character it must be a small symbol matching the
       // final romaji letter
-      const auto romajiLen = i.second->romaji().length();
+      const auto romajiLen = i.second->romaji().size();
       ASSERT_GT(romajiLen, 1);
       if (i.second->romaji() == "qwa") // only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "くゎ");
@@ -138,7 +138,7 @@ TEST(KanaTest, CheckKatakana) {
     if (s.next(c)) {
       // if there's a second character it must be a small symbol matching the
       // final romaji letter
-      auto romajiLen = i.second->romaji().length();
+      auto romajiLen = i.second->romaji().size();
       ASSERT_GT(romajiLen, 1);
       if (i.second->romaji() == "qwa") // only digraph that ends with small 'wa'
         EXPECT_EQ(i.first, "クヮ");
@@ -168,12 +168,12 @@ TEST(KanaTest, CheckRomaji) {
       i.second->romaji() == i.first ? ++normal : ++variant;
     };
     ASSERT_FALSE(i.first.empty());
-    EXPECT_LT(i.first.length(), 4);
+    EXPECT_LT(i.first.size(), 4);
     for (auto& j : i.second->romajiVariants()) romajiVariants.insert(j);
     if (i.first == "n")
       ++nNum;
     else
-      switch (i.first[i.first.length() - 1]) {
+      switch (i.first[i.first.size() - 1]) {
       case 'a': count(aNum, vaNum); break;
       case 'i': count(iNum, viNum); break;
       case 'u': count(uNum, vuNum); break;

@@ -117,7 +117,7 @@ ColumnFile::OptInt ColumnFile::getOptInt(const Column& column) const {
 
 bool ColumnFile::getBool(const Column& column) const {
   auto& s = get(column);
-  if (s.length() == 1) switch (s[0]) {
+  if (s.size() == 1) switch (s[0]) {
     case 'Y':
     case 'T': return true;
     case 'N':
@@ -129,8 +129,8 @@ bool ColumnFile::getBool(const Column& column) const {
 
 char32_t ColumnFile::getWChar(const Column& column,
                               const std::string& s) const {
-  if (s.length() < 4 || s.length() > 5)
-    error("failed to convert to char32_t, length must be 4 or 5", column, s);
+  if (s.size() < 4 || s.size() > 5)
+    error("failed to convert to char32_t, size must be 4 or 5", column, s);
   for (const char c : s)
     if (c < '0' || c > 'F' || (c < 'A' && c > '9'))
       error("failed to convert to char32_t, invalid hex", column, s);

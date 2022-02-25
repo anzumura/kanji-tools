@@ -92,7 +92,7 @@ void UcdData::load(const std::filesystem::path& file) {
     if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
       f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
     auto& name = f.get(nameCol);
-    if (name.length() > 4) f.error("name greater than 4");
+    if (name.size() > 4) f.error("name greater than 4");
     if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
 
     const auto radical = f.getInt(radicalCol), strokes = f.getInt(strokesCol),

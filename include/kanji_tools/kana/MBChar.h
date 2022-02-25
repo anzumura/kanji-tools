@@ -22,7 +22,7 @@ namespace kanji_tools {
 class MBChar {
 public:
   // 'isVariationSelector' returns true if s points to a UTF-8 variation
-  // selector, this method is used by 'length', 'next' and 'doPeek'.
+  // selector, this method is used by 'size', 'next' and 'doPeek'.
   [[nodiscard]] static auto isVariationSelector(const unsigned char* s) {
     // Checking for variation selectors would be easier if 'i' was char32_t, but
     // that would involve calling more expensive conversion functions (like
@@ -52,20 +52,20 @@ public:
     return isCombiningMark(s.c_str());
   }
 
-  // 'length' with onlyMB=true only counts multi-byte 'sequence start' bytes,
-  // otherwise length includes both multi-byte sequence starts as well as
-  // regular single byte values, i.e., simply don't add 'continuation' bytes to
-  // length (this done by using '11 00 00 00' to grab the first two bits and
-  // only adding to length if the result is not binary '10 00 00 00'). Examples:
-  // - length("abc") = 0
-  // - length("abc", false) = 3
-  // - length("大blue空") = 2
-  // - length("大blue空", false) = 6
+  // 'size' with onlyMB=true only counts multi-byte 'sequence start' bytes,
+  // otherwise it includes both multi-byte sequence starts as well as regular
+  // single byte values, i.e., simply don't add 'continuation' bytes to 'size'
+  // (this done by using '11 00 00 00' to grab the first two bits and only
+  // adding if the result is not binary '10 00 00 00'). Examples:
+  // - size("abc") = 0
+  // - size("abc", false) = 3
+  // - size("大blue空") = 2
+  // - size("大blue空", false) = 6
   // Note: some Kanji can be followed by a 'variation selector' or 'combining
   // mark' - these are not counted since they are considered part of the
   // previous 'MB character' (as a modifier).
-  [[nodiscard]] static auto length(const char* s, bool onlyMB = true) {
-    int len = 0;
+  [[nodiscard]] static auto size(const char* s, bool onlyMB = true) {
+    int result = 0;
     // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
     // checking if the next 3 bytes represent a 'variation selector'
     if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
@@ -73,30 +73,30 @@ public:
         if (isCombiningMark(i) || isVariationSelector(i))
           i += 3;
         else if (onlyMB)
-          len += (*i++ & TwoBits) == TwoBits;
+          result += (*i++ & TwoBits) == TwoBits;
         else
-          len += (*i++ & TwoBits) != Bit1;
+          result += (*i++ & TwoBits) != Bit1;
     }
-    return len;
+    return result;
   }
-  [[nodiscard]] static auto length(const std::string& s, bool onlyMB = true) {
-    return length(s.c_str(), onlyMB);
+  [[nodiscard]] static auto size(const std::string& s, bool onlyMB = true) {
+    return size(s.c_str(), onlyMB);
   }
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so
-  // len 2-4) followed by a variation selector (which are always len 3).
+  // 2-4 bytes) followed by a variation selector (which are always 3 bytes).
   [[nodiscard]] static auto
   isMBCharWithVariationSelector(const std::string& s) {
-    return s.length() > 4 && s.length() < 8 &&
-           isVariationSelector(s.substr(s.length() - 3));
+    return s.size() > 4 && s.size() < 8 &&
+           isVariationSelector(s.substr(s.size() - 3));
   }
   [[nodiscard]] static auto withoutVariationSelector(const std::string& s) {
-    return isMBCharWithVariationSelector(s) ? s.substr(0, s.length() - 3) : s;
+    return isMBCharWithVariationSelector(s) ? s.substr(0, s.size() - 3) : s;
   }
   [[nodiscard]] static auto
   optionalWithoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s)
-             ? std::optional(s.substr(0, s.length() - 3))
+             ? std::optional(s.substr(0, s.size() - 3))
              : std::nullopt;
   }
 
@@ -138,8 +138,8 @@ public:
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
   [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
-  [[nodiscard]] auto length(bool onlyMB = true) const {
-    return length(_data, onlyMB);
+  [[nodiscard]] auto size(bool onlyMB = true) const {
+    return size(_data, onlyMB);
   }
   [[nodiscard]] auto valid(bool sizeOne = true) const {
     return validateMBUtf8(_data, sizeOne);
