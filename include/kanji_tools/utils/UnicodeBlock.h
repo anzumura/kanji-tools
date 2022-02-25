@@ -26,10 +26,11 @@ public:
 // version 1.1, but U+30A0 (゠) was added to the block in version 3.2.
 class UnicodeBlock {
 public:
-  constexpr UnicodeBlock(char32_t s, char32_t e,
-                         const UnicodeVersion* const v = nullptr,
-                         const char* const n = nullptr) noexcept
-      : start(s), end(e), version(v), name(n) {}
+  constexpr UnicodeBlock(char32_t s, char32_t e) noexcept
+      : UnicodeBlock(s, e, nullptr) {}
+  constexpr UnicodeBlock(char32_t s, char32_t e, const UnicodeVersion& v,
+                         const char* const n) noexcept
+      : UnicodeBlock(s, e, &v, n) {}
 
   // Official Unicode blocks start on a value having mod 16 = 0 (so ending in
   // hex '0') and end on a value having mod 16 = 15 (so ending in hex 'f'), but
@@ -68,6 +69,10 @@ public:
   const char32_t end;
   const UnicodeVersion* const version;
   const char* const name;
+private:
+  constexpr UnicodeBlock(char32_t s, char32_t e, const UnicodeVersion* const v,
+                         const char* const n = nullptr) noexcept
+      : start(s), end(e), version(v), name(n) {}
 };
 
 // below are the Unicode versions referenced in this program, for the full list
@@ -78,12 +83,12 @@ inline constexpr UnicodeVersion UVer1_0("1.0", 10, 1991),
   UVer5_0("5.0", 7, 2006), UVer5_2("5.2", 10, 2009), UVer13_0("13.0", 3, 2020);
 
 inline constexpr std::array HiraganaBlocks = {
-  UnicodeBlock(0x3040, 0x309f, &UVer1_1, "Hiragana")};
+  UnicodeBlock(0x3040, 0x309f, UVer1_1, "Hiragana")};
 
 // Second block contains small letters (for Ainu) like ㇱ
 inline constexpr std::array KatakanaBlocks = {
-  UnicodeBlock(0x30a0, 0x30ff, &UVer1_1, "Katakana"),
-  UnicodeBlock(0x31f0, 0x31ff, &UVer3_2, "Katakana Phonetic Extension")};
+  UnicodeBlock(0x30a0, 0x30ff, UVer1_1, "Katakana"),
+  UnicodeBlock(0x31f0, 0x31ff, UVer3_2, "Katakana Phonetic Extension")};
 
 // Almost all 'common' Japanese Kanji are in the original CJK Unified block.
 // Extension A has one 'Kentei' and about 1000 'Ucd' Kanji. Extension B has an
@@ -92,10 +97,10 @@ inline constexpr std::array KatakanaBlocks = {
 // Japanese Kanji that used to require two graphemes, i.e., a base character
 // followed by a variation selector.
 inline constexpr std::array CommonKanjiBlocks = {
-  UnicodeBlock(0x3400, 0x4dbf, &UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
-  UnicodeBlock(0x4e00, 0x9fff, &UVer1_1, "CJK Unified Ideographs"), // ~20K
-  UnicodeBlock(0xf900, 0xfaff, &UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
-  UnicodeBlock(0x20000, 0x2a6df, &UVer3_1, "CJK Extension B") // ~42K: 𠮟
+  UnicodeBlock(0x3400, 0x4dbf, UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
+  UnicodeBlock(0x4e00, 0x9fff, UVer1_1, "CJK Unified Ideographs"), // ~20K
+  UnicodeBlock(0xf900, 0xfaff, UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
+  UnicodeBlock(0x20000, 0x2a6df, UVer3_1, "CJK Extension B")       // ~42K: 𠮟
 };
 
 // Note: Extensions C, D, E and F are contiguous so combine into one block (more
@@ -105,46 +110,46 @@ inline constexpr std::array CommonKanjiBlocks = {
 // - U+2B820 to U+2CEAF : CJK Extension E, ver 8.0 Jun 2015, ~6K kanji
 // - U+2CEB0 to U+2EBEF : CJK Extension F, ver 10.0 Jun 2016, ~7K kanji
 inline constexpr std::array RareKanjiBlocks = {
-  UnicodeBlock(0x2e80, 0x2eff, &UVer3_0, "Radicals Supp."),      // 128
-  UnicodeBlock(0x2a700, 0x2ebef, &UVer5_2, "CJK Extension C-F"), // ~17K kanji
-  UnicodeBlock(0x2f800, 0x2fa1f, &UVer3_1, "CJK Compat. Supp."), // ~6K kanji
-  UnicodeBlock(0x30000, 0x3134f, &UVer13_0, "CJK Extension G")   // ~5K kanji
+  UnicodeBlock(0x2e80, 0x2eff, UVer3_0, "Radicals Supp."),      // 128
+  UnicodeBlock(0x2a700, 0x2ebef, UVer5_2, "CJK Extension C-F"), // ~17K kanji
+  UnicodeBlock(0x2f800, 0x2fa1f, UVer3_1, "CJK Compat. Supp."), // ~6K kanji
+  UnicodeBlock(0x30000, 0x3134f, UVer13_0, "CJK Extension G")   // ~5K kanji
 };
 
 inline constexpr std::array PunctuationBlocks = {
-  UnicodeBlock(0x2000, 0x206f, &UVer1_1, "General Punctuation"), // —, ‥, ”, “
-  UnicodeBlock(0x3000, 0x303f, &UVer1_1, "CJK Symbols and Punctuation"), // 、,
-  UnicodeBlock(0xfff0, 0xffff, &UVer1_1, "Specials") // Object Replacement, etc.
+  UnicodeBlock(0x2000, 0x206f, UVer1_1, "General Punctuation"), // —, ‥, ”, “
+  UnicodeBlock(0x3000, 0x303f, UVer1_1, "CJK Symbols and Punctuation"), // 、,
+  UnicodeBlock(0xfff0, 0xffff, UVer1_1, "Specials") // Object Replacement, etc.
 };
 
 // There are a lot more symbol and letter blocks, but they haven't come up in
 // sample files so far
 inline constexpr std::array SymbolBlocks = {
-  UnicodeBlock(0x2100, 0x214f, &UVer1_1, "Letterlike Symbols"),          // ℃
-  UnicodeBlock(0x2190, 0x21ff, &UVer1_1, "Arrows"),                      // →
-  UnicodeBlock(0x2200, 0x22ff, &UVer1_1, "Mathematical Operators"),      // ∀
-  UnicodeBlock(0x2500, 0x257f, &UVer1_1, "Box Drawing"),                 // ─
-  UnicodeBlock(0x25a0, 0x25ff, &UVer1_1, "Geometric Shapes"),            // ○
-  UnicodeBlock(0x2600, 0x26ff, &UVer1_1, "Miscellaneous Symbols"),       // ☆
-  UnicodeBlock(0x2ff0, 0x2fff, &UVer3_0, "CJK Ideographic Desc. Chars"), // ⿱
-  UnicodeBlock(0x3190, 0x319f, &UVer1_1, "Kanbun (Annotations)"),        // ㆑
-  UnicodeBlock(0x31c0, 0x31ef, &UVer4_1, "CJK Strokes")                  // ㇁
+  UnicodeBlock(0x2100, 0x214f, UVer1_1, "Letterlike Symbols"),          // ℃
+  UnicodeBlock(0x2190, 0x21ff, UVer1_1, "Arrows"),                      // →
+  UnicodeBlock(0x2200, 0x22ff, UVer1_1, "Mathematical Operators"),      // ∀
+  UnicodeBlock(0x2500, 0x257f, UVer1_1, "Box Drawing"),                 // ─
+  UnicodeBlock(0x25a0, 0x25ff, UVer1_1, "Geometric Shapes"),            // ○
+  UnicodeBlock(0x2600, 0x26ff, UVer1_1, "Miscellaneous Symbols"),       // ☆
+  UnicodeBlock(0x2ff0, 0x2fff, UVer3_0, "CJK Ideographic Desc. Chars"), // ⿱
+  UnicodeBlock(0x3190, 0x319f, UVer1_1, "Kanbun (Annotations)"),        // ㆑
+  UnicodeBlock(0x31c0, 0x31ef, UVer4_1, "CJK Strokes")                  // ㇁
 };
 
 // the last block also includes 'halfwidth katakana'
 inline constexpr std::array LetterBlocks = {
-  UnicodeBlock(0x0080, 0x00ff, &UVer1_1, "Latin-1 Supplement"),    // ·, ×
-  UnicodeBlock(0x0100, 0x017f, &UVer1_1, "Latin Extended-A"),      // Ā
-  UnicodeBlock(0x0180, 0x024f, &UVer1_1, "Latin Extended-B"),      // ƀ
-  UnicodeBlock(0x2150, 0x218f, &UVer1_1, "Number Forms"),          // Ⅳ
-  UnicodeBlock(0x2460, 0x24ff, &UVer1_1, "Enclosed Alphanumeics"), // ⑦
-  UnicodeBlock(0x2c60, 0x2c7f, &UVer5_0, "Latin Extended-C"),
-  UnicodeBlock(0xff00, 0xffef, &UVer1_1, "Halfwidth and Fullwidth Forms")};
+  UnicodeBlock(0x0080, 0x00ff, UVer1_1, "Latin-1 Supplement"),    // ·, ×
+  UnicodeBlock(0x0100, 0x017f, UVer1_1, "Latin Extended-A"),      // Ā
+  UnicodeBlock(0x0180, 0x024f, UVer1_1, "Latin Extended-B"),      // ƀ
+  UnicodeBlock(0x2150, 0x218f, UVer1_1, "Number Forms"),          // Ⅳ
+  UnicodeBlock(0x2460, 0x24ff, UVer1_1, "Enclosed Alphanumeics"), // ⑦
+  UnicodeBlock(0x2c60, 0x2c7f, UVer5_0, "Latin Extended-C"),
+  UnicodeBlock(0xff00, 0xffef, UVer1_1, "Halfwidth and Fullwidth Forms")};
 
 // Skip codes in this range when reading in Kanji. See this link for more info:
 // http://unicode.org/reports/tr28/tr28-3.html#13_7_variation_selectors
 inline constexpr std::array NonSpacingBlocks = {
-  UnicodeBlock(0xfe00, 0xfe0f, &UVer3_2, "Variation Selectors")};
+  UnicodeBlock(0xfe00, 0xfe0f, UVer3_2, "Variation Selectors")};
 
 // 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array
 // 't'. The blocks in 't' are assumed to be in order (order is checked by
