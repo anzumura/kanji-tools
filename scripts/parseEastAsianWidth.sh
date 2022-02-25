@@ -24,7 +24,7 @@ echo "inline constexpr std::array WideBlocks = {"
 blocks=()
 
 function out() {
-  [ $1 = $2 ] && blocks+=("{0x$1}") || blocks+=("{0x$1, 0x$2}")
+  [ $1 = $2 ] && blocks+=("<0x$1>()") || blocks+=("<0x$1, 0x$2>()")
   prevStart=""
   prevEnd=""
 }
@@ -91,7 +91,7 @@ comma=,
 for i in "${blocks[@]}"; do
   len=$((len - 1))
   [ $len -eq 0 ] && comma=""
-  echo "  UnicodeBlock$i"$comma
+  echo "  makeBlock$i"$comma
 done
 echo "};"
 msg end

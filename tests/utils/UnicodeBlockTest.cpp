@@ -13,13 +13,6 @@ void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
   for (const auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
     oldEnd = i.end;
-    EXPECT_LT(i.start, i.end);
-    EXPECT_EQ(
-      i.start % 16,
-      0); // Unicode blocks must start with a value having MOD 16 of zero
-    EXPECT_EQ(
-      i.end % 16,
-      15); // Unicode blocks must end with a value having MOD 16 of 15 (hex f)
     if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
   }
 }
