@@ -7,19 +7,35 @@
 
 namespace kanji_tools {
 
-// 'UnicodeBlock' is used to hold a unicode block range which is used in the
-// below 'is' functions (isKanji, isHiragana, etc.). 'wide' should be set to
-// true if the block has all wide chars (so display on a terminal is 2 columns
-// instead of 1). This is
+// Unicode version and release date
+class UnicodeVersion {
+public:
+  constexpr UnicodeVersion(const char* v, uint8_t m, uint16_t y) noexcept
+      : version(v), month(m), year(y) {}
+
+  const char* const version;
+  const uint8_t month;
+  const uint16_t year;
+};
+
+// 'UnicodeBlock' holds a range which is used in the 'is' functions ('isKanji',
+// 'isHiragana', etc.). Official blocks have a 'version' and a 'name' (just for
+// reference). To keep it simple, 'version' represents the first version the
+// block was introduced whereas in reality some characters in the block may be
+// added in later versions. For example, the 'Katakana' block was introduced in
+// version 1.1, but U+30A0 (゠) was added to the block in version 3.2.
 class UnicodeBlock {
 public:
-  constexpr UnicodeBlock(char32_t s, char32_t e) noexcept : start(s), end(e) {}
+  constexpr UnicodeBlock(char32_t s, char32_t e,
+                         const UnicodeVersion* const v = nullptr,
+                         const char* const n = nullptr) noexcept
+      : start(s), end(e), version(v), name(n) {}
 
   // Official Unicode blocks start on a value having mod 16 = 0 (so ending in
   // hex '0') and end on a value having mod 16 = 15 (so ending in hex 'f'), but
   // some of the 'WideBlocks' used for determining if a character is narrow or
   // wide display can be a single entry.
-  constexpr UnicodeBlock(char32_t s) noexcept : start(s), end(s) {}
+  constexpr UnicodeBlock(char32_t s) noexcept : UnicodeBlock(s, s) {}
 
   // return number of code points in the block (inclusive of start and end)
   [[nodiscard]] constexpr auto range() const noexcept {
@@ -50,14 +66,24 @@ public:
 
   const char32_t start;
   const char32_t end;
+  const UnicodeVersion* const version;
+  const char* const name;
 };
 
-constexpr std::array HiraganaBlocks = {UnicodeBlock{0x3040, 0x309f}};
+// below are the Unicode versions referenced in this program, for the full list
+// see: https://unicode.org/history/publicationdates.html
+inline constexpr UnicodeVersion UVer1_0("1.0", 10, 1991),
+  UVer1_1("1.1", 6, 1993), UVer2_0("2.0", 7, 1996), UVer3_0("3.0", 9, 1999),
+  UVer3_1("3.1", 3, 2001), UVer3_2("3.2", 3, 2002), UVer4_1("4.1", 3, 2005),
+  UVer5_0("5.0", 7, 2006), UVer5_2("5.2", 10, 2009), UVer13_0("13.0", 3, 2020);
 
-// Second block is 'Katakana Phonetic Extensions' which contains small letters
-// (for Ainu) like ㇱ
-constexpr std::array KatakanaBlocks = {UnicodeBlock{0x30a0, 0x30ff},
-                                       UnicodeBlock{0x31f0, 0x31ff}};
+inline constexpr std::array HiraganaBlocks = {
+  UnicodeBlock(0x3040, 0x309f, &UVer1_1, "Hiragana")};
+
+// Second block contains small letters (for Ainu) like ㇱ
+inline constexpr std::array KatakanaBlocks = {
+  UnicodeBlock(0x30a0, 0x30ff, &UVer1_1, "Katakana"),
+  UnicodeBlock(0x31f0, 0x31ff, &UVer3_2, "Katakana Phonetic Extension")};
 
 // Almost all 'common' Japanese Kanji are in the original CJK Unified block.
 // Extension A has one 'Kentei' and about 1000 'Ucd' Kanji. Extension B has an
@@ -65,64 +91,60 @@ constexpr std::array KatakanaBlocks = {UnicodeBlock{0x30a0, 0x30ff},
 // Compatibility block contains many 'single grapheme' versions of old/variant
 // Japanese Kanji that used to require two graphemes, i.e., a base character
 // followed by a variation selector.
-constexpr std::array CommonKanjiBlocks = {
-  UnicodeBlock{0x3400, 0x4dbf}, // Ext. A, ver 3.0 Sep 1999, ~6K kanji: 㵎
-  UnicodeBlock{0x4e00, 0x9fff}, // Unified Ideographs, ver 1.1 Jun 1992, ~20K
-  UnicodeBlock(0xf900, 0xfaff), // Compat. Ideo., ver 3.2 Mar 2002, 512: 渚, 猪
-  UnicodeBlock(0x20000, 0x2a6df) // Ext. B, ver 3.1 Mar 2001, ~42K: 𠮟
+inline constexpr std::array CommonKanjiBlocks = {
+  UnicodeBlock(0x3400, 0x4dbf, &UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
+  UnicodeBlock(0x4e00, 0x9fff, &UVer1_1, "CJK Unified Ideographs"), // ~20K
+  UnicodeBlock(0xf900, 0xfaff, &UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
+  UnicodeBlock(0x20000, 0x2a6df, &UVer3_1, "CJK Extension B") // ~42K: 𠮟
 };
 
 // Note: Extensions C, D, E and F are contiguous so combine into one block (more
-// efficient for isKanji) functions and wregex). Here are the actual block
-// ranges:
+// efficient for 'isKanji' functions and wregex). Here are the actual ranges:
 // - U+2A700 to U+2B73F : CJK Extension C, ver 5.2 Oct 2009, ~4K kanji
 // - U+2B740 to U+2B81F : CJK Extension D, ver 6.0 Oct 2010, 222 kanji
 // - U+2B820 to U+2CEAF : CJK Extension E, ver 8.0 Jun 2015, ~6K kanji
 // - U+2CEB0 to U+2EBEF : CJK Extension F, ver 10.0 Jun 2016, ~7K kanji
-constexpr std::array RareKanjiBlocks = {
-  UnicodeBlock{0x2e80, 0x2eff},   // Radicals Supp., ver 3.0 Sep 1999, 128
-  UnicodeBlock{0x2a700, 0x2ebef}, // Ext. C, D, E and F, ~17K kanji
-  UnicodeBlock{0x2f800, 0x2fa1f}, // Compat. Supp., ver 3.1 Mar 2001, ~6K kanji
-  UnicodeBlock{0x30000, 0x3134f}  // Ext. G, ver 13.0 Mar 2020, ~5K kanji
+inline constexpr std::array RareKanjiBlocks = {
+  UnicodeBlock(0x2e80, 0x2eff, &UVer3_0, "Radicals Supp."),      // 128
+  UnicodeBlock(0x2a700, 0x2ebef, &UVer5_2, "CJK Extension C-F"), // ~17K kanji
+  UnicodeBlock(0x2f800, 0x2fa1f, &UVer3_1, "CJK Compat. Supp."), // ~6K kanji
+  UnicodeBlock(0x30000, 0x3134f, &UVer13_0, "CJK Extension G")   // ~5K kanji
 };
 
-constexpr std::array PunctuationBlocks = {
-  UnicodeBlock{0x2000, 0x206f}, // General MB Punctuation: —, ‥, ”, “
-  UnicodeBlock{0x3000, 0x303f}, // Wide Punctuation: 、, 。, （
-  UnicodeBlock{0xfff0, 0xffff}  // Specials (like Object Replacement, etc.)
+inline constexpr std::array PunctuationBlocks = {
+  UnicodeBlock(0x2000, 0x206f, &UVer1_1, "General Punctuation"), // —, ‥, ”, “
+  UnicodeBlock(0x3000, 0x303f, &UVer1_1, "CJK Symbols and Punctuation"), // 、,
+  UnicodeBlock(0xfff0, 0xffff, &UVer1_1, "Specials") // Object Replacement, etc.
 };
 
 // There are a lot more symbol and letter blocks, but they haven't come up in
 // sample files so far
-constexpr std::array SymbolBlocks = {
-  UnicodeBlock{0x2100, 0x214f}, // Letterlike Symbols: ℃
-  UnicodeBlock{0x2190, 0x21ff}, // Arrows: →
-  UnicodeBlock{0x2200, 0x22ff}, // Math Symbols: ∀
-  UnicodeBlock{0x2500, 0x257f}, // Box Drawing: ─
-  UnicodeBlock{0x25A0, 0x25ff}, // Geometric Shapes: ○
-  UnicodeBlock{0x2600, 0x26ff}, // Misc Symbols: ☆
-  UnicodeBlock{0x2ff0, 0x2fff}, // CJK Ideographic Description Characters: ⿱
-  UnicodeBlock{0x3190, 0x319f}, // Kanbun (Ideographic Annotations): ㆑
-  UnicodeBlock{0x31c0, 0x31ef}  // CJK Strokes: ㇁
+inline constexpr std::array SymbolBlocks = {
+  UnicodeBlock(0x2100, 0x214f, &UVer1_1, "Letterlike Symbols"),          // ℃
+  UnicodeBlock(0x2190, 0x21ff, &UVer1_1, "Arrows"),                      // →
+  UnicodeBlock(0x2200, 0x22ff, &UVer1_1, "Mathematical Operators"),      // ∀
+  UnicodeBlock(0x2500, 0x257f, &UVer1_1, "Box Drawing"),                 // ─
+  UnicodeBlock(0x25a0, 0x25ff, &UVer1_1, "Geometric Shapes"),            // ○
+  UnicodeBlock(0x2600, 0x26ff, &UVer1_1, "Miscellaneous Symbols"),       // ☆
+  UnicodeBlock(0x2ff0, 0x2fff, &UVer3_0, "CJK Ideographic Desc. Chars"), // ⿱
+  UnicodeBlock(0x3190, 0x319f, &UVer1_1, "Kanbun (Annotations)"),        // ㆑
+  UnicodeBlock(0x31c0, 0x31ef, &UVer4_1, "CJK Strokes")                  // ㇁
 };
 
-constexpr std::array LetterBlocks = {
-  UnicodeBlock{0x0080, 0x00ff}, // Latin Supplement: ·, ×
-  UnicodeBlock{0x0100, 0x017f}, // Latin Extension A
-  UnicodeBlock{0x0180, 0x024f}, // Latin Extension B
-  UnicodeBlock{0x2150, 0x218f}, // Number Forms: Roman Numerals, etc.
-  UnicodeBlock{0x2460, 0x24ff}, // Enclosed Alphanumeic: ⑦
-  UnicodeBlock{0x2c60, 0x2c7f}, // Latin Extension C
-  UnicodeBlock{
-    0xff00,
-    0xffef} // Wide Letters: full width Roman letters and half-width Katakana
-};
+// the last block also includes 'halfwidth katakana'
+inline constexpr std::array LetterBlocks = {
+  UnicodeBlock(0x0080, 0x00ff, &UVer1_1, "Latin-1 Supplement"),    // ·, ×
+  UnicodeBlock(0x0100, 0x017f, &UVer1_1, "Latin Extended-A"),      // Ā
+  UnicodeBlock(0x0180, 0x024f, &UVer1_1, "Latin Extended-B"),      // ƀ
+  UnicodeBlock(0x2150, 0x218f, &UVer1_1, "Number Forms"),          // Ⅳ
+  UnicodeBlock(0x2460, 0x24ff, &UVer1_1, "Enclosed Alphanumeics"), // ⑦
+  UnicodeBlock(0x2c60, 0x2c7f, &UVer5_0, "Latin Extended-C"),
+  UnicodeBlock(0xff00, 0xffef, &UVer1_1, "Halfwidth and Fullwidth Forms")};
 
 // Skip codes in this range when reading in Kanji. See this link for more info:
 // http://unicode.org/reports/tr28/tr28-3.html#13_7_variation_selectors
-constexpr std::array NonSpacingBlocks = {
-  UnicodeBlock(0xfe00, 0xfe0f) // Variation Selection
-};
+inline constexpr std::array NonSpacingBlocks = {
+  UnicodeBlock(0xfe00, 0xfe0f, &UVer3_2, "Variation Selectors")};
 
 // 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array
 // 't'. The blocks in 't' are assumed to be in order (order is checked by
@@ -274,7 +296,7 @@ template<typename... T>
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as
 // variation selectors.
-constexpr wchar_t WideDash = L'-';
+inline constexpr wchar_t WideDash = L'-';
 
 // 'KanjiRange' contains the following blocks (in order):
 // - CJK Extension A
@@ -288,7 +310,7 @@ constexpr wchar_t WideDash = L'-';
 // - CJK Extension G
 
 // clang-format off
-constexpr wchar_t KanjiRange[] = {
+inline constexpr wchar_t KanjiRange[] = {
   CommonKanjiBlocks[0].wStart(), WideDash, CommonKanjiBlocks[0].wEnd(),
   CommonKanjiBlocks[1].wStart(), WideDash, CommonKanjiBlocks[1].wEnd(),
   CommonKanjiBlocks[2].wStart(), WideDash, CommonKanjiBlocks[2].wEnd(),
@@ -302,9 +324,9 @@ constexpr wchar_t KanjiRange[] = {
 };
 // clang-format on
 
-constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
-constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
-constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";
+inline constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
+inline constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
+inline constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";
 
 } // namespace kanji_tools
 
