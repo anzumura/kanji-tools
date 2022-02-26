@@ -57,14 +57,11 @@ inline constexpr bool is_enumarray = false;
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 inline constexpr bool is_enumarray_with_none = false;
 
-template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, bool>
-enumArrayEnabled() noexcept {
-  return is_enumarray<T> || is_enumarray_with_none<T>;
-}
+template<typename T, typename _ = int>
+using isEnumArray =
+  std::enable_if_t<is_enumarray<T> || is_enumarray_with_none<T>, _>;
 
-template<typename T, std::enable_if_t<enumArrayEnabled<T>(), int> = 0>
-class BaseEnumArray {
+template<typename T, isEnumArray<T> = 0> class BaseEnumArray {
 public:
   // 'create' requires at least one 'name' (see comments above)
   template<typename... Names>
@@ -274,7 +271,7 @@ private:
   std::array<std::string, N> _names;
 };
 
-template<typename T, std::enable_if_t<enumArrayEnabled<T>(), int> _>
+template<typename T, isEnumArray<T> _>
 template<typename... Names>
 [[nodiscard]] auto BaseEnumArray<T, _>::create(const std::string& name,
                                                Names... args) {
@@ -293,14 +290,12 @@ template<typename... Names>
 }
 
 template<typename T>
-[[nodiscard]] std::enable_if_t<enumArrayEnabled<T>(), const std::string&>
-toString(T x) {
+[[nodiscard]] isEnumArray<T, const std::string&> toString(T x) {
   return BaseEnumArray<T>::instance().toString(x);
 }
 
 template<typename T>
-std::enable_if_t<enumArrayEnabled<T>(), std::ostream&>
-operator<<(std::ostream& os, T x) {
+isEnumArray<T, std::ostream&> operator<<(std::ostream& os, T x) {
   return os << toString(x);
 }
 
