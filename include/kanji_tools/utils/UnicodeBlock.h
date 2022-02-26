@@ -53,7 +53,18 @@ public:
   const UnicodeVersion* const version;
   const char* const name;
 private:
-  // friend 'makeBlock' functions call private constructor
+  template<char32_t Start, char32_t End = Start>
+  static constexpr void checkRange() noexcept {
+    static_assert(Start > 0x7f);
+    static_assert(End <= MaxUnicode);
+  }
+
+  template<char32_t Start, char32_t End>
+  static constexpr void checkLess() noexcept {
+    checkRange<Start, End>();
+    static_assert(Start < End);
+  }
+
   constexpr UnicodeBlock(char32_t s, char32_t e,
                          const UnicodeVersion* v = nullptr,
                          const char* n = nullptr) noexcept
@@ -74,12 +85,12 @@ private:
 // combination with the friend declaration inside UnicodeBlock so split into two
 // functions. This also allows better static_assert (using '<' instead of '<=').
 template<char32_t Start> [[nodiscard]] constexpr auto makeBlock() noexcept {
-  static_assert(Start > 0x7f && Start <= MaxUnicode);
+  UnicodeBlock::checkRange<Start>();
   return UnicodeBlock(Start, Start);
 }
 template<char32_t Start, char32_t End>
 [[nodiscard]] constexpr auto makeBlock() noexcept {
-  static_assert(Start > 0x7f && Start < End && End <= MaxUnicode);
+  UnicodeBlock::checkLess<Start, End>();
   return UnicodeBlock(Start, End);
 }
 
@@ -87,7 +98,7 @@ template<char32_t Start, char32_t End>
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 template<char32_t Start, char32_t End, typename T>
 [[nodiscard]] constexpr auto makeBlock(T& v, const char* n) noexcept {
-  static_assert(Start > 0x7f && Start < End && End <= MaxUnicode);
+  UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % 16 == 0);
   static_assert(End % 16 == 15);
   return UnicodeBlock(Start, End, &v, n);
