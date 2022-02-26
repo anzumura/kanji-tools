@@ -227,6 +227,8 @@ enum BitPatterns : unsigned char {
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
 
+inline constexpr char32_t MaxUnicode = 0x10ffff;
+
 } // namespace kanji_tools
 
 #endif // KANJI_TOOLS_UTILS_MBUTILS_H

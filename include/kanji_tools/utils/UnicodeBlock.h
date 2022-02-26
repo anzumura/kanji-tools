@@ -74,11 +74,12 @@ private:
 // combination with the friend declaration inside UnicodeBlock so split into two
 // functions. This also allows better static_assert (using '<' instead of '<=').
 template<char32_t Start> [[nodiscard]] constexpr auto makeBlock() noexcept {
+  static_assert(Start > 0x7f && Start <= MaxUnicode);
   return UnicodeBlock(Start, Start);
 }
 template<char32_t Start, char32_t End>
 [[nodiscard]] constexpr auto makeBlock() noexcept {
-  static_assert(Start < End);
+  static_assert(Start > 0x7f && Start < End && End <= MaxUnicode);
   return UnicodeBlock(Start, End);
 }
 
@@ -86,7 +87,7 @@ template<char32_t Start, char32_t End>
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 template<char32_t Start, char32_t End, typename T>
 [[nodiscard]] constexpr auto makeBlock(T& v, const char* n) noexcept {
-  static_assert(Start < End);
+  static_assert(Start > 0x7f && Start < End && End <= MaxUnicode);
   static_assert(Start % 16 == 0);
   static_assert(End % 16 == 15);
   return UnicodeBlock(Start, End, &v, n);

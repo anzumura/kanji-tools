@@ -9,15 +9,15 @@ namespace kanji_tools {
 
 namespace {
 
-// 'Min' and 'Max' Values for determining invalid Unicde code points when doing
-// UTF-8 conversion. Here's a quote from
+// Values for determining invalid Unicde code points when doing UTF-8
+// conversion (in addition to 'MaxUnicode' in MBUtils.h). Here's a quote from
 // https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
 //   Since RFC 3629 (November 2003), the high and low surrogate halves used by
 //   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
 constexpr char32_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff,
-                   MaxUnicode = 0x10ffff, ErrorReplacement = 0xfffd;
+                   ErrorReplacement = 0xfffd;
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
