@@ -20,58 +20,51 @@ namespace kanji_tools {
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 inline constexpr bool is_bitmask = false;
 
+template<typename T, typename _ = T>
+using isBitmask = std::enable_if_t<is_bitmask<T>, _>;
+
 // the 7 required bitwise operators are: &, |, ^, ~, &=, |= and ^=
 
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T>
-operator&(T x, T y) noexcept {
+[[nodiscard]] constexpr isBitmask<T> operator&(T x, T y) noexcept {
   return static_cast<T>(to_underlying(x) & to_underlying(y));
 }
 
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T>
-operator|(T x, T y) noexcept {
+[[nodiscard]] constexpr isBitmask<T> operator|(T x, T y) noexcept {
   return static_cast<T>(to_underlying(x) | to_underlying(y));
 }
 
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T>
-operator^(T x, T y) noexcept {
+[[nodiscard]] constexpr isBitmask<T> operator^(T x, T y) noexcept {
   return static_cast<T>(to_underlying(x) ^ to_underlying(y));
 }
 
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, T>
-operator~(T x) noexcept {
+[[nodiscard]] constexpr isBitmask<T> operator~(T x) noexcept {
   return static_cast<T>(~to_underlying(x));
 }
 
-template<typename T>
-constexpr std::enable_if_t<is_bitmask<T>, T&> operator&=(T& x, T y) noexcept {
+template<typename T> constexpr isBitmask<T>& operator&=(T& x, T y) noexcept {
   return x = x & y;
 }
 
-template<typename T>
-constexpr std::enable_if_t<is_bitmask<T>, T&> operator|=(T& x, T y) noexcept {
+template<typename T> constexpr isBitmask<T>& operator|=(T& x, T y) noexcept {
   return x = x | y;
 }
 
-template<typename T>
-constexpr std::enable_if_t<is_bitmask<T>, T&> operator^=(T& x, T y) noexcept {
+template<typename T> constexpr isBitmask<T>& operator^=(T& x, T y) noexcept {
   return x = x ^ y;
 }
 
 // 'hasValue' can help in cases like 'if (hasValue(myEnum & MyEnum::Flag1)) ...'
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, bool>
-hasValue(T x) noexcept {
+[[nodiscard]] constexpr isBitmask<T, bool> hasValue(T x) noexcept {
   return to_underlying(x);
 }
 
 // 'operator!' can help in cases like 'if (!(myEnum & MyEnum::Flag1)) ...'
-template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_bitmask<T>, bool>
-operator!(T x) noexcept {
+template<typename T> [[nodiscard]] isBitmask<T, bool> operator!(T x) noexcept {
   return !hasValue(x);
 }
 
