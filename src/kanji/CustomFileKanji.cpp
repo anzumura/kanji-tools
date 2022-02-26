@@ -6,16 +6,18 @@ namespace kanji_tools {
 
 Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes kanjiType,
                                      const std::filesystem::path& file) {
-  ColumnFile::Columns columns;
+  ColumnFile::Columns columns(RequiredColumns);
+  const auto add = [&columns](auto& x) {
+    for (auto& i : x) columns.emplace_back(i);
+  };
   switch (kanjiType) {
-  case KanjiTypes::Jouyou: columns = JouyouRequiredColumns; break;
-  case KanjiTypes::Jinmei: columns = JinmeiRequiredColumns; break;
-  case KanjiTypes::Extra: columns = ExtraRequiredColumns; break;
+  case KanjiTypes::Jouyou: add(JouyouRequiredColumns); break;
+  case KanjiTypes::Jinmei: add(JinmeiRequiredColumns); break;
+  case KanjiTypes::Extra: add(ExtraRequiredColumns); break;
   default:
     throw std::domain_error(std::string("fromFile got invalid type: ") +
                             toString(kanjiType));
   }
-  columns.insert(columns.end(), RequiredColumns.begin(), RequiredColumns.end());
   Data::List results;
   for (ColumnFile f(file, columns); f.nextRow();) switch (kanjiType) {
     case KanjiTypes::Jouyou:

@@ -32,8 +32,8 @@ public:
     [[nodiscard]] auto& name() const { return _name; }
     [[nodiscard]] auto number() const { return _number; }
   private:
-    std::string _name;
-    size_t _number; // globally unique number per column based on '_name'
+    const std::string _name;
+    const size_t _number; // globally unique number per column based on '_name'
   };
 
   using Columns = std::vector<Column>;
