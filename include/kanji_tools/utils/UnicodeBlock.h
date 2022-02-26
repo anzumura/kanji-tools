@@ -10,7 +10,7 @@ namespace kanji_tools {
 // Unicode version and release date
 class UnicodeVersion {
 public:
-  constexpr UnicodeVersion(const char* v, uint8_t m, uint16_t y) noexcept
+  consteval UnicodeVersion(const char* v, uint8_t m, uint16_t y)
       : version(v), month(m), year(y) {}
 
   UnicodeVersion(const UnicodeVersion&) = delete;
@@ -54,29 +54,27 @@ public:
   const char* const name;
 private:
   template<char32_t Start, char32_t End = Start>
-  static constexpr void checkRange() noexcept {
+  static consteval void checkRange() {
     static_assert(Start > 0x7f);
     static_assert(End <= MaxUnicode);
   }
 
-  template<char32_t Start, char32_t End>
-  static constexpr void checkLess() noexcept {
+  template<char32_t Start, char32_t End> static consteval void checkLess() {
     checkRange<Start, End>();
     static_assert(Start < End);
   }
 
-  constexpr UnicodeBlock(char32_t s, char32_t e,
+  consteval UnicodeBlock(char32_t s, char32_t e,
                          const UnicodeVersion* v = nullptr,
-                         const char* n = nullptr) noexcept
+                         const char* n = nullptr)
       : start(s), end(e), version(v), name(n) {}
 
-  template<char32_t Start> friend constexpr auto makeBlock() noexcept;
+  template<char32_t Start> friend consteval auto makeBlock();
 
-  template<char32_t Start, char32_t End>
-  friend constexpr auto makeBlock() noexcept;
+  template<char32_t Start, char32_t End> friend consteval auto makeBlock();
 
   template<char32_t Start, char32_t End, typename T>
-  friend constexpr auto makeBlock(T&, const char*) noexcept;
+  friend consteval auto makeBlock(T&, const char*);
 };
 
 // 'WideBlocks' used for determining if a character is narrow or wide display
@@ -84,12 +82,12 @@ private:
 // gcc 11.2 didn't like using a default template (char32_t End = Start) in
 // combination with the friend declaration inside UnicodeBlock so split into two
 // functions. This also allows better static_assert (using '<' instead of '<=').
-template<char32_t Start> [[nodiscard]] constexpr auto makeBlock() noexcept {
+template<char32_t Start> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkRange<Start>();
   return UnicodeBlock(Start, Start);
 }
 template<char32_t Start, char32_t End>
-[[nodiscard]] constexpr auto makeBlock() noexcept {
+[[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkLess<Start, End>();
   return UnicodeBlock(Start, End);
 }
@@ -97,7 +95,7 @@ template<char32_t Start, char32_t End>
 // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 template<char32_t Start, char32_t End, typename T>
-[[nodiscard]] constexpr auto makeBlock(T& v, const char* n) noexcept {
+[[nodiscard]] consteval auto makeBlock(T& v, const char* n) {
   UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % 16 == 0);
   static_assert(End % 16 == 15);
