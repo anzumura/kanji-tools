@@ -5,15 +5,15 @@ namespace kanji_tools {
 
 namespace {
 
-using BlockSet = std::set<UnicodeBlock>;
+using BlockSet = std::set<const UnicodeBlock*>;
 
 template<typename T>
 void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
   int oldEnd = 0;
-  for (const auto& i : blocks) {
+  for (auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
     oldEnd = i.end;
-    if (allBlocks) EXPECT_TRUE(allBlocks->insert(i).second);
+    if (allBlocks) EXPECT_TRUE(allBlocks->insert(&i).second);
   }
 }
 
@@ -29,7 +29,6 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   checkRange(CommonKanjiBlocks, &allBlocks);
   checkRange(RareKanjiBlocks, &allBlocks);
   checkRange(NonSpacingBlocks, &allBlocks);
-  checkRange(allBlocks);
   // check 'range' strings (used in regex calls to remove furigana)
   ASSERT_EQ(CommonKanjiBlocks.size(), 4);
   ASSERT_EQ(RareKanjiBlocks.size(), 4);

@@ -13,6 +13,8 @@ public:
   constexpr UnicodeVersion(const char* v, uint8_t m, uint16_t y) noexcept
       : version(v), month(m), year(y) {}
 
+  UnicodeVersion(const UnicodeVersion&) = delete;
+
   const char* const version;
   const uint8_t month;
   const uint16_t year;
@@ -26,6 +28,8 @@ public:
 // version 1.1, but U+30A0 (゠) was added to the block in version 3.2.
 class UnicodeBlock {
 public:
+  UnicodeBlock(const UnicodeBlock&) = delete;
+
   // return number of code points in the block (inclusive of start and end)
   [[nodiscard]] constexpr auto range() const noexcept {
     return end - start + 1;
@@ -34,15 +38,6 @@ public:
   // 'opterator()' returns true if the given character is in this block
   [[nodiscard]] constexpr auto operator()(char32_t x) const noexcept {
     return x >= start && x <= end;
-  }
-
-  [[nodiscard]] constexpr auto
-  operator<(const UnicodeBlock& rhs) const noexcept {
-    return start < rhs.start;
-  }
-  [[nodiscard]] constexpr auto
-  operator==(const UnicodeBlock& rhs) const noexcept {
-    return start == rhs.start && end == rhs.end;
   }
 
   // 'wStart' and 'wEnd' are needed for wregex (may remove later)
@@ -64,31 +59,37 @@ private:
                          const char* n = nullptr) noexcept
       : start(s), end(e), version(v), name(n) {}
 
-  template<char32_t Start, char32_t End>
-  friend constexpr UnicodeBlock makeBlock() noexcept;
+  template<char32_t Start> friend constexpr auto makeBlock() noexcept;
 
   template<char32_t Start, char32_t End>
-  friend constexpr UnicodeBlock makeBlock(const UnicodeVersion&,
-                                          const char*) noexcept;
+  friend constexpr auto makeBlock() noexcept;
+
+  template<char32_t Start, char32_t End, typename T>
+  friend constexpr auto makeBlock(T&, const char*) noexcept;
 };
+
+// 'WideBlocks' used for determining if a character is narrow or wide display
+// can be a single entry and also not start or end on an 'official' boundry.
+// gcc 11.2 didn't like using a default template (char32_t End = Start) in
+// combination with the friend declaration inside UnicodeBlock so split into two
+// functions. This also allows better static_assert (using '<' instead of '<=').
+template<char32_t Start> [[nodiscard]] constexpr auto makeBlock() noexcept {
+  return UnicodeBlock(Start, Start);
+}
+template<char32_t Start, char32_t End>
+[[nodiscard]] constexpr auto makeBlock() noexcept {
+  static_assert(Start < End);
+  return UnicodeBlock(Start, End);
+}
 
 // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
-template<char32_t Start, char32_t End>
-[[nodiscard]] constexpr UnicodeBlock makeBlock(const UnicodeVersion& v,
-                                               const char* n) noexcept {
+template<char32_t Start, char32_t End, typename T>
+[[nodiscard]] constexpr auto makeBlock(T& v, const char* n) noexcept {
   static_assert(Start < End);
   static_assert(Start % 16 == 0);
   static_assert(End % 16 == 15);
   return UnicodeBlock(Start, End, &v, n);
-}
-
-// 'WideBlocks' used for determining if a character is narrow or wide display
-// can be a single entry and also not start or end on an 'official' boundry.
-template<char32_t Start, char32_t End = Start>
-[[nodiscard]] constexpr UnicodeBlock makeBlock() noexcept {
-  static_assert(Start <= End);
-  return UnicodeBlock(Start, End);
 }
 
 // below are the Unicode versions referenced in this program, for the full list
@@ -184,8 +185,9 @@ inRange(char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
 // no requirement for the arrays to be specified in a particular order (which
 // wouldn't work anyway for overlapping ranges).
 template<size_t N, typename... Ts>
-[[nodiscard]] constexpr bool
-inRange(char32_t c, const std::array<UnicodeBlock, N>& t, Ts... args) noexcept {
+[[nodiscard]] constexpr bool inRange(char32_t c,
+                                     const std::array<UnicodeBlock, N>& t,
+                                     Ts&... args) noexcept {
   return inRange(c, t) || inRange(c, args...);
 }
 
@@ -202,7 +204,7 @@ inline constexpr auto CombiningMarkVoiced = U'\x3099',
 // false unless 'sizeOne' is false.
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const std::string& s, bool sizeOne,
-                                       T... t) {
+                                       T&... t) {
   if (s.size() > 1 && (!sizeOne || s.size() < 9))
     if (const auto w = fromUtf8(s);
         sizeOne ? w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])
@@ -213,7 +215,7 @@ template<typename... T>
 
 // true if all characers are in the given blocks, empty is also considered true
 template<typename... T>
-[[nodiscard]] inline auto inWCharRange(const std::string& s, T... t) {
+[[nodiscard]] inline auto inWCharRange(const std::string& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
   for (auto allowNonSpacing = false; const auto i : fromUtf8(s))
     if (allowNonSpacing && isNonSpacing(i))
