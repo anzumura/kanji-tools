@@ -43,7 +43,7 @@ public:
       : _number(number), _name(name), _members(members) {}
 
   Group(const Group&) = delete;
-  Group& operator=(const Group&) = delete;
+  // operator= is not generated since there are const members
   virtual ~Group() = default;
 
   [[nodiscard]] virtual GroupType type() const = 0;

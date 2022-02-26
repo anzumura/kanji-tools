@@ -29,7 +29,7 @@ public:
       : _title(title), _countInFirstColumn(countInFirstColumn) {}
 
   Table(const Table&) = delete;
-  Table& operator=(const Table&) = delete;
+  // operator= is not generated since there are const members
 
   // add 'row' to the table. If 'startNewSection' is true then a horizontal
   // border will be printed before printing the row. Row can have less columns

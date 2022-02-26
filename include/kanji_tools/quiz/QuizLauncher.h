@@ -27,7 +27,7 @@ public:
                JukugoDataPtr, std::istream* in = 0);
 
   QuizLauncher(const QuizLauncher&) = delete;
-  QuizLauncher& operator=(const QuizLauncher&) = delete;
+  // operator= is not generated since there are const members
 
   // 'start' is the top level method for starting a quiz or doing a review (List
   // or Group based). 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the

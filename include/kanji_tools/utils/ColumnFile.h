@@ -47,7 +47,7 @@ public:
              char delimiter = '\t');
 
   ColumnFile(const ColumnFile&) = delete;
-  ColumnFile& operator=(const ColumnFile&) = delete;
+  // operator= is not generated since there are const members
 
   // 'nextRow' must be called before using 'get'. An exception is thrown if the
   // next row has too few or too many columns. 'nextRow' returns 'false' when

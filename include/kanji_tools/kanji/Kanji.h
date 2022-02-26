@@ -45,7 +45,7 @@ public:
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
-  Kanji& operator=(const Kanji&) = delete;
+  // operator= is not generated since there are const members
 
   [[nodiscard]] virtual KanjiTypes type() const = 0;
   [[nodiscard]] virtual const std::string& meaning() const = 0;

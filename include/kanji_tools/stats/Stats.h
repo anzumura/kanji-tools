@@ -17,7 +17,7 @@ public:
   Stats(size_t argc, const char** argv, DataPtr data);
 
   Stats(const Stats&) = delete;
-  Stats& operator=(const Stats&) = delete;
+  // operator= is not generated since there are const members
 private:
   [[nodiscard]] auto& log(bool heading = false) const {
     return _data->log(heading);

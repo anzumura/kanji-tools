@@ -33,7 +33,7 @@ public:
               ConvertFlags flags = ConvertFlags::None);
 
   KanaConvert(const KanaConvert&) = delete;
-  KanaConvert& operator=(const KanaConvert&) = delete;
+  // operator= is not generated since there are const members
 
   [[nodiscard]] CharType target() const { return _target; }
   void target(CharType target) { _target = target; }

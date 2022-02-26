@@ -11,7 +11,7 @@ public:
       : _name(name), _reading(reading), _grade(grade) {}
 
   Jukugo(const Jukugo&) = delete;
-  Jukugo& operator=(const Jukugo&) = delete;
+  // operator= is not generated since there are const members
 
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& reading() const { return _reading; }

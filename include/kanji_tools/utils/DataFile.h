@@ -44,7 +44,7 @@ public:
       : DataFile(p, FileType::OnePerLine, createNewUniqueFile, nullptr) {}
 
   DataFile(const DataFile&) = delete;
-  DataFile& operator=(const DataFile&) = delete;
+  // operator= is not generated since there are const members
 
   [[nodiscard]] auto exists(const std::string& s) const {
     return _map.find(s) != _map.end();

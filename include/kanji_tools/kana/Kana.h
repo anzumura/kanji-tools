@@ -108,7 +108,7 @@ public:
   class RepeatMark {
   public:
     RepeatMark(const RepeatMark&) = delete;
-    RepeatMark& operator=(const RepeatMark&) = delete;
+    // operator= is not generated since there are const members
 
     [[nodiscard]] auto matches(CharType t, const std::string& s) const {
       return t == CharType::Hiragana && _hiragana == s ||
@@ -161,7 +161,7 @@ public:
     validate();
   }
 
-  Kana& operator=(const Kana&) = delete; // there's a private copy constructor
+  // operator= is not generated since there are const members
   virtual ~Kana() = default;
 
   // 'dakutenKana' and 'hanDakutenKana' are overridden by derived classes to

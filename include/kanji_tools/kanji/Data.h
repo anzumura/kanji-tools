@@ -32,7 +32,7 @@ public:
        std::ostream& out = std::cout, std::ostream& err = std::cerr);
 
   Data(const Data&) = delete;
-  Data& operator=(const Data&) = delete;
+  // operator= is not generated since there are const members
   virtual ~Data() = default;
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
