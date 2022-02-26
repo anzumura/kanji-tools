@@ -58,10 +58,10 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 inline constexpr bool is_enumarray_with_none = false;
 
 template<typename T, typename _ = int>
-using isEnumArray =
+using isBaseEnumArray =
   std::enable_if_t<is_enumarray<T> || is_enumarray_with_none<T>, _>;
 
-template<typename T, isEnumArray<T> = 0> class BaseEnumArray {
+template<typename T, isBaseEnumArray<T> = 0> class BaseEnumArray {
 public:
   // 'create' requires at least one 'name' (see comments above)
   template<typename... Names>
@@ -271,7 +271,7 @@ private:
   std::array<std::string, N> _names;
 };
 
-template<typename T, isEnumArray<T> _>
+template<typename T, isBaseEnumArray<T> _>
 template<typename... Names>
 [[nodiscard]] auto BaseEnumArray<T, _>::create(const std::string& name,
                                                Names... args) {
@@ -290,31 +290,31 @@ template<typename... Names>
 }
 
 template<typename T>
-[[nodiscard]] isEnumArray<T, const std::string&> toString(T x) {
+[[nodiscard]] isBaseEnumArray<T, const std::string&> toString(T x) {
   return BaseEnumArray<T>::instance().toString(x);
 }
 
 template<typename T>
-isEnumArray<T, std::ostream&> operator<<(std::ostream& os, T x) {
+isBaseEnumArray<T, std::ostream&> operator<<(std::ostream& os, T x) {
   return os << toString(x);
 }
 
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_enumarray_with_none<T>, bool>
-hasValue(T x) noexcept {
+using isEnumArrayWithNone = std::enable_if_t<is_enumarray_with_none<T>, bool>;
+
+template<typename T>
+[[nodiscard]] constexpr isEnumArrayWithNone<T> hasValue(T x) noexcept {
   return x != T::None;
 }
 
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_enumarray_with_none<T>, bool>
-operator!(T x) noexcept {
+[[nodiscard]] constexpr isEnumArrayWithNone<T> operator!(T x) noexcept {
   return !hasValue(x);
 }
 
 // 'isNextNone' returns true if the next value after 'x' is T::None
 template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_enumarray_with_none<T>, bool>
-isNextNone(T x) noexcept {
+[[nodiscard]] constexpr isEnumArrayWithNone<T> isNextNone(T x) noexcept {
   return static_cast<T>(to_underlying(x) + 1) == T::None;
 }
 
