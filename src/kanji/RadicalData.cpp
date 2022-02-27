@@ -1,5 +1,6 @@
 #include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/utils/ColumnFile.h>
+#include <kanji_tools/utils/UnicodeBlock.h>
 
 #include <numeric>
 #include <sstream>
@@ -29,7 +30,7 @@ void RadicalData::load(const std::filesystem::path& file) {
 }
 
 void RadicalData::print(const Data& data) const {
-  data.log() << "Radical breakdown - Total (";
+  data.log() << "Common Kanji Radicals (";
   for (auto i : AllKanjiTypes) {
     data.out() << i;
     if (isNextNone(i)) break;
@@ -38,7 +39,10 @@ void RadicalData::print(const Data& data) const {
   data.out() << "):\n";
   RadicalLists radicals;
   for (auto& i : data.kanjiNameMap())
-    radicals[i.second->radical()].push_back(i.second);
+    // only inclue 'Common Kanji' for now since a lot of the rare kanji don't
+    // display properly - they just show up as '?' (𮧮)
+    if (isCommonKanji(i.second->name()))
+      radicals[i.second->radical()].push_back(i.second);
   printRadicalLists(data, radicals);
   printMissingRadicals(data, radicals);
 }
