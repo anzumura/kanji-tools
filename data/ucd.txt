@@ -2447,7 +2447,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 4F21	伡	CJK	1.1	9	6		chē			G				4FE5	俥	Traditional			KURUMA
 4F23	伣	CJK	1.1	9	6		xiàn			G				4FD4	俔	Traditional	like	KEN	UKAGAU
 4F29	伩	CJK	1.1	9	6		xìn			GHKTV							trust, believe; letter; (Cant.) small	SHIN	MAKOTO TAYORI MAKASERU
-4F2B	伫	CJK	1.1	9	6		zhù			G				4F47	佇	Traditional*	wait; look towards; turn one's back on	CHO	TATAZUMU
 4F2D	伭	CJK	1.1	9	7		xián	463		GHT							dark, somber; deep, profound	KEN SEN	
 4F2E	伮	CJK	1.1	9	7		nǔ	464		GJTV	J1-305D						to make a great effort	DO	TSUTOMERU
 4F2F	伯	CJK	1.1	9	7		bó	466	397	GHJKTV	J0-476C	Y					older brother; father's elder brother; senior male 'sire'; feudal rank 'count'	HAKU HA	OSA HATAGASHIRA
@@ -2998,7 +2997,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 5171	共	CJK	1.1	12	6		gòng	1458	581	GHJKTV	J0-3626	Y					together with, all, total; to share	KYOU	TOMO TOMONI DOMO
 5172	兲	CJK	1.1	12	6		tiān	1461		GT									
 5173	关	CJK	1.1	12	6		guān			GJT	J4-2328			95DC	關	Traditional*	frontier pass; close; relation	KAN WAN	SEKI
-5174	兴	CJK	1.1	12	6		xìng			GH				8208	興	Traditional*	thrive, prosper, flourish	KYOU KOU	OKORU OKOSU OKIRU
 5175	兵	CJK	1.1	12	7		bīng	1462	201	GHJKTV	J0-4A3C	Y					soldier, troops	HEI HYOU	TSUWAMONO IKUSA
 5176	其	CJK	1.1	12	8		qí	1472	590	GHJKTV	J0-4236		Y				his, her, its, their; that	KI GI	SONO SORE
 5177	具	CJK	1.1	12	8		jù	1473	585,3128	GHJKTV	J0-3671	Y					tool, implement; draw up, write	GU KU	SONAERU SONAE TSUBUSANI
@@ -4337,7 +4335,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 5758	坘	CJK	1.1	32	7		dǐ	4953		GT									
 5759	坙	CJK	1.1	32	7		jīng	4962		GT								KEI	
 575A	坚	CJK	1.1	32	7		jiān	4963	1057	G				5805	堅	Traditional	hard, strong, firm; resolute	KEN	
-575F	坟	CJK	1.1	32	7		fén			GHTV				58B3	墳	Traditional*	grave, mound; bulge; bulging	FUN	HAKA
 5761	坡	CJK	1.1	32	8		pō	4966	1068	GHJKTV	J0-5433						slope, bank, hillside	HA HI	TSUTSUMI
 5762	坢	CJK	1.1	32	8		bàn	4967		GHJKT	J1-3741							HAN BAN	TAHIRAKA CHIRI
 5763	坣	CJK	1.1	32	8		táng	4968		GT									
@@ -4760,7 +4757,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 5936	夶	CJK	1.1	37	6		bǐ	5850		GJT	J1-3870							HI	KURAABERU
 5937	夷	CJK	1.1	37	6		yí	5852	182	GHJKTV	J0-3050		Y				ancient barbarian tribes	I	TAIRAGERU KOROSU EBISU
 5938	夸	CJK	1.1	37	6		kuā	5854		GHJKTV	J0-5472			8A87	誇	Traditional	extravagant, luxurious; handsome	KO KA	OGORU
-5939	夹	CJK	1.1	37	6		jiā			G				593E	夾	Traditional*	be wedged or inserted between	KOU KYOU	HASAMU
 593D	夽	CJK	1.1	37	7		yǔn	5863		GJKT	J4-2540								
 593E	夾	CJK	1.1	37	7		jiā	5867	192	GHJKTV	J0-5473						be wedged or inserted between	KOU KYOU	HASAMU
 593F	夿	CJK	1.1	37	7		bā	5866		GJT	J1-3871							HA HE	OOKII
@@ -5628,7 +5624,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 5CE0	峠	CJK	1.1	46	9		qiǎ	8068	1416	GJK	J0-463D	Y					mountain pass; crisis, climax		TOUGE
 5CE1	峡	CJK	1.1	46	9		xiá	8068P	1417	GJT	J0-362E	Y					gorge, strait, ravine; isthmus	KYOU KOU	HAZAMA
 5CE3	峣	CJK	1.1	46	9		yáo			G				5DA2	嶢	Traditional	high or tall	GYOU	KEWASHII
-5CE6	峦	CJK	1.1	46	9		luán			GT				5DD2	巒	Traditional*	mountain range; pointed mountain	RAN	MINE
 5CE8	峨	CJK	1.1	46	10		é	8071	1422	GHJKT	J0-3265		Y				lofty	GA	TAKANE IKAMESHII
 5CE9	峩	CJK	1.1	46	10		é	8072	1422	GHJKT	J0-5636						lofty	GA	KEWASHII
 5CEA	峪	CJK	1.1	46	10		yù	8073		GHJKT	J0-563B						valley, ravine	YOKU	TANI
@@ -7099,7 +7094,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 6317	挗	CJK	1.1	64	9		jué	12073		GTV									
 6318	挘	CJK	1.1	64	9		liě	12081	1891	GHJK	J13-746D						to pluck, pick, tear; (Cant.) rubbing action		MUSHIRU MUSHIRITORU
 6319	挙	CJK	1.1	64	10		jǔ	12081P	1902,2007,3854	GJKT	J0-3573	Y					raise, lift up; recommend	KYO	AGERU AGARU KOZORU
-631B	挛	CJK	1.1	64	10		luán			GT				6523	攣	Traditional*	tangled; entwined; crooked	REN	HIKU
 631F	挟	CJK	1.1	64	9		xié			GJT	J0-3634	Y					clasp under arm; hold to bosom	KYOU SHOU	HASAMU
 6327	挧	CJK	1.1	64	9		yǔ			GJ	J0-594B							KU	
 6328	挨	CJK	1.1	64	10		āi	12082	1910	GHJKT	J0-3027	Y					near, close by, next to, towards, against; to wait; to lean on	AI	HIRAKU
@@ -9862,7 +9856,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 6EDD	滝	CJK	1.1	85	13		lóng	18067	2655	GHJKTV	J0-426C	Y					raining; wet; soaked; a river in Guangdong	SOU ROU	TAKI
 6EDE	滞	CJK	1.1	85	13		zhì	18067P	2661	GJ	J0-425A	Y					block up, obstruct; stagnant	TAI	TODOKOORU
 6EE1	满	CJK	1.1	85	13		mǎn			G				6EFF	滿	Traditional	fill; full, satisfied	MAN BAN	MICHIRU MITASU
-6EE6	滦	CJK	1.1	85	13		luán			GT				7064	灤	Traditional*	river and county in Hebei province	RAN	NAGARERU
 6EEB	滫	CJK	1.1	85	14		xiǔ	18071		GHJKT	J14-6F29						water in which rice has been boiled	SHUU SHU	TOGISHIRU
 6EEC	滬	CJK	1.1	85	14		hù	18072		GHJKT	J0-5E76			6CAA	沪	Simplified	Shanghai; river near Shanghai	KO	ERI AJIRO
 6EED	滭	CJK	1.1	85	14		bì	18073		GHJKT	J1-483C							HITSU HICHI	WAKU
@@ -11947,7 +11940,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 77B4	瞴	CJK	1.1	109	17		móu	23710		GHKT									
 77B5	瞵	CJK	1.1	109	18		lín	23712		GHJKT	J1-4F3A						to stare at	RIN REN	HITOMI
 77B6	瞶	CJK	1.1	109	17		guì	23713		GHJKT	J0-6258			7786	瞆	Simplified	dim; blurred vision	KI I	MITSUKUSU MEYAMI
-77B7	瞷	CJK	1.1	109	17		jiàn			GHKTV				77AF	瞯	Semantic*	to peep; to spy	KAN GEN KEN	UWAMEZUKAI NAGASHIME
 77B8	瞸	CJK	1.1	109	17		yè	23725		GT									
 77B9	瞹	CJK	1.1	109	18		ài	23727		GHJKT	J0-6259						clouded, obscure	AI	KAKURERU
 77BA	瞺	CJK	1.1	109	18		huì	23730		GHKT									
@@ -14546,7 +14538,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 8356	荖	CJK	1.1	140	9		lǎo	30972		GHJKT	J1-577B						betel pepper	HOU ROU	KINMA
 8357	荗	CJK	1.1	140	9		shù	30977		GHJKT	J14-7631							SHOKU JIKI	
 8358	荘	CJK	1.1	140	9		zhuāng	30890	3938	GJT	J0-4171	Y					village, hamlet; villa; surname	SOU	OGOSOKA
-835A	荚	CJK	1.1	140	9		jiá			G				83A2	莢	Traditional*	pods of leguminous plants; pods	KYOU	SAYA
 8362	荢	CJK	1.1	140	9		zì			GHJT	J3-7A6D								
 8363	荣	CJK	1.1	140	9		róng			GHJT	J4-2E4A			69AE	榮	Traditional*	glory, honor; flourish, prosper	EI YOU	SAKAERU HAE
 8370	荰	CJK	1.1	140	10		dù	30984		GJKT	J1-577D							TO ZU	
@@ -15816,7 +15807,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 88C3	裃	CJK	1.1	145	11		kǎ	34282	4228	GJ	J0-6A61						old ceremonial garb; samurai garb		KAMISHIMO
 88C4	裄	CJK	1.1	145	11		xing	34283	4231	GJ	J0-6A62						sleeve length		YUKI
 88C5	装	CJK	1.1	145	12		zhuāng	34283P	4234	GHJK	J0-4175	Y					dress, clothes; decorate; fill	SOU SHOU	YOSOOU
-88C6	裆	CJK	1.1	145	11		dāng			G				8960	襠	Traditional*	crotch or seat of pants; pants	TOU	MACHI
 88C8	裈	CJK	1.1	145	11		kūn			G				890C	褌	Traditional	trousers, pants, shorts, drawers	KON	FUNDOSHI
 88CA	裊	CJK	1.1	145	13		niǎo	34285		GHJKTV	J13-7B6A						curling upwards; wavering gently	JOU NYOU	SHINAYAKA
 88CB	裋	CJK	1.1	145	12		shù	34286		GHJKT	J1-5C46						cotton clothes of a boy servant	SHU JU TAN	SHITAGI
@@ -17264,7 +17254,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 8FC5	迅	CJK	1.1	162	6	7	xùn	38727P	4664	GHJKT	J0-3F57	Y					quick, hasty, rapid, sudden	JIN SHIN SHUN	HAYAI
 8FC6	迆	CJK	1.1	162	6	7	yí	38728		GHJKT	J14-796D						wind; walk out of straight path	I TA DA	NANAME
 8FC7	过	CJK	1.1	162	6		guò	38733		GTV				904E	過	Traditional*	pass, pass through, go across	KA	SUGIRU AYAMATSU TOGA
-8FC8	迈	CJK	1.1	162	6		mài			GT				9081	邁	Traditional*	take a big stride; pass by	BAI MAI	YUKU SUGIRU TSUTOMERU
 8FCA	迊	CJK	1.1	162	8		zā	38735		GHJKT	J14-796F						to go round, to make a circuit, to make a revolution, to turn round	SOU	MEGURU
 8FCB	迋	CJK	1.1	162	8		wàng	38737		GHJKT	J1-613B						travel, go to; deceive; scare	OU	YUKU AZAMUKU
 8FCC	迌	CJK	1.1	162	7		tù	38746		GHT									
@@ -20498,7 +20487,6 @@ Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sour
 9FC4	鿄	CJK	5.2	75	10					JT	JARIB-754F								
 9FC5	鿅	CJK	5.2	113	17					J	JARIB-7621								
 9FC6	鿆	CJK	5.2	113	8					J	JARIB-757D								
-9FCC	鿌	CJK	6.1	85	12									6DBC	涼	Semantic*	cool, cold; disheartened	RYOU	SUZUSHII USUI MAKOTONI
 9FEE	鿮	CJK	11.0	53	13					J	JMJ-057449								
 9FEF	鿯	CJK	11.0	119	16					J	JMJ-060040								
 F900	豈	CJK_Compat_Ideographs	1.1	151	10					K				8C48	豈	Compatibility*	how? what?	KI GAI KAI	ANI
@@ -21017,7 +21005,6 @@ FA6D	舘	CJK_Compat_Ideographs	5.2	30	16					J	JARIB-762B			8218	舘	Compatibili
 24E37	𤸷	CJK_Ext_B	3.1	104	15		qún			GJT	J4-7161								
 24E6A	𤹪	CJK_Ext_B	3.1	104	16		yǔ			GJTV	J4-7166								
 24E8B	𤺋	CJK_Ext_B	3.1	104	17					GJT	J4-7169								
-24FF2	𤿲	CJK_Ext_B	3.1	107	12					T				9EAC	麬	Traditional*		FU	FUSUMA
 2504A	𥁊	CJK_Ext_B	3.1	108	9					J	J4-7175								
 25055	𥁕	CJK_Ext_B	3.1	108	10		wēn			GJTV	J4-7177			6637	昷	Semantic*	to feed a prisoner	ON	MEGUMU
 25122	𥄢	CJK_Ext_B	3.1	109	9					J	J4-717A								
@@ -23727,48 +23714,3 @@ FA6D	舘	CJK_Compat_Ideographs	5.2	30	16					J	JARIB-762B			8218	舘	Compatibili
 2EBDE	𮯞	CJK_Ext_F	10.0	213	17					J	JMJ-059289								
 2EBDF	𮯟	CJK_Ext_F	10.0	213	16					J	JMJ-059287								
 2EBE0	𮯠	CJK_Ext_F	10.0	214	25					J	JMJ-060380								
-2F804	你	CJK_Compat_Ideographs_Sup	3.1	9	7					T				4F60	你	Compatibility*	you, second person pronoun	JI NI	NANJI
-2F80F	兔	CJK_Compat_Ideographs_Sup	3.1	10	8					T				5154	兔	Compatibility*	rabbit, hare	TO	USAGI
-2F815	再	CJK_Compat_Ideographs_Sup	3.1	13	6					T				518D	再	Compatibility*	again, twice, re-	SAI SA	FUTATABI
-2F818	冤	CJK_Compat_Ideographs_Sup	3.1	14	10					T				51A4	冤	Compatibility*	grievance, injustice, wrong	EN	KAGAMU NUREGINU
-2F81A	冬	CJK_Compat_Ideographs_Sup	3.1	15	5					T				51AC	冬	Compatibility*	winter, 11th lunar month	TOU	FUYU
-2F822	割	CJK_Compat_Ideographs_Sup	3.1	18	12					T				5272	割	Compatibility*	cut, divide, partition; cede	KATSU	WARU SAKU WARERU
-2F828	勺	CJK_Compat_Ideographs_Sup	3.1	20	3					T				52FA	勺	Compatibility*	spoon, ladle; unit of volume	SHAKU	SHAKU
-2F82C	卉	CJK_Compat_Ideographs_Sup	3.1	24	6					T				5349	卉	Compatibility*	general term for plants; myriads	KI	KUSA
-2F833	卿	CJK_Compat_Ideographs_Sup	3.1	26	12					T				537F	卿	Compatibility*	noble, high officer	KYOU KEI	KIMI
-2F83F	周	CJK_Compat_Ideographs_Sup	3.1	30	8					T				5468	周	Compatibility*	Zhou dynasty; circumference	SHUU	MAWARI AMANESHI MEGURU
-2F846	善	CJK_Compat_Ideographs_Sup	3.1	30	12					T				5584	善	Compatibility*	good, virtuous, charitable, kind	ZEN	YOI
-2F852	城	CJK_Compat_Ideographs_Sup	3.1	32	10					T				57CE	城	Compatibility*	castle; city, town; municipality	JOU	SHIRO KIZUKU
-2F862	姬	CJK_Compat_Ideographs_Sup	3.1	38	10					T				59EC	姬	Compatibility*	beauty; imperial concubine	KI	HIME
-2F86D	寃	CJK_Compat_Ideographs_Sup	3.1	40	11					T				5BC3	寃	Compatibility*	grievance, injustice, wrong	EN	KAGAMU NUREGINU
-2F873	将	CJK_Compat_Ideographs_Sup	3.1	41	10					T				5C06	将	Compatibility*	will, going to, future; general	SHOU SOU	HIKIIRU MOTTE HATA
-2F877	屠	CJK_Compat_Ideographs_Sup	3.1	44	12					T				5C60	屠	Compatibility*	butcher, slaughter, massacre	TO CHO	HOFURU
-2F884	巽	CJK_Compat_Ideographs_Sup	3.1	49	12					T				5DFD	巽	Compatibility*	5th of the 8 trigrams; south-east; mild, modest, obedient	SON	TATSUMI
-2F899	形	CJK_Compat_Ideographs_Sup	3.1	59	9					T				5F62	形	Compatibility*	form, shape, appearance	KEI GYOU	KATACHI KATA ARAWARERU
-2F89A	彫	CJK_Compat_Ideographs_Sup	3.1	59	11					T				5F6B	彫	Compatibility*	carve, decorate; emaciated	CHOU	HORU
-2F8A6	慈	CJK_Compat_Ideographs_Sup	3.1	61	13					HT				6148	慈	Compatibility*	kind, charitable, benevolent	JI	ITSUKUSHIMU ITSUKUSHIMI
-2F8AC	憲	CJK_Compat_Ideographs_Sup	3.1	61	16					T				61B2	憲	Compatibility*	constitution, statute, law	KEN	NORI
-2F8B2	成	CJK_Compat_Ideographs_Sup	3.1	62	7					T				6210	成	Compatibility*	completed, finished, fixed	SEI JOU	NARU TAIRAGERU NASU
-2F8B6	拔	CJK_Compat_Ideographs_Sup	3.1	64	8					T				62D4	拔	Compatibility*	uproot, pull out	BATSU HATSU HAI	NUKU NUKERU TASUKERU
-2F8D3	冕	CJK_Compat_Ideographs_Sup	3.1	13	11					T				5195	冕	Compatibility*	crown; ceremonial cap	BEN MEN	KANMURI
-2F8DB	杞	CJK_Compat_Ideographs_Sup	3.1	75	7					T				675E	杞	Compatibility*	willow; medlar tree; a small feudal state (Qi)	KO KI	SUKI FUGO MOKKO
-2F8DC	杓	CJK_Compat_Ideographs_Sup	3.1	75	7					T				6753	杓	Compatibility*	handle of cup, ladle, spoon; name of a constellation	HYOU TEKI SHAKU	HISHAKU
-2F8E1	桒	CJK_Compat_Ideographs_Sup	3.1	75	10					T				6852	桒	Compatibility*		SOU	KUWA
-2F8E5	栟	CJK_Compat_Ideographs_Sup	3.1	75	12					T				681F	栟	Compatibility*	hemp palm	HEI HYUU HIN	
-2F8EA	槪	CJK_Compat_Ideographs_Sup	3.1	75	15					T				69EA	槪	Compatibility*	generally	GAI KAI	TOKAKI OOMUNE OMOMUKI
-2F8ED	櫛	CJK_Compat_Ideographs_Sup	3.1	75	19					T				6ADB	櫛	Compatibility*	comb out; weed out, eliminate	SHITSU	KUSHI KUSHIKEZURU
-2F8FC	沿	CJK_Compat_Ideographs_Sup	3.1	85	8					T				6CBF	沿	Compatibility*	follow a course, go along	EN	SOU
-2F903	浩	CJK_Compat_Ideographs_Sup	3.1	85	10					T				6D69	浩	Compatibility*	great, numerous, vast, abundant	KOU	HIROI OOKII
-2F90B	滋	CJK_Compat_Ideographs_Sup	3.1	85	12					T				6ECB	滋	Compatibility*	grow, multiply, increase; thrive	JI SHI	SHIGERU MASU MASUMASU
-2F90F	潮	CJK_Compat_Ideographs_Sup	3.1	85	15					T				6F6E	潮	Compatibility*	tide; moist, wet, damp; flow	CHOU	SHIO USHIO
-2F91A	炭	CJK_Compat_Ideographs_Sup	3.1	86	9					T				70AD	炭	Compatibility*	charcoal; coal; carbon	TAN	SUMI
-2F920	爨	CJK_Compat_Ideographs_Sup	3.1	86	30					T				7228	爨	Compatibility*	oven, cooking stove; cook	SAN	KASHIGU KAMADO
-2F921	爵	CJK_Compat_Ideographs_Sup	3.1	87	18					T				7235	爵	Compatibility*	feudal title or rank	SHAKU	SAKAZUKI
-2F945	眞	CJK_Compat_Ideographs_Sup	3.1	109	10					T				771E	眞	Compatibility*	real, actual, true, genuine	SHIN	MA MAKOTO MAKOTONI
-2F947	真	CJK_Compat_Ideographs_Sup	3.1	109	10					T				771F	真	Compatibility*	real, actual, true, genuine	SHIN	MAKOTO MAKOTONI MA
-2F96C	絣	CJK_Compat_Ideographs_Sup	3.1	120	14					T				7D63	絣	Compatibility*	to baste for sewing; to connect	HOU	KASURI
-2F995	芽	CJK_Compat_Ideographs_Sup	3.1	140	7					T				82BD	芽	Compatibility*	bud, sprout, shoot	GA GE	ME MEGUMU
-2F9D0	諭	CJK_Compat_Ideographs_Sup	3.1	149	16					T				8AED	諭	Compatibility*	proclaim, instruct; edict	YU	SATOSU
-2F9DE	軔	CJK_Compat_Ideographs_Sup	3.1	159	10					T				8ED4	軔	Compatibility*	a block that keeps a wheel from moving	JIN NIN JI NI	HADOME
-2F9DF	輸	CJK_Compat_Ideographs_Sup	3.1	159	16					T				8F38	輸	Compatibility*	transport, carry, haul	YU SHU	OKURU ITASU
-2F9F4	嶲	CJK_Compat_Ideographs_Sup	3.1	46	15					T				5DB2	嶲	Compatibility*	a name of an old town in Sichuan; cuckoo; revolution of a wheel	KEI E KI SUI	MEGURI

@@ -90,7 +90,7 @@ void UcdData::load(const std::filesystem::path& file) {
                      linkTypeCol,  meaningCol,   onCol,        kunCol});
        f.nextRow();) {
     if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol) &&
-      f.isEmpty(jSourceCol))
+        f.isEmpty(jSourceCol))
       f.error("one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated");
     auto& name = f.get(nameCol);
     if (name.size() > 4) f.error("name greater than 4");

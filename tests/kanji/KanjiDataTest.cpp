@@ -102,7 +102,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, BasicChecks) {
-  EXPECT_EQ(_data->kanjiNameMap().size(), 23773);
+  EXPECT_EQ(_data->kanjiNameMap().size(), 23715);
   EXPECT_EQ(_data->getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data->getFrequency("蝦"), 2501);
   EXPECT_EQ(_data->getStrokes("廳"), 25);
@@ -338,8 +338,9 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
     if (isRareKanji(i.first)) {
       if (auto t = _data->getType(i.first); t != KanjiTypes::Ucd)
         FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);
+      // rare kanji have a jSource value (since that's how they got pulled in)
+      EXPECT_FALSE(i.second.jSource().empty());
       ++rareUcd;
-      if (i.second.jSource().empty()) ++rareMissingJSource[i.second.block()];
     } else if (!isCommonKanji(i.first))
       FAIL() << "kanji '" << i.first << "' not recognized";
     else if (i.second.jSource().empty()) {
@@ -351,14 +352,11 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
       EXPECT_NE(i.second.sources().find('J'), std::string::npos);
   }
-  EXPECT_EQ(rareUcd, 2579);
-  // all missing JSource for rare Kanji are in the 'Compat Sup' block
-  EXPECT_EQ(rareMissingJSource.size(), 1);
-  EXPECT_EQ(rareMissingJSource["CJK_Compat_Ideographs_Sup"], 45);
+  EXPECT_EQ(rareUcd, 2534);
   // missing JSource for common Kanji are either 'Kentei' or 'Ucd' type
   EXPECT_EQ(missingJSource.size(), 2);
   EXPECT_EQ(missingJSource[KanjiTypes::Kentei], 16);
-  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7485);
+  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7472);
 }
 
 TEST_F(KanjiDataTest, UcdLinks) {
@@ -414,7 +412,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 10);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 15);
   EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 232);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2896);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2838);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // part of 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 90);
   auto officialLinksToJinmei{0}, officialLinksToJouyou{0};

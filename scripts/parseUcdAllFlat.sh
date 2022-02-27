@@ -3,8 +3,8 @@
 declare -r program="parseUcdAllFlat.sh"
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
-# have a Japanese reading (On or Kun) or Morohashi ID and prints a tab-separated
-# line with the following 20 values:
+# have a Japanese reading (On or Kun), Morohashi ID or a non-empty JSource and
+# prints a tab-separated line with the following 20 values:
 # - Code: Unicode code point (4 or 5 digit hex code)
 # - Name: character in UTF-8
 # - Block: name of the Unicode block (from the 'blk' tag)
@@ -113,12 +113,11 @@ EOF
 declare -r onKunRegex='kJapanese[OK].*n="[^"]'
 
 # 'printResults' loop uses 'onKunRegex' as well as the following regexes:
-declare -r adobeRegex='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
 declare -r jSourceRegex='kIRG_JSource="[^"]'    # has a JSource
 declare -r morohashiRegex='kMorohashi="[^"]'    # has a Morohashi ID
 declare -r nelsonRegex='kNelson="[^"]'          # has a Nelson ID
 
-outFilter="$onKunRegex|$adobeRegex|$jSourceRegex|$morohashiRegex|$nelsonRegex"
+outFilter="$onKunRegex|$jSourceRegex|$morohashiRegex|$nelsonRegex"
 
 # populate 'on', 'kun', 'definition', 'jSource' and 'morohashi' arrays. Arrays
 # need to be populated before 'printResults' to handle links to entries later in
@@ -608,27 +607,24 @@ $((totalReading - directReading - linkedReading)))"
 #
 # Filtering on kIRG_JSource being populated cuts the set to 16,226 entries (IRG
 # = 'Ideographic Research Group') and 12,275 of these have at least one Japanese
-# reading (On/Kun) or a value in kJoyoKanji. However, kRSAdobe_Japan1_6 gets
-# almost the same sized set (12,274, but has a few hundred different entries).
-# The advantage of using Adobe is its value contains more accurate stroke count
-# information. The kTotalStrokes field doesn't always work well for Japanese
-# common characters, i.e., there are over 300 differences in just the 3000 or so
+# reading (On/Kun) or a value in kJoyoKanji. The kTotalStrokes field doesn't
+# always work well for Japanese common characters so the kRSAdobe_Japan1_6 field
+# is also used, i.e., there are over 300 differences in just the 3000 or so
 # standard Jōyō + Jinmei. Examples: 4EE5 (以) and 4F3C (似) have kTotalStrokes
 # of 4 and 6 respectively, but in Japanese they should be 5 and 7.
 #
-# In addition to Adobe, also pull in kanji that have a Morohashi ID to help get
-# compatibility/variants of kanji that have on/kun readings. Note, 'kMorohashi'
-# has 18,168 entries (12,965 with On/Kun) which is more than Adobe so it pulls
-# in a few hundred more entries (including some Kentei Kanji).
-# Some counts as of Unicode 13.0:
+# In addition to on/kun and non-empty JSource, also pull in kanji that have a
+# Morohashi ID to get a better set for 'lookup by Morohashi ID' functionality.
+# Note, 'kMorohashi' has 18,168 entries (12,965 with On/Kun) and it covers a
+# similar set of characters as 'kRSAdobe...'. Some counts as of Unicode 13.0:
 # - has both Adobe and Morohashi: 12,447
 # - has Morohashi, but not Adobe: 5,721
 # - has Adobe, but not Morohashi: 1,010
 #
-# Morohashi: Unicode 14.0 has 17,830 unique values in the 'kMorohashi'. This
-# This property has one or more index numbers into 'Dai Kan-Wa Jiten' (a massive
-# Chinese-Japanese dictionary compiled by Tetsuji Morohashi). There are plans to
-# cleanup/expand this property to cover ~50K entries by Unicode 16.0.
+# Morohashi: Unicode 14.0 has 17,830 unique 'kMorohashi' valuse. This property
+# has one or more index numbers into 'Dai Kan-Wa Jiten' (a huge Chinese-Japanese
+# dictionary compiled by Tetsuji Morohashi). There are plans to cleanup/expand
+# this property to cover ~50K entries by Unicode 16.0.
 #
 # Nelson: Unicode 14.0 has 5,442 unique ids in 'kNelson'. This property has one
 # or more ids from the 'Classic Nelson' Japanese-English Character Dictionary.

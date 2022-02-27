@@ -198,7 +198,7 @@ TEST_F(StatsTest, NonUcdKanji) {
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
-  writeTestFile("ああア西西東南南南巽沿㐁");
+  writeTestFile("ああア西西東南南南巽𫞉㐁");
   const char* testArgs[] = {"", "testDir", "-b"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[] = {
@@ -214,10 +214,10 @@ TEST_F(StatsTest, ShowBreakdown) {
     "  2     [西    2]  259, N5, Jouyou",
     "  3     [東    1]   37, N5, Jouyou",
     "  4     [巽    1] 2061, N1, Jinmei",
-    ">>>       Rare Kanji:      1, unique:    1           (沿 1)",
+    ">>>       Rare Kanji:      1, unique:    1           (𫞉 1)",
     ">>> Showing Breakdown for 'Rare Kanji':",
     "  Rank  [Val Num] Freq, LV, Type",
-    "  1     [沿    1]    0, --, Ucd",
+    "  1     [𫞉    1]    0, --, Ucd",
     ">>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)",
     ">>> Showing Breakdown for 'Non-UCD Kanji':",
     "  Rank  [Val Num], Unicode, Highest Count File",
