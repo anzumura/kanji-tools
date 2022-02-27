@@ -1,25 +1,29 @@
 cmake_minimum_required(VERSION 3.14..3.22)
 project(kanji_tools VERSION 1.0
-                    DESCRIPTION "Tools for working with Japanesse Kana and Kanji"
+                    DESCRIPTION "Tools for Japanesse Kana and Kanji"
                     LANGUAGES CXX)
 
 ### Require out-of-source builds
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
-  message(FATAL_ERROR "You cannot build in a source directory (or any directory with a CMakeLists.txt file).")
+  message(FATAL_ERROR "can't build in a source directory")
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # enable some warnings and turn them into errors (skip -Wdeprecated if using boost)
-    set(WARN_FLAGS "-Werror -Wall -Wextra -Wunused -Wdeprecated -Wunreachable-code-aggressive")
+    # enable some warnings and turn them into errors (-W is the same as -Wextra)
+    set(WARN_FLAGS "-Werror -W -Wall -Wunused -Wunreachable-code-aggressive")
+    # skip -Wdeprecated if using boost
+    set(WARN_FLAGS "${WARN_FLAGS} -Wdeprecated")
     # disable a warning (add -Wno-unused-variable if using boost)
     set(WARN_FLAGS "${WARN_FLAGS} -Wno-logical-op-parentheses")
-    set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 -fno-optimize-sibling-calls")
-    # need to set env for after stack reporting: ASAN_OPTIONS=detect_stack_use_after_return=1
+    set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 \
+-fno-optimize-sibling-calls")
+    # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
     # set(SANITIZER_STACK_FLAGS "-fsanitize-address-use-after-scope")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS} ${SANITIZER_STACK_FLAGS} ${WARN_FLAGS}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS} \
+${SANITIZER_STACK_FLAGS} ${WARN_FLAGS}")
   endif()
   # Use the following to override the linker
   # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
@@ -36,7 +40,7 @@ FetchContent_MakeAvailable(googletest)
 
 ### ICU
 # icu build guide: https://unicode-org.github.io/icu/userguide/icu4c/build.html
-# icu download: https://github.com/unicode-org/icu/releases - get 'Source code (tar.gz)'
+# icu download: https://github.com/unicode-org/icu/releases - get tar.gz
 #   tar -xzf Downloads/icu-release-70-1.tar
 #   cd icu-release-70-1/icu4c/source
 #   ./runConfigureICU MacOSX --prefix=/opt/icu
@@ -71,7 +75,8 @@ add_subdirectory(src/stats) # source files for 'stats' lib (depends on 'kanji')
 add_subdirectory(src/utils) # source files for 'utils' lib
 add_subdirectory(apps)
 
-if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND BUILD_TESTING)
+if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
+  AND BUILD_TESTING)
   add_subdirectory(tests/kana)
   add_subdirectory(tests/kanji)
   add_subdirectory(tests/quiz)
