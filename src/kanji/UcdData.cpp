@@ -89,8 +89,9 @@ void UcdData::load(const std::filesystem::path& file) {
                      joyoCol,      jinmeiCol,    linkCodesCol, linkNamesCol,
                      linkTypeCol,  meaningCol,   onCol,        kunCol});
        f.nextRow();) {
-    if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol))
-      f.error("one of 'On', 'Kun' or 'Morohashi' must be populated");
+    if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol) &&
+      f.isEmpty(jSourceCol))
+      f.error("one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated");
     auto& name = f.get(nameCol);
     if (name.size() > 4) f.error("name greater than 4");
     if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
@@ -98,8 +99,8 @@ void UcdData::load(const std::filesystem::path& file) {
     const auto radical = f.getInt(radicalCol), strokes = f.getInt(strokesCol),
                vStrokes = f.isEmpty(vStrokesCol) ? 0 : f.getInt(vStrokesCol);
     if (radical < 1 || radical > 214) f.error("radical out of range");
-    // 9F98 (龘) has 48 strokes
-    if (strokes < 1 || strokes > 48) f.error("strokes out of range");
+    // 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
+    if (strokes < 1 || strokes > 53) f.error("strokes out of range");
     if (vStrokes < 0 || vStrokes == 1 || vStrokes > 33)
       f.error("variant strokes out of range");
 

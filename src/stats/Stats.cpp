@@ -286,10 +286,10 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown,
                  [=] { return p->run(pred, verbose, firstCount); }),
       p);
   };
-  // Only 45 Kanji loaded into this program fall into the 'Rare' blocks (and
-  // they are all type 'Ucd' in the 'CJK_Compat_Ideographs_Sup' block). All
-  // other types (like Jouyou, Jinmei, etc.) are in the 'Common' blocks (see
-  // comments in UnicodeBlock.h and KanjiDataTest.cpp 'CommonAndRareBlocks').
+  // 2579 Kanji are loaded into this program fall into the 'Rare' blocks (and
+  // they are all type 'Ucd'). All other types (like Jouyou, Jinmei, etc.) are
+  // in the 'Common' blocks (see comments in UnicodeBlock.h and
+  // KanjiDataTest.cpp 'CommonAndRareBlocks').
   std::array totals{
     f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
     f([](const auto& x) { return isKatakana(x); }, "Katakana"),

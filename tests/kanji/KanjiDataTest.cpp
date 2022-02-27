@@ -102,7 +102,7 @@ protected:
 };
 
 TEST_F(KanjiDataTest, BasicChecks) {
-  EXPECT_EQ(_data->kanjiNameMap().size(), 20507);
+  EXPECT_EQ(_data->kanjiNameMap().size(), 23773);
   EXPECT_EQ(_data->getLevel("院"), JlptLevels::N4);
   EXPECT_EQ(_data->getFrequency("蝦"), 2501);
   EXPECT_EQ(_data->getStrokes("廳"), 25);
@@ -332,14 +332,14 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
   // Jinmei Frequency, Kentei, etc.) should be in the 'common' bloacks.
   auto rareUcd = 0;
+  std::map<std::string, int> rareMissingJSource;
   std::map<KanjiTypes, int> missingJSource;
   for (auto& i : _data->ucd().map()) {
     if (isRareKanji(i.first)) {
-      // no rare kanji have a jSource value
-      EXPECT_TRUE(i.second.jSource().empty());
       if (auto t = _data->getType(i.first); t != KanjiTypes::Ucd)
         FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);
       ++rareUcd;
+      if (i.second.jSource().empty()) ++rareMissingJSource[i.second.block()];
     } else if (!isCommonKanji(i.first))
       FAIL() << "kanji '" << i.first << "' not recognized";
     else if (i.second.jSource().empty()) {
@@ -351,7 +351,11 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
       EXPECT_NE(i.second.sources().find('J'), std::string::npos);
   }
-  EXPECT_EQ(rareUcd, 45);
+  EXPECT_EQ(rareUcd, 2579);
+  // all missing JSource for rare Kanji are in the 'Compat Sup' block
+  EXPECT_EQ(rareMissingJSource.size(), 1);
+  EXPECT_EQ(rareMissingJSource["CJK_Compat_Ideographs_Sup"], 45);
+  // missing JSource for common Kanji are either 'Kentei' or 'Ucd' type
   EXPECT_EQ(missingJSource.size(), 2);
   EXPECT_EQ(missingJSource[KanjiTypes::Kentei], 16);
   EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7485);
@@ -407,12 +411,12 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(jouyou, _data->jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data->jinmeiKanji().size());
   EXPECT_EQ(jinmeiLinks, _data->linkedJinmeiKanji().size());
-  EXPECT_EQ(otherLinks[KanjiTypes::Extra], 9);
+  EXPECT_EQ(otherLinks[KanjiTypes::Extra], 10);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 15);
-  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 224);
-  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2877);
+  EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 232);
+  EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2896);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // part of 'jinmeiLinks'
-  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 89);
+  EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 90);
   auto officialLinksToJinmei{0}, officialLinksToJouyou{0};
   for (auto& i : _data->linkedJinmeiKanji()) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();

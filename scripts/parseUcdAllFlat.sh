@@ -74,7 +74,7 @@ function setOnKun() {
 }
 
 # global arrays to help support links for variant and compat kanjis
-declare -A morohashi definition on kun linkBack noLink readingLink
+declare -A morohashi jSource definition on kun linkBack noLink readingLink
 
 # there are 18 Jinmeiyō Kanji that link to other Jinmei, but unfortunately UCD
 # data seems to have some mistakes (where the link points from the standard to
@@ -113,15 +113,16 @@ EOF
 declare -r onKunRegex='kJapanese[OK].*n="[^"]'
 
 # 'printResults' loop uses 'onKunRegex' as well as the following regexes:
+declare -r adobeRegex='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
+declare -r jSourceRegex='kIRG_JSource="[^"]'    # has a JSource
 declare -r morohashiRegex='kMorohashi="[^"]'    # has a Morohashi ID
 declare -r nelsonRegex='kNelson="[^"]'          # has a Nelson ID
-declare -r adobeRegex='kRSAdobe_Japan1_6="[^"]' # has an Adobe ID
 
-printResulsFilter="$onKunRegex|$morohashiRegex|$nelsonRegex|$adobeRegex"
+outFilter="$onKunRegex|$adobeRegex|$jSourceRegex|$morohashiRegex|$nelsonRegex"
 
-# 'populateArrays': populates 'on', 'kun', 'definition' and 'morohashi' arrays.
-# Arrays need to be populated before 'printResults' to handle links to entries
-# later in the file like '5DE2 (巢)' which links to '5DE3 (巣)'.
+# populate 'on', 'kun', 'definition', 'jSource' and 'morohashi' arrays. Arrays
+# need to be populated before 'printResults' to handle links to entries later in
+# the file like '5DE2 (巢)' which links to '5DE3 (巣)'.
 function populateArrays() {
   log 'Populate arrays ... ' -n
   local -i count=0
@@ -136,6 +137,7 @@ function populateArrays() {
       # again before setting global array.
       [[ -n $kMorohashi ]] && morohashi[$cp]=$kMorohashi
     fi
+    [[ -n $kIRG_JSource ]] && jSource[$cp]=$kIRG_JSource
     if [[ -n $kJoyoKanji ]]; then
       # There are 4 entries with a Joyo link: 5265, 53F1, 586B and 982C. Store
       # definition/on/kun since since they are missing for some linked Jinmeiyo
@@ -154,16 +156,16 @@ function populateArrays() {
         count+=1
       done
     fi
-  done < <(grep -E "($onKunRegex|$morohashiRegex)" $ucdFile)
-  echo "set $count reading and ${#morohashi[@]} morohashi"
+  done < <(grep -E "($onKunRegex|$jSourceRegex|$morohashiRegex)" $ucdFile)
+  echo "Reading $count, Morohashi ${#morohashi[@]}, JSource ${#jSource[@]}"
 }
 
 function hasReading() {
   [[ -n ${on[$1]}${kun[$1]} ]]
 }
 
-function hasMorohashi() {
-  [[ -n ${morohashi[$1]} ]]
+function hasJapanID() {
+  [[ -n ${morohashi[$1]} ]] || [[ -n ${jSource[$1]} ]]
 }
 
 # 'canLoadFrom': has exit status of 0 (true) if '$1' in refers to a kanji with
@@ -276,7 +278,7 @@ function findDefinitionLinks() {
   local -r types="variant interchangeable same non-classical Variant standard \
 simplified ancient"
   local link s='kDefinition="[^"]*('${types// /|}')[ ,]'
-  printResulsFilter+="|$s"
+  outFilter+="|$s"
   # Use 'outFile' to temporarily hold the ~2K records that might have definition
   # links to speed up processing (instead of 'ucdFile' which has >150K records).
   # This reduces the time to run 3 passes on 8 types from ~120 secs to ~12 secs.
@@ -385,8 +387,8 @@ function getTraditionalLinks() {
 
 # 'getLinks': sets 'linkTo' to one on more values and sets 'linkType' if the
 # links point to a value that satisfies the function passed in $1 ('canLoadFrom'
-# or 'hasMorohashi'). This function can only be used after 'setVars' and
-# it also looks at 'resultOn' and 'resultKun'.
+# or 'hasJapanID'). This function can only be used after 'setVars' and it also
+# looks at 'resultOn' and 'resultKun'.
 function getLinks() {
   local s
   # For non-Jouyou/non-Jinmei kanji, try to find meaningful links based on
@@ -424,8 +426,8 @@ function getLinks() {
       fi
     fi
   elif [[ $1 == canLoadFrom ]]; then
-    # allow adding morohashi traditional links if reading ones are found
-    getTraditionalLinks hasMorohashi
+    # allow traditional links to kanji with a 'JapanID' if reading ones exist
+    getTraditionalLinks hasJapanID
   fi
   if [[ -z $linkType ]]; then
     linkTo=
@@ -455,7 +457,10 @@ function countLinkType() {
 declare -A uniqueMorohashi uniqueNelson
 
 function processRecord() {
-  local -r localMorohashi=${morohashi[$cp]}
+  # morohashi IDs stored in 'morohashi' can be different than kMorohashi due to
+  # some processing (like removing zeroes). JSource values are not modified but
+  # also look them up to be consistent.
+  local -r localMorohashi=${morohashi[$cp]} localJSource=${jSource[$cp]}
   local localDefinition=${definition[$cp]} loadFrom
   setOnKun "${on[$cp]}" "${kun[$cp]}"
   # 'linkTo' and 'linkType' can be modified by 'getLinks' function
@@ -473,7 +478,7 @@ function processRecord() {
     fi
     [[ -z $linkTo ]] && totalJinmei+=1 || linkType=Jinmei
   else
-    getLinks canLoadFrom && loadFrom=${linkTo%%,*} || getLinks hasMorohashi
+    getLinks canLoadFrom && loadFrom=${linkTo%%,*} || getLinks hasJapanID
   fi
   if [[ -n $resultOn$resultKun ]]; then
     directReading+=1
@@ -506,12 +511,12 @@ function processRecord() {
     7B53) setOnKun KEI 'KOUGAI KANZASHI' ;;          # 筓
     7CF1) setOnKun GETSU 'KOUJI MOYASHI' ;;          # 糱
     83C6) setOnKun SHU ;;                            # 菆 (Nelson 3961)
-    # if there are no readings and no Morohashi ID then skip this record
-    *) [[ -n $localMorohashi ]] || return 1 ;;
+    # if no readings (and no Morohashi ID or JSource) then skip this record
+    *) [[ -n $localMorohashi$localJSource ]] || return 1 ;;
     esac
   fi
   vstrokes=0
-  if [[ -z ${kRSAdobe_Japan1_6} ]]; then
+  if [[ -z $kRSAdobe_Japan1_6 ]]; then
     kTotalStrokes=${kTotalStrokes%% *}
     strokes=$kTotalStrokes
   else
@@ -541,7 +546,7 @@ function processRecord() {
   countLinkType
   # don't print 'vstrokes' if it's 0
   echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
-$kMandarin\t$localMorohashi\t${kNelson// /,}\t$sources\t$kIRG_JSource\t\
+$kMandarin\t$localMorohashi\t${kNelson// /,}\t$sources\t$localJSource\t\
 ${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\
 \t$linkType\t$localDefinition\t$resultOn\t$resultKun" >>$outFile
 }
@@ -560,7 +565,7 @@ LinkType\tMeaning\tOn\tKun" >$outFile
       kSemanticVariant kRSAdobe_Japan1_6 kMandarin kNelson &&
       processRecord "$s" && count+=1
     # kIRG_xSource fields are also included in all Unihan records ("" if empty)
-  done < <(grep -E "($printResulsFilter)" $ucdFile)
+  done < <(grep -E "($outFilter)" $ucdFile)
   echo "wrote $count"
 }
 
