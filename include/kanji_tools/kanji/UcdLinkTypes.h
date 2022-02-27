@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_UCD_LINK_TYPES_H
-#define KANJI_TOOLS_KANJI_UCD_LINK_TYPES_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 
@@ -22,5 +21,3 @@ inline const auto AllUcdLinkTypes =
                                       "Semantic", "Simplified", "Traditional");
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_UCD_LINK_TYPES_H

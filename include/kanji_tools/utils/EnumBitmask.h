@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_ENUM_BITMASK_H
-#define KANJI_TOOLS_UTILS_ENUM_BITMASK_H
+#pragma once
 
 #include <kanji_tools/utils/EnumTraits.h>
 
@@ -69,5 +68,3 @@ template<typename T> [[nodiscard]] isBitmask<T, bool> operator!(T x) noexcept {
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_ENUM_BITMASK_H

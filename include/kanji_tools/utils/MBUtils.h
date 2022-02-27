@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_MBUTILS_H
-#define KANJI_TOOLS_UTILS_MBUTILS_H
+#pragma once
 
 #include <string>
 
@@ -230,5 +229,3 @@ enum BitPatterns : unsigned char {
 inline constexpr char32_t MaxUnicode = 0x10ffff;
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_MBUTILS_H

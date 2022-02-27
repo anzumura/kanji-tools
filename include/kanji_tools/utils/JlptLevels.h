@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_JLPT_LEVELS_H
-#define KANJI_TOOLS_UTILS_JLPT_LEVELS_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 
@@ -12,5 +11,3 @@ inline const auto AllJlptLevels =
   BaseEnumArray<JlptLevels>::create("N5", "N4", "N3", "N2", "N1");
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_JLPT_LEVELS_H

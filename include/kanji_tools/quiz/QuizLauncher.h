@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_QUIZ_QUIZ_LAUNCHER_H
-#define KANJI_TOOLS_QUIZ_QUIZ_LAUNCHER_H
+#pragma once
 
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/quiz/JukugoData.h>
@@ -97,5 +96,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_QUIZ_QUIZ_LAUNCHER_H

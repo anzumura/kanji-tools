@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_DISPLAY_SIZE_H
-#define KANJI_TOOLS_UTILS_DISPLAY_SIZE_H
+#pragma once
 
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -91,5 +90,3 @@ inline constexpr std::array WideBlocks = {
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_DISPLAY_SIZE_H

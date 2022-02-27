@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANA_KANA_H
-#define KANJI_TOOLS_KANA_KANA_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 #include <kanji_tools/utils/EnumBitmask.h>
@@ -341,5 +340,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANA_KANA_H

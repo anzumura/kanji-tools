@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_ENUM_ARRAY_H
-#define KANJI_TOOLS_UTILS_ENUM_ARRAY_H
+#pragma once
 
 #include <kanji_tools/utils/EnumTraits.h>
 
@@ -319,5 +318,3 @@ template<typename T>
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_ENUM_ARRAY_H

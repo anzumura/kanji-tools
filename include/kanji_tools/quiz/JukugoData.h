@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_QUIZ_JUKUGO_DATA_H
-#define KANJI_TOOLS_QUIZ_JUKUGO_DATA_H
+#pragma once
 
 #include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/quiz/Jukugo.h>
@@ -36,5 +35,3 @@ private:
 using JukugoDataPtr = std::shared_ptr<const JukugoData>;
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_QUIZ_JUKUGO_DATA_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_QUIZ_JUKUGO_H
-#define KANJI_TOOLS_QUIZ_JUKUGO_H
+#pragma once
 
 #include <kanji_tools/kanji/KanjiGrades.h>
 
@@ -26,5 +25,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_QUIZ_JUKUGO_H

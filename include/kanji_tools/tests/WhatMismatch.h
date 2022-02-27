@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_TESTS_WHAT_MISMATCH_H
-#define KANJI_TOOLS_TESTS_WHAT_MISMATCH_H
+#pragma once
 
 #include <string>
 
@@ -30,5 +29,3 @@ template<typename F> auto call(const F& f, const std::string& expectedWhat) {
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_TESTS_WHAT_MISMATCH_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_JINMEI_KANJI_REASONS_H
-#define KANJI_TOOLS_KANJI_JINMEI_KANJI_REASONS_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 
@@ -19,5 +18,3 @@ inline const auto AllJinmeiKanjiReasons =
                                             "Moved", "Simple", "Other");
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_JINMEI_KANJI_REASONS_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_STATS_STATS_H
-#define KANJI_TOOLS_STATS_STATS_H
+#pragma once
 
 #include <kanji_tools/kanji/Data.h>
 
@@ -31,5 +30,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_STATS_STATS_H

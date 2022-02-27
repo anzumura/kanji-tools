@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_QUIZ_GROUP_H
-#define KANJI_TOOLS_QUIZ_GROUP_H
+#pragma once
 
 #include <kanji_tools/kanji/Data.h>
 
@@ -96,5 +95,3 @@ inline auto& operator<<(std::ostream& os, const Group& x) {
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_QUIZ_GROUP_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_KANJI_TYPES_H
-#define KANJI_TOOLS_KANJI_KANJI_TYPES_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 
@@ -35,5 +34,3 @@ inline const auto AllKanjiTypes = BaseEnumArray<KanjiTypes>::create(
   "Kentei", "Ucd");
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_KANJI_TYPES_H

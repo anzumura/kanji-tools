@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_DATA_H
-#define KANJI_TOOLS_KANJI_DATA_H
+#pragma once
 
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/RadicalData.h>
@@ -327,5 +326,3 @@ private:
 using DataPtr = std::shared_ptr<const Data>;
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_DATA_H

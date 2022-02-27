@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_ENUM_TRAITS_H
-#define KANJI_TOOLS_UTILS_ENUM_TRAITS_H
+#pragma once
 
 #include <type_traits>
 
@@ -25,5 +24,3 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_ENUM_TRAITS_H

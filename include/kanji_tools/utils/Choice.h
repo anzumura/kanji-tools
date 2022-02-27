@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_CHOICE_H
-#define KANJI_TOOLS_UTILS_CHOICE_H
+#pragma once
 
 #include <iostream>
 #include <map>
@@ -101,5 +100,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_CHOICE_H

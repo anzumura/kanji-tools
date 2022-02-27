@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_TABLE_H
-#define KANJI_TOOLS_UTILS_TABLE_H
+#pragma once
 
 #include <iostream>
 #include <set>
@@ -66,5 +65,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_TABLE_H

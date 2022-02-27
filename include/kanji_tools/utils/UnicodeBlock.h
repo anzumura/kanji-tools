@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_UNICODE_BLOCK_H
-#define KANJI_TOOLS_UTILS_UNICODE_BLOCK_H
+#pragma once
 
 #include <kanji_tools/utils/MBUtils.h>
 
@@ -362,5 +361,3 @@ inline constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
 inline constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_UNICODE_BLOCK_H

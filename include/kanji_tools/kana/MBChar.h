@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANA_MBCHAR_H
-#define KANJI_TOOLS_KANA_MBCHAR_H
+#pragma once
 
 #include <kanji_tools/utils/MBUtils.h>
 
@@ -185,5 +184,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANA_MBCHAR_H

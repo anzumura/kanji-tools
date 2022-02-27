@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_KANJI_H
-#define KANJI_TOOLS_KANJI_KANJI_H
+#pragma once
 
 #include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/kanji/KanjiTypes.h>
@@ -212,5 +211,3 @@ inline auto& operator<<(std::ostream& os, const Kanji& k) {
 }
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_KANJI_H

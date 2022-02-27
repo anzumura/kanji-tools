@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_KANJI_GRADES_H
-#define KANJI_TOOLS_KANJI_KANJI_GRADES_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 
@@ -14,5 +13,3 @@ inline const auto AllKanjiGrades =
   BaseEnumArray<KanjiGrades>::create("G1", "G2", "G3", "G4", "G5", "G6", "S");
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_KANJI_GRADES_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANJI_RADICAL_DATA_H
-#define KANJI_TOOLS_KANJI_RADICAL_DATA_H
+#pragma once
 
 #include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Radical.h>
@@ -59,5 +58,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANJI_RADICAL_DATA_H

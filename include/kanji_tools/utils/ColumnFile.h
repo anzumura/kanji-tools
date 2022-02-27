@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_COLUMN_FILE_H
-#define KANJI_TOOLS_UTILS_COLUMN_FILE_H
+#pragma once
 
 #include <filesystem>
 #include <fstream>
@@ -137,5 +136,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_COLUMN_FILE_H

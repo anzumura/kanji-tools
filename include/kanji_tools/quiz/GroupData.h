@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_QUIZ_GROUP_DATA_H
-#define KANJI_TOOLS_QUIZ_GROUP_DATA_H
+#pragma once
 
 #include <kanji_tools/quiz/Group.h>
 
@@ -73,5 +72,3 @@ private:
 using GroupDataPtr = std::shared_ptr<const GroupData>;
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_QUIZ_GROUP_DATA_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_KANA_KANA_CONVERT_H
-#define KANJI_TOOLS_KANA_KANA_CONVERT_H
+#pragma once
 
 #include <kanji_tools/kana/Kana.h>
 
@@ -147,5 +146,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_KANA_KANA_CONVERT_H

@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_QUIZ_QUIZ_H
-#define KANJI_TOOLS_QUIZ_QUIZ_H
+#pragma once
 
 #include <kanji_tools/quiz/QuizLauncher.h>
 
@@ -73,5 +72,3 @@ private:
 };
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_QUIZ_QUIZ_H

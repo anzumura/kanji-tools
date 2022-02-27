@@ -1,5 +1,4 @@
-#ifndef KANJI_TOOLS_UTILS_KENTEI_KYUS_H
-#define KANJI_TOOLS_UTILS_KENTEI_KYUS_H
+#pragma once
 
 #include <kanji_tools/utils/EnumArray.h>
 
@@ -26,5 +25,3 @@ inline const auto AllKenteiKyus = BaseEnumArray<KenteiKyus>::create(
   "K10", "K9", "K8", "K7", "K6", "K5", "K4", "K3", "KJ2", "K2", "KJ1", "K1");
 
 } // namespace kanji_tools
-
-#endif // KANJI_TOOLS_UTILS_KENTEI_KYUS_H
