@@ -335,22 +335,26 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   std::map<std::string, int> rareMissingJSource;
   std::map<KanjiTypes, int> missingJSource;
   for (auto& i : _data->ucd().map()) {
+    auto& u = i.second;
+    // at least one of 'on', 'kun', 'jSource' or 'morohashiId' must have a value
+    EXPECT_FALSE(u.onReading().empty() && u.kunReading().empty() &&
+                 u.jSource().empty() && u.morohashiId().empty());
     if (isRareKanji(i.first)) {
       if (auto t = _data->getType(i.first); t != KanjiTypes::Ucd)
         FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);
       // rare kanji have a jSource value (since that's how they got pulled in)
-      EXPECT_FALSE(i.second.jSource().empty());
+      EXPECT_FALSE(u.jSource().empty());
       ++rareUcd;
     } else if (!isCommonKanji(i.first))
       FAIL() << "kanji '" << i.first << "' not recognized";
-    else if (i.second.jSource().empty()) {
+    else if (u.jSource().empty()) {
       if (auto t = _data->getType(i.first); t == KanjiTypes::LinkedOld)
         EXPECT_EQ(i.first, "絕"); // old form of 絶 doesn't have a jSource
       else
         ++missingJSource[t]; // other with empty jSource should be Kentei or Ucd
     } else
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
-      EXPECT_NE(i.second.sources().find('J'), std::string::npos);
+      EXPECT_NE(u.sources().find('J'), std::string::npos);
   }
   EXPECT_EQ(rareUcd, 2534);
   // missing JSource for common Kanji are either 'Kentei' or 'Ucd' type
@@ -367,44 +371,44 @@ TEST_F(KanjiDataTest, UcdLinks) {
   std::map<KanjiTypes, int> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
-    auto& k = i.second;
+    auto& u = i.second;
     // every Ucd entry should be a wide character, i.e., have 'display size' 2
-    EXPECT_EQ(displaySize(k.name()), 2);
+    EXPECT_EQ(displaySize(u.name()), 2);
     // if 'variantStrokes' is present it should be different than 'strokes'
-    if (k.hasVariantStrokes())
-      EXPECT_NE(k.strokes(), k.variantStrokes()) << k.codeAndName();
+    if (u.hasVariantStrokes())
+      EXPECT_NE(u.strokes(), u.variantStrokes()) << u.codeAndName();
     // make sure MBUtils UCD characters are part of MBUtils unicode blocks
-    if (k.joyo() || k.jinmei())
-      EXPECT_TRUE(isCommonKanji(k.name())) << k.codeAndName();
+    if (u.joyo() || u.jinmei())
+      EXPECT_TRUE(isCommonKanji(u.name())) << u.codeAndName();
     else
-      EXPECT_TRUE(isKanji(k.name())) << k.codeAndName();
+      EXPECT_TRUE(isKanji(u.name())) << u.codeAndName();
     // make sure links point to other valid UCD entries
-    for (auto& i : k.links()) {
-      EXPECT_NE(k.name(), i.name());
+    for (auto& i : u.links()) {
+      EXPECT_NE(u.name(), i.name());
       auto link = ucd.find(i.name());
       ASSERT_FALSE(link == ucd.end()) << i.name();
     }
-    if (k.joyo()) {
-      EXPECT_FALSE(k.jinmei()) << k.codeAndName() << " is both joyo and jinmei";
-      EXPECT_FALSE(k.hasLinks()) << k.codeAndName() << " joyo has a link";
+    if (u.joyo()) {
+      EXPECT_FALSE(u.jinmei()) << u.codeAndName() << " is both joyo and jinmei";
+      EXPECT_FALSE(u.hasLinks()) << u.codeAndName() << " joyo has a link";
       ++jouyou;
-    } else if (k.jinmei()) {
+    } else if (u.jinmei()) {
       ++jinmei;
-      if (k.hasLinks()) {
-        EXPECT_EQ(k.links().size(), 1) << k.name();
+      if (u.hasLinks()) {
+        EXPECT_EQ(u.links().size(), 1) << u.name();
         ++jinmeiLinks;
-        auto& link = ucd.find(k.links()[0].name())->second;
+        auto& link = ucd.find(u.links()[0].name())->second;
         if (link.joyo())
           ++jinmeiLinksToJouyou;
         else if (link.jinmei())
           ++jinmeiLinksToJinmei;
         else
-          FAIL() << "jinmei '" << k.name()
+          FAIL() << "jinmei '" << u.name()
                  << "' shouldn't have non-official link";
-        if (link.hasLinks()) EXPECT_NE(link.links()[0].name(), k.name());
+        if (link.hasLinks()) EXPECT_NE(link.links()[0].name(), u.name());
       }
-    } else if (k.hasLinks())
-      ++otherLinks[_data->getType(k.name())];
+    } else if (u.hasLinks())
+      ++otherLinks[_data->getType(u.name())];
   }
   EXPECT_EQ(jouyou, _data->jouyouKanji().size());
   EXPECT_EQ(jinmei - jinmeiLinks, _data->jinmeiKanji().size());
