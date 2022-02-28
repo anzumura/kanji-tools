@@ -117,9 +117,11 @@ declare -r jSourceRegex='kIRG_JSource="[^"]'    # has a JSource
 declare -r morohashiRegex='kMorohashi="[^"]'    # has a Morohashi ID
 declare -r nelsonRegex='kNelson="[^"]'          # has a Nelson ID
 
+# nelsonRegex only pulls in a few Kanji not included in the other regexes, but
+# add it to the filter to help make 'find by Nelson ID' as complete as possible.
 outFilter="$onKunRegex|$jSourceRegex|$morohashiRegex|$nelsonRegex"
 
-# populate 'on', 'kun', 'definition', 'jSource' and 'morohashi' arrays. Arrays
+# Populate 'on', 'kun', 'definition', 'jSource' and 'morohashi' arrays. Arrays
 # need to be populated before 'printResults' to handle links to entries later in
 # the file like '5DE2 (巢)' which links to '5DE3 (巣)'.
 function populateArrays() {
@@ -458,9 +460,9 @@ declare -A uniqueMorohashi uniqueNelson
 function processRecord() {
   # morohashi IDs stored in 'morohashi' can be different than kMorohashi due to
   # some processing (like removing zeroes). JSource values are not modified but
-  # also look them up to be consistent.
+  # also use the values stored in the array to be consistent.
   local -r localMorohashi=${morohashi[$cp]} localJSource=${jSource[$cp]}
-  local localDefinition=${definition[$cp]} loadFrom
+  local localDefinition=${definition[$cp]} loadFrom sources
   setOnKun "${on[$cp]}" "${kun[$cp]}"
   # 'linkTo' and 'linkType' can be modified by 'getLinks' function
   linkTo=
@@ -538,7 +540,6 @@ function processRecord() {
       [[ -z ${uniqueNelson[$s]} ]] && uniqueNelson[$s]=1
     done
   fi
-  sources=
   for s in G H J K T V; do
     eval [[ -n \$kIRG_${s}Source ]] && sources+=$s
   done
@@ -681,6 +682,25 @@ $((totalReading - directReading - linkedReading)))"
 #   - JH Hanyo-Denshi Program (汎用電子情報交換環境整備プログラム), 2002-2009
 #   - JK Japanese KOKUJI Collection
 #   - JMJ Moji Joho Kiban Project (文字情報基盤整備事業)
+# Here are counts by prefix of kIRG_JSource as of Unicode 14.0:
+#   J0: 6356
+#   J1: 3058
+#   J14: 1704
+#   JMJ: 1647
+#   J13: 1037
+#   JK: 782
+#   J4: 665
+#   JA: 575
+#   J3: 194
+#   JH: 107
+#   JA4: 67
+#   JA3: 18
+#   J3A: 8
+#   JARIB: 6
+#   J13A: 2
+# These counts can be obtained via a command like the following:
+# grep -o 'kIRG_JSource="[^"]*-' ~/ucd/14/ucd.all.flat.xml | sort | uniq -c |
+#   sort -rn | sed 's/ *\([^ ]*\)[^"]*"\([^-]*\).*/#   \2: \1/'
 #
 # Here are some other 'Japan' type properties that aren't used by this script:
 # - 'kJis0' has 6,356 (6,354 with On/Kun), but missed 4 Jōyō and 15 Jinmei.
