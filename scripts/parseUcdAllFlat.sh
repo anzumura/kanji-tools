@@ -113,9 +113,9 @@ EOF
 declare -r onKunRegex='kJapanese[OK].*n="[^"]'
 
 # 'printResults' loop uses 'onKunRegex' as well as the following regexes:
-declare -r jSourceRegex='kIRG_JSource="[^"]'    # has a JSource
-declare -r morohashiRegex='kMorohashi="[^"]'    # has a Morohashi ID
-declare -r nelsonRegex='kNelson="[^"]'          # has a Nelson ID
+declare -r jSourceRegex='kIRG_JSource="[^"]' # has a JSource
+declare -r morohashiRegex='kMorohashi="[^"]' # has a Morohashi ID
+declare -r nelsonRegex='kNelson="[^"]'       # has a Nelson ID
 
 # nelsonRegex only pulls in a few Kanji not included in the other regexes, but
 # add it to the filter to help make 'find by Nelson ID' as complete as possible.
@@ -451,7 +451,7 @@ function countLinkType() {
   Compatibility) compatibilityLinks+=1 ;;
   Definition) definitionLinks+=1 ;;
   Semantic) semanticLinks+=1 ;;
-  *) ;;
+  *) [[ -n $linkType ]] && echo "unexpected linkType: $linkType" && exit 1 ;;
   esac
 }
 
@@ -462,7 +462,7 @@ function processRecord() {
   # some processing (like removing zeroes). JSource values are not modified but
   # also use the values stored in the array to be consistent.
   local -r localMorohashi=${morohashi[$cp]} localJSource=${jSource[$cp]}
-  local localDefinition=${definition[$cp]} loadFrom sources
+  local localDefinition=${definition[$cp]} loadFrom sources s
   setOnKun "${on[$cp]}" "${kun[$cp]}"
   # 'linkTo' and 'linkType' can be modified by 'getLinks' function
   linkTo=
@@ -533,7 +533,6 @@ function processRecord() {
   [[ -n $localMorohashi && -z ${uniqueMorohashi[$localMorohashi]} ]] &&
     uniqueMorohashi[$localMorohashi]=1
   if [[ -n $kNelson ]]; then
-    local s
     # remove leading 0's from all Nelson ids in the list
     kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
     for s in $kNelson; do
