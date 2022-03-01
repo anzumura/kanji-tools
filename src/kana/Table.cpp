@@ -1,5 +1,5 @@
+#include <kanji_tools/kana/Table.h>
 #include <kanji_tools/utils/DisplaySize.h>
-#include <kanji_tools/utils/Table.h>
 
 #include <iomanip>
 
@@ -18,14 +18,14 @@ void Table::add(const Row& row, bool startNewSection) {
 void Table::print(std::ostream& os) const {
   Widths widths;
   for (auto& i : _title) widths.push_back(displaySize(i));
-  for (auto& row : _rows) {
-    for (size_t colNum = 0; colNum < row.size(); ++colNum) {
-      if (colNum < widths.size())
-        widths[colNum] = std::max(widths[colNum], displaySize(row[colNum]));
-      else
-        widths.push_back(displaySize(row[colNum]));
+  for (auto& row : _rows)
+    for (size_t i = 0; auto& col : row) {
+      if (const auto w = displaySize(col); i < widths.size()) {
+        if (widths[i] < w) widths[i] = w;
+      } else
+        widths.push_back(w);
+      ++i;
     }
-  }
   if (!widths.empty()) {
     border(os, widths);
     if (!_title.empty()) print(os, widths, _title);
@@ -77,6 +77,7 @@ void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
                   char delim) const {
   static const std::string empty;
   const auto cell = [&os, delim, fill](int w, const auto& s) {
+    std::cout << "widtth: " << w << " val: " << s << '\n';
     os << delim << fill << std::setw(w + 1) << s;
   };
   os << std::left << std::setfill(fill);
