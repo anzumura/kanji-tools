@@ -75,7 +75,7 @@ void Table::printMarkdown(std::ostream& os) const {
 
 void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
                   char delim) const {
-  static const std::string empty;
+  static const std::string EmptyString;
   const auto cell = [&os, delim, fill](int w, const auto& s) {
     std::cout << "widtth: " << w << " val: " << s << '\n';
     os << delim << fill << std::setw(w + 1) << s;
@@ -87,7 +87,7 @@ void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
       // wide chars then need to add difference to get 'setw' to work properly
       cell(w[i] + (r[i].size() - displaySize(r[i])), r[i]);
     else
-      cell(w[i], empty);
+      cell(w[i], EmptyString);
   os << delim << '\n';
 }
 
