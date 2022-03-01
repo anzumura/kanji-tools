@@ -582,7 +582,7 @@ function checkTotal() {
 # May need to update JSource and Morohashi expected totals when upgrading to a
 # new Unicode version (below numbers are based on Unicode 14.0). Nelson could go
 # up if any missing ones are added (see comments in 'processRecord'). Jouyou and
-# Jinmei numbers should only change if the Japanese goverment changes the lists.
+# Jinmei numbers should only change if the Japanese government makes changes.
 checkTotal 'Unique JSource' ${#uniqueJSource[@]} 16226
 checkTotal 'Unique Morohashi' ${#uniqueMorohashi[@]} 17830
 checkTotal 'Unique Nelson ID' ${#uniqueNelson[@]} 5442
