@@ -255,7 +255,7 @@ function processUniLink() {
 # 'kDefinition' field and updates 'defType' arrays.
 function findDefinitionLinksForType() {
   local -r def="kDefinition=\"$2$1[-,a-z0-9 ]*" utf='[^ -~]' uni=[A-F0-9]
-  local -r start='s/.*cp="\([^"]*\).*'$def end='*\).*/\1:\2/'
+  local -r start='s/.* cp="\([^"]*\).*'$def end='*\).*/\1:\2/'
   local -i utfCount=0 uniCount=0
   local s
   # loop to handle strings like 'same as X' where X is a UTF-8 kanji
@@ -455,7 +455,7 @@ function countLinkType() {
   esac
 }
 
-declare -A uniqueMorohashi uniqueNelson
+declare -A uniqueJSource uniqueMorohashi uniqueNelson
 
 function processRecord() {
   # morohashi IDs stored in 'morohashi' can be different than kMorohashi due to
@@ -530,13 +530,13 @@ function processRecord() {
     kMandarin=${kMandarin%% *}
     totalPinyin+=1
   fi
-  [[ -n $localMorohashi && -z ${uniqueMorohashi[$localMorohashi]} ]] &&
-    uniqueMorohashi[$localMorohashi]=1
+  [[ -n $localJSource ]] && uniqueJSource[$localJSource]=1
+  [[ -n $localMorohashi ]] && uniqueMorohashi[$localMorohashi]=1
   if [[ -n $kNelson ]]; then
     # remove leading 0's from all Nelson ids in the list
     kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
     for s in $kNelson; do
-      [[ -z ${uniqueNelson[$s]} ]] && uniqueNelson[$s]=1
+      uniqueNelson[$s]=1
     done
   fi
   for s in G H J K T V; do
@@ -579,6 +579,11 @@ function checkTotal() {
   [[ $2 -eq $3 ]] && echo "/$3" || echo " *** expected $3 ***"
 }
 
+# May need to update JSource and Morohashi expected totals when upgrading to a
+# new Unicode version (below numbers are based on Unicode 14.0). Nelson could go
+# up if any missing ones are added (see comments in 'processRecord'). Jouyou and
+# Jinmei numbers should only change if the Japanese goverment changes the lists.
+checkTotal 'Unique JSource' ${#uniqueJSource[@]} 16226
 checkTotal 'Unique Morohashi' ${#uniqueMorohashi[@]} 17830
 checkTotal 'Unique Nelson ID' ${#uniqueNelson[@]} 5442
 checkTotal 'Total Jouyou' $totalJoyo 2136
