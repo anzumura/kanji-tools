@@ -15,7 +15,7 @@ TEST(DisplaySizeTest, WideBlocksRange) {
 }
 
 TEST(DisplaySizeTest, DisplaySize) {
-  EXPECT_EQ(displaySize("abc"), 3);
+  EXPECT_EQ(displaySize("abc ."), 5);
   EXPECT_EQ(displaySize("abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize("。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
   // rare kanji, common kanji, 4 narrow numbers and a wide space = 10

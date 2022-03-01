@@ -137,8 +137,8 @@ TEST(MBUtilsTest, NotValidForOverlong) {
 }
 
 TEST(MBUtilsTest, FromUTF8String) {
-  auto wideSingle = fromUtf8("single");
-  ASSERT_EQ(wideSingle, U"single");
+  auto wideSingle = fromUtf8("single .");
+  ASSERT_EQ(wideSingle, U"single .");
   // first byte error cases
   fromUtf8Error(std::string({static_cast<char>(Bit1)}));
   fromUtf8Error(std::string({static_cast<char>(FiveBits)}));
