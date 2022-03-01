@@ -136,11 +136,16 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::Overlong);
 }
 
-TEST(MBUtilsTest, FromUTF8String) {
+TEST(MBUtilsTest, ConvertEmptyStrings) {
   std::string emptyString;
   std::u32string emptyU32String;
   EXPECT_EQ(fromUtf8(emptyString), emptyU32String);
   EXPECT_EQ(fromUtf8(""), emptyU32String);
+  EXPECT_EQ(toUtf8(emptyU32String), emptyString);
+  EXPECT_EQ(toUtf8(U""), emptyString);
+}
+
+TEST(MBUtilsTest, FromUTF8String) {
   auto wideSingle = fromUtf8("single .");
   ASSERT_EQ(wideSingle, U"single .");
   // first byte error cases
@@ -258,6 +263,7 @@ TEST(MBUtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode("すずめ-雀", BracketType::Square),
             "[3059 305A 3081 002D 96C0]");
 }
+
 TEST(MBUtilsTest, U32ToUnicode) {
   EXPECT_EQ(toUnicode(U'a'), "0061");
   EXPECT_EQ(toUnicode(U"ぁ"), "3041");
