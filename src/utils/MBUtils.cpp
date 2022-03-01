@@ -39,7 +39,7 @@ template<typename R, typename T = typename R::value_type>
                      maxSurrogate = static_cast<T>(MaxSurrogate),
                      maxUnicode = static_cast<T>(MaxUnicode);
   R result;
-  if (!s) return result;
+  if (!s || !*s) return result;
   auto* u = reinterpret_cast<const unsigned char*>(s);
   do {
     if (*u <= 0x7fU) // one byte case

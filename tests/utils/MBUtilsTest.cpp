@@ -14,9 +14,9 @@ void fromUtf8Error(const std::string& s,
 #ifdef USE_CODECVT_FOR_UTF_8
   // 'result' isn't used by codecvt since it throws an exception, but use it
   // below to avoid a compile warning
-  EXPECT_THROW(call([&] { return fromUtf8(s) + result; },
-                    "wstring_convert: from_bytes error"),
-               std::range_error);
+  EXPECT_THROW(
+    call([&] { return fromUtf8(s) + result; }, "wstring_convert::from_bytes"),
+    std::range_error);
 #else
   EXPECT_EQ(fromUtf8(s), result);
 #endif
@@ -26,7 +26,7 @@ void toUtf8Error(const std::u32string& s,
                  const std::string& result = "\xEF\xBF\xBD") {
 #ifdef USE_CODECVT_FOR_UTF_8
   EXPECT_THROW(
-    call([&] { return toUtf8(s) + result; }, "wstring_convert: to_bytes error"),
+    call([&] { return toUtf8(s) + result; }, "wstring_convert::to_bytes"),
     std::range_error);
 #else
   EXPECT_EQ(toUtf8(s), result);
@@ -137,6 +137,10 @@ TEST(MBUtilsTest, NotValidForOverlong) {
 }
 
 TEST(MBUtilsTest, FromUTF8String) {
+  std::string emptyString;
+  std::u32string emptyU32String;
+  EXPECT_EQ(fromUtf8(emptyString), emptyU32String);
+  EXPECT_EQ(fromUtf8(""), emptyU32String);
   auto wideSingle = fromUtf8("single .");
   ASSERT_EQ(wideSingle, U"single .");
   // first byte error cases
@@ -186,6 +190,7 @@ TEST(MBUtilsTest, InvalidSurrogateRange) {
   const auto afterRange = std::string({'\xEE', '\x80', '\x80'});  // U+E000
   // from UTF-8
   EXPECT_EQ(fromUtf8(beforeRange), U"\ud7ff");
+#ifndef USE_CODECVT_FOR_UTF_8
   fromUtf8Error(rangeStart);
   fromUtf8Error(rangeEnd);
   EXPECT_EQ(fromUtf8(afterRange), U"\ue000");
@@ -193,6 +198,7 @@ TEST(MBUtilsTest, InvalidSurrogateRange) {
   EXPECT_EQ(toUtf8(U"\ud7ff"), beforeRange);
   toUtf8Error(U"\xd800");
   toUtf8Error(U"\xdfff");
+#endif
   EXPECT_EQ(toUtf8(U"\ue000"), afterRange);
 }
 
@@ -250,6 +256,14 @@ TEST(MBUtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode("ぁ", BracketType::Square), "[3041]");
   EXPECT_EQ(toUnicode("すずめ-雀"), "3059 305A 3081 002D 96C0");
   EXPECT_EQ(toUnicode("すずめ-雀", BracketType::Square),
+            "[3059 305A 3081 002D 96C0]");
+}
+TEST(MBUtilsTest, U32ToUnicode) {
+  EXPECT_EQ(toUnicode(U'a'), "0061");
+  EXPECT_EQ(toUnicode(U"ぁ"), "3041");
+  EXPECT_EQ(toUnicode(U"ぁ", BracketType::Square), "[3041]");
+  EXPECT_EQ(toUnicode(U"すずめ-雀"), "3059 305A 3081 002D 96C0");
+  EXPECT_EQ(toUnicode(U"すずめ-雀", BracketType::Square),
             "[3059 305A 3081 002D 96C0]");
 }
 

@@ -53,6 +53,15 @@ enum class BracketType { Curly, Round, Square, None };
   return result;
 }
 
+[[nodiscard]] inline auto addLeadingZeroes(const std::u32string& result,
+                                           size_t minSize) {
+  static const std::u32string Zero(U"0");
+  if (result.size() < minSize)
+    return std::u32string(minSize - result.size(), U'0') + result;
+  if (result.empty()) return Zero;
+  return result;
+}
+
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
 // of 'x' ('x' must be integer type). 'minSize' of '0' (the default) causes
 // leading zeroes to be added to make strings the same size for a given type,
@@ -132,6 +141,16 @@ template<>
                                     BracketType brackets = BracketType::None) {
   std::string result;
   for (const auto i : fromUtf8(s)) {
+    if (!result.empty()) result += ' ';
+    result += toUnicode(i);
+  }
+  return addBrackets(result, brackets);
+}
+
+[[nodiscard]] inline auto toUnicode(const std::u32string& s,
+                                    BracketType brackets = BracketType::None) {
+  std::string result;
+  for (const auto i : s) {
     if (!result.empty()) result += ' ';
     result += toUnicode(i);
   }
