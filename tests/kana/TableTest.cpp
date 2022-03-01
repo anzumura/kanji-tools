@@ -176,7 +176,6 @@ TEST_F(TableTest, TableWithTitleSectionsAndRows) {
   // clang-format on
   std::string line;
   int count{0}, maxLines{std::size(expected)};
-  std::cout << "HERE\n";
   while (std::getline(_os, line)) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count++]);

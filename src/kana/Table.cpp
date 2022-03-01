@@ -77,7 +77,6 @@ void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
                   char delim) const {
   static const std::string EmptyString;
   const auto cell = [&os, delim, fill](int w, const auto& s) {
-    std::cout << "widtth: " << w << " val: " << s << '\n';
     os << delim << fill << std::setw(w + 1) << s;
   };
   os << std::left << std::setfill(fill);
