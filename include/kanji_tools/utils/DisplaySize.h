@@ -71,12 +71,17 @@ inline constexpr std::array WideBlocks = {
 
 // Return size of 's' in terms of how many columns would be required for display
 // on a terminal, i.e, 1 for a normal character and 2 for a wide character.
-template<typename T>
-[[nodiscard]] inline auto displaySize(const T& s) {
+[[nodiscard]] inline auto displaySize(const std::u32string& s) {
   size_t result = 0;
-  for (const auto i : fromUtf8(s))
+  for (const auto i : s)
     if (i && !isNonSpacing(i)) result += inRange(i, WideBlocks) ? 2 : 1;
   return result;
+}
+[[nodiscard]] inline auto displaySize(const char* s) {
+  return displaySize(fromUtf8(s));
+}
+[[nodiscard]] inline auto displaySize(const std::string& s) {
+  return displaySize(s.c_str());
 }
 
 // 'wideSetw' returns a value that works for 'std::setw' when 's' contains wide

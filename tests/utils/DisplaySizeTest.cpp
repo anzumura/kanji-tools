@@ -17,6 +17,9 @@ TEST(DisplaySizeTest, WideBlocksRange) {
 TEST(DisplaySizeTest, DisplaySize) {
   EXPECT_EQ(displaySize(""), 0);
   EXPECT_EQ(displaySize("abc ."), 5);
+  std::string empty;
+  EXPECT_EQ(displaySize(empty), 0);
+  EXPECT_EQ(displaySize(std::string("abc .")), 5);
   EXPECT_EQ(displaySize("abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize("。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
   // rare kanji, common kanji, 4 narrow numbers and a wide space = 10
@@ -31,6 +34,28 @@ TEST(DisplaySizeTest, DisplaySize) {
   EXPECT_EQ(displaySize(s), 4);
   // try a character beyond BMP
   EXPECT_EQ(displaySize("𠮟"), 2);
+}
+
+TEST(DisplaySizeTest, U32DisplaySize) {
+  EXPECT_EQ(displaySize(U""), 0);
+  EXPECT_EQ(displaySize(U"abc ."), 5);
+  std::u32string empty;
+  EXPECT_EQ(displaySize(empty), 0);
+  EXPECT_EQ(displaySize(std::u32string(U"abc .")), 5);
+  EXPECT_EQ(displaySize(U"abクcカ"), 7); // 3 narrow + 2 wide
+  EXPECT_EQ(displaySize(U"。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
+  // rare kanji, common kanji, 4 narrow numbers and a wide space = 10
+  EXPECT_EQ(displaySize(U"𫠜中1234　"), 10);
+  // don't include non-spacing characters
+  std::u32string s = U"逸︁";
+  EXPECT_EQ(s.size(), 2);               // two unicode chars
+  EXPECT_EQ(toUnicode(s), "9038 FE01"); // 'FE01' is a variation selector
+  EXPECT_EQ(displaySize(s), 2);
+  // don't include combining marks
+  s = U"と\x3099ヒ\x309a";
+  EXPECT_EQ(displaySize(s), 4);
+  // try a character beyond BMP
+  EXPECT_EQ(displaySize(U"𠮟"), 2);
 }
 
 TEST(DisplaySizeTest, WideSetw) {
