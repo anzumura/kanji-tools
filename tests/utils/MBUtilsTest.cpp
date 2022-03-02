@@ -76,7 +76,7 @@ TEST(MBUtilsTest, NotValidWithFiveByte) {
   EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidMBUtf8(x));
   // try to make a 'fake valid' string with 5 bytes (which is not valid)
-  x[0] = 0b11'11'10'10;
+  x[0] = static_cast<char>(0b11'11'10'10);
   EXPECT_EQ(x.size(), 4);
   EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::MBCharTooLong);
   x += x[3];

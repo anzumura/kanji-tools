@@ -36,7 +36,7 @@ public:
   };
 
   using Columns = std::vector<Column>;
-  using OptInt = std::optional<int>;
+  using OptSize = std::optional<size_t>;
 
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a
   // regular file) or if the list of 'columns' doesn't match the first row of
@@ -62,11 +62,11 @@ public:
     return get(column).empty();
   }
 
-  // convert to 'int' or call 'error'
-  int getInt(const Column&) const;
+  // convert to 'size_t' or call 'error'
+  size_t getSize(const Column&) const;
 
-  // return std::nullopt if column is empty or return 'getInt'
-  OptInt getOptInt(const Column&) const;
+  // return std::nullopt if column is empty or return 'getSize'
+  OptSize getOptSize(const Column&) const;
 
   // convert 'Y' or 'T' to true, 'N', 'F' or '' to false or call 'error'
   bool getBool(const Column&) const;
@@ -95,7 +95,7 @@ public:
   [[nodiscard]] auto& name() const { return _name; }
 private:
   // 'getColumnNumber' is used by 'Column' class constructor
-  [[nodiscard]] static int getColumnNumber(const std::string& name);
+  [[nodiscard]] static size_t getColumnNumber(const std::string& name);
   friend Column;
 
   using ColNames = std::map<std::string, Column>;
@@ -116,7 +116,7 @@ private:
   const std::string _name;
 
   // '_currentRow' starts at 0 and is incremented each time 'nextRow' is called
-  int _currentRow = 0;
+  size_t _currentRow = 0;
 
   // '_rowValues' is updated each time a new row is processed by 'nextRow'
   std::vector<std::string> _rowValues;
@@ -132,7 +132,7 @@ private:
   // '_allColumns' is used to globally assign unique numbers to 'Column'
   // instances, i.e., if the column name exists then the same number is used,
   // otherwise a new number is assigned.
-  inline static std::map<std::string, int> _allColumns;
+  inline static std::map<std::string, size_t> _allColumns;
 };
 
 } // namespace kanji_tools

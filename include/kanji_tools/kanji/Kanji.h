@@ -34,7 +34,7 @@ template<> inline constexpr bool is_bitmask<KanjiInfo> = true;
 
 class Kanji {
 public:
-  using OptInt = std::optional<int>;
+  using OptSize = std::optional<size_t>;
   using OptString = std::optional<std::string>;
   using LinkNames = std::vector<std::string>;
   using NelsonIds = std::vector<int>;
@@ -50,7 +50,7 @@ public:
   [[nodiscard]] virtual const std::string& meaning() const = 0;
   [[nodiscard]] virtual const std::string& reading() const = 0;
 
-  [[nodiscard]] virtual OptInt frequency() const { return std::nullopt; }
+  [[nodiscard]] virtual OptSize frequency() const { return std::nullopt; }
   [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
@@ -99,11 +99,11 @@ public:
     return _compatibilityName.value_or(_name);
   }
 
-  [[nodiscard]] auto frequencyOrDefault(int x) const {
+  [[nodiscard]] auto frequencyOrDefault(size_t x) const {
     return frequency().value_or(x);
   }
   [[nodiscard]] auto frequencyOrMax() const {
-    return frequencyOrDefault(std::numeric_limits<int>::max());
+    return frequencyOrDefault(std::numeric_limits<size_t>::max());
   }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
@@ -165,7 +165,7 @@ public:
     ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
 protected:
   Kanji(const std::string& name, const OptString& compatibilityName,
-        const Radical& radical, int strokes, const OptString& morohashiId,
+        const Radical& radical, size_t strokes, const OptString& morohashiId,
         const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames{};
 private:
@@ -175,7 +175,7 @@ private:
   static constexpr std::array QualifiedNames = {'.', '\'', '"', '^', '~',
                                                 '%', '+',  '@', '#', '*'};
 
-  [[nodiscard]] int qualifiedNameRank() const {
+  [[nodiscard]] size_t qualifiedNameRank() const {
     auto t = type();
     // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd
     // (so the least common)
@@ -198,7 +198,7 @@ private:
 
   // all kanji have radical and strokes
   const Radical _radical;
-  const int _strokes;
+  const size_t _strokes;
 
   // optional fields
   const OptString _morohashiId;

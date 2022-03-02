@@ -12,7 +12,7 @@ namespace kanji_tools {
 // 'MBCount' counts multi-byte characters in strings passed to 'add' functions
 class MBCount {
 public:
-  using Map = std::map<std::string, int>;
+  using Map = std::map<std::string, size_t>;
   using TagMap = std::map<std::string, Map>;
   using OptRegex = std::optional<std::wregex>;
   using OptString = std::optional<std::string>;
@@ -45,15 +45,15 @@ public:
   // 'add' adds all the 'MBChars' from the given string 's' and returns the
   // number added. If 'tag' is provided then '_tags' will be updated (which
   // contains a count per tag per unique token).
-  int add(const std::string& s, const OptString& tag = {});
+  size_t add(const std::string& s, const OptString& tag = {});
 
   // 'addFile' adds strings from given 'file' or from all files in directory (if
   // file is 'directory'). 'fileNames' controls whether the name of the file (or
   // directory) should also be included in the count and 'recurse' determines if
   // subdirectories are also searched. By default, file names are used as 'tag'
   // values when calling 'add'.
-  int addFile(const std::filesystem::path& file, bool addTag = true,
-              bool fileNames = true, bool recurse = true) {
+  size_t addFile(const std::filesystem::path& file, bool addTag = true,
+                 bool fileNames = true, bool recurse = true) {
     if (!std::filesystem::exists(file))
       throw std::domain_error("file not found: " + file.string());
     return doAddFile(file, addTag, fileNames, recurse);
@@ -94,9 +94,9 @@ private:
   // 'processJoinedLine' returns count from processing 'prevline' plus 'line' up
   // until 'pos' (plus size of close bracket) and sets 'prevLine' to the
   // unprocessed remainder of 'line'.
-  [[nodiscard]] int processJoinedLine(std::string& prevLine,
-                                      const std::string& line, int pos,
-                                      const OptString& tag);
+  [[nodiscard]] size_t processJoinedLine(std::string& prevLine,
+                                         const std::string& line, size_t pos,
+                                         const OptString& tag);
 
   // 'processFile' returns the MBChar count from 'file'. If '_find' is not set
   // then each line is processed independently, otherwise 'hasUnclosedBrackets'
@@ -104,26 +104,26 @@ private:
   // calling 'add' to help '_find' match against larger sets of data. The focus
   // on brackets is to help removing furigana which is in brackets after a kanji
   // and can potentially span across lines of a text file.
-  [[nodiscard]] int processFile(const std::filesystem::path& file,
-                                const OptString& tag);
+  [[nodiscard]] size_t processFile(const std::filesystem::path& file,
+                                   const OptString& tag);
 
   [[nodiscard]] virtual bool allowAdd(const std::string&) const { return true; }
-  [[nodiscard]] int doAddFile(const std::filesystem::path& file, bool addTag,
-                              bool fileNames, bool recurse = true);
+  [[nodiscard]] size_t doAddFile(const std::filesystem::path& file, bool addTag,
+                                 bool fileNames, bool recurse = true);
 
   Map _map;
   TagMap _tags;
   std::string _lastReplaceTag;
 
   // count files and directories processed
-  int _files = 0;
-  int _directories = 0;
+  size_t _files = 0;
+  size_t _directories = 0;
 
   // count errors, variants, combining marks and replacements during processing
-  int _errors = 0;
-  int _variants = 0;
-  int _combiningMarks = 0;
-  int _replacements = 0;
+  size_t _errors = 0;
+  size_t _variants = 0;
+  size_t _combiningMarks = 0;
+  size_t _replacements = 0;
 
   const OptRegex _find;
   const std::wstring _replace;

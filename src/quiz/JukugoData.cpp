@@ -42,7 +42,7 @@ JukugoData::JukugoData(DataPtr data) {
   }
 }
 
-int JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
+size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
   static const std::string stripPrefix("..."), openBracket("("),
     closeBracket(")");
   const auto previouslyCreated = _uniqueJukugo.size();

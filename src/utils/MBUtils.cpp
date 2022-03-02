@@ -63,15 +63,16 @@ template<typename R, typename T = typename R::value_type>
               result += errorReplacement; // fourth byte didn't start with '10'
             else {
               // four byte case - check for overlong and max unicode
-              const T c = ((byte1 ^ FourBits) << 18) + (byte2 << 12) +
-                          (byte3 << 6) + (*u ^ Bit1);
+              const auto c =
+                static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
+                               (byte3 << 6) + (*u ^ Bit1));
               result += c > 0xffff && c <= maxUnicode ? c : errorReplacement;
               ++u;
             }
           } else {
             // three byte case - check for overlong and surrogate range
-            const T c =
-              ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1);
+            const auto c = static_cast<T>(((byte1 ^ ThreeBits) << 12) +
+                                          (byte2 << 6) + (*u ^ Bit1));
             result += c > 0x7ff && (c < minSurrogate || c > maxSurrogate)
                         ? c
                         : errorReplacement;
@@ -79,8 +80,9 @@ template<typename R, typename T = typename R::value_type>
           }
         } else {
           // two byte case - check for overlong
-          result += (byte1 ^ TwoBits) > 1 ? ((byte1 ^ TwoBits) << 6) + byte2
-                                          : errorReplacement;
+          result += (byte1 ^ TwoBits) > 1
+                      ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
+                      : errorReplacement;
           ++u;
         }
       }

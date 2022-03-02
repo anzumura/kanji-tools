@@ -76,8 +76,8 @@ void Table::printMarkdown(std::ostream& os) const {
 void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
                   char delim) const {
   static const std::string EmptyString;
-  const auto cell = [&os, delim, fill](int w, const auto& s) {
-    os << delim << fill << std::setw(w + 1) << s;
+  const auto cell = [&os, delim, fill](size_t w, const auto& s) {
+    os << delim << fill << std::setw(static_cast<int>(w) + 1) << s;
   };
   os << std::left << std::setfill(fill);
   for (size_t i = 0; i < w.size(); ++i)

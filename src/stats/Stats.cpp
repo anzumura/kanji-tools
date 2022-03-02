@@ -19,7 +19,7 @@ constexpr auto HelpMessage = R"(kanjiStats [-bhv] file [file ...]:
   -v: show 'before' and 'after' versions of lines that changed due to furigana removal
 )";
 
-[[nodiscard]] constexpr double asPercent(int amount, int total) {
+[[nodiscard]] constexpr double asPercent(size_t amount, size_t total) {
   return amount * 100. / total;
 }
 
@@ -28,7 +28,7 @@ class Count {
 public:
   using OptEntry = Data::OptEntry;
 
-  Count(int f, const std::string& n, OptEntry e)
+  Count(size_t f, const std::string& n, OptEntry e)
       : count(f), name(n), entry(e) {}
 
   [[nodiscard]] auto frequency() const {
@@ -52,7 +52,7 @@ public:
              (type() == x.type() && name < x.name)));
   }
 
-  int count;
+  size_t count;
   std::string name;
   OptEntry entry;
 };
@@ -72,7 +72,7 @@ std::ostream& operator<<(std::ostream& os, const Count& c) {
 // 'IncludeInTotals' of 4 indicates only Kanji and full-width kana should be
 // included in totals and percents 'MaxExamples' is the maximum number of
 // examples to show for each kanji type when printing stats
-constexpr int IncludeInTotals = 5, MaxExamples = 5;
+constexpr size_t IncludeInTotals = 5, MaxExamples = 5;
 
 // 'StatsPred' is a helper class for gathering stats matching a predicate (Pred)
 // function across a group of files. The 'run' method is thread-safe and the
@@ -102,7 +102,8 @@ private:
   using CountSet = std::set<Count>;
 
   void printHeaderInfo(const MBCount&);
-  void printTotalAndUnique(const std::string& name, int total, int unique);
+  void printTotalAndUnique(const std::string& name, size_t total,
+                           size_t unique);
   void printKanjiTypeCounts(const std::set<Count>&);
   void printExamples(const CountSet&);
   void printBreakdown(const CountSet&, const MBCount&);
@@ -112,7 +113,7 @@ private:
   const std::string _name;
   const bool _showBreakdown;
   const bool _isKanji;
-  int _total = 0;
+  size_t _total = 0;
   std::stringstream _os;
 };
 
@@ -179,15 +180,15 @@ void StatsPred::printHeaderInfo(const MBCount& count) {
   _os << '\n';
 }
 
-void StatsPred::printTotalAndUnique(const std::string& name, int total,
-                                    int unique) {
+void StatsPred::printTotalAndUnique(const std::string& name, size_t total,
+                                    size_t unique) {
   _os << ">>> " << std::right << std::setw(TypeNameWidth) << name << ": "
       << std::setw(TotalCountWidth) << total
       << ", unique: " << std::setw(UniqueCountWidth) << unique;
 }
 
 void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
-  std::map<KanjiTypes, int> totalKanjiPerType, uniqueKanjiPerType;
+  std::map<KanjiTypes, size_t> totalKanjiPerType, uniqueKanjiPerType;
   std::map<KanjiTypes, std::vector<Count>> found;
   for (const auto& i : frequency) {
     const auto t = i.type();
@@ -237,7 +238,7 @@ void StatsPred::printBreakdown(const CountSet& frequency,
     if (!i.entry) {
       if (const auto tags = count.tags(i.name); tags != nullptr) {
         std::string file;
-        for (auto maxCount = 0; auto& j : *tags)
+        for (size_t maxCount = 0; auto& j : *tags)
           if (j.second > maxCount) {
             maxCount = j.second;
             file = j.first;
@@ -304,13 +305,14 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown,
     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
     f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
   for (auto& i : totals) out() << i.first.get();
-  auto total = 0;
-  for (auto i = 0; i < IncludeInTotals; ++i) total += totals[i].second->total();
+  size_t total = 0;
+  for (size_t i = 0; i < IncludeInTotals; ++i)
+    total += totals[i].second->total();
   log() << "Total Kana+Kanji: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);
-    auto totalKanji = 0;
-    for (auto i = 0; i < IncludeInTotals; ++i)
+    size_t totalKanji = 0;
+    for (size_t i = 0; i < IncludeInTotals; ++i)
       if (totals[i].second->isKanji())
         totalKanji += totals[i].second->total();
       else if (totals[i].second->total())

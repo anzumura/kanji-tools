@@ -7,7 +7,7 @@ TEST(DisplaySizeTest, WideBlocksRange) {
   // WideBlocks.size() may change after parsing newer Unicode files
   EXPECT_EQ(WideBlocks.size(), 121);
   // make sure 'WideBlocks' (from generated code) has no overlaps
-  for (int oldEnd = 0; auto& i : WideBlocks) {
+  for (char32_t oldEnd = 0; auto& i : WideBlocks) {
     EXPECT_LT(oldEnd, i.start);
     oldEnd = i.end;
     EXPECT_LE(i.start, i.end);

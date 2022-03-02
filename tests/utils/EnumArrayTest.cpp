@@ -99,7 +99,9 @@ TEST(EnumArrayTest, BadIncrement) {
 
 TEST(EnumArrayTest, BadDecrement) {
   auto i = AllColors.end();
-  i = i - 3;
+  EXPECT_THROW(call([&] { i -= 4; }, "can't decrement past zero"),
+               std::out_of_range);
+  i -= 3;
   EXPECT_EQ(*i, Colors::Red);
   EXPECT_THROW(call([&] { --i; }, "can't decrement past zero"),
                std::out_of_range);

@@ -24,11 +24,12 @@ public:
   using Links = std::vector<Link>;
 
   Ucd(char32_t code, const std::string& name, const std::string& block,
-      const std::string& version, int radical, int strokes, int variantStrokes,
-      const std::string& pinyin, const std::string& morohashiId,
-      const std::string& nelsonIds, const std::string& sources,
-      const std::string& jSource, bool joyo, bool jinmei, const Links& links,
-      UcdLinkTypes linkType, bool linkedReadings, const std::string& meaning,
+      const std::string& version, size_t radical, size_t strokes,
+      size_t variantStrokes, const std::string& pinyin,
+      const std::string& morohashiId, const std::string& nelsonIds,
+      const std::string& sources, const std::string& jSource, bool joyo,
+      bool jinmei, const Links& links, UcdLinkTypes linkType,
+      bool linkedReadings, const std::string& meaning,
       const std::string& onReading, const std::string& kunReading)
       : _code(code), _name(name), _block(block), _version(version),
         _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes),
@@ -85,9 +86,9 @@ private:
   const std::string _name;
   const std::string _block;
   const std::string _version;
-  const int _radical;
-  const int _strokes;
-  const int _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
+  const size_t _radical;
+  const size_t _strokes;
+  const size_t _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
   const std::string _pinyin;
   const std::string _morohashiId;
   const std::string _nelsonIds;

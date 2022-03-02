@@ -38,7 +38,7 @@ public:
   //   simpler characters such as 凹 or 後 as well as some radicals.
   enum class PatternType { Family, Peer, Reading, None };
 
-  Group(int number, const std::string& name, const Data::List& members)
+  Group(size_t number, const std::string& name, const Data::List& members)
       : _number(number), _name(name), _members(members) {}
 
   Group(const Group&) = delete;
@@ -57,14 +57,15 @@ public:
     return "[" + std::to_string(_number) + ' ' + name() + ']';
   }
 private:
-  const int _number;
+  const size_t _number;
   const std::string _name;
   const Data::List _members;
 };
 
 class MeaningGroup : public Group {
 public:
-  MeaningGroup(int number, const std::string& name, const Data::List& members)
+  MeaningGroup(size_t number, const std::string& name,
+               const Data::List& members)
       : Group(number, name, members) {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Meaning; }
@@ -72,8 +73,8 @@ public:
 
 class PatternGroup : public Group {
 public:
-  PatternGroup(int number, const std::string& name, const Data::List& members,
-               PatternType patternType)
+  PatternGroup(size_t number, const std::string& name,
+               const Data::List& members, PatternType patternType)
       : Group(number, name, members), _patternType(patternType) {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }

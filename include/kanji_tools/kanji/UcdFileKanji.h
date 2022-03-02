@@ -57,11 +57,11 @@ protected:
   // constructor used by 'FrequencyKanji': has 'reading' and looks up 'kyu'
   StandardKanji(const Data& d, const std::string& name,
                 const std::string& reading)
-      : UcdFileKanji(d, name, reading, d.findUcd(name)), _kyu(d.getKyu(name)) {}
+      : UcdFileKanji(d, name, reading, d.findUcd(name)), _kyu(d.kyu(name)) {}
 
   // constructor used by 'FrequencyKanji': looks up 'kyu'
   StandardKanji(const Data& d, const std::string& name)
-      : StandardKanji(d, name, d.getKyu(name)) {}
+      : StandardKanji(d, name, d.kyu(name)) {}
 
   // constructor used by 'KenteiKanji': has 'kyu'
   StandardKanji(const Data& d, const std::string& name, KenteiKyus kyu)
@@ -75,21 +75,23 @@ private:
 class FrequencyKanji : public StandardKanji {
 public:
   // constructor used for 'FrequencyKanji' without a reading
-  FrequencyKanji(const Data& d, const std::string& name, int frequency)
+  FrequencyKanji(const Data& d, const std::string& name, size_t frequency)
       : StandardKanji(d, name), _frequency(frequency) {}
 
   // constructor used for 'FrequencyKanji' with readings from
   // 'frequency-readings.txt'
   FrequencyKanji(const Data& d, const std::string& name,
-                 const std::string& reading, int frequency)
+                 const std::string& reading, size_t frequency)
       : StandardKanji(d, name, reading), _frequency(frequency) {}
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::Frequency;
   }
-  [[nodiscard]] OptInt frequency() const override { return OptInt(_frequency); }
+  [[nodiscard]] OptSize frequency() const override {
+    return OptSize(_frequency);
+  }
 private:
-  const int _frequency;
+  const size_t _frequency;
 };
 
 // 'KenteiKanji' is for kanji in 'kentei/k*.txt' files that aren't already

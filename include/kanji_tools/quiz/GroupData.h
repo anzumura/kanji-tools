@@ -42,7 +42,7 @@ private:
   template<typename T>
   void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
 
-  [[nodiscard]] Entry createGroup(int number, const std::string& name,
+  [[nodiscard]] Entry createGroup(size_t number, const std::string& name,
                                   const Data::List& members,
                                   Group::PatternType) const;
 

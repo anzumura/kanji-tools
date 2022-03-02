@@ -120,7 +120,7 @@ public:
 
     // common requirements for iterators
     auto& operator++() {
-      if (_index >= N) throw std::out_of_range("can't increment past end");
+      if (_index >= N) error(BadEnd);
       ++_index;
       return *this;
     }
@@ -139,14 +139,13 @@ public:
       // exception should only happen when dereferencing 'end' since other
       // methods prevent moving out of range
       if (_index >= N)
-        throw std::out_of_range("index '" + std::to_string(_index) +
-                                "' is out of range");
+        error("index '" + std::to_string(_index) + "' is out of range");
       return static_cast<T>(_index);
     }
 
     // bi-directional iterator requirements
     auto& operator--() {
-      if (_index == 0) throw std::out_of_range("can't decrement past zero");
+      if (_index == 0) error(BadBegin);
       --_index;
       return *this;
     }
@@ -158,9 +157,12 @@ public:
 
     // random-access iterator requirements (except non-const operator[])
     auto& operator+=(difference_type offset) {
-      if (_index + offset < 0 || _index + offset > N)
-        throw std::out_of_range("can't increment past end");
-      _index += offset;
+      if (const auto i = static_cast<difference_type>(_index) + offset; i < 0)
+        error(BadBegin);
+      else if (i > static_cast<difference_type>(N))
+        error(BadEnd);
+      else
+        _index = static_cast<size_t>(i);
       return *this;
     }
     auto& operator-=(difference_type offset) { return *this += -offset; }
@@ -179,6 +181,11 @@ public:
       return _index - x._index;
     }
   private:
+    inline static const std::string BadBegin = "can't decrement past zero",
+                                    BadEnd = "can't increment past end";
+
+    static void error(const std::string& s) { throw std::out_of_range(s); }
+
     size_t _index = 0;
   };
 
@@ -195,7 +202,7 @@ public:
   }
 protected:
   [[nodiscard]] static auto getIndex(T x) {
-    size_t i = to_underlying(x);
+    const auto i = static_cast<size_t>(to_underlying(x));
     if (i >= N)
       throw std::out_of_range("enum '" + std::to_string(i) +
                               "' is out of range");

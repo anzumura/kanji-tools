@@ -25,7 +25,7 @@ private:
                     const std::string& reading);
 
   using JukugoKey = std::pair<std::string, std::string>;
-  [[nodiscard]] int loadFile(const std::filesystem::path&, KanjiGrades);
+  [[nodiscard]] size_t loadFile(const std::filesystem::path&, KanjiGrades);
 
   std::map<JukugoKey, Entry> _uniqueJukugo;
   std::map<std::string, List> _kanjiToJukugo;

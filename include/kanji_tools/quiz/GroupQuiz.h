@@ -16,7 +16,7 @@ public:
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou = 0, JLPT, Frequency, All };
 
-  GroupQuiz(const QuizLauncher&, int question, bool showMeanings,
+  GroupQuiz(const QuizLauncher&, size_t question, bool showMeanings,
             const GroupData::List&, MemberType);
 private:
   // 'GroupEntryWidth' is the width required for 'qualified name', 'pinyin' and
@@ -59,7 +59,7 @@ private:
                                 bool& skipGroup, bool& stopQuiz);
   [[nodiscard]] bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
   void editAnswer(Choices&);
-  [[nodiscard]] int getAnswerToEdit() const;
+  [[nodiscard]] size_t getAnswerToEdit() const;
   void checkAnswers(const List& questions, const List& readings,
                     const std::string& name);
 

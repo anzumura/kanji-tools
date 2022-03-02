@@ -20,7 +20,7 @@ const std::wregex MBCount::RemoveFurigana(std::wstring(L"([") + KanjiRange +
                                           L"]{1})（[" + KanaRange + L"]+）");
 const std::wstring MBCount::DefaultReplace(L"$1");
 
-int MBCount::add(const std::string& s, const OptString& tag) {
+size_t MBCount::add(const std::string& s, const OptString& tag) {
   auto n = s;
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8ToWstring(s), *_find, _replace));
@@ -33,12 +33,13 @@ int MBCount::add(const std::string& s, const OptString& tag) {
       if (_debug) {
         const auto count = std::to_string(_replacements);
         std::cout << count << " : " << s << '\n'
-                  << std::setw(count.size() + 3) << ": " << n << '\n';
+                  << std::setw(static_cast<int>(count.size() + 3)) << ": " << n
+                  << '\n';
       }
     }
   }
   MBChar c(n);
-  auto added = 0;
+  size_t added = 0;
   for (std::string token; c.next(token);)
     if (allowAdd(token)) {
       ++_map[token];
@@ -51,9 +52,9 @@ int MBCount::add(const std::string& s, const OptString& tag) {
   return added;
 }
 
-int MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
-                       bool recurse) {
-  auto added = 0;
+size_t MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
+                          bool recurse) {
+  size_t added = 0;
   const auto fileName = file.filename().string(); // use final component of path
   const auto tag = addTag ? OptString(fileName) : std::nullopt;
   if (fs::is_regular_file(file)) {
@@ -81,8 +82,9 @@ bool MBCount::hasUnclosedBrackets(const std::string& line) {
   return false;
 }
 
-int MBCount::processJoinedLine(std::string& prevLine, const std::string& line,
-                               int pos, const OptString& tag) {
+size_t MBCount::processJoinedLine(std::string& prevLine,
+                                  const std::string& line, size_t pos,
+                                  const OptString& tag) {
   const auto end = pos + CloseWideBracketSize;
   const auto joinedLine = prevLine + line.substr(0, end);
   // set 'prevLine' to the unprocessed portion of 'line'
@@ -90,8 +92,8 @@ int MBCount::processJoinedLine(std::string& prevLine, const std::string& line,
   return add(joinedLine, tag);
 }
 
-int MBCount::processFile(const fs::path& file, const OptString& tag) {
-  auto added = 0;
+size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
+  size_t added = 0;
   std::string line;
   if (std::fstream f(file); _find) {
     std::string prevLine;

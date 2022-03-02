@@ -292,7 +292,7 @@ TEST_F(ColumnFileTest, GetInt) {
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_EQ(f.getInt(col), 123);
+  EXPECT_EQ(f.getSize(col), 123);
 }
 
 TEST_F(ColumnFileTest, GetIntError) {
@@ -303,9 +303,9 @@ TEST_F(ColumnFileTest, GetIntError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
-    call([&] { f.getInt(col); },
+    call([&] { f.getSize(col); },
          convertError +
-           "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
+           "size_t - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
     std::domain_error);
 }
 
@@ -316,9 +316,9 @@ TEST_F(ColumnFileTest, GetOptInt) {
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_EQ(f.getOptInt(col), 123);
+  EXPECT_EQ(f.getOptSize(col), 123);
   EXPECT_TRUE(f.nextRow());
-  EXPECT_FALSE(f.getOptInt(col));
+  EXPECT_FALSE(f.getOptSize(col));
 }
 
 TEST_F(ColumnFileTest, GetOptIntError) {
@@ -329,9 +329,9 @@ TEST_F(ColumnFileTest, GetOptIntError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
-    call([&] { f.getOptInt(col); },
+    call([&] { f.getOptSize(col); },
          convertError +
-           "int - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
+           "size_t - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
     std::domain_error);
 }
 

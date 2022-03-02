@@ -7,13 +7,9 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-int ColumnFile::getColumnNumber(const std::string& name) {
+size_t ColumnFile::getColumnNumber(const std::string& name) {
   const auto i = _allColumns.find(name);
-  if (i == _allColumns.end()) {
-    const auto n = static_cast<int>(_allColumns.size());
-    _allColumns[name] = n;
-    return n;
-  }
+  if (i == _allColumns.end()) return _allColumns[name] = _allColumns.size();
   return i->second;
 }
 
@@ -91,26 +87,26 @@ const std::string& ColumnFile::get(const Column& column) const {
     error("unrecognized column '" + column.name() + "'");
   const auto position = _columnToPosition[column.number()];
   if (position == -1) error("invalid column '" + column.name() + "'");
-  return _rowValues[position];
+  return _rowValues[static_cast<size_t>(position)];
 }
 
-int ColumnFile::getInt(const Column& column) const {
+size_t ColumnFile::getSize(const Column& column) const {
   auto& s = get(column);
   try {
-    return std::stoi(s);
+    return std::stoul(s);
   } catch (...) {
-    error("failed to convert to int", column, s);
+    error("failed to convert to size_t", column, s);
   }
   __builtin_unreachable(); // 'error' function always throws an exception
 }
 
-ColumnFile::OptInt ColumnFile::getOptInt(const Column& column) const {
+ColumnFile::OptSize ColumnFile::getOptSize(const Column& column) const {
   auto& s = get(column);
   if (s.empty()) return std::nullopt;
   try {
     return std::stoi(s);
   } catch (...) {
-    error("failed to convert to int", column, s);
+    error("failed to convert to size_t", column, s);
   }
   __builtin_unreachable(); // 'error' function always throws an exception
 }
@@ -134,7 +130,7 @@ char32_t ColumnFile::getWChar(const Column& column,
   for (const char c : s)
     if (c < '0' || c > 'F' || (c < 'A' && c > '9'))
       error("failed to convert to char32_t, invalid hex", column, s);
-  return std::strtol(s.c_str(), nullptr, 16);
+  return static_cast<char32_t>(std::strtol(s.c_str(), nullptr, 16));
 }
 
 } // namespace kanji_tools

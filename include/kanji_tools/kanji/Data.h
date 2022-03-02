@@ -40,10 +40,9 @@ public:
   }
 
   // functions used by 'Kanji' classes during construction, each take kanji name
-  [[nodiscard]] virtual Kanji::OptInt
-  getFrequency(const std::string&) const = 0;
-  [[nodiscard]] virtual JlptLevels getLevel(const std::string&) const = 0;
-  [[nodiscard]] virtual KenteiKyus getKyu(const std::string&) const = 0;
+  [[nodiscard]] virtual Kanji::OptSize frequency(const std::string&) const = 0;
+  [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
+  [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual const Radical& ucdRadical(const std::string& kanjiName,
                                                   const Ucd* u) const {
     if (u) return _radicals.find(u->radical());
@@ -91,7 +90,7 @@ public:
       const auto i = _strokes.find(kanjiName);
       if (i != _strokes.end()) return i->second;
     }
-    return u ? u->getStrokes(variant) : 0;
+    return u ? u->getStrokes(variant) : 0UL;
   }
   [[nodiscard]] auto getStrokes(const std::string& kanjiName) const {
     return getStrokes(kanjiName, findUcd(kanjiName));
@@ -157,11 +156,11 @@ public:
   // See comment for '_frequencies' private data member for more details about
   // frequency lists
   enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
-  [[nodiscard]] auto& frequencyList(int range) const {
+  [[nodiscard]] auto& frequencyList(size_t range) const {
     return range >= 0 && range < FrequencyBuckets ? _frequencies[range]
                                                   : _emptyList;
   }
-  [[nodiscard]] auto frequencyTotal(int range) const {
+  [[nodiscard]] auto frequencyTotal(size_t range) const {
     return frequencyList(range).size();
   }
 
@@ -178,7 +177,7 @@ public:
 
   // 'findKanjiByFrequency' returns the Kanji with the given 'frequency' (should
   // be a value from 1 to 2501)
-  [[nodiscard]] OptEntry findKanjiByFrequency(int frequency) const {
+  [[nodiscard]] OptEntry findKanjiByFrequency(size_t frequency) const {
     if (frequency < 1 || frequency >= _maxFrequency) return {};
     auto bucket = --frequency / FrequencyBucketEntries;
     if (bucket == FrequencyBuckets)
@@ -269,7 +268,7 @@ protected:
   // both jouyou and jinmei files. This file contains stroke counts followed by
   // one or more lines each with a single kanji that has the given number of
   // strokes.
-  std::map<std::string, int> _strokes;
+  std::map<std::string, size_t> _strokes;
 
   std::map<KanjiTypes, List> _types;
 private:
@@ -315,7 +314,7 @@ private:
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'
-  inline static int _maxFrequency = 0;
+  inline static size_t _maxFrequency = 0;
 
   inline static const std::string dataArg = "-data", debugArg = "-debug",
                                   infoArg = "-info";

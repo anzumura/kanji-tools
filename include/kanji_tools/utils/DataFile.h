@@ -71,7 +71,7 @@ protected:
   DataFile(const std::filesystem::path& p, FileType fileType, bool, Set*,
            const std::string& name = "");
 private:
-  using Map = std::map<std::string, int>;
+  using Map = std::map<std::string, size_t>;
 
   // 'UniqueNames': ensures uniqueness across non-typed DataFiles (currently
   // only frequency.txt)

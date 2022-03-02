@@ -103,8 +103,8 @@ protected:
 
 TEST_F(KanjiDataTest, BasicChecks) {
   EXPECT_EQ(_data->kanjiNameMap().size(), 23715);
-  EXPECT_EQ(_data->getLevel("院"), JlptLevels::N4);
-  EXPECT_EQ(_data->getFrequency("蝦"), 2501);
+  EXPECT_EQ(_data->level("院"), JlptLevels::N4);
+  EXPECT_EQ(_data->frequency("蝦"), 2501);
   EXPECT_EQ(_data->getStrokes("廳"), 25);
 }
 
@@ -188,7 +188,6 @@ TEST_F(KanjiDataTest, TotalsChecks) {
   EXPECT_EQ(_data->levelTotal(JlptLevels::N2), 415);
   EXPECT_EQ(_data->levelTotal(JlptLevels::N1), 1162);
   EXPECT_EQ(_data->levelTotal(JlptLevels::None), 0);
-  EXPECT_EQ(_data->frequencyTotal(-1), 0);
   EXPECT_EQ(_data->frequencyTotal(0), 500);
   EXPECT_EQ(_data->frequencyTotal(1), 500);
   EXPECT_EQ(_data->frequencyTotal(2), 500);
@@ -240,10 +239,9 @@ TEST_F(KanjiDataTest, FindByName) {
 }
 
 TEST_F(KanjiDataTest, FindKanjiByFrequency) {
-  ASSERT_FALSE(_data->findKanjiByFrequency(-1));
   ASSERT_FALSE(_data->findKanjiByFrequency(0));
   ASSERT_FALSE(_data->findKanjiByFrequency(2502));
-  for (auto i = 1; i < 2502; ++i) ASSERT_TRUE(_data->findKanjiByFrequency(i));
+  for (size_t i = 1; i < 2502; ++i) ASSERT_TRUE(_data->findKanjiByFrequency(i));
   EXPECT_EQ((**_data->findKanjiByFrequency(1)).name(), "日");
   EXPECT_EQ((**_data->findKanjiByFrequency(2001)).name(), "炒");
   EXPECT_EQ((**_data->findKanjiByFrequency(2501)).name(), "蝦");

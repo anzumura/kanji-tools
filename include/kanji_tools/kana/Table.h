@@ -61,7 +61,7 @@ private:
   const Row _title;
   const bool _countInFirstColumn;
   Rows _rows;
-  std::set<int> _sections;
+  std::set<size_t> _sections;
 };
 
 } // namespace kanji_tools

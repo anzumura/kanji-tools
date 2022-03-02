@@ -115,7 +115,7 @@ std::string KanaConvert::convert(CharType source,
   // For Romaji source, break into words separated by any of _narrowDelimList
   // and process each word. This helps deal with words ending in 'n'.
   std::string result;
-  auto oldPos = 0;
+  size_t oldPos = 0;
   for (const auto keepSpaces = !(_flags & ConvertFlags::RemoveSpaces);;) {
     const auto pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
@@ -263,19 +263,19 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
   std::string result, letterGroup, letter;
   for (MBChar s(input); s.next(letter, false);)
     if (isSingleByte(letter)) {
-      if (const char lowerCaseLetter = std::tolower(letter[0]);
-          lowerCaseLetter != 'n') {
-        letterGroup += lowerCaseLetter;
+      if (const auto lowerLetter = static_cast<char>(std::tolower(letter[0]));
+          lowerLetter != 'n') {
+        letterGroup += lowerLetter;
         romajiLetters(letterGroup, result);
       } else if (letterGroup.empty())
-        letterGroup += lowerCaseLetter;
+        letterGroup += lowerLetter;
       else if (letterGroup == "n")
         // got two 'n's in a row so output one, but don't clear letterGroup
         result += getN();
       else {
         // error: partial romaji followed by n - output uncoverted partial group
         result += letterGroup;
-        letterGroup = lowerCaseLetter; // 'n' starts a new group
+        letterGroup = lowerLetter; // 'n' starts a new group
       }
     } else if (!romajiMacronLetter(letter, letterGroup, result)) {
       romajiLetters(letterGroup, result);

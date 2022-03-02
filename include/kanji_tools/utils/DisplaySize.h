@@ -92,7 +92,8 @@ inline constexpr std::array WideBlocks = {
 // << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by returning
 // '5' (5 is 2 more than the 3 byte size of 's').
 [[nodiscard]] inline auto wideSetw(const std::string& s, size_t setwLen) {
-  return setwLen + s.size() - displaySize(s);
+  // cast to int since std::setw takes an int
+  return static_cast<int>(setwLen + s.size() - displaySize(s));
 }
 
 } // namespace kanji_tools

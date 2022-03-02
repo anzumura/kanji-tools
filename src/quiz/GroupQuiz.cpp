@@ -32,7 +32,7 @@ constexpr auto TotalLetters = 'z' - 'a';
 
 } // namespace
 
-GroupQuiz::GroupQuiz(const QuizLauncher& launcher, int question,
+GroupQuiz::GroupQuiz(const QuizLauncher& launcher, size_t question,
                      bool showMeanings, const GroupData::List& list,
                      MemberType memberType)
     : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
@@ -169,11 +169,12 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
 
 void GroupQuiz::showGroup(const List& questions, const List& readings,
                           Choices& choices, bool repeatQuestion) const {
-  for (auto count = 0; auto& i : questions) {
-    const auto choice =
-      isTestMode()
-        ? count < TotalLetters ? 'a' + count : 'A' + (count - TotalLetters)
-        : ' ';
+  for (size_t count = 0; auto& i : questions) {
+    const char choice = isTestMode()
+                          ? count < TotalLetters
+                              ? 'a' + static_cast<char>(count)
+                              : 'A' + static_cast<char>(count - TotalLetters)
+                          : ' ';
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s = i->qualifiedName();
     addPinyin(i, s);
@@ -249,7 +250,7 @@ void GroupQuiz::editAnswer(Choices& choices) {
   choices.erase(answer);
 }
 
-int GroupQuiz::getAnswerToEdit() const {
+size_t GroupQuiz::getAnswerToEdit() const {
   static const std::string AnswerToEdit("    Answer to edit: ");
 
   if (_answers.size() == 1) return 0;
@@ -258,14 +259,15 @@ int GroupQuiz::getAnswerToEdit() const {
   const auto index = std::find(_answers.begin(), _answers.end(),
                                get(AnswerToEdit, answersToEdit, {}, false));
   assert(index != _answers.end());
-  return std::distance(_answers.begin(), index);
+  return static_cast<size_t>(std::distance(_answers.begin(), index));
 }
 
 void GroupQuiz::checkAnswers(const List& questions, const List& readings,
                              const std::string& name) {
   size_t count = 0;
   for (auto i : _answers) {
-    auto index = (i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
+    const auto index =
+      static_cast<size_t>(i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
     // Only match on readings (and meanings if '_showMeanings' is true) instead
     // of making sure the kanji is exactly the same since many kanjis have
     // identical readings especially in the 'patterns' groups (and the user has

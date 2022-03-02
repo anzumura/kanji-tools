@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 class LinkedKanji : public Kanji {
 public:
-  [[nodiscard]] OptInt frequency() const override { return _frequency; }
+  [[nodiscard]] OptSize frequency() const override { return _frequency; }
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
   [[nodiscard]] const std::string& meaning() const override {
     return _link->meaning();
@@ -24,7 +24,7 @@ protected:
       : Kanji(name, d.getCompatibilityName(name), d.ucdRadical(name, u),
               d.getStrokes(name, u), d.getMorohashiId(u), d.getNelsonIds(u),
               d.getPinyin(u)),
-        _frequency(d.getFrequency(name)), _kyu(d.getKyu(name)), _link(link) {}
+        _frequency(d.frequency(name)), _kyu(d.kyu(name)), _link(link) {}
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to
   // either Jouyou or Jinmei
@@ -42,7 +42,7 @@ protected:
     return name;
   }
 private:
-  const OptInt _frequency;
+  const OptSize _frequency;
   const KenteiKyus _kyu;
   const Data::Entry _link;
 };

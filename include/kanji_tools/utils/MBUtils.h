@@ -20,6 +20,12 @@ namespace kanji_tools {
 }
 
 [[nodiscard]] std::string toUtf8(char32_t);
+[[nodiscard]] inline std::string toUtf8(int x) {
+  return toUtf8(static_cast<char32_t>(x));
+}
+[[nodiscard]] inline std::string toUtf8(long x) {
+  return toUtf8(static_cast<char32_t>(x));
+}
 [[nodiscard]] std::string toUtf8(const std::u32string&);
 
 // keep wstring versions of conversion functions for now to work with wregex
@@ -79,7 +85,8 @@ template<typename T>
     addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
 }
 
-template<typename T> [[nodiscard]] inline auto toBinary(T x, int minSize = 0) {
+template<typename T>
+[[nodiscard]] inline auto toBinary(T x, size_t minSize = 0) {
   return toBinary(x, BracketType::None, minSize);
 }
 

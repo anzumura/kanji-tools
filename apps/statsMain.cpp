@@ -5,7 +5,8 @@ using namespace kanji_tools;
 
 int main(int argc, const char** argv) {
   try {
-    Stats stats(argc, argv, std::make_shared<KanjiData>(argc, argv));
+    const auto c = static_cast<size_t>(argc);
+    Stats stats(c, argv, std::make_shared<KanjiData>(c, argv));
   } catch (const std::exception& err) {
     std::cerr << err.what() << '\n';
     return 1;

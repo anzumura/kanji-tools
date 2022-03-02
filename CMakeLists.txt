@@ -15,7 +15,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # enable some warnings and turn them into errors (-W is the same as -Wextra)
     set(WARN_FLAGS "-Werror -W -Wall -Wunused -Wunreachable-code-aggressive")
     # skip -Wdeprecated if using boost
-    set(WARN_FLAGS "${WARN_FLAGS} -Wdeprecated")
+    set(WARN_FLAGS "${WARN_FLAGS} -Wdeprecated -Wconversion")
     # disable a warning (add -Wno-unused-variable if using boost)
     set(WARN_FLAGS "${WARN_FLAGS} -Wno-logical-op-parentheses")
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 \

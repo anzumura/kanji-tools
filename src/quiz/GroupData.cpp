@@ -93,13 +93,13 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
               " members");
 
     Entry group =
-      createGroup(f.getInt(numberCol), name, memberKanji, patternType);
+      createGroup(f.getSize(numberCol), name, memberKanji, patternType);
     for (auto& i : memberKanji) checkInsert(i->name(), groups, group);
     list.push_back(group);
   }
 }
 
-GroupData::Entry GroupData::createGroup(int number, const std::string& name,
+GroupData::Entry GroupData::createGroup(size_t number, const std::string& name,
                                         const Data::List& members,
                                         Group::PatternType patternType) const {
   if (patternType == Group::PatternType::None)
@@ -205,12 +205,10 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
       auto& list = _data->typeList(i);
       out() << std::right << std::setw(14) << i << ": " << j->second.size()
             << " / " << list.size();
-      if (int missing = list.size() - j->second.size(); missing < 0)
-        out() << " -- ERROR: negative missing values"; // shouldn't be possible
-      else if (missing > 0) {
+      if (const auto missing = list.size() - j->second.size(); missing) {
         std::sort(j->second.begin(), j->second.end());
         out() << " (";
-        for (auto count = 0; auto& k : list)
+        for (size_t count = 0; auto& k : list)
           if (!std::binary_search(j->second.begin(), j->second.end(),
                                   k->name())) {
             if (count) out() << ' ';

@@ -43,20 +43,18 @@ protected:
   // Constructor used by 'CustomFileKanji' and 'ExtraKanji': calls base with
   // 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
-                  int strokes, const std::string& meaning,
+                  size_t strokes, const std::string& meaning,
                   const LinkNames& oldNames, const Ucd* u)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
                        f.get(ReadingCol), strokes, u),
-        _kyu(d.getKyu(name)), _number(f.getInt(NumberCol)),
-        _oldNames(oldNames) {}
+        _kyu(d.kyu(name)), _number(f.getSize(NumberCol)), _oldNames(oldNames) {}
 
   // Constructor used by 'OfficialKanji': calls base without 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
-                  int strokes, const LinkNames& oldNames)
+                  size_t strokes, const LinkNames& oldNames)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)),
                        f.get(ReadingCol), strokes, findUcd(d, name)),
-        _kyu(d.getKyu(name)), _number(f.getInt(NumberCol)),
-        _oldNames(oldNames) {}
+        _kyu(d.kyu(name)), _number(f.getSize(NumberCol)), _oldNames(oldNames) {}
 private:
   // all kanji files must have at least the following columns
   inline static const std::vector RequiredColumns{NumberCol, NameCol,
@@ -70,7 +68,7 @@ private:
   inline static const std::vector ExtraRequiredColumns{StrokesCol, MeaningCol};
 
   const KenteiKyus _kyu;
-  const int _number;
+  const size_t _number;
   const LinkNames _oldNames;
 };
 
@@ -84,7 +82,7 @@ public:
                  : CustomFileKanji::extraTypeInfo();
   }
 
-  [[nodiscard]] OptInt frequency() const override { return _frequency; }
+  [[nodiscard]] OptSize frequency() const override { return _frequency; }
   [[nodiscard]] JlptLevels level() const override { return _level; }
 
   [[nodiscard]] auto year() const { return _year; }
@@ -92,22 +90,22 @@ protected:
   // constructor used by 'JinmeiKanji' calls base without 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name)
       : CustomFileKanji(d, f, name, d.getStrokes(name), getOldNames(f)),
-        _frequency(d.getFrequency(name)), _level(d.getLevel(name)),
-        _year(f.getOptInt(YearCol)) {}
+        _frequency(d.frequency(name)), _level(d.level(name)),
+        _year(f.getOptSize(YearCol)) {}
 
   // constructor used by 'JouyouKanji' calls base with 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name,
-                int s, const std::string& meaning)
+                size_t s, const std::string& meaning)
       : CustomFileKanji(d, f, name, s, meaning, getOldNames(f),
                         findUcd(d, name)),
-        _frequency(d.getFrequency(name)), _level(d.getLevel(name)),
-        _year(f.getOptInt(YearCol)) {}
+        _frequency(d.frequency(name)), _level(d.level(name)),
+        _year(f.getOptSize(YearCol)) {}
 private:
   [[nodiscard]] static LinkNames getOldNames(const ColumnFile&);
 
-  const OptInt _frequency;
+  const OptSize _frequency;
   const JlptLevels _level;
-  const OptInt _year;
+  const OptSize _year;
 };
 
 class JinmeiKanji : public OfficialKanji {
@@ -129,7 +127,7 @@ private:
 class JouyouKanji : public OfficialKanji {
 public:
   JouyouKanji(const Data& d, const ColumnFile& f)
-      : OfficialKanji(d, f, f.get(NameCol), f.getInt(StrokesCol),
+      : OfficialKanji(d, f, f.get(NameCol), f.getSize(StrokesCol),
                       f.get(MeaningCol)),
         _grade(getGrade(f.get(GradeCol))) {}
 
@@ -159,7 +157,7 @@ private:
   ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name,
              const Ucd* u)
       : CustomFileKanji(
-          d, f, name, f.getInt(StrokesCol), f.get(MeaningCol),
+          d, f, name, f.getSize(StrokesCol), f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
         _newName(u && u->hasNonTraditionalLinks()
                    ? OptString(u->links()[0].name())

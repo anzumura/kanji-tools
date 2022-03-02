@@ -111,7 +111,7 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
     }
   };
 
-  auto question = 0;
+  size_t question = 0;
   auto endOptions = false, showMeanings = false;
   for (auto i = Data::nextArg(argc, argv); i < argc;
        i = Data::nextArg(argc, argv, i))
@@ -146,7 +146,7 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
     start(quizType, questionList, question, showMeanings);
 }
 
-void QuizLauncher::start(OptChar quizType, OptChar qList, int question,
+void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
                          bool meanings) {
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c = _choice.get("Mode", ProgramModeChoices, DefaultProgramMode);
@@ -171,7 +171,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question,
     if (const auto c =
           qList ? *qList : _choice.get("Choose list", FrequencyChoices);
         !isQuit(c))
-      listQuiz(KanjiInfo::Freq, data().frequencyList(c - '1'));
+      listQuiz(KanjiInfo::Freq,
+               data().frequencyList(static_cast<size_t>(c - '1')));
     break;
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
@@ -180,7 +181,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question,
                                            GradeChoices, DefaultGrade);
         !isQuit(c))
       listQuiz(KanjiInfo::Grade,
-               data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']));
+               data().gradeList(
+                 AllKanjiGrades[static_cast<size_t>(c == 's' ? 6 : c - '1')]));
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
@@ -188,21 +190,24 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, int question,
                              : _choice.get("Choose kyu", KyuStart, KyuEnd,
                                            KyuChoices, DefaultKyu);
         !isQuit(c))
-      listQuiz(KanjiInfo::Kyu,
-               data().kyuList(AllKenteiKyus[c == 'a'   ? 0
+      listQuiz(
+        KanjiInfo::Kyu,
+        data().kyuList(
+          AllKenteiKyus[static_cast<size_t>(c == 'a'   ? 0
                                             : c == 'c' ? 8
                                             : c == '2' ? 9
                                             : c == 'b' ? 10
                                             : c == '1' ? 11
-                                                       : 7 - (c - '3')]));
+                                                       : 7 - (c - '3'))]));
     break;
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
     if (const char c =
           qList ? *qList : _choice.get("Choose level", LevelChoices);
         !isQuit(c))
-      listQuiz(KanjiInfo::Level,
-               data().levelList(AllJlptLevels[4 - (c - '1')]));
+      listQuiz(
+        KanjiInfo::Level,
+        data().levelList(AllJlptLevels[static_cast<size_t>(4 - (c - '1'))]));
     break;
   case 'm': groupQuiz(_groupData->meaningGroups()); break;
   case 'p': groupQuiz(_groupData->patternGroups()); break;
@@ -294,16 +299,16 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   out() << '\n';
 }
 
-void QuizLauncher::startListQuiz(int question, bool showMeanings,
+void QuizLauncher::startListQuiz(size_t question, bool showMeanings,
                                  KanjiInfo excludeField,
                                  const List& list) const {
-  auto choiceCount = 1;
+  size_t choiceCount = 1;
   auto quizStyle = DefaultListStyle;
   if (isTestMode()) {
     const auto c = _choice.get("Number of choices", ListChoiceCountStart,
                                ListChoiceCountEnd, DefaultListChoiceCount);
     if (isQuit(c)) return;
-    choiceCount = c - '0';
+    choiceCount = static_cast<size_t>(c - '0');
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);
     if (isQuit(quizStyle)) return;
   }
@@ -311,7 +316,7 @@ void QuizLauncher::startListQuiz(int question, bool showMeanings,
            choiceCount, ListQuiz::toQuizStyle(quizStyle));
 }
 
-void QuizLauncher::startGroupQuiz(int question, bool showMeanings,
+void QuizLauncher::startGroupQuiz(size_t question, bool showMeanings,
                                   OptChar qList,
                                   const GroupData::List& list) const {
   if (const auto c =
@@ -322,7 +327,7 @@ void QuizLauncher::startGroupQuiz(int question, bool showMeanings,
               static_cast<GroupQuiz::MemberType>(c - '1'));
 }
 
-int QuizLauncher::processProgramModeArg(const std::string& arg) {
+size_t QuizLauncher::processProgramModeArg(const std::string& arg) {
   if (_programMode != ProgramMode::NotAssigned)
     Data::usage("only one mode (-r or -t) can be specified, use -h for help");
   _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
@@ -330,7 +335,7 @@ int QuizLauncher::processProgramModeArg(const std::string& arg) {
     if (arg.size() == 3 && arg[2] == '0')
       _questionOrder = QuestionOrder::Random;
     else {
-      auto offset = 2;
+      size_t offset = 2;
       if (arg[2] == '-') {
         _questionOrder = QuestionOrder::FromEnd;
         offset = 3;
@@ -342,7 +347,7 @@ int QuizLauncher::processProgramModeArg(const std::string& arg) {
       if (!std::all_of(numArg.begin(), numArg.end(), ::isdigit))
         Data::usage("invalid format for " + arg.substr(0, 2) +
                     ", use -h for help");
-      return std::stoi(numArg);
+      return std::stoul(numArg);
     }
   }
   return 0;
@@ -350,7 +355,7 @@ int QuizLauncher::processProgramModeArg(const std::string& arg) {
 
 void QuizLauncher::processKanjiArg(const std::string& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
-    const auto kanji = _groupData->data().findKanjiByFrequency(std::stoi(arg));
+    const auto kanji = _groupData->data().findKanjiByFrequency(std::stoul(arg));
     if (!kanji) Data::usage("invalid frequency '" + arg + "'");
     printDetails((**kanji).name());
   } else if (arg.starts_with("m")) {
@@ -438,13 +443,13 @@ void QuizLauncher::printJukugoList(const std::string& name,
     for (auto& i : list) out() << ' ' << i->nameAndReading();
   else {
     out() << ' ' << list.size();
-    std::array<int, JukugoPerLine> colWidths;
+    std::array<size_t, JukugoPerLine> colWidths;
     colWidths.fill(0);
     // make each column wide enough to hold the longest entry plus 2 spaces
     // (upto MaxJukugoSize)
     for (size_t i = 0; i < list.size(); ++i)
       if (colWidths[i % JukugoPerLine] < MaxJukugoSize)
-        if (const int size = displaySize(list[i]->nameAndReading()) + 2;
+        if (const size_t size = displaySize(list[i]->nameAndReading()) + 2;
             size > colWidths[i % JukugoPerLine])
           colWidths[i % JukugoPerLine] =
             size < MaxJukugoSize ? size : MaxJukugoSize;

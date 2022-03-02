@@ -22,7 +22,7 @@ protected:
   static constexpr auto PrevOption = ',';
   static constexpr auto SkipOption = '.';
 
-  Quiz(const QuizLauncher& launcher, int question, bool showMeanings)
+  Quiz(const QuizLauncher& launcher, size_t question, bool showMeanings)
       : _launcher(launcher), _question(question), _correctAnswers(0),
         _showMeanings(showMeanings) {}
 

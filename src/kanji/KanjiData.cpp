@@ -34,7 +34,7 @@ const fs::path UcdFile = "ucd.txt";
 
 } // namespace
 
-KanjiData::KanjiData(int argc, const char** argv, std::ostream& out,
+KanjiData::KanjiData(size_t argc, const char** argv, std::ostream& out,
                      std::ostream& err)
     : Data(getDataDir(argc, argv), getDebugMode(argc, argv), out, err),
       _levels{LevelDataFile(dataDir() / N5File, JlptLevels::N5, debug()),
@@ -87,19 +87,19 @@ KanjiData::KanjiData(int argc, const char** argv, std::ostream& out,
   }
 }
 
-JlptLevels KanjiData::getLevel(const std::string& k) const {
+JlptLevels KanjiData::level(const std::string& k) const {
   for (auto& i : _levels)
     if (i.exists(k)) return i.level();
   return JlptLevels::None;
 }
 
-KenteiKyus KanjiData::getKyu(const std::string& k) const {
+KenteiKyus KanjiData::kyu(const std::string& k) const {
   for (auto& i : _kyus)
     if (i.exists(k)) return i.kyu();
   return KenteiKyus::None;
 }
 
-void KanjiData::noFreq(int f, bool brackets) const {
+void KanjiData::noFreq(long f, bool brackets) const {
   if (f) {
     if (brackets)
       out() << " (";
@@ -117,7 +117,7 @@ void KanjiData::printCount(const std::string& name, T pred,
   std::map<KanjiTypes, std::vector<std::string>> examples;
   auto total = 0;
   for (auto& l : _types) {
-    auto count = 0;
+    auto count = 0L;
     if (printExamples)
       for (auto& i : l.second) {
         if (pred(i) && ++count <= printExamples)

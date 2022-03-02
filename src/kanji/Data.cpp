@@ -171,10 +171,10 @@ void Data::printError(const std::string& msg) const {
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
-  auto strokes = 0;
+  size_t strokes = 0;
   for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
-      const auto newStrokes = std::stoi(line);
+      const auto newStrokes = std::stoul(line);
       assert(newStrokes > strokes);
       strokes = newStrokes;
     } else {
@@ -316,8 +316,8 @@ void Data::processList(const DataFile& list) {
         std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
       for (const auto& i : lists) {
         DataFile::List jlptJinmei, otherJinmei;
-        for (const auto& j : *i.first)
-          (hasValue(getLevel(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
+        for (auto& j : *i.first)
+          (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
         DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei",
                         list.name());
         DataFile::print(otherJinmei,

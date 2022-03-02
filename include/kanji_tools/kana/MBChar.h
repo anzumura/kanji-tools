@@ -64,7 +64,7 @@ public:
   // mark' - these are not counted since they are considered part of the
   // previous 'MB character' (as a modifier).
   [[nodiscard]] static auto size(const char* s, bool onlyMB = true) {
-    int result = 0;
+    size_t result = 0;
     // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
     // checking if the next 3 bytes represent a 'variation selector'
     if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
@@ -150,7 +150,7 @@ private:
   // 'getMBUtf8' returns a string containing one multi-byte UTF-8 sequence
   // starting at 'location'
   [[nodiscard]] static auto getMBUtf8(const char*& location) {
-    const unsigned char firstOfGroup = *location;
+    const auto firstOfGroup = static_cast<unsigned char>(*location);
     std::string result({*location++});
     for (unsigned char x = Bit2; x && firstOfGroup & x; x >>= 1)
       result += *location++;
@@ -178,9 +178,9 @@ private:
 
   const std::string _data;
   const char* _location = _data.c_str();
-  int _errors = 0;         // count of invalid bytes sequences found
-  int _variants = 0;       // count of 'Variation Selector's found
-  int _combiningMarks = 0; // count of 'Combining Marks's found
+  size_t _errors = 0;         // count of invalid bytes sequences found
+  size_t _variants = 0;       // count of 'Variation Selector's found
+  size_t _combiningMarks = 0; // count of 'Combining Marks's found
 };
 
 } // namespace kanji_tools
