@@ -1,5 +1,5 @@
-add_executable(utilsTest ChoiceTest.cpp ColumnFileTest.cpp DisplaySizeTest.cpp
-  DataFileTest.cpp EnumArrayTest.cpp EnumArrayWithNoneTest.cpp
+add_executable(utilsTest ChoiceTest.cpp ColumnFileTest.cpp DataFileTest.cpp
+  DisplaySizeTest.cpp EnumArrayTest.cpp EnumArrayWithNoneTest.cpp
   EnumBitmaskTest.cpp JlptLevelsTest.cpp KenteiKyusTest.cpp MBUtilsTest.cpp
   UnicodeBlockTest.cpp ../testMain.cpp)
 target_link_libraries(utilsTest PRIVATE kanjiToolsUtils gtest)
