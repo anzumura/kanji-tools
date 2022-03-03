@@ -69,8 +69,19 @@ TEST(EnumArrayTest, Iteration) {
   EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
 }
 
+TEST(EnumArrayTest, IterationInt) {
+  std::vector<Colors> colors;
+  // test the int overload of operator[]
+  for (auto i = 0; i < 3; ++i) colors.push_back(AllColors[i]);
+  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
+}
+
 TEST(EnumArrayTest, BadAccess) {
+  EXPECT_THROW(call([] { return AllColors[-1]; }, "index '-1' is out of range"),
+               std::out_of_range);
   EXPECT_THROW(call([] { return AllColors[4]; }, "index '4' is out of range"),
+               std::out_of_range);
+  EXPECT_THROW(call([] { return AllColors[4UL]; }, "index '4' is out of range"),
                std::out_of_range);
 }
 

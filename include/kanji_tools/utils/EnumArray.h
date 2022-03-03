@@ -159,10 +159,10 @@ public:
     auto& operator+=(difference_type offset) {
       if (const auto i = static_cast<difference_type>(_index) + offset; i < 0)
         error(BadBegin);
-      else if (i > static_cast<difference_type>(N))
+      else if (const auto j = static_cast<size_t>(i); j > N)
         error(BadEnd);
       else
-        _index = static_cast<size_t>(i);
+        _index = j;
       return *this;
     }
     auto& operator-=(difference_type offset) { return *this += -offset; }
@@ -195,18 +195,25 @@ public:
   [[nodiscard]] static constexpr size_t size() noexcept { return N; }
 
   [[nodiscard]] auto operator[](size_t i) const {
-    if (i >= N)
-      throw std::out_of_range("index '" + std::to_string(i) +
-                              "' is out of range");
-    return static_cast<T>(i);
+    return static_cast<T>(checkIndex(i, Index));
+  }
+  [[nodiscard]] auto operator[](int i) const {
+    return static_cast<T>(checkIndex(i, Index));
   }
 protected:
   [[nodiscard]] static auto getIndex(T x) {
-    const auto i = static_cast<size_t>(to_underlying(x));
-    if (i >= N)
-      throw std::out_of_range("enum '" + std::to_string(i) +
-                              "' is out of range");
-    return i;
+    return checkIndex(to_underlying(x), Enum);
+  }
+private:
+  inline static const std::string Index = "index '", Enum = "enum '";
+
+  template<typename Index>
+  [[nodiscard]] static auto checkIndex(Index i, const std::string& name) {
+    const auto x = static_cast<size_t>(i);
+    if (x >= N)
+      // use original value in error message (so int '-1' is preserved)
+      throw std::out_of_range(name + std::to_string(i) + "' is out of range");
+    return x;
   }
 };
 
