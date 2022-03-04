@@ -60,18 +60,16 @@ void ListQuiz::start(const List& questions) {
 }
 
 size_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
-  std::uniform_int_distribution<> randomReading(
-    0, static_cast<int>(questions.size()) - 1);
-  std::uniform_int_distribution<> randomCorrect(
-    0, static_cast<int>(_choiceCount) - 1);
+  std::uniform_int_distribution<size_t> randomReading(0, questions.size() - 1);
+  std::uniform_int_distribution<size_t> randomCorrect(0, _choiceCount - 1);
 
-  const auto correctChoice = static_cast<size_t>(randomCorrect(RandomGen));
+  const auto correctChoice = randomCorrect(RandomGen);
   // 'sameReading' prevents more than one choice having the same reading
   DataFile::Set sameReading = {kanji->reading()};
   _answers[correctChoice] = _question;
   for (size_t i = 0; i < _choiceCount; ++i)
     if (i != correctChoice) do {
-        if (const auto choice = static_cast<size_t>(randomReading(RandomGen));
+        if (const auto choice = randomReading(RandomGen);
             sameReading.insert(questions[choice]->reading()).second) {
           _answers[i] = choice;
           break;

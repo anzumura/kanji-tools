@@ -170,11 +170,11 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
 void GroupQuiz::showGroup(const List& questions, const List& readings,
                           Choices& choices, bool repeatQuestion) const {
   for (size_t count = 0; auto& i : questions) {
-    const char choice = isTestMode()
-                          ? count < TotalLetters
-                              ? 'a' + static_cast<char>(count)
-                              : 'A' + static_cast<char>(count - TotalLetters)
-                          : ' ';
+    const char choice =
+      isTestMode()
+        ? static_cast<char>(count < TotalLetters ? 'a' + count
+                                                 : 'A' + count - TotalLetters)
+        : ' ';
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s = i->qualifiedName();
     addPinyin(i, s);
