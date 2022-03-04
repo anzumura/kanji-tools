@@ -101,8 +101,7 @@ void UcdData::load(const std::filesystem::path& file) {
     if (radical < 1 || radical > 214) f.error("radical out of range");
     // 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
     if (strokes < 1 || strokes > 53) f.error("strokes out of range");
-    if (vStrokes < 0 || vStrokes == 1 || vStrokes > 33)
-      f.error("variant strokes out of range");
+    if (vStrokes == 1 || vStrokes > 33) f.error("variant strokes out of range");
 
     const auto joyo = f.getBool(joyoCol), jinmei = f.getBool(jinmeiCol);
     if (joyo) {

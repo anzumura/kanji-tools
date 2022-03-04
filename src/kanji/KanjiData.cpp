@@ -115,7 +115,7 @@ void KanjiData::printCount(const std::string& name, T pred,
                            int printExamples) const {
   std::vector<std::pair<KanjiTypes, int>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
-  auto total = 0;
+  auto total = 0L;
   for (auto& l : _types) {
     auto count = 0L;
     if (printExamples)
@@ -169,7 +169,7 @@ void KanjiData::printStats() const {
 
 void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
-  auto all = 0;
+  auto all = 0L;
   for (auto& jouyou = _types.at(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
     const auto grade = [i](auto& x) { return x->grade() == i; };
     if (auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
@@ -203,10 +203,10 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
                                T (Kanji::*p)() const, const std::string& name,
                                bool showNoFrequency) const {
   log() << name << " breakdown:\n";
-  auto total = 0;
+  auto total = 0L;
   for (const auto i : all) {
     std::vector<std::pair<KanjiTypes, int>> counts;
-    auto iTotal = 0;
+    auto iTotal = 0L;
     for (auto& l : _types)
       if (const auto count =
             std::count_if(l.second.begin(), l.second.end(),

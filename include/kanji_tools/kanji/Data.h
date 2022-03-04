@@ -157,8 +157,7 @@ public:
   // frequency lists
   enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
   [[nodiscard]] auto& frequencyList(size_t range) const {
-    return range >= 0 && range < FrequencyBuckets ? _frequencies[range]
-                                                  : _emptyList;
+    return range < FrequencyBuckets ? _frequencies[range] : _emptyList;
   }
   [[nodiscard]] auto frequencyTotal(size_t range) const {
     return frequencyList(range).size();

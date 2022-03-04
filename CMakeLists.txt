@@ -7,24 +7,25 @@ project(kanji_tools VERSION 1.0
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
   message(FATAL_ERROR "can't build in a source directory")
-endif()
-
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  endif()
+  
+  if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
+  # enable some warnings and turn them into errors (-W is the same as -Wextra)
+  # for boost skip -Wdeprecated and -Wconversion and add -Wno-unused-variable
+  set(WARN_FLAGS "-Werror -W -Wall -Wunused -Wconversion")
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # enable some warnings and turn them into errors (-W is the same as -Wextra)
-    set(WARN_FLAGS "-Werror -W -Wall -Wunused -Wunreachable-code-aggressive")
-    # skip -Wdeprecated and -Wconversion if using boost
-    set(WARN_FLAGS "${WARN_FLAGS} -Wdeprecated -Wconversion")
-    # disable a warning (add -Wno-unused-variable if using boost)
-    set(WARN_FLAGS "${WARN_FLAGS} -Wno-logical-op-parentheses")
+    # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h'
+    string(APPEND WARN_FLAGS " -Wdeprecated -Wunreachable-code-aggressive")
+    string(APPEND WARN_FLAGS " -Wno-logical-op-parentheses")
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 \
 -fno-optimize-sibling-calls")
     # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
-    # set(SANITIZER_STACK_FLAGS "-fsanitize-address-use-after-scope")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZER_FLAGS} \
-${SANITIZER_STACK_FLAGS} ${WARN_FLAGS}")
+    # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    string(APPEND WARN_FLAGS " -Wno-parentheses")
   endif()
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS} ${WARN_FLAGS}")
   # Use the following to override the linker
   # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
   include(CTest)
@@ -34,6 +35,7 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
+  # 1.11.0 was released on June 11, 2021 (or change to HEAD)
   GIT_TAG release-1.11.0
 )
 FetchContent_MakeAvailable(googletest)

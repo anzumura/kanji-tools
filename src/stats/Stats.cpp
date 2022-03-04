@@ -20,7 +20,7 @@ constexpr auto HelpMessage = R"(kanjiStats [-bhv] file [file ...]:
 )";
 
 [[nodiscard]] constexpr double asPercent(size_t amount, size_t total) {
-  return amount * 100. / total;
+  return static_cast<double>(amount) * 100. / static_cast<double>(total);
 }
 
 // helper class for ordering and printing out kanji found in files

@@ -80,7 +80,8 @@ template<typename T>
                                    size_t minSize = 0) {
   static_assert(std::is_integral_v<T>);
   std::string result;
-  for (; x > 0; x >>= 1) result.insert(result.begin(), '0' + x % 2);
+  for (; x > 0; x >>= 1)
+    result.insert(result.begin(), '0' + static_cast<char>(x % 2));
   return addBrackets(
     addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
 }
@@ -169,7 +170,7 @@ template<>
   return x >= 0;
 }
 [[nodiscard]] constexpr auto isSingleByteChar(char32_t x) noexcept {
-  return x >= 0 && x < 128;
+  return x < 128;
 }
 [[nodiscard]] inline auto isSingleByte(const std::string& s,
                                        bool sizeOne = true) noexcept {
