@@ -86,21 +86,22 @@ The program also supports various flags for controlling conversion (like Hepburn
 
 **Notes**:
 
-- Roma=Rōmaji, Hira=Hiragana, Kata=Katakana, Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
-- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro' in some cases
+- Abbreviations used below: Roma=Rōmaji, Hira=Hiragana, Kata=Katakana,
+                            Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
+- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro'
 - Hepb and Kunr are only populated when they would produce different output
   - Values in () means 'output-only' since inputting leads to a different kana
-- 'Roma Variants' are alternative keyboard combinations that lead to the same kana
+- 'Roma Variants' are alternative key combinations that lead to the same kana
 - When populated, Roma, Hira and Kata columns are unique (no duplicates)
 - Unicode values are only shown for 'monograph' entries
-- Some 'digraphs' may not be in any real words, but they are typeable and thus included
+- Some 'digraphs' may not be in any real words, but include for completeness
 - Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no standard Hiragana or Romaji)
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no conversion exist)
 - Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
 - Type 'N' includes:
-  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match usual IME keyboard entry
-  - Prolong Mark (ー): conversion via macrons (ā, ī, ū, ē, ō) so no single Rōmaji value
-  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): conversion only supported when 'target' is Rōmaji
+  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
+  - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
+  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
 
 | No. | Type | Roma | Hira | Kata | HUni | KUni | Hepb | Kunr | Roma Variants |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
