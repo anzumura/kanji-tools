@@ -127,7 +127,7 @@ private:
   // row. A vector is used instead of a map to make lookups faster (and avoid
   // string compares) and the extra space of having a sparse collection should
   // be minimal since columns numbers are shared if they have the same name.
-  std::vector<int> _columnToPosition;
+  std::vector<size_t> _columnToPosition;
 
   // '_allColumns' is used to globally assign unique numbers to 'Column'
   // instances, i.e., if the column name exists then the same number is used,

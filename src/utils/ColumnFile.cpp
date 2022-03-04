@@ -5,6 +5,12 @@
 
 namespace kanji_tools {
 
+namespace {
+
+constexpr auto ColNotFound = std::numeric_limits<size_t>::max();
+
+} // namespace
+
 namespace fs = std::filesystem;
 
 size_t ColumnFile::getColumnNumber(const std::string& name) {
@@ -17,7 +23,7 @@ ColumnFile::ColumnFile(const fs::path& p, const Columns& columns,
                        char delimiter)
     : _file(std::fstream(p)), _delimiter(delimiter),
       _name(p.filename().string()), _rowValues(columns.size()),
-      _columnToPosition(_allColumns.size(), -1) {
+      _columnToPosition(_allColumns.size(), ColNotFound) {
   if (columns.empty()) error("must specify at least one column");
   if (!fs::exists(p)) error("doesn't exist");
   if (!fs::is_regular_file(p)) error("not regular file");
@@ -33,7 +39,7 @@ ColumnFile::ColumnFile(const fs::path& p, const Columns& columns,
 }
 
 void ColumnFile::processHeaderRow(const std::string& row, ColNames& colNames) {
-  auto pos = 0;
+  size_t pos = 0;
   std::set<std::string> foundCols;
   std::string header;
   for (std::stringstream ss(row); std::getline(ss, header, _delimiter); ++pos) {
@@ -85,9 +91,9 @@ const std::string& ColumnFile::get(const Column& column) const {
   if (!_currentRow) error("'nextRow' must be called before calling 'get'");
   if (column.number() >= _columnToPosition.size())
     error("unrecognized column '" + column.name() + "'");
-  const auto position = _columnToPosition[column.number()];
-  if (position == -1) error("invalid column '" + column.name() + "'");
-  return _rowValues[static_cast<size_t>(position)];
+  const auto pos = _columnToPosition[column.number()];
+  if (pos == ColNotFound) error("invalid column '" + column.name() + "'");
+  return _rowValues[pos];
 }
 
 size_t ColumnFile::getSize(const Column& column) const {
