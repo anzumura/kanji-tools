@@ -13,21 +13,21 @@ if(EXISTS "${LOC_PATH}")
   set(CMAKE_CXX_STANDARD 20)
   # enable some warnings and turn them into errors (-W is the same as -Wextra)
   # for boost skip -Wdeprecated and -Wconversion and add -Wno-unused-variable
-  set(WARN_FLAGS "-Werror -W -Wall -Wunused -Wconversion")
+  add_compile_options(-Werror -W -Wall -Wunused -Wconversion -Wshadow)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h'
-    string(APPEND WARN_FLAGS " -Wdeprecated -Wunreachable-code-aggressive")
-    string(APPEND WARN_FLAGS " -Wno-logical-op-parentheses")
+    add_compile_options(-Wdeprecated -Wunreachable-code-aggressive)
+    add_compile_options(-Wno-logical-op-parentheses)
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 \
 -fno-optimize-sibling-calls")
     # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
     # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
+    string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS}")
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    string(APPEND WARN_FLAGS " -Wno-parentheses")
+    add_compile_options(-Wno-parentheses)
   endif()
-  string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS} ${WARN_FLAGS}")
   # Use the following to override the linker
-  # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
+  # string(APPEND " -fuse-ld=gold")
   include(CTest)
 endif()
 

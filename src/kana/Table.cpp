@@ -73,20 +73,20 @@ void Table::printMarkdown(std::ostream& os) const {
   }
 }
 
-void Table::print(std::ostream& os, const Widths& w, const Row& r, char fill,
-                  char delim) const {
+void Table::print(std::ostream& os, const Widths& widths, const Row& row,
+                  char fill, char delim) const {
   static const std::string EmptyString;
   const auto cell = [&os, delim, fill](size_t w, const auto& s) {
     os << delim << fill << std::setw(static_cast<int>(w) + 1) << s;
   };
   os << std::left << std::setfill(fill);
-  for (size_t i = 0; i < w.size(); ++i)
-    if (i < r.size())
+  for (size_t i = 0; i < widths.size(); ++i)
+    if (i < row.size())
       // if string is all narrow then nothing will be added, but if there are
       // wide chars then need to add difference to get 'setw' to work properly
-      cell(w[i] + (r[i].size() - displaySize(r[i])), r[i]);
+      cell(widths[i] + (row[i].size() - displaySize(row[i])), row[i]);
     else
-      cell(w[i], EmptyString);
+      cell(widths[i], EmptyString);
   os << delim << '\n';
 }
 

@@ -97,7 +97,7 @@ private:
   // would result in the code not getting executed when compiling with asserts
   // disabled, i.e., a 'Release' build.
   static void insertUnique(Set& s, const std::string& x) {
-    const auto i = s.insert(x);
+    [[maybe_unused]] const auto i = s.insert(x);
     assert(i.second);
   }
 

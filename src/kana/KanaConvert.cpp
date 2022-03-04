@@ -66,17 +66,17 @@ void KanaConvert::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
   assert(_repeatingConsonents.size() == 18);
-  for (const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
+  for ([[maybe_unused]] const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
     assert(_repeatingConsonents.contains(i) == false);
   assert(_markAfterNHiragana.size() == 8); // 5 vowels plus 3 y's
   assert(_markAfterNHiragana.size() == _markAfterNKatakana.size());
   // 5 small vowels plus 3 small y's plus small 'wa'
   assert(_digraphSecondHiragana.size() == 9);
   assert(_digraphSecondHiragana.size() == _digraphSecondKatakana.size());
-  for (auto& i : _markAfterNHiragana) assert(isHiragana(i));
-  for (auto& i : _markAfterNKatakana) assert(isKatakana(i));
-  for (auto& i : _digraphSecondHiragana) assert(isHiragana(i));
-  for (auto& i : _digraphSecondKatakana) assert(isKatakana(i));
+  for ([[maybe_unused]] auto& i : _markAfterNHiragana) assert(isHiragana(i));
+  for ([[maybe_unused]] auto& i : _markAfterNKatakana) assert(isKatakana(i));
+  for ([[maybe_unused]] auto& i : _digraphSecondHiragana) assert(isHiragana(i));
+  for ([[maybe_unused]] auto& i : _digraphSecondKatakana) assert(isKatakana(i));
   assert(_wideDelims.size() == Delimiters.size());
   assert(_narrowDelims.size() == Delimiters.size());
   assert(_narrowDelimList.size() == Delimiters.size() + 2);

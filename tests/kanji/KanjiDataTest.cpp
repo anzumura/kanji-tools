@@ -381,10 +381,10 @@ TEST_F(KanjiDataTest, UcdLinks) {
     else
       EXPECT_TRUE(isKanji(u.name())) << u.codeAndName();
     // make sure links point to other valid UCD entries
-    for (auto& i : u.links()) {
-      EXPECT_NE(u.name(), i.name());
-      auto link = ucd.find(i.name());
-      ASSERT_FALSE(link == ucd.end()) << i.name();
+    for (auto& j : u.links()) {
+      EXPECT_NE(u.name(), j.name());
+      const auto link = ucd.find(j.name());
+      ASSERT_FALSE(link == ucd.end()) << j.name();
     }
     if (u.joyo()) {
       EXPECT_FALSE(u.jinmei()) << u.codeAndName() << " is both joyo and jinmei";
