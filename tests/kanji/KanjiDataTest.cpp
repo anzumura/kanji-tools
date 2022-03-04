@@ -301,7 +301,9 @@ TEST_F(KanjiDataTest, UcdChecks) {
   // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD
   // unfortunately don't have a dash before the Okurigana.
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
-  // Kanji with multiple Nelson Ids
+}
+
+TEST_F(KanjiDataTest, KanjiWithMultipleNelsonIds) {
   auto ucdNelson = _data->ucd().find("㡡");
   ASSERT_NE(ucdNelson, nullptr);
   EXPECT_EQ(ucdNelson->nelsonIds(), "1487,1491");
