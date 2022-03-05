@@ -23,7 +23,7 @@ public:
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.
   QuizLauncher(size_t argc, const char** argv, DataPtr, GroupDataPtr,
-               JukugoDataPtr, std::istream* in = 0);
+               JukugoDataPtr, std::istream* in = nullptr);
 
   QuizLauncher(const QuizLauncher&) = delete;
   // operator= is not generated since there are const members
