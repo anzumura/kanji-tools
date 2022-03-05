@@ -12,8 +12,6 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
   # enable some warnings and turn them into errors (-W is the same as -Wextra)
-  # note: if using boost, can't set -Wdeprecated, -Wconversion or -Wshadow and
-  # need to add -Wno-unused-variable
   add_compile_options(-Werror -W -Wall -Wunused -Wconversion -Wshadow)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h'
@@ -65,7 +63,7 @@ FetchContent_MakeAvailable(googletest)
 # find_package(Boost 1.78.0 REQUIRED regex locale)
 # if(Boost_FOUND)
 #   link_directories(${Boost_LINK_DIR})
-#   include_directories(${Boost_INCLUDE_DIR})
+#   include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 #   message("-- Boost found: ${Boost_VERSION_STRING}")
 # else()
 #   message(FATAL_ERROR "Boost not found!")
