@@ -216,7 +216,7 @@ std::string Kana::RepeatMark::get(CharType target, ConvertFlags flags,
   switch (target) {
   case CharType::Hiragana: return _hiragana;
   case CharType::Katakana: return _katakana;
-  default: break;
+  case CharType::Romaji: break;
   }
   if (!prevKana) return "";
   const Kana* k = prevKana;

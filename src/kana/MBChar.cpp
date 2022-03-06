@@ -3,6 +3,9 @@
 
 namespace kanji_tools {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+
 bool MBChar::next(std::string& result, bool onlyMB) {
   const auto combiningMark = [this](const auto& r, const auto& i) {
     _location += 3;
@@ -75,5 +78,7 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
   }
   return false;
 }
+
+#pragma GCC diagnostic pop
 
 } // namespace kanji_tools

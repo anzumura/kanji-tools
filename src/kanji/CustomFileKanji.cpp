@@ -4,6 +4,9 @@
 
 namespace kanji_tools {
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+
 Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes kanjiType,
                                      const std::filesystem::path& file) {
   ColumnFile::Columns columns(RequiredColumns);
@@ -30,6 +33,8 @@ Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes kanjiType,
     }
   return results;
 }
+
+#pragma GCC diagnostic pop
 
 Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
   LinkNames result;

@@ -45,7 +45,7 @@ enum class BracketType { Curly, Round, Square, None };
   case BracketType::Curly: return '{' + s + '}';
   case BracketType::Round: return '(' + s + ')';
   case BracketType::Square: return '[' + s + ']';
-  default: break;
+  case BracketType::None: break;
   }
   return s;
 }

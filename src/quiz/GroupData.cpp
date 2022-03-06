@@ -166,7 +166,8 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
           out() << "　 : " << i->qualifiedName();
           break;
         case Group::PatternType::Reading: out() << i->qualifiedName(); break;
-        default: out() << i->qualifiedName() << ':';
+        case Group::PatternType::Family:
+        case Group::PatternType::None: out() << i->qualifiedName() << ':';
         }
       else
         out() << ' ' << i->qualifiedName();

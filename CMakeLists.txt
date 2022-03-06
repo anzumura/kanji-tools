@@ -69,6 +69,17 @@ FetchContent_MakeAvailable(googletest)
 #   message(FATAL_ERROR "Boost not found!")
 # endif()
 
+# Need to add this after building googletest. Also, a couple files now have
+# pragmas to turn it off (to use a non-exhaustive switch with 'defualt').
+add_compile_options(-Wswitch-enum)
+
+# to turn off a warning for a section of code use the following ('GCC' works
+# for both Clang and GCC):
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+# ... code with warning ...
+#pragma GCC diagnostic pop
+
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
   AND BUILD_TESTING)
   add_subdirectory(tests/kana)
