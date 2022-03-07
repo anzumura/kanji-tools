@@ -69,8 +69,9 @@ FetchContent_MakeAvailable(googletest)
 #   message(FATAL_ERROR "Boost not found!")
 # endif()
 
-# Need to add this after building googletest. Also, a couple files now have
-# pragmas to turn it off (to use a non-exhaustive switch with 'defualt').
+# Need to add this after building googletest. This warning happens even when a
+# 'default' exists. '-Wswitch' (enabled by default) only warns about a missing
+# enum value when there is no 'default'.
 add_compile_options(-Wswitch-enum)
 
 # to turn off a warning for a section of code use the following ('GCC' works
