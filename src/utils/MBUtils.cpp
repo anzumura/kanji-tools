@@ -174,37 +174,43 @@ std::string toUtf8(const std::wstring& s) {
 
 // validateMBUtf8
 
-MBUtf8Result validateMBUtf8(const char* s, bool sizeOne) noexcept {
-  if (!s || !(*s & Bit1)) return MBUtf8Result::NotMBUtf8;
-  if ((*s & TwoBits) == Bit1) return MBUtf8Result::ContinuationByte;
+MBUtf8Result validateMBUtf8(const char* s, Utf8Result& error,
+                            bool sizeOne) noexcept {
+  const auto err = [&error](auto e) {
+    error = e;
+    return MBUtf8Result::NotValid;
+  };
+  if (!s || !(*s & Bit1)) return MBUtf8Result::NotMultiByte;
+  if ((*s & TwoBits) == Bit1) return err(Utf8Result::ContinuationByte);
   auto* u = reinterpret_cast<const unsigned char*>(s);
   const unsigned byte1 = *u;
   if ((*++u & TwoBits) != Bit1)
-    return MBUtf8Result::MBCharMissingBytes; // didn't start with '10'
+    return err(Utf8Result::MissingBytes); // didn't start with '10'
   if (byte1 & Bit3) {
     const unsigned byte2 = *u ^ Bit1; // last 6 bits of the second byte
     if ((*++u & TwoBits) != Bit1)
-      return MBUtf8Result::MBCharMissingBytes; // didn't start with '10'
+      return err(Utf8Result::MissingBytes); // didn't start with '10'
     if (byte1 & Bit4) {
       if (byte1 & Bit5)
-        return MBUtf8Result::MBCharTooLong; // UTF-8 can only have up to 4 bytes
-      const unsigned byte3 = *u ^ Bit1;     // last 6 bits of the third byte
+        return err(Utf8Result::CharTooLong); // UTF-8 more than 4 bytes
+      const unsigned byte3 = *u ^ Bit1;      // last 6 bits of the third byte
       if ((*++u & TwoBits) != Bit1)
-        return MBUtf8Result::MBCharMissingBytes; // didn't start with '10'
+        return err(Utf8Result::MissingBytes); // didn't start with '10'
       const unsigned c =
         ((byte1 ^ FourBits) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1);
       if (c <= 0xffffU)
-        return MBUtf8Result::Overlong; // overlong 4 byte encoding
-      if (c > MaxUnicode) return MBUtf8Result::InvalidCodePoint;
+        return err(Utf8Result::Overlong); // overlong 4 byte encoding
+      if (c > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
     } else if (const unsigned c =
                  ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1);
                c <= 0x7ffU)
-      return MBUtf8Result::Overlong; // overlong 3 byte encoding
+      return err(Utf8Result::Overlong); // overlong 3 byte encoding
     else if (c >= MinSurrogate && c <= MaxSurrogate)
-      return MBUtf8Result::InvalidCodePoint;
+      return err(Utf8Result::InvalidCodePoint);
   } else if ((byte1 ^ TwoBits) < 2)
-    return MBUtf8Result::Overlong; // overlong 2 byte encoding
-  return !sizeOne || !*++u ? MBUtf8Result::Valid : MBUtf8Result::StringTooLong;
+    return err(Utf8Result::Overlong); // overlong 2 byte encoding
+  return !sizeOne || !*++u ? MBUtf8Result::Valid
+                           : err(Utf8Result::StringTooLong);
 }
 
 } // namespace kanji_tools

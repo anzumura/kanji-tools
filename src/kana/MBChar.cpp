@@ -3,9 +3,6 @@
 
 namespace kanji_tools {
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch-enum"
-
 bool MBChar::next(std::string& result, bool onlyMB) {
   const auto combiningMark = [this](const auto& r, const auto& i) {
     _location += 3;
@@ -18,7 +15,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
   };
   while (*_location) {
     switch (validateMBUtf8(_location)) {
-    case MBUtf8Result::NotMBUtf8:
+    case MBUtf8Result::NotMultiByte:
       if (!onlyMB) {
         result = *_location++;
         return true;
@@ -40,7 +37,8 @@ bool MBChar::next(std::string& result, bool onlyMB) {
       }
       ++_errors; // can't start with a variation selector or a combining mark
       break;
-    default: // _location doesn't start a valid utf8 sequence so try next byte
+    case MBUtf8Result::NotValid:
+      // _location doesn't start a valid utf8 sequence so try next byte
       ++_location;
       ++_errors;
     }
@@ -54,7 +52,7 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
   };
   for (auto location = _location; *location;) {
     switch (validateMBUtf8(location)) {
-    case MBUtf8Result::NotMBUtf8:
+    case MBUtf8Result::NotMultiByte:
       if (!onlyMB) {
         result = *location;
         return true;
@@ -73,12 +71,10 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
         return true;
       }
       break;
-    default: ++location;
+    case MBUtf8Result::NotValid: ++location;
     }
   }
   return false;
 }
-
-#pragma GCC diagnostic pop
 
 } // namespace kanji_tools

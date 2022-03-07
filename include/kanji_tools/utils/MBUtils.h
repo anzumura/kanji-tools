@@ -201,43 +201,71 @@ template<>
   return false;
 }
 
-// 'MBUtf8Result' is used for the return value of 'validateMBUtf8' - see
-// comments below for more details.
+// 'MBUtf8Result' is the return value of 'validateMBUtf8' - see comments below
+// for more details.
 enum class MBUtf8Result {
   Valid,
-  ContinuationByte, // returned when the first byte is a continuation byte,
-  InvalidCodePoint, // returned when the bytes decode to an invalid Unicode code
-  MBCharTooLong,    // returned when the first byte starts with more than 4 1's
-  MBCharMissingBytes, // returned when there are not enough continuation bytes
-  NotMBUtf8,          // returned when sequence is not a multi-byte character
+  NotMultiByte, // returned when sequence is not a multi-byte character
+  NotValid      // detailed conversion info will be in 'Utf8Result'
+};
+
+// 'Utf8Result' provides more information about errors during conversion and
+// is the return value of 'validateUtf8'.
+enum class Utf8Result {
+  Valid,
+  // error cases:
+  CharTooLong,      // the first byte starts with more than 4 1's
+  ContinuationByte, // the first byte is a continuation byte,
+  InvalidCodePoint, // the bytes decode to an invalid Unicode code point
+  MissingBytes,     // not enough continuation bytes
   // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the
   // minimum required, i.e., if a characer can be encoded in two bytes, but
   // instead is encoded using three or four bytes (with extra leading zero bits
   // - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
   Overlong,
-  StringTooLong,
+  StringTooLong // more than one UTF-8 character (see examples below)
 };
 
 // 'validateMBUtf8' returns 'Valid' if 's' starts with a valid 'Multi-Byte'
 // UTF-8 sequence. Examples:
-// - validateMBUtf8("") = NotMBUtf8
-// - validateMBUtf8("a") = NotMBUtf8
-// - validateMBUtf8("a猫") = NotMBUtf8
+// - validateMBUtf8("") = NotMultiByte
+// - validateMBUtf8("a") = NotMultiByte
+// - validateMBUtf8("a猫") = NotMultiByte
 // - validateMBUtf8("雪") = Valid
-// - validateMBUtf8("雪s", true) = StringTooLong
-// - validateMBUtf8("吹雪", true) = StringTooLong
-// Note, the last two cases would be considered 'valid' if sizeOne was
-// false (the default)
-[[nodiscard]] MBUtf8Result validateMBUtf8(const char* s,
-                                          bool sizeOne = false) noexcept;
-[[nodiscard]] inline auto validateMBUtf8(const std::string& s,
+// - validateMBUtf8("雪s", true) = NotValid
+// - validateMBUtf8("吹雪", true) = NotValid
+// Note, the last two examples would be 'Valid' if 'sizeOne' was set to 'false'
+// (the default). Use the first two overloads to get more info about errors.
+MBUtf8Result validateMBUtf8(const char*, Utf8Result&,
+                            bool sizeOne = false) noexcept;
+inline auto validateMBUtf8(const std::string& s, Utf8Result& e,
+                           bool sizeOne = false) noexcept {
+  return validateMBUtf8(s.c_str(), e, sizeOne);
+}
+template<typename T>
+[[nodiscard]] inline auto validateMBUtf8(const T& s,
                                          bool sizeOne = false) noexcept {
-  return validateMBUtf8(s.c_str(), sizeOne);
+  Utf8Result e = Utf8Result::Valid;
+  return validateMBUtf8(s, e, sizeOne);
+}
+
+// 'validateUtf8' returns 'Valid' if 's' starts a valid UTF-8 sequence
+template<typename T>
+[[nodiscard]] inline auto validateUtf8(const T& s,
+                                       bool sizeOne = false) noexcept {
+  Utf8Result e = Utf8Result::Valid;
+  validateMBUtf8(s, e, sizeOne);
+  return e;
 }
 
 [[nodiscard]] inline auto isValidMBUtf8(const std::string& s,
                                         bool sizeOne = false) noexcept {
   return validateMBUtf8(s, sizeOne) == MBUtf8Result::Valid;
+}
+
+[[nodiscard]] inline auto isValidUtf8(const std::string& s,
+                                      bool sizeOne = false) noexcept {
+  return validateUtf8(s, sizeOne) == Utf8Result::Valid;
 }
 
 // bit patterns used for processing UTF-8

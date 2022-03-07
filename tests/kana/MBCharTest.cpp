@@ -149,17 +149,17 @@ TEST(MBCharTest, ErrorCount) {
 }
 
 TEST(MBCharTest, Valid) {
-  EXPECT_EQ(MBChar("").valid(), MBUtf8Result::NotMBUtf8);
-  EXPECT_EQ(MBChar("a").valid(), MBUtf8Result::NotMBUtf8);
+  EXPECT_EQ(MBChar("").valid(), MBUtf8Result::NotMultiByte);
+  EXPECT_EQ(MBChar("a").valid(), MBUtf8Result::NotMultiByte);
   std::string x("雪");
   EXPECT_EQ(x.size(), 3);
   EXPECT_EQ(MBChar(x).valid(), MBUtf8Result::Valid);
   EXPECT_TRUE(MBChar(x).isValid());
 
   // longer strings are not considered valid by default
-  EXPECT_EQ(MBChar("吹雪").valid(), MBUtf8Result::StringTooLong);
-  EXPECT_EQ(MBChar("猫s").valid(), MBUtf8Result::StringTooLong);
-  EXPECT_EQ(MBChar("a猫").valid(), MBUtf8Result::NotMBUtf8);
+  EXPECT_EQ(MBChar("吹雪").valid(), MBUtf8Result::NotValid);
+  EXPECT_EQ(MBChar("猫s").valid(), MBUtf8Result::NotValid);
+  EXPECT_EQ(MBChar("a猫").valid(), MBUtf8Result::NotMultiByte);
 
   // however, longer strings can be valid if 'sizeOne' is false
   EXPECT_TRUE(MBChar("吹雪").isValid(false));
