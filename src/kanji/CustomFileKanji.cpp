@@ -4,38 +4,6 @@
 
 namespace kanji_tools {
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch-enum"
-
-Data::List CustomFileKanji::fromFile(const Data& data, KanjiTypes kanjiType,
-                                     const std::filesystem::path& file) {
-  ColumnFile::Columns columns(RequiredColumns);
-  const auto add = [&columns](auto& x) {
-    for (auto& i : x) columns.emplace_back(i);
-  };
-  switch (kanjiType) {
-  case KanjiTypes::Jouyou: add(JouyouRequiredColumns); break;
-  case KanjiTypes::Jinmei: add(JinmeiRequiredColumns); break;
-  case KanjiTypes::Extra: add(ExtraRequiredColumns); break;
-  default:
-    throw std::domain_error(std::string("fromFile got invalid type: ") +
-                            toString(kanjiType));
-  }
-  Data::List results;
-  for (ColumnFile f(file, columns); f.nextRow();) switch (kanjiType) {
-    case KanjiTypes::Jouyou:
-      results.push_back(std::make_shared<JouyouKanji>(data, f));
-      break;
-    case KanjiTypes::Jinmei:
-      results.push_back(std::make_shared<JinmeiKanji>(data, f));
-      break;
-    default: results.push_back(std::make_shared<ExtraKanji>(data, f)); break;
-    }
-  return results;
-}
-
-#pragma GCC diagnostic pop
-
 Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
   LinkNames result;
   std::stringstream ss(f.get(OldNamesCol));

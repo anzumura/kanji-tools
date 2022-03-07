@@ -199,8 +199,8 @@ void Data::loadFrequencyReadings(const fs::path& file) {
 }
 
 void Data::populateJouyou() {
-  auto results = CustomFileKanji::fromFile(
-    *this, KanjiTypes::Jouyou, DataFile::getFile(_dataDir, JouyouFile));
+  auto results = CustomFileKanji::fromFile<JouyouKanji>(
+    *this, DataFile::getFile(_dataDir, JouyouFile));
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(hasValue(i->grade()));
@@ -239,8 +239,8 @@ void Data::populateLinkedKanji() {
 }
 
 void Data::populateJinmei() {
-  auto results = CustomFileKanji::fromFile(
-    *this, KanjiTypes::Jinmei, DataFile::getFile(_dataDir, JinmeiFile));
+  auto results = CustomFileKanji::fromFile<JinmeiKanji>(
+    *this, DataFile::getFile(_dataDir, JinmeiFile));
   for (auto& linkedJinmei = _types[KanjiTypes::LinkedJinmei];
        const auto& i : results) {
     checkInsert(i);
@@ -252,8 +252,8 @@ void Data::populateJinmei() {
 }
 
 void Data::populateExtra() {
-  auto results = CustomFileKanji::fromFile(
-    *this, KanjiTypes::Extra, DataFile::getFile(_dataDir, ExtraFile));
+  auto results = CustomFileKanji::fromFile<ExtraKanji>(
+    *this, DataFile::getFile(_dataDir, ExtraFile));
   for (const auto& i : results) checkInsert(i);
   _types.emplace(KanjiTypes::Extra, std::move(results));
 }

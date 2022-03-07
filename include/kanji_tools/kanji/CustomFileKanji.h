@@ -21,15 +21,23 @@ public:
 
   [[nodiscard]] auto number() const { return _number; }
 
-  // 'fromString' is a factory method that creates a list of kanjis of the given
-  // 'type' from the given 'file'
-  // - 'type' must be Jouyou, Jinmei or Extra
+  // 'fromFile' is a factory method that creates a list of Kanji of type 'T':
+  // - 'T' must have a public 'RequiredColumns' and be constructable from 'data'
+  //   and a custom file (currently JouyouKanji, JinmeiKanji and ExtraKanji)
   // - 'file' must have tab separated lines that have the right number of
-  //   columns for the given type
-  // - first line of 'file' must have header names that match the static
-  //   'Column' instances below
-  [[nodiscard]] static Data::List fromFile(const Data&, KanjiTypes type,
-                                           const std::filesystem::path& file);
+  //   columns for the given Kanji type 'T' (and the first line must have header
+  //   names that match the static 'Column' instances below)
+  template<typename T>
+  [[nodiscard]] static Data::List fromFile(const Data& data,
+                                           const std::filesystem::path& file) {
+    // all CustomFileKanji files must have at least the following columns
+    ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
+    for (auto& i : T::RequiredColumns) columns.emplace_back(i);
+    Data::List results;
+    for (ColumnFile f(file, columns); f.nextRow();)
+      results.emplace_back(std::make_shared<T>(data, f));
+    return results;
+  }
 protected:
   inline static const ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"},
     RadicalCol{"Radical"}, OldNamesCol{"OldNames"}, YearCol{"Year"},
@@ -56,17 +64,6 @@ protected:
                        f.get(ReadingCol), strokes, findUcd(d, name)),
         _kyu(d.kyu(name)), _number(f.getSize(NumberCol)), _oldNames(oldNames) {}
 private:
-  // all kanji files must have at least the following columns
-  inline static const std::vector RequiredColumns{NumberCol, NameCol,
-                                                  RadicalCol, ReadingCol};
-
-  // specific types require additional columns
-  inline static const std::vector JouyouRequiredColumns{
-    OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
-  inline static const std::vector JinmeiRequiredColumns{OldNamesCol, YearCol,
-                                                        ReasonCol};
-  inline static const std::vector ExtraRequiredColumns{StrokesCol, MeaningCol};
-
   const KenteiKyus _kyu;
   const size_t _number;
   const LinkNames _oldNames;
@@ -120,6 +117,9 @@ public:
                          toString(_reason) + ']');
   }
   [[nodiscard]] auto reason() const { return _reason; }
+
+  inline static const std::array RequiredColumns{OldNamesCol, YearCol,
+                                                 ReasonCol};
 private:
   const JinmeiKanjiReasons _reason;
 };
@@ -133,6 +133,9 @@ public:
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
+
+  inline static const std::array RequiredColumns{
+    OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
 private:
   [[nodiscard]] static KanjiGrades getGrade(const std::string& s) {
     return AllKanjiGrades.fromString(s.starts_with("S") ? s : "G" + s);
@@ -151,6 +154,8 @@ public:
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
   [[nodiscard]] OptString newName() const override { return _newName; }
+
+  inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 private:
   ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name)
       : ExtraKanji(d, f, name, findUcd(d, name)) {}
