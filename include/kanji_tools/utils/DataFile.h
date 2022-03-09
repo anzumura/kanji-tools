@@ -45,6 +45,8 @@ public:
   DataFile(const DataFile&) = delete;
   // operator= is not generated since there are const members
 
+  virtual ~DataFile() = default;
+
   [[nodiscard]] auto exists(const std::string& s) const {
     return _map.find(s) != _map.end();
   }
