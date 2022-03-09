@@ -11,23 +11,33 @@ endif()
   
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
-  # enable some warnings and turn them into errors (-W is the same as -Wextra)
-  add_compile_options(-Werror -W -Wall -Wconversion -Wmain -Wsuggest-override
-    -Wextra-semi -Wignored-qualifiers -Wmisleading-indentation -Wold-style-cast)
+  # enable warnings and turn them into errors (-W is the same as -Wextra, but
+  # it's deprecated for GCC so explicitly use -Wextra). -Wpedantic means 'Issue
+  # all the warnings demanded by strict ISO C++'. Links for more info:
+  # Clang: https://clang.llvm.org/docs/DiagnosticsReference.html
+  # GCC: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+  add_compile_options(-Wall -Wconversion -Werror -Wextra -Wextra-semi
+    -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h'
-    add_compile_options(-Wmost -Wdeprecated -Wunreachable-code-aggressive
-      -Wno-logical-op-parentheses -Wsuggest-destructor-override -Wshadow-all
-      -Wduplicate-enum -Wloop-analysis -Wheader-hygiene)
+    # so add it for Clang here and add it for GCC after building googletest
+    add_compile_options(-Wdeprecated -Wduplicate-enum -Wheader-hygiene
+      -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override
+      -Wunreachable-code-aggressive)
+    # turn off a warning
+    add_compile_options(-Wno-logical-op-parentheses )
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 \
 -fno-optimize-sibling-calls")
     # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
     # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
     string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS}")
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # Clang 'most' sets 'overloaded-virtual' and 'unused'
-    add_compile_options(-Wno-parentheses -Wshadow -Wrange-loop-construct
-      -Woverloaded-virtual -Wunused)
+    # Clang -Wall sets -Wmost which sets -Woverloaded-virtual, -Wunused, etc.,
+    # and -Wshadow-all sets -Wshadow (and more). GCC -Wall also sets things like
+    # -Wunused (see links above), but the following don't seem to be included:
+    add_compile_options(-Wnon-virtual-dtor -Woverloaded-virtual -Wshadow)
+    # turn off a warning
+    add_compile_options(-Wno-parentheses)
   endif()
   # Use the following to override the linker
   # string(APPEND " -fuse-ld=gold")
@@ -79,6 +89,8 @@ FetchContent_MakeAvailable(googletest)
 add_compile_options(-Wswitch-enum)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wcovered-switch-default)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  add_compile_options(-Wdeprecated -Wuseless-cast)
 endif()
 
 # to turn off a warning for a section of code use the following ('GCC' works
