@@ -14,7 +14,7 @@ public:
   // - Frequency: include if member is Jōyō or JLPT or in the Top 2501 Frequency
   //   list (adds another 294 kanji)
   // - All: include all members (as long as they have readings)
-  enum MemberType { Jouyou = 0, JLPT, Frequency, All };
+  enum MemberType { Jouyou, JLPT, Frequency, All };
 
   GroupQuiz(const QuizLauncher&, size_t question, bool showMeanings,
             const GroupData::List&, MemberType);

@@ -51,7 +51,7 @@ inline const auto CharTypes =
 // Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try
 // Kunrei before falling back to the unique '_romaji' value in the Kana class.
 enum class ConvertFlags {
-  None = 0,
+  None,
   Hepburn,
   Kunrei,
   NoProlongMark = 4,
