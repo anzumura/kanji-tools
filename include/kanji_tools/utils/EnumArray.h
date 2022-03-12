@@ -200,7 +200,7 @@ public:
   [[nodiscard]] auto operator[](int i) const {
     return static_cast<T>(checkIndex(i, Index));
   }
-protected:
+
   [[nodiscard]] static auto getIndex(T x) {
     return checkIndex(to_underlying(x), Enum);
   }

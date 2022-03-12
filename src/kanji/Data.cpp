@@ -204,7 +204,7 @@ void Data::populateJouyou() {
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(hasValue(i->grade()));
-    if (checkInsert(i)) _grades[i->grade()].push_back(i);
+    if (checkInsert(i)) gradeList(i->grade()).push_back(i);
   }
   typeList(KanjiTypes::Jouyou) = std::move(results);
   populateLinkedKanji();
@@ -292,10 +292,10 @@ void Data::processList(const DataFile& list) {
     }
     if (kenteiList) {
       assert(kanji->kyu() == list.kyu());
-      _kyus[list.kyu()].push_back(kanji);
+      kyuList(list.kyu()).push_back(kanji);
     } else if (hasValue(list.level())) {
       assert(kanji->level() == list.level());
-      _levels[list.level()].push_back(kanji);
+      levelList(list.level()).push_back(kanji);
     } else {
       assert(kanji->frequency());
       const auto index = (*kanji->frequency() - 1) / FrequencyBucketEntries;

@@ -100,7 +100,7 @@ public:
 
   // get list by KanjiType
   [[nodiscard]] auto& typeList(KanjiTypes t) const {
-    return hasValue(t) ? _types[to_underlying(t)] : _emptyList;
+    return hasValue(t) ? _types[AllKanjiTypes.getIndex(t)] : _emptyList;
   }
   [[nodiscard]] auto typeTotal(KanjiTypes t) const {
     return typeList(t).size();
@@ -124,27 +124,24 @@ public:
   [[nodiscard]] auto& extraKanji() const { return typeList(KanjiTypes::Extra); }
 
   // get list by KanjiGrade
-  [[nodiscard]] auto& gradeList(KanjiGrades grade) const {
-    const auto i = _grades.find(grade);
-    return i != _grades.end() ? i->second : _emptyList;
+  [[nodiscard]] auto& gradeList(KanjiGrades g) const {
+    return hasValue(g) ? _grades[AllKanjiGrades.getIndex(g)] : _emptyList;
   }
-  [[nodiscard]] auto gradeTotal(KanjiGrades grade) const {
-    return gradeList(grade).size();
+  [[nodiscard]] auto gradeTotal(KanjiGrades g) const {
+    return gradeList(g).size();
   }
 
   // get list by JLPT Level
-  [[nodiscard]] auto& levelList(JlptLevels level) const {
-    const auto i = _levels.find(level);
-    return i != _levels.end() ? i->second : _emptyList;
+  [[nodiscard]] auto& levelList(JlptLevels l) const {
+    return hasValue(l) ? _levels[AllJlptLevels.getIndex(l)] : _emptyList;
   }
   [[nodiscard]] auto levelTotal(JlptLevels level) const {
     return levelList(level).size();
   }
 
   // get list by Kentei Kyu
-  [[nodiscard]] auto& kyuList(KenteiKyus kyu) const {
-    const auto i = _kyus.find(kyu);
-    return i != _kyus.end() ? i->second : _emptyList;
+  [[nodiscard]] auto& kyuList(KenteiKyus k) const {
+    return hasValue(k) ? _kyus[AllKenteiKyus.getIndex(k)] : _emptyList;
   }
   [[nodiscard]] auto kyuTotal(KenteiKyus kyu) const {
     return kyuList(kyu).size();
@@ -268,7 +265,16 @@ protected:
   std::array<List, AllKanjiTypes.size() - 1> _types;
 private:
   [[nodiscard]] auto& typeList(KanjiTypes t) {
-    return _types[to_underlying(t)];
+    return _types[AllKanjiTypes.getIndex(t)];
+  }
+  [[nodiscard]] auto& gradeList(KanjiGrades g) {
+    return _grades[AllKanjiGrades.getIndex(g)];
+  }
+  [[nodiscard]] auto& levelList(JlptLevels l) {
+    return _levels[AllJlptLevels.getIndex(l)];
+  }
+  [[nodiscard]] auto& kyuList(KenteiKyus k) {
+    return _kyus[AllKenteiKyus.getIndex(k)];
   }
 
   // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data
@@ -298,9 +304,9 @@ private:
 
   // lists of kanji corresponding to Levels, Grades and Kyus (excluding the
   // 'None' enum values)
-  std::map<JlptLevels, List> _levels;
-  std::map<KanjiGrades, List> _grades;
-  std::map<KenteiKyus, List> _kyus;
+  std::array<List, AllJlptLevels.size() - 1> _levels;
+  std::array<List, AllKanjiGrades.size() - 1> _grades;
+  std::array<List, AllKenteiKyus.size() - 1> _kyus;
 
   // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500,
   // 1501-2000, 2001-2501. The last list is one longer in order to hold the full
