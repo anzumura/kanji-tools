@@ -366,7 +366,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     const auto id = arg.substr(1);
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
       Data::usage("invalid Nelson ID '" + id + "'");
-    printDetails(_groupData->data().findKanjisByNelsonId(std::stoi(id)),
+    printDetails(_groupData->data().findKanjisByNelsonId(std::stoul(id)),
                  "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id = arg.substr(1);

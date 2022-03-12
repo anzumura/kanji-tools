@@ -188,7 +188,7 @@ public:
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] auto& findKanjisByNelsonId(int id) const {
+  [[nodiscard]] auto& findKanjisByNelsonId(size_t id) const {
     const auto i = _nelsonMap.find(id);
     return i != _nelsonMap.end() ? i->second : _emptyList;
   }
@@ -315,7 +315,7 @@ private:
 
   Map _kanjiNameMap;                         // lookup by UTF-8 name
   std::map<std::string, List> _morohashiMap; // lookup by Dai Kan-Wa Jiten ID
-  std::map<int, List> _nelsonMap;            // lookup by Nelson ID
+  std::map<size_t, List> _nelsonMap;         // lookup by Nelson ID
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'

@@ -40,7 +40,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
     auto s = u->nelsonIds();
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss(s);
-    int id;
+    size_t id;
     while (ss >> id) ids.push_back(id);
     return ids;
   }

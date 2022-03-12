@@ -37,7 +37,7 @@ public:
   using OptSize = std::optional<size_t>;
   using OptString = std::optional<std::string>;
   using LinkNames = std::vector<std::string>;
-  using NelsonIds = std::vector<int>;
+  using NelsonIds = std::vector<size_t>;
   static auto hasLink(KanjiTypes t) {
     return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
   }
