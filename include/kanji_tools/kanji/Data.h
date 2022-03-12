@@ -24,7 +24,7 @@ public:
   enum class DebugMode { Full, Info, None };
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
-  inline static const auto orderByQualifiedName =
+  inline static constexpr auto orderByQualifiedName =
     [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); };
 
   Data(const std::filesystem::path& dataDir, DebugMode,
@@ -319,7 +319,7 @@ private:
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'
-  inline static size_t _maxFrequency;
+  inline static constinit size_t _maxFrequency;
 
   inline static const std::string dataArg = "-data", debugArg = "-debug",
                                   infoArg = "-info";
