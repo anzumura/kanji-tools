@@ -112,21 +112,22 @@ void KanjiData::noFreq(long f, bool brackets) const {
 
 template<typename T>
 void KanjiData::printCount(const std::string& name, T pred,
-                           int printExamples) const {
+                           size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, int>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
-  auto total = 0L;
-  for (auto& l : _types) {
-    auto count = 0L;
+  size_t total{};
+  for (auto i = AllKanjiTypes.begin(); auto& l : _types) {
+    size_t count{};
+    const auto t = *i++;
     if (printExamples)
-      for (auto& i : l.second) {
-        if (pred(i) && ++count <= printExamples)
-          examples[l.first].push_back(i->name());
+      for (auto& j : l) {
+        if (pred(j) && ++count <= printExamples)
+          examples[t].push_back(j->name());
       }
     else
-      count = std::count_if(l.second.begin(), l.second.end(), pred);
+      count = std::count_if(l.begin(), l.end(), pred);
     if (count) {
-      counts.emplace_back(l.first, count);
+      counts.emplace_back(t, count);
       total += count;
     }
   }
@@ -144,9 +145,9 @@ void KanjiData::printCount(const std::string& name, T pred,
 
 void KanjiData::printStats() const {
   log() << "Loaded " << kanjiNameMap().size() << " Kanji (";
-  for (auto& i : _types) {
-    if (i != *_types.begin()) out() << ' ';
-    out() << i.first << ' ' << i.second.size();
+  for (auto i = AllKanjiTypes.begin(); auto& j : _types) {
+    if (i != AllKanjiTypes.begin()) out() << ' ';
+    out() << *i++ << ' ' << j.size();
   }
   out() << ")\n";
   if (fullDebug()) {
@@ -169,8 +170,8 @@ void KanjiData::printStats() const {
 
 void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
-  auto all = 0L;
-  for (auto& jouyou = _types.at(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
+  size_t all{};
+  for (auto& jouyou = typeList(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
     const auto grade = [i](auto& x) { return x->grade() == i; };
     if (auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
         gradeCount) {
@@ -203,24 +204,25 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
                                T (Kanji::*p)() const, const std::string& name,
                                bool showNoFrequency) const {
   log() << name << " breakdown:\n";
-  auto total = 0L;
+  size_t total{};
   for (const auto i : all) {
-    std::vector<std::pair<KanjiTypes, int>> counts;
-    auto iTotal = 0L;
-    for (auto& l : _types)
-      if (const auto count =
-            std::count_if(l.second.begin(), l.second.end(),
-                          [i, &p](auto& x) { return ((*x).*p)() == i; });
+    std::vector<std::pair<KanjiTypes, size_t>> counts;
+    size_t iTotal{};
+    for (auto j = AllKanjiTypes.begin(); auto& l : _types) {
+      const auto t = *j++;
+      if (const auto count = std::count_if(
+            l.begin(), l.end(), [i, &p](auto& x) { return ((*x).*p)() == i; });
           count) {
-        counts.emplace_back(l.first, count);
+        counts.emplace_back(t, count);
         iTotal += count;
       }
+    }
     if (iTotal) {
       total += iTotal;
       log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
       for (const auto& j : counts) {
         out() << j.first << ' ' << j.second;
-        auto& l = _types.at(j.first);
+        auto& l = typeList(j.first);
         if (showNoFrequency)
           noFreq(std::count_if(l.begin(), l.end(), [i, &p](auto& x) {
             return ((*x).*p)() == i && !x->frequency();

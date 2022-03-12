@@ -24,7 +24,8 @@ private:
   // functions to print loaded data if _debug is true
   void noFreq(long f, bool brackets = false) const; // print no-freq count
   template<typename T>
-  void printCount(const std::string& name, T pred, int printExamples = 0) const;
+  void printCount(const std::string& name, T pred,
+                  size_t printExamples = 0) const;
   void printStats() const;
   void printGrades() const;
   template<typename T, size_t S>

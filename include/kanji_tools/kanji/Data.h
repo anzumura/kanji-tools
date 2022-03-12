@@ -96,35 +96,32 @@ public:
     return getStrokes(kanjiName, findUcd(kanjiName));
   }
 
-  // get kanji lists
-  [[nodiscard]] auto& jouyouKanji() const {
-    return _types.at(KanjiTypes::Jouyou);
-  }
-  [[nodiscard]] auto& jinmeiKanji() const {
-    return _types.at(KanjiTypes::Jinmei);
-  }
-  [[nodiscard]] auto& linkedJinmeiKanji() const {
-    return _types.at(KanjiTypes::LinkedJinmei);
-  }
-  [[nodiscard]] auto& linkedOldKanji() const {
-    return _types.at(KanjiTypes::LinkedOld);
-  }
-  [[nodiscard]] auto& frequencyKanji() const {
-    return _types.at(KanjiTypes::Frequency);
-  }
-  [[nodiscard]] auto& extraKanji() const {
-    return _types.at(KanjiTypes::Extra);
-  }
+  [[nodiscard]] KanjiTypes getType(const std::string& name) const;
 
   // get list by KanjiType
-  [[nodiscard]] auto& typeList(KanjiTypes type) const {
-    const auto i = _types.find(type);
-    return i != _types.end() ? i->second : _emptyList;
+  [[nodiscard]] auto& typeList(KanjiTypes t) const {
+    return hasValue(t) ? _types[to_underlying(t)] : _emptyList;
   }
-  [[nodiscard]] auto typeTotal(KanjiTypes type) const {
-    return typeList(type).size();
+  [[nodiscard]] auto typeTotal(KanjiTypes t) const {
+    return typeList(t).size();
   }
-  [[nodiscard]] KanjiTypes getType(const std::string& name) const;
+
+  [[nodiscard]] auto& jouyouKanji() const {
+    return typeList(KanjiTypes::Jouyou);
+  }
+  [[nodiscard]] auto& jinmeiKanji() const {
+    return typeList(KanjiTypes::Jinmei);
+  }
+  [[nodiscard]] auto& linkedJinmeiKanji() const {
+    return typeList(KanjiTypes::LinkedJinmei);
+  }
+  [[nodiscard]] auto& linkedOldKanji() const {
+    return typeList(KanjiTypes::LinkedOld);
+  }
+  [[nodiscard]] auto& frequencyKanji() const {
+    return typeList(KanjiTypes::Frequency);
+  }
+  [[nodiscard]] auto& extraKanji() const { return typeList(KanjiTypes::Extra); }
 
   // get list by KanjiGrade
   [[nodiscard]] auto& gradeList(KanjiGrades grade) const {
@@ -262,15 +259,18 @@ protected:
   // '_ucd' is used to get Kanji attributes like radical, meaning and reading
   UcdData _ucd;
 
-  // '_strokes' is populated from strokes.txt and is meant to supplement jinmei
-  // kanji (file doesn't have a 'Strokes' column) as well as old kanjis from
-  // both jouyou and jinmei files. This file contains stroke counts followed by
-  // one or more lines each with a single kanji that has the given number of
-  // strokes.
+  // '_strokes' is populated from strokes.txt and supplements jinmei Kanji (file
+  // doesn't have 'Strokes' column) as well as old Kanji from jouyou and jinmei
+  // files. This file contains stroke counts followed by one or more lines each
+  // with a single kanji that has the given number of strokes.
   std::map<std::string, size_t> _strokes;
 
-  std::map<KanjiTypes, List> _types;
+  std::array<List, AllKanjiTypes.size() - 1> _types;
 private:
+  [[nodiscard]] auto& typeList(KanjiTypes t) {
+    return _types[to_underlying(t)];
+  }
+
   // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data
   // from 'linked-jinmei.txt' and creates either a LinkedJinmei or a LinkedOld
   // kanji for each entry.
