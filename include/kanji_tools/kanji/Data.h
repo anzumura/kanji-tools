@@ -313,7 +313,7 @@ private:
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'
-  inline static size_t _maxFrequency = 0;
+  inline static size_t _maxFrequency;
 
   inline static const std::string dataArg = "-data", debugArg = "-debug",
                                   infoArg = "-info";
