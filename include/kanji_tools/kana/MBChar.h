@@ -64,7 +64,7 @@ public:
   // mark' - these are not counted since they are considered part of the
   // previous 'MB character' (as a modifier).
   [[nodiscard]] static auto size(const char* s, bool onlyMB = true) {
-    size_t result = 0;
+    size_t result{};
     // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
     // checking if the next 3 bytes represent a 'variation selector'
     if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
@@ -117,9 +117,7 @@ public:
   // call reset in order to loop over the string again
   void reset() {
     _location = _data.c_str();
-    _errors = 0;
-    _variants = 0;
-    _combiningMarks = 0;
+    _errors = _variants = _combiningMarks = 0;
   }
 
   // 'next' populates 'result' with the full multi-byte character (so could be
@@ -178,9 +176,8 @@ private:
 
   const std::string _data;
   const char* _location = _data.c_str();
-  size_t _errors = 0;         // count of invalid bytes sequences found
-  size_t _variants = 0;       // count of 'Variation Selector's found
-  size_t _combiningMarks = 0; // count of 'Combining Marks's found
+  // counts of errors, variants and combiningMarks found
+  size_t _errors{}, _variants{}, _combiningMarks{};
 };
 
 } // namespace kanji_tools

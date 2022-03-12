@@ -186,7 +186,7 @@ public:
 
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
-    size_t _index = 0;
+    size_t _index{};
   };
 
   [[nodiscard]] static auto begin() noexcept { return Iterator(0); }

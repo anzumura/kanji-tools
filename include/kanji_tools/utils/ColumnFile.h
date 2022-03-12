@@ -116,7 +116,7 @@ private:
   const std::string _name;
 
   // '_currentRow' starts at 0 and is incremented each time 'nextRow' is called
-  size_t _currentRow = 0;
+  size_t _currentRow{};
 
   // '_rowValues' is updated each time a new row is processed by 'nextRow'
   std::vector<std::string> _rowValues;

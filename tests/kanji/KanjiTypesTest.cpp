@@ -16,7 +16,7 @@ TEST(KanjiTypesTest, CheckStrings) {
 }
 
 TEST(KanjiTypesTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(AllKanjiTypes[i], KanjiTypes::Jouyou);
   EXPECT_EQ(AllKanjiTypes[++i], KanjiTypes::Jinmei);
   EXPECT_EQ(AllKanjiTypes[++i], KanjiTypes::LinkedJinmei);

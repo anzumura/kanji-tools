@@ -111,7 +111,7 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
     }
   };
 
-  size_t question = 0;
+  size_t question{};
   auto endOptions = false, showMeanings = false;
   for (auto i = Data::nextArg(argc, argv); i < argc;
        i = Data::nextArg(argc, argv, i))
@@ -443,13 +443,13 @@ void QuizLauncher::printJukugoList(const std::string& name,
     colWidths.fill(0);
     // make each column wide enough to hold the longest entry plus 2 spaces
     // (upto MaxJukugoSize)
-    for (size_t i = 0; i < list.size(); ++i)
+    for (size_t i{}; i < list.size(); ++i)
       if (colWidths[i % JukugoPerLine] < MaxJukugoSize)
         if (const size_t size = displaySize(list[i]->nameAndReading()) + 2;
             size > colWidths[i % JukugoPerLine])
           colWidths[i % JukugoPerLine] =
             size < MaxJukugoSize ? size : MaxJukugoSize;
-    for (size_t i = 0; i < list.size(); ++i) {
+    for (size_t i{}; i < list.size(); ++i) {
       if (i % JukugoPerLine == 0) out() << '\n';
       const auto s = list[i]->nameAndReading();
       out() << std::left << std::setw(wideSetw(s, colWidths[i % JukugoPerLine]))

@@ -19,7 +19,7 @@ void Table::print(std::ostream& os) const {
   Widths widths;
   for (auto& i : _title) widths.push_back(displaySize(i));
   for (auto& row : _rows)
-    for (size_t i = 0; auto& col : row) {
+    for (size_t i{}; auto& col : row) {
       if (const auto w = displaySize(col); i < widths.size()) {
         if (widths[i] < w) widths[i] = w;
       } else
@@ -29,7 +29,7 @@ void Table::print(std::ostream& os) const {
   if (!widths.empty()) {
     border(os, widths);
     if (!_title.empty()) print(os, widths, _title);
-    for (size_t i = 0; i < _rows.size(); ++i) {
+    for (size_t i{}; i < _rows.size(); ++i) {
       if (_sections.contains(i)) border(os, widths);
       print(os, widths, _rows[i]);
     }
@@ -42,7 +42,7 @@ void Table::printMarkdown(std::ostream& os) const {
   for (auto& i : _rows) maxColumns = std::max(maxColumns, i.size());
   const auto printRow = [&os, maxColumns](const Row& r, bool header = false,
                                           bool section = false) {
-    for (size_t i = 0; i < maxColumns; ++i) {
+    for (size_t i{}; i < maxColumns; ++i) {
       os << "| ";
       if (header && r.empty()) os << "---";
       if (i < r.size()) {
@@ -68,7 +68,7 @@ void Table::printMarkdown(std::ostream& os) const {
     // set of headers).
     printRow(_title);
     printRow({}, true);
-    for (size_t i = 0; i < _rows.size(); ++i)
+    for (size_t i{}; i < _rows.size(); ++i)
       printRow(_rows[i], false, _sections.contains(i));
   }
 }
@@ -80,7 +80,7 @@ void Table::print(std::ostream& os, const Widths& widths, const Row& row,
     os << delim << fill << std::setw(static_cast<int>(w) + 1) << s;
   };
   os << std::left << std::setfill(fill);
-  for (size_t i = 0; i < widths.size(); ++i)
+  for (size_t i{}; i < widths.size(); ++i)
     if (i < row.size())
       // if string is all narrow then nothing will be added, but if there are
       // wide chars then need to add difference to get 'setw' to work properly

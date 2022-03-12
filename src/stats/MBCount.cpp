@@ -39,7 +39,7 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
     }
   }
   MBChar c(n);
-  size_t added = 0;
+  size_t added{};
   for (std::string token; c.next(token);)
     if (allowAdd(token)) {
       ++_map[token];
@@ -54,7 +54,7 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
 
 size_t MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
                           bool recurse) {
-  size_t added = 0;
+  size_t added{};
   const auto fileName = file.filename().string(); // use final component of path
   const auto tag = addTag ? OptString(fileName) : std::nullopt;
   if (fs::is_regular_file(file)) {
@@ -93,7 +93,7 @@ size_t MBCount::processJoinedLine(std::string& prevLine,
 }
 
 size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
-  size_t added = 0;
+  size_t added{};
   std::string line;
   if (std::fstream f(file); _find) {
     std::string prevLine;

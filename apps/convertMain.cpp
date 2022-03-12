@@ -237,9 +237,9 @@ void ConvertMain::printKanaChart(bool markdown) const {
   - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
 )";
-  size_t hanDakutenMonographs = 0, small = 0, plainMonographs = 0,
-         dakutenMonographs = 0, plainDigraphs = 0, hanDakutenDigraphs = 0,
-         dakutenDigraphs = 0, romajiVariants = 0;
+  size_t hanDakutenMonographs{}, small{}, plainMonographs{},
+    dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
+    dakutenDigraphs{}, romajiVariants{};
   Table table({"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
                "Kunr", "Roma Variants"},
               true);

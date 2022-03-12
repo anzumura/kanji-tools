@@ -20,7 +20,7 @@ TEST(KenteiKyusTest, CheckStrings) {
 }
 
 TEST(KenteiKyusTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(AllKenteiKyus[i], KenteiKyus::K10);
   EXPECT_EQ(AllKenteiKyus[++i], KenteiKyus::K9);
   EXPECT_EQ(AllKenteiKyus[++i], KenteiKyus::K8);

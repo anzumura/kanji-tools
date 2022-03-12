@@ -73,7 +73,7 @@ TEST(EnumArrayWithNoneTest, CallCreateTwice) {
 
 TEST(EnumArrayWithNoneTest, Iteration) {
   std::vector<Colors> colors;
-  for (size_t i = 0; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
+  for (size_t i{}; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
   EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue,
                                  Colors::None}));
 }

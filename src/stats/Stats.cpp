@@ -113,7 +113,7 @@ private:
   const std::string _name;
   const bool _showBreakdown;
   const bool _isKanji;
-  size_t _total = 0;
+  size_t _total{};
   std::stringstream _os;
 };
 
@@ -206,7 +206,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
           << std::setprecision(PercentPrecision)
           << asPercent(totalForType, _total) << "%  (";
       const auto& j = found[t];
-      for (size_t k = 0; k < j.size(); ++k) {
+      for (size_t k{}; k < j.size(); ++k) {
         if (k) _os << ", ";
         _os << j[k].name << ' ' << j[k].count;
       }
@@ -216,7 +216,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
 
 void StatsPred::printExamples(const CountSet& frequency) {
   _os << std::setw(12) << '(';
-  for (auto i = 0; auto& j : frequency) {
+  for (size_t i{}; auto& j : frequency) {
     if (i) _os << ", ";
     _os << j.name << ' ' << j.count;
     if (++i == MaxExamples) break;
@@ -231,14 +231,14 @@ void StatsPred::printBreakdown(const CountSet& frequency,
             ? " Freq, LV, Type"
             : ", Unicode, Highest Count File")
       << '\n';
-  for (auto rank = 0; auto& i : frequency) {
+  for (size_t rank{}; auto& i : frequency) {
     _os << "  ";
     if (_showBreakdown) _os << std::left << std::setw(5) << ++rank << ' ';
     _os << i;
     if (!i.entry) {
       if (const auto tags = count.tags(i.name); tags != nullptr) {
         std::string file;
-        for (size_t maxCount = 0; auto& j : *tags)
+        for (size_t maxCount{}; auto& j : *tags)
           if (j.second > maxCount) {
             maxCount = j.second;
             file = j.first;
@@ -305,14 +305,13 @@ void Stats::countKanji(const fs::path& top, bool showBreakdown,
     f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
     f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
   for (auto& i : totals) out() << i.first.get();
-  size_t total = 0;
-  for (size_t i = 0; i < IncludeInTotals; ++i)
-    total += totals[i].second->total();
+  size_t total{};
+  for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();
   log() << "Total Kana+Kanji: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);
-    size_t totalKanji = 0;
-    for (size_t i = 0; i < IncludeInTotals; ++i)
+    size_t totalKanji{};
+    for (size_t i{}; i < IncludeInTotals; ++i)
       if (totals[i].second->isKanji())
         totalKanji += totals[i].second->total();
       else if (totals[i].second->total())

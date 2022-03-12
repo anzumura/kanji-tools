@@ -39,7 +39,7 @@ ColumnFile::ColumnFile(const fs::path& p, const Columns& columns,
 }
 
 void ColumnFile::processHeaderRow(const std::string& row, ColNames& colNames) {
-  size_t pos = 0;
+  size_t pos{};
   std::set<std::string> foundCols;
   std::string header;
   for (std::stringstream ss(row); std::getline(ss, header, _delimiter); ++pos) {
@@ -68,7 +68,7 @@ void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
 bool ColumnFile::nextRow() {
   if (std::string line; std::getline(_file, line)) {
     ++_currentRow;
-    size_t i = 0;
+    size_t i{};
     std::string field;
     for (std::stringstream ss(line); std::getline(ss, field, _delimiter); ++i) {
       if (i == _rowValues.size()) error("too many columns");

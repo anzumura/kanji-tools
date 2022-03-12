@@ -15,7 +15,7 @@ TEST(KanjiGradesTest, CheckStrings) {
 }
 
 TEST(KanjiGradesTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(AllKanjiGrades[i], KanjiGrades::G1);
   EXPECT_EQ(AllKanjiGrades[++i], KanjiGrades::G2);
   EXPECT_EQ(AllKanjiGrades[++i], KanjiGrades::G3);

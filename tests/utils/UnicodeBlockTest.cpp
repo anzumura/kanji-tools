@@ -9,7 +9,7 @@ using BlockSet = std::set<const UnicodeBlock*>;
 
 template<typename T>
 void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
-  for (char32_t oldEnd = 0; auto& i : blocks) {
+  for (char32_t oldEnd{}; auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
     oldEnd = i.end;
     if (allBlocks) EXPECT_TRUE(allBlocks->insert(&i).second);
@@ -45,7 +45,7 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(RareKanjiBlocks[2].range(), 544);
   EXPECT_EQ(RareKanjiBlocks[3].range(), 4944);
   EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
-  int pos = 0;
+  int pos{};
   auto checkKanjiRange = [&pos](auto& blocks) {
     for (auto& i : blocks) {
       EXPECT_EQ(KanjiRange[pos++], i.start) << pos;

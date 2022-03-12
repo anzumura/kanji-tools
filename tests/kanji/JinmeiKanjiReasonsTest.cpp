@@ -13,7 +13,7 @@ TEST(JinmeiKanjiReasonsTest, CheckStrings) {
 }
 
 TEST(JinmeiKanjiReasonsTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(AllJinmeiKanjiReasons[i], JinmeiKanjiReasons::Names);
   EXPECT_EQ(AllJinmeiKanjiReasons[++i], JinmeiKanjiReasons::Print);
   EXPECT_EQ(AllJinmeiKanjiReasons[++i], JinmeiKanjiReasons::Variant);

@@ -13,7 +13,7 @@ TEST(JlptLevelsTest, CheckStrings) {
 }
 
 TEST(JlptLevelsTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(AllJlptLevels[i], JlptLevels::N5);
   EXPECT_EQ(AllJlptLevels[++i], JlptLevels::N4);
   EXPECT_EQ(AllJlptLevels[++i], JlptLevels::N3);

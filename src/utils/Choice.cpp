@@ -22,7 +22,7 @@ char Choice::getOneChar() {
   if (tcsetattr(0, TCSANOW, &settings) < 0)
     perror("tcsetattr() - turning on raw mode");
   // read a single char
-  char result = 0;
+  char result{};
   if (read(0, &result, 1) < 0) perror("read()");
   // turn raw mode off
   settings.c_lflag |= ICANON;

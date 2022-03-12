@@ -67,7 +67,7 @@ size_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
   // 'sameReading' prevents more than one choice having the same reading
   DataFile::Set sameReading = {kanji->reading()};
   _answers[correctChoice] = _question;
-  for (size_t i = 0; i < _choiceCount; ++i)
+  for (size_t i{}; i < _choiceCount; ++i)
     if (i != correctChoice) do {
         if (const auto choice = randomReading(RandomGen);
             sameReading.insert(questions[choice]->reading()).second) {
@@ -91,7 +91,7 @@ void ListQuiz::printQuestion(const Entry& kanji) const {
 
 void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
   if (isTestMode())
-    for (size_t i = 0; i < _choiceCount; ++i)
+    for (size_t i{}; i < _choiceCount; ++i)
       out() << "    " << i + 1 << ".  "
             << (isKanjiToReading() ? questions[_answers[i]]->reading()
                                    : questions[_answers[i]]->name())

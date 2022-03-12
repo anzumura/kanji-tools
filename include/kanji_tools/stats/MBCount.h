@@ -116,14 +116,10 @@ private:
   std::string _lastReplaceTag;
 
   // count files and directories processed
-  size_t _files = 0;
-  size_t _directories = 0;
+  size_t _files{}, _directories{};
 
   // count errors, variants, combining marks and replacements during processing
-  size_t _errors = 0;
-  size_t _variants = 0;
-  size_t _combiningMarks = 0;
-  size_t _replacements = 0;
+  size_t _errors{}, _variants{}, _combiningMarks{}, _replacements{};
 
   const OptRegex _find;
   const std::wstring _replace;

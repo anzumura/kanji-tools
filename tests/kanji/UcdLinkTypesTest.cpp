@@ -14,7 +14,7 @@ TEST(UcdLinkTypesTest, CheckStrings) {
 }
 
 TEST(UcdLinkTypesTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(AllUcdLinkTypes[i], UcdLinkTypes::Compatibility);
   EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Definition);
   EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Jinmei);

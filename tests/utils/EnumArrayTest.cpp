@@ -65,14 +65,14 @@ TEST(EnumArrayTest, CallCreateTwice) {
 
 TEST(EnumArrayTest, Iteration) {
   std::vector<Colors> colors;
-  for (size_t i = 0; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
+  for (size_t i{}; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
   EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
 }
 
 TEST(EnumArrayTest, IterationInt) {
   std::vector<Colors> colors;
   // test the int overload of operator[]
-  for (auto i = 0; i < 3; ++i) colors.push_back(AllColors[i]);
+  for (int i{}; i < 3; ++i) colors.push_back(AllColors[i]);
   EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
 }
 
