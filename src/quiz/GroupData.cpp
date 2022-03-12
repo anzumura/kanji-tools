@@ -178,19 +178,20 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
 template<typename T>
 void GroupData::printUniqueNames(const T& groups,
                                  const StringSet& uniqueNames) const {
-  std::map<std::string, int> multipleGroups;
+  std::map<std::string, size_t> multipleGroups;
   std::string prevKey;
-  auto maxBelongsTo = 0; // the maximum number of groups a kanji belongs to
+  size_t maxBelongsTo{}; // the maximum number of groups a kanji belongs to
   for (auto i = groups.begin(); i != groups.end(); ++i)
     if (i->first == prevKey) {
-      if (int belongsTo = ++multipleGroups[i->first]; belongsTo > maxBelongsTo)
+      if (size_t belongsTo = ++multipleGroups[i->first];
+          belongsTo > maxBelongsTo)
         maxBelongsTo = belongsTo;
     } else
       prevKey = i->first;
   log() << "Unique kanji: " << uniqueNames.size() << " (once "
         << uniqueNames.size() - multipleGroups.size() << ", multi "
         << multipleGroups.size() << ")\n";
-  for (auto i = 1; i <= maxBelongsTo; ++i) {
+  for (size_t i = 1; i <= maxBelongsTo; ++i) {
     out() << "  Kanji in " << i + 1 << " groups:";
     for (auto j = multipleGroups.begin(); j != multipleGroups.end(); ++j)
       if (j->second == i) out() << ' ' << j->first;
@@ -209,7 +210,7 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
       if (const auto missing = list.size() - j->second.size(); missing) {
         std::sort(j->second.begin(), j->second.end());
         out() << " (";
-        for (size_t count = 0; auto& k : list)
+        for (size_t count{}; auto& k : list)
           if (!std::binary_search(j->second.begin(), j->second.end(),
                                   k->name())) {
             if (count) out() << ' ';

@@ -12,14 +12,9 @@ namespace {
 // 'load' function (like Joyo with a link or missing meaning), but count all
 // cases for completeness.
 struct PrintCount {
-  int count = 0;
-  int link = 0;
-  int variantStrokes = 0;
-  int meaning = 0;
-  int onReading = 0;
-  int kunReading = 0;
-  int morohashi = 0;
-  int nelson = 0;
+  size_t count{}, link{}, variantStrokes{}, meaning{}, onReading{},
+    kunReading{}, morohashi{}, nelson{};
+
   void add(const Ucd& k) {
     ++count;
     if (k.hasLinks()) ++link;
@@ -158,7 +153,7 @@ void UcdData::load(const std::filesystem::path& file) {
 }
 
 void UcdData::print(const Data& data) const {
-  const auto print = [&data](const char* s, int x, int y, int z) {
+  const auto print = [&data](const char* s, auto x, auto y, auto z) {
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x
                << ", Jinmei " << y << ", Other " << z << ")\n";
   };
@@ -209,7 +204,7 @@ void UcdData::printVariationSelectorKanji(const Data& data) const {
     << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
   data.log()
     << "    -      ----------------------------    -----------------------\n";
-  for (auto count = 0; auto& i : data.kanjiNameMap())
+  for (size_t count{}; auto& i : data.kanjiNameMap())
     if (auto& k = *i.second; k.variant()) {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3)
                  << ++count << "    "

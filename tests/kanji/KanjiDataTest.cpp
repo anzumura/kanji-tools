@@ -74,7 +74,7 @@ protected:
   KanjiDataTest() {}
 
   [[nodiscard]] auto checkKanji(const Data::List& l) const {
-    auto variants = 0;
+    size_t variants{};
     for (auto& i : l) {
       if (i->variant()) {
         EXPECT_NE(i->name(), i->nonVariantName());
@@ -331,7 +331,7 @@ TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
 TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
   // Jinmei Frequency, Kentei, etc.) should be in the 'common' bloacks.
-  auto rareUcd = 0;
+  size_t rareUcd{};
   std::map<std::string, int> rareMissingJSource;
   std::map<KanjiTypes, int> missingJSource;
   for (auto& i : _data->ucd().map()) {

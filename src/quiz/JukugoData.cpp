@@ -35,7 +35,7 @@ JukugoData::JukugoData(DataPtr data) {
     for (auto& i : types) {
       data->out() << std::right << std::setw(14) << i.first << ": "
                   << i.second.size() << ' ';
-      for (size_t j = 0; j < i.second.size() && j < 12; ++j)
+      for (size_t j{}; j < i.second.size() && j < 12; ++j)
         data->out() << (j == 0 ? '(' : ' ') << i.second[j];
       data->out() << ")\n";
     }
@@ -95,7 +95,7 @@ void JukugoData::createJukugo(T& error, KanjiGrades grade,
   JukugoKey key{name, reading};
   if (auto i = _uniqueJukugo.find(key); i == _uniqueJukugo.end()) {
     MBChar nameChars(name), readingChars(reading);
-    auto count = 0;
+    size_t count{};
     for (std::string c; nameChars.next(c);)
       if (isKanji(c)) ++count;
     if (count < 2)

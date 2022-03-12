@@ -59,7 +59,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, size_t question,
       } else if (i->name().find(PatternGroupBuckets[*bucket - 1]) !=
                  std::string::npos)
         startIncluding = true;
-      if (auto memberCount = 0; startIncluding) {
+      if (size_t memberCount{}; startIncluding) {
         for (auto& j : i->members())
           if (includeMember(j, memberType)) ++memberCount;
         // only include groups that have 2 or more members after applying the
@@ -154,14 +154,14 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
 void GroupQuiz::printAssignedAnswers() const {
   if (!_answers.empty()) {
     out() << "   ";
-    for (size_t i = 0; i < _answers.size(); ++i)
+    for (size_t i{}; i < _answers.size(); ++i)
       out() << ' ' << i + 1 << "->" << _answers[i];
     out() << '\n';
   }
 }
 
 std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
-  for (size_t i = 0; i < _answers.size(); ++i)
+  for (size_t i{}; i < _answers.size(); ++i)
     if (_answers[i] == choice)
       return out() << std::right << std::setw(2) << i + 1 << "->";
   return out() << "    ";
@@ -169,7 +169,7 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
 
 void GroupQuiz::showGroup(const List& questions, const List& readings,
                           Choices& choices, bool repeatQuestion) const {
-  for (size_t count = 0; auto& i : questions) {
+  for (size_t count{}; auto& i : questions) {
     const char choice =
       isTestMode()
         ? static_cast<char>(count < TotalLetters ? 'a' + count
@@ -264,7 +264,7 @@ size_t GroupQuiz::getAnswerToEdit() const {
 
 void GroupQuiz::checkAnswers(const List& questions, const List& readings,
                              const std::string& name) {
-  size_t count = 0;
+  size_t count{};
   for (auto i : _answers) {
     const auto index =
       static_cast<size_t>(i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);

@@ -164,14 +164,14 @@ void Data::insertSanityChecks(const Entry& kanji) const {
 }
 
 void Data::printError(const std::string& msg) const {
-  static auto count = 0;
+  static size_t count;
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- "
        << msg << std::setfill(' ') << '\n';
 }
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
-  size_t strokes = 0;
+  size_t strokes{};
   for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
       const auto newStrokes = std::stoul(line);
@@ -264,7 +264,7 @@ void Data::processList(const DataFile& list) {
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji =
     _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency];
-  for (size_t i = 0; i < list.list().size(); ++i) {
+  for (size_t i{}; i < list.list().size(); ++i) {
     auto& name = list.list()[i];
     Entry kanji;
     if (const auto j = findKanjiByName(name); j) {

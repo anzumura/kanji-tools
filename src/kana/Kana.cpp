@@ -178,7 +178,7 @@ void Kana::validate() const {
 
 Kana::Map Kana::populate(CharType t) {
   Kana::Map result;
-  auto duplicates = 0;
+  size_t duplicates{};
   const auto insert = [&result, &duplicates, t](auto& k, auto& v) {
     if (const auto i = result.emplace(k, &v); !i.second) {
       std::cerr << "key '" << k << "' already in " << toString(t)

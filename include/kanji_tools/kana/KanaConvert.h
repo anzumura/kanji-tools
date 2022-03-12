@@ -105,7 +105,7 @@ private:
                                             CharType source, const Set& afterN,
                                             const Set& smallKana) const;
   [[nodiscard]] std::string kanaLetters(const std::string& letterGroup,
-                                        CharType source, int count,
+                                        CharType source, size_t count,
                                         const Kana*& prevKana,
                                         bool prolong = false) const;
   [[nodiscard]] std::string convertFromRomaji(const std::string& input) const;

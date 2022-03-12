@@ -221,9 +221,9 @@ TEST_F(QuizTest, LevelLists) {
 }
 
 TEST_F(QuizTest, SkipListQuestions) {
-  for (auto i = 2; i < 4; ++i) {
+  for (size_t i = 2; i < 4; ++i) {
     gradeListQuiz();
-    for (auto j = 0; j < i; ++j) skip();
+    for (size_t j{}; j < i; ++j) skip();
     startQuiz();
     // make sure _os is in expected 'good' state
     EXPECT_TRUE(_os.good());
@@ -247,7 +247,7 @@ TEST_F(QuizTest, ToggleListMeanings) {
   startQuiz();
   std::string line;
   auto meaningsOn = false;
-  auto found = 0;
+  size_t found{};
   std::string expected(
     "Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
   while (std::getline(_os, line)) {
@@ -276,9 +276,9 @@ TEST_F(QuizTest, GroupQuiz) {
 }
 
 TEST_F(QuizTest, SkipGroupQuestions) {
-  for (auto i = 2; i < 4; ++i) {
+  for (size_t i = 2; i < 4; ++i) {
     meaningGroupQuiz();
-    for (auto j = 0; j < i; ++j) skip();
+    for (size_t j{}; j < i; ++j) skip();
     startQuiz();
     std::string line, lastLine;
     while (std::getline(_os, line)) lastLine = line;
@@ -294,7 +294,7 @@ TEST_F(QuizTest, ToggleGroupMeanings) {
   toggleMeanings(); // turn meanings off
   startQuiz();
   auto meaningsOn = false;
-  auto found = 0;
+  size_t found{};
   std::string line, expected("みなみ");
   std::string expectedWithMeaning = expected + " : south";
   while (std::getline(_os, line)) {
@@ -316,7 +316,7 @@ TEST_F(QuizTest, EditAfterOneAnswer) {
   edit();
   _is << "b\n"; // change the answer from 'a' to 'b'
   startQuiz();
-  auto found = 0;
+  size_t found{};
   std::string line;
   while (std::getline(_os, line)) {
     if (!found) {
@@ -334,7 +334,7 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
   _is << "a\n"; // pick the answer to change (so 1->a)
   _is << "c\n"; // set new value (should now be 1->c and 2 still maps to 'b')
   startQuiz();
-  auto found = 0;
+  size_t found{};
   std::string line;
   while (std::getline(_os, line)) {
     if (!found) {

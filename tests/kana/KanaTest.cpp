@@ -30,7 +30,7 @@ TEST(CharTypeTest, CheckStrings) {
 }
 
 TEST(CharTypeTest, CheckValues) {
-  size_t i = 0;
+  size_t i{};
   EXPECT_EQ(CharTypes[i], CharType::Hiragana);
   EXPECT_EQ(CharTypes[++i], CharType::Katakana);
   EXPECT_EQ(CharTypes[++i], CharType::Romaji);
@@ -53,9 +53,9 @@ TEST(KanaTest, CheckHiragana) {
   auto& sourceMap = Kana::getMap(CharType::Hiragana);
   EXPECT_EQ(sourceMap.size(), TotalKana);
   // count various types including smallDigraphs (which should be 0)
-  auto hanDakutenMonographs = 0, smallMonographs = 0, plainMonographs = 0,
-       dakutenMonographs = 0, plainDigraphs = 0, hanDakutenDigraphs = 0,
-       dakutenDigraphs = 0, smallDigraphs = 0;
+  size_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
+    dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
+    dakutenDigraphs{}, smallDigraphs{};
   for (auto& i : sourceMap) {
     MBChar s(i.first);
     std::string c;

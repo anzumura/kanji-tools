@@ -115,7 +115,7 @@ std::string KanaConvert::convert(CharType source,
   // For Romaji source, break into words separated by any of _narrowDelimList
   // and process each word. This helps deal with words ending in 'n'.
   std::string result;
-  size_t oldPos = 0;
+  size_t oldPos{};
   for (const auto keepSpaces = !(_flags & ConvertFlags::RemoveSpaces);;) {
     const auto pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
@@ -135,7 +135,7 @@ std::string KanaConvert::convertFromKana(const std::string& input,
                                          CharType source, const Set& afterN,
                                          const Set& smallKana) const {
   std::string result, letterGroup, letter;
-  auto count = 0;
+  size_t count{};
   auto hasSmallTsu = false, groupDone = false;
   const Kana* prevKana = nullptr;
   const auto done = [this, source, &prevKana, &result, &count, &hasSmallTsu,
@@ -212,7 +212,7 @@ std::string KanaConvert::convertFromKana(const std::string& input,
 }
 
 std::string KanaConvert::kanaLetters(const std::string& letterGroup,
-                                     CharType source, int count,
+                                     CharType source, size_t count,
                                      const Kana*& prevKana,
                                      bool prolong) const {
   auto& sourceMap = Kana::getMap(source);
