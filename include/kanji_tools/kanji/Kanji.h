@@ -167,7 +167,7 @@ protected:
   Kanji(const std::string& name, const OptString& compatibilityName,
         const Radical& radical, size_t strokes, const OptString& morohashiId,
         const NelsonIds& nelsonIds, const OptString& pinyin);
-  inline static const LinkNames EmptyLinkNames{};
+  inline static const LinkNames EmptyLinkNames;
 private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most
   // common to least common (see comments for 'qualifiedName' method and
