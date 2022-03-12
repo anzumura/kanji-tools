@@ -98,7 +98,7 @@ protected:
   }
 
   std::map<std::string, T> _nameMap;
-  inline static const BaseEnumArray<T>* _instance = nullptr;
+  inline static const constinit BaseEnumArray<T>* _instance;
 };
 
 template<typename T, size_t N>
