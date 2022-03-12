@@ -113,7 +113,7 @@ void KanjiData::noFreq(long f, bool brackets) const {
 template<typename T>
 void KanjiData::printCount(const std::string& name, T pred,
                            size_t printExamples) const {
-  std::vector<std::pair<KanjiTypes, int>> counts;
+  std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
   size_t total{};
   for (auto i = AllKanjiTypes.begin(); auto& l : _types) {
@@ -125,7 +125,7 @@ void KanjiData::printCount(const std::string& name, T pred,
           examples[t].push_back(j->name());
       }
     else
-      count = std::count_if(l.begin(), l.end(), pred);
+      count = static_cast<size_t>(std::count_if(l.begin(), l.end(), pred));
     if (count) {
       counts.emplace_back(t, count);
       total += count;
@@ -173,7 +173,8 @@ void KanjiData::printGrades() const {
   size_t all{};
   for (auto& jouyou = typeList(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
     const auto grade = [i](auto& x) { return x->grade() == i; };
-    if (auto gradeCount = std::count_if(jouyou.begin(), jouyou.end(), grade);
+    if (auto gradeCount = static_cast<size_t>(
+          std::count_if(jouyou.begin(), jouyou.end(), grade));
         gradeCount) {
       all += gradeCount;
       log() << "  Total for grade " << i << ": " << gradeCount;
@@ -183,10 +184,10 @@ void KanjiData::printGrades() const {
              true);
       out() << " (";
       for (const auto level : AllJlptLevels) {
-        const auto gradeLevelCount =
+        const auto gradeLevelCount = static_cast<size_t>(
           std::count_if(jouyou.begin(), jouyou.end(), [&grade, level](auto& x) {
             return grade(x) && x->level() == level;
-          });
+          }));
         if (gradeLevelCount) {
           gradeCount -= gradeLevelCount;
           out() << level << ' ' << gradeLevelCount;
@@ -210,8 +211,8 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
     size_t iTotal{};
     for (auto j = AllKanjiTypes.begin(); auto& l : _types) {
       const auto t = *j++;
-      if (const auto count = std::count_if(
-            l.begin(), l.end(), [i, &p](auto& x) { return ((*x).*p)() == i; });
+      if (const auto count = static_cast<size_t>(std::count_if(
+            l.begin(), l.end(), [i, &p](auto& x) { return ((*x).*p)() == i; }));
           count) {
         counts.emplace_back(t, count);
         iTotal += count;
