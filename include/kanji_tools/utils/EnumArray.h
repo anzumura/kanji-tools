@@ -101,119 +101,137 @@ protected:
   inline static constinit const BaseEnumArray<T>* _instance;
 };
 
-template<typename T, size_t N>
-class IterableEnumArray : public BaseEnumArray<T> {
+template<typename T, size_t N> class IterableEnum {
 public:
+  [[nodiscard]] static constexpr size_t size() noexcept { return N; }
+
+  [[nodiscard]] static auto getIndex(T x) {
+    return checkIndex(to_underlying(x), Enum);
+  }
+protected:
+  inline static const std::string Index = "index '", Enum = "enum '",
+                                  Range = "' is out of range";
+
   // Random access iterator for looping over all values of T (the scoped enum).
-  // This iterator does not allow modifying entries.
-  class Iterator {
+  template<typename Derived> class BaseIterator {
   public:
     using iterator_category = std::random_access_iterator_tag;
     using difference_type = std::ptrdiff_t;
-    using value_type = const T;
-    using pointer = const T*;
-    using reference = const T&;
-    using self_type = Iterator;
-
-    // forward iterator requirements (a default constructor)
-    Iterator(size_t index = 0) noexcept : _index(index) {}
 
     // common requirements for iterators
     auto& operator++() {
       if (_index >= N) error(BadEnd);
       ++_index;
-      return *this;
+      return derived();
     }
     auto operator++(int) {
-      Iterator x = *this;
+      Derived x = derived();
       ++*this;
       return x;
     }
 
     // operator<=> enables == and != needed for 'input interator' and <, >, <=
     // and >= needed for 'random access iterator'
-    [[nodiscard]] auto operator<=>(const Iterator& x) const noexcept = default;
-
-    // input iterator requirements (except operator->)
-    [[nodiscard]] auto operator*() const {
-      // exception should only happen when dereferencing 'end' since other
-      // methods prevent moving out of range
-      if (_index >= N)
-        error("index '" + std::to_string(_index) + "' is out of range");
-      return static_cast<T>(_index);
-    }
+    [[nodiscard]] auto
+    operator<=>(const BaseIterator& x) const noexcept = default;
 
     // bi-directional iterator requirements
     auto& operator--() {
       if (_index == 0) error(BadBegin);
       --_index;
-      return *this;
+      return derived();
     }
     auto operator--(int) {
-      Iterator x = *this;
+      Derived x = derived();
       --*this;
       return x;
     }
 
     // random-access iterator requirements (except non-const operator[])
-    auto& operator+=(difference_type offset) {
-      if (const auto i = static_cast<difference_type>(_index) + offset; i < 0)
+    auto& operator+=(difference_type i) {
+      if ((i += static_cast<difference_type>(_index)) < 0)
         error(BadBegin);
-      else if (const auto j = static_cast<size_t>(i); j > N)
+      if (const auto j = static_cast<size_t>(i); j > N)
         error(BadEnd);
       else
         _index = j;
-      return *this;
+      return derived();
     }
-    auto& operator-=(difference_type offset) { return *this += -offset; }
-    [[nodiscard]] auto operator[](difference_type offset) const {
-      return *(*this + offset);
+    auto& operator-=(difference_type i) { return *this += -i; }
+    [[nodiscard]] auto operator+(difference_type i) const {
+      Derived x = derived();
+      return x += i;
     }
-    [[nodiscard]] auto operator+(difference_type offset) const {
-      Iterator x = *this;
-      return x += offset;
+    [[nodiscard]] auto operator-(difference_type i) const {
+      Derived x = derived();
+      return x -= i;
     }
-    [[nodiscard]] auto operator-(difference_type offset) const {
-      Iterator x = *this;
-      return x -= offset;
-    }
-    [[nodiscard]] auto operator-(const Iterator& x) const noexcept {
+    [[nodiscard]] auto operator-(const BaseIterator& x) const noexcept {
       return _index - x._index;
     }
-  private:
-    inline static const std::string BadBegin = "can't decrement past zero",
-                                    BadEnd = "can't increment past end";
-
+  protected:
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
+    BaseIterator(size_t index) noexcept : _index(index) {}
+
     size_t _index{};
+  private:
+    [[nodiscard]] auto& derived() noexcept {
+      return static_cast<Derived&>(*this);
+    }
+    [[nodiscard]] auto& derived() const noexcept {
+      return static_cast<const Derived&>(*this);
+    }
+
+    inline static const std::string BadBegin = "can't decrement past zero",
+                                    BadEnd = "can't increment past end";
   };
-
-  [[nodiscard]] static auto begin() noexcept { return Iterator(0); }
-  [[nodiscard]] static auto end() noexcept { return Iterator(N); }
-
-  [[nodiscard]] static constexpr size_t size() noexcept { return N; }
-
-  [[nodiscard]] auto operator[](size_t i) const {
-    return static_cast<T>(checkIndex(i, Index));
-  }
-  [[nodiscard]] auto operator[](int i) const {
-    return static_cast<T>(checkIndex(i, Index));
-  }
-
-  [[nodiscard]] static auto getIndex(T x) {
-    return checkIndex(to_underlying(x), Enum);
-  }
-private:
-  inline static const std::string Index = "index '", Enum = "enum '";
 
   template<typename Index>
   [[nodiscard]] static auto checkIndex(Index i, const std::string& name) {
     const auto x = static_cast<size_t>(i);
     if (x >= N)
       // use original value in error message (so int '-1' is preserved)
-      throw std::out_of_range(name + std::to_string(i) + "' is out of range");
+      throw std::out_of_range(name + std::to_string(i) + Range);
     return x;
+  }
+};
+
+template<typename T, size_t N>
+class IterableEnumArray : public IterableEnum<T, N>, public BaseEnumArray<T> {
+private:
+  using base = IterableEnum<T, N>;
+public:
+  class Iterator : public base::template BaseIterator<Iterator> {
+  private:
+    using iBase = typename base::template BaseIterator<Iterator>;
+  public:
+    // forward iterator requirements (a default constructor)
+    Iterator(size_t index = 0) noexcept : iBase(index) {}
+
+    // input iterator requirements (except operator->)
+    [[nodiscard]] auto operator*() const {
+      // exception should only happen when dereferencing 'end' since other
+      // methods prevent moving out of range
+      if (iBase::_index >= N)
+        iBase::error(base::Index + std::to_string(iBase::_index) + base::Range);
+      return static_cast<T>(iBase::_index);
+    }
+
+    // random-access iterator requirements
+    [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
+      return *(*this + i);
+    }
+  };
+
+  [[nodiscard]] static auto begin() noexcept { return Iterator(0); }
+  [[nodiscard]] static auto end() noexcept { return Iterator(N); }
+
+  [[nodiscard]] auto operator[](size_t i) const {
+    return static_cast<T>(base::checkIndex(i, base::Index));
+  }
+  [[nodiscard]] auto operator[](int i) const {
+    return static_cast<T>(base::checkIndex(i, base::Index));
   }
 };
 
