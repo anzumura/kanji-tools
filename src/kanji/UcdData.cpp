@@ -192,8 +192,8 @@ void UcdData::print(const Data& data) const {
       } else
         data.out() << "  ERROR: " << i->name() << " not found in UCD\n";
   };
-  printLinks("Frequency", data.frequencyKanji());
-  printLinks("Extra", data.extraKanji());
+  printLinks("Frequency", data.types(KanjiTypes::Frequency));
+  printLinks("Extra", data.types(KanjiTypes::Extra));
   printVariationSelectorKanji(data);
 }
 

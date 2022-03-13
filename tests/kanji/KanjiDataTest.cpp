@@ -174,26 +174,26 @@ TEST_F(KanjiDataTest, RadicalChecks) {
 }
 
 TEST_F(KanjiDataTest, TotalsChecks) {
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::G1), 80);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::G2), 160);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::G3), 200);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::G4), 200);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::G5), 185);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::G6), 181);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::S), 1130);
-  EXPECT_EQ(_data->gradeTotal(KanjiGrades::None), 0);
-  EXPECT_EQ(_data->levelTotal(JlptLevels::N5), 103);
-  EXPECT_EQ(_data->levelTotal(JlptLevels::N4), 181);
-  EXPECT_EQ(_data->levelTotal(JlptLevels::N3), 361);
-  EXPECT_EQ(_data->levelTotal(JlptLevels::N2), 415);
-  EXPECT_EQ(_data->levelTotal(JlptLevels::N1), 1162);
-  EXPECT_EQ(_data->levelTotal(JlptLevels::None), 0);
-  EXPECT_EQ(_data->frequencyTotal(0), 500);
-  EXPECT_EQ(_data->frequencyTotal(1), 500);
-  EXPECT_EQ(_data->frequencyTotal(2), 500);
-  EXPECT_EQ(_data->frequencyTotal(3), 500);
-  EXPECT_EQ(_data->frequencyTotal(4), 501);
-  EXPECT_EQ(_data->frequencyTotal(5), 0);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::G1), 80);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::G2), 160);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::G3), 200);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::G4), 200);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::G5), 185);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::G6), 181);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::S), 1130);
+  EXPECT_EQ(_data->gradeSize(KanjiGrades::None), 0);
+  EXPECT_EQ(_data->levelSize(JlptLevels::N5), 103);
+  EXPECT_EQ(_data->levelSize(JlptLevels::N4), 181);
+  EXPECT_EQ(_data->levelSize(JlptLevels::N3), 361);
+  EXPECT_EQ(_data->levelSize(JlptLevels::N2), 415);
+  EXPECT_EQ(_data->levelSize(JlptLevels::N1), 1162);
+  EXPECT_EQ(_data->levelSize(JlptLevels::None), 0);
+  EXPECT_EQ(_data->frequencySize(0), 500);
+  EXPECT_EQ(_data->frequencySize(1), 500);
+  EXPECT_EQ(_data->frequencySize(2), 500);
+  EXPECT_EQ(_data->frequencySize(3), 500);
+  EXPECT_EQ(_data->frequencySize(4), 501);
+  EXPECT_EQ(_data->frequencySize(5), 0);
 }
 
 TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
@@ -212,13 +212,13 @@ TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
   }
   EXPECT_EQ(sorted, "弓. 窮. 穹^ 弼@ 弖# 躬#");
   // Make sure all Kanji are in Kanji related Unicode blocks
-  EXPECT_EQ(checkKanji(_data->jouyouKanji()), 0);
-  EXPECT_EQ(checkKanji(_data->jinmeiKanji()), 0);
+  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Jouyou)), 0);
+  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Jinmei)), 0);
   // 52 LinkedJinmei type Kanji use the Unicode 'Variation Selector'
-  EXPECT_EQ(checkKanji(_data->linkedJinmeiKanji()), 52);
-  EXPECT_EQ(checkKanji(_data->linkedOldKanji()), 0);
-  EXPECT_EQ(checkKanji(_data->extraKanji()), 0);
-  EXPECT_EQ(checkKanji(_data->frequencyKanji()), 0);
+  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::LinkedJinmei)), 52);
+  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::LinkedOld)), 0);
+  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Extra)), 0);
+  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Frequency)), 0);
 }
 
 TEST_F(KanjiDataTest, FindByName) {
@@ -409,9 +409,9 @@ TEST_F(KanjiDataTest, UcdLinks) {
     } else if (u.hasLinks())
       ++otherLinks[_data->getType(u.name())];
   }
-  EXPECT_EQ(jouyou, _data->jouyouKanji().size());
-  EXPECT_EQ(jinmei - jinmeiLinks, _data->jinmeiKanji().size());
-  EXPECT_EQ(jinmeiLinks, _data->linkedJinmeiKanji().size());
+  EXPECT_EQ(jouyou, _data->typeSize(KanjiTypes::Jouyou));
+  EXPECT_EQ(jinmei - jinmeiLinks, _data->typeSize(KanjiTypes::Jinmei));
+  EXPECT_EQ(jinmeiLinks, _data->typeSize(KanjiTypes::LinkedJinmei));
   EXPECT_EQ(otherLinks[KanjiTypes::Extra], 10);
   EXPECT_EQ(otherLinks[KanjiTypes::Frequency], 15);
   EXPECT_EQ(otherLinks[KanjiTypes::Kentei], 232);
@@ -419,7 +419,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // part of 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 90);
   auto officialLinksToJinmei{0}, officialLinksToJouyou{0};
-  for (auto& i : _data->linkedJinmeiKanji()) {
+  for (auto& i : _data->types(KanjiTypes::LinkedJinmei)) {
     auto& link = *static_cast<const LinkedKanji&>(*i).link();
     if (link.type() == KanjiTypes::Jouyou)
       ++officialLinksToJouyou;

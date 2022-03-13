@@ -172,7 +172,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
           qList ? *qList : _choice.get("Choose list", FrequencyChoices);
         !isQuit(c))
       listQuiz(KanjiInfo::Freq,
-               data().frequencyList(static_cast<size_t>(c - '1')));
+               data().frequencies(static_cast<size_t>(c - '1')));
     break;
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
@@ -181,7 +181,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
                                            GradeChoices, DefaultGrade);
         !isQuit(c))
       listQuiz(KanjiInfo::Grade,
-               data().gradeList(AllKanjiGrades[c == 's' ? 6 : c - '1']));
+               data().grades(AllKanjiGrades[c == 's' ? 6 : c - '1']));
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
@@ -190,20 +190,19 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
                                            KyuChoices, DefaultKyu);
         !isQuit(c))
       listQuiz(KanjiInfo::Kyu,
-               data().kyuList(AllKenteiKyus[c == 'a'   ? 0
-                                            : c == 'c' ? 8
-                                            : c == '2' ? 9
-                                            : c == 'b' ? 10
-                                            : c == '1' ? 11
-                                                       : 7 - (c - '3')]));
+               data().kyus(AllKenteiKyus[c == 'a'   ? 0
+                                         : c == 'c' ? 8
+                                         : c == '2' ? 9
+                                         : c == 'b' ? 10
+                                         : c == '1' ? 11
+                                                    : 7 - (c - '3')]));
     break;
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
     if (const char c =
           qList ? *qList : _choice.get("Choose level", LevelChoices);
         !isQuit(c))
-      listQuiz(KanjiInfo::Level,
-               data().levelList(AllJlptLevels[4 - (c - '1')]));
+      listQuiz(KanjiInfo::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
     break;
   case 'm': groupQuiz(_groupData->meaningGroups()); break;
   case 'p': groupQuiz(_groupData->patternGroups()); break;

@@ -4,6 +4,7 @@
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
 #include <kanji_tools/utils/DataFile.h>
+#include <kanji_tools/utils/EnumMap.h>
 
 #include <optional>
 
@@ -17,6 +18,7 @@ public:
   using OptEntry = std::optional<const Entry>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
+  template<typename T> using EnumList = EnumMap<T, List>;
 
   // 'DebugMode' is controlled by command-line options:
   //   -debug: sets '_debugMode' to 'Full' to print all debug output
@@ -96,66 +98,33 @@ public:
     return getStrokes(kanjiName, findUcd(kanjiName));
   }
 
-  [[nodiscard]] KanjiTypes getType(const std::string& name) const;
-
   // get list by KanjiType
-  [[nodiscard]] auto& typeList(KanjiTypes t) const {
-    return hasValue(t) ? _types[AllKanjiTypes.getIndex(t)] : _emptyList;
-  }
-  [[nodiscard]] auto typeTotal(KanjiTypes t) const {
-    return typeList(t).size();
-  }
-
-  [[nodiscard]] auto& jouyouKanji() const {
-    return typeList(KanjiTypes::Jouyou);
-  }
-  [[nodiscard]] auto& jinmeiKanji() const {
-    return typeList(KanjiTypes::Jinmei);
-  }
-  [[nodiscard]] auto& linkedJinmeiKanji() const {
-    return typeList(KanjiTypes::LinkedJinmei);
-  }
-  [[nodiscard]] auto& linkedOldKanji() const {
-    return typeList(KanjiTypes::LinkedOld);
-  }
-  [[nodiscard]] auto& frequencyKanji() const {
-    return typeList(KanjiTypes::Frequency);
-  }
-  [[nodiscard]] auto& extraKanji() const { return typeList(KanjiTypes::Extra); }
+  [[nodiscard]] auto& types(KanjiTypes t) const { return _types[t]; }
+  [[nodiscard]] auto typeSize(KanjiTypes t) const { return types(t).size(); }
 
   // get list by KanjiGrade
-  [[nodiscard]] auto& gradeList(KanjiGrades g) const {
-    return hasValue(g) ? _grades[AllKanjiGrades.getIndex(g)] : _emptyList;
-  }
-  [[nodiscard]] auto gradeTotal(KanjiGrades g) const {
-    return gradeList(g).size();
-  }
+  [[nodiscard]] auto& grades(KanjiGrades g) const { return _grades[g]; }
+  [[nodiscard]] auto gradeSize(KanjiGrades g) const { return grades(g).size(); }
 
   // get list by JLPT Level
-  [[nodiscard]] auto& levelList(JlptLevels l) const {
-    return hasValue(l) ? _levels[AllJlptLevels.getIndex(l)] : _emptyList;
-  }
-  [[nodiscard]] auto levelTotal(JlptLevels level) const {
-    return levelList(level).size();
-  }
+  [[nodiscard]] auto& levels(JlptLevels l) const { return _levels[l]; }
+  [[nodiscard]] auto levelSize(JlptLevels l) const { return levels(l).size(); }
 
   // get list by Kentei Kyu
-  [[nodiscard]] auto& kyuList(KenteiKyus k) const {
-    return hasValue(k) ? _kyus[AllKenteiKyus.getIndex(k)] : _emptyList;
-  }
-  [[nodiscard]] auto kyuTotal(KenteiKyus kyu) const {
-    return kyuList(kyu).size();
-  }
+  [[nodiscard]] auto& kyus(KenteiKyus k) const { return _kyus[k]; }
+  [[nodiscard]] auto kyuSize(KenteiKyus k) const { return kyus(k).size(); }
 
   // See comment for '_frequencies' private data member for more details about
   // frequency lists
   enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
-  [[nodiscard]] auto& frequencyList(size_t range) const {
-    return range < FrequencyBuckets ? _frequencies[range] : _emptyList;
+  [[nodiscard]] auto& frequencies(size_t f) const {
+    return f < FrequencyBuckets ? _frequencies[f] : _emptyList;
   }
-  [[nodiscard]] auto frequencyTotal(size_t range) const {
-    return frequencyList(range).size();
+  [[nodiscard]] auto frequencySize(size_t f) const {
+    return frequencies(f).size();
   }
+
+  [[nodiscard]] KanjiTypes getType(const std::string& name) const;
 
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including
   // 'variation selectors', i.e., the same result is returned for '侮︀ [4FAE
@@ -262,21 +231,8 @@ protected:
   // with a single kanji that has the given number of strokes.
   std::map<std::string, size_t> _strokes;
 
-  std::array<List, AllKanjiTypes.size() - 1> _types;
+  EnumList<KanjiTypes> _types;
 private:
-  [[nodiscard]] auto& typeList(KanjiTypes t) {
-    return _types[AllKanjiTypes.getIndex(t)];
-  }
-  [[nodiscard]] auto& gradeList(KanjiGrades g) {
-    return _grades[AllKanjiGrades.getIndex(g)];
-  }
-  [[nodiscard]] auto& levelList(JlptLevels l) {
-    return _levels[AllJlptLevels.getIndex(l)];
-  }
-  [[nodiscard]] auto& kyuList(KenteiKyus k) {
-    return _kyus[AllKenteiKyus.getIndex(k)];
-  }
-
   // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data
   // from 'linked-jinmei.txt' and creates either a LinkedJinmei or a LinkedOld
   // kanji for each entry.
@@ -302,11 +258,10 @@ private:
   // not Jouyou or Jinmei).
   std::map<std::string, std::string> _frequencyReadings;
 
-  // lists of kanji corresponding to Levels, Grades and Kyus (excluding the
-  // 'None' enum values)
-  std::array<List, AllJlptLevels.size() - 1> _levels;
-  std::array<List, AllKanjiGrades.size() - 1> _grades;
-  std::array<List, AllKenteiKyus.size() - 1> _kyus;
+  // lists of kanji per Level, Grade and Kyu (excluding the 'None' enum values)
+  EnumList<JlptLevels> _levels;
+  EnumList<KanjiGrades> _grades;
+  EnumList<KenteiKyus> _kyus;
 
   // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500,
   // 1501-2000, 2001-2501. The last list is one longer in order to hold the full
