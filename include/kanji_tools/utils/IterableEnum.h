@@ -16,13 +16,13 @@ public:
   IterableEnum& operator=(const IterableEnum&) = delete;
 
   [[nodiscard]] static constexpr size_t size() noexcept { return N; }
+protected:
+  inline static const std::string Index{"index '"}, Enum{"enum '"},
+    Range{"' is out of range"};
 
   [[nodiscard]] static auto getIndex(T x) {
     return checkIndex(to_underlying(x), Enum);
   }
-protected:
-  inline static const std::string Index = "index '", Enum = "enum '",
-                                  Range = "' is out of range";
 
   IterableEnum() noexcept = default;
 
@@ -96,8 +96,8 @@ protected:
       return static_cast<const Derived&>(*this);
     }
 
-    inline static const std::string BadBegin = "can't decrement past zero",
-                                    BadEnd = "can't increment past end";
+    inline static const std::string BadBegin{"can't decrement past zero"},
+      BadEnd{"can't increment past end"};
   };
 
   template<typename Index>
