@@ -118,7 +118,7 @@ public:
   // frequency lists
   enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
   [[nodiscard]] auto& frequencies(size_t f) const {
-    return f < FrequencyBuckets ? _frequencies[f] : _emptyList;
+    return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
   }
   [[nodiscard]] auto frequencySize(size_t f) const {
     return frequencies(f).size();
@@ -152,14 +152,14 @@ public:
   // by a 'P'. For example, '4138' maps to 嗩 and '4138P' maps to 嘆.
   [[nodiscard]] auto& findKanjisByMorohashiId(const std::string& id) const {
     const auto i = _morohashiMap.find(id);
-    return i != _morohashiMap.end() ? i->second : _emptyList;
+    return i != _morohashiMap.end() ? i->second : BaseEnumMap<List>::Empty;
   }
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
   [[nodiscard]] auto& findKanjisByNelsonId(size_t id) const {
     const auto i = _nelsonMap.find(id);
-    return i != _nelsonMap.end() ? i->second : _emptyList;
+    return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
   }
 
   void printError(const std::string&) const;
@@ -278,7 +278,6 @@ private:
 
   inline static const std::string dataArg = "-data", debugArg = "-debug",
                                   infoArg = "-info";
-  inline static const List _emptyList;
   inline static const Kanji::NelsonIds _emptyNelsonIds;
 };
 

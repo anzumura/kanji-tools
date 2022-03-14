@@ -11,9 +11,9 @@ namespace kanji_tools {
 // allows this class to use 'std::array' internally instead of 'std::map'. It
 // provides 'size', 'operator[]', 'begin' and 'end' methods.
 //
-// Passing T::None to 'operator[] const' returns an empty value, but T::None is
+// Passing T::None to const 'operator[]' returns an empty value, but T::None is
 // not valid for non-const 'operator[]' (it will throw an exception). Iteration
-// loops over 'non-None' values. For example:
+// loops over only 'non-None' values. For example:
 //
 // enum class Colors { Red, Green, Blue, None };
 // EnumMap<Colors, int> m;
@@ -21,13 +21,15 @@ namespace kanji_tools {
 // m[Colors::Green] = 4;
 // m[Colors::Blue] = 7;
 // for (auto i : m) std::cout << i << '\n'; // prints the 3 values
-// std::cout << m[Colors::None]; // prints 0 (the default value for 'int')
+// const auto& cm = m;
+// std::cout << cm[Colors::None]; // prints 0 (the default value for 'int')
 
+// BaseEnumMap has a static 'Empty' value to share amongst different EnumMaps
 template<typename V> class BaseEnumMap {
+public:
+  inline static const V Empty{};
 protected:
   BaseEnumMap() noexcept = default;
-
-  inline static const V Empty{};
 };
 
 template<typename T, typename V, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
