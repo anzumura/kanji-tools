@@ -15,6 +15,10 @@ namespace {
 const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"},
   LinkedJinmeiFile{"linked-jinmei"}, ExtraFile{"extra"};
 
+// This value is used for finding the location of 'data' directory. It will of
+// course need to be updated if the number of '.txt' files changes.
+constexpr size_t TextFilesInDataDir{12};
+
 } // namespace
 
 Data::Data(const std::filesystem::path& dataDir, DebugMode debugMode,
@@ -46,7 +50,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 }
 
 fs::path Data::getDataDir(size_t argc, const char** argv) {
-  static const auto DataDir = fs::path("data");
+  static const auto DataDir = fs::path{"data"};
 
   std::optional<fs::path> found = {};
   for (size_t i = 1; !found && i < argc; ++i)
@@ -63,14 +67,20 @@ fs::path Data::getDataDir(size_t argc, const char** argv) {
     if (!argc)
       usage("need at least one argument, argv[0], to check for a relative "
             "'data' directory");
-    auto oldParent = fs::absolute(fs::path(argv[0])).lexically_normal();
+    auto oldParent{fs::absolute(fs::path(argv[0])).lexically_normal()};
     do {
-      const auto parent = oldParent.parent_path();
+      const auto parent{oldParent.parent_path()};
       // 'has_parent_path' seems to always return true, i.e., parent of '/' is
       // '/' so break if new 'parent' is equal to 'oldParent'.
       if (parent == oldParent) break;
-      if (const auto data = parent / DataDir;
-          fs::is_directory(data) && fs::is_regular_file(data / JouyouFile))
+      // check if 'data' exists and contains the expected number of '.txt' files
+      if (const auto data{parent / DataDir};
+          fs::is_directory(data) &&
+          std::count_if(fs::directory_iterator(data), fs::directory_iterator{},
+                        [](const auto& i) {
+                          return i.path().extension() ==
+                                 DataFile::TextFileExtension;
+                        }) == TextFilesInDataDir)
         found = data;
       else
         oldParent = parent;
