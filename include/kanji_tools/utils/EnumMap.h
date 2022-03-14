@@ -41,13 +41,41 @@ private:
 public:
   class Iterator : public base::template BaseIterator<Iterator> {
   private:
+    friend EnumMap<T, V>;
     using iBase = typename base::template BaseIterator<Iterator>;
+
+    Iterator(size_t index, const EnumMap<T, V>& map) noexcept
+        : iBase(index), _map(&map) {}
+
+    void checkComparable(const Iterator& x) const {
+      if (_map != x._map) throw std::domain_error("not comparable");
+    }
 
     const EnumMap<T, V>* _map;
   public:
     // forward iterator requirements (a default constructor)
-    Iterator(size_t index = 0, const EnumMap<T, V>* map = nullptr) noexcept
-        : iBase(index), _map(map) {}
+    Iterator() noexcept : iBase(0), _map(nullptr) {}
+
+    [[nodiscard]] bool operator==(const Iterator& x) const {
+      checkComparable(x);
+      return iBase::operator==(x);
+    }
+    [[nodiscard]] bool operator<(const Iterator& x) const {
+      checkComparable(x);
+      return iBase::_index < x._index;
+    }
+    [[nodiscard]] bool operator!=(const Iterator& x) const {
+      return !(*this == x);
+    }
+    [[nodiscard]] bool operator<=(const Iterator& x) const {
+      return *this < x || *this == x;
+    }
+    [[nodiscard]] bool operator>=(const Iterator& x) const {
+      return !(*this < x);
+    }
+    [[nodiscard]] bool operator>(const Iterator& x) const {
+      return !(*this <= x);
+    }
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto& operator*() const {
@@ -61,11 +89,15 @@ public:
     [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
       return *(*this + i);
     }
+    [[nodiscard]] auto operator-(const Iterator& x) const {
+      checkComparable(x);
+      return iBase::_index - x._index;
+    }
   };
 
   // only support 'const' iteration
-  [[nodiscard]] auto begin() const noexcept { return Iterator(0, this); }
-  [[nodiscard]] auto end() const noexcept { return Iterator(N, this); }
+  [[nodiscard]] auto begin() const noexcept { return Iterator(0, *this); }
+  [[nodiscard]] auto end() const noexcept { return Iterator(N, *this); }
 
   [[nodiscard]] auto& operator[](T i) const {
     return i == T::None ? BaseEnumMap<V>::Empty

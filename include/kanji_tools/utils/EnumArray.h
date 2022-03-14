@@ -103,10 +103,13 @@ private:
 public:
   class Iterator : public base::template BaseIterator<Iterator> {
   private:
+    friend IterableEnumArray<T, N>;
     using iBase = typename base::template BaseIterator<Iterator>;
+
+    Iterator(size_t index) noexcept : iBase(index) {}
   public:
     // forward iterator requirements (a default constructor)
-    Iterator(size_t index = 0) noexcept : iBase(index) {}
+    Iterator() noexcept : iBase(0) {}
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto operator*() const {
@@ -120,6 +123,9 @@ public:
     // random-access iterator requirements
     [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
       return *(*this + i);
+    }
+    [[nodiscard]] auto operator-(const Iterator& x) const noexcept {
+      return iBase::_index - x._index;
     }
   };
 

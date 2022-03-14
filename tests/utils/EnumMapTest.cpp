@@ -47,6 +47,11 @@ TEST_F(EnumMapTest, RangeBasedForLoop) {
   EXPECT_EQ(values, std::vector({2, 4, 7}));
 }
 
+TEST_F(EnumMapTest, UninitializedIterator) {
+  auto i = EnumMap<Colors, int>::Iterator();
+  EXPECT_THROW(call([&] { return *i; }, "not initialized"), std::domain_error);
+}
+
 TEST_F(EnumMapTest, BadAccess) {
   EXPECT_THROW(call([this] { return _map[static_cast<Colors>(4UL)]; },
                     "index 'enum value 4' is out of range"),
@@ -96,13 +101,14 @@ TEST_F(EnumMapTest, IteratorCompare) {
   EXPECT_EQ(j - i, 2);
 }
 
-TEST_F(EnumMapTest, ThreeWayCompare) {
+TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
+  EnumMap<Colors, int> other;
   auto i = _map.begin();
-  auto j = i;
-  EXPECT_EQ(i <=> j, std::strong_ordering::equal);
-  j += 2;
-  EXPECT_EQ(i <=> j, std::strong_ordering::less);
-  EXPECT_EQ(j <=> i, std::strong_ordering::greater);
+  auto j = other.begin();
+  EXPECT_THROW(call([&] { return i == j; }, "not comparable"),
+               std::domain_error);
+  EXPECT_THROW(call([&] { return i - j; }, "not comparable"),
+               std::domain_error);
 }
 
 } // namespace kanji_tools

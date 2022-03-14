@@ -79,9 +79,6 @@ protected:
       Derived x = derived();
       return x -= i;
     }
-    [[nodiscard]] auto operator-(const BaseIterator& x) const noexcept {
-      return _index - x._index;
-    }
   protected:
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
@@ -89,15 +86,15 @@ protected:
 
     size_t _index{};
   private:
+    inline static const std::string BadBegin{"can't decrement past zero"},
+      BadEnd{"can't increment past end"};
+
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);
     }
     [[nodiscard]] auto& derived() const noexcept {
       return static_cast<const Derived&>(*this);
     }
-
-    inline static const std::string BadBegin{"can't decrement past zero"},
-      BadEnd{"can't increment past end"};
   };
 
   template<typename Index>
