@@ -93,7 +93,7 @@ public:
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
   static OptString findHanDakuten(const std::string& s) {
-    auto i = _hiraganaMap.find(s);
+    auto i{_hiraganaMap.find(s)};
     if (i != _hiraganaMap.end())
       return i->second->hanDakuten(CharType::Hiragana);
     i = _katakanaMap.find(s);
@@ -129,8 +129,8 @@ public:
   };
 
   // plain and accented repeat marks
-  inline static const auto RepeatPlain = RepeatMark("ゝ", "ヽ", false);
-  inline static const auto RepeatAccented = RepeatMark("ゞ", "ヾ", true);
+  inline static const auto RepeatPlain{RepeatMark("ゝ", "ヽ", false)};
+  inline static const auto RepeatAccented{RepeatMark("ゞ", "ヾ", true)};
 
   // provide static const refs for some special-case Kana
   static const Kana& SmallTsu;
@@ -169,14 +169,12 @@ public:
   [[nodiscard]] virtual const Kana* hanDakutenKana() const { return nullptr; }
 
   [[nodiscard]] OptString dakuten(CharType t) const {
-    auto i = dakutenKana();
-    if (i) return i->get(t, ConvertFlags::None);
+    if (const auto i{dakutenKana()}; i) return i->get(t, ConvertFlags::None);
     return {};
   }
 
   [[nodiscard]] OptString hanDakuten(CharType t) const {
-    auto i = hanDakutenKana();
-    if (i) return i->get(t, ConvertFlags::None);
+    if (const auto i{hanDakutenKana()}; i) return i->get(t, ConvertFlags::None);
     return {};
   }
 
@@ -215,7 +213,7 @@ public:
   // repeat the first letter of _romaji for sokuon (促音) output (special
   // handling for 't' as described in comments above).
   [[nodiscard]] std::string getSokuonRomaji(ConvertFlags flags) const {
-    auto& r = getRomaji(flags);
+    auto& r{getRomaji(flags)};
     return (r[0] == 'c' ? 't' : r[0]) + r;
   }
 
@@ -265,21 +263,21 @@ private:
   // which is ambiguous with ず.
   // '_hepburn' (if it's populated) is always a duplicate of another Kana's
   // '_romaji' value.
-  const std::optional<std::string> _hepburn = std::nullopt;
+  const std::optional<std::string> _hepburn{};
 
   // '_kunrei' holds an optional 'Kunrei Shiki' value for a few cases like 'zya'
   // for じゃ.
-  const std::optional<std::string> _kunrei = std::nullopt;
+  const std::optional<std::string> _kunrei{};
 
   // '_kunreiVariant' is true if the first entry in '_romajiVariants' is a
   // 'Kunrei Shiki' value. If this is true then '_kunrei' should be nullopt.
-  const bool _kunreiVariant = false;
+  const bool _kunreiVariant{false};
 
   // '_plainKana' is set to unaccented version by DakutenKana and HanDakutenKana
   // constructors. For example, the DakutenKana instance for け contains
   // '_dakutenKana' Kana げ and in turn, げ will have '_plainKana' set to the
   // original け to allow migration both ways.
-  const Kana* _plainKana = nullptr;
+  const Kana* _plainKana{};
 
   friend class DakutenKana;
   friend class HanDakutenKana;

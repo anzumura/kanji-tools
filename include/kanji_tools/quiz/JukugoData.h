@@ -16,10 +16,12 @@ public:
   JukugoData& operator=(const JukugoData&) = delete;
 
   [[nodiscard]] auto& find(const std::string& kanji) const {
-    const auto i = _kanjiToJukugo.find(kanji);
-    return i != _kanjiToJukugo.end() ? i->second : _emptyList;
+    const auto i{_kanjiToJukugo.find(kanji)};
+    return i != _kanjiToJukugo.end() ? i->second : EmptyList;
   }
 private:
+  inline static const List EmptyList;
+
   template<typename T>
   void createJukugo(T& error, KanjiGrades, const std::string& name,
                     const std::string& reading);
@@ -29,7 +31,6 @@ private:
 
   std::map<JukugoKey, Entry> _uniqueJukugo;
   std::map<std::string, List> _kanjiToJukugo;
-  inline static const List _emptyList;
 };
 
 using JukugoDataPtr = std::shared_ptr<const JukugoData>;

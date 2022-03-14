@@ -57,7 +57,7 @@ public:
   // 'convert' has 4 overloads. The first and second use the current values of
   // '_target' and '_flags'. The first and third convert characters of any
   // source type whereas the second and fourth restrict the source type to be
-  // converted. If 'source' = 'target' then the original string is returned.
+  // converted. If 'source' == 'target' then the original string is returned.
   //
   // Note: a number of delimiters are also supported and get converted from
   // narrow to wide and vice versa (see KanaConvert.cpp 'Delimiters'). Also,
@@ -74,6 +74,13 @@ public:
                                     CharType target,
                                     ConvertFlags = ConvertFlags::None);
 private:
+  // For input, either '_apostrophe' or '_dash' can be used to separate 'n' in
+  // the middle of Rōmaji words like gin'iro, kan'atsu, kan-i, etc.. For Rōmaji
+  // output, '_apostrophe' is used. Note, dash is used in 'Traditional Hepburn'
+  // whereas apostrophe is used in 'Modern (revised) Hepburn'.
+  static constexpr auto _apostrophe{'\''};
+  static constexpr auto _dash{'-'};
+
   // 'verifyData' is called by the constructor and performs various 'asserts' on
   // member data.
   void verifyData() const;
@@ -97,7 +104,7 @@ private:
   // would result in the code not getting executed when compiling with asserts
   // disabled, i.e., a 'Release' build.
   static void insertUnique(Set& s, const std::string& x) {
-    [[maybe_unused]] const auto i = s.insert(x);
+    [[maybe_unused]] const auto i{s.insert(x)};
     assert(i.second);
   }
 
@@ -113,13 +120,6 @@ private:
   [[nodiscard]] bool romajiMacronLetter(const std::string& letter,
                                         std::string& letterGroup,
                                         std::string& result) const;
-
-  // For input, either '_apostrophe' or '_dash' can be used to separate 'n' in
-  // the middle of Rōmaji words like gin'iro, kan'atsu, kan-i, etc.. For Rōmaji
-  // output, '_apostrophe' is used. Note, dash is used in 'Traditional Hepburn'
-  // whereas apostrophe is used in 'Modern (revised) Hepburn'.
-  const char _apostrophe = '\'';
-  const char _dash = '-';
 
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;

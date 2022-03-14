@@ -18,9 +18,7 @@ protected:
   // symbols that come before letters and numbers so that 'Choice::get' method
   // displays them at the beginning of the list (assuming the other choices are
   // just letters and/or numbers).
-  static constexpr auto MeaningsOption = '-';
-  static constexpr auto PrevOption = ',';
-  static constexpr auto SkipOption = '.';
+  static constexpr auto MeaningsOption{'-'}, PrevOption{','}, SkipOption{'.'};
 
   Quiz(const QuizLauncher& launcher, size_t question, bool showMeanings)
       : _launcher(launcher), _question(question), _correctAnswers(0),

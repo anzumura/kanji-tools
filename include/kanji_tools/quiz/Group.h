@@ -88,9 +88,9 @@ private:
 inline auto& operator<<(std::ostream& os, const Group& x) {
   os << '[';
   if (x.patternType() == Group::PatternType::Peer) {
-    const auto i = x.members().begin();
     os << "Peers ";
-    if (i != x.members().end()) os << (**i).name();
+    if (const auto i{x.members().begin()}; i != x.members().end())
+      os << (**i).name();
   }
   return os << x.name() << ']';
 }

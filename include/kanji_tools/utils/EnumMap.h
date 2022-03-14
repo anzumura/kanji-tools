@@ -21,7 +21,7 @@ namespace kanji_tools {
 // m[Colors::Green] = 4;
 // m[Colors::Blue] = 7;
 // for (auto i : m) std::cout << i << '\n'; // prints the 3 values
-// const auto& cm = m;
+// const auto& cm{m};
 // std::cout << cm[Colors::None]; // prints 0 (the default value for 'int')
 
 // BaseEnumMap has a static 'Empty' value to share amongst different EnumMaps

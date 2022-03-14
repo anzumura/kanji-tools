@@ -18,7 +18,7 @@ public:
   using Entry = Data::Entry;
   using List = Data::List;
 
-  static constexpr char QuitOption = '/';
+  static constexpr char QuitOption{'/'};
 
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.

@@ -31,8 +31,8 @@ protected:
   [[nodiscard]] static auto& checkType(const std::string& name,
                                        const Data::Entry& link,
                                        bool isJinmei = false) {
-    const auto t = link->type();
-    if (t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
+    if (const auto t{link->type()};
+        t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
       throw std::domain_error(
         "LinkedKanji " + name + " wanted type '" +
         toString(KanjiTypes::Jouyou) +

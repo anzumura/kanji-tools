@@ -23,13 +23,13 @@ protected:
 
 TEST_F(EnumMapTest, SquareOperator) {
   _map[Colors::Green] = 6;
-  const auto& cMap = _map;
+  const auto& cMap{_map};
   EXPECT_EQ(_map[Colors::Green], 6);
   EXPECT_EQ(cMap[Colors::Green], 6);
 }
 
 TEST_F(EnumMapTest, NoneReturnsEmptyForConstOperator) {
-  const auto& cMap = _map;
+  const auto& cMap{_map};
   EXPECT_EQ(cMap[Colors::None], 0);
   const EnumMap<Colors, std::string> stringMap;
   EXPECT_EQ(stringMap[Colors::None], std::string{});
@@ -48,7 +48,7 @@ TEST_F(EnumMapTest, RangeBasedForLoop) {
 }
 
 TEST_F(EnumMapTest, UninitializedIterator) {
-  auto i = EnumMap<Colors, int>::ConstIterator();
+  auto i{EnumMap<Colors, int>::ConstIterator()};
   EXPECT_THROW(call([&] { return *i; }, "not initialized"), std::domain_error);
 }
 
@@ -59,7 +59,7 @@ TEST_F(EnumMapTest, BadAccess) {
 }
 
 TEST_F(EnumMapTest, BadIncrement) {
-  auto i = _map.begin();
+  auto i{_map.begin()};
   i = i + 1;
   EXPECT_EQ(i[1], 7);
   i += 1;
@@ -76,7 +76,7 @@ TEST_F(EnumMapTest, BadIncrement) {
 }
 
 TEST_F(EnumMapTest, BadDecrement) {
-  auto i = _map.end();
+  auto i{_map.end()};
   EXPECT_THROW(call([&] { i -= 4; }, "can't decrement past zero"),
                std::out_of_range);
   i -= 3;
@@ -86,8 +86,8 @@ TEST_F(EnumMapTest, BadDecrement) {
 }
 
 TEST_F(EnumMapTest, IteratorCompare) {
-  auto i = _map.begin();
-  auto j = i;
+  auto i{_map.begin()};
+  auto j{i};
   EXPECT_EQ(i, j);
   EXPECT_LE(i, j);
   EXPECT_GE(i, j);
@@ -102,8 +102,8 @@ TEST_F(EnumMapTest, IteratorCompare) {
 }
 
 TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
-  auto i = EnumMap<Colors, int>::ConstIterator();
-  auto j = EnumMap<Colors, int>::ConstIterator();
+  EnumMap<Colors, int>::ConstIterator i, j;
+  ;
   // uninitialized iterators are considered equal
   EXPECT_EQ(i, j);
   EXPECT_FALSE(i != j);

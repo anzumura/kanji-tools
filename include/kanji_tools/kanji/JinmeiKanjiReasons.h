@@ -12,9 +12,9 @@ namespace kanji_tools {
 // - Simple: simplified form (表外漢字字体表の簡易慣用字体)
 // - Other: reason listed as その他
 enum class JinmeiKanjiReasons { Names, Print, Variant, Moved, Simple, Other };
-template<> inline constexpr bool is_enumarray<JinmeiKanjiReasons> = true;
-inline const auto AllJinmeiKanjiReasons =
+template<> inline constexpr auto is_enumarray<JinmeiKanjiReasons>{true};
+inline const auto AllJinmeiKanjiReasons{
   BaseEnumArray<JinmeiKanjiReasons>::create("Names", "Print", "Variant",
-                                            "Moved", "Simple", "Other");
+                                            "Moved", "Simple", "Other")};
 
 } // namespace kanji_tools

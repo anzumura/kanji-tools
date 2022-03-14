@@ -67,7 +67,7 @@ public:
     size_t result{};
     // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
     // checking if the next 3 bytes represent a 'variation selector'
-    if (auto i = reinterpret_cast<const unsigned char*>(s); i) {
+    if (auto i{reinterpret_cast<const unsigned char*>(s)}; i) {
       while (*i)
         if (isCombiningMark(i) || isVariationSelector(i))
           i += 3;
@@ -148,9 +148,9 @@ private:
   // 'getMBUtf8' returns a string containing one multi-byte UTF-8 sequence
   // starting at 'location'
   [[nodiscard]] static auto getMBUtf8(const char*& location) {
-    const auto firstOfGroup = static_cast<unsigned char>(*location);
+    const auto firstOfGroup{static_cast<unsigned char>(*location)};
     std::string result({*location++});
-    for (unsigned char x = Bit2; x && firstOfGroup & x; x >>= 1)
+    for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1)
       result += *location++;
     return result;
   }
@@ -175,7 +175,7 @@ private:
   }
 
   const std::string _data;
-  const char* _location = _data.c_str();
+  const char* _location{_data.c_str()};
   // counts of errors, variants and combiningMarks found
   size_t _errors{}, _variants{}, _combiningMarks{};
 };

@@ -22,8 +22,8 @@ namespace kanji_tools {
 //
 //   enum class Colors { Red, Green, Blue };
 //   template<> inline constexpr auto is_enumarray<Colors>{true};
-//   inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green",
-//     "Blue");
+//   inline const auto AllColors{BaseEnumArray<Colors>::create("Red", "Green",
+//     "Blue")};
 //
 //   for (auto c : AllColors) { std::cout << c << '\n'; }
 //
@@ -38,8 +38,8 @@ namespace kanji_tools {
 //
 //   enum class Colors { Red, Green, Blue, None };
 //   template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
-//   inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green",
-//     "Blue");
+//   inline const auto AllColors{BaseEnumArray<Colors>::create("Red", "Green",
+//     "Blue")};
 //
 //   // prints all Colors including 'None'
 //   for (auto c : AllColors) { std::cout << c << '\n'; }

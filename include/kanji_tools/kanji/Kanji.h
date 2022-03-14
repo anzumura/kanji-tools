@@ -30,7 +30,7 @@ enum class KanjiInfo {
 };
 
 // enable bitwise operators for 'KanjiInfo'
-template<> inline constexpr bool is_bitmask<KanjiInfo> = true;
+template<> inline constexpr auto is_bitmask<KanjiInfo>{true};
 
 class Kanji {
 public:
@@ -172,11 +172,11 @@ private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most
   // common to least common (see comments for 'qualifiedName' method and
   // 'Legend' string above for more details).
-  static constexpr std::array QualifiedNames = {'.', '\'', '"', '^', '~',
-                                                '%', '+',  '@', '#', '*'};
+  static constexpr std::array QualifiedNames{'.', '\'', '"', '^', '~',
+                                             '%', '+',  '@', '#', '*'};
 
   [[nodiscard]] size_t qualifiedNameRank() const {
-    auto t = type();
+    const auto t{type()};
     // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd
     // (so the least common)
     return t == KanjiTypes::Jouyou         ? 0
