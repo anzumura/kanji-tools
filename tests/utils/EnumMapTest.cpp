@@ -102,13 +102,32 @@ TEST_F(EnumMapTest, IteratorCompare) {
 }
 
 TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
-  EnumMap<Colors, int> other;
-  auto i = _map.begin();
-  auto j = other.begin();
+  auto i = EnumMap<Colors, int>::ConstIterator();
+  auto j = EnumMap<Colors, int>::ConstIterator();
+  // uninitialized iterators are considered equal
+  EXPECT_EQ(i, j);
+  EXPECT_FALSE(i != j);
+  // an initialized iterator can't be compared to an initialized one
+  i = _map.begin();
   EXPECT_THROW(call([&] { return i == j; }, "not comparable"),
                std::domain_error);
-  EXPECT_THROW(call([&] { return i - j; }, "not comparable"),
-               std::domain_error);
+  EnumMap<Colors, int> other; // all values are initially set to zero
+  EXPECT_EQ(_map.size(), other.size());
+  j = other.begin();
+  // iterators for different collections can't be compared even if they both
+  // point to the same locations (begin, middle or end)
+  for (int distance{};; ++distance, ++i, ++j) {
+    EXPECT_EQ(i - _map.begin(), distance);
+    EXPECT_EQ(j - other.begin(), distance);
+    EXPECT_THROW(call([&] { return i == j; }, "not comparable"),
+                 std::domain_error);
+    EXPECT_THROW(call([&] { return i - j; }, "not comparable"),
+                 std::domain_error);
+    // put loop break condition here to let 'end' case get tested as well
+    if (i == _map.end()) break;
+  }
+  EXPECT_EQ(j, other.end());
+  EXPECT_EQ(j - other.begin(), 3);
 }
 
 } // namespace kanji_tools
