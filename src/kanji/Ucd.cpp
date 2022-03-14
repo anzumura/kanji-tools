@@ -3,8 +3,6 @@
 
 namespace kanji_tools {
 
-const std::string Ucd::EmptyString = "";
-
 std::string Ucd::codeAndName() const {
   return toUnicode(_code, BracketType::Square) + ' ' + _name;
 }
