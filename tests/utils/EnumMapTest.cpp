@@ -48,7 +48,7 @@ TEST_F(EnumMapTest, RangeBasedForLoop) {
 }
 
 TEST_F(EnumMapTest, UninitializedIterator) {
-  auto i = EnumMap<Colors, int>::Iterator();
+  auto i = EnumMap<Colors, int>::ConstIterator();
   EXPECT_THROW(call([&] { return *i; }, "not initialized"), std::domain_error);
 }
 

@@ -8,18 +8,43 @@
 
 namespace kanji_tools {
 
-// IterableEnum is a base class for EnumArray and EnumMap classes. It provides
-// 'size' and 'getIndex' methods and a 'BaseIterator' (used by derived classes)
-template<typename T, size_t N> class IterableEnum {
+class BaseIterableEnum {
 public:
-  IterableEnum(const IterableEnum&) = delete;
-  IterableEnum& operator=(const IterableEnum&) = delete;
-
-  [[nodiscard]] static constexpr size_t size() noexcept { return N; }
+  BaseIterableEnum(const BaseIterableEnum&) = delete;
+  BaseIterableEnum& operator=(const BaseIterableEnum&) = delete;
 protected:
   inline static const std::string Index{"index '"}, Enum{"enum '"},
     Range{"' is out of range"};
 
+  class BaseIterator {
+  public:
+    using iterator_category = std::random_access_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+
+    // operator<=> enables == and != needed for 'input interator' and <, >, <=
+    // and >= needed for 'random access iterator'
+    [[nodiscard]] auto
+    operator<=>(const BaseIterator& x) const noexcept = default;
+  protected:
+    inline static const std::string BadBegin{"can't decrement past zero"},
+      BadEnd{"can't increment past end"};
+
+    static void error(const std::string& s) { throw std::out_of_range(s); }
+
+    BaseIterator(size_t index) noexcept : _index(index) {}
+
+    size_t _index;
+  };
+
+  BaseIterableEnum() noexcept = default;
+};
+
+// IterableEnum is a base class for EnumArray and EnumMap classes. It provides
+// 'size' and 'getIndex' methods and an 'Iterator' (used by derived classes)
+template<typename T, size_t N> class IterableEnum : public BaseIterableEnum {
+public:
+  [[nodiscard]] static constexpr size_t size() noexcept { return N; }
+protected:
   [[nodiscard]] static auto getIndex(T x) {
     return checkIndex(to_underlying(x), Enum);
   }
@@ -27,11 +52,8 @@ protected:
   IterableEnum() noexcept = default;
 
   // Random access iterator for looping over all values of T (the scoped enum).
-  template<typename Derived> class BaseIterator {
+  template<typename Derived> class Iterator : public BaseIterator {
   public:
-    using iterator_category = std::random_access_iterator_tag;
-    using difference_type = std::ptrdiff_t;
-
     // common requirements for iterators
     auto& operator++() {
       if (_index >= N) error(BadEnd);
@@ -43,11 +65,6 @@ protected:
       ++*this;
       return x;
     }
-
-    // operator<=> enables == and != needed for 'input interator' and <, >, <=
-    // and >= needed for 'random access iterator'
-    [[nodiscard]] auto
-    operator<=>(const BaseIterator& x) const noexcept = default;
 
     // bi-directional iterator requirements
     auto& operator--() {
@@ -80,15 +97,8 @@ protected:
       return x -= i;
     }
   protected:
-    static void error(const std::string& s) { throw std::out_of_range(s); }
-
-    BaseIterator(size_t index) noexcept : _index(index) {}
-
-    size_t _index{};
+    Iterator(size_t index) noexcept : BaseIterator(index) {}
   private:
-    inline static const std::string BadBegin{"can't decrement past zero"},
-      BadEnd{"can't increment past end"};
-
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);
     }

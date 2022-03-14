@@ -41,41 +41,41 @@ private:
 
   std::array<V, N> _values;
 public:
-  class Iterator : public base::template BaseIterator<Iterator> {
+  class ConstIterator : public base::template Iterator<ConstIterator> {
   private:
     friend EnumMap<T, V>;
-    using iBase = typename base::template BaseIterator<Iterator>;
+    using iBase = typename base::template Iterator<ConstIterator>;
 
-    Iterator(size_t index, const EnumMap<T, V>& map) noexcept
+    ConstIterator(size_t index, const EnumMap<T, V>& map) noexcept
         : iBase(index), _map(&map) {}
 
-    void checkComparable(const Iterator& x) const {
+    void checkComparable(const ConstIterator& x) const {
       if (_map != x._map) throw std::domain_error("not comparable");
     }
 
     const EnumMap<T, V>* _map;
   public:
     // forward iterator requirements (a default constructor)
-    Iterator() noexcept : iBase(0), _map(nullptr) {}
+    ConstIterator() noexcept : iBase(0), _map(nullptr) {}
 
-    [[nodiscard]] bool operator==(const Iterator& x) const {
+    [[nodiscard]] bool operator==(const ConstIterator& x) const {
       checkComparable(x);
       return iBase::operator==(x);
     }
-    [[nodiscard]] bool operator<(const Iterator& x) const {
+    [[nodiscard]] bool operator<(const ConstIterator& x) const {
       checkComparable(x);
       return iBase::_index < x._index;
     }
-    [[nodiscard]] bool operator!=(const Iterator& x) const {
+    [[nodiscard]] bool operator!=(const ConstIterator& x) const {
       return !(*this == x);
     }
-    [[nodiscard]] bool operator<=(const Iterator& x) const {
+    [[nodiscard]] bool operator<=(const ConstIterator& x) const {
       return *this < x || *this == x;
     }
-    [[nodiscard]] bool operator>=(const Iterator& x) const {
+    [[nodiscard]] bool operator>=(const ConstIterator& x) const {
       return !(*this < x);
     }
-    [[nodiscard]] bool operator>(const Iterator& x) const {
+    [[nodiscard]] bool operator>(const ConstIterator& x) const {
       return !(*this <= x);
     }
 
@@ -91,15 +91,15 @@ public:
     [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
       return *(*this + i);
     }
-    [[nodiscard]] auto operator-(const Iterator& x) const {
+    [[nodiscard]] auto operator-(const ConstIterator& x) const {
       checkComparable(x);
       return iBase::_index - x._index;
     }
   };
 
   // only support 'const' iteration
-  [[nodiscard]] auto begin() const noexcept { return Iterator(0, *this); }
-  [[nodiscard]] auto end() const noexcept { return Iterator(N, *this); }
+  [[nodiscard]] auto begin() const noexcept { return ConstIterator(0, *this); }
+  [[nodiscard]] auto end() const noexcept { return ConstIterator(N, *this); }
 
   [[nodiscard]] auto& operator[](T i) const {
     return i == T::None ? BaseEnumMap<V>::Empty

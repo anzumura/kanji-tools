@@ -101,15 +101,15 @@ class IterableEnumArray : public IterableEnum<T, N>, public BaseEnumArray<T> {
 private:
   using base = IterableEnum<T, N>;
 public:
-  class Iterator : public base::template BaseIterator<Iterator> {
+  class ConstIterator : public base::template Iterator<ConstIterator> {
   private:
     friend IterableEnumArray<T, N>;
-    using iBase = typename base::template BaseIterator<Iterator>;
+    using iBase = typename base::template Iterator<ConstIterator>;
 
-    Iterator(size_t index) noexcept : iBase(index) {}
+    ConstIterator(size_t index) noexcept : iBase(index) {}
   public:
     // forward iterator requirements (a default constructor)
-    Iterator() noexcept : iBase(0) {}
+    ConstIterator() noexcept : iBase(0) {}
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto operator*() const {
@@ -124,13 +124,13 @@ public:
     [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
       return *(*this + i);
     }
-    [[nodiscard]] auto operator-(const Iterator& x) const noexcept {
+    [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
       return iBase::_index - x._index;
     }
   };
 
-  [[nodiscard]] static auto begin() noexcept { return Iterator(0); }
-  [[nodiscard]] static auto end() noexcept { return Iterator(N); }
+  [[nodiscard]] static auto begin() noexcept { return ConstIterator(0); }
+  [[nodiscard]] static auto end() noexcept { return ConstIterator(N); }
 
   [[nodiscard]] auto operator[](size_t i) const {
     return static_cast<T>(base::checkIndex(i, base::Index));
