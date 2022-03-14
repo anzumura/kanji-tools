@@ -36,7 +36,7 @@ template<typename T, typename V, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 class EnumMap : public IterableEnum<T, static_cast<size_t>(T::None)>,
                 public BaseEnumMap<V> {
 private:
-  static constexpr auto N = static_cast<size_t>(T::None);
+  static constexpr auto N{static_cast<size_t>(T::None)};
   using base = IterableEnum<T, N>;
 
   std::array<V, N> _values;

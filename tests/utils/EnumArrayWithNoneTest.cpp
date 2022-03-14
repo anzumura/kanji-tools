@@ -15,11 +15,11 @@ enum class TestEnum { A, B, C, None };
 
 } // namespace
 
-template<> inline constexpr bool is_enumarray_with_none<Colors> = true;
-inline const auto AllColors =
-  BaseEnumArray<Colors>::create("Red", "Green", "Blue");
+template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
+inline const auto AllColors{
+  BaseEnumArray<Colors>::create("Red", "Green", "Blue")};
 
-template<> inline constexpr bool is_enumarray_with_none<TestEnum> = true;
+template<> inline constexpr auto is_enumarray_with_none<TestEnum>{true};
 
 TEST(EnumArrayWithNoneTest, FailForDuplicateName) {
   EXPECT_THROW(

@@ -26,8 +26,8 @@ public:
   enum class DebugMode { Full, Info, None };
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
-  inline static constexpr auto orderByQualifiedName =
-    [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); };
+  static constexpr auto orderByQualifiedName{
+    [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); }};
 
   Data(const std::filesystem::path& dataDir, DebugMode,
        std::ostream& out = std::cout, std::ostream& err = std::cerr);

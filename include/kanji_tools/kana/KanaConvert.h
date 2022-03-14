@@ -74,12 +74,11 @@ public:
                                     CharType target,
                                     ConvertFlags = ConvertFlags::None);
 private:
-  // For input, either '_apostrophe' or '_dash' can be used to separate 'n' in
+  // For input, either 'Apostrophe' or 'Dash' can be used to separate 'n' in
   // the middle of Rōmaji words like gin'iro, kan'atsu, kan-i, etc.. For Rōmaji
-  // output, '_apostrophe' is used. Note, dash is used in 'Traditional Hepburn'
+  // output, 'Apostrophe' is used. Note, 'Dash' is used in 'Traditional Hepburn'
   // whereas apostrophe is used in 'Modern (revised) Hepburn'.
-  static constexpr auto _apostrophe{'\''};
-  static constexpr auto _dash{'-'};
+  static constexpr auto Apostrophe{'\''}, Dash{'-'};
 
   // 'verifyData' is called by the constructor and performs various 'asserts' on
   // member data.
@@ -124,9 +123,8 @@ private:
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
 
-  // '_markAfterN...' sets contain the 8 Kana symbols (5 vowels and 3 y's) that
-  // should be proceedeed with _apostrophe when producing Rōmaji output if they
-  // follow 'n'.
+  // '_markAfterN...' contain the 8 Kana (5 vowels and 3 y's) that should be
+  // proceedeed with 'Apostrophe' when producing Rōmaji if they follow 'n'.
   Set _markAfterNHiragana;
   Set _markAfterNKatakana;
 

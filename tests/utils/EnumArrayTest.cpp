@@ -15,11 +15,11 @@ enum class TestEnum { A, B, C };
 
 } // namespace
 
-template<> inline constexpr bool is_enumarray<Colors> = true;
-inline const auto AllColors =
-  BaseEnumArray<Colors>::create("Red", "Green", "Blue");
+template<> inline constexpr auto is_enumarray<Colors>{true};
+inline const auto AllColors{
+  BaseEnumArray<Colors>::create("Red", "Green", "Blue")};
 
-template<> inline constexpr bool is_enumarray<TestEnum> = true;
+template<> inline constexpr auto is_enumarray<TestEnum>{true};
 
 TEST(EnumArrayTest, FailForDuplicateName) {
   EXPECT_THROW(

@@ -5,7 +5,7 @@
 namespace kanji_tools {
 
 // --- begin generated code from 'parseEastAsiaWidth.sh' ---
-inline constexpr std::array WideBlocks = {
+inline constexpr std::array WideBlocks{
   makeBlock<0x1100, 0x115F>(),   makeBlock<0x231A, 0x231B>(),
   makeBlock<0x2329, 0x232A>(),   makeBlock<0x23E9, 0x23EC>(),
   makeBlock<0x23F0>(),           makeBlock<0x23F3>(),

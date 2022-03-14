@@ -24,7 +24,7 @@ constexpr std::array Delimiters{
 KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
     : _target(target), _flags(flags) {
   for (auto& i : Kana::getMap(CharType::Hiragana))
-    if (auto& r = i.second->romaji(); !r.starts_with("n")) {
+    if (auto& r{i.second->romaji()}; !r.starts_with("n")) {
       if (r.size() == 1 || r == "ya" || r == "yu" || r == "yo") {
         insertUnique(_markAfterNHiragana, i.second->hiragana());
         insertUnique(_markAfterNKatakana, i.second->katakana());
@@ -41,20 +41,20 @@ KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
     _narrowDelims[i.first] = i.second;
     _wideDelims[i.second] = i.first;
   }
-  _narrowDelimList += _apostrophe;
-  _narrowDelimList += _dash;
+  _narrowDelimList += Apostrophe;
+  _narrowDelimList += Dash;
   verifyData();
 }
 
 std::string KanaConvert::flagString() const {
   if (_flags == ConvertFlags::None) return "None";
   std::string result;
-  const auto flag = [this, &result](auto f, const char* v) {
+  const auto flag{[this, &result](auto f, const char* v) {
     if (hasValue(_flags & f)) {
       if (!result.empty()) result += '|';
       result += v;
     }
-  };
+  }};
   flag(ConvertFlags::Hepburn, "Hepburn");
   flag(ConvertFlags::Kunrei, "Kunrei");
   flag(ConvertFlags::NoProlongMark, "NoProlongMark");
@@ -116,7 +116,7 @@ std::string KanaConvert::convert(CharType source,
   // and process each word. This helps deal with words ending in 'n'.
   std::string result;
   size_t oldPos{};
-  for (const auto keepSpaces = !(_flags & ConvertFlags::RemoveSpaces);;) {
+  for (const auto keepSpaces{!(_flags & ConvertFlags::RemoveSpaces)};;) {
     const auto pos = input.find_first_of(_narrowDelimList, oldPos);
     if (pos == std::string::npos) {
       result += convertFromRomaji(input.substr(oldPos));
@@ -124,7 +124,7 @@ std::string KanaConvert::convert(CharType source,
     }
     result += convertFromRomaji(input.substr(oldPos, pos - oldPos));
     if (const auto delim = input[pos];
-        delim != _apostrophe && delim != _dash && (keepSpaces || delim != ' '))
+        delim != Apostrophe && delim != Dash && (keepSpaces || delim != ' '))
       result += _narrowDelims.at(delim);
     oldPos = pos + 1;
   }
@@ -144,7 +144,7 @@ std::string KanaConvert::convertFromKana(const std::string& input,
     result += kanaLetters(letterGroup, source, count, prevKana, prolong);
     if (romajiTarget() && Kana::N.containsKana(letterGroup) &&
         afterN.contains(letter))
-      result += _apostrophe;
+      result += Apostrophe;
     hasSmallTsu = false;
     groupDone = false;
     // if 'startNewGroup' is false then drop the current letter instead of using

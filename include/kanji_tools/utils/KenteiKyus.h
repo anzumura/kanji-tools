@@ -20,8 +20,8 @@ enum class KenteiKyus {
   K1,
   None
 };
-template<> inline constexpr bool is_enumarray_with_none<KenteiKyus> = true;
-inline const auto AllKenteiKyus = BaseEnumArray<KenteiKyus>::create(
-  "K10", "K9", "K8", "K7", "K6", "K5", "K4", "K3", "KJ2", "K2", "KJ1", "K1");
+template<> inline constexpr auto is_enumarray_with_none<KenteiKyus>{true};
+inline const auto AllKenteiKyus{BaseEnumArray<KenteiKyus>::create(
+  "K10", "K9", "K8", "K7", "K6", "K5", "K4", "K3", "KJ2", "K2", "KJ1", "K1")};
 
 } // namespace kanji_tools
