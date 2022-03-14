@@ -8,53 +8,33 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path N5File = "jlpt/n5.txt";
-const fs::path N4File = "jlpt/n4.txt";
-const fs::path N3File = "jlpt/n3.txt";
-const fs::path N2File = "jlpt/n2.txt";
-const fs::path N1File = "jlpt/n1.txt";
-const fs::path K10File = "kentei/k10.txt";
-const fs::path K9File = "kentei/k9.txt";
-const fs::path K8File = "kentei/k8.txt";
-const fs::path K7File = "kentei/k7.txt";
-const fs::path K6File = "kentei/k6.txt";
-const fs::path K5File = "kentei/k5.txt";
-const fs::path K4File = "kentei/k4.txt";
-const fs::path K3File = "kentei/k3.txt";
-const fs::path KJ2File = "kentei/kj2.txt";
-const fs::path K2File = "kentei/k2.txt";
-const fs::path KJ1File = "kentei/kj1.txt";
-const fs::path K1File = "kentei/k1.txt";
-const fs::path FrequencyFile = "frequency.txt";
-const fs::path FrequencyReadingsFile = "frequency-readings.txt";
-const fs::path RadicalsFile = "radicals.txt";
-const fs::path StrokesFile = "strokes.txt";
-const fs::path WikiStrokesFile = "wiki-strokes.txt";
-const fs::path UcdFile = "ucd.txt";
+const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
+  FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"},
+  StrokesFile{"strokes"}, WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
 
 } // namespace
 
 KanjiData::KanjiData(size_t argc, const char** argv, std::ostream& out,
                      std::ostream& err)
     : Data(getDataDir(argc, argv), getDebugMode(argc, argv), out, err),
-      _levels{LevelDataFile(dataDir() / N5File, JlptLevels::N5, debug()),
-              LevelDataFile(dataDir() / N4File, JlptLevels::N4, debug()),
-              LevelDataFile(dataDir() / N3File, JlptLevels::N3, debug()),
-              LevelDataFile(dataDir() / N2File, JlptLevels::N2, debug()),
-              LevelDataFile(dataDir() / N1File, JlptLevels::N1, debug())},
-      _kyus{KyuDataFile(dataDir() / K10File, KenteiKyus::K10, debug()),
-            KyuDataFile(dataDir() / K9File, KenteiKyus::K9, debug()),
-            KyuDataFile(dataDir() / K8File, KenteiKyus::K8, debug()),
-            KyuDataFile(dataDir() / K7File, KenteiKyus::K7, debug()),
-            KyuDataFile(dataDir() / K6File, KenteiKyus::K6, debug()),
-            KyuDataFile(dataDir() / K5File, KenteiKyus::K5, debug()),
-            KyuDataFile(dataDir() / K4File, KenteiKyus::K4, debug()),
-            KyuDataFile(dataDir() / K3File, KenteiKyus::K3, debug()),
-            KyuDataFile(dataDir() / KJ2File, KenteiKyus::KJ2, debug()),
-            KyuDataFile(dataDir() / K2File, KenteiKyus::K2, debug()),
-            KyuDataFile(dataDir() / KJ1File, KenteiKyus::KJ1, debug()),
-            KyuDataFile(dataDir() / K1File, KenteiKyus::K1, debug())},
-      _frequency(dataDir() / FrequencyFile, debug()) {
+      _levels{LevelDataFile(dataDir(Jlpt, "n5"), JlptLevels::N5, debug()),
+              LevelDataFile(dataDir(Jlpt, "n4"), JlptLevels::N4, debug()),
+              LevelDataFile(dataDir(Jlpt, "n3"), JlptLevels::N3, debug()),
+              LevelDataFile(dataDir(Jlpt, "n2"), JlptLevels::N2, debug()),
+              LevelDataFile(dataDir(Jlpt, "n1"), JlptLevels::N1, debug())},
+      _kyus{KyuDataFile(dataDir(Kentei, "k10"), KenteiKyus::K10, debug()),
+            KyuDataFile(dataDir(Kentei, "k9"), KenteiKyus::K9, debug()),
+            KyuDataFile(dataDir(Kentei, "k8"), KenteiKyus::K8, debug()),
+            KyuDataFile(dataDir(Kentei, "k7"), KenteiKyus::K7, debug()),
+            KyuDataFile(dataDir(Kentei, "k6"), KenteiKyus::K6, debug()),
+            KyuDataFile(dataDir(Kentei, "k5"), KenteiKyus::K5, debug()),
+            KyuDataFile(dataDir(Kentei, "k4"), KenteiKyus::K4, debug()),
+            KyuDataFile(dataDir(Kentei, "k3"), KenteiKyus::K3, debug()),
+            KyuDataFile(dataDir(Kentei, "kJ2"), KenteiKyus::KJ2, debug()),
+            KyuDataFile(dataDir(Kentei, "k2"), KenteiKyus::K2, debug()),
+            KyuDataFile(dataDir(Kentei, "kJ1"), KenteiKyus::KJ1, debug()),
+            KyuDataFile(dataDir(Kentei, "k1"), KenteiKyus::K1, debug())},
+      _frequency(dataDir() / "frequency", debug()) {
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
   _ucd.load(DataFile::getFile(dataDir(), UcdFile));
   _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));

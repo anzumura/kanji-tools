@@ -12,10 +12,8 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path JouyouFile = "jouyou.txt";
-const fs::path JinmeiFile = "jinmei.txt";
-const fs::path LinkedJinmeiFile = "linked-jinmei.txt";
-const fs::path ExtraFile = "extra.txt";
+const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"},
+  LinkedJinmeiFile{"linked-jinmei"}, ExtraFile{"extra"};
 
 } // namespace
 

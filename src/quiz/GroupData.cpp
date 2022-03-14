@@ -9,17 +9,14 @@ namespace kanji_tools {
 
 namespace {
 
-const std::filesystem::path MeaningGroupFile = "meaning-groups.txt";
-const std::filesystem::path PatternGroupFile = "pattern-groups.txt";
-
-const std::string WideColon("：");
+const std::string WideColon{"："};
 
 } // namespace
 
 GroupData::GroupData(DataPtr data) : _data(data) {
-  loadGroup(DataFile::getFile(_data->dataDir(), MeaningGroupFile), _meaningMap,
+  loadGroup(DataFile::getFile(_data->dataDir(), "meaning-groups"), _meaningMap,
             _meaningGroups, GroupType::Meaning);
-  loadGroup(DataFile::getFile(_data->dataDir(), PatternGroupFile), _patternMap,
+  loadGroup(DataFile::getFile(_data->dataDir(), "pattern-groups"), _patternMap,
             _patternGroups, GroupType::Pattern);
   if (_data->debug()) {
     printGroups(_meaningMap, _meaningGroups);

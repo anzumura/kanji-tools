@@ -18,17 +18,24 @@ class DataFile {
 public:
   using List = std::vector<std::string>;
   using Set = std::set<std::string>;
+
+  inline static const std::string TextFileExtension{".txt"};
+
   // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and
-  // then returns the full path
+  // then returns the full path. It will also try adding '.txt' extension if
+  // 'file' isn't found and doesn't already have an extension.
   [[nodiscard]] static std::filesystem::path
   getFile(const std::filesystem::path& dir, const std::filesystem::path& file);
+
   static void print(const List&, const std::string& type,
-                    const std::string& group = "", bool isError = false,
+                    const std::string& group = {}, bool isError = false,
                     std::ostream& = std::cout);
   static void print(std::ostream& out, const List& l, const std::string& type) {
-    print(l, type, "", false, out);
+    print(l, type, {}, false, out);
   }
+
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
+
   // should be called after loading all lists to clean up unneeded static data
   static void clearUniqueCheckData() {
     UniqueNames.clear();
@@ -36,6 +43,7 @@ public:
   }
 
   enum class FileType { MultiplePerLine, OnePerLine };
+
   DataFile(const std::filesystem::path& p, FileType fileType,
            bool createNewUniqueFile = false)
       : DataFile(p, fileType, createNewUniqueFile, nullptr) {}
@@ -71,7 +79,7 @@ public:
   }
 protected:
   DataFile(const std::filesystem::path& p, FileType fileType, bool, Set*,
-           const std::string& name = "");
+           const std::string& name = {});
 private:
   using Map = std::map<std::string, size_t>;
 

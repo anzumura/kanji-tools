@@ -9,8 +9,15 @@ namespace kanji_tools {
 namespace fs = std::filesystem;
 
 fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
+  if (!fs::is_directory(dir)) usage(dir.string() + " is not a directory");
   fs::path p(dir / file);
-  if (!fs::exists(p)) usage(dir.string() + " must contain " + file.string());
+  if (!fs::is_regular_file(p) && !file.has_extension()) p += TextFileExtension;
+  if (!fs::exists(p)) {
+    std::string msg = dir.string() + " must contain '" + file.string();
+    usage(file.has_extension()
+            ? msg + '\''
+            : msg + "' (also tried '" + TextFileExtension + "' extension)");
+  }
   if (!fs::is_regular_file(p)) usage(file.string() + " must be a regular file");
   return p;
 }
@@ -28,10 +35,14 @@ void DataFile::print(const List& l, const std::string& type,
   }
 }
 
-DataFile::DataFile(const fs::path& file, FileType fileType,
+DataFile::DataFile(const fs::path& fileIn, FileType fileType,
                    bool createNewUniqueFile, Set* uniqueTypeNames,
                    const std::string& name)
-    : _name(name.empty() ? capitalize(file.stem().string()) : name) {
+    : _name(name.empty() ? capitalize(fileIn.stem().string()) : name) {
+  auto file = fileIn;
+  // try adding .txt if file isn't found
+  if (!fs::is_regular_file(file) && !fileIn.has_extension())
+    file += TextFileExtension;
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
   auto lineNumber = 1;

@@ -13,8 +13,7 @@ JukugoData::JukugoData(DataPtr data) {
   const std::string jukugoDir("jukugo/");
   auto f = [this, &jukugoDir, data](const char* file, KanjiGrades grade) {
     const auto loaded = loadFile(
-      DataFile::getFile(data->dataDir(), fs::path(jukugoDir + file + ".txt")),
-      grade);
+      DataFile::getFile(data->dataDir(), fs::path(jukugoDir + file)), grade);
     if (data->debug())
       data->log() << "Loaded " << loaded << " for Grade: " << grade << '\n';
   };
