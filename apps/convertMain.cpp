@@ -18,7 +18,7 @@ private:
   // 'usage' prints optional error message and then details about valid
   // arguments. If 'showAllOptions' is true then all options are displayed and
   // the program exits.
-  void usage(const std::string& errorMsg = "",
+  void usage(const std::string& errorMsg = Table::EmptyString,
              bool showAllOptions = true) const;
   void processOneLine(const std::string& s) {
     std::cout << (_source ? _converter.convert(*_source, s)

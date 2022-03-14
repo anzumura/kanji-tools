@@ -24,6 +24,8 @@ public:
   using Row = std::vector<std::string>;
   using Rows = std::vector<Row>;
 
+  inline static const std::string EmptyString;
+
   Table(const Row& title = {}, bool countInFirstColumn = false)
       : _title(title), _countInFirstColumn(countInFirstColumn) {}
 
