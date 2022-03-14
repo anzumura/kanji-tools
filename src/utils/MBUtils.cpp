@@ -21,7 +21,7 @@ constexpr char32_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff,
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
-constexpr auto ReplacementCharacter = "\xEF\xBF\xBD";
+constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
 
 #ifdef USE_CODECVT_FOR_UTF_8
 inline auto utf8Converter() {

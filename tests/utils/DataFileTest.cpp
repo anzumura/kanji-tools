@@ -10,13 +10,12 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path TestDir = "testDir";
-const fs::path GoodOnePerLine = TestDir / "goodOnePerLine";
-const fs::path GoodOnePerLineLevel = TestDir / "goodOnePerLineLevel";
-const fs::path MultiplePerLine = TestDir / "multiplePerLine";
-const fs::path BadOnePerLine = TestDir / "badOnePerLine";
-const fs::path BadSymbol = TestDir / "badSymbol";
-const fs::path DuplicateSymbol = TestDir / "duplicateSymbol";
+const fs::path TestDir{"testDir"};
+const fs::path GoodOnePerLine{TestDir / "goodOnePerLine"},
+  GoodOnePerLineLevel{TestDir / "goodOnePerLineLevel"},
+  MultiplePerLine{TestDir / "multiplePerLine"},
+  BadOnePerLine{TestDir / "badOnePerLine"}, BadSymbol{TestDir / "badSymbol"},
+  DuplicateSymbol{TestDir / "duplicateSymbol"};
 
 } // namespace
 

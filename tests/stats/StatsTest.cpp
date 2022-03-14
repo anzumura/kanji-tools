@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 class StatsTest : public ::testing::Test {
 protected:
   [[nodiscard]] static auto argv() {
-    static auto arg0 = "testMain", arg1 = "-data", arg2 = "../../../data";
+    static auto arg0{"testMain"}, arg1{"-data"}, arg2{"../../../data"};
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }
@@ -40,8 +40,8 @@ protected:
 
   inline static std::stringstream _os;
   inline static DataPtr _data;
-  inline static const fs::path TestDir = "testDir";
-  inline static const fs::path TestFile = TestDir / "test.txt";
+  inline static const fs::path TestDir{"testDir"};
+  inline static const fs::path TestFile{TestDir / "test.txt"};
 };
 
 TEST_F(StatsTest, PrintStatsForOneFile) {

@@ -11,6 +11,9 @@ namespace kanji_tools {
 // scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
+  // 'EmptyString' can be returned by 'linkCodeAndName'
+  inline static const std::string EmptyString;
+
   class Link {
   public:
     Link(char32_t code, const std::string& name) : _code(code), _name(name) {}
@@ -78,9 +81,6 @@ public:
   // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
-
-  // 'EmptyString' can be returned by 'linkCodeAndName'
-  static const std::string EmptyString;
 private:
   const char32_t _code;
   const std::string _name;

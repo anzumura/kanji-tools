@@ -10,13 +10,12 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path TestDir = "testDir";
-const fs::path TestFile1 = TestDir / "testFile甲";
-const fs::path TestFile2 = TestDir / "testFile乙";
-const fs::path BracketFile = TestDir / "bracketFile";
-const fs::path TestSubDir = TestDir / "test下";
-const fs::path TestSubFile1 = TestSubDir / "testSubFile1";
-const fs::path TestSubFile2 = TestSubDir / "testSubFile2.txt";
+const fs::path TestDir{"testDir"};
+const fs::path TestFile1{TestDir / "testFile甲"},
+  TestFile2{TestDir / "testFile乙"}, BracketFile{TestDir / "bracketFile"},
+  TestSubDir{TestDir / "test下"};
+const fs::path TestSubFile1{TestSubDir / "testSubFile1"},
+  TestSubFile2{TestSubDir / "testSubFile2.txt"};
 
 auto removeFurigana(const std::wstring& s) {
   return std::regex_replace(s, MBCount::RemoveFurigana,

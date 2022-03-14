@@ -10,7 +10,7 @@ namespace kanji_tools {
 class QuizTest : public ::testing::Test {
 protected:
   [[nodiscard]] static auto argv() {
-    static auto arg0 = "testMain", arg1 = "-data", arg2 = "../../../data";
+    static auto arg0{"testMain"}, arg1{"-data"}, arg2{"../../../data"};
     static const char* args[] = {arg0, arg1, arg2};
     return args;
   }

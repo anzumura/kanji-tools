@@ -25,7 +25,7 @@ TEST(DisplaySizeTest, DisplaySize) {
   // rare kanji, common kanji, 4 narrow numbers and a wide space = 10
   EXPECT_EQ(displaySize("𫠜中1234　"), 10);
   // don't include non-spacing characters
-  std::string s = "逸︁";
+  std::string s{"逸︁"};
   EXPECT_EQ(s.size(), 6);               // two 3-byte sequences
   EXPECT_EQ(toUnicode(s), "9038 FE01"); // 'FE01' is a variation selector
   EXPECT_EQ(displaySize(s), 2);
@@ -64,7 +64,7 @@ TEST(DisplaySizeTest, WideSetw) {
   EXPECT_EQ(wideSetw("。、Ｈ", 8), 11);  // 2 wide punctuation + 1 wide letter
   // a 4 byte rare kanji, a 3 byte common kanji, 4 narrow numbers and a 3 byte
   // wide space is 14 bytes, but has a displaySize of 10 (2 + 2 + 4 + 2)
-  std::string s = "𫠜中1234　";
+  std::string s{"𫠜中1234　"};
   EXPECT_EQ(s.size(), 14);
   EXPECT_EQ(displaySize(s), 10);
   // in order to get a 'width' of 11, std::setw would need to be given 15, i.e.,

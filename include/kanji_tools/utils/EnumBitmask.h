@@ -7,7 +7,7 @@ namespace kanji_tools {
 // To enable operators to meet the requirements of 'BitmaskType', specialize
 // 'is_bitmask' for a scoped enum like the following:
 //
-//   template<> inline constexpr bool is_bitmask<MyEnum> = true;
+//   template<> inline constexpr auto is_bitmask<MyEnum>{true};
 //
 // See https://en.cppreference.com/w/cpp/named_req/BitmaskType for details.
 //
@@ -17,7 +17,7 @@ namespace kanji_tools {
 
 // 'is_bitmask' bool that should be specialized:
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-inline constexpr bool is_bitmask = false;
+inline constexpr auto is_bitmask{false};
 
 template<typename T, typename _ = T>
 using isBitmask = std::enable_if_t<is_bitmask<T>, _>;

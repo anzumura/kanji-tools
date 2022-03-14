@@ -30,7 +30,7 @@ protected:
   // populate 'romaji' when round trip is lossy (like repeat symbols)
   void kanaConvertCheck(const std::string& hiragana,
                         const std::string& katakana,
-                        const std::string& romaji = "") {
+                        const std::string& romaji = {}) {
     if (romaji.empty()) {
       auto r = hiraganaToRomaji(hiragana);
       EXPECT_EQ(katakanaToRomaji(katakana), r);
@@ -70,7 +70,7 @@ protected:
   void checkSmallKana(CharType source, const std::string& s) {
     // small letters that don't form part of a digraph are output in 'wāpuro'
     // style favoring 'l' instead of 'x' as first letter (so small tsu is 'ltu')
-    std::string romaji = "lalilulelolkalkelyalyulyoltulwa";
+    std::string romaji{"lalilulelolkalkelyalyulyoltulwa"};
     EXPECT_EQ(_converter.convert(source, s, CharType::Romaji), romaji);
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
     // also test small letters starting with 'x'

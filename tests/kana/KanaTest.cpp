@@ -60,7 +60,7 @@ TEST(KanaTest, CheckHiragana) {
     MBChar s(i.first);
     std::string c;
     const auto checkDigraph = [&i, &c](const std::string& a,
-                                       const std::string& b = "") {
+                                       const std::string& b = {}) {
       EXPECT_TRUE(c == a || (!b.empty() && c == b))
         << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
         << i.second->romaji() << "', hiragana " << i.first;
@@ -129,7 +129,7 @@ TEST(KanaTest, CheckKatakana) {
     EXPECT_TRUE(hiraganaMap.contains(i.second->hiragana()));
     std::string c;
     const auto checkDigraph = [&i, &c](const std::string& a,
-                                       const std::string& b = "") {
+                                       const std::string& b = {}) {
       EXPECT_TRUE(c == a || (!b.empty() && c == b))
         << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
         << i.second->romaji() << "', katakana " << i.first;

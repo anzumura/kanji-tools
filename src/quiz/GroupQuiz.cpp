@@ -90,7 +90,7 @@ bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
 void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
   if (kanji->pinyin()) {
-    const auto p = "  (" + *kanji->pinyin() + ')';
+    const auto p{"  (" + *kanji->pinyin() + ')'};
     // use 'displaySize' since Pinyin can contain multi-byte chars (for tones)
     s += p + std::string(PinyinWidth - displaySize(p), ' ');
   } else
@@ -183,7 +183,7 @@ void GroupQuiz::showGroup(const List& questions, const List& readings,
     printAssignedAnswer(choice)
       << choice << ":  " << readings[count]->reading();
     printMeaning(readings[count++]);
-    if (!repeatQuestion && isTestMode()) choices[choice] = "";
+    if (!repeatQuestion && isTestMode()) choices[choice] = {};
   }
   out() << '\n';
 }
@@ -238,7 +238,7 @@ void GroupQuiz::editAnswer(Choices& choices) {
   static const std::string NewReadingForEntry("    New reading for Entry: ");
 
   const auto entry = getAnswerToEdit();
-  choices[_answers[entry]] = ""; // put the answer back as a choice
+  choices[_answers[entry]] = {}; // put the answer back as a choice
   auto newChoices = choices;
   newChoices.erase(EditOption);
   newChoices.erase(MeaningsOption);
@@ -255,7 +255,7 @@ size_t GroupQuiz::getAnswerToEdit() const {
 
   if (_answers.size() == 1) return 0;
   std::map<char, std::string> answersToEdit;
-  for (auto k : _answers) answersToEdit[k] = "";
+  for (auto k : _answers) answersToEdit[k] = {};
   const auto index = std::find(_answers.begin(), _answers.end(),
                                get(AnswerToEdit, answersToEdit, {}, false));
   assert(index != _answers.end());

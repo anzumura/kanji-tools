@@ -23,14 +23,14 @@ TEST(ColumnFileColumnTest, SameNumberForSameName) {
 
 class ColumnFileTest : public ::testing::Test {
 protected:
-  inline static const std::string convertError = "failed to convert to ";
+  inline static const std::string convertError{"failed to convert to "};
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
   }
   void TearDown() override { fs::remove_all(TestDir); }
-  inline static const fs::path TestDir = "testDir";
-  inline static const fs::path TestFile = TestDir / "testFile.txt";
+  inline static const fs::path TestDir{"testDir"};
+  inline static const fs::path TestFile{TestDir / "testFile.txt"};
 };
 
 TEST_F(ColumnFileTest, SingleColumnFile) {

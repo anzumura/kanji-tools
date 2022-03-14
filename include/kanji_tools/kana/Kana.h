@@ -12,7 +12,7 @@ namespace kanji_tools {
 // 'CharType' is used to specify 'source' and 'target' types for
 // 'KanaConvert::convert' methods
 enum class CharType { Hiragana, Katakana, Romaji };
-template<> inline constexpr bool is_enumarray<CharType> = true;
+template<> inline constexpr auto is_enumarray<CharType>{true};
 inline const auto CharTypes =
   BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji");
 
@@ -57,7 +57,7 @@ enum class ConvertFlags {
   NoProlongMark = 4,
   RemoveSpaces = 8
 };
-template<> inline constexpr bool is_bitmask<ConvertFlags> = true;
+template<> inline constexpr auto is_bitmask<ConvertFlags>{true};
 
 // 'Kana' is used to represent a Kana 'Monograph' or 'Digraph'. It stores
 // Rōmaji, Hiragana and Katakana as well variant Rōmaji forms. A 'Monograph' is
@@ -83,7 +83,7 @@ public:
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
   static OptString findDakuten(const std::string& s) {
-    auto i = _hiraganaMap.find(s);
+    auto i{_hiraganaMap.find(s)};
     if (i != _hiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
     i = _katakanaMap.find(s);
     if (i != _katakanaMap.end()) return i->second->dakuten(CharType::Katakana);
@@ -138,7 +138,7 @@ public:
 
   // 'ProlongMark' (ー) is officially in the Katakana Unicode block, but it can
   // also rarely appear in some (non-standard) Hiragana words like らーめん.
-  inline static const std::string ProlongMark = "ー";
+  inline static const std::string ProlongMark{"ー"};
 
   using List = std::vector<std::string>;
 

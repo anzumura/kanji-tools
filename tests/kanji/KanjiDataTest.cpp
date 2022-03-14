@@ -10,8 +10,8 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto Arg0 = "program-name", DebugArg = "-debug", DataArg = "-data",
-               DataDir = "some-dir";
+constexpr auto Arg0{"program-name"}, DebugArg{"-debug"}, DataArg{"-data"},
+  DataDir{"some-dir"};
 
 } // namespace
 
@@ -23,7 +23,7 @@ TEST(DataTest, NextArgWithJustArg0) {
 }
 
 TEST(DataTest, NextArgWithCurrentArg) {
-  auto arg1 = "arg1", arg2 = "arg2";
+  auto arg1{"arg1"}, arg2{"arg2"};
   const char* argv[] = {Arg0, arg1, arg2};
   EXPECT_EQ(Data::nextArg(std::size(argv), argv, 1), 2);
   EXPECT_EQ(Data::nextArg(std::size(argv), argv, 2), 3);
@@ -48,7 +48,7 @@ TEST(DataTest, NextArgWithDebugAndDataArgs) {
 }
 
 TEST(DataTest, NextArgWithMultipleArgs) {
-  auto arg1 = "arg1", arg3 = "arg3", arg6 = "arg6";
+  auto arg1{"arg1"}, arg3{"arg3"}, arg6{"arg6"};
   const char* argv[] = {Arg0, arg1, DebugArg, arg3, DataArg, DataDir, arg6};
   auto argc = std::size(argv);
   std::vector<const char*> actualArgs;
@@ -61,7 +61,7 @@ TEST(DataTest, NextArgWithMultipleArgs) {
 class KanjiDataTest : public ::testing::Test {
 protected:
   [[nodiscard]] static const char** argv() {
-    static auto arg2 = "../../../data";
+    static auto arg2{"../../../data"};
     static const char* args[] = {Arg0, DataArg, arg2};
     return args;
   }

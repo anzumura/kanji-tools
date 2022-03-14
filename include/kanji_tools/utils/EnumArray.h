@@ -21,7 +21,7 @@ namespace kanji_tools {
 // Here's an example of how to create (and use) an EnumArray:
 //
 //   enum class Colors { Red, Green, Blue };
-//   template<> inline constexpr bool is_enumarray<Colors> = true;
+//   template<> inline constexpr auto is_enumarray<Colors>{true};
 //   inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green",
 //     "Blue");
 //
@@ -37,7 +37,7 @@ namespace kanji_tools {
 // Here's an example of how to create (and use) an EnumArray with 'None':
 //
 //   enum class Colors { Red, Green, Blue, None };
-//   template<> inline constexpr bool is_enumarray_with_none<Colors> = true;
+//   template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
 //   inline const auto AllColors = BaseEnumArray<Colors>::create("Red", "Green",
 //     "Blue");
 //
@@ -48,11 +48,11 @@ namespace kanji_tools {
 
 // specialize 'is_enumarray' to enable 'EnumArray'
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-inline constexpr bool is_enumarray = false;
+inline constexpr auto is_enumarray{false};
 
 // specialize 'is_enumarray_with_none' to enable 'EnumArrayWithNone'
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-inline constexpr bool is_enumarray_with_none = false;
+inline constexpr auto is_enumarray_with_none{false};
 
 template<typename T, typename _ = int>
 using isBaseEnumArray =
@@ -188,7 +188,7 @@ public:
     return allowEmptyAsNone && s.empty() || s == None ? T::None : base::find(s);
   }
 private:
-  inline const static std::string None = "None";
+  inline const static std::string None{"None"};
   friend BaseEnumArray<T>; // 'create' calls private constructor
 
   EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }

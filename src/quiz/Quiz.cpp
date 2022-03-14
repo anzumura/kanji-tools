@@ -4,8 +4,7 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto ShowMeanings = "show meanings";
-constexpr auto HideMeanings = "hide meanings";
+constexpr auto ShowMeanings{"show meanings"}, HideMeanings{"hide meanings"};
 
 } // namespace
 

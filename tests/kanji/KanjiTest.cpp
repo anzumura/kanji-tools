@@ -95,8 +95,8 @@ protected:
   }
 
   const MockData _data;
-  inline static const fs::path TestDir = "testDir";
-  inline static const fs::path TestFile = TestDir / "test.txt";
+  inline static const fs::path TestDir{"testDir"};
+  inline static const fs::path TestFile{TestDir / "test.txt"};
 };
 
 TEST_F(KanjiTest, FrequencyKanji) {
