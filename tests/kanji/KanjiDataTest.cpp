@@ -330,7 +330,7 @@ TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
 TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
   // Jinmei Frequency, Kentei, etc.) should be in the 'common' bloacks.
-  u_int rareUcd{};
+  u_int32_t rareUcd{};
   std::map<std::string, u_int> rareMissingJSource;
   std::map<KanjiTypes, u_int> missingJSource;
   for (auto& i : _data->ucd().map()) {
@@ -365,7 +365,7 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd{_data->ucd().map()};
   EXPECT_EQ(ucd.size(), _data->kanjiNameMap().size());
-  u_int jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
+  u_int32_t jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
     jinmeiLinksToJinmei{};
   std::map<KanjiTypes, u_int> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
@@ -418,7 +418,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2838);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // part of 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 90);
-  u_int officialLinksToJinmei{}, officialLinksToJouyou{};
+  u_int32_t officialLinksToJinmei{}, officialLinksToJouyou{};
   for (auto& i : _data->types(KanjiTypes::LinkedJinmei)) {
     auto& link{*static_cast<const LinkedKanji&>(*i).link()};
     if (link.type() == KanjiTypes::Jouyou)
