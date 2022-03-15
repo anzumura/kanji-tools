@@ -132,7 +132,7 @@ bool Data::checkInsert(const Entry& kanji) {
   // update _maxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
   // applicable
   if (kanji->frequency() && *kanji->frequency() >= _maxFrequency)
-    _maxFrequency = *kanji->frequency() + 1;
+    _maxFrequency = *kanji->frequency() + 1U;
   if (kanji->variant() &&
       !_compatibilityMap.insert({kanji->compatibilityName(), kanji->name()})
          .second)
@@ -308,7 +308,7 @@ void Data::processList(const DataFile& list) {
       _levels[list.level()].push_back(kanji);
     } else {
       assert(kanji->frequency());
-      const auto index{(*kanji->frequency() - 1) / FrequencyBucketEntries};
+      const auto index{(*kanji->frequency() - 1U) / FrequencyBucketEntries};
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1]
         .push_back(kanji);
     }

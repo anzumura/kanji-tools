@@ -55,19 +55,17 @@ protected:
                   const LinkNames& oldNames, const Ucd* u)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
                        f.get(ReadingCol), strokes, u),
-        _kyu(d.kyu(name)), _number(f.getULong(NumberCol)), _oldNames(oldNames) {
-  }
+        _kyu(d.kyu(name)), _number(f.getU16(NumberCol)), _oldNames(oldNames) {}
 
   // Constructor used by 'OfficialKanji': calls base without 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
                   u_int8_t strokes, const LinkNames& oldNames)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)),
                        f.get(ReadingCol), strokes, findUcd(d, name)),
-        _kyu(d.kyu(name)), _number(f.getULong(NumberCol)), _oldNames(oldNames) {
-  }
+        _kyu(d.kyu(name)), _number(f.getU16(NumberCol)), _oldNames(oldNames) {}
 private:
   const KenteiKyus _kyu;
-  const size_t _number;
+  const u_int16_t _number;
   const LinkNames _oldNames;
 };
 
@@ -81,7 +79,7 @@ public:
                  : CustomFileKanji::extraTypeInfo();
   }
 
-  [[nodiscard]] OptSize frequency() const override { return _frequency; }
+  [[nodiscard]] OptU16 frequency() const override { return _frequency; }
   [[nodiscard]] JlptLevels level() const override { return _level; }
 
   [[nodiscard]] auto year() const { return _year; }
@@ -90,7 +88,7 @@ protected:
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name)
       : CustomFileKanji(d, f, name, d.getStrokes(name), getOldNames(f)),
         _frequency(d.frequency(name)), _level(d.level(name)),
-        _year(f.getOptULong(YearCol)) {}
+        _year(f.getOptU16(YearCol)) {}
 
   // constructor used by 'JouyouKanji' calls base with 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name,
@@ -98,13 +96,13 @@ protected:
       : CustomFileKanji(d, f, name, s, meaning, getOldNames(f),
                         findUcd(d, name)),
         _frequency(d.frequency(name)), _level(d.level(name)),
-        _year(f.getOptULong(YearCol)) {}
+        _year(f.getOptU16(YearCol)) {}
 private:
   [[nodiscard]] static LinkNames getOldNames(const ColumnFile&);
 
-  const OptSize _frequency;
+  const OptU16 _frequency;
   const JlptLevels _level;
-  const OptSize _year;
+  const OptU16 _year;
 };
 
 class JinmeiKanji : public OfficialKanji {
@@ -129,7 +127,7 @@ private:
 class JouyouKanji : public OfficialKanji {
 public:
   JouyouKanji(const Data& d, const ColumnFile& f)
-      : OfficialKanji(d, f, f.get(NameCol), f.getUInt<u_int8_t>(StrokesCol),
+      : OfficialKanji(d, f, f.get(NameCol), f.getU8(StrokesCol),
                       f.get(MeaningCol)),
         _grade(getGrade(f.get(GradeCol))) {}
 
@@ -164,7 +162,7 @@ private:
   ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name,
              const Ucd* u)
       : CustomFileKanji(
-          d, f, name, f.getUInt<u_int8_t>(StrokesCol), f.get(MeaningCol),
+          d, f, name, f.getU8(StrokesCol), f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
         _newName(u && u->hasNonTraditionalLinks()
                    ? OptString(u->links()[0].name())

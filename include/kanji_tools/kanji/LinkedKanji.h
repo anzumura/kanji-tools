@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 class LinkedKanji : public Kanji {
 public:
-  [[nodiscard]] OptSize frequency() const override { return _frequency; }
+  [[nodiscard]] OptU16 frequency() const override { return _frequency; }
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
   [[nodiscard]] const std::string& meaning() const override {
     return _link->meaning();
@@ -42,7 +42,7 @@ protected:
     return name;
   }
 private:
-  const OptSize _frequency;
+  const OptU16 _frequency;
   const KenteiKyus _kyu;
   const Data::Entry _link;
 };

@@ -42,7 +42,7 @@ public:
   }
 
   // functions used by 'Kanji' classes during construction, each take kanji name
-  [[nodiscard]] virtual Kanji::OptSize frequency(const std::string&) const = 0;
+  [[nodiscard]] virtual Kanji::OptU16 frequency(const std::string&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual const Radical& ucdRadical(const std::string& kanjiName,
@@ -86,8 +86,8 @@ public:
   }
 
   [[nodiscard]] u_int8_t getStrokes(const std::string& kanjiName, const Ucd* u,
-                                bool variant = false,
-                                bool onlyUcd = false) const {
+                                    bool variant = false,
+                                    bool onlyUcd = false) const {
     if (!onlyUcd) {
       if (const auto i{_strokes.find(kanjiName)}; i != _strokes.end())
         return i->second;
@@ -116,7 +116,7 @@ public:
 
   // See comment for '_frequencies' private data member for more details about
   // frequency lists
-  enum Values { FrequencyBuckets = 5, FrequencyBucketEntries = 500 };
+  static constexpr u_int16_t FrequencyBuckets{5}, FrequencyBucketEntries{500};
   [[nodiscard]] auto& frequencies(size_t f) const {
     return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
   }
@@ -280,7 +280,7 @@ private:
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'
-  inline static constinit size_t _maxFrequency;
+  inline static constinit u_int16_t _maxFrequency;
 
   inline static const std::string dataArg{"-data"}, debugArg{"-debug"},
     infoArg{"-info"};
