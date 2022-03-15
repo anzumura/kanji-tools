@@ -37,7 +37,7 @@ public:
   using OptU16 = std::optional<u_int16_t>;
   using OptString = std::optional<std::string>;
   using LinkNames = std::vector<std::string>;
-  using NelsonIds = std::vector<size_t>;
+  using NelsonIds = std::vector<u_int16_t>;
   static auto hasLink(KanjiTypes t) {
     return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
   }

@@ -41,8 +41,8 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
     Kanji::NelsonIds ids;
     auto s{u->nelsonIds()};
     std::replace(s.begin(), s.end(), ',', ' ');
-    std::stringstream ss(s);
-    size_t id;
+    std::stringstream ss{s};
+    u_int16_t id;
     while (ss >> id) ids.push_back(id);
     return ids;
   }
@@ -53,7 +53,7 @@ fs::path Data::getDataDir(u_int8_t argc, const char** argv) {
   static const auto DataDir{fs::path{"data"}};
 
   std::optional<fs::path> found{};
-  for (size_t i{1}; !found && i < argc; ++i)
+  for (u_int8_t i{1}; !found && i < argc; ++i)
     if (argv[i] == dataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
       const auto data{fs::path(argv[i + 1])};
@@ -105,10 +105,10 @@ Data::DebugMode Data::getDebugMode(u_int8_t argc, const char** argv) {
   return result;
 }
 
-size_t Data::nextArg(u_int8_t argc, const char* const* argv,
-                     size_t currentArg) {
-  const auto result{currentArg + 1};
-  if (result < argc) {
+u_int8_t Data::nextArg(u_int8_t argc, const char* const* argv,
+                       u_int8_t currentArg) {
+  u_int8_t result{currentArg};
+  if (++result < argc) {
     std::string arg{argv[result]};
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
     // followed by a path then an earlier call to 'getDataDir' would have failed

@@ -140,9 +140,10 @@ public:
 
   // 'findKanjiByFrequency' returns the Kanji with the given 'frequency'
   // (should be a value from 1 to 2501)
-  [[nodiscard]] OptEntry findKanjiByFrequency(size_t frequency) const {
-    if (frequency < 1 || frequency >= _maxFrequency) return {};
-    auto bucket{--frequency / FrequencyBucketEntries};
+  [[nodiscard]] OptEntry findKanjiByFrequency(u_int16_t frequency) const {
+    if (!frequency || frequency >= _maxFrequency) return {};
+    auto bucket{--frequency};
+    bucket /= FrequencyBucketEntries;
     if (bucket == FrequencyBuckets)
       --bucket; // last bucket contains FrequencyBucketEntries + 1
     return _frequencies[bucket][frequency - bucket * FrequencyBucketEntries];
@@ -158,7 +159,7 @@ public:
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] auto& findKanjisByNelsonId(size_t id) const {
+  [[nodiscard]] auto& findKanjisByNelsonId(u_int16_t id) const {
     const auto i{_nelsonMap.find(id)};
     return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
   }
@@ -192,8 +193,8 @@ public:
   // args, for example:
   //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
   //        i = Data::nextArg(argc, argv, i))
-  [[nodiscard]] static size_t nextArg(u_int8_t argc, const char* const* argv,
-                                      size_t currentArg = 0);
+  [[nodiscard]] static u_int8_t nextArg(u_int8_t argc, const char* const* argv,
+                                        u_int8_t currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt'
   // based on checking directories starting at 'argv[0]' (the program name)
@@ -276,7 +277,7 @@ private:
 
   Map _kanjiNameMap;                         // lookup by UTF-8 name
   std::map<std::string, List> _morohashiMap; // lookup by Dai Kan-Wa Jiten ID
-  std::map<size_t, List> _nelsonMap;         // lookup by Nelson ID
+  std::map<u_int16_t, List> _nelsonMap;      // lookup by Nelson ID
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'

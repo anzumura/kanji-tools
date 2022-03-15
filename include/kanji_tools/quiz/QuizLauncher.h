@@ -66,6 +66,8 @@ private:
   void startGroupQuiz(u_int16_t question, bool showMeanings,
                       OptChar questionList, const GroupData::List& list) const;
 
+  u_int16_t getU16(const std::string& msg, const std::string& arg) const;
+
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets
   // '_programMode'. It can also set '_questionOrder' depending on the value of
   // 'arg' and returns the question to start from.

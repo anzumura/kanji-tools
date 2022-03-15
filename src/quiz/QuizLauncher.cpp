@@ -4,6 +4,8 @@
 #include <kanji_tools/quiz/QuizLauncher.h>
 #include <kanji_tools/utils/DisplaySize.h>
 
+#include <sstream>
+
 namespace kanji_tools {
 
 namespace {
@@ -349,10 +351,19 @@ u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
   return 0;
 }
 
+u_int16_t QuizLauncher::getU16(const std::string& msg,
+                               const std::string& arg) const {
+  std::stringstream ss{arg};
+  u_int16_t id;
+  if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
+  return id;
+}
+
 void QuizLauncher::processKanjiArg(const std::string& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
-    const auto kanji = _groupData->data().findKanjiByFrequency(std::stoul(arg));
-    if (!kanji) Data::usage("invalid frequency '" + arg + "'");
+    const auto kanji{
+      _groupData->data().findKanjiByFrequency(getU16("frequency", arg))};
+    if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
     printDetails((**kanji).name());
   } else if (arg.starts_with("m")) {
     const auto id = arg.substr(1);
@@ -366,8 +377,9 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     const auto id = arg.substr(1);
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
       Data::usage("invalid Nelson ID '" + id + "'");
-    printDetails(_groupData->data().findKanjisByNelsonId(std::stoul(id)),
-                 "Nelson", id);
+    printDetails(
+      _groupData->data().findKanjisByNelsonId(getU16("Nelson ID", id)),
+      "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id = arg.substr(1);
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit
