@@ -308,7 +308,7 @@ TEST_F(ColumnFileTest, GetULongError) {
                std::domain_error);
 }
 
-TEST_F(ColumnFileTest, GetSizeMaxValueError) {
+TEST_F(ColumnFileTest, GetULongMaxValueError) {
   std::ofstream of(TestFile);
   const auto maxValue{123U};
   of << "Col\n" << maxValue << '\n' << maxValue << '\n' << maxValue + 1 << '\n';
@@ -374,6 +374,31 @@ TEST_F(ColumnFileTest, GetOptULongError) {
   EXPECT_THROW(call([&] { f.getOptULong(col); },
                     convertError + "unsigned long - file: testFile.txt, row: "
                                    "1, column: 'Col', value: 'blah'"),
+               std::domain_error);
+}
+
+TEST_F(ColumnFileTest, GetOptUInt) {
+  std::ofstream of(TestFile);
+  of << "Col\n123\n\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(TestFile, {col});
+  f.nextRow();
+  EXPECT_EQ(f.getOptUInt<u_int16_t>(col), 123);
+  EXPECT_TRUE(f.nextRow());
+  EXPECT_FALSE(f.getOptUInt<u_int16_t>(col));
+}
+
+TEST_F(ColumnFileTest, GetOptUIntError) {
+  std::ofstream of(TestFile);
+  of << "Col\n256\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(TestFile, {col});
+  f.nextRow();
+  EXPECT_THROW(call([&] { f.getOptUInt<u_int8_t>(col); },
+                    "exceeded max value of 255 - file: testFile.txt, row: 1, "
+                    "column: 'Col', value: '256'"),
                std::domain_error);
 }
 

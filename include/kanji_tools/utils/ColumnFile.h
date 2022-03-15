@@ -81,6 +81,14 @@ public:
     return static_cast<T>(i);
   }
 
+  template<std::unsigned_integral T>
+  std::optional<T> getOptUInt(const Column& column) const {
+    const auto i{getOptULong(column, std::numeric_limits<T>::max())};
+    if (i)
+      return static_cast<T>(*i);
+    return {};
+  }
+
   // convert 'Y' or 'T' to true, 'N', 'F' or '' to false or call 'error'
   bool getBool(const Column&) const;
 
