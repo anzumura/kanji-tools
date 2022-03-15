@@ -92,7 +92,7 @@ public:
       if (const auto i{_strokes.find(kanjiName)}; i != _strokes.end())
         return i->second;
     }
-    return u ? u->getStrokes(variant) : 0UL;
+    return u ? u->getStrokes(variant) : 0U;
   }
   [[nodiscard]] auto getStrokes(const std::string& kanjiName) const {
     return getStrokes(kanjiName, findUcd(kanjiName));

@@ -263,11 +263,11 @@ TEST_F(KanjiDataTest, FindKanjisByMorohashiId) {
 TEST_F(KanjiDataTest, FindKanjisByNelsonId) {
   ASSERT_TRUE(_data->findKanjisByNelsonId(0).empty());
   ASSERT_TRUE(_data->findKanjisByNelsonId(5447).empty());
-  std::vector<size_t> missingNelsonIds;
-  for (size_t i = 1; i < 5447; ++i)
+  std::vector<u_int> missingNelsonIds;
+  for (auto i{1U}; i < 5447; ++i)
     if (_data->findKanjisByNelsonId(i).empty()) missingNelsonIds.push_back(i);
   // There are a few Nelson IDs that are missing from UCD data
-  EXPECT_EQ(missingNelsonIds, std::vector({125UL, 149UL, 489UL, 1639UL}));
+  EXPECT_EQ(missingNelsonIds, std::vector({125U, 149U, 489U, 1639U}));
   EXPECT_EQ(_data->findKanjisByNelsonId(1)[0]->name(), "一");
   EXPECT_EQ(_data->findKanjisByNelsonId(5446)[0]->name(), "龠");
 }

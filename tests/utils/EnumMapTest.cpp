@@ -53,7 +53,7 @@ TEST_F(EnumMapTest, UninitializedIterator) {
 }
 
 TEST_F(EnumMapTest, BadAccess) {
-  EXPECT_THROW(call([this] { return _map[static_cast<Colors>(4UL)]; },
+  EXPECT_THROW(call([this] { return _map[static_cast<Colors>(4U)]; },
                     "index 'enum value 4' is out of range"),
                std::out_of_range);
 }
