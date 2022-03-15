@@ -20,7 +20,7 @@ void Table::print(std::ostream& os) const {
   for (auto& i : _title) widths.push_back(displaySize(i));
   for (auto& row : _rows)
     for (size_t i{}; auto& col : row) {
-      if (const auto w = displaySize(col); i < widths.size()) {
+      if (const auto w{displaySize(col)}; i < widths.size()) {
         if (widths[i] < w) widths[i] = w;
       } else
         widths.push_back(w);
@@ -38,10 +38,9 @@ void Table::print(std::ostream& os) const {
 }
 
 void Table::printMarkdown(std::ostream& os) const {
-  size_t maxColumns = _title.size();
+  size_t maxColumns{_title.size()};
   for (auto& i : _rows) maxColumns = std::max(maxColumns, i.size());
-  const auto printRow = [&os, maxColumns](const Row& r, bool header = false,
-                                          bool section = false) {
+  const auto pRow{[&](const Row& r, bool header = false, bool section = false) {
     for (size_t i{}; i < maxColumns; ++i) {
       os << "| ";
       if (header && r.empty()) os << "---";
@@ -61,23 +60,23 @@ void Table::printMarkdown(std::ostream& os) const {
       os << ' ';
     }
     os << "|\n";
-  };
+  }};
   if (maxColumns) {
     // Markdown needs a header row followed by a row for formatting (---, :-:,
     // etc.) so print _title even if it's empty (which will just make and empty
     // set of headers).
-    printRow(_title);
-    printRow({}, true);
+    pRow(_title);
+    pRow({}, true);
     for (size_t i{}; i < _rows.size(); ++i)
-      printRow(_rows[i], false, _sections.contains(i));
+      pRow(_rows[i], false, _sections.contains(i));
   }
 }
 
 void Table::print(std::ostream& os, const Widths& widths, const Row& row,
                   char fill, char delim) const {
-  const auto cell = [&os, delim, fill](size_t w, const auto& s) {
+  const auto cell{[&os, delim, fill](size_t w, const auto& s) {
     os << delim << fill << std::setw(static_cast<int>(w) + 1) << s;
-  };
+  }};
   os << std::left << std::setfill(fill);
   for (size_t i{}; i < widths.size(); ++i)
     if (i < row.size())

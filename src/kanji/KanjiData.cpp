@@ -96,9 +96,9 @@ void KanjiData::printCount(const std::string& name, T pred,
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
   size_t total{};
-  for (auto i = AllKanjiTypes.begin(); auto& l : _types) {
+  for (auto i{AllKanjiTypes.begin()}; auto& l : _types) {
     size_t count{};
-    const auto t = *i++;
+    const auto t{*i++};
     if (printExamples)
       for (auto& j : l) {
         if (pred(j) && ++count <= printExamples)
@@ -125,7 +125,7 @@ void KanjiData::printCount(const std::string& name, T pred,
 
 void KanjiData::printStats() const {
   log() << "Loaded " << kanjiNameMap().size() << " Kanji (";
-  for (auto i = AllKanjiTypes.begin(); auto& j : _types) {
+  for (auto i{AllKanjiTypes.begin()}; auto& j : _types) {
     if (i != AllKanjiTypes.begin()) out() << ' ';
     out() << *i++ << ' ' << j.size();
   }
@@ -151,10 +151,10 @@ void KanjiData::printStats() const {
 void KanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   size_t all{};
-  for (auto& jouyou = types(KanjiTypes::Jouyou); auto i : AllKanjiGrades) {
-    const auto grade = [i](auto& x) { return x->grade() == i; };
-    if (auto gradeCount = static_cast<size_t>(
-          std::count_if(jouyou.begin(), jouyou.end(), grade));
+  for (auto& jouyou{types(KanjiTypes::Jouyou)}; auto i : AllKanjiGrades) {
+    const auto grade{[i](auto& x) { return x->grade() == i; }};
+    if (auto gradeCount{static_cast<size_t>(
+          std::count_if(jouyou.begin(), jouyou.end(), grade))};
         gradeCount) {
       all += gradeCount;
       log() << "  Total for grade " << i << ": " << gradeCount;
@@ -164,10 +164,10 @@ void KanjiData::printGrades() const {
              true);
       out() << " (";
       for (const auto level : AllJlptLevels) {
-        const auto gradeLevelCount = static_cast<size_t>(
+        const auto gradeLevelCount{static_cast<size_t>(
           std::count_if(jouyou.begin(), jouyou.end(), [&grade, level](auto& x) {
             return grade(x) && x->level() == level;
-          }));
+          }))};
         if (gradeLevelCount) {
           gradeCount -= gradeLevelCount;
           out() << level << ' ' << gradeLevelCount;
@@ -189,13 +189,14 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
   for (const auto i : all) {
     std::vector<std::pair<KanjiTypes, size_t>> counts;
     size_t iTotal{};
-    for (auto j = AllKanjiTypes.begin(); auto& l : _types) {
-      const auto t = *j++;
-      if (const auto count = static_cast<size_t>(std::count_if(
-            l.begin(), l.end(), [i, &p](auto& x) { return ((*x).*p)() == i; }));
-          count) {
-        counts.emplace_back(t, count);
-        iTotal += count;
+    for (auto j{AllKanjiTypes.begin()}; auto& l : _types) {
+      const auto t{*j++};
+      if (const auto c{static_cast<size_t>(
+            std::count_if(l.begin(), l.end(),
+                          [i, &p](auto& x) { return ((*x).*p)() == i; }))};
+          c) {
+        counts.emplace_back(t, c);
+        iTotal += c;
       }
     }
     if (iTotal) {
@@ -203,7 +204,7 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
       log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
       for (const auto& j : counts) {
         out() << j.first << ' ' << j.second;
-        auto& l = types(j.first);
+        auto& l{types(j.first)};
         if (showNoFrequency)
           noFreq(std::count_if(l.begin(), l.end(), [i, &p](auto& x) {
             return ((*x).*p)() == i && !x->frequency();

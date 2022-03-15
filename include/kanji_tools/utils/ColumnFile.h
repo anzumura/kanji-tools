@@ -104,7 +104,7 @@ private:
   void verifyHeaderColumns(const ColNames&) const;
 
   [[nodiscard]] std::string errorMsg(const std::string& msg) const {
-    auto result = msg + " - file: " + _name;
+    auto result{msg + " - file: " + _name};
     if (_currentRow) result += ", row: " + std::to_string(_currentRow);
     return result;
   }

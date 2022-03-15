@@ -61,13 +61,13 @@ public:
 
   // return count for given string or 0 if not found
   [[nodiscard]] auto count(const std::string& s) const {
-    const auto i = _map.find(s);
+    const auto i{_map.find(s)};
     return i != _map.end() ? i->second : 0;
   }
 
   // return an optional Map of 'tag to count' for the given MBChar 's'
   [[nodiscard]] auto tags(const std::string& s) const {
-    const auto i = _tags.find(s);
+    const auto i{_tags.find(s)};
     return i != _tags.end() ? &i->second : nullptr;
   }
 

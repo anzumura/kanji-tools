@@ -71,9 +71,9 @@ public:
   using Map = std::map<std::string, const class Kana*>;
   [[nodiscard]] static auto& getMap(CharType t) {
     switch (t) {
-    case CharType::Romaji: return _romajiMap;
-    case CharType::Hiragana: return _hiraganaMap;
-    case CharType::Katakana: return _katakanaMap;
+    case CharType::Romaji: return RomajiMap;
+    case CharType::Hiragana: return HiraganaMap;
+    case CharType::Katakana: return KatakanaMap;
     }
     __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
   }
@@ -83,21 +83,21 @@ public:
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
   static OptString findDakuten(const std::string& s) {
-    auto i{_hiraganaMap.find(s)};
-    if (i != _hiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
-    i = _katakanaMap.find(s);
-    if (i != _katakanaMap.end()) return i->second->dakuten(CharType::Katakana);
+    auto i{HiraganaMap.find(s)};
+    if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
+    i = KatakanaMap.find(s);
+    if (i != KatakanaMap.end()) return i->second->dakuten(CharType::Katakana);
     return std::nullopt;
   }
 
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
   static OptString findHanDakuten(const std::string& s) {
-    auto i{_hiraganaMap.find(s)};
-    if (i != _hiraganaMap.end())
+    auto i{HiraganaMap.find(s)};
+    if (i != HiraganaMap.end())
       return i->second->hanDakuten(CharType::Hiragana);
-    i = _katakanaMap.find(s);
-    if (i != _katakanaMap.end())
+    i = KatakanaMap.find(s);
+    if (i != KatakanaMap.end())
       return i->second->hanDakuten(CharType::Katakana);
     return std::nullopt;
   }
@@ -236,9 +236,7 @@ public:
   [[nodiscard]] auto kunreiVariant() const { return _kunreiVariant; }
 private:
   static Map populate(CharType);
-  static const Map _romajiMap;
-  static const Map _hiraganaMap;
-  static const Map _katakanaMap;
+  static const Map RomajiMap, HiraganaMap, KatakanaMap;
 
   // 'validate' uses asserts to make sure the data is valid such as checking
   // sizes and ensuring '_hiragana' is actually valid Hiragana, etc..
@@ -247,9 +245,7 @@ private:
   // '_romaji' usually holds the Modern Hepburn value, but will sometimes be a
   // Nihon Shiki value in order to ensure a unique value for Kana maps ('di' for
   // ぢ, 'du' for づ, etc.)
-  const std::string _romaji;
-  const std::string _hiragana;
-  const std::string _katakana;
+  const std::string _romaji, _hiragana, _katakana;
 
   // '_romajiVariants' holds any further variant Rōmaji values that are unique
   // for this 'Kana' class. These include extra key combinations that also map

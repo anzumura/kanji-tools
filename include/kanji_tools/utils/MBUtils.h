@@ -245,7 +245,7 @@ inline auto validateMBUtf8(const std::string& s, Utf8Result& e,
 template<typename T>
 [[nodiscard]] inline auto validateMBUtf8(const T& s,
                                          bool sizeOne = false) noexcept {
-  Utf8Result e = Utf8Result::Valid;
+  auto e{Utf8Result::Valid};
   return validateMBUtf8(s, e, sizeOne);
 }
 
@@ -253,7 +253,7 @@ template<typename T>
 template<typename T>
 [[nodiscard]] inline auto validateUtf8(const T& s,
                                        bool sizeOne = false) noexcept {
-  Utf8Result e = Utf8Result::Valid;
+  auto e{Utf8Result::Valid};
   validateMBUtf8(s, e, sizeOne);
   return e;
 }

@@ -59,7 +59,7 @@ public:
     return _map.find(s) != _map.end();
   }
   [[nodiscard]] auto get(const std::string& name) const {
-    auto i = _map.find(name);
+    const auto i{_map.find(name)};
     return i != _map.end() ? i->second : 0;
   }
   [[nodiscard]] auto& name() const { return _name; }
@@ -128,7 +128,7 @@ public:
 // simple function to capitalize first letter of an ascii (non-multibyte) string
 [[nodiscard]] inline auto capitalize(const std::string& s) {
   if (s.size() && std::islower(s[0])) {
-    std::string result(s);
+    std::string result{s};
     result[0] = static_cast<char>(std::toupper(result[0]));
     return result;
   }

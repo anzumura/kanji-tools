@@ -65,7 +65,7 @@ const std::array KanaList{
 
 using D = DakutenKana;
 // 'DakutenKanaList' contains kana that have a 'dakuten' version, but not 'h'
-std::array DakutenKanaList = {
+std::array DakutenKanaList{
   // --- あ 行 ---
   D{"ka", "か", "カ", K{"ga", "が", "ガ"}},
   D{"sa", "さ", "サ", K{"za", "ざ", "ザ"}},
@@ -134,7 +134,7 @@ std::array DakutenKanaList = {
 using H = HanDakutenKana;
 // 'HanDakutenKanaList' contains kana that have both a 'dakuten' and a
 // 'han-dakuten' (so 'h' row)
-std::array HanDakutenKanaList = {
+std::array HanDakutenKanaList{
   H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{"pa", "ぱ", "パ"}},
   H{"hi", "ひ", "ヒ", K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}},
   H{"fu", "ふ", "フ", K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"}, V{"hu"}, true},
@@ -179,14 +179,14 @@ void Kana::validate() const {
 Kana::Map Kana::populate(CharType t) {
   Kana::Map result;
   size_t duplicates{};
-  const auto insert = [&result, &duplicates, t](auto& k, auto& v) {
-    if (const auto i = result.emplace(k, &v); !i.second) {
+  const auto insert{[&result, &duplicates, t](auto& k, auto& v) {
+    if (const auto i{result.emplace(k, &v)}; !i.second) {
       std::cerr << "key '" << k << "' already in " << toString(t)
                 << " map: " << i.first->second << '\n';
       ++duplicates;
     }
-  };
-  const auto processKana = [&insert, t](auto& k) {
+  }};
+  const auto processKana{[&insert, t](auto& k) {
     switch (t) {
     case CharType::Romaji:
       insert(k.romaji(), k);
@@ -195,7 +195,7 @@ Kana::Map Kana::populate(CharType t) {
     case CharType::Hiragana: insert(k.hiragana(), k); break;
     case CharType::Katakana: insert(k.katakana(), k); break;
     }
-  };
+  }};
   // process lists (inserting into 'result')
   for (auto& i : KanaList) processKana(i);
   for (auto& i : DakutenKanaList) {
@@ -219,17 +219,17 @@ std::string Kana::RepeatMark::get(CharType target, ConvertFlags flags,
   case CharType::Romaji: break;
   }
   if (!prevKana) return "";
-  const Kana* k = prevKana;
+  const Kana* k{prevKana};
   if (_dakuten) {
-    if (const auto accented = prevKana->dakutenKana(); accented) k = accented;
-  } else if (const auto unaccented = prevKana->plainKana(); unaccented)
+    if (const auto accented{prevKana->dakutenKana()}; accented) k = accented;
+  } else if (const auto unaccented{prevKana->plainKana()}; unaccented)
     k = unaccented;
   return k->getRomaji(flags);
 }
 
-const Kana::Map Kana::_romajiMap(Kana::populate(CharType::Romaji));
-const Kana::Map Kana::_hiraganaMap(Kana::populate(CharType::Hiragana));
-const Kana::Map Kana::_katakanaMap(Kana::populate(CharType::Katakana));
+const Kana::Map Kana::RomajiMap(Kana::populate(CharType::Romaji)),
+  Kana::HiraganaMap(Kana::populate(CharType::Hiragana)),
+  Kana::KatakanaMap(Kana::populate(CharType::Katakana));
 
 const Kana& Kana::SmallTsu(KanaList[KanaList.size() - 2]);
 const Kana& Kana::N(KanaList[KanaList.size() - 1]);

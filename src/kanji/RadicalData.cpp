@@ -12,7 +12,7 @@ void RadicalData::load(const std::filesystem::path& file) {
     longNameCol("LongName"), readingCol("Reading");
   for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol});
        f.nextRow();) {
-    const auto radicalNumber = f.getSize(numberCol);
+    const auto radicalNumber{f.getSize(numberCol)};
     if (radicalNumber != f.currentRow())
       f.error("radicals must be ordered by 'number'");
     std::stringstream radicals(f.get(nameCol));
@@ -51,7 +51,7 @@ void RadicalData::printRadicalLists(const Data& data,
                                     RadicalLists& radicals) const {
   Count total;
   for (auto& i : radicals) {
-    KanjiList& l = i.second;
+    auto& l{i.second};
     std::sort(l.begin(), l.end(), [](const auto& x, const auto& y) {
       return x->strokes() < y->strokes();
     });
@@ -92,7 +92,7 @@ void RadicalData::printCounts(const Data& data, const Count& c,
                     [](const auto& x, const auto& y) { return x + y.second; });
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
   for (const auto i : AllKanjiTypes) {
-    if (const auto j = c.find(i); summary) {
+    if (const auto j{c.find(i)}; summary) {
       if (i != AllKanjiTypes[0]) data.out() << ' ';
       data.out() << (j == c.end() ? 0 : j->second);
     } else

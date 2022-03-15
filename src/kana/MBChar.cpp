@@ -4,7 +4,7 @@
 namespace kanji_tools {
 
 bool MBChar::next(std::string& result, bool onlyMB) {
-  const auto combiningMark = [this](const auto& r, const auto& i) {
+  const auto combiningMark{[this](const auto& r, const auto& i) {
     _location += 3;
     if (i) {
       ++_combiningMarks;
@@ -12,7 +12,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
     }
     ++_errors;
     return r;
-  };
+  }};
   while (*_location) {
     switch (validateMBUtf8(_location)) {
     case MBUtf8Result::NotMultiByte:
@@ -47,10 +47,9 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 }
 
 bool MBChar::peek(std::string& result, bool onlyMB) const {
-  const auto combiningMark = [](const auto& r, const auto& i) {
-    return i ? *i : r;
-  };
-  for (auto location = _location; *location;) {
+  const auto combiningMark{
+    [](const auto& r, const auto& i) { return i ? *i : r; }};
+  for (auto location{_location}; *location;) {
     switch (validateMBUtf8(location)) {
     case MBUtf8Result::NotMultiByte:
       if (!onlyMB) {

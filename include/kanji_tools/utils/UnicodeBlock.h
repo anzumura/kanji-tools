@@ -63,9 +63,8 @@ private:
     static_assert(Start < End);
   }
 
-  consteval UnicodeBlock(char32_t s, char32_t e,
-                         const UnicodeVersion* v = nullptr,
-                         const char* n = nullptr)
+  consteval UnicodeBlock(char32_t s, char32_t e, const UnicodeVersion* v = {},
+                         const char* n = {})
       : start(s), end(e), version(v), name(n) {}
 
   template<char32_t Start> friend consteval auto makeBlock();
@@ -108,11 +107,11 @@ inline constexpr UnicodeVersion UVer1_0("1.0", 10, 1991),
   UVer3_1("3.1", 3, 2001), UVer3_2("3.2", 3, 2002), UVer4_1("4.1", 3, 2005),
   UVer5_0("5.0", 7, 2006), UVer5_2("5.2", 10, 2009), UVer13_0("13.0", 3, 2020);
 
-inline constexpr std::array HiraganaBlocks = {
+inline constexpr std::array HiraganaBlocks{
   makeBlock<0x3040, 0x309f>(UVer1_1, "Hiragana")};
 
 // Second block contains small letters (for Ainu) like ㇱ
-inline constexpr std::array KatakanaBlocks = {
+inline constexpr std::array KatakanaBlocks{
   makeBlock<0x30a0, 0x30ff>(UVer1_1, "Katakana"),
   makeBlock<0x31f0, 0x31ff>(UVer3_2, "Katakana Phonetic Extension")};
 
@@ -122,7 +121,7 @@ inline constexpr std::array KatakanaBlocks = {
 // Compatibility block contains many 'single grapheme' versions of old/variant
 // Japanese Kanji that used to require two graphemes, i.e., a base character
 // followed by a variation selector.
-inline constexpr std::array CommonKanjiBlocks = {
+inline constexpr std::array CommonKanjiBlocks{
   makeBlock<0x3400, 0x4dbf>(UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
   makeBlock<0x4e00, 0x9fff>(UVer1_1, "CJK Unified Ideographs"), // ~20K
   makeBlock<0xf900, 0xfaff>(UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
@@ -135,14 +134,14 @@ inline constexpr std::array CommonKanjiBlocks = {
 // - U+2B740 to U+2B81F : CJK Extension D, ver 6.0 Oct 2010, 222 kanji
 // - U+2B820 to U+2CEAF : CJK Extension E, ver 8.0 Jun 2015, ~6K kanji
 // - U+2CEB0 to U+2EBEF : CJK Extension F, ver 10.0 Jun 2016, ~7K kanji
-inline constexpr std::array RareKanjiBlocks = {
+inline constexpr std::array RareKanjiBlocks{
   makeBlock<0x2e80, 0x2eff>(UVer3_0, "Radicals Supp."),      // 128
   makeBlock<0x2a700, 0x2ebef>(UVer5_2, "CJK Extension C-F"), // ~17K kanji
   makeBlock<0x2f800, 0x2fa1f>(UVer3_1, "CJK Compat. Supp."), // ~6K kanji
   makeBlock<0x30000, 0x3134f>(UVer13_0, "CJK Extension G")   // ~5K kanji
 };
 
-inline constexpr std::array PunctuationBlocks = {
+inline constexpr std::array PunctuationBlocks{
   makeBlock<0x2000, 0x206f>(UVer1_1, "General Punctuation"), // —, ‥, ”, “
   makeBlock<0x3000, 0x303f>(UVer1_1, "CJK Symbols and Punctuation"), // 、,
   makeBlock<0xfff0, 0xffff>(UVer1_1, "Specials") // Object Replacement, etc.
@@ -150,7 +149,7 @@ inline constexpr std::array PunctuationBlocks = {
 
 // There are a lot more symbol and letter blocks, but they haven't come up in
 // sample files so far
-inline constexpr std::array SymbolBlocks = {
+inline constexpr std::array SymbolBlocks{
   makeBlock<0x2100, 0x214f>(UVer1_1, "Letterlike Symbols"),          // ℃
   makeBlock<0x2190, 0x21ff>(UVer1_1, "Arrows"),                      // →
   makeBlock<0x2200, 0x22ff>(UVer1_1, "Mathematical Operators"),      // ∀
@@ -163,7 +162,7 @@ inline constexpr std::array SymbolBlocks = {
 };
 
 // the last block also includes 'halfwidth katakana'
-inline constexpr std::array LetterBlocks = {
+inline constexpr std::array LetterBlocks{
   makeBlock<0x0080, 0x00ff>(UVer1_1, "Latin-1 Supplement"),    // ·, ×
   makeBlock<0x0100, 0x017f>(UVer1_1, "Latin Extended-A"),      // Ā
   makeBlock<0x0180, 0x024f>(UVer1_1, "Latin Extended-B"),      // ƀ
@@ -174,7 +173,7 @@ inline constexpr std::array LetterBlocks = {
 
 // Skip codes in this range when reading in Kanji. See this link for more info:
 // http://unicode.org/reports/tr28/tr28-3.html#13_7_variation_selectors
-inline constexpr std::array NonSpacingBlocks = {
+inline constexpr std::array NonSpacingBlocks{
   makeBlock<0xfe00, 0xfe0f>(UVer3_2, "Variation Selectors")};
 
 // 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array
@@ -200,8 +199,8 @@ template<size_t N, typename... Ts>
   return inRange(c, t) || inRange(c, args...);
 }
 
-inline constexpr auto CombiningMarkVoiced = U'\x3099',
-                      CombiningMarkSemiVoiced = U'\x309a';
+inline constexpr auto CombiningMarkVoiced{U'\x3099'},
+  CombiningMarkSemiVoiced{U'\x309a'};
 
 [[nodiscard]] constexpr auto isNonSpacing(char32_t c) noexcept {
   return inRange(c, NonSpacingBlocks) || c == CombiningMarkVoiced ||
@@ -215,7 +214,7 @@ template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const std::string& s, bool sizeOne,
                                        T&... t) {
   if (s.size() > 1 && (!sizeOne || s.size() < 9))
-    if (const auto w = fromUtf8(s);
+    if (const auto w{fromUtf8(s)};
         sizeOne ? w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])
                 : w.size() >= 1)
       return inRange(w[0], t...);
@@ -226,7 +225,7 @@ template<typename... T>
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const std::string& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
-  for (auto allowNonSpacing = false; const auto i : fromUtf8(s))
+  for (auto allowNonSpacing{false}; const auto i : fromUtf8(s))
     if (allowNonSpacing && isNonSpacing(i))
       allowNonSpacing = false;
     else if (inRange(i, t...))
@@ -328,7 +327,7 @@ template<typename... T>
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as
 // variation selectors.
-inline constexpr wchar_t WideDash = L'-';
+inline constexpr wchar_t WideDash{L'-'};
 
 // 'KanjiRange' contains the following blocks (in order):
 // - CJK Extension A
@@ -342,7 +341,7 @@ inline constexpr wchar_t WideDash = L'-';
 // - CJK Extension G
 
 // clang-format off
-inline constexpr wchar_t KanjiRange[] = {
+inline constexpr wchar_t KanjiRange[]{
   CommonKanjiBlocks[0].wStart(), WideDash, CommonKanjiBlocks[0].wEnd(),
   CommonKanjiBlocks[1].wStart(), WideDash, CommonKanjiBlocks[1].wEnd(),
   CommonKanjiBlocks[2].wStart(), WideDash, CommonKanjiBlocks[2].wEnd(),
@@ -356,8 +355,8 @@ inline constexpr wchar_t KanjiRange[] = {
 };
 // clang-format on
 
-inline constexpr wchar_t HiraganaRange[] = L"\u3040-\u309f";
-inline constexpr wchar_t KatakanaRange[] = L"\u30a0-\u30ff\u31f0-\u31ff";
-inline constexpr wchar_t KanaRange[] = L"\u3040-\u30ff\u31f0-\u31ff";
+inline constexpr wchar_t HiraganaRange[]{L"\u3040-\u309f"};
+inline constexpr wchar_t KatakanaRange[]{L"\u30a0-\u30ff\u31f0-\u31ff"};
+inline constexpr wchar_t KanaRange[]{L"\u3040-\u30ff\u31f0-\u31ff"};
 
 } // namespace kanji_tools

@@ -81,7 +81,7 @@ protected:
   BaseEnumArray() noexcept { _instance = this; }
 
   [[nodiscard]] auto find(const std::string& name) const {
-    const auto i = _nameMap.find(name);
+    const auto i{_nameMap.find(name)};
     if (i == _nameMap.end())
       throw std::domain_error("name '" + name + "' not found");
     return i->second;
@@ -179,7 +179,7 @@ public:
   using base = IterableEnumArray<T, N + 1>;
 
   [[nodiscard]] const std::string& toString(T x) const override {
-    size_t i = base::getIndex(x);
+    const auto i{base::getIndex(x)};
     return i < N ? _names[i] : None;
   }
 

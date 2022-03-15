@@ -22,10 +22,10 @@ std::string Kanji::info(KanjiInfo fields) const {
     New("New "), Old("Old ");
 
   std::string result;
-  const auto add = [&result](const auto& x) {
+  const auto add{[&result](const auto& x) {
     if (!result.empty()) result += ", ";
     result += x;
-  };
+  }};
   if (hasValue(fields & KanjiInfo::Radical))
     add(Rad + radical().name() + '(' + std::to_string(radical().number()) +
         ')');

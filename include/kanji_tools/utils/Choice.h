@@ -95,8 +95,8 @@ private:
 
   std::ostream& _out;
   std::istream* _in;
-  OptChar _quit = {};
-  std::string _quitDescription = DefaultQuitDescription;
+  OptChar _quit{};
+  std::string _quitDescription{DefaultQuitDescription};
 };
 
 } // namespace kanji_tools

@@ -61,7 +61,7 @@ protected:
       return derived();
     }
     auto operator++(int) {
-      Derived x = derived();
+      Derived x{derived()};
       ++*this;
       return x;
     }
@@ -73,7 +73,7 @@ protected:
       return derived();
     }
     auto operator--(int) {
-      Derived x = derived();
+      Derived x{derived()};
       --*this;
       return x;
     }
@@ -81,7 +81,7 @@ protected:
     // random-access iterator requirements (except non-const operator[])
     auto& operator+=(difference_type i) {
       if ((i += static_cast<difference_type>(_index)) < 0) error(BadBegin);
-      if (const auto j = static_cast<size_t>(i); j > N)
+      if (const auto j{static_cast<size_t>(i)}; j > N)
         error(BadEnd);
       else
         _index = j;
@@ -89,11 +89,11 @@ protected:
     }
     auto& operator-=(difference_type i) { return *this += -i; }
     [[nodiscard]] auto operator+(difference_type i) const {
-      Derived x = derived();
+      Derived x{derived()};
       return x += i;
     }
     [[nodiscard]] auto operator-(difference_type i) const {
-      Derived x = derived();
+      Derived x{derived()};
       return x -= i;
     }
   protected:
@@ -109,9 +109,9 @@ protected:
 
   template<typename Index>
   [[nodiscard]] static auto checkIndex(Index i, const std::string& name) {
-    const auto x = static_cast<size_t>(i);
+    const auto x{static_cast<size_t>(i)};
     if (x >= N) {
-      std::string msg = name;
+      std::string msg{name};
       if constexpr (std::is_same_v<Index, T>)
         msg += "enum value " + std::to_string(x);
       else // use original value in error message (so int '-1' is preserved)
