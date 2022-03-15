@@ -49,7 +49,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
   return _emptyNelsonIds;
 }
 
-fs::path Data::getDataDir(size_t argc, const char** argv) {
+fs::path Data::getDataDir(u_int8_t argc, const char** argv) {
   static const auto DataDir{fs::path{"data"}};
 
   std::optional<fs::path> found{};
@@ -90,7 +90,7 @@ fs::path Data::getDataDir(size_t argc, const char** argv) {
   return *found;
 }
 
-Data::DebugMode Data::getDebugMode(size_t argc, const char** argv) {
+Data::DebugMode Data::getDebugMode(u_int8_t argc, const char** argv) {
   auto result{DebugMode::None};
   const auto setResult{[&result](DebugMode x) {
     if (result != DebugMode::None)
@@ -105,7 +105,8 @@ Data::DebugMode Data::getDebugMode(size_t argc, const char** argv) {
   return result;
 }
 
-size_t Data::nextArg(size_t argc, const char* const* argv, size_t currentArg) {
+size_t Data::nextArg(u_int8_t argc, const char* const* argv,
+                     size_t currentArg) {
   const auto result{currentArg + 1};
   if (result < argc) {
     std::string arg{argv[result]};

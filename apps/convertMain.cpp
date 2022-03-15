@@ -237,7 +237,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
   - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
 )";
-  size_t hanDakutenMonographs{}, small{}, plainMonographs{},
+  u_int8_t hanDakutenMonographs{}, small{}, plainMonographs{},
     dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
     dakutenDigraphs{}, romajiVariants{};
   Table table({"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
@@ -251,7 +251,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
                                      "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i{*entry.second};
-    romajiVariants += i.romajiVariants().size();
+    romajiVariants += static_cast<u_int8_t>(i.romajiVariants().size());
     if (i.isSmall())
       ++small;
     else if (i.isMonograph()) {
@@ -295,8 +295,10 @@ void ConvertMain::printKanaChart(bool markdown) const {
   const auto& middleDot{_converter.narrowDelims().find(slash)};
   // middleDot should always be found and thus '4' none rows, but handle if
   // missing just in case ...
-  const size_t none{middleDot != _converter.narrowDelims().end() ? 4U : 3U};
-  if (none == 4)
+  static constexpr u_int8_t HasSlash{4}, NoSlash{3};
+  const u_int8_t none{middleDot != _converter.narrowDelims().end() ? HasSlash
+                                                                   : NoSlash};
+  if (none == HasSlash)
     table.add({"N", empty + slash, empty, middleDot->second, empty,
                toUnicode(middleDot->second)},
               true);
@@ -305,7 +307,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
               << " in _converter.narrowDelims()\n";
   table.add(
     {"N", empty, empty, Kana::ProlongMark, empty, toUnicode(Kana::ProlongMark)},
-    none == 3);
+    none == NoSlash);
   for (auto& i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
     auto& h{i->hiragana()};
     auto& k{i->katakana()};

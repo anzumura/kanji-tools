@@ -14,7 +14,7 @@ const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
 
 } // namespace
 
-KanjiData::KanjiData(size_t argc, const char** argv, std::ostream& out,
+KanjiData::KanjiData(u_int8_t argc, const char** argv, std::ostream& out,
                      std::ostream& err)
     : Data(getDataDir(argc, argv), getDebugMode(argc, argv), out, err),
       _levels{LevelDataFile(dataDir(Jlpt, "n5"), JlptLevels::N5, debug()),

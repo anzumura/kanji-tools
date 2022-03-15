@@ -192,19 +192,19 @@ public:
   // args, for example:
   //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
   //        i = Data::nextArg(argc, argv, i))
-  [[nodiscard]] static size_t nextArg(size_t argc, const char* const* argv,
+  [[nodiscard]] static size_t nextArg(u_int8_t argc, const char* const* argv,
                                       size_t currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt'
   // based on checking directories starting at 'argv[0]' (the program name)
   // and working up parent directories. Therefore argc must be at least 1.
   // '-data' followed by a directory name can also be used as an override.
-  [[nodiscard]] static std::filesystem::path getDataDir(size_t argc,
+  [[nodiscard]] static std::filesystem::path getDataDir(u_int8_t argc,
                                                         const char** argv);
 
   // 'getDebugMode' looks for '-debug' or '-info' flags in 'argv' list (see
   // 'DebugMode' above)
-  [[nodiscard]] static DebugMode getDebugMode(size_t argc, const char** argv);
+  [[nodiscard]] static DebugMode getDebugMode(u_int8_t argc, const char** argv);
 
   // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling
   // 'populate Lists' functions

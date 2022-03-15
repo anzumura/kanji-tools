@@ -10,7 +10,7 @@ namespace kanji_tools {
 // jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(size_t argc, const char** argv, std::ostream& out = std::cout,
+  KanjiData(u_int8_t argc, const char** argv, std::ostream& out = std::cout,
             std::ostream& err = std::cerr);
 
   // Implement the base class functions used during Kanji construction

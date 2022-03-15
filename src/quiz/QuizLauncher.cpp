@@ -78,13 +78,13 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 
 } // namespace
 
-void QuizLauncher::run(size_t argc, const char** argv) {
+void QuizLauncher::run(u_int8_t argc, const char** argv) {
   const auto data{std::make_shared<KanjiData>(argc, argv)};
   QuizLauncher(argc, argv, data, std::make_shared<GroupData>(data),
                std::make_shared<JukugoData>(data));
 }
 
-QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
+QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
                            GroupDataPtr groupData, JukugoDataPtr jukugoData,
                            std::istream* in)
     : _programMode(ProgramMode::NotAssigned),

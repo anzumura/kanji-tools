@@ -252,7 +252,7 @@ void StatsPred::printBreakdown(const CountSet& frequency,
 
 } // namespace
 
-Stats::Stats(size_t argc, const char** argv, DataPtr data) : _data(data) {
+Stats::Stats(u_int8_t argc, const char** argv, DataPtr data) : _data(data) {
   auto breakdown = false, endOptions = false, verbose = false;
   std::vector<std::string> files;
   for (auto i = Data::nextArg(argc, argv); i < argc;
