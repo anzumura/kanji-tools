@@ -165,7 +165,7 @@ public:
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
   Kanji(const std::string& name, const OptString& compatibilityName,
-        const Radical& radical, size_t strokes, const OptString& morohashiId,
+        const Radical& radical, u_int8_t strokes, const OptString& morohashiId,
         const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames;
 private:
@@ -198,7 +198,7 @@ private:
 
   // all kanji have radical and strokes
   const Radical _radical;
-  const size_t _strokes;
+  const u_int8_t _strokes;
 
   // optional fields
   const OptString _morohashiId;

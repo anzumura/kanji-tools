@@ -51,7 +51,7 @@ protected:
   // Constructor used by 'CustomFileKanji' and 'ExtraKanji': calls base with
   // 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
-                  size_t strokes, const std::string& meaning,
+                  u_int8_t strokes, const std::string& meaning,
                   const LinkNames& oldNames, const Ucd* u)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
                        f.get(ReadingCol), strokes, u),
@@ -59,7 +59,7 @@ protected:
 
   // Constructor used by 'OfficialKanji': calls base without 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
-                  size_t strokes, const LinkNames& oldNames)
+                  u_int8_t strokes, const LinkNames& oldNames)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)),
                        f.get(ReadingCol), strokes, findUcd(d, name)),
         _kyu(d.kyu(name)), _number(f.getSize(NumberCol)), _oldNames(oldNames) {}
@@ -92,7 +92,7 @@ protected:
 
   // constructor used by 'JouyouKanji' calls base with 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name,
-                size_t s, const std::string& meaning)
+                u_int8_t s, const std::string& meaning)
       : CustomFileKanji(d, f, name, s, meaning, getOldNames(f),
                         findUcd(d, name)),
         _frequency(d.frequency(name)), _level(d.level(name)),
@@ -127,7 +127,7 @@ private:
 class JouyouKanji : public OfficialKanji {
 public:
   JouyouKanji(const Data& d, const ColumnFile& f)
-      : OfficialKanji(d, f, f.get(NameCol), f.getSize(StrokesCol),
+      : OfficialKanji(d, f, f.get(NameCol), f.getUInt<u_int8_t>(StrokesCol),
                       f.get(MeaningCol)),
         _grade(getGrade(f.get(GradeCol))) {}
 
@@ -162,7 +162,7 @@ private:
   ExtraKanji(const Data& d, const ColumnFile& f, const std::string& name,
              const Ucd* u)
       : CustomFileKanji(
-          d, f, name, f.getSize(StrokesCol), f.get(MeaningCol),
+          d, f, name, f.getUInt<u_int8_t>(StrokesCol), f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames, u),
         _newName(u && u->hasNonTraditionalLinks()
                    ? OptString(u->links()[0].name())

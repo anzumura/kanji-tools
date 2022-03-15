@@ -6,7 +6,7 @@
 namespace kanji_tools {
 
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
-             const Radical& radical, size_t strokes,
+             const Radical& radical, u_int8_t strokes,
              const OptString& morohashiId, const NelsonIds& nelsonIds,
              const OptString& pinyin)
     : _name(name),

@@ -27,8 +27,8 @@ public:
   using Links = std::vector<Link>;
 
   Ucd(char32_t code, const std::string& name, const std::string& block,
-      const std::string& version, size_t radical, size_t strokes,
-      size_t variantStrokes, const std::string& pinyin,
+      const std::string& version, u_int8_t radical, u_int8_t strokes,
+      u_int8_t variantStrokes, const std::string& pinyin,
       const std::string& morohashiId, const std::string& nelsonIds,
       const std::string& sources, const std::string& jSource, bool joyo,
       bool jinmei, const Links& links, UcdLinkTypes linkType,
@@ -86,9 +86,9 @@ private:
   const std::string _name;
   const std::string _block;
   const std::string _version;
-  const size_t _radical;
-  const size_t _strokes;
-  const size_t _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
+  const u_int8_t _radical;
+  const u_int8_t _strokes;
+  const u_int8_t _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
   const std::string _pinyin;
   const std::string _morohashiId;
   const std::string _nelsonIds;

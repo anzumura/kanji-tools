@@ -135,7 +135,7 @@ std::string KanaConvert::convertFromKana(const std::string& input,
                                          CharType source, const Set& afterN,
                                          const Set& smallKana) const {
   std::string result, letterGroup, letter;
-  size_t count{};
+  u_int8_t count{};
   auto hasSmallTsu{false}, groupDone{false};
   const Kana* prevKana{};
   const auto done{[this, source, &prevKana, &result, &count, &hasSmallTsu,
@@ -212,7 +212,7 @@ std::string KanaConvert::convertFromKana(const std::string& input,
 }
 
 std::string KanaConvert::kanaLetters(const std::string& letterGroup,
-                                     CharType source, size_t count,
+                                     CharType source, u_int8_t count,
                                      const Kana*& prevKana,
                                      bool prolong) const {
   auto& sourceMap{Kana::getMap(source)};

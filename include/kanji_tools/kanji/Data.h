@@ -85,14 +85,14 @@ public:
                                        : std::nullopt;
   }
 
-  [[nodiscard]] auto getStrokes(const std::string& kanjiName, const Ucd* u,
+  [[nodiscard]] u_int8_t getStrokes(const std::string& kanjiName, const Ucd* u,
                                 bool variant = false,
                                 bool onlyUcd = false) const {
     if (!onlyUcd) {
       if (const auto i{_strokes.find(kanjiName)}; i != _strokes.end())
         return i->second;
     }
-    return u ? u->getStrokes(variant) : 0U;
+    return u ? u->getStrokes(variant) : 0;
   }
   [[nodiscard]] auto getStrokes(const std::string& kanjiName) const {
     return getStrokes(kanjiName, findUcd(kanjiName));
@@ -234,7 +234,7 @@ protected:
   // (file doesn't have 'Strokes' column) as well as old Kanji from jouyou and
   // jinmei files. This file contains stroke counts followed by one or more
   // lines each with a single kanji that has the given number of strokes.
-  std::map<std::string, size_t> _strokes;
+  std::map<std::string, u_int8_t> _strokes;
 
   EnumList<KanjiTypes> _types;
 private:

@@ -12,7 +12,7 @@ void RadicalData::load(const std::filesystem::path& file) {
     longNameCol("LongName"), readingCol("Reading");
   for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol});
        f.nextRow();) {
-    const auto radicalNumber{f.getSize(numberCol)};
+    const auto radicalNumber{f.getUInt<u_int8_t>(numberCol)};
     if (radicalNumber != f.currentRow())
       f.error("radicals must be ordered by 'number'");
     std::stringstream radicals(f.get(nameCol));

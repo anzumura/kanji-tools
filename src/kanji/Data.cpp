@@ -180,12 +180,13 @@ void Data::printError(const std::string& msg) const {
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f(file);
-  size_t strokes{};
+  u_int8_t strokes{};
   for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
       const auto newStrokes{std::stoul(line)};
+      assert(newStrokes <= std::numeric_limits<u_int8_t>::max());
       assert(newStrokes > strokes);
-      strokes = newStrokes;
+      strokes = static_cast<u_int8_t>(newStrokes);
     } else {
       assert(strokes != 0); // first line must have a stroke count
       for (std::stringstream ss(line); std::getline(ss, line, ' ');)
