@@ -50,7 +50,7 @@ public:
   [[nodiscard]] virtual const std::string& meaning() const = 0;
   [[nodiscard]] virtual const std::string& reading() const = 0;
 
-  [[nodiscard]] virtual OptSize frequency() const { return std::nullopt; }
+  [[nodiscard]] virtual OptSize frequency() const { return {}; }
   [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
@@ -76,14 +76,14 @@ public:
   // UcdFileKanji have an optional 'newName' field (based on Link field loaded
   // from ucd.txt). LinkedKanji also have a 'newName', i.e., the linked kanji
   // name which is the new (or more standard) version.
-  [[nodiscard]] virtual OptString newName() const { return std::nullopt; }
+  [[nodiscard]] virtual OptString newName() const { return {}; }
 
   // Only CustomFileKanji have 'extraTypeInfo'. They have a 'number' (from
   // 'Number' column) plus:
   // - Jouyou: optionally adds the year the kanji was added to the official list
   // - Jinmei: adds the year the kanji was added as well as the 'reason' (see
   // JinmeiKanji class)
-  [[nodiscard]] virtual OptString extraTypeInfo() const { return std::nullopt; }
+  [[nodiscard]] virtual OptString extraTypeInfo() const { return {}; }
 
   [[nodiscard]] auto& name() const { return _name; }
 

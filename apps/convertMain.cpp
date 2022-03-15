@@ -34,7 +34,7 @@ private:
 
   bool _interactive{false};
   bool _suppressNewLine{false};
-  std::optional<CharType> _source{std::nullopt};
+  std::optional<CharType> _source{};
   std::vector<std::string> _strings;
   KanaConvert _converter;
   const Choice _choice;

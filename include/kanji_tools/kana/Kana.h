@@ -87,7 +87,7 @@ public:
     if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
     i = KatakanaMap.find(s);
     if (i != KatakanaMap.end()) return i->second->dakuten(CharType::Katakana);
-    return std::nullopt;
+    return {};
   }
 
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
@@ -99,7 +99,7 @@ public:
     i = KatakanaMap.find(s);
     if (i != KatakanaMap.end())
       return i->second->hanDakuten(CharType::Katakana);
-    return std::nullopt;
+    return {};
   }
 
   // 'RepeatMark' is for handling repeating Kana marks (一の時点) when source is

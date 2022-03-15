@@ -57,7 +57,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
       // second value isn't empty so complete any ranges if needed
       if (rangeStart) {
         completeRange();
-        rangeStart = std::nullopt;
+        rangeStart = {};
       }
       if (i.first != choices.begin()->first) prompt += CommaSpace;
       prompt += i.first + Equals + i.second;

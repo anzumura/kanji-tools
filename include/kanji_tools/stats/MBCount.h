@@ -32,10 +32,9 @@ public:
   // 'RemoveFurigana' regex.
   static const std::wstring DefaultReplace;
 
-  // if 'regex' is provided it will be applied to strings before they are
-  // processed for counting
-  MBCount(OptRegex find = std::nullopt,
-          const std::wstring& replace = DefaultReplace, bool debug = false)
+  // if 'find' regex is provided it's applied before processing for counting
+  MBCount(OptRegex find = {}, const std::wstring& replace = DefaultReplace,
+          bool debug = false)
       : _find(find), _replace(replace), _debug(debug) {}
 
   MBCount(const MBCount&) = delete;
@@ -128,7 +127,7 @@ private:
 
 template<typename Pred> class MBCountIf : public MBCount {
 public:
-  MBCountIf(Pred pred, OptRegex find = std::nullopt,
+  MBCountIf(Pred pred, OptRegex find = {},
             const std::wstring& replace = DefaultReplace, bool debug = false)
       : MBCount(find, replace, debug), _pred(pred) {}
 private:

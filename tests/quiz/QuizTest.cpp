@@ -67,8 +67,8 @@ protected:
   void toggleMeanings() {
     _is << "-\n";
   } // '-' is the option to toggle meanings
-  void startQuiz(QuizLauncher::OptChar quizType = std::nullopt,
-                 QuizLauncher::OptChar questionList = std::nullopt) {
+  void startQuiz(QuizLauncher::OptChar quizType = {},
+                 QuizLauncher::OptChar questionList = {}) {
     // clear eofbit and failbit for output streams in case quiz is run again
     _os.clear();
     _es.clear();
@@ -79,8 +79,8 @@ protected:
   }
 
   void getFirstQuestion(std::string& line,
-                        QuizLauncher::OptChar quizType = std::nullopt,
-                        QuizLauncher::OptChar questionList = std::nullopt) {
+                        QuizLauncher::OptChar quizType = {},
+                        QuizLauncher::OptChar questionList = {}) {
     startQuiz(quizType, questionList);
     while (std::getline(_os, line))
       if (line.starts_with("Question 1/")) break;

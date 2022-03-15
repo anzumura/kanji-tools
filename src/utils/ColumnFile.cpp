@@ -108,7 +108,7 @@ size_t ColumnFile::getSize(const Column& column) const {
 
 ColumnFile::OptSize ColumnFile::getOptSize(const Column& column) const {
   auto& s = get(column);
-  if (s.empty()) return std::nullopt;
+  if (s.empty()) return {};
   try {
     return std::stoi(s);
   } catch (...) {
