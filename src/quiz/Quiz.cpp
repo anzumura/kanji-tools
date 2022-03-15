@@ -60,9 +60,9 @@ std::ostream& Quiz::incorrectMessage(const std::string& name) {
 Choice::Choices Quiz::getDefaultChoices(size_t totalQuestions) const {
   Choice::Choices c{
     {MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
-    {SkipOption, _question + 1 == totalQuestions ? "finish"
-                 : !isTestMode()                 ? "next"
-                                                 : "skip"}};
+    {SkipOption, _question + 1U == totalQuestions ? "finish"
+                 : !isTestMode()                  ? "next"
+                                                  : "skip"}};
   if (!isTestMode() && _question) c[PrevOption] = "prev";
   return c;
 }

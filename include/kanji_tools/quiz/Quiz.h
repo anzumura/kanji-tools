@@ -20,7 +20,7 @@ protected:
   // just letters and/or numbers).
   static constexpr auto MeaningsOption{'-'}, PrevOption{','}, SkipOption{'.'};
 
-  Quiz(const QuizLauncher& launcher, size_t question, bool showMeanings)
+  Quiz(const QuizLauncher& launcher, u_int16_t question, bool showMeanings)
       : _launcher(launcher), _question(question), _correctAnswers(0),
         _showMeanings(showMeanings) {}
 
@@ -61,9 +61,9 @@ protected:
   void toggleMeanings(Choices&);
 
   const QuizLauncher& _launcher;
-  size_t _question;
+  u_int16_t _question;
 private:
-  size_t _correctAnswers;
+  u_int16_t _correctAnswers;
   DataFile::List _mistakes;
   bool _showMeanings;
 };

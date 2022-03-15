@@ -16,9 +16,9 @@ constexpr auto ChoiceStart{'1'};
 
 } // namespace
 
-ListQuiz::ListQuiz(const QuizLauncher& launcher, size_t question,
+ListQuiz::ListQuiz(const QuizLauncher& launcher, u_int16_t question,
                    bool showMeanings, const List& list, KanjiInfo fields,
-                   size_t choiceCount, QuizStyle quizStyle)
+                   u_int8_t choiceCount, QuizStyle quizStyle)
     : Quiz(launcher, question, showMeanings), _answers(choiceCount),
       _infoFields(fields), _choiceCount(choiceCount), _quizStyle(quizStyle),
       _prompt(isTestMode()
@@ -59,15 +59,16 @@ void ListQuiz::start(const List& questions) {
   if (stopQuiz) --_question;
 }
 
-size_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
-  std::uniform_int_distribution<size_t> randomReading(0, questions.size() - 1);
-  std::uniform_int_distribution<size_t> randomCorrect(0, _choiceCount - 1);
+u_int8_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
+  std::uniform_int_distribution<u_int16_t> randomReading(
+    0, static_cast<u_int16_t>(questions.size()) - 1);
+  std::uniform_int_distribution<u_int8_t> randomCorrect(0, _choiceCount - 1);
 
   const auto correctChoice{randomCorrect(RandomGen)};
   // 'sameReading' prevents more than one choice having the same reading
   DataFile::Set sameReading{kanji->reading()};
   _answers[correctChoice] = _question;
-  for (size_t i{}; i < _choiceCount; ++i)
+  for (u_int8_t i{}; i < _choiceCount; ++i)
     if (i != correctChoice) do {
         if (const auto choice{randomReading(RandomGen)};
             sameReading.insert(questions[choice]->reading()).second) {
@@ -91,7 +92,7 @@ void ListQuiz::printQuestion(const Entry& kanji) const {
 
 void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
   if (isTestMode())
-    for (size_t i{}; i < _choiceCount; ++i)
+    for (u_int8_t i{}; i < _choiceCount; ++i)
       out() << "    " << i + 1 << ".  "
             << (isKanjiToReading() ? questions[_answers[i]]->reading()
                                    : questions[_answers[i]]->name())
@@ -100,8 +101,8 @@ void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
     _launcher.printReviewDetails(kanji);
 }
 
-bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, size_t correctChoice,
-                         const std::string& name) {
+bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz,
+                         u_int8_t correctChoice, const std::string& name) {
   const auto answer{isTestMode()
                       ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices)
                       : get(_prompt, choices)};

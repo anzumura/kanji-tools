@@ -32,7 +32,7 @@ public:
   // or Group based). 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the
   // type of quiz/review and 'questionList' can also be provided (values depend
   // on quiz type - see Quiz.cpp 'HelpMessage' for details).
-  void start(OptChar quizType, OptChar questionList, size_t question = 0,
+  void start(OptChar quizType, OptChar questionList, u_int16_t question = 0,
              bool showMeanings = false);
 
   [[nodiscard]] auto& log(bool heading = false) const {
@@ -57,19 +57,19 @@ public:
                     bool showMeaning = true) const;
   void printReviewDetails(const Entry&) const;
 private:
-  static constexpr size_t JukugoPerLine{3}, MaxJukugoSize{30};
+  static constexpr u_int8_t JukugoPerLine{3}, MaxJukugoSize{30};
 
   [[nodiscard]] const Data& data() const { return _groupData->data(); }
 
-  void startListQuiz(size_t question, bool showMeanings, KanjiInfo excludeField,
-                     const List&) const;
-  void startGroupQuiz(size_t question, bool showMeanings, OptChar questionList,
-                      const GroupData::List& list) const;
+  void startListQuiz(u_int16_t question, bool showMeanings,
+                     KanjiInfo excludeField, const List&) const;
+  void startGroupQuiz(u_int16_t question, bool showMeanings,
+                      OptChar questionList, const GroupData::List& list) const;
 
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets
   // '_programMode'. It can also set '_questionOrder' depending on the value of
   // 'arg' and returns the question to start from.
-  [[nodiscard]] size_t processProgramModeArg(const std::string& arg);
+  [[nodiscard]] u_int16_t processProgramModeArg(const std::string& arg);
 
   // 'processKanjiArg' is called when a kanji arg is passed to the program (see
   // 'HelpMessage' in QuizLauncher.cpp)

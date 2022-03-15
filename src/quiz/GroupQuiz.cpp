@@ -32,7 +32,7 @@ constexpr auto TotalLetters{'z' - 'a'};
 
 } // namespace
 
-GroupQuiz::GroupQuiz(const QuizLauncher& launcher, size_t question,
+GroupQuiz::GroupQuiz(const QuizLauncher& launcher, u_int16_t question,
                      bool showMeanings, const GroupData::List& list,
                      MemberType memberType)
     : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
