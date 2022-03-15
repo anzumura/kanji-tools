@@ -247,7 +247,7 @@ private:
   // helper functions for checking and inserting into '_kanjiNameMap'
   bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
-  void insertSanityChecks(const Entry&) const;
+  void insertSanityChecks(const Kanji&) const;
 
   const std::filesystem::path _dataDir;
   const DebugMode _debugMode;

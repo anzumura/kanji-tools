@@ -53,11 +53,11 @@ TEST(KanaTest, CheckHiragana) {
   auto& sourceMap{Kana::getMap(CharType::Hiragana)};
   EXPECT_EQ(sourceMap.size(), TotalKana);
   // count various types including smallDigraphs (which should be 0)
-  size_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
+  u_int8_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
     dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
     dakutenDigraphs{}, smallDigraphs{};
   for (auto& i : sourceMap) {
-    MBChar s(i.first);
+    MBChar s{i.first};
     std::string c;
     const auto checkDigraph{
       [&i, &c](const std::string& a, const std::string& b = {}) {
@@ -122,7 +122,7 @@ TEST(KanaTest, CheckKatakana) {
   auto& hiraganaMap{Kana::getMap(CharType::Hiragana)};
   EXPECT_EQ(sourceMap.size(), TotalKana);
   for (auto& i : sourceMap) {
-    MBChar s(i.first);
+    MBChar s{i.first};
     // As long as all entries in katakana map are also be in hiragana map (and
     // the maps are the same size) then there's no need to checkDigraph the
     // various counts again.
@@ -160,7 +160,7 @@ TEST(KanaTest, CheckKatakana) {
 TEST(KanaTest, CheckRomaji) {
   auto& sourceMap{Kana::getMap(CharType::Romaji)};
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
-  size_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
+  u_int8_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
     oNum{}, voNum{}, nNum{};
   std::set<std::string> romajiVariants;
   for (auto& i : sourceMap) {

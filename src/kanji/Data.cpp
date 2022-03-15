@@ -97,7 +97,7 @@ Data::DebugMode Data::getDebugMode(u_int8_t argc, const char** argv) {
       usage("can only specify one '-debug' or '-info' option");
     result = x;
   }};
-  for (size_t i{1}; i < argc; ++i)
+  for (u_int8_t i{1}; i < argc; ++i)
     if (argv[i] == debugArg)
       setResult(DebugMode::Full);
     else if (argv[i] == infoArg)
@@ -120,46 +120,45 @@ u_int8_t Data::nextArg(u_int8_t argc, const char* const* argv,
 }
 
 bool Data::checkInsert(const Entry& kanji) {
-  if (!_kanjiNameMap.insert({kanji->name(), kanji}).second) {
-    printError("failed to insert " + kanji->name() + " into map");
+  auto& k{*kanji};
+  if (!_kanjiNameMap.emplace(k.name(), kanji).second) {
+    printError("failed to insert " + k.name() + " into map");
     return false;
   }
   // Perform some sanity checks on newly created kanji, failures result in error
   // messages getting printed to stderr, but the program is allowed to continue
   // since it can be helpful to see more than one error printed out if something
   // goes wrong. Any failures should be fixed right away.
-  insertSanityChecks(kanji);
+  insertSanityChecks(k);
   // update _maxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
   // applicable
-  if (kanji->frequency() && *kanji->frequency() >= _maxFrequency)
-    _maxFrequency = *kanji->frequency() + 1U;
-  if (kanji->variant() &&
-      !_compatibilityMap.insert({kanji->compatibilityName(), kanji->name()})
-         .second)
-    printError("failed to insert variant " + kanji->name() + " into map");
-  if (kanji->morohashiId())
-    _morohashiMap[*kanji->morohashiId()].push_back(kanji);
-  for (const auto id : kanji->nelsonIds()) _nelsonMap[id].push_back(kanji);
+  if (k.frequency() && *k.frequency() >= _maxFrequency)
+    _maxFrequency = *k.frequency() + 1U;
+  if (k.variant() &&
+      !_compatibilityMap.emplace(k.compatibilityName(), k.name()).second)
+    printError("failed to insert variant " + k.name() + " into map");
+  if (k.morohashiId()) _morohashiMap[*k.morohashiId()].emplace_back(kanji);
+  for (const auto id : k.nelsonIds()) _nelsonMap[id].emplace_back(kanji);
   return true;
 }
 
 bool Data::checkInsert(List& s, const Entry& kanji) {
   if (!checkInsert(kanji)) return false;
-  s.push_back(kanji);
+  s.emplace_back(kanji);
   return true;
 }
 
-void Data::insertSanityChecks(const Entry& kanji) const {
+void Data::insertSanityChecks(const Kanji& kanji) const {
   const auto error{[this, &kanji](const std::string& s) {
     std::string v;
-    if (kanji->variant()) v = " (non-variant: " + kanji->nonVariantName() + ")";
-    printError(kanji->name() + ' ' +
-               toUnicode(kanji->name(), BracketType::Square) + ' ' + v + " " +
+    if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";
+    printError(kanji.name() + ' ' +
+               toUnicode(kanji.name(), BracketType::Square) + ' ' + v + " " +
                s + " in _ucd");
   }};
 
-  const auto kanjiType{kanji->type()};
-  if (const auto ucd{_ucd.find(kanji->name())}; !ucd)
+  const auto kanjiType{kanji.type()};
+  if (const auto ucd{_ucd.find(kanji.name())}; !ucd)
     error("not found");
   else if (kanjiType == KanjiTypes::Jouyou && !ucd->joyo())
     error("not marked as 'Joyo'");

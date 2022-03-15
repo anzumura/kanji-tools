@@ -71,7 +71,7 @@ public:
 
   // return std::nullopt if column is empty or call 'processULong'
   OptULong getOptULong(const Column& column, unsigned long maxValue = 0) const {
-    auto& s = get(column);
+    auto& s{get(column)};
     if (s.empty()) return {};
     return processULong(s, column, maxValue);
   }
@@ -129,7 +129,8 @@ private:
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const std::string& name);
 
-  size_t processULong(const std::string&, const Column&, size_t maxValue) const;
+  unsigned long processULong(const std::string&, const Column&,
+                             unsigned long maxValue) const;
 
   using ColNames = std::map<std::string, Column>;
 
