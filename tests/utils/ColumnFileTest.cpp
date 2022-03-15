@@ -285,7 +285,7 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
     std::domain_error);
 }
 
-TEST_F(ColumnFileTest, GetInt) {
+TEST_F(ColumnFileTest, GetSize) {
   std::ofstream of(TestFile);
   of << "Col\n123\n";
   of.close();
@@ -295,7 +295,7 @@ TEST_F(ColumnFileTest, GetInt) {
   EXPECT_EQ(f.getSize(col), 123);
 }
 
-TEST_F(ColumnFileTest, GetIntError) {
+TEST_F(ColumnFileTest, GetSizeError) {
   std::ofstream of(TestFile);
   of << "Col\nblah\n";
   of.close();
@@ -309,7 +309,51 @@ TEST_F(ColumnFileTest, GetIntError) {
     std::domain_error);
 }
 
-TEST_F(ColumnFileTest, GetOptInt) {
+TEST_F(ColumnFileTest, GetSizeMaxValueError) {
+  std::ofstream of(TestFile);
+  const auto maxValue{123U};
+  of << "Col\n" << maxValue << '\n' << maxValue << '\n' << maxValue + 1 << '\n';
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(TestFile, {col});
+  f.nextRow();
+  EXPECT_EQ(f.getSize(col, maxValue), maxValue);
+  f.nextRow();
+  EXPECT_EQ(f.getSize(col, 0), maxValue); // 0 implies no max value
+  f.nextRow();
+  std::string msg{"exceeded max value of "};
+  EXPECT_THROW(call([&] { f.getSize(col, maxValue); },
+                    msg + std::to_string(maxValue) +
+                      " - file: testFile.txt, row: 3, column: 'Col', value: '" +
+                      std::to_string(maxValue + 1) + "'"),
+               std::domain_error);
+}
+
+TEST_F(ColumnFileTest, GetUInt) {
+  std::ofstream of(TestFile);
+  of << "Col\n123\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(TestFile, {col});
+  f.nextRow();
+  u_int8_t expected{123};
+  EXPECT_EQ(f.getUInt<u_int8_t>(col), expected);
+}
+
+TEST_F(ColumnFileTest, GetUIntError) {
+  std::ofstream of(TestFile);
+  of << "Col\n1234\n";
+  of.close();
+  ColumnFile::Column col("Col");
+  ColumnFile f(TestFile, {col});
+  f.nextRow();
+  EXPECT_THROW(call([&] { f.getUInt<u_int8_t>(col); },
+                    "exceeded max value of 255 - file: testFile.txt, row: 1, "
+                    "column: 'Col', value: '1234'"),
+               std::domain_error);
+}
+
+TEST_F(ColumnFileTest, GetOptSize) {
   std::ofstream of(TestFile);
   of << "Col\n123\n\n";
   of.close();
@@ -321,7 +365,7 @@ TEST_F(ColumnFileTest, GetOptInt) {
   EXPECT_FALSE(f.getOptSize(col));
 }
 
-TEST_F(ColumnFileTest, GetOptIntError) {
+TEST_F(ColumnFileTest, GetOptSizeError) {
   std::ofstream of(TestFile);
   of << "Col\nblah\n";
   of.close();

@@ -96,25 +96,17 @@ const std::string& ColumnFile::get(const Column& column) const {
   return _rowValues[pos];
 }
 
-size_t ColumnFile::getSize(const Column& column) const {
-  auto& s = get(column);
+size_t ColumnFile::processSize(const std::string& s, const Column& column,
+                               size_t maxValue) const {
+  size_t i;
   try {
-    return std::stoul(s);
+    i = std::stoul(s);
   } catch (...) {
     error("failed to convert to size_t", column, s);
   }
-  __builtin_unreachable(); // 'error' function always throws an exception
-}
-
-ColumnFile::OptSize ColumnFile::getOptSize(const Column& column) const {
-  auto& s = get(column);
-  if (s.empty()) return {};
-  try {
-    return std::stoi(s);
-  } catch (...) {
-    error("failed to convert to size_t", column, s);
-  }
-  __builtin_unreachable(); // 'error' function always throws an exception
+  if (maxValue && maxValue < i)
+    error("exceeded max value of " + std::to_string(maxValue), column, s);
+  return i;
 }
 
 bool ColumnFile::getBool(const Column& column) const {

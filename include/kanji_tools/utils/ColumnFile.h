@@ -62,11 +62,23 @@ public:
     return get(column).empty();
   }
 
-  // convert to 'size_t' or call 'error'
-  size_t getSize(const Column&) const;
+  // convert to 'size_t' or call 'error' (if maxValue is non-zero and value
+  // exceeds it then call 'error')
+  size_t getSize(const Column& column, size_t maxValue = 0) const {
+    return processSize(get(column), column, maxValue);
+  }
 
-  // return std::nullopt if column is empty or return 'getSize'
-  OptSize getOptSize(const Column&) const;
+  // return std::nullopt if column is empty or call 'processSize'
+  OptSize getOptSize(const Column& column, size_t maxValue = 0) const {
+    auto& s = get(column);
+    if (s.empty()) return {};
+    return processSize(s, column, maxValue);
+  }
+
+  template<std::unsigned_integral T> T getUInt(const Column& c) const {
+    const auto i{getSize(c, std::numeric_limits<T>::max())};
+    return static_cast<T>(i);
+  }
 
   // convert 'Y' or 'T' to true, 'N', 'F' or '' to false or call 'error'
   bool getBool(const Column&) const;
@@ -94,9 +106,12 @@ public:
   [[nodiscard]] auto currentRow() const { return _currentRow; }
   [[nodiscard]] auto& name() const { return _name; }
 private:
+  friend Column;
+
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const std::string& name);
-  friend Column;
+
+  size_t processSize(const std::string&, const Column&, size_t maxValue) const;
 
   using ColNames = std::map<std::string, Column>;
 
