@@ -39,7 +39,7 @@ TEST(MBCharTest, GetFirst) {
 TEST(MBCharTest, Next) {
   MBChar s("todayトロントの天気is nice。");
   std::string x;
-  for (const std::array _ = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
+  for (const auto _ = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
        auto& i : _) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
@@ -53,8 +53,7 @@ TEST(MBCharTest, Next) {
 TEST(MBCharTest, NextWithVariationSelectors) {
   MBChar s("憎︀憎む朗︀");
   std::string x;
-  for (const std::array expected = {"憎︀", "憎", "む", "朗︀"};
-       auto& i : expected) {
+  for (const auto _ = {"憎︀", "憎", "む", "朗︀"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
     x.clear();
@@ -77,7 +76,7 @@ TEST(MBCharTest, NextWithCombiningMarks) {
   MBChar s(c);
   std::string x;
   // combining marks ashould get replaced by normal versions
-  for (const std::array expected = {ga, gi, gu, po}; auto& i : expected) {
+  for (const auto _ = {ga, gi, gu, po}; auto& i : _) {
     EXPECT_EQ(i.size(), 3);
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
@@ -94,8 +93,7 @@ TEST(MBCharTest, NextWithCombiningMarks) {
 TEST(MBCharTest, GetNextIncludingSingleByte) {
   MBChar s("a天気b");
   std::string x;
-  std::array expected = {"a", "天", "気", "b"};
-  for (const auto& i : expected) {
+  for (const auto _ = {"a", "天", "気", "b"}; auto& i : _) {
     EXPECT_TRUE(s.next(x, false));
     EXPECT_EQ(x, i);
   }
@@ -105,14 +103,14 @@ TEST(MBCharTest, GetNextIncludingSingleByte) {
 TEST(MBCharTest, Reset) {
   MBChar s("a天気b");
   std::string x;
-  std::array expected = {"天", "気"};
-  for (const auto& i : expected) {
+  const auto expected = {"天", "気"};
+  for (auto& i : expected) {
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
   EXPECT_FALSE(s.next(x));
   s.reset();
-  for (const auto& i : expected) {
+  for (auto& i : expected) {
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
@@ -128,8 +126,7 @@ TEST(MBCharTest, ErrorCount) {
   original[6] = 'z'; // change first byte of 丙 makes 2 errors (2nd + 3rd bytes)
   MBChar s(original);
   std::string x;
-  std::array expected = {"乙", "丁"};
-  for (const auto& i : expected) {
+  for (const auto _ = {"乙", "丁"}; auto& i : _) {
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
@@ -139,8 +136,7 @@ TEST(MBCharTest, ErrorCount) {
   // make sure 'reset' also clears errors
   EXPECT_EQ(s.errors(), 0);
   // now loop again looking for single byte results as well
-  std::array expectedWithSingle = {"x", "乙", "z", "丁"};
-  for (const auto& i : expectedWithSingle) {
+  for (const auto _ = {"x", "乙", "z", "丁"}; auto& i : _) {
     EXPECT_TRUE(s.next(x, false));
     EXPECT_EQ(x, i);
   }

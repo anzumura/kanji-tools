@@ -29,7 +29,7 @@ protected:
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directories(TestSubDir));
-    std::array files = {
+    const auto files = {
       std::pair(TestFile1, "北海道"), std::pair(TestFile2, "南北"),
       std::pair(TestSubFile1, "東西線"), std::pair(TestSubFile2, "東北")};
     for (auto& i : files) {
