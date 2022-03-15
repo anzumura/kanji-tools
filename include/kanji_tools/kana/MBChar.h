@@ -36,10 +36,8 @@ public:
     return isVariationSelector(s.c_str());
   }
 
-  inline static const auto CombiningVoiced =
-    std::string("\xe3\x82\x99"); // U+3099
-  inline static const auto CombiningSemiVoiced =
-    std::string("\xe3\x82\x9a"); // U+309A
+  inline static const std::string CombiningVoiced{"\xe3\x82\x99"}, // U+3099
+    CombiningSemiVoiced{"\xe3\x82\x9a"};                           // U+309A
 
   [[nodiscard]] static auto isCombiningMark(const unsigned char* s) {
     return s && *s++ == 0xe3 && *s++ == 0x82 && (*s == 0x99 || *s == 0x9a);

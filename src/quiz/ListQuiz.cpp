@@ -9,10 +9,10 @@ namespace {
 std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
-const std::string Prompt("  Select");
-const std::string QuizPrompt = Prompt + " correct ";
+const std::string Prompt{"  Select"};
+const std::string QuizPrompt{Prompt + " correct "};
 
-constexpr auto ChoiceStart = '1';
+constexpr auto ChoiceStart{'1'};
 
 } // namespace
 
@@ -44,11 +44,11 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, size_t question,
 }
 
 void ListQuiz::start(const List& questions) {
-  bool stopQuiz = false;
+  auto stopQuiz{false};
   for (; !stopQuiz && _question < questions.size(); ++_question) {
-    const Entry& i = questions[_question];
-    Choices choices = getDefaultChoices(questions.size());
-    const auto correctChoice = populateAnswers(i, questions);
+    const Entry& i{questions[_question]};
+    auto choices{getDefaultChoices(questions.size())};
+    const auto correctChoice{populateAnswers(i, questions)};
     do {
       beginQuestionMessage(questions.size());
       printQuestion(i);
@@ -63,13 +63,13 @@ size_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
   std::uniform_int_distribution<size_t> randomReading(0, questions.size() - 1);
   std::uniform_int_distribution<size_t> randomCorrect(0, _choiceCount - 1);
 
-  const auto correctChoice = randomCorrect(RandomGen);
+  const auto correctChoice{randomCorrect(RandomGen)};
   // 'sameReading' prevents more than one choice having the same reading
-  DataFile::Set sameReading = {kanji->reading()};
+  DataFile::Set sameReading{kanji->reading()};
   _answers[correctChoice] = _question;
   for (size_t i{}; i < _choiceCount; ++i)
     if (i != correctChoice) do {
-        if (const auto choice = randomReading(RandomGen);
+        if (const auto choice{randomReading(RandomGen)};
             sameReading.insert(questions[choice]->reading()).second) {
           _answers[i] = choice;
           break;
@@ -81,8 +81,8 @@ size_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
 void ListQuiz::printQuestion(const Entry& kanji) const {
   if (isKanjiToReading()) {
     out() << kanji->name();
-    auto info = kanji->info(_infoFields);
-    if (!info.empty()) out() << "  " << info;
+    if (const auto info{kanji->info(_infoFields)}; !info.empty())
+      out() << "  " << info;
     if (!isTestMode()) _launcher.printExtraTypeInfo(kanji);
   } else
     out() << "Reading:  " << kanji->reading();
@@ -102,9 +102,9 @@ void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
 
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, size_t correctChoice,
                          const std::string& name) {
-  const auto answer =
-    isTestMode() ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices)
-                 : get(_prompt, choices);
+  const auto answer{isTestMode()
+                      ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices)
+                      : get(_prompt, choices)};
   if (answer == MeaningsOption) {
     toggleMeanings(choices);
     return false;

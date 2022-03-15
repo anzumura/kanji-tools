@@ -173,11 +173,11 @@ void UcdData::print(const Data& data) const {
   print("Morohashi Ids", joyo.morohashi, jinmei.morohashi, other.morohashi);
   print("Nelson Ids", joyo.nelson, jinmei.nelson, other.nelson);
   const auto pLinks{[this, &data](const std::string& name, const auto& list) {
-    const auto count =
+    const auto count{
       std::count_if(list.begin(), list.end(), [this](const auto& i) {
         const auto j{_map.find(i->name())};
         return j != _map.end() && j->second.hasLinks();
-      });
+      })};
     data.log() << name << " Kanji with links " << count << ":\n";
     for (auto& i : list)
       if (const auto j{_map.find(i->name())}; j != _map.end()) {

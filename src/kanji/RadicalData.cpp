@@ -87,9 +87,9 @@ void RadicalData::printMissingRadicals(const Data& data,
 
 void RadicalData::printCounts(const Data& data, const Count& c,
                               bool summary) const {
-  const auto t =
+  const auto t{
     std::accumulate(c.begin(), c.end(), 0,
-                    [](const auto& x, const auto& y) { return x + y.second; });
+                    [](const auto& x, const auto& y) { return x + y.second; })};
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
   for (const auto i : AllKanjiTypes) {
     if (const auto j{c.find(i)}; summary) {

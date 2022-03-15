@@ -63,9 +63,9 @@ template<typename R, typename T = typename R::value_type>
               result += errorReplacement; // fourth byte didn't start with '10'
             else {
               // four byte case - check for overlong and max unicode
-              const auto c =
-                static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
-                               (byte3 << 6) + (*u ^ Bit1));
+              const auto c{static_cast<T>(((byte1 ^ FourBits) << 18) +
+                                          (byte2 << 12) + (byte3 << 6) +
+                                          (*u ^ Bit1))};
               result += c > 0xffff && c <= maxUnicode ? c : errorReplacement;
               ++u;
             }
@@ -196,13 +196,13 @@ MBUtf8Result validateMBUtf8(const char* s, Utf8Result& error,
       const unsigned byte3 = *u ^ Bit1;      // last 6 bits of the third byte
       if ((*++u & TwoBits) != Bit1)
         return err(Utf8Result::MissingBytes); // didn't start with '10'
-      const unsigned c =
-        ((byte1 ^ FourBits) << 18) + (byte2 << 12) + (byte3 << 6) + (*u ^ Bit1);
+      const unsigned c{((byte1 ^ FourBits) << 18) + (byte2 << 12) +
+                       (byte3 << 6) + (*u ^ Bit1)};
       if (c <= 0xffffU)
         return err(Utf8Result::Overlong); // overlong 4 byte encoding
       if (c > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
-    } else if (const unsigned c =
-                 ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1);
+    } else if (const unsigned c{((byte1 ^ ThreeBits) << 12) + (byte2 << 6) +
+                                (*u ^ Bit1)};
                c <= 0x7ffU)
       return err(Utf8Result::Overlong); // overlong 3 byte encoding
     else if (c >= MinSurrogate && c <= MaxSurrogate)

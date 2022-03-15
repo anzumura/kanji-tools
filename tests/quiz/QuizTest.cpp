@@ -11,7 +11,7 @@ class QuizTest : public ::testing::Test {
 protected:
   [[nodiscard]] static auto argv() {
     static auto arg0{"testMain"}, arg1{"-data"}, arg2{"../../../data"};
-    static const char* args[] = {arg0, arg1, arg2};
+    static const char* args[]{arg0, arg1, arg2};
     return args;
   }
 
@@ -90,8 +90,7 @@ protected:
   std::stringstream _is;
   QuizLauncher _quiz;
 
-  inline static std::stringstream _os;
-  inline static std::stringstream _es;
+  inline static std::stringstream _os, _es;
   inline static DataPtr _data;
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
@@ -110,7 +109,7 @@ TEST_F(QuizTest, ListQuiz) {
 }
 
 TEST_F(QuizTest, ListQuizDefaults) {
-  auto run = [this](std::string& out) {
+  const auto run{[this](std::string& out) {
     startQuiz();
     std::string line;
     // collect all lines after ">>>" (the start of the quiz), but don't add the
@@ -119,7 +118,7 @@ TEST_F(QuizTest, ListQuizDefaults) {
     while (std::getline(_os, line))
       if (!out.empty() || line.starts_with(">>>"))
         out += line.starts_with("    ") ? line.substr(0, 8) : line;
-  };
+  }};
   std::string all, allWithDefaults;
   gradeListQuiz();
   run(all);
@@ -161,7 +160,7 @@ TEST_F(QuizTest, ListQuizReview) {
 }
 
 TEST_F(QuizTest, FrequencyLists) {
-  auto f = [this](char x) { return listQuizFirstQuestion('f', x); };
+  const auto f{[this](char x) { return listQuizFirstQuestion('f', x); }};
   EXPECT_EQ(f('1'), "1/500:  日  Rad 日(72), Strokes 4, rì, G1, N5, K10");
   EXPECT_EQ(f('2'), "1/500:  良  Rad 艮(138), Strokes 7, liáng, G4, N3, K7");
   EXPECT_EQ(f('3'),
@@ -171,9 +170,9 @@ TEST_F(QuizTest, FrequencyLists) {
 }
 
 TEST_F(QuizTest, GradeLists) {
-  auto f = [this](char x, bool checkDefault = false) {
+  const auto f{[this](char x, bool checkDefault = false) {
     return listQuizFirstQuestion('g', x, checkDefault);
-  };
+  }};
   EXPECT_EQ(f('1'), "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
   EXPECT_EQ(f('2'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, N4, Frq 218, K9");
   EXPECT_EQ(f('3'),
@@ -188,9 +187,9 @@ TEST_F(QuizTest, GradeLists) {
 }
 
 TEST_F(QuizTest, KyuLists) {
-  auto f = [this](char x, bool checkDefault = false) {
+  const auto f{[this](char x, bool checkDefault = false) {
     return listQuizFirstQuestion('k', x, checkDefault);
-  };
+  }};
   EXPECT_EQ(f('a'), "1/80:  一  Rad 一(1), Strokes 1, yī, G1, N5, Frq 2");
   EXPECT_EQ(f('9'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, G2, N4, Frq 218");
   EXPECT_EQ(f('8'),
@@ -210,7 +209,7 @@ TEST_F(QuizTest, KyuLists) {
 }
 
 TEST_F(QuizTest, LevelLists) {
-  auto f = [this](char x) { return listQuizFirstQuestion('l', x); };
+  const auto f{[this](char x) { return listQuizFirstQuestion('l', x); }};
   EXPECT_EQ(f('5'), "1/103:  一  Rad 一(1), Strokes 1, yī, G1, Frq 2, K10");
   EXPECT_EQ(f('4'), "1/181:  不  Rad 一(1), Strokes 4, bù, G4, Frq 101, K7");
   EXPECT_EQ(f('3'), "1/361:  丁  Rad 一(1), Strokes 2, dīng, G3, Frq 1312, K8");
@@ -221,7 +220,7 @@ TEST_F(QuizTest, LevelLists) {
 }
 
 TEST_F(QuizTest, SkipListQuestions) {
-  for (size_t i = 2; i < 4; ++i) {
+  for (size_t i{2}; i < 4; ++i) {
     gradeListQuiz();
     for (size_t j{}; j < i; ++j) skip();
     startQuiz();
@@ -233,10 +232,8 @@ TEST_F(QuizTest, SkipListQuestions) {
     // make sure _os is in expected 'eof' state
     EXPECT_TRUE(_os.eof() && _os.fail());
     EXPECT_FALSE(_os.good() || _os.bad());
-
-    auto expected =
-      "Final score: 0/" + std::to_string(i) + ", skipped: " + std::to_string(i);
-    EXPECT_EQ(lastLine, expected);
+    const auto skipped(std::to_string(i));
+    EXPECT_EQ(lastLine, "Final score: 0/" + skipped + ", skipped: " + skipped);
   }
 }
 
@@ -246,7 +243,7 @@ TEST_F(QuizTest, ToggleListMeanings) {
   toggleMeanings(); // turn meanings off
   startQuiz();
   std::string line;
-  auto meaningsOn = false;
+  auto meaningsOn{false};
   size_t found{};
   std::string expected(
     "Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
@@ -276,15 +273,14 @@ TEST_F(QuizTest, GroupQuiz) {
 }
 
 TEST_F(QuizTest, SkipGroupQuestions) {
-  for (size_t i = 2; i < 4; ++i) {
+  for (size_t i{2}; i < 4; ++i) {
     meaningGroupQuiz();
     for (size_t j{}; j < i; ++j) skip();
     startQuiz();
     std::string line, lastLine;
     while (std::getline(_os, line)) lastLine = line;
-    auto expected =
-      "Final score: 0/" + std::to_string(i) + ", skipped: " + std::to_string(i);
-    EXPECT_EQ(lastLine, expected);
+    const auto skipped{std::to_string(i)};
+    EXPECT_EQ(lastLine, "Final score: 0/" + skipped + ", skipped: " + skipped);
   }
 }
 
@@ -293,10 +289,11 @@ TEST_F(QuizTest, ToggleGroupMeanings) {
   toggleMeanings(); // turn meanings on
   toggleMeanings(); // turn meanings off
   startQuiz();
-  auto meaningsOn = false;
+  auto meaningsOn{false};
   size_t found{};
-  std::string line, expected("みなみ");
-  std::string expectedWithMeaning = expected + " : south";
+  std::string line;
+  const std::string expected{"みなみ"};
+  const auto expectedWithMeaning{expected + " : south"};
   while (std::getline(_os, line)) {
     if (line.erase(0, 4).starts_with(":  ") &&
         line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
@@ -346,12 +343,12 @@ TEST_F(QuizTest, EditAfterMultipleAnswers) {
 }
 
 TEST_F(QuizTest, PatternGroupBuckets) {
-  auto f = [this](char x) {
+  const auto f{[this](char x) {
     _is << "t\nb\np\n4\n" << x << "\n";
     std::string line;
     getFirstQuestion(line);
     return line.substr(9);
-  };
+  }};
   EXPECT_EQ(f('1'), "1/85:  [阿：ア], 3 members");
   EXPECT_EQ(f('2'), "1/269:  [華：カ], 5 members");
   EXPECT_EQ(f('3'), "1/286:  [差：サ], 9 members");

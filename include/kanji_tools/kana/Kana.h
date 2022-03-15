@@ -13,8 +13,8 @@ namespace kanji_tools {
 // 'KanaConvert::convert' methods
 enum class CharType { Hiragana, Katakana, Romaji };
 template<> inline constexpr auto is_enumarray<CharType>{true};
-inline const auto CharTypes =
-  BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji");
+inline const auto CharTypes{
+  BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
 // 'ConvertFlags' controls some aspects of conversion (by KanaConvert class).
 // For example: Hepburn: off by default, only applies to 'Rōomaji' output

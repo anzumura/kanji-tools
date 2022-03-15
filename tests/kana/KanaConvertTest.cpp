@@ -240,15 +240,15 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
   for (auto& i : Kana::getMap(CharType::Hiragana)) {
-    auto r =
-      _converter.convert(CharType::Hiragana, i.first, CharType::Katakana);
+    const auto r{
+      _converter.convert(CharType::Hiragana, i.first, CharType::Katakana)};
     EXPECT_EQ(r, i.second->katakana());
     EXPECT_EQ(_converter.convert(CharType::Katakana, r, CharType::Hiragana),
               i.second->hiragana());
   }
   for (auto& i : Kana::getMap(CharType::Katakana)) {
-    auto r =
-      _converter.convert(CharType::Katakana, i.first, CharType::Hiragana);
+    const auto r{
+      _converter.convert(CharType::Katakana, i.first, CharType::Hiragana)};
     EXPECT_EQ(r, i.second->hiragana());
     EXPECT_EQ(_converter.convert(CharType::Hiragana, r, CharType::Katakana),
               i.second->katakana());

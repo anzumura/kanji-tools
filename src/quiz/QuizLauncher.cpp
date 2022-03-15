@@ -8,7 +8,7 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto HelpMessage =
+constexpr auto HelpMessage{
   R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]
     -h   show this help message for command-line options
@@ -42,7 +42,7 @@ or 'u' followed by Unicode. For example, theses all produce the same output:
   kanjiQuiz m5894
   kanjiQuiz n212
   kanjiQuiz u5949
-)";
+)"};
 
 const Choice::Choices ProgramModeChoices({{'r', "review"}, {'t', "test"}}),
   ListOrderChoices({{'b', "from beginning"},
@@ -168,8 +168,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
   case 'f':
     // suppress printing 'Freq' since this would work against showing the list
     // in a random order.
-    if (const auto c =
-          qList ? *qList : _choice.get("Choose list", FrequencyChoices);
+    if (const auto c{qList ? *qList
+                           : _choice.get("Choose list", FrequencyChoices)};
         !isQuit(c))
       listQuiz(KanjiInfo::Freq,
                data().frequencies(static_cast<size_t>(c - '1')));
@@ -199,8 +199,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
     break;
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
-    if (const char c =
-          qList ? *qList : _choice.get("Choose level", LevelChoices);
+    if (const char c{qList ? *qList
+                           : _choice.get("Choose level", LevelChoices)};
         !isQuit(c))
       listQuiz(KanjiInfo::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
     break;
@@ -314,9 +314,9 @@ void QuizLauncher::startListQuiz(size_t question, bool showMeanings,
 void QuizLauncher::startGroupQuiz(size_t question, bool showMeanings,
                                   OptChar qList,
                                   const GroupData::List& list) const {
-  if (const auto c =
-        qList ? *qList
-              : _choice.get("Kanji type", GroupKanjiChoices, DefaultGroupKanji);
+  if (const auto c{qList ? *qList
+                         : _choice.get("Kanji type", GroupKanjiChoices,
+                                       DefaultGroupKanji)};
       !isQuit(c))
     GroupQuiz(*this, question, showMeanings, list,
               static_cast<GroupQuiz::MemberType>(c - '1'));

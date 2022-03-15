@@ -161,8 +161,8 @@ public:
   // 'Legend' is meant to be used in output to briefly describe the suffix added
   // to a kanji when using the 'qualifiedName' method. See comments for
   // Kanji::qualifiedName for more details.
-  static constexpr auto Legend =
-    ".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd";
+  static constexpr auto Legend{".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO "
+                               "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
   Kanji(const std::string& name, const OptString& compatibilityName,
         const Radical& radical, size_t strokes, const OptString& morohashiId,

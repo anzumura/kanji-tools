@@ -18,7 +18,7 @@ const Choice::Choices PatternGroupChoices({{'1', "ア"},
                                            {'5', "ハ、マ"},
                                            {'6', "ヤ、ラ、ワ"}});
 
-constexpr auto DefaultPatternGroup = '1';
+constexpr auto DefaultPatternGroup{'1'};
 
 // Since there are over 1000 pattern groups, split them into 6 buckets based on
 // reading. The first bucket starts at 'ア', the second bucket starts at 'カ'
@@ -26,9 +26,9 @@ constexpr auto DefaultPatternGroup = '1';
 constexpr std::array PatternGroupBuckets{"：カ", "：サ", "：タ", "：ハ",
                                          "：ヤ"};
 
-constexpr auto RefreshOption = '\'', EditOption = '*';
+constexpr auto RefreshOption{'\''}, EditOption{'*'};
 
-constexpr auto TotalLetters = 'z' - 'a';
+constexpr auto TotalLetters{'z' - 'a'};
 
 } // namespace
 
@@ -37,11 +37,9 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, size_t question,
                      MemberType memberType)
     : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
   std::optional<size_t> bucket;
-  // for 'pattern' groups, allow choosing a smaller subset based on the name
-  // reading
+  // for 'pattern' groups, allow choosing a smaller subset (based on 'reading')
   if (_groupType == GroupType::Pattern) {
-    const auto c =
-      get("Pattern name", PatternGroupChoices, DefaultPatternGroup);
+    const auto c{get("Pattern name", PatternGroupChoices, DefaultPatternGroup)};
     if (isQuit(c)) return;
     bucket = c - '1';
   }
@@ -50,8 +48,8 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, size_t question,
     start(list, memberType);
   else {
     GroupData::List newList;
-    const size_t bucketHasEnd = bucket && *bucket < PatternGroupBuckets.size();
-    for (auto startIncluding = !bucket.value_or(0); const auto& i : list) {
+    const auto bucketHasEnd{bucket && *bucket < PatternGroupBuckets.size()};
+    for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {
       if (startIncluding) {
         if (bucketHasEnd &&
             i->name().find(PatternGroupBuckets[*bucket]) != std::string::npos)
@@ -76,7 +74,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, size_t question,
 }
 
 GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
-  const auto i = list.begin();
+  const auto i{list.begin()};
   return i != list.end() ? (**i).type()
                          : throw std::domain_error("empty group list");
 }
@@ -99,13 +97,13 @@ void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
 
 void GroupQuiz::addOtherGroupName(const std::string& name,
                                   std::string& s) const {
-  auto add = [this, &name, &s](const auto& map) {
-    if (auto j = map.find(name); j != map.end()) {
+  const auto add{[this, &name, &s](const auto& map) {
+    if (const auto j{map.find(name)}; j != map.end()) {
       s += _groupType == GroupType::Meaning ? 'p' : 'm';
       s += ':';
       s += std::to_string(j->second->number());
     }
-  };
+  }};
   if (_groupType == GroupType::Meaning)
     add(_launcher.groupData()->patternMap());
   else
@@ -116,9 +114,9 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
   beginQuizMessage(list.size()) << _groupType << " groups\n";
   if (memberType) log() << "  " << Kanji::Legend << '\n';
 
-  auto stopQuiz = false;
+  auto stopQuiz{false};
   for (; _question < list.size() && !stopQuiz; ++_question) {
-    auto& i = list[_question];
+    auto& i{list[_question]};
     List questions, readings;
     for (auto& j : i->members())
       if (includeMember(j, memberType)) {
@@ -130,8 +128,8 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
       std::shuffle(readings.begin(), readings.end(), RandomGen);
     }
     _answers.clear();
-    Choices choices = getDefaultChoices(list.size());
-    auto repeatQuestion = false, skipGroup = false;
+    auto choices{getDefaultChoices(list.size())};
+    auto repeatQuestion{false}, skipGroup{false};
     do {
       beginQuestionMessage(list.size()) << *i << ", ";
       if (questions.size() == i->members().size())
@@ -170,13 +168,13 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
 void GroupQuiz::showGroup(const List& questions, const List& readings,
                           Choices& choices, bool repeatQuestion) const {
   for (size_t count{}; auto& i : questions) {
-    const char choice =
-      isTestMode()
-        ? static_cast<char>(count < TotalLetters ? 'a' + count
-                                                 : 'A' + count - TotalLetters)
-        : ' ';
+    const char choice{isTestMode()
+                        ? static_cast<char>(count < TotalLetters
+                                              ? 'a' + count
+                                              : 'A' + count - TotalLetters)
+                        : ' '};
     out() << std::right << std::setw(4) << count + 1 << ":  ";
-    auto s = i->qualifiedName();
+    auto s{i->qualifiedName()};
     addPinyin(i, s);
     if (!isTestMode()) addOtherGroupName(i->name(), s);
     out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
@@ -190,8 +188,8 @@ void GroupQuiz::showGroup(const List& questions, const List& readings,
 
 bool GroupQuiz::getAnswers(size_t totalQuestions, Choices& choices,
                            bool& skipGroup, bool& stopQuiz) {
-  for (size_t i = _answers.size(); i < totalQuestions; ++i)
-    if (auto refresh = false; !getAnswer(choices, skipGroup, refresh)) {
+  for (size_t i{_answers.size()}; i < totalQuestions; ++i)
+    if (auto refresh{false}; !getAnswer(choices, skipGroup, refresh)) {
       // set 'stopQuiz' to break out of top quiz loop if user quit in the middle
       // of providing answers
       if (!refresh && !skipGroup) stopQuiz = true;
@@ -204,10 +202,9 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
   const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for: ");
   do {
     printAssignedAnswers();
-    switch (const auto answer =
-              get(isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1)
-                               : ReviewMsg,
-                  choices);
+    switch (const auto answer{get(
+      isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg,
+      choices)};
             answer) {
     case RefreshOption: refresh = true; break;
     case MeaningsOption:
@@ -237,15 +234,15 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
 void GroupQuiz::editAnswer(Choices& choices) {
   static const std::string NewReadingForEntry("    New reading for Entry: ");
 
-  const auto entry = getAnswerToEdit();
+  const auto entry{getAnswerToEdit()};
   choices[_answers[entry]] = {}; // put the answer back as a choice
-  auto newChoices = choices;
+  auto newChoices{choices};
   newChoices.erase(EditOption);
   newChoices.erase(MeaningsOption);
   newChoices.erase(RefreshOption);
   newChoices.erase(SkipOption);
-  const auto answer = get(NewReadingForEntry + std::to_string(entry + 1),
-                          newChoices, _answers[entry], false);
+  const auto answer{get(NewReadingForEntry + std::to_string(entry + 1),
+                        newChoices, _answers[entry], false)};
   _answers[entry] = answer;
   choices.erase(answer);
 }
@@ -256,8 +253,8 @@ size_t GroupQuiz::getAnswerToEdit() const {
   if (_answers.size() == 1) return 0;
   std::map<char, std::string> answersToEdit;
   for (auto k : _answers) answersToEdit[k] = {};
-  const auto index = std::find(_answers.begin(), _answers.end(),
-                               get(AnswerToEdit, answersToEdit, {}, false));
+  const auto index{std::find(_answers.begin(), _answers.end(),
+                             get(AnswerToEdit, answersToEdit, {}, false))};
   assert(index != _answers.end());
   return static_cast<size_t>(std::distance(_answers.begin(), index));
 }
@@ -266,8 +263,8 @@ void GroupQuiz::checkAnswers(const List& questions, const List& readings,
                              const std::string& name) {
   size_t count{};
   for (auto i : _answers) {
-    const auto index =
-      static_cast<size_t>(i <= 'z' ? i - 'a' : i - 'A' + TotalLetters);
+    const auto index{
+      static_cast<size_t>(i <= 'z' ? i - 'a' : i - 'A' + TotalLetters)};
     // Only match on readings (and meanings if '_showMeanings' is true) instead
     // of making sure the kanji is exactly the same since many kanjis have
     // identical readings especially in the 'patterns' groups (and the user has

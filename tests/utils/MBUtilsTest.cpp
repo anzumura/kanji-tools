@@ -100,9 +100,9 @@ TEST(MBUtilsTest, ValidateMaxUnicode) {
   const auto okS = std::string({firstByte, static_cast<char>(0b10'00'11'11),
                                 static_cast<char>(0b10'11'11'11),
                                 static_cast<char>(0b10'11'11'11)});
-  const auto badS =
+  const auto badS{
     std::string({firstByte, static_cast<char>(0b10'01'00'00),
-                 static_cast<char>(Bit1), static_cast<char>(Bit1)});
+                 static_cast<char>(Bit1), static_cast<char>(Bit1)})};
   EXPECT_EQ(validateUtf8(okS), Utf8Result::Valid);
   EXPECT_EQ(validateUtf8(badS), Utf8Result::InvalidCodePoint);
 }
@@ -183,9 +183,9 @@ TEST(MBUtilsTest, BeyondMaxUnicode) {
   const auto okS = std::string({firstByte, static_cast<char>(0b10'00'11'11),
                                 static_cast<char>(0b10'11'11'11),
                                 static_cast<char>(0b10'11'11'11)});
-  const auto badS =
+  const auto badS{
     std::string({firstByte, static_cast<char>(0b10'01'00'00),
-                 static_cast<char>(Bit1), static_cast<char>(Bit1)});
+                 static_cast<char>(Bit1), static_cast<char>(Bit1)})};
   // from UTF-8
   EXPECT_EQ(fromUtf8(okS), U"\x10ffff");
   fromUtf8Error(badS);
