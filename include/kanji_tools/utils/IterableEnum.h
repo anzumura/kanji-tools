@@ -108,7 +108,8 @@ protected:
     }
   };
 
-  template<typename I> requires std::integral<I> || std::same_as<T, I>
+  template<typename I>
+  requires std::integral<I> || std::same_as<T, I>
   [[nodiscard]] static auto checkIndex(I i, const std::string& name) {
     const auto x{static_cast<size_t>(i)};
     if (x >= N) {

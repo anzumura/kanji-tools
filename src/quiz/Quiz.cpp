@@ -16,7 +16,7 @@ Quiz::~Quiz() {
     else if (_correctAnswers == _question)
       out() << " - Perfect!\n";
     else {
-      if (const auto skipped = _question - _correctAnswers - _mistakes.size();
+      if (const auto skipped{_question - _correctAnswers - _mistakes.size()};
           skipped)
         out() << ", skipped: " << skipped;
       if (!_mistakes.empty()) {
@@ -58,7 +58,7 @@ std::ostream& Quiz::incorrectMessage(const std::string& name) {
 }
 
 Choice::Choices Quiz::getDefaultChoices(size_t totalQuestions) const {
-  Choice::Choices c = {
+  Choice::Choices c{
     {MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
     {SkipOption, _question + 1 == totalQuestions ? "finish"
                  : !isTestMode()                 ? "next"

@@ -78,8 +78,7 @@ protected:
     _quiz.start(quizType, questionList);
   }
 
-  void getFirstQuestion(std::string& line,
-                        QuizLauncher::OptChar quizType = {},
+  void getFirstQuestion(std::string& line, QuizLauncher::OptChar quizType = {},
                         QuizLauncher::OptChar questionList = {}) {
     startQuiz(quizType, questionList);
     while (std::getline(_os, line))

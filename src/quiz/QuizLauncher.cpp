@@ -66,20 +66,20 @@ const Choice::Choices ProgramModeChoices({{'r', "review"}, {'t', "test"}}),
   ListStyleChoices({{'k', "kanji to reading"}, {'r', "reading to kanji"}}),
   GroupKanjiChoices(
     {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}});
-constexpr auto GradeStart = '1', GradeEnd = '6', KyuStart = '1', KyuEnd = '9',
-               ListChoiceCountStart = '2', ListChoiceCountEnd = '9';
+
+constexpr auto GradeStart{'1'}, GradeEnd{'6'}, KyuStart{'1'}, KyuEnd{'9'},
+  ListChoiceCountStart{'2'}, ListChoiceCountEnd{'9'};
 
 // Default options are offered for some of the above 'Choices' (when prompting
 // the user for input):
-constexpr auto DefaultProgramMode = 't', DefaultQuestionOrder = 'r',
-               DefaultQuizType = 'g', DefaultGrade = '6', DefaultKyu = '2',
-               DefaultListChoiceCount = '4', DefaultListStyle = 'k',
-               DefaultGroupKanji = '2';
+constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
+  DefaultQuizType{'g'}, DefaultGrade{'6'}, DefaultKyu{'2'},
+  DefaultListChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
 
 } // namespace
 
 void QuizLauncher::run(size_t argc, const char** argv) {
-  auto data = std::make_shared<KanjiData>(argc, argv);
+  const auto data{std::make_shared<KanjiData>(argc, argv)};
   QuizLauncher(argc, argv, data, std::make_shared<GroupData>(data),
                std::make_shared<JukugoData>(data));
 }
@@ -111,10 +111,10 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
   }};
 
   size_t question{};
-  auto endOptions = false, showMeanings = false;
-  for (auto i = Data::nextArg(argc, argv); i < argc;
+  auto endOptions{false}, showMeanings{false};
+  for (auto i{Data::nextArg(argc, argv)}; i < argc;
        i = Data::nextArg(argc, argv, i))
-    if (std::string arg = argv[i];
+    if (std::string arg{argv[i]};
         !endOptions && arg.starts_with("-") && arg.size() > 1) {
       if (arg == "-h") {
         out() << HelpMessage;
@@ -147,18 +147,18 @@ QuizLauncher::QuizLauncher(size_t argc, const char** argv, DataPtr data,
 void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
                          bool meanings) {
   if (_programMode == ProgramMode::NotAssigned) {
-    const auto c = _choice.get("Mode", ProgramModeChoices, DefaultProgramMode);
+    const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
     _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Test;
   }
   if (!getQuestionOrder()) return;
 
-  const auto listQuiz = [this, question, meanings](auto f, auto& l) {
+  const auto listQuiz{[this, question, meanings](auto f, auto& l) {
     startListQuiz(question, meanings, f, l);
-  };
-  const auto groupQuiz = [this, question, meanings, qList](auto& l) {
+  }};
+  const auto groupQuiz{[this, question, meanings, qList](auto& l) {
     startGroupQuiz(question, meanings, qList, l);
-  };
+  }};
 
   // replace 'quizType' turnary operator with 'or_else' when C++23 is available
   switch (quizType ? *quizType
@@ -174,18 +174,18 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
     break;
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
-    if (const auto c = qList ? *qList
-                             : _choice.get("Choose grade", GradeStart, GradeEnd,
-                                           GradeChoices, DefaultGrade);
+    if (const auto c{qList ? *qList
+                           : _choice.get("Choose grade", GradeStart, GradeEnd,
+                                         GradeChoices, DefaultGrade)};
         !isQuit(c))
       listQuiz(KanjiInfo::Grade,
                data().grades(AllKanjiGrades[c == 's' ? 6 : c - '1']));
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
-    if (const auto c = qList ? *qList
-                             : _choice.get("Choose kyu", KyuStart, KyuEnd,
-                                           KyuChoices, DefaultKyu);
+    if (const auto c{qList ? *qList
+                           : _choice.get("Choose kyu", KyuStart, KyuEnd,
+                                         KyuChoices, DefaultKyu)};
         !isQuit(c))
       listQuiz(KanjiInfo::Kyu,
                data().kyus(AllKenteiKyus[c == 'a'   ? 0
@@ -212,7 +212,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, size_t question,
 
 void QuizLauncher::printExtraTypeInfo(const Entry& k) const {
   out() << ", " << k->type();
-  if (const auto i = k->extraTypeInfo(); i) out() << " (" << *i << ')';
+  if (const auto i{k->extraTypeInfo()}; i) out() << " (" << *i << ')';
 }
 
 void QuizLauncher::printLegend(KanjiInfo fields) const {
@@ -239,7 +239,7 @@ void QuizLauncher::printMeaning(const Entry& k, bool useNewLine,
 void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   out() << "    Reading: " << kanji->reading() << '\n';
   // Similar Kanji
-  if (const auto i = _groupData->patternMap().find(kanji->name());
+  if (const auto i{_groupData->patternMap().find(kanji->name())};
       i != _groupData->patternMap().end() &&
       i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
@@ -258,9 +258,9 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
     out() << '\n';
   }
   // Categories
-  if (const auto i = _groupData->meaningMap().equal_range(kanji->name());
+  if (const auto i{_groupData->meaningMap().equal_range(kanji->name())};
       i.first != i.second) {
-    auto j = i.first;
+    auto j{i.first};
     out() << (++j == i.second ? "   Category: " : " Categories: ");
     for (j = i.first; j != i.second; ++j) {
       if (j != i.first) out() << ", ";
@@ -271,7 +271,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   // Jukugo Lists
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"),
     otherGrade("Other Grade Jukugo");
-  if (auto& list = _jukugoData->find(kanji->name()); !list.empty()) {
+  if (auto& list{_jukugoData->find(kanji->name())}; !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
     // lists, one for the same grade of the given kanji and one for other
     // grades. For example, 一生（いっしょう） is a grade 1 Jukugo for '一', but
@@ -295,13 +295,13 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
 void QuizLauncher::startListQuiz(size_t question, bool showMeanings,
                                  KanjiInfo excludeField,
                                  const List& list) const {
-  size_t choiceCount = 1;
-  auto quizStyle = DefaultListStyle;
+  auto choiceCount{1U};
+  auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
-    const auto c = _choice.get("Number of choices", ListChoiceCountStart,
-                               ListChoiceCountEnd, DefaultListChoiceCount);
+    const auto c{_choice.get("Number of choices", ListChoiceCountStart,
+                             ListChoiceCountEnd, DefaultListChoiceCount)};
     if (isQuit(c)) return;
-    choiceCount = static_cast<size_t>(c - '0');
+    choiceCount = static_cast<u_int>(c - '0');
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);
     if (isQuit(quizStyle)) return;
   }
