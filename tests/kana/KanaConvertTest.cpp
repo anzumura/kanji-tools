@@ -44,7 +44,7 @@ protected:
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
   void check(const char* hiragana, const char* katakana, const char* romaji,
-             const char* hepburn = nullptr, const char* kunrei = nullptr) {
+             const char* hepburn = {}, const char* kunrei = {}) {
     EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
     EXPECT_EQ(katakanaToRomaji(katakana), romaji);
     EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Hepburn),

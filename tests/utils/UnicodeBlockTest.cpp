@@ -8,7 +8,7 @@ namespace {
 using BlockSet = std::set<const UnicodeBlock*>;
 
 template<typename T>
-void checkRange(const T& blocks, BlockSet* allBlocks = nullptr) {
+void checkRange(const T& blocks, BlockSet* allBlocks = {}) {
   for (char32_t oldEnd{}; auto& i : blocks) {
     EXPECT_LT(oldEnd, i.start);
     oldEnd = i.end;

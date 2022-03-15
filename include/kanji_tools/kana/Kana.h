@@ -143,7 +143,7 @@ public:
   using List = std::vector<std::string>;
 
   Kana(const char* romaji, const char* hiragana, const char* katakana,
-       const char* hepburn = nullptr, const char* kunrei = nullptr)
+       const char* hepburn = {}, const char* kunrei = {})
       : _romaji(romaji), _hiragana(hiragana), _katakana(katakana),
         _hepburn(hepburn ? std::optional(hepburn) : std::nullopt),
         _kunrei(kunrei ? std::optional(kunrei) : std::nullopt) {
@@ -288,8 +288,8 @@ private:
 class DakutenKana : public Kana {
 public:
   DakutenKana(const char* romaji, const char* hiragana, const char* katakana,
-              const Kana& dakutenKana, const char* hepburn = nullptr,
-              const char* kunrei = nullptr)
+              const Kana& dakutenKana, const char* hepburn = {},
+              const char* kunrei = {})
       : Kana(romaji, hiragana, katakana, hepburn, kunrei),
         _dakutenKana(dakutenKana) {
     _dakutenKana._plainKana = this;
@@ -313,7 +313,7 @@ class HanDakutenKana : public DakutenKana {
 public:
   HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana,
                  const Kana& dakutenKana, const Kana& hanDakutenKana,
-                 const char* hepburn = nullptr, const char* kunrei = nullptr)
+                 const char* hepburn = {}, const char* kunrei = {})
       : DakutenKana(romaji, hiragana, katakana, dakutenKana, hepburn, kunrei),
         _hanDakutenKana(hanDakutenKana) {
     _hanDakutenKana._plainKana = this;

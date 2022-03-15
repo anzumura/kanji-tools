@@ -95,7 +95,7 @@ ConvertMain::ConvertMain(int argc, const char** argv)
 
 void ConvertMain::usage(const std::string& errorMsg,
                         bool showAllOptions) const {
-  auto& os = errorMsg.empty() ? std::cout : std::cerr;
+  auto& os{errorMsg.empty() ? std::cout : std::cerr};
   if (!errorMsg.empty()) os << _program << ": " << errorMsg << '\n';
   if (showAllOptions)
     os << "usage: " << _program
@@ -295,7 +295,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
   const auto& middleDot{_converter.narrowDelims().find(slash)};
   // middleDot should always be found and thus '4' none rows, but handle if
   // missing just in case ...
-  const size_t none = middleDot != _converter.narrowDelims().end() ? 4 : 3;
+  const size_t none{middleDot != _converter.narrowDelims().end() ? 4U : 3U};
   if (none == 4)
     table.add({"N", empty + slash, empty, middleDot->second, empty,
                toUnicode(middleDot->second)},
