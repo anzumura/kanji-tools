@@ -81,7 +81,7 @@ TEST(EnumArrayTest, BadAccess) {
                std::out_of_range);
   EXPECT_THROW(call([] { return AllColors[4]; }, "index '4' is out of range"),
                std::out_of_range);
-  EXPECT_THROW(call([] { return AllColors[4UL]; }, "index '4' is out of range"),
+  EXPECT_THROW(call([] { return AllColors[4U]; }, "index '4' is out of range"),
                std::out_of_range);
 }
 

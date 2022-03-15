@@ -3,6 +3,7 @@
 #include <kanji_tools/utils/EnumTraits.h>
 
 #include <compare>
+#include <concepts>
 #include <stdexcept>
 #include <string>
 
@@ -107,12 +108,12 @@ protected:
     }
   };
 
-  template<typename Index>
-  [[nodiscard]] static auto checkIndex(Index i, const std::string& name) {
+  template<typename I> requires std::integral<I> || std::same_as<T, I>
+  [[nodiscard]] static auto checkIndex(I i, const std::string& name) {
     const auto x{static_cast<size_t>(i)};
     if (x >= N) {
       std::string msg{name};
-      if constexpr (std::is_same_v<Index, T>)
+      if constexpr (std::is_same_v<I, T>)
         msg += "enum value " + std::to_string(x);
       else // use original value in error message (so int '-1' is preserved)
         msg += std::to_string(i);
