@@ -337,6 +337,7 @@ TEST_F(ColumnFileTest, GetUInt) {
   f.nextRow();
   u_int8_t expected{123};
   EXPECT_EQ(f.getUInt<u_int8_t>(col), expected);
+  EXPECT_EQ(f.getU8(col), expected); // convience function
 }
 
 TEST_F(ColumnFileTest, GetUIntError) {
@@ -346,7 +347,7 @@ TEST_F(ColumnFileTest, GetUIntError) {
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_THROW(call([&] { f.getUInt<u_int8_t>(col); },
+  EXPECT_THROW(call([&] { f.getU8(col); },
                     "exceeded max value of 255 - file: testFile.txt, row: 1, "
                     "column: 'Col', value: '1234'"),
                std::domain_error);
@@ -386,7 +387,7 @@ TEST_F(ColumnFileTest, GetOptUInt) {
   f.nextRow();
   EXPECT_EQ(f.getOptUInt<u_int16_t>(col), 123);
   EXPECT_TRUE(f.nextRow());
-  EXPECT_FALSE(f.getOptUInt<u_int16_t>(col));
+  EXPECT_FALSE(f.getOptU16(col));
 }
 
 TEST_F(ColumnFileTest, GetOptUIntError) {
@@ -396,7 +397,7 @@ TEST_F(ColumnFileTest, GetOptUIntError) {
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_THROW(call([&] { f.getOptUInt<u_int8_t>(col); },
+  EXPECT_THROW(call([&] { f.getOptU8(col); },
                     "exceeded max value of 255 - file: testFile.txt, row: 1, "
                     "column: 'Col', value: '256'"),
                std::domain_error);

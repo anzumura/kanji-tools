@@ -76,18 +76,27 @@ public:
     return processULong(s, column, maxValue);
   }
 
+  // getUInt takes a numeric type T (like u_int16_t) and then calls getLong with
+  // the appropriate max value
   template<std::unsigned_integral T> T getUInt(const Column& c) const {
     const auto i{getULong(c, std::numeric_limits<T>::max())};
     return static_cast<T>(i);
   }
 
+  // getOptUInt takes a numeric type T and then calls getOptLong with the
+  // appropriate max value
   template<std::unsigned_integral T>
   std::optional<T> getOptUInt(const Column& column) const {
     const auto i{getOptULong(column, std::numeric_limits<T>::max())};
-    if (i)
-      return static_cast<T>(*i);
+    if (i) return static_cast<T>(*i);
     return {};
   }
+
+  // conveince functions for some numberic types
+  auto getU8(const Column& c) const { return getUInt<u_int8_t>(c); }
+  auto getOptU8(const Column& c) const { return getOptUInt<u_int8_t>(c); }
+  auto getU16(const Column& c) const { return getUInt<u_int16_t>(c); }
+  auto getOptU16(const Column& c) const { return getOptUInt<u_int16_t>(c); }
 
   // convert 'Y' or 'T' to true, 'N', 'F' or '' to false or call 'error'
   bool getBool(const Column&) const;
