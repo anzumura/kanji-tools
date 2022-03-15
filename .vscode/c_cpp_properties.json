@@ -18,7 +18,7 @@
         // "/opt/boost/include",
         "${sdk}/c++/v1",
         "${sdk}",
-        "${tools}/usr/lib/clang/13.0.0/include"
+        "${tools}/usr/lib/clang/13.1.6/include"
       ],
       "intelliSenseMode": "macos-clang-arm64"
     }
