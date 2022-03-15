@@ -90,7 +90,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
               " members");
 
     auto group{
-      createGroup(f.getSize(numberCol), name, memberKanji, patternType)};
+      createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
     for (auto& i : memberKanji) checkInsert(i->name(), groups, group);
     list.push_back(group);
   }

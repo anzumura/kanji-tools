@@ -36,7 +36,7 @@ public:
   };
 
   using Columns = std::vector<Column>;
-  using OptSize = std::optional<size_t>;
+  using OptULong = std::optional<unsigned long>;
 
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a
   // regular file) or if the list of 'columns' doesn't match the first row of
@@ -62,21 +62,22 @@ public:
     return get(column).empty();
   }
 
-  // convert to 'size_t' or call 'error' (if maxValue is non-zero and value
-  // exceeds it then call 'error')
-  size_t getSize(const Column& column, size_t maxValue = 0) const {
-    return processSize(get(column), column, maxValue);
+  // convert to 'unsigned long' or call 'error' (if maxValue is non-zero and
+  // value exceeds it then call 'error')
+  unsigned long getULong(const Column& column,
+                         unsigned long maxValue = 0) const {
+    return processULong(get(column), column, maxValue);
   }
 
-  // return std::nullopt if column is empty or call 'processSize'
-  OptSize getOptSize(const Column& column, size_t maxValue = 0) const {
+  // return std::nullopt if column is empty or call 'processULong'
+  OptULong getOptULong(const Column& column, unsigned long maxValue = 0) const {
     auto& s = get(column);
     if (s.empty()) return {};
-    return processSize(s, column, maxValue);
+    return processULong(s, column, maxValue);
   }
 
   template<std::unsigned_integral T> T getUInt(const Column& c) const {
-    const auto i{getSize(c, std::numeric_limits<T>::max())};
+    const auto i{getULong(c, std::numeric_limits<T>::max())};
     return static_cast<T>(i);
   }
 
@@ -111,7 +112,7 @@ private:
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const std::string& name);
 
-  size_t processSize(const std::string&, const Column&, size_t maxValue) const;
+  size_t processULong(const std::string&, const Column&, size_t maxValue) const;
 
   using ColNames = std::map<std::string, Column>;
 

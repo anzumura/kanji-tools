@@ -55,14 +55,16 @@ protected:
                   const LinkNames& oldNames, const Ucd* u)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
                        f.get(ReadingCol), strokes, u),
-        _kyu(d.kyu(name)), _number(f.getSize(NumberCol)), _oldNames(oldNames) {}
+        _kyu(d.kyu(name)), _number(f.getULong(NumberCol)), _oldNames(oldNames) {
+  }
 
   // Constructor used by 'OfficialKanji': calls base without 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
                   u_int8_t strokes, const LinkNames& oldNames)
       : NonLinkedKanji(d, name, d.getRadicalByName(f.get(RadicalCol)),
                        f.get(ReadingCol), strokes, findUcd(d, name)),
-        _kyu(d.kyu(name)), _number(f.getSize(NumberCol)), _oldNames(oldNames) {}
+        _kyu(d.kyu(name)), _number(f.getULong(NumberCol)), _oldNames(oldNames) {
+  }
 private:
   const KenteiKyus _kyu;
   const size_t _number;
@@ -88,7 +90,7 @@ protected:
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name)
       : CustomFileKanji(d, f, name, d.getStrokes(name), getOldNames(f)),
         _frequency(d.frequency(name)), _level(d.level(name)),
-        _year(f.getOptSize(YearCol)) {}
+        _year(f.getOptULong(YearCol)) {}
 
   // constructor used by 'JouyouKanji' calls base with 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name,
@@ -96,7 +98,7 @@ protected:
       : CustomFileKanji(d, f, name, s, meaning, getOldNames(f),
                         findUcd(d, name)),
         _frequency(d.frequency(name)), _level(d.level(name)),
-        _year(f.getOptSize(YearCol)) {}
+        _year(f.getOptULong(YearCol)) {}
 private:
   [[nodiscard]] static LinkNames getOldNames(const ColumnFile&);
 

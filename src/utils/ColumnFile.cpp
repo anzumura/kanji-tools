@@ -96,13 +96,14 @@ const std::string& ColumnFile::get(const Column& column) const {
   return _rowValues[pos];
 }
 
-size_t ColumnFile::processSize(const std::string& s, const Column& column,
-                               size_t maxValue) const {
-  size_t i;
+unsigned long ColumnFile::processULong(const std::string& s,
+                                       const Column& column,
+                                       unsigned long maxValue) const {
+  unsigned long i;
   try {
     i = std::stoul(s);
   } catch (...) {
-    error("failed to convert to size_t", column, s);
+    error("failed to convert to unsigned long", column, s);
   }
   if (maxValue && maxValue < i)
     error("exceeded max value of " + std::to_string(maxValue), column, s);

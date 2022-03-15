@@ -263,7 +263,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   EXPECT_CALL(_data, getRadicalByName("雨")).WillOnce(ReturnRef(rad));
   EXPECT_THROW(
     call([this] { return fromFile<ExtraKanji>(); },
-         "failed to convert to size_t - file: test.txt, row: 1, column: "
+         "failed to convert to unsigned long - file: test.txt, row: 1, column: "
          "'Number', value: 'a'"),
     std::domain_error);
 }

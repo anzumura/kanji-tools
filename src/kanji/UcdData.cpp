@@ -88,8 +88,8 @@ void UcdData::load(const std::filesystem::path& file) {
     if (name.size() > 4) f.error("name greater than 4");
     if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
 
-    const auto radical{f.getSize(radicalCol)}, strokes{f.getSize(strokesCol)},
-      vStrokes{f.isEmpty(vStrokesCol) ? 0 : f.getSize(vStrokesCol)};
+    const auto radical{f.getULong(radicalCol)}, strokes{f.getULong(strokesCol)},
+      vStrokes{f.isEmpty(vStrokesCol) ? 0 : f.getULong(vStrokesCol)};
     if (radical < 1 || radical > 214) f.error("radical out of range");
     // 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
     if (strokes < 1 || strokes > 53) f.error("strokes out of range");

@@ -285,28 +285,27 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
     std::domain_error);
 }
 
-TEST_F(ColumnFileTest, GetSize) {
+TEST_F(ColumnFileTest, GetULong) {
   std::ofstream of(TestFile);
   of << "Col\n123\n";
   of.close();
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_EQ(f.getSize(col), 123);
+  EXPECT_EQ(f.getULong(col), 123);
 }
 
-TEST_F(ColumnFileTest, GetSizeError) {
+TEST_F(ColumnFileTest, GetULongError) {
   std::ofstream of(TestFile);
   of << "Col\nblah\n";
   of.close();
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_THROW(
-    call([&] { f.getSize(col); },
-         convertError +
-           "size_t - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
-    std::domain_error);
+  EXPECT_THROW(call([&] { f.getULong(col); },
+                    convertError + "unsigned long - file: testFile.txt, row: "
+                                   "1, column: 'Col', value: 'blah'"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetSizeMaxValueError) {
@@ -317,12 +316,12 @@ TEST_F(ColumnFileTest, GetSizeMaxValueError) {
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_EQ(f.getSize(col, maxValue), maxValue);
+  EXPECT_EQ(f.getULong(col, maxValue), maxValue);
   f.nextRow();
-  EXPECT_EQ(f.getSize(col, 0), maxValue); // 0 implies no max value
+  EXPECT_EQ(f.getULong(col, 0), maxValue); // 0 implies no max value
   f.nextRow();
   std::string msg{"exceeded max value of "};
-  EXPECT_THROW(call([&] { f.getSize(col, maxValue); },
+  EXPECT_THROW(call([&] { f.getULong(col, maxValue); },
                     msg + std::to_string(maxValue) +
                       " - file: testFile.txt, row: 3, column: 'Col', value: '" +
                       std::to_string(maxValue + 1) + "'"),
@@ -353,30 +352,29 @@ TEST_F(ColumnFileTest, GetUIntError) {
                std::domain_error);
 }
 
-TEST_F(ColumnFileTest, GetOptSize) {
+TEST_F(ColumnFileTest, GetOptULong) {
   std::ofstream of(TestFile);
   of << "Col\n123\n\n";
   of.close();
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_EQ(f.getOptSize(col), 123);
+  EXPECT_EQ(f.getOptULong(col), 123);
   EXPECT_TRUE(f.nextRow());
-  EXPECT_FALSE(f.getOptSize(col));
+  EXPECT_FALSE(f.getOptULong(col));
 }
 
-TEST_F(ColumnFileTest, GetOptSizeError) {
+TEST_F(ColumnFileTest, GetOptULongError) {
   std::ofstream of(TestFile);
   of << "Col\nblah\n";
   of.close();
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   f.nextRow();
-  EXPECT_THROW(
-    call([&] { f.getOptSize(col); },
-         convertError +
-           "size_t - file: testFile.txt, row: 1, column: 'Col', value: 'blah'"),
-    std::domain_error);
+  EXPECT_THROW(call([&] { f.getOptULong(col); },
+                    convertError + "unsigned long - file: testFile.txt, row: "
+                                   "1, column: 'Col', value: 'blah'"),
+               std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetBool) {
