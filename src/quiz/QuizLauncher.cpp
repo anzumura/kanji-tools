@@ -330,7 +330,7 @@ u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
     if (arg.size() == 3 && arg[2] == '0')
       _questionOrder = QuestionOrder::Random;
     else {
-      size_t offset = 2;
+      u_int8_t offset{2};
       if (arg[2] == '-') {
         _questionOrder = QuestionOrder::FromEnd;
         offset = 3;
@@ -366,22 +366,22 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
     printDetails((**kanji).name());
   } else if (arg.starts_with("m")) {
-    const auto id = arg.substr(1);
+    const auto id{arg.substr(1)};
     // a valid Morohashi ID should be numeric followed by an optional 'P'
-    if (auto nonPrime = id.ends_with("P") ? id.substr(0, id.size() - 1) : id;
-        id.empty() || !std::all_of(nonPrime.begin(), nonPrime.end(), ::isdigit))
+    if (const auto noP{id.ends_with("P") ? id.substr(0, id.size() - 1) : id};
+        id.empty() || !std::all_of(noP.begin(), noP.end(), ::isdigit))
       Data::usage("invalid Morohashi ID '" + id + "'");
     printDetails(_groupData->data().findKanjisByMorohashiId(id), "Morohashi",
                  id);
   } else if (arg.starts_with("n")) {
-    const auto id = arg.substr(1);
+    const auto id{arg.substr(1)};
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
       Data::usage("invalid Nelson ID '" + id + "'");
     printDetails(
       _groupData->data().findKanjisByNelsonId(getU16("Nelson ID", id)),
       "Nelson", id);
   } else if (arg.starts_with("u")) {
-    const auto id = arg.substr(1);
+    const auto id{arg.substr(1)};
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit
     // must be a 1 or 2)
     if (id.size() < 4 || id.size() > 5 ||
@@ -415,13 +415,13 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
              "T=Taiwan, V=Vietnam\n\n";
   }
   out() << "Details for " << arg << ' ' << toUnicode(arg, BracketType::Square);
-  if (const auto ucd = data().ucd().find(arg); ucd) {
+  if (const auto ucd{data().ucd().find(arg)}; ucd) {
     out() << ", Blk " << ucd->block() << ", Ver " << ucd->version();
     if (!ucd->sources().empty()) {
       out() << ", Sources " << ucd->sources();
       if (!ucd->jSource().empty()) out() << " (" << ucd->jSource() << ')';
     }
-    if (const auto k = data().findKanjiByName(arg); k) {
+    if (const auto k{data().findKanjiByName(arg)}; k) {
       printExtraTypeInfo(*k);
       out() << '\n' << (**k).info();
       printMeaning(*k, true);
@@ -457,13 +457,13 @@ void QuizLauncher::printJukugoList(const std::string& name,
     // (upto MaxJukugoSize)
     for (size_t i{}; i < list.size(); ++i)
       if (colWidths[i % JukugoPerLine] < MaxJukugoSize)
-        if (const size_t size = displaySize(list[i]->nameAndReading()) + 2;
+        if (const auto size{displaySize(list[i]->nameAndReading()) + 2};
             size > colWidths[i % JukugoPerLine])
           colWidths[i % JukugoPerLine] =
             size < MaxJukugoSize ? size : MaxJukugoSize;
     for (size_t i{}; i < list.size(); ++i) {
       if (i % JukugoPerLine == 0) out() << '\n';
-      const auto s = list[i]->nameAndReading();
+      const auto s{list[i]->nameAndReading()};
       out() << std::left << std::setw(wideSetw(s, colWidths[i % JukugoPerLine]))
             << s;
     }

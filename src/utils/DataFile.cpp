@@ -13,7 +13,7 @@ fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   fs::path p(dir / file);
   if (!fs::is_regular_file(p) && !file.has_extension()) p += TextFileExtension;
   if (!fs::exists(p)) {
-    std::string msg = dir.string() + " must contain '" + file.string();
+    auto msg{dir.string() + " must contain '" + file.string()};
     usage(file.has_extension()
             ? msg + '\''
             : msg + "' (also tried '" + TextFileExtension + "' extension)");
@@ -39,22 +39,21 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
                    bool createNewUniqueFile, Set* uniqueTypeNames,
                    const std::string& name)
     : _name(name.empty() ? capitalize(fileIn.stem().string()) : name) {
-  auto file = fileIn;
+  auto file{fileIn};
   // try adding .txt if file isn't found
   if (!fs::is_regular_file(file) && !fileIn.has_extension())
     file += TextFileExtension;
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
-  auto lineNumber = 1;
-  const auto error = [&lineNumber, &file](const std::string& s,
-                                          bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNumber) : "") +
+  auto lineNum{1};
+  const auto error{[&lineNum, &file](const auto& s, bool printLine = true) {
+    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") +
           ", file: " + file.string());
-  };
-  std::ifstream f(file);
+  }};
+  std::ifstream f{file};
   DataFile::List good, dups;
-  for (std::string line; std::getline(f, line); ++lineNumber) {
-    std::stringstream ss(line);
+  for (std::string line; std::getline(f, line); ++lineNum) {
+    std::stringstream ss{line};
     for (std::string token; std::getline(ss, token, ' ');) {
       if (fileType == FileType::OnePerLine) {
         if (token != line) error("got multiple tokens");
@@ -67,7 +66,7 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
         error("got duplicate token '" + token);
       // check uniqueness across files
       if (uniqueTypeNames) {
-        const auto i = uniqueTypeNames->insert(token);
+        const auto i{uniqueTypeNames->insert(token)};
         if (!i.second) {
           dups.emplace_back(*i.first);
           continue;
@@ -89,7 +88,7 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
                 << ":";
       for (const auto& i : dups) std::cerr << ' ' << i;
       if (createNewUniqueFile) {
-        fs::path newFile(file);
+        fs::path newFile{file};
         newFile.replace_extension(fs::path("new"));
         std::cerr << "\n>>> saving " << good.size()
                   << " unique entries to: " << newFile.string() << '\n';

@@ -14,7 +14,7 @@ namespace kanji_tools {
 // pressing 'return') and choice 'ranges' (see 'get' functions below).
 class Choice {
 public:
-  inline static const std::string DefaultQuitDescription{"quit"};
+  inline static const std::string DefaultQuitDescription{"quit"}, EmptyString;
 
   using OptChar = std::optional<char>;
 

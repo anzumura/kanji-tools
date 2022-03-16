@@ -9,8 +9,8 @@ namespace kanji_tools {
 
 namespace {
 
-const std::string OpenWideBracket("（"), CloseWideBracket("）");
-const auto CloseWideBracketSize = CloseWideBracket.size();
+const std::string OpenWideBracket{"（"}, CloseWideBracket{"）"};
+const auto CloseWideBracketSize{CloseWideBracket.size()};
 
 } // namespace
 
@@ -21,7 +21,7 @@ const std::wregex MBCount::RemoveFurigana(std::wstring(L"([") + KanjiRange +
 const std::wstring MBCount::DefaultReplace(L"$1");
 
 size_t MBCount::add(const std::string& s, const OptString& tag) {
-  auto n = s;
+  auto n{s};
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8ToWstring(s), *_find, _replace));
     if (n != s) {
@@ -31,14 +31,14 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
         _lastReplaceTag = *tag;
       }
       if (_debug) {
-        const auto count = std::to_string(_replacements);
+        const auto count{std::to_string(_replacements)};
         std::cout << count << " : " << s << '\n'
                   << std::setw(static_cast<int>(count.size() + 3)) << ": " << n
                   << '\n';
       }
     }
   }
-  MBChar c(n);
+  MBChar c{n};
   size_t added{};
   for (std::string token; c.next(token);)
     if (allowAdd(token)) {
@@ -55,8 +55,8 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
 size_t MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
                           bool recurse) {
   size_t added{};
-  const auto fileName = file.filename().string(); // use final component of path
-  const auto tag = addTag ? OptString(fileName) : std::nullopt;
+  const auto fileName{file.filename().string()}; // use final component of path
+  const auto tag{addTag ? OptString(fileName) : std::nullopt};
   if (fs::is_regular_file(file)) {
     ++_files;
     added += processFile(file, tag);
@@ -74,9 +74,8 @@ size_t MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
 }
 
 bool MBCount::hasUnclosedBrackets(const std::string& line) {
-  if (const auto open = line.rfind(OpenWideBracket);
-      open != std::string::npos) {
-    const auto close = line.rfind(CloseWideBracket);
+  if (const auto open{line.rfind(OpenWideBracket)}; open != std::string::npos) {
+    const auto close{line.rfind(CloseWideBracket)};
     return close == std::string::npos || close < open;
   }
   return false;
@@ -85,8 +84,8 @@ bool MBCount::hasUnclosedBrackets(const std::string& line) {
 size_t MBCount::processJoinedLine(std::string& prevLine,
                                   const std::string& line, size_t pos,
                                   const OptString& tag) {
-  const auto end = pos + CloseWideBracketSize;
-  const auto joinedLine = prevLine + line.substr(0, end);
+  const auto end{pos + CloseWideBracketSize};
+  const auto joinedLine{prevLine + line.substr(0, end)};
   // set 'prevLine' to the unprocessed portion of 'line'
   prevLine = line.substr(end);
   return add(joinedLine, tag);
@@ -97,7 +96,7 @@ size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
   std::string line;
   if (std::fstream f(file); _find) {
     std::string prevLine;
-    for (auto prevUnclosed = false; std::getline(f, line);
+    for (auto prevUnclosed{false}; std::getline(f, line);
          prevUnclosed = hasUnclosedBrackets(prevLine)) {
       if (prevLine.empty()) {
         // don't process in case next line stars with open bracket
@@ -105,15 +104,15 @@ size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
         continue;
       } else if (prevUnclosed) {
         // case for previous line having unclosed brackets
-        if (const auto close = line.find(CloseWideBracket);
+        if (const auto close{line.find(CloseWideBracket)};
             close != std::string::npos)
-          if (const auto open = line.find(OpenWideBracket); close < open) {
+          if (const auto open{line.find(OpenWideBracket)}; close < open) {
             added += processJoinedLine(prevLine, line, close, tag);
             continue;
           }
-      } else if (const auto open = line.find(OpenWideBracket); open == 0)
+      } else if (const auto open{line.find(OpenWideBracket)}; !open)
         // case for line starting with open bracket
-        if (const auto close = line.find(CloseWideBracket);
+        if (const auto close{line.find(CloseWideBracket)};
             close != std::string::npos) {
           added += processJoinedLine(prevLine, line, close, tag);
           continue;

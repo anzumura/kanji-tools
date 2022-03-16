@@ -16,8 +16,8 @@ namespace {
 //   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
-constexpr char32_t MinSurrogate = 0xd800, MaxSurrogate = 0xdfff,
-                   ErrorReplacement = 0xfffd;
+constexpr char32_t MinSurrogate{0xd800}, MaxSurrogate{0xdfff},
+  ErrorReplacement{0xfffd};
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
@@ -34,13 +34,13 @@ template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(const char* s) {
   static_assert(std::is_integral_v<T>);
   static_assert(sizeof(T) == 4);
-  static constexpr T errorReplacement = static_cast<T>(ErrorReplacement),
-                     minSurrogate = static_cast<T>(MinSurrogate),
-                     maxSurrogate = static_cast<T>(MaxSurrogate),
-                     maxUnicode = static_cast<T>(MaxUnicode);
+  static constexpr T errorReplacement{static_cast<T>(ErrorReplacement)},
+    minSurrogate{static_cast<T>(MinSurrogate)},
+    maxSurrogate{static_cast<T>(MaxSurrogate)},
+    maxUnicode{static_cast<T>(MaxUnicode)};
   R result;
   if (!s || !*s) return result;
-  auto* u = reinterpret_cast<const unsigned char*>(s);
+  auto u{reinterpret_cast<const unsigned char*>(s)};
   do {
     if (*u <= 0x7fU) // one byte case
       result += static_cast<T>(*u++);
@@ -49,7 +49,7 @@ template<typename R, typename T = typename R::value_type>
       result += errorReplacement;
       ++u;
     } else {
-      const unsigned byte1 = *u;
+      const unsigned byte1{*u};
       if ((*++u & TwoBits) != Bit1)
         result += errorReplacement; // second byte didn't start with '10'
       else {
@@ -71,8 +71,8 @@ template<typename R, typename T = typename R::value_type>
             }
           } else {
             // three byte case - check for overlong and surrogate range
-            const auto c = static_cast<T>(((byte1 ^ ThreeBits) << 12) +
-                                          (byte2 << 6) + (*u ^ Bit1));
+            const auto c{static_cast<T>(((byte1 ^ ThreeBits) << 12) +
+                                        (byte2 << 6) + (*u ^ Bit1))};
             result += c > 0x7ff && (c < minSurrogate || c > maxSurrogate)
                         ? c
                         : errorReplacement;
@@ -92,9 +92,9 @@ template<typename R, typename T = typename R::value_type>
 }
 
 void convertToUtf8(char32_t c, std::string& s) {
-  static constexpr char32_t FirstThree = 0b111 << 18, FirstFour = 0b11'11 << 12,
-                            FirstFive = 0b1'11'11 << 6, Six = 0b11'11'11;
-  static constexpr char32_t SecondSix = Six << 6, ThirdSix = Six << 12;
+  static constexpr char32_t FirstThree{0b111 << 18}, FirstFour{0b11'11 << 12},
+    FirstFive{0b1'11'11 << 6}, Six{0b11'11'11};
+  static constexpr char32_t SecondSix{Six << 6}, ThirdSix{Six << 12};
   if (c <= 0x7f)
     s += static_cast<char>(c);
   else if (c <= 0x7ff) {
@@ -176,14 +176,14 @@ std::string toUtf8(const std::wstring& s) {
 
 MBUtf8Result validateMBUtf8(const char* s, Utf8Result& error,
                             bool sizeOne) noexcept {
-  const auto err = [&error](auto e) {
+  const auto err{[&error](auto e) {
     error = e;
     return MBUtf8Result::NotValid;
-  };
+  }};
   if (!s || !(*s & Bit1)) return MBUtf8Result::NotMultiByte;
   if ((*s & TwoBits) == Bit1) return err(Utf8Result::ContinuationByte);
-  auto* u = reinterpret_cast<const unsigned char*>(s);
-  const unsigned byte1 = *u;
+  auto u{reinterpret_cast<const unsigned char*>(s)};
+  const unsigned byte1{*u};
   if ((*++u & TwoBits) != Bit1)
     return err(Utf8Result::MissingBytes); // didn't start with '10'
   if (byte1 & Bit3) {

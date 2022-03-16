@@ -32,7 +32,7 @@ protected:
                         const std::string& katakana,
                         const std::string& romaji = {}) {
     if (romaji.empty()) {
-      auto r = hiraganaToRomaji(hiragana);
+      auto r{hiraganaToRomaji(hiragana)};
       EXPECT_EQ(katakanaToRomaji(katakana), r);
       EXPECT_EQ(romajiToHiragana(r), hiragana);
       EXPECT_EQ(romajiToKatakana(r), katakana);
@@ -55,7 +55,7 @@ protected:
               kunrei ? kunrei : romaji);
     EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Kunrei),
               kunrei ? kunrei : romaji);
-    auto preferHepburnIfBoth = hepburn ? hepburn : kunrei ? kunrei : romaji;
+    auto preferHepburnIfBoth{hepburn ? hepburn : kunrei ? kunrei : romaji};
     EXPECT_EQ(
       hiraganaToRomaji(hiragana, ConvertFlags::Hepburn | ConvertFlags::Kunrei),
       preferHepburnIfBoth);

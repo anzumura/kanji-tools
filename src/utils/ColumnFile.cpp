@@ -7,14 +7,14 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto ColNotFound = std::numeric_limits<size_t>::max();
+constexpr auto ColNotFound{std::numeric_limits<size_t>::max()};
 
 } // namespace
 
 namespace fs = std::filesystem;
 
 size_t ColumnFile::getColumnNumber(const std::string& name) {
-  const auto i = _allColumns.find(name);
+  const auto i{_allColumns.find(name)};
   if (i == _allColumns.end()) return _allColumns[name] = _allColumns.size();
   return i->second;
 }
@@ -44,7 +44,7 @@ void ColumnFile::processHeaderRow(const std::string& row, ColNames& colNames) {
   std::string header;
   for (std::stringstream ss(row); std::getline(ss, header, _delimiter); ++pos) {
     if (foundCols.contains(header)) error("duplicate header '" + header + "'");
-    const auto i = colNames.find(header);
+    const auto i{colNames.find(header)};
     if (i == colNames.end()) error("unrecognized header '" + header + "'");
     _columnToPosition[i->second.number()] = pos;
     foundCols.insert(header);
@@ -70,7 +70,7 @@ bool ColumnFile::nextRow() {
     ++_currentRow;
     size_t i{};
     std::string field;
-    for (std::stringstream ss(line); std::getline(ss, field, _delimiter); ++i) {
+    for (std::stringstream ss{line}; std::getline(ss, field, _delimiter); ++i) {
       if (i == _rowValues.size()) error("too many columns");
       _rowValues[i] = field;
     }
@@ -91,7 +91,7 @@ const std::string& ColumnFile::get(const Column& column) const {
   if (!_currentRow) error("'nextRow' must be called before calling 'get'");
   if (column.number() >= _columnToPosition.size())
     error("unrecognized column '" + column.name() + "'");
-  const auto pos = _columnToPosition[column.number()];
+  const auto pos{_columnToPosition[column.number()]};
   if (pos == ColNotFound) error("invalid column '" + column.name() + "'");
   return _rowValues[pos];
 }
@@ -111,7 +111,7 @@ unsigned long ColumnFile::processULong(const std::string& s,
 }
 
 bool ColumnFile::getBool(const Column& column) const {
-  auto& s = get(column);
+  auto& s{get(column)};
   if (s.size() == 1) switch (s[0]) {
     case 'Y':
     case 'T': return true;

@@ -41,11 +41,11 @@ TEST_F(TableTest, TableWithOnlyEmptyRows) {
 }
 
 TEST_F(TableTest, TableWithJustTitles) {
-  std::string world("world");
-  Table t({"hello", world});
+  std::string world{"world"};
+  Table t{{"hello", world}};
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+-------+-------+",
     "| hello | world |",
     "+-------+-------+"};
@@ -60,13 +60,13 @@ TEST_F(TableTest, TableWithJustTitles) {
 }
 
 TEST_F(TableTest, TableWithTitleAndEmptyRows) {
-  Table t({"hello", "world"});
+  Table t{{"hello", "world"}};
   t.add();
   t.add();
   t.add();
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+-------+-------+",
     "| hello | world |",
     "|       |       |",
@@ -84,13 +84,13 @@ TEST_F(TableTest, TableWithTitleAndEmptyRows) {
 }
 
 TEST_F(TableTest, TableWithTitleAndSectionAndEmptyRows) {
-  Table t({"hello", "world"});
+  Table t{{"hello", "world"}};
   t.add({}, true);
   t.add();
   t.add();
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+-------+-------+",
     "| hello | world |",
     "+-------+-------+",
@@ -112,7 +112,7 @@ TEST_F(TableTest, TableWithOneCell) {
   Table t;
   t.add({"a"});
   t.print(_os);
-  const char* expected[] = {"+---+", "| a |", "+---+"};
+  const char* expected[]{"+---+", "| a |", "+---+"};
   std::string line;
   int count{0}, maxLines{std::size(expected)};
   while (std::getline(_os, line)) {
@@ -128,12 +128,12 @@ TEST_F(TableTest, TableWithMultipleRowsAndColumns) {
   t.add({"1", "123"});
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+---+-----+---+",
     "| a | b   | c |",
     "| 1 | 123 |   |",
     "+---+-----+---+"};
-  const char* expectedMD[] = {
+  const char* expectedMD[]{
     "|  |  |  |",
     "| --- | --- | --- |",
     "| a | b | c |",
@@ -158,13 +158,13 @@ TEST_F(TableTest, TableWithMultipleRowsAndColumns) {
 }
 
 TEST_F(TableTest, TableWithTitleSectionsAndRows) {
-  Table t({"one", "two", "three"});
+  Table t{{"one", "two", "three"}};
   t.add({"a", "b", "c"}, true);
   t.add({"1", "123"});
   t.add({"x", "", "y", "z"}, true); // four columns
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+-----+-----+-------+---+",
     "| one | two | three |   |",
     "+-----+-----+-------+---+",
@@ -184,13 +184,13 @@ TEST_F(TableTest, TableWithTitleSectionsAndRows) {
 }
 
 TEST_F(TableTest, TableWithCount) {
-  Table t({"count", "one", "two"}, true);
+  Table t{{"count", "one", "two"}, true};
   t.add({"a", "b"}, true);
   t.add({"5", "789"}, true);
   t.add({"x"});
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+-------+-----+-----+",
     "| count | one | two |",
     "+-------+-----+-----+",
@@ -210,14 +210,14 @@ TEST_F(TableTest, TableWithCount) {
 }
 
 TEST_F(TableTest, TableWithWideCharacters) {
-  Table t({"数字", "one", "two"}, true);
+  Table t{{"数字", "one", "two"}, true};
   t.add({"a", "カタカナ"}, true);
   t.add({"5", "中"});
   t.add({"x", "y/はい"});
   t.print(_os);
   // clang-format off
   // This text aligns properly on a terminal (see comments in Table.h for more details)
-  const char* expected[] = {
+  const char* expected[]{
     "+------+-----+----------+",
     "| 数字 | one | two      |",
     "+------+-----+----------+",
@@ -226,7 +226,7 @@ TEST_F(TableTest, TableWithWideCharacters) {
     "| 3    | x   | y/はい   |",
     "+------+-----+----------+"};
   // Markdown output doesn't try to align columns (that's done by the browser or editor)
-  const char* expectedMD[] = {
+  const char* expectedMD[]{
     "| 数字 | one | two |",
     "| --- | --- | --- |",
     "| **1** | **a** | **カタカナ** |",
@@ -252,16 +252,16 @@ TEST_F(TableTest, TableWithWideCharacters) {
 }
 
 TEST_F(TableTest, EscapePipeForMarkdown) {
-  Table t({"a", "b", "c"});
+  Table t{{"a", "b", "c"}};
   t.add({"1", "1|2", "3"});
   t.print(_os);
   // clang-format off
-  const char* expected[] = {
+  const char* expected[]{
     "+---+-----+---+",
     "| a | b   | c |",
     "| 1 | 1|2 | 3 |",
     "+---+-----+---+"};
-  const char* expectedMD[] = {
+  const char* expectedMD[]{
     "| a | b | c |",
     "| --- | --- | --- |",
     "| 1 | 1\\|2 | 3 |"};
