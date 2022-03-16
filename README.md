@@ -5,16 +5,17 @@
 **[Introduction](#Introduction)**\
 **[Project Structure](#Project-Structure)**\
 **[Kana Convert](#Kana-Convert)**\
-**[Kana Conversion Chart](#Kana-Conversion-Chart)**\
+**[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
-**[Kanji Class Hierarchy](#Kanji-Class-Hierarchy)**\
-**[JLPT Kanji](#JLPT-Kanji)**\
-**[Jōyō Kanji](#Jōyō-Kanji)**\
-**[Data Directory](#Data-Directory)**\
-**[Data Directory](#Data-Directory)**\
+**[- Kanji Class Hierarchy](#Kanji-Class-Hierarchy)**\
+**[- JLPT Kanji](#JLPT-Kanji)**\
+**[- Jōyō Kanji](#Jōyō-Kanji)**\
+**[- Data Directory](#Data-Directory)**\
 **[Kanji Quiz](#Kanji-Quiz)**\
+**[- Kanji Quiz Runtime Memory](#Kanji-Quiz-Runtime-Memory)**\
+**[- Kanji Quiz Binary File Size](#Kanji-Quiz-Binary-File-Size)**\
 **[Kanji Stats](#Kanji-Stats)**\
-**[Aozora](#Aozora)**\
+**[- Aozora](#Aozora)**\
 **[Helpful Commands](#Helpful-Commands)**
 
 ## Introduction
@@ -483,6 +484,22 @@ Rad 龍(212), Strokes 16, lóng, Frq 1734, New 竜*
      Jukugo: 龍頭蛇尾（りゅうとうだび） 烏龍茶（うーろんちゃ） 画龍点睛（がりょうてんせい）
 ```
 
+Here are some runtime memory and (statically linked) file size stats for **kanjiQuiz**. These stats are more relevant for this program compared to the others since it loads more Kanji related data including all *groups* and *jukugo*. *Sanitize* data is only available for *Clang* builds (these flags cause a lot more runtime memory to be used, but slightly smaller binary file size presumably because of less inlining).
+
+### Kanji Quiz Runtime Memory
+
+| Compiler | Debug Sanitize | Debug | Release |
+| --- | --- | --- | --- |
+| Clang | 126.8 MB | 30.0 MB | 30.7 MB |
+| GCC | | 41.9 MB | 41.8 MB |
+
+### Kanji Quiz Binary File Size
+
+| Compiler | Debug Sanitize | Debug | Release |
+| --- | --- | --- | --- |
+| Clang | 8.0 MB | 8.3 MB | 744 KB |
+| GCC | | 4.3 MB | 983 KB |
+
 ## Kanji Stats
 
 The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command line options. In order to get more accurate stats about percentages of *kanji*, *hiragana* and *katakana*, the program attempts to strip away all *furigana* before counting.
@@ -507,7 +524,7 @@ Here is the output from processing a set of files containing lyrics for *中島�
 >>> Total Kana+Kanji: 208105 (Hiragana: 70.3%, Katakana: 4.5%, Kanji: 25.2%)
 ```
 
-## Aozora
+### Aozora
 
 There is also a **tests/stats/sample-data** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
 
