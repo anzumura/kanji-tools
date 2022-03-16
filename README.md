@@ -4,6 +4,7 @@
 
 **[Introduction](#Introduction)**\
 **[- Project Structure](#Project-Structure)**\
+**[- Compiler Diagnostic Flags](#Commpiler-Dianostic-Flags)**\
 **[Kana Convert](#Kana-Convert)**\
 **[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
@@ -49,6 +50,26 @@ The five libraries are:
 - **quiz**: code used by *kanjiQuiz* program (depends on **kanji** lib)
 
 The code was written using **[VS Code](https://code.visualstudio.com)** on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via *Homebrew*. It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
+
+### Compiler Diagnostic Flags
+
+The code builds without warnings using a large set of diagnostic flags such as **-Wall**, **-Wextra** (equivalent to **-W**), **-Wconversion**, etc.. **-Werror** is also included to ensure the code remains warning-free. Finally, only one type of warning has been disabled (requiring paraenthese for some expressions that seemed excessive).
+
+The following table shows flags used per compiler (**Common** shows flags used for both). Diagnostics enabled by default or enabled via another flag such as **-Wall** are not included (at least that's the intention):
+
+| Compiler | Standard | Diagnostic Flags | Disabled |
+| --- | --- | --- | --- |
+| Common | | -Wall -Wconversion -Wdeprecated -Werror -Wextra -Wextra-semi -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override -Wswitch-enum -Wzero-as-null-pointer-constant | |
+| Clang | gnu++2a | -Wcovered-switch-default -Wduplicate-enum -Wheader-hygiene -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override -Wunreachable-code-aggressive | -Wno-logical-op-parentheses |
+| GCC | gnu++20 | -Wnon-virtual-dtor -Woverloaded-virtual -Wshadow -Wuseless-cast | -Wno-parentheses |
+
+**Notes**:
+
+- **-Wpedantic** means 'Issue all the warnings demanded by strict ISO C++'
+- **-Wswitch-enum** happens even when a 'default' label exists (so it's very strict) whereas **-Wswitch** (enabled by default) only warns about a missing enum value when there is no 'default'.
+- Here are links for more info:
+  - **Clang**: https://clang.llvm.org/docs/DiagnosticsReference.html
+  - **GCC**: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 
 ## Kana Convert
 
