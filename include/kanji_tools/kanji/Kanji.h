@@ -196,8 +196,8 @@ private:
   const OptString _nonVariantName;
   const OptString _compatibilityName;
 
-  // all kanji have radical and strokes
-  const Radical _radical;
+  // all kanji have an official radical and non-zero strokes
+  const Radical& _radical; // reference to an entry in RadicalData::_radicals
   const u_int8_t _strokes;
 
   // optional fields
