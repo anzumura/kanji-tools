@@ -3,7 +3,7 @@
 ## Table of Contents
 
 **[Introduction](#Introduction)**\
-**[Project Structure](#Project-Structure)**\
+**[- Project Structure](#Project-Structure)**\
 **[Kana Convert](#Kana-Convert)**\
 **[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
@@ -29,7 +29,7 @@ This repository contains code for four 'main' programs:
 
 The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify Japanese **kanji** (漢字) characters into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code already created for the *stats* program.
 
-## Project Structure
+### Project Structure
 
 The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds five libraries, the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
 
@@ -338,7 +338,7 @@ To support **kanjiStats** and **kanjiQuiz** programs, *KanjiData* class loads an
 
 ### Kanji Class Hierarchy
 
-The following diagram is the class hierarchy for the **Kanji** class (* = abstract class).
+The following diagram shows the class hierarchy for the **Kanji** class (* = abstract class). There are currently 8 concrete types:
 
 ```;
      Kanji*
@@ -484,7 +484,7 @@ Rad 龍(212), Strokes 16, lóng, Frq 1734, New 竜*
      Jukugo: 龍頭蛇尾（りゅうとうだび） 烏龍茶（うーろんちゃ） 画龍点睛（がりょうてんせい）
 ```
 
-Here are some runtime memory and (statically linked) file size stats for **kanjiQuiz**. These stats are more relevant for this program compared to the others since it loads more Kanji related data including all *groups* and *jukugo*. *Sanitize* data is only available for *Clang* builds (these flags cause a lot more runtime memory to be used, but slightly smaller binary file size presumably because of less inlining).
+Here are some runtime memory and (statically linked) file size stats for **kanjiQuiz**. These stats are more relevant for this program compared to the others since it loads more Kanji related data including all *groups* and *jukugo*. *Sanitize* stats are only available for *Clang* - they cause a lot more runtime memory to be used, but slightly smaller debug binary file size (presumably because of less inlining).
 
 ### Kanji Quiz Runtime Memory
 
