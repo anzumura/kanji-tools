@@ -4,7 +4,7 @@
 
 **[Introduction](#Introduction)**\
 **[- Project Structure](#Project-Structure)**\
-**[- Compiler Diagnostic Flags](#Commpiler-Dianostic-Flags)**\
+**[- Compiler Diagnostic Flags](#Compiler-Diagnostic-Flags)**\
 **[Kana Convert](#Kana-Convert)**\
 **[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
