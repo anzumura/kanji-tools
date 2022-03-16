@@ -147,7 +147,7 @@ private:
   // starting at 'location'
   [[nodiscard]] static auto getMBUtf8(const char*& location) {
     const auto firstOfGroup{static_cast<unsigned char>(*location)};
-    std::string result({*location++});
+    std::string result{*location++};
     for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1)
       result += *location++;
     return result;

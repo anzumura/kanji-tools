@@ -11,12 +11,9 @@ namespace {
 std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
-const Choice::Choices PatternGroupChoices({{'1', "ア"},
-                                           {'2', "カ"},
-                                           {'3', "サ"},
-                                           {'4', "タ、ナ"},
-                                           {'5', "ハ、マ"},
-                                           {'6', "ヤ、ラ、ワ"}});
+const Choice::Choices PatternGroupChoices{{'1', "ア"},     {'2', "カ"},
+                                          {'3', "サ"},     {'4', "タ、ナ"},
+                                          {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}};
 
 constexpr auto DefaultPatternGroup{'1'};
 

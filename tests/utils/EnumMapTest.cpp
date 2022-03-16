@@ -44,7 +44,7 @@ TEST_F(EnumMapTest, NoneThrowsErrorForNonConstOperator) {
 TEST_F(EnumMapTest, RangeBasedForLoop) {
   std::vector<int> values;
   for (auto i : _map) values.push_back(i);
-  EXPECT_EQ(values, std::vector({2, 4, 7}));
+  EXPECT_EQ(values, (std::vector{2, 4, 7}));
 }
 
 TEST_F(EnumMapTest, UninitializedIterator) {

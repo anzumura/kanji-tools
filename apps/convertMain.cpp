@@ -240,9 +240,9 @@ void ConvertMain::printKanaChart(bool markdown) const {
   u_int8_t hanDakutenMonographs{}, small{}, plainMonographs{},
     dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
     dakutenDigraphs{}, romajiVariants{};
-  Table table({"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
+  Table table{{"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
                "Kunr", "Roma Variants"},
-              true);
+              true};
   const std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when
   // there are small letters that should be included, i.e., 'la' (ぁ) comes

@@ -66,14 +66,14 @@ TEST(EnumArrayTest, CallCreateTwice) {
 TEST(EnumArrayTest, Iteration) {
   std::vector<Colors> colors;
   for (size_t i{}; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
-  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
+  EXPECT_EQ(colors, (std::vector{Colors::Red, Colors::Green, Colors::Blue}));
 }
 
 TEST(EnumArrayTest, IterationInt) {
   std::vector<Colors> colors;
   // test the int overload of operator[]
   for (int i{}; i < 3; ++i) colors.push_back(AllColors[i]);
-  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
+  EXPECT_EQ(colors, (std::vector{Colors::Red, Colors::Green, Colors::Blue}));
 }
 
 TEST(EnumArrayTest, BadAccess) {
@@ -88,7 +88,7 @@ TEST(EnumArrayTest, BadAccess) {
 TEST(EnumArrayTest, RangeBasedForLoop) {
   std::vector<Colors> colors;
   for (auto c : AllColors) colors.push_back(c);
-  EXPECT_EQ(colors, std::vector({Colors::Red, Colors::Green, Colors::Blue}));
+  EXPECT_EQ(colors, (std::vector{Colors::Red, Colors::Green, Colors::Blue}));
 }
 
 TEST(EnumArrayTest, BadIncrement) {

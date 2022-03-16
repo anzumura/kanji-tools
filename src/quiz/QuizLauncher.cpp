@@ -46,28 +46,21 @@ or 'u' followed by Unicode. For example, theses all produce the same output:
   kanjiQuiz u5949
 )"};
 
-const Choice::Choices ProgramModeChoices({{'r', "review"}, {'t', "test"}}),
-  ListOrderChoices({{'b', "from beginning"},
-                    {'e', "from end"},
-                    {'r', "random"}}),
-  QuizTypeChoices({{'f', "freq"},
-                   {'g', "grade"},
-                   {'k', "kyu"},
-                   {'l', "JLPT"},
-                   {'m', "meaning"},
-                   {'p', "pattern"}}),
-  FrequencyChoices({{'1', "1-500"},
-                    {'2', "501-1000"},
-                    {'3', "1001-1500"},
-                    {'4', "1501-2000"},
-                    {'5', "2001-2501"}}),
-  GradeChoices({{'s', "Secondary School"}}),
-  KyuChoices({{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}}),
-  LevelChoices(
-    {{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}}),
-  ListStyleChoices({{'k', "kanji to reading"}, {'r', "reading to kanji"}}),
-  GroupKanjiChoices(
-    {{'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}});
+const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
+  ListOrderChoices{{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}},
+  QuizTypeChoices{{'f', "freq"}, {'g', "grade"},   {'k', "kyu"},
+                  {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}},
+  FrequencyChoices{{'1', "1-500"},
+                   {'2', "501-1000"},
+                   {'3', "1001-1500"},
+                   {'4', "1501-2000"},
+                   {'5', "2001-2501"}},
+  GradeChoices{{'s', "Secondary School"}},
+  KyuChoices{{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}},
+  LevelChoices{{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}},
+  ListStyleChoices{{'k', "kanji to reading"}, {'r', "reading to kanji"}},
+  GroupKanjiChoices{
+    {'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}};
 
 constexpr auto GradeStart{'1'}, GradeEnd{'6'}, KyuStart{'1'}, KyuEnd{'9'},
   ListChoiceCountStart{'2'}, ListChoiceCountEnd{'9'};

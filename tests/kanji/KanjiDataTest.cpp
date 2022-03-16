@@ -55,7 +55,7 @@ TEST(DataTest, NextArgWithMultipleArgs) {
   for (auto i{Data::nextArg(argc, argv)}; i < argc;
        i = Data::nextArg(argc, argv, i))
     actualArgs.push_back(argv[i]);
-  EXPECT_EQ(actualArgs, std::vector<const char*>({arg1, arg3, arg6}));
+  EXPECT_EQ(actualArgs, (std::vector{arg1, arg3, arg6}));
 }
 
 class KanjiDataTest : public ::testing::Test {
@@ -117,7 +117,7 @@ TEST_F(KanjiDataTest, FrequencyKanjiChecks) {
   EXPECT_EQ((**yeast).kyu(), KenteiKyus::KJ1);
   EXPECT_EQ((**yeast).frequency(), 1988);
   EXPECT_FALSE((**yeast).newName());
-  EXPECT_EQ((**yeast).oldNames(), Kanji::LinkNames({"麴"}));
+  EXPECT_EQ((**yeast).oldNames(), Kanji::LinkNames{"麴"});
   EXPECT_EQ((**yeast).reading(), "キク、こうじ");
   EXPECT_EQ((**yeast).meaning(), "yeast, leaven; surname");
 }
@@ -131,7 +131,7 @@ TEST_F(KanjiDataTest, ExtraKanjiChecks) {
   EXPECT_EQ((**grab).kyu(), KenteiKyus::KJ1);
   EXPECT_FALSE((**grab).frequency());
   EXPECT_FALSE((**grab).newName());
-  EXPECT_EQ((**grab).oldNames(), Kanji::LinkNames({"摑"}));
+  EXPECT_EQ((**grab).oldNames(), Kanji::LinkNames{"摑"});
   EXPECT_EQ((**grab).reading(), "カク、つか-む、つか-まえる、つか-まる");
   EXPECT_EQ((**grab).meaning(), "catch");
 }
@@ -197,7 +197,7 @@ TEST_F(KanjiDataTest, TotalsChecks) {
 }
 
 TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
-  std::vector<std::string> list({"弓", "弖", "窮", "弼", "穹", "躬"});
+  std::vector<std::string> list{"弓", "弖", "窮", "弼", "穹", "躬"};
   Data::List kanjis;
   for (auto& i : list) {
     const auto k{_data->findKanjiByName(i)};
@@ -224,7 +224,7 @@ TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
 TEST_F(KanjiDataTest, FindByName) {
   const auto result{_data->findKanjiByName("響︀")};
   ASSERT_TRUE(result);
-  auto& k = **result;
+  auto& k{**result};
   EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ(k.name(), "響︀");
   EXPECT_EQ(k.radical(), _data->getRadicalByName("音"));
@@ -268,16 +268,16 @@ TEST_F(KanjiDataTest, FindKanjisByNelsonId) {
   for (u_int16_t i{1}; i < 5447; ++i)
     if (_data->findKanjisByNelsonId(i).empty()) missingNelsonIds.push_back(i);
   // There are a few Nelson IDs that are missing from UCD data
-  EXPECT_EQ(missingNelsonIds, std::vector({125U, 149U, 489U, 1639U}));
+  EXPECT_EQ(missingNelsonIds, (std::vector{125U, 149U, 489U, 1639U}));
   EXPECT_EQ(_data->findKanjisByNelsonId(1)[0]->name(), "一");
   EXPECT_EQ(_data->findKanjisByNelsonId(5446)[0]->name(), "龠");
 }
 
 TEST_F(KanjiDataTest, KanjiWithMultipleOldNames) {
   // kanji with 3 old names
-  auto result3 = _data->findKanjiByName("弁");
+  auto result3{_data->findKanjiByName("弁")};
   ASSERT_TRUE(result3);
-  EXPECT_EQ((**result3).oldNames(), Kanji::LinkNames({"辨", "瓣", "辯"}));
+  EXPECT_EQ((**result3).oldNames(), (Kanji::LinkNames{"辨", "瓣", "辯"}));
   EXPECT_EQ((**result3).info(KanjiInfo::Old), "Old 辨／瓣／辯");
   for (auto& i : (**result3).oldNames()) {
     const auto old{_data->findKanjiByName(i)};
@@ -308,13 +308,13 @@ TEST_F(KanjiDataTest, KanjiWithMultipleNelsonIds) {
   ASSERT_NE(ucdNelson, nullptr);
   EXPECT_EQ(ucdNelson->nelsonIds(), "1487,1491");
   auto& kanjiNelson{**_data->findKanjiByName(ucdNelson->name())};
-  EXPECT_EQ(kanjiNelson.nelsonIds(), Kanji::NelsonIds({1487, 1491}));
+  EXPECT_EQ(kanjiNelson.nelsonIds(), (Kanji::NelsonIds{1487, 1491}));
   auto& ids{_data->findKanjisByNelsonId(1491)};
   ASSERT_EQ(ids.size(), 3);
 }
 
 TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
-  const std::string north("北"), variantNorth("北");
+  const std::string north{"北"}, variantNorth{"北"};
   EXPECT_EQ(toUnicode(north), "5317");
   EXPECT_EQ(toUnicode(variantNorth), "F963");
   EXPECT_NE(north, variantNorth);
