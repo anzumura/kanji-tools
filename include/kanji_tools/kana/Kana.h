@@ -12,7 +12,9 @@ namespace kanji_tools {
 // 'CharType' is used to specify 'source' and 'target' types for
 // 'KanaConvert::convert' methods
 enum class CharType { Hiragana, Katakana, Romaji };
+
 template<> inline constexpr auto is_enumarray<CharType>{true};
+
 inline const auto CharTypes{
     BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
@@ -57,6 +59,7 @@ enum class ConvertFlags {
   NoProlongMark = 4,
   RemoveSpaces = 8
 };
+
 template<> inline constexpr auto is_bitmask<ConvertFlags>{true};
 
 // 'Kana' is used to represent a Kana 'Monograph' or 'Digraph'. It stores

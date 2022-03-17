@@ -16,7 +16,7 @@ public:
   // Implement the base class functions used during Kanji construction
   [[nodiscard]] Kanji::OptU16 frequency(const std::string& s) const override {
     const auto x{_frequency.get(s)};
-    return x ? Kanji::OptU16(x) : std::nullopt;
+    return x ? Kanji::OptU16{x} : std::nullopt;
   }
   [[nodiscard]] JlptLevels level(const std::string&) const override;
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;

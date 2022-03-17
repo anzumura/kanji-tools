@@ -16,6 +16,7 @@ enum class TestEnum { A, B, C, None };
 } // namespace
 
 template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
+
 inline const auto AllColors{
     BaseEnumArray<Colors>::create("Red", "Green", "Blue")};
 

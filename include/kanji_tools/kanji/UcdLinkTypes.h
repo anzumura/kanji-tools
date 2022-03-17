@@ -15,7 +15,9 @@ enum class UcdLinkTypes {
   Traditional,
   None
 };
+
 template<> inline constexpr auto is_enumarray_with_none<UcdLinkTypes>{true};
+
 inline const auto AllUcdLinkTypes{
     BaseEnumArray<UcdLinkTypes>::create("Compatibility", "Definition", "Jinmei",
         "Semantic", "Simplified", "Traditional")};
