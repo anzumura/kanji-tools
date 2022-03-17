@@ -13,6 +13,8 @@ protected:
   using Choices = QuizLauncher::Choices;
   using Entry = QuizLauncher::Entry;
   using OptChar = QuizLauncher::OptChar;
+  using Question = QuizLauncher::Question;
+  using QuestionOrder = QuizLauncher::QuestionOrder;
 
   // Below are some options used in for quiz questions. These are all ascii
   // symbols that come before letters and numbers so that 'Choice::get' method
@@ -20,7 +22,7 @@ protected:
   // just letters and/or numbers).
   static constexpr auto MeaningsOption{'-'}, PrevOption{','}, SkipOption{'.'};
 
-  Quiz(const QuizLauncher& launcher, u_int16_t question, bool showMeanings)
+  Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
       : _launcher{launcher}, _question{question}, _correctAnswers{0},
         _showMeanings{showMeanings} {}
 
@@ -61,9 +63,9 @@ protected:
   void toggleMeanings(Choices&);
 
   const QuizLauncher& _launcher;
-  u_int16_t _question;
+  Question _question;
 private:
-  u_int16_t _correctAnswers;
+  Question _correctAnswers;
   DataFile::List _mistakes;
   bool _showMeanings;
 };

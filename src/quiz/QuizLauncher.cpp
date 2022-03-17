@@ -103,7 +103,7 @@ QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
     }
   }};
 
-  u_int16_t question{};
+  Question question{};
   auto endOptions{false}, showMeanings{false};
   for (auto i{Data::nextArg(argc, argv)}; i < argc;
        i = Data::nextArg(argc, argv, i))
@@ -138,7 +138,7 @@ QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
 }
 
 void QuizLauncher::start(
-    OptChar quizType, OptChar qList, u_int16_t question, bool meanings) {
+    OptChar quizType, OptChar qList, Question question, bool meanings) {
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
@@ -285,15 +285,15 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   out() << '\n';
 }
 
-void QuizLauncher::startListQuiz(u_int16_t question, bool showMeanings,
+void QuizLauncher::startListQuiz(Question question, bool showMeanings,
     KanjiInfo excludeField, const List& list) const {
-  u_int8_t choiceCount{1};
+  ListQuiz::ChoiceCount choiceCount{1};
   auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
     const auto c{_choice.get("Number of choices", ListChoiceCountStart,
         ListChoiceCountEnd, DefaultListChoiceCount)};
     if (isQuit(c)) return;
-    choiceCount = static_cast<u_int8_t>(c - '0');
+    choiceCount = static_cast<ListQuiz::ChoiceCount>(c - '0');
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);
     if (isQuit(quizStyle)) return;
   }
@@ -301,7 +301,7 @@ void QuizLauncher::startListQuiz(u_int16_t question, bool showMeanings,
       choiceCount, ListQuiz::toQuizStyle(quizStyle));
 }
 
-void QuizLauncher::startGroupQuiz(u_int16_t question, bool showMeanings,
+void QuizLauncher::startGroupQuiz(Question question, bool showMeanings,
     OptChar qList, const GroupData::List& list) const {
   if (const auto c{qList ? *qList
                          : _choice.get("Kanji type", GroupKanjiChoices,
@@ -311,7 +311,8 @@ void QuizLauncher::startGroupQuiz(u_int16_t question, bool showMeanings,
         static_cast<GroupQuiz::MemberType>(c - '1'));
 }
 
-u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
+QuizLauncher::Question QuizLauncher::processProgramModeArg(
+    const std::string& arg) {
   if (_programMode != ProgramMode::NotAssigned)
     Data::usage("only one mode (-r or -t) can be specified, use -h for help");
   _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
@@ -332,8 +333,8 @@ u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
         Data::usage(
             "invalid format for " + arg.substr(0, 2) + ", use -h for help");
       if (const auto i{std::stoul(s)};
-          i <= std::numeric_limits<u_int16_t>::max())
-        return static_cast<u_int16_t>(i);
+          i <= std::numeric_limits<Question>::max())
+        return static_cast<Question>(i);
       Data::usage("value for " + arg.substr(0, 2) + " exceeds limit");
     }
   }

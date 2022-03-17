@@ -28,9 +28,9 @@ constexpr auto TotalLetters{'z' - 'a'};
 
 } // namespace
 
-GroupQuiz::GroupQuiz(const QuizLauncher& launcher, u_int16_t question,
+GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
     bool showMeanings, const GroupData::List& list, MemberType memberType)
-    : Quiz(launcher, question, showMeanings), _groupType(getGroupType(list)) {
+    : Quiz{launcher, question, showMeanings}, _groupType{getGroupType(list)} {
   std::optional<size_t> bucket;
   // for 'pattern' groups, allow choosing a smaller subset (based on 'reading')
   if (_groupType == GroupType::Pattern) {
@@ -38,7 +38,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, u_int16_t question,
     if (isQuit(c)) return;
     bucket = c - '1';
   }
-  if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::FromBeginning &&
+  if (_launcher.questionOrder() == QuestionOrder::FromBeginning &&
       memberType == All && !bucket)
     start(list, memberType);
   else {
@@ -60,9 +60,9 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, u_int16_t question,
         if (memberCount > 1) newList.push_back(i);
       }
     }
-    if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::FromEnd)
+    if (_launcher.questionOrder() == QuestionOrder::FromEnd)
       std::reverse(newList.begin(), newList.end());
-    else if (_launcher.questionOrder() == QuizLauncher::QuestionOrder::Random)
+    else if (_launcher.questionOrder() == QuestionOrder::Random)
       std::shuffle(newList.begin(), newList.end(), RandomGen);
     start(newList, memberType);
   }
@@ -71,7 +71,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, u_int16_t question,
 GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
   const auto i{list.begin()};
   return i != list.end() ? (**i).type()
-                         : throw std::domain_error("empty group list");
+                         : throw std::domain_error{"empty group list"};
 }
 
 bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
@@ -115,8 +115,8 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
     List questions, readings;
     for (auto& j : i->members())
       if (includeMember(j, memberType)) {
-        questions.push_back(j);
-        readings.push_back(j);
+        questions.emplace_back(j);
+        readings.emplace_back(j);
       }
     if (isTestMode()) {
       std::shuffle(questions.begin(), questions.end(), RandomGen);
@@ -215,7 +215,7 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
     case EditOption: editAnswer(choices); break;
     default:
       if (isQuit(answer)) return false;
-      _answers.push_back(answer);
+      _answers.emplace_back(answer);
       choices.erase(answer);
       if (_answers.size() == 1) {
         choices[EditOption] = "edit";
@@ -244,7 +244,7 @@ void GroupQuiz::editAnswer(Choices& choices) {
 }
 
 size_t GroupQuiz::getAnswerToEdit() const {
-  static const std::string AnswerToEdit("    Answer to edit: ");
+  static const std::string AnswerToEdit{"    Answer to edit: "};
 
   if (_answers.size() == 1) return 0;
   std::map<char, std::string> answersToEdit;
