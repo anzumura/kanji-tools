@@ -36,7 +36,7 @@ void DataFile::print(const List& l, const std::string& type,
 
 DataFile::DataFile(const fs::path& fileIn, FileType fileType,
     bool createNewUniqueFile, Set* uniqueTypeNames, const std::string& name)
-    : _name(name.empty() ? capitalize(fileIn.stem().string()) : name) {
+    : _name(name.empty() ? firstUpper(fileIn.stem().string()) : name) {
   auto file{fileIn};
   // try adding .txt if file isn't found
   if (!fs::is_regular_file(file) && !fileIn.has_extension())

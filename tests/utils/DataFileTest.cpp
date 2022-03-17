@@ -117,4 +117,18 @@ TEST_F(DataFileTest, DuplicateSymbol) {
       std::domain_error);
 }
 
+TEST(DataFileFunctionsTest, FirstLower) {
+  const std::string empty, lower{"aBcD"}, upper{"EfGh"};
+  EXPECT_EQ(firstLower(empty), empty);
+  EXPECT_EQ(firstLower(lower), lower);
+  EXPECT_EQ(firstLower(upper), "efGh");
+}
+
+TEST(DataFileFunctionsTest, FirstUpper) {
+  const std::string empty, lower{"aBcD"}, upper{"EfGh"};
+  EXPECT_EQ(firstUpper(empty), empty);
+  EXPECT_EQ(firstUpper(lower), "ABcD");
+  EXPECT_EQ(firstUpper(upper), upper);
+}
+
 } // namespace kanji_tools
