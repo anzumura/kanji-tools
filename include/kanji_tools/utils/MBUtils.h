@@ -11,7 +11,7 @@ namespace kanji_tools {
 // a 'range_error'. Also, 'wstring_convert' was depecated as of C++17 (see
 // http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
 
-// uncomment the following line to use 'codecvt' (may remove this soon):
+// uncomment the following line to use 'codecvt' (may remove this later):
 //#define USE_CODECVT_FOR_UTF_8
 
 [[nodiscard]] std::u32string fromUtf8(const char*);
@@ -69,11 +69,10 @@ enum class BracketType { Curly, Round, Square, None };
 }
 
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
-// of 'x' ('x' must be integer type). 'minSize' of '0' (the default) causes
-// leading zeroes to be added to make strings the same size for a given type,
-// i.e., if 'x' is char then toHex returns a string of size 2 and toBinary
-// returns a string of size 8. 'minSize' is ignored if it's less than 'result'
-// size.
+// of 'x' ('x' must be integral). 'minSize' 0 (the default) causes leading
+// zeroes to be added to make strings the same size for a given type, i.e., if
+// 'x' is char then toHex returns a string of size 2 and toBinary returns a
+// string of size 8. 'minSize' is ignored if it's less than 'result' size.
 
 template<typename T>
 [[nodiscard]] inline auto toBinary(
@@ -164,13 +163,15 @@ template<>
   return addBrackets(result, brackets);
 }
 
-// check if a given char or string is not a 'multi-byte char'
+// 'isSingle..' functions return false if a given char or string is 'multi-byte'
+
 [[nodiscard]] constexpr auto isSingleByteChar(char x) noexcept {
   return x >= 0;
 }
 [[nodiscard]] constexpr auto isSingleByteChar(char32_t x) noexcept {
   return x < 128;
 }
+
 [[nodiscard]] inline auto isSingleByte(
     const std::string& s, bool sizeOne = true) noexcept {
   return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);
@@ -179,6 +180,7 @@ template<>
     const std::u32string& s, bool sizeOne = true) noexcept {
   return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);
 }
+
 [[nodiscard]] inline auto isAllSingleByte(const std::string& s) noexcept {
   for (const auto i : s)
     if (!isSingleByteChar(i)) return false;
@@ -189,6 +191,7 @@ template<>
     if (!isSingleByteChar(i)) return false;
   return true;
 }
+
 [[nodiscard]] inline auto isAnySingleByte(const std::string& s) noexcept {
   for (const auto i : s)
     if (isSingleByteChar(i)) return true;
