@@ -53,7 +53,7 @@ void Quiz::correctMessage() {
 }
 
 std::ostream& Quiz::incorrectMessage(const std::string& name) {
-  _mistakes.push_back(name);
+  _mistakes.emplace_back(name);
   return out() << "  Incorrect";
 }
 
