@@ -24,19 +24,20 @@ private:
   // functions to print loaded data if _debug is true
   void noFreq(long f, bool brackets = false) const; // print no-freq count
   template<typename T>
-  void printCount(
-      const std::string& name, T pred, size_t printExamples = 0) const;
+  void printCount(const std::string& name, T pred, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
   template<typename T, size_t S>
   void printListStats(const IterableEnumArray<T, S>&, T (Kanji::*)() const,
       const std::string&, bool showNoFrequency) const;
 
+  template<typename V, size_t N> using List = const std::array<const V, N - 1>;
+
   // '_levels' (for JLPT) loaded from files under 'data/jlpt'
-  const std::array<const LevelDataFile, AllJlptLevels.size() - 1> _levels;
+  List<LevelDataFile, AllJlptLevels.size()> _levels;
 
   // '_kyus' (for Kanji Kentei) loaded from files under 'data/kentei'
-  const std::array<const KyuDataFile, AllKenteiKyus.size() - 1> _kyus;
+  List<KyuDataFile, AllKenteiKyus.size()> _kyus;
 
   // top 2501 frequency kanji loaded from 'data/frequency.txt'
   const DataFile _frequency;
