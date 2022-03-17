@@ -22,7 +22,7 @@ public:
   class Column {
   public:
     Column(const std::string& name)
-        : _name(name), _number(ColumnFile::getColumnNumber(name)) {}
+        : _name{name}, _number{ColumnFile::getColumnNumber(name)} {}
 
     [[nodiscard]] auto operator==(const Column& rhs) const {
       return _number == rhs._number;
@@ -116,8 +116,8 @@ public:
   // overload for reporting a problem with a specific value for a column
   void error(
       const std::string& msg, const Column& c, const std::string& s) const {
-    throw std::domain_error(
-        errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'");
+    throw std::domain_error{
+        errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'"};
   }
 
   [[nodiscard]] auto columns() const { return _rowValues.size(); }

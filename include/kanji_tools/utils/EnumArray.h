@@ -129,8 +129,8 @@ public:
     }
   };
 
-  [[nodiscard]] static auto begin() noexcept { return ConstIterator(0); }
-  [[nodiscard]] static auto end() noexcept { return ConstIterator(N); }
+  [[nodiscard]] static auto begin() noexcept { return ConstIterator{0}; }
+  [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
 
   template<std::integral I> [[nodiscard]] auto operator[](I i) const {
     return static_cast<T>(base::checkIndex(i, base::Index));

@@ -13,7 +13,7 @@ public:
   [[nodiscard]] const std::string& reading() const override { return _reading; }
 protected:
   // used by UcdFileKanji and ExtraKanji to populate links from Ucd data
-  [[nodiscard]] static auto getLinkNames(const Ucd* u) {
+  [[nodiscard]] static auto linkNames(const Ucd* u) {
     LinkNames result;
     if (u && u->hasLinks())
       std::transform(u->links().begin(), u->links().end(),
@@ -25,16 +25,16 @@ protected:
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical,
       const std::string& meaning, const std::string& reading, u_int8_t strokes,
       const Ucd* u)
-      : Kanji(name, d.getCompatibilityName(name), radical, strokes,
-            d.getMorohashiId(u), d.getNelsonIds(u), d.getPinyin(u)),
-        _meaning(meaning), _reading(reading) {}
+      : Kanji{name, d.getCompatibilityName(name), radical, strokes,
+            d.getMorohashiId(u), d.getNelsonIds(u), d.getPinyin(u)},
+        _meaning{meaning}, _reading{reading} {}
 
   // constructor used by 'CustomFileKanji' and 'UcdFileKanji': has 'reading' and
   // looks up 'meaning'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& rad,
       const std::string& reading, u_int8_t strokes, const Ucd* u)
-      : NonLinkedKanji(
-            d, name, rad, d.ucd().getMeaning(u), reading, strokes, u) {}
+      : NonLinkedKanji{
+            d, name, rad, d.ucd().getMeaning(u), reading, strokes, u} {}
 private:
   const std::string _meaning;
   const std::string _reading;

@@ -5,6 +5,7 @@
 namespace kanji_tools {
 
 enum class GroupType { Meaning, Pattern };
+
 inline auto& operator<<(std::ostream& os, const GroupType& x) {
   return os << (x == GroupType::Meaning ? "Meaning" : "Pattern");
 }
@@ -39,7 +40,7 @@ public:
   enum class PatternType { Family, Peer, Reading, None };
 
   Group(size_t number, const std::string& name, const Data::List& members)
-      : _number(number), _name(name), _members(members) {}
+      : _number{number}, _name{name}, _members{members} {}
 
   Group(const Group&) = delete;
   // operator= is not generated since there are const members
@@ -66,7 +67,7 @@ class MeaningGroup : public Group {
 public:
   MeaningGroup(
       size_t number, const std::string& name, const Data::List& members)
-      : Group(number, name, members) {}
+      : Group{number, name, members} {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Meaning; }
 };
@@ -75,7 +76,7 @@ class PatternGroup : public Group {
 public:
   PatternGroup(size_t number, const std::string& name,
       const Data::List& members, PatternType patternType)
-      : Group(number, name, members), _patternType(patternType) {}
+      : Group{number, name, members}, _patternType{patternType} {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }
   [[nodiscard]] PatternType patternType() const override {

@@ -98,8 +98,8 @@ public:
   };
 
   // only support 'const' iteration
-  [[nodiscard]] auto begin() const noexcept { return ConstIterator(0, *this); }
-  [[nodiscard]] auto end() const noexcept { return ConstIterator(N, *this); }
+  [[nodiscard]] auto begin() const noexcept { return ConstIterator{0, *this}; }
+  [[nodiscard]] auto end() const noexcept { return ConstIterator{N, *this}; }
 
   [[nodiscard]] auto& operator[](T i) const {
     return i == T::None ? BaseEnumMap<V>::Empty

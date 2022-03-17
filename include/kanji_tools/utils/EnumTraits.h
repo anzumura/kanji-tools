@@ -16,7 +16,7 @@ struct is_scoped_enum<T, true>
           !std::is_convertible_v<T, std::underlying_type_t<T>>> {};
 
 template<typename T>
-inline constexpr bool is_scoped_enum_v = is_scoped_enum<T>::value;
+inline constexpr auto is_scoped_enum_v{is_scoped_enum<T>::value};
 
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 [[nodiscard]] constexpr auto to_underlying(T x) noexcept {

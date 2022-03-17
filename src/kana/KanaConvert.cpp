@@ -10,13 +10,13 @@ namespace kanji_tools {
 namespace {
 
 using P = std::pair<char, const char*>;
-constexpr std::array Delimiters{P(' ', "　"), P('.', "。"), P(',', "、"),
-    P(':', "："), P(';', "；"), P('/', "・"), P('!', "！"), P('?', "？"),
-    P('(', "（"), P(')', "）"), P('[', "「"), P(']', "」"), P('*', "＊"),
-    P('~', "〜"), P('=', "＝"), P('+', "＋"), P('@', "＠"), P('#', "＃"),
-    P('$', "＄"), P('%', "％"), P('^', "＾"), P('&', "＆"), P('{', "『"),
-    P('}', "』"), P('|', "｜"), P('"', "”"), P('`', "｀"), P('<', "＜"),
-    P('>', "＞"), P('_', "＿"), P('\\', "￥")};
+constexpr std::array Delimiters{P{' ', "　"}, P{'.', "。"}, P{',', "、"},
+    P{':', "："}, P{';', "；"}, P{'/', "・"}, P{'!', "！"}, P{'?', "？"},
+    P{'(', "（"}, P{')', "）"}, P{'[', "「"}, P{']', "」"}, P{'*', "＊"},
+    P{'~', "〜"}, P{'=', "＝"}, P{'+', "＋"}, P{'@', "＠"}, P{'#', "＃"},
+    P{'$', "＄"}, P{'%', "％"}, P{'^', "＾"}, P{'&', "＆"}, P{'{', "『"},
+    P{'}', "』"}, P{'|', "｜"}, P{'"', "”"}, P{'`', "｀"}, P{'<', "＜"},
+    P{'>', "＞"}, P{'_', "＿"}, P{'\\', "￥"}};
 
 } // namespace
 
@@ -155,7 +155,7 @@ std::string KanaConvert::convertFromKana(const std::string& input,
       letterGroup.clear();
     }
   }};
-  for (MBChar s(input); s.next(letter, false);) {
+  for (MBChar s{input}; s.next(letter, false);) {
     // check prolong and repeating marks first since they aren't in 'sourceMap'
     if (letter == Kana::ProlongMark)
       // prolong is 'katakana', but it can appear in (non-standard) Hiragana.
@@ -292,7 +292,7 @@ std::string KanaConvert::convertFromRomaji(const std::string& input) const {
 
 bool KanaConvert::romajiMacronLetter(const std::string& letter,
     std::string& letterGroup, std::string& result) const {
-  static const std::map<std::string, std::pair<char, std::string>> Macrons = {
+  static const std::map<std::string, std::pair<char, std::string>> Macrons{
       {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, {"ū", {'u', "う"}},
       {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
 
@@ -318,7 +318,8 @@ void KanaConvert::romajiLetters(
     letterGroup.clear();
   } else if (letterGroup.size() == 3) {
     // convert first letter to small tsu if letter repeats and is a valid
-    // consonant (also allow 'tc' combination)
+    // consonant (also allow 'tc' combination) otherwise output the first letter
+    // unconverted since no valid romaji can be longer than 3 letters
     result +=
         letterGroup[0] == 'n' ? getN()
         : letterGroup[0] == letterGroup[1] ||
@@ -326,9 +327,7 @@ void KanaConvert::romajiLetters(
             ? _repeatingConsonents.contains(letterGroup[0])
                   ? getSmallTsu()
                   : letterGroup.substr(0, 1) // error: first letter not valid
-            : letterGroup.substr(0,
-                  1); // error: no romaji is longer than 3 chars
-                      // so output the first letter unconverted
+            : letterGroup.substr(0, 1);      // error: first letter not valid
     letterGroup = letterGroup.substr(1);
     // try converting the shortened letterGroup
     romajiLetters(letterGroup, result);

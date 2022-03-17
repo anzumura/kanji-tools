@@ -32,7 +32,7 @@ protected:
 
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
-    BaseIterator(size_t index) noexcept : _index(index) {}
+    BaseIterator(size_t index) noexcept : _index{index} {}
 
     size_t _index;
   };
@@ -98,7 +98,7 @@ protected:
       return x -= i;
     }
   protected:
-    Iterator(size_t index) noexcept : BaseIterator(index) {}
+    Iterator(size_t index) noexcept : BaseIterator{index} {}
   private:
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);
@@ -118,7 +118,7 @@ protected:
         msg += "enum value " + std::to_string(x);
       else // use original value in error message (so int '-1' is preserved)
         msg += std::to_string(i);
-      throw std::out_of_range(msg + Range);
+      throw std::out_of_range{msg + Range};
     }
     return x;
   }

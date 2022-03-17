@@ -23,7 +23,7 @@ constexpr size_t TextFilesInDataDir{12};
 
 Data::Data(const std::filesystem::path& dataDir, DebugMode debugMode,
     std::ostream& out, std::ostream& err)
-    : _dataDir(dataDir), _debugMode(debugMode), _out(out), _err(err) {
+    : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
   // Clearing DataFile static data is only needed to help test code, for example
   // DataFile tests can leave some data in these sets before Quiz tests are run
   // (leading to problems loading real files).
@@ -52,7 +52,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 fs::path Data::getDataDir(u_int8_t argc, const char** argv) {
   static const auto DataDir{fs::path{"data"}};
 
-  std::optional<fs::path> found{};
+  std::optional<fs::path> found;
   for (u_int8_t i{1}; !found && i < argc; ++i)
     if (argv[i] == dataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
@@ -177,7 +177,7 @@ void Data::printError(const std::string& msg) const {
 }
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
-  std::ifstream f(file);
+  std::ifstream f{file};
   u_int8_t strokes{};
   for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
@@ -187,7 +187,7 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
       strokes = static_cast<u_int8_t>(newStrokes);
     } else {
       assert(strokes != 0); // first line must have a stroke count
-      for (std::stringstream ss(line); std::getline(ss, line, ' ');)
+      for (std::stringstream ss{line}; std::getline(ss, line, ' ');)
         if (const auto i{_strokes.insert(std::pair(line, strokes))};
             !i.second) {
           if (checkDuplicates)
@@ -200,8 +200,8 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
 }
 
 void Data::loadFrequencyReadings(const fs::path& file) {
-  const ColumnFile::Column nameCol("Name"), readingCol("Reading");
-  for (ColumnFile f(file, {nameCol, readingCol}); f.nextRow();)
+  const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
+  for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
     if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
       f.error("duplicate name");
 }
@@ -212,7 +212,7 @@ void Data::populateJouyou() {
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(hasValue(i->grade()));
-    if (checkInsert(i)) _grades[i->grade()].push_back(i);
+    if (checkInsert(i)) _grades[i->grade()].emplace_back(i);
   }
   _types[KanjiTypes::Jouyou] = std::move(results);
   populateLinkedKanji();
@@ -220,11 +220,11 @@ void Data::populateJouyou() {
 
 void Data::populateLinkedKanji() {
   fs::path file{DataFile::getFile(_dataDir, LinkedJinmeiFile)};
-  std::ifstream f(file);
+  std::ifstream f{file};
   // populate _linkedJinmeiKanji that are linked to Jouyou
   auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
   for (std::string line; std::getline(f, line);) {
-    std::stringstream ss(line);
+    std::stringstream ss{line};
     if (std::string jouyou, linked;
         std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
       if (const auto i{_kanjiNameMap.find(jouyou)}; i == _kanjiNameMap.end())
@@ -296,39 +296,39 @@ void Data::processList(const DataFile& list) {
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of
       // the other types
-      if (debug() && !kenteiList) created.push_back(name);
+      if (debug() && !kenteiList) created.emplace_back(name);
     }
     if (kenteiList) {
       assert(kanji->kyu() == list.kyu());
-      _kyus[list.kyu()].push_back(kanji);
+      _kyus[list.kyu()].emplace_back(kanji);
     } else if (hasValue(list.level())) {
       assert(kanji->level() == list.level());
-      _levels[list.level()].push_back(kanji);
+      _levels[list.level()].emplace_back(kanji);
     } else {
       assert(kanji->frequency());
       const auto index{(*kanji->frequency() - 1U) / FrequencyBucketEntries};
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1]
-          .push_back(kanji);
+          .emplace_back(kanji);
     }
   }
   if (fullDebug()) {
     DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
     DataFile::print(created,
-        std::string("non-Jouyou/Jinmei") +
+        std::string{"non-Jouyou/Jinmei"} +
             (hasValue(list.level()) ? "" : "/JLPT"),
         list.name());
     // list.level is None when processing 'frequency.txt' file (so not JLPT)
     if (!kenteiList && !(list.level())) {
-      std::vector lists{std::pair(&found[KanjiTypes::Jinmei], ""),
-          std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
+      std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
+          std::pair{&found[KanjiTypes::LinkedJinmei], "Linked "}};
       for (const auto& i : lists) {
         DataFile::List jlptJinmei, otherJinmei;
         for (auto& j : *i.first)
           (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
-        DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei",
+        DataFile::print(jlptJinmei, std::string{"JLPT "} + i.second + "Jinmei",
             list.name());
         DataFile::print(otherJinmei,
-            std::string("non-JLPT ") + i.second + "Jinmei", list.name());
+            std::string{"non-JLPT "} + i.second + "Jinmei", list.name());
       }
     } else {
       DataFile::print(found[KanjiTypes::Jinmei], "Jinmei", list.name());
@@ -362,18 +362,18 @@ void Data::checkStrokes() const {
       if (k) {
         if ((**k).variant()) {
           if ((**k).strokes() != getStrokes(i.first, u, true, true))
-            vStrokeDiffs.push_back(i.first);
+            vStrokeDiffs.emplace_back(i.first);
         } else if ((**k).strokes() != ucdStrokes)
-          strokeDiffs.push_back(i.first);
+          strokeDiffs.emplace_back(i.first);
       } else if (i.second != ucdStrokes)
-        missingDiffs.push_back(i.first);
+        missingDiffs.emplace_back(i.first);
     } else
-      missingUcd.push_back(i.first);
+      missingUcd.emplace_back(i.first);
     if (k) {
       if ((**k).type() == KanjiTypes::Frequency)
-        strokesFrequency.push_back(i.first);
+        strokesFrequency.emplace_back(i.first);
     } else
-      strokesNotFound.push_back(i.first);
+      strokesNotFound.emplace_back(i.first);
   }
   if (debug()) {
     DataFile::print(strokesNotFound, "Kanji not loaded", "_strokes");

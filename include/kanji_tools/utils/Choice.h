@@ -26,10 +26,10 @@ public:
   // 'istream' of '0' (the default) means read from stdin.
   Choice(std::ostream& out, OptChar quit = {},
       const std::string& d = DefaultQuitDescription)
-      : Choice(out, nullptr, quit, d) {}
+      : Choice{out, nullptr, quit, d} {}
   Choice(std::ostream& out, std::istream* in, OptChar quit = {},
       const std::string& d = DefaultQuitDescription)
-      : _out(out), _in(in) {
+      : _out{out}, _in{in} {
     if (quit) setQuit(*quit, d);
   }
 

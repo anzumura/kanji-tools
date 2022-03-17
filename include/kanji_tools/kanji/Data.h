@@ -64,14 +64,14 @@ public:
 
   // 'getPinyin' returns 'optional' since not all Kanji have a Pinyin reading
   [[nodiscard]] auto getPinyin(const Ucd* u) const {
-    return u && !u->pinyin().empty() ? Kanji::OptString(u->pinyin())
+    return u && !u->pinyin().empty() ? Kanji::OptString{u->pinyin()}
                                      : std::nullopt;
   }
 
   // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see
   // comments in scripts/parseUcdAllFlat.sh)
   [[nodiscard]] auto getMorohashiId(const Ucd* u) const {
-    return u && !u->morohashiId().empty() ? Kanji::OptString(u->morohashiId())
+    return u && !u->morohashiId().empty() ? Kanji::OptString{u->morohashiId()}
                                           : std::nullopt;
   }
 
@@ -83,7 +83,7 @@ public:
   // kanjiName has a variation selector).
   [[nodiscard]] auto getCompatibilityName(const std::string& kanjiName) const {
     const auto u{_ucd.find(kanjiName)};
-    return u && u->name() != kanjiName ? Kanji::OptString(u->name())
+    return u && u->name() != kanjiName ? Kanji::OptString{u->name()}
                                        : std::nullopt;
   }
 

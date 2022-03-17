@@ -13,11 +13,11 @@ public:
 
   Radical(u_int8_t number, const std::string& name, const AltForms& altForms,
       const std::string& longName, const std::string& reading)
-      : _number(number), _name(name), _altForms(altForms), _longName(longName),
-        _reading(reading) {}
+      : _number{number}, _name{name}, _altForms{altForms}, _longName{longName},
+        _reading{reading} {}
 
   Radical(const Radical&) = default;
-  Radical& operator=(const Radical&) = default;
+  // operator= is not generated since there are const members
 
   [[nodiscard]] auto operator==(const Radical& rhs) const {
     return _number == rhs._number;
@@ -32,11 +32,11 @@ public:
   [[nodiscard]] auto& longName() const { return _longName; }
   [[nodiscard]] auto& reading() const { return _reading; }
 private:
-  u_int8_t _number;
-  std::string _name;
-  AltForms _altForms;
-  std::string _longName;
-  std::string _reading;
+  const u_int8_t _number;
+  const std::string _name;
+  const AltForms _altForms;
+  const std::string _longName;
+  const std::string _reading;
 };
 
 inline auto& operator<<(std::ostream& os, const Radical& r) {

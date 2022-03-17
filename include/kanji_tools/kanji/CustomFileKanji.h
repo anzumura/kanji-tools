@@ -74,8 +74,8 @@ private:
 class OfficialKanji : public CustomFileKanji {
 public:
   [[nodiscard]] OptString extraTypeInfo() const override {
-    return _year ? std::optional(*CustomFileKanji::extraTypeInfo() + ' ' +
-                                 std::to_string(*_year))
+    return _year ? OptString{*CustomFileKanji::extraTypeInfo() + ' ' +
+                             std::to_string(*_year)}
                  : CustomFileKanji::extraTypeInfo();
   }
 
@@ -113,8 +113,7 @@ public:
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   [[nodiscard]] OptString extraTypeInfo() const override {
-    return std::optional(
-        *OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']');
+    return *OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']';
   }
   [[nodiscard]] auto reason() const { return _reason; }
 
@@ -127,9 +126,9 @@ private:
 class JouyouKanji : public OfficialKanji {
 public:
   JouyouKanji(const Data& d, const ColumnFile& f)
-      : OfficialKanji(
-            d, f, f.get(NameCol), f.getU8(StrokesCol), f.get(MeaningCol)),
-        _grade(getGrade(f.get(GradeCol))) {}
+      : OfficialKanji{d, f, f.get(NameCol), f.getU8(StrokesCol),
+            f.get(MeaningCol)},
+        _grade{getGrade(f.get(GradeCol))} {}
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
@@ -150,7 +149,7 @@ private:
 class ExtraKanji : public CustomFileKanji {
 public:
   ExtraKanji(const Data& d, const ColumnFile& f)
-      : ExtraKanji(d, f, f.get(NameCol)) {}
+      : ExtraKanji{d, f, f.get(NameCol)} {}
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
   [[nodiscard]] OptString newName() const override { return _newName; }
@@ -162,10 +161,9 @@ private:
   ExtraKanji(
       const Data& d, const ColumnFile& f, const std::string& name, const Ucd* u)
       : CustomFileKanji{d, f, name, f.getU8(StrokesCol), f.get(MeaningCol),
-            u && u->hasTraditionalLinks() ? getLinkNames(u) : EmptyLinkNames,
-            u},
+            u && u->hasTraditionalLinks() ? linkNames(u) : EmptyLinkNames, u},
         _newName{u && u->hasNonTraditionalLinks()
-                     ? OptString(u->links()[0].name())
+                     ? OptString{u->links()[0].name()}
                      : std::nullopt} {}
   const OptString _newName;
 };

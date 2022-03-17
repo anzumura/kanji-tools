@@ -234,11 +234,11 @@ std::string Kana::RepeatMark::get(
   return k->getRomaji(flags);
 }
 
-const Kana::Map Kana::RomajiMap(Kana::populate(CharType::Romaji)),
-    Kana::HiraganaMap(Kana::populate(CharType::Hiragana)),
-    Kana::KatakanaMap(Kana::populate(CharType::Katakana));
+const Kana::Map Kana::RomajiMap{Kana::populate(CharType::Romaji)},
+    Kana::HiraganaMap{Kana::populate(CharType::Hiragana)},
+    Kana::KatakanaMap{Kana::populate(CharType::Katakana)};
 
-const Kana& Kana::SmallTsu(KanaList[KanaList.size() - 2]);
-const Kana& Kana::N(KanaList[KanaList.size() - 1]);
+const Kana& Kana::SmallTsu{KanaList[KanaList.size() - 2]};
+const Kana& Kana::N{KanaList[KanaList.size() - 1]};
 
 } // namespace kanji_tools

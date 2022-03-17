@@ -8,11 +8,11 @@ namespace kanji_tools {
 void Table::add(const Row& row, bool startNewSection) {
   if (startNewSection) _sections.insert(_rows.size());
   if (_countInFirstColumn) {
-    Row r(row);
+    Row r{row};
     r.insert(r.begin(), std::to_string(_rows.size() + 1));
-    _rows.emplace_back(r);
+    _rows.emplace_back(std::move(r));
   } else
-    _rows.push_back(row);
+    _rows.emplace_back(row);
 }
 
 void Table::print(std::ostream& os) const {

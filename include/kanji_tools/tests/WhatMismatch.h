@@ -23,7 +23,7 @@ template<typename F> auto call(const F& f, const std::string& expectedWhat) {
   try {
     return f();
   } catch (const std::exception& e) {
-    if (expectedWhat != e.what()) throw WhatMismatch(expectedWhat, e);
+    if (expectedWhat != e.what()) throw WhatMismatch{expectedWhat, e};
     throw;
   }
 }

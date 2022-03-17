@@ -16,7 +16,7 @@ public:
 
   class Link {
   public:
-    Link(char32_t code, const std::string& name) : _code(code), _name(name) {}
+    Link(char32_t code, const std::string& name) : _code{code}, _name{name} {}
     [[nodiscard]] auto code() const { return _code; }
     [[nodiscard]] auto& name() const { return _name; }
     [[nodiscard]] std::string codeAndName() const;
@@ -34,12 +34,12 @@ public:
       bool jinmei, const Links& links, UcdLinkTypes linkType,
       bool linkedReadings, const std::string& meaning,
       const std::string& onReading, const std::string& kunReading)
-      : _code(code), _name(name), _block(block), _version(version),
-        _radical(radical), _strokes(strokes), _variantStrokes(variantStrokes),
-        _pinyin(pinyin), _morohashiId(morohashiId), _nelsonIds(nelsonIds),
-        _sources(sources), _jSource(jSource), _joyo(joyo), _jinmei(jinmei),
-        _links(links), _linkType(linkType), _linkedReadings(linkedReadings),
-        _meaning(meaning), _onReading(onReading), _kunReading(kunReading) {}
+      : _code{code}, _name{name}, _block{block}, _version{version},
+        _radical{radical}, _strokes{strokes}, _variantStrokes{variantStrokes},
+        _pinyin{pinyin}, _morohashiId{morohashiId}, _nelsonIds{nelsonIds},
+        _sources{sources}, _jSource{jSource}, _joyo{joyo}, _jinmei{jinmei},
+        _links{links}, _linkType{linkType}, _linkedReadings{linkedReadings},
+        _meaning{meaning}, _onReading{onReading}, _kunReading{kunReading} {}
 
   [[nodiscard]] auto code() const { return _code; }
   [[nodiscard]] auto& name() const { return _name; }

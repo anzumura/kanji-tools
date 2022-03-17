@@ -6,9 +6,9 @@ namespace kanji_tools {
 
 Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
   LinkNames result;
-  std::stringstream ss(f.get(OldNamesCol));
+  std::stringstream ss{f.get(OldNamesCol)};
   for (std::string token; std::getline(ss, token, ',');)
-    result.push_back(token);
+    result.emplace_back(token);
   return result;
 }
 
