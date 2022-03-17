@@ -53,15 +53,16 @@ private:
   // otherwise prints 4 spaces
   std::ostream& printAssignedAnswer(char choice) const;
 
-  void showGroup(const List& questions, const List& readings, Choices&,
-      bool repeatQuestion) const;
+  void showGroup(const List&, const List&, Choices&, bool repeatQuestion) const;
+
   [[nodiscard]] bool getAnswers(
       size_t totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
   [[nodiscard]] bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
+
   void editAnswer(Choices&);
   [[nodiscard]] size_t getAnswerToEdit() const;
-  void checkAnswers(
-      const List& questions, const List& readings, const std::string& name);
+
+  void checkAnswers(const List&, const List&, const std::string& name);
 
   // '_answers' holds answers for the current question, i.e., the reading
   // selected for each group member
