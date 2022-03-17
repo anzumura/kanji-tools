@@ -72,13 +72,13 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 
 } // namespace
 
-void QuizLauncher::run(u_int8_t argc, const char** argv) {
+void QuizLauncher::run(Data::ArgCount argc, const char** argv) {
   const auto data{std::make_shared<KanjiData>(argc, argv)};
   QuizLauncher(argc, argv, data, std::make_shared<GroupData>(data),
       std::make_shared<JukugoData>(data));
 }
 
-QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
+QuizLauncher::QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr data,
     GroupDataPtr groupData, JukugoDataPtr jukugoData, std::istream* in)
     : _programMode(ProgramMode::NotAssigned),
       _questionOrder(QuestionOrder::NotAssigned), _choice(data->out(), in, '/'),
@@ -341,10 +341,10 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(
   return 0;
 }
 
-u_int16_t QuizLauncher::getU16(
+Kanji::NelsonId QuizLauncher::getId(
     const std::string& msg, const std::string& arg) const {
   std::stringstream ss{arg};
-  u_int16_t id;
+  Kanji::NelsonId id;
   if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
   return id;
 }
@@ -352,7 +352,7 @@ u_int16_t QuizLauncher::getU16(
 void QuizLauncher::processKanjiArg(const std::string& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
     const auto kanji{
-        _groupData->data().findKanjiByFrequency(getU16("frequency", arg))};
+        _groupData->data().findKanjiByFrequency(getId("frequency", arg))};
     if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
     printDetails((**kanji).name());
   } else if (arg.starts_with("m")) {
@@ -368,7 +368,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
       Data::usage("invalid Nelson ID '" + id + "'");
     printDetails(
-        _groupData->data().findKanjisByNelsonId(getU16("Nelson ID", id)),
+        _groupData->data().findKanjisByNelsonId(getId("Nelson ID", id)),
         "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id{arg.substr(1)};

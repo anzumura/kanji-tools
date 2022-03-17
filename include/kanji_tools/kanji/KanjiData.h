@@ -10,13 +10,13 @@ namespace kanji_tools {
 // jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(u_int8_t argc, const char** argv, std::ostream& out = std::cout,
+  KanjiData(ArgCount argc, const char** argv, std::ostream& out = std::cout,
       std::ostream& err = std::cerr);
 
   // Implement the base class functions used during Kanji construction
-  [[nodiscard]] Kanji::OptU16 frequency(const std::string& s) const override {
+  [[nodiscard]] Kanji::OptFreq frequency(const std::string& s) const override {
     const auto x{_frequency.get(s)};
-    return x ? Kanji::OptU16{x} : std::nullopt;
+    return x ? Kanji::OptFreq{x} : std::nullopt;
   }
   [[nodiscard]] JlptLevels level(const std::string&) const override;
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;

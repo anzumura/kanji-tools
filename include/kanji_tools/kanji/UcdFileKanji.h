@@ -74,21 +74,21 @@ private:
 class FrequencyKanji : public StandardKanji {
 public:
   // constructor used for 'FrequencyKanji' without a reading
-  FrequencyKanji(const Data& d, const std::string& name, u_int16_t frequency)
+  FrequencyKanji(const Data& d, const std::string& name, Frequency frequency)
       : StandardKanji{d, name}, _frequency{frequency} {}
 
   // constructor used for 'FrequencyKanji' with readings from
   // 'frequency-readings.txt'
   FrequencyKanji(const Data& d, const std::string& name,
-      const std::string& reading, u_int16_t frequency)
+      const std::string& reading, Frequency frequency)
       : StandardKanji{d, name, reading}, _frequency{frequency} {}
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::Frequency;
   }
-  [[nodiscard]] OptU16 frequency() const override { return _frequency; }
+  [[nodiscard]] OptFreq frequency() const override { return _frequency; }
 private:
-  const u_int16_t _frequency;
+  const Frequency _frequency;
 };
 
 // 'KenteiKanji' is for kanji in 'kentei/k*.txt' files that aren't already

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/kanji/UcdLinkTypes.h>
 
 #include <vector>
@@ -11,6 +12,8 @@ namespace kanji_tools {
 // scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
+  using Strokes = u_int8_t;
+
   // 'EmptyString' can be returned by 'linkCodeAndName'
   inline static const std::string EmptyString;
 
@@ -27,8 +30,8 @@ public:
   using Links = std::vector<Link>;
 
   Ucd(char32_t code, const std::string& name, const std::string& block,
-      const std::string& version, u_int8_t radical, u_int8_t strokes,
-      u_int8_t variantStrokes, const std::string& pinyin,
+      const std::string& version, Radical::Number radical, Strokes strokes,
+      Strokes variantStrokes, const std::string& pinyin,
       const std::string& morohashiId, const std::string& nelsonIds,
       const std::string& sources, const std::string& jSource, bool joyo,
       bool jinmei, const Links& links, UcdLinkTypes linkType,
@@ -86,9 +89,9 @@ private:
   const std::string _name;
   const std::string _block;
   const std::string _version;
-  const u_int8_t _radical;
-  const u_int8_t _strokes;
-  const u_int8_t _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
+  const Radical::Number _radical;
+  const Strokes _strokes;
+  const Strokes _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
   const std::string _pinyin;
   const std::string _morohashiId;
   const std::string _nelsonIds;

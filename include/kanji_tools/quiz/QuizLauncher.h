@@ -11,7 +11,7 @@ namespace kanji_tools {
 class QuizLauncher {
 public:
   // 'run' is called by main function in 'quizMain.cpp'
-  static void run(u_int8_t argc, const char** argv);
+  static void run(Data::ArgCount argc, const char** argv);
 
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
@@ -23,7 +23,7 @@ public:
 
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.
-  QuizLauncher(u_int8_t argc, const char** argv, DataPtr, GroupDataPtr,
+  QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr, GroupDataPtr,
       JukugoDataPtr, std::istream* in = {});
 
   QuizLauncher(const QuizLauncher&) = delete;
@@ -67,7 +67,7 @@ private:
   void startGroupQuiz(Question question, bool showMeanings,
       OptChar questionList, const GroupData::List& list) const;
 
-  u_int16_t getU16(const std::string& msg, const std::string& arg) const;
+  Kanji::NelsonId getId(const std::string& msg, const std::string& arg) const;
 
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets
   // '_programMode'. It can also set '_questionOrder' depending on the value of

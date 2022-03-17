@@ -42,18 +42,18 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
     auto s{u->nelsonIds()};
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss{s};
-    u_int16_t id;
-    while (ss >> id) ids.push_back(id);
+    Kanji::NelsonId id;
+    while (ss >> id) ids.emplace_back(id);
     return ids;
   }
   return _emptyNelsonIds;
 }
 
-fs::path Data::getDataDir(u_int8_t argc, const char** argv) {
+fs::path Data::getDataDir(ArgCount argc, const char** argv) {
   static const auto DataDir{fs::path{"data"}};
 
   std::optional<fs::path> found;
-  for (u_int8_t i{1}; !found && i < argc; ++i)
+  for (ArgCount i{1}; !found && i < argc; ++i)
     if (argv[i] == dataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
       const auto data{fs::path(argv[i + 1])};
@@ -89,14 +89,14 @@ fs::path Data::getDataDir(u_int8_t argc, const char** argv) {
   return *found;
 }
 
-Data::DebugMode Data::getDebugMode(u_int8_t argc, const char** argv) {
+Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
   auto result{DebugMode::None};
   const auto setResult{[&result](DebugMode x) {
     if (result != DebugMode::None)
       usage("can only specify one '-debug' or '-info' option");
     result = x;
   }};
-  for (u_int8_t i{1}; i < argc; ++i)
+  for (ArgCount i{1}; i < argc; ++i)
     if (argv[i] == debugArg)
       setResult(DebugMode::Full);
     else if (argv[i] == infoArg)
@@ -104,9 +104,9 @@ Data::DebugMode Data::getDebugMode(u_int8_t argc, const char** argv) {
   return result;
 }
 
-u_int8_t Data::nextArg(
-    u_int8_t argc, const char* const* argv, u_int8_t currentArg) {
-  u_int8_t result{currentArg};
+Data::ArgCount Data::nextArg(
+    ArgCount argc, const char* const* argv, ArgCount currentArg) {
+  ArgCount result{currentArg};
   if (++result < argc) {
     std::string arg{argv[result]};
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
@@ -178,13 +178,13 @@ void Data::printError(const std::string& msg) const {
 
 void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f{file};
-  u_int8_t strokes{};
+  Ucd::Strokes strokes{};
   for (std::string line; std::getline(f, line);)
     if (std::isdigit(line[0])) {
       const auto newStrokes{std::stoul(line)};
-      assert(newStrokes <= std::numeric_limits<u_int8_t>::max());
+      assert(newStrokes <= std::numeric_limits<Ucd::Strokes>::max());
       assert(newStrokes > strokes);
-      strokes = static_cast<u_int8_t>(newStrokes);
+      strokes = static_cast<Ucd::Strokes>(newStrokes);
     } else {
       assert(strokes != 0); // first line must have a stroke count
       for (std::stringstream ss{line}; std::getline(ss, line, ' ');)
@@ -306,7 +306,7 @@ void Data::processList(const DataFile& list) {
       _levels[list.level()].emplace_back(kanji);
     } else {
       assert(kanji->frequency());
-      const auto index{(*kanji->frequency() - 1U) / FrequencyBucketEntries};
+      const auto index{(*kanji->frequency() - 1U) / FrequencyEntries};
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1]
           .emplace_back(kanji);
     }

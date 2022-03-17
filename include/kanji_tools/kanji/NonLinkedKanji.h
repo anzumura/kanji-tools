@@ -23,7 +23,7 @@ protected:
 
   // constructor used by 'CustomFileKanji': has 'meaning' and 'reading'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical,
-      const std::string& meaning, const std::string& reading, u_int8_t strokes,
+      const std::string& meaning, const std::string& reading, Strokes strokes,
       const Ucd* u)
       : Kanji{name, d.getCompatibilityName(name), radical, strokes,
             d.getMorohashiId(u), d.getNelsonIds(u), d.getPinyin(u)},
@@ -32,7 +32,7 @@ protected:
   // constructor used by 'CustomFileKanji' and 'UcdFileKanji': has 'reading' and
   // looks up 'meaning'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& rad,
-      const std::string& reading, u_int8_t strokes, const Ucd* u)
+      const std::string& reading, Strokes strokes, const Ucd* u)
       : NonLinkedKanji{
             d, name, rad, d.ucd().getMeaning(u), reading, strokes, u} {}
 private:

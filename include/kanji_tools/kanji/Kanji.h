@@ -2,7 +2,7 @@
 
 #include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/kanji/KanjiTypes.h>
-#include <kanji_tools/kanji/Radical.h>
+#include <kanji_tools/kanji/Ucd.h>
 #include <kanji_tools/utils/EnumBitmask.h>
 #include <kanji_tools/utils/JlptLevels.h>
 #include <kanji_tools/utils/KenteiKyus.h>
@@ -34,10 +34,14 @@ template<> inline constexpr auto is_bitmask<KanjiInfo>{true};
 
 class Kanji {
 public:
-  using OptU16 = std::optional<u_int16_t>;
-  using OptString = std::optional<std::string>;
+  using Frequency = u_int16_t;
   using LinkNames = std::vector<std::string>;
-  using NelsonIds = std::vector<u_int16_t>;
+  using NelsonId = u_int16_t;
+  using NelsonIds = std::vector<NelsonId>;
+  using OptFreq = std::optional<Frequency>;
+  using OptString = std::optional<std::string>;
+  using Strokes = Ucd::Strokes;
+
   static auto hasLink(KanjiTypes t) {
     return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
   }
@@ -50,7 +54,7 @@ public:
   [[nodiscard]] virtual const std::string& meaning() const = 0;
   [[nodiscard]] virtual const std::string& reading() const = 0;
 
-  [[nodiscard]] virtual OptU16 frequency() const { return {}; }
+  [[nodiscard]] virtual OptFreq frequency() const { return {}; }
   [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
@@ -99,11 +103,11 @@ public:
     return _compatibilityName.value_or(_name);
   }
 
-  [[nodiscard]] auto frequencyOrDefault(u_int16_t x) const {
+  [[nodiscard]] auto frequencyOrDefault(Frequency x) const {
     return frequency().value_or(x);
   }
   [[nodiscard]] auto frequencyOrMax() const {
-    return frequencyOrDefault(std::numeric_limits<u_int16_t>::max());
+    return frequencyOrDefault(std::numeric_limits<Frequency>::max());
   }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
@@ -165,7 +169,7 @@ public:
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
   Kanji(const std::string& name, const OptString& compatibilityName,
-      const Radical& radical, u_int8_t strokes, const OptString& morohashiId,
+      const Radical& radical, Strokes strokes, const OptString& morohashiId,
       const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames;
 private:
@@ -198,7 +202,7 @@ private:
 
   // all kanji have an official radical and non-zero strokes
   const Radical& _radical; // reference to an entry in RadicalData::_radicals
-  const u_int8_t _strokes;
+  const Strokes _strokes;
 
   // optional fields
   const OptString _morohashiId;

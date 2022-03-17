@@ -11,7 +11,7 @@ namespace kanji_tools {
 // 'RadicalData': holds data loaded from 'radicals.txt' (214 official Radicals).
 class RadicalData {
 public:
-  using Map = std::map<std::string, u_int8_t>;
+  using Map = std::map<std::string, Radical::Number>;
   using List = std::vector<Radical>;
 
   RadicalData() {}
@@ -29,7 +29,7 @@ public:
   }
 
   // 'find' by the official Radical Number (one greater than index in _radicals)
-  [[nodiscard]] auto& find(u_int8_t number) const {
+  [[nodiscard]] auto& find(Radical::Number number) const {
     return _radicals.at(number - 1);
   }
 

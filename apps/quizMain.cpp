@@ -4,7 +4,7 @@ using namespace kanji_tools;
 
 int main(int argc, const char** argv) {
   try {
-    QuizLauncher::run(static_cast<u_int8_t>(argc), argv);
+    QuizLauncher::run(static_cast<Data::ArgCount>(argc), argv);
   } catch (const std::exception& err) {
     std::cerr << err.what() << '\n';
     return 1;

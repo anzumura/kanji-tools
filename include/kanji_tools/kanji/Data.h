@@ -14,6 +14,7 @@ namespace kanji_tools {
 // base class for 'KanjiData'
 class Data {
 public:
+  using ArgCount = u_int8_t;
   using Entry = std::shared_ptr<Kanji>;
   using OptEntry = std::optional<const Entry>;
   using List = std::vector<Entry>;
@@ -44,7 +45,7 @@ public:
   }
 
   // functions used by 'Kanji' classes during construction, each take kanji name
-  [[nodiscard]] virtual Kanji::OptU16 frequency(const std::string&) const = 0;
+  [[nodiscard]] virtual Kanji::OptFreq frequency(const std::string&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual const Radical& ucdRadical(
@@ -87,8 +88,8 @@ public:
                                        : std::nullopt;
   }
 
-  [[nodiscard]] u_int8_t getStrokes(const std::string& kanjiName, const Ucd* u,
-      bool variant = false, bool onlyUcd = false) const {
+  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanjiName,
+      const Ucd* u, bool variant = false, bool onlyUcd = false) const {
     if (!onlyUcd) {
       if (const auto i{_strokes.find(kanjiName)}; i != _strokes.end())
         return i->second;
@@ -117,7 +118,7 @@ public:
 
   // See comment for '_frequencies' private data member for more details about
   // frequency lists
-  static constexpr u_int16_t FrequencyBuckets{5}, FrequencyBucketEntries{500};
+  static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
   [[nodiscard]] auto& frequencies(size_t f) const {
     return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
   }
@@ -139,15 +140,15 @@ public:
     return {};
   }
 
-  // 'findKanjiByFrequency' returns the Kanji with the given 'frequency'
-  // (should be a value from 1 to 2501)
-  [[nodiscard]] OptEntry findKanjiByFrequency(u_int16_t frequency) const {
-    if (!frequency || frequency >= _maxFrequency) return {};
-    auto bucket{--frequency};
-    bucket /= FrequencyBucketEntries;
+  // 'findKanjiByFrequency' returns the Kanji with the given 'freq' (should be a
+  // value from 1 to 2501)
+  [[nodiscard]] OptEntry findKanjiByFrequency(Kanji::Frequency freq) const {
+    if (!freq || freq >= _maxFrequency) return {};
+    auto bucket{--freq};
+    bucket /= FrequencyEntries;
     if (bucket == FrequencyBuckets)
-      --bucket; // last bucket contains FrequencyBucketEntries + 1
-    return _frequencies[bucket][frequency - bucket * FrequencyBucketEntries];
+      --bucket; // last bucket contains FrequencyEntries + 1
+    return _frequencies[bucket][freq - bucket * FrequencyEntries];
   }
 
   // 'findKanjisByMorohashiId' can return more than one entry. The ids are
@@ -160,7 +161,7 @@ public:
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] auto& findKanjisByNelsonId(u_int16_t id) const {
+  [[nodiscard]] auto& findKanjisByNelsonId(Kanji::NelsonId id) const {
     const auto i{_nelsonMap.find(id)};
     return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
   }
@@ -190,19 +191,19 @@ public:
   // args, for example:
   //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
   //        i = Data::nextArg(argc, argv, i))
-  [[nodiscard]] static u_int8_t nextArg(
-      u_int8_t argc, const char* const* argv, u_int8_t currentArg = 0);
+  [[nodiscard]] static ArgCount nextArg(
+      ArgCount argc, const char* const* argv, ArgCount currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt'
   // based on checking directories starting at 'argv[0]' (the program name)
   // and working up parent directories. Therefore argc must be at least 1.
   // '-data' followed by a directory name can also be used as an override.
   [[nodiscard]] static std::filesystem::path getDataDir(
-      u_int8_t argc, const char** argv);
+      ArgCount argc, const char** argv);
 
   // 'getDebugMode' looks for '-debug' or '-info' flags in 'argv' list (see
   // 'DebugMode' above)
-  [[nodiscard]] static DebugMode getDebugMode(u_int8_t argc, const char** argv);
+  [[nodiscard]] static DebugMode getDebugMode(ArgCount argc, const char** argv);
 
   // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling
   // 'populate Lists' functions
@@ -232,7 +233,7 @@ protected:
   // (file doesn't have 'Strokes' column) as well as old Kanji from jouyou and
   // jinmei files. This file contains stroke counts followed by one or more
   // lines each with a single kanji that has the given number of strokes.
-  std::map<std::string, u_int8_t> _strokes;
+  std::map<std::string, Ucd::Strokes> _strokes;
 
   EnumList<KanjiTypes> _types;
 private:
@@ -272,13 +273,13 @@ private:
   // hold the full frequency list (of 2501 kanji).
   std::array<List, FrequencyBuckets> _frequencies;
 
-  Map _kanjiNameMap;                         // lookup by UTF-8 name
-  std::map<std::string, List> _morohashiMap; // lookup by Dai Kan-Wa Jiten ID
-  std::map<u_int16_t, List> _nelsonMap;      // lookup by Nelson ID
+  Map _kanjiNameMap;                          // lookup by UTF-8 name
+  std::map<std::string, List> _morohashiMap;  // lookup by Dai Kan-Wa Jiten ID
+  std::map<Kanji::NelsonId, List> _nelsonMap; // lookup by Nelson ID
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
   // put into '_kanjiNameMap'
-  inline static constinit u_int16_t _maxFrequency;
+  inline static constinit Kanji::Frequency _maxFrequency;
 
   inline static const std::string dataArg{"-data"}, debugArg{"-debug"},
       infoArg{"-info"};

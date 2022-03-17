@@ -250,7 +250,7 @@ void StatsPred::printBreakdown(
 
 } // namespace
 
-Stats::Stats(u_int8_t argc, const char** argv, DataPtr data) : _data(data) {
+Stats::Stats(Data::ArgCount argc, const char** argv, DataPtr data) : _data(data) {
   auto breakdown{false}, endOptions{false}, verbose{false};
   std::vector<std::string> files;
   for (auto i{Data::nextArg(argc, argv)}; i < argc;

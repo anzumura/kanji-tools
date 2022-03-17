@@ -13,6 +13,8 @@ namespace kanji_tools {
 //   'strokes.txt' or 'ucd.txt'
 class CustomFileKanji : public NonLinkedKanji {
 public:
+  using Number = u_int16_t;
+
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
   [[nodiscard]] OptString extraTypeInfo() const override {
     return '#' + std::to_string(_number);
@@ -51,7 +53,7 @@ protected:
   // Constructor used by 'CustomFileKanji' and 'ExtraKanji': calls base with
   // 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
-      u_int8_t strokes, const std::string& meaning, const LinkNames& oldNames,
+      Strokes strokes, const std::string& meaning, const LinkNames& oldNames,
       const Ucd* u)
       : NonLinkedKanji{d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
             f.get(ReadingCol), strokes, u},
@@ -59,13 +61,13 @@ protected:
 
   // Constructor used by 'OfficialKanji': calls base without 'meaning' field
   CustomFileKanji(const Data& d, const ColumnFile& f, const std::string& name,
-      u_int8_t strokes, const LinkNames& oldNames)
+      Strokes strokes, const LinkNames& oldNames)
       : NonLinkedKanji{d, name, d.getRadicalByName(f.get(RadicalCol)),
             f.get(ReadingCol), strokes, findUcd(d, name)},
         _kyu{d.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 private:
   const KenteiKyus _kyu;
-  const u_int16_t _number;
+  const Number _number;
   const LinkNames _oldNames;
 };
 
@@ -79,7 +81,7 @@ public:
                  : CustomFileKanji::extraTypeInfo();
   }
 
-  [[nodiscard]] OptU16 frequency() const override { return _frequency; }
+  [[nodiscard]] OptFreq frequency() const override { return _frequency; }
   [[nodiscard]] JlptLevels level() const override { return _level; }
 
   [[nodiscard]] auto year() const { return _year; }
@@ -92,7 +94,7 @@ protected:
 
   // constructor used by 'JouyouKanji' calls base with 'meaning' field
   OfficialKanji(const Data& d, const ColumnFile& f, const std::string& name,
-      u_int8_t s, const std::string& meaning)
+      Strokes s, const std::string& meaning)
       : CustomFileKanji{d, f, name, s, meaning, getOldNames(f),
             findUcd(d, name)},
         _frequency{d.frequency(name)}, _level{d.level(name)}, _year{f.getOptU16(
@@ -100,9 +102,9 @@ protected:
 private:
   [[nodiscard]] static LinkNames getOldNames(const ColumnFile&);
 
-  const OptU16 _frequency;
+  const OptFreq _frequency;
   const JlptLevels _level;
-  const OptU16 _year;
+  const OptFreq _year;
 };
 
 class JinmeiKanji : public OfficialKanji {
