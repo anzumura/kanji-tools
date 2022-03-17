@@ -16,7 +16,7 @@ const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
 
 KanjiData::KanjiData(u_int8_t argc, const char** argv, std::ostream& out,
                      std::ostream& err)
-    : Data(getDataDir(argc, argv), getDebugMode(argc, argv), out, err),
+    : Data{getDataDir(argc, argv), getDebugMode(argc, argv), out, err},
       _levels{LevelDataFile(dataDir(Jlpt, "n5"), JlptLevels::N5, debug()),
               LevelDataFile(dataDir(Jlpt, "n4"), JlptLevels::N4, debug()),
               LevelDataFile(dataDir(Jlpt, "n3"), JlptLevels::N3, debug()),

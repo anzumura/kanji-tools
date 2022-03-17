@@ -22,7 +22,7 @@ constexpr std::array Delimiters{
 } // namespace
 
 KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
-    : _target(target), _flags(flags) {
+    : _target{target}, _flags{flags} {
   for (auto& i : Kana::getMap(CharType::Hiragana))
     if (auto& r{i.second->romaji()}; !r.starts_with("n")) {
       if (r.size() == 1 || r == "ya" || r == "yu" || r == "yo") {
@@ -83,7 +83,7 @@ void KanaConvert::verifyData() const {
 }
 
 std::string KanaConvert::convert(const std::string& input) const {
-  std::string result(input);
+  std::string result{input};
   for (const auto i : CharTypes)
     if (_target != i) result = convert(i, result);
   return result;
@@ -261,7 +261,7 @@ std::string KanaConvert::kanaLetters(const std::string& letterGroup,
 
 std::string KanaConvert::convertFromRomaji(const std::string& input) const {
   std::string result, letterGroup, letter;
-  for (MBChar s(input); s.next(letter, false);)
+  for (MBChar s{input}; s.next(letter, false);)
     if (isSingleByte(letter)) {
       if (const auto lowerLetter{static_cast<char>(std::tolower(letter[0]))};
           lowerLetter != 'n') {

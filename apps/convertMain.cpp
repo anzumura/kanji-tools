@@ -42,9 +42,9 @@ private:
 };
 
 ConvertMain::ConvertMain(int argc, const char** argv)
-    : _choice(std::cout),
-      _program(argc > 0 ? fs::path(argv[0]).filename().string()
-                        : std::string("kanaConvert")) {
+    : _choice{std::cout}, _program{argc > 0
+                                     ? fs::path(argv[0]).filename().string()
+                                     : std::string{"kanaConvert"}} {
   auto finishedOptions{false}, printKana{false}, printMarkdown{false};
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     if (_interactive || _suppressNewLine || printKana || printMarkdown)
@@ -78,7 +78,7 @@ ConvertMain::ConvertMain(int argc, const char** argv)
     } else if (arg.starts_with("-")) {
       if (!charTypeArgs(arg)) usage("illegal option: " + arg);
     } else
-      _strings.push_back(arg);
+      _strings.emplace_back(arg);
   }
   if (_strings.empty()) {
     if (isatty(fileno(stdin))) {
@@ -143,10 +143,10 @@ void ConvertMain::run() {
 }
 
 void ConvertMain::getInput() {
-  static Choice::Choices flagChoices{{'h', "Hepburn"},
-                                     {'k', "Kunrei"},
-                                     {'n', "NoProlongMark"},
-                                     {'r', "RemoveSpaces"}};
+  static const Choice::Choices flagChoices{{'h', "Hepburn"},
+                                           {'k', "Kunrei"},
+                                           {'n', "NoProlongMark"},
+                                           {'r', "RemoveSpaces"}};
   auto outputCurrentOptions{true};
   do {
     if (_interactive && outputCurrentOptions) {
@@ -273,8 +273,8 @@ void ConvertMain::printKanaChart(bool markdown) const {
     auto& romaji{i.romaji()};
     auto& h{i.hiragana()};
     auto& k{i.katakana()};
-    std::string hepb{i.getRomaji(ConvertFlags::Hepburn)};
-    std::string kunr{i.getRomaji(ConvertFlags::Kunrei)};
+    auto hepb{i.getRomaji(ConvertFlags::Hepburn)},
+      kunr{i.getRomaji(ConvertFlags::Kunrei)};
     hepb = romaji == hepb ? empty : ('(' + hepb + ')');
     kunr = romaji == kunr      ? empty
            : i.kunreiVariant() ? kunr
@@ -348,7 +348,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
 }
 
 int main(int argc, const char** argv) {
-  ConvertMain convertMain(argc, argv);
+  ConvertMain convertMain{argc, argv};
   try {
     convertMain.run();
   } catch (const std::exception& err) {
