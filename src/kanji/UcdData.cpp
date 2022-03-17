@@ -67,13 +67,13 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 }
 
 void UcdData::load(const std::filesystem::path& file) {
-  const ColumnFile::Column codeCol("Code"), nameCol("Name"), blockCol("Block"),
-      versionCol("Version"), radicalCol("Radical"), strokesCol("Strokes"),
-      vStrokesCol("VStrokes"), pinyinCol("Pinyin"), morohashiCol("Morohashi"),
-      nelsonIdsCol("NelsonIds"), sourcesCol("Sources"), jSourceCol("JSource"),
-      joyoCol("Joyo"), jinmeiCol("Jinmei"), linkCodesCol("LinkCodes"),
-      linkNamesCol("LinkNames"), linkTypeCol("LinkType"), meaningCol("Meaning"),
-      onCol("On"), kunCol("Kun");
+  const ColumnFile::Column codeCol{"Code"}, nameCol{"Name"}, blockCol{"Block"},
+      versionCol{"Version"}, radicalCol{"Radical"}, strokesCol{"Strokes"},
+      vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"Morohashi"},
+      nelsonIdsCol{"NelsonIds"}, sourcesCol{"Sources"}, jSourceCol{"JSource"},
+      joyoCol{"Joyo"}, jinmeiCol{"Jinmei"}, linkCodesCol{"LinkCodes"},
+      linkNamesCol{"LinkNames"}, linkTypeCol{"LinkType"}, meaningCol{"Meaning"},
+      onCol{"On"}, kunCol{"Kun"};
   for (ColumnFile f(file,
            {codeCol, nameCol, blockCol, versionCol, radicalCol, strokesCol,
                vStrokesCol, pinyinCol, morohashiCol, nelsonIdsCol, sourcesCol,
@@ -104,7 +104,7 @@ void UcdData::load(const std::filesystem::path& file) {
 
     Ucd::Links links;
     if (!f.isEmpty(linkNamesCol)) {
-      std::stringstream names(f.get(linkNamesCol)), codes(f.get(linkCodesCol));
+      std::stringstream names{f.get(linkNamesCol)}, codes{f.get(linkCodesCol)};
       for (std::string linkName; std::getline(names, linkName, ',');)
         if (std::string linkCode; std::getline(codes, linkCode, ','))
           links.emplace_back(f.getWChar(linkCodesCol, linkCode), linkName);
@@ -137,7 +137,7 @@ void UcdData::load(const std::filesystem::path& file) {
       f.error("duplicate entry '" + name + "'");
     for (const auto& link : links)
       if (!jinmei)
-        _linkedOther[link.name()].push_back(name);
+        _linkedOther[link.name()].emplace_back(name);
       else if (const auto i{_linkedJinmei.emplace(link.name(), name)};
                !i.second)
         f.error("jinmei link " + link.name() + " to " + name +

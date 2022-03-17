@@ -13,7 +13,7 @@ const std::string WideColon{"："};
 
 } // namespace
 
-GroupData::GroupData(DataPtr data) : _data(data) {
+GroupData::GroupData(DataPtr data) : _data{data} {
   loadGroup(DataFile::getFile(_data->dataDir(), "meaning-groups"), _meaningMap,
       _meaningGroups, GroupType::Meaning);
   loadGroup(DataFile::getFile(_data->dataDir(), "pattern-groups"), _patternMap,
@@ -50,11 +50,11 @@ bool GroupData::checkInsert(
 template<typename T>
 void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
     List& list, GroupType groupType) {
-  const ColumnFile::Column numberCol("Number"), nameCol("Name"),
-      membersCol("Members");
+  const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
+      membersCol{"Members"};
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
-    auto& name(f.get(nameCol));
-    auto& members(f.get(membersCol));
+    auto& name{f.get(nameCol)};
+    auto& members{f.get(membersCol)};
     if (name.empty()) f.error("group must have a name");
     if (isAnySingleByte(name)) f.error("group name must be all MB characters");
     if (members.ends_with(",")) f.error("members ends with ,");
@@ -68,15 +68,15 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
                         : Group::PatternType::Reading;
       // 'name' before the colon is the first member of a 'family'
       if (patternType == Group::PatternType::Family)
-        kanjiNames.push_back(MBChar::getFirst(name));
+        kanjiNames.emplace_back(MBChar::getFirst(name));
     }
     std::string member;
-    for (std::stringstream ss(members); std::getline(ss, member, ',');)
+    for (std::stringstream ss{members}; std::getline(ss, member, ',');)
       kanjiNames.emplace_back(member);
     Data::List memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findKanjiByName(i)}; k)
-        memberKanji.push_back(*k);
+        memberKanji.emplace_back(*k);
       else
         _data->printError("failed to find member " + i + " in group: '" + name +
                           "', number: " + f.get(numberCol));
@@ -92,7 +92,7 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
     auto group{
         createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
     for (auto& i : memberKanji) checkInsert(i->name(), groups, group);
-    list.push_back(group);
+    list.emplace_back(group);
   }
 }
 
@@ -146,7 +146,7 @@ void GroupData::printMeaningGroup(
     // the same kanji can be in more than one meaning group so check uniqueness
     // to avoid overcounting
     if (uniqueNames.insert(i->name()).second)
-      types[i->type()].push_back(i->name());
+      types[i->type()].emplace_back(i->name());
   }
 }
 
@@ -155,7 +155,7 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
     out() << std::setw(wideSetw(group.name(), 25)) << group.name() << '('
           << std::setw(2) << group.members().size() << ")   ";
   for (auto& i : group.members()) {
-    types[i->type()].push_back(i->name());
+    types[i->type()].emplace_back(i->name());
     if (fullDebug()) {
       if (i == group.members()[0]) switch (group.patternType()) {
         case Group::PatternType::Peer:

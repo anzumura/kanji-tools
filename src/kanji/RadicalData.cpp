@@ -8,14 +8,14 @@
 namespace kanji_tools {
 
 void RadicalData::load(const std::filesystem::path& file) {
-  const ColumnFile::Column numberCol("Number"), nameCol("Name"),
-      longNameCol("LongName"), readingCol("Reading");
-  for (ColumnFile f(file, {numberCol, nameCol, longNameCol, readingCol});
+  const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
+      longNameCol{"LongName"}, readingCol{"Reading"};
+  for (ColumnFile f{file, {numberCol, nameCol, longNameCol, readingCol}};
        f.nextRow();) {
     const auto radicalNumber{f.getU8(numberCol)};
     if (radicalNumber != f.currentRow())
       f.error("radicals must be ordered by 'number'");
-    std::stringstream radicals(f.get(nameCol));
+    std::stringstream radicals{f.get(nameCol)};
     Radical::AltForms altForms;
     std::string name, token;
     while (std::getline(radicals, token, ' '))
@@ -42,7 +42,7 @@ void RadicalData::print(const Data& data) const {
     // only inclue 'Common Kanji' for now since a lot of the rare kanji don't
     // display properly - they just show up as '?' (𮧮)
     if (isCommonKanji(i.second->name()))
-      radicals[i.second->radical()].push_back(i.second);
+      radicals[i.second->radical()].emplace_back(i.second);
   printRadicalLists(data, radicals);
   printMissingRadicals(data, radicals);
 }
@@ -76,7 +76,7 @@ void RadicalData::printMissingRadicals(
     const Data& data, const RadicalLists& radicals) const {
   std::vector<Radical> missingRadicals;
   for (auto& i : _radicals)
-    if (radicals.find(i) == radicals.end()) missingRadicals.push_back(i);
+    if (radicals.find(i) == radicals.end()) missingRadicals.emplace_back(i);
   if (!missingRadicals.empty()) {
     data.log() << "  Found " << missingRadicals.size()
                << " radicals with no kanji:";

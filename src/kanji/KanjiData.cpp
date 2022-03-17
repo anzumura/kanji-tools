@@ -26,7 +26,7 @@ KanjiData::KanjiData(
           dataFile(KenteiKyus::K4), dataFile(KenteiKyus::K3),
           dataFile(KenteiKyus::KJ2), dataFile(KenteiKyus::K2),
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
-      _frequency(dataDir() / "frequency", debug()) {
+      _frequency{dataDir() / "frequency", debug()} {
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
   _ucd.load(DataFile::getFile(dataDir(), UcdFile));
   _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));
@@ -94,7 +94,7 @@ void KanjiData::printCount(
     if (printExamples)
       for (auto& j : l) {
         if (pred(j) && ++count <= printExamples)
-          examples[t].push_back(j->name());
+          examples[t].emplace_back(j->name());
       }
     else
       count = static_cast<size_t>(std::count_if(l.begin(), l.end(), pred));
