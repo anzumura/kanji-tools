@@ -12,7 +12,7 @@ public:
   using AltForms = std::vector<std::string>;
 
   Radical(u_int8_t number, const std::string& name, const AltForms& altForms,
-          const std::string& longName, const std::string& reading)
+      const std::string& longName, const std::string& reading)
       : _number(number), _name(name), _altForms(altForms), _longName(longName),
         _reading(reading) {}
 

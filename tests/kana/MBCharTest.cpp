@@ -67,7 +67,7 @@ TEST(MBCharTest, NextWithVariationSelectors) {
 
 TEST(MBCharTest, NextWithCombiningMarks) {
   const std::string ga{"ガ"}, gi{"ギ"}, combinedGi{"ギ"}, gu{"グ"}, po{"ポ"},
-    combinedPo{"ポ"};
+      combinedPo{"ポ"};
   EXPECT_EQ(combinedGi.size(), 6);
   EXPECT_EQ(combinedPo.size(), 6);
   const auto c{ga + combinedGi + gu + combinedPo};

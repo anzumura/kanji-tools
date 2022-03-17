@@ -27,10 +27,10 @@ TEST_F(GroupDataTest, SanityChecks) {
     std::set<size_t> uniqueNumbers;
     for (auto i : list) {
       EXPECT_TRUE(uniqueNumbers.insert(i->number()).second)
-        << i->name() << " has duplicate number " << i->number();
+          << i->name() << " has duplicate number " << i->number();
       for (auto j : i->members())
         EXPECT_TRUE(groupMap.contains(j->name()))
-          << j->name() << "from group " << i->name() << " missing from map";
+            << j->name() << "from group " << i->name() << " missing from map";
     }
   };
   checkNumbers(_groupData.meaningGroups(), _groupData.meaningMap());

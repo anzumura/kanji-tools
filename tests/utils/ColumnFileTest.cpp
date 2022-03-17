@@ -46,8 +46,8 @@ TEST_F(ColumnFileTest, SingleColumnFile) {
 
 TEST_F(ColumnFileTest, NoColumnsError) {
   EXPECT_THROW(call([] { ColumnFile f(TestFile, {}); },
-                    "must specify at least one column - file: testFile.txt"),
-               std::domain_error);
+                   "must specify at least one column - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetValueFromOneColumn) {
@@ -148,8 +148,8 @@ TEST_F(ColumnFileTest, NotEnoughColumns) {
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
   ColumnFile f(TestFile, {col1, col2, col3});
   EXPECT_THROW(call([&f] { f.nextRow(); },
-                    "not enough columns - file: testFile.txt, row: 1"),
-               std::domain_error);
+                   "not enough columns - file: testFile.txt, row: 1"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, TooManyColumns) {
@@ -159,8 +159,8 @@ TEST_F(ColumnFileTest, TooManyColumns) {
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3");
   ColumnFile f(TestFile, {col1, col2, col3});
   EXPECT_THROW(call([&f] { f.nextRow(); },
-                    "too many columns - file: testFile.txt, row: 1"),
-               std::domain_error);
+                   "too many columns - file: testFile.txt, row: 1"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
@@ -169,8 +169,8 @@ TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
   of.close();
   ColumnFile::Column col("ColumnName");
   EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); },
-                    "unrecognized header 'HeaderName' - file: testFile.txt"),
-               std::domain_error);
+                   "unrecognized header 'HeaderName' - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, DuplicateHeaderError) {
@@ -179,8 +179,8 @@ TEST_F(ColumnFileTest, DuplicateHeaderError) {
   of.close();
   ColumnFile::Column col("Col");
   EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); },
-                    "duplicate header 'Col' - file: testFile.txt"),
-               std::domain_error);
+                   "duplicate header 'Col' - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, DuplicateColumnError) {
@@ -189,11 +189,11 @@ TEST_F(ColumnFileTest, DuplicateColumnError) {
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2");
   EXPECT_THROW(call(
-                 [&] {
-                   ColumnFile f(TestFile, {col1, col2, col1});
-                 },
-                 "duplicate column 'Col1' - file: testFile.txt"),
-               std::domain_error);
+                   [&] {
+                     ColumnFile f(TestFile, {col1, col2, col1});
+                   },
+                   "duplicate column 'Col1' - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, OneMissingColumnError) {
@@ -202,11 +202,11 @@ TEST_F(ColumnFileTest, OneMissingColumnError) {
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2");
   EXPECT_THROW(call(
-                 [&] {
-                   ColumnFile f(TestFile, {col1, col2});
-                 },
-                 "column 'Col2' not found - file: testFile.txt"),
-               std::domain_error);
+                   [&] {
+                     ColumnFile f(TestFile, {col1, col2});
+                   },
+                   "column 'Col2' not found - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
@@ -215,25 +215,25 @@ TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
   of.close();
   ColumnFile::Column col1("Col1"), col2("Col2"), col3("Col3"), col4("Col4");
   EXPECT_THROW(call(
-                 [&] {
-                   ColumnFile f(TestFile, {col1, col2, col3, col4});
-                 },
-                 "2 columns not found: 'Col2', 'Col4' - file: testFile.txt"),
-               std::domain_error);
+                   [&] {
+                     ColumnFile f(TestFile, {col1, col2, col3, col4});
+                   },
+                   "2 columns not found: 'Col2', 'Col4' - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MissingFileError) {
   ColumnFile::Column col("Col");
   EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); },
-                    "doesn't exist - file: testFile.txt"),
-               std::domain_error);
+                   "doesn't exist - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, NotRegularFileError) {
   ColumnFile::Column col("Col");
   EXPECT_THROW(call([&] { ColumnFile f(TestDir, {col}); },
-                    "not regular file - file: testDir"),
-               std::domain_error);
+                   "not regular file - file: testDir"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MissingHeaderRowError) {
@@ -242,8 +242,8 @@ TEST_F(ColumnFileTest, MissingHeaderRowError) {
   of.close();
   ColumnFile::Column col("Col");
   EXPECT_THROW(call([&] { ColumnFile f(TestFile, {col}); },
-                    "missing header row - file: testFile.txt"),
-               std::domain_error);
+                   "missing header row - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetBeforeNextRowError) {
@@ -253,9 +253,9 @@ TEST_F(ColumnFileTest, GetBeforeNextRowError) {
   ColumnFile::Column col("Col");
   ColumnFile f(TestFile, {col});
   EXPECT_THROW(
-    call([&] { f.get(col); },
-         "'nextRow' must be called before calling 'get' - file: testFile.txt"),
-    std::domain_error);
+      call([&] { f.get(col); },
+          "'nextRow' must be called before calling 'get' - file: testFile.txt"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
@@ -267,9 +267,9 @@ TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
   f.nextRow();
   ColumnFile::Column columnCreatedAfterConstruction("Created After");
   EXPECT_THROW(
-    call([&] { f.get(columnCreatedAfterConstruction); },
-         "unrecognized column 'Created After' - file: testFile.txt, row: 1"),
-    std::domain_error);
+      call([&] { f.get(columnCreatedAfterConstruction); },
+          "unrecognized column 'Created After' - file: testFile.txt, row: 1"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetInvalidColumError) {
@@ -280,9 +280,9 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
-    call([&] { f.get(columnNotIncludedInFile); },
-         "invalid column 'Not Included' - file: testFile.txt, row: 1"),
-    std::domain_error);
+      call([&] { f.get(columnNotIncludedInFile); },
+          "invalid column 'Not Included' - file: testFile.txt, row: 1"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetULong) {
@@ -303,9 +303,9 @@ TEST_F(ColumnFileTest, GetULongError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(call([&] { f.getULong(col); },
-                    convertError + "unsigned long - file: testFile.txt, row: "
-                                   "1, column: 'Col', value: 'blah'"),
-               std::domain_error);
+                   convertError + "unsigned long - file: testFile.txt, row: "
+                                  "1, column: 'Col', value: 'blah'"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetULongMaxValueError) {
@@ -321,11 +321,12 @@ TEST_F(ColumnFileTest, GetULongMaxValueError) {
   EXPECT_EQ(f.getULong(col, 0), maxValue); // 0 implies no max value
   f.nextRow();
   std::string msg{"exceeded max value of "};
-  EXPECT_THROW(call([&] { f.getULong(col, maxValue); },
-                    msg + std::to_string(maxValue) +
-                      " - file: testFile.txt, row: 3, column: 'Col', value: '" +
-                      std::to_string(maxValue + 1) + "'"),
-               std::domain_error);
+  EXPECT_THROW(
+      call([&] { f.getULong(col, maxValue); },
+          msg + std::to_string(maxValue) +
+              " - file: testFile.txt, row: 3, column: 'Col', value: '" +
+              std::to_string(maxValue + 1) + "'"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetUInt) {
@@ -348,9 +349,9 @@ TEST_F(ColumnFileTest, GetUIntError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(call([&] { f.getU8(col); },
-                    "exceeded max value of 255 - file: testFile.txt, row: 1, "
-                    "column: 'Col', value: '1234'"),
-               std::domain_error);
+                   "exceeded max value of 255 - file: testFile.txt, row: 1, "
+                   "column: 'Col', value: '1234'"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetOptULong) {
@@ -373,9 +374,9 @@ TEST_F(ColumnFileTest, GetOptULongError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(call([&] { f.getOptULong(col); },
-                    convertError + "unsigned long - file: testFile.txt, row: "
-                                   "1, column: 'Col', value: 'blah'"),
-               std::domain_error);
+                   convertError + "unsigned long - file: testFile.txt, row: "
+                                  "1, column: 'Col', value: 'blah'"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetOptUInt) {
@@ -398,9 +399,9 @@ TEST_F(ColumnFileTest, GetOptUIntError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(call([&] { f.getOptU8(col); },
-                    "exceeded max value of 255 - file: testFile.txt, row: 1, "
-                    "column: 'Col', value: '256'"),
-               std::domain_error);
+                   "exceeded max value of 255 - file: testFile.txt, row: 1, "
+                   "column: 'Col', value: '256'"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetBool) {
@@ -425,10 +426,10 @@ TEST_F(ColumnFileTest, GetBoolError) {
   ColumnFile f(TestFile, {col});
   f.nextRow();
   EXPECT_THROW(
-    call([&] { f.getBool(col); },
-         convertError +
-           "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'"),
-    std::domain_error);
+      call([&] { f.getBool(col); },
+          convertError +
+              "bool - file: testFile.txt, row: 1, column: 'Col', value: 'x'"),
+      std::domain_error);
 }
 
 TEST_F(ColumnFileTest, GetWChar) {
@@ -450,16 +451,16 @@ TEST_F(ColumnFileTest, GetWCharError) {
   ColumnFile f(TestFile, {col});
   for (auto i : {std::string("size must be 4 or 5 - file: testFile.txt, row: "
                              "1, column: 'Col', value: 'AAA'"),
-                 std::string("size must be 4 or 5 - file: testFile.txt, row: "
-                             "2, column: 'Col', value: '123456'"),
-                 std::string("invalid hex - file: testFile.txt, row: 3, "
-                             "column: 'Col', value: 'ABCd'"),
-                 std::string("invalid hex - file: testFile.txt, row: 4, "
-                             "column: 'Col', value: 'DEFG'")}) {
+           std::string("size must be 4 or 5 - file: testFile.txt, row: "
+                       "2, column: 'Col', value: '123456'"),
+           std::string("invalid hex - file: testFile.txt, row: 3, "
+                       "column: 'Col', value: 'ABCd'"),
+           std::string("invalid hex - file: testFile.txt, row: 4, "
+                       "column: 'Col', value: 'DEFG'")}) {
     f.nextRow();
     EXPECT_THROW(
-      call([&] { f.getWChar(col); }, convertError + "char32_t, " + i),
-      std::domain_error);
+        call([&] { f.getWChar(col); }, convertError + "char32_t, " + i),
+        std::domain_error);
   }
 }
 

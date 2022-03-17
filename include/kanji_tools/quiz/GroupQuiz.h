@@ -17,7 +17,7 @@ public:
   enum MemberType { Jouyou, JLPT, Frequency, All };
 
   GroupQuiz(const QuizLauncher&, u_int16_t question, bool showMeanings,
-            const GroupData::List&, MemberType);
+      const GroupData::List&, MemberType);
 private:
   // 'GroupEntryWidth' is the width required for 'qualified name', 'pinyin' and
   // 'other group name'
@@ -54,14 +54,14 @@ private:
   std::ostream& printAssignedAnswer(char choice) const;
 
   void showGroup(const List& questions, const List& readings, Choices&,
-                 bool repeatQuestion) const;
-  [[nodiscard]] bool getAnswers(size_t totalQuestions, Choices&,
-                                bool& skipGroup, bool& stopQuiz);
+      bool repeatQuestion) const;
+  [[nodiscard]] bool getAnswers(
+      size_t totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
   [[nodiscard]] bool getAnswer(Choices&, bool& skipGroup, bool& refresh);
   void editAnswer(Choices&);
   [[nodiscard]] size_t getAnswerToEdit() const;
-  void checkAnswers(const List& questions, const List& readings,
-                    const std::string& name);
+  void checkAnswers(
+      const List& questions, const List& readings, const std::string& name);
 
   // '_answers' holds answers for the current question, i.e., the reading
   // selected for each group member

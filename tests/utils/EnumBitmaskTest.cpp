@@ -20,7 +20,7 @@ TEST(EnumBitmaskTest, BitwiseAndOperator) {
 TEST(EnumBitmaskTest, BitwiseOrOperator) {
   EXPECT_EQ(TestEnum::Two | TestEnum::Four, static_cast<TestEnum>(2 | 4));
   EXPECT_EQ(TestEnum::One | TestEnum::Two | TestEnum::Four | TestEnum::Eight,
-            TestEnum::All);
+      TestEnum::All);
 }
 
 TEST(EnumBitmaskTest, BitwiseXOrOperator) {

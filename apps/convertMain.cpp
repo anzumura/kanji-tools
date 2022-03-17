@@ -19,7 +19,7 @@ private:
   // arguments. If 'showAllOptions' is true then all options are displayed and
   // the program exits.
   void usage(const std::string& errorMsg = Table::EmptyString,
-             bool showAllOptions = true) const;
+      bool showAllOptions = true) const;
   void processOneLine(const std::string& s) {
     std::cout << (_source ? _converter.convert(*_source, s)
                           : _converter.convert(s));
@@ -43,8 +43,8 @@ private:
 
 ConvertMain::ConvertMain(int argc, const char** argv)
     : _choice{std::cout}, _program{argc > 0
-                                     ? fs::path(argv[0]).filename().string()
-                                     : std::string{"kanaConvert"}} {
+                                       ? fs::path(argv[0]).filename().string()
+                                       : std::string{"kanaConvert"}} {
   auto finishedOptions{false}, printKana{false}, printMarkdown{false};
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     if (_interactive || _suppressNewLine || printKana || printMarkdown)
@@ -93,8 +93,8 @@ ConvertMain::ConvertMain(int argc, const char** argv)
     usage("'-i' can't be combined with other 'string' arguments");
 }
 
-void ConvertMain::usage(const std::string& errorMsg,
-                        bool showAllOptions) const {
+void ConvertMain::usage(
+    const std::string& errorMsg, bool showAllOptions) const {
   auto& os{errorMsg.empty() ? std::cout : std::cerr};
   if (!errorMsg.empty()) os << _program << ": " << errorMsg << '\n';
   if (showAllOptions)
@@ -143,10 +143,8 @@ void ConvertMain::run() {
 }
 
 void ConvertMain::getInput() {
-  static const Choice::Choices flagChoices{{'h', "Hepburn"},
-                                           {'k', "Kunrei"},
-                                           {'n', "NoProlongMark"},
-                                           {'r', "RemoveSpaces"}};
+  static const Choice::Choices flagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
+      {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
   auto outputCurrentOptions{true};
   do {
     if (_interactive && outputCurrentOptions) {
@@ -238,17 +236,17 @@ void ConvertMain::printKanaChart(bool markdown) const {
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
 )";
   u_int8_t hanDakutenMonographs{}, small{}, plainMonographs{},
-    dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
-    dakutenDigraphs{}, romajiVariants{};
+      dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
+      dakutenDigraphs{}, romajiVariants{};
   Table table{{"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
-               "Kunr", "Roma Variants"},
-              true};
+                  "Kunr", "Roma Variants"},
+      true};
   const std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when
   // there are small letters that should be included, i.e., 'la' (ぁ) comes
   // right before 'a' (あ).
-  const std::set<std::string> groups{"la", "ka", "sa",  "ta", "na",
-                                     "ha", "ma", "lya", "ra", "lwa"};
+  const std::set<std::string> groups{
+      "la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i{*entry.second};
     romajiVariants += static_cast<u_int8_t>(i.romajiVariants().size());
@@ -274,7 +272,7 @@ void ConvertMain::printKanaChart(bool markdown) const {
     auto& h{i.hiragana()};
     auto& k{i.katakana()};
     auto hepb{i.getRomaji(ConvertFlags::Hepburn)},
-      kunr{i.getRomaji(ConvertFlags::Kunrei)};
+        kunr{i.getRomaji(ConvertFlags::Kunrei)};
     hepb = romaji == hepb ? empty : ('(' + hepb + ')');
     kunr = romaji == kunr      ? empty
            : i.kunreiVariant() ? kunr
@@ -285,10 +283,11 @@ void ConvertMain::printKanaChart(bool markdown) const {
       vars += j;
     }
     // only show unicode for monographs
-    const auto uni{
-      [&i, &empty](auto& s) { return i.isMonograph() ? toUnicode(s) : empty; }};
+    const auto uni{[&i, &empty](auto& s) {
+      return i.isMonograph() ? toUnicode(s) : empty;
+    }};
     table.add({type, romaji, h, k, uni(h), uni(k), hepb, kunr, vars},
-              groups.contains(romaji));
+        groups.contains(romaji));
   }
   // special handling middle dot, prolong symbol and repeat symbols
   const auto slash{'/'};
@@ -296,30 +295,30 @@ void ConvertMain::printKanaChart(bool markdown) const {
   // middleDot should always be found and thus '4' none rows, but handle if
   // missing just in case ...
   static constexpr u_int8_t HasSlash{4}, NoSlash{3};
-  const u_int8_t none{middleDot != _converter.narrowDelims().end() ? HasSlash
-                                                                   : NoSlash};
+  const u_int8_t none{
+      middleDot != _converter.narrowDelims().end() ? HasSlash : NoSlash};
   if (none == HasSlash)
     table.add({"N", empty + slash, empty, middleDot->second, empty,
-               toUnicode(middleDot->second)},
-              true);
+                  toUnicode(middleDot->second)},
+        true);
   else
     std::cerr << "Failed to find " << slash
               << " in _converter.narrowDelims()\n";
-  table.add(
-    {"N", empty, empty, Kana::ProlongMark, empty, toUnicode(Kana::ProlongMark)},
-    none == NoSlash);
+  table.add({"N", empty, empty, Kana::ProlongMark, empty,
+                toUnicode(Kana::ProlongMark)},
+      none == NoSlash);
   for (auto& i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
     auto& h{i->hiragana()};
     auto& k{i->katakana()};
     table.add({"N", empty, h, k, toUnicode(h), toUnicode(k)});
   }
   markdown ? table.printMarkdown() : table.print();
-  const auto monographs{small + plainMonographs + dakutenMonographs +
-                        hanDakutenMonographs},
-    digraphs{plainDigraphs + dakutenDigraphs + hanDakutenDigraphs},
-    plain{small + plainMonographs + plainDigraphs},
-    dakuten{dakutenMonographs + dakutenDigraphs},
-    hanDakuten{hanDakutenMonographs + hanDakutenDigraphs};
+  const auto monographs{
+      small + plainMonographs + dakutenMonographs + hanDakutenMonographs},
+      digraphs{plainDigraphs + dakutenDigraphs + hanDakutenDigraphs},
+      plain{small + plainMonographs + plainDigraphs},
+      dakuten{dakutenMonographs + dakutenDigraphs},
+      hanDakuten{hanDakutenMonographs + hanDakutenDigraphs};
   const auto types{plain + dakuten + hanDakuten + none};
   const auto out{[markdown](const std::string& s) -> std::ostream& {
     if (markdown)

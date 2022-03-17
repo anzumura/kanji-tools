@@ -13,7 +13,7 @@ namespace fs = std::filesystem;
 namespace {
 
 const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"},
-  LinkedJinmeiFile{"linked-jinmei"}, ExtraFile{"extra"};
+    LinkedJinmeiFile{"linked-jinmei"}, ExtraFile{"extra"};
 
 // This value is used for finding the location of 'data' directory. It will of
 // course need to be updated if the number of '.txt' files changes.
@@ -22,7 +22,7 @@ constexpr size_t TextFilesInDataDir{12};
 } // namespace
 
 Data::Data(const std::filesystem::path& dataDir, DebugMode debugMode,
-           std::ostream& out, std::ostream& err)
+    std::ostream& out, std::ostream& err)
     : _dataDir(dataDir), _debugMode(debugMode), _out(out), _err(err) {
   // Clearing DataFile static data is only needed to help test code, for example
   // DataFile tests can leave some data in these sets before Quiz tests are run
@@ -77,10 +77,9 @@ fs::path Data::getDataDir(u_int8_t argc, const char** argv) {
       if (const auto data{parent / DataDir};
           fs::is_directory(data) &&
           std::count_if(fs::directory_iterator(data), fs::directory_iterator{},
-                        [](const auto& i) {
-                          return i.path().extension() ==
-                                 DataFile::TextFileExtension;
-                        }) == TextFilesInDataDir)
+              [](const auto& i) {
+                return i.path().extension() == DataFile::TextFileExtension;
+              }) == TextFilesInDataDir)
         found = data;
       else
         oldParent = parent;
@@ -105,8 +104,8 @@ Data::DebugMode Data::getDebugMode(u_int8_t argc, const char** argv) {
   return result;
 }
 
-u_int8_t Data::nextArg(u_int8_t argc, const char* const* argv,
-                       u_int8_t currentArg) {
+u_int8_t Data::nextArg(
+    u_int8_t argc, const char* const* argv, u_int8_t currentArg) {
   u_int8_t result{currentArg};
   if (++result < argc) {
     std::string arg{argv[result]};
@@ -209,7 +208,7 @@ void Data::loadFrequencyReadings(const fs::path& file) {
 
 void Data::populateJouyou() {
   auto results{CustomFileKanji::fromFile<JouyouKanji>(
-    *this, DataFile::getFile(_dataDir, JouyouFile))};
+      *this, DataFile::getFile(_dataDir, JouyouFile))};
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(hasValue(i->grade()));
@@ -229,11 +228,11 @@ void Data::populateLinkedKanji() {
     if (std::string jouyou, linked;
         std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
       if (const auto i{_kanjiNameMap.find(jouyou)}; i == _kanjiNameMap.end())
-        printError("can't find " + jouyou + " while processing " +
-                   file.string());
+        printError(
+            "can't find " + jouyou + " while processing " + file.string());
       else
-        checkInsert(linkedJinmei, std::make_shared<LinkedJinmeiKanji>(
-                                    *this, linked, i->second));
+        checkInsert(linkedJinmei,
+            std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second));
     } else
       printError("bad line in " + file.string() + ": " + line);
   }
@@ -243,26 +242,26 @@ void Data::populateLinkedKanji() {
        const auto& i : _kanjiNameMap)
     for (auto& j : i.second->oldNames())
       if (!findKanjiByName(j))
-        checkInsert(linkedOld,
-                    std::make_shared<LinkedOldKanji>(*this, j, i.second));
+        checkInsert(
+            linkedOld, std::make_shared<LinkedOldKanji>(*this, j, i.second));
 }
 
 void Data::populateJinmei() {
   auto results{CustomFileKanji::fromFile<JinmeiKanji>(
-    *this, DataFile::getFile(_dataDir, JinmeiFile))};
+      *this, DataFile::getFile(_dataDir, JinmeiFile))};
   for (auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
        const auto& i : results) {
     checkInsert(i);
     for (auto& j : i->oldNames())
-      checkInsert(linkedJinmei,
-                  std::make_shared<LinkedJinmeiKanji>(*this, j, i));
+      checkInsert(
+          linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
   }
   _types[KanjiTypes::Jinmei] = std::move(results);
 }
 
 void Data::populateExtra() {
   auto results{CustomFileKanji::fromFile<ExtraKanji>(
-    *this, DataFile::getFile(_dataDir, ExtraFile))};
+      *this, DataFile::getFile(_dataDir, ExtraFile))};
   for (const auto& i : results) checkInsert(i);
   _types[KanjiTypes::Extra] = std::move(results);
 }
@@ -272,7 +271,7 @@ void Data::processList(const DataFile& list) {
   DataFile::List created;
   std::map<KanjiTypes, DataFile::List> found;
   auto& newKanji{
-    _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency]};
+      _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency]};
   for (size_t i{}; i < list.list().size(); ++i) {
     auto& name{list.list()[i]};
     Entry kanji;
@@ -290,9 +289,9 @@ void Data::processList(const DataFile& list) {
         // of JLPT levels)
         const auto reading{_frequencyReadings.find(name)};
         kanji = reading == _frequencyReadings.end()
-                  ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
-                  : std::make_shared<FrequencyKanji>(*this, name,
-                                                     reading->second, i + 1);
+                    ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
+                    : std::make_shared<FrequencyKanji>(
+                          *this, name, reading->second, i + 1);
       }
       checkInsert(newKanji, kanji);
       // don't print out kentei 'created' since there more than 2,000 outside of
@@ -309,33 +308,32 @@ void Data::processList(const DataFile& list) {
       assert(kanji->frequency());
       const auto index{(*kanji->frequency() - 1U) / FrequencyBucketEntries};
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1]
-        .push_back(kanji);
+          .push_back(kanji);
     }
   }
   if (fullDebug()) {
     DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
     DataFile::print(created,
-                    std::string("non-Jouyou/Jinmei") +
-                      (hasValue(list.level()) ? "" : "/JLPT"),
-                    list.name());
+        std::string("non-Jouyou/Jinmei") +
+            (hasValue(list.level()) ? "" : "/JLPT"),
+        list.name());
     // list.level is None when processing 'frequency.txt' file (so not JLPT)
     if (!kenteiList && !(list.level())) {
       std::vector lists{std::pair(&found[KanjiTypes::Jinmei], ""),
-                        std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
+          std::pair(&found[KanjiTypes::LinkedJinmei], "Linked ")};
       for (const auto& i : lists) {
         DataFile::List jlptJinmei, otherJinmei;
         for (auto& j : *i.first)
           (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
         DataFile::print(jlptJinmei, std::string("JLPT ") + i.second + "Jinmei",
-                        list.name());
+            list.name());
         DataFile::print(otherJinmei,
-                        std::string("non-JLPT ") + i.second + "Jinmei",
-                        list.name());
+            std::string("non-JLPT ") + i.second + "Jinmei", list.name());
       }
     } else {
       DataFile::print(found[KanjiTypes::Jinmei], "Jinmei", list.name());
-      DataFile::print(found[KanjiTypes::LinkedJinmei], "Linked Jinmei",
-                      list.name());
+      DataFile::print(
+          found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
     }
   }
 }
@@ -351,7 +349,7 @@ void Data::processUcd() {
 
 void Data::checkStrokes() const {
   DataFile::List strokesFrequency, strokesNotFound, strokeDiffs, vStrokeDiffs,
-    missingDiffs, missingUcd;
+      missingDiffs, missingUcd;
   for (const auto& i : _strokes) {
     const auto u{findUcd(i.first)};
     const auto ucdStrokes{getStrokes(i.first, u, false, true)};
@@ -379,14 +377,14 @@ void Data::checkStrokes() const {
   }
   if (debug()) {
     DataFile::print(strokesNotFound, "Kanji not loaded", "_strokes");
-    DataFile::print(vStrokeDiffs, "Variant kanji with differrent strokes",
-                    "_ucd");
-    DataFile::print(missingDiffs,
-                    "'_stokes only' Kanji with differrent strokes", "_ucd");
+    DataFile::print(
+        vStrokeDiffs, "Variant kanji with differrent strokes", "_ucd");
+    DataFile::print(
+        missingDiffs, "'_stokes only' Kanji with differrent strokes", "_ucd");
     DataFile::print(missingUcd, "Kanji in _strokes, but not found", "_ucd");
     if (fullDebug()) {
-      DataFile::print(strokesFrequency, "Kanji in 'Frequency' group",
-                      "_strokes");
+      DataFile::print(
+          strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
       DataFile::print(strokeDiffs, "Kanji with differrent strokes", "_ucd");
     }
   }

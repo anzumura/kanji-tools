@@ -24,7 +24,7 @@ public:
   // Radical' value of 2F1D
   [[nodiscard]] auto& find(const std::string& name) const {
     const auto i{_map.find(name)};
-    if (i == _map.end()) throw std::domain_error("name not found: " + name);
+    if (i == _map.end()) throw std::domain_error{"name not found: " + name};
     return _radicals.at(i->second);
   }
 

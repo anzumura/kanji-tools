@@ -47,16 +47,16 @@ public:
     using iBase = typename base::template Iterator<ConstIterator>;
 
     ConstIterator(size_t index, const EnumMap<T, V>& map) noexcept
-        : iBase(index), _map(&map) {}
+        : iBase{index}, _map{&map} {}
 
     void checkComparable(const ConstIterator& x) const {
-      if (_map != x._map) throw std::domain_error("not comparable");
+      if (_map != x._map) throw std::domain_error{"not comparable"};
     }
 
     const EnumMap<T, V>* _map;
   public:
     // forward iterator requirements (a default constructor)
-    ConstIterator() noexcept : iBase(0), _map(nullptr) {}
+    ConstIterator() noexcept : iBase{0}, _map{nullptr} {}
 
     [[nodiscard]] bool operator==(const ConstIterator& x) const {
       checkComparable(x);
@@ -81,7 +81,7 @@ public:
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto& operator*() const {
-      if (!_map) throw std::domain_error("not initialized");
+      if (!_map) throw std::domain_error{"not initialized"};
       if (iBase::_index >= N)
         iBase::error(base::Index + std::to_string(iBase::_index) + base::Range);
       return (*_map)[static_cast<T>(iBase::_index)];

@@ -37,7 +37,7 @@ public:
   }
 
   inline static const std::string CombiningVoiced{"\xe3\x82\x99"}, // U+3099
-    CombiningSemiVoiced{"\xe3\x82\x9a"};                           // U+309A
+      CombiningSemiVoiced{"\xe3\x82\x9a"};                         // U+309A
 
   [[nodiscard]] static auto isCombiningMark(const unsigned char* s) {
     return s && *s++ == 0xe3 && *s++ == 0x82 && (*s == 0x99 || *s == 0x9a);
@@ -82,19 +82,19 @@ public:
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so
   // 2-4 bytes) followed by a variation selector (which are always 3 bytes).
-  [[nodiscard]] static auto
-  isMBCharWithVariationSelector(const std::string& s) {
+  [[nodiscard]] static auto isMBCharWithVariationSelector(
+      const std::string& s) {
     return s.size() > 4 && s.size() < 8 &&
            isVariationSelector(s.substr(s.size() - 3));
   }
   [[nodiscard]] static auto withoutVariationSelector(const std::string& s) {
     return isMBCharWithVariationSelector(s) ? s.substr(0, s.size() - 3) : s;
   }
-  [[nodiscard]] static auto
-  optionalWithoutVariationSelector(const std::string& s) {
+  [[nodiscard]] static auto optionalWithoutVariationSelector(
+      const std::string& s) {
     return isMBCharWithVariationSelector(s)
-             ? std::optional(s.substr(0, s.size() - 3))
-             : std::nullopt;
+               ? std::optional(s.substr(0, s.size() - 3))
+               : std::nullopt;
   }
 
   // 'getFirst' returns the first MBChar from 's' (including any variation
@@ -102,12 +102,12 @@ public:
   // sequence then empty string is returned.
   [[nodiscard]] static auto getFirst(const std::string& s) {
     std::string result;
-    MBChar c(s);
+    MBChar c{s};
     c.next(result);
     return result;
   }
 
-  explicit MBChar(const std::string& data) : _data(data) {}
+  explicit MBChar(const std::string& data) : _data{data} {}
 
   MBChar(const MBChar&) = delete;
   // operator= is not generated since there are const members
@@ -157,8 +157,8 @@ private:
   // points to a valid multi-byte utf8 sequence. It sets 'result', increments
   // 'location' and returns true if the result is valid, i.e., not a 'variation
   // selector' or a 'combining mark'.
-  [[nodiscard]] static auto validResult(std::string& result,
-                                        const char*& location) {
+  [[nodiscard]] static auto validResult(
+      std::string& result, const char*& location) {
     return !isVariationSelector(result = getMBUtf8(location)) &&
            !isCombiningMark(result);
   }
@@ -166,8 +166,8 @@ private:
   // 'peekVariant' is called from 'next' and 'peek' methods. It populates
   // 'result' if 'location' starts a valid multi-byte utf8 sequence and returns
   // true if 'result' is a 'variation selector'.
-  [[nodiscard]] static auto peekVariant(std::string& result,
-                                        const char* location) {
+  [[nodiscard]] static auto peekVariant(
+      std::string& result, const char* location) {
     return isValidMBUtf8(location) &&
            isVariationSelector(result = getMBUtf8(location));
   }

@@ -73,7 +73,7 @@ void Table::printMarkdown(std::ostream& os) const {
 }
 
 void Table::print(std::ostream& os, const Widths& widths, const Row& row,
-                  char fill, char delim) const {
+    char fill, char delim) const {
   const auto cell{[&os, delim, fill](size_t w, const auto& s) {
     os << delim << fill << std::setw(static_cast<int>(w) + 1) << s;
   }};

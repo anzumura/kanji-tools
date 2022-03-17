@@ -10,7 +10,7 @@ namespace kanji_tools {
 class UnicodeVersion {
 public:
   consteval UnicodeVersion(const char* v, uint8_t m, uint16_t y)
-      : version(v), month(m), year(y) {}
+      : version{v}, month{m}, year{y} {}
 
   UnicodeVersion(const UnicodeVersion&) = delete;
 
@@ -63,9 +63,9 @@ private:
     static_assert(Start < End);
   }
 
-  consteval UnicodeBlock(char32_t s, char32_t e, const UnicodeVersion* v = {},
-                         const char* n = {})
-      : start(s), end(e), version(v), name(n) {}
+  consteval UnicodeBlock(
+      char32_t s, char32_t e, const UnicodeVersion* v = {}, const char* n = {})
+      : start{s}, end{e}, version{v}, name{n} {}
 
   template<char32_t Start> friend consteval auto makeBlock();
 
@@ -82,12 +82,12 @@ private:
 // functions. This also allows better static_assert (using '<' instead of '<=').
 template<char32_t Start> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkRange<Start>();
-  return UnicodeBlock(Start, Start);
+  return UnicodeBlock{Start, Start};
 }
 template<char32_t Start, char32_t End>
 [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkLess<Start, End>();
-  return UnicodeBlock(Start, End);
+  return UnicodeBlock{Start, End};
 }
 
 // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex
@@ -97,23 +97,24 @@ template<char32_t Start, char32_t End, typename T>
   UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % 16 == 0);
   static_assert(End % 16 == 15);
-  return UnicodeBlock(Start, End, &v, n);
+  return UnicodeBlock{Start, End, &v, n};
 }
 
 // below are the Unicode versions referenced in this program, for the full list
 // see: https://unicode.org/history/publicationdates.html
-inline constexpr UnicodeVersion UVer1_0("1.0", 10, 1991),
-  UVer1_1("1.1", 6, 1993), UVer2_0("2.0", 7, 1996), UVer3_0("3.0", 9, 1999),
-  UVer3_1("3.1", 3, 2001), UVer3_2("3.2", 3, 2002), UVer4_1("4.1", 3, 2005),
-  UVer5_0("5.0", 7, 2006), UVer5_2("5.2", 10, 2009), UVer13_0("13.0", 3, 2020);
+inline constexpr UnicodeVersion UVer1_0{"1.0", 10, 1991},
+    UVer1_1{"1.1", 6, 1993}, UVer2_0{"2.0", 7, 1996}, UVer3_0{"3.0", 9, 1999},
+    UVer3_1{"3.1", 3, 2001}, UVer3_2{"3.2", 3, 2002}, UVer4_1{"4.1", 3, 2005},
+    UVer5_0{"5.0", 7, 2006}, UVer5_2{"5.2", 10, 2009},
+    UVer13_0{"13.0", 3, 2020};
 
 inline constexpr std::array HiraganaBlocks{
-  makeBlock<0x3040, 0x309f>(UVer1_1, "Hiragana")};
+    makeBlock<0x3040, 0x309f>(UVer1_1, "Hiragana")};
 
 // Second block contains small letters (for Ainu) like ㇱ
 inline constexpr std::array KatakanaBlocks{
-  makeBlock<0x30a0, 0x30ff>(UVer1_1, "Katakana"),
-  makeBlock<0x31f0, 0x31ff>(UVer3_2, "Katakana Phonetic Extension")};
+    makeBlock<0x30a0, 0x30ff>(UVer1_1, "Katakana"),
+    makeBlock<0x31f0, 0x31ff>(UVer3_2, "Katakana Phonetic Extension")};
 
 // Almost all 'common' Japanese Kanji are in the original CJK Unified block.
 // Extension A has one 'Kentei' and about 1000 'Ucd' Kanji. Extension B has an
@@ -122,10 +123,10 @@ inline constexpr std::array KatakanaBlocks{
 // Japanese Kanji that used to require two graphemes, i.e., a base character
 // followed by a variation selector.
 inline constexpr std::array CommonKanjiBlocks{
-  makeBlock<0x3400, 0x4dbf>(UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
-  makeBlock<0x4e00, 0x9fff>(UVer1_1, "CJK Unified Ideographs"), // ~20K
-  makeBlock<0xf900, 0xfaff>(UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
-  makeBlock<0x20000, 0x2a6df>(UVer3_1, "CJK Extension B")       // ~42K: 𠮟
+    makeBlock<0x3400, 0x4dbf>(UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
+    makeBlock<0x4e00, 0x9fff>(UVer1_1, "CJK Unified Ideographs"), // ~20K
+    makeBlock<0xf900, 0xfaff>(UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
+    makeBlock<0x20000, 0x2a6df>(UVer3_1, "CJK Extension B")       // ~42K: 𠮟
 };
 
 // Note: Extensions C, D, E and F are contiguous so combine into one block (more
@@ -135,53 +136,53 @@ inline constexpr std::array CommonKanjiBlocks{
 // - U+2B820 to U+2CEAF : CJK Extension E, ver 8.0 Jun 2015, ~6K kanji
 // - U+2CEB0 to U+2EBEF : CJK Extension F, ver 10.0 Jun 2016, ~7K kanji
 inline constexpr std::array RareKanjiBlocks{
-  makeBlock<0x2e80, 0x2eff>(UVer3_0, "Radicals Supp."),      // 128
-  makeBlock<0x2a700, 0x2ebef>(UVer5_2, "CJK Extension C-F"), // ~17K kanji
-  makeBlock<0x2f800, 0x2fa1f>(UVer3_1, "CJK Compat. Supp."), // ~6K kanji
-  makeBlock<0x30000, 0x3134f>(UVer13_0, "CJK Extension G")   // ~5K kanji
+    makeBlock<0x2e80, 0x2eff>(UVer3_0, "Radicals Supp."),      // 128
+    makeBlock<0x2a700, 0x2ebef>(UVer5_2, "CJK Extension C-F"), // ~17K kanji
+    makeBlock<0x2f800, 0x2fa1f>(UVer3_1, "CJK Compat. Supp."), // ~6K kanji
+    makeBlock<0x30000, 0x3134f>(UVer13_0, "CJK Extension G")   // ~5K kanji
 };
 
 inline constexpr std::array PunctuationBlocks{
-  makeBlock<0x2000, 0x206f>(UVer1_1, "General Punctuation"), // —, ‥, ”, “
-  makeBlock<0x3000, 0x303f>(UVer1_1, "CJK Symbols and Punctuation"), // 、,
-  makeBlock<0xfff0, 0xffff>(UVer1_1, "Specials") // Object Replacement, etc.
+    makeBlock<0x2000, 0x206f>(UVer1_1, "General Punctuation"), // —, ‥, ”, “
+    makeBlock<0x3000, 0x303f>(UVer1_1, "CJK Symbols and Punctuation"), // 、,
+    makeBlock<0xfff0, 0xffff>(UVer1_1, "Specials") // Object Replacement, etc.
 };
 
 // There are a lot more symbol and letter blocks, but they haven't come up in
 // sample files so far
 inline constexpr std::array SymbolBlocks{
-  makeBlock<0x2100, 0x214f>(UVer1_1, "Letterlike Symbols"),          // ℃
-  makeBlock<0x2190, 0x21ff>(UVer1_1, "Arrows"),                      // →
-  makeBlock<0x2200, 0x22ff>(UVer1_1, "Mathematical Operators"),      // ∀
-  makeBlock<0x2500, 0x257f>(UVer1_1, "Box Drawing"),                 // ─
-  makeBlock<0x25a0, 0x25ff>(UVer1_1, "Geometric Shapes"),            // ○
-  makeBlock<0x2600, 0x26ff>(UVer1_1, "Miscellaneous Symbols"),       // ☆
-  makeBlock<0x2ff0, 0x2fff>(UVer3_0, "CJK Ideographic Desc. Chars"), // ⿱
-  makeBlock<0x3190, 0x319f>(UVer1_1, "Kanbun (Annotations)"),        // ㆑
-  makeBlock<0x31c0, 0x31ef>(UVer4_1, "CJK Strokes")                  // ㇁
+    makeBlock<0x2100, 0x214f>(UVer1_1, "Letterlike Symbols"),          // ℃
+    makeBlock<0x2190, 0x21ff>(UVer1_1, "Arrows"),                      // →
+    makeBlock<0x2200, 0x22ff>(UVer1_1, "Mathematical Operators"),      // ∀
+    makeBlock<0x2500, 0x257f>(UVer1_1, "Box Drawing"),                 // ─
+    makeBlock<0x25a0, 0x25ff>(UVer1_1, "Geometric Shapes"),            // ○
+    makeBlock<0x2600, 0x26ff>(UVer1_1, "Miscellaneous Symbols"),       // ☆
+    makeBlock<0x2ff0, 0x2fff>(UVer3_0, "CJK Ideographic Desc. Chars"), // ⿱
+    makeBlock<0x3190, 0x319f>(UVer1_1, "Kanbun (Annotations)"),        // ㆑
+    makeBlock<0x31c0, 0x31ef>(UVer4_1, "CJK Strokes")                  // ㇁
 };
 
 // the last block also includes 'halfwidth katakana'
 inline constexpr std::array LetterBlocks{
-  makeBlock<0x0080, 0x00ff>(UVer1_1, "Latin-1 Supplement"),    // ·, ×
-  makeBlock<0x0100, 0x017f>(UVer1_1, "Latin Extended-A"),      // Ā
-  makeBlock<0x0180, 0x024f>(UVer1_1, "Latin Extended-B"),      // ƀ
-  makeBlock<0x2150, 0x218f>(UVer1_1, "Number Forms"),          // Ⅳ
-  makeBlock<0x2460, 0x24ff>(UVer1_1, "Enclosed Alphanumeics"), // ⑦
-  makeBlock<0x2c60, 0x2c7f>(UVer5_0, "Latin Extended-C"),
-  makeBlock<0xff00, 0xffef>(UVer1_1, "Halfwidth and Fullwidth Forms")};
+    makeBlock<0x0080, 0x00ff>(UVer1_1, "Latin-1 Supplement"),    // ·, ×
+    makeBlock<0x0100, 0x017f>(UVer1_1, "Latin Extended-A"),      // Ā
+    makeBlock<0x0180, 0x024f>(UVer1_1, "Latin Extended-B"),      // ƀ
+    makeBlock<0x2150, 0x218f>(UVer1_1, "Number Forms"),          // Ⅳ
+    makeBlock<0x2460, 0x24ff>(UVer1_1, "Enclosed Alphanumeics"), // ⑦
+    makeBlock<0x2c60, 0x2c7f>(UVer5_0, "Latin Extended-C"),
+    makeBlock<0xff00, 0xffef>(UVer1_1, "Halfwidth and Fullwidth Forms")};
 
 // Skip codes in this range when reading in Kanji. See this link for more info:
 // http://unicode.org/reports/tr28/tr28-3.html#13_7_variation_selectors
 inline constexpr std::array NonSpacingBlocks{
-  makeBlock<0xfe00, 0xfe0f>(UVer3_2, "Variation Selectors")};
+    makeBlock<0xfe00, 0xfe0f>(UVer3_2, "Variation Selectors")};
 
 // 'inRange' checks if 'c' is contained in any of the UnicodeBocks in the array
 // 't'. The blocks in 't' are assumed to be in order (order is checked by
 // automated tests for all the arrays defined above).
 template<size_t N>
-[[nodiscard]] constexpr bool
-inRange(char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
+[[nodiscard]] constexpr bool inRange(
+    char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
   for (auto& i : t) {
     if (c < i.start) break;
     if (i(c)) return true;
@@ -193,14 +194,13 @@ inRange(char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
 // no requirement for the arrays to be specified in a particular order (which
 // wouldn't work anyway for overlapping ranges).
 template<size_t N, typename... Ts>
-[[nodiscard]] constexpr bool inRange(char32_t c,
-                                     const std::array<UnicodeBlock, N>& t,
-                                     Ts&... args) noexcept {
+[[nodiscard]] constexpr bool inRange(
+    char32_t c, const std::array<UnicodeBlock, N>& t, Ts&... args) noexcept {
   return inRange(c, t) || inRange(c, args...);
 }
 
 inline constexpr auto CombiningMarkVoiced{U'\x3099'},
-  CombiningMarkSemiVoiced{U'\x309a'};
+    CombiningMarkSemiVoiced{U'\x309a'};
 
 [[nodiscard]] constexpr auto isNonSpacing(char32_t c) noexcept {
   return inRange(c, NonSpacingBlocks) || c == CombiningMarkVoiced ||
@@ -211,8 +211,8 @@ inline constexpr auto CombiningMarkVoiced{U'\x3099'},
 // will return false and a string longer than one 'MB characer' will also return
 // false unless 'sizeOne' is false.
 template<typename... T>
-[[nodiscard]] inline auto inWCharRange(const std::string& s, bool sizeOne,
-                                       T&... t) {
+[[nodiscard]] inline auto inWCharRange(
+    const std::string& s, bool sizeOne, T&... t) {
   if (s.size() > 1 && (!sizeOne || s.size() < 9))
     if (const auto w{fromUtf8(s)};
         sizeOne ? w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])
@@ -242,15 +242,15 @@ template<typename... T>
 // the string are the desired type.
 
 // kana
-[[nodiscard]] inline auto isHiragana(const std::string& s,
-                                     bool sizeOne = true) {
+[[nodiscard]] inline auto isHiragana(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, HiraganaBlocks);
 }
 [[nodiscard]] inline auto isAllHiragana(const std::string& s) {
   return inWCharRange(s, HiraganaBlocks);
 }
-[[nodiscard]] inline auto isKatakana(const std::string& s,
-                                     bool sizeOne = true) {
+[[nodiscard]] inline auto isKatakana(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, KatakanaBlocks);
 }
 [[nodiscard]] inline auto isAllKatakana(const std::string& s) {
@@ -264,15 +264,15 @@ template<typename... T>
 }
 
 // kanji
-[[nodiscard]] inline auto isCommonKanji(const std::string& s,
-                                        bool sizeOne = true) {
+[[nodiscard]] inline auto isCommonKanji(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, CommonKanjiBlocks);
 }
 [[nodiscard]] inline auto isAllCommonKanji(const std::string& s) {
   return inWCharRange(s, CommonKanjiBlocks);
 }
-[[nodiscard]] inline auto isRareKanji(const std::string& s,
-                                      bool sizeOne = true) {
+[[nodiscard]] inline auto isRareKanji(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, RareKanjiBlocks);
 }
 [[nodiscard]] inline auto isAllRareKanji(const std::string& s) {
@@ -287,24 +287,23 @@ template<typename... T>
 
 // 'isMBPunctuation' tests for wide space by default, but also allows not
 // including spaces.
-[[nodiscard]] inline auto isMBPunctuation(const std::string& s,
-                                          bool includeSpace = false,
-                                          bool sizeOne = true) {
+[[nodiscard]] inline auto isMBPunctuation(
+    const std::string& s, bool includeSpace = false, bool sizeOne = true) {
   return s.starts_with("　") ? (includeSpace && (s.size() < 4 || !sizeOne))
                              : inWCharRange(s, sizeOne, PunctuationBlocks);
 }
 [[nodiscard]] inline auto isAllMBPunctuation(const std::string& s) {
   return inWCharRange(s, PunctuationBlocks);
 }
-[[nodiscard]] inline auto isMBSymbol(const std::string& s,
-                                     bool sizeOne = true) {
+[[nodiscard]] inline auto isMBSymbol(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, SymbolBlocks);
 }
 [[nodiscard]] inline auto isAllMBSymbol(const std::string& s) {
   return inWCharRange(s, SymbolBlocks);
 }
-[[nodiscard]] inline auto isMBLetter(const std::string& s,
-                                     bool sizeOne = true) {
+[[nodiscard]] inline auto isMBLetter(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, LetterBlocks);
 }
 [[nodiscard]] inline auto isAllMBLetter(const std::string& s) {
@@ -313,16 +312,15 @@ template<typename... T>
 
 // 'isRecognizedCharacter' returns true if 's' is in any UnicodeBlock defined in
 // this header file (including wide space)
-[[nodiscard]] inline auto isRecognizedCharacter(const std::string& s,
-                                                bool sizeOne = true) {
+[[nodiscard]] inline auto isRecognizedCharacter(
+    const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, HiraganaBlocks, CommonKanjiBlocks,
-                      RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks,
-                      SymbolBlocks, LetterBlocks);
+      RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks, SymbolBlocks,
+      LetterBlocks);
 }
 [[nodiscard]] inline auto isAllRecognizedCharacters(const std::string& s) {
   return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks,
-                      KatakanaBlocks, PunctuationBlocks, SymbolBlocks,
-                      LetterBlocks);
+      KatakanaBlocks, PunctuationBlocks, SymbolBlocks, LetterBlocks);
 }
 
 // KanjiRange is for wregex and includes the common and rare kanji as well as

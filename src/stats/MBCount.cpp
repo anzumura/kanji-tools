@@ -16,8 +16,8 @@ const auto CloseWideBracketSize{CloseWideBracket.size()};
 
 namespace fs = std::filesystem;
 
-const std::wregex MBCount::RemoveFurigana(std::wstring(L"([") + KanjiRange +
-                                          L"]{1})（[" + KanaRange + L"]+）");
+const std::wregex MBCount::RemoveFurigana(
+    std::wstring(L"([") + KanjiRange + L"]{1})（[" + KanaRange + L"]+）");
 const std::wstring MBCount::DefaultReplace(L"$1");
 
 size_t MBCount::add(const std::string& s, const OptString& tag) {
@@ -52,8 +52,8 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
   return added;
 }
 
-size_t MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
-                          bool recurse) {
+size_t MBCount::doAddFile(
+    const fs::path& file, bool addTag, bool fileNames, bool recurse) {
   size_t added{};
   const auto fileName{file.filename().string()}; // use final component of path
   const auto tag{addTag ? OptString(fileName) : std::nullopt};
@@ -65,8 +65,8 @@ size_t MBCount::doAddFile(const fs::path& file, bool addTag, bool fileNames,
     for (fs::directory_entry i : fs::directory_iterator(file))
       added += recurse ? doAddFile(i.path(), addTag, fileNames)
                : fs::is_regular_file(i.path())
-                 ? doAddFile(i.path(), addTag, fileNames, false)
-                 : 0;
+                   ? doAddFile(i.path(), addTag, fileNames, false)
+                   : 0;
   } else // skip if not a regular file or directory
     return 0;
   if (fileNames) added += add(fileName, tag);
@@ -82,8 +82,7 @@ bool MBCount::hasUnclosedBrackets(const std::string& line) {
 }
 
 size_t MBCount::processJoinedLine(std::string& prevLine,
-                                  const std::string& line, size_t pos,
-                                  const OptString& tag) {
+    const std::string& line, size_t pos, const OptString& tag) {
   const auto end{pos + CloseWideBracketSize};
   const auto joinedLine{prevLine + line.substr(0, end)};
   // set 'prevLine' to the unprocessed portion of 'line'

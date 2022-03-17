@@ -56,7 +56,7 @@ inline constexpr auto is_enumarray_with_none{false};
 
 template<typename T, typename _ = int>
 using isBaseEnumArray =
-  std::enable_if_t<is_enumarray<T> || is_enumarray_with_none<T>, _>;
+    std::enable_if_t<is_enumarray<T> || is_enumarray_with_none<T>, _>;
 
 template<typename T, isBaseEnumArray<T> = 0> class BaseEnumArray {
 public:
@@ -66,7 +66,7 @@ public:
 
   [[nodiscard]] static auto& instance() {
     if (!_instance)
-      throw std::domain_error("must call 'create' before calling 'instance'");
+      throw std::domain_error{"must call 'create' before calling 'instance'"};
     return *_instance;
   }
 
@@ -83,13 +83,13 @@ protected:
   [[nodiscard]] auto find(const std::string& name) const {
     const auto i{_nameMap.find(name)};
     if (i == _nameMap.end())
-      throw std::domain_error("name '" + name + "' not found");
+      throw std::domain_error{"name '" + name + "' not found"};
     return i->second;
   }
 
   void insert(const std::string& name, size_t index) {
     if (!_nameMap.emplace(name, static_cast<T>(index)).second)
-      throw std::domain_error("duplicate name '" + name + "'");
+      throw std::domain_error{"duplicate name '" + name + "'"};
   }
 
   std::map<std::string, T> _nameMap;
@@ -106,10 +106,10 @@ public:
     friend IterableEnumArray<T, N>;
     using iBase = typename base::template Iterator<ConstIterator>;
 
-    ConstIterator(size_t index) noexcept : iBase(index) {}
+    ConstIterator(size_t index) noexcept : iBase{index} {}
   public:
     // forward iterator requirements (a default constructor)
-    ConstIterator() noexcept : iBase(0) {}
+    ConstIterator() noexcept : iBase{0} {}
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto operator*() const {
@@ -155,7 +155,7 @@ private:
   EnumArray(const std::string& name) { setName(name, N - 1); }
 
   template<typename... Names>
-  EnumArray(const std::string& name, Names... args) : EnumArray(args...) {
+  EnumArray(const std::string& name, Names... args) : EnumArray{args...} {
     setName(name, N - 1 - sizeof...(args));
   }
 
@@ -180,8 +180,8 @@ public:
     return i < N ? _names[i] : None;
   }
 
-  [[nodiscard]] auto fromString(const std::string& s,
-                                bool allowEmptyAsNone = false) const {
+  [[nodiscard]] auto fromString(
+      const std::string& s, bool allowEmptyAsNone = false) const {
     return allowEmptyAsNone && s.empty() || s == None ? T::None : base::find(s);
   }
 private:
@@ -192,12 +192,12 @@ private:
 
   template<typename... Names>
   EnumArrayWithNone(const std::string& name, Names... args)
-      : EnumArrayWithNone(args...) {
+      : EnumArrayWithNone{args...} {
     setName(name, N - 1 - sizeof...(args));
   }
 
   void setName(const std::string& name, size_t index) {
-    if (name == None) throw std::domain_error("'None' should not be specified");
+    if (name == None) throw std::domain_error{"'None' should not be specified"};
     base::insert(_names[index] = name, index);
   }
 
@@ -206,19 +206,19 @@ private:
 
 template<typename T, isBaseEnumArray<T> _>
 template<typename... Names>
-[[nodiscard]] auto BaseEnumArray<T, _>::create(const std::string& name,
-                                               Names... args) {
+[[nodiscard]] auto BaseEnumArray<T, _>::create(
+    const std::string& name, Names... args) {
   static_assert(is_enumarray<T> != is_enumarray_with_none<T>,
-                "both 'is_enumarray' and 'is_enumarray_with_none' are true");
-  if (_instance) throw std::domain_error("'create' should only be called once");
+      "both 'is_enumarray' and 'is_enumarray_with_none' are true");
+  if (_instance) throw std::domain_error{"'create' should only be called once"};
   if constexpr (is_enumarray<T>)
-    return EnumArray<T, sizeof...(args) + 1>(name, args...);
+    return EnumArray<T, sizeof...(args) + 1>{name, args...};
   else {
     // Make sure the scoped enum 'T' has a value of None that is just past the
     // set of string values provided - this will help ensure that any changes to
     // the enum must also be made to the call to 'create' and vice versa.
     static_assert(static_cast<T>(sizeof...(Names) + 1) == T::None);
-    return EnumArrayWithNone<T, sizeof...(args) + 1>(name, args...);
+    return EnumArrayWithNone<T, sizeof...(args) + 1>{name, args...};
   }
 }
 

@@ -15,11 +15,11 @@ enum Values {
   PlainDigraphs = 71,
   RomajiVariants = 55
 };
-constexpr auto TotalMonographs{HanDakuten + SmallMonographs +
-                               DakutenMonographs + PlainMonographs},
-  TotalDigraphs{HanDakuten + PlainDigraphs + DakutenDigraphs},
-  TotalKana{TotalMonographs + TotalDigraphs},
-  TotalRomaji{TotalKana + RomajiVariants};
+constexpr auto TotalMonographs{
+    HanDakuten + SmallMonographs + DakutenMonographs + PlainMonographs},
+    TotalDigraphs{HanDakuten + PlainDigraphs + DakutenDigraphs},
+    TotalKana{TotalMonographs + TotalDigraphs},
+    TotalRomaji{TotalKana + RomajiVariants};
 
 } // namespace
 
@@ -54,17 +54,17 @@ TEST(KanaTest, CheckHiragana) {
   EXPECT_EQ(sourceMap.size(), TotalKana);
   // count various types including smallDigraphs (which should be 0)
   u_int8_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
-    dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
-    dakutenDigraphs{}, smallDigraphs{};
+      dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
+      dakutenDigraphs{}, smallDigraphs{};
   for (auto& i : sourceMap) {
     MBChar s{i.first};
     std::string c;
     const auto checkDigraph{
-      [&i, &c](const std::string& a, const std::string& b = {}) {
-        EXPECT_TRUE(c == a || (!b.empty() && c == b))
-          << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-          << i.second->romaji() << "', hiragana " << i.first;
-      }};
+        [&i, &c](const std::string& a, const std::string& b = {}) {
+          EXPECT_TRUE(c == a || (!b.empty() && c == b))
+              << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
+              << i.second->romaji() << "', hiragana " << i.first;
+        }};
     EXPECT_TRUE(s.next(c));
     if (s.next(c)) {
       EXPECT_FALSE(i.second->isMonograph());
@@ -129,11 +129,11 @@ TEST(KanaTest, CheckKatakana) {
     EXPECT_TRUE(hiraganaMap.contains(i.second->hiragana()));
     std::string c;
     const auto checkDigraph{
-      [&i, &c](const std::string& a, const std::string& b = {}) {
-        EXPECT_TRUE(c == a || (!b.empty() && c == b))
-          << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-          << i.second->romaji() << "', katakana " << i.first;
-      }};
+        [&i, &c](const std::string& a, const std::string& b = {}) {
+          EXPECT_TRUE(c == a || (!b.empty() && c == b))
+              << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
+              << i.second->romaji() << "', katakana " << i.first;
+        }};
     EXPECT_TRUE(s.next(c));
     if (s.next(c)) {
       // if there's a second character it must be a small symbol matching the
@@ -161,7 +161,7 @@ TEST(KanaTest, CheckRomaji) {
   auto& sourceMap{Kana::getMap(CharType::Romaji)};
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
   u_int8_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
-    oNum{}, voNum{}, nNum{};
+      oNum{}, voNum{}, nNum{};
   std::set<std::string> romajiVariants;
   for (auto& i : sourceMap) {
     const auto count{[&i](auto& normal, auto& variant) {
@@ -197,8 +197,8 @@ TEST(KanaTest, CheckRomaji) {
   EXPECT_EQ(voNum, 10);
   EXPECT_EQ(nNum, 1);
   EXPECT_EQ(aNum + vaNum + iNum + viNum + uNum + vuNum + eNum + veNum + oNum +
-              voNum + nNum,
-            TotalRomaji);
+                voNum + nNum,
+      TotalRomaji);
   EXPECT_EQ(romajiVariants.size(), RomajiVariants);
 }
 

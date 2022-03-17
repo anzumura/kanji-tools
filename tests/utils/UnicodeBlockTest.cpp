@@ -35,7 +35,7 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   // KanjiRange should include all the common and rare kanji + variant selectors
   // and a null terminator
   ASSERT_EQ(std::size(KanjiRange),
-            (CommonKanjiBlocks.size() + RareKanjiBlocks.size() + 1) * 3 + 1);
+      (CommonKanjiBlocks.size() + RareKanjiBlocks.size() + 1) * 3 + 1);
   EXPECT_EQ(CommonKanjiBlocks[0].range(), 6592);
   EXPECT_EQ(CommonKanjiBlocks[1].range(), 20992);
   EXPECT_EQ(CommonKanjiBlocks[2].range(), 512);

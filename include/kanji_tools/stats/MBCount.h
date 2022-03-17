@@ -34,8 +34,8 @@ public:
 
   // if 'find' regex is provided it's applied before processing for counting
   MBCount(OptRegex find = {}, const std::wstring& replace = DefaultReplace,
-          bool debug = false)
-      : _find(find), _replace(replace), _debug(debug) {}
+      bool debug = false)
+      : _find{find}, _replace{replace}, _debug{debug} {}
 
   MBCount(const MBCount&) = delete;
   // operator= is not generated since there are const members
@@ -52,9 +52,9 @@ public:
   // subdirectories are also searched. By default, file names are used as 'tag'
   // values when calling 'add'.
   size_t addFile(const std::filesystem::path& file, bool addTag = true,
-                 bool fileNames = true, bool recurse = true) {
+      bool fileNames = true, bool recurse = true) {
     if (!std::filesystem::exists(file))
-      throw std::domain_error("file not found: " + file.string());
+      throw std::domain_error{"file not found: " + file.string()};
     return doAddFile(file, addTag, fileNames, recurse);
   }
 
@@ -94,8 +94,7 @@ private:
   // until 'pos' (plus size of close bracket) and sets 'prevLine' to the
   // unprocessed remainder of 'line'.
   [[nodiscard]] size_t processJoinedLine(std::string& prevLine,
-                                         const std::string& line, size_t pos,
-                                         const OptString& tag);
+      const std::string& line, size_t pos, const OptString& tag);
 
   // 'processFile' returns the MBChar count from 'file'. If '_find' is not set
   // then each line is processed independently, otherwise 'hasUnclosedBrackets'
@@ -103,12 +102,12 @@ private:
   // calling 'add' to help '_find' match against larger sets of data. The focus
   // on brackets is to help removing furigana which is in brackets after a kanji
   // and can potentially span across lines of a text file.
-  [[nodiscard]] size_t processFile(const std::filesystem::path& file,
-                                   const OptString& tag);
+  [[nodiscard]] size_t processFile(
+      const std::filesystem::path& file, const OptString& tag);
 
   [[nodiscard]] virtual bool allowAdd(const std::string&) const { return true; }
   [[nodiscard]] size_t doAddFile(const std::filesystem::path& file, bool addTag,
-                                 bool fileNames, bool recurse = true);
+      bool fileNames, bool recurse = true);
 
   Map _map;
   TagMap _tags;
@@ -128,8 +127,8 @@ private:
 template<typename Pred> class MBCountIf : public MBCount {
 public:
   MBCountIf(Pred pred, OptRegex find = {},
-            const std::wstring& replace = DefaultReplace, bool debug = false)
-      : MBCount(find, replace, debug), _pred(pred) {}
+      const std::wstring& replace = DefaultReplace, bool debug = false)
+      : MBCount{find, replace, debug}, _pred{pred} {}
 private:
   [[nodiscard]] bool allowAdd(const std::string& token) const override {
     return _pred(token);

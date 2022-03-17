@@ -37,8 +37,8 @@ TEST_F(EnumMapTest, NoneReturnsEmptyForConstOperator) {
 
 TEST_F(EnumMapTest, NoneThrowsErrorForNonConstOperator) {
   EXPECT_THROW(call([this] { return _map[Colors::None]; },
-                    "index 'enum value 3' is out of range"),
-               std::out_of_range);
+                   "index 'enum value 3' is out of range"),
+      std::out_of_range);
 }
 
 TEST_F(EnumMapTest, RangeBasedForLoop) {
@@ -54,8 +54,8 @@ TEST_F(EnumMapTest, UninitializedIterator) {
 
 TEST_F(EnumMapTest, BadAccess) {
   EXPECT_THROW(call([this] { return _map[static_cast<Colors>(4U)]; },
-                    "index 'enum value 4' is out of range"),
-               std::out_of_range);
+                   "index 'enum value 4' is out of range"),
+      std::out_of_range);
 }
 
 TEST_F(EnumMapTest, BadIncrement) {
@@ -65,24 +65,24 @@ TEST_F(EnumMapTest, BadIncrement) {
   i += 1;
   EXPECT_EQ(*i, 7);
   EXPECT_EQ(++i, _map.end());
-  EXPECT_THROW(call([&] { return *i; }, "index '3' is out of range"),
-               std::out_of_range);
-  EXPECT_THROW(call([&] { i++; }, "can't increment past end"),
-               std::out_of_range);
-  EXPECT_THROW(call([&] { i += 1; }, "can't increment past end"),
-               std::out_of_range);
+  EXPECT_THROW(
+      call([&] { return *i; }, "index '3' is out of range"), std::out_of_range);
+  EXPECT_THROW(
+      call([&] { i++; }, "can't increment past end"), std::out_of_range);
+  EXPECT_THROW(
+      call([&] { i += 1; }, "can't increment past end"), std::out_of_range);
   EXPECT_THROW(call([&] { return i[1]; }, "can't increment past end"),
-               std::out_of_range);
+      std::out_of_range);
 }
 
 TEST_F(EnumMapTest, BadDecrement) {
   auto i{_map.end()};
-  EXPECT_THROW(call([&] { i -= 4; }, "can't decrement past zero"),
-               std::out_of_range);
+  EXPECT_THROW(
+      call([&] { i -= 4; }, "can't decrement past zero"), std::out_of_range);
   i -= 3;
   EXPECT_EQ(*i, 2);
-  EXPECT_THROW(call([&] { --i; }, "can't decrement past zero"),
-               std::out_of_range);
+  EXPECT_THROW(
+      call([&] { --i; }, "can't decrement past zero"), std::out_of_range);
 }
 
 TEST_F(EnumMapTest, IteratorCompare) {
@@ -109,8 +109,8 @@ TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
   EXPECT_FALSE(i != j);
   // an initialized iterator can't be compared to an initialized one
   i = _map.begin();
-  EXPECT_THROW(call([&] { return i == j; }, "not comparable"),
-               std::domain_error);
+  EXPECT_THROW(
+      call([&] { return i == j; }, "not comparable"), std::domain_error);
   EnumMap<Colors, int> other; // all values are initially set to zero
   EXPECT_EQ(_map.size(), other.size());
   j = other.begin();
@@ -119,10 +119,10 @@ TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
   for (int distance{};; ++distance, ++i, ++j) {
     EXPECT_EQ(i - _map.begin(), distance);
     EXPECT_EQ(j - other.begin(), distance);
-    EXPECT_THROW(call([&] { return i == j; }, "not comparable"),
-                 std::domain_error);
-    EXPECT_THROW(call([&] { return i - j; }, "not comparable"),
-                 std::domain_error);
+    EXPECT_THROW(
+        call([&] { return i == j; }, "not comparable"), std::domain_error);
+    EXPECT_THROW(
+        call([&] { return i - j; }, "not comparable"), std::domain_error);
     // put loop break condition here to let 'end' case get tested as well
     if (i == _map.end()) break;
   }

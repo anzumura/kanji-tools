@@ -15,16 +15,15 @@ fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   if (!fs::exists(p)) {
     auto msg{dir.string() + " must contain '" + file.string()};
     usage(file.has_extension()
-            ? msg + '\''
-            : msg + "' (also tried '" + TextFileExtension + "' extension)");
+              ? msg + '\''
+              : msg + "' (also tried '" + TextFileExtension + "' extension)");
   }
   if (!fs::is_regular_file(p)) usage(file.string() + " must be a regular file");
   return p;
 }
 
 void DataFile::print(const List& l, const std::string& type,
-                     const std::string& group, bool isError,
-                     std::ostream& out) {
+    const std::string& group, bool isError, std::ostream& out) {
   if (!l.empty()) {
     out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' '
         << type;
@@ -36,8 +35,7 @@ void DataFile::print(const List& l, const std::string& type,
 }
 
 DataFile::DataFile(const fs::path& fileIn, FileType fileType,
-                   bool createNewUniqueFile, Set* uniqueTypeNames,
-                   const std::string& name)
+    bool createNewUniqueFile, Set* uniqueTypeNames, const std::string& name)
     : _name(name.empty() ? capitalize(fileIn.stem().string()) : name) {
   auto file{fileIn};
   // try adding .txt if file isn't found
@@ -82,7 +80,7 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
   if (!dups.empty()) {
     if (good.empty())
       error("found " + std::to_string(dups.size()) + " duplicates in " + _name,
-            false);
+          false);
     else {
       std::cerr << ">>> found " << dups.size() << " duplicates in " << _name
                 << ":";

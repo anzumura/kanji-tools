@@ -29,7 +29,7 @@ public:
   // and sets 'flags' to None (which means no special conversion flags). Calling
   // the below 'convert' functions can override these values.
   KanaConvert(CharType target = CharType::Hiragana,
-              ConvertFlags flags = ConvertFlags::None);
+      ConvertFlags flags = ConvertFlags::None);
 
   KanaConvert(const KanaConvert&) = delete;
   // operator= is not generated since there are const members
@@ -66,13 +66,12 @@ public:
   // available flags that can be used. The third and fourth overloads update
   // '_target' and '_flags'.
   [[nodiscard]] std::string convert(const std::string& input) const;
-  [[nodiscard]] std::string convert(CharType source,
-                                    const std::string& input) const;
+  [[nodiscard]] std::string convert(
+      CharType source, const std::string& input) const;
   [[nodiscard]] std::string convert(const std::string& input, CharType target,
-                                    ConvertFlags = ConvertFlags::None);
+      ConvertFlags = ConvertFlags::None);
   [[nodiscard]] std::string convert(CharType source, const std::string& input,
-                                    CharType target,
-                                    ConvertFlags = ConvertFlags::None);
+      CharType target, ConvertFlags = ConvertFlags::None);
 private:
   // For input, either 'Apostrophe' or 'Dash' can be used to separate 'n' in
   // the middle of Rōmaji words like gin'iro, kan'atsu, kan-i, etc.. For Rōmaji
@@ -108,30 +107,25 @@ private:
   }
 
   [[nodiscard]] std::string convertFromKana(const std::string& input,
-                                            CharType source, const Set& afterN,
-                                            const Set& smallKana) const;
+      CharType source, const Set& afterN, const Set& smallKana) const;
   [[nodiscard]] std::string kanaLetters(const std::string& letterGroup,
-                                        CharType source, u_int8_t count,
-                                        const Kana*& prevKana,
-                                        bool prolong = false) const;
+      CharType source, u_int8_t count, const Kana*& prevKana,
+      bool prolong = false) const;
   [[nodiscard]] std::string convertFromRomaji(const std::string& input) const;
   void romajiLetters(std::string& letterGroup, std::string& result) const;
   [[nodiscard]] bool romajiMacronLetter(const std::string& letter,
-                                        std::string& letterGroup,
-                                        std::string& result) const;
+      std::string& letterGroup, std::string& result) const;
 
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
 
   // '_markAfterN...' contain the 8 Kana (5 vowels and 3 y's) that should be
   // proceedeed with 'Apostrophe' when producing Rōmaji if they follow 'n'.
-  Set _markAfterNHiragana;
-  Set _markAfterNKatakana;
+  Set _markAfterNHiragana, _markAfterNKatakana;
 
   // '_digraphSecond...' sets contain the 9 small Kana symbols (5 vowels, 3 y's,
   // and 'wa') that form the second parts of digraphs.
-  Set _digraphSecondHiragana;
-  Set _digraphSecondKatakana;
+  Set _digraphSecondHiragana, _digraphSecondKatakana;
 
   // Punctuation and word delimiter handling
   std::string _narrowDelimList;

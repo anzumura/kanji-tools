@@ -23,7 +23,7 @@ public:
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.
   QuizLauncher(u_int8_t argc, const char** argv, DataPtr, GroupDataPtr,
-               JukugoDataPtr, std::istream* in = {});
+      JukugoDataPtr, std::istream* in = {});
 
   QuizLauncher(const QuizLauncher&) = delete;
   // operator= is not generated since there are const members
@@ -33,7 +33,7 @@ public:
   // type of quiz/review and 'questionList' can also be provided (values depend
   // on quiz type - see Quiz.cpp 'HelpMessage' for details).
   void start(OptChar quizType, OptChar questionList, u_int16_t question = 0,
-             bool showMeanings = false);
+      bool showMeanings = false);
 
   [[nodiscard]] auto& log(bool heading = false) const {
     return data().log(heading);
@@ -53,8 +53,8 @@ public:
 
   void printExtraTypeInfo(const Entry&) const;
   void printLegend(KanjiInfo fields = KanjiInfo::All) const;
-  void printMeaning(const Entry&, bool useNewLine = false,
-                    bool showMeaning = true) const;
+  void printMeaning(
+      const Entry&, bool useNewLine = false, bool showMeaning = true) const;
   void printReviewDetails(const Entry&) const;
 private:
   static constexpr u_int8_t JukugoPerLine{3}, MaxJukugoSize{30};
@@ -62,9 +62,9 @@ private:
   [[nodiscard]] const Data& data() const { return _groupData->data(); }
 
   void startListQuiz(u_int16_t question, bool showMeanings,
-                     KanjiInfo excludeField, const List&) const;
+      KanjiInfo excludeField, const List&) const;
   void startGroupQuiz(u_int16_t question, bool showMeanings,
-                      OptChar questionList, const GroupData::List& list) const;
+      OptChar questionList, const GroupData::List& list) const;
 
   u_int16_t getU16(const std::string& msg, const std::string& arg) const;
 
@@ -79,8 +79,8 @@ private:
 
   // 'printDetails' prints info about a kanji provided on the command line
   // (instead of running a quiz)
-  void printDetails(const Data::List&, const std::string& name,
-                    const std::string& arg) const;
+  void printDetails(
+      const Data::List&, const std::string& name, const std::string& arg) const;
   void printDetails(const std::string&, bool showLegend = true) const;
 
   [[nodiscard]] bool getQuestionOrder();

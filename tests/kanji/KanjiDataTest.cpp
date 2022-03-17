@@ -11,7 +11,7 @@ namespace kanji_tools {
 namespace {
 
 constexpr auto Arg0{"program-name"}, DebugArg{"-debug"}, DataArg{"-data"},
-  DataDir{"some-dir"};
+    DataDir{"some-dir"};
 
 } // namespace
 
@@ -89,11 +89,11 @@ protected:
       }
       if (!Kanji::hasLink(i->type()))
         EXPECT_TRUE(_data->getStrokes(i->name()))
-          << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+            << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_EQ(MBChar::size(i->name()), 1)
-        << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+          << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_TRUE(isKanji(i->name()))
-        << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
+          << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
     }
     return variants;
   }
@@ -367,7 +367,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd{_data->ucd().map()};
   EXPECT_EQ(ucd.size(), _data->kanjiNameMap().size());
   u_int32_t jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
-    jinmeiLinksToJinmei{};
+      jinmeiLinksToJinmei{};
   std::map<KanjiTypes, u_int> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {

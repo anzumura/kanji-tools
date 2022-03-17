@@ -19,8 +19,8 @@ size_t ColumnFile::getColumnNumber(const std::string& name) {
   return i->second;
 }
 
-ColumnFile::ColumnFile(const fs::path& p, const Columns& columns,
-                       char delimiter)
+ColumnFile::ColumnFile(
+    const fs::path& p, const Columns& columns, char delimiter)
     : _file(std::fstream(p)), _delimiter(delimiter),
       _name(p.filename().string()), _rowValues(columns.size()),
       _columnToPosition(_allColumns.size(), ColNotFound) {
@@ -96,9 +96,8 @@ const std::string& ColumnFile::get(const Column& column) const {
   return _rowValues[pos];
 }
 
-unsigned long ColumnFile::processULong(const std::string& s,
-                                       const Column& column,
-                                       unsigned long maxValue) const {
+unsigned long ColumnFile::processULong(
+    const std::string& s, const Column& column, unsigned long maxValue) const {
   unsigned long i;
   try {
     i = std::stoul(s);
@@ -122,8 +121,8 @@ bool ColumnFile::getBool(const Column& column) const {
   return false;
 }
 
-char32_t ColumnFile::getWChar(const Column& column,
-                              const std::string& s) const {
+char32_t ColumnFile::getWChar(
+    const Column& column, const std::string& s) const {
   if (s.size() < 4 || s.size() > 5)
     error("failed to convert to char32_t, size must be 4 or 5", column, s);
   for (const char c : s)

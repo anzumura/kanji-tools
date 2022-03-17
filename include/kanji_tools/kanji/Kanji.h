@@ -148,14 +148,14 @@ public:
   [[nodiscard]] auto orderByQualifiedName(const Kanji& x) const {
     return qualifiedNameRank() < x.qualifiedNameRank() ||
            qualifiedNameRank() == x.qualifiedNameRank() &&
-             (strokes() < x.strokes() ||
-              strokes() == x.strokes() &&
-                (frequencyOrMax() < x.frequencyOrMax() ||
-                 frequencyOrMax() == x.frequencyOrMax() &&
-                   (variant() < x.variant() ||
-                    variant() == x.variant() &&
-                      toUnicode(compatibilityName()) <
-                        toUnicode(x.compatibilityName()))));
+               (strokes() < x.strokes() ||
+                   strokes() == x.strokes() &&
+                       (frequencyOrMax() < x.frequencyOrMax() ||
+                           frequencyOrMax() == x.frequencyOrMax() &&
+                               (variant() < x.variant() ||
+                                   variant() == x.variant() &&
+                                       toUnicode(compatibilityName()) <
+                                           toUnicode(x.compatibilityName()))));
   }
 
   // 'Legend' is meant to be used in output to briefly describe the suffix added
@@ -165,15 +165,15 @@ public:
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
   Kanji(const std::string& name, const OptString& compatibilityName,
-        const Radical& radical, u_int8_t strokes, const OptString& morohashiId,
-        const NelsonIds& nelsonIds, const OptString& pinyin);
+      const Radical& radical, u_int8_t strokes, const OptString& morohashiId,
+      const NelsonIds& nelsonIds, const OptString& pinyin);
   inline static const LinkNames EmptyLinkNames;
 private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most
   // common to least common (see comments for 'qualifiedName' method and
   // 'Legend' string above for more details).
-  static constexpr std::array QualifiedNames{'.', '\'', '"', '^', '~',
-                                             '%', '+',  '@', '#', '*'};
+  static constexpr std::array QualifiedNames{
+      '.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
 
   [[nodiscard]] u_int8_t qualifiedNameRank() const {
     const auto t{type()};

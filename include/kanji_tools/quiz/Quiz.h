@@ -33,7 +33,7 @@ protected:
   // the following methods are shotcuts for calling '_launcher' methods
   [[nodiscard]] auto& choice() const { return _launcher.choice(); }
   [[nodiscard]] auto get(const std::string& msg, const Choices& choices,
-                         OptChar def = {}, bool useQuit = true) const {
+      OptChar def = {}, bool useQuit = true) const {
     return choice().get(msg, useQuit, choices, def);
   }
   [[nodiscard]] auto isQuit(char c) const { return _launcher.isQuit(c); }

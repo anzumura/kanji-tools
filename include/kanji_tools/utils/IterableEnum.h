@@ -15,7 +15,7 @@ public:
   BaseIterableEnum& operator=(const BaseIterableEnum&) = delete;
 protected:
   inline static const std::string Index{"index '"}, Enum{"enum '"},
-    Range{"' is out of range"};
+      Range{"' is out of range"};
 
   class BaseIterator {
   public:
@@ -24,11 +24,11 @@ protected:
 
     // operator<=> enables == and != needed for 'input interator' and <, >, <=
     // and >= needed for 'random access iterator'
-    [[nodiscard]] auto
-    operator<=>(const BaseIterator& x) const noexcept = default;
+    [[nodiscard]] auto operator<=>(
+        const BaseIterator& x) const noexcept = default;
   protected:
     inline static const std::string BadBegin{"can't decrement past zero"},
-      BadEnd{"can't increment past end"};
+        BadEnd{"can't increment past end"};
 
     static void error(const std::string& s) { throw std::out_of_range(s); }
 

@@ -24,7 +24,7 @@ private:
 
   template<typename T>
   void createJukugo(T& error, KanjiGrades, const std::string& name,
-                    const std::string& reading);
+      const std::string& reading);
 
   using JukugoKey = std::pair<std::string, std::string>;
   [[nodiscard]] size_t loadFile(const std::filesystem::path&, KanjiGrades);

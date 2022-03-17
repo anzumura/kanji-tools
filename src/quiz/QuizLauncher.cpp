@@ -11,7 +11,7 @@ namespace kanji_tools {
 namespace {
 
 constexpr auto HelpMessage{
-  R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
+    R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]
     -h   show this help message for command-line options
     -s   show English meanings by default (can be toggled on/off later)
@@ -47,41 +47,39 @@ or 'u' followed by Unicode. For example, theses all produce the same output:
 )"};
 
 const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
-  ListOrderChoices{{'b', "from beginning"}, {'e', "from end"}, {'r', "random"}},
-  QuizTypeChoices{{'f', "freq"}, {'g', "grade"},   {'k', "kyu"},
-                  {'l', "JLPT"}, {'m', "meaning"}, {'p', "pattern"}},
-  FrequencyChoices{{'1', "1-500"},
-                   {'2', "501-1000"},
-                   {'3', "1001-1500"},
-                   {'4', "1501-2000"},
-                   {'5', "2001-2501"}},
-  GradeChoices{{'s', "Secondary School"}},
-  KyuChoices{{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}},
-  LevelChoices{{'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}},
-  ListStyleChoices{{'k', "kanji to reading"}, {'r', "reading to kanji"}},
-  GroupKanjiChoices{
-    {'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}};
+    ListOrderChoices{
+        {'b', "from beginning"}, {'e', "from end"}, {'r', "random"}},
+    QuizTypeChoices{{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"},
+        {'m', "meaning"}, {'p', "pattern"}},
+    FrequencyChoices{{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"},
+        {'4', "1501-2000"}, {'5', "2001-2501"}},
+    GradeChoices{{'s', "Secondary School"}},
+    KyuChoices{{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}},
+    LevelChoices{
+        {'1', "N1"}, {'2', "N2"}, {'3', "N3"}, {'4', "N4"}, {'5', "N5"}},
+    ListStyleChoices{{'k', "kanji to reading"}, {'r', "reading to kanji"}},
+    GroupKanjiChoices{
+        {'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}};
 
 constexpr auto GradeStart{'1'}, GradeEnd{'6'}, KyuStart{'1'}, KyuEnd{'9'},
-  ListChoiceCountStart{'2'}, ListChoiceCountEnd{'9'};
+    ListChoiceCountStart{'2'}, ListChoiceCountEnd{'9'};
 
 // Default options are offered for some of the above 'Choices' (when prompting
 // the user for input):
 constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
-  DefaultQuizType{'g'}, DefaultGrade{'6'}, DefaultKyu{'2'},
-  DefaultListChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
+    DefaultQuizType{'g'}, DefaultGrade{'6'}, DefaultKyu{'2'},
+    DefaultListChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
 
 } // namespace
 
 void QuizLauncher::run(u_int8_t argc, const char** argv) {
   const auto data{std::make_shared<KanjiData>(argc, argv)};
   QuizLauncher(argc, argv, data, std::make_shared<GroupData>(data),
-               std::make_shared<JukugoData>(data));
+      std::make_shared<JukugoData>(data));
 }
 
 QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
-                           GroupDataPtr groupData, JukugoDataPtr jukugoData,
-                           std::istream* in)
+    GroupDataPtr groupData, JukugoDataPtr jukugoData, std::istream* in)
     : _programMode(ProgramMode::NotAssigned),
       _questionOrder(QuestionOrder::NotAssigned), _choice(data->out(), in, '/'),
       _groupData(groupData), _jukugoData(jukugoData) {
@@ -89,19 +87,19 @@ QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
   // checkType is called to check f, g, l, k, m and p args (so ok to assume
   // size is at least 2) and set quizType and qList (list of questions choice)
   const auto checkType{[&quizType, &qList](const auto& arg, auto& choices,
-                                           OptChar start = std::nullopt,
-                                           OptChar end = std::nullopt) {
+                           OptChar start = std::nullopt,
+                           OptChar end = std::nullopt) {
     if (quizType)
       Data::usage("only one quiz type can be specified, use -h for help");
     quizType = arg[1];
     if (arg.size() > 2) {
-      if (auto c = arg[2];
-          arg.size() == 3 && (choices.contains(c) ||
-                              (start && *start <= c && end.value_or(c) >= c)))
+      if (auto c = arg[2]; arg.size() == 3 &&
+                           (choices.contains(c) ||
+                               (start && *start <= c && end.value_or(c) >= c)))
         qList = c;
       else
-        Data::usage("invalid format for " + arg.substr(0, 2) +
-                    ", use -h for help");
+        Data::usage(
+            "invalid format for " + arg.substr(0, 2) + ", use -h for help");
     }
   }};
 
@@ -139,8 +137,8 @@ QuizLauncher::QuizLauncher(u_int8_t argc, const char** argv, DataPtr data,
   if (!data->debug() && !in) start(quizType, qList, question, showMeanings);
 }
 
-void QuizLauncher::start(OptChar quizType, OptChar qList, u_int16_t question,
-                         bool meanings) {
+void QuizLauncher::start(
+    OptChar quizType, OptChar qList, u_int16_t question, bool meanings) {
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
@@ -161,39 +159,39 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, u_int16_t question,
   case 'f':
     // suppress printing 'Freq' since this would work against showing the list
     // in a random order.
-    if (const auto c{qList ? *qList
-                           : _choice.get("Choose list", FrequencyChoices)};
+    if (const auto c{
+            qList ? *qList : _choice.get("Choose list", FrequencyChoices)};
         !isQuit(c))
-      listQuiz(KanjiInfo::Freq,
-               data().frequencies(static_cast<size_t>(c - '1')));
+      listQuiz(
+          KanjiInfo::Freq, data().frequencies(static_cast<size_t>(c - '1')));
     break;
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
     if (const auto c{qList ? *qList
                            : _choice.get("Choose grade", GradeStart, GradeEnd,
-                                         GradeChoices, DefaultGrade)};
+                                 GradeChoices, DefaultGrade)};
         !isQuit(c))
       listQuiz(KanjiInfo::Grade,
-               data().grades(AllKanjiGrades[c == 's' ? 6 : c - '1']));
+          data().grades(AllKanjiGrades[c == 's' ? 6 : c - '1']));
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     if (const auto c{qList ? *qList
                            : _choice.get("Choose kyu", KyuStart, KyuEnd,
-                                         KyuChoices, DefaultKyu)};
+                                 KyuChoices, DefaultKyu)};
         !isQuit(c))
       listQuiz(KanjiInfo::Kyu,
-               data().kyus(AllKenteiKyus[c == 'a'   ? 0
-                                         : c == 'c' ? 8
-                                         : c == '2' ? 9
-                                         : c == 'b' ? 10
-                                         : c == '1' ? 11
-                                                    : 7 - (c - '3')]));
+          data().kyus(AllKenteiKyus[c == 'a'   ? 0
+                                    : c == 'c' ? 8
+                                    : c == '2' ? 9
+                                    : c == 'b' ? 10
+                                    : c == '1' ? 11
+                                               : 7 - (c - '3')]));
     break;
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
-    if (const char c{qList ? *qList
-                           : _choice.get("Choose level", LevelChoices)};
+    if (const char c{
+            qList ? *qList : _choice.get("Choose level", LevelChoices)};
         !isQuit(c))
       listQuiz(KanjiInfo::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
     break;
@@ -224,8 +222,8 @@ void QuizLauncher::printLegend(KanjiInfo fields) const {
   log() << "Legend:\nFields:" << s << "\nSuffix: " << Kanji::Legend << '\n';
 }
 
-void QuizLauncher::printMeaning(const Entry& k, bool useNewLine,
-                                bool showMeaning) const {
+void QuizLauncher::printMeaning(
+    const Entry& k, bool useNewLine, bool showMeaning) const {
   if (showMeaning && k->hasMeaning())
     out() << (useNewLine ? "\n    Meaning: " : " : ") << k->meaning();
   out() << '\n';
@@ -265,7 +263,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   }
   // Jukugo Lists
   static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"),
-    otherGrade("Other Grade Jukugo");
+      otherGrade("Other Grade Jukugo");
   if (auto& list{_jukugoData->find(kanji->name())}; !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
     // lists, one for the same grade of the given kanji and one for other
@@ -288,31 +286,29 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
 }
 
 void QuizLauncher::startListQuiz(u_int16_t question, bool showMeanings,
-                                 KanjiInfo excludeField,
-                                 const List& list) const {
+    KanjiInfo excludeField, const List& list) const {
   u_int8_t choiceCount{1};
   auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
     const auto c{_choice.get("Number of choices", ListChoiceCountStart,
-                             ListChoiceCountEnd, DefaultListChoiceCount)};
+        ListChoiceCountEnd, DefaultListChoiceCount)};
     if (isQuit(c)) return;
     choiceCount = static_cast<u_int8_t>(c - '0');
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);
     if (isQuit(quizStyle)) return;
   }
   ListQuiz(*this, question, showMeanings, list, KanjiInfo::All ^ excludeField,
-           choiceCount, ListQuiz::toQuizStyle(quizStyle));
+      choiceCount, ListQuiz::toQuizStyle(quizStyle));
 }
 
 void QuizLauncher::startGroupQuiz(u_int16_t question, bool showMeanings,
-                                  OptChar qList,
-                                  const GroupData::List& list) const {
+    OptChar qList, const GroupData::List& list) const {
   if (const auto c{qList ? *qList
                          : _choice.get("Kanji type", GroupKanjiChoices,
-                                       DefaultGroupKanji)};
+                               DefaultGroupKanji)};
       !isQuit(c))
     GroupQuiz(*this, question, showMeanings, list,
-              static_cast<GroupQuiz::MemberType>(c - '1'));
+        static_cast<GroupQuiz::MemberType>(c - '1'));
 }
 
 u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
@@ -333,8 +329,8 @@ u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
       }
       const auto s{arg.substr(offset)};
       if (!std::all_of(s.begin(), s.end(), ::isdigit))
-        Data::usage("invalid format for " + arg.substr(0, 2) +
-                    ", use -h for help");
+        Data::usage(
+            "invalid format for " + arg.substr(0, 2) + ", use -h for help");
       if (const auto i{std::stoul(s)};
           i <= std::numeric_limits<u_int16_t>::max())
         return static_cast<u_int16_t>(i);
@@ -344,8 +340,8 @@ u_int16_t QuizLauncher::processProgramModeArg(const std::string& arg) {
   return 0;
 }
 
-u_int16_t QuizLauncher::getU16(const std::string& msg,
-                               const std::string& arg) const {
+u_int16_t QuizLauncher::getU16(
+    const std::string& msg, const std::string& arg) const {
   std::stringstream ss{arg};
   u_int16_t id;
   if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
@@ -355,7 +351,7 @@ u_int16_t QuizLauncher::getU16(const std::string& msg,
 void QuizLauncher::processKanjiArg(const std::string& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
     const auto kanji{
-      _groupData->data().findKanjiByFrequency(getU16("frequency", arg))};
+        _groupData->data().findKanjiByFrequency(getU16("frequency", arg))};
     if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
     printDetails((**kanji).name());
   } else if (arg.starts_with("m")) {
@@ -364,15 +360,15 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (const auto noP{id.ends_with("P") ? id.substr(0, id.size() - 1) : id};
         id.empty() || !std::all_of(noP.begin(), noP.end(), ::isdigit))
       Data::usage("invalid Morohashi ID '" + id + "'");
-    printDetails(_groupData->data().findKanjisByMorohashiId(id), "Morohashi",
-                 id);
+    printDetails(
+        _groupData->data().findKanjisByMorohashiId(id), "Morohashi", id);
   } else if (arg.starts_with("n")) {
     const auto id{arg.substr(1)};
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
       Data::usage("invalid Nelson ID '" + id + "'");
     printDetails(
-      _groupData->data().findKanjisByNelsonId(getU16("Nelson ID", id)),
-      "Nelson", id);
+        _groupData->data().findKanjisByNelsonId(getU16("Nelson ID", id)),
+        "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id{arg.substr(1)};
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit
@@ -389,7 +385,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
 }
 
 void QuizLauncher::printDetails(const Data::List& list, const std::string& name,
-                                const std::string& arg) const {
+    const std::string& arg) const {
   if (list.size() != 1) {
     if (list.size() > 1) {
       printLegend();
@@ -437,8 +433,8 @@ bool QuizLauncher::getQuestionOrder() {
   return true;
 }
 
-void QuizLauncher::printJukugoList(const std::string& name,
-                                   const JukugoData::List& list) const {
+void QuizLauncher::printJukugoList(
+    const std::string& name, const JukugoData::List& list) const {
   out() << "    " << name << ':';
   if (list.size() <= JukugoPerLine)
     for (auto& i : list) out() << ' ' << i->nameAndReading();
@@ -453,7 +449,7 @@ void QuizLauncher::printJukugoList(const std::string& name,
         if (const auto size{displaySize(list[i]->nameAndReading()) + 2};
             size > colWidths[i % JukugoPerLine])
           colWidths[i % JukugoPerLine] =
-            size < MaxJukugoSize ? size : MaxJukugoSize;
+              size < MaxJukugoSize ? size : MaxJukugoSize;
     for (size_t i{}; i < list.size(); ++i) {
       if (i % JukugoPerLine == 0) out() << '\n';
       const auto s{list[i]->nameAndReading()};

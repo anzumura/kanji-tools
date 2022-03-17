@@ -15,17 +15,17 @@ const std::string WideColon{"："};
 
 GroupData::GroupData(DataPtr data) : _data(data) {
   loadGroup(DataFile::getFile(_data->dataDir(), "meaning-groups"), _meaningMap,
-            _meaningGroups, GroupType::Meaning);
+      _meaningGroups, GroupType::Meaning);
   loadGroup(DataFile::getFile(_data->dataDir(), "pattern-groups"), _patternMap,
-            _patternGroups, GroupType::Pattern);
+      _patternGroups, GroupType::Pattern);
   if (_data->debug()) {
     printGroups(_meaningMap, _meaningGroups);
     printGroups(_patternMap, _patternGroups);
   }
 }
 
-bool GroupData::checkInsert(const std::string& name, Map& groups,
-                            const Entry& group) const {
+bool GroupData::checkInsert(
+    const std::string& name, Map& groups, const Entry& group) const {
   const auto i{groups.emplace(name, group)};
   if (!i.second)
     _data->printError(name + " from Group " + std::to_string(group->number()) +
@@ -33,8 +33,8 @@ bool GroupData::checkInsert(const std::string& name, Map& groups,
   return i.second;
 }
 
-bool GroupData::checkInsert(const std::string& name, MultiMap& groups,
-                            const Entry& group) const {
+bool GroupData::checkInsert(
+    const std::string& name, MultiMap& groups, const Entry& group) const {
   const auto i{groups.equal_range(name)};
   for (auto j{i.first}; j != i.second; ++j)
     if (j->second->number() == group->number()) {
@@ -49,9 +49,9 @@ bool GroupData::checkInsert(const std::string& name, MultiMap& groups,
 
 template<typename T>
 void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
-                          List& list, GroupType groupType) {
+    List& list, GroupType groupType) {
   const ColumnFile::Column numberCol("Number"), nameCol("Name"),
-    membersCol("Members");
+      membersCol("Members");
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
     auto& name(f.get(nameCol));
     auto& members(f.get(membersCol));
@@ -64,8 +64,8 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
     if (groupType == GroupType::Pattern) {
       patternType = name.starts_with(WideColon) ? Group::PatternType::Peer
                     : name.find(WideColon) != std::string::npos
-                      ? Group::PatternType::Family
-                      : Group::PatternType::Reading;
+                        ? Group::PatternType::Family
+                        : Group::PatternType::Reading;
       // 'name' before the colon is the first member of a 'family'
       if (patternType == Group::PatternType::Family)
         kanjiNames.push_back(MBChar::getFirst(name));
@@ -86,19 +86,18 @@ void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
     if (memberKanji.size() < kanjiNames.size())
       f.error("group failed to load all members");
     if (memberKanji.size() > MaxGroupSize)
-      f.error("group has more than " + std::to_string(MaxGroupSize) +
-              " members");
+      f.error(
+          "group has more than " + std::to_string(MaxGroupSize) + " members");
 
     auto group{
-      createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
+        createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
     for (auto& i : memberKanji) checkInsert(i->name(), groups, group);
     list.push_back(group);
   }
 }
 
 GroupData::Entry GroupData::createGroup(size_t number, const std::string& name,
-                                        const Data::List& members,
-                                        Group::PatternType patternType) const {
+    const Data::List& members, Group::PatternType patternType) const {
   if (patternType == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, patternType);
@@ -131,14 +130,14 @@ void GroupData::printGroups(const T& groups, const List& groupList) const {
   printTypeBreakdown(types);
 }
 
-void GroupData::printMeaningGroup(const Group& group, TypeMap& types,
-                                  StringSet& uniqueNames) const {
+void GroupData::printMeaningGroup(
+    const Group& group, TypeMap& types, StringSet& uniqueNames) const {
   if (fullDebug()) {
     const auto len{MBChar::size(group.name())};
     out() << group.name()
-          << (len == 1   ? "　　"
-              : len == 2 ? "　"
-                         : "")
+          << (len == 1      ? "　　"
+                 : len == 2 ? "　"
+                            : "")
           << " (" << std::setw(2) << std::setfill(' ') << group.members().size()
           << ")   :";
   }
@@ -173,8 +172,8 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
 }
 
 template<typename T>
-void GroupData::printUniqueNames(const T& groups,
-                                 const StringSet& uniqueNames) const {
+void GroupData::printUniqueNames(
+    const T& groups, const StringSet& uniqueNames) const {
   std::map<std::string, size_t> multipleGroups;
   std::string prevKey;
   size_t maxBelongsTo{}; // the maximum number of groups a kanji belongs to
@@ -208,8 +207,8 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
         std::sort(j->second.begin(), j->second.end());
         out() << " (";
         for (size_t count{}; auto& k : list)
-          if (!std::binary_search(j->second.begin(), j->second.end(),
-                                  k->name())) {
+          if (!std::binary_search(
+                  j->second.begin(), j->second.end(), k->name())) {
             if (count) out() << ' ';
             out() << k->name();
             if (++count == missing || count == MissingTypeExamples) break;

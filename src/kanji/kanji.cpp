@@ -6,9 +6,8 @@
 namespace kanji_tools {
 
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
-             const Radical& radical, u_int8_t strokes,
-             const OptString& morohashiId, const NelsonIds& nelsonIds,
-             const OptString& pinyin)
+    const Radical& radical, u_int8_t strokes, const OptString& morohashiId,
+    const NelsonIds& nelsonIds, const OptString& pinyin)
     : _name(name),
       _nonVariantName(MBChar::optionalWithoutVariationSelector(name)),
       _compatibilityName(compatibilityName), _radical(radical),
@@ -19,7 +18,7 @@ Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
 
 std::string Kanji::info(KanjiInfo fields) const {
   static const std::string Rad("Rad "), Strokes("Strokes "), Freq("Frq "),
-    New("New "), Old("Old ");
+      New("New "), Old("Old ");
 
   std::string result;
   const auto add{[&result](const auto& x) {

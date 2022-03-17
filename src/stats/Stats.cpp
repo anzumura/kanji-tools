@@ -48,8 +48,8 @@ public:
   [[nodiscard]] auto operator<(const Count& x) const {
     return count > x.count ||
            (count == x.count && frequency() < x.frequency() ||
-            (frequency() == x.frequency() && type() < x.type() ||
-             (type() == x.type() && name < x.name)));
+               (frequency() == x.frequency() && type() < x.type() ||
+                   (type() == x.type() && name < x.name)));
   }
 
   size_t count;
@@ -80,7 +80,7 @@ constexpr size_t IncludeInTotals{5}, MaxExamples{5};
 class StatsPred {
 public:
   StatsPred(const DataPtr data, const fs::path& top, const std::string& name,
-            bool showBreakdown)
+      bool showBreakdown)
       : _data(data), _top(top), _name(name), _showBreakdown(showBreakdown),
         _isKanji(name.ends_with("Kanji")) {}
 
@@ -102,8 +102,8 @@ private:
   using CountSet = std::set<Count>;
 
   void printHeaderInfo(const MBCount&);
-  void printTotalAndUnique(const std::string& name, size_t total,
-                           size_t unique);
+  void printTotalAndUnique(
+      const std::string& name, size_t total, size_t unique);
   void printKanjiTypeCounts(const std::set<Count>&);
   void printExamples(const CountSet&);
   void printBreakdown(const CountSet&, const MBCount&);
@@ -120,29 +120,27 @@ private:
 template<typename Pred>
 std::string StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   const auto isHiragana(_name == "Hiragana"),
-    isUnrecognized(_name == "Unrecognized"),
-    isCommonKanji(_isKanji && _name.starts_with("Common"));
+      isUnrecognized(_name == "Unrecognized"),
+      isCommonKanji(_isKanji && _name.starts_with("Common"));
 
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect
   // on counts, i.e., furigana in .txt files will artificially inflate Hiragana
   // count (and MB-Letter because of the wide brackets)
-  const auto removeFurigana(isHiragana || _name == "Katakana" ||
-                            _name == "MB-Letter");
+  const auto removeFurigana(
+      isHiragana || _name == "Katakana" || _name == "MB-Letter");
 
   if (isHiragana && verbose) _os << ">>> Showing all furigana replacements:\n";
 
   MBCountIf count(pred,
-                  removeFurigana ? std::optional(MBCount::RemoveFurigana)
-                                 : std::nullopt,
-                  MBCount::DefaultReplace, isHiragana && verbose);
+      removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt,
+      MBCount::DefaultReplace, isHiragana && verbose);
   count.addFile(_top, _isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(count);
   CountSet frequency;
   for (const auto& i : count.map()) {
     _total += i.second;
     frequency.emplace(i.second, i.first,
-                      _isKanji ? _data->findKanjiByName(i.first)
-                               : std::nullopt);
+        _isKanji ? _data->findKanjiByName(i.first) : std::nullopt);
   }
   if (_total) {
     printTotalAndUnique(_name, _total, frequency.size());
@@ -180,8 +178,8 @@ void StatsPred::printHeaderInfo(const MBCount& count) {
   _os << '\n';
 }
 
-void StatsPred::printTotalAndUnique(const std::string& name, size_t total,
-                                    size_t unique) {
+void StatsPred::printTotalAndUnique(
+    const std::string& name, size_t total, size_t unique) {
   _os << ">>> " << std::right << std::setw(TypeNameWidth) << name << ": "
       << std::setw(TotalCountWidth) << total
       << ", unique: " << std::setw(UniqueCountWidth) << unique;
@@ -200,8 +198,8 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
     if (const auto i{uniqueKanjiPerType.find(t)};
         i != uniqueKanjiPerType.end()) {
       auto totalForType{totalKanjiPerType[t]};
-      printTotalAndUnique(std::string("[") + toString(t) + "] ", totalForType,
-                          i->second);
+      printTotalAndUnique(
+          std::string("[") + toString(t) + "] ", totalForType, i->second);
       _os << ", " << std::setw(PercentWidth) << std::fixed
           << std::setprecision(PercentPrecision)
           << asPercent(totalForType, _total) << "%  (";
@@ -224,12 +222,12 @@ void StatsPred::printExamples(const CountSet& frequency) {
   _os << ")\n";
 }
 
-void StatsPred::printBreakdown(const CountSet& frequency,
-                               const MBCount& count) {
+void StatsPred::printBreakdown(
+    const CountSet& frequency, const MBCount& count) {
   _os << ">>> Showing Breakdown for '" << _name << "':\n  Rank  [Val Num]"
       << (_isKanji && !_name.starts_with("Non-UCD")
-            ? " Freq, LV, Type"
-            : ", Unicode, Highest Count File")
+                 ? " Freq, LV, Type"
+                 : ", Unicode, Highest Count File")
       << '\n';
   for (size_t rank{}; auto& i : frequency) {
     _os << "  ";
@@ -277,33 +275,33 @@ Stats::Stats(u_int8_t argc, const char** argv, DataPtr data) : _data(data) {
   for (auto& i : files) countKanji(i, breakdown, verbose);
 }
 
-void Stats::countKanji(const fs::path& top, bool showBreakdown,
-                       bool verbose) const {
+void Stats::countKanji(
+    const fs::path& top, bool showBreakdown, bool verbose) const {
   const auto f{[=, this, &top](const auto& pred, const std::string& name,
-                               bool firstCount = false) {
+                   bool firstCount = false) {
     auto p{std::make_shared<StatsPred>(_data, top, name, showBreakdown)};
-    return std::pair(
-      std::async(std::launch::async,
-                 [=] { return p->run(pred, verbose, firstCount); }),
-      p);
+    return std::pair(std::async(std::launch::async,
+                         [=] { return p->run(pred, verbose, firstCount); }),
+        p);
   }};
   // 2579 Kanji are loaded into this program fall into the 'Rare' blocks (and
   // they are all type 'Ucd'). All other types (like Jouyou, Jinmei, etc.) are
   // in the 'Common' blocks (see comments in UnicodeBlock.h and
   // KanjiDataTest.cpp 'CommonAndRareBlocks').
   std::array totals{
-    f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
-    f([](const auto& x) { return isKatakana(x); }, "Katakana"),
-    f([this](const auto& x) { return isCommonKanji(x) && _data->findUcd(x); },
-      "Common Kanji"),
-    f([this](const auto& x) { return isRareKanji(x) && _data->findUcd(x); },
-      "Rare Kanji"),
-    f([this](const auto& x) { return isKanji(x) && !_data->findUcd(x); },
-      "Non-UCD Kanji"),
-    f([](const auto& x) { return isMBPunctuation(x); }, "MB-Punctuation"),
-    f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
-    f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-    f([](const auto& x) { return !isRecognizedCharacter(x); }, "Unrecognized")};
+      f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
+      f([](const auto& x) { return isKatakana(x); }, "Katakana"),
+      f([this](const auto& x) { return isCommonKanji(x) && _data->findUcd(x); },
+          "Common Kanji"),
+      f([this](const auto& x) { return isRareKanji(x) && _data->findUcd(x); },
+          "Rare Kanji"),
+      f([this](const auto& x) { return isKanji(x) && !_data->findUcd(x); },
+          "Non-UCD Kanji"),
+      f([](const auto& x) { return isMBPunctuation(x); }, "MB-Punctuation"),
+      f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
+      f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
+      f([](const auto& x) { return !isRecognizedCharacter(x); },
+          "Unrecognized")};
   for (auto& i : totals) out() << i.first.get();
   size_t total{};
   for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();

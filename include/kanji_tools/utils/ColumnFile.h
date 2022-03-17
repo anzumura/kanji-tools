@@ -43,7 +43,7 @@ public:
   // the file. Note, the columns in the file can be in a different order than
   // 'columns', but the names must all be found.
   ColumnFile(const std::filesystem::path& p, const Columns& columns,
-             char delimiter = '\t');
+      char delimiter = '\t');
 
   ColumnFile(const ColumnFile&) = delete;
   // operator= is not generated since there are const members
@@ -64,8 +64,8 @@ public:
 
   // convert to 'unsigned long' or call 'error' (if maxValue is non-zero and
   // value exceeds it then call 'error')
-  unsigned long getULong(const Column& column,
-                         unsigned long maxValue = 0) const {
+  unsigned long getULong(
+      const Column& column, unsigned long maxValue = 0) const {
     return processULong(get(column), column, maxValue);
   }
 
@@ -114,10 +114,10 @@ public:
   }
 
   // overload for reporting a problem with a specific value for a column
-  void error(const std::string& msg, const Column& c,
-             const std::string& s) const {
-    throw std::domain_error(errorMsg(msg) + ", column: '" + c.name() +
-                            "', value: '" + s + "'");
+  void error(
+      const std::string& msg, const Column& c, const std::string& s) const {
+    throw std::domain_error(
+        errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'");
   }
 
   [[nodiscard]] auto columns() const { return _rowValues.size(); }
@@ -129,8 +129,8 @@ private:
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const std::string& name);
 
-  unsigned long processULong(const std::string&, const Column&,
-                             unsigned long maxValue) const;
+  unsigned long processULong(
+      const std::string&, const Column&, unsigned long maxValue) const;
 
   using ColNames = std::map<std::string, Column>;
 

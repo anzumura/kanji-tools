@@ -25,18 +25,18 @@ TEST_F(ChoiceTest, SingleChoice) {
 
 TEST_F(ChoiceTest, NoChoicesError) {
   EXPECT_THROW(
-    call([this] { _choice.get("", {}); }, "must specify at least one choice"),
-    std::domain_error);
+      call([this] { _choice.get("", {}); }, "must specify at least one choice"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableError) {
   char esc = 27;
   EXPECT_THROW(call(
-                 [=, this] {
-                   _choice.get("", {{esc, ""}});
-                 },
-                 "option is non-printable: 0x1b"),
-               std::domain_error);
+                   [=, this] {
+                     _choice.get("", {{esc, ""}});
+                   },
+                   "option is non-printable: 0x1b"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, TwoChoices) {
@@ -58,8 +58,8 @@ TEST_F(ChoiceTest, TwoNonConsecutiveChoices) {
 TEST_F(ChoiceTest, MultipleConsecutiveChoices) {
   _is << "e\n";
   EXPECT_EQ(
-    _choice.get("", {{'a', ""}, {'b', ""}, {'c', ""}, {'e', ""}, {'f', ""}}),
-    'e');
+      _choice.get("", {{'a', ""}, {'b', ""}, {'c', ""}, {'e', ""}, {'f', ""}}),
+      'e');
   std::string line;
   std::getline(_os, line);
   EXPECT_EQ(line, "(a-c, e-f): ");
@@ -67,10 +67,9 @@ TEST_F(ChoiceTest, MultipleConsecutiveChoices) {
 
 TEST_F(ChoiceTest, ConsecutiveAndNonConsecutiveChoices) {
   _is << "c\n";
-  EXPECT_EQ(
-    _choice.get(
-      "", {{'a', ""}, {'b', ""}, {'c', ""}, {'e', ""}, {'1', ""}, {'2', ""}}),
-    'c');
+  EXPECT_EQ(_choice.get("", {{'a', ""}, {'b', ""}, {'c', ""}, {'e', ""},
+                                {'1', ""}, {'2', ""}}),
+      'c');
   std::string line;
   std::getline(_os, line);
   // Note: choices map is in ascii order so numbers are shown before letters.
@@ -87,11 +86,9 @@ TEST_F(ChoiceTest, ChoicesWithMessageAndDescriptions) {
 
 TEST_F(ChoiceTest, DescriptionsAndRanges) {
   _is << "a\n";
-  EXPECT_EQ(
-    _choice.get(
-      "hello",
-      {{'1', ""}, {'2', ""}, {'a', "world"}, {'b', "!"}, {'c', ""}, {'d', ""}}),
-    'a');
+  EXPECT_EQ(_choice.get("hello", {{'1', ""}, {'2', ""}, {'a', "world"},
+                                     {'b', "!"}, {'c', ""}, {'d', ""}}),
+      'a');
   std::string line;
   std::getline(_os, line);
   EXPECT_EQ(line, "hello (1-2, a=world, b=!, c-d): ");
@@ -124,20 +121,20 @@ TEST_F(ChoiceTest, RangeWithDefault) {
 
 TEST_F(ChoiceTest, InvalidRange) {
   EXPECT_THROW(call([this] { _choice.get("", '2', '1'); },
-                    "first range option '2' is greater than last '1'"),
-               std::domain_error);
+                   "first range option '2' is greater than last '1'"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableFirstRange) {
   EXPECT_THROW(call([this] { _choice.get("", '\0', 'a'); },
-                    "first range option is non-printable: 0x00"),
-               std::domain_error);
+                   "first range option is non-printable: 0x00"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableLastRange) {
   EXPECT_THROW(call([this] { _choice.get("", 'a', 10); },
-                    "last range option is non-printable: 0x0a"),
-               std::domain_error);
+                   "last range option is non-printable: 0x0a"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, RangeWithNoDefault) {
@@ -160,8 +157,8 @@ TEST_F(ChoiceTest, RangeAndChoices) {
 
 TEST_F(ChoiceTest, RangeChoicesAndDefault) {
   _is << "\n";
-  EXPECT_EQ(_choice.get("pick", 'a', 'f', {{'g', "good"}, {'y', "yes"}}, 'y'),
-            'y');
+  EXPECT_EQ(
+      _choice.get("pick", 'a', 'f', {{'g', "good"}, {'y', "yes"}}, 'y'), 'y');
   std::string line;
   std::getline(_os, line);
   EXPECT_EQ(line, "pick (a-f, g=good, y=yes) def 'y': ");
@@ -238,15 +235,15 @@ TEST_F(ChoiceTest, SetQuitFromConstructor) {
 }
 
 TEST_F(ChoiceTest, NonPrintableQuitError) {
-  EXPECT_THROW(
-    call([this] { _choice.setQuit(22); }, "quit option is non-printable: 0x16"),
-    std::domain_error);
+  EXPECT_THROW(call([this] { _choice.setQuit(22); },
+                   "quit option is non-printable: 0x16"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
   EXPECT_THROW(call([this] { Choice choice(_os, 23); },
-                    "quit option is non-printable: 0x17"),
-               std::domain_error);
+                   "quit option is non-printable: 0x17"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, UseQuitOption) {
@@ -280,22 +277,22 @@ TEST_F(ChoiceTest, ClearQuitOption) {
 
 TEST_F(ChoiceTest, MissingDefaultOption) {
   EXPECT_THROW(call(
-                 [this] {
-                   _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e');
-                 },
-                 "default option 'e' not in choices"),
-               std::domain_error);
+                   [this] {
+                     _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e');
+                   },
+                   "default option 'e' not in choices"),
+      std::domain_error);
 }
 
 TEST_F(ChoiceTest, DuplicateQuitOption) {
   _choice.setQuit('q');
   for (bool useQuit : {false, true})
     EXPECT_THROW(call(
-                   [=, this] {
-                     _choice.get("", useQuit, {{'q', "abc"}});
-                   },
-                   "quit option 'q' already in choices"),
-                 std::domain_error);
+                     [=, this] {
+                       _choice.get("", useQuit, {{'q', "abc"}});
+                     },
+                     "quit option 'q' already in choices"),
+        std::domain_error);
 }
 
 TEST_F(ChoiceTest, DuplicateRangeOption) {
@@ -303,8 +300,8 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
   const std::string start("range option '"), end("' already in choices");
   for (char rangeStart : {'a', 'b'})
     EXPECT_THROW(call([&, this] { _choice.get("", rangeStart, 'c', choices); },
-                      start + (rangeStart == 'a' ? 'a' : 'c') + end),
-                 std::domain_error);
+                     start + (rangeStart == 'a' ? 'a' : 'c') + end),
+        std::domain_error);
 }
 
 } // namespace kanji_tools

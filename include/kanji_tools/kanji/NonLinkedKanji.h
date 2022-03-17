@@ -17,25 +17,24 @@ protected:
     LinkNames result;
     if (u && u->hasLinks())
       std::transform(u->links().begin(), u->links().end(),
-                     std::back_inserter(result),
-                     [](const auto& i) { return i.name(); });
+          std::back_inserter(result), [](const auto& i) { return i.name(); });
     return result;
   }
 
   // constructor used by 'CustomFileKanji': has 'meaning' and 'reading'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& radical,
-                 const std::string& meaning, const std::string& reading,
-                 u_int8_t strokes, const Ucd* u)
+      const std::string& meaning, const std::string& reading, u_int8_t strokes,
+      const Ucd* u)
       : Kanji(name, d.getCompatibilityName(name), radical, strokes,
-              d.getMorohashiId(u), d.getNelsonIds(u), d.getPinyin(u)),
+            d.getMorohashiId(u), d.getNelsonIds(u), d.getPinyin(u)),
         _meaning(meaning), _reading(reading) {}
 
   // constructor used by 'CustomFileKanji' and 'UcdFileKanji': has 'reading' and
   // looks up 'meaning'
   NonLinkedKanji(const Data& d, const std::string& name, const Radical& rad,
-                 const std::string& reading, u_int8_t strokes, const Ucd* u)
-      : NonLinkedKanji(d, name, rad, d.ucd().getMeaning(u), reading, strokes,
-                       u) {}
+      const std::string& reading, u_int8_t strokes, const Ucd* u)
+      : NonLinkedKanji(
+            d, name, rad, d.ucd().getMeaning(u), reading, strokes, u) {}
 private:
   const std::string _meaning;
   const std::string _reading;

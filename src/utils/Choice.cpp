@@ -68,9 +68,9 @@ void Choice::add(std::string& prompt, const Choices& choices) {
 }
 
 char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
-                 OptChar def) const {
+    OptChar def) const {
   static const std::string QuitError{"quit option '"},
-    DefaultError{"default option '"}, DefaultPrompt{") def '"};
+      DefaultError{"default option '"}, DefaultPrompt{") def '"};
 
   auto choices{choicesIn};
   if (_quit && (useQuit ? !choices.emplace(*_quit, _quitDescription).second
@@ -106,10 +106,10 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
 }
 
 char Choice::get(const std::string& msg, bool useQuit, char first, char last,
-                 const Choices& choicesIn, OptChar def) const {
+    const Choices& choicesIn, OptChar def) const {
   static const std::string RangeError{"range option"};
   static const std::string FirstError{"first " + RangeError},
-    LastError{"last " + RangeError};
+      LastError{"last " + RangeError};
 
   checkPrintableAscii(first, FirstError);
   checkPrintableAscii(last, LastError);

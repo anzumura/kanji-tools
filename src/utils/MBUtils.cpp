@@ -17,7 +17,7 @@ namespace {
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
 constexpr char32_t MinSurrogate{0xd800}, MaxSurrogate{0xdfff},
-  ErrorReplacement{0xfffd};
+    ErrorReplacement{0xfffd};
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
@@ -35,9 +35,9 @@ template<typename R, typename T = typename R::value_type>
   static_assert(std::is_integral_v<T>);
   static_assert(sizeof(T) == 4);
   static constexpr T errorReplacement{static_cast<T>(ErrorReplacement)},
-    minSurrogate{static_cast<T>(MinSurrogate)},
-    maxSurrogate{static_cast<T>(MaxSurrogate)},
-    maxUnicode{static_cast<T>(MaxUnicode)};
+      minSurrogate{static_cast<T>(MinSurrogate)},
+      maxSurrogate{static_cast<T>(MaxSurrogate)},
+      maxUnicode{static_cast<T>(MaxUnicode)};
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
@@ -63,26 +63,26 @@ template<typename R, typename T = typename R::value_type>
               result += errorReplacement; // fourth byte didn't start with '10'
             else {
               // four byte case - check for overlong and max unicode
-              const auto c{static_cast<T>(((byte1 ^ FourBits) << 18) +
-                                          (byte2 << 12) + (byte3 << 6) +
-                                          (*u ^ Bit1))};
+              const auto c{
+                  static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
+                                 (byte3 << 6) + (*u ^ Bit1))};
               result += c > 0xffff && c <= maxUnicode ? c : errorReplacement;
               ++u;
             }
           } else {
             // three byte case - check for overlong and surrogate range
-            const auto c{static_cast<T>(((byte1 ^ ThreeBits) << 12) +
-                                        (byte2 << 6) + (*u ^ Bit1))};
+            const auto c{static_cast<T>(
+                ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1))};
             result += c > 0x7ff && (c < minSurrogate || c > maxSurrogate)
-                        ? c
-                        : errorReplacement;
+                          ? c
+                          : errorReplacement;
             ++u;
           }
         } else {
           // two byte case - check for overlong
           result += (byte1 ^ TwoBits) > 1
-                      ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
-                      : errorReplacement;
+                        ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
+                        : errorReplacement;
           ++u;
         }
       }
@@ -93,7 +93,7 @@ template<typename R, typename T = typename R::value_type>
 
 void convertToUtf8(char32_t c, std::string& s) {
   static constexpr char32_t FirstThree{0b111 << 18}, FirstFour{0b11'11 << 12},
-    FirstFive{0b1'11'11 << 6}, Six{0b11'11'11};
+      FirstFive{0b1'11'11 << 6}, Six{0b11'11'11};
   static constexpr char32_t SecondSix{Six << 6}, ThirdSix{Six << 12};
   if (c <= 0x7f)
     s += static_cast<char>(c);
@@ -174,8 +174,8 @@ std::string toUtf8(const std::wstring& s) {
 
 // validateMBUtf8
 
-MBUtf8Result validateMBUtf8(const char* s, Utf8Result& error,
-                            bool sizeOne) noexcept {
+MBUtf8Result validateMBUtf8(
+    const char* s, Utf8Result& error, bool sizeOne) noexcept {
   const auto err{[&error](auto e) {
     error = e;
     return MBUtf8Result::NotValid;
@@ -201,8 +201,8 @@ MBUtf8Result validateMBUtf8(const char* s, Utf8Result& error,
       if (c <= 0xffffU)
         return err(Utf8Result::Overlong); // overlong 4 byte encoding
       if (c > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
-    } else if (const unsigned c{((byte1 ^ ThreeBits) << 12) + (byte2 << 6) +
-                                (*u ^ Bit1)};
+    } else if (const unsigned c{
+                   ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1)};
                c <= 0x7ffU)
       return err(Utf8Result::Overlong); // overlong 3 byte encoding
     else if (c >= MinSurrogate && c <= MaxSurrogate)

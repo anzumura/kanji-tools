@@ -9,31 +9,31 @@ namespace fs = std::filesystem;
 namespace {
 
 const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
-  FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"},
-  StrokesFile{"strokes"}, WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
+    FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"},
+    StrokesFile{"strokes"}, WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
 
 } // namespace
 
-KanjiData::KanjiData(u_int8_t argc, const char** argv, std::ostream& out,
-                     std::ostream& err)
+KanjiData::KanjiData(
+    u_int8_t argc, const char** argv, std::ostream& out, std::ostream& err)
     : Data{getDataDir(argc, argv), getDebugMode(argc, argv), out, err},
       _levels{LevelDataFile(dataDir(Jlpt, "n5"), JlptLevels::N5, debug()),
-              LevelDataFile(dataDir(Jlpt, "n4"), JlptLevels::N4, debug()),
-              LevelDataFile(dataDir(Jlpt, "n3"), JlptLevels::N3, debug()),
-              LevelDataFile(dataDir(Jlpt, "n2"), JlptLevels::N2, debug()),
-              LevelDataFile(dataDir(Jlpt, "n1"), JlptLevels::N1, debug())},
+          LevelDataFile(dataDir(Jlpt, "n4"), JlptLevels::N4, debug()),
+          LevelDataFile(dataDir(Jlpt, "n3"), JlptLevels::N3, debug()),
+          LevelDataFile(dataDir(Jlpt, "n2"), JlptLevels::N2, debug()),
+          LevelDataFile(dataDir(Jlpt, "n1"), JlptLevels::N1, debug())},
       _kyus{KyuDataFile(dataDir(Kentei, "k10"), KenteiKyus::K10, debug()),
-            KyuDataFile(dataDir(Kentei, "k9"), KenteiKyus::K9, debug()),
-            KyuDataFile(dataDir(Kentei, "k8"), KenteiKyus::K8, debug()),
-            KyuDataFile(dataDir(Kentei, "k7"), KenteiKyus::K7, debug()),
-            KyuDataFile(dataDir(Kentei, "k6"), KenteiKyus::K6, debug()),
-            KyuDataFile(dataDir(Kentei, "k5"), KenteiKyus::K5, debug()),
-            KyuDataFile(dataDir(Kentei, "k4"), KenteiKyus::K4, debug()),
-            KyuDataFile(dataDir(Kentei, "k3"), KenteiKyus::K3, debug()),
-            KyuDataFile(dataDir(Kentei, "kJ2"), KenteiKyus::KJ2, debug()),
-            KyuDataFile(dataDir(Kentei, "k2"), KenteiKyus::K2, debug()),
-            KyuDataFile(dataDir(Kentei, "kJ1"), KenteiKyus::KJ1, debug()),
-            KyuDataFile(dataDir(Kentei, "k1"), KenteiKyus::K1, debug())},
+          KyuDataFile(dataDir(Kentei, "k9"), KenteiKyus::K9, debug()),
+          KyuDataFile(dataDir(Kentei, "k8"), KenteiKyus::K8, debug()),
+          KyuDataFile(dataDir(Kentei, "k7"), KenteiKyus::K7, debug()),
+          KyuDataFile(dataDir(Kentei, "k6"), KenteiKyus::K6, debug()),
+          KyuDataFile(dataDir(Kentei, "k5"), KenteiKyus::K5, debug()),
+          KyuDataFile(dataDir(Kentei, "k4"), KenteiKyus::K4, debug()),
+          KyuDataFile(dataDir(Kentei, "k3"), KenteiKyus::K3, debug()),
+          KyuDataFile(dataDir(Kentei, "kJ2"), KenteiKyus::KJ2, debug()),
+          KyuDataFile(dataDir(Kentei, "k2"), KenteiKyus::K2, debug()),
+          KyuDataFile(dataDir(Kentei, "kJ1"), KenteiKyus::KJ1, debug()),
+          KyuDataFile(dataDir(Kentei, "k1"), KenteiKyus::K1, debug())},
       _frequency(dataDir() / "frequency", debug()) {
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
   _ucd.load(DataFile::getFile(dataDir(), UcdFile));
@@ -91,8 +91,8 @@ void KanjiData::noFreq(long f, bool brackets) const {
 }
 
 template<typename T>
-void KanjiData::printCount(const std::string& name, T pred,
-                           size_t printExamples) const {
+void KanjiData::printCount(
+    const std::string& name, T pred, size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
   size_t total{};
@@ -143,7 +143,7 @@ void KanjiData::printStats() const {
     printCount("  NF (no-frequency)", [](auto& x) { return !x->frequency(); });
     printCount("  Has Strokes", [](auto& x) { return x->strokes() != 0; });
     printCount(
-      "  Has Variation Selectors", [](auto& x) { return x->variant(); }, 5);
+        "  Has Variation Selectors", [](auto& x) { return x->variant(); }, 5);
     printCount("Old Forms", [](auto& x) { return !x->oldNames().empty(); });
   }
 }
@@ -154,20 +154,19 @@ void KanjiData::printGrades() const {
   for (auto& jouyou{types(KanjiTypes::Jouyou)}; auto i : AllKanjiGrades) {
     const auto grade{[i](auto& x) { return x->grade() == i; }};
     if (auto gradeCount{static_cast<size_t>(
-          std::count_if(jouyou.begin(), jouyou.end(), grade))};
+            std::count_if(jouyou.begin(), jouyou.end(), grade))};
         gradeCount) {
       all += gradeCount;
       log() << "  Total for grade " << i << ": " << gradeCount;
-      noFreq(std::count_if(
-               jouyou.begin(), jouyou.end(),
-               [&grade](auto& x) { return grade(x) && !x->frequency(); }),
-             true);
+      noFreq(std::count_if(jouyou.begin(), jouyou.end(),
+                 [&grade](auto& x) { return grade(x) && !x->frequency(); }),
+          true);
       out() << " (";
       for (const auto level : AllJlptLevels) {
-        const auto gradeLevelCount{static_cast<size_t>(
-          std::count_if(jouyou.begin(), jouyou.end(), [&grade, level](auto& x) {
-            return grade(x) && x->level() == level;
-          }))};
+        const auto gradeLevelCount{static_cast<size_t>(std::count_if(
+            jouyou.begin(), jouyou.end(), [&grade, level](auto& x) {
+              return grade(x) && x->level() == level;
+            }))};
         if (gradeLevelCount) {
           gradeCount -= gradeLevelCount;
           out() << level << ' ' << gradeLevelCount;
@@ -182,8 +181,8 @@ void KanjiData::printGrades() const {
 
 template<typename T, size_t S>
 void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
-                               T (Kanji::*p)() const, const std::string& name,
-                               bool showNoFrequency) const {
+    T (Kanji::*p)() const, const std::string& name,
+    bool showNoFrequency) const {
   log() << name << " breakdown:\n";
   size_t total{};
   for (const auto i : all) {
@@ -191,9 +190,8 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
     size_t iTotal{};
     for (auto j{AllKanjiTypes.begin()}; auto& l : _types) {
       const auto t{*j++};
-      if (const auto c{static_cast<size_t>(
-            std::count_if(l.begin(), l.end(),
-                          [i, &p](auto& x) { return ((*x).*p)() == i; }))};
+      if (const auto c{static_cast<size_t>(std::count_if(l.begin(), l.end(),
+              [i, &p](auto& x) { return ((*x).*p)() == i; }))};
           c) {
         counts.emplace_back(t, c);
         iTotal += c;

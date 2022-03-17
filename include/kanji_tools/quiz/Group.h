@@ -64,8 +64,8 @@ private:
 
 class MeaningGroup : public Group {
 public:
-  MeaningGroup(size_t number, const std::string& name,
-               const Data::List& members)
+  MeaningGroup(
+      size_t number, const std::string& name, const Data::List& members)
       : Group(number, name, members) {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Meaning; }
@@ -74,7 +74,7 @@ public:
 class PatternGroup : public Group {
 public:
   PatternGroup(size_t number, const std::string& name,
-               const Data::List& members, PatternType patternType)
+      const Data::List& members, PatternType patternType)
       : Group(number, name, members), _patternType(patternType) {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }

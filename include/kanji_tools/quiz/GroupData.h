@@ -36,15 +36,14 @@ private:
   bool checkInsert(const std::string& kanji, Map&, const Entry& group) const;
 
   // return false if 'kanji' is already in 'MultiMap' for the given 'group'
-  bool checkInsert(const std::string& kanji, MultiMap&,
-                   const Entry& group) const;
+  bool checkInsert(
+      const std::string& kanji, MultiMap&, const Entry& group) const;
 
   template<typename T>
   void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
 
   [[nodiscard]] Entry createGroup(size_t number, const std::string& name,
-                                  const Data::List& members,
-                                  Group::PatternType) const;
+      const Data::List& members, Group::PatternType) const;
 
   template<typename T> void printGroups(const T&, const List&) const;
 

@@ -1,13 +1,14 @@
+# style options for clang-format version 13.0.1 (insalled via Homebrew)
 Language: Cpp
 
-# Run 'clang-format -style=llvm -dump-config > .clang-format' to see defaults
+# run 'clang-format -style=llvm -dump-config > .clang-format' to see defaults
 BasedOnStyle: LLVM
 
-# Override the (llvm style) values for the following options
+# override the following (llvm style) options:
+AlignAfterOpenBracket: DontAlign
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
-ContinuationIndentWidth: 2
 EmptyLineBeforeAccessModifier: Never
 PointerAlignment: Left
 SpaceAfterTemplateKeyword: false

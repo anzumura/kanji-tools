@@ -12,14 +12,14 @@ namespace {
 
 const fs::path TestDir{"testDir"};
 const fs::path TestFile1{TestDir / "testFile甲"},
-  TestFile2{TestDir / "testFile乙"}, BracketFile{TestDir / "bracketFile"},
-  TestSubDir{TestDir / "test下"};
+    TestFile2{TestDir / "testFile乙"}, BracketFile{TestDir / "bracketFile"},
+    TestSubDir{TestDir / "test下"};
 const fs::path TestSubFile1{TestSubDir / "testSubFile1"},
-  TestSubFile2{TestSubDir / "testSubFile2.txt"};
+    TestSubFile2{TestSubDir / "testSubFile2.txt"};
 
 auto removeFurigana(const std::wstring& s) {
-  return std::regex_replace(s, MBCount::RemoveFurigana,
-                            MBCount::DefaultReplace);
+  return std::regex_replace(
+      s, MBCount::RemoveFurigana, MBCount::DefaultReplace);
 }
 
 } // namespace
@@ -29,9 +29,9 @@ protected:
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directories(TestSubDir));
-    const auto files = {
-      std::pair(TestFile1, "北海道"), std::pair(TestFile2, "南北"),
-      std::pair(TestSubFile1, "東西線"), std::pair(TestSubFile2, "東北")};
+    const auto files = {std::pair(TestFile1, "北海道"),
+        std::pair(TestFile2, "南北"), std::pair(TestSubFile1, "東西線"),
+        std::pair(TestSubFile2, "東北")};
     for (auto& i : files) {
       std::ofstream of(i.first);
       of << i.second;
@@ -52,10 +52,10 @@ TEST_F(MBCountTest, CheckRemovingFurigana) {
   EXPECT_EQ(removeFurigana(L"（いぬ）"), L"（いぬ）");
   // replace one furigana set in a longer string
   EXPECT_EQ(removeFurigana(L"記された文（ふみ）だけがこの世に残って"),
-            L"記された文だけがこの世に残って");
+      L"記された文だけがこの世に残って");
   // replace multiple furigana sets (for compound words)
   EXPECT_EQ(removeFurigana(L"子供たちは茫漠（ぼうばく）と見霽（みはる）かす"),
-            L"子供たちは茫漠と見霽かす");
+      L"子供たちは茫漠と見霽かす");
 }
 
 TEST_F(MBCountTest, Add) {
@@ -173,8 +173,8 @@ TEST_F(MBCountTest, AddFileIncludingFile) {
 
 TEST_F(MBCountTest, AddMissingFile) {
   EXPECT_THROW(call([this] { c.addFile(TestDir / "missing"); },
-                    "file not found: testDir/missing"),
-               std::domain_error);
+                   "file not found: testDir/missing"),
+      std::domain_error);
   EXPECT_EQ(c.files(), 0);
   EXPECT_EQ(c.directories(), 0);
 }

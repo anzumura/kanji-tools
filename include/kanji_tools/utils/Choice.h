@@ -25,10 +25,10 @@ public:
   // constructor or changed later via 'setQuit' and 'clearQuit' methods. An
   // 'istream' of '0' (the default) means read from stdin.
   Choice(std::ostream& out, OptChar quit = {},
-         const std::string& d = DefaultQuitDescription)
+      const std::string& d = DefaultQuitDescription)
       : Choice(out, nullptr, quit, d) {}
   Choice(std::ostream& out, std::istream* in, OptChar quit = {},
-         const std::string& d = DefaultQuitDescription)
+      const std::string& d = DefaultQuitDescription)
       : _out(out), _in(in) {
     if (quit) setQuit(*quit, d);
   }
@@ -58,7 +58,7 @@ public:
   // this class and expected output. 'useQuit' can be set to false to skip
   // providing '_quit' value (has no effect if '_quit' isn't set).
   char get(const std::string& msg, bool useQuit, const Choices& choices,
-           OptChar def) const;
+      OptChar def) const;
   auto get(const std::string& msg, bool useQuit, const Choices& choices) const {
     return get(msg, useQuit, choices, {});
   }
@@ -72,13 +72,13 @@ public:
   // 'get' with ranges are convenience methods when there is a range (inclusive)
   // with no descriptions
   char get(const std::string& msg, bool useQuit, char first, char last,
-           const Choices& choices, OptChar def) const;
+      const Choices& choices, OptChar def) const;
   auto get(const std::string& msg, char first, char last,
-           const Choices& choices, OptChar def) const {
+      const Choices& choices, OptChar def) const {
     return get(msg, true, first, last, choices, def);
   }
   auto get(const std::string& msg, char first, char last,
-           const Choices& choices) const {
+      const Choices& choices) const {
     return get(msg, first, last, choices, {});
   }
   auto get(const std::string& msg, char first, char last) const {

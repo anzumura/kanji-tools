@@ -24,9 +24,9 @@ public:
 protected:
   // constructor used by 'StandardKanji': has 'reading'
   UcdFileKanji(const Data& d, const std::string& name,
-               const std::string& reading, const Ucd* u)
-      : NonLinkedKanji(d, name, d.ucdRadical(name, u), reading,
-                       d.getStrokes(name, u), u),
+      const std::string& reading, const Ucd* u)
+      : NonLinkedKanji(
+            d, name, d.ucdRadical(name, u), reading, d.getStrokes(name, u), u),
         _hasOldLinks(u && u->hasTraditionalLinks()),
         _linkNames(getLinkNames(u)), _linkedReadings(u && u->linkedReadings()) {
   }
@@ -55,8 +55,8 @@ public:
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
 protected:
   // constructor used by 'FrequencyKanji': has 'reading' and looks up 'kyu'
-  StandardKanji(const Data& d, const std::string& name,
-                const std::string& reading)
+  StandardKanji(
+      const Data& d, const std::string& name, const std::string& reading)
       : UcdFileKanji(d, name, reading, d.findUcd(name)), _kyu(d.kyu(name)) {}
 
   // constructor used by 'FrequencyKanji': looks up 'kyu'
@@ -81,7 +81,7 @@ public:
   // constructor used for 'FrequencyKanji' with readings from
   // 'frequency-readings.txt'
   FrequencyKanji(const Data& d, const std::string& name,
-                 const std::string& reading, u_int16_t frequency)
+      const std::string& reading, u_int16_t frequency)
       : StandardKanji(d, name, reading), _frequency(frequency) {}
 
   [[nodiscard]] KanjiTypes type() const override {

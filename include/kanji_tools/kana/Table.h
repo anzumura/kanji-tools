@@ -27,7 +27,7 @@ public:
   inline static const std::string EmptyString;
 
   Table(const Row& title = {}, bool countInFirstColumn = false)
-      : _title(title), _countInFirstColumn(countInFirstColumn) {}
+      : _title{title}, _countInFirstColumn{countInFirstColumn} {}
 
   Table(const Table&) = delete;
   // operator= is not generated since there are const members
@@ -53,7 +53,7 @@ private:
   using Widths = std::vector<size_t>;
 
   void print(std::ostream&, const Widths&, const Row&, char fill = ' ',
-             char delim = '|') const;
+      char delim = '|') const;
 
   // 'border' prints a horizontal border row
   void border(std::ostream& os, const Widths& w) const {

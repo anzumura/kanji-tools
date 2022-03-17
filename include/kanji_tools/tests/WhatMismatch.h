@@ -9,8 +9,8 @@ namespace kanji_tools {
 class WhatMismatch : public std::runtime_error {
 public:
   WhatMismatch(const std::string& expectedWhat, const std::exception& e)
-      : std::runtime_error(std::string("expected: '") + expectedWhat +
-                           "', actual: '" + e.what() + '\'') {}
+      : std::runtime_error{
+            "expected: '" + expectedWhat + "', actual: '" + e.what() + '\''} {}
 };
 
 // 'call' is a helper function for tests that expect exceptions to be thrown. It

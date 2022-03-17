@@ -27,10 +27,12 @@ public:
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
   static constexpr auto orderByQualifiedName{
-    [](const Entry& a, const Entry& b) { return a->orderByQualifiedName(*b); }};
+      [](const Entry& a, const Entry& b) {
+        return a->orderByQualifiedName(*b);
+      }};
 
   Data(const std::filesystem::path& dataDir, DebugMode,
-       std::ostream& out = std::cout, std::ostream& err = std::cerr);
+      std::ostream& out = std::cout, std::ostream& err = std::cerr);
 
   Data(const Data&) = delete;
   // operator= is not generated since there are const members
@@ -45,18 +47,18 @@ public:
   [[nodiscard]] virtual Kanji::OptU16 frequency(const std::string&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
-  [[nodiscard]] virtual const Radical& ucdRadical(const std::string& kanjiName,
-                                                  const Ucd* u) const {
+  [[nodiscard]] virtual const Radical& ucdRadical(
+      const std::string& kanjiName, const Ucd* u) const {
     if (u) return _radicals.find(u->radical());
     // 'throw' should never happen - every 'Kanji' class instance should have
     // also exist in the data loaded from Unicode.
-    throw std::domain_error("UCD entry not found: " + kanjiName);
+    throw std::domain_error{"UCD entry not found: " + kanjiName};
   }
 
   // 'getRadicalByName' is used by 'ExtraKanji' classes during construction. It
   // returns the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
-  [[nodiscard]] virtual const Radical&
-  getRadicalByName(const std::string& radicalName) const {
+  [[nodiscard]] virtual const Radical& getRadicalByName(
+      const std::string& radicalName) const {
     return _radicals.find(radicalName);
   }
 
@@ -86,8 +88,7 @@ public:
   }
 
   [[nodiscard]] u_int8_t getStrokes(const std::string& kanjiName, const Ucd* u,
-                                    bool variant = false,
-                                    bool onlyUcd = false) const {
+      bool variant = false, bool onlyUcd = false) const {
     if (!onlyUcd) {
       if (const auto i{_strokes.find(kanjiName)}; i != _strokes.end())
         return i->second;
@@ -132,7 +133,7 @@ public:
   [[nodiscard]] OptEntry findKanjiByName(const std::string& s) const {
     const auto i{_compatibilityMap.find(s)};
     if (const auto j{
-          _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
+            _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
         j != _kanjiNameMap.end())
       return j->second;
     return {};
@@ -173,8 +174,8 @@ public:
   [[nodiscard]] auto& out() const { return _out; }
   [[nodiscard]] auto& err() const { return _err; }
   [[nodiscard]] auto& dataDir() const { return _dataDir; }
-  [[nodiscard]] auto dataDir(const std::filesystem::path& dir,
-                             const std::string& file) const {
+  [[nodiscard]] auto dataDir(
+      const std::filesystem::path& dir, const std::string& file) const {
     return _dataDir / dir / file;
   }
   [[nodiscard]] auto& kanjiNameMap() const { return _kanjiNameMap; }
@@ -193,15 +194,15 @@ public:
   // args, for example:
   //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
   //        i = Data::nextArg(argc, argv, i))
-  [[nodiscard]] static u_int8_t nextArg(u_int8_t argc, const char* const* argv,
-                                        u_int8_t currentArg = 0);
+  [[nodiscard]] static u_int8_t nextArg(
+      u_int8_t argc, const char* const* argv, u_int8_t currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt'
   // based on checking directories starting at 'argv[0]' (the program name)
   // and working up parent directories. Therefore argc must be at least 1.
   // '-data' followed by a directory name can also be used as an override.
-  [[nodiscard]] static std::filesystem::path getDataDir(u_int8_t argc,
-                                                        const char** argv);
+  [[nodiscard]] static std::filesystem::path getDataDir(
+      u_int8_t argc, const char** argv);
 
   // 'getDebugMode' looks for '-debug' or '-info' flags in 'argv' list (see
   // 'DebugMode' above)
@@ -284,7 +285,7 @@ private:
   inline static constinit u_int16_t _maxFrequency;
 
   inline static const std::string dataArg{"-data"}, debugArg{"-debug"},
-    infoArg{"-info"};
+      infoArg{"-info"};
   inline static const Kanji::NelsonIds _emptyNelsonIds;
 };
 

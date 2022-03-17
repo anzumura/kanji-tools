@@ -34,9 +34,9 @@ std::ostream& Quiz::beginQuizMessage(size_t totalQuestions) {
   // index starts at zero.
   if (_question) {
     if (_question > totalQuestions)
-      Data::usage(
-        "entry num '" + std::to_string(_question) +
-        "' is larger than total questions: " + std::to_string(totalQuestions));
+      Data::usage("entry num '" + std::to_string(_question) +
+                  "' is larger than total questions: " +
+                  std::to_string(totalQuestions));
     --_question;
   }
   return log(true) << "Starting " << (isTestMode() ? "quiz" : "review")
@@ -59,10 +59,10 @@ std::ostream& Quiz::incorrectMessage(const std::string& name) {
 
 Choice::Choices Quiz::getDefaultChoices(size_t totalQuestions) const {
   Choice::Choices c{
-    {MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
-    {SkipOption, _question + 1U == totalQuestions ? "finish"
-                 : !isTestMode()                  ? "next"
-                                                  : "skip"}};
+      {MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
+      {SkipOption, _question + 1U == totalQuestions ? "finish"
+                   : !isTestMode()                  ? "next"
+                                                    : "skip"}};
   if (!isTestMode() && _question) c[PrevOption] = "prev";
   return c;
 }

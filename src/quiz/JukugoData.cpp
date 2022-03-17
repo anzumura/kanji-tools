@@ -13,7 +13,7 @@ JukugoData::JukugoData(DataPtr data) {
   const std::string jukugoDir("jukugo/");
   const auto f{[this, &jukugoDir, data](const char* file, KanjiGrades grade) {
     const auto loaded{loadFile(
-      DataFile::getFile(data->dataDir(), fs::path(jukugoDir + file)), grade)};
+        DataFile::getFile(data->dataDir(), fs::path(jukugoDir + file)), grade)};
     if (data->debug())
       data->log() << "Loaded " << loaded << " for Grade: " << grade << '\n';
   }};
@@ -43,7 +43,7 @@ JukugoData::JukugoData(DataPtr data) {
 
 size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
   static const std::string stripPrefix("..."), openBracket("("),
-    closeBracket(")");
+      closeBracket(")");
   const auto previouslyCreated{_uniqueJukugo.size()};
   std::ifstream f(file);
   auto lineNumber{1};
@@ -63,8 +63,8 @@ size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
       if (j == std::string::npos) error("failed to find close bracket");
       if (j != line.size() - 1)
         error("close bracket should be the last character");
-      createJukugo(error, grade, line.substr(0, i - 1),
-                   line.substr(i + 1, j - i - 1));
+      createJukugo(
+          error, grade, line.substr(0, i - 1), line.substr(i + 1, j - i - 1));
     } else
       // line has multiple space separated Jukugo entries for a given kanji (so
       // other.txt file), i.e.: X ... XA(reading) XB(reading) XC(reading)
@@ -74,16 +74,15 @@ size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
         if (i == std::string::npos) error("failed to find open bracket");
         const auto j{line.find(closeBracket)};
         if (j == std::string::npos) error("failed to find close bracket");
-        createJukugo(error, grade, line.substr(0, i),
-                     line.substr(i + 1, j - i - 1));
+        createJukugo(
+            error, grade, line.substr(0, i), line.substr(i + 1, j - i - 1));
       }
   return _uniqueJukugo.size() - previouslyCreated;
 }
 
 template<typename T>
 void JukugoData::createJukugo(T& error, KanjiGrades grade,
-                              const std::string& name,
-                              const std::string& reading) {
+    const std::string& name, const std::string& reading) {
   // There are some duplicates in data files which makes sense for
   // 'jukugo/other.txt' since it has a line per kanji followed by jukugo, but
   // there are also duplicate in the 'jukugo/g*.txt' files. For example 一見 is

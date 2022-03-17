@@ -24,12 +24,12 @@ public:
   // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and
   // then returns the full path. It will also try adding '.txt' extension if
   // 'file' isn't found and doesn't already have an extension.
-  [[nodiscard]] static std::filesystem::path
-  getFile(const std::filesystem::path& dir, const std::filesystem::path& file);
+  [[nodiscard]] static std::filesystem::path getFile(
+      const std::filesystem::path& dir, const std::filesystem::path& file);
 
   static void print(const List&, const std::string& type,
-                    const std::string& group = {}, bool isError = false,
-                    std::ostream& = std::cout);
+      const std::string& group = {}, bool isError = false,
+      std::ostream& = std::cout);
   static void print(std::ostream& out, const List& l, const std::string& type) {
     print(l, type, {}, false, out);
   }
@@ -45,7 +45,7 @@ public:
   enum class FileType { MultiplePerLine, OnePerLine };
 
   DataFile(const std::filesystem::path& p, FileType fileType,
-           bool createNewUniqueFile = false)
+      bool createNewUniqueFile = false)
       : DataFile(p, fileType, createNewUniqueFile, nullptr) {}
   DataFile(const std::filesystem::path& p, bool createNewUniqueFile = false)
       : DataFile(p, FileType::OnePerLine, createNewUniqueFile, nullptr) {}
@@ -79,7 +79,7 @@ public:
   }
 protected:
   DataFile(const std::filesystem::path& p, FileType fileType, bool, Set*,
-           const std::string& name = {});
+      const std::string& name = {});
 private:
   using Map = std::map<std::string, size_t>;
 
@@ -96,10 +96,10 @@ private:
 // there are TypedDataFile classes for 'JlptLevels' and 'KenteiKyus'
 template<typename T> class TypedDataFile : public DataFile {
 protected:
-  TypedDataFile(const std::filesystem::path& p, T type,
-                bool createNewUniqueFile = false)
+  TypedDataFile(
+      const std::filesystem::path& p, T type, bool createNewUniqueFile = false)
       : DataFile(p, FileType::MultiplePerLine, createNewUniqueFile,
-                 &UniqueTypeNames, kanji_tools::toString(type)),
+            &UniqueTypeNames, kanji_tools::toString(type)),
         _type(type) {}
 protected:
   const T _type;
@@ -110,7 +110,7 @@ private:
 class LevelDataFile : public TypedDataFile<JlptLevels> {
 public:
   LevelDataFile(const std::filesystem::path& p, JlptLevels level,
-                bool createNewUniqueFile = false)
+      bool createNewUniqueFile = false)
       : TypedDataFile(p, level, createNewUniqueFile) {}
 
   [[nodiscard]] JlptLevels level() const override { return _type; }
@@ -119,7 +119,7 @@ public:
 class KyuDataFile : public TypedDataFile<KenteiKyus> {
 public:
   KyuDataFile(const std::filesystem::path& p, KenteiKyus kyu,
-              bool createNewUniqueFile = false)
+      bool createNewUniqueFile = false)
       : TypedDataFile(p, kyu, createNewUniqueFile) {}
 
   [[nodiscard]] KenteiKyus kyu() const override { return _type; }

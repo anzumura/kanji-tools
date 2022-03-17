@@ -17,13 +17,13 @@ constexpr auto ChoiceStart{'1'};
 } // namespace
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, u_int16_t question,
-                   bool showMeanings, const List& list, KanjiInfo fields,
-                   u_int8_t choiceCount, QuizStyle quizStyle)
+    bool showMeanings, const List& list, KanjiInfo fields, u_int8_t choiceCount,
+    QuizStyle quizStyle)
     : Quiz(launcher, question, showMeanings), _answers(choiceCount),
       _infoFields(fields), _choiceCount(choiceCount), _quizStyle(quizStyle),
       _prompt(isTestMode()
-                ? QuizPrompt + (isKanjiToReading() ? "reading" : "kanji")
-                : Prompt),
+                  ? QuizPrompt + (isKanjiToReading() ? "reading" : "kanji")
+                  : Prompt),
       _choiceEnd('0' + static_cast<char>(_choiceCount)) {
   List questions;
   for (auto& i : list)
@@ -61,7 +61,7 @@ void ListQuiz::start(const List& questions) {
 
 u_int8_t ListQuiz::populateAnswers(const Entry& kanji, const List& questions) {
   std::uniform_int_distribution<u_int16_t> randomReading(
-    0, static_cast<u_int16_t>(questions.size()) - 1);
+      0, static_cast<u_int16_t>(questions.size()) - 1);
   std::uniform_int_distribution<u_int8_t> randomCorrect(0, _choiceCount - 1);
 
   const auto correctChoice{randomCorrect(RandomGen)};
@@ -102,10 +102,10 @@ void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
 }
 
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz,
-                         u_int8_t correctChoice, const std::string& name) {
-  const auto answer{isTestMode()
-                      ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices)
-                      : get(_prompt, choices)};
+    u_int8_t correctChoice, const std::string& name) {
+  const auto answer{
+      isTestMode() ? choice().get(_prompt, ChoiceStart, _choiceEnd, choices)
+                   : get(_prompt, choices)};
   if (answer == MeaningsOption) {
     toggleMeanings(choices);
     return false;
