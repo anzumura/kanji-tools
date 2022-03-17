@@ -21,6 +21,8 @@ public:
   [[nodiscard]] JlptLevels level(const std::string&) const override;
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;
 private:
+  inline static const std::filesystem::path Jlpt{"jlpt"}, Kentei{"kentei"};
+
   // functions to print loaded data if _debug is true
   void noFreq(long f, bool brackets = false) const; // print no-freq count
   template<typename T>
@@ -30,6 +32,16 @@ private:
   template<typename T, size_t S>
   void printListStats(const IterableEnumArray<T, S>&, T (Kanji::*)() const,
       const std::string&, bool showNoFrequency) const;
+
+  template<typename T> auto dataFile(T t) const {
+    const auto f{[this, t](const auto& dir) {
+      return dataDir() / dir / firstLower(kanji_tools::toString(t));
+    }};
+    if constexpr (std::is_same_v<T, JlptLevels>)
+      return LevelDataFile{f(Jlpt), t, debug()};
+    else if (std::is_same_v<T, KenteiKyus>)
+      return KyuDataFile{f(Kentei), t, debug()};
+  }
 
   template<typename V, size_t N> using List = const std::array<const V, N - 1>;
 

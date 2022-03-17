@@ -174,10 +174,6 @@ public:
   [[nodiscard]] auto& out() const { return _out; }
   [[nodiscard]] auto& err() const { return _err; }
   [[nodiscard]] auto& dataDir() const { return _dataDir; }
-  [[nodiscard]] auto dataDir(
-      const std::filesystem::path& dir, const std::string& file) const {
-    return _dataDir / dir / file;
-  }
   [[nodiscard]] auto& kanjiNameMap() const { return _kanjiNameMap; }
 
   // 'log' can be used for putting a standard prefix to output messages (used

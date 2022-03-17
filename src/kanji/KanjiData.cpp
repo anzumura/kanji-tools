@@ -8,32 +8,24 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
-    FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"},
-    StrokesFile{"strokes"}, WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
+const fs::path FrequencyReadingsFile{"frequency-readings"},
+    RadicalsFile{"radicals"}, StrokesFile{"strokes"},
+    WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
 
 } // namespace
 
 KanjiData::KanjiData(
     u_int8_t argc, const char** argv, std::ostream& out, std::ostream& err)
     : Data{getDataDir(argc, argv), getDebugMode(argc, argv), out, err},
-      _levels{LevelDataFile(dataDir(Jlpt, "n5"), JlptLevels::N5, debug()),
-          LevelDataFile(dataDir(Jlpt, "n4"), JlptLevels::N4, debug()),
-          LevelDataFile(dataDir(Jlpt, "n3"), JlptLevels::N3, debug()),
-          LevelDataFile(dataDir(Jlpt, "n2"), JlptLevels::N2, debug()),
-          LevelDataFile(dataDir(Jlpt, "n1"), JlptLevels::N1, debug())},
-      _kyus{KyuDataFile(dataDir(Kentei, "k10"), KenteiKyus::K10, debug()),
-          KyuDataFile(dataDir(Kentei, "k9"), KenteiKyus::K9, debug()),
-          KyuDataFile(dataDir(Kentei, "k8"), KenteiKyus::K8, debug()),
-          KyuDataFile(dataDir(Kentei, "k7"), KenteiKyus::K7, debug()),
-          KyuDataFile(dataDir(Kentei, "k6"), KenteiKyus::K6, debug()),
-          KyuDataFile(dataDir(Kentei, "k5"), KenteiKyus::K5, debug()),
-          KyuDataFile(dataDir(Kentei, "k4"), KenteiKyus::K4, debug()),
-          KyuDataFile(dataDir(Kentei, "k3"), KenteiKyus::K3, debug()),
-          KyuDataFile(dataDir(Kentei, "kJ2"), KenteiKyus::KJ2, debug()),
-          KyuDataFile(dataDir(Kentei, "k2"), KenteiKyus::K2, debug()),
-          KyuDataFile(dataDir(Kentei, "kJ1"), KenteiKyus::KJ1, debug()),
-          KyuDataFile(dataDir(Kentei, "k1"), KenteiKyus::K1, debug())},
+      _levels{dataFile(JlptLevels::N5), dataFile(JlptLevels::N4),
+          dataFile(JlptLevels::N3), dataFile(JlptLevels::N2),
+          dataFile(JlptLevels::N1)},
+      _kyus{dataFile(KenteiKyus::K10), dataFile(KenteiKyus::K9),
+          dataFile(KenteiKyus::K8), dataFile(KenteiKyus::K7),
+          dataFile(KenteiKyus::K6), dataFile(KenteiKyus::K5),
+          dataFile(KenteiKyus::K4), dataFile(KenteiKyus::K3),
+          dataFile(KenteiKyus::KJ2), dataFile(KenteiKyus::K2),
+          dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
       _frequency(dataDir() / "frequency", debug()) {
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
   _ucd.load(DataFile::getFile(dataDir(), UcdFile));
