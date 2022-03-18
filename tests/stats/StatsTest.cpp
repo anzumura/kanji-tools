@@ -45,10 +45,10 @@ protected:
 };
 
 TEST_F(StatsTest, PrintStatsForOneFile) {
-  const char* testArgs[] = {
+  const char* testArgs[]{
       "", "../../../tests/stats/sample-data/wiki-articles/02-中島みゆき.txt"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {
+  const char* expected[]{
       "Stats for: '02-中島みゆき.txt' - showing top 5 Kanji per type",
       "Furigana Removed: 6, Combining Marks Replaced: 0, Variation "
       "Selectors: 0",
@@ -84,10 +84,9 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
 }
 
 TEST_F(StatsTest, PrintStatsForOneDirectory) {
-  const char* testArgs[] = {
-      "", "../../../tests/stats/sample-data/wiki-articles"};
+  const char* testArgs[]{"", "../../../tests/stats/sample-data/wiki-articles"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {
+  const char* expected[]{
       "Stats for: 'wiki-articles' (3 files) - showing top 5 Kanji per type",
       "Furigana Removed: 39, Combining Marks Replaced: 0, Variation "
       "Selectors: 0",
@@ -125,8 +124,7 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
 }
 
 TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
-  const char* testArgs[] = {
-      "", "../../../tests/stats/sample-data/wiki-articles/"};
+  const char* testArgs[]{"", "../../../tests/stats/sample-data/wiki-articles/"};
   Stats stats(std::size(testArgs), testArgs, _data);
   std::string line;
   auto found = false;
@@ -136,9 +134,9 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
 }
 
 TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
-  const char* testArgs[] = {"", "../../../tests/stats/sample-data"};
+  const char* testArgs[]{"", "../../../tests/stats/sample-data"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {
+  const char* expected[]{
       "Stats for: 'sample-data' (5 files from 3 directories) - showing top 5 "
       "Kanji per type",
       "Furigana Removed: 3397, Combining Marks Replaced: 0, Variation "
@@ -182,10 +180,9 @@ TEST_F(StatsTest, NonUcdKanji) {
   // details).
   writeTestFile(
       "丆㐁"); // include examples from both 'common' and 'rare' unicode blocks
-  const char* testArgs[] = {"", "testDir"};
+  const char* testArgs[]{"", "testDir"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {
-      "Stats for: 'testDir' - showing top 5 Kanji per type",
+  const char* expected[]{"Stats for: 'testDir' - showing top 5 Kanji per type",
       "   Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)",
       "Total Kana+Kanji: 2 (Kanji: 100.0%)"};
   std::string line;
@@ -199,10 +196,9 @@ TEST_F(StatsTest, NonUcdKanji) {
 
 TEST_F(StatsTest, ShowBreakdown) {
   writeTestFile("ああア西西東南南南巽𫞉㐁");
-  const char* testArgs[] = {"", "testDir", "-b"};
+  const char* testArgs[]{"", "testDir", "-b"};
   Stats stats(std::size(testArgs), testArgs, _data);
-  const char* expected[] = {
-      "Stats for: 'testDir' - showing top 5 Kanji per type",
+  const char* expected[]{"Stats for: 'testDir' - showing top 5 Kanji per type",
       "        Hiragana:      2, unique:    1",
       "        Katakana:      1, unique:    1",
       "    Common Kanji:      7, unique:    4, 100.00%",
