@@ -59,7 +59,7 @@ const char32_t MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
 
 TEST(MBUtilsTest, ValidMBUtf8) {
   EXPECT_EQ(validateMBUtf8(nullptr), MBUtf8Result::NotMultiByte);
-  std::string x{"雪"};
+  const std::string x{"雪"};
   EXPECT_EQ(x.size(), 3);
   EXPECT_EQ(validateUtf8(x), Utf8Result::Valid);
   EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::Valid);
@@ -71,7 +71,7 @@ TEST(MBUtilsTest, ValidMBUtf8) {
 }
 
 TEST(MBUtilsTest, ValidWithTwoByte) {
-  std::string x{"©"};
+  const std::string x{"©"};
   EXPECT_EQ(x.size(), 2);
   EXPECT_TRUE(isValidUtf8(x));
   EXPECT_TRUE(isValidMBUtf8(x));
@@ -81,7 +81,7 @@ TEST(MBUtilsTest, ValidWithTwoByte) {
 }
 
 TEST(MBUtilsTest, ValidWithFourByte) {
-  std::string x{"𒀄"}; // a four byte Sumerian cuneiform symbol
+  const std::string x{"𒀄"}; // a four byte Sumerian cuneiform symbol
   EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidUtf8(x));
   EXPECT_TRUE(isValidMBUtf8(x));
@@ -137,7 +137,7 @@ TEST(MBUtilsTest, NotValidForOverlong) {
                 static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)}),
       Utf8Result::Overlong);
   // overlong ō with 3 bytes
-  std::string o{"ō"};
+  const std::string o{"ō"};
   EXPECT_EQ(o.size(), 2);
   EXPECT_EQ(validateUtf8(o), Utf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
@@ -146,13 +146,13 @@ TEST(MBUtilsTest, NotValidForOverlong) {
       static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)};
   EXPECT_EQ(validateUtf8(overlongO), Utf8Result::Overlong);
   // overlong Euro symbol with 4 bytes
-  std::string x{"\xF0\x82\x82\xAC"};
+  const std::string x{"\xF0\x82\x82\xAC"};
   EXPECT_EQ(validateUtf8(x), Utf8Result::Overlong);
 }
 
 TEST(MBUtilsTest, ConvertEmptyStrings) {
-  std::string emptyString;
-  std::u32string emptyU32String;
+  const std::string emptyString;
+  const std::u32string emptyU32String;
   EXPECT_EQ(fromUtf8(emptyString), emptyU32String);
   EXPECT_EQ(fromUtf8(""), emptyU32String);
   EXPECT_EQ(toUtf8(emptyU32String), emptyString);
@@ -160,7 +160,7 @@ TEST(MBUtilsTest, ConvertEmptyStrings) {
 }
 
 TEST(MBUtilsTest, FromUTF8String) {
-  auto wideSingle{fromUtf8("single .")};
+  const auto wideSingle{fromUtf8("single .")};
   ASSERT_EQ(wideSingle, U"single .");
   // first byte error cases
   fromUtf8Error(std::string{static_cast<char>(Bit1)});
@@ -342,8 +342,8 @@ TEST(MBUtilsTest, SortKanaAndRomaji) {
   // - Katakana: should mix with Hiragana instead of always coming after
   // - Full-width Rōmaji: should probably come before Kana
   // - Half-width Katakana: should mix with other Kana instead
-  std::set<std::string> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ", "バラ", "ばら",
-      "ぱら", "para", "じょ", "しょ", "ｐａｒａ"};
+  const std::set<std::string> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ", "バラ",
+      "ばら", "ぱら", "para", "じょ", "しょ", "ｐａｒａ"};
   ASSERT_EQ(s.size(), 11);
   auto i{s.begin()};
   EXPECT_EQ(*i++, "para");
@@ -364,7 +364,7 @@ TEST(MBUtilsTest, SortKanji) {
   // Kanji sort order seems to follow Unicode code points instead of
   // 'radical/stroke' ordering. Calling std::setlocale with values like ja_JP or
   // ja_JP.UTF-8 doesn't make any difference.
-  std::set<std::string> s{
+  const std::set<std::string> s{
       "些", "丑", "云", "丞", "乃", "𠮟", "廿", "⺠", "輸", "鳩"};
   ASSERT_EQ(s.size(), 10);
   auto i{s.begin()};
