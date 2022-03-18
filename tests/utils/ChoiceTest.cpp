@@ -8,7 +8,7 @@ namespace kanji_tools {
 
 class ChoiceTest : public ::testing::Test {
 protected:
-  ChoiceTest() : _choice(_os, &_is) {}
+  ChoiceTest() : _choice{_os, &_is} {}
 
   std::stringstream _os;
   std::stringstream _is;
@@ -30,7 +30,7 @@ TEST_F(ChoiceTest, NoChoicesError) {
 }
 
 TEST_F(ChoiceTest, NonPrintableError) {
-  char esc = 27;
+  const char esc{27};
   EXPECT_THROW(call(
                    [=, this] {
                      _choice.get("", {{esc, ""}});
@@ -227,10 +227,10 @@ TEST_F(ChoiceTest, QuitDescription) {
 }
 
 TEST_F(ChoiceTest, SetQuitFromConstructor) {
-  Choice choice(_os, 'e');
+  Choice choice{_os, 'e'};
   EXPECT_EQ(choice.quit(), 'e');
   EXPECT_EQ(choice.quitDescription(), "quit"); // default quit description
-  Choice choiceWithQuitDescription(_os, 'e', "end");
+  Choice choiceWithQuitDescription{_os, 'e', "end"};
   EXPECT_EQ(choiceWithQuitDescription.quitDescription(), "end");
 }
 
@@ -241,7 +241,10 @@ TEST_F(ChoiceTest, NonPrintableQuitError) {
 }
 
 TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
-  EXPECT_THROW(call([this] { Choice choice(_os, 23); },
+  EXPECT_THROW(call(
+                   [this] {
+                     Choice choice{_os, 23};
+                   },
                    "quit option is non-printable: 0x17"),
       std::domain_error);
 }
@@ -296,8 +299,8 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
 }
 
 TEST_F(ChoiceTest, DuplicateRangeOption) {
-  Choice::Choices choices = {{'a', "12"}, {'c', "34"}};
-  const std::string start("range option '"), end("' already in choices");
+  const Choice::Choices choices{{'a', "12"}, {'c', "34"}};
+  const std::string start{"range option '"}, end{"' already in choices"};
   for (char rangeStart : {'a', 'b'})
     EXPECT_THROW(call([&, this] { _choice.get("", rangeStart, 'c', choices); },
                      start + (rangeStart == 'a' ? 'a' : 'c') + end),

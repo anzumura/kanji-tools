@@ -32,7 +32,7 @@ protected:
   }
   void TearDown() override { fs::remove_all(TestDir); }
 
-  void writeTestFile(const std::string& s) {
+  void write(const std::string& s) {
     std::ofstream of(TestFile);
     of << s;
     of.close();
@@ -178,7 +178,7 @@ TEST_F(StatsTest, NonUcdKanji) {
   // 'UCD' here refers to Kanji in 'data/ucd.txt' which is a filtered set of
   // kanji from the original complete set (see scripts/parseUcdAllFlat.sh for
   // details).
-  writeTestFile(
+  write(
       "丆㐁"); // include examples from both 'common' and 'rare' unicode blocks
   const char* testArgs[]{"", "testDir"};
   Stats stats(std::size(testArgs), testArgs, _data);
@@ -195,7 +195,7 @@ TEST_F(StatsTest, NonUcdKanji) {
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
-  writeTestFile("ああア西西東南南南巽𫞉㐁");
+  write("ああア西西東南南南巽𫞉㐁");
   const char* testArgs[]{"", "testDir", "-b"};
   Stats stats(std::size(testArgs), testArgs, _data);
   const char* expected[]{"Stats for: 'testDir' - showing top 5 Kanji per type",
