@@ -16,12 +16,7 @@ namespace {
 //   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
-constexpr char32_t MinSurrogate{0xd800}, MaxSurrogate{0xdfff},
-    ErrorReplacement{0xfffd};
-
-// UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
-// invalid code points
-constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
+constexpr char32_t MinSurrogate{0xd800}, MaxSurrogate{0xdfff};
 
 #ifdef USE_CODECVT_FOR_UTF_8
 inline auto utf8Converter() {
@@ -29,6 +24,11 @@ inline auto utf8Converter() {
   return &conv;
 }
 #else
+constexpr char32_t ErrorReplacement{0xfffd};
+
+// UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
+// invalid code points
+constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
 
 template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(const char* s) {
@@ -121,7 +121,7 @@ void convertToUtf8(char32_t c, std::string& s) {
 
 std::u32string fromUtf8(const char* s) {
 #ifdef USE_CODECVT_FOR_UTF_8
-  auto r = utf8Converter()->from_bytes(s);
+  const auto r{utf8Converter()->from_bytes(s)};
   return std::u32string(reinterpret_cast<const char32_t*>(r.c_str()));
 #else
   return convertFromUtf8<std::u32string>(s);
