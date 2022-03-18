@@ -29,7 +29,7 @@ public:
   using OptEntry = Data::OptEntry;
 
   Count(size_t f, const std::string& n, OptEntry e)
-      : count(f), name(n), entry(e) {}
+      : count{f}, name{n}, entry{e} {}
 
   [[nodiscard]] auto frequency() const {
     return entry ? (**entry).frequencyOrDefault(Data::maxFrequency())
@@ -62,7 +62,7 @@ std::ostream& operator<<(std::ostream& os, const Count& c) {
   if (c.entry)
     os << std::setw(5) << (**c.entry).frequencyOrDefault(0) << ", "
        << ((**c.entry).hasLevel() ? toString((**c.entry).level())
-                                  : std::string("--"))
+                                  : std::string{"--"})
        << ", " << (**c.entry).type();
   else
     os << ", " << std::setw(7) << "U+" + toUnicode(c.name);
@@ -81,8 +81,8 @@ class StatsPred {
 public:
   StatsPred(const DataPtr data, const fs::path& top, const std::string& name,
       bool showBreakdown)
-      : _data(data), _top(top), _name(name), _showBreakdown(showBreakdown),
-        _isKanji(name.ends_with("Kanji")) {}
+      : _data{data}, _top{top}, _name{name}, _showBreakdown{showBreakdown},
+        _isKanji{name.ends_with("Kanji")} {}
 
   template<typename Pred>
   [[nodiscard]] std::string run(const Pred&, bool verbose, bool firstCount);
@@ -119,21 +119,21 @@ private:
 
 template<typename Pred>
 std::string StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
-  const auto isHiragana(_name == "Hiragana"),
-      isUnrecognized(_name == "Unrecognized"),
-      isCommonKanji(_isKanji && _name.starts_with("Common"));
+  const auto isHiragana{_name == "Hiragana"},
+      isUnrecognized{_name == "Unrecognized"},
+      isCommonKanji{_isKanji && _name.starts_with("Common")};
 
   // Remove furigana when processing Hiragana or MB-Letter to remove the effect
   // on counts, i.e., furigana in .txt files will artificially inflate Hiragana
   // count (and MB-Letter because of the wide brackets)
-  const auto removeFurigana(
-      isHiragana || _name == "Katakana" || _name == "MB-Letter");
+  const auto removeFurigana{
+      isHiragana || _name == "Katakana" || _name == "MB-Letter"};
 
   if (isHiragana && verbose) _os << ">>> Showing all furigana replacements:\n";
 
-  MBCountIf count(pred,
+  MBCountIf count{pred,
       removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt,
-      MBCount::DefaultReplace, isHiragana && verbose);
+      MBCount::DefaultReplace, isHiragana && verbose};
   count.addFile(_top, _isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(count);
   CountSet frequency;
@@ -199,7 +199,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
         i != uniqueKanjiPerType.end()) {
       auto totalForType{totalKanjiPerType[t]};
       printTotalAndUnique(
-          std::string("[") + toString(t) + "] ", totalForType, i->second);
+          std::string{"["} + toString(t) + "] ", totalForType, i->second);
       _os << ", " << std::setw(PercentWidth) << std::fixed
           << std::setprecision(PercentPrecision)
           << asPercent(totalForType, _total) << "%  (";
@@ -250,7 +250,8 @@ void StatsPred::printBreakdown(
 
 } // namespace
 
-Stats::Stats(Data::ArgCount argc, const char** argv, DataPtr data) : _data(data) {
+Stats::Stats(Data::ArgCount argc, const char** argv, DataPtr data)
+    : _data(data) {
   auto breakdown{false}, endOptions{false}, verbose{false};
   std::vector<std::string> files;
   for (auto i{Data::nextArg(argc, argv)}; i < argc;
@@ -269,7 +270,7 @@ Stats::Stats(Data::ArgCount argc, const char** argv, DataPtr data) : _data(data)
       else
         Data::usage("illegal option '" + arg + "' use -h for help");
     } else
-      files.push_back(arg);
+      files.emplace_back(arg);
   if (!data->debug() && files.empty())
     Data::usage("please specify at least one option or '-h' for help");
   for (auto& i : files) countKanji(i, breakdown, verbose);

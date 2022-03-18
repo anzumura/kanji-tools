@@ -27,7 +27,7 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
                                                                 : "kanji")
                                          : Prompt},
       _choiceEnd{static_cast<char>('0' + _choiceCount)} {
-  assert(_answers.size() == _choiceCount);
+  assert(_answers.size() == _choiceCount); // need () ctor
   List questions;
   for (auto& i : list)
     if (i->hasReading()) questions.push_back(i);

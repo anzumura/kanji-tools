@@ -27,7 +27,8 @@ protected:
   [[nodiscard]] auto katakanaToHiragana(const std::string& s) {
     return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
-  // populate 'romaji' when round trip is lossy (like repeat symbols)
+
+  // pass in 'romaji' when round trip is lossy (like repeat symbols)
   void kanaConvertCheck(const std::string& hiragana,
       const std::string& katakana, const std::string& romaji = {}) {
     if (romaji.empty()) {
@@ -62,10 +63,12 @@ protected:
                   katakana, ConvertFlags::Hepburn | ConvertFlags::Kunrei),
         preferHepburnIfBoth);
   }
+
   void checkKunrei(const char* hiragana, const char* katakana,
       const char* romaji, const char* kunrei) {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
+
   void checkSmallKana(CharType source, const std::string& s) {
     // small letters that don't form part of a digraph are output in 'wāpuro'
     // style favoring 'l' instead of 'x' as first letter (so small tsu is 'ltu')
@@ -80,7 +83,7 @@ protected:
 };
 
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
-  std::string s("atatakaiあたたかいアタタカイ");
+  std::string s{"atatakaiあたたかいアタタカイ"};
   EXPECT_EQ(_converter.convert(CharType::Romaji, s, CharType::Romaji), s);
   EXPECT_EQ(_converter.convert(CharType::Hiragana, s, CharType::Hiragana), s);
   EXPECT_EQ(_converter.convert(CharType::Katakana, s, CharType::Katakana), s);

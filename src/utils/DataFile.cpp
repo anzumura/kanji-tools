@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 
 fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   if (!fs::is_directory(dir)) usage(dir.string() + " is not a directory");
-  fs::path p(dir / file);
+  fs::path p{dir / file};
   if (!fs::is_regular_file(p) && !file.has_extension()) p += TextFileExtension;
   if (!fs::exists(p)) {
     auto msg{dir.string() + " must contain '" + file.string()};
@@ -36,7 +36,7 @@ void DataFile::print(const List& l, const std::string& type,
 
 DataFile::DataFile(const fs::path& fileIn, FileType fileType,
     bool createNewUniqueFile, Set* uniqueTypeNames, const std::string& name)
-    : _name(name.empty() ? firstUpper(fileIn.stem().string()) : name) {
+    : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
   auto file{fileIn};
   // try adding .txt if file isn't found
   if (!fs::is_regular_file(file) && !fileIn.has_extension())
@@ -72,18 +72,17 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
         good.emplace_back(*i.first);
       } else if (!UniqueNames.insert(token).second)
         error("found globally non-unique entry '" + token + "'");
-      _list.push_back(token);
+      _list.emplace_back(token);
       // 'value' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
       _map[token] = _list.size();
     }
   }
   if (!dups.empty()) {
+    static const std::string Found{"found "}, Duplicates{" duplicates in "};
     if (good.empty())
-      error("found " + std::to_string(dups.size()) + " duplicates in " + _name,
-          false);
+      error(Found + std::to_string(dups.size()) + Duplicates + _name, false);
     else {
-      std::cerr << ">>> found " << dups.size() << " duplicates in " << _name
-                << ":";
+      std::cerr << ">>> " << Found << dups.size() << Duplicates << _name << ":";
       for (const auto& i : dups) std::cerr << ' ' << i;
       if (createNewUniqueFile) {
         fs::path newFile{file};

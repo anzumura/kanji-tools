@@ -74,11 +74,11 @@ void UcdData::load(const std::filesystem::path& file) {
       joyoCol{"Joyo"}, jinmeiCol{"Jinmei"}, linkCodesCol{"LinkCodes"},
       linkNamesCol{"LinkNames"}, linkTypeCol{"LinkType"}, meaningCol{"Meaning"},
       onCol{"On"}, kunCol{"Kun"};
-  for (ColumnFile f(file,
+  for (ColumnFile f{file,
            {codeCol, nameCol, blockCol, versionCol, radicalCol, strokesCol,
                vStrokesCol, pinyinCol, morohashiCol, nelsonIdsCol, sourcesCol,
                jSourceCol, joyoCol, jinmeiCol, linkCodesCol, linkNamesCol,
-               linkTypeCol, meaningCol, onCol, kunCol});
+               linkTypeCol, meaningCol, onCol, kunCol}};
        f.nextRow();) {
     if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol) &&
         f.isEmpty(jSourceCol))

@@ -21,9 +21,10 @@ size_t ColumnFile::getColumnNumber(const std::string& name) {
 
 ColumnFile::ColumnFile(
     const fs::path& p, const Columns& columns, char delimiter)
-    : _file(std::fstream(p)), _delimiter(delimiter),
-      _name(p.filename().string()), _rowValues(columns.size()),
+    : _file{std::fstream(p)}, _delimiter{delimiter},
+      _name{p.filename().string()}, _rowValues{columns.size()},
       _columnToPosition(_allColumns.size(), ColNotFound) {
+  assert(_columnToPosition.size() == _allColumns.size()); // need () ctor
   if (columns.empty()) error("must specify at least one column");
   if (!fs::exists(p)) error("doesn't exist");
   if (!fs::is_regular_file(p)) error("not regular file");
@@ -42,7 +43,7 @@ void ColumnFile::processHeaderRow(const std::string& row, ColNames& colNames) {
   size_t pos{};
   std::set<std::string> foundCols;
   std::string header;
-  for (std::stringstream ss(row); std::getline(ss, header, _delimiter); ++pos) {
+  for (std::stringstream ss{row}; std::getline(ss, header, _delimiter); ++pos) {
     if (foundCols.contains(header)) error("duplicate header '" + header + "'");
     const auto i{colNames.find(header)};
     if (i == colNames.end()) error("unrecognized header '" + header + "'");
@@ -74,9 +75,9 @@ bool ColumnFile::nextRow() {
       if (i == _rowValues.size()) error("too many columns");
       _rowValues[i] = field;
     }
-    // 'getline' will return failure if it only reads a delimiter and then
-    // reaches the end of input so need a special case for handing an empty
-    // final column.
+    // the above call to 'getline' returns false when there's no more data, but
+    // it also returns false if it only reads a delimiter and then reaches the
+    // end of input so need a special case for an empty final column
     if (i == _rowValues.size() - 1 &&
         (i ? line.ends_with(_delimiter) : line.empty()))
       _rowValues[_rowValues.size() - 1] = EmptyString;

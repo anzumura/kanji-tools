@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 namespace {
 
-const std::string AlreadyInChoices("' already in choices");
+const std::string AlreadyInChoices{"' already in choices"};
 
 } // namespace
 
@@ -33,7 +33,7 @@ char Choice::getOneChar() {
 }
 
 void Choice::add(std::string& prompt, const Choices& choices) {
-  static const std::string CommaSpace(", "), Equals("="), Dash("-");
+  static const std::string CommaSpace{", "}, Equals{"="}, Dash{"-"};
 
   OptChar rangeStart;
   char prevChar;

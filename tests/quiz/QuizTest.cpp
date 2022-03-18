@@ -22,7 +22,7 @@ protected:
   }
 
   // Contructs Quiz using the real data files
-  QuizTest() : _quiz(3, argv(), _data, _groupData, _jukugoData, &_is) {}
+  QuizTest() : _quiz{3, argv(), _data, _groupData, _jukugoData, &_is} {}
 
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {
@@ -243,8 +243,8 @@ TEST_F(QuizTest, ToggleListMeanings) {
   std::string line;
   auto meaningsOn{false};
   size_t found{};
-  std::string expected(
-      "Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
+  const std::string expected{
+      "Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10"};
   while (std::getline(_os, line)) {
     if (line.starts_with("Question")) {
       ++found;

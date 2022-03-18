@@ -29,16 +29,18 @@ protected:
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directories(TestSubDir));
-    const auto files = {std::pair(TestFile1, "北海道"),
-        std::pair(TestFile2, "南北"), std::pair(TestSubFile1, "東西線"),
-        std::pair(TestSubFile2, "東北")};
+    const auto files = {std::pair{TestFile1, "北海道"},
+        std::pair{TestFile2, "南北"}, std::pair{TestSubFile1, "東西線"},
+        std::pair{TestSubFile2, "東北"}};
     for (auto& i : files) {
-      std::ofstream of(i.first);
+      std::ofstream of{i.first};
       of << i.second;
       of.close();
     }
   }
+
   void TearDown() override { fs::remove_all(TestDir); }
+
   MBCount c;
 };
 
@@ -79,7 +81,7 @@ TEST_F(MBCountTest, Add) {
 }
 
 TEST_F(MBCountTest, AddWithErrors) {
-  std::string s1("hello空は青い"), s2("箱は空です");
+  std::string s1{"hello空は青い"}, s2{"箱は空です"};
   s1[s1.size() - 2] = 'x'; // mess up い introducing 2 errors
   s2[0] = 'y';             // mess up 箱 introducing 2 errors
   EXPECT_EQ(c.add(s1), 3);
@@ -102,7 +104,7 @@ TEST_F(MBCountTest, AddWithErrors) {
 }
 
 TEST_F(MBCountTest, AddWithVariants) {
-  std::string s1("normal中variant逸︁"), s2("あア謁︀");
+  const std::string s1{"normal中variant逸︁"}, s2{"あア謁︀"};
   EXPECT_EQ(c.add(s1), 2);
   EXPECT_EQ(c.add(s2), 3);
   EXPECT_EQ(c.count("中"), 1);
@@ -115,17 +117,16 @@ TEST_F(MBCountTest, AddWithVariants) {
 }
 
 TEST_F(MBCountTest, AddWithCombiningMarks) {
-  std::string s1("て\xe3\x82\x99"); // with dakuten
-  std::string s2("フ\xe3\x82\x9a"); // with han-dakuten
+  const std::string s1{"て\xe3\x82\x99"}, // with dakuten
+      s2{"フ\xe3\x82\x9a"},               // with han-dakuten
+      bad("や\xe3\x82\x9aく");            // error, but still add や and く
   EXPECT_EQ(c.add(s1), 1);
   EXPECT_EQ(c.add(s2), 1);
   EXPECT_EQ(c.combiningMarks(), 2);
-  std::string bad("や\xe3\x82\x9aく"); // error case, but still adds や and く
   EXPECT_EQ(c.add(bad), 2);
   EXPECT_EQ(c.combiningMarks(), 2);
   EXPECT_EQ(c.errors(), 1);
-  std::string noMarks("愛詞（あいことば）");
-  std::string marks("愛詞（あいことば）");
+  const std::string noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
   EXPECT_EQ(noMarks.size(), 27);
   EXPECT_EQ(marks.size(), 30);
   EXPECT_EQ(c.add(noMarks), 9);
@@ -136,7 +137,7 @@ TEST_F(MBCountTest, AddWithCombiningMarks) {
 }
 
 TEST_F(MBCountTest, AddWithPredicate) {
-  auto pred = [](const auto& s) { return s != "。" && s != "は"; };
+  const auto pred{[](const auto& s) { return s != "。" && s != "は"; }};
   MBCountIf cPred(pred);
   EXPECT_EQ(cPred.add("これは模擬テストです。"), 9);
   EXPECT_EQ(cPred.count("こ"), 1);
@@ -234,10 +235,10 @@ TEST_F(MBCountTest, AddDirectoryRecurseIncludingFileNamesButNoTags) {
 TEST_F(MBCountTest, CheckTags) {
   EXPECT_EQ(c.addFile(TestDir), 13);
   EXPECT_EQ(c.uniqueEntries(), 10);
-  auto tags = c.tags("北");
+  const auto tags{c.tags("北")};
   ASSERT_TRUE(tags != nullptr);
   ASSERT_EQ(tags->size(), 3);
-  auto i = tags->find("testFile甲");
+  auto i{tags->find("testFile甲")};
   ASSERT_NE(i, tags->end());
   EXPECT_EQ(i->second, 1);
   i = tags->find("testFile乙");
@@ -250,8 +251,8 @@ TEST_F(MBCountTest, CheckTags) {
 
 TEST_F(MBCountTest, Regex) {
   EXPECT_EQ(sizeof(U'a'), 4);
-  std::wregex regex(L"（[^）]+）");
-  MBCount r(regex);
+  const std::wregex regex{L"（[^）]+）"};
+  MBCount r{regex};
   EXPECT_EQ(r.replacements(), 0);
   EXPECT_EQ(r.add("a仰（あお）ぐbc仰（あお）ぐ）"), 5);
   EXPECT_EQ(r.replacements(), 1);
@@ -264,26 +265,26 @@ TEST_F(MBCountTest, Regex) {
 }
 
 TEST_F(MBCountTest, BracketsAcrossLines) {
-  std::ofstream of(BracketFile);
+  std::ofstream of{BracketFile};
   of << "安寿が亡きあとはねんごろに弔（\n";
   of << "とむら）われ、また入水した沼の畔（ほとり）には尼寺が立つことになった。"
         "\n";
   of.close();
-  std::wregex regex(L"（[^）]+）");
-  MBCount r(regex);
+  const std::wregex regex{L"（[^）]+）"};
+  MBCount r{regex};
   EXPECT_EQ(r.addFile(BracketFile), 40);
   EXPECT_EQ(r.count("（"), 0);
   EXPECT_EQ(r.count("）"), 0);
 }
 
 TEST_F(MBCountTest, BracketsAtStartOfLine) {
-  std::ofstream of(BracketFile);
+  std::ofstream of{BracketFile};
   of << "安寿が亡きあとはねんごろに弔（と\n";
   of << "むら）われ、また入水した沼の畔\n";
   of << "（ほとり）には尼寺が立つことになった。\n";
   of.close();
-  std::wregex regex(L"（[^）]+）");
-  MBCount r(regex);
+  const std::wregex regex{L"（[^）]+）"};
+  MBCount r{regex};
   EXPECT_EQ(r.addFile(BracketFile), 40);
   EXPECT_EQ(r.count("（"), 0);
   EXPECT_EQ(r.count("）"), 0);
