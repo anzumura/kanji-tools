@@ -81,8 +81,8 @@ class StatsPred {
 public:
   StatsPred(const DataPtr data, const fs::path& top, const std::string& name,
       bool showBreakdown)
-      : _data{data}, _top{top}, _name{name}, _showBreakdown{showBreakdown},
-        _isKanji{name.ends_with("Kanji")} {}
+      : _data{data}, _top{top}, _name{name},
+        _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
 
   template<typename Pred>
   [[nodiscard]] std::string run(const Pred&, bool verbose, bool firstCount);
@@ -192,7 +192,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
     const auto t{i.type()};
     totalKanjiPerType[t] += i.count;
     uniqueKanjiPerType[t]++;
-    if (auto& j{found[t]}; j.size() < MaxExamples) j.push_back(i);
+    if (auto& j{found[t]}; j.size() < MaxExamples) j.emplace_back(i);
   }
   for (const auto t : AllKanjiTypes)
     if (const auto i{uniqueKanjiPerType.find(t)};
