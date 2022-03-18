@@ -1,5 +1,6 @@
 #include <kanji_tools/utils/ColumnFile.h>
 
+#include <cassert>
 #include <set>
 #include <sstream>
 
