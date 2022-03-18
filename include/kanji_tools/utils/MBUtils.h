@@ -7,9 +7,9 @@ namespace kanji_tools {
 // UTF-8 conversion functions (between 'char' strings and 'char32_t' wstrings)
 // were originally implemented using 'codecvt', but this was changed to local
 // implementations to remove the dependency and allow more flexibility. For
-// example, the local implementaions use 'U+FFFD' for errors instead of throwing
-// a 'range_error'. Also, 'wstring_convert' was depecated as of C++17 (see
-// http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
+// example, the local implementations use 'U+FFFD' for errors instead of
+// throwing a 'range_error'. Also, 'wstring_convert' was deprecated as of C++17
+// (see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
 
 // uncomment the following line to use 'codecvt' (may remove this later):
 //#define USE_CODECVT_FOR_UTF_8

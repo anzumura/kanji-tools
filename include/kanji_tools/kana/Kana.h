@@ -19,7 +19,7 @@ inline const auto CharTypes{
     BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
 // 'ConvertFlags' controls some aspects of conversion (by KanaConvert class).
-// For example: Hepburn: off by default, only applies to 'Rōomaji' output
+// For example: Hepburn: off by default, only applies to 'Rōmaji' output
 // - convert("つづき", CharType::Romaji) -> "tsuduki"
 // - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
 // Kunrei: off by default, only applies to 'Rōmaji' output

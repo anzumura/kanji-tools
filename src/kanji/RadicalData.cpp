@@ -39,7 +39,7 @@ void RadicalData::print(const Data& data) const {
   data.out() << "):\n";
   RadicalLists radicals;
   for (auto& i : data.kanjiNameMap())
-    // only inclue 'Common Kanji' for now since a lot of the rare kanji don't
+    // only include 'Common Kanji' for now since a lot of the rare kanji don't
     // display properly - they just show up as '?' (𮧮)
     if (isCommonKanji(i.second->name()))
       radicals[i.second->radical()].emplace_back(i.second);

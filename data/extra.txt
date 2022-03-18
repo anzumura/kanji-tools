@@ -77,7 +77,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 76	鶺	鳥	21	wagtail	セキ
 77	煽	火	14	fan	セン、あお-る、おだて-る、おこ-る
 78	仟	人	5	thousand	セン、ち、かしら
-79	跣	足	13	barefotted	セン、はだし
+79	跣	足	13	barefooted	セン、はだし
 80	鼠	鼠	13	mouse	ソ、ショ、ねずみ、ねず
 81	掻	手	11	scratch	ソウ、か-く
 82	嗾	口	14	instigate	ゾク、ソク、ソウ、けしか-ける、そそのか-す
@@ -112,7 +112,7 @@ Number	Name	Radical	Strokes	Meaning	Reading
 111	憫	心	15	anxiety	ビン、ミン、あわれ-む、うれ-える
 112	罠	网	10	trap	ビン、ミン、わな、あみ
 113	孵	子	14	hatch	フ、かえ-す
-114	埠	土	11	warf	フ、ホ、つか、はとば
+114	埠	土	11	wharf	フ、ホ、つか、はとば
 115	鵡	鳥	19	cockatoo	ブ、ム
 116	騙	馬	19	deceive	ヘン、かた-る、だま-す
 117	貶	貝	11	degrade	ヘン、けな-す、おとし-める、おと-す

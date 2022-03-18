@@ -53,7 +53,7 @@ The code was written using **[VS Code](https://code.visualstudio.com)** on an *M
 
 ### Compiler Diagnostic Flags
 
-The code builds without warnings using a large set of diagnostic flags such as **-Wall**, **-Wextra** (equivalent to **-W**), **-Wconversion**, etc.. **-Werror** is also included to ensure the code remains warning-free. Finally, only one type of warning has been disabled (requiring paraenthese for some expressions that seemed excessive).
+The code builds without warnings using a large set of diagnostic flags such as **-Wall**, **-Wextra** (equivalent to **-W**), **-Wconversion**, etc.. **-Werror** is also included to ensure the code remains warning-free. Finally, only one type of warning has been disabled (requiring parentheses for some expressions that seemed excessive).
 
 The following table shows flags used per compiler (**Common** shows flags used for both). Diagnostics enabled by default or enabled via another flag such as **-Wall** are not included (at least that's the intention):
 
@@ -118,7 +118,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 - Unicode values are only shown for 'monograph' entries
 - Some 'digraphs' may not be in any real words, but include for completeness
 - Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no conversion exist)
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no conversion exist)
 - Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
 - Type 'N' includes:
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry

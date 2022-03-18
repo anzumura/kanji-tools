@@ -74,7 +74,7 @@ TEST(MBCharTest, NextWithCombiningMarks) {
   EXPECT_EQ(c.size(), 18);
   MBChar s{c};
   std::string x;
-  // combining marks ashould get replaced by normal versions
+  // combining marks should get replaced by normal versions
   for (const auto _ = {ga, gi, gu, po}; auto& i : _) {
     EXPECT_EQ(i.size(), 3);
     EXPECT_TRUE(s.peek(x));

@@ -76,7 +76,7 @@ private:
 };
 
 // 'WideBlocks' used for determining if a character is narrow or wide display
-// can be a single entry and also not start or end on an 'official' boundry.
+// can be a single entry and also not start or end on an 'official' boundary.
 // gcc 11.2 didn't like using a default template (char32_t End = Start) in
 // combination with the friend declaration inside UnicodeBlock so split into two
 // functions. This also allows better static_assert (using '<' instead of '<=').
@@ -164,11 +164,11 @@ inline constexpr std::array SymbolBlocks{
 
 // the last block also includes 'halfwidth katakana'
 inline constexpr std::array LetterBlocks{
-    makeBlock<0x0080, 0x00ff>(UVer1_1, "Latin-1 Supplement"),    // ·, ×
-    makeBlock<0x0100, 0x017f>(UVer1_1, "Latin Extended-A"),      // Ā
-    makeBlock<0x0180, 0x024f>(UVer1_1, "Latin Extended-B"),      // ƀ
-    makeBlock<0x2150, 0x218f>(UVer1_1, "Number Forms"),          // Ⅳ
-    makeBlock<0x2460, 0x24ff>(UVer1_1, "Enclosed Alphanumeics"), // ⑦
+    makeBlock<0x0080, 0x00ff>(UVer1_1, "Latin-1 Supplement"),     // ·, ×
+    makeBlock<0x0100, 0x017f>(UVer1_1, "Latin Extended-A"),       // Ā
+    makeBlock<0x0180, 0x024f>(UVer1_1, "Latin Extended-B"),       // ƀ
+    makeBlock<0x2150, 0x218f>(UVer1_1, "Number Forms"),           // Ⅳ
+    makeBlock<0x2460, 0x24ff>(UVer1_1, "Enclosed Alphanumerics"), // ⑦
     makeBlock<0x2c60, 0x2c7f>(UVer5_0, "Latin Extended-C"),
     makeBlock<0xff00, 0xffef>(UVer1_1, "Halfwidth and Fullwidth Forms")};
 

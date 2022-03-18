@@ -330,7 +330,7 @@ TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
 
 TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
-  // Jinmei Frequency, Kentei, etc.) should be in the 'common' bloacks.
+  // Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
   u_int32_t rareUcd{};
   std::map<std::string, u_int> rareMissingJSource;
   std::map<KanjiTypes, u_int> missingJSource;
