@@ -103,7 +103,6 @@ TEST_F(EnumMapTest, IteratorCompare) {
 
 TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
   EnumMap<Colors, int>::ConstIterator i, j;
-  ;
   // uninitialized iterators are considered equal
   EXPECT_EQ(i, j);
   EXPECT_FALSE(i != j);
