@@ -46,13 +46,13 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(RareKanjiBlocks[3].range(), 4944);
   EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
   int pos{};
-  auto checkKanjiRange = [&pos](auto& blocks) {
+  auto checkKanjiRange{[&pos](auto& blocks) {
     for (auto& i : blocks) {
       EXPECT_EQ(KanjiRange[pos++], i.start) << pos;
       EXPECT_EQ(KanjiRange[pos++], U'-') << pos;
       EXPECT_EQ(KanjiRange[pos++], i.end) << pos;
     }
-  };
+  }};
   checkKanjiRange(CommonKanjiBlocks);
   checkKanjiRange(NonSpacingBlocks);
   checkKanjiRange(RareKanjiBlocks);
@@ -78,11 +78,11 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
 }
 
 TEST(UnicodeBlockTest, IsNonSpacing) {
-  auto s = std::u32string(U"\x3078\x3099"); // へ and dakuten combining mark
+  std::u32string s{U"\x3078\x3099"}; // へ and dakuten combining mark
   EXPECT_EQ(s.size(), 2);
   EXPECT_FALSE(isNonSpacing(s[0]));
   EXPECT_TRUE(isNonSpacing(s[1]));
-  s = std::u32string(U"\x3078\x309a"); // へ and han=dakuten combining mark
+  s = U"\x3078\x309a"; // へ and han=dakuten combining mark
   EXPECT_EQ(s.size(), 2);
   EXPECT_FALSE(isNonSpacing(s[0]));
   EXPECT_TRUE(isNonSpacing(s[1]));
@@ -112,8 +112,7 @@ TEST(UnicodeBlockTest, IsMBLetter) {
   EXPECT_TRUE(isMBLetter("ｶＺ", false)); // sizeOne=false
   EXPECT_TRUE(isAllMBLetter("ｶＺ"));
   EXPECT_FALSE(isAllMBLetter("ｶＺ犬"));
-  // 'isMBLetter' check also includes extended latin letters and enclosed
-  // letters
+  // 'isMBLetter' also includes extended latin letters and enclosed letters
   EXPECT_TRUE(isMBLetter("ã"));
   EXPECT_TRUE(isMBLetter("⑦"));
   EXPECT_TRUE(isMBLetter("Ⅰ")); // Roman Numeral 'One'

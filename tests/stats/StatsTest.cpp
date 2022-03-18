@@ -127,7 +127,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   const char* testArgs[]{"", "../../../tests/stats/sample-data/wiki-articles/"};
   Stats stats(std::size(testArgs), testArgs, _data);
   std::string line;
-  auto found = false;
+  auto found{false};
   while (!found && std::getline(_os, line))
     found = line.starts_with(">>> Stats for: 'wiki-articles' (3 files)");
   EXPECT_TRUE(found);

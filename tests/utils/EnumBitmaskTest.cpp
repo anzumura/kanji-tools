@@ -30,49 +30,49 @@ TEST(EnumBitmaskTest, BitwiseXOrOperator) {
 
 TEST(EnumBitmaskTest, BitwiseComplementOperator) {
   EXPECT_EQ(~TestEnum::Four, static_cast<TestEnum>(~4));
-  auto x = TestEnum::Two | TestEnum::Four;
+  auto x{TestEnum::Two | TestEnum::Four};
   EXPECT_EQ(x &= ~TestEnum::Two, TestEnum::Four);
 }
 
 TEST(EnumBitmaskTest, BitwiseAndEqualOperator) {
-  auto x = TestEnum::One;
+  auto x{TestEnum::One};
   EXPECT_EQ(x &= TestEnum::All, TestEnum::One);
   // test chaining
-  auto y = TestEnum::All;
+  auto y{TestEnum::All};
   ((y &= TestEnum::Two) |= TestEnum::Four) &= TestEnum::Two;
   EXPECT_EQ(y, TestEnum::Two);
 }
 
 TEST(EnumBitmaskTest, BitwiseOrEqualOperator) {
-  auto x = TestEnum::Two;
+  auto x{TestEnum::Two};
   EXPECT_EQ(x |= TestEnum::One, static_cast<TestEnum>(1 | 2));
   EXPECT_EQ(x |= TestEnum::Four, static_cast<TestEnum>(1 | 2 | 4));
   // test chaining
-  auto y = TestEnum::One;
+  auto y{TestEnum::One};
   ((y |= TestEnum::Two) |= TestEnum::Four) |= TestEnum::Eight;
   EXPECT_EQ(y, TestEnum::All);
 }
 
 TEST(EnumBitmaskTest, BitwiseXOrEqualOperator) {
-  auto x = TestEnum::All;
+  auto x{TestEnum::All};
   EXPECT_EQ(x ^= TestEnum::Four, static_cast<TestEnum>(1 | 2 | 8));
   EXPECT_EQ(x ^= TestEnum::Eight, static_cast<TestEnum>(1 | 2));
   // test chaining
-  auto y = TestEnum::All;
+  auto y{TestEnum::All};
   ((y ^= TestEnum::Two) ^= TestEnum::Four) ^= TestEnum::Eight;
   EXPECT_EQ(y, TestEnum::One);
 }
 
 TEST(EnumBitmaskTest, HasValue) {
   EXPECT_TRUE(hasValue(TestEnum::One));
-  auto x = TestEnum::Two;
+  const auto x{TestEnum::Two};
   EXPECT_TRUE(hasValue(x));
   EXPECT_FALSE(hasValue(x ^ TestEnum::Two));
 }
 
 TEST(EnumBitmaskTest, NotOperator) {
   EXPECT_FALSE(!TestEnum::One);
-  auto x = TestEnum::Two;
+  const auto x{TestEnum::Two};
   EXPECT_FALSE(!x);
   EXPECT_TRUE(!(x ^ TestEnum::Two));
 }

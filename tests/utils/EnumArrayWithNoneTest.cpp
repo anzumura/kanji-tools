@@ -24,14 +24,14 @@ template<> inline constexpr auto is_enumarray_with_none<TestEnum>{true};
 
 TEST(EnumArrayWithNoneTest, FailForDuplicateName) {
   EXPECT_THROW(
-      call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "B"); },
+      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "B"); },
           "duplicate name 'B'"),
       std::domain_error);
 }
 
 TEST(EnumArrayWithNoneTest, FailForNoneName) {
   EXPECT_THROW(
-      call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "None"); },
+      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "None"); },
           "'None' should not be specified"),
       std::domain_error);
 }
@@ -44,15 +44,15 @@ TEST(EnumArrayWithNoneTest, CallInstanceBeforeCreate) {
 }
 
 TEST(EnumArrayWithNoneTest, DestructorClearsInstance) {
-  for (auto _ = 2; _--;) {
+  for (auto _{2}; _--;) {
     EXPECT_FALSE(BaseEnumArray<TestEnum>::isCreated());
-    auto x = BaseEnumArray<TestEnum>::create("A", "B", "C");
+    const auto x{BaseEnumArray<TestEnum>::create("A", "B", "C")};
     EXPECT_TRUE(BaseEnumArray<TestEnum>::isCreated());
   }
 }
 
 TEST(EnumArrayWithNoneTest, CallCreateTwice) {
-  auto enumArray = BaseEnumArray<TestEnum>::create("A", "B", "C");
+  const auto enumArray{BaseEnumArray<TestEnum>::create("A", "B", "C")};
   // 'create' returns an 'EnumArray' for the given enum with a second template
   // parameter for the number of names provided (the actual enum should have one
   // more 'None' value at the end)
@@ -60,21 +60,21 @@ TEST(EnumArrayWithNoneTest, CallCreateTwice) {
   EXPECT_EQ(enumArray.size(), 4); // 'size' includes final 'None' value
   // 'instance' returns 'const BaseEnumArray&', but the object returned is
   // 'EnumArrayWithNone'
-  auto& instance = enumArray.instance();
+  auto& instance{enumArray.instance()};
   EXPECT_EQ(
       typeid(std::result_of_t<decltype (&BaseEnumArray<TestEnum>::instance)()>),
       typeid(const BaseEnumArray<TestEnum>&));
   EXPECT_EQ(typeid(instance), typeid(const EnumArrayWithNone<TestEnum, 3>&));
   // calling 'create' again should throw an exception
   EXPECT_THROW(
-      call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "C"); },
+      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "C"); },
           "'create' should only be called once"),
       std::domain_error);
 }
 
 TEST(EnumArrayWithNoneTest, Iteration) {
   std::vector<Colors> colors;
-  for (size_t i{}; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
+  for (size_t i{}; i < AllColors.size(); ++i) colors.emplace_back(AllColors[i]);
   EXPECT_EQ(colors,
       (std::vector{Colors::Red, Colors::Green, Colors::Blue, Colors::None}));
 }
@@ -86,13 +86,13 @@ TEST(EnumArrayWithNoneTest, BadAccess) {
 
 TEST(EnumArrayWithNoneTest, RangeBasedForLoop) {
   std::vector<Colors> colors;
-  for (auto c : AllColors) colors.push_back(c);
+  for (auto c : AllColors) colors.emplace_back(c);
   EXPECT_EQ(colors,
       (std::vector{Colors::Red, Colors::Green, Colors::Blue, Colors::None}));
 }
 
 TEST(EnumArrayWithNoneTest, BadIncrement) {
-  auto i = AllColors.begin();
+  auto i{AllColors.begin()};
   i = i + 1;
   EXPECT_EQ(i[2], Colors::None);
   i += 2;
@@ -109,7 +109,7 @@ TEST(EnumArrayWithNoneTest, BadIncrement) {
 }
 
 TEST(EnumArrayWithNoneTest, BadDecrement) {
-  auto i = AllColors.end();
+  auto i{AllColors.end()};
   EXPECT_THROW(
       call([&] { i -= 5; }, "can't decrement past zero"), std::out_of_range);
   i -= 4;
@@ -119,8 +119,8 @@ TEST(EnumArrayWithNoneTest, BadDecrement) {
 }
 
 TEST(EnumArrayWithNoneTest, IteratorCompare) {
-  auto i = AllColors.begin();
-  auto j = i;
+  auto i{AllColors.begin()};
+  auto j{i};
   EXPECT_EQ(i, j);
   EXPECT_LE(i, j);
   EXPECT_GE(i, j);
@@ -135,8 +135,8 @@ TEST(EnumArrayWithNoneTest, IteratorCompare) {
 }
 
 TEST(EnumArrayWithNoneTest, ThreeWayCompare) {
-  auto i = AllColors.begin();
-  auto j = i;
+  auto i{AllColors.begin()};
+  auto j{i};
   EXPECT_EQ(i <=> j, std::strong_ordering::equal);
   j += 2;
   EXPECT_EQ(i <=> j, std::strong_ordering::less);

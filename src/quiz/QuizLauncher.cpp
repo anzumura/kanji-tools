@@ -93,9 +93,9 @@ QuizLauncher::QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr data,
       Data::usage("only one quiz type can be specified, use -h for help");
     quizType = arg[1];
     if (arg.size() > 2) {
-      if (auto c = arg[2]; arg.size() == 3 &&
-                           (choices.contains(c) ||
-                               (start && *start <= c && end.value_or(c) >= c)))
+      if (auto c{arg[2]}; arg.size() == 3 &&
+                          (choices.contains(c) ||
+                              (start && *start <= c && end.value_or(c) >= c)))
         qList = c;
       else
         Data::usage(

@@ -24,7 +24,7 @@ template<> inline constexpr auto is_enumarray<TestEnum>{true};
 
 TEST(EnumArrayTest, FailForDuplicateName) {
   EXPECT_THROW(
-      call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "B"); },
+      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "B"); },
           "duplicate name 'B'"),
       std::domain_error);
 }
@@ -37,43 +37,43 @@ TEST(EnumArrayTest, CallInstanceBeforeCreate) {
 }
 
 TEST(EnumArrayTest, DestructorClearsInstance) {
-  for (auto _ = 2; _--;) {
+  for (auto _{2}; _--;) {
     EXPECT_FALSE(BaseEnumArray<TestEnum>::isCreated());
-    auto x = BaseEnumArray<TestEnum>::create("A", "B", "C");
+    const auto x{BaseEnumArray<TestEnum>::create("A", "B", "C")};
     EXPECT_TRUE(BaseEnumArray<TestEnum>::isCreated());
   }
 }
 
 TEST(EnumArrayTest, CallCreateTwice) {
-  auto enumArray = BaseEnumArray<TestEnum>::create("A", "B", "C");
+  const auto enumArray{BaseEnumArray<TestEnum>::create("A", "B", "C")};
   // 'create' returns an 'EnumArray' for the given enum with a second template
   // parameter for the number of names provided.
   EXPECT_EQ(typeid(enumArray), typeid(EnumArray<TestEnum, 3>));
   EXPECT_EQ(enumArray.size(), 3);
   // 'instance' returns 'const BaseEnumArray&', but the object returned is
   // 'EnumArray' (typeid ignores 'const', but put it in for clarity)
-  auto& instance = enumArray.instance();
+  auto& instance{enumArray.instance()};
   EXPECT_EQ(
       typeid(std::result_of_t<decltype (&BaseEnumArray<TestEnum>::instance)()>),
       typeid(const BaseEnumArray<TestEnum>&));
   EXPECT_EQ(typeid(instance), typeid(const EnumArray<TestEnum, 3>&));
   // calling 'create' again should throw an exception
   EXPECT_THROW(
-      call([] { auto x = BaseEnumArray<TestEnum>::create("A", "B", "C"); },
+      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "C"); },
           "'create' should only be called once"),
       std::domain_error);
 }
 
 TEST(EnumArrayTest, Iteration) {
   std::vector<Colors> colors;
-  for (size_t i{}; i < AllColors.size(); ++i) colors.push_back(AllColors[i]);
+  for (size_t i{}; i < AllColors.size(); ++i) colors.emplace_back(AllColors[i]);
   EXPECT_EQ(colors, (std::vector{Colors::Red, Colors::Green, Colors::Blue}));
 }
 
 TEST(EnumArrayTest, IterationInt) {
   std::vector<Colors> colors;
   // test the int overload of operator[]
-  for (int i{}; i < 3; ++i) colors.push_back(AllColors[i]);
+  for (int i{}; i < 3; ++i) colors.emplace_back(AllColors[i]);
   EXPECT_EQ(colors, (std::vector{Colors::Red, Colors::Green, Colors::Blue}));
 }
 
@@ -88,12 +88,12 @@ TEST(EnumArrayTest, BadAccess) {
 
 TEST(EnumArrayTest, RangeBasedForLoop) {
   std::vector<Colors> colors;
-  for (auto c : AllColors) colors.push_back(c);
+  for (auto c : AllColors) colors.emplace_back(c);
   EXPECT_EQ(colors, (std::vector{Colors::Red, Colors::Green, Colors::Blue}));
 }
 
 TEST(EnumArrayTest, BadIncrement) {
-  auto i = AllColors.begin();
+  auto i{AllColors.begin()};
   i = i + 1;
   EXPECT_EQ(i[1], Colors::Blue);
   i += 1;
@@ -110,7 +110,7 @@ TEST(EnumArrayTest, BadIncrement) {
 }
 
 TEST(EnumArrayTest, BadDecrement) {
-  auto i = AllColors.end();
+  auto i{AllColors.end()};
   EXPECT_THROW(
       call([&] { i -= 4; }, "can't decrement past zero"), std::out_of_range);
   i -= 3;
@@ -120,8 +120,8 @@ TEST(EnumArrayTest, BadDecrement) {
 }
 
 TEST(EnumArrayTest, IteratorCompare) {
-  auto i = AllColors.begin();
-  auto j = i;
+  auto i{AllColors.begin()};
+  auto j{i};
   EXPECT_EQ(i, j);
   EXPECT_LE(i, j);
   EXPECT_GE(i, j);
@@ -136,8 +136,8 @@ TEST(EnumArrayTest, IteratorCompare) {
 }
 
 TEST(EnumArrayTest, ThreeWayCompare) {
-  auto i = AllColors.begin();
-  auto j = i;
+  auto i{AllColors.begin()};
+  auto j{i};
   EXPECT_EQ(i <=> j, std::strong_ordering::equal);
   j += 2;
   EXPECT_EQ(i <=> j, std::strong_ordering::less);
