@@ -119,7 +119,7 @@ TEST_F(MBCountTest, AddWithVariants) {
 TEST_F(MBCountTest, AddWithCombiningMarks) {
   const std::string s1{"て\xe3\x82\x99"}, // with dakuten
       s2{"フ\xe3\x82\x9a"},               // with han-dakuten
-      bad("や\xe3\x82\x9aく");            // error, but still add や and く
+      bad{"や\xe3\x82\x9aく"};            // error, but still add や and く
   EXPECT_EQ(c.add(s1), 1);
   EXPECT_EQ(c.add(s2), 1);
   EXPECT_EQ(c.combiningMarks(), 2);

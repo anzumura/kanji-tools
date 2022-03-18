@@ -262,8 +262,8 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
     out() << '\n';
   }
   // Jukugo Lists
-  static const std::string jukugo(" Jukugo"), sameGrade("Same Grade Jukugo"),
-      otherGrade("Other Grade Jukugo");
+  static const std::string jukugo{" Jukugo"}, sameGrade{"Same Grade Jukugo"},
+      otherGrade{"Other Grade Jukugo"};
   if (auto& list{_jukugoData->find(kanji->name())}; !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
     // lists, one for the same grade of the given kanji and one for other

@@ -322,7 +322,7 @@ TEST_F(ColumnFileTest, GetOptUIntError) {
 }
 
 TEST_F(ColumnFileTest, GetBool) {
-  const ColumnFile::Column c1("1"), c2("2"), c3("3"), c4("4"), c5("5");
+  const ColumnFile::Column c1{"1"}, c2{"2"}, c3{"3"}, c4{"4"}, c5{"5"};
   auto f{write({c1, c2, c3, c4, c5}, "1\t2\t3\t4\t5\nY\tT\tN\tF\t")};
   EXPECT_TRUE(f.nextRow());
   EXPECT_TRUE(f.getBool(c1));
@@ -342,7 +342,7 @@ TEST_F(ColumnFileTest, GetBoolError) {
 }
 
 TEST_F(ColumnFileTest, GetWChar) {
-  const ColumnFile::Column c1("1"), c2("2");
+  const ColumnFile::Column c1{"1"}, c2{"2"};
   auto f{write({c1, c2}, "1\t2\n898B\t20B9F")};
   EXPECT_TRUE(f.nextRow());
   EXPECT_EQ(f.getWChar(c1), 35211);

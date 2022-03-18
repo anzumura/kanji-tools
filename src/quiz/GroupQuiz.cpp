@@ -194,7 +194,7 @@ bool GroupQuiz::getAnswers(
 }
 
 bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
-  const static std::string ReviewMsg("  Select"), QuizMsg("  Reading for: ");
+  const static std::string ReviewMsg{"  Select"}, QuizMsg{"  Reading for: "};
   do {
     printAssignedAnswers();
     switch (const auto answer{

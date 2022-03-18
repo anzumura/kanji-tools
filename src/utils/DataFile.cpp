@@ -86,7 +86,7 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
       for (const auto& i : dups) std::cerr << ' ' << i;
       if (createNewUniqueFile) {
         fs::path newFile{file};
-        newFile.replace_extension(fs::path("new"));
+        newFile.replace_extension(fs::path{"new"});
         std::cerr << "\n>>> saving " << good.size()
                   << " unique entries to: " << newFile.string() << '\n';
         std::ofstream of(newFile);
