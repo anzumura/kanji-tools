@@ -32,7 +32,7 @@ protected:
 
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
-    BaseIterator(size_t index) noexcept : _index{index} {}
+    BaseIterator(size_t index = 0) noexcept : _index{index} {}
 
     size_t _index;
   };
@@ -80,6 +80,9 @@ protected:
     }
 
     // random-access iterator requirements (except non-const operator[])
+    [[nodiscard]] auto operator[](difference_type i) const {
+      return *(derived() + i);
+    }
     auto& operator+=(difference_type i) {
       if ((i += static_cast<difference_type>(_index)) < 0) error(BadBegin);
       if (const auto j{static_cast<size_t>(i)}; j > N)

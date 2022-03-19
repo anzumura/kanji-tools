@@ -53,10 +53,10 @@ public:
       if (_map != x._map) throw std::domain_error{"not comparable"};
     }
 
-    const EnumMap<T, V>* _map;
+    const EnumMap<T, V>* _map{};
   public:
     // forward iterator requirements (a default constructor)
-    ConstIterator() noexcept : iBase{0}, _map{nullptr} {}
+    ConstIterator() noexcept : iBase{0} {}
 
     [[nodiscard]] bool operator==(const ConstIterator& x) const {
       checkComparable(x);
@@ -88,9 +88,6 @@ public:
     }
 
     // random-access iterator requirements
-    [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
-      return *(*this + i);
-    }
     [[nodiscard]] auto operator-(const ConstIterator& x) const {
       checkComparable(x);
       return iBase::_index - x._index;

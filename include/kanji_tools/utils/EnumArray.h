@@ -109,7 +109,7 @@ public:
     ConstIterator(size_t index) noexcept : iBase{index} {}
   public:
     // forward iterator requirements (a default constructor)
-    ConstIterator() noexcept : iBase{0} {}
+    ConstIterator() noexcept = default;
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto operator*() const {
@@ -121,9 +121,6 @@ public:
     }
 
     // random-access iterator requirements
-    [[nodiscard]] auto operator[](typename iBase::difference_type i) const {
-      return *(*this + i);
-    }
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
       return iBase::_index - x._index;
     }
