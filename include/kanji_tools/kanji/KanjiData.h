@@ -39,8 +39,10 @@ private:
     }};
     if constexpr (std::is_same_v<T, JlptLevels>)
       return LevelDataFile{f(Jlpt), t, debug()};
-    else if (std::is_same_v<T, KenteiKyus>)
+    else {
+      static_assert(std::is_same_v<T, KenteiKyus>);
       return KyuDataFile{f(Kentei), t, debug()};
+    }
   }
 
   template<typename V, size_t N> using List = const std::array<const V, N - 1>;
