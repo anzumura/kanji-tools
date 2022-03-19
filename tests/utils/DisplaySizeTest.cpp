@@ -17,8 +17,7 @@ TEST(DisplaySizeTest, WideBlocksRange) {
 TEST(DisplaySizeTest, DisplaySize) {
   EXPECT_EQ(displaySize(""), 0);
   EXPECT_EQ(displaySize("abc ."), 5);
-  const std::string empty;
-  EXPECT_EQ(displaySize(empty), 0);
+  EXPECT_EQ(displaySize(EmptyString), 0);
   EXPECT_EQ(displaySize(std::string{"abc ."}), 5);
   EXPECT_EQ(displaySize("abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize("。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
@@ -39,8 +38,7 @@ TEST(DisplaySizeTest, DisplaySize) {
 TEST(DisplaySizeTest, U32DisplaySize) {
   EXPECT_EQ(displaySize(U""), 0);
   EXPECT_EQ(displaySize(U"abc ."), 5);
-  const std::u32string empty;
-  EXPECT_EQ(displaySize(empty), 0);
+  EXPECT_EQ(displaySize(EmptyU32String), 0);
   EXPECT_EQ(displaySize(std::u32string{U"abc ."}), 5);
   EXPECT_EQ(displaySize(U"abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize(U"。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter

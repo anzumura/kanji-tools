@@ -162,12 +162,10 @@ TEST(MBUtilsTest, NotValidForOverlong) {
 }
 
 TEST(MBUtilsTest, ConvertEmptyStrings) {
-  const std::string emptyString;
-  const std::u32string emptyU32String;
-  EXPECT_EQ(fromUtf8(emptyString), emptyU32String);
-  EXPECT_EQ(fromUtf8(""), emptyU32String);
-  EXPECT_EQ(toUtf8(emptyU32String), emptyString);
-  EXPECT_EQ(toUtf8(U""), emptyString);
+  EXPECT_EQ(fromUtf8(EmptyString), EmptyU32String);
+  EXPECT_EQ(fromUtf8(""), EmptyU32String);
+  EXPECT_EQ(toUtf8(EmptyU32String), EmptyString);
+  EXPECT_EQ(toUtf8(U""), EmptyString);
 }
 
 TEST(MBUtilsTest, FromUTF8String) {

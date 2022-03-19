@@ -19,7 +19,7 @@ public:
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
   [[nodiscard]] auto& getMeaning(const Ucd* u) const {
-    return u ? u->meaning() : Ucd::EmptyString;
+    return u ? u->meaning() : EmptyString;
   }
   [[nodiscard]] auto& getMeaning(const std::string& kanjiName) const {
     return getMeaning(find(kanjiName));

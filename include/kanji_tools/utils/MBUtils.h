@@ -285,4 +285,7 @@ enum BitPatterns : unsigned char {
 
 inline constexpr char32_t MaxUnicode{0x10ffff};
 
+inline static const std::string EmptyString;
+inline static const std::u32string EmptyU32String;
+
 } // namespace kanji_tools

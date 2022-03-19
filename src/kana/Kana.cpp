@@ -218,14 +218,14 @@ Kana::Map Kana::populate(CharType t) {
   return result;
 }
 
-std::string Kana::RepeatMark::get(
+const std::string& Kana::RepeatMark::get(
     CharType target, ConvertFlags flags, const Kana* prevKana) const {
   switch (target) {
   case CharType::Hiragana: return _hiragana;
   case CharType::Katakana: return _katakana;
   case CharType::Romaji: break;
   }
-  if (!prevKana) return "";
+  if (!prevKana) return EmptyString;
   const Kana* k{prevKana};
   if (_dakuten) {
     if (const auto accented{prevKana->dakutenKana()}; accented) k = accented;

@@ -63,7 +63,7 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
     }
     return result;
   }
-  return Ucd::EmptyString;
+  return EmptyString;
 }
 
 void UcdData::load(const std::filesystem::path& file) {

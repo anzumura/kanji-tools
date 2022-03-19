@@ -44,8 +44,8 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
   auto lineNum{1};
-  const auto error{[&lineNum, &file](const auto& s, bool printLine = true) {
-    usage(s + (printLine ? " - line: " + std::to_string(lineNum) : "") +
+  const auto error{[&lineNum, &file](const auto& s, bool pLine = true) {
+    usage(s + (pLine ? " - line: " + std::to_string(lineNum) : EmptyString) +
           ", file: " + file.string());
   }};
   std::ifstream f{file};

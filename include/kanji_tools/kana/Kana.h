@@ -116,7 +116,7 @@ public:
       return t == CharType::Hiragana && _hiragana == s ||
              t == CharType::Katakana && _katakana == s;
     }
-    [[nodiscard]] std::string get(
+    [[nodiscard]] const std::string& get(
         CharType target, ConvertFlags flags, const Kana* prevKana) const;
     [[nodiscard]] auto& hiragana() const { return _hiragana; }
     [[nodiscard]] auto& katakana() const { return _katakana; }

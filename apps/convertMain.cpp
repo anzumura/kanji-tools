@@ -18,7 +18,7 @@ private:
   // 'usage' prints optional error message and then details about valid
   // arguments. If 'showAllOptions' is true then all options are displayed and
   // the program exits.
-  void usage(const std::string& errorMsg = Table::EmptyString,
+  void usage(const std::string& errorMsg = EmptyString,
       bool showAllOptions = true) const;
   void processOneLine(const std::string& s) {
     std::cout << (_source ? _converter.convert(*_source, s)
@@ -166,7 +166,7 @@ void ConvertMain::getInput() {
           else if (line == "f")
             flagArgs(_choice.get(">>> Enter flag option", FlagChoices));
           else if (line == "h")
-            usage("", false);
+            usage(EmptyString, false);
           else if (line.starts_with("-")) {
             if (!charTypeArgs(line))
               std::cout << "  illegal option: " << line << '\n';
@@ -241,7 +241,6 @@ void ConvertMain::printKanaChart(bool markdown) const {
   Table table{{"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
                   "Kunr", "Roma Variants"},
       true};
-  const std::string empty;
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when
   // there are small letters that should be included, i.e., 'la' (ぁ) comes
   // right before 'a' (あ).
@@ -273,8 +272,8 @@ void ConvertMain::printKanaChart(bool markdown) const {
     auto& k{i.katakana()};
     auto hepb{i.getRomaji(ConvertFlags::Hepburn)},
         kunr{i.getRomaji(ConvertFlags::Kunrei)};
-    hepb = romaji == hepb ? empty : ('(' + hepb + ')');
-    kunr = romaji == kunr      ? empty
+    hepb = romaji == hepb ? EmptyString : ('(' + hepb + ')');
+    kunr = romaji == kunr      ? EmptyString
            : i.kunreiVariant() ? kunr
                                : ('(' + kunr + ')');
     std::string vars;
@@ -283,9 +282,8 @@ void ConvertMain::printKanaChart(bool markdown) const {
       vars += j;
     }
     // only show unicode for monographs
-    const auto uni{[&i, &empty](auto& s) {
-      return i.isMonograph() ? toUnicode(s) : empty;
-    }};
+    const auto uni{
+        [&i](auto& s) { return i.isMonograph() ? toUnicode(s) : EmptyString; }};
     table.add({type, romaji, h, k, uni(h), uni(k), hepb, kunr, vars},
         groups.contains(romaji));
   }
@@ -298,19 +296,19 @@ void ConvertMain::printKanaChart(bool markdown) const {
   const u_int8_t none{
       middleDot != _converter.narrowDelims().end() ? HasSlash : NoSlash};
   if (none == HasSlash)
-    table.add({"N", empty + slash, empty, middleDot->second, empty,
-                  toUnicode(middleDot->second)},
+    table.add({"N", std::string{slash}, EmptyString, middleDot->second,
+                  EmptyString, toUnicode(middleDot->second)},
         true);
   else
     std::cerr << "Failed to find " << slash
               << " in _converter.narrowDelims()\n";
-  table.add({"N", empty, empty, Kana::ProlongMark, empty,
+  table.add({"N", EmptyString, EmptyString, Kana::ProlongMark, EmptyString,
                 toUnicode(Kana::ProlongMark)},
       none == NoSlash);
   for (auto& i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
     auto& h{i->hiragana()};
     auto& k{i->katakana()};
-    table.add({"N", empty, h, k, toUnicode(h), toUnicode(k)});
+    table.add({"N", EmptyString, h, k, toUnicode(h), toUnicode(k)});
   }
   markdown ? table.printMarkdown() : table.print();
   const auto monographs{

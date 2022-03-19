@@ -36,7 +36,7 @@ protected:
           "LinkedKanji " + name + " wanted type '" +
           toString(KanjiTypes::Jouyou) +
           (isJinmei ? std::string{"' or '"} + toString(KanjiTypes::Jinmei)
-                    : Ucd::EmptyString) +
+                    : EmptyString) +
           "' for link " + link->name() + ", but got '" + toString(t) + "'"};
     return name;
   }

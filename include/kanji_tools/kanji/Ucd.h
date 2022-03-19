@@ -14,9 +14,6 @@ class Ucd {
 public:
   using Strokes = u_int8_t;
 
-  // 'EmptyString' can be returned by 'linkCodeAndName'
-  inline static const std::string EmptyString;
-
   class Link {
   public:
     Link(char32_t code, const std::string& name) : _code{code}, _name{name} {}
