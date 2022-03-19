@@ -46,7 +46,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
     while (ss >> id) ids.emplace_back(id);
     return ids;
   }
-  return _emptyNelsonIds;
+  return EmptyNelsonIds;
 }
 
 fs::path Data::getDataDir(ArgCount argc, const char** argv) {
@@ -54,7 +54,7 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
 
   std::optional<fs::path> found;
   for (ArgCount i{1}; !found && i < argc; ++i)
-    if (argv[i] == dataArg) {
+    if (argv[i] == DataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
       const auto data{fs::path(argv[i + 1])};
       if (!fs::is_directory(data))
@@ -97,9 +97,9 @@ Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
     result = x;
   }};
   for (ArgCount i{1}; i < argc; ++i)
-    if (argv[i] == debugArg)
+    if (argv[i] == DebugArg)
       setResult(DebugMode::Full);
-    else if (argv[i] == infoArg)
+    else if (argv[i] == InfoArg)
       setResult(DebugMode::Info);
   return result;
 }
@@ -112,8 +112,8 @@ Data::ArgCount Data::nextArg(
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
     // followed by a path then an earlier call to 'getDataDir' would have failed
     // with a call to 'usage' which ends the program.
-    if (arg == dataArg) return nextArg(argc, argv, result + 1);
-    if (arg == debugArg || arg == infoArg) return nextArg(argc, argv, result);
+    if (arg == DataArg) return nextArg(argc, argv, result + 1);
+    if (arg == DebugArg || arg == InfoArg) return nextArg(argc, argv, result);
   }
   return result;
 }

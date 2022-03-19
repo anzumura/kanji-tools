@@ -27,7 +27,7 @@ public:
   enum class DebugMode { Full, Info, None };
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
-  static constexpr auto orderByQualifiedName{
+  static constexpr auto OrderByQualifiedName{
       [](const Entry& a, const Entry& b) {
         return a->orderByQualifiedName(*b);
       }};
@@ -281,9 +281,9 @@ private:
   // put into '_kanjiNameMap'
   inline static constinit Kanji::Frequency _maxFrequency;
 
-  inline static const std::string dataArg{"-data"}, debugArg{"-debug"},
-      infoArg{"-info"};
-  inline static const Kanji::NelsonIds _emptyNelsonIds;
+  inline static const std::string DataArg{"-data"}, DebugArg{"-debug"},
+      InfoArg{"-info"};
+  inline static const Kanji::NelsonIds EmptyNelsonIds;
 };
 
 using DataPtr = std::shared_ptr<const Data>;

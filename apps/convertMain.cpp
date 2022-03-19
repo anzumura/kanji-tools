@@ -143,7 +143,7 @@ void ConvertMain::run() {
 }
 
 void ConvertMain::getInput() {
-  static const Choice::Choices flagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
+  static const Choice::Choices FlagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
       {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
   auto outputCurrentOptions{true};
   do {
@@ -164,7 +164,7 @@ void ConvertMain::getInput() {
           if (line == "c")
             _converter.flags(ConvertFlags::None);
           else if (line == "f")
-            flagArgs(_choice.get(">>> Enter flag option", flagChoices));
+            flagArgs(_choice.get(">>> Enter flag option", FlagChoices));
           else if (line == "h")
             usage("", false);
           else if (line.starts_with("-")) {

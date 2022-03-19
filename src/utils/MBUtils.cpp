@@ -34,10 +34,10 @@ template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(const char* s) {
   static_assert(std::is_integral_v<T>);
   static_assert(sizeof(T) == 4);
-  static constexpr T errorReplacement{static_cast<T>(ErrorReplacement)},
-      minSurrogate{static_cast<T>(MinSurrogate)},
-      maxSurrogate{static_cast<T>(MaxSurrogate)},
-      maxUnicode{static_cast<T>(MaxUnicode)};
+  static constexpr T TError{static_cast<T>(ErrorReplacement)},
+      TMinSur{static_cast<T>(MinSurrogate)},
+      TMaxSur{static_cast<T>(MaxSurrogate)},
+      TMaxUni{static_cast<T>(MaxUnicode)};
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
@@ -46,43 +46,41 @@ template<typename R, typename T = typename R::value_type>
       result += static_cast<T>(*u++);
     else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
       // first byte was '10' or started with more than four '1's
-      result += errorReplacement;
+      result += TError;
       ++u;
     } else {
       const unsigned byte1{*u};
       if ((*++u & TwoBits) != Bit1)
-        result += errorReplacement; // second byte didn't start with '10'
+        result += TError; // second byte didn't start with '10'
       else {
         const unsigned byte2 = *u ^ Bit1; // last 6 bits of the second byte
         if (byte1 & Bit3) {
           if ((*++u & TwoBits) != Bit1)
-            result += errorReplacement; // third byte didn't start with '10'
+            result += TError; // third byte didn't start with '10'
           else if (byte1 & Bit4) {
             const unsigned byte3 = *u ^ Bit1; // last 6 bits of the third byte
             if ((*++u & TwoBits) != Bit1)
-              result += errorReplacement; // fourth byte didn't start with '10'
+              result += TError; // fourth byte didn't start with '10'
             else {
               // four byte case - check for overlong and max unicode
               const auto c{
                   static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
                                  (byte3 << 6) + (*u ^ Bit1))};
-              result += c > 0xffff && c <= maxUnicode ? c : errorReplacement;
+              result += c > 0xffff && c <= TMaxUni ? c : TError;
               ++u;
             }
           } else {
             // three byte case - check for overlong and surrogate range
             const auto c{static_cast<T>(
                 ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1))};
-            result += c > 0x7ff && (c < minSurrogate || c > maxSurrogate)
-                          ? c
-                          : errorReplacement;
+            result += c > 0x7ff && (c < TMinSur || c > TMaxSur) ? c : TError;
             ++u;
           }
         } else {
           // two byte case - check for overlong
           result += (byte1 ^ TwoBits) > 1
                         ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
-                        : errorReplacement;
+                        : TError;
           ++u;
         }
       }

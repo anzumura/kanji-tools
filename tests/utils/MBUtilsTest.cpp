@@ -12,15 +12,17 @@ namespace {
 void fromUtf8Error(
     const std::string& s, const std::u32string& result = U"\ufffd") {
 #ifdef USE_CODECVT_FOR_UTF_8
+  static constexpr auto Msg{
 #ifdef __clang__
-  const char* msg{"wstring_convert: from_bytes error"};
+      "wstring_convert: from_bytes error"
 #else
-  const char* msg{"wstring_convert::from_bytes"};
+      "wstring_convert::from_bytes"
 #endif
+  };
   // 'result' isn't used by codecvt since it throws an exception, but use it
   // below to avoid a compile warning
   EXPECT_THROW(
-      call([&] { return fromUtf8(s) + result; }, msg), std::range_error);
+      call([&] { return fromUtf8(s) + result; }, Msg), std::range_error);
 #else
   EXPECT_EQ(fromUtf8(s), result);
 #endif
@@ -29,12 +31,14 @@ void fromUtf8Error(
 void toUtf8Error(
     const std::u32string& s, const std::string& result = "\xEF\xBF\xBD") {
 #ifdef USE_CODECVT_FOR_UTF_8
+  static constexpr auto Msg{
 #ifdef __clang__
-  const char* msg{"wstring_convert: to_bytes error"};
+      "wstring_convert: to_bytes error"
 #else
-  const char* msg{"wstring_convert::to_bytes"};
+      "wstring_convert::to_bytes"
 #endif
-  EXPECT_THROW(call([&] { return toUtf8(s) + result; }, msg), std::range_error);
+  };
+  EXPECT_THROW(call([&] { return toUtf8(s) + result; }, Msg), std::range_error);
 #else
   EXPECT_EQ(toUtf8(s), result);
 #endif

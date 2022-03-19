@@ -237,7 +237,7 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
       i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
     Data::List sorted(i->second->members());
-    std::sort(sorted.begin(), sorted.end(), Data::orderByQualifiedName);
+    std::sort(sorted.begin(), sorted.end(), Data::OrderByQualifiedName);
     for (auto& j : sorted)
       if (j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
@@ -262,8 +262,8 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
     out() << '\n';
   }
   // Jukugo Lists
-  static const std::string jukugo{" Jukugo"}, sameGrade{"Same Grade Jukugo"},
-      otherGrade{"Other Grade Jukugo"};
+  static const std::string Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
+      OtherGrade{"Other Grade Jukugo"};
   if (auto& list{_jukugoData->find(kanji->name())}; !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
     // lists, one for the same grade of the given kanji and one for other
@@ -274,13 +274,13 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
       for (auto& i : list)
         (kanji->grade() == i->grade() ? same : other).push_back(i);
       if (other.empty())
-        printJukugoList(jukugo, list);
+        printJukugoList(Jukugo, list);
       else {
-        printJukugoList(sameGrade, same);
-        printJukugoList(otherGrade, other);
+        printJukugoList(SameGrade, same);
+        printJukugoList(OtherGrade, other);
       }
     } else
-      printJukugoList(jukugo, list);
+      printJukugoList(Jukugo, list);
   }
   out() << '\n';
 }

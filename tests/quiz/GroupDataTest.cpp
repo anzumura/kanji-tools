@@ -7,9 +7,9 @@ namespace kanji_tools {
 class GroupDataTest : public ::testing::Test {
 protected:
   [[nodiscard]] static auto argv() {
-    static auto arg0{"testMain"}, arg1{"-data"}, arg2{"../../../data"};
-    static const char* args[]{arg0, arg1, arg2};
-    return args;
+    static constexpr auto Arg0{"test"}, Arg1{"-data"}, Arg2{"../../../data"};
+    static const char* Args[]{Arg0, Arg1, Arg2};
+    return Args;
   }
   // Contructs GroupData using the real data files
   GroupDataTest()

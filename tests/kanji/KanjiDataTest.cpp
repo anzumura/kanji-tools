@@ -10,8 +10,8 @@ namespace kanji_tools {
 
 namespace {
 
-constexpr auto Arg0{"program-name"}, DebugArg{"-debug"}, DataArg{"-data"},
-    DataDir{"some-dir"};
+constexpr auto Arg0{"test"}, DebugArg{"-debug"}, DataArg{"-data"},
+    DataDir{"dir"};
 
 } // namespace
 
@@ -60,10 +60,10 @@ TEST(DataTest, NextArgWithMultipleArgs) {
 
 class KanjiDataTest : public ::testing::Test {
 protected:
-  [[nodiscard]] static const char** argv() {
-    static auto arg2{"../../../data"};
-    static const char* args[]{Arg0, DataArg, arg2};
-    return args;
+  [[nodiscard]] static auto argv() {
+    static constexpr auto Arg2{"../../../data"};
+    static const char* Args[]{Arg0, DataArg, Arg2};
+    return Args;
   }
 
   static void SetUpTestCase() {
@@ -204,7 +204,7 @@ TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
     ASSERT_TRUE(k);
     kanjis.emplace_back(*k);
   }
-  std::sort(kanjis.begin(), kanjis.end(), Data::orderByQualifiedName);
+  std::sort(kanjis.begin(), kanjis.end(), Data::OrderByQualifiedName);
   std::string sorted;
   for (auto& i : kanjis) {
     if (!sorted.empty()) sorted += ' ';
