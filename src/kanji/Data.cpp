@@ -180,7 +180,7 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
   std::ifstream f{file};
   Ucd::Strokes strokes{};
   for (std::string line; std::getline(f, line);)
-    if (std::isdigit(line[0])) {
+    if (::isdigit(line[0])) {
       const auto newStrokes{std::stoul(line)};
       assert(newStrokes <= std::numeric_limits<Ucd::Strokes>::max());
       assert(newStrokes > strokes);
