@@ -13,8 +13,6 @@ namespace kanji_tools {
 // tab) separated text file with a header row (containing the column names).
 class ColumnFile {
 public:
-  static inline const std::string EmptyString;
-
   // 'Column' has a name that must match a column header in the file being
   // processed. The set of columns for a 'ColumnFile' are passed into its
   // constructor and the same column instances are used to get values from each

@@ -25,7 +25,7 @@ protected:
   StatsTest() {}
 
   void SetUp() override {
-    _os.str("");
+    _os.str(EmptyString);
     _os.clear();
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
