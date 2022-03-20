@@ -62,7 +62,8 @@ using bytes::MaxUnicodeUtf8, bytes::BeyondMaxUnicodeUtf8;
 const std::string BeforeSurrogateRange{'\xED', '\x9F', '\xBF'}, // U+D7FF
     SurrogateRangeStart{'\xED', '\xA0', '\x80'},                // U+D800
     SurrogateRangeEnd{'\xED', '\xBF', '\xBF'},                  // U+DFFF
-    AfterSurrogateRange{'\xEE', '\x80', '\x80'};                // U+E000
+    AfterSurrogateRange{'\xEE', '\x80', '\x80'},                // U+E000
+    LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪snow"};
 
 const char32_t MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
 
@@ -329,8 +330,23 @@ TEST(MBUtilsTest, CheckSingleByte) {
   EXPECT_FALSE(isAnySingleByte(U"こ"));
 }
 
+TEST(MBUtilsTest, FirstLower) {
+  EXPECT_EQ(firstLower(""), "");
+  EXPECT_EQ(firstLower(LowerString), LowerString);
+  EXPECT_EQ(firstLower(UpperString), "efGh");
+  EXPECT_EQ(firstLower(MBString), MBString);
+}
+
+TEST(MBUtilsTest, FirstUpper) {
+  EXPECT_EQ(firstUpper(""), "");
+  EXPECT_EQ(firstUpper(LowerString), "ABcD");
+  EXPECT_EQ(firstUpper(UpperString), UpperString);
+  EXPECT_EQ(firstUpper(MBString), MBString);
+}
+
 TEST(MBUtilsTest, SortKatakana) {
-  std::set<std::string> s{"ケン、トウ", "カ", "カ、サ", "ガ", "ゲン、カン"};
+  const std::set<std::string> s{
+      "ケン、トウ", "カ", "カ、サ", "ガ", "ゲン、カン"};
   ASSERT_EQ(s.size(), 5);
   auto i{s.begin()};
   EXPECT_EQ(*i++, "カ");

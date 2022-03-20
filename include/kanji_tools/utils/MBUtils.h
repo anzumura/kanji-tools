@@ -203,6 +203,26 @@ template<>
   return false;
 }
 
+template<typename T>
+[[nodiscard]] inline auto firstConvert(T pred, T conv, const std::string& s) {
+  if (s.size() && pred(s[0])) {
+    std::string result{s};
+    result[0] = static_cast<char>(conv(result[0]));
+    return result;
+  }
+  return s;
+}
+
+// convert first letter of an ascii (non-multibyte) string to lower case
+[[nodiscard]] inline auto firstLower(const std::string& s) {
+  return firstConvert(::isupper, ::tolower, s);
+}
+
+// convert first letter of an ascii (non-multibyte) string to upper case
+[[nodiscard]] inline auto firstUpper(const std::string& s) {
+  return firstConvert(::islower, ::toupper, s);
+}
+
 // 'MBUtf8Result' is the return value of 'validateMBUtf8' - see comments below
 // for more details.
 enum class MBUtf8Result {

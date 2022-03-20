@@ -17,23 +17,7 @@ const fs::path GoodOnePerLine{TestDir / "goodOnePerLine"},
     BadOnePerLine{TestDir / "badOnePerLine"}, BadSymbol{TestDir / "badSymbol"},
     DuplicateSymbol{TestDir / "duplicateSymbol"};
 
-const std::string LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪snow"};
-
 } // namespace
-
-TEST(DataFileFunctionsTest, FirstLower) {
-  EXPECT_EQ(firstLower(""), "");
-  EXPECT_EQ(firstLower(LowerString), LowerString);
-  EXPECT_EQ(firstLower(UpperString), "efGh");
-  EXPECT_EQ(firstLower(MBString), MBString);
-}
-
-TEST(DataFileFunctionsTest, FirstUpper) {
-  EXPECT_EQ(firstUpper(""), "");
-  EXPECT_EQ(firstUpper(LowerString), "ABcD");
-  EXPECT_EQ(firstUpper(UpperString), UpperString);
-  EXPECT_EQ(firstUpper(MBString), MBString);
-}
 
 class DataFileTest : public ::testing::Test {
 protected:

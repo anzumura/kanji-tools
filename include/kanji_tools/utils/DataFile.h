@@ -125,24 +125,4 @@ public:
   [[nodiscard]] KenteiKyus kyu() const override { return _type; }
 };
 
-// convert first letter of an ascii (non-multibyte) string to lower case
-[[nodiscard]] inline auto firstLower(const std::string& s) {
-  if (s.size() && std::isupper(s[0])) {
-    std::string result{s};
-    result[0] = static_cast<char>(std::tolower(result[0]));
-    return result;
-  }
-  return s;
-}
-
-// convert first letter of an ascii (non-multibyte) string to upper case
-[[nodiscard]] inline auto firstUpper(const std::string& s) {
-  if (s.size() && std::islower(s[0])) {
-    std::string result{s};
-    result[0] = static_cast<char>(std::toupper(result[0]));
-    return result;
-  }
-  return s;
-}
-
 } // namespace kanji_tools
