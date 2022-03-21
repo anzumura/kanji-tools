@@ -4,6 +4,7 @@
 
 **[Introduction](#Introduction)**\
 **[- Project Structure](#Project-Structure)**\
+**[- VS Code Setup](#VS-Code-Setup)**\
 **[- Compiler Diagnostic Flags](#Compiler-Diagnostic-Flags)**\
 **[Kana Convert](#Kana-Convert)**\
 **[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
@@ -34,12 +35,13 @@ The initial goal for this project was to create a program that could parse multi
 
 The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds five libraries, the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
 
-- **apps**: *cpp* files for the 4 main programs
+- **apps**: *.cpp* files for the 4 main programs
+- **build**: generated directory for build targets and *cmake* dependencies
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
-- **include**: *h* files split into 5 directories (one per library)
+- **include/kanji_tools**: *.h* files in 6 sub-directories (one per library as well as *tests*)
 - **scripts**: *bash* scripts for working with *Unicode* data
-- **src**: *cpp* files split into 5 directories (one per library)
-- **tests**: *cpp* files split into 5 directories (one per library)
+- **src**: *.cpp* files in 5 sub-directories (one per library)
+- **tests**: *.cpp* files in 5 sub-directories (one per library)
 
 The five libraries are:
 
@@ -49,7 +51,30 @@ The five libraries are:
 - **stats**: code used by *kanjiStats* program (depends on **kanji** lib)
 - **quiz**: code used by *kanjiQuiz* program (depends on **kanji** lib)
 
-The code was written using **[VS Code](https://code.visualstudio.com)** on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via *Homebrew*. It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
+### VS Code Setup
+
+The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via *Homebrew*. It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
+
+Here are some links that might help with setup:
+
+- **[VS Code - Clang on macOS](https://code.visualstudio.com/docs/cpp/config-clang-mac)**
+- **[VS Code - Build with CMake](https://code.visualstudio.com/docs/cpp/cmake-linux)**
+
+I am using the following VS Code extensions:
+
+- **[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)**
+- **[C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)**
+- **[Clock](https://marketplace.visualstudio.com/items?itemName=angelo-breuer.clock)**
+- **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)**
+- **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**
+- **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**
+- **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
+
+**Notes**:
+
+- **Clock** and **shell-format** are of course not required for building code
+- **Code Spell Checker** is also optional, but there are lots of entries for it in *.vscode/settings.json* (partly caused by all the Japanese words in test code)
+- **CodeLLDB** is only used for debugging (see comments in *.vscode/launch.json* for more details)
 
 ### Compiler Diagnostic Flags
 
