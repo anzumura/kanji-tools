@@ -61,14 +61,14 @@ const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
     GroupKanjiChoices{
         {'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}};
 
-constexpr auto GradeStart{'1'}, GradeEnd{'6'}, KyuStart{'1'}, KyuEnd{'9'},
-    ListChoiceCountStart{'2'}, ListChoiceCountEnd{'9'};
+constexpr Choice::Range GradeRange{'1', '6'}, KyuRange{'1', '9'},
+    ChoiceCountRange{'2', '9'};
 
 // Default options are offered for some of the above 'Choices' (when prompting
 // the user for input):
 constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
     DefaultQuizType{'g'}, DefaultGrade{'6'}, DefaultKyu{'2'},
-    DefaultListChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
+    DefaultChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
 
 } // namespace
 
@@ -88,15 +88,14 @@ QuizLauncher::QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr data,
   // checkType is called to check f, g, l, k, m and p args (so ok to assume
   // size is at least 2) and set quizType and qList (list of questions choice)
   const auto checkType{[&quizType, &qList](const auto& arg, auto& choices,
-                           OptChar start = std::nullopt,
-                           OptChar end = std::nullopt) {
+                           std::optional<Choice::Range> r = std::nullopt) {
     if (quizType)
       Data::usage("only one quiz type can be specified, use -h for help");
     quizType = arg[1];
     if (arg.size() > 2) {
-      if (auto c{arg[2]}; arg.size() == 3 &&
-                          (choices.contains(c) ||
-                              (start && *start <= c && end.value_or(c) >= c)))
+      if (auto c{arg[2]};
+          arg.size() == 3 &&
+          (choices.contains(c) || r && r->first <= c && r->second >= c))
         qList = c;
       else
         Data::usage(
@@ -123,8 +122,8 @@ QuizLauncher::QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr data,
         case 'r': // intentional fallthrough
         case 't': question = processProgramModeArg(arg); break;
         case 'f': checkType(arg, FrequencyChoices); break;
-        case 'g': checkType(arg, GradeChoices, GradeStart, GradeEnd); break;
-        case 'k': checkType(arg, KyuChoices, KyuStart, KyuEnd); break;
+        case 'g': checkType(arg, GradeChoices, GradeRange); break;
+        case 'k': checkType(arg, KyuChoices, KyuRange); break;
         case 'l': checkType(arg, LevelChoices); break;
         case 'm': // intentional fallthrough
         case 'p': checkType(arg, GroupKanjiChoices); break;
@@ -169,7 +168,7 @@ void QuizLauncher::start(
   case 'g':
     // suppress printing 'Grade' since it's the same for every kanji in the list
     if (const auto c{qList ? *qList
-                           : _choice.get("Choose grade", GradeStart, GradeEnd,
+                           : _choice.get("Choose grade", GradeRange,
                                  GradeChoices, DefaultGrade)};
         !isQuit(c))
       listQuiz(KanjiInfo::Grade,
@@ -178,8 +177,8 @@ void QuizLauncher::start(
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
     if (const auto c{qList ? *qList
-                           : _choice.get("Choose kyu", KyuStart, KyuEnd,
-                                 KyuChoices, DefaultKyu)};
+                           : _choice.get("Choose kyu", KyuRange, KyuChoices,
+                                 DefaultKyu)};
         !isQuit(c))
       listQuiz(KanjiInfo::Kyu,
           data().kyus(AllKenteiKyus[c == 'a'   ? 0
@@ -291,8 +290,8 @@ void QuizLauncher::startListQuiz(Question question, bool showMeanings,
   ListQuiz::ChoiceCount choiceCount{1};
   auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
-    const auto c{_choice.get("Number of choices", ListChoiceCountStart,
-        ListChoiceCountEnd, DefaultListChoiceCount)};
+    const auto c{
+        _choice.get("Number of choices", ChoiceCountRange, DefaultChoiceCount)};
     if (isQuit(c)) return;
     choiceCount = static_cast<ListQuiz::ChoiceCount>(c - '0');
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);

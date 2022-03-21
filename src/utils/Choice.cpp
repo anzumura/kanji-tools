@@ -105,20 +105,21 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   return line[0];
 }
 
-char Choice::get(const std::string& msg, bool useQuit, char first, char last,
+char Choice::get(const std::string& msg, bool useQuit, const Range& range,
     const Choices& choicesIn, OptChar def) const {
   static const std::string RangeError{"range option"};
   static const std::string FirstError{"first " + RangeError},
       LastError{"last " + RangeError};
 
-  checkPrintableAscii(first, FirstError);
-  checkPrintableAscii(last, LastError);
-  if (first > last)
-    error(FirstError + " '" + first + "' is greater than last '" + last + "'");
+  checkPrintableAscii(range.first, FirstError);
+  checkPrintableAscii(range.second, LastError);
+  if (range.first > range.second)
+    error(FirstError + " '" + range.first + "' is greater than last '" +
+          range.second + "'");
   auto choices{choicesIn};
-  for (; first <= last; ++first)
-    if (!choices.emplace(first, EmptyString).second)
-      error(RangeError + " '" + first + AlreadyInChoices);
+  for (auto i{range.first}; i <= range.second; ++i)
+    if (!choices.emplace(i, EmptyString).second)
+      error(RangeError + " '" + i + AlreadyInChoices);
   return get(msg, useQuit, choices, def);
 }
 

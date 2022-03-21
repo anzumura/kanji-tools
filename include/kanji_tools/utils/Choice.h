@@ -21,6 +21,8 @@ public:
   // 'Choices' should map 'char' choices to a description of the choice
   using Choices = std::map<char, std::string>;
 
+  using Range = std::pair<char, char>;
+
   // There is no 'quit' option by default, but it can be specified in the
   // constructor or changed later via 'setQuit' and 'clearQuit' methods. An
   // 'istream' of '0' (the default) means read from stdin.
@@ -71,21 +73,21 @@ public:
 
   // 'get' with ranges are convenience methods when there is a range (inclusive)
   // with no descriptions
-  char get(const std::string& msg, bool useQuit, char first, char last,
-      const Choices& choices, OptChar def) const;
-  auto get(const std::string& msg, char first, char last,
-      const Choices& choices, OptChar def) const {
-    return get(msg, true, first, last, choices, def);
+  char get(const std::string& msg, bool useQuit, const Range&, const Choices&,
+      OptChar def) const;
+  auto get(const std::string& msg, const Range& range, const Choices& choices,
+      OptChar def) const {
+    return get(msg, true, range, choices, def);
   }
-  auto get(const std::string& msg, char first, char last,
+  auto get(const std::string& msg, const Range& range,
       const Choices& choices) const {
-    return get(msg, first, last, choices, {});
+    return get(msg, range, choices, {});
   }
-  auto get(const std::string& msg, char first, char last) const {
-    return get(msg, first, last, {}, {});
+  auto get(const std::string& msg, const Range& range) const {
+    return get(msg, range, {}, {});
   }
-  auto get(const std::string& msg, char first, char last, OptChar def) const {
-    return get(msg, first, last, {}, def);
+  auto get(const std::string& msg, const Range& range, OptChar def) const {
+    return get(msg, range, {}, def);
   }
 private:
   static void add(std::string& prompt, const Choices& choices);
