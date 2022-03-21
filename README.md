@@ -33,15 +33,15 @@ The initial goal for this project was to create a program that could parse multi
 
 ### Project Structure
 
-The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds five libraries, the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
+The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
 
-- **apps**: *.cpp* files for the 4 main programs
+- **apps**: *.cpp* files for the main programs
 - **build**: generated directory for build targets and *cmake* dependencies
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
-- **include/kanji_tools**: *.h* files in 6 sub-directories (one per library as well as *tests*)
-- **scripts**: *bash* scripts for working with *Unicode* data
-- **src**: *.cpp* files in 5 sub-directories (one per library)
-- **tests**: *.cpp* files in 5 sub-directories (one per library)
+- **include/kanji_tools**: *.h* files in sub-directories per lib (plus *tests* directory)
+- **scripts**: *bash* scripts for working with *Unicode* data files
+- **src**: *.cpp* files in sub-directories per lib
+- **tests**: *.cpp* files in sub-directories per lib (plus *testMain.cpp* file)
 
 The five libraries are:
 
