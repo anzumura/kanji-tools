@@ -158,7 +158,7 @@ public:
       bool kunreiVariant = false)
       : Kana{
             romaji, hiragana, katakana, {}, {}, romajiVariants, kunreiVariant} {
-    assert(!kunreiVariant || !romajiVariants.empty());
+    assert(kunreiVariant ? !romajiVariants.empty() : true);
   }
 
   // operator= is not generated since there are const members
