@@ -8,7 +8,7 @@ namespace kanji_tools {
 namespace {
 
 using K = Kana;
-using V = Kana::List;
+using V = Kana::RomajiVariants;
 
 // 'KanaList' has mappings for all monographs (single kana) with no 'dakuten' or
 // 'han-dakuten' versions and regularly used digraphs (normal kana followed by a
@@ -74,16 +74,16 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{"kya", "きゃ", "キャ", K{"gya", "ぎゃ", "ギャ"}},
     // Diagraphs
     D{"qa", "くぁ", "クァ", K{"gwa", "ぐぁ", "グァ"}, V{"kwa"}},
-    D{"sha", "しゃ", "シャ", K{"ja", "じゃ", "ジャ", V{"zya", "jya"}, true},
-        V{"sya"}, true},
-    D{"cha", "ちゃ", "チャ", K{"dya", "ぢゃ", "ヂャ", "ja", "zya"}, V{"tya"},
-        true},
+    D{"sha", "しゃ", "シャ", K{"ja", "じゃ", "ジャ", V{"zya", "jya", true}},
+        V{"sya", true}},
+    D{"cha", "ちゃ", "チャ", K{"dya", "ぢゃ", "ヂャ", "ja", "zya"},
+        V{"tya", true}},
     D{"tha", "てゃ", "テャ", K{"dha", "でゃ", "デャ"}},
     D{"twa", "とぁ", "トァ", K{"dwa", "どぁ", "ドァ"}},
     // --- い 行 ---
     D{"ki", "き", "キ", K{"gi", "ぎ", "ギ"}},
-    D{"shi", "し", "シ", K{"ji", "じ", "ジ", V{"zi"}, true}, V{"si"}, true},
-    D{"chi", "ち", "チ", K{"di", "ぢ", "ヂ", "ji", "zi"}, V{"ti"}, true},
+    D{"shi", "し", "シ", K{"ji", "じ", "ジ", V{"zi", true}}, V{"si", true}},
+    D{"chi", "ち", "チ", K{"di", "ぢ", "ヂ", "ji", "zi"}, V{"ti", true}},
     // Digraphs
     D{"wi", "うぃ", "ウィ", K{"vi", "ゔぃ", "ヴィ"}},
     D{"qi", "くぃ", "クィ", K{"gwi", "ぐぃ", "グィ"}, V{"kwi", "qwi"}},
@@ -96,14 +96,14 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{"u", "う", "ウ", K{"vu", "ゔ", "ヴ"}, V{"wu"}},
     D{"ku", "く", "ク", K{"gu", "ぐ", "グ"}},
     D{"su", "す", "ス", K{"zu", "ず", "ズ"}},
-    D{"tsu", "つ", "ツ", K{"du", "づ", "ヅ", "zu", "zu"}, V{"tu"}, true},
+    D{"tsu", "つ", "ツ", K{"du", "づ", "ヅ", "zu", "zu"}, V{"tu", true}},
     // Digraphs
     D{"kyu", "きゅ", "キュ", K{"gyu", "ぎゅ", "ギュ"}},
     D{"qu", "くぅ", "クゥ", K{"gwu", "ぐぅ", "グゥ"}, V{"kwu", "qwu"}},
-    D{"shu", "しゅ", "シュ", K{"ju", "じゅ", "ジュ", V{"zyu", "jyu"}, true},
-        V{"syu"}, true},
-    D{"chu", "ちゅ", "チュ", K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"}, V{"tyu"},
-        true},
+    D{"shu", "しゅ", "シュ", K{"ju", "じゅ", "ジュ", V{"zyu", "jyu", true}},
+        V{"syu", true}},
+    D{"chu", "ちゅ", "チュ", K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"},
+        V{"tyu", true}},
     D{"thu", "てゅ", "テュ", K{"dhu", "でゅ", "デュ"}},
     D{"twu", "とぅ", "トゥ", K{"dwu", "どぅ", "ドゥ"}},
     // --- え 行 ---
@@ -125,10 +125,10 @@ std::array DakutenKanaList{// --- あ 行 ---
     // Digraphs
     D{"kyo", "きょ", "キョ", K{"gyo", "ぎょ", "ギョ"}},
     D{"qo", "くぉ", "クォ", K{"gwo", "ぐぉ", "グォ"}, V{"kwo", "qwo"}},
-    D{"sho", "しょ", "ショ", K{"jo", "じょ", "ジョ", V{"zyo", "jyo"}, true},
-        V{"syo"}, true},
-    D{"cho", "ちょ", "チョ", K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"}, V{"tyo"},
-        true},
+    D{"sho", "しょ", "ショ", K{"jo", "じょ", "ジョ", V{"zyo", "jyo", true}},
+        V{"syo", true}},
+    D{"cho", "ちょ", "チョ", K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"},
+        V{"tyo", true}},
     D{"tho", "てょ", "テョ", K{"dho", "でょ", "デョ"}},
     D{"two", "とぉ", "トォ", K{"dwo", "どぉ", "ドォ"}}};
 
@@ -138,8 +138,8 @@ using H = HanDakutenKana;
 std::array HanDakutenKanaList{
     H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{"pa", "ぱ", "パ"}},
     H{"hi", "ひ", "ヒ", K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}},
-    H{"fu", "ふ", "フ", K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"}, V{"hu"},
-        true},
+    H{"fu", "ふ", "フ", K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"},
+        V{"hu", true}},
     H{"he", "へ", "ヘ", K{"be", "べ", "ベ"}, K{"pe", "ぺ", "ペ"}},
     H{"ho", "ほ", "ホ", K{"bo", "ぼ", "ボ"}, K{"po", "ぽ", "ポ"}},
     H{"hya", "ひゃ", "ヒャ", K{"bya", "びゃ", "ビャ"},
@@ -155,10 +155,15 @@ std::array HanDakutenKanaList{
 
 } // namespace
 
+void Kana::RepeatMark::validate() const {
+  assert(isAllHiragana(_hiragana));
+  assert(isAllKatakana(_katakana));
+}
+
 const std::string& Kana::getRomaji(ConvertFlags flags) const {
   return hasValue(flags & ConvertFlags::Hepburn) && _hepburn ? *_hepburn
-         : hasValue(flags & ConvertFlags::Kunrei) && _kunreiVariant
-             ? _romajiVariants[0]
+         : hasValue(flags & ConvertFlags::Kunrei) && kunreiVariant()
+             ? romajiVariants()[0]
          : hasValue(flags & ConvertFlags::Kunrei) && _kunrei ? *_kunrei
                                                              : _romaji;
 }
@@ -173,8 +178,7 @@ const std::string& Kana::get(CharType t, ConvertFlags flags) const {
 }
 
 void Kana::validate() const {
-  for ([[maybe_unused]] auto& i : _romajiVariants)
-    assert(!i.empty() && i.size() < 4); // must be 1 to 3 chars
+  for ([[maybe_unused]] auto& i : romajiVariants()) assert(isAllSingleByte(i));
   assert(isAllSingleByte(_romaji));
   assert(isAllHiragana(_hiragana));
   assert(isAllKatakana(_katakana));
