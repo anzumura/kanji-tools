@@ -114,27 +114,38 @@ public:
     RomajiVariants() = default;
     RomajiVariants(RomajiVariants&&) = default; // only allow moving (no copy)
 
-    template<size_t V1>
-    RomajiVariants(const char (&v1)[V1], bool kunrei = false)
-        : _list{v1}, _kunrei{kunrei} {
-      static_assert(V1 < 5);
+    template<size_t V>
+    RomajiVariants(const char (&v)[V], bool kunrei = false)
+        : _list{v}, _kunrei{kunrei} {
+      static_assert(check(V));
     }
+
+    // all instances with two variants have variants with the same size (like
+    // 'fa' (ファ) which has Rōmaji variants of 'fwa' and 'hwa')
+    template<size_t V>
+    RomajiVariants(
+        const char (&v1)[V], const char (&v2)[V], bool kunrei = false)
+        : _list{v1, v2}, _kunrei{kunrei} {
+      static_assert(check(V));
+    }
+
+    // no instance with 3 variants has 'kunrei' true, but one has differing
+    // sizes so need two template params, i.e, small 'ぇ' with Rōmaji of 'le'
+    // has a variant list of 'xe', 'lye' and 'xye'
     template<size_t V1, size_t V2>
     RomajiVariants(
-        const char (&v1)[V1], const char (&v2)[V2], bool kunrei = false)
-        : _list{v1, v2}, _kunrei{kunrei} {
-      static_assert(V1 < 5 && V2 < 5);
-    }
-    template<size_t V1, size_t V2, size_t V3>
-    RomajiVariants(
-        const char (&v1)[V1], const char (&v2)[V2], const char (&v3)[V3])
+        const char (&v1)[V1], const char (&v2)[V2], const char (&v3)[V2])
         : _list{v1, v2, v3} {
-      static_assert(V1 < 5 && V2 < 5 && V3 < 5);
+      static_assert(check(V1) && check(V2));
     }
 
     [[nodiscard]] auto& list() const { return _list; }
     [[nodiscard]] auto kunrei() const { return _kunrei; }
   private:
+    [[nodiscard]] static consteval bool check(size_t x) {
+      return x > 2 && x < 5;
+    }
+
     std::vector<std::string> _list;
     bool _kunrei{false};
   };
@@ -192,6 +203,7 @@ public:
       const char (&katakana)[N], const char (&hepburn)[H],
       const char (&kunrei)[K])
       : Kana{romaji, hiragana, katakana, hepburn, kunrei, {}} {
+    static_assert(H < 5 && K < 5);
     static_assert(N == 4 && H > 1 && K > 1 || N == 7 && H > 2 && K > 2);
   }
 
