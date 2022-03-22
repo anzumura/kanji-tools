@@ -144,22 +144,21 @@ public:
 
   using List = std::vector<std::string>;
 
-  Kana(const char* romaji, const char* hiragana, const char* katakana,
-      const char* hepburn = {}, const char* kunrei = {})
-      : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
-        _hepburn{hepburn ? std::optional(hepburn) : std::nullopt},
-        _kunrei{kunrei ? std::optional(kunrei) : std::nullopt} {
-    validate();
-  }
+  template<size_t R, size_t N>
+  Kana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const char* hepburn = {},
+      const char* kunrei = {})
+      : Kana(romaji, hiragana, katakana, hepburn, kunrei, {}) {}
 
   // Kana with a set of unique extra variant Rōmaji values (first variant is
   // optionally a 'kunreiVariant')
-  Kana(const char* romaji, const char* hiragana, const char* katakana,
-      const List& romajiVariants, bool kunreiVariant = false)
-      : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
-        _romajiVariants{romajiVariants}, _kunreiVariant{kunreiVariant} {
-    assert(_kunreiVariant ? !_romajiVariants.empty() : true);
-    validate();
+  template<size_t R, size_t N>
+  Kana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const List& romajiVariants,
+      bool kunreiVariant = false)
+      : Kana{
+            romaji, hiragana, katakana, {}, {}, romajiVariants, kunreiVariant} {
+    assert(!kunreiVariant || !romajiVariants.empty());
   }
 
   // operator= is not generated since there are const members
@@ -237,6 +236,22 @@ public:
   [[nodiscard]] auto& romajiVariants() const { return _romajiVariants; }
   [[nodiscard]] auto kunreiVariant() const { return _kunreiVariant; }
 private:
+  template<size_t R, size_t N>
+  Kana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const char* hepburn, const char* kunrei,
+      const List& romajiVariants, bool kunreiVariant = false)
+      : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
+        _hepburn{hepburn ? std::optional(hepburn) : std::nullopt},
+        _kunrei{kunrei ? std::optional(kunrei) : std::nullopt},
+        _romajiVariants(romajiVariants), _kunreiVariant(kunreiVariant) {
+    // Romaji can't be longer than 3 (so <=4 when including the final '\0')
+    static_assert(R <= 4);
+    // Hiragana and Katakana must be the same size (3 or 6) and also check that
+    // Romaji is at least 1 character for a monograph or 2 for a digraph
+    static_assert(N == 4 && R > 1 || N == 7 && R > 2);
+    validate();
+  }
+
   static Map populate(CharType);
   static const Map RomajiMap, HiraganaMap, KatakanaMap;
 
@@ -249,26 +264,26 @@ private:
   // ぢ, 'du' for づ, etc.)
   const std::string _romaji, _hiragana, _katakana;
 
+  // '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where
+  // it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be uniquely
+  // identified by 'du', but the correct Hepburn output for this Kana is 'zu'
+  // which is ambiguous with ず. '_hepburn' (if it's populated) is always a
+  // duplicate of another Kana's '_romaji' value.
+  const std::optional<std::string> _hepburn;
+
+  // '_kunrei' holds an optional 'Kunrei Shiki' value for a few cases like 'zya'
+  // for じゃ.
+  const std::optional<std::string> _kunrei;
+
   // '_romajiVariants' holds any further variant Rōmaji values that are unique
   // for this 'Kana' class. These include extra key combinations that also map
   // to the same value such as 'kwa' for クァ (instead of 'qa'), 'fyi' フィ
   // (instead of 'fi'), etc.
   const List _romajiVariants;
 
-  // '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where
-  // it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be uniquely
-  // identified by 'du', but the correct Hepburn output for this Kana is 'zu'
-  // which is ambiguous with ず. '_hepburn' (if it's populated) is always a
-  // duplicate of another Kana's '_romaji' value.
-  const std::optional<std::string> _hepburn{};
-
-  // '_kunrei' holds an optional 'Kunrei Shiki' value for a few cases like 'zya'
-  // for じゃ.
-  const std::optional<std::string> _kunrei{};
-
   // '_kunreiVariant' is true if the first entry in '_romajiVariants' is a
   // 'Kunrei Shiki' value. If this is true then '_kunrei' should be nullopt.
-  const bool _kunreiVariant{false};
+  const bool _kunreiVariant;
 
   // '_plainKana' is set to unaccented version by DakutenKana and HanDakutenKana
   // constructors. For example, the DakutenKana instance for け contains
@@ -288,20 +303,23 @@ private:
 // version with a 'dakuten').
 class DakutenKana : public Kana {
 public:
-  DakutenKana(const char* romaji, const char* hiragana, const char* katakana,
-      const Kana& dakutenKana, const char* hepburn = {},
-      const char* kunrei = {})
+  template<size_t R, size_t N>
+  DakutenKana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const Kana& dakutenKana,
+      const char* hepburn = {}, const char* kunrei = {})
       : Kana{romaji, hiragana, katakana, hepburn, kunrei}, _dakutenKana{
                                                                dakutenKana} {
     _dakutenKana._plainKana = this;
   }
-  DakutenKana(const char* romaji, const char* hiragana, const char* katakana,
-      const Kana& dakutenKana, const List& romajiVariants,
-      bool kunreiVariant = false)
+  template<size_t R, size_t N>
+  DakutenKana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const Kana& dakutenKana,
+      const List& romajiVariants, bool kunreiVariant = false)
       : Kana{romaji, hiragana, katakana, romajiVariants, kunreiVariant},
         _dakutenKana{dakutenKana} {
     _dakutenKana._plainKana = this;
   }
+
   [[nodiscard]] const Kana* dakutenKana() const override {
     return &_dakutenKana;
   }
@@ -312,21 +330,26 @@ private:
 // 'HanDakutenKana' is only populated for 'h' row Kana, i.e., は has ぱ
 class HanDakutenKana : public DakutenKana {
 public:
-  HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana,
-      const Kana& dakutenKana, const Kana& hanDakutenKana,
-      const char* hepburn = {}, const char* kunrei = {})
+  template<size_t R, size_t N>
+  HanDakutenKana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const Kana& dakutenKana,
+      const Kana& hanDakutenKana, const char* hepburn = {},
+      const char* kunrei = {})
       : DakutenKana{romaji, hiragana, katakana, dakutenKana, hepburn, kunrei},
         _hanDakutenKana{hanDakutenKana} {
     _hanDakutenKana._plainKana = this;
   }
-  HanDakutenKana(const char* romaji, const char* hiragana, const char* katakana,
-      const Kana& dakutenKana, const Kana& hanDakutenKana,
-      const List& romajiVariants, bool kunreiVariant = false)
+  template<size_t R, size_t N>
+  HanDakutenKana(const char (&romaji)[R], const char (&hiragana)[N],
+      const char (&katakana)[N], const Kana& dakutenKana,
+      const Kana& hanDakutenKana, const List& romajiVariants,
+      bool kunreiVariant = false)
       : DakutenKana{romaji, hiragana, katakana, dakutenKana, romajiVariants,
             kunreiVariant},
         _hanDakutenKana{hanDakutenKana} {
     _hanDakutenKana._plainKana = this;
   }
+
   [[nodiscard]] const Kana* hanDakutenKana() const override {
     return &_hanDakutenKana;
   }
