@@ -17,7 +17,7 @@ using V = Kana::RomajiVariants;
 const std::array KanaList{// --- あ 行 ---
     K{"a", "あ", "ア"}, K{"na", "な", "ナ"}, K{"ma", "ま", "マ"},
     K{"ya", "や", "ヤ"}, K{"ra", "ら", "ラ"}, K{"wa", "わ", "ワ"},
-    // Digraphs
+    // あ Digraphs
     K{"qwa", "くゎ", "クヮ"}, K{"swa", "すぁ", "スァ"},
     K{"tsa", "つぁ", "ツァ"}, K{"nya", "にゃ", "ニャ"},
     K{"fa", "ふぁ", "ファ", V{"fwa", "hwa"}}, K{"fya", "ふゃ", "フャ"},
@@ -25,37 +25,37 @@ const std::array KanaList{// --- あ 行 ---
     // --- い 行 ---
     K{"i", "い", "イ"}, K{"ni", "に", "ニ"}, K{"mi", "み", "ミ"},
     K{"ri", "り", "リ"}, K{"wyi", "ゐ", "ヰ", "i", "i"},
-    // Digraphs
+    // い Digraphs
     K{"swi", "すぃ", "スィ"}, K{"tsi", "つぃ", "ツィ"},
     K{"nyi", "にぃ", "ニィ"}, K{"fi", "ふぃ", "フィ", V{"fyi", "fwi", "hwi"}},
     K{"myi", "みぃ", "ミィ"}, K{"ryi", "りぃ", "リィ"},
     // --- う 行 ---
     K{"nu", "ぬ", "ヌ"}, K{"mu", "む", "ム"}, K{"yu", "ゆ", "ユ"},
     K{"ru", "る", "ル"},
-    // Digraphs
+    //う Digraphs
     K{"swu", "すぅ", "スゥ"}, K{"nyu", "にゅ", "ニュ"},
     K{"fwu", "ふぅ", "フゥ"}, K{"fyu", "ふゅ", "フュ"},
     K{"myu", "みゅ", "ミュ"}, K{"ryu", "りゅ", "リュ"},
     // --- え 行 ---
     K{"e", "え", "エ"}, K{"ne", "ね", "ネ"}, K{"me", "め", "メ"},
     K{"re", "れ", "レ"}, K{"wye", "ゑ", "ヱ", "e", "e"},
-    // Digraphs
+    // え Digraphs
     K{"ye", "いぇ", "イェ"}, K{"swe", "すぇ", "スェ"}, K{"tse", "つぇ", "ツェ"},
     K{"nye", "にぇ", "ニェ"}, K{"fe", "ふぇ", "フェ", V{"fye", "fwe", "hwe"}},
     K{"mye", "みぇ", "ミェ"}, K{"rye", "りぇ", "リェ"},
     // --- お 行 ---
     K{"o", "お", "オ"}, K{"no", "の", "ノ"}, K{"mo", "も", "モ"},
     K{"yo", "よ", "ヨ"}, K{"ro", "ろ", "ロ"}, K{"wo", "を", "ヲ", "o", "o"},
-    // Digraphs
+    //お Digraphs
     K{"swo", "すぉ", "スォ"}, K{"tso", "つぉ", "ツォ"},
     K{"nyo", "にょ", "ニョ"}, K{"fo", "ふぉ", "フォ", V{"fwo", "hwo"}},
     K{"fyo", "ふょ", "フョ"}, K{"myo", "みょ", "ミョ"},
     K{"ryo", "りょ", "リョ"},
-    // Digraphs that only have a dakuten version
+    // Digraphs that only have a dakuten version (all start with 'v')
     K{"va", "ゔぁ", "ヴァ"}, K{"vo", "ゔぉ", "ヴォ"}, K{"vya", "ゔゃ", "ヴャ"},
     K{"vyu", "ゔゅ", "ヴュ"}, K{"vyo", "ゔょ", "ヴョ"},
     // 12 Small letters (5 vowels, 2 k's, 3 y's, small 'wa' and small 'tsu') -
-    // prefer 'l' versions for Romaji output
+    // prefer 'l' versions for Rōmaji output, but 'x' version is also included
     K{"la", "ぁ", "ァ", V{"xa"}}, K{"li", "ぃ", "ィ", V{"xi"}},
     K{"lu", "ぅ", "ゥ", V{"xu"}}, K{"le", "ぇ", "ェ", V{"xe", "lye", "xye"}},
     K{"lo", "ぉ", "ォ", V{"xo"}}, K{"lka", "ゕ", "ヵ", V{"xka"}},
@@ -66,13 +66,13 @@ const std::array KanaList{// --- あ 行 ---
     K{"n", "ん", "ン"}};
 
 using D = DakutenKana;
-// 'DakutenKanaList' contain Kana that have a 'dakuten' version, but not 'h'
+// 'DakutenKanaList' holds Kana that have a 'dakuten' version (but not 'h' row)
 std::array DakutenKanaList{// --- あ 行 ---
     D{K{"ga", "が", "ガ"}, "ka", "か", "カ"},
     D{K{"za", "ざ", "ザ"}, "sa", "さ", "サ"},
     D{K{"da", "だ", "ダ"}, "ta", "た", "タ"},
     D{K{"gya", "ぎゃ", "ギャ"}, "kya", "きゃ", "キャ"},
-    // Diagraphs
+    // あ Diagraphs
     D{K{"gwa", "ぐぁ", "グァ"}, "qa", "くぁ", "クァ", V{"kwa"}},
     D{K{"ja", "じゃ", "ジャ", V{"zya", "jya", true}}, "sha", "しゃ", "シャ",
         V{"sya", true}},
@@ -84,7 +84,7 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{K{"gi", "ぎ", "ギ"}, "ki", "き", "キ"},
     D{K{"ji", "じ", "ジ", V{"zi", true}}, "shi", "し", "シ", V{"si", true}},
     D{K{"di", "ぢ", "ヂ", "ji", "zi"}, "chi", "ち", "チ", V{"ti", true}},
-    // Digraphs
+    // い Digraphs
     D{K{"vi", "ゔぃ", "ヴィ"}, "wi", "うぃ", "ウィ"},
     D{K{"gwi", "ぐぃ", "グィ"}, "qi", "くぃ", "クィ", V{"kwi", "qwi"}},
     D{K{"gyi", "ぎぃ", "ギィ"}, "kyi", "きぃ", "キィ"},
@@ -97,7 +97,7 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{K{"gu", "ぐ", "グ"}, "ku", "く", "ク"},
     D{K{"zu", "ず", "ズ"}, "su", "す", "ス"},
     D{K{"du", "づ", "ヅ", "zu", "zu"}, "tsu", "つ", "ツ", V{"tu", true}},
-    // Digraphs
+    // う Digraphs
     D{K{"gyu", "ぎゅ", "ギュ"}, "kyu", "きゅ", "キュ"},
     D{K{"gwu", "ぐぅ", "グゥ"}, "qu", "くぅ", "クゥ", V{"kwu", "qwu"}},
     D{K{"ju", "じゅ", "ジュ", V{"zyu", "jyu", true}}, "shu", "しゅ", "シュ",
@@ -111,7 +111,7 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{K{"gye", "ぎぇ", "ギェ"}, "kye", "きぇ", "キェ"},
     D{K{"ze", "ぜ", "ゼ"}, "se", "せ", "セ"},
     D{K{"de", "で", "デ"}, "te", "て", "テ"},
-    // Digraphs
+    // え Digraphs
     D{K{"ve", "ゔぇ", "ヴェ"}, "we", "うぇ", "ウェ"},
     D{K{"gwe", "ぐぇ", "グェ"}, "qe", "くぇ", "クェ", V{"kwe", "qwe"}},
     D{K{"je", "じぇ", "ジェ", V{"zye", "jye"}}, "she", "しぇ", "シェ"},
@@ -122,7 +122,7 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{K{"go", "ご", "ゴ"}, "ko", "こ", "コ"},
     D{K{"zo", "ぞ", "ゾ"}, "so", "そ", "ソ"},
     D{K{"do", "ど", "ド"}, "to", "と", "ト"},
-    // Digraphs
+    // お Digraphs
     D{K{"gyo", "ぎょ", "ギョ"}, "kyo", "きょ", "キョ"},
     D{K{"gwo", "ぐぉ", "グォ"}, "qo", "くぉ", "クォ", V{"kwo", "qwo"}},
     D{K{"jo", "じょ", "ジョ", V{"zyo", "jyo", true}}, "sho", "しょ", "ショ",
@@ -133,8 +133,8 @@ std::array DakutenKanaList{// --- あ 行 ---
     D{K{"dwo", "どぉ", "ドォ"}, "two", "とぉ", "トォ"}};
 
 using H = HanDakutenKana;
-// 'HanDakutenKanaList' contain Kana that have both a 'dakuten' and a
-// 'han-dakuten' (so 'h' row)
+// 'HanDakutenKanaList' has Kana that have both a 'dakuten' and a 'han-dakuten'
+// version (so just the 'h' row)
 std::array HanDakutenKanaList{
     H{K{"pa", "ぱ", "パ"}, K{"ba", "ば", "バ"}, "ha", "は", "ハ"},
     H{K{"pi", "ぴ", "ピ"}, K{"bi", "び", "ビ"}, "hi", "ひ", "ヒ"},
@@ -142,6 +142,7 @@ std::array HanDakutenKanaList{
         V{"hu", true}},
     H{K{"pe", "ぺ", "ペ"}, K{"be", "べ", "ベ"}, "he", "へ", "ヘ"},
     H{K{"po", "ぽ", "ポ"}, K{"bo", "ぼ", "ボ"}, "ho", "ほ", "ホ"},
+    // Digraphs
     H{K{"pya", "ぴゃ", "ピャ"}, K{"bya", "びゃ", "ビャ"}, "hya", "ひゃ",
         "ヒャ"},
     H{K{"pyi", "ぴぃ", "ピィ"}, K{"byi", "びぃ", "ビィ"}, "hyi", "ひぃ",
