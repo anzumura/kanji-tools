@@ -66,92 +66,92 @@ const std::array KanaList{// --- あ 行 ---
     K{"n", "ん", "ン"}};
 
 using D = DakutenKana;
-// 'DakutenKanaList' contains kana that have a 'dakuten' version, but not 'h'
+// 'DakutenKanaList' contain Kana that have a 'dakuten' version, but not 'h'
 std::array DakutenKanaList{// --- あ 行 ---
-    D{"ka", "か", "カ", K{"ga", "が", "ガ"}},
-    D{"sa", "さ", "サ", K{"za", "ざ", "ザ"}},
-    D{"ta", "た", "タ", K{"da", "だ", "ダ"}},
-    D{"kya", "きゃ", "キャ", K{"gya", "ぎゃ", "ギャ"}},
+    D{K{"ga", "が", "ガ"}, "ka", "か", "カ"},
+    D{K{"za", "ざ", "ザ"}, "sa", "さ", "サ"},
+    D{K{"da", "だ", "ダ"}, "ta", "た", "タ"},
+    D{K{"gya", "ぎゃ", "ギャ"}, "kya", "きゃ", "キャ"},
     // Diagraphs
-    D{"qa", "くぁ", "クァ", K{"gwa", "ぐぁ", "グァ"}, V{"kwa"}},
-    D{"sha", "しゃ", "シャ", K{"ja", "じゃ", "ジャ", V{"zya", "jya", true}},
+    D{K{"gwa", "ぐぁ", "グァ"}, "qa", "くぁ", "クァ", V{"kwa"}},
+    D{K{"ja", "じゃ", "ジャ", V{"zya", "jya", true}}, "sha", "しゃ", "シャ",
         V{"sya", true}},
-    D{"cha", "ちゃ", "チャ", K{"dya", "ぢゃ", "ヂャ", "ja", "zya"},
+    D{K{"dya", "ぢゃ", "ヂャ", "ja", "zya"}, "cha", "ちゃ", "チャ",
         V{"tya", true}},
-    D{"tha", "てゃ", "テャ", K{"dha", "でゃ", "デャ"}},
-    D{"twa", "とぁ", "トァ", K{"dwa", "どぁ", "ドァ"}},
+    D{K{"dha", "でゃ", "デャ"}, "tha", "てゃ", "テャ"},
+    D{K{"dwa", "どぁ", "ドァ"}, "twa", "とぁ", "トァ"},
     // --- い 行 ---
-    D{"ki", "き", "キ", K{"gi", "ぎ", "ギ"}},
-    D{"shi", "し", "シ", K{"ji", "じ", "ジ", V{"zi", true}}, V{"si", true}},
-    D{"chi", "ち", "チ", K{"di", "ぢ", "ヂ", "ji", "zi"}, V{"ti", true}},
+    D{K{"gi", "ぎ", "ギ"}, "ki", "き", "キ"},
+    D{K{"ji", "じ", "ジ", V{"zi", true}}, "shi", "し", "シ", V{"si", true}},
+    D{K{"di", "ぢ", "ヂ", "ji", "zi"}, "chi", "ち", "チ", V{"ti", true}},
     // Digraphs
-    D{"wi", "うぃ", "ウィ", K{"vi", "ゔぃ", "ヴィ"}},
-    D{"qi", "くぃ", "クィ", K{"gwi", "ぐぃ", "グィ"}, V{"kwi", "qwi"}},
-    D{"kyi", "きぃ", "キィ", K{"gyi", "ぎぃ", "ギィ"}},
-    D{"syi", "しぃ", "シィ", K{"jyi", "じぃ", "ジィ", V{"zyi"}}},
-    D{"tyi", "ちぃ", "チィ", K{"dyi", "ぢぃ", "ヂィ"}},
-    D{"twi", "とぃ", "トィ", K{"dwi", "どぃ", "ドィ"}},
-    D{"thi", "てぃ", "ティ", K{"dhi", "でぃ", "ディ"}},
+    D{K{"vi", "ゔぃ", "ヴィ"}, "wi", "うぃ", "ウィ"},
+    D{K{"gwi", "ぐぃ", "グィ"}, "qi", "くぃ", "クィ", V{"kwi", "qwi"}},
+    D{K{"gyi", "ぎぃ", "ギィ"}, "kyi", "きぃ", "キィ"},
+    D{K{"jyi", "じぃ", "ジィ", V{"zyi"}}, "syi", "しぃ", "シィ"},
+    D{K{"dyi", "ぢぃ", "ヂィ"}, "tyi", "ちぃ", "チィ"},
+    D{K{"dwi", "どぃ", "ドィ"}, "twi", "とぃ", "トィ"},
+    D{K{"dhi", "でぃ", "ディ"}, "thi", "てぃ", "ティ"},
     // --- う 行 ---
-    D{"u", "う", "ウ", K{"vu", "ゔ", "ヴ"}, V{"wu"}},
-    D{"ku", "く", "ク", K{"gu", "ぐ", "グ"}},
-    D{"su", "す", "ス", K{"zu", "ず", "ズ"}},
-    D{"tsu", "つ", "ツ", K{"du", "づ", "ヅ", "zu", "zu"}, V{"tu", true}},
+    D{K{"vu", "ゔ", "ヴ"}, "u", "う", "ウ", V{"wu"}},
+    D{K{"gu", "ぐ", "グ"}, "ku", "く", "ク"},
+    D{K{"zu", "ず", "ズ"}, "su", "す", "ス"},
+    D{K{"du", "づ", "ヅ", "zu", "zu"}, "tsu", "つ", "ツ", V{"tu", true}},
     // Digraphs
-    D{"kyu", "きゅ", "キュ", K{"gyu", "ぎゅ", "ギュ"}},
-    D{"qu", "くぅ", "クゥ", K{"gwu", "ぐぅ", "グゥ"}, V{"kwu", "qwu"}},
-    D{"shu", "しゅ", "シュ", K{"ju", "じゅ", "ジュ", V{"zyu", "jyu", true}},
+    D{K{"gyu", "ぎゅ", "ギュ"}, "kyu", "きゅ", "キュ"},
+    D{K{"gwu", "ぐぅ", "グゥ"}, "qu", "くぅ", "クゥ", V{"kwu", "qwu"}},
+    D{K{"ju", "じゅ", "ジュ", V{"zyu", "jyu", true}}, "shu", "しゅ", "シュ",
         V{"syu", true}},
-    D{"chu", "ちゅ", "チュ", K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"},
+    D{K{"dyu", "ぢゅ", "ヂュ", "ju", "zyu"}, "chu", "ちゅ", "チュ",
         V{"tyu", true}},
-    D{"thu", "てゅ", "テュ", K{"dhu", "でゅ", "デュ"}},
-    D{"twu", "とぅ", "トゥ", K{"dwu", "どぅ", "ドゥ"}},
+    D{K{"dhu", "でゅ", "デュ"}, "thu", "てゅ", "テュ"},
+    D{K{"dwu", "どぅ", "ドゥ"}, "twu", "とぅ", "トゥ"},
     // --- え 行 ---
-    D{"ke", "け", "ケ", K{"ge", "げ", "ゲ"}},
-    D{"kye", "きぇ", "キェ", K{"gye", "ぎぇ", "ギェ"}},
-    D{"se", "せ", "セ", K{"ze", "ぜ", "ゼ"}},
-    D{"te", "て", "テ", K{"de", "で", "デ"}},
+    D{K{"ge", "げ", "ゲ"}, "ke", "け", "ケ"},
+    D{K{"gye", "ぎぇ", "ギェ"}, "kye", "きぇ", "キェ"},
+    D{K{"ze", "ぜ", "ゼ"}, "se", "せ", "セ"},
+    D{K{"de", "で", "デ"}, "te", "て", "テ"},
     // Digraphs
-    D{"we", "うぇ", "ウェ", K{"ve", "ゔぇ", "ヴェ"}},
-    D{"qe", "くぇ", "クェ", K{"gwe", "ぐぇ", "グェ"}, V{"kwe", "qwe"}},
-    D{"she", "しぇ", "シェ", K{"je", "じぇ", "ジェ", V{"zye", "jye"}}},
-    D{"che", "ちぇ", "チェ", K{"dye", "ぢぇ", "ヂェ"}, V{"tye"}},
-    D{"the", "てぇ", "テェ", K{"dhe", "でぇ", "デェ"}},
-    D{"twe", "とぇ", "トェ", K{"dwe", "どぇ", "ドェ"}},
+    D{K{"ve", "ゔぇ", "ヴェ"}, "we", "うぇ", "ウェ"},
+    D{K{"gwe", "ぐぇ", "グェ"}, "qe", "くぇ", "クェ", V{"kwe", "qwe"}},
+    D{K{"je", "じぇ", "ジェ", V{"zye", "jye"}}, "she", "しぇ", "シェ"},
+    D{K{"dye", "ぢぇ", "ヂェ"}, "che", "ちぇ", "チェ", V{"tye"}},
+    D{K{"dhe", "でぇ", "デェ"}, "the", "てぇ", "テェ"},
+    D{K{"dwe", "どぇ", "ドェ"}, "twe", "とぇ", "トェ"},
     // --- お 行 ---
-    D{"ko", "こ", "コ", K{"go", "ご", "ゴ"}},
-    D{"so", "そ", "ソ", K{"zo", "ぞ", "ゾ"}},
-    D{"to", "と", "ト", K{"do", "ど", "ド"}},
+    D{K{"go", "ご", "ゴ"}, "ko", "こ", "コ"},
+    D{K{"zo", "ぞ", "ゾ"}, "so", "そ", "ソ"},
+    D{K{"do", "ど", "ド"}, "to", "と", "ト"},
     // Digraphs
-    D{"kyo", "きょ", "キョ", K{"gyo", "ぎょ", "ギョ"}},
-    D{"qo", "くぉ", "クォ", K{"gwo", "ぐぉ", "グォ"}, V{"kwo", "qwo"}},
-    D{"sho", "しょ", "ショ", K{"jo", "じょ", "ジョ", V{"zyo", "jyo", true}},
+    D{K{"gyo", "ぎょ", "ギョ"}, "kyo", "きょ", "キョ"},
+    D{K{"gwo", "ぐぉ", "グォ"}, "qo", "くぉ", "クォ", V{"kwo", "qwo"}},
+    D{K{"jo", "じょ", "ジョ", V{"zyo", "jyo", true}}, "sho", "しょ", "ショ",
         V{"syo", true}},
-    D{"cho", "ちょ", "チョ", K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"},
+    D{K{"dyo", "ぢょ", "ヂョ", "jo", "zyo"}, "cho", "ちょ", "チョ",
         V{"tyo", true}},
-    D{"tho", "てょ", "テョ", K{"dho", "でょ", "デョ"}},
-    D{"two", "とぉ", "トォ", K{"dwo", "どぉ", "ドォ"}}};
+    D{K{"dho", "でょ", "デョ"}, "tho", "てょ", "テョ"},
+    D{K{"dwo", "どぉ", "ドォ"}, "two", "とぉ", "トォ"}};
 
 using H = HanDakutenKana;
-// 'HanDakutenKanaList' contains kana that have both a 'dakuten' and a
+// 'HanDakutenKanaList' contain Kana that have both a 'dakuten' and a
 // 'han-dakuten' (so 'h' row)
 std::array HanDakutenKanaList{
-    H{"ha", "は", "ハ", K{"ba", "ば", "バ"}, K{"pa", "ぱ", "パ"}},
-    H{"hi", "ひ", "ヒ", K{"bi", "び", "ビ"}, K{"pi", "ぴ", "ピ"}},
-    H{"fu", "ふ", "フ", K{"bu", "ぶ", "ブ"}, K{"pu", "ぷ", "プ"},
+    H{K{"pa", "ぱ", "パ"}, K{"ba", "ば", "バ"}, "ha", "は", "ハ"},
+    H{K{"pi", "ぴ", "ピ"}, K{"bi", "び", "ビ"}, "hi", "ひ", "ヒ"},
+    H{K{"pu", "ぷ", "プ"}, K{"bu", "ぶ", "ブ"}, "fu", "ふ", "フ",
         V{"hu", true}},
-    H{"he", "へ", "ヘ", K{"be", "べ", "ベ"}, K{"pe", "ぺ", "ペ"}},
-    H{"ho", "ほ", "ホ", K{"bo", "ぼ", "ボ"}, K{"po", "ぽ", "ポ"}},
-    H{"hya", "ひゃ", "ヒャ", K{"bya", "びゃ", "ビャ"},
-        K{"pya", "ぴゃ", "ピャ"}},
-    H{"hyi", "ひぃ", "ヒィ", K{"byi", "びぃ", "ビィ"},
-        K{"pyi", "ぴぃ", "ピィ"}},
-    H{"hyu", "ひゅ", "ヒュ", K{"byu", "びゅ", "ビュ"},
-        K{"pyu", "ぴゅ", "ピュ"}},
-    H{"hye", "ひぇ", "ヒェ", K{"bye", "びぇ", "ビェ"},
-        K{"pye", "ぴぇ", "ピェ"}},
-    H{"hyo", "ひょ", "ヒョ", K{"byo", "びょ", "ビョ"},
-        K{"pyo", "ぴょ", "ピョ"}}};
+    H{K{"pe", "ぺ", "ペ"}, K{"be", "べ", "ベ"}, "he", "へ", "ヘ"},
+    H{K{"po", "ぽ", "ポ"}, K{"bo", "ぼ", "ボ"}, "ho", "ほ", "ホ"},
+    H{K{"pya", "ぴゃ", "ピャ"}, K{"bya", "びゃ", "ビャ"}, "hya", "ひゃ",
+        "ヒャ"},
+    H{K{"pyi", "ぴぃ", "ピィ"}, K{"byi", "びぃ", "ビィ"}, "hyi", "ひぃ",
+        "ヒィ"},
+    H{K{"pyu", "ぴゅ", "ピュ"}, K{"byu", "びゅ", "ビュ"}, "hyu", "ひゅ",
+        "ヒュ"},
+    H{K{"pye", "ぴぇ", "ピェ"}, K{"bye", "びぇ", "ビェ"}, "hye", "ひぇ",
+        "ヒェ"},
+    H{K{"pyo", "ぴょ", "ピョ"}, K{"byo", "びょ", "ビョ"}, "hyo", "ひょ",
+        "ヒョ"}};
 
 } // namespace
 
@@ -208,12 +208,12 @@ Kana::Map Kana::populate(CharType t) {
   for (auto& i : KanaList) processKana(i);
   for (auto& i : DakutenKanaList) {
     processKana(i);
-    processKana(*i.dakutenKana());
+    processKana(*i.dakuten());
   }
   for (auto& i : HanDakutenKanaList) {
     processKana(i);
-    processKana(*i.dakutenKana());
-    processKana(*i.hanDakutenKana());
+    processKana(*i.dakuten());
+    processKana(*i.hanDakuten());
   }
   assert(duplicates == 0);
   return result;
@@ -229,8 +229,8 @@ const std::string& Kana::RepeatMark::get(
   if (!prevKana) return EmptyString;
   const Kana* k{prevKana};
   if (_dakuten) {
-    if (const auto accented{prevKana->dakutenKana()}; accented) k = accented;
-  } else if (const auto unaccented{prevKana->plainKana()}; unaccented)
+    if (const auto accented{prevKana->dakuten()}; accented) k = accented;
+  } else if (const auto unaccented{prevKana->plain()}; unaccented)
     k = unaccented;
   return k->getRomaji(flags);
 }
