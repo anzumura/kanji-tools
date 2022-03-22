@@ -2,6 +2,7 @@
 
 #include <kanji_tools/kana/Kana.h>
 
+#include <cassert>
 #include <set>
 
 namespace kanji_tools {

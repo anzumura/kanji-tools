@@ -1,6 +1,7 @@
 #include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
+#include <cassert>
 #include <iostream>
 
 namespace kanji_tools {
@@ -10,9 +11,9 @@ namespace {
 using K = Kana;
 using V = Kana::RomajiVariants;
 
-// 'KanaList' has mappings for all monographs (single kana) with no 'dakuten' or
-// 'han-dakuten' versions and regularly used digraphs (normal kana followed by a
-// small kana 'vowel', 'y' or 'wa'). See comments for 'Kana' class for a
+// 'KanaList' has mappings for all monographs (single Kana) with no 'dakuten' or
+// 'han-dakuten' versions and regularly used digraphs (normal Kana followed by a
+// small Kana 'vowel', 'y' or 'wa'). See comments for 'Kana' class for a
 // description of the fields.
 const std::array KanaList{// --- あ 行 ---
     K{"a", "あ", "ア"}, K{"na", "な", "ナ"}, K{"ma", "ま", "マ"},

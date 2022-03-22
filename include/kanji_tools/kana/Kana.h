@@ -3,7 +3,6 @@
 #include <kanji_tools/utils/EnumArray.h>
 #include <kanji_tools/utils/EnumBitmask.h>
 
-#include <cassert>
 #include <optional>
 #include <vector>
 
