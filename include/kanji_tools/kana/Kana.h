@@ -8,8 +8,8 @@
 
 namespace kanji_tools {
 
-// 'CharType' is used to specify 'source' and 'target' types for
-// 'KanaConvert::convert' methods
+// 'CharType' is used by 'KanaConvert' class to specify 'source' and 'target'
+// types when converting
 enum class CharType { Hiragana, Katakana, Romaji };
 
 template<> inline constexpr auto is_enumarray<CharType>{true};
@@ -17,40 +17,8 @@ template<> inline constexpr auto is_enumarray<CharType>{true};
 inline const auto CharTypes{
     BaseEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
-// 'ConvertFlags' controls some aspects of conversion (by KanaConvert class).
-// For example: Hepburn: off by default, only applies to 'Rōmaji' output
-// - convert("つづき", CharType::Romaji) -> "tsuduki"
-// - convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
-// Kunrei: off by default, only applies to 'Rōmaji' output
-// - convert("しつ", CharType::Romaji) -> "shitsu"
-// - convert("しつ", CharType::Romaji, Kunrei) -> "situ"
-// NoProlongMark: off by default, only applies to 'Hiragana' output
-// - convert("rāmen", CharType::Hiragana) -> "らーめん"
-// - convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
-// RemoveSpaces: off by default, only applies when converting from Rōmaji:
-// - convert("akai kitsune", CharType::Hiragana) returns "あかい　きつね" (with
-// a wide space)
-// - convert("akai kitsune", CharType::Hiragana, RemoveSpaces) returns
-// "あかいきつね"
-//
-// Notes:
-//
-// Prolonged sound marks in Hiragana are non-standard, but output them by
-// default in order to support round-trip type conversions, otherwise the above
-// example would map "らあめん" back to "raamen" which doesn't match the initial
-// value. ConvertFlags suppots bitwise operators so they can be combined using
-// '|', for example:
-// - convert("rāmen desu.", CharType::Hiragana, ConvertFlags::RemoveSpaces |
-// ConvertFlags::NoProlongMark) -> "らあめんです。"
-//
-// Enabling 'Hepburn' leads to more standard Rōmaji, but the output is ambiguous
-// and leads to different Kana if converted back. This affects di (ぢ), dya
-// (ぢゃ), dyo (ぢょ), dyu (ぢゅ), du (づ) and wo (を) - these become ji, ja,
-// ju, jo, zu and o instead. There's also no support for trying to handle は and
-// へ (which in standard Hepburn should map to 'wa' and 'e' if they are used as
-// particles) - instead they simply map to 'ha' and 'he' all the time. If both
-// Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try
-// Kunrei before falling back to the unique '_romaji' value in the Kana class.
+// 'ConvertFlags' is also used by 'KanaConvert' class to control some aspects of
+// conversion (see comments at the bottom of this file for more details)
 enum class ConvertFlags {
   None,
   Hepburn,
@@ -61,16 +29,15 @@ enum class ConvertFlags {
 
 template<> inline constexpr auto is_bitmask<ConvertFlags>{true};
 
-// 'Kana' is used to represent a Kana 'Monograph' or 'Digraph'. It stores
-// Rōmaji, Hiragana and Katakana as well variant Rōmaji forms. A 'Monograph' is
-// a single Kana character (large or small) and a 'Digraph' is a valid (at least
-// typable using standard IME) two Kana combination. A 'Diagraph' always has a
-// normal sized first Kana followed by a small Kana (one of the 5 vowels, 3 y's
-// or 'wa'). This class also holds relationships between unaccented (plain) and
-// accented (dakuten and han-dakuten) versions.
+// 'Kana' represents a Kana 'Monograph' or 'Digraph'. It stores Rōmaji, Hiragana
+// and Katakana as well as variant Rōmaji forms (see comments at the bottom of
+// this file for more details)
 class Kana {
 public:
   using Map = std::map<std::string, const class Kana*>;
+  using OptString = std::optional<std::string>;
+  template<size_t N> using CharArray = const char (&)[N];
+
   [[nodiscard]] static auto& getMap(CharType t) {
     switch (t) {
     case CharType::Romaji: return RomajiMap;
@@ -79,8 +46,6 @@ public:
     }
     __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
   }
-
-  using OptString = std::optional<std::string>;
 
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
@@ -115,7 +80,7 @@ public:
     RomajiVariants(RomajiVariants&&) = default; // only allow moving (no copy)
 
     template<size_t V>
-    RomajiVariants(const char (&v)[V], bool kunrei = false)
+    RomajiVariants(CharArray<V> v, bool kunrei = false)
         : _list{v}, _kunrei{kunrei} {
       static_assert(check(V));
     }
@@ -123,8 +88,7 @@ public:
     // all instances with two variants have variants with the same size (like
     // 'fa' (ファ) which has Rōmaji variants of 'fwa' and 'hwa')
     template<size_t V>
-    RomajiVariants(
-        const char (&v1)[V], const char (&v2)[V], bool kunrei = false)
+    RomajiVariants(CharArray<V> v1, CharArray<V> v2, bool kunrei = false)
         : _list{v1, v2}, _kunrei{kunrei} {
       static_assert(check(V));
     }
@@ -133,8 +97,7 @@ public:
     // sizes so need two template params, i.e, small 'ぇ' with Rōmaji of 'le'
     // has a variant list of 'xe', 'lye' and 'xye'
     template<size_t V1, size_t V2>
-    RomajiVariants(
-        const char (&v1)[V1], const char (&v2)[V2], const char (&v3)[V2])
+    RomajiVariants(CharArray<V1> v1, CharArray<V2> v2, CharArray<V2> v3)
         : _list{v1, v2, v3} {
       static_assert(check(V1) && check(V2));
     }
@@ -168,8 +131,7 @@ public:
   private:
     friend Kana; // only Kana class can constuct
     template<size_t N>
-    RepeatMark(
-        const char (&hiragana)[N], const char (&katakana)[N], bool dakuten)
+    RepeatMark(CharArray<N> hiragana, CharArray<N> katakana, bool dakuten)
         : _hiragana{hiragana}, _katakana{katakana}, _dakuten{dakuten} {
       static_assert(N == 4);
       validate();
@@ -194,14 +156,12 @@ public:
   inline static const std::string ProlongMark{"ー"};
 
   template<size_t R, size_t N>
-  Kana(const char (&romaji)[R], const char (&hiragana)[N],
-      const char (&katakana)[N])
+  Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana)
       : Kana{romaji, hiragana, katakana, {}, {}, {}} {}
 
   template<size_t R, size_t N, size_t H, size_t K>
-  Kana(const char (&romaji)[R], const char (&hiragana)[N],
-      const char (&katakana)[N], const char (&hepburn)[H],
-      const char (&kunrei)[K])
+  Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
+      CharArray<H> hepburn, CharArray<K> kunrei)
       : Kana{romaji, hiragana, katakana, hepburn, kunrei, {}} {
     static_assert(H < 5 && K < 5);
     static_assert(N == 4 && H > 1 && K > 1 || N == 7 && H > 2 && K > 2);
@@ -210,8 +170,8 @@ public:
   // Kana with a set of unique extra variant Rōmaji values (first variant is
   // optionally a 'kunreiVariant')
   template<size_t R, size_t N>
-  Kana(const char (&romaji)[R], const char (&hiragana)[N],
-      const char (&katakana)[N], RomajiVariants&& variants)
+  Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
+      RomajiVariants&& variants)
       : Kana{romaji, hiragana, katakana, {}, {}, std::move(variants)} {}
 
   virtual ~Kana() = default;
@@ -252,12 +212,14 @@ public:
   // i.e., the class of 'this' is 'Kana', but we are a member of a 'DakutenKana'
   // or 'HanDakutenKana' class.
   [[nodiscard]] auto isDakuten() const {
-    // special case for a few digraphs starting with 'v', but don't have an
-    // unaccented version (see above)
-    return _romaji.starts_with("v") || plain() && plain()->dakuten() == this;
+    if (auto* p{plain()}; p) return p->dakuten() == this;
+    // special case for a few digraphs that start with 'v', but don't have an
+    // unaccented version (see 'plain' method comments for more details)
+    return _romaji.starts_with("v");
   }
   [[nodiscard]] auto isHanDakuten() const {
-    return plain() && plain()->hanDakuten() == this;
+    if (auto* p{plain()}; p) return p->hanDakuten() == this;
+    return false;
   }
 
   // 'getRomaji' returns 'Rōmaji' value based on flags
@@ -295,17 +257,16 @@ protected:
   Kana(Kana&&) = default;
 private:
   template<size_t R, size_t N>
-  Kana(const char (&romaji)[R], const char (&hiragana)[N],
-      const char (&katakana)[N], const char* hepburn, const char* kunrei,
-      RomajiVariants&& variants)
+  Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
+      const char* hepburn, const char* kunrei, RomajiVariants&& variants)
       : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
         _hepburn{hepburn ? OptString(hepburn) : std::nullopt},
         _kunrei{kunrei ? OptString(kunrei) : std::nullopt}, _variants{std::move(
                                                                 variants)} {
-    // Romaji can't be longer than 3 (so '< 5' when including the final '\0')
+    // Rōmaji can't be longer than 3 (so '< 5' to include the final '\0')
     static_assert(R < 5);
     // Hiragana and Katakana must be the same size (3 or 6) and also check that
-    // Romaji is at least 1 character for a monograph or 2 for a digraph
+    // Rōmaji is at least 1 character for a monograph or 2 for a digraph
     static_assert(N == 4 && R > 1 || N == 7 && R > 2);
     validate();
   }
@@ -313,24 +274,12 @@ private:
   static Map populate(CharType);
   static const Map RomajiMap, HiraganaMap, KatakanaMap;
 
-  // 'validate' uses asserts to make sure the data is valid such as checking
-  // sizes and ensuring '_hiragana' is actually valid Hiragana, etc..
+  // 'validate' uses asserts to make sure the data is valid such as ensuring
+  // '_hiragana' is actually valid Hiragana, etc..
   void validate() const;
 
-  // '_romaji' usually holds the Modern Hepburn value, but will sometimes be a
-  // Nihon Shiki value in order to ensure a unique value for Kana maps ('di' for
-  // ぢ, 'du' for づ, etc.)
   const std::string _romaji, _hiragana, _katakana;
-
-  // '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where
-  // it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be uniquely
-  // identified by 'du', but the correct Hepburn output for this Kana is 'zu'
-  // which is ambiguous with ず. '_hepburn' (if it's populated) is always a
-  // duplicate of another Kana's '_romaji' value.
-  const OptString _hepburn;
-
-  // '_kunrei' holds an optional 'Kunrei Shiki' value like 'zya' for じゃ.
-  const OptString _kunrei;
+  const OptString _hepburn, _kunrei;
 
   RomajiVariants _variants; // non-const to allow moving
 };
@@ -382,5 +331,53 @@ public:
 private:
   const AccentedKana _hanDakuten;
 };
+
+// More details for 'ConvertFlags':
+// - 'Hepburn': off by default, only applies to 'Rōmaji' output
+//  convert("つづき", CharType::Romaji) -> "tsuduki"
+//  convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
+// - 'Kunrei': off by default, only applies to 'Rōmaji' output
+//  convert("しつ", CharType::Romaji) -> "shitsu"
+//  convert("しつ", CharType::Romaji, Kunrei) -> "situ"
+// - 'NoProlongMark': off by default, only applies to 'Hiragana' output
+//  convert("rāmen", CharType::Hiragana) -> "らーめん"
+//  convert("rāmen", CharType::Hiragana, NoProlongMark) -> "らあめん"
+// - 'RemoveSpaces': off by default, only applies when converting from Rōmaji:
+//  convert("akai kitsune", CharType::Hiragana) -> "あかい　きつね" (wide space)
+//  convert("akai kitsune", CharType::Hiragana, RemoveSpaces) -> "あかいきつね"
+//
+// Prolonged sound marks in Hiragana are non-standard, but output them by
+// default in order to support round-trip type conversions, otherwise the above
+// example would map "らあめん" back to "raamen" which doesn't match the initial
+// value. ConvertFlags suppots bitwise operators so they can be combined using
+// '|', for example:
+//  convert("rāmen desu.", CharType::Hiragana, ConvertFlags::RemoveSpaces |
+//      ConvertFlags::NoProlongMark) -> "らあめんです。"
+//
+// Enabling 'Hepburn' leads to more standard Rōmaji, but the output is ambiguous
+// and leads to different Kana if converted back. This affects di (ぢ), dya
+// (ぢゃ), dyo (ぢょ), dyu (ぢゅ), du (づ) and wo (を) - these become ji, ja,
+// ju, jo, zu and o instead. There's also no support for trying to handle は and
+// へ (which in standard Hepburn should map to 'wa' and 'e' if they are used as
+// particles) - instead they simply map to 'ha' and 'he' all the time. If both
+// Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try
+// Kunrei before falling back to the unique '_romaji' value in the Kana class.
+
+// More details for 'Kana' class:
+// - 'Monograph' is a single Kana character (large or small)
+// - 'Digraph' is a valid (at least typable using standard IME) two Kana
+// combination. A 'Diagraph' always has a normal sized first Kana followed by a
+// small Kana (one of the 5 vowels, 3 y's or 'wa').
+// - 'Kana' class also holds relationships between unaccented (plain) and
+// accented (dakuten and han-dakuten) versions.
+// - '_romaji' usually holds 'Modern Hepburn' value, but will sometimes be a
+// 'Nihon Shiki' value in order to ensure a unique value for Kana maps ('di' for
+// ぢ, 'du' for づ, etc.).
+// - '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where
+// it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be uniquely
+// identified by 'du', but the correct Hepburn output for this Kana is 'zu'
+// which is ambiguous with ず. '_hepburn' (if it's populated) is always a
+// duplicate of another Kana's '_romaji' value.
+// - '_kunrei' holds an optional 'Kunrei Shiki' value like 'zya' for じゃ.
 
 } // namespace kanji_tools
