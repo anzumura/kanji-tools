@@ -143,7 +143,6 @@ public:
     const bool _dakuten; // true if this instance is 'dakuten' (濁点) version
   };
 
-  // plain and accented repeat marks
   inline static const RepeatMark RepeatPlain{"ゝ", "ヽ", false},
       RepeatAccented{"ゞ", "ヾ", true};
 
@@ -167,8 +166,6 @@ public:
     static_assert(N == 4 && H > 1 && K > 1 || N == 7 && H > 2 && K > 2);
   }
 
-  // Kana with a set of unique extra variant Rōmaji values (first variant is
-  // optionally a 'kunreiVariant')
   template<size_t R, size_t N>
   Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
       RomajiVariants&& variants)
@@ -332,7 +329,12 @@ private:
   const AccentedKana _hanDakuten;
 };
 
-// More details for 'ConvertFlags':
+// A 'Monograph' is a single Kana character (large or small) and a 'Digraph' is
+// a valid (at least typable with standard IME) two Kana combination. Diagraphs
+// are always a full sized Kana followed by a small Kana (one of the 5 vowels, 3
+// y's or 'wa').
+
+//// More details for 'ConvertFlags' enum ////
 // - 'Hepburn': off by default, only applies to 'Rōmaji' output
 //  convert("つづき", CharType::Romaji) -> "tsuduki"
 //  convert("つづき", CharType::Romaji, Hepburn) -> "tsuzuki"
@@ -363,21 +365,15 @@ private:
 // Hepburn and Kunrei flags are set then Hepburn is preferred, but will then try
 // Kunrei before falling back to the unique '_romaji' value in the Kana class.
 
-// More details for 'Kana' class:
-// - 'Monograph' is a single Kana character (large or small)
-// - 'Digraph' is a valid (at least typable using standard IME) two Kana
-// combination. A 'Diagraph' always has a normal sized first Kana followed by a
-// small Kana (one of the 5 vowels, 3 y's or 'wa').
-// - 'Kana' class also holds relationships between unaccented (plain) and
-// accented (dakuten and han-dakuten) versions.
-// - '_romaji' usually holds 'Modern Hepburn' value, but will sometimes be a
-// 'Nihon Shiki' value in order to ensure a unique value for Kana maps ('di' for
-// ぢ, 'du' for づ, etc.).
-// - '_hepburn' holds an optional 'Modern Hepburn' value for a few cases where
+//// More details for 'Kana' class ////
+// - '_romaji': usually holds the 'Modern Hepburn' value, but will sometimes be
+// a 'Nihon Shiki' value in order to ensure a unique value for Kana maps ('di'
+// for ぢ, 'du' for づ, etc.).
+// - '_hepburn': holds an optional 'Modern Hepburn' value for a few cases where
 // it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be uniquely
 // identified by 'du', but the correct Hepburn output for this Kana is 'zu'
 // which is ambiguous with ず. '_hepburn' (if it's populated) is always a
 // duplicate of another Kana's '_romaji' value.
-// - '_kunrei' holds an optional 'Kunrei Shiki' value like 'zya' for じゃ.
+// - '_kunrei': holds an optional 'Kunrei Shiki' value like 'zya' for じゃ.
 
 } // namespace kanji_tools
