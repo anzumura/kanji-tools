@@ -223,6 +223,13 @@ public:
   [[nodiscard]] virtual const Kana* dakuten() const { return nullptr; }
   [[nodiscard]] virtual const Kana* hanDakuten() const { return nullptr; }
 
+  // 'plain' returns the unaccented version of this Kana or 'nullptr' if this
+  // Kana is unaccented or is a combination that doesn't have an equivalent
+  // unaccented 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc..
+  // Note: ウォ can be typed with 'u' then 'lo', but is treated as two separate
+  // Kana instances ('u' and 'lo') instead of a plain version of 'vo'.
+  [[nodiscard]] virtual const Kana* plain() const { return nullptr; }
+
   [[nodiscard]] OptString dakuten(CharType t) const {
     if (const auto i{dakuten()}; i) return i->get(t, ConvertFlags::None);
     return {};
@@ -232,13 +239,6 @@ public:
     if (const auto i{hanDakuten()}; i) return i->get(t, ConvertFlags::None);
     return {};
   }
-
-  // 'plain' returns the unaccented version of a Kana - returns 'nullptr' if
-  // instance is already an unaccented version or is a combination that doesn't
-  // have an equivalent unaccented 'standard combination' such as 'va', 've',
-  // 'vo' (ヴォ), etc.. ウォ can be typed with 'u' then 'lo' to get a small 'o',
-  // but this is treated as two separate Kana instances ('u' and 'lo').
-  [[nodiscard]] auto plain() const { return _plain; }
 
   // All small Kana have _romaji starting with 'l' (and they are all monographs)
   [[nodiscard]] auto isSmall() const { return _romaji.starts_with("l"); }
@@ -254,10 +254,10 @@ public:
   [[nodiscard]] auto isDakuten() const {
     // special case for a few digraphs starting with 'v', but don't have an
     // unaccented version (see above)
-    return _romaji.starts_with("v") || _plain && _plain->dakuten() == this;
+    return _romaji.starts_with("v") || plain() && plain()->dakuten() == this;
   }
   [[nodiscard]] auto isHanDakuten() const {
-    return _plain && _plain->hanDakuten() == this;
+    return plain() && plain()->hanDakuten() == this;
   }
 
   // 'getRomaji' returns 'Rōmaji' value based on flags
@@ -287,6 +287,12 @@ public:
   [[nodiscard]] auto& katakana() const { return _katakana; }
   [[nodiscard]] auto& romajiVariants() const { return _variants.list(); }
   [[nodiscard]] auto kunreiVariant() const { return _variants.kunrei(); }
+protected:
+  // This move constructor is used by derived 'AccentedKana' class. It moves the
+  // non-const '_variants' field, but other fields will get copied because they
+  // are all 'const' (copy is fine since the other fields are all short strings
+  // that would not benefit from move anyway because of SSO).
+  Kana(Kana&&) = default;
 private:
   template<size_t R, size_t N>
   Kana(const char (&romaji)[R], const char (&hiragana)[N],
@@ -327,24 +333,6 @@ private:
   const OptString _kunrei;
 
   RomajiVariants _variants; // non-const to allow moving
-
-  // '_plain' is set to unaccented version by DakutenKana and HanDakutenKana
-  // constructors. For example, the DakutenKana instance for け contains
-  // '_dakuten' Kana げ and in turn, げ will have '_plain' set to the original
-  // け to allow lookup both ways.
-  const Kana* const _plain{};
-
-  // 'friend' derived classes call private move-constructor
-  friend class DakutenKana;
-  friend class HanDakutenKana;
-
-  // Custom move-constructor that moves '_variants' and sets '_plain' - don't
-  // bother using 'std::move' on the other attributes since they are all short
-  // strings that would copy anyway because of SSO (so can leave them as const).
-  Kana(Kana&& k, const Kana& plain)
-      : _romaji{k._romaji}, _hiragana{k._hiragana}, _katakana{k._katakana},
-        _hepburn{k._hepburn}, _kunrei{k._kunrei},
-        _variants{std::move(k._variants)}, _plain{&plain} {}
 };
 
 // 'DakutenKana' is for 'k', 's', 't', 'h' row Kana which have a dakuten, i.e.,
@@ -358,11 +346,31 @@ public:
       : Kana{std::forward<T>(t)...}, _dakuten{std::move(dakuten), *this} {}
 
   [[nodiscard]] const Kana* dakuten() const override { return &_dakuten; }
+protected:
+  // 'AccentedKana' holds a pointer back to a corresponding 'plain' version.
+  // This class is used by both 'DakutenKana' and 'HanDakutenKana' classes to
+  // hold the accented versions.
+  class AccentedKana : public Kana {
+  public:
+    // Custom move-constructor that moves 'k' into base class fields via
+    // protected move constructor and sets '_plain'.
+    AccentedKana(Kana&& k, const Kana& p) : Kana{std::move(k)}, _plain{&p} {}
+
+    [[nodiscard]] const Kana* plain() const override { return _plain; }
+  private:
+    // '_plain' is set to unaccented version by DakutenKana and HanDakutenKana
+    // constructors. For example, the DakutenKana instance for け contains
+    // '_dakuten' Kana げ and in turn, げ will have '_plain' set to the original
+    // け to allow lookup both ways.
+    const Kana* const _plain;
+  };
 private:
-  const Kana _dakuten;
+  const AccentedKana _dakuten;
 };
 
-// 'HanDakutenKana' is only populated for 'h' row Kana, i.e., は has ぱ
+// 'HanDakutenKana' (semi-voiced) is only populated for 'h' row Kana. This class
+// also derives from 'DakutenKana' since 'h' row Kana also have voiced versions,
+// i.e., 'ha' (は) has semi-voiced 'pa' (ぱ) and voiced 'ba' (ば).
 class HanDakutenKana : public DakutenKana {
 public:
   template<typename... T>
@@ -372,7 +380,7 @@ public:
 
   [[nodiscard]] const Kana* hanDakuten() const override { return &_hanDakuten; }
 private:
-  const Kana _hanDakuten;
+  const AccentedKana _hanDakuten;
 };
 
 } // namespace kanji_tools
