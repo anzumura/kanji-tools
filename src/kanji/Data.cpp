@@ -64,10 +64,7 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
   if (!found) {
-    if (!argc)
-      usage("need at least one argument, argv[0], to check for a relative "
-            "'data' directory");
-    auto oldParent{fs::absolute(fs::path(argv[0])).lexically_normal()};
+    auto oldParent{fs::current_path()};
     do {
       const auto parent{oldParent.parent_path()};
       // 'has_parent_path' seems to always return true, i.e., parent of '/' is

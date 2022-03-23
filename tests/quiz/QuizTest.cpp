@@ -9,20 +9,14 @@ namespace kanji_tools {
 
 class QuizTest : public ::testing::Test {
 protected:
-  [[nodiscard]] static auto argv() {
-    static constexpr auto Arg0{"test"}, Arg1{"-data"}, Arg2{"../../../data"};
-    static const char* Args[]{Arg0, Arg1, Arg2};
-    return Args;
-  }
-
   static void SetUpTestCase() {
-    _data = std::make_shared<KanjiData>(3, argv(), _os, _es);
+    _data = std::make_shared<KanjiData>(0, nullptr, _os, _es);
     _groupData = std::make_shared<GroupData>(_data);
     _jukugoData = std::make_shared<JukugoData>(_data);
   }
 
   // Contructs Quiz using the real data files
-  QuizTest() : _quiz{3, argv(), _data, _groupData, _jukugoData, &_is} {}
+  QuizTest() : _quiz{0, {}, _data, _groupData, _jukugoData, &_is} {}
 
   // Populate '_is' as input for '_quiz'
   void gradeListQuiz() {

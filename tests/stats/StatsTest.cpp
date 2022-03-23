@@ -12,14 +12,8 @@ namespace fs = std::filesystem;
 
 class StatsTest : public ::testing::Test {
 protected:
-  [[nodiscard]] static auto argv() {
-    static constexpr auto Arg0{"test"}, Arg1{"-data"}, Arg2{"../../../data"};
-    static const char* Args[]{Arg0, Arg1, Arg2};
-    return Args;
-  }
-
   static void SetUpTestCase() {
-    _data = std::make_shared<KanjiData>(3, argv(), _os);
+    _data = std::make_shared<KanjiData>(0, nullptr, _os);
   }
 
   StatsTest() {}

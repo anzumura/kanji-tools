@@ -60,15 +60,9 @@ TEST(DataTest, NextArgWithMultipleArgs) {
 
 class KanjiDataTest : public ::testing::Test {
 protected:
-  [[nodiscard]] static auto argv() {
-    static constexpr auto Arg2{"../../../data"};
-    static const char* Args[]{Arg0, DataArg, Arg2};
-    return Args;
-  }
-
   static void SetUpTestCase() {
     // Contructs KanjiData using the real data files
-    _data = std::make_shared<KanjiData>(3, argv());
+    _data = std::make_shared<KanjiData>();
   }
 
   KanjiDataTest() {}
