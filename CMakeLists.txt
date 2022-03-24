@@ -39,7 +39,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # turn off a warning
     add_compile_options(-Wno-parentheses)
     string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-inline-small-functions \
--fno-default-inline")
+-fno-default-inline -fPIC -O0")
   endif()
   # add options for test coverage
   string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fno-inline --coverage")
