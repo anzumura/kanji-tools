@@ -40,7 +40,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_compile_options(-Wno-parentheses)
   endif()
   # add options for test coverage
-  string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fprofile-arcs -ftest-coverage")
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage")
   # Use the following to override the linker
   # string(APPEND " -fuse-ld=gold")
   include(CTest)
