@@ -26,7 +26,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
       -Wunreachable-code-aggressive)
     # turn off a warning
     add_compile_options(-Wno-logical-op-parentheses )
-    set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer -O1 \
+    set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer \
 -fno-optimize-sibling-calls")
     # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
     # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
@@ -39,8 +39,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # turn off a warning
     add_compile_options(-Wno-parentheses)
   endif()
-  # add options for test coverage
-  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage")
+  # add options for test coverage (-O0 gets rid of all inlining)
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -O0")
   # Use the following to override the linker
   # string(APPEND " -fuse-ld=gold")
   include(CTest)
