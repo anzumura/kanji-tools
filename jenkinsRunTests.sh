@@ -33,6 +33,7 @@ done
 #   set 'Test report XMLs' to: 'build/tests/*/test*.xml'
 # - Publish Cobertura Coverage:
 #   set 'Cobertura xml report pattern' to: 'build/tests/*/coverage.xml'
+#   set 'Source Encoding' (in Advanced options) to: 'UTF-8'
 
 # googletest docs: https://google.github.io/googletest/
 # gcovr docs: https://gcovr.com/en/stable/
