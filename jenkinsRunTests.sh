@@ -13,15 +13,18 @@
 #   CMAKE_GENERATOR="Unix Makefiles"
 #   CMAKE_EXPORT_COMPILE_COMMANDS=TRUE
 
-# remove coverage results from previous runs
-find build/src -name '*.gcda' -exec rm {} \;
+# only make coverage reports if there are .gcno files (so not 'Release' builds)
+if [[ -n $(find src -name *.gcno | head -1) ]]; then
+  # remove coverage results from previous runs
+  find build/src -name '*.gcda' -exec rm {} \;
+  declare -r r=../../..
+fi
 
-declare -r r=../../..
 cd build/tests
 for i in *; do
   cd $i
   ./${i}Test --gtest_output=xml
-  gcovr -x -r$r -f$r/src -f$r/include > coverage.xml
+  [[ -n $r ]] && gcovr -x -r$r -f$r/src -f$r/include > coverage.xml
   cd ..
 done
 
