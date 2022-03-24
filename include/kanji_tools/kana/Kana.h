@@ -99,12 +99,13 @@ public:
     template<size_t V1, size_t V2>
     RomajiVariants(CharArray<V1> v1, CharArray<V2> v2, CharArray<V2> v3)
         : _list{v1, v2, v3} {
-      static_assert(check(V1) && check(V2));
+      static_assert(check(V1) && V2 == 4);
     }
 
     [[nodiscard]] auto& list() const { return _list; }
     [[nodiscard]] auto kunrei() const { return _kunrei; }
   private:
+    // all Rōmaji variants are either 2 or 3 characters long
     [[nodiscard]] static consteval bool check(size_t x) {
       return x > 2 && x < 5;
     }
