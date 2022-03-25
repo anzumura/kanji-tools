@@ -192,9 +192,11 @@ Kana::Map Kana::populate(CharType t) {
   size_t duplicates{};
   const auto insert{[&result, &duplicates, t](auto& k, auto& v) {
     if (const auto i{result.emplace(k, &v)}; !i.second) {
+      // LCOV_EXCL_START
       std::cerr << "key '" << k << "' already in " << toString(t)
                 << " map: " << i.first->second << '\n';
-      ++duplicates;
+      ++duplicates; // gather all failures and then exit via an 'assert' below
+      // LCOV_EXCL_STOP
     }
   }};
   const auto processKana{[&insert, t](auto& k) {
