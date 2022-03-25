@@ -12,6 +12,7 @@
 #   PATH=/opt/homebrew/bin:$PATH
 #   CMAKE_GENERATOR="Unix Makefiles"
 #   CMAKE_EXPORT_COMPILE_COMMANDS=TRUE
+#   BUILD_COVERAGE=TRUE
 
 for i in src tests; do
   i=build/$i

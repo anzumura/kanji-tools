@@ -8,7 +8,7 @@ file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
   message(FATAL_ERROR "can't build in a source directory")
 endif()
-  
+
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
   # enable warnings and turn them into errors (-W is the same as -Wextra, but
@@ -25,7 +25,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
       -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override
       -Wunreachable-code-aggressive)
     # turn off a warning
-    add_compile_options(-Wno-logical-op-parentheses )
+    add_compile_options(-Wno-logical-op-parentheses)
     set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer \
 -fno-optimize-sibling-calls")
     # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
@@ -38,12 +38,13 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_compile_options(-Wnon-virtual-dtor -Woverloaded-virtual -Wshadow)
     # turn off a warning
     add_compile_options(-Wno-parentheses)
-    string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fPIC -fno-inline-small-functions \
--fno-default-inline")
   endif()
-  # add options for test coverage
-  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -O0 -fno-elide-constructors \
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O0")
+  # add options for test coverage (only affects debug builds)
+  if(BUILD_COVERAGE)
+    string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -fno-elide-constructors \
 -fno-inline")
+  endif()
   # Use the following to override the linker
   # string(APPEND " -fuse-ld=gold")
   include(CTest)
