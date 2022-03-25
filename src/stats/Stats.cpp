@@ -301,8 +301,7 @@ void Stats::countKanji(
       f([](const auto& x) { return isMBPunctuation(x); }, "MB-Punctuation"),
       f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
       f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-      f([](const auto& x) { return !isRecognizedCharacter(x); },
-          "Unrecognized")};
+      f([](const auto& x) { return !isRecognizedMBChar(x); }, "Unrecognized")};
   for (auto& i : totals) out() << i.first.get();
   size_t total{};
   for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();

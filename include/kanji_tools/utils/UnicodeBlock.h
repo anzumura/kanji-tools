@@ -307,9 +307,9 @@ template<typename... T>
   return inWCharRange(s, LetterBlocks);
 }
 
-// 'isRecognizedCharacter' returns true if 's' is in any UnicodeBlock defined in
+// 'isRecognizedMBChar' returns true if 's' is in any UnicodeBlock defined in
 // this header file (including wide space)
-[[nodiscard]] inline auto isRecognizedCharacter(
+[[nodiscard]] inline auto isRecognizedMBChar(
     const std::string& s, bool sizeOne = true) {
   return inWCharRange(s, sizeOne, HiraganaBlocks, CommonKanjiBlocks,
       RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks, SymbolBlocks,

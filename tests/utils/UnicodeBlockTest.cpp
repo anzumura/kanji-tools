@@ -100,8 +100,8 @@ TEST(UnicodeBlockTest, IsKana) {
   EXPECT_FALSE(isKatakana("ゑ"));
   EXPECT_TRUE(isKatakana("ヰ"));
   EXPECT_FALSE(isHiragana("ヰ"));
-  EXPECT_TRUE(isRecognizedCharacter("ー"));
-  EXPECT_TRUE(isRecognizedCharacter("さ"));
+  EXPECT_TRUE(isRecognizedMBChar("ー"));
+  EXPECT_TRUE(isRecognizedMBChar("さ"));
 }
 
 TEST(UnicodeBlockTest, IsMBLetter) {
@@ -121,7 +121,7 @@ TEST(UnicodeBlockTest, IsMBLetter) {
   EXPECT_TRUE(isMBLetter("ｄ"));
   EXPECT_TRUE(isMBLetter("Ｚ"));
   EXPECT_TRUE(isMBLetter("１"));
-  EXPECT_TRUE(isRecognizedCharacter("。"));
+  EXPECT_TRUE(isRecognizedMBChar("。"));
 }
 
 TEST(UnicodeBlockTest, IsMBPunctuation) {
@@ -137,8 +137,8 @@ TEST(UnicodeBlockTest, IsMBPunctuation) {
   EXPECT_FALSE(isAllMBPunctuation("　x"));
   EXPECT_TRUE(isAllMBPunctuation("　。　、"));
   EXPECT_TRUE(isMBPunctuation(toUtf8(U"\ufffc"))); // from Specials block
-  EXPECT_TRUE(isRecognizedCharacter("—"));
-  EXPECT_TRUE(isRecognizedCharacter("　"));
+  EXPECT_TRUE(isRecognizedMBChar("—"));
+  EXPECT_TRUE(isRecognizedMBChar("　"));
 }
 
 TEST(UnicodeBlockTest, IsMBSymbol) {
@@ -153,7 +153,7 @@ TEST(UnicodeBlockTest, IsMBSymbol) {
   EXPECT_FALSE(isAllMBSymbol("㇁ぶ"));
   EXPECT_TRUE(isAllMBSymbol("㇁☆"));
   EXPECT_FALSE(isMBSymbol("ｺ"));
-  EXPECT_TRUE(isRecognizedCharacter("☆"));
+  EXPECT_TRUE(isRecognizedMBChar("☆"));
 }
 
 TEST(UnicodeBlockTest, IsKanji) {
@@ -179,11 +179,11 @@ TEST(UnicodeBlockTest, IsKanji) {
   EXPECT_TRUE(isKanji("厭"));
   EXPECT_TRUE(isKanji("⺠"));
   EXPECT_TRUE(isKanji("𫠜"));
-  EXPECT_TRUE(isRecognizedCharacter("厭"));
-  EXPECT_TRUE(isRecognizedCharacter("⺠"));
-  EXPECT_TRUE(isRecognizedCharacter("𫠜"));
-  EXPECT_FALSE(isRecognizedCharacter("𫠜馬イヌねこ"));
-  EXPECT_TRUE(isRecognizedCharacter("𫠜馬イヌねこ", false));
+  EXPECT_TRUE(isRecognizedMBChar("厭"));
+  EXPECT_TRUE(isRecognizedMBChar("⺠"));
+  EXPECT_TRUE(isRecognizedMBChar("𫠜"));
+  EXPECT_FALSE(isRecognizedMBChar("𫠜馬イヌねこ"));
+  EXPECT_TRUE(isRecognizedMBChar("𫠜馬イヌねこ", false));
   EXPECT_TRUE(isAllRecognizedCharacters("𫠜馬イヌねこ"));
   EXPECT_FALSE(isAllRecognizedCharacters("𫠜馬イxヌねこ"));
 }
