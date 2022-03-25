@@ -107,6 +107,7 @@ endif()
 
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
   AND BUILD_TESTING)
+  set(TESTS_INCLUDE "${PROJECT_SOURCE_DIR}/tests/include")
   add_subdirectory(tests/kana)
   add_subdirectory(tests/kanji)
   add_subdirectory(tests/quiz)

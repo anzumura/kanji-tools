@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/tests/WhatMismatch.h>
 #include <kanji_tools/utils/DataFile.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
 

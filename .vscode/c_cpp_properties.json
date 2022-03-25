@@ -6,6 +6,7 @@
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
       "${workspaceFolder}/include",
+      "${workspaceFolder}/tests/include",
       // "/opt/icu/include",
       // "/opt/boost/include",
       "${googletest}/googletest/include",

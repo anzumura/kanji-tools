@@ -3,7 +3,7 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/kanji/UcdFileKanji.h>
-#include <kanji_tools/tests/WhatMismatch.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
 
