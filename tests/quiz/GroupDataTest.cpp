@@ -7,8 +7,7 @@ namespace kanji_tools {
 class GroupDataTest : public ::testing::Test {
 protected:
   // Contructs GroupData using the real data files
-  GroupDataTest()
-      : _data{std::make_shared<KanjiData>()}, _groupData{_data} {}
+  GroupDataTest() : _data{std::make_shared<KanjiData>()}, _groupData{_data} {}
 
   const DataPtr _data;
   const GroupData _groupData;
