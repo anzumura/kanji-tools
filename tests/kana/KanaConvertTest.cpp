@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/utils/UnicodeBlock.h>
 
 namespace kanji_tools {
 
@@ -81,6 +82,38 @@ protected:
   }
   KanaConvert _converter;
 };
+
+TEST_F(KanaConvertTest, CheckNarrowDelims) {
+  EXPECT_EQ(_converter.narrowDelims().size(), 31);
+  for (auto i : _converter.narrowDelims()) {
+    EXPECT_TRUE(isSingleByteChar(i.first)) << i.first;
+    EXPECT_TRUE(isRecognizedMBChar(i.second)) << i.second;
+  }
+}
+
+TEST_F(KanaConvertTest, CheckWideDelims) {
+  EXPECT_EQ(_converter.wideDelims().size(), 31);
+  for (auto i : _converter.wideDelims()) {
+    EXPECT_TRUE(isRecognizedMBChar(i.first)) << i.first;
+    EXPECT_TRUE(isSingleByteChar(i.second)) << i.second;
+  }
+}
+
+TEST_F(KanaConvertTest, CheckConvertTarget) {
+  EXPECT_EQ(_converter.target(), CharType::Hiragana); // check default ctor
+  KanaConvert converter(CharType::Katakana);
+  EXPECT_EQ(converter.target(), CharType::Katakana); // check ctor
+  converter.target(CharType::Romaji);
+  EXPECT_EQ(converter.target(), CharType::Romaji); // check update
+}
+
+TEST_F(KanaConvertTest, CheckConvertFlags) {
+  EXPECT_EQ(_converter.flags(), ConvertFlags::None); // check default ctor
+  KanaConvert converter(CharType::Romaji, ConvertFlags::Hepburn);
+  EXPECT_EQ(converter.flags(), ConvertFlags::Hepburn); // check ctor
+  converter.flags(ConvertFlags::Kunrei);
+  EXPECT_EQ(converter.flags(), ConvertFlags::Kunrei); // check update
+}
 
 TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
   std::string s{"atatakaiあたたかいアタタカイ"};
