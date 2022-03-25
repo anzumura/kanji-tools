@@ -303,9 +303,11 @@ enum BitPatterns : unsigned char {
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
 
-inline constexpr char32_t MaxUnicode{0x10ffff};
-
-inline static const std::string EmptyString;
+inline constexpr auto MaxUnicode{U'\x10ffff'}, CombiningVoicedChar{U'\x3099'},
+    CombiningSemiVoicedChar{U'\x309a'};
+inline static const std::string EmptyString,
+    CombiningVoiced{"\xe3\x82\x99"},     // U+3099
+    CombiningSemiVoiced{"\xe3\x82\x9a"}; // U+309A
 inline static const std::u32string EmptyU32String;
 
 } // namespace kanji_tools

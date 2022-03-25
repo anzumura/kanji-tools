@@ -199,12 +199,9 @@ template<size_t N, typename... Ts>
   return inRange(c, t) || inRange(c, args...);
 }
 
-inline constexpr auto CombiningMarkVoiced{U'\x3099'},
-    CombiningMarkSemiVoiced{U'\x309a'};
-
 [[nodiscard]] constexpr auto isNonSpacing(char32_t c) noexcept {
-  return inRange(c, NonSpacingBlocks) || c == CombiningMarkVoiced ||
-         c == CombiningMarkSemiVoiced;
+  return inRange(c, NonSpacingBlocks) || c == CombiningVoicedChar ||
+         c == CombiningSemiVoicedChar;
 }
 
 // Return true if the first 'MB character' is in the given blocks, empty string
