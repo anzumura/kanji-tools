@@ -177,7 +177,7 @@ const std::string& Kana::get(CharType t, ConvertFlags flags) const {
   case CharType::Hiragana: return _hiragana;
   case CharType::Katakana: return _katakana;
   }
-  __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning¥
+  __builtin_unreachable(); // stop gcc 'reaches end' warning LCOV_EXCL_LINE
 }
 
 void Kana::validate() const {

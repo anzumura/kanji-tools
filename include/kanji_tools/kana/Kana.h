@@ -46,7 +46,7 @@ public:
     case CharType::Hiragana: return HiraganaMap;
     case CharType::Katakana: return KatakanaMap;
     }
-    __builtin_unreachable(); // prevent gcc 'control reaches end ...' warning
+    __builtin_unreachable(); // stop gcc 'reaches end' warning LCOV_EXCL_LINE
   }
 
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
