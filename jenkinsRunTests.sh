@@ -5,14 +5,14 @@
 
 # Example 'Execute shell' build commands for a 'Clang' 'Debug' build:
 #
-# cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++ -Bbuild
+# cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_COVERAGE=TRUE \
+#   -DCMAKE_CXX_COMPILER=clang++ -Bbuild
 # cmake --build build -j 10
 
 # Some global Jenkins env vars that can help the build are:
 #   PATH=/opt/homebrew/bin:$PATH
 #   CMAKE_GENERATOR="Unix Makefiles"
 #   CMAKE_EXPORT_COMPILE_COMMANDS=TRUE
-#   BUILD_COVERAGE=TRUE
 
 for i in src tests; do
   i=build/$i
