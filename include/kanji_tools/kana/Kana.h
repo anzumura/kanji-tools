@@ -49,7 +49,7 @@ public:
 
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
-  static OptString findDakuten(const std::string& s) {
+  [[nodiscard]] static OptString findDakuten(const std::string& s) {
     auto i{HiraganaMap.find(s)};
     if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
     i = KatakanaMap.find(s);
@@ -59,7 +59,7 @@ public:
 
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
-  static OptString findHanDakuten(const std::string& s) {
+  [[nodiscard]] static OptString findHanDakuten(const std::string& s) {
     auto i{HiraganaMap.find(s)};
     if (i != HiraganaMap.end())
       return i->second->hanDakuten(CharType::Hiragana);
