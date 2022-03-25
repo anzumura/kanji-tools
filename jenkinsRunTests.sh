@@ -25,7 +25,7 @@ cd build
 # only make coverage reports if there are .gcno files (so not 'Release' builds)
 if [[ -n $(find src -name *.gcno | head -1) ]]; then
   # remove coverage results from previous runs
-  find src -name '*.gcda' -exec rm {} \;
+  find . -name *.gcda -exec rm {} \;
   declare -r r=../../..
 fi
 
