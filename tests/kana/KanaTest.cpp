@@ -40,13 +40,13 @@ TEST(KanaTest, FindDakuten) {
   EXPECT_EQ(Kana::findDakuten("か"), Kana::OptString{"が"});
   EXPECT_EQ(Kana::findDakuten("シ"), Kana::OptString{"ジ"});
   EXPECT_EQ(Kana::findDakuten("う"), Kana::OptString{"ゔ"});
-  EXPECT_FALSE(Kana::findDakuten("ま"));
+  EXPECT_EQ(Kana::findDakuten("ま"), Kana::EmptyOptString);
 }
 
 TEST(KanaTest, FindHanDakuten) {
   EXPECT_EQ(Kana::findHanDakuten("は"), Kana::OptString{"ぱ"});
   EXPECT_EQ(Kana::findHanDakuten("ホ"), Kana::OptString{"ポ"});
-  EXPECT_FALSE(Kana::findHanDakuten("さ"));
+  EXPECT_EQ(Kana::findHanDakuten("さ"), Kana::EmptyOptString);
 }
 
 TEST(KanaTest, CheckHiragana) {
