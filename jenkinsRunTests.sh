@@ -13,7 +13,7 @@
 #   CMAKE_GENERATOR="Unix Makefiles"
 #   CMAKE_EXPORT_COMPILE_COMMANDS=TRUE
 
-for i in src include tests; do
+for i in src tests; do
   i=build/$i
   if [[ ! -d $i ]]; then
     echo "'$i' directory not found"
