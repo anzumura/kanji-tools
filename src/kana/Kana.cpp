@@ -62,9 +62,10 @@ const std::array KanaList{// --- あ 行 ---
     K{"lo", "ぉ", "ォ", V{"xo"}}, K{"lka", "ゕ", "ヵ", V{"xka"}},
     K{"lke", "ゖ", "ヶ", V{"xke"}}, K{"lya", "ゃ", "ャ", V{"xya"}},
     K{"lyu", "ゅ", "ュ", V{"xyu"}}, K{"lyo", "ょ", "ョ", V{"xyo"}},
-    K{"lwa", "ゎ", "ヮ", V{"xwa"}}, K{"ltu", "っ", "ッ", V{"xtu"}},
-    // ん - keep 'n' as well as the previous small 'tsu' at the end of the list
-    K{"n", "ん", "ン"}};
+    K{"lwa", "ゎ", "ヮ", V{"xwa"}},
+    // Keep 'small tsu' and 'n' at the end of the list. Some input methods allow
+    // 'ltsu' and 'xtsu' for 'small tsu', but ignore these combinations for now.
+    K{"ltu", "っ", "ッ", V{"xtu"}}, K{"n", "ん", "ン"}};
 
 using D = DakutenKana;
 // 'DakutenKanaList' holds Kana that have a 'dakuten' version (but not 'h' row)

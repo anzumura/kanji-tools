@@ -36,6 +36,30 @@ TEST(CharTypeTest, CheckValues) {
   EXPECT_EQ(CharTypes[++i], CharType::Romaji);
 }
 
+TEST(KanaTest, CheckN) {
+  EXPECT_EQ(Kana::N.hiragana(), "ん");
+  EXPECT_EQ(Kana::N.katakana(), "ン");
+  EXPECT_EQ(Kana::N.romaji(), "n");
+  EXPECT_TRUE(Kana::N.isMonograph());
+  EXPECT_FALSE(Kana::N.isDigraph());
+  EXPECT_FALSE(Kana::N.isDakuten());
+  EXPECT_FALSE(Kana::N.isHanDakuten());
+  EXPECT_TRUE(Kana::N.romajiVariants().empty());
+  EXPECT_FALSE(Kana::N.kunreiVariant());
+}
+
+TEST(KanaTest, CheckSmallTsu) {
+  EXPECT_EQ(Kana::SmallTsu.hiragana(), "っ");
+  EXPECT_EQ(Kana::SmallTsu.katakana(), "ッ");
+  EXPECT_EQ(Kana::SmallTsu.romaji(), "ltu");
+  EXPECT_TRUE(Kana::SmallTsu.isMonograph());
+  EXPECT_FALSE(Kana::SmallTsu.isDigraph());
+  EXPECT_FALSE(Kana::SmallTsu.isDakuten());
+  EXPECT_FALSE(Kana::SmallTsu.isHanDakuten());
+  EXPECT_EQ(Kana::SmallTsu.romajiVariants(), Kana::RomajiVariants::List{"xtu"});
+  EXPECT_FALSE(Kana::SmallTsu.kunreiVariant());
+}
+
 TEST(KanaTest, FindDakuten) {
   EXPECT_EQ(Kana::findDakuten("か"), Kana::OptString{"が"});
   EXPECT_EQ(Kana::findDakuten("シ"), Kana::OptString{"ジ"});

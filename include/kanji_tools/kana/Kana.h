@@ -78,6 +78,8 @@ public:
   // a 'Kunrei Shiki' value (and then 'Kana::_kunrei' should be nullopt).
   class RomajiVariants {
   public:
+    using List = std::vector<std::string>;
+
     RomajiVariants() = default;
     RomajiVariants(RomajiVariants&&) = default; // only allow moving (no copy)
 
@@ -112,7 +114,7 @@ public:
       return x > 2 && x < 5;
     }
 
-    std::vector<std::string> _list;
+    List _list;
     bool _kunrei{false};
   };
 
