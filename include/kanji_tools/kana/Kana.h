@@ -38,6 +38,8 @@ public:
   using OptString = std::optional<std::string>;
   template<size_t N> using CharArray = const char (&)[N];
 
+  inline static const OptString EmptyOptString;
+
   [[nodiscard]] static auto& getMap(CharType t) {
     switch (t) {
     case CharType::Romaji: return RomajiMap;
@@ -54,7 +56,7 @@ public:
     if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
     i = KatakanaMap.find(s);
     if (i != KatakanaMap.end()) return i->second->dakuten(CharType::Katakana);
-    return {};
+    return EmptyOptString;
   }
 
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
@@ -66,7 +68,7 @@ public:
     i = KatakanaMap.find(s);
     if (i != KatakanaMap.end())
       return i->second->hanDakuten(CharType::Katakana);
-    return {};
+    return EmptyOptString;
   }
 
   // 'RomajiVariants' holds any further variant Rōmaji values that are unique
@@ -190,12 +192,12 @@ public:
 
   [[nodiscard]] OptString dakuten(CharType t) const {
     if (const auto i{dakuten()}; i) return i->get(t, ConvertFlags::None);
-    return {};
+    return EmptyOptString;
   }
 
   [[nodiscard]] OptString hanDakuten(CharType t) const {
     if (const auto i{hanDakuten()}; i) return i->get(t, ConvertFlags::None);
-    return {};
+    return EmptyOptString;
   }
 
   // All small Kana have _romaji starting with 'l' (and they are all monographs)
