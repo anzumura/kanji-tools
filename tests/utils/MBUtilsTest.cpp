@@ -63,7 +63,8 @@ const std::string BeforeSurrogateRange{'\xED', '\x9F', '\xBF'}, // U+D7FF
     SurrogateRangeStart{'\xED', '\xA0', '\x80'},                // U+D800
     SurrogateRangeEnd{'\xED', '\xBF', '\xBF'},                  // U+DFFF
     AfterSurrogateRange{'\xEE', '\x80', '\x80'},                // U+E000
-    LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪snow"};
+    LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪snow"}, Dog{"犬"};
+
 
 const char32_t MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
 
@@ -184,16 +185,22 @@ TEST(MBUtilsTest, FromUTF8String) {
   // fourth byte not continuation
   fromUtf8Error(
       std::string{static_cast<char>(FourBits), cont, cont, 'a'}, U"\ufffda");
-  const std::string dog{"犬"};
-  ASSERT_EQ(dog.size(), 3);
-  EXPECT_EQ(dog[0], '\xe7');
-  EXPECT_EQ(dog[1], '\x8a');
-  EXPECT_EQ(dog[2], '\xac');
-  const auto wideDog{fromUtf8(dog)};
+  ASSERT_EQ(Dog.size(), 3);
+  EXPECT_EQ(Dog[0], '\xe7');
+  EXPECT_EQ(Dog[1], '\x8a');
+  EXPECT_EQ(Dog[2], '\xac');
+  const auto wideDog{fromUtf8(Dog)};
   ASSERT_EQ(wideDog.size(), 1);
   EXPECT_EQ(wideDog[0], U'\u72ac');
   const auto newDog{toUtf8(wideDog)};
-  EXPECT_EQ(dog, newDog);
+  EXPECT_EQ(Dog, newDog);
+}
+
+TEST(MBUtils, ToUTF8IntAndLong) {
+  const int intDog{0x72ac};
+  EXPECT_EQ(toUtf8(intDog), Dog);
+  const long longDog{0x72ac};
+  EXPECT_EQ(toUtf8(longDog), Dog);
 }
 
 TEST(MBUtilsTest, BeyondMaxUnicode) {
