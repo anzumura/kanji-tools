@@ -158,6 +158,31 @@ std::array HanDakutenKanaList{
 
 } // namespace
 
+const Kana::Map& Kana::getMap(CharType t) {
+  switch (t) {
+  case CharType::Romaji: return RomajiMap;
+  case CharType::Hiragana: return HiraganaMap;
+  case CharType::Katakana: return KatakanaMap;
+  }
+  __builtin_unreachable(); // stop gcc 'reaches end' warning LCOV_EXCL_LINE
+}
+
+Kana::OptString Kana::findDakuten(const std::string& s) {
+  auto i{HiraganaMap.find(s)};
+  if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
+  i = KatakanaMap.find(s);
+  if (i != KatakanaMap.end()) return i->second->dakuten(CharType::Katakana);
+  return EmptyOptString;
+}
+
+Kana::OptString Kana::findHanDakuten(const std::string& s) {
+  auto i{HiraganaMap.find(s)};
+  if (i != HiraganaMap.end()) return i->second->hanDakuten(CharType::Hiragana);
+  i = KatakanaMap.find(s);
+  if (i != KatakanaMap.end()) return i->second->hanDakuten(CharType::Katakana);
+  return EmptyOptString;
+}
+
 void Kana::RepeatMark::validate() const {
   assert(isAllHiragana(_hiragana));
   assert(isAllKatakana(_katakana));

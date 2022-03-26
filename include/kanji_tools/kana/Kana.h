@@ -40,36 +40,15 @@ public:
 
   inline static const OptString EmptyOptString;
 
-  [[nodiscard]] static auto& getMap(CharType t) {
-    switch (t) {
-    case CharType::Romaji: return RomajiMap;
-    case CharType::Hiragana: return HiraganaMap;
-    case CharType::Katakana: return KatakanaMap;
-    }
-    __builtin_unreachable(); // stop gcc 'reaches end' warning LCOV_EXCL_LINE
-  }
+  [[nodiscard]] static const Map& getMap(CharType);
 
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
-  [[nodiscard]] static OptString findDakuten(const std::string& s) {
-    auto i{HiraganaMap.find(s)};
-    if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
-    i = KatakanaMap.find(s);
-    if (i != KatakanaMap.end()) return i->second->dakuten(CharType::Katakana);
-    return EmptyOptString;
-  }
+  [[nodiscard]] static OptString findDakuten(const std::string& s);
 
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
-  [[nodiscard]] static OptString findHanDakuten(const std::string& s) {
-    auto i{HiraganaMap.find(s)};
-    if (i != HiraganaMap.end())
-      return i->second->hanDakuten(CharType::Hiragana);
-    i = KatakanaMap.find(s);
-    if (i != KatakanaMap.end())
-      return i->second->hanDakuten(CharType::Katakana);
-    return EmptyOptString;
-  }
+  [[nodiscard]] static OptString findHanDakuten(const std::string& s);
 
   // 'RomajiVariants' holds any further variant Rōmaji values that are unique
   // for this 'Kana' class. These include extra key combinations that also map
