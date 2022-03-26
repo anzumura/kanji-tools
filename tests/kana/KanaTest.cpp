@@ -64,15 +64,17 @@ TEST(KanaTest, FindDakuten) {
   EXPECT_EQ(Kana::findDakuten("か"), Kana::OptString{"が"});
   EXPECT_EQ(Kana::findDakuten("シ"), Kana::OptString{"ジ"});
   EXPECT_EQ(Kana::findDakuten("う"), Kana::OptString{"ゔ"});
-  EXPECT_EQ(Kana::findDakuten("ま"), Kana::EmptyOptString);
-  EXPECT_EQ(Kana::findDakuten("マ"), Kana::EmptyOptString);
+  EXPECT_FALSE(Kana::findDakuten("ま"));
+  EXPECT_FALSE(Kana::findDakuten("マ"));
+  EXPECT_FALSE(Kana::findDakuten("bad"));
 }
 
 TEST(KanaTest, FindHanDakuten) {
   EXPECT_EQ(Kana::findHanDakuten("は"), Kana::OptString{"ぱ"});
   EXPECT_EQ(Kana::findHanDakuten("ホ"), Kana::OptString{"ポ"});
-  EXPECT_EQ(Kana::findHanDakuten("さ"), Kana::EmptyOptString);
-  EXPECT_EQ(Kana::findHanDakuten("サ"), Kana::EmptyOptString);
+  EXPECT_FALSE(Kana::findHanDakuten("さ"));
+  EXPECT_FALSE(Kana::findHanDakuten("サ"));
+  EXPECT_FALSE(Kana::findHanDakuten("bad"));
 }
 
 TEST(KanaTest, CheckHiragana) {
