@@ -26,28 +26,31 @@ done
 cd build
 # only make coverage reports if there are .gcno files (so with -DCODE_COVERAGE)
 if [[ -n $(find src -name *.gcno | head -1) ]]; then
-  # remove coverage results from previous runs
+  # remove coverage results from previous runs before running tests
   find . -name *.gcda -exec rm {} \;
-  declare -r r=../../..
+  if otool -L $(ls tests/*/*Test | head -1) | grep -q /lib/gcc/; then
+    cov=gcov-11
+  else
+    cov=gcov
+  fi
 fi
 
 cd tests
 for i in *; do
-  ./$i/${i}Test --gtest_output=$i:xml
+  cd $i
+  ./${i}Test --gtest_output=xml
+  cd ..
 done
-if [[ -n $r ]]; then
-  for i in *; do
-    cd $i # 'gcovr' needs to run in the same directory as the executable
-    gcovr -x -r$r -f$r/src -f$r/include > coverage.xml
-    cd ..
-  done
+if [[ -n $cov ]]; then
+  cd ..
+  gcovr --gcov-executable=$cov -x -r.. -f../src -f../include > coverage.xml
 fi
 
 # set the following values for the actions:
 # - Publish JUnit test result:
-#   set 'Test report XMLs' to: 'build/tests/*.xml'
+#   set 'Test report XMLs' to: 'build/*/test*.xml'
 # - Publish Cobertura Coverage:
-#   set 'Cobertura xml report pattern' to: 'build/tests/*/*.xml'
+#   set 'Cobertura xml report pattern' to: 'build/coverage.xml'
 #   set 'Source Encoding' (in Advanced options) to: 'UTF-8'
 
 # googletest docs: https://google.github.io/googletest/
