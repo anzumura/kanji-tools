@@ -171,16 +171,16 @@ Kana::OptString Kana::findDakuten(const std::string& s) {
   auto i{HiraganaMap.find(s)};
   if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
   i = KatakanaMap.find(s);
-  if (i != KatakanaMap.end()) return i->second->dakuten(CharType::Katakana);
-  return EmptyOptString;
+  return i != KatakanaMap.end() ? i->second->dakuten(CharType::Katakana)
+                                : EmptyOptString;
 }
 
 Kana::OptString Kana::findHanDakuten(const std::string& s) {
   auto i{HiraganaMap.find(s)};
   if (i != HiraganaMap.end()) return i->second->hanDakuten(CharType::Hiragana);
   i = KatakanaMap.find(s);
-  if (i != KatakanaMap.end()) return i->second->hanDakuten(CharType::Katakana);
-  return EmptyOptString;
+  return i != KatakanaMap.end() ? i->second->hanDakuten(CharType::Katakana)
+                                : EmptyOptString;
 }
 
 void Kana::RepeatMark::validate() const {
