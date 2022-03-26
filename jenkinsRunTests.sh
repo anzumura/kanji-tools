@@ -33,12 +33,13 @@ fi
 
 cd tests
 for i in *; do
-  ./$i/${i}Test --gtest_output=xml
+  ./$i/${i}Test --gtest_output=$i:xml
 done
 if [[ -n $r ]]; then
   for i in *; do
-    # 'gcovr' needs to run in the same directory as the executable
-    cd $i && gcovr -x -r$r -f$r/src -f$r/include > coverage.xml && cd ..
+    cd $i # 'gcovr' needs to run in the same directory as the executable
+    gcovr -x -r$r -f$r/src -f$r/include > coverage.xml
+    cd ..
   done
 fi
 
