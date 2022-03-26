@@ -158,6 +158,27 @@ std::array HanDakutenKanaList{
 
 } // namespace
 
+const std::string& Kana::RepeatMark::get(
+    CharType target, ConvertFlags flags, const Kana* prevKana) const {
+  switch (target) {
+  case CharType::Hiragana: return _hiragana;
+  case CharType::Katakana: return _katakana;
+  case CharType::Romaji: break;
+  }
+  if (!prevKana) return EmptyString;
+  const Kana* k{prevKana};
+  if (_dakuten) {
+    if (const auto accented{prevKana->dakuten()}; accented) k = accented;
+  } else if (const auto unaccented{prevKana->plain()}; unaccented)
+    k = unaccented;
+  return k->getRomaji(flags);
+}
+
+void Kana::RepeatMark::validate() const {
+  assert(isAllHiragana(_hiragana));
+  assert(isAllKatakana(_katakana));
+}
+
 const Kana::Map& Kana::getMap(CharType t) {
   switch (t) {
   case CharType::Romaji: return RomajiMap;
@@ -181,11 +202,6 @@ Kana::OptString Kana::findHanDakuten(const std::string& s) {
   i = KatakanaMap.find(s);
   return i != KatakanaMap.end() ? i->second->hanDakuten(CharType::Katakana)
                                 : EmptyOptString;
-}
-
-void Kana::RepeatMark::validate() const {
-  assert(isAllHiragana(_hiragana));
-  assert(isAllKatakana(_katakana));
 }
 
 const std::string& Kana::getRomaji(ConvertFlags flags) const {
@@ -247,22 +263,6 @@ Kana::Map Kana::populate(CharType t) {
   }
   assert(duplicates == 0);
   return result;
-}
-
-const std::string& Kana::RepeatMark::get(
-    CharType target, ConvertFlags flags, const Kana* prevKana) const {
-  switch (target) {
-  case CharType::Hiragana: return _hiragana;
-  case CharType::Katakana: return _katakana;
-  case CharType::Romaji: break;
-  }
-  if (!prevKana) return EmptyString;
-  const Kana* k{prevKana};
-  if (_dakuten) {
-    if (const auto accented{prevKana->dakuten()}; accented) k = accented;
-  } else if (const auto unaccented{prevKana->plain()}; unaccented)
-    k = unaccented;
-  return k->getRomaji(flags);
 }
 
 const Kana::Map Kana::RomajiMap{Kana::populate(CharType::Romaji)},

@@ -60,6 +60,58 @@ TEST(KanaTest, CheckSmallTsu) {
   EXPECT_FALSE(Kana::SmallTsu.kunreiVariant());
 }
 
+TEST(KanaTest, RepeatPlain) {
+  EXPECT_EQ(Kana::RepeatPlain.hiragana(), "ゝ");
+  EXPECT_EQ(Kana::RepeatPlain.katakana(), "ヽ");
+}
+
+TEST(KanaTest, RepeatAccented) {
+  EXPECT_EQ(Kana::RepeatAccented.hiragana(), "ゞ");
+  EXPECT_EQ(Kana::RepeatAccented.katakana(), "ヾ");
+}
+
+TEST(KanaTest, RepeatMarkMatches) {
+  for (auto i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
+    EXPECT_TRUE(i->matches(CharType::Hiragana, i->hiragana()));
+    EXPECT_TRUE(i->matches(CharType::Katakana, i->katakana()));
+    EXPECT_FALSE(i->matches(CharType::Hiragana, i->katakana()));
+    EXPECT_FALSE(i->matches(CharType::Katakana, i->hiragana()));
+    EXPECT_FALSE(i->matches(CharType::Romaji, EmptyString));
+  }
+}
+
+TEST(KanaTest, RepeatMarkGet) {
+  for (auto flags : std::array{ConvertFlags::None, ConvertFlags::Hepburn})
+    for (auto i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
+      // get with CharType 'Hiragana' or 'Katakana' always return underlying
+      // 'hiragana' or 'katakana' respectively regardless of 'flags' or prevKana
+      EXPECT_EQ(i->get(CharType::Hiragana, flags, {}), i->hiragana());
+      EXPECT_EQ(i->get(CharType::Katakana, flags, {}), i->katakana());
+      // get CharType 'Romaji' always returns EmptyString if prevKana is nullptr
+      // see other tests below for getting with non-empty prevKana
+      EXPECT_EQ(i->get(CharType::Romaji, flags, {}), EmptyString);
+    }
+}
+
+TEST(KanaTest, RepeatMarkGetRomaji) {
+  auto& m{Kana::getMap(CharType::Romaji)};
+  const auto i{m.find("tsu")};
+  ASSERT_TRUE(i != m.end());
+  auto* prev{i->second};
+  auto flags{ConvertFlags::None};
+  EXPECT_EQ(Kana::RepeatPlain.get(CharType::Romaji, flags, prev), "tsu");
+  EXPECT_EQ(Kana::RepeatAccented.get(CharType::Romaji, flags, prev), "du");
+  // 'tsu' has 'Kunrei' of 'tu' and accented value of 'du' by default (the
+  // Wāpuro value), but the accented value is 'zu' if either 'Hepburn' or
+  // 'Kunrei' standard is requested
+  flags = ConvertFlags::Hepburn;
+  EXPECT_EQ(Kana::RepeatPlain.get(CharType::Romaji, flags, prev), "tsu");
+  EXPECT_EQ(Kana::RepeatAccented.get(CharType::Romaji, flags, prev), "zu");
+  flags = ConvertFlags::Kunrei;
+  EXPECT_EQ(Kana::RepeatPlain.get(CharType::Romaji, flags, prev), "tu");
+  EXPECT_EQ(Kana::RepeatAccented.get(CharType::Romaji, flags, prev), "zu");
+}
+
 TEST(KanaTest, FindDakuten) {
   EXPECT_EQ(Kana::findDakuten("か"), Kana::OptString{"が"});
   EXPECT_EQ(Kana::findDakuten("シ"), Kana::OptString{"ジ"});
