@@ -38,6 +38,11 @@ protected:
   void TearDown() override { fs::remove_all(TestDir); }
 };
 
+TEST(DataTest, Usage) {
+  const std::string msg{"error msg"};
+  EXPECT_THROW(call([&msg] { DataFile::usage(msg); }, msg), std::domain_error);
+}
+
 TEST_F(DataFileTest, GoodOnePerLine) {
   const DataFile f{GoodOnePerLine};
   EXPECT_EQ(f.level(), JlptLevels::None);
