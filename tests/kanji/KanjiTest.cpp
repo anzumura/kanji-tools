@@ -60,12 +60,15 @@ protected:
     EXPECT_FALSE(k.hasGrade());
     EXPECT_FALSE(k.hasLevel());
     EXPECT_FALSE(k.frequency());
+    const auto maxFreq{std::numeric_limits<Kanji::Frequency>::max()};
+    EXPECT_EQ(k.frequencyOrMax(), maxFreq);
     EXPECT_EQ(k.kyu(), KenteiKyus::K1);
     EXPECT_EQ(k.name(), "霙");
     EXPECT_EQ(k.strokes(), 16);
     EXPECT_EQ(k.meaning(), "sleet");
     EXPECT_EQ(k.reading(), "エイ、ヨウ、みぞれ");
     EXPECT_EQ(k.info(), "Rad 雨(1), Strokes 16, K1");
+    EXPECT_EQ(k.extraTypeInfo(), "#1");
     EXPECT_FALSE(k.hasGrade());
     EXPECT_FALSE(k.hasLevel());
     EXPECT_TRUE(k.hasMeaning());
@@ -80,6 +83,7 @@ protected:
     EXPECT_EQ(k.level(), JlptLevels::N1);
     EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
     EXPECT_EQ(k.frequency(), Kanji::OptFreq{1728});
+    EXPECT_EQ(k.frequencyOrMax(), 1728);
     EXPECT_EQ(k.name(), "亘");
     EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
     EXPECT_FALSE(k.hasMeaning());
@@ -114,6 +118,7 @@ TEST_F(KanjiTest, FrequencyKanji) {
   EXPECT_FALSE(k.hasGrade());
   EXPECT_EQ(k.kyu(), kyu);
   EXPECT_EQ(k.info(), "Rad TestRadical(1), Frq 2362, KJ1");
+  EXPECT_FALSE(k.extraTypeInfo());
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_FALSE(k.hasReading());
 }
@@ -152,6 +157,7 @@ TEST_F(KanjiTest, KenteiKanji) {
   EXPECT_FALSE(k.hasGrade());
   EXPECT_EQ(k.kyu(), kyu);
   EXPECT_EQ(k.info(), "Rad TestRadical(1), K1");
+  EXPECT_FALSE(k.extraTypeInfo());
   EXPECT_FALSE(k.hasMeaning());
   EXPECT_FALSE(k.hasReading());
 }
@@ -178,6 +184,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   ASSERT_TRUE(k.newName());
   EXPECT_EQ(*k.newName(), sampleLink);
   EXPECT_EQ(k.info(), "Rad TestRadical(1), New sampleLink");
+  EXPECT_FALSE(k.extraTypeInfo());
 }
 
 TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
