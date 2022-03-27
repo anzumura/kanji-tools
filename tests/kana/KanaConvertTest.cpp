@@ -44,8 +44,10 @@ protected:
     EXPECT_EQ(hiraganaToKatakana(hiragana), katakana);
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
-  void check(const char* hiragana, const char* katakana, const char* romaji,
-      const char* hepburn = {}, const char* kunrei = {}) {
+
+  void check(const std::string& hiragana, const std::string& katakana,
+      const std::string& romaji, const char* hepburn = {},
+      const char* kunrei = {}, const char* both = {}) {
     EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
     EXPECT_EQ(katakanaToRomaji(katakana), romaji);
     EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Hepburn),
@@ -56,17 +58,17 @@ protected:
         kunrei ? kunrei : romaji);
     EXPECT_EQ(katakanaToRomaji(katakana, ConvertFlags::Kunrei),
         kunrei ? kunrei : romaji);
-    auto preferHepburnIfBoth{hepburn ? hepburn : kunrei ? kunrei : romaji};
+    auto result{both ? both : hepburn ? hepburn : kunrei ? kunrei : romaji};
     EXPECT_EQ(hiraganaToRomaji(
                   hiragana, ConvertFlags::Hepburn | ConvertFlags::Kunrei),
-        preferHepburnIfBoth);
+        result);
     EXPECT_EQ(katakanaToRomaji(
                   katakana, ConvertFlags::Hepburn | ConvertFlags::Kunrei),
-        preferHepburnIfBoth);
+        result);
   }
 
-  void checkKunrei(const char* hiragana, const char* katakana,
-      const char* romaji, const char* kunrei) {
+  void checkKunrei(const std::string& hiragana, const std::string& katakana,
+      const std::string& romaji, const char* kunrei) {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
 
@@ -80,8 +82,21 @@ protected:
     std::replace(romaji.begin(), romaji.end(), 'l', 'x');
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
   }
+
   KanaConvert _converter;
 };
+
+TEST_F(KanaConvertTest, FlagString) {
+  EXPECT_EQ(_converter.flagString(), "None");
+  _converter.flags(ConvertFlags::Hepburn);
+  EXPECT_EQ(_converter.flagString(), "Hepburn");
+  _converter.flags(_converter.flags() | ConvertFlags::Kunrei);
+  EXPECT_EQ(_converter.flagString(), "Hepburn|Kunrei");
+  _converter.flags(_converter.flags() | ConvertFlags::NoProlongMark);
+  EXPECT_EQ(_converter.flagString(), "Hepburn|Kunrei|NoProlongMark");
+  _converter.flags(ConvertFlags::Kunrei | ConvertFlags::RemoveSpaces);
+  EXPECT_EQ(_converter.flagString(), "Kunrei|RemoveSpaces");
+}
 
 TEST_F(KanaConvertTest, CheckNarrowDelims) {
   EXPECT_EQ(_converter.narrowDelims().size(), 31);
@@ -203,27 +218,6 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   // to reproduce the Hiragana.
   EXPECT_EQ(hiraganaToRomaji("いてっ"), "iteltu");
   EXPECT_EQ(hiraganaToRomaji("いっって"), "iltutte");
-  // prolonged sound mark is mainly for Katakana, but also works for Hiragana,
-  // for now using this mark is the only way to get a macron (bar over letter)
-  // in Romaji output.
-  EXPECT_EQ(hiraganaToRomaji("らーめん"), "rāmen");
-  EXPECT_EQ(hiraganaToRomaji("きゃー"), "kyā");
-  // ー not following a vowel is left unchanged
-  EXPECT_EQ(hiraganaToRomaji("ーぶ"), "ーbu");
-  EXPECT_EQ(hiraganaToRomaji("はんーぶ"), "hanーbu");
-  // Hepburn examples
-  EXPECT_EQ(hiraganaToRomaji("ちぢむ"), "chidimu");
-  EXPECT_EQ(hiraganaToRomaji("ちぢむ", ConvertFlags::Hepburn), "chijimu");
-  EXPECT_EQ(hiraganaToRomaji("つづき"), "tsuduki");
-  EXPECT_EQ(hiraganaToRomaji("つづき", ConvertFlags::Hepburn), "tsuzuki");
-  EXPECT_EQ(hiraganaToRomaji("ぢゃ"), "dya");
-  EXPECT_EQ(hiraganaToRomaji("ぢゃ", ConvertFlags::Hepburn), "ja");
-  EXPECT_EQ(hiraganaToRomaji("ぢゅ"), "dyu");
-  EXPECT_EQ(hiraganaToRomaji("ぢゅ", ConvertFlags::Hepburn), "ju");
-  EXPECT_EQ(hiraganaToRomaji("ぢょ"), "dyo");
-  EXPECT_EQ(hiraganaToRomaji("ぢょ", ConvertFlags::Hepburn), "jo");
-  EXPECT_EQ(hiraganaToRomaji("を"), "wo");
-  EXPECT_EQ(hiraganaToRomaji("を", ConvertFlags::Hepburn), "o");
 }
 
 TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
@@ -249,28 +243,36 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   // to reproduce the Hiragana.
   EXPECT_EQ(katakanaToRomaji("イテッ"), "iteltu");
   EXPECT_EQ(katakanaToRomaji("イッッテ"), "iltutte");
+}
+
+TEST_F(KanaConvertTest, ProlongMark) {
   // prolonged sound mark is mainly for Katakana, but also works for Hiragana,
   // for now using this mark is the only way to get a macron (bar over letter)
   // in Romaji output.
-  EXPECT_EQ(katakanaToRomaji("ラーメン"), "rāmen");
-  EXPECT_EQ(katakanaToRomaji("キャー"), "kyā");
+  check("らーめん", "ラーメン", "rāmen");
+  check("きゃー", "キャー", "kyā");
   EXPECT_EQ(katakanaToRomaji("ファーザー"), "fāzā");
+  EXPECT_EQ(katakanaToRomaji("コーヒー"), "kōhī");
+  EXPECT_EQ(katakanaToRomaji("ツー"), "tsū");
+  EXPECT_EQ(katakanaToRomaji("ページ"), "pēji");
   // ー not following a vowel is left unchanged
+  EXPECT_EQ(hiraganaToRomaji("ーぶ"), "ーbu");
+  EXPECT_EQ(hiraganaToRomaji("はんーぶ"), "hanーbu");
   EXPECT_EQ(katakanaToRomaji("ーカ"), "ーka");
   EXPECT_EQ(katakanaToRomaji("ホンート"), "honーto");
-  // Hepburn examples
-  EXPECT_EQ(katakanaToRomaji("チヂム"), "chidimu");
-  EXPECT_EQ(katakanaToRomaji("チヂム", ConvertFlags::Hepburn), "chijimu");
-  EXPECT_EQ(katakanaToRomaji("ツヅキ"), "tsuduki");
-  EXPECT_EQ(katakanaToRomaji("ツヅキ", ConvertFlags::Hepburn), "tsuzuki");
-  EXPECT_EQ(katakanaToRomaji("ヂャ"), "dya");
-  EXPECT_EQ(katakanaToRomaji("ヂャ", ConvertFlags::Hepburn), "ja");
-  EXPECT_EQ(katakanaToRomaji("ヂュ"), "dyu");
-  EXPECT_EQ(katakanaToRomaji("ヂュ", ConvertFlags::Hepburn), "ju");
-  EXPECT_EQ(katakanaToRomaji("ヂョ"), "dyo");
-  EXPECT_EQ(katakanaToRomaji("ヂョ", ConvertFlags::Hepburn), "jo");
-  EXPECT_EQ(katakanaToRomaji("ヲ"), "wo");
-  EXPECT_EQ(katakanaToRomaji("ヲ", ConvertFlags::Hepburn), "o");
+}
+
+TEST_F(KanaConvertTest, HepburnAndKunrei) {
+  // third param is 'Hepburn', fourth is 'Kunrei', fifth is both flags enabled
+  check("ちぢむ", "チヂム", "chidimu", "chijimu", "tizimu", "tijimu");
+  check("つづき", "ツヅキ", "tsuduki", "tsuzuki", "tuzuki", "tuzuki");
+  // explanation of 'tijimu':
+  // - when both Hepburn and Kunrei are set then the Hepburn value is preferred
+  // - this leads to 'ぢ' mapping to 'ji' (instead of 'zi' or the default 'di')
+  // - but 'ち' maps to 'ti' (the 'Kunrei' value) since there is no 'Hepburn'
+  //   value override, i.e., just the 'Hepburn' flag would produce 'chi'
+  // best idea is to only set 'flags' to one or the other (or neither) to avoid
+  // surprising results (see 'HepburnVersusKunrei' test below to see all values)
 }
 
 TEST_F(KanaConvertTest, ConvertBetweenKana) {
@@ -485,6 +487,20 @@ TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   check("ぴょ", "ピョ", "pyo");
   // -- VU
   check("ゔ", "ヴ", "vu");
+}
+
+TEST_F(KanaConvertTest, CheckDelims) {
+  using P = std::pair<char, const char*>;
+  for (const auto& i : {P{' ', "　"}, P{'.', "。"}, P{',', "、"}, P{':', "："},
+           P{';', "；"}, P{'/', "・"}, P{'!', "！"}, P{'?', "？"}, P{'(', "（"},
+           P{')', "）"}, P{'[', "「"}, P{']', "」"}, P{'*', "＊"}, P{'~', "〜"},
+           P{'=', "＝"}, P{'+', "＋"}, P{'@', "＠"}, P{'#', "＃"}, P{'$', "＄"},
+           P{'%', "％"}, P{'^', "＾"}, P{'&', "＆"}, P{'{', "『"}, P{'}', "』"},
+           P{'|', "｜"}, P{'"', "”"}, P{'`', "｀"}, P{'<', "＜"}, P{'>', "＞"},
+           P{'_', "＿"}, P{'\\', "￥"}}) {
+    const std::string romaji{i.first}, kana{i.second};
+    check(kana, kana, romaji);
+  }
 }
 
 } // namespace kanji_tools
