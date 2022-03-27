@@ -147,20 +147,9 @@ public:
 
   // Used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
   // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the
-  // same 'qualifiedNameRank' then sort by strokes, frequency, variant and
-  // (unicode) compatibilityName.
-  [[nodiscard]] auto orderByQualifiedName(const Kanji& x) const {
-    return qualifiedNameRank() < x.qualifiedNameRank() ||
-           qualifiedNameRank() == x.qualifiedNameRank() &&
-               (strokes() < x.strokes() ||
-                   strokes() == x.strokes() &&
-                       (frequencyOrMax() < x.frequencyOrMax() ||
-                           frequencyOrMax() == x.frequencyOrMax() &&
-                               (variant() < x.variant() ||
-                                   variant() == x.variant() &&
-                                       toUnicode(compatibilityName()) <
-                                           toUnicode(x.compatibilityName()))));
-  }
+  // same 'qualifiedNameRank' then sort by strokes, frequency (if exists) and
+  // finally andcompatibilityName (in unicode).
+  [[nodiscard]] bool orderByQualifiedName(const Kanji&) const;
 
   // 'Legend' is meant to be used in output to briefly describe the suffix added
   // to a kanji when using the 'qualifiedName' method. See comments for

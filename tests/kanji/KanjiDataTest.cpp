@@ -3,6 +3,7 @@
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/utils/DisplaySize.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 #include <type_traits>
 
@@ -16,6 +17,11 @@ constexpr auto Arg0{"test"}, DebugArg{"-debug"}, DataArg{"-data"},
 } // namespace
 
 namespace fs = std::filesystem;
+
+TEST(DataTest, Usage) {
+  const std::string msg{"error msg"};
+  EXPECT_THROW(call([&msg] { Data::usage(msg); }, msg), std::domain_error);
+}
 
 TEST(DataTest, NextArgWithJustArg0) {
   // call without final 'currentArg' parameter increments to 1
@@ -165,6 +171,12 @@ TEST_F(KanjiDataTest, RadicalChecks) {
   EXPECT_EQ(radical.name(), "鹿");
   EXPECT_EQ(radical.longName(), "鹿部（ろくぶ）");
   EXPECT_EQ(radical.reading(), "しか");
+}
+
+TEST_F(KanjiDataTest, BadUcdRadical) {
+  EXPECT_THROW(call([] { return _data->ucdRadical("blah", {}); },
+                   "UCD entry not found: blah"),
+      std::domain_error);
 }
 
 TEST_F(KanjiDataTest, TotalsChecks) {
@@ -425,6 +437,43 @@ TEST_F(KanjiDataTest, UcdLinks) {
   }
   EXPECT_EQ(jinmeiLinksToJouyou, officialLinksToJouyou);
   EXPECT_EQ(jinmeiLinksToJinmei, officialLinksToJinmei);
+}
+
+TEST_F(KanjiDataTest, SortByQualifiedName) {
+  const auto find{[](const std::string& name, auto t, auto s, Kanji::OptFreq f,
+                      const std::string& u = EmptyString) {
+    auto i{_data->findKanjiByName(name)};
+    // can't use 'ASSERT' in a function returning non-void so throw an exception
+    // if not found (which never happens by design of the rest of this test)
+    if (!i) throw std::domain_error(name + " not found");
+    auto k{*i};
+    // verify attributes of the Kanji found match expected values
+    EXPECT_EQ(k->type(), t);
+    EXPECT_EQ(k->strokes(), s);
+    EXPECT_EQ(k->frequency(), f);
+    if (!u.empty()) EXPECT_EQ(toUnicode(k->compatibilityName()), u);
+    return k;
+  }};
+  auto jouyou7stroke1{find("位", KanjiTypes::Jouyou, 7, 276)};
+  auto jouyou7stroke2{find("囲", KanjiTypes::Jouyou, 7, 771)};
+  auto jouyou10stroke{find("院", KanjiTypes::Jouyou, 10, 150)};
+  auto jinmei4stroke1{find("云", KanjiTypes::Jinmei, 4, {}, "4E91")};
+  auto jinmei4stroke2{find("勿", KanjiTypes::Jinmei, 4, {}, "52FF")};
+
+  const auto check{[](const auto& x, const auto& y) {
+    EXPECT_TRUE(Data::OrderByQualifiedName(x, y));
+    EXPECT_FALSE(Data::OrderByQualifiedName(y, x));
+  }};
+  // sort by qualified type first (so Jouyou is less then Jinmei)
+  check(jouyou10stroke, jinmei4stroke1);
+  check(jouyou10stroke, jinmei4stroke2);
+  // if qualified type is the same then sort by stokes
+  check(jouyou7stroke1, jouyou10stroke);
+  check(jouyou7stroke2, jouyou10stroke);
+  // if qualified type and strokes are the same then sort by frequency
+  check(jouyou7stroke1, jouyou7stroke2);
+  // if type and strokes are the same (and no frequency) then sort by unicode
+  check(jinmei4stroke1, jinmei4stroke2);
 }
 
 } // namespace kanji_tools

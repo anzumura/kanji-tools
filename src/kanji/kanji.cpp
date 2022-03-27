@@ -54,4 +54,15 @@ std::string Kanji::info(KanjiInfo fields) const {
   return result;
 }
 
+bool Kanji::orderByQualifiedName(const Kanji& x) const {
+  return qualifiedNameRank() < x.qualifiedNameRank() ||
+         qualifiedNameRank() == x.qualifiedNameRank() &&
+             (strokes() < x.strokes() ||
+                 strokes() == x.strokes() &&
+                     (frequencyOrMax() < x.frequencyOrMax() ||
+                         frequencyOrMax() == x.frequencyOrMax() &&
+                             toUnicode(compatibilityName()) <
+                                 toUnicode(x.compatibilityName())));
+}
+
 } // namespace kanji_tools
