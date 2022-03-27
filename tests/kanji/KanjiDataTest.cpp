@@ -433,7 +433,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
     else if (link.type() == KanjiTypes::Jinmei)
       ++officialLinksToJinmei;
     else
-      FAIL() << "official link from " << link.name() << " is type " << link.type();
+      FAIL() << "link from " << link.name() << " is type " << link.type();
   }
   EXPECT_EQ(jinmeiLinksToJouyou, officialLinksToJouyou);
   EXPECT_EQ(jinmeiLinksToJinmei, officialLinksToJinmei);
