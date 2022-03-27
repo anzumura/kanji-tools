@@ -33,7 +33,7 @@ The initial goal for this project was to create a program that could parse multi
 
 ### Project Structure
 
-The project is build using *cmake* so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
+The project is build using *cmake* (installed via Homebrew) so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
 
 - **apps**: *.cpp* files for the main programs
 - **build**: generated directory for build targets and *cmake* dependencies
@@ -54,7 +54,7 @@ The five libraries are:
 
 ### VS Code Setup
 
-The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via *Homebrew*. It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
+The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*. 
 
 Here are some links that might help with setup:
 
