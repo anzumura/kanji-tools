@@ -38,10 +38,11 @@ The project is build using *cmake* so there is a *CMakeLists.txt* file in the to
 - **apps**: *.cpp* files for the main programs
 - **build**: generated directory for build targets and *cmake* dependencies
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
-- **include/kanji_tools**: *.h* files in sub-directories per lib (plus *tests* directory)
 - **scripts**: *bash* scripts for working with *Unicode* data files
-- **src**: *.cpp* files in sub-directories per lib
-- **tests**: *.cpp* files in sub-directories per lib (plus *testMain.cpp* file)
+- **src**: contains a sub-directory per library:
+  - each sub-directory contains *CMakeLists.txt*, *.cpp* files and *include* directory
+- **tests**: contains *testMain.cpp*, *include* directory and a sub-directory per library:
+  - each sub-directory contains *CMakeLists.txt* and *.cpp* files
 
 The five libraries are:
 

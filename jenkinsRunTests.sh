@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+declare -r program="jenkinsRunTests.sh"
+
 # add this script as an 'Execute shell' build step after the actual build to
 # generate reports for Jenkins post build actions (JUnit and Cobertura)
 
@@ -15,35 +17,47 @@
 #   CMAKE_GENERATOR="Unix Makefiles"
 #   CMAKE_EXPORT_COMPILE_COMMANDS=TRUE
 
-for i in src tests; do
-  i=build/$i
-  if [[ ! -d $i ]]; then
-    echo "'$i' directory not found"
+function log() {
+  echo "[$program] $1"
+}
+
+function changeDir() {
+  if [[ ! -d $1 ]]; then
+    log "directory not found: '$PWD/$1' - exiting"
     exit 1
   fi
-done
+  cd $1
+  log "current directory: $PWD"
+}
 
-cd build
+log "PATH=$PATH"
+
+changeDir build/tests
+declare -r testTop=$PWD
+
 # only make coverage reports if there are .gcno files (so with -DCODE_COVERAGE)
-if [[ -n $(find src -name *.gcno | head -1) ]]; then
+if [[ -n $(find . -name *.gcno | head -1) ]]; then
   # remove coverage results from previous runs before running tests
-  find . -name *.gcda -exec rm {} \;
-  if otool -L $(ls tests/*/*Test | head -1) | grep -q /lib/gcc/; then
+  log "detected a coverage build"
+  log "- removing *.gcda files"
+  find .. -name *.gcda -exec rm {} \;
+  if otool -L $(ls ./*/*Test | head -1) | grep -q /lib/gcc/; then
     cov=gcov-11
   else
     cov=gcov
   fi
+  log "- will use gcov executable: $(which $cov)"
 fi
 
-cd tests
 for i in *; do
-  cd $i
+  changeDir $testTop/$i
   ./${i}Test --gtest_output=xml
-  cd ..
 done
+
 if [[ -n $cov ]]; then
-  cd ..
-  gcovr --gcov-executable=$cov -x -r.. -f../src -f../include > coverage.xml
+  changeDir $testTop/..
+  log "running: $(which gcovr)"
+  gcovr --gcov-executable=$cov -x -r.. -f../src > coverage.xml
 fi
 
 # set the following values for the actions:

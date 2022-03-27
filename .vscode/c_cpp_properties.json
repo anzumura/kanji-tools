@@ -5,7 +5,11 @@
     "gccVer": "gcc/11.2.0_3",
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
-      "${workspaceFolder}/include",
+      "${workspaceFolder}/src/kana/include",
+      "${workspaceFolder}/src/kanji/include",
+      "${workspaceFolder}/src/quiz/include",
+      "${workspaceFolder}/src/stats/include",
+      "${workspaceFolder}/src/utils/include",
       "${workspaceFolder}/tests/include",
       // "/opt/icu/include",
       // "/opt/boost/include",
