@@ -199,8 +199,4 @@ private:
   const OptString _pinyin;
 };
 
-inline auto& operator<<(std::ostream& os, const Kanji& k) {
-  return os << k.name();
-}
-
 } // namespace kanji_tools
