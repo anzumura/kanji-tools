@@ -36,7 +36,7 @@ private:
   template<typename T> auto dataFile(T t) const {
     const auto f{[this, t](const auto& dir) {
       return dataDir() / dir / firstLower(kanji_tools::toString(t));
-    }};
+    }}; // LCOV_EXCL_LINE - for some reason Clang marks this line as 0 coverage
     if constexpr (std::is_same_v<T, JlptLevels>)
       return LevelDataFile{f(Jlpt), t, debug()};
     else {
