@@ -32,8 +32,9 @@ function changeDir() {
 
 log "PATH=$PATH"
 
+declare -r topDir=$PWD
 changeDir build/tests
-declare -r testTop=$PWD
+declare -r testDir=$PWD
 
 # only make coverage reports if there are .gcno files (so with -DCODE_COVERAGE)
 if [[ -n $(find . -name *.gcno | head -1) ]]; then
@@ -54,18 +55,18 @@ if [[ -n $(find . -name *.gcno | head -1) ]]; then
 fi
 
 for i in *; do
-  changeDir $testTop/$i
+  changeDir $testDir/$i
   ./${i}Test --gtest_output=xml
 done
 
 if [[ -n $cov ]]; then
-  changeDir $testTop/..
+  changeDir $topDir
   log "running: $(which gcovr)"
   # 'gcovr' 5.0 worked fine for both Clang and GCC, but version 5.1 gets a few
   # parse errors for GCC which don't seem to affect the overall coverage so for
   # now use '--gcov-ignore-parse-errors' to allow the report to get generated
-  gcovr --gcov-executable=$cov -x -r.. -f../libs --gcov-ignore-parse-errors \
-    --exclude-unreachable-branches --exclude-throw-branches >coverage.xml
+  gcovr --gcov-executable=$cov -x -d -flibs --gcov-ignore-parse-errors \
+    --exclude-unreachable-branches --exclude-throw-branches >build/coverage.xml
 fi
 
 # set the following values for the actions:

@@ -23,6 +23,13 @@ endif()
 add_compile_options(-Wall -Wconversion -Werror -Wextra -Wextra-semi
   -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override)
 
+  # to turn off a warning for a section of code use the following ('GCC' works
+# for both Clang and GCC):
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+# ... code with warning ...
+#pragma GCC diagnostic pop
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h' so
   # add it for Clang here and add it for GCC after building googletest
@@ -46,18 +53,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
   # turn off a warning
   add_compile_options(-Wno-parentheses)
-
-  if(CODE_COVERAGE)
-    string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fprofile-abs-path")
-  endif()      
 endif()
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O0")
-
-# add options for test coverage (only affects debug builds)
-if(CODE_COVERAGE)
-  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -fno-elide-constructors \
--fno-inline")
-endif()
 
 include(FetchContent)
 FetchContent_Declare(
@@ -108,20 +105,26 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   add_compile_options(-Wdeprecated -Wuseless-cast)
 endif()
 
-# to turn off a warning for a section of code use the following ('GCC' works
-# for both Clang and GCC):
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch-enum"
-# ... code with warning ...
-#pragma GCC diagnostic pop
+# prefix for libraries created by this project
+set(LIB_PREFIX kanjiTools_)
 
-set(LIBS utils kana kanji quiz stats) # libraries created by this project
-set(LIB_PREFIX kanjiTools_) # prefix for libraries created by this project
+# add 'main' programs (before adding coverage flags)
+add_subdirectory(apps)
 
-# Note: LIBS is in (least-first) dependency order, i.e., 'quiz' and 'stats' each
-# depend on 'kanji', 'kanji' depends on 'kana' and 'kana' depends on 'utils'.
+# LIBS is in (least-first) dependency order, i.e., 'quiz' and 'stats' depend
+# on 'kanji', 'kanji' depends on 'kana' and 'kana' depends on 'utils'.
+set(LIBS utils kana kanji quiz stats)
 
-# add tests (one 'main' test program per lib)
+# add options for test coverage (only affects debug builds)
+if(CODE_COVERAGE)
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -fno-elide-constructors \
+-fno-inline")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fprofile-abs-path")
+  endif()
+endif()
+
+# add tests (there is one 'test' program per lib)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   foreach(LIB ${LIBS})
     set(TARGET ${LIB}Test)
@@ -142,6 +145,3 @@ foreach(LIB ${LIBS})
   add_subdirectory(libs/${LIB}/src)
   target_include_directories(${TARGET} PUBLIC libs/${LIB}/include)
 endforeach()
-
-# add 'main' programs
-add_subdirectory(apps)
