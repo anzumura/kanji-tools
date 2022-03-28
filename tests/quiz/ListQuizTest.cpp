@@ -2,12 +2,13 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 #include <sstream>
 
 namespace kanji_tools {
 
-class QuizTest : public ::testing::Test {
+class ListQuizTest : public ::testing::Test {
 protected:
   static void SetUpTestCase() {
     _data = std::make_shared<KanjiData>(0, nullptr, _os, _es);
@@ -16,10 +17,10 @@ protected:
   }
 
   // Contructs Quiz using the real data files
-  QuizTest() : _quiz{0, {}, _data, _groupData, _jukugoData, &_is} {}
+  ListQuizTest() : _quiz{0, {}, _data, _groupData, _jukugoData, &_is} {}
 
   // Populate '_is' as input for '_quiz'
-  void gradeListQuiz() {
+  void gradeQuiz() {
     // 't' for 'test' mode (instead of review mode)
     // 'b' for Beginning of list (instead of End or Random)
     // 'g' for List Quiz
@@ -29,7 +30,7 @@ protected:
     _is << "t\nb\ng\n1\n4\nk\n";
   }
 
-  [[nodiscard]] std::string listQuizFirstQuestion(
+  [[nodiscard]] std::string firstQuestion(
       char quizType, char questionList, bool checkDefault = false) {
     std::string line, otherLine;
     // run with quizType and questionList coming from stdin
@@ -48,18 +49,12 @@ protected:
     return line.substr(9);
   }
 
-  void meaningGroupQuiz() {
-    // 't' for 'test' mode (instead of review mode)
-    // 'b' for Beginning of list (instead of End or Random)
-    // 'm' for Meaning Group Quiz
-    // '1' for including only Jōyō kanji
-    _is << "t\nb\nm\n1\n";
-  }
-  void edit() { _is << "*\n"; } // '*' is the option to edit an answer
   void skip() { _is << ".\n"; } // '.' is the option to skip a question
+
   void toggleMeanings() {
-    _is << "-\n";
-  } // '-' is the option to toggle meanings
+    _is << "-\n"; // '-' is the option to toggle meanings
+  }
+
   void startQuiz(QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}) {
     // clear eofbit and failbit for output streams in case quiz is run again
@@ -88,8 +83,8 @@ protected:
   inline static JukugoDataPtr _jukugoData;
 };
 
-TEST_F(QuizTest, ListQuiz) {
-  gradeListQuiz();
+TEST_F(ListQuizTest, StartQuiz) {
+  gradeQuiz();
   startQuiz();
   std::string line, lastLine;
   while (std::getline(_os, line)) lastLine = line;
@@ -100,7 +95,7 @@ TEST_F(QuizTest, ListQuiz) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
-TEST_F(QuizTest, ListQuizDefaults) {
+TEST_F(ListQuizTest, QuizDefaults) {
   const auto run{[this](std::string& out) {
     startQuiz();
     std::string line;
@@ -112,7 +107,7 @@ TEST_F(QuizTest, ListQuizDefaults) {
         out += line.starts_with("    ") ? line.substr(0, 8) : line;
   }};
   std::string all, allWithDefaults;
-  gradeListQuiz();
+  gradeQuiz();
   run(all);
   ASSERT_FALSE(all.empty());
   // run again using defaults for the following and expect the same results:
@@ -127,7 +122,7 @@ TEST_F(QuizTest, ListQuizDefaults) {
   EXPECT_EQ(all, allWithDefaults);
 }
 
-TEST_F(QuizTest, ListQuizReview) {
+TEST_F(ListQuizTest, QuizReview) {
   _is << "r\nb\ng\n1\n";
   toggleMeanings();
   startQuiz();
@@ -151,8 +146,8 @@ TEST_F(QuizTest, ListQuizReview) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
-TEST_F(QuizTest, FrequencyLists) {
-  const auto f{[this](char x) { return listQuizFirstQuestion('f', x); }};
+TEST_F(ListQuizTest, FrequencyLists) {
+  const auto f{[this](char x) { return firstQuestion('f', x); }};
   EXPECT_EQ(f('1'), "1/500:  日  Rad 日(72), Strokes 4, rì, G1, N5, K10");
   EXPECT_EQ(f('2'), "1/500:  良  Rad 艮(138), Strokes 7, liáng, G4, N3, K7");
   EXPECT_EQ(
@@ -161,9 +156,9 @@ TEST_F(QuizTest, FrequencyLists) {
   EXPECT_EQ(f('5'), "1/501:  炒  Rad 火(86), Strokes 8, chǎo, K1");
 }
 
-TEST_F(QuizTest, GradeLists) {
+TEST_F(ListQuizTest, GradeLists) {
   const auto f{[this](char x, bool checkDefault = false) {
-    return listQuizFirstQuestion('g', x, checkDefault);
+    return firstQuestion('g', x, checkDefault);
   }};
   EXPECT_EQ(f('1'), "1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10");
   EXPECT_EQ(f('2'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, N4, Frq 218, K9");
@@ -178,9 +173,9 @@ TEST_F(QuizTest, GradeLists) {
       "1/1130:  亜  Rad 二(7), Strokes 7, yà, N1, Frq 1509, Old 亞, KJ2");
 }
 
-TEST_F(QuizTest, KyuLists) {
+TEST_F(ListQuizTest, KyuLists) {
   const auto f{[this](char x, bool checkDefault = false) {
-    return listQuizFirstQuestion('k', x, checkDefault);
+    return firstQuestion('k', x, checkDefault);
   }};
   EXPECT_EQ(f('a'), "1/80:  一  Rad 一(1), Strokes 1, yī, G1, N5, Frq 2");
   EXPECT_EQ(f('9'), "1/160:  引  Rad 弓(57), Strokes 4, yǐn, G2, N4, Frq 218");
@@ -200,8 +195,8 @@ TEST_F(QuizTest, KyuLists) {
   EXPECT_EQ(f('1'), "1/2780:  芦  Rad 艸(140), Strokes 7, lú, Frq 1733");
 }
 
-TEST_F(QuizTest, LevelLists) {
-  const auto f{[this](char x) { return listQuizFirstQuestion('l', x); }};
+TEST_F(ListQuizTest, LevelLists) {
+  const auto f{[this](char x) { return firstQuestion('l', x); }};
   EXPECT_EQ(f('5'), "1/103:  一  Rad 一(1), Strokes 1, yī, G1, Frq 2, K10");
   EXPECT_EQ(f('4'), "1/181:  不  Rad 一(1), Strokes 4, bù, G4, Frq 101, K7");
   EXPECT_EQ(f('3'), "1/361:  丁  Rad 一(1), Strokes 2, dīng, G3, Frq 1312, K8");
@@ -211,9 +206,9 @@ TEST_F(QuizTest, LevelLists) {
       f('1'), "1/1162:  統  Rad 糸(120), Strokes 12, tǒng, G5, Frq 125, K6");
 }
 
-TEST_F(QuizTest, SkipListQuestions) {
+TEST_F(ListQuizTest, SkipQuestions) {
   for (size_t i{2}; i < 4; ++i) {
-    gradeListQuiz();
+    gradeQuiz();
     for (size_t j{}; j < i; ++j) skip();
     startQuiz();
     // make sure _os is in expected 'good' state
@@ -229,8 +224,8 @@ TEST_F(QuizTest, SkipListQuestions) {
   }
 }
 
-TEST_F(QuizTest, ToggleListMeanings) {
-  gradeListQuiz();
+TEST_F(ListQuizTest, ToggleMeanings) {
+  gradeQuiz();
   toggleMeanings(); // turn meanings on
   toggleMeanings(); // turn meanings off
   startQuiz();
@@ -250,115 +245,6 @@ TEST_F(QuizTest, ToggleListMeanings) {
   // then again with a meaning when meanings are toggled on and then again
   // without a meaning when meanings are toggled off.
   EXPECT_EQ(found, 3);
-}
-
-TEST_F(QuizTest, GroupQuiz) {
-  meaningGroupQuiz();
-  startQuiz();
-  std::string line, lastLine;
-  while (std::getline(_os, line)) lastLine = line;
-  // test the line sent to _os
-  EXPECT_EQ(lastLine, "Final score: 0/0");
-  // should be nothing sent to _es (for errors) and nothing left in _is
-  EXPECT_FALSE(std::getline(_es, line));
-  EXPECT_FALSE(std::getline(_is, line));
-}
-
-TEST_F(QuizTest, SkipGroupQuestions) {
-  for (size_t i{2}; i < 4; ++i) {
-    meaningGroupQuiz();
-    for (size_t j{}; j < i; ++j) skip();
-    startQuiz();
-    std::string line, lastLine;
-    while (std::getline(_os, line)) lastLine = line;
-    const auto skipped{std::to_string(i)};
-    EXPECT_EQ(lastLine, "Final score: 0/" + skipped + ", skipped: " + skipped);
-  }
-}
-
-TEST_F(QuizTest, ToggleGroupMeanings) {
-  meaningGroupQuiz();
-  toggleMeanings(); // turn meanings on
-  toggleMeanings(); // turn meanings off
-  startQuiz();
-  auto meaningsOn{false};
-  size_t found{};
-  std::string line;
-  const std::string expected{"みなみ"};
-  const auto expectedWithMeaning{expected + " : south"};
-  while (std::getline(_os, line)) {
-    if (line.erase(0, 4).starts_with(":  ") &&
-        line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
-      ++found;
-      meaningsOn = !meaningsOn;
-    }
-  }
-  // We want to find the Question string 3 times, i.e., once without meanings,
-  // then again with a meaning when meanings are toggled on and then again
-  // without a meaning when meanings are toggled off.
-  EXPECT_EQ(found, 3);
-}
-
-TEST_F(QuizTest, EditAfterOneAnswer) {
-  meaningGroupQuiz();
-  _is << "a\n"; // provide an answer for the first group entry
-  edit();
-  _is << "b\n"; // change the answer from 'a' to 'b'
-  startQuiz();
-  size_t found{};
-  std::string line;
-  while (std::getline(_os, line)) {
-    if (!found) {
-      if (line.ends_with("1->a")) ++found;
-    } else if (line.ends_with("1->b"))
-      ++found;
-  }
-  EXPECT_EQ(found, 2);
-}
-
-TEST_F(QuizTest, EditAfterMultipleAnswers) {
-  meaningGroupQuiz();
-  _is << "a\nb\n"; // entry 1 maps to 'a' and 2 maps to 'b'
-  edit();
-  _is << "a\n"; // pick the answer to change (so 1->a)
-  _is << "c\n"; // set new value (should now be 1->c and 2 still maps to 'b')
-  startQuiz();
-  size_t found{};
-  std::string line;
-  while (std::getline(_os, line)) {
-    if (!found) {
-      if (line.ends_with("1->a 2->b")) ++found; // before edit
-    } else if (line.ends_with("1->c 2->b"))     // after edit
-      ++found;
-  }
-  EXPECT_EQ(found, 2);
-}
-
-TEST_F(QuizTest, PatternGroupBuckets) {
-  const auto f{[this](char x) {
-    _is << "t\nb\np\n4\n" << x << "\n";
-    std::string line;
-    getFirstQuestion(line);
-    return line.substr(9);
-  }};
-  EXPECT_EQ(f('1'), "1/85:  [阿：ア], 3 members");
-  EXPECT_EQ(f('2'), "1/269:  [華：カ], 5 members");
-  EXPECT_EQ(f('3'), "1/286:  [差：サ], 9 members");
-  EXPECT_EQ(f('4'), "1/143:  [朶：タ], 2 members");
-  EXPECT_EQ(f('5'), "1/144:  [巴：ハ、ヒ], 8 members");
-  EXPECT_EQ(f('6'), "1/111:  [耶：ヤ], 4 members");
-}
-
-TEST_F(QuizTest, GroupQuizDefaults) {
-  _is << "t\nb\np\n2\n1\n";
-  std::string line, lineWithDefaults;
-  getFirstQuestion(line);
-  EXPECT_EQ(
-      line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");
-  // check default 'member filter' is '2' and the default 'bucket' is '1'
-  _is << "t\nb\np\n\n\n";
-  getFirstQuestion(lineWithDefaults);
-  EXPECT_EQ(line, lineWithDefaults);
 }
 
 } // namespace kanji_tools
