@@ -118,6 +118,10 @@ endif()
 set(LIBS utils kana kanji quiz stats) # libraries created by this project
 set(LIB_PREFIX kanjiTools_) # prefix for libraries created by this project
 
+# Note: LIBS is in (least-first) dependency order, i.e., 'quiz' and 'stats' each
+# depend on 'kanji', 'kanji' depends on 'kana' and 'kana' depends on 'utils'.
+
+# add tests (one 'main' test program per lib)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   foreach(LIB ${LIBS})
     set(TARGET ${LIB}Test)
@@ -127,18 +131,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   endforeach()
 endif()
 
-# add this flag here so that it only applies to main code (googletest uses '0'
-# as a pointer in 'gtest.cc' line 2660 and equality tests for operator<=> also
-# produce this warning)
+# add this diagnostic flag here so that it only applies to main code (googletest
+# uses '0' as a pointer in 'gtest.cc' line 2660 and operator<=> equality tests
+# also produce this warning)
 add_compile_options(-Wzero-as-null-pointer-constant)
 
-# add libs in dependency order, i.e., 'kana' depends on 'utils', 'kanji'
-# depends on 'kana' (and 'utils') and both 'quiz' and 'stats' depend on 'kanji'
+# add libs
 foreach(LIB ${LIBS})
   set(TARGET ${LIB_PREFIX}${LIB})
-  set(LIB_DIR "${PROJECT_SOURCE_DIR}/libs/${LIB}")
-  add_subdirectory(${LIB_DIR}/src)
-  target_include_directories(${TARGET} PUBLIC ${LIB_DIR}/include)
+  add_subdirectory(libs/${LIB}/src)
+  target_include_directories(${TARGET} PUBLIC libs/${LIB}/include)
 endforeach()
 
+# add 'main' programs
 add_subdirectory(apps)
