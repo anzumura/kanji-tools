@@ -87,8 +87,8 @@ The following table shows flags used per compiler (**Common** shows flags used f
 | Compiler | Standard | Diagnostic Flags | Disabled |
 | --- | --- | --- | --- |
 | Common | | -Wall -Wconversion -Wdeprecated -Werror -Wextra -Wextra-semi -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override -Wswitch-enum -Wzero-as-null-pointer-constant | |
-| Clang | gnu++2a | -Wcovered-switch-default -Wduplicate-enum -Wheader-hygiene -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override -Wunreachable-code-aggressive | -Wno-logical-op-parentheses |
-| GCC | gnu++20 | -Wnon-virtual-dtor -Woverloaded-virtual -Wshadow -Wuseless-cast | -Wno-parentheses |
+| Clang | c++2a | -Wcovered-switch-default -Wduplicate-enum -Wheader-hygiene -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override -Wunreachable-code-aggressive | -Wno-logical-op-parentheses |
+| GCC | c++20 | -Wnon-virtual-dtor -Woverloaded-virtual -Wshadow -Wuseless-cast | -Wno-parentheses |
 
 **Notes**:
 

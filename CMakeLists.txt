@@ -11,46 +11,52 @@ endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   set(CMAKE_CXX_STANDARD 20)
-  # enable warnings and turn them into errors (-W is the same as -Wextra, but
-  # it's deprecated for GCC so explicitly use -Wextra). -Wpedantic means 'Issue
-  # all the warnings demanded by strict ISO C++'. Links for more info:
-  # Clang: https://clang.llvm.org/docs/DiagnosticsReference.html
-  # GCC: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-  add_compile_options(-Wall -Wconversion -Werror -Wextra -Wextra-semi
-    -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override)
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h'
-    # so add it for Clang here and add it for GCC after building googletest
-    add_compile_options(-Wdeprecated -Wduplicate-enum -Wheader-hygiene
-      -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override
-      -Wunreachable-code-aggressive)
-    # turn off a warning
-    add_compile_options(-Wno-logical-op-parentheses)
-    set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer \
--fno-optimize-sibling-calls")
-    # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
-    # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
-    string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS}")
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    # Clang -Wall sets -Wmost which sets -Woverloaded-virtual, -Wunused, etc.,
-    # and -Wshadow-all sets -Wshadow (and more). GCC -Wall also sets things like
-    # -Wunused (see links above), but the following don't seem to be included:
-    add_compile_options(-Wnon-virtual-dtor -Woverloaded-virtual -Wshadow)
-    # turn off a warning
-    add_compile_options(-Wno-parentheses)
-    if(CODE_COVERAGE)
-      string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fprofile-abs-path")
-    endif()      
-  endif()
-  string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O0")
-  # add options for test coverage (only affects debug builds)
-  if(CODE_COVERAGE)
-    string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -fno-elide-constructors \
--fno-inline")
-  endif()
-  # Use the following to override the linker
-  # string(APPEND " -fuse-ld=gold")
+  set(CMAKE_CXX_EXTENSIONS OFF) # use -std=c++xx instead of -std=g++xx
   include(CTest)
+endif()
+
+# enable warnings and turn them into errors (-W is the same as -Wextra, but it's
+# deprecated for GCC so explicitly use -Wextra). -Wpedantic means 'Issue all the
+# warnings demanded by strict ISO C++'. Links for more info:
+# Clang: https://clang.llvm.org/docs/DiagnosticsReference.html
+# GCC: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+add_compile_options(-Wall -Wconversion -Werror -Wextra -Wextra-semi
+  -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # '-Wdeprecated' causes an error with GCC on line 918 in 'gtest-internal.h' so
+  # add it for Clang here and add it for GCC after building googletest
+  add_compile_options(-Wdeprecated -Wduplicate-enum -Wheader-hygiene
+    -Wloop-analysis -Wshadow-all -Wsuggest-destructor-override
+    -Wunreachable-code-aggressive)
+
+  # turn off a warning
+  add_compile_options(-Wno-logical-op-parentheses)
+
+  set(SANITIZER_FLAGS "-fsanitize=address -fno-omit-frame-pointer \
+-fno-optimize-sibling-calls")
+  # need to set env for stack: ASAN_OPTIONS=detect_stack_use_after_return=1
+  # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS}")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  # Clang -Wall sets -Wmost which sets -Woverloaded-virtual, -Wunused, etc.,
+  # and -Wshadow-all sets -Wshadow (and more). GCC -Wall also sets things like
+  # -Wunused (see links above), but the following don't seem to be included:
+  add_compile_options(-Wnon-virtual-dtor -Woverloaded-virtual -Wshadow)
+
+  # turn off a warning
+  add_compile_options(-Wno-parentheses)
+
+  if(CODE_COVERAGE)
+    string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fprofile-abs-path")
+  endif()      
+endif()
+string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O0")
+
+# add options for test coverage (only affects debug builds)
+if(CODE_COVERAGE)
+  string(APPEND CMAKE_CXX_FLAGS_DEBUG " --coverage -fno-elide-constructors \
+-fno-inline")
 endif()
 
 include(FetchContent)
@@ -109,15 +115,14 @@ endif()
 # ... code with warning ...
 #pragma GCC diagnostic pop
 
-# prefix for libraries create by this project
-set(LIB_PREFIX kanjiTools_)
+set(LIBS utils kana kanji quiz stats) # libraries created by this project
+set(LIB_PREFIX kanjiTools_) # prefix for libraries created by this project
 
-if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
-  AND BUILD_TESTING)
-  set(TESTS_INCLUDE "${PROJECT_SOURCE_DIR}/tests/include")
-  foreach(LIB utils kana kanji quiz stats)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+  foreach(LIB ${LIBS})
     set(TARGET ${LIB}Test)
     add_subdirectory(tests/${LIB})
+    target_include_directories(${TARGET} PRIVATE tests/include)
     add_test(NAME ${LIB} COMMAND ${TARGET})
   endforeach()
 endif()
@@ -129,7 +134,7 @@ add_compile_options(-Wzero-as-null-pointer-constant)
 
 # add libs in dependency order, i.e., 'kana' depends on 'utils', 'kanji'
 # depends on 'kana' (and 'utils') and both 'quiz' and 'stats' depend on 'kanji'
-foreach(LIB utils kana kanji quiz stats)
+foreach(LIB ${LIBS})
   set(TARGET ${LIB_PREFIX}${LIB})
   set(LIB_DIR "${PROJECT_SOURCE_DIR}/libs/${LIB}")
   add_subdirectory(${LIB_DIR}/src)
