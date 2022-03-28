@@ -60,7 +60,7 @@ if [[ -n $cov ]]; then
   # 'gcovr' 5.0 worked fine for both Clang and GCC, but version 5.1 gets a few
   # parse errors for GCC which don't seem to affect the overall coverage so for
   # now use '--gcov-ignore-parse-errors' to allow the report to get generated
-  gcovr libs --gcov-executable=$cov -x -r.. --gcov-ignore-parse-errors \
+  gcovr --gcov-executable=$cov -x -r.. -f../libs --gcov-ignore-parse-errors \
     --exclude-unreachable-branches --exclude-throw-branches >coverage.xml
 fi
 
