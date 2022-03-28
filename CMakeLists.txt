@@ -105,12 +105,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   add_compile_options(-Wdeprecated -Wuseless-cast)
 endif()
 
-# prefix for libraries created by this project
-set(LIB_PREFIX kanjiTools_)
-
-# LIBS is in (least-first) dependency order, i.e., 'quiz' and 'stats' depend
-# on 'kanji', 'kanji' depends on 'kana' and 'kana' depends on 'utils'.
-set(LIBS utils kana kanji quiz stats)
+set(LIB_PREFIX kanjiTools_) # prefix for libs created by this project
+set(LIBS kana kanji quiz stats utils) # libs created by this project
 
 # add options for test coverage (only affects debug builds)
 if(CODE_COVERAGE)
