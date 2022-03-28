@@ -1,3 +1,2 @@
-add_executable(quizTest GroupDataTest.cpp QuizTest.cpp ../testMain.cpp)
-target_link_libraries(quizTest PRIVATE kanjiToolsQuiz gtest)
-add_test(NAME quiz COMMAND quizTest)
+add_executable(${TARGET} GroupDataTest.cpp QuizTest.cpp ../testMain.cpp)
+target_link_libraries(${TARGET} PRIVATE ${LIB_PREFIX}quiz gtest)

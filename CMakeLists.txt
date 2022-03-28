@@ -109,14 +109,17 @@ endif()
 # ... code with warning ...
 #pragma GCC diagnostic pop
 
+# prefix for libraries create by this project
+set(LIB_PREFIX kanjiTools_)
+
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING)
   AND BUILD_TESTING)
   set(TESTS_INCLUDE "${PROJECT_SOURCE_DIR}/tests/include")
-  add_subdirectory(tests/kana)
-  add_subdirectory(tests/kanji)
-  add_subdirectory(tests/quiz)
-  add_subdirectory(tests/stats)
-  add_subdirectory(tests/utils)
+  foreach(LIB utils kana kanji quiz stats)
+    set(TARGET ${LIB}Test)
+    add_subdirectory(tests/${LIB})
+    add_test(NAME ${LIB} COMMAND ${TARGET})
+  endforeach()
 endif()
 
 # add this flag here so that it only applies to main code (googletest uses '0'
@@ -124,9 +127,13 @@ endif()
 # produce this warning)
 add_compile_options(-Wzero-as-null-pointer-constant)
 
-add_subdirectory(src/kana)  # source files for 'kana' lib (depends on 'utils')
-add_subdirectory(src/kanji) # source files for 'kanji' lib (depends on 'kana')
-add_subdirectory(src/quiz)  # source files for 'quiz' lib (depends on 'kanji')
-add_subdirectory(src/stats) # source files for 'stats' lib (depends on 'kanji')
-add_subdirectory(src/utils) # source files for 'utils' lib
+# add libs in dependency order, i.e., 'kana' depends on 'utils', 'kanji'
+# depends on 'kana' (and 'utils') and both 'quiz' and 'stats' depend on 'kanji'
+foreach(LIB utils kana kanji quiz stats)
+  set(TARGET ${LIB_PREFIX}${LIB})
+  set(LIB_DIR "${PROJECT_SOURCE_DIR}/libs/${LIB}")
+  add_subdirectory(${LIB_DIR}/src)
+  target_include_directories(${TARGET} PUBLIC ${LIB_DIR}/include)
+endforeach()
+
 add_subdirectory(apps)

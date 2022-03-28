@@ -1,3 +1,0 @@
-add_library(kanjiToolsStats MBCount.cpp Stats.cpp)
-target_include_directories(kanjiToolsStats PUBLIC include)
-target_link_libraries(kanjiToolsStats kanjiToolsKanji)

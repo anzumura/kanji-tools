@@ -35,14 +35,15 @@ The initial goal for this project was to create a program that could parse multi
 
 The project is build using *cmake* (installed via Homebrew) so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The code is split out across the following directories:
 
-- **apps**: *.cpp* files for the main programs
+- **apps**: *CMakeLists.txt* and a *.cpp* file for each main programs
 - **build**: generated directory for build targets and *cmake* dependencies
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
-- **scripts**: *bash* scripts for working with *Unicode* data files
-- **src**: contains a sub-directory per library:
-  - each sub-directory contains *CMakeLists.txt*, *.cpp* files and *include* directory
-- **tests**: contains *testMain.cpp*, *include* directory and a sub-directory per library:
-  - each sub-directory contains *CMakeLists.txt* and *.cpp* files
+- **scripts**: *.sh* bash scripts for working with *Unicode* data files
+- **libs**: has a directory per lib, each containing:
+  - **include**: *.h* files for the lib
+  - **src**: *CMakeLists.txt* and *.cpp* files for the lib
+- **tests**: has *testMain.cpp*, an *include* directory and a directory per lib:
+  - each sub-directory has *CMakeLists.txt* and *.cpp* files
 
 The five libraries are:
 

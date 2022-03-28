@@ -1,5 +1,4 @@
-add_executable(kanaTest KanaConvertTest.cpp KanaTest.cpp MBCharTest.cpp
+add_executable(${TARGET} KanaConvertTest.cpp KanaTest.cpp MBCharTest.cpp
   TableTest.cpp ../testMain.cpp)
-target_include_directories(kanaTest PRIVATE ${TESTS_INCLUDE})
-target_link_libraries(kanaTest PRIVATE kanjiToolsKana gtest)
-add_test(NAME kana COMMAND kanaTest)
+target_include_directories(${TARGET} PRIVATE ${TESTS_INCLUDE})
+target_link_libraries(${TARGET} PRIVATE ${LIB_PREFIX}kana gtest)
