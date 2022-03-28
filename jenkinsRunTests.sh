@@ -37,10 +37,14 @@ declare -r testTop=$PWD
 
 # only make coverage reports if there are .gcno files (so with -DCODE_COVERAGE)
 if [[ -n $(find . -name *.gcno | head -1) ]]; then
-  # remove coverage results from previous runs before running tests
+  # remove coverage results from previous runs before running tests - this is
+  # faster than wiping the workspace or doing a full re-build, but it's fragile
+  # if files are renamed, removed, etc.. (then a full re-build should be done)
   log "detected a coverage build"
-  log "- removing *.gcda files"
+  log "- removing .gcda files"
   find .. -name *.gcda -exec rm {} \;
+  log "- removing .gcno files that don't have a corresponding .o file"
+  find .. -name *.gcno -exec bash -c '[[ ! -f ${1/.gcno/.o} ]] && rm $1' _ {} \;
   if otool -L $(ls ./*/*Test | head -1) | grep -q /lib/gcc/; then
     cov=gcov-11
   else
