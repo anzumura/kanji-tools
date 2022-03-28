@@ -108,9 +108,6 @@ endif()
 # prefix for libraries created by this project
 set(LIB_PREFIX kanjiTools_)
 
-# add 'main' programs (before adding coverage flags)
-add_subdirectory(apps)
-
 # LIBS is in (least-first) dependency order, i.e., 'quiz' and 'stats' depend
 # on 'kanji', 'kanji' depends on 'kana' and 'kana' depends on 'utils'.
 set(LIBS utils kana kanji quiz stats)
@@ -145,3 +142,6 @@ foreach(LIB ${LIBS})
   add_subdirectory(libs/${LIB}/src)
   target_include_directories(${TARGET} PUBLIC libs/${LIB}/include)
 endforeach()
+
+# add 'main' programs
+add_subdirectory(apps)

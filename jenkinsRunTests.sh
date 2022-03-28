@@ -66,7 +66,8 @@ if [[ -n $cov ]]; then
   # parse errors for GCC which don't seem to affect the overall coverage so for
   # now use '--gcov-ignore-parse-errors' to allow the report to get generated
   gcovr --gcov-executable=$cov -x -d -flibs --gcov-ignore-parse-errors \
-    --exclude-unreachable-branches --exclude-throw-branches >build/coverage.xml
+    --exclude-unreachable-branches --exclude-throw-branches build/libs \
+    build/tests >build/coverage.xml
 fi
 
 # set the following values for the actions:
