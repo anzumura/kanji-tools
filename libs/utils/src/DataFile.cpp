@@ -53,10 +53,8 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
   for (std::string line; std::getline(f, line); ++lineNum) {
     std::stringstream ss{line};
     for (std::string token; std::getline(ss, token, ' ');) {
-      if (fileType == FileType::OnePerLine) {
-        if (token != line) error("got multiple tokens");
-      } else if (token.empty() || token == "　")
-        continue; // skip empty tokens and 'wide spaces'
+      if (fileType == FileType::OnePerLine && token != line)
+        error("got multiple tokens");
       if (!isValidMBUtf8(token, true))
         error("invalid multi-byte token '" + token + "'");
       // check uniqueness with file
