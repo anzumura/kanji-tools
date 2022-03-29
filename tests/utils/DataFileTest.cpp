@@ -144,12 +144,12 @@ TEST_F(DataFileTest, GlobalDuplicate) {
 }
 
 TEST_F(DataFileTest, GlobalDuplicateLevel) {
-  EXPECT_THROW(
-      call(
-          [] {
-            LevelDataFile{GoodOnePerLineLevel, JlptLevels::N3};
-          },
-          "found 3 duplicates in N3, file: testDir/goodOnePerLineLevel"),
+  EXPECT_THROW(call(
+                   [] {
+                     LevelDataFile{GoodOnePerLineLevel, JlptLevels::N3};
+                   },
+                   "found 3 duplicates in N3: 犬 猫 虎, file: "
+                   "testDir/goodOnePerLineLevel"),
       std::domain_error);
 }
 

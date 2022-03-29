@@ -26,7 +26,7 @@ KanjiData::KanjiData(
           dataFile(KenteiKyus::K4), dataFile(KenteiKyus::K3),
           dataFile(KenteiKyus::KJ2), dataFile(KenteiKyus::K2),
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
-      _frequency{dataDir() / "frequency", debug()} {
+      _frequency{dataDir() / "frequency"} {
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
   _ucd.load(DataFile::getFile(dataDir(), UcdFile));
   _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));

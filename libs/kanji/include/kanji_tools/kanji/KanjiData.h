@@ -38,10 +38,10 @@ private:
       return dataDir() / dir / firstLower(kanji_tools::toString(t));
     }}; // LCOV_EXCL_LINE - for some reason Clang marks this line as 0 coverage
     if constexpr (std::is_same_v<T, JlptLevels>)
-      return LevelDataFile{f(Jlpt), t, debug()};
+      return LevelDataFile{f(Jlpt), t};
     else {
       static_assert(std::is_same_v<T, KenteiKyus>);
-      return KyuDataFile{f(Kentei), t, debug()};
+      return KyuDataFile{f(Kentei), t};
     }
   }
 

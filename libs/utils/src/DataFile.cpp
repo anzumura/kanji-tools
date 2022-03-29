@@ -35,7 +35,7 @@ void DataFile::print(const List& l, const std::string& type,
 }
 
 DataFile::DataFile(const fs::path& fileIn, FileType fileType,
-    bool createNewUniqueFile, Set* uniqueTypeNames, const std::string& name)
+    Set* uniqueTypeNames, const std::string& name)
     : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
   auto file{fileIn};
   // try adding .txt if file isn't found
@@ -76,21 +76,13 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
     }
   }
   if (!dups.empty()) {
-    static const std::string Found{"found "}, Duplicates{" duplicates in "};
-    if (good.empty())
-      error(Found + std::to_string(dups.size()) + Duplicates + _name, false);
-    else {
-      std::cerr << ">>> " << Found << dups.size() << Duplicates << _name << ":";
-      for (const auto& i : dups) std::cerr << ' ' << i;
-      if (createNewUniqueFile) {
-        fs::path newFile{file};
-        newFile.replace_extension(fs::path{"new"});
-        std::cerr << "\n>>> saving " << good.size()
-                  << " unique entries to: " << newFile.string() << '\n';
-        std::ofstream of(newFile);
-        for (const auto& i : good) of << i << '\n';
-      }
+    std::string msg{"found " + std::to_string(dups.size()) + " duplicates in " +
+                    _name + ":"};
+    for (const auto& i : dups) {
+      msg += ' ';
+      msg += i;
     }
+    error(msg, false);
   }
 }
 

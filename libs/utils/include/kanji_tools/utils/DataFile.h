@@ -44,11 +44,10 @@ public:
 
   enum class FileType { MultiplePerLine, OnePerLine };
 
-  DataFile(const std::filesystem::path& p, FileType fileType,
-      bool createNewUniqueFile = false)
-      : DataFile{p, fileType, createNewUniqueFile, nullptr} {}
-  DataFile(const std::filesystem::path& p, bool createNewUniqueFile = false)
-      : DataFile{p, FileType::OnePerLine, createNewUniqueFile, nullptr} {}
+  DataFile(const std::filesystem::path& p, FileType fileType)
+      : DataFile{p, fileType, nullptr} {}
+  DataFile(const std::filesystem::path& p)
+      : DataFile{p, FileType::OnePerLine, nullptr} {}
 
   DataFile(const DataFile&) = delete;
   // operator= is not generated since there are const members
@@ -78,7 +77,7 @@ public:
     return result;
   }
 protected:
-  DataFile(const std::filesystem::path& p, FileType fileType, bool, Set*,
+  DataFile(const std::filesystem::path& p, FileType fileType, Set*,
       const std::string& name = {});
 private:
   using Map = std::map<std::string, size_t>;
@@ -96,10 +95,9 @@ private:
 // there are TypedDataFile classes for 'JlptLevels' and 'KenteiKyus'
 template<typename T> class TypedDataFile : public DataFile {
 protected:
-  TypedDataFile(
-      const std::filesystem::path& p, T type, bool createNewUniqueFile = false)
-      : DataFile{p, FileType::MultiplePerLine, createNewUniqueFile,
-            &UniqueTypeNames, kanji_tools::toString(type)},
+  TypedDataFile(const std::filesystem::path& p, T type)
+      : DataFile{p, FileType::MultiplePerLine, &UniqueTypeNames,
+            kanji_tools::toString(type)},
         _type{type} {}
 protected:
   const T _type;
@@ -109,18 +107,16 @@ private:
 
 class LevelDataFile : public TypedDataFile<JlptLevels> {
 public:
-  LevelDataFile(const std::filesystem::path& p, JlptLevels level,
-      bool createNewUniqueFile = false)
-      : TypedDataFile{p, level, createNewUniqueFile} {}
+  LevelDataFile(const std::filesystem::path& p, JlptLevels level)
+      : TypedDataFile{p, level} {}
 
   [[nodiscard]] JlptLevels level() const override { return _type; }
 };
 
 class KyuDataFile : public TypedDataFile<KenteiKyus> {
 public:
-  KyuDataFile(const std::filesystem::path& p, KenteiKyus kyu,
-      bool createNewUniqueFile = false)
-      : TypedDataFile{p, kyu, createNewUniqueFile} {}
+  KyuDataFile(const std::filesystem::path& p, KenteiKyus kyu)
+      : TypedDataFile{p, kyu} {}
 
   [[nodiscard]] KenteiKyus kyu() const override { return _type; }
 };
