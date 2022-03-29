@@ -22,8 +22,8 @@ fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
   return p;
 }
 
-void DataFile::print(const List& l, const std::string& type,
-    const std::string& group, bool isError, std::ostream& out) {
+void DataFile::print(std::ostream& out, const List& l, const std::string& type,
+    const std::string& group, bool isError) {
   if (!l.empty()) {
     out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' '
         << type;
@@ -49,7 +49,7 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
           ", file: " + file.string());
   }};
   std::ifstream f{file};
-  DataFile::List good, dups;
+  DataFile::List dups;
   for (std::string line; std::getline(f, line); ++lineNum) {
     std::stringstream ss{line};
     for (std::string token; std::getline(ss, token, ' ');) {
@@ -67,7 +67,6 @@ DataFile::DataFile(const fs::path& fileIn, FileType fileType,
           dups.emplace_back(*i.first);
           continue;
         }
-        good.emplace_back(*i.first);
       } else if (!UniqueNames.insert(token).second)
         error("found globally non-unique entry '" + token + "'");
       _list.emplace_back(token);

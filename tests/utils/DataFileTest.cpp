@@ -62,26 +62,26 @@ TEST_F(DataFileTest, PrintEmptyList) {
   std::stringstream s;
   // no output regardless of 'isError' value
   for (auto isError : {false, true}) {
-    DataFile::print({}, "items", {}, isError, s);
+    DataFile::print(s, {}, "items", {}, isError);
     EXPECT_EQ(s.str(), "");
   }
 }
 
 TEST_F(DataFileTest, PrintNonEmptyList) {
   std::stringstream s;
-  DataFile::print({"foo", "bar"}, "items", {}, false, s);
+  DataFile::print(s, {"foo", "bar"}, "items", {});
   EXPECT_EQ(s.str(), ">>> Found 2 items: foo bar\n");
 }
 
 TEST_F(DataFileTest, PrintNonEmptyListAsError) {
   std::stringstream s;
-  DataFile::print({"foo", "bar"}, "items", {}, true, s);
+  DataFile::print(s, {"foo", "bar"}, "items", {}, true);
   EXPECT_EQ(s.str(), "ERROR --- Found 2 items: foo bar\n");
 }
 
 TEST_F(DataFileTest, PrintWithGroupName) {
   std::stringstream s;
-  DataFile::print({"a", "b", "c"}, "items", "bag", false, s);
+  DataFile::print(s, {"a", "b", "c"}, "items", "bag");
   EXPECT_EQ(s.str(), ">>> Found 3 items in bag: a b c\n");
 }
 

@@ -9,60 +9,7 @@
 
 namespace kanji_tools {
 
-namespace {
-
-constexpr auto Arg0{"test"}, DebugArg{"-debug"}, DataArg{"-data"},
-    DataDir{"dir"};
-
-} // namespace
-
 namespace fs = std::filesystem;
-
-TEST(DataTest, Usage) {
-  const std::string msg{"error msg"};
-  EXPECT_THROW(call([&msg] { Data::usage(msg); }, msg), std::domain_error);
-}
-
-TEST(DataTest, NextArgWithJustArg0) {
-  // call without final 'currentArg' parameter increments to 1
-  EXPECT_EQ(Data::nextArg(1, &Arg0), 1);
-}
-
-TEST(DataTest, NextArgWithCurrentArg) {
-  auto arg1{"arg1"}, arg2{"arg2"};
-  const char* argv[]{Arg0, arg1, arg2};
-  EXPECT_EQ(Data::nextArg(std::size(argv), argv, 1), 2);
-  EXPECT_EQ(Data::nextArg(std::size(argv), argv, 2), 3);
-}
-
-TEST(DataTest, NextArgWithDebugArg) {
-  const char* argv[]{Arg0, DebugArg};
-  // skip '-data some-dir'
-  EXPECT_EQ(Data::nextArg(std::size(argv), argv), 2);
-}
-
-TEST(DataTest, NextArgWithDataArg) {
-  const char* argv[]{Arg0, DataArg, DataDir};
-  // skip '-data some-dir'
-  EXPECT_EQ(Data::nextArg(std::size(argv), argv), 3);
-}
-
-TEST(DataTest, NextArgWithDebugAndDataArgs) {
-  const char* argv[]{Arg0, DebugArg, DataArg, DataDir};
-  // skip '-data some-dir'
-  EXPECT_EQ(Data::nextArg(std::size(argv), argv), 4);
-}
-
-TEST(DataTest, NextArgWithMultipleArgs) {
-  auto arg1{"arg1"}, arg3{"arg3"}, arg6{"arg6"};
-  const char* argv[]{Arg0, arg1, DebugArg, arg3, DataArg, DataDir, arg6};
-  Data::ArgCount argc{std::size(argv)};
-  std::vector<const char*> actualArgs;
-  for (auto i{Data::nextArg(argc, argv)}; i < argc;
-       i = Data::nextArg(argc, argv, i))
-    actualArgs.push_back(argv[i]);
-  EXPECT_EQ(actualArgs, (std::vector{arg1, arg3, arg6}));
-}
 
 class KanjiDataTest : public ::testing::Test {
 protected:
@@ -474,6 +421,64 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
   check(jouyou7stroke1, jouyou7stroke2);
   // if type and strokes are the same (and no frequency) then sort by unicode
   check(jinmei4stroke1, jinmei4stroke2);
+}
+
+TEST(KanjiDataPrintTest, Info) {
+  const char* testArgs[]{"", "-info"};
+  std::stringstream os;
+  KanjiData data(std::size(testArgs), testArgs, os);
+  const char* expected[]{
+      (">>> Loaded 23715 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
+       "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17471)"),
+      ">>> Grade breakdown:",
+      ">>>   Total for grade G1: 80 (N5 57, N4 15, N3 8)",
+      ">>>   Total for grade G2: 160 (N5 43, N4 74, N3 43)",
+      ">>>   Total for grade G3: 200 (N5 3, N4 67, N3 130)",
+      ">>>   Total for grade G4: 200 (N4 20, N3 180)",
+      ">>>   Total for grade G5: 185 (N4 2, N2 149, N1 34)",
+      ">>>   Total for grade G6: 181 (N4 3, N2 105, N1 73)",
+      ">>>   Total for grade S: 1130 (nf 99) (N2 161, N1 804, None 165)",
+      ">>>   Total for all grades: 2136"};
+  std::string line;
+  int count{0}, maxLines{std::size(expected)};
+  while (std::getline(os, line)) {
+    if (count == maxLines) FAIL() << "got more than " << maxLines;
+    EXPECT_EQ(line, expected[count++]);
+  }
+  EXPECT_EQ(count, maxLines);
+}
+
+TEST(KanjiDataPrintTest, Debug) {
+  const char* testArgs[]{"", "-debug"};
+  std::stringstream os;
+  KanjiData data(std::size(testArgs), testArgs, os);
+  std::string lastLine;
+  size_t count{}, found{};
+  // output is really big so just check for a few examples
+  for (std::string line; std::getline(os, line); ++count, lastLine = line) {
+    if (count == 1)
+      EXPECT_EQ(line, ">>> Begin Loading Data");
+    else if (line.starts_with(">>> Found ")) {
+      const std::string s{line.substr(10)};
+      // check each line against all strings (to detect possible duplicates)
+      if (s.starts_with("251 Jinmei in N1")) ++found;
+      if (s.starts_with("2 Linked Old in Frequency")) ++found;
+      if (s.starts_with("124 non-Jouyou/Jinmei/JLPT in Frequency")) ++found;
+      if (s.starts_with("168 JLPT Jinmei in Frequency")) ++found;
+      if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
+      if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
+      if (s.starts_with("12 non-JLPT Linked Jinmei in Frequency")) ++found;
+      if (s.starts_with("4 Kanji in 'Frequency' group in _strokes")) ++found;
+      if (s.starts_with("51 Kanji with differrent strokes in _ucd")) ++found;
+    } else {
+      if (line == ">>> Frequency Kanji with links 15:") ++found;
+      if (line == ">>> Extra Kanji with links 10:") ++found;
+      if (line.starts_with(">>>   Total for 214 radicals: 21181")) ++found;
+    }
+  }
+  EXPECT_TRUE(lastLine.starts_with(">>>     52     [985E FE00] 類︀"));
+  EXPECT_EQ(found, 12);
+  EXPECT_EQ(count, 362);
 }
 
 } // namespace kanji_tools

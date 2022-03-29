@@ -27,11 +27,10 @@ public:
   [[nodiscard]] static std::filesystem::path getFile(
       const std::filesystem::path& dir, const std::filesystem::path& file);
 
-  static void print(const List&, const std::string& type,
-      const std::string& group = {}, bool isError = false,
-      std::ostream& = std::cout);
+  static void print(std::ostream&, const List&, const std::string& type,
+      const std::string& group, bool isError = false);
   static void print(std::ostream& out, const List& l, const std::string& type) {
-    print(l, type, {}, false, out);
+    print(out, l, type, {}, false);
   }
 
   static void usage(const std::string& msg) { throw std::domain_error(msg); }

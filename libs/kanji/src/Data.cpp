@@ -310,8 +310,9 @@ void Data::processList(const DataFile& list) {
     }
   }
   if (fullDebug()) {
-    DataFile::print(found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-    DataFile::print(created,
+    DataFile::print(
+        _out, found[KanjiTypes::LinkedOld], "Linked Old", list.name());
+    DataFile::print(_out, created,
         std::string{"non-Jouyou/Jinmei"} +
             (hasValue(list.level()) ? "" : "/JLPT"),
         list.name());
@@ -323,15 +324,15 @@ void Data::processList(const DataFile& list) {
         DataFile::List jlptJinmei, otherJinmei;
         for (auto& j : *i.first)
           (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
-        DataFile::print(jlptJinmei, std::string{"JLPT "} + i.second + "Jinmei",
-            list.name());
-        DataFile::print(otherJinmei,
+        DataFile::print(_out, jlptJinmei,
+            std::string{"JLPT "} + i.second + "Jinmei", list.name());
+        DataFile::print(_out, otherJinmei,
             std::string{"non-JLPT "} + i.second + "Jinmei", list.name());
       }
     } else {
-      DataFile::print(found[KanjiTypes::Jinmei], "Jinmei", list.name());
+      DataFile::print(_out, found[KanjiTypes::Jinmei], "Jinmei", list.name());
       DataFile::print(
-          found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
+          _out, found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
     }
   }
 }
@@ -374,16 +375,18 @@ void Data::checkStrokes() const {
       strokesNotFound.emplace_back(i.first);
   }
   if (debug()) {
-    DataFile::print(strokesNotFound, "Kanji not loaded", "_strokes");
+    DataFile::print(_out, strokesNotFound, "Kanji not loaded", "_strokes");
     DataFile::print(
-        vStrokeDiffs, "Variant kanji with differrent strokes", "_ucd");
+        _out, vStrokeDiffs, "Variant kanji with differrent strokes", "_ucd");
+    DataFile::print(_out, missingDiffs,
+        "'_stokes only' Kanji with differrent strokes", "_ucd");
     DataFile::print(
-        missingDiffs, "'_stokes only' Kanji with differrent strokes", "_ucd");
-    DataFile::print(missingUcd, "Kanji in _strokes, but not found", "_ucd");
+        _out, missingUcd, "Kanji in _strokes, but not found", "_ucd");
     if (fullDebug()) {
       DataFile::print(
-          strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
-      DataFile::print(strokeDiffs, "Kanji with differrent strokes", "_ucd");
+          _out, strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
+      DataFile::print(
+          _out, strokeDiffs, "Kanji with differrent strokes", "_ucd");
     }
   }
 }
