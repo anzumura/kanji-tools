@@ -32,10 +32,11 @@ function changeDir() {
 
 log "PATH=$PATH"
 
-changeDir build/tests
+changeDir "$testDir"
 
 # only make coverage reports if there are .gcno files (so with -DCODE_COVERAGE)
-if [[ -n $(find . -name '*.gcno' | head -1) ]]; then
+declare -r gcno='*.gcno'
+if [[ -n $(find . -name $gcno | head -1) ]]; then
   # remove coverage results from previous runs before running tests - this is
   # faster than wiping the workspace or doing a full re-build, but it's fragile
   # if files are renamed, removed, etc.. (then a full re-build should be done)
@@ -43,7 +44,7 @@ if [[ -n $(find . -name '*.gcno' | head -1) ]]; then
   log "- remove .gcda and .gcov files"
   find .. \( -name '*.gcda' -o -name '*.gcov' \) -exec rm {} \;
   log "- remove .gcno files that don't have a corresponding .o file"
-  find .. -name '*.gcno' -exec bash -c '[[ -f ${1/.gcno/.o} ]] || rm $1' _ {} \;
+  find .. -name $gcno -exec bash -c '[[ -f ${1/.gcno/.o} ]] || rm "$1"' _ {} \;
   if otool -L $(ls ./*/*Test | head -1) | grep -q /lib/gcc/; then
     cov=gcov-11
   else
@@ -53,12 +54,12 @@ if [[ -n $(find . -name '*.gcno' | head -1) ]]; then
 fi
 
 for i in *; do
-  changeDir $testDir/$i
+  changeDir "$testDir/$i"
   ./${i}Test --gtest_output=xml
 done
 
 if [[ -n $cov ]]; then
-  changeDir $topDir
+  changeDir "$topDir"
   log "running: $(which gcovr)"
   # 'gcovr' 5.0 worked fine for both Clang and GCC, but version 5.1 gets a few
   # parse errors for GCC which don't seem to affect the overall coverage so for
