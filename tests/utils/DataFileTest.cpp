@@ -35,12 +35,54 @@ protected:
       of.close();
     }
   }
+
   void TearDown() override { fs::remove_all(TestDir); }
 };
 
-TEST(DataTest, Usage) {
+TEST_F(DataFileTest, Usage) {
   const std::string msg{"error msg"};
   EXPECT_THROW(call([&msg] { DataFile::usage(msg); }, msg), std::domain_error);
+}
+
+TEST_F(DataFileTest, MissingFileWithExtension) {
+  const std::string msg{"testDir must contain 'missing.txt'"};
+  EXPECT_THROW(
+      call([] { return DataFile::getFile(TestDir, "missing.txt"); }, msg),
+      std::domain_error);
+}
+
+TEST_F(DataFileTest, MissingFileWithoutExtension) {
+  const std::string msg{
+      "testDir must contain 'missing' (also tried '.txt' extension)"};
+  EXPECT_THROW(call([] { return DataFile::getFile(TestDir, "missing"); }, msg),
+      std::domain_error);
+}
+
+TEST_F(DataFileTest, PrintEmptyList) {
+  std::stringstream s;
+  // no output regardless of 'isError' value
+  for (auto isError : {false, true}) {
+    DataFile::print({}, "items", {}, isError, s);
+    EXPECT_EQ(s.str(), "");
+  }
+}
+
+TEST_F(DataFileTest, PrintNonEmptyList) {
+  std::stringstream s;
+  DataFile::print({"foo", "bar"}, "items", {}, false, s);
+  EXPECT_EQ(s.str(), ">>> Found 2 items: foo bar\n");
+}
+
+TEST_F(DataFileTest, PrintNonEmptyListAsError) {
+  std::stringstream s;
+  DataFile::print({"foo", "bar"}, "items", {}, true, s);
+  EXPECT_EQ(s.str(), "ERROR --- Found 2 items: foo bar\n");
+}
+
+TEST_F(DataFileTest, PrintWithGroupName) {
+  std::stringstream s;
+  DataFile::print({"a", "b", "c"}, "items", "bag", false, s);
+  EXPECT_EQ(s.str(), ">>> Found 3 items in bag: a b c\n");
 }
 
 TEST_F(DataFileTest, GoodOnePerLine) {
