@@ -64,12 +64,9 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
   if (!found) {
-    auto oldParent{fs::current_path()};
+    auto parent{fs::current_path()};
+    std::optional<fs::path> oldParent;
     do {
-      const auto parent{oldParent.parent_path()};
-      // 'has_parent_path' seems to always return true, i.e., parent of '/' is
-      // '/' so break if new 'parent' is equal to 'oldParent'.
-      if (parent == oldParent) break;
       // check if 'data' exists and contains the expected number of '.txt' files
       if (const auto data{parent / DataDir};
           fs::is_directory(data) &&
@@ -78,9 +75,13 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
                 return i.path().extension() == DataFile::TextFileExtension;
               }) == TextFilesInDataDir)
         found = data;
-      else
+      else {
         oldParent = parent;
-    } while (!found);
+        parent = oldParent->parent_path();
+      }
+      // 'has_parent_path' seems to always return true, i.e., parent of '/' is
+      // '/' so break if new 'parent' is equal to 'oldParent'.
+    } while (!found && parent != oldParent);
   }
   if (!found) usage("couldn't find valid 'data' directory");
   return *found;
