@@ -68,11 +68,10 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
       "       MB-Letter:    244, unique:   11",
       "Total Kana+Kanji: 24807 (Hiragana: 32.2%, Katakana: 28.7%, Kanji: "
       "39.1%)"};
-  std::string line;
   int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.substr(4), expected[count++]);
+    EXPECT_EQ(line.substr(4), expected[count]);
   }
   EXPECT_EQ(count, maxLines);
 }
@@ -108,11 +107,10 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
       "       MB-Letter:   1204, unique:   36",
       "Total Kana+Kanji: 112846 (Hiragana: 38.3%, Katakana: 21.7%, Kanji: "
       "40.1%)"};
-  std::string line;
   int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.substr(4), expected[count++]);
+    EXPECT_EQ(line.substr(4), expected[count]);
   }
   EXPECT_EQ(count, maxLines);
 }
@@ -120,9 +118,8 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
 TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   const char* args[]{"", "../../../tests/stats/sample-data/wiki-articles/"};
   Stats stats(std::size(args), args, _data);
-  std::string line;
   auto found{false};
-  while (!found && std::getline(_os, line))
+  for (std::string line; !found && std::getline(_os, line);)
     found = line.starts_with(">>> Stats for: 'wiki-articles' (3 files)");
   EXPECT_TRUE(found);
 }
@@ -159,11 +156,10 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
       "       MB-Letter:   1704, unique:   39",
       "Total Kana+Kanji: 283386 (Hiragana: 57.4%, Katakana: 8.7%, Kanji: "
       "33.9%)"};
-  std::string line;
   int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.substr(4), expected[count++]);
+    EXPECT_EQ(line.substr(4), expected[count]);
   }
   EXPECT_EQ(count, maxLines);
 }
@@ -179,11 +175,10 @@ TEST_F(StatsTest, NonUcdKanji) {
   const char* expected[]{"Stats for: 'testDir' - showing top 5 Kanji per type",
       "   Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)",
       "Total Kana+Kanji: 2 (Kanji: 100.0%)"};
-  std::string line;
   int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.substr(4), expected[count++]);
+    EXPECT_EQ(line.substr(4), expected[count]);
   }
   EXPECT_EQ(count, maxLines);
 }
@@ -211,11 +206,10 @@ TEST_F(StatsTest, ShowBreakdown) {
       "  Rank  [Val Num], Unicode, Highest Count File",
       "  1     [㐁    1],  U+3401, test.txt",
       "Total Kana+Kanji: 12 (Hiragana: 16.7%, Katakana: 8.3%, Kanji: 75.0%)"};
-  std::string line;
   int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.starts_with(">") ? line.substr(4) : line, expected[count++]);
+    EXPECT_EQ(line.starts_with(">") ? line.substr(4) : line, expected[count]);
   }
   EXPECT_EQ(count, maxLines);
 }

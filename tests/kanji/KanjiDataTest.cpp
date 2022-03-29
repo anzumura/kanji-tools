@@ -439,11 +439,10 @@ TEST(KanjiDataPrintTest, Info) {
       ">>>   Total for grade G6: 181 (N4 3, N2 105, N1 73)",
       ">>>   Total for grade S: 1130 (nf 99) (N2 161, N1 804, None 165)",
       ">>>   Total for all grades: 2136"};
-  std::string line;
   int count{0}, maxLines{std::size(expected)};
-  while (std::getline(os, line)) {
+  for (std::string line; std::getline(os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
+    EXPECT_EQ(line, expected[count]);
   }
   EXPECT_EQ(count, maxLines);
 }
