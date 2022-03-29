@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -r program="parseUcdAllFlat.sh"
+declare -r program=parseUcdAllFlat.sh
 
 # This script searches the Unicode 'ucd.all.flat.xml' file for characters that
 # have a Japanese reading (On or Kun), Morohashi ID or a non-empty JSource and

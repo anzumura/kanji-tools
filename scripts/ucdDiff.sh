@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -r program="ucdDiff.sh"
+declare -r program=ucdDiff.sh defaultFile=ucd.all.flat.xml
 
 # UCD = "Unicode Character Database": http://www.unicode.org/reports/tr42/
 # Location of 'ucd.all.flat.zip': https://unicode.org/Public/UCD/latest/ucdxml
@@ -14,9 +14,6 @@ if [[ ! $LANG =~ UTF-8 ]]; then
   done
   [[ ! $LANG =~ UTF-8 ]] && echo "failed to find a UTF-8 locale" && exit 1
 fi
-
-# default value for UCD file
-declare -r defaultFile=ucd.all.flat.xml
 
 oldFile=~/ucd/13/$defaultFile
 newFile=~/ucd/14/$defaultFile

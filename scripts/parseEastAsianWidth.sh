@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-declare -r program='parseEastAsiaWidth.sh'
+declare -r program=parseEastAsiaWidth.sh
 
 # This script parses the Unicode 'EastAsiaWidth.txt' file and outputs C++ code
 # that can be used in 'utils/DisplaySize.h' for calculating 'displaySize' of
