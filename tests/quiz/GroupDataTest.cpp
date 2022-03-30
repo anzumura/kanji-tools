@@ -4,6 +4,8 @@
 
 namespace kanji_tools {
 
+namespace {
+
 class GroupDataTest : public ::testing::Test {
 protected:
   // Contructs GroupData using the real data files
@@ -12,6 +14,8 @@ protected:
   const DataPtr _data;
   const GroupData _groupData;
 };
+
+} // namespace
 
 TEST_F(GroupDataTest, SanityChecks) {
   EXPECT_FALSE(_groupData.meaningGroups().empty());

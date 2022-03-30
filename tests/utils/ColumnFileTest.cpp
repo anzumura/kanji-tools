@@ -21,6 +21,8 @@ TEST(ColumnFileColumnTest, SameNumberForSameName) {
   EXPECT_EQ(colC1.number(), colC2.number());
 }
 
+namespace {
+
 class ColumnFileTest : public ::testing::Test {
 protected:
   inline static const ColumnFile::Column Col{"Col"}, Col1{"Col1"}, Col2{"Col2"},
@@ -54,6 +56,8 @@ protected:
     return create(c);
   }
 };
+
+} // namespace
 
 TEST_F(ColumnFileTest, SingleColumnFile) {
   const auto f{write({Col}, "Col")};

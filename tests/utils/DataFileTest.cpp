@@ -17,8 +17,6 @@ const fs::path GoodOnePerLine{TestDir / "goodOnePerLine"},
     BadOnePerLine{TestDir / "badOnePerLine"}, BadSymbol{TestDir / "badSymbol"},
     DuplicateSymbol{TestDir / "duplicateSymbol"};
 
-} // namespace
-
 class DataFileTest : public ::testing::Test {
 protected:
   void SetUp() override {
@@ -38,6 +36,8 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 };
+
+} // namespace
 
 TEST_F(DataFileTest, Usage) {
   const std::string msg{"error msg"};

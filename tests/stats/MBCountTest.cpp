@@ -22,8 +22,6 @@ auto removeFurigana(const std::wstring& s) {
       s, MBCount::RemoveFurigana, MBCount::DefaultReplace);
 }
 
-} // namespace
-
 class MBCountTest : public ::testing::Test {
 protected:
   void SetUp() override {
@@ -43,6 +41,8 @@ protected:
 
   MBCount c;
 };
+
+} // namespace
 
 TEST_F(MBCountTest, CheckRemovingFurigana) {
   // replace furigana - must be kanji followed by kana in wide brackets

@@ -8,6 +8,8 @@
 
 namespace kanji_tools {
 
+namespace {
+
 class GroupQuizTest : public ::testing::Test {
 protected:
   static void SetUpTestCase() {
@@ -62,6 +64,8 @@ protected:
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
 };
+
+} // namespace
 
 TEST_F(GroupQuizTest, StartQuiz) {
   meaningQuiz();

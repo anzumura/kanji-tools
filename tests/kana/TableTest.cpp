@@ -5,10 +5,14 @@
 
 namespace kanji_tools {
 
+namespace {
+
 class TableTest : public ::testing::Test {
 protected:
   std::stringstream _os;
 };
+
+} // namespace
 
 TEST_F(TableTest, EmptyTable) {
   Table t;

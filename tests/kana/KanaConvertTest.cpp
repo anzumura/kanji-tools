@@ -4,6 +4,8 @@
 
 namespace kanji_tools {
 
+namespace {
+
 class KanaConvertTest : public ::testing::Test {
 protected:
   [[nodiscard]] auto romajiToHiragana(
@@ -85,6 +87,8 @@ protected:
 
   KanaConvert _converter;
 };
+
+} // namespace
 
 TEST_F(KanaConvertTest, FlagString) {
   EXPECT_EQ(_converter.flagString(), "None");

@@ -10,6 +10,8 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
+namespace {
+
 class StatsTest : public ::testing::Test {
 protected:
   static void SetUpTestCase() {
@@ -37,6 +39,8 @@ protected:
   inline static const fs::path TestDir{"testDir"};
   inline static const fs::path TestFile{TestDir / "test.txt"};
 };
+
+} // namespace
 
 TEST_F(StatsTest, PrintStatsForOneFile) {
   const auto file{_data->dataDir() /

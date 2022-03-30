@@ -11,6 +11,8 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
+namespace {
+
 class KanjiDataTest : public ::testing::Test {
 protected:
   static void SetUpTestCase() {
@@ -47,6 +49,8 @@ protected:
 
   inline static DataPtr _data;
 };
+
+} // namespace
 
 TEST_F(KanjiDataTest, BasicChecks) {
   EXPECT_EQ(_data->kanjiNameMap().size(), 23715);

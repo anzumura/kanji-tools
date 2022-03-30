@@ -15,6 +15,8 @@ using ::testing::_;
 using ::testing::Return;
 using ::testing::ReturnRef;
 
+namespace {
+
 class MockData : public Data {
 public:
   MockData(const fs::path& p) : Data{p, Data::DebugMode::None} {
@@ -102,6 +104,8 @@ protected:
   inline static const fs::path TestDir{"testDir"};
   inline static const fs::path TestFile{TestDir / "test.txt"};
 };
+
+} // namespace
 
 TEST_F(KanjiTest, FrequencyKanji) {
   const Kanji::Frequency frequency{2362};

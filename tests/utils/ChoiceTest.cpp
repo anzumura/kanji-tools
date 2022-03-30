@@ -6,6 +6,8 @@
 
 namespace kanji_tools {
 
+namespace {
+
 class ChoiceTest : public ::testing::Test {
 protected:
   ChoiceTest() : _choice{_os, &_is} {}
@@ -61,6 +63,8 @@ protected:
   std::stringstream _is;
   Choice _choice;
 };
+
+} // namespace
 
 TEST_F(ChoiceTest, SingleChoice) {
   EXPECT_EQ(get('a', {{'a', ""}}), 'a');
