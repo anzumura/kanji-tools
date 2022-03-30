@@ -167,9 +167,9 @@ public:
     return _frequencies[bucket][freq - bucket * FrequencyEntries];
   }
 
-  // 'findKanjisByMorohashiId' can return more than one entry. The ids are
-  // usually plain just numeric, but they can also be an index number followed
-  // by a 'P'. For example, '4138' maps to 嗩 and '4138P' maps to 嘆.
+  // 'findKanjisByMorohashiId' can return more than one entry. Ids are usually
+  // just numeric, but they can also be an index number followed by a 'P'. For
+  // example, '4138' maps to 嗩 and '4138P' maps to 嘆.
   [[nodiscard]] auto& findKanjisByMorohashiId(const std::string& id) const {
     const auto i{_morohashiMap.find(id)};
     return i != _morohashiMap.end() ? i->second : BaseEnumMap<List>::Empty;
@@ -201,10 +201,11 @@ public:
 
   [[nodiscard]] static auto maxFrequency() { return _maxFrequency; }
 protected:
-  // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt'
-  // based on checking directories starting at 'argv[0]' (the program name)
-  // and working up parent directories. Therefore argc must be at least 1.
-  // '-data' followed by a directory name can also be used as an override.
+  // 'getDataDir' looks for a directory called 'data' containing expected number
+  // of .txt files based on checking directories starting at 'current dir' and
+  // working up parent directories (if this fails and 'argc' is non-zero then
+  // search up based on argv[0]). '-data' followed by a directory name can also
+  // be used as an override.
   [[nodiscard]] static Path getDataDir(ArgCount argc, const char** argv);
 
   // 'getDebugMode' looks for 'DebugArg' or 'InfoArg' flags in 'argv' list (see
@@ -223,10 +224,10 @@ protected:
   void processList(const DataFile&);
   void processUcd(); // should be called after processing all other types
 
-  // 'checkStrokes' should be called after all lists are populated. If debug
-  // is enabled (-debug) then this function will print any entries in _strokes
-  // that are 'Frequency' type or not found. It also compares strokes that
-  // were loaded from other files to strokes in 'ucd.txt'
+  // 'checkStrokes' should be called after all lists are populated. If debug is
+  // enabled (-debug) then this function will print any entries in _strokes that
+  // are 'Frequency' type or not found. It also compares stroke values loaded
+  // from other files to strokes in 'ucd.txt'
   void checkStrokes() const;
 
   // '_radicals' holds the 214 official Kanji Radicals
@@ -235,10 +236,10 @@ protected:
   // '_ucd' is used to get Kanji attributes like radical, meaning and reading
   UcdData _ucd;
 
-  // '_strokes' is populated from strokes.txt and supplements jinmei Kanji
-  // (file doesn't have 'Strokes' column) as well as old Kanji from jouyou and
-  // jinmei files. This file contains stroke counts followed by one or more
-  // lines each with a single kanji that has the given number of strokes.
+  // '_strokes' is populated from strokes.txt and supplements jinmei Kanji (file
+  // doesn't have 'Strokes' column) as well as old Kanji from jouyou and jinmei
+  // files. This file contains stroke counts followed by one or more lines each
+  // with a single kanji that has the given number of strokes.
   std::map<std::string, Ucd::Strokes> _strokes;
 
   EnumList<KanjiTypes> _types;
@@ -251,9 +252,9 @@ private:
   // throw an exception if ArgCount is non-zero, but args is a null pointer
   static void argSanityCheck(ArgCount, const char* const*);
 
-  // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads
-  // data from 'linked-jinmei.txt' and creates either a LinkedJinmei or a
-  // LinkedOld kanji for each entry.
+  // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data
+  // from 'linked-jinmei.txt' and creates either a LinkedJinmei or a LinkedOld
+  // kanji for each entry.
   void populateLinkedKanji();
 
   // helper functions for checking and inserting into '_kanjiNameMap'
@@ -266,9 +267,9 @@ private:
   std::ostream& _out;
   std::ostream& _err;
 
-  // '_compatibilityMap' maps from a UCD 'compatibility' code name to a
-  // 'variation selector' style name. This map only has entries for recognized
-  // kanji that were loaded with a selector.
+  // '_compatibilityMap' maps from a UCD 'compatibility' name to a 'variation
+  // selector' style name. This map only has entries for recognized Kanji that
+  // were loaded with a selector.
   std::map<std::string, std::string> _compatibilityMap;
 
   // '_frequencyReadings' holds readings loaded from frequency-readings.txt -
@@ -276,15 +277,14 @@ private:
   // not Jouyou or Jinmei).
   std::map<std::string, std::string> _frequencyReadings;
 
-  // lists of kanji per Level, Grade and Kyu (excluding the 'None' enum
-  // values)
+  // lists of kanji per Level, Grade and Kyu (excluding the 'None' enum values)
   EnumList<JlptLevels> _levels;
   EnumList<KanjiGrades> _grades;
   EnumList<KenteiKyus> _kyus;
 
-  // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000,
-  // 1001-1500, 1501-2000, 2001-2501. The last list is one longer in order to
-  // hold the full frequency list (of 2501 kanji).
+  // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500,
+  // 1501-2000, 2001-2501. The last list is one longer in order to hold the full
+  // frequency list (of 2501 kanji).
   std::array<List, FrequencyBuckets> _frequencies;
 
   Map _kanjiNameMap;                          // lookup by UTF-8 name
