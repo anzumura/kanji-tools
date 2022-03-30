@@ -26,6 +26,7 @@ protected:
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
   }
+
   void TearDown() override { fs::remove_all(TestDir); }
 
   void write(const std::string& s) {
