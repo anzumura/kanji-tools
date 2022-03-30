@@ -246,6 +246,7 @@ private:
   using OptPath = std::optional<Path>;
 
   [[nodiscard]] static OptPath searchUpForDataDir(Path);
+  [[nodiscard]] static bool isValidDataDir(const Path&);
 
   // throw an exception if ArgCount is non-zero, but args is a null pointer
   static void argSanityCheck(ArgCount, const char* const*);

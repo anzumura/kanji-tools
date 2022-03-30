@@ -68,6 +68,9 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 }
 
 fs::path Data::getDataDir(ArgCount argc, const char** argv) {
+  static const std::string ExpectedTextFiles{
+      std::to_string(TextFilesInDataDir) + " expected '" +
+      DataFile::TextFileExtension + "' files"};
   argSanityCheck(argc, argv);
   OptPath found;
   for (ArgCount i{1}; !found && i < argc; ++i)
@@ -76,13 +79,16 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
       const auto data{Path(argv[i + 1])};
       if (!fs::is_directory(data))
         usage("'" + data.string() + "' is not a valid directory");
+      if (!isValidDataDir(data))
+        usage("'" + data.string() + "' does not contain " + ExpectedTextFiles);
       found = data;
     }
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
   if (!found) {
-    static const std::string NotFound{
-        "couldn't find valid 'data' directory:\n- searched up from current: "};
+    static const std::string NotFound{"couldn't find 'data' directory with " +
+                                      ExpectedTextFiles +
+                                      ":\n- searched up from current: "};
     static const std::string NotFoundEnd{
         "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
     // search up from current directory
@@ -123,11 +129,7 @@ Data::OptPath Data::searchUpForDataDir(Path parent) {
   do {
     // check if 'data' exists and contains the expected number of '.txt' files
     if (const auto data{parent / DataDir};
-        fs::is_directory(data) &&
-        std::count_if(fs::directory_iterator(data), fs::directory_iterator{},
-            [](const auto& i) {
-              return i.path().extension() == DataFile::TextFileExtension;
-            }) == TextFilesInDataDir)
+        fs::is_directory(data) && isValidDataDir(data))
       return data;
     oldParent = parent;
     parent = oldParent->parent_path();
@@ -135,6 +137,13 @@ Data::OptPath Data::searchUpForDataDir(Path parent) {
     // '/' so break if new 'parent' is equal to 'oldParent'.
   } while (parent != oldParent);
   return {};
+}
+
+bool Data::isValidDataDir(const Path& p) {
+  return std::count_if(fs::directory_iterator(p), fs::directory_iterator{},
+             [](const auto& i) {
+               return i.path().extension() == DataFile::TextFileExtension;
+             }) == TextFilesInDataDir;
 }
 
 void Data::argSanityCheck(ArgCount argc, const char* const* argv) {

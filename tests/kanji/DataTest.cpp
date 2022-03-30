@@ -126,6 +126,17 @@ TEST_F(DataTest, GoodDataDirArg) {
   EXPECT_EQ(getDataDir(std::size(argv), argv), dir);
 }
 
+TEST_F(DataTest, DataDirArgToInvalidData) {
+  // get a valid directory that isn't a 'data' directory, i.e., it doesn't have
+  // the expected .txt files
+  const auto dir{_currentDir.root_directory()};
+  const char* argv[]{Arg0, DataArg.c_str(), dir.c_str()};
+  const std::string msg{
+      "'" + dir.string() + "' does not contain 12 expected '.txt' files"};
+  EXPECT_THROW(call([&argv] { return getDataDir(std::size(argv), argv); }, msg),
+      std::domain_error);
+}
+
 TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
   // get 'data' directory based on 'current directory' logic, i.e., look in
   // current directory for 'data' and if not found check all parent directories
@@ -141,7 +152,8 @@ TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
 TEST_F(DataTest, FailToFindDataDirNoArg0) {
   fs::current_path(_currentDir.root_directory());
   const std::string msg{
-      "couldn't find valid 'data' directory:\n- searched up from current: " +
+      "couldn't find 'data' directory with 12 expected '.txt' files:\n- "
+      "searched up from current: " +
       fs::current_path().string() +
       "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
   EXPECT_THROW(
@@ -152,7 +164,8 @@ TEST_F(DataTest, FailToFindDataDirWithArg0) {
   fs::current_path(_currentDir.root_directory());
   const std::string arg0{fs::current_path() / "testProgramName"};
   const std::string msg{
-      "couldn't find valid 'data' directory:\n- searched up from current: " +
+      "couldn't find 'data' directory with 12 expected '.txt' files:\n- "
+      "searched up from current: " +
       fs::current_path().string() + "\n- searched up from arg0: " + arg0 +
       "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
   const char* argv[]{arg0.c_str()};
