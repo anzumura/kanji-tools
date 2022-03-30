@@ -16,8 +16,6 @@ const fs::path DataDirPath{TestDataDir};
 
 class DataTest : public ::testing::Test, public Data {
 public:
-  DataTest() : Data{DataDirPath, DebugMode::None} {}
-
   [[nodiscard]] Kanji::OptFreq frequency(const std::string&) const override {
     return {};
   }
@@ -27,6 +25,13 @@ public:
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override {
     return KenteiKyus::None;
   }
+protected:
+  DataTest()
+      : Data{DataDirPath, DebugMode::None}, _currentDir(fs::current_path()) {}
+
+  void TearDown() override { fs::current_path(_currentDir); }
+
+  Path _currentDir;
 };
 
 } // namespace
@@ -119,6 +124,40 @@ TEST_F(DataTest, GoodDataDirArg) {
   const auto dir{getDataDir(0, {})};
   const char* argv[]{Arg0, DataArg.c_str(), dir.c_str()};
   EXPECT_EQ(getDataDir(std::size(argv), argv), dir);
+}
+
+TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
+  // get 'data' directory based on 'current directory' logic, i.e., look in
+  // current directory for 'data' and if not found check all parent directories
+  const auto expected{getDataDir(0, nullptr)};
+  // change to a directory that shouldn't have a 'data' directory
+  fs::current_path(expected.root_directory());
+  ASSERT_NE(expected, fs::current_path());
+  const auto arg0{expected / "testProgramName"};
+  const char* argv[]{arg0.c_str()};
+  EXPECT_EQ(getDataDir(1, argv), expected);
+}
+
+TEST_F(DataTest, FailToFindDataDirNoArg0) {
+  fs::current_path(_currentDir.root_directory());
+  const std::string msg{
+      "couldn't find valid 'data' directory:\n- searched up from current: " +
+      fs::current_path().string() +
+      "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
+  EXPECT_THROW(
+      call([] { return getDataDir(0, nullptr); }, msg), std::domain_error);
+}
+
+TEST_F(DataTest, FailToFindDataDirWithArg0) {
+  fs::current_path(_currentDir.root_directory());
+  const std::string arg0{fs::current_path() / "testProgramName"};
+  const std::string msg{
+      "couldn't find valid 'data' directory:\n- searched up from current: " +
+      fs::current_path().string() + "\n- searched up from arg0: " + arg0 +
+      "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
+  const char* argv[]{arg0.c_str()};
+  EXPECT_THROW(
+      call([&argv] { return getDataDir(1, argv); }, msg), std::domain_error);
 }
 
 TEST_F(DataTest, NoDebugArgs) {

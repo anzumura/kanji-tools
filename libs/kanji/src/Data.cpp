@@ -81,14 +81,22 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
   if (!found) {
+    static const std::string NotFound{
+        "couldn't find valid 'data' directory:\n- searched up from current: "};
+    static const std::string NotFoundEnd{
+        "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
     // search up from current directory
-    found = searchUpForDataDir(fs::current_path());
-    if (!found && argc) {
+    const auto cur{fs::current_path()};
+    if (found = searchUpForDataDir(cur); !found && argc) {
       // search up from 'argv[0]'
-      if (const Path p{argv[0]}; fs::is_regular_file(p))
-        found = searchUpForDataDir(p.parent_path());
-      if (!found) usage("couldn't find valid 'data' directory");
+      Path p{argv[0]};
+      if (p = p.parent_path(); fs::is_directory(p)) {
+        static const std::string Arg0Msg{"\n- searched up from arg0: "};
+        if (found = searchUpForDataDir(p.parent_path()); !found)
+          usage(NotFound + cur.string() + Arg0Msg + argv[0] + NotFoundEnd);
+      }
     }
+    if (!found) usage(NotFound + cur.string() + NotFoundEnd);
   }
   return *found;
 }
