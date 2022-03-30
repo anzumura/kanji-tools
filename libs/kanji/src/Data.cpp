@@ -58,7 +58,7 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
       const auto data{fs::path(argv[i + 1])};
       if (!fs::is_directory(data))
-        usage(data.string() + " is not a valid directory");
+        usage("'" + data.string() + "' is not a valid directory");
       found = data;
     }
   // If '-data' wasn't provided then search up directories for 'data' and make
@@ -91,7 +91,8 @@ Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
   auto result{DebugMode::None};
   const auto setResult{[&result](DebugMode x) {
     if (result != DebugMode::None)
-      usage("can only specify one '-debug' or '-info' option");
+      usage("can only specify one '" + DebugArg + "' or '" + InfoArg +
+            "' option");
     result = x;
   }};
   for (ArgCount i{1}; i < argc; ++i)

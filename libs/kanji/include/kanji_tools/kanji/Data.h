@@ -21,9 +21,14 @@ public:
   using Map = std::map<std::string, Entry>;
   template<typename T> using EnumList = EnumMap<T, List>;
 
-  // 'DebugMode' is controlled by command-line options:
-  //   -debug: sets '_debugMode' to 'Full' to print all debug output
-  //   -info:  sets '_debugMode' to 'Info' to print some summary debug output
+  // DataArg (to specify location of 'data' dir), DebugArg and InfoArg are
+  // command line options that can be passed to apps using this 'Data' class
+  inline static const std::string DataArg{"-data"}, DebugArg{"-debug"},
+      InfoArg{"-info"};
+
+  // 'DebugMode' is controlled by debug/info command-line options (see above):
+  //   DebugArg: sets '_debugMode' to 'Full' to print all debug output
+  //   InfoArg:  sets '_debugMode' to 'Info' to print some summary debug output
   enum class DebugMode { Full, Info, None };
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
@@ -201,7 +206,7 @@ protected:
   [[nodiscard]] static std::filesystem::path getDataDir(
       ArgCount argc, const char** argv);
 
-  // 'getDebugMode' looks for '-debug' or '-info' flags in 'argv' list (see
+  // 'getDebugMode' looks for 'DebugArg' or 'InfoArg' flags in 'argv' list (see
   // 'DebugMode' above)
   [[nodiscard]] static DebugMode getDebugMode(ArgCount argc, const char** argv);
 
@@ -281,8 +286,6 @@ private:
   // put into '_kanjiNameMap'
   inline static constinit Kanji::Frequency _maxFrequency;
 
-  inline static const std::string DataArg{"-data"}, DebugArg{"-debug"},
-      InfoArg{"-info"};
   inline static const Kanji::NelsonIds EmptyNelsonIds;
 };
 

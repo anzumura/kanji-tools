@@ -7,7 +7,7 @@
 namespace kanji_tools {
 
 TEST(QuizTest, Info) {
-  const char* args[]{"", "-info"};
+  const char* args[]{"", Data::InfoArg.c_str()};
   std::stringstream os;
   const auto data{std::make_shared<KanjiData>(std::size(args), args, os)};
   const auto groupData{std::make_shared<GroupData>(data)};
@@ -28,7 +28,7 @@ TEST(QuizTest, Info) {
 }
 
 TEST(QuizTest, Debug) {
-  const char* args[]{"", "-debug"};
+  const char* args[]{"", Data::DebugArg.c_str()};
   std::stringstream os;
   const auto data{std::make_shared<KanjiData>(std::size(args), args, os)};
   const auto groupData{std::make_shared<GroupData>(data)};

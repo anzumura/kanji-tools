@@ -428,7 +428,7 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
 }
 
 TEST(KanjiDataPrintTest, Info) {
-  const char* args[]{"", "-info"};
+  const char* args[]{"", Data::InfoArg.c_str()};
   std::stringstream os;
   KanjiData data(std::size(args), args, os);
   const char* expected[]{
@@ -452,7 +452,7 @@ TEST(KanjiDataPrintTest, Info) {
 }
 
 TEST(KanjiDataPrintTest, Debug) {
-  const char* args[]{"", "-debug"};
+  const char* args[]{"", Data::DebugArg.c_str()};
   std::stringstream os;
   KanjiData data(std::size(args), args, os);
   std::string lastLine;
