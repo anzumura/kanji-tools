@@ -63,8 +63,10 @@ size_t MBCount::doAddFile(
   } else if (fs::is_directory(file)) {
     ++_directories;
     for (fs::directory_entry i : fs::directory_iterator(file))
-      added += recurse ? doAddFile(i.path(), addTag, fileNames)
-               : fs::is_regular_file(i.path())
+      // skip symlinks for now when potentially recursing
+      added += i.is_symlink() ? 0
+               : recurse      ? doAddFile(i.path(), addTag, fileNames)
+               : i.is_regular_file()
                    ? doAddFile(i.path(), addTag, fileNames, false)
                    : 0;
   } else // skip if not a regular file or directory

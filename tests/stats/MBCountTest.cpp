@@ -232,6 +232,15 @@ TEST_F(MBCountTest, AddDirectoryRecurseIncludingFileNamesButNoTags) {
   EXPECT_EQ(c.count("下"), 1);
 }
 
+TEST_F(MBCountTest, SkipSimlinksWhenRecursing) {
+  const auto link{TestDir / "link"};
+  fs::create_symlink(TestSubDir.filename(), link);
+  EXPECT_TRUE(fs::is_symlink(link));
+  EXPECT_EQ(c.addFile(TestDir, false), 13);
+  EXPECT_EQ(c.directories(), 2);
+  EXPECT_EQ(c.files(), 4);
+}
+
 TEST_F(MBCountTest, CheckTags) {
   EXPECT_EQ(c.addFile(TestDir), 13);
   EXPECT_EQ(c.uniqueEntries(), 10);
