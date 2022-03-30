@@ -31,7 +31,7 @@ public:
   //   names that match the static 'Column' instances below)
   template<typename T>
   [[nodiscard]] static Data::List fromFile(
-      const Data& data, const std::filesystem::path& file) {
+      const Data& data, const Data::Path& file) {
     // all CustomFileKanji files must have at least the following columns
     ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
     for (auto& i : T::RequiredColumns) columns.emplace_back(i);

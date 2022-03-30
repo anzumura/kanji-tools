@@ -8,9 +8,9 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-fs::path DataFile::getFile(const fs::path& dir, const fs::path& file) {
+fs::path DataFile::getFile(const Path& dir, const Path& file) {
   if (!fs::is_directory(dir)) usage(dir.string() + " is not a directory");
-  fs::path p{dir / file};
+  Path p{dir / file};
   if (!fs::is_regular_file(p) && !file.has_extension()) p += TextFileExtension;
   if (!fs::exists(p)) {
     auto msg{dir.string() + " must contain '" + file.string()};
@@ -34,8 +34,8 @@ void DataFile::print(std::ostream& out, const List& l, const std::string& type,
   }
 }
 
-DataFile::DataFile(const fs::path& fileIn, FileType fileType,
-    Set* uniqueTypeNames, const std::string& name)
+DataFile::DataFile(const Path& fileIn, FileType fileType, Set* uniqueTypeNames,
+    const std::string& name)
     : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
   auto file{fileIn};
   // try adding .txt if file isn't found

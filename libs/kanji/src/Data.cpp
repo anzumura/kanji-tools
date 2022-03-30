@@ -21,8 +21,22 @@ constexpr size_t TextFilesInDataDir{12};
 
 } // namespace
 
-Data::Data(const std::filesystem::path& dataDir, DebugMode debugMode,
-    std::ostream& out, std::ostream& err)
+Data::ArgCount Data::nextArg(
+    ArgCount argc, const char* const* argv, ArgCount currentArg) {
+  ArgCount result{currentArg};
+  if (++result < argc) {
+    std::string arg{argv[result]};
+    // '-data' should be followed by a 'path' so increment by 2. If -data isn't
+    // followed by a path then an earlier call to 'getDataDir' would have failed
+    // with a call to 'usage' which ends the program.
+    if (arg == DataArg) return nextArg(argc, argv, result + 1);
+    if (arg == DebugArg || arg == InfoArg) return nextArg(argc, argv, result);
+  }
+  return result;
+}
+
+Data::Data(const Path& dataDir, DebugMode debugMode, std::ostream& out,
+    std::ostream& err)
     : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
   // Clearing DataFile static data is only needed to help test code, for example
   // DataFile tests can leave some data in these sets before Quiz tests are run
@@ -50,13 +64,11 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 }
 
 fs::path Data::getDataDir(ArgCount argc, const char** argv) {
-  static const auto DataDir{fs::path{"data"}};
-
-  std::optional<fs::path> found;
+  OptPath found;
   for (ArgCount i{1}; !found && i < argc; ++i)
     if (argv[i] == DataArg) {
       if (i + 1 == argc) usage("'-data' must be followed by a directory name");
-      const auto data{fs::path(argv[i + 1])};
+      const auto data{Path(argv[i + 1])};
       if (!fs::is_directory(data))
         usage("'" + data.string() + "' is not a valid directory");
       found = data;
@@ -64,26 +76,15 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
   if (!found) {
-    auto parent{fs::current_path()};
-    std::optional<fs::path> oldParent;
-    do {
-      // check if 'data' exists and contains the expected number of '.txt' files
-      if (const auto data{parent / DataDir};
-          fs::is_directory(data) &&
-          std::count_if(fs::directory_iterator(data), fs::directory_iterator{},
-              [](const auto& i) {
-                return i.path().extension() == DataFile::TextFileExtension;
-              }) == TextFilesInDataDir)
-        found = data;
-      else {
-        oldParent = parent;
-        parent = oldParent->parent_path();
-      }
-      // 'has_parent_path' seems to always return true, i.e., parent of '/' is
-      // '/' so break if new 'parent' is equal to 'oldParent'.
-    } while (!found && parent != oldParent);
+    // search up from current directory
+    found = searchUpForDataDir(fs::current_path());
+    if (!found && argc) {
+      // search up from 'argv[0]'
+      if (const Path p{argv[0]}; fs::is_regular_file(p))
+        found = searchUpForDataDir(p.parent_path());
+      if (!found) usage("couldn't find valid 'data' directory");
+    }
   }
-  if (!found) usage("couldn't find valid 'data' directory");
   return *found;
 }
 
@@ -103,18 +104,23 @@ Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
   return result;
 }
 
-Data::ArgCount Data::nextArg(
-    ArgCount argc, const char* const* argv, ArgCount currentArg) {
-  ArgCount result{currentArg};
-  if (++result < argc) {
-    std::string arg{argv[result]};
-    // '-data' should be followed by a 'path' so increment by 2. If -data isn't
-    // followed by a path then an earlier call to 'getDataDir' would have failed
-    // with a call to 'usage' which ends the program.
-    if (arg == DataArg) return nextArg(argc, argv, result + 1);
-    if (arg == DebugArg || arg == InfoArg) return nextArg(argc, argv, result);
-  }
-  return result;
+Data::OptPath Data::searchUpForDataDir(Path parent) {
+  OptPath oldParent;
+  do {
+    // check if 'data' exists and contains the expected number of '.txt' files
+    if (const auto data{parent / DataDir};
+        fs::is_directory(data) &&
+        std::count_if(fs::directory_iterator(data), fs::directory_iterator{},
+            [](const auto& i) {
+              return i.path().extension() == DataFile::TextFileExtension;
+            }) == TextFilesInDataDir)
+      return data;
+    oldParent = parent;
+    parent = oldParent->parent_path();
+    // 'has_parent_path' seems to always return true, i.e., parent of '/' is
+    // '/' so break if new 'parent' is equal to 'oldParent'.
+  } while (parent != oldParent);
+  return {};
 }
 
 bool Data::checkInsert(const Entry& kanji) {
@@ -175,7 +181,7 @@ void Data::printError(const std::string& msg) const {
        << msg << std::setfill(' ') << '\n';
 }
 
-void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
+void Data::loadStrokes(const Path& file, bool checkDuplicates) {
   std::ifstream f{file};
   Ucd::Strokes strokes{};
   for (std::string line; std::getline(f, line);)
@@ -198,7 +204,7 @@ void Data::loadStrokes(const fs::path& file, bool checkDuplicates) {
     }
 }
 
-void Data::loadFrequencyReadings(const fs::path& file) {
+void Data::loadFrequencyReadings(const Path& file) {
   const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
   for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
     if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
@@ -218,7 +224,7 @@ void Data::populateJouyou() {
 }
 
 void Data::populateLinkedKanji() {
-  fs::path file{DataFile::getFile(_dataDir, LinkedJinmeiFile)};
+  Path file{DataFile::getFile(_dataDir, LinkedJinmeiFile)};
   std::ifstream f{file};
   // populate _linkedJinmeiKanji that are linked to Jouyou
   auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};

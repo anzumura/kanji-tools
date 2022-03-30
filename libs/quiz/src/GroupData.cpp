@@ -48,8 +48,8 @@ bool GroupData::checkInsert(
 }
 
 template<typename T>
-void GroupData::loadGroup(const std::filesystem::path& file, T& groups,
-    List& list, GroupType groupType) {
+void GroupData::loadGroup(
+    const Data::Path& file, T& groups, List& list, GroupType groupType) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
       membersCol{"Members"};
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {

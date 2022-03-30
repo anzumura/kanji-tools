@@ -24,7 +24,7 @@ private:
   [[nodiscard]] auto& out() const { return _data->out(); }
 
   void countKanji(
-      const std::filesystem::path& top, bool showBreakdown, bool verbose) const;
+      const Data::Path& top, bool showBreakdown, bool verbose) const;
 
   const DataPtr _data;
 };

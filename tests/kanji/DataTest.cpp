@@ -8,11 +8,11 @@ namespace fs = std::filesystem;
 
 namespace {
 
-constexpr auto Arg0{"test"}, DataDir{"dir"};
+constexpr auto Arg0{"test"}, TestDataDir{"dir"};
 
 namespace fs = std::filesystem;
 
-const fs::path DataDirPath{DataDir};
+const fs::path DataDirPath{TestDataDir};
 
 class DataTest : public ::testing::Test, public Data {
 public:
@@ -55,13 +55,13 @@ TEST_F(DataTest, NextArgWithDebugArg) {
 }
 
 TEST_F(DataTest, NextArgWithDataArg) {
-  const char* argv[]{Arg0, DataArg.c_str(), DataDir};
+  const char* argv[]{Arg0, DataArg.c_str(), TestDataDir};
   // skip '-data some-dir'
   EXPECT_EQ(nextArg(std::size(argv), argv), 3);
 }
 
 TEST_F(DataTest, NextArgWithDebugAndDataArgs) {
-  const char* argv[]{Arg0, DebugArg.c_str(), DataArg.c_str(), DataDir};
+  const char* argv[]{Arg0, DebugArg.c_str(), DataArg.c_str(), TestDataDir};
   // skip '-data some-dir'
   EXPECT_EQ(nextArg(std::size(argv), argv), 4);
 }
@@ -69,7 +69,7 @@ TEST_F(DataTest, NextArgWithDebugAndDataArgs) {
 TEST_F(DataTest, NextArgWithMultipleArgs) {
   auto arg1{"arg1"}, arg3{"arg3"}, arg6{"arg6"};
   const char* argv[]{
-      Arg0, arg1, DebugArg.c_str(), arg3, DataArg.c_str(), DataDir, arg6};
+      Arg0, arg1, DebugArg.c_str(), arg3, DataArg.c_str(), TestDataDir, arg6};
   Data::ArgCount argc{std::size(argv)};
   std::vector<const char*> actualArgs;
   for (auto i{nextArg(argc, argv)}; i < argc; i = nextArg(argc, argv, i))
@@ -85,7 +85,7 @@ TEST_F(DataTest, MissingDataDirArg) {
 }
 
 TEST_F(DataTest, BadDataDirArg) {
-  const char* argv[]{Arg0, DataArg.c_str(), DataDir};
+  const char* argv[]{Arg0, DataArg.c_str(), TestDataDir};
   EXPECT_THROW(call([&argv] { return getDataDir(std::size(argv), argv); },
                    "'dir' is not a valid directory"),
       std::domain_error);

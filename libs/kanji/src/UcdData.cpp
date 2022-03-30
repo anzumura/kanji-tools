@@ -66,7 +66,7 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
   return EmptyString;
 }
 
-void UcdData::load(const std::filesystem::path& file) {
+void UcdData::load(const Data::Path& file) {
   const ColumnFile::Column codeCol{"Code"}, nameCol{"Name"}, blockCol{"Block"},
       versionCol{"Version"}, radicalCol{"Radical"}, strokesCol{"Strokes"},
       vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"Morohashi"},

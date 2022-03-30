@@ -19,7 +19,7 @@ namespace {
 
 class MockData : public Data {
 public:
-  MockData(const fs::path& p) : Data{p, Data::DebugMode::None} {
+  MockData(const Path& p) : Data{p, Data::DebugMode::None} {
     strokes("亘", 6);
     strokes("亙", 6);
     strokes("云", 6);

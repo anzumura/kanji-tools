@@ -20,11 +20,22 @@ public:
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   template<typename T> using EnumList = EnumMap<T, List>;
+  using Path = DataFile::Path;
 
   // DataArg (to specify location of 'data' dir), DebugArg and InfoArg are
   // command line options that can be passed to apps using this 'Data' class
   inline static const std::string DataArg{"-data"}, DebugArg{"-debug"},
       InfoArg{"-info"};
+
+  // 'nextArg' is meant to be used by other classes that process command line
+  // options, but also have a 'Data' class (like Quiz and Stats programs) - it
+  // will return 'currentArg + 1' if argv[currentArg + 1] is not used used by
+  // this 'Data' class (ie getDataDir or getDebug). If 'currentArg + 1' is used
+  // then a larger increment is returned to 'skip over' the args, for example:
+  //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
+  //       i = Data::nextArg(argc, argv, i)) { /* do something with argv[i] */ }
+  [[nodiscard]] static ArgCount nextArg(
+      ArgCount argc, const char* const* argv, ArgCount currentArg = 0);
 
   // 'DebugMode' is controlled by debug/info command-line options (see above):
   //   DebugArg: sets '_debugMode' to 'Full' to print all debug output
@@ -37,8 +48,8 @@ public:
         return a->orderByQualifiedName(*b);
       }};
 
-  Data(const std::filesystem::path& dataDir, DebugMode,
-      std::ostream& out = std::cout, std::ostream& err = std::cerr);
+  Data(const Path& dataDir, DebugMode, std::ostream& out = std::cout,
+      std::ostream& err = std::cerr);
 
   Data(const Data&) = delete;
   // operator= is not generated since there are const members
@@ -189,22 +200,12 @@ public:
   }
 
   [[nodiscard]] static auto maxFrequency() { return _maxFrequency; }
-
-  // 'nextArg' will return 'currentArg + 1' if argv[currentArg + 1] is not
-  // used by this class (ie getDataDir or getDebug). If currentArg + 1 is used
-  // by this class then a larger increment is returned to 'skip over' the
-  // args, for example:
-  //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
-  //        i = Data::nextArg(argc, argv, i))
-  [[nodiscard]] static ArgCount nextArg(
-      ArgCount argc, const char* const* argv, ArgCount currentArg = 0);
 protected:
   // 'getDataDir' looks for a directory called 'data' containing 'jouyou.txt'
   // based on checking directories starting at 'argv[0]' (the program name)
   // and working up parent directories. Therefore argc must be at least 1.
   // '-data' followed by a directory name can also be used as an override.
-  [[nodiscard]] static std::filesystem::path getDataDir(
-      ArgCount argc, const char** argv);
+  [[nodiscard]] static Path getDataDir(ArgCount argc, const char** argv);
 
   // 'getDebugMode' looks for 'DebugArg' or 'InfoArg' flags in 'argv' list (see
   // 'DebugMode' above)
@@ -212,8 +213,8 @@ protected:
 
   // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling
   // 'populate Lists' functions
-  void loadStrokes(const std::filesystem::path&, bool checkDuplicates = true);
-  void loadFrequencyReadings(const std::filesystem::path&);
+  void loadStrokes(const Path&, bool checkDuplicates = true);
+  void loadFrequencyReadings(const Path&);
 
   // populate Lists (_types datastructure)
   void populateJouyou();
@@ -242,6 +243,10 @@ protected:
 
   EnumList<KanjiTypes> _types;
 private:
+  using OptPath = std::optional<Path>;
+
+  [[nodiscard]] static OptPath searchUpForDataDir(Path);
+
   // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads
   // data from 'linked-jinmei.txt' and creates either a LinkedJinmei or a
   // LinkedOld kanji for each entry.
@@ -252,7 +257,7 @@ private:
   bool checkInsert(List&, const Entry&);
   void insertSanityChecks(const Kanji&) const;
 
-  const std::filesystem::path _dataDir;
+  const Path _dataDir;
   const DebugMode _debugMode;
   std::ostream& _out;
   std::ostream& _err;
@@ -287,6 +292,8 @@ private:
   inline static constinit Kanji::Frequency _maxFrequency;
 
   inline static const Kanji::NelsonIds EmptyNelsonIds;
+
+  inline static const Path DataDir{"data"};
 };
 
 using DataPtr = std::shared_ptr<const Data>;

@@ -7,7 +7,7 @@
 
 namespace kanji_tools {
 
-void RadicalData::load(const std::filesystem::path& file) {
+void RadicalData::load(const Data::Path& file) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
       longNameCol{"LongName"}, readingCol{"Reading"};
   for (ColumnFile f{file, {numberCol, nameCol, longNameCol, readingCol}};

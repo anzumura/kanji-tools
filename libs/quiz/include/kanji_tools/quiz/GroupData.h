@@ -39,8 +39,7 @@ private:
   bool checkInsert(
       const std::string& kanji, MultiMap&, const Entry& group) const;
 
-  template<typename T>
-  void loadGroup(const std::filesystem::path&, T&, List&, GroupType);
+  template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
   [[nodiscard]] Entry createGroup(size_t number, const std::string& name,
       const Data::List& members, Group::PatternType) const;

@@ -17,6 +17,7 @@ namespace kanji_tools {
 class DataFile {
 public:
   using List = std::vector<std::string>;
+  using Path = std::filesystem::path;
   using Set = std::set<std::string>;
 
   inline static const std::string TextFileExtension{".txt"};
@@ -24,8 +25,7 @@ public:
   // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and
   // then returns the full path. It will also try adding '.txt' extension if
   // 'file' isn't found and doesn't already have an extension.
-  [[nodiscard]] static std::filesystem::path getFile(
-      const std::filesystem::path& dir, const std::filesystem::path& file);
+  [[nodiscard]] static Path getFile(const Path& dir, const Path& file);
 
   static void print(std::ostream&, const List&, const std::string& type,
       const std::string& group, bool isError = false);
@@ -43,10 +43,8 @@ public:
 
   enum class FileType { MultiplePerLine, OnePerLine };
 
-  DataFile(const std::filesystem::path& p, FileType fileType)
-      : DataFile{p, fileType, nullptr} {}
-  DataFile(const std::filesystem::path& p)
-      : DataFile{p, FileType::OnePerLine, nullptr} {}
+  DataFile(const Path& p, FileType fileType) : DataFile{p, fileType, nullptr} {}
+  DataFile(const Path& p) : DataFile{p, FileType::OnePerLine, nullptr} {}
 
   DataFile(const DataFile&) = delete;
   // operator= is not generated since there are const members
@@ -76,8 +74,7 @@ public:
     return result;
   }
 protected:
-  DataFile(const std::filesystem::path& p, FileType fileType, Set*,
-      const std::string& name = {});
+  DataFile(const Path&, FileType, Set*, const std::string& name = {});
 private:
   using Map = std::map<std::string, size_t>;
 
@@ -94,7 +91,7 @@ private:
 // there are TypedDataFile classes for 'JlptLevels' and 'KenteiKyus'
 template<typename T> class TypedDataFile : public DataFile {
 protected:
-  TypedDataFile(const std::filesystem::path& p, T type)
+  TypedDataFile(const Path& p, T type)
       : DataFile{p, FileType::MultiplePerLine, &UniqueTypeNames,
             kanji_tools::toString(type)},
         _type{type} {}
@@ -106,16 +103,14 @@ private:
 
 class LevelDataFile : public TypedDataFile<JlptLevels> {
 public:
-  LevelDataFile(const std::filesystem::path& p, JlptLevels level)
-      : TypedDataFile{p, level} {}
+  LevelDataFile(const Path& p, JlptLevels level) : TypedDataFile{p, level} {}
 
   [[nodiscard]] JlptLevels level() const override { return _type; }
 };
 
 class KyuDataFile : public TypedDataFile<KenteiKyus> {
 public:
-  KyuDataFile(const std::filesystem::path& p, KenteiKyus kyu)
-      : TypedDataFile{p, kyu} {}
+  KyuDataFile(const Path& p, KenteiKyus kyu) : TypedDataFile{p, kyu} {}
 
   [[nodiscard]] KenteiKyus kyu() const override { return _type; }
 };

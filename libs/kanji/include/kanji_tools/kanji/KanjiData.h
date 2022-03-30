@@ -21,7 +21,7 @@ public:
   [[nodiscard]] JlptLevels level(const std::string&) const override;
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;
 private:
-  inline static const std::filesystem::path Jlpt{"jlpt"}, Kentei{"kentei"};
+  inline static const Path Jlpt{"jlpt"}, Kentei{"kentei"};
 
   // functions to print loaded data if _debug is true
   void noFreq(long f, bool brackets = false) const; // print no-freq count
