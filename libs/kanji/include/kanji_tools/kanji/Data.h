@@ -247,6 +247,9 @@ private:
 
   [[nodiscard]] static OptPath searchUpForDataDir(Path);
 
+  // throw an exception if ArgCount is non-zero, but args is a null pointer
+  static void argSanityCheck(ArgCount, const char* const*);
+
   // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads
   // data from 'linked-jinmei.txt' and creates either a LinkedJinmei or a
   // LinkedOld kanji for each entry.

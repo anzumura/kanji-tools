@@ -36,6 +36,23 @@ TEST_F(DataTest, Usage) {
   EXPECT_THROW(call([&msg] { Data::usage(msg); }, msg), std::domain_error);
 }
 
+TEST_F(DataTest, NextArgWithNoArgs) {
+  // passing no args returns 0
+  EXPECT_EQ(nextArg(0, nullptr), 0);
+}
+
+TEST_F(DataTest, NextArgWithCountButNoArgs) {
+  EXPECT_THROW(
+      call([] { return nextArg(1, nullptr); }, "argc is 1, but argv is null"),
+      std::domain_error);
+}
+
+TEST_F(DataTest, NextArgWithBadCurrentArg) {
+  EXPECT_THROW(call([] { return nextArg(1, &Arg0, 2); },
+                   "currentArg 2 is greater than argc 1"),
+      std::domain_error);
+}
+
 TEST_F(DataTest, NextArgWithJustArg0) {
   // call without final 'currentArg' parameter increments to 1
   EXPECT_EQ(nextArg(1, &Arg0), 1);
@@ -77,6 +94,12 @@ TEST_F(DataTest, NextArgWithMultipleArgs) {
   EXPECT_EQ(actualArgs, (std::vector{arg1, arg3, arg6}));
 }
 
+TEST_F(DataTest, BadDataArgs) {
+  EXPECT_THROW(call([] { return getDataDir(2, nullptr); },
+                   "argc is 2, but argv is null"),
+      std::domain_error);
+}
+
 TEST_F(DataTest, MissingDataDirArg) {
   const char* argv[]{Arg0, DataArg.c_str()};
   EXPECT_THROW(call([&argv] { return getDataDir(std::size(argv), argv); },
@@ -96,6 +119,28 @@ TEST_F(DataTest, GoodDataDirArg) {
   const auto dir{getDataDir(0, {})};
   const char* argv[]{Arg0, DataArg.c_str(), dir.c_str()};
   EXPECT_EQ(getDataDir(std::size(argv), argv), dir);
+}
+
+TEST_F(DataTest, NoDebugArgs) {
+  EXPECT_EQ(getDebugMode(0, nullptr), DebugMode::None);
+  const char* argv[]{Arg0, "some arg", "some other arg"};
+  EXPECT_EQ(getDebugMode(std::size(argv), argv), DebugMode::None);
+}
+
+TEST_F(DataTest, BadDebugArgs) {
+  EXPECT_THROW(call([] { return getDebugMode(3, nullptr); },
+                   "argc is 3, but argv is null"),
+      std::domain_error);
+}
+
+TEST_F(DataTest, DebugArg) {
+  const char* argv[]{Arg0, "some arg", DebugArg.c_str(), "some other arg"};
+  EXPECT_EQ(getDebugMode(std::size(argv), argv), DebugMode::Full);
+}
+
+TEST_F(DataTest, InfoArg) {
+  const char* argv[]{Arg0, "some arg", InfoArg.c_str(), "some other arg"};
+  EXPECT_EQ(getDebugMode(std::size(argv), argv), DebugMode::Info);
 }
 
 TEST_F(DataTest, BothDebugAndInfoArgs) {

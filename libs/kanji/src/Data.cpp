@@ -23,8 +23,12 @@ constexpr size_t TextFilesInDataDir{12};
 
 Data::ArgCount Data::nextArg(
     ArgCount argc, const char* const* argv, ArgCount currentArg) {
+  argSanityCheck(argc, argv);
+  if (currentArg > argc)
+    throw std::domain_error("currentArg " + std::to_string(currentArg) +
+                            " is greater than argc " + std::to_string(argc));
   ArgCount result{currentArg};
-  if (++result < argc) {
+  if (argc && ++result < argc) {
     std::string arg{argv[result]};
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
     // followed by a path then an earlier call to 'getDataDir' would have failed
@@ -64,6 +68,7 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 }
 
 fs::path Data::getDataDir(ArgCount argc, const char** argv) {
+  argSanityCheck(argc, argv);
   OptPath found;
   for (ArgCount i{1}; !found && i < argc; ++i)
     if (argv[i] == DataArg) {
@@ -89,6 +94,7 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
 }
 
 Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
+  argSanityCheck(argc, argv);
   auto result{DebugMode::None};
   const auto setResult{[&result](DebugMode x) {
     if (result != DebugMode::None)
@@ -121,6 +127,12 @@ Data::OptPath Data::searchUpForDataDir(Path parent) {
     // '/' so break if new 'parent' is equal to 'oldParent'.
   } while (parent != oldParent);
   return {};
+}
+
+void Data::argSanityCheck(ArgCount argc, const char* const* argv) {
+  if (argc && !argv)
+    throw std::domain_error(
+        "argc is " + std::to_string(argc) + ", but argv is null");
 }
 
 bool Data::checkInsert(const Entry& kanji) {
