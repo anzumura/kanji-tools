@@ -24,15 +24,18 @@ KanaConvert::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
     const char narrow;
     const char (&wide)[Kana::OneKanaArraySize]; // wide delims are 3 byte UTF-8
   };
-  // add delims in ASCII order (skipping alphanum, Apostrophe and Dash)
+  // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
   for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
            D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
            D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
-           /* 0-9 */ D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"},
-           D{'>', "＞"}, D{'?', "？"}, D{'@', "＠"}, /* A-Z */
+           // Ascii 0-9
+           D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"}, D{'>', "＞"},
+           D{'?', "？"}, D{'@', "＠"},
+           // Ascii A-Z
            D{'[', "「"}, D{'\\', "￥"}, D{']', "」"}, D{'^', "＾"},
-           D{'_', "＿"}, D{'`', "｀"}, /* a-z */ D{'{', "『"}, D{'|', "｜"},
-           D{'}', "』"}, D{'~', "〜"}}) {
+           D{'_', "＿"}, D{'`', "｀"},
+           // Ascii a-z
+           D{'{', "『"}, D{'|', "｜"}, D{'}', "』"}, D{'~', "〜"}}) {
     _narrowDelimList += i.narrow;
     _narrowDelims[i.narrow] = i.wide;
     _wideDelims[i.wide] = i.narrow;
