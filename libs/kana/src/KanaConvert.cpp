@@ -20,17 +20,16 @@ constexpr std::array Delimiters{P{' ', "　"}, P{'.', "。"}, P{',', "、"},
 
 } // namespace
 
-KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
-    : _target{target}, _flags{flags} {
+KanaConvert::Tokens::Tokens() {
   for (auto& i : Kana::getMap(CharType::Hiragana))
     if (auto& r{i.second->romaji()}; !r.starts_with("n")) {
       if (r.size() == 1 || r == "ya" || r == "yu" || r == "yo") {
-        insertUnique(_markAfterNHiragana, i.second->hiragana());
-        insertUnique(_markAfterNKatakana, i.second->katakana());
+        insertUnique(_afterNHiragana, i.second->hiragana());
+        insertUnique(_afterNKatakana, i.second->katakana());
       } else if (r.starts_with("l")) {
         if (*i.second != Kana::SmallTsu && !r.starts_with("lk")) {
-          insertUnique(_digraphSecondHiragana, i.second->hiragana());
-          insertUnique(_digraphSecondKatakana, i.second->katakana());
+          insertUnique(_smallHiragana, i.second->hiragana());
+          insertUnique(_smallKatakana, i.second->katakana());
         }
       } else
         _repeatingConsonents.insert(r[0]);
@@ -44,6 +43,34 @@ KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
   _narrowDelimList += Dash;
   verifyData();
 }
+
+void KanaConvert::Tokens::verifyData() const {
+  assert(Kana::N.romaji() == "n");
+  assert(Kana::SmallTsu.romaji() == "ltu");
+  assert(_wideDelims.size() == Delimiters.size());
+  assert(_narrowDelims.size() == Delimiters.size());
+  assert(_narrowDelimList.size() == Delimiters.size() + 2);
+  assert(_repeatingConsonents.size() == 18);
+  for ([[maybe_unused]] const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
+    assert(_repeatingConsonents.contains(i) == false);
+  assert(_afterNHiragana.size() == 8); // 5 vowels plus 3 y's
+  assert(_afterNHiragana.size() == _afterNKatakana.size());
+  // 5 small vowels plus 3 small y's plus small 'wa'
+  assert(_smallHiragana.size() == 9);
+  assert(_smallHiragana.size() == _smallKatakana.size());
+  for ([[maybe_unused]] auto& i : _afterNHiragana) assert(isHiragana(i));
+  for ([[maybe_unused]] auto& i : _afterNKatakana) assert(isKatakana(i));
+  for ([[maybe_unused]] auto& i : _smallHiragana) assert(isHiragana(i));
+  for ([[maybe_unused]] auto& i : _smallKatakana) assert(isKatakana(i));
+}
+
+const KanaConvert::Tokens& KanaConvert::tokens() {
+  static const Tokens tokens;
+  return tokens;
+}
+
+KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
+    : _target{target}, _flags{flags} {}
 
 std::string KanaConvert::flagString() const {
   if (_flags == ConvertFlags::None) return "None";
@@ -59,26 +86,6 @@ std::string KanaConvert::flagString() const {
   flag(ConvertFlags::NoProlongMark, "NoProlongMark");
   flag(ConvertFlags::RemoveSpaces, "RemoveSpaces");
   return result;
-}
-
-void KanaConvert::verifyData() const {
-  assert(Kana::N.romaji() == "n");
-  assert(Kana::SmallTsu.romaji() == "ltu");
-  assert(_repeatingConsonents.size() == 18);
-  for ([[maybe_unused]] const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
-    assert(_repeatingConsonents.contains(i) == false);
-  assert(_markAfterNHiragana.size() == 8); // 5 vowels plus 3 y's
-  assert(_markAfterNHiragana.size() == _markAfterNKatakana.size());
-  // 5 small vowels plus 3 small y's plus small 'wa'
-  assert(_digraphSecondHiragana.size() == 9);
-  assert(_digraphSecondHiragana.size() == _digraphSecondKatakana.size());
-  for ([[maybe_unused]] auto& i : _markAfterNHiragana) assert(isHiragana(i));
-  for ([[maybe_unused]] auto& i : _markAfterNKatakana) assert(isKatakana(i));
-  for ([[maybe_unused]] auto& i : _digraphSecondHiragana) assert(isHiragana(i));
-  for ([[maybe_unused]] auto& i : _digraphSecondKatakana) assert(isKatakana(i));
-  assert(_wideDelims.size() == Delimiters.size());
-  assert(_narrowDelims.size() == Delimiters.size());
-  assert(_narrowDelimList.size() == Delimiters.size() + 2);
 }
 
 std::string KanaConvert::convert(const std::string& input) const {
@@ -105,18 +112,14 @@ std::string KanaConvert::convert(CharType source, const std::string& input,
 std::string KanaConvert::convert(
     CharType source, const std::string& input) const {
   if (source == _target) return input;
-  if (source == CharType::Hiragana)
-    return convertFromKana(
-        input, source, _markAfterNHiragana, _digraphSecondHiragana);
-  if (source == CharType::Katakana)
-    return convertFromKana(
-        input, source, _markAfterNKatakana, _digraphSecondKatakana);
+  if (source == CharType::Hiragana) return convertFromKana(input, source);
+  if (source == CharType::Katakana) return convertFromKana(input, source);
   // For Romaji source, break into words separated by any of _narrowDelimList
   // and process each word. This helps deal with words ending in 'n'.
   std::string result;
   size_t oldPos{};
   for (const auto keepSpaces{!(_flags & ConvertFlags::RemoveSpaces)};;) {
-    const auto pos{input.find_first_of(_narrowDelimList, oldPos)};
+    const auto pos{input.find_first_of(tokens().narrowDelimList(), oldPos)};
     if (pos == std::string::npos) {
       result += convertToKana(input.substr(oldPos));
       break;
@@ -124,37 +127,37 @@ std::string KanaConvert::convert(
     result += convertToKana(input.substr(oldPos, pos - oldPos));
     if (const auto delim{input[pos]};
         delim != Apostrophe && delim != Dash && (keepSpaces || delim != ' '))
-      result += _narrowDelims.at(delim);
+      result += narrowDelims().at(delim);
     oldPos = pos + 1;
   }
   return result;
 }
 
-std::string KanaConvert::convertFromKana(const std::string& kanaInput,
-    CharType source, const Set& afterN, const Set& smallKana) const {
+std::string KanaConvert::convertFromKana(
+    const std::string& kanaInput, CharType source) const {
   std::string result, kanaGroup, kana;
   u_int8_t count{};
   auto hasSmallTsu{false}, groupDone{false};
   const Kana* prevKana{};
-  const auto done{[this, source, &prevKana, &result, &count, &hasSmallTsu,
-                      &groupDone, &kanaGroup, &kana, &afterN](
-                      bool startNewGroup = true, bool prolong = false) {
-    result += processKana(kanaGroup, source, count, prevKana, prolong);
-    if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
-        afterN.contains(kana))
-      result += Apostrophe;
-    hasSmallTsu = false;
-    groupDone = false;
-    // if 'startNewGroup' is false then drop the current letter instead of using
-    // it to start a new group
-    if (startNewGroup) {
-      count = 1;
-      kanaGroup = kana;
-    } else {
-      count = 0;
-      kanaGroup.clear();
-    }
-  }};
+  const auto done{
+      [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone,
+          &kanaGroup, &kana](bool startNewGroup = true, bool prolong = false) {
+        result += processKana(kanaGroup, source, count, prevKana, prolong);
+        if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
+            afterN(source).contains(kana))
+          result += Apostrophe;
+        hasSmallTsu = false;
+        groupDone = false;
+        // if 'startNewGroup' is false then drop the current letter instead of
+        // using it to start a new group
+        if (startNewGroup) {
+          count = 1;
+          kanaGroup = kana;
+        } else {
+          count = 0;
+          kanaGroup.clear();
+        }
+      }};
   for (MBChar s{kanaInput}; s.next(kana, false);) {
     // check prolong and repeating marks first since they aren't in 'sourceMap'
     if (kana == Kana::ProlongMark)
@@ -177,7 +180,7 @@ std::string KanaConvert::convertFromKana(const std::string& kanaInput,
         groupDone = true; // mark the new group as 'done' for an 'n'
       } else if (groupDone)
         done();
-      else if (smallKana.contains(kana)) {
+      else if (smallKana(source).contains(kana)) {
         // a small letter should cause letters to be processed including the
         // small letter so mark group as done, but continue the loop in case
         // there's a 'prolong' mark.
@@ -198,7 +201,7 @@ std::string KanaConvert::convertFromKana(const std::string& kanaInput,
       // letter unconverted
       done(false);
       if (romajiTarget()) {
-        if (const auto i{_wideDelims.find(kana)}; i != _wideDelims.end())
+        if (const auto i{wideDelims().find(kana)}; i != wideDelims().end())
           result += i->second;
         else
           result += kana;
@@ -241,7 +244,7 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
       if (const auto i{sourceMap.find(kanaGroup.substr(3))};
           i != sourceMap.end())
         return romajiTarget() && Kana::SmallTsu.containsKana(firstKana) &&
-                       _repeatingConsonents.contains(i->second->romaji()[0])
+                       repeatingConsonents().contains(i->second->romaji()[0])
                    ? macron(i->second, true)
                    : processKana(firstKana, source, 1, prevKana) +
                          macron(i->second);
@@ -302,7 +305,7 @@ void KanaConvert::processRomaji(
     result +=
         letters[0] == 'n' ? getN()
         : letters[0] == letters[1] || letters[0] == 't' && letters[1] == 'c'
-            ? _repeatingConsonents.contains(letters[0])
+            ? repeatingConsonents().contains(letters[0])
                   ? getSmallTsu()
                   : letters.substr(0, 1) // error: first letter not valid
             : letters.substr(0, 1);      // error: first letter not valid

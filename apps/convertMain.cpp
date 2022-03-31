@@ -288,20 +288,18 @@ void ConvertMain::printKanaChart(bool markdown) const {
         groups.contains(romaji));
   }
   // special handling middle dot, prolong symbol and repeat symbols
-  const auto slash{'/'};
-  const auto& middleDot{_converter.narrowDelims().find(slash)};
+  const std::string slash{"/"};
+  const auto& middleDot{_converter.convert(slash)};
   // middleDot should always be found and thus '4' none rows, but handle if
   // missing just in case ...
   static constexpr u_int8_t HasSlash{4}, NoSlash{3};
-  const u_int8_t none{
-      middleDot != _converter.narrowDelims().end() ? HasSlash : NoSlash};
+  const u_int8_t none{middleDot.empty() ? NoSlash : HasSlash};
   if (none == HasSlash)
-    table.add({"N", std::string{slash}, EmptyString, middleDot->second,
-                  EmptyString, toUnicode(middleDot->second)},
+    table.add(
+        {"N", slash, EmptyString, middleDot, EmptyString, toUnicode(middleDot)},
         true);
   else
-    std::cerr << "Failed to find " << slash
-              << " in _converter.narrowDelims()\n";
+    std::cerr << "Failed to find " << slash << '\n';
   table.add({"N", EmptyString, EmptyString, Kana::ProlongMark, EmptyString,
                 toUnicode(Kana::ProlongMark)},
       none == NoSlash);
