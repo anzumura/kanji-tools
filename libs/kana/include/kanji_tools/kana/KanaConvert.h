@@ -107,15 +107,26 @@ private:
     assert(i.second);
   }
 
-  [[nodiscard]] std::string convertFromKana(const std::string& input,
+  // 'convertFromKana' takes 'kanaInput' (so 'source' is Hiragana or Katakana)
+  // and retuns converted result based on '_target' and '_flags' (result can be
+  // either Rōmaji or Kana, i.e., this function can convert Hiragana to Katakana
+  // and vice versa).
+  [[nodiscard]] std::string convertFromKana(const std::string& kanaInput,
       CharType source, const Set& afterN, const Set& smallKana) const;
-  [[nodiscard]] std::string kanaLetters(const std::string& letterGroup,
+
+  // helper function used by 'convertFromKana'
+  [[nodiscard]] std::string processKana(const std::string& kanaGroup,
       CharType source, u_int8_t count, const Kana*& prevKana,
       bool prolong = false) const;
-  [[nodiscard]] std::string convertFromRomaji(const std::string& input) const;
-  void romajiLetters(std::string& letterGroup, std::string& result) const;
-  [[nodiscard]] bool romajiMacronLetter(const std::string& letter,
-      std::string& letterGroup, std::string& result) const;
+
+  // 'convertToKana' takes 'romajiInput' and returns either Hiragana or Katakana
+  // based on '_target' and '_flags'.
+  [[nodiscard]] std::string convertToKana(const std::string& romajiInput) const;
+
+  // helper functions used by 'convertToKana'
+  void processRomaji(std::string& romajiLetters, std::string& result) const;
+  [[nodiscard]] bool processRomajiMacron(const std::string& letter,
+      std::string& letters, std::string& result) const;
 
   // '_repeatingConsonents' is used for processing small 'tsu' for sokuon output
   std::set<char> _repeatingConsonents;
