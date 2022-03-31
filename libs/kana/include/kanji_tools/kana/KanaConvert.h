@@ -134,6 +134,10 @@ private:
   [[nodiscard]] auto& getN() const { return get(Kana::N); }
   [[nodiscard]] auto& getSmallTsu() const { return get(Kana::SmallTsu); }
 
+  [[nodiscard]] static auto isN(const std::string& x) {
+    return x == "n" || x == "N";
+  }
+
   // 'convertFromKana' takes 'kanaInput' (so 'source' is Hiragana or Katakana)
   // and retuns converted result based on '_target' and '_flags' (result can be
   // either Rōmaji or Kana, i.e., this function can convert Hiragana to Katakana

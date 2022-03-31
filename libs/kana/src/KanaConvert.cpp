@@ -190,13 +190,12 @@ std::string KanaConvert::convertFromKana(
       // got non-hiragana letter so flush any letters and preserve the new
       // letter unconverted
       done(false);
-      if (romajiTarget()) {
-        if (const auto i{wideDelims().find(kana)}; i != wideDelims().end())
+      if (romajiTarget())
+        if (const auto i{wideDelims().find(kana)}; i != wideDelims().end()) {
           result += i->second;
-        else
-          result += kana;
-      } else
-        result += kana;
+          continue;
+        }
+      result += kana;
     }
   }
   return result + processKana(kanaGroup, source, prevKana);
@@ -237,9 +236,12 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
                    ? macron(i->second, true)
                    : processKana(firstKana, source, prevKana) +
                          macron(i->second);
-      // error: couldn't convert second part
+      // LCOV_EXCL_START
+      // return second part unconverted - this should be impossible by design
+      // since only Kana that exists in sourceMap are added to 'kanaGroup'
       return processKana(firstKana, source, prevKana) +
              kanaGroup.substr(Kana::OneKanaSize);
+      // LCOV_EXCL_STOP
     }
   } else if (prolong)
     // got 'prolong mark' at the start of a group which isn't valid so just
@@ -252,26 +254,25 @@ std::string KanaConvert::convertToKana(const std::string& romajiInput) const {
   std::string result, letters, letter;
   for (MBChar s{romajiInput}; s.next(letter, false);)
     if (isSingleByte(letter)) {
-      if (const auto lowerLetter{static_cast<char>(std::tolower(letter[0]))};
-          lowerLetter != 'n') {
-        letters += lowerLetter;
+      if (!isN(letter)) {
+        letters += letter;
         processRomaji(letters, result);
       } else if (letters.empty())
-        letters += lowerLetter;
-      else if (letters == "n")
+        letters += letter;
+      else if (isN(letters))
         // got two 'n's in a row so output one, but don't clear letters
         result += getN();
       else {
         // error: partial romaji followed by n - output uncoverted partial group
         result += letters;
-        letters = lowerLetter; // 'n' starts a new group
+        letters = letter; // 'n' starts a new group
       }
     } else if (!processRomajiMacron(letter, letters, result)) {
       processRomaji(letters, result);
       result += letter;
     }
   while (!letters.empty())
-    if (letters == "n") {
+    if (isN(letters)) {
       result += getN(); // normal case for a word ending in 'n'
       letters.clear();
     } else {
@@ -285,20 +286,22 @@ std::string KanaConvert::convertToKana(const std::string& romajiInput) const {
 void KanaConvert::processRomaji(
     std::string& letters, std::string& result) const {
   auto& sourceMap{Kana::getMap(CharType::Romaji)};
-  if (const auto i{sourceMap.find(letters)}; i != sourceMap.end()) {
+  std::string lower{letters};
+  std::transform(lower.begin(), lower.end(), lower.begin(),
+      [](unsigned char c) { return std::tolower(c); });
+  if (const auto i{sourceMap.find(lower)}; i != sourceMap.end()) {
     result += get(*i->second);
     letters.clear();
   } else if (letters.size() == Kana::RomajiStringMaxSize) {
     // convert first letter to small tsu if letter repeats and is a valid
     // consonant (also allow 'tc' combination) otherwise output the first letter
     // unconverted since no valid romaji can be longer than 3 letters
-    result +=
-        letters[0] == 'n' ? getN()
-        : letters[0] == letters[1] || letters[0] == 't' && letters[1] == 'c'
-            ? repeatingConsonents().contains(letters[0])
-                  ? getSmallTsu()
-                  : letters.substr(0, 1) // error: first letter not valid
-            : letters.substr(0, 1);      // error: first letter not valid
+    result += lower[0] == 'n' ? getN()
+              : lower[0] == lower[1] || lower[0] == 't' && lower[1] == 'c'
+                  ? repeatingConsonents().contains(letters[0])
+                        ? getSmallTsu()
+                        : letters.substr(0, 1) // error: first letter not valid
+                  : letters.substr(0, 1);      // error: first letter not valid
     letters = letters.substr(1);
     // try converting the shortened letters
     processRomaji(letters, result);
