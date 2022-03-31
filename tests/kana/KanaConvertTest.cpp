@@ -335,6 +335,12 @@ TEST_F(KanaConvertTest, ConvertAllToOneType) {
       "ラーメンラーメンラーメン！！");
 }
 
+TEST_F(KanaConvertTest, UnsupportedKana) {
+  // leave unsupported Kana symbols unconverted
+  EXPECT_EQ(hiraganaToRomaji("かゟこ"), "kaゟko"); // Hiragana 'yori'
+  EXPECT_EQ(katakanaToRomaji("カヿコ"), "kaヿko"); // Katakana 'koto'
+}
+
 TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki
   // sometimes in order to be unique for round-trips (plus there are a lot of
