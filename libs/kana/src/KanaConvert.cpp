@@ -2,25 +2,11 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
-#include <iostream>
 #include <sstream>
 
 namespace kanji_tools {
 
-namespace {
-
-using P = const std::pair<const char, const char* const>;
-constexpr std::array Delimiters{P{' ', "　"}, P{'.', "。"}, P{',', "、"},
-    P{':', "："}, P{';', "；"}, P{'/', "・"}, P{'!', "！"}, P{'?', "？"},
-    P{'(', "（"}, P{')', "）"}, P{'[', "「"}, P{']', "」"}, P{'*', "＊"},
-    P{'~', "〜"}, P{'=', "＝"}, P{'+', "＋"}, P{'@', "＠"}, P{'#', "＃"},
-    P{'$', "＄"}, P{'%', "％"}, P{'^', "＾"}, P{'&', "＆"}, P{'{', "『"},
-    P{'}', "』"}, P{'|', "｜"}, P{'"', "”"}, P{'`', "｀"}, P{'<', "＜"},
-    P{'>', "＞"}, P{'_', "＿"}, P{'\\', "￥"}};
-
-} // namespace
-
-KanaConvert::Tokens::Tokens() {
+KanaConvert::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   for (auto& i : Kana::getMap(CharType::Hiragana))
     if (auto& r{i.second->romaji()}; !r.starts_with("n")) {
       if (r.size() == 1 || r == "ya" || r == "yu" || r == "yo") {
@@ -34,22 +20,29 @@ KanaConvert::Tokens::Tokens() {
       } else
         _repeatingConsonents.insert(r[0]);
     }
-  for (auto& i : Delimiters) {
-    _narrowDelimList += i.first;
-    _narrowDelims[i.first] = i.second;
-    _wideDelims[i.second] = i.first;
+  struct D {
+    const char narrow;
+    const char (&wide)[Kana::OneKanaArraySize]; // wide delims are 3 byte UTF-8
+  };
+  // add delims in ASCII order (skipping alphanum, Apostrophe and Dash)
+  for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
+           D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
+           D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
+           /* 0-9 */ D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"},
+           D{'>', "＞"}, D{'?', "？"}, D{'@', "＠"}, /* A-Z */
+           D{'[', "「"}, D{'\\', "￥"}, D{']', "」"}, D{'^', "＾"},
+           D{'_', "＿"}, D{'`', "｀"}, /* a-z */ D{'{', "『"}, D{'|', "｜"},
+           D{'}', "』"}, D{'~', "〜"}}) {
+    _narrowDelimList += i.narrow;
+    _narrowDelims[i.narrow] = i.wide;
+    _wideDelims[i.wide] = i.narrow;
   }
-  _narrowDelimList += Apostrophe;
-  _narrowDelimList += Dash;
   verifyData();
 }
 
 void KanaConvert::Tokens::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
-  assert(_wideDelims.size() == Delimiters.size());
-  assert(_narrowDelims.size() == Delimiters.size());
-  assert(_narrowDelimList.size() == Delimiters.size() + 2);
   assert(_repeatingConsonents.size() == 18);
   for ([[maybe_unused]] const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
     assert(_repeatingConsonents.contains(i) == false);
@@ -62,6 +55,10 @@ void KanaConvert::Tokens::verifyData() const {
   for ([[maybe_unused]] auto& i : _afterNKatakana) assert(isKatakana(i));
   for ([[maybe_unused]] auto& i : _smallHiragana) assert(isHiragana(i));
   for ([[maybe_unused]] auto& i : _smallKatakana) assert(isKatakana(i));
+  // make sure there are no duplicate narrow or wide delims, i.e., both maps
+  // must have the same size (which is 2 less than _narrowDelimList)
+  assert(_wideDelims.size() == _narrowDelimList.size() - 2);
+  assert(_narrowDelims.size() == _wideDelims.size());
 }
 
 const KanaConvert::Tokens& KanaConvert::tokens() {
