@@ -40,6 +40,16 @@ public:
 
   inline static const OptString EmptyOptString;
 
+  // constants for UTF-8 Kana string and array sizes containing Kana (an array
+  // is one bigger to hold the final null character)
+  inline static constexpr u_int8_t OneKanaSize{3}; // all Kana are 3 bytes
+  inline static constexpr u_int8_t OneKanaArraySize{OneKanaSize + 1},
+      TwoKanaSize{OneKanaSize * 2}, TwoKanaArraySize{OneKanaSize * 2 + 1};
+
+  // sizes for Rōmaji strings and arrays
+  inline static constexpr u_int8_t RomajiArrayMinSize{2}, RomajiArrayMaxSize{4};
+  inline static constexpr u_int8_t RomajiStringMaxSize{RomajiArrayMaxSize - 1};
+
   [[nodiscard]] static const Map& getMap(CharType);
 
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
@@ -76,13 +86,13 @@ public:
       static_assert(check(V));
     }
 
-    // no instance with 3 variants has 'kunrei' true, but one has differing
+    // no instance with three variants has 'kunrei' true, but one has differing
     // sizes so need two template params, i.e, small 'ぇ' with Rōmaji of 'le'
     // has a variant list of 'xe', 'lye' and 'xye'
     template<size_t V1, size_t V2>
     RomajiVariants(CharArray<V1> v1, CharArray<V2> v2, CharArray<V2> v3)
         : _list{v1, v2, v3} {
-      static_assert(check(V1) && V2 == 4);
+      static_assert(check(V1) && V2 == RomajiArrayMaxSize);
     }
 
     [[nodiscard]] auto& list() const { return _list; }
@@ -90,7 +100,7 @@ public:
   private:
     // all Rōmaji variants are either 2 or 3 characters long
     [[nodiscard]] static consteval bool check(size_t x) {
-      return x > 2 && x < 5;
+      return x > RomajiArrayMinSize && x <= RomajiArrayMaxSize;
     }
 
     List _list;
@@ -117,7 +127,7 @@ public:
     template<size_t N>
     RepeatMark(CharArray<N> hiragana, CharArray<N> katakana, bool dakuten)
         : _hiragana{hiragana}, _katakana{katakana}, _dakuten{dakuten} {
-      static_assert(N == 4);
+      static_assert(N == OneKanaArraySize);
       validate();
     }
 
@@ -146,8 +156,14 @@ public:
   Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
       CharArray<H> hepburn, CharArray<K> kunrei)
       : Kana{romaji, hiragana, katakana, hepburn, kunrei, {}} {
-    static_assert(H < 5 && K < 5);
-    static_assert(N == 4 && H > 1 && K > 1 || N == 7 && H > 2 && K > 2);
+    static_assert(H <= RomajiArrayMaxSize && K <= RomajiArrayMaxSize);
+    if constexpr (N == OneKanaArraySize)
+      static_assert(H >= RomajiArrayMinSize && K >= RomajiArrayMinSize);
+    else {
+      // all digraphs have Rōmaji of at least 2 characters
+      static_assert(N == TwoKanaArraySize);
+      static_assert(H > RomajiArrayMinSize && K > RomajiArrayMinSize);
+    }
   }
 
   template<size_t R, size_t N>
@@ -244,11 +260,11 @@ private:
         _hepburn{hepburn ? OptString(hepburn) : std::nullopt},
         _kunrei{kunrei ? OptString(kunrei) : std::nullopt}, _variants{std::move(
                                                                 variants)} {
-    // Rōmaji can't be longer than 3 (so '< 5' to include the final '\0')
-    static_assert(R < 5);
+    static_assert(R <= RomajiArrayMaxSize);
     // Hiragana and Katakana must be the same size (3 or 6) and also check that
     // Rōmaji is at least 1 character for a monograph or 2 for a digraph
-    static_assert(N == 4 && R > 1 || N == 7 && R > 2);
+    static_assert(N == OneKanaArraySize && R >= RomajiArrayMinSize ||
+                  N == TwoKanaArraySize && R > RomajiArrayMinSize);
     validate();
   }
 

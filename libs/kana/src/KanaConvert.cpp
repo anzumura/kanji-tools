@@ -136,13 +136,12 @@ std::string KanaConvert::convert(
 std::string KanaConvert::convertFromKana(
     const std::string& kanaInput, CharType source) const {
   std::string result, kanaGroup, kana;
-  u_int8_t count{};
   auto hasSmallTsu{false}, groupDone{false};
   const Kana* prevKana{};
   const auto done{
-      [this, source, &prevKana, &result, &count, &hasSmallTsu, &groupDone,
-          &kanaGroup, &kana](bool startNewGroup = true, bool prolong = false) {
-        result += processKana(kanaGroup, source, count, prevKana, prolong);
+      [this, source, &prevKana, &result, &hasSmallTsu, &groupDone, &kanaGroup,
+          &kana](bool startNewGroup = true, bool prolong = false) {
+        result += processKana(kanaGroup, source, prevKana, prolong);
         if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
             afterN(source).contains(kana))
           result += Apostrophe;
@@ -150,13 +149,7 @@ std::string KanaConvert::convertFromKana(
         groupDone = false;
         // if 'startNewGroup' is false then drop the current letter instead of
         // using it to start a new group
-        if (startNewGroup) {
-          count = 1;
-          kanaGroup = kana;
-        } else {
-          count = 0;
-          kanaGroup.clear();
-        }
+        kanaGroup = startNewGroup ? kana : EmptyString;
       }};
   for (MBChar s{kanaInput}; s.next(kana, false);) {
     // check prolong and repeating marks first since they aren't in 'sourceMap'
@@ -185,17 +178,14 @@ std::string KanaConvert::convertFromKana(
         // small letter so mark group as done, but continue the loop in case
         // there's a 'prolong' mark.
         kanaGroup += kana;
-        ++count;
         groupDone = true;
-      } else if (count > (hasSmallTsu ? 1 : 0))
+      } else if (kanaGroup.size() > (hasSmallTsu ? Kana::OneKanaSize : 0))
         // a normal (non-n, non-small) letter can't form the second part of a
         // digraph so process any stored previous letter and hold processing of
         // the new letter in case it forms the first part of a new digraph.
         done();
-      else {
+      else
         kanaGroup += kana;
-        ++count;
-      }
     } else {
       // got non-hiragana letter so flush any letters and preserve the new
       // letter unconverted
@@ -209,12 +199,11 @@ std::string KanaConvert::convertFromKana(
         result += kana;
     }
   }
-  return result + processKana(kanaGroup, source, count, prevKana);
+  return result + processKana(kanaGroup, source, prevKana);
 }
 
 std::string KanaConvert::processKana(const std::string& kanaGroup,
-    CharType source, u_int8_t count, const Kana*& prevKana,
-    bool prolong) const {
+    CharType source, const Kana*& prevKana, bool prolong) const {
   auto& sourceMap{Kana::getMap(source)};
   const auto macron{[this, prolong, &prevKana](
                         const Kana* k, bool sokuon = false) {
@@ -239,17 +228,18 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
     if (const auto i{sourceMap.find(kanaGroup)}; i != sourceMap.end())
       return macron(i->second);
     // if letter group is an unknown, split it up and try processing each part
-    if (count > 1) {
-      const auto firstKana{kanaGroup.substr(0, 3)}; // valid Kana are size '3'
-      if (const auto i{sourceMap.find(kanaGroup.substr(3))};
+    if (kanaGroup.size() > Kana::OneKanaSize) {
+      const auto firstKana{kanaGroup.substr(0, Kana::OneKanaSize)};
+      if (const auto i{sourceMap.find(kanaGroup.substr(Kana::OneKanaSize))};
           i != sourceMap.end())
         return romajiTarget() && Kana::SmallTsu.containsKana(firstKana) &&
                        repeatingConsonents().contains(i->second->romaji()[0])
                    ? macron(i->second, true)
-                   : processKana(firstKana, source, 1, prevKana) +
+                   : processKana(firstKana, source, prevKana) +
                          macron(i->second);
       // error: couldn't convert second part
-      return processKana(firstKana, source, 1, prevKana) + kanaGroup.substr(3);
+      return processKana(firstKana, source, prevKana) +
+             kanaGroup.substr(Kana::OneKanaSize);
     }
   } else if (prolong)
     // got 'prolong mark' at the start of a group which isn't valid so just
@@ -298,7 +288,7 @@ void KanaConvert::processRomaji(
   if (const auto i{sourceMap.find(letters)}; i != sourceMap.end()) {
     result += get(*i->second);
     letters.clear();
-  } else if (letters.size() == 3) {
+  } else if (letters.size() == Kana::RomajiStringMaxSize) {
     // convert first letter to small tsu if letter repeats and is a valid
     // consonant (also allow 'tc' combination) otherwise output the first letter
     // unconverted since no valid romaji can be longer than 3 letters

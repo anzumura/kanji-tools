@@ -143,8 +143,7 @@ private:
 
   // helper function used by 'convertFromKana'
   [[nodiscard]] std::string processKana(const std::string& kanaGroup,
-      CharType source, u_int8_t count, const Kana*& prevKana,
-      bool prolong = false) const;
+      CharType source, const Kana*& prevKana, bool prolong = false) const;
 
   // 'convertToKana' takes 'romajiInput' and returns either Hiragana or Katakana
   // based on '_target' and '_flags'.
