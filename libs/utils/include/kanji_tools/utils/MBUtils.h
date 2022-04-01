@@ -213,14 +213,32 @@ template<typename T>
   return s;
 }
 
-// convert first letter of an ascii (non-multibyte) string to lower case
+// if first letter of (ascii string) 's' is upper case then return a copy with
+// the first character converted to lower case, otherwise return 's'
 [[nodiscard]] inline auto firstLower(const std::string& s) {
   return firstConvert(::isupper, ::tolower, s);
 }
 
-// convert first letter of an ascii (non-multibyte) string to upper case
+// if first letter of (ascii string) 's' is lower case then return a copy with
+// the first character converted to upper case, otherwise return 's'
 [[nodiscard]] inline auto firstUpper(const std::string& s) {
   return firstConvert(::islower, ::toupper, s);
+}
+
+// return a copy of (ascii string) 's' converted to lower case
+[[nodiscard]] inline auto toLower(const std::string& s) {
+  std::string result{s};
+  std::transform(
+      s.begin(), s.end(), result.begin(), [](auto c) { return ::tolower(c); });
+  return result;
+}
+
+// return a copy of (ascii string) 's' converted to upper case
+[[nodiscard]] inline auto toUpper(const std::string& s) {
+  std::string result{s};
+  std::transform(
+      s.begin(), s.end(), result.begin(), [](auto c) { return ::toupper(c); });
+  return result;
 }
 
 // 'MBUtf8Result' is the return value of 'validateMBUtf8' - see comments below

@@ -286,9 +286,7 @@ std::string KanaConvert::convertToKana(const std::string& romajiInput) const {
 void KanaConvert::processRomaji(
     std::string& letters, std::string& result) const {
   auto& sourceMap{Kana::getMap(CharType::Romaji)};
-  std::string lower{letters};
-  std::transform(lower.begin(), lower.end(), lower.begin(),
-      [](unsigned char c) { return std::tolower(c); });
+  std::string lower{toLower(letters)};
   if (const auto i{sourceMap.find(lower)}; i != sourceMap.end()) {
     result += get(*i->second);
     letters.clear();

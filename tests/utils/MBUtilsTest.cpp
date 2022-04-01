@@ -63,7 +63,7 @@ const std::string BeforeSurrogateRange{'\xED', '\x9F', '\xBF'}, // U+D7FF
     SurrogateRangeStart{'\xED', '\xA0', '\x80'},                // U+D800
     SurrogateRangeEnd{'\xED', '\xBF', '\xBF'},                  // U+DFFF
     AfterSurrogateRange{'\xEE', '\x80', '\x80'},                // U+E000
-    LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪snow"}, Dog{"犬"};
+    LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪sNow"}, Dog{"犬"};
 
 const char32_t MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
 
@@ -337,17 +337,31 @@ TEST(MBUtilsTest, CheckSingleByte) {
 }
 
 TEST(MBUtilsTest, FirstLower) {
-  EXPECT_EQ(firstLower(""), "");
+  EXPECT_EQ(firstLower(EmptyString), EmptyString);
   EXPECT_EQ(firstLower(LowerString), LowerString);
   EXPECT_EQ(firstLower(UpperString), "efGh");
   EXPECT_EQ(firstLower(MBString), MBString);
 }
 
 TEST(MBUtilsTest, FirstUpper) {
-  EXPECT_EQ(firstUpper(""), "");
+  EXPECT_EQ(firstUpper(EmptyString), EmptyString);
   EXPECT_EQ(firstUpper(LowerString), "ABcD");
   EXPECT_EQ(firstUpper(UpperString), UpperString);
   EXPECT_EQ(firstUpper(MBString), MBString);
+}
+
+TEST(MBUtilsTest, ToLower) {
+  EXPECT_EQ(toLower(EmptyString), EmptyString);
+  EXPECT_EQ(toLower(LowerString), "abcd");
+  EXPECT_EQ(toLower(UpperString), "efgh");
+  EXPECT_EQ(toLower(MBString), "雪snow");
+}
+
+TEST(MBUtilsTest, ToUpper) {
+  EXPECT_EQ(toUpper(EmptyString), EmptyString);
+  EXPECT_EQ(toUpper(LowerString), "ABCD");
+  EXPECT_EQ(toUpper(UpperString), "EFGH");
+  EXPECT_EQ(toUpper(MBString), "雪SNOW");
 }
 
 TEST(MBUtilsTest, SortKatakana) {
