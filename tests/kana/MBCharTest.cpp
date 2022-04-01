@@ -132,6 +132,9 @@ TEST(MBCharTest, ErrorCount) {
   MBChar s{original};
   std::string x;
   for (const auto _ = {"乙", "丁"}; auto& i : _) {
+    EXPECT_TRUE(s.peek(x));
+    EXPECT_EQ(x, i);
+    x.clear();
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
