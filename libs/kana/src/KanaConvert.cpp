@@ -135,51 +135,54 @@ std::string KanaConvert::convert(
 
 std::string KanaConvert::convertFromKana(
     const std::string& kanaInput, CharType source) const {
+  enum class State { Start, SmallTsu, Done };
+  State state{State::Start};
   std::string result, kanaGroup, kana;
-  auto hasSmallTsu{false}, groupDone{false};
   const Kana* prevKana{};
-  const auto done{
-      [this, source, &prevKana, &result, &hasSmallTsu, &groupDone, &kanaGroup,
-          &kana](bool startNewGroup = true, bool prolong = false) {
-        result += processKana(kanaGroup, source, prevKana, prolong);
-        if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
-            afterN(source).contains(kana))
-          result += Apostrophe;
-        hasSmallTsu = false;
-        groupDone = false;
-        // if 'startNewGroup' is false then drop the current letter instead of
-        // using it to start a new group
-        kanaGroup = startNewGroup ? kana : EmptyString;
-      }};
+
+  enum class DoneType { NewGroup, NewEmptyGroup, Prolong };
+  // 'done' is called to process the Kana built up in 'kanaGroup'. By default it
+  // starts a new group containing 'kana' (the current symbol being processed).
+  const auto done{[this, source, &state, &result, &kanaGroup, &kana, &prevKana](
+                      DoneType dt = DoneType::NewGroup) {
+    result += processKana(kanaGroup, source, prevKana, dt == DoneType::Prolong);
+    if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
+        afterN(source).contains(kana))
+      result += Apostrophe;
+    kanaGroup = dt == DoneType::NewGroup ? kana : EmptyString;
+    state = State::Start;
+  }};
+
   for (MBChar s{kanaInput}; s.next(kana, false);) {
     // check prolong and repeating marks first since they aren't in 'sourceMap'
     if (kana == Kana::ProlongMark)
       // prolong is 'katakana', but it can appear in (non-standard) Hiragana.
-      done(false, true);
+      done(DoneType::Prolong);
     else if (Kana::RepeatPlain.matches(source, kana)) {
-      done(false);
+      done(DoneType::NewEmptyGroup);
       result += Kana::RepeatPlain.get(_target, _flags, prevKana);
     } else if (Kana::RepeatAccented.matches(source, kana)) {
-      done(false);
+      done(DoneType::NewEmptyGroup);
       result += Kana::RepeatAccented.get(_target, _flags, prevKana);
     } else if (Kana::getMap(source).contains(kana)) {
       if (Kana::SmallTsu.containsKana(kana)) {
         // getting a small tsu should cause any stored letters to be processed
         done();
-        hasSmallTsu = true;
+        state = State::SmallTsu;
       } else if (Kana::N.containsKana(kana)) {
         // getting an 'n' should cause any stored letters to be processed
         done();
-        groupDone = true; // mark the new group as 'done' for an 'n'
-      } else if (groupDone)
+        state = State::Done; // mark the new group as 'done' for an 'n'
+      } else if (state == State::Done)
         done();
       else if (smallKana(source).contains(kana)) {
         // a small letter should cause letters to be processed including the
         // small letter so mark group as done, but continue the loop in case
         // there's a 'prolong' mark.
         kanaGroup += kana;
-        groupDone = true;
-      } else if (kanaGroup.size() > (hasSmallTsu ? Kana::OneKanaSize : 0))
+        state = State::Done;
+      } else if (kanaGroup.size() >
+                 (state == State::SmallTsu ? Kana::OneKanaSize : 0))
         // a normal (non-n, non-small) letter can't form the second part of a
         // digraph so process any stored previous letter and hold processing of
         // the new letter in case it forms the first part of a new digraph.
@@ -189,7 +192,7 @@ std::string KanaConvert::convertFromKana(
     } else {
       // got non-hiragana letter so flush any letters and preserve the new
       // letter unconverted
-      done(false);
+      done(DoneType::NewEmptyGroup);
       if (romajiTarget())
         if (const auto i{wideDelims().find(kana)}; i != wideDelims().end()) {
           result += i->second;
