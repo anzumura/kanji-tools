@@ -3,6 +3,7 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
+#include <kanji_tools/utils/Args.h>
 #include <kanji_tools/utils/DataFile.h>
 #include <kanji_tools/utils/EnumMap.h>
 
@@ -14,7 +15,6 @@ namespace kanji_tools {
 // base class for 'KanjiData'
 class Data {
 public:
-  using ArgCount = u_int8_t;
   using Entry = std::shared_ptr<Kanji>;
   using OptEntry = std::optional<const Entry>;
   using List = std::vector<Entry>;
@@ -29,13 +29,12 @@ public:
 
   // 'nextArg' is meant to be used by other classes that process command line
   // options, but also have a 'Data' class (like Quiz and Stats programs) - it
-  // will return 'currentArg + 1' if argv[currentArg + 1] is not used used by
-  // this 'Data' class (ie getDataDir or getDebug). If 'currentArg + 1' is used
-  // then a larger increment is returned to 'skip over' the args, for example:
-  //   for (auto i{Data::nextArg(argc, argv)}; i < argc;
-  //       i = Data::nextArg(argc, argv, i)) { /* do something with argv[i] */ }
-  [[nodiscard]] static ArgCount nextArg(
-      ArgCount argc, const char* const* argv, ArgCount currentArg = 0);
+  // returns 'current + 1' if args[currentArg + 1] is not used used by this
+  // 'Data' class (ie getDataDir or getDebug). If 'current + 1' is used then a
+  // larger increment is returned to 'skip over' the args, for example:
+  //   for (auto i{Data::nextArg(args)}; i < args.size();
+  //       i = Data::nextArg(args)) { /* do something with args[i] */ }
+  [[nodiscard]] static Args::Size nextArg(const Args&, Args::Size current = 0);
 
   // 'DebugMode' is controlled by debug/info command-line options (see above):
   //   DebugArg: sets '_debugMode' to 'Full' to print all debug output
@@ -203,14 +202,14 @@ public:
 protected:
   // 'getDataDir' looks for a directory called 'data' containing expected number
   // of .txt files based on checking directories starting at 'current dir' and
-  // working up parent directories (if this fails and 'argc' is non-zero then
-  // search up based on argv[0]). '-data' followed by a directory name can also
+  // working up parent directories (if this fails and 'args' is non-empty then
+  // search up based on args[0]). '-data' followed by a directory name can also
   // be used as an override.
-  [[nodiscard]] static Path getDataDir(ArgCount argc, const char** argv);
+  [[nodiscard]] static Path getDataDir(const Args&);
 
-  // 'getDebugMode' looks for 'DebugArg' or 'InfoArg' flags in 'argv' list (see
+  // 'getDebugMode' looks for 'DebugArg' or 'InfoArg' flags in 'args' list (see
   // 'DebugMode' above)
-  [[nodiscard]] static DebugMode getDebugMode(ArgCount argc, const char** argv);
+  [[nodiscard]] static DebugMode getDebugMode(const Args&);
 
   // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling
   // 'populate Lists' functions
@@ -248,9 +247,6 @@ private:
 
   [[nodiscard]] static OptPath searchUpForDataDir(Path);
   [[nodiscard]] static bool isValidDataDir(const Path&);
-
-  // throw an exception if ArgCount is non-zero, but args is a null pointer
-  static void argSanityCheck(ArgCount, const char* const*);
 
   // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data
   // from 'linked-jinmei.txt' and creates either a LinkedJinmei or a LinkedOld

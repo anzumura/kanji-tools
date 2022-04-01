@@ -14,9 +14,8 @@ const fs::path FrequencyReadingsFile{"frequency-readings"},
 
 } // namespace
 
-KanjiData::KanjiData(
-    ArgCount argc, const char** argv, std::ostream& out, std::ostream& err)
-    : Data{getDataDir(argc, argv), getDebugMode(argc, argv), out, err},
+KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
+    : Data{getDataDir(args), getDebugMode(args), out, err},
       _levels{dataFile(JlptLevels::N5), dataFile(JlptLevels::N4),
           dataFile(JlptLevels::N3), dataFile(JlptLevels::N2),
           dataFile(JlptLevels::N1)},

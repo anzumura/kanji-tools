@@ -1,1 +1,2 @@
-add_library(${TARGET} Choice.cpp ColumnFile.cpp DataFile.cpp MBUtils.cpp)
+add_library(${TARGET} Args.cpp Choice.cpp ColumnFile.cpp DataFile.cpp
+  MBUtils.cpp)

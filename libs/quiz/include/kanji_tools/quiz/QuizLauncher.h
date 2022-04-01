@@ -11,7 +11,7 @@ namespace kanji_tools {
 class QuizLauncher {
 public:
   // 'run' is called by main function in 'quizMain.cpp'
-  static void run(Data::ArgCount argc, const char** argv);
+  static void run(const Args&);
 
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
@@ -23,8 +23,8 @@ public:
 
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.
-  QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr, GroupDataPtr,
-      JukugoDataPtr, std::istream* in = {});
+  QuizLauncher(
+      const Args&, DataPtr, GroupDataPtr, JukugoDataPtr, std::istream* in = {});
 
   QuizLauncher(const QuizLauncher&) = delete;
   // operator= is not generated since there are const members

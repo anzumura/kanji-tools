@@ -21,20 +21,19 @@ constexpr size_t TextFilesInDataDir{12};
 
 } // namespace
 
-Data::ArgCount Data::nextArg(
-    ArgCount argc, const char* const* argv, ArgCount currentArg) {
-  argSanityCheck(argc, argv);
-  if (currentArg > argc)
-    throw std::domain_error("currentArg " + std::to_string(currentArg) +
-                            " is greater than argc " + std::to_string(argc));
-  ArgCount result{currentArg};
-  if (argc && ++result < argc) {
-    std::string arg{argv[result]};
+Args::Size Data::nextArg(const Args& args, Args::Size current) {
+  if (current > args.size())
+    throw std::domain_error("current arg '" + std::to_string(current) +
+                            "' is greater than args size '" +
+                            std::to_string(args.size()) + "'");
+  Args::Size result{current};
+  if (args && ++result < args.size()) {
+    std::string arg{args[result]};
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
     // followed by a path then an earlier call to 'getDataDir' would have failed
     // with a call to 'usage' which ends the program.
-    if (arg == DataArg) return nextArg(argc, argv, result + 1);
-    if (arg == DebugArg || arg == InfoArg) return nextArg(argc, argv, result);
+    if (arg == DataArg) return nextArg(args, result + 1);
+    if (arg == DebugArg || arg == InfoArg) return nextArg(args, result);
   }
   return result;
 }
@@ -67,16 +66,16 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
   return EmptyNelsonIds;
 }
 
-fs::path Data::getDataDir(ArgCount argc, const char** argv) {
+fs::path Data::getDataDir(const Args& args) {
   static const std::string ExpectedTextFiles{
       std::to_string(TextFilesInDataDir) + " expected '" +
       DataFile::TextFileExtension + "' files"};
-  argSanityCheck(argc, argv);
   OptPath found;
-  for (ArgCount i{1}; !found && i < argc; ++i)
-    if (argv[i] == DataArg) {
-      if (i + 1 == argc) usage("'-data' must be followed by a directory name");
-      const auto data{Path(argv[i + 1])};
+  for (Args::Size i{1}; !found && i < args.size(); ++i)
+    if (args[i] == DataArg) {
+      if (i + 1 == args.size())
+        usage("'-data' must be followed by a directory name");
+      const auto data{Path(args[i + 1])};
       if (!fs::is_directory(data))
         usage("'" + data.string() + "' is not a valid directory");
       if (!isValidDataDir(data))
@@ -93,13 +92,12 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
         "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
     // search up from current directory
     const auto cur{fs::current_path()};
-    if (found = searchUpForDataDir(cur); !found && argc) {
-      // search up from 'argv[0]'
-      Path p{argv[0]};
+    if (found = searchUpForDataDir(cur); !found && args) {
+      Path p{args[0]}; // search up from 'args[0]'
       if (p = p.parent_path(); fs::is_directory(p)) {
         static const std::string Arg0Msg{"\n- searched up from arg0: "};
         if (found = searchUpForDataDir(p.parent_path()); !found)
-          usage(NotFound + cur.string() + Arg0Msg + argv[0] + NotFoundEnd);
+          usage(NotFound + cur.string() + Arg0Msg + args[0] + NotFoundEnd);
       }
     }
     if (!found) usage(NotFound + cur.string() + NotFoundEnd);
@@ -107,8 +105,7 @@ fs::path Data::getDataDir(ArgCount argc, const char** argv) {
   return *found;
 }
 
-Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
-  argSanityCheck(argc, argv);
+Data::DebugMode Data::getDebugMode(const Args& args) {
   auto result{DebugMode::None};
   const auto setResult{[&result](DebugMode x) {
     if (result != DebugMode::None)
@@ -116,10 +113,10 @@ Data::DebugMode Data::getDebugMode(ArgCount argc, const char** argv) {
             "' option");
     result = x;
   }};
-  for (ArgCount i{1}; i < argc; ++i)
-    if (argv[i] == DebugArg)
+  for (Args::Size i{1}; i < args.size(); ++i)
+    if (args[i] == DebugArg)
       setResult(DebugMode::Full);
-    else if (argv[i] == InfoArg)
+    else if (args[i] == InfoArg)
       setResult(DebugMode::Info);
   return result;
 }
@@ -144,12 +141,6 @@ bool Data::isValidDataDir(const Path& p) {
              [](const auto& i) {
                return i.path().extension() == DataFile::TextFileExtension;
              }) == TextFilesInDataDir;
-}
-
-void Data::argSanityCheck(ArgCount argc, const char* const* argv) {
-  if (argc && !argv)
-    throw std::domain_error(
-        "argc is " + std::to_string(argc) + ", but argv is null");
 }
 
 bool Data::checkInsert(const Entry& kanji) {

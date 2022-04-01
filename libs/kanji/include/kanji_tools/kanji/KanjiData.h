@@ -10,8 +10,8 @@ namespace kanji_tools {
 // jinmei.txt, etc. - see README file for more details).
 class KanjiData : public Data {
 public:
-  KanjiData(ArgCount argc = 0, const char** argv = {},
-      std::ostream& out = std::cout, std::ostream& err = std::cerr);
+  KanjiData(const Args& = {}, std::ostream& out = std::cout,
+      std::ostream& err = std::cerr);
 
   // Implement the base class functions used during Kanji construction
   [[nodiscard]] Kanji::OptFreq frequency(const std::string& s) const override {

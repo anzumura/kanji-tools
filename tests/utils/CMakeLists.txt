@@ -1,5 +1,6 @@
-add_executable(${TARGET} ChoiceTest.cpp ColumnFileTest.cpp DataFileTest.cpp
-  DisplaySizeTest.cpp EnumArrayTest.cpp EnumArrayWithNoneTest.cpp
-  EnumBitmaskTest.cpp EnumMapTest.cpp JlptLevelsTest.cpp KenteiKyusTest.cpp
-  MBUtilsTest.cpp UnicodeBlockTest.cpp ../testMain.cpp)
+add_executable(${TARGET} ArgsTest.cpp ChoiceTest.cpp ColumnFileTest.cpp
+  DataFileTest.cpp DisplaySizeTest.cpp EnumArrayTest.cpp
+  EnumArrayWithNoneTest.cpp EnumBitmaskTest.cpp EnumMapTest.cpp
+  JlptLevelsTest.cpp KenteiKyusTest.cpp MBUtilsTest.cpp UnicodeBlockTest.cpp
+  ../testMain.cpp)
 target_link_libraries(${TARGET} PRIVATE ${LIB_PREFIX}utils gtest)

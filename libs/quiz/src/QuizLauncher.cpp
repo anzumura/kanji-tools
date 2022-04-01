@@ -72,13 +72,13 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 
 } // namespace
 
-void QuizLauncher::run(Data::ArgCount argc, const char** argv) {
-  const auto data{std::make_shared<KanjiData>(argc, argv)};
-  QuizLauncher(argc, argv, data, std::make_shared<GroupData>(data),
+void QuizLauncher::run(const Args& args) {
+  const auto data{std::make_shared<KanjiData>(args)};
+  QuizLauncher(args, data, std::make_shared<GroupData>(data),
       std::make_shared<JukugoData>(data));
 }
 
-QuizLauncher::QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr data,
+QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
     GroupDataPtr groupData, JukugoDataPtr jukugoData, std::istream* in)
     : _programMode(ProgramMode::NotAssigned),
       _questionOrder(QuestionOrder::NotAssigned),
@@ -105,9 +105,8 @@ QuizLauncher::QuizLauncher(Data::ArgCount argc, const char** argv, DataPtr data,
 
   Question question{};
   auto endOptions{false}, showMeanings{false};
-  for (auto i{Data::nextArg(argc, argv)}; i < argc;
-       i = Data::nextArg(argc, argv, i))
-    if (std::string arg{argv[i]};
+  for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
+    if (std::string arg{args[i]};
         !endOptions && arg.starts_with("-") && arg.size() > 1) {
       if (arg == "-h") {
         out() << HelpMessage;

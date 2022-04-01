@@ -9,10 +9,10 @@ namespace kanji_tools {
 TEST(QuizTest, Info) {
   const char* args[]{"", Data::InfoArg.c_str()};
   std::stringstream os;
-  const auto data{std::make_shared<KanjiData>(std::size(args), args, os)};
+  const auto data{std::make_shared<KanjiData>(args, os)};
   const auto groupData{std::make_shared<GroupData>(data)};
   const auto jukugoData{std::make_shared<JukugoData>(data)};
-  QuizLauncher quiz{0, {}, data, groupData, jukugoData};
+  QuizLauncher quiz{{}, data, groupData, jukugoData};
   // look for a few strings instead of comparing the whole output
   const auto expected = {">>> Loaded 1460 kanji into 88 groups",
       ">>> Loaded 5700 kanji into 1038 groups",
@@ -30,10 +30,10 @@ TEST(QuizTest, Info) {
 TEST(QuizTest, Debug) {
   const char* args[]{"", Data::DebugArg.c_str()};
   std::stringstream os;
-  const auto data{std::make_shared<KanjiData>(std::size(args), args, os)};
+  const auto data{std::make_shared<KanjiData>(args, os)};
   const auto groupData{std::make_shared<GroupData>(data)};
   const auto jukugoData{std::make_shared<JukugoData>(data)};
-  QuizLauncher quiz{0, {}, data, groupData, jukugoData};
+  QuizLauncher quiz{{}, data, groupData, jukugoData};
   // look for a few strings instead of comparing the whole output
   const auto expected = {"阿：ア( 3)   阿': 婀# 痾#",
       "時間：十干 (10)   : 甲. 乙. 丙. 丁. 戊^ 己. 庚^ 辛. 壬\" 癸+",

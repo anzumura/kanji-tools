@@ -250,13 +250,11 @@ void StatsPred::printBreakdown(
 
 } // namespace
 
-Stats::Stats(Data::ArgCount argc, const char** argv, DataPtr data)
-    : _data(data) {
+Stats::Stats(const Args& args, DataPtr data) : _data(data) {
   auto breakdown{false}, endOptions{false}, verbose{false};
   std::vector<std::string> files;
-  for (auto i{Data::nextArg(argc, argv)}; i < argc;
-       i = Data::nextArg(argc, argv, i))
-    if (std::string arg{argv[i]}; !endOptions && arg.starts_with("-")) {
+  for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
+    if (std::string arg{args[i]}; !endOptions && arg.starts_with("-")) {
       if (arg == "-h") {
         out() << HelpMessage;
         return;

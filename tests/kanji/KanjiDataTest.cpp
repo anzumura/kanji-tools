@@ -430,7 +430,7 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
 TEST(KanjiDataPrintTest, Info) {
   const char* args[]{"", Data::InfoArg.c_str()};
   std::stringstream os;
-  KanjiData data(std::size(args), args, os);
+  KanjiData data(args, os);
   const char* expected[]{
       (">>> Loaded 23715 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
        "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17471)"),
@@ -454,7 +454,7 @@ TEST(KanjiDataPrintTest, Info) {
 TEST(KanjiDataPrintTest, Debug) {
   const char* args[]{"", Data::DebugArg.c_str()};
   std::stringstream os;
-  KanjiData data(std::size(args), args, os);
+  KanjiData data(args, os);
   std::string lastLine;
   size_t count{}, found{};
   // output is really big so just check for a few examples

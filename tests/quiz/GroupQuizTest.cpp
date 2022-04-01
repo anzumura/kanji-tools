@@ -13,13 +13,13 @@ namespace {
 class GroupQuizTest : public ::testing::Test {
 protected:
   static void SetUpTestCase() {
-    _data = std::make_shared<KanjiData>(0, nullptr, _os, _es);
+    _data = std::make_shared<KanjiData>(Args{}, _os, _es);
     _groupData = std::make_shared<GroupData>(_data);
     _jukugoData = std::make_shared<JukugoData>(_data);
   }
 
   // Contructs Quiz using the real data files
-  GroupQuizTest() : _quiz{0, {}, _data, _groupData, _jukugoData, &_is} {}
+  GroupQuizTest() : _quiz{{}, _data, _groupData, _jukugoData, &_is} {}
 
   void meaningQuiz() {
     // 't' for 'test' mode (instead of review mode)
