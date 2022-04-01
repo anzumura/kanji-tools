@@ -321,10 +321,19 @@ bool KanaConvert::processRomajiMacron(const std::string& letter,
           hiraganaTarget() && hasValue(_flags & ConvertFlags::NoProlongMark)
               ? i->second.second
               : Kana::ProlongMark;
-    else
-      result += i->second.first; // should never happen ...
+    else {
+      // non-empty 'letters' (after the above call to 'processRomaji') can only
+      // happen for bad input like 'vyī', i.e., a bad Rōmaji group followed by a
+      // macron. In this case add unconverted letters and treat the macron as a
+      // single vowel (above case would become 'vyい' for Hiragana target)
+      letters.pop_back();
+      result += letters;
+      processRomaji(letters = i->second.first, result);
+    }
     return true;
   }
+  // not being found in 'Macrons' map can happen when processing Rōmaji input
+  // and a non-macron multi-byte character is found (like Kana for example)
   return false;
 }
 

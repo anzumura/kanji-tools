@@ -345,6 +345,10 @@ TEST_F(KanaConvertTest, UnsupportedRomaji) {
   // leave unsupported Rōmaji combinations unconverted
   EXPECT_EQ(romajiToHiragana("TGIF"), "TぎF");
   EXPECT_EQ(romajiToKatakana("Alba"), "アlバ");
+  // incorrect 'n'
+  EXPECT_EQ(romajiToHiragana("sHni"), "sHに");
+  // incorrect macron
+  EXPECT_EQ(romajiToKatakana("Vyī"), "Vyイ");
 }
 
 TEST_F(KanaConvertTest, HepburnVersusKunrei) {
