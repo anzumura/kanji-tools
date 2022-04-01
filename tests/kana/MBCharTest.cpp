@@ -93,6 +93,9 @@ TEST(MBCharTest, GetNextIncludingSingleByte) {
   MBChar s{"a天気b"};
   std::string x;
   for (const auto _ = {"a", "天", "気", "b"}; auto& i : _) {
+    EXPECT_TRUE(s.peek(x, false));
+    EXPECT_EQ(x, i);
+    x.clear();
     EXPECT_TRUE(s.next(x, false));
     EXPECT_EQ(x, i);
   }
@@ -104,6 +107,9 @@ TEST(MBCharTest, Reset) {
   std::string x;
   const auto expected = {"天", "気"};
   for (auto& i : expected) {
+    EXPECT_TRUE(s.peek(x));
+    EXPECT_EQ(x, i);
+    x.clear();
     EXPECT_TRUE(s.next(x));
     EXPECT_EQ(x, i);
   }
