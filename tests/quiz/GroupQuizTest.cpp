@@ -82,7 +82,7 @@ TEST_F(GroupQuizTest, StartQuiz) {
 TEST_F(GroupQuizTest, QuizWithEmptyList) {
   // should never happen with proper '-groups.txt' files
   EXPECT_THROW(call(
-                   [this]() {
+                   [this] {
                      GroupQuiz{_quiz, {}, {}, {}, GroupQuiz::MemberType::All};
                    },
                    "empty group list"),
