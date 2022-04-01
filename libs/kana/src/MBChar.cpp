@@ -15,7 +15,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
   }};
   while (*_location) {
     switch (validateMBUtf8(_location)) {
-    case MBUtf8Result::NotMultiByte:
+    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE - missed by Clang
       if (!onlyMB) {
         result = *_location++;
         return true;
