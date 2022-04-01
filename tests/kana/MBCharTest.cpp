@@ -152,6 +152,37 @@ TEST(MBCharTest, ErrorCount) {
   EXPECT_EQ(s.errors(), 4);
 }
 
+TEST(MBCharTest, ErrorWithVariationSelectors) {
+  const auto variantSelector{toUtf8(U"\ufe01")};
+  // put a variation selector after a single byte char which is invalid
+  MBChar s{"a" + variantSelector + "ご"};
+  std::string x;
+  EXPECT_TRUE(s.next(x, false));
+  EXPECT_EQ(x, "a");
+  EXPECT_TRUE(s.peek(x));
+  EXPECT_EQ(x, "ご");
+  EXPECT_EQ(s.errors(), 0); // peek doesn't increment errors
+  x.clear();
+  EXPECT_TRUE(s.next(x));
+  EXPECT_EQ(x, "ご");
+  EXPECT_EQ(s.errors(), 1);
+  EXPECT_FALSE(s.next(x));
+}
+
+TEST(MBCharTest, ErrorWithCombiningMarks) {
+  // put combining marks at the start which isn't valid
+  MBChar s{CombiningVoiced + CombiningSemiVoiced + "じ"};
+  std::string x;
+  EXPECT_TRUE(s.peek(x));
+  EXPECT_EQ(x, "じ");
+  EXPECT_EQ(s.errors(), 0);
+  x.clear();
+  EXPECT_TRUE(s.next(x));
+  EXPECT_EQ(x, "じ");
+  EXPECT_EQ(s.errors(), 2); // each combining mark causes a error
+  EXPECT_FALSE(s.next(x));
+}
+
 TEST(MBCharTest, Valid) {
   EXPECT_EQ(MBChar{""}.valid(), MBUtf8Result::NotMultiByte);
   EXPECT_EQ(MBChar{"a"}.valid(), MBUtf8Result::NotMultiByte);
