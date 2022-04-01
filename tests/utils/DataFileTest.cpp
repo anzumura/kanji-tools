@@ -133,23 +133,18 @@ TEST_F(DataFileTest, MultiplePerLine) {
 }
 
 TEST_F(DataFileTest, GlobalDuplicate) {
-  EXPECT_THROW(
-      call(
-          [] {
-            DataFile{MultiplePerLine, DataFile::FileType::MultiplePerLine};
-          },
-          "found globally non-unique entry '東' - line: 1, file: "
-          "testDir/multiplePerLine"),
+  const auto f{[] {
+    DataFile{MultiplePerLine, DataFile::FileType::MultiplePerLine};
+  }};
+  EXPECT_THROW(call(f, "found globally non-unique entry '東' - line: 1, file: "
+                       "testDir/multiplePerLine"),
       std::domain_error);
 }
 
 TEST_F(DataFileTest, GlobalDuplicateLevel) {
-  EXPECT_THROW(call(
-                   [] {
-                     LevelDataFile{GoodOnePerLineLevel, JlptLevels::N3};
-                   },
-                   "found 3 duplicates in N3: 犬 猫 虎, file: "
-                   "testDir/goodOnePerLineLevel"),
+  const auto f{[] { LevelDataFile{GoodOnePerLineLevel, JlptLevels::N3}; }};
+  EXPECT_THROW(call(f, "found 3 duplicates in N3: 犬 猫 虎, file: "
+                       "testDir/goodOnePerLineLevel"),
       std::domain_error);
 }
 

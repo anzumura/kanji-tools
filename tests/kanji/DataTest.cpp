@@ -47,11 +47,8 @@ TEST_F(DataTest, NextArgWithNoArgs) {
 }
 
 TEST_F(DataTest, NextArgWithBadCurrentArg) {
-  EXPECT_THROW(call(
-                   [] {
-                     return nextArg({1, &Arg0}, 2);
-                   },
-                   "current arg '2' is greater than args size '1'"),
+  const auto f{[] { return nextArg({1, &Arg0}, 2); }};
+  EXPECT_THROW(call(f, "current arg '2' is greater than args size '1'"),
       std::domain_error);
 }
 

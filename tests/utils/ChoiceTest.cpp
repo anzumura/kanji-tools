@@ -78,12 +78,8 @@ TEST_F(ChoiceTest, NoChoicesError) {
 
 TEST_F(ChoiceTest, NonPrintableError) {
   const char esc{27};
-  EXPECT_THROW(call(
-                   [esc, this] {
-                     getDef({{esc, ""}});
-                   },
-                   "option is non-printable: 0x1b"),
-      std::domain_error);
+  const auto f{[esc, this] { getDef({{esc, ""}}); }};
+  EXPECT_THROW(call(f, "option is non-printable: 0x1b"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, TwoChoices) {
@@ -142,30 +138,21 @@ TEST_F(ChoiceTest, RangeWithDefault) {
 }
 
 TEST_F(ChoiceTest, InvalidRange) {
-  EXPECT_THROW(call(
-                   [this] {
-                     rangeDef({'2', '1'});
-                   },
-                   "first range option '2' is greater than last '1'"),
+  const auto f{[this] { rangeDef({'2', '1'}); }};
+  EXPECT_THROW(call(f, "first range option '2' is greater than last '1'"),
       std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableFirstRange) {
-  EXPECT_THROW(call(
-                   [this] {
-                     rangeDef({'\0', 'a'});
-                   },
-                   "first range option is non-printable: 0x00"),
-      std::domain_error);
+  const auto f{[this] { rangeDef({'\0', 'a'}); }};
+  EXPECT_THROW(
+      call(f, "first range option is non-printable: 0x00"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableLastRange) {
-  EXPECT_THROW(call(
-                   [this] {
-                     rangeDef({'a', 10});
-                   },
-                   "last range option is non-printable: 0x0a"),
-      std::domain_error);
+  const auto f{[this] { rangeDef({'a', 10}); }};
+  EXPECT_THROW(
+      call(f, "last range option is non-printable: 0x0a"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, RangeWithNoDefault) {
@@ -254,12 +241,9 @@ TEST_F(ChoiceTest, NonPrintableQuitError) {
 }
 
 TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
-  EXPECT_THROW(call(
-                   [this] {
-                     Choice{_os, 23};
-                   },
-                   "quit option is non-printable: 0x17"),
-      std::domain_error);
+  const auto f{[this] { Choice{_os, 23}; }};
+  EXPECT_THROW(
+      call(f, "quit option is non-printable: 0x17"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, UseQuitOption) {
@@ -287,35 +271,27 @@ TEST_F(ChoiceTest, ClearQuitOption) {
 }
 
 TEST_F(ChoiceTest, MissingDefaultOption) {
-  EXPECT_THROW(call(
-                   [this] {
-                     _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e');
-                   },
-                   "default option 'e' not in choices"),
-      std::domain_error);
+  const auto f{[this] { _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e'); }};
+  EXPECT_THROW(call(f, "default option 'e' not in choices"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, DuplicateQuitOption) {
   _choice.setQuit('q');
-  for (bool useQuit : {false, true})
-    EXPECT_THROW(call(
-                     [=, this] {
-                       _choice.get("", useQuit, {{'q', "abc"}});
-                     },
-                     "quit option 'q' already in choices"),
-        std::domain_error);
+  for (bool useQuit : {false, true}) {
+    const auto f{[useQuit, this] { _choice.get("", useQuit, {{'q', "abc"}}); }};
+    EXPECT_THROW(
+        call(f, "quit option 'q' already in choices"), std::domain_error);
+  }
 }
 
 TEST_F(ChoiceTest, DuplicateRangeOption) {
   const Choices choices{{'a', "12"}, {'c', "34"}};
   const std::string start{"range option '"}, end{"' already in choices"};
-  for (char rangeStart : {'a', 'b'})
-    EXPECT_THROW(call(
-                     [&, this] {
-                       _choice.get("", {rangeStart, 'c'}, choices);
-                     },
-                     start + (rangeStart == 'a' ? 'a' : 'c') + end),
+  for (char rangeStart : {'a', 'b'}) {
+    const auto f{[&, this] { _choice.get("", {rangeStart, 'c'}, choices); }};
+    EXPECT_THROW(call(f, start + (rangeStart == 'a' ? 'a' : 'c') + end),
         std::domain_error);
+  }
 }
 
 } // namespace kanji_tools

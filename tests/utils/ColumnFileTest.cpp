@@ -166,31 +166,20 @@ TEST_F(ColumnFileTest, DuplicateHeaderError) {
 
 TEST_F(ColumnFileTest, DuplicateColumnError) {
   write("");
-  EXPECT_THROW(call(
-                   [] {
-                     create({Col1, Col2, Col1});
-                   },
-                   "duplicate column 'Col1'" + FileMsg),
-      std::domain_error);
+  const auto f{[] { create({Col1, Col2, Col1}); }};
+  EXPECT_THROW(call(f, "duplicate column 'Col1'" + FileMsg), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, OneMissingColumnError) {
   write("Col1");
-  EXPECT_THROW(call(
-                   [] {
-                     create({Col1, Col2});
-                   },
-                   "column 'Col2' not found" + FileMsg),
-      std::domain_error);
+  const auto f{[] { create({Col1, Col2}); }};
+  EXPECT_THROW(call(f, "column 'Col2' not found" + FileMsg), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
   write("Col1\tCol3");
-  EXPECT_THROW(call(
-                   [] {
-                     create({Col1, Col2, Col3, Col4});
-                   },
-                   "2 columns not found: 'Col2', 'Col4'" + FileMsg),
+  const auto f{[] { create({Col1, Col2, Col3, Col4}); }};
+  EXPECT_THROW(call(f, "2 columns not found: 'Col2', 'Col4'" + FileMsg),
       std::domain_error);
 }
 
@@ -200,12 +189,8 @@ TEST_F(ColumnFileTest, MissingFileError) {
 }
 
 TEST_F(ColumnFileTest, NotRegularFileError) {
-  EXPECT_THROW(call(
-                   [] {
-                     ColumnFile{TestDir, {Col}};
-                   },
-                   "not regular file - file: testDir"),
-      std::domain_error);
+  const auto f{[] { ColumnFile{TestDir, {Col}}; }};
+  EXPECT_THROW(call(f, "not regular file - file: testDir"), std::domain_error);
 }
 
 TEST_F(ColumnFileTest, MissingHeaderRowError) {

@@ -5,22 +5,14 @@
 namespace kanji_tools {
 
 TEST(ArgsTest, SizeWithNoArgs) {
-  EXPECT_THROW(call(
-                   [] {
-                     Args{1, {}};
-                   },
-                   "size is 1, but args is null"),
-      std::domain_error);
+  const auto f{[] { Args{1, {}}; }};
+  EXPECT_THROW(call(f, "size is 1, but args is null"), std::domain_error);
 }
 
 TEST(ArgsTest, NoSizeWithArgs) {
   const char* args{"test"};
-  EXPECT_THROW(call(
-                   [&args] {
-                     Args{0, &args};
-                   },
-                   "size is 0, but args is not null"),
-      std::domain_error);
+  const auto f{[&args] { Args{0, &args}; }};
+  EXPECT_THROW(call(f, "size is 0, but args is not null"), std::domain_error);
 }
 
 TEST(ArgsTest, IntArgs) {
@@ -31,20 +23,11 @@ TEST(ArgsTest, IntArgs) {
 }
 
 TEST(ArgsTest, IntArgsOutOfRange) {
-  const int tooSmall{-1}, tooBig{256};
   const char* argv[]{"a", "bb", "ccc"};
-  EXPECT_THROW(call(
-                   [&] {
-                     Args{tooSmall, argv};
-                   },
-                   "size -1 is less than 0"),
-      std::domain_error);
-  EXPECT_THROW(call(
-                   [&] {
-                     Args{tooBig, argv};
-                   },
-                   "size 256 is greater than 255"),
-      std::domain_error);
+  const auto small{[&] { Args{-1, argv}; }};
+  EXPECT_THROW(call(small, "size -1 is less than 0"), std::domain_error);
+  const auto big{[&argv] { Args{256, argv}; }};
+  EXPECT_THROW(call(big, "size 256 is greater than 255"), std::domain_error);
 }
 
 TEST(ArgsTest, Index) {
