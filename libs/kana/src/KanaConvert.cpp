@@ -135,8 +135,8 @@ std::string KanaConvert::convert(
 
 std::string KanaConvert::convertFromKana(
     const std::string& kanaInput, CharType source) const {
-  enum class State { Start, SmallTsu, Done };
-  State state{State::Start};
+  enum class State { New, SmallTsu, Done };
+  State state{State::New};
   std::string result, kanaGroup, kana;
   const Kana* prevKana{};
 
@@ -144,13 +144,13 @@ std::string KanaConvert::convertFromKana(
   // 'done' is called to process the Kana built up in 'kanaGroup'. By default it
   // starts a new group containing 'kana' (the current symbol being processed).
   const auto done{[this, source, &state, &result, &kanaGroup, &kana, &prevKana](
-                      DoneType dt = DoneType::NewGroup) {
+                      DoneType dt = DoneType::NewGroup, State ns = State::New) {
     result += processKana(kanaGroup, source, prevKana, dt == DoneType::Prolong);
     if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
         afterN(source).contains(kana))
       result += Apostrophe;
     kanaGroup = dt == DoneType::NewGroup ? kana : EmptyString;
-    state = State::Start;
+    state = ns;
   }};
 
   for (MBChar s{kanaInput}; s.next(kana, false);) {
@@ -165,15 +165,13 @@ std::string KanaConvert::convertFromKana(
       done(DoneType::NewEmptyGroup);
       result += Kana::RepeatAccented.get(_target, _flags, prevKana);
     } else if (Kana::getMap(source).contains(kana)) {
-      if (Kana::SmallTsu.containsKana(kana)) {
-        // getting a small tsu should cause any stored letters to be processed
-        done();
-        state = State::SmallTsu;
-      } else if (Kana::N.containsKana(kana)) {
-        // getting an 'n' should cause any stored letters to be processed
-        done();
-        state = State::Done; // mark the new group as 'done' for an 'n'
-      } else if (state == State::Done)
+      if (Kana::SmallTsu.containsKana(kana))
+        // getting a small tsu causes any stored kana to be processed
+        done(DoneType::NewGroup, State::SmallTsu);
+      else if (Kana::N.containsKana(kana))
+        // getting an 'n' causes any stored kana to be processed
+        done(DoneType::NewGroup, State::Done); // new group marked as 'Done'
+      else if (state == State::Done)
         done();
       else if (smallKana(source).contains(kana)) {
         // a small letter should cause letters to be processed including the
@@ -206,29 +204,11 @@ std::string KanaConvert::convertFromKana(
 
 std::string KanaConvert::processKana(const std::string& kanaGroup,
     CharType source, const Kana*& prevKana, bool prolong) const {
-  auto& sourceMap{Kana::getMap(source)};
-  const auto macron{[this, prolong, &prevKana](
-                        const Kana* k, bool sokuon = false) {
-    const auto& s{sokuon ? k->getSokuonRomaji(_flags) : get(*k)};
-    if (prolong) {
-      if (_target != CharType::Romaji) return s + Kana::ProlongMark;
-      switch (s[s.size() - 1]) {
-      case 'a': return s.substr(0, s.size() - 1) + "ā";
-      case 'i': return s.substr(0, s.size() - 1) + "ī";
-      case 'u': return s.substr(0, s.size() - 1) + "ū";
-      case 'e': return s.substr(0, s.size() - 1) + "ē";
-      case 'o': return s.substr(0, s.size() - 1) + "ō";
-      default:
-        return s + Kana::ProlongMark; // shouldn't happen - output unconverted
-      }
-    }
-    prevKana = k;
-    return s;
-  }};
   if (!kanaGroup.empty()) {
     prevKana = nullptr;
+    auto& sourceMap{Kana::getMap(source)};
     if (const auto i{sourceMap.find(kanaGroup)}; i != sourceMap.end())
-      return macron(i->second);
+      return processKanaMacron(prolong, prevKana, i->second);
     // if letter group is an unknown, split it up and try processing each part
     if (kanaGroup.size() > Kana::OneKanaSize) {
       const auto firstKana{kanaGroup.substr(0, Kana::OneKanaSize)};
@@ -236,9 +216,9 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
           i != sourceMap.end())
         return romajiTarget() && Kana::SmallTsu.containsKana(firstKana) &&
                        repeatingConsonents().contains(i->second->romaji()[0])
-                   ? macron(i->second, true)
+                   ? processKanaMacron(prolong, prevKana, i->second, true)
                    : processKana(firstKana, source, prevKana) +
-                         macron(i->second);
+                         processKanaMacron(prolong, prevKana, i->second);
       // LCOV_EXCL_START
       // return second part unconverted - this should be impossible by design
       // since only Kana that exists in sourceMap are added to 'kanaGroup'
@@ -247,10 +227,29 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
       // LCOV_EXCL_STOP
     }
   } else if (prolong)
-    // got 'prolong mark' at the start of a group which isn't valid so just
+    // a 'prolong mark' at the start of a group isn't valid so in this case just
     // return the symbol unchanged
     return Kana::ProlongMark;
   return kanaGroup;
+}
+
+std::string KanaConvert::processKanaMacron(
+    bool prolong, const Kana*& prevKana, const Kana* kana, bool sokuon) const {
+  const auto& result{sokuon ? kana->getSokuonRomaji(_flags) : get(*kana)};
+  if (prolong) {
+    if (_target != CharType::Romaji) return result + Kana::ProlongMark;
+    switch (result[result.size() - 1]) {
+    case 'a': return result.substr(0, result.size() - 1) + "ā";
+    case 'i': return result.substr(0, result.size() - 1) + "ī";
+    case 'u': return result.substr(0, result.size() - 1) + "ū";
+    case 'e': return result.substr(0, result.size() - 1) + "ē";
+    case 'o': return result.substr(0, result.size() - 1) + "ō";
+    default:
+      return result + Kana::ProlongMark; // shouldn't happen, return unconverted
+    }
+  }
+  prevKana = kana;
+  return result;
 }
 
 std::string KanaConvert::convertToKana(const std::string& romajiInput) const {

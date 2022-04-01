@@ -145,9 +145,11 @@ private:
   [[nodiscard]] std::string convertFromKana(
       const std::string& kanaInput, CharType source) const;
 
-  // helper function used by 'convertFromKana'
+  // helper functions used by 'convertFromKana'
   [[nodiscard]] std::string processKana(const std::string& kanaGroup,
       CharType source, const Kana*& prevKana, bool prolong = false) const;
+  [[nodiscard]] std::string processKanaMacron(bool prolong,
+      const Kana*& prevKana, const Kana* kana, bool sokuon = false) const;
 
   // 'convertToKana' takes 'romajiInput' and returns either Hiragana or Katakana
   // based on '_target' and '_flags'.
