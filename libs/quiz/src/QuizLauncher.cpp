@@ -99,7 +99,7 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
         qList = c;
       else
         Data::usage(
-            "invalid format for " + arg.substr(0, 2) + ", use -h for help");
+            "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
     }
   }};
 
@@ -126,7 +126,7 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
         case 'l': checkType(arg, LevelChoices); break;
         case 'm': // intentional fallthrough
         case 'p': checkType(arg, GroupKanjiChoices); break;
-        default: Data::usage("illegal option '" + arg + "' use -h for help");
+        default: Data::usage("illegal option '" + arg + "', use -h for help");
         }
     } else {
       // show details for a 'kanji' (instead of running a test or review)
@@ -330,11 +330,11 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(
       const auto s{arg.substr(offset)};
       if (!std::all_of(s.begin(), s.end(), ::isdigit))
         Data::usage(
-            "invalid format for " + arg.substr(0, 2) + ", use -h for help");
+            "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
       if (const auto i{std::stoul(s)};
           i <= std::numeric_limits<Question>::max())
         return static_cast<Question>(i);
-      Data::usage("value for " + arg.substr(0, 2) + " exceeds limit");
+      Data::usage("value for '" + arg.substr(0, 2) + "' exceeds limit");
     }
   }
   return 0;
@@ -381,7 +381,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
   } else if (isKanji(arg))
     printDetails(arg);
   else
-    Data::usage("unrecognized 'kanji' value '" + arg + "' use -h for help");
+    Data::usage("unrecognized 'kanji' value '" + arg + "', use -h for help");
 }
 
 void QuizLauncher::printDetails(const Data::List& list, const std::string& name,
@@ -403,7 +403,7 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
     out() << "Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, "
              "T=Taiwan, V=Vietnam\n\n";
   }
-  out() << "Details for " << arg << ' ' << toUnicode(arg, BracketType::Square);
+  out() << "Kanji " << arg << ' ' << toUnicode(arg, BracketType::Square);
   if (const auto ucd{data().ucd().find(arg)}; ucd) {
     out() << ", Blk " << ucd->block() << ", Ver " << ucd->version();
     if (!ucd->sources().empty()) {
@@ -416,7 +416,7 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
       printMeaning(*k, true);
       printReviewDetails(*k);
     } else // should never happen since all kanji in ucd.txt should be loaded
-      out() << " --- Kanji not loaded'\n";
+      out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE
   } else
     // can happen for non=supported rare kanji (see parseUcdAllFlat.sh)
     out() << " --- Not found in 'ucd.txt'\n";
