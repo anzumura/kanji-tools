@@ -152,6 +152,27 @@ TEST_F(ListQuizTest, QuizReview) {
   EXPECT_FALSE(std::getline(_is, line));
 }
 
+TEST_F(ListQuizTest, ReviewNextPrev) {
+  // move forward twice (.) and then back twice (,)
+  _is << "r\nb\n.\n.\n,\n,\n";
+  startQuiz('g', '2');
+  size_t found{};
+  std::string line;
+  const auto f{[&line, &found](auto question) {
+    if (line.starts_with(std::to_string(question) + "/")) ++found;
+  }};
+  while (std::getline(_os, line)) switch (found) {
+    case 0: f(1); break;
+    case 1: f(2); break;
+    case 2: f(3); break;
+    case 3: f(2); break;
+    case 4: f(1); break;
+    default: break;
+    }
+  // expect to find question 1 then 2 then 3 then 2 then 1
+  EXPECT_EQ(found, 5);
+}
+
 TEST_F(ListQuizTest, FrequencyLists) {
   const auto f{[this](char x) { return firstQuestion('f', x); }};
   EXPECT_EQ(f('1'), "1/500:  日  Rad 日(72), Strokes 4, rì, G1, N5, K10");

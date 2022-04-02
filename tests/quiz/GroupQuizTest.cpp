@@ -123,10 +123,9 @@ TEST_F(GroupQuizTest, ToggleMeanings) {
   startQuiz();
   auto meaningsOn{false};
   size_t found{};
-  std::string line;
   const std::string expected{"みなみ"};
   const auto expectedWithMeaning{expected + " : south"};
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line);) {
     if (line.erase(0, 4).starts_with(":  ") &&
         line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
       ++found;
@@ -146,8 +145,7 @@ TEST_F(GroupQuizTest, EditAfterOneAnswer) {
   _is << "b\n"; // change the answer from 'a' to 'b'
   startQuiz();
   size_t found{};
-  std::string line;
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line);) {
     if (!found) {
       if (line.ends_with("1->a")) ++found;
     } else if (line.ends_with("1->b"))
@@ -164,12 +162,28 @@ TEST_F(GroupQuizTest, EditAfterMultipleAnswers) {
   _is << "c\n"; // set new value (should now be 1->c and 2 still maps to 'b')
   startQuiz();
   size_t found{};
-  std::string line;
-  while (std::getline(_os, line)) {
+  for (std::string line; std::getline(_os, line);) {
     if (!found) {
       if (line.ends_with("1->a 2->b")) ++found; // before edit
     } else if (line.ends_with("1->c 2->b"))     // after edit
       ++found;
+  }
+  EXPECT_EQ(found, 2);
+}
+
+TEST_F(GroupQuizTest, RefreshAfterAnswer) {
+  meaningQuiz();
+  _is << "a\n"; // provide an answer for the first group entry
+  _is << "'\n"; // refresh - will update the screen with '1->a:'
+  startQuiz();
+  size_t found{};
+  for (std::string line; std::getline(_os, line);) {
+    if (line.starts_with("   1:  ")) {
+      if (!found)
+        ++found;
+      else if (line.find("1->a:") != std::string::npos)
+        ++found;
+    }
   }
   EXPECT_EQ(found, 2);
 }
@@ -212,6 +226,27 @@ TEST_F(GroupQuizTest, QuizReview) {
       if (line.ends_with(i.second)) break;
     EXPECT_FALSE(_os.eof()) << "line not found: " << i.second;
   }
+}
+
+TEST_F(GroupQuizTest, ReviewNextPrev) {
+  // move forward twice (.) and then back twice (,)
+  _is << "r\nb\n.\n.\n,\n,\n";
+  startQuiz('m', '4');
+  size_t found{};
+  std::string line;
+  const auto f{[&line, &found](auto question) {
+    if (line.starts_with(std::to_string(question) + "/")) ++found;
+  }};
+  while (std::getline(_os, line)) switch (found) {
+    case 0: f(1); break;
+    case 1: f(2); break;
+    case 2: f(3); break;
+    case 3: f(2); break;
+    case 4: f(1); break;
+    default: break;
+    }
+  // expect to find question 1 then 2 then 3 then 2 then 1
+  EXPECT_EQ(found, 5);
 }
 
 } // namespace kanji_tools
