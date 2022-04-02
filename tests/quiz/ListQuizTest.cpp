@@ -59,6 +59,8 @@ protected:
 
   void startQuiz(QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}) {
+    _os.str(EmptyString);
+    _es.str(EmptyString);
     // clear eofbit and failbit for output streams in case quiz is run again
     _os.clear();
     _es.clear();
