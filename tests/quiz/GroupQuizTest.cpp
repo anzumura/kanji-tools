@@ -81,7 +81,7 @@ TEST_F(GroupQuizTest, ListOrders) {
   }
 }
 
-TEST_F(GroupQuizTest, KanjiTypes) {
+TEST_F(GroupQuizTest, GroupKanjiTypes) {
   const auto f{[](int x = 0) {
     return (x ? "showing " + std::to_string(x) + " out of " : EmptyString) +
            "37 members";
@@ -199,6 +199,19 @@ TEST_F(GroupQuizTest, QuizDefaults) {
   _is << "t\nb\np\n\n\n";
   getFirstQuestion(lineWithDefaults);
   EXPECT_EQ(line, lineWithDefaults);
+}
+
+TEST_F(GroupQuizTest, QuizReview) {
+  for (auto& i :
+      {std::pair{'p', "1:  華.  (huá)     m:24        :  カ、（ケ）、はな"},
+          std::pair{'m', "1:  北.  (běi)     p:897       :  ホク、きた"}}) {
+    _is << "r\nb\n";
+    if (i.first == 'p') _is << "2\n"; // choose 'カ' pattern group bucket
+    startQuiz(i.first, '4');
+    for (std::string line; std::getline(_os, line);)
+      if (line.ends_with(i.second)) break;
+    EXPECT_FALSE(_os.eof()) << "line not found: " << i.second;
+  }
 }
 
 } // namespace kanji_tools
