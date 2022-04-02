@@ -22,14 +22,14 @@ protected:
   ListQuizTest() : _quiz{{}, _data, _groupData, _jukugoData, &_is} {}
 
   // Populate '_is' as input for '_quiz'
-  void gradeQuiz() {
+  void gradeQuiz(char listOrder = 'b') {
     // 't' for 'test' mode (instead of review mode)
     // 'b' for Beginning of list (instead of End or Random)
     // 'g' for List Quiz
     // '1' for 1
     // '4' for 4 choices
     // 'k' for kanji to reading quiz
-    _is << "t\nb\ng\n1\n4\nk\n";
+    _is << "t\n" << listOrder << "\ng\n1\n4\nk\n";
   }
 
   [[nodiscard]] std::string firstQuestion(
@@ -89,16 +89,16 @@ protected:
 
 } // namespace
 
-TEST_F(ListQuizTest, StartQuiz) {
-  gradeQuiz();
-  startQuiz();
-  std::string line, lastLine;
-  while (std::getline(_os, line)) lastLine = line;
-  // test the last (non-eof) line sent to _os
-  EXPECT_EQ(lastLine, "Final score: 0/0");
-  // should be nothing sent to _es (for errors) and nothing left in _is
-  EXPECT_FALSE(std::getline(_es, line));
-  EXPECT_FALSE(std::getline(_is, line));
+TEST_F(ListQuizTest, ListOrders) {
+  for (std::string lastLine; const auto i : {'b', 'e', 'r'}) {
+    gradeQuiz(i);
+    startQuiz();
+    for (std::string line; std::getline(_os, line);) lastLine = line;
+    // test the last (non-eof) line sent to _os
+    EXPECT_EQ(lastLine, "Final score: 0/0");
+    // should be nothing sent to _es (for errors)
+    EXPECT_FALSE(std::getline(_es, lastLine));
+  }
 }
 
 TEST_F(ListQuizTest, QuizDefaults) {

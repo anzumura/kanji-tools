@@ -21,12 +21,12 @@ protected:
   // Contructs Quiz using the real data files
   GroupQuizTest() : _quiz{{}, _data, _groupData, _jukugoData, &_is} {}
 
-  void meaningQuiz() {
+  void meaningQuiz(char listOrder = 'b') {
     // 't' for 'test' mode (instead of review mode)
     // 'b' for Beginning of list (instead of End or Random)
     // 'm' for Meaning Group Quiz
     // '1' for including only Jōyō kanji
-    _is << "t\nb\nm\n1\n";
+    _is << "t\n" << listOrder << "\nm\n1\n";
   }
 
   void edit() { _is << "*\n"; } // '*' is the option to edit an answer
@@ -69,16 +69,16 @@ protected:
 
 } // namespace
 
-TEST_F(GroupQuizTest, StartQuiz) {
-  meaningQuiz();
-  startQuiz();
-  std::string line, lastLine;
-  while (std::getline(_os, line)) lastLine = line;
-  // test the line sent to _os
-  EXPECT_EQ(lastLine, "Final score: 0/0");
-  // should be nothing sent to _es (for errors) and nothing left in _is
-  EXPECT_FALSE(std::getline(_es, line));
-  EXPECT_FALSE(std::getline(_is, line));
+TEST_F(GroupQuizTest, ListOrders) {
+  for (std::string lastLine; const auto i : {'b', 'e', 'r'}) {
+    meaningQuiz(i);
+    startQuiz();
+    for (std::string line; std::getline(_os, line);) lastLine = line;
+    // test the line sent to _os
+    EXPECT_EQ(lastLine, "Final score: 0/0");
+    // should be nothing sent to _es (for errors)
+    EXPECT_FALSE(std::getline(_es, lastLine));
+  }
 }
 
 TEST_F(GroupQuizTest, KanjiTypes) {
