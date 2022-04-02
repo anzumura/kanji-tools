@@ -19,8 +19,7 @@ constexpr auto DefaultPatternGroup{'1'};
 // Since there are over 1000 pattern groups, split them into 6 buckets based on
 // reading. The first bucket starts at 'ア', the second bucket starts at 'カ'
 // and so on (see 'PatternBucketChoices' above).
-constexpr std::array PatternGroupBuckets{
-    "：カ", "：サ", "：タ", "：ハ", "：ヤ"};
+constexpr std::array PatternGroups{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
 
 constexpr auto RefreshOption{'\''}, EditOption{'*'};
 
@@ -43,13 +42,13 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
     start(list, memberType);
   else {
     GroupData::List newList;
-    const auto bucketHasEnd{bucket && *bucket < PatternGroupBuckets.size()};
+    const auto bucketHasEnd{bucket && *bucket < PatternGroups.size()};
     for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {
       if (startIncluding) {
         if (bucketHasEnd &&
-            i->name().find(PatternGroupBuckets[*bucket]) != std::string::npos)
+            i->name().find(PatternGroups[*bucket]) != std::string::npos)
           break;
-      } else if (i->name().find(PatternGroupBuckets[*bucket - 1]) !=
+      } else if (i->name().find(PatternGroups[*bucket - 1]) !=
                  std::string::npos)
         startIncluding = true;
       if (size_t memberCount{}; startIncluding) {
