@@ -55,6 +55,8 @@ std::ostream& Quiz::beginQuestionMessage(size_t totalQuestions) const {
                << totalQuestions << ":  ";
 }
 
+bool Quiz::showMeanings() const { return _showMeanings; }
+
 void Quiz::correctMessage() {
   out() << "  Correct! (" << ++_correctAnswers << '/' << _question + 1 << ")\n";
 }

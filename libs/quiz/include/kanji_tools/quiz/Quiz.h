@@ -57,7 +57,7 @@ protected:
   std::ostream& incorrectMessage(const std::string& name);
   std::ostream& beginQuizMessage(size_t totalQuestions);
   std::ostream& beginQuestionMessage(size_t totalQuestions) const;
-  [[nodiscard]] auto showMeanings() const { return _showMeanings; }
+  [[nodiscard]] bool showMeanings() const;
 
   // 'getDefaultChoices' returns a Choices structure populated with just the
   // common values for a quiz question like skip and quit. It will also populate
