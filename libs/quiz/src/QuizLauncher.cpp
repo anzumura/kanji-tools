@@ -9,6 +9,9 @@ namespace kanji_tools {
 
 namespace {
 
+// Clang marks some lines in 'HelpMessage' as '0' coverage whereas GCC doesn't
+// count them at all (which seems like the correct way to go for 'constexpr')
+// LCOV_EXCL_START
 constexpr auto HelpMessage{
     R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]
@@ -44,6 +47,7 @@ or 'u' followed by Unicode. For example, theses all produce the same output:
   kanjiQuiz n212
   kanjiQuiz u5949
 )"};
+// LCOV_EXCL_STOP
 
 const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
     ListOrderChoices{
