@@ -1,4 +1,3 @@
-#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <kanji_tools/quiz/ListQuiz.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
@@ -71,12 +70,6 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
     DefaultChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
 
 } // namespace
-
-void QuizLauncher::run(const Args& args) {
-  const auto data{std::make_shared<KanjiData>(args)};
-  QuizLauncher(args, data, std::make_shared<GroupData>(data),
-      std::make_shared<JukugoData>(data));
-}
 
 QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
     GroupDataPtr groupData, JukugoDataPtr jukugoData, std::istream* in)

@@ -9,6 +9,11 @@ namespace kanji_tools {
 class Quiz {
 public:
   using List = QuizLauncher::List;
+
+  // 'run' is called by 'quizMain.cpp'. it creates 'QuizLauncher' as well as its
+  // dependencies. 'QuizLauncher' constructor creates and starts an instance of
+  // either 'ListQuiz' or 'GroupQuiz' depending on command line args.
+  static void run(const Args&, std::ostream& out = std::cout);
 protected:
   using Choices = QuizLauncher::Choices;
   using Entry = QuizLauncher::Entry;

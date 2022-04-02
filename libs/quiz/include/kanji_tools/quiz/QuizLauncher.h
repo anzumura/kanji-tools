@@ -10,9 +10,6 @@ namespace kanji_tools {
 // about a kanji based on command line args passed in to the constructor.
 class QuizLauncher {
 public:
-  // 'run' is called by main function in 'quizMain.cpp'
-  static void run(const Args&);
-
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
   using Entry = Data::Entry;
