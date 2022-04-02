@@ -39,6 +39,8 @@ protected:
 
   void startQuiz(QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}) {
+    _os.str(EmptyString);
+    _es.str(EmptyString);
     // clear eofbit and failbit for output streams in case quiz is run again
     _os.clear();
     _es.clear();
@@ -77,6 +79,21 @@ TEST_F(GroupQuizTest, StartQuiz) {
   // should be nothing sent to _es (for errors) and nothing left in _is
   EXPECT_FALSE(std::getline(_es, line));
   EXPECT_FALSE(std::getline(_is, line));
+}
+
+TEST_F(GroupQuizTest, KanjiTypes) {
+  const auto f{[](int x = 0) {
+    return (x ? "showing " + std::to_string(x) + " out of " : EmptyString) +
+           "37 members";
+  }};
+  for (auto i : {std::pair{'1', f(28)}, std::pair{'2', f(31)},
+           std::pair{'3', f(32)}, std::pair{'4', f()}}) {
+    // t=test mode, b=beginning of list, and .=skip to the next question (totals
+    // in this test are for question 2 since it contains Kanji of all 4 types)
+    _is << "t\nb\n.\n";
+    startQuiz('m', i.first);
+    EXPECT_NE(_os.str().find(", " + i.second), std::string::npos) << i.second;
+  }
 }
 
 TEST_F(GroupQuizTest, QuizWithEmptyList) {
