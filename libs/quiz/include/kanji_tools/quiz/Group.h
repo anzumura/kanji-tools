@@ -54,9 +54,7 @@ public:
   [[nodiscard]] auto number() const { return _number; }
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& members() const { return _members; }
-  [[nodiscard]] auto toString() const {
-    return "[" + std::to_string(_number) + ' ' + name() + ']';
-  }
+  [[nodiscard]] std::string toString() const;  
 private:
   const size_t _number;
   const std::string _name;
@@ -75,8 +73,7 @@ public:
 class PatternGroup : public Group {
 public:
   PatternGroup(size_t number, const std::string& name,
-      const Data::List& members, PatternType patternType)
-      : Group{number, name, members}, _patternType{patternType} {}
+      const Data::List& members, PatternType patternType);
 
   [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }
   [[nodiscard]] PatternType patternType() const override {
@@ -86,14 +83,6 @@ private:
   const PatternType _patternType;
 };
 
-inline auto& operator<<(std::ostream& os, const Group& x) {
-  os << '[';
-  if (x.patternType() == Group::PatternType::Peer) {
-    os << "Peers ";
-    if (const auto i{x.members().begin()}; i != x.members().end())
-      os << (**i).name();
-  }
-  return os << x.name() << ']';
-}
+std::ostream& operator<<(std::ostream&, const Group&);
 
 } // namespace kanji_tools
