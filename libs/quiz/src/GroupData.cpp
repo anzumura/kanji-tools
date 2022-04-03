@@ -14,10 +14,14 @@ constexpr u_int8_t MissingTypeExamples{12};
 
 } // namespace
 
-GroupData::GroupData(DataPtr data) : _data{data} {
-  loadGroup(DataFile::getFile(_data->dataDir(), "meaning-groups"), _meaningMap,
+const Data::Path& GroupData::dataDir(const Data::Path* dir) const {
+  return dir ? *dir : _data->dataDir();
+}
+
+GroupData::GroupData(DataPtr data, const Data::Path* dir) : _data{data} {
+  loadGroup(DataFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
       _meaningGroups, GroupType::Meaning);
-  loadGroup(DataFile::getFile(_data->dataDir(), "pattern-groups"), _patternMap,
+  loadGroup(DataFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
       _patternGroups, GroupType::Pattern);
   if (_data->debug()) {
     printGroups(_meaningMap, _meaningGroups);
@@ -29,8 +33,8 @@ void GroupData::add(
     const std::string& name, Map& groups, const Entry& group) const {
   const auto i{groups.emplace(name, group)};
   if (!i.second)
-    _data->printError(name + " from Group " + std::to_string(group->number()) +
-                      " already in group " + i.first->second->toString());
+    _data->printError(name + " from " + group->toString() + " already in " +
+                      i.first->second->toString());
 }
 
 void GroupData::add(

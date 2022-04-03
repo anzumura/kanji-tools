@@ -14,7 +14,9 @@ public:
   using Map = std::map<std::string, Entry>;
   using List = std::vector<Entry>;
 
-  GroupData(DataPtr);
+  // if 'dir' is provided it will be used intead of 'data->dataDir()' when
+  // looking for group files (to help with testing)
+  GroupData(DataPtr data, const Data::Path* dir = {});
 
   GroupData(const GroupData&) = delete;
   GroupData& operator=(const GroupData&) = delete;
@@ -29,6 +31,8 @@ public:
     return _data->log(heading);
   }
 private:
+  const Data::Path& dataDir(const Data::Path*) const;
+
   // add 'kanji'->'group' mapping or log an error if it's already been added
   void add(const std::string& kanji, Map&, const Entry& group) const;
 
