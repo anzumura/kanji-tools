@@ -55,12 +55,44 @@ TEST(GroupTest, CreatePatternGroup) {
   }
 }
 
+TEST(GroupTest, GroupWithNoMembers) {
+  const auto f{[] { MeaningGroup{3, "empty", {}}; }};
+  EXPECT_THROW(call(f, "group [3 empty] has no members"), std::domain_error);
+}
+
+TEST(GroupTest, GroupWithOneMember) {
+  const auto f{[] { MeaningGroup{4, "one", {TestMembers[0]}}; }};
+  EXPECT_THROW(call(f, "group [4 one] has only one member"), std::domain_error);
+}
+
+TEST(GroupTest, GroupWithTooManyMembers) {
+  Data::List l;
+  for (size_t i{}; i <= Group::MaxGroupSize; ++i) l.push_back(TestMembers[0]);
+  const auto f{[&l] { MeaningGroup{5, "big", l}; }};
+  EXPECT_THROW(
+      call(f, "group [5 big] has more than 58 members"), std::domain_error);
+}
+
+TEST(GroupTest, GroupWithOneDuplicateMember) {
+  const auto f{[] { MeaningGroup{6, "d", {TestMembers[0], TestMembers[0]}}; }};
+  EXPECT_THROW(
+      call(f, "group [6 d] has 1 duplicate member: 甲"), std::domain_error);
+}
+
+TEST(GroupTest, GroupWithMultipleDuplicateMembers) {
+  Data::List l{TestMembers};
+  l.insert(l.end(), TestMembers.begin(), TestMembers.end());
+  const auto f{[&l] { MeaningGroup{7, "m", l}; }};
+  EXPECT_THROW(
+      call(f, "group [7 m] has 2 duplicate members: 甲 乙"), std::domain_error);
+}
+
 TEST(GroupTest, InvalidPatternGroup) {
   const auto f{[] {
     PatternGroup{1, "bad", TestMembers, Group::PatternType::None};
   }};
-  EXPECT_THROW(call(f, "PatternGroup: 'bad' has invalid pattern type"),
-      std::domain_error);
+  EXPECT_THROW(
+      call(f, "group [1 bad] has invalid pattern type"), std::domain_error);
 }
 
 } // namespace kanji_tools

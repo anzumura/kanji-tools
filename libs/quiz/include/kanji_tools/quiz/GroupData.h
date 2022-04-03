@@ -4,14 +4,11 @@
 
 namespace kanji_tools {
 
+// 'GroupData' creates 'Group' instances from the '-groups.txt' files. 'Group'
+// class prevents duplicates, but this class also prevent a Kanji from being in
+// multiple Pattern Groups (see comments at the bottom of this file for details)
 class GroupData {
 public:
-  // For now, set max size for a group to '58' since this is the maximum number
-  // of entries that the group quiz currently supports for entering answers,
-  // i.e., a-z, then A-Z, then 6 more ascii characters following Z (before
-  // reaching 'a' again).
-  enum Values { MissingTypeExamples = 12, MaxGroupSize = 58 };
-
   using Entry = std::shared_ptr<Group>;
   using MultiMap = std::multimap<std::string, Entry>;
   using Map = std::map<std::string, Entry>;
@@ -32,12 +29,11 @@ public:
     return _data->log(heading);
   }
 private:
-  // return false if 'kanji' is already in 'Map'
-  bool checkInsert(const std::string& kanji, Map&, const Entry& group) const;
+  // add 'kanji'->'group' mapping or log an error if it's already been added
+  void add(const std::string& kanji, Map&, const Entry& group) const;
 
-  // return false if 'kanji' is already in 'MultiMap' for the given 'group'
-  bool checkInsert(
-      const std::string& kanji, MultiMap&, const Entry& group) const;
+  // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
+  void add(const std::string& kanji, MultiMap&, const Entry& group) const;
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
@@ -68,5 +64,13 @@ private:
 };
 
 using GroupDataPtr = std::shared_ptr<const GroupData>;
+
+// Not allowing a Kanji to be in multiple Pattern Groups can be ambiguous for
+// some more complex Kanji so in these cases, the pattern that best fits related
+// pronunciation was chosen (as well as preferring grouping by 'non-radical')
+// when creating the 'pattern-groups.txt' file. This restriction doesn't apply
+// to Meaning groups since choosing only one meaning for some (even very common)
+// Kanji would make other groups seem incomplete, e.g., if '金' was only in the
+// '色' group then the '時間：曜日' group would be missing a day.
 
 } // namespace kanji_tools

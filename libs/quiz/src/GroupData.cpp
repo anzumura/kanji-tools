@@ -10,6 +10,7 @@ namespace kanji_tools {
 namespace {
 
 const std::string WideColon{"："};
+constexpr u_int8_t MissingTypeExamples{12};
 
 } // namespace
 
@@ -24,27 +25,17 @@ GroupData::GroupData(DataPtr data) : _data{data} {
   }
 }
 
-bool GroupData::checkInsert(
+void GroupData::add(
     const std::string& name, Map& groups, const Entry& group) const {
   const auto i{groups.emplace(name, group)};
   if (!i.second)
     _data->printError(name + " from Group " + std::to_string(group->number()) +
                       " already in group " + i.first->second->toString());
-  return i.second;
 }
 
-bool GroupData::checkInsert(
+void GroupData::add(
     const std::string& name, MultiMap& groups, const Entry& group) const {
-  const auto i{groups.equal_range(name)};
-  for (auto j{i.first}; j != i.second; ++j)
-    if (j->second->number() == group->number()) {
-      _data->printError(name + " from Group " +
-                        std::to_string(group->number()) +
-                        " already in same group");
-      return false;
-    }
   groups.emplace(name, group);
-  return true;
 }
 
 template<typename T>
@@ -80,19 +71,16 @@ void GroupData::loadGroup(
       else
         _data->printError("failed to find member " + i + " in group: '" + name +
                           "', number: " + f.get(numberCol));
-    if (memberKanji.empty()) f.error("group has no valid members");
-    if (memberKanji.size() == 1)
-      f.error("group must have more than one member");
     if (memberKanji.size() < kanjiNames.size())
       f.error("group failed to load all members");
-    if (memberKanji.size() > MaxGroupSize)
-      f.error(
-          "group has more than " + std::to_string(MaxGroupSize) + " members");
-
-    auto group{
-        createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
-    for (auto& i : memberKanji) checkInsert(i->name(), groups, group);
-    list.emplace_back(group);
+    try {
+      auto group{
+          createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
+      for (auto& i : memberKanji) add(i->name(), groups, group);
+      list.emplace_back(group);
+    } catch (const std::exception& e) {
+      f.error(e.what());
+    }
   }
 }
 

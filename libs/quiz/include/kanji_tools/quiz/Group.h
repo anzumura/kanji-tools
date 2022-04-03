@@ -15,16 +15,14 @@ inline auto& operator<<(std::ostream& os, const GroupType& x) {
 // 'Animal', 'Plant', etc. whereas Pattern groups are mostly organized by
 // 'non-radical' parts in order to help see related kanji that often have the
 // same pronunciation.
-//
-// The 'GroupData' class prevents a kanji from being in multiple Pattern groups
-// which can be ambiguous for some more complex kanji. In these fairly rare
-// cases, the pattern that best fits related pronunciation was chosen (as well
-// as preferring grouping by 'non-radical'). This restriction doesn't apply to
-// Meaning groups since choosing only one meaning for some (even very common)
-// kanji would make other groups seem incomplete, e.g., if '金' was only in the
-// '色' group then the '時間：曜日' group would be missing a day.
 class Group {
 public:
+  // For now, set max size for a group to '58' since this is the maximum number
+  // of entries that the group quiz currently supports for entering answers,
+  // i.e., a-z, then A-Z, then 6 more ascii characters following Z (before
+  // reaching 'a' again).
+  inline static constexpr u_int8_t MaxGroupSize{58};
+
   // 'PatternType' is 'None' for Meaning groups, but for a Pattern Group it can
   // be one of three values:
   // - 'Family': a pattern where the first character is a parent of the other
@@ -39,8 +37,9 @@ public:
   //   simpler characters such as 凹 or 後 as well as some radicals.
   enum class PatternType { Family, Peer, Reading, None };
 
-  Group(size_t number, const std::string& name, const Data::List& members)
-      : _number{number}, _name{name}, _members{members} {}
+  // ctor throws if 'members' contains duplicates, has less than two entries or
+  // has more than 'MaxGroupSize' entries
+  Group(size_t number, const std::string& name, const Data::List& members);
 
   Group(const Group&) = delete;
   // operator= is not generated since there are const members
@@ -54,7 +53,9 @@ public:
   [[nodiscard]] auto number() const { return _number; }
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& members() const { return _members; }
-  [[nodiscard]] std::string toString() const;  
+  [[nodiscard]] std::string toString() const;
+protected:
+  void error(const std::string&) const;
 private:
   const size_t _number;
   const std::string _name;
