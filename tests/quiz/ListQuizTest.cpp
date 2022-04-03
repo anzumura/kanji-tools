@@ -18,7 +18,7 @@ protected:
     _jukugoData = std::make_shared<JukugoData>(_data);
   }
 
-  // Contructs Quiz using the real data files
+  // Constructs Quiz using the real data files
   ListQuizTest() : _quiz{{}, _data, _groupData, _jukugoData, &_is} {}
 
   // Populate '_is' as input for '_quiz'

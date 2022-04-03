@@ -16,7 +16,7 @@ namespace {
 class KanjiDataTest : public ::testing::Test {
 protected:
   static void SetUpTestCase() {
-    // Contructs KanjiData using the real data files
+    // Constructs KanjiData using the real data files
     _data = std::make_shared<KanjiData>();
   }
 
