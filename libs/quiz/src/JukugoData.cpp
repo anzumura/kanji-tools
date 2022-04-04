@@ -46,25 +46,30 @@ const JukugoData::List& JukugoData::find(const std::string& kanji) const {
 }
 
 size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
-  static const std::string StripPrefix{"..."};
   const auto previouslyCreated{_uniqueJukugo.size()};
   std::ifstream f{file};
   auto lineNum{1};
-  for (std::string line; std::getline(f, line); ++lineNum) try {
-      if (auto i{line.find(StripPrefix)}; i == std::string::npos)
-        // line has one entry with a space between the Jukugo and its bracketed
-        // reading (so g*.txt files)
-        createJukugo(line, grade);
-      else
-        // line has multiple space separated Jukugo entries for a given kanji
-        // (so other.txt file), i.e.: X ... XA(reading) XB(reading) XC(reading)
-        for (std::stringstream ss{line.substr(i + StripPrefix.size() + 1)};
+  try {
+    if (const bool onePerLine{grade != KanjiGrades::S}; onePerLine)
+      // line has one entry with a space between the Jukugo and its bracketed
+      // reading (so g*.txt files)
+      for (std::string line; std::getline(f, line); ++lineNum)
+        createJukugo(line, grade, onePerLine);
+    else
+      // line has multiple space separated Jukugo entries for a given kanji
+      // (so other.txt file), i.e.: X ... XA(reading) XB(reading) XC(reading)
+      for (std::string line; std::getline(f, line); ++lineNum) {
+        static const std::string Dots{"..."};
+        const auto i{line.find(Dots)};
+        if (i == std::string::npos) error("line is missing '" + Dots + "'");
+        for (std::stringstream ss{line.substr(i + Dots.size() + 1)};
              std::getline(ss, line, ' ');)
-          createJukugo(line, grade);
-    } catch (const std::exception& e) {
-      error(std::string{e.what()} + " - line: " + std::to_string(lineNum) +
-            ", file: " + file.filename().string());
-    }
+          createJukugo(line, grade, onePerLine);
+      }
+  } catch (const std::exception& e) {
+    error(std::string{e.what()} + " - line: " + std::to_string(lineNum) +
+          ", file: " + file.filename().string());
+  }
   return _uniqueJukugo.size() - previouslyCreated;
 }
 
@@ -86,8 +91,8 @@ size_t JukugoData::findCloseBracket(const std::string& line, bool onePerLine) {
 
 void JukugoData::error(const std::string& msg) { throw std::domain_error(msg); }
 
-void JukugoData::createJukugo(const std::string& line, KanjiGrades grade) {
-  const auto onePerLine{grade != KanjiGrades::S};
+void JukugoData::createJukugo(
+    const std::string& line, KanjiGrades grade, bool onePerLine) {
   const auto open{findOpenBracket(line, onePerLine)};
   const auto close{findCloseBracket(line, onePerLine)};
   const std::string name{line.substr(0, onePerLine ? open - 1 : open)},

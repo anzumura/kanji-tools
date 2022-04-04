@@ -25,7 +25,7 @@ private:
   static size_t findCloseBracket(const std::string&, bool onePerLine);
   static void error(const std::string&);
 
-  void createJukugo(const std::string& line, KanjiGrades);
+  void createJukugo(const std::string& line, KanjiGrades, bool onePerLine);
 
   using JukugoKey = std::pair<std::string, std::string>;
   [[nodiscard]] size_t loadFile(const Data::Path&, KanjiGrades);

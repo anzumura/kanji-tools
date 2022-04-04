@@ -120,6 +120,13 @@ TEST_F(JukugoDataTest, OtherFileMissingCloseBracket) {
       std::domain_error);
 }
 
+TEST_F(JukugoDataTest, OtherFileMissingPrefix) {
+  write(OtherFile, "鶴 .. 千羽鶴(せんばづる) 丹頂鶴(たんちょうづる");
+  EXPECT_THROW(
+      call([] { create(); }, "line is missing '...'" + Err + OtherFile),
+      std::domain_error);
+}
+
 TEST_F(JukugoDataTest, IgnoreDuplicateInSameFile) {
   write(Grade1File, "青白 (あおじろ)\n青空 (あおぞら)\n青白 (あおじろ)");
   const auto jukugoData{create()};
