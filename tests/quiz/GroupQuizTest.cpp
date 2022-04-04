@@ -111,14 +111,16 @@ TEST_F(GroupQuizTest, CorrectResponse) {
 }
 
 TEST_F(GroupQuizTest, IncorrectResponse) {
-  _is << "t\nb\n1\nb\na\n";
-  startQuiz('p', '1', false);
-  auto found{false};
-  std::string lastLine;
-  for (std::string line; std::getline(_os, line); lastLine = line)
-    if (line.ends_with("Incorrect (got 0 right out of 2)")) found = true;
-  EXPECT_TRUE(found);
-  EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 亜：ア、アク");
+  for (const auto meanings : {false, true}) {
+    _is << "t\nb\n1\nb\na\n";
+    startQuiz('p', '1', meanings, false);
+    auto found{false};
+    std::string lastLine;
+    for (std::string line; std::getline(_os, line); lastLine = line)
+      if (line.ends_with("Incorrect (got 0 right out of 2)")) found = true;
+    EXPECT_TRUE(found);
+    EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 亜：ア、アク");
+  }
 }
 
 TEST_F(GroupQuizTest, QuizWithEmptyList) {
