@@ -122,7 +122,8 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
         case 'k': checkType(arg, KyuChoices, KyuRange); break;
         case 'l': checkType(arg, LevelChoices); break;
         case 'm': // intentional fallthrough
-        case 'p': checkType(arg, GroupKanjiChoices); break;
+        // Clang (incorrectly) thinks the following line isn't covered
+        case 'p': checkType(arg, GroupKanjiChoices); break; // LCOV_EXCL_LINE
         default: Data::usage("illegal option '" + arg + "', use -h for help");
         }
     } else {
