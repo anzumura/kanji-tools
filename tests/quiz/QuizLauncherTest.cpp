@@ -51,15 +51,19 @@ TEST_F(QuizLauncherTest, HelpMessage) {
 }
 
 TEST_F(QuizLauncherTest, ValidOptions) {
-  for (const auto i : {"-g5", "-f2", "-kc", "-l3", "-m1", "-p4"}) {
-    const char* args[]{"", i, "-r1"};
-    if (i[1] == 'p') _is << "1\n"; // select pattern group bucket
-    _is << "/\n";                  // send 'quit' option
-    QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
-    EXPECT_TRUE(
-        _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
-    EXPECT_EQ(_es.str(), EmptyString);
-  }
+  // loop over all the different quiz types (plus a valid question list)
+  for (const auto i : {"-g5", "-f2", "-kc", "-l3", "-m1", "-p4"})
+    // loop over different question orders: 1=beginning, -1=end, 0=random
+    for (const auto j : {"-r1", "-r-1", "-r0"}) {
+      const char* args[]{"", i, j};
+      if (i[1] == 'p') _is << "1\n"; // select pattern group bucket
+      _is << "/\n";                  // send 'quit' option
+      QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
+      EXPECT_TRUE(
+          _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
+      EXPECT_EQ(_es.str(), EmptyString);
+      reset();
+    }
 }
 
 TEST_F(QuizLauncherTest, IllegalOption) {
