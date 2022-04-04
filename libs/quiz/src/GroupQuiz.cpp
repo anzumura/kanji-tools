@@ -28,7 +28,9 @@ constexpr auto TotalLetters{'z' - 'a'};
 } // namespace
 
 GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
+    // LCOV_EXCL_START - Clang (incorrectly) doesn't count the following line
     bool showMeanings, const GroupData::List& list, MemberType memberType)
+    // LCOV_EXCL_STOP
     : Quiz{launcher, question, showMeanings}, _groupType{getGroupType(list)} {
   std::optional<size_t> bucket;
   // for 'pattern' groups, allow choosing a smaller subset (based on 'reading')
