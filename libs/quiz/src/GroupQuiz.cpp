@@ -117,7 +117,7 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
         questions.emplace_back(j);
         readings.emplace_back(j);
       }
-    if (isTestMode()) {
+    if (isTestMode() && _launcher.randomizeAnswers()) {
       std::shuffle(questions.begin(), questions.end(), RandomGen);
       std::shuffle(readings.begin(), readings.end(), RandomGen);
     }
@@ -256,23 +256,22 @@ size_t GroupQuiz::getAnswerToEdit() const {
 
 void GroupQuiz::checkAnswers(
     const List& questions, const List& readings, const std::string& name) {
-  size_t count{};
-  for (auto i : _answers) {
-    const auto index{
+  size_t correctCount{};
+  for (size_t count{}; auto i : _answers) {
+    const auto answer{
         static_cast<size_t>(i <= 'z' ? i - 'a' : i - 'A' + TotalLetters)};
-    // Only match on readings (and meanings if '_showMeanings' is true) instead
-    // of making sure the kanji is exactly the same since many kanjis have
-    // identical readings especially in the 'patterns' groups (and the user has
-    // no way to distinguish).
-    if (questions[count]->reading() == readings[index]->reading() &&
+    // always look at reading for a match and only additionally require matching
+    // meanings if '_showMeanings' is true
+    if (questions[count]->reading() == readings[answer]->reading() &&
         (!showMeanings() ||
-            questions[count]->meaning() == readings[index]->meaning()))
-      ++count;
+            questions[count]->meaning() == readings[answer]->meaning()))
+      ++correctCount;
+    ++count;
   }
-  if (count == _answers.size())
+  if (correctCount == _answers.size())
     correctMessage();
   else
-    incorrectMessage(name) << " (got " << count << " right out of "
+    incorrectMessage(name) << " (got " << correctCount << " right out of "
                            << _answers.size() << ")\n";
 }
 

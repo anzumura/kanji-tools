@@ -38,7 +38,7 @@ protected:
   }
 
   void startQuiz(QuizLauncher::OptChar quizType = {},
-      QuizLauncher::OptChar questionList = {}) {
+      QuizLauncher::OptChar questionList = {}, bool randomizeAnswers = true) {
     _os.str(EmptyString);
     _es.str(EmptyString);
     // clear eofbit and failbit for output streams in case quiz is run again
@@ -47,7 +47,7 @@ protected:
     // final input needs to be '/' to 'quit' the quiz, otherwise test code will
     // hang while quiz is waiting for more input.
     _is << "/\n";
-    _quiz.start(quizType, questionList);
+    _quiz.start(quizType, questionList, {}, false, randomizeAnswers);
   }
 
   void getFirstQuestion(std::string& line, QuizLauncher::OptChar quizType = {},
@@ -94,6 +94,28 @@ TEST_F(GroupQuizTest, GroupKanjiTypes) {
     startQuiz('m', i.first);
     EXPECT_NE(_os.str().find(", " + i.second), std::string::npos) << i.second;
   }
+}
+
+TEST_F(GroupQuizTest, CorrectResponse) {
+  _is << "t\nb\n1\na\nb\n";
+  startQuiz('p', '1', false);
+  auto found{false};
+  std::string lastLine;
+  for (std::string line; std::getline(_os, line); lastLine = line)
+    if (line.ends_with("Correct! (1/1)")) found = true;
+  EXPECT_TRUE(found);
+  EXPECT_EQ(lastLine, "Final score: 1/1 - Perfect!");
+}
+
+TEST_F(GroupQuizTest, IncorrectResponse) {
+  _is << "t\nb\n1\nb\na\n";
+  startQuiz('p', '1', false);
+  auto found{false};
+  std::string lastLine;
+  for (std::string line; std::getline(_os, line); lastLine = line)
+    if (line.ends_with("Incorrect (got 0 right out of 2)")) found = true;
+  EXPECT_TRUE(found);
+  EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 亜：ア、アク");
 }
 
 TEST_F(GroupQuizTest, QuizWithEmptyList) {
@@ -201,6 +223,19 @@ TEST_F(GroupQuizTest, PatternGroupBuckets) {
   EXPECT_EQ(f('4'), "1/143:  [朶：タ], 2 members");
   EXPECT_EQ(f('5'), "1/144:  [巴：ハ、ヒ], 8 members");
   EXPECT_EQ(f('6'), "1/111:  [耶：ヤ], 4 members");
+}
+
+TEST_F(GroupQuizTest, LoopOverAllPatternsInABucket) {
+  // the first bucket has 85 groups so specify 85 '.'s to loop through all of
+  // them - this will make sure the quiz actually finishes (and the '/' from
+  // the 'startQuiz' method should still be on _is).
+  _is << "r\nb\n1\n";
+  for (auto _{85}; _--;)
+    _is << ".\n";
+  startQuiz('p', '4');
+  std::string leftOverInput;
+  std::getline(_is, leftOverInput);
+  EXPECT_EQ(leftOverInput, "/");
 }
 
 TEST_F(GroupQuizTest, QuizDefaults) {
