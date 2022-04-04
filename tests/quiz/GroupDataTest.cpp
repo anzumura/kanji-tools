@@ -19,24 +19,17 @@ protected:
     _data = std::make_shared<KanjiData>(Args{}, _os, _es);
   }
 
-  GroupDataTest() { reset(); }
-
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
     static const std::string HeaderRow{"Number\tName\tMembers"};
     write(MeaningFile, HeaderRow);
     write(PatternFile, HeaderRow);
-  }
-
-  void TearDown() override { fs::remove_all(TestDir); }
-
-  void reset() const {
-    _os.str(EmptyString);
-    _os.clear();
     _es.str(EmptyString);
     _es.clear();
   }
+
+  void TearDown() override { fs::remove_all(TestDir); }
 
   void write(const fs::path& f, const std::string& s) {
     std::ofstream of{f, std::ios_base::app};
