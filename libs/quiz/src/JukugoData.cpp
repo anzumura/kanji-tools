@@ -46,12 +46,11 @@ const JukugoData::List& JukugoData::find(const std::string& kanji) const {
 }
 
 size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
-  static const std::string StripPrefix{"..."}, OpenBracket{"("},
-      CloseBracket{")"}, Line{" - line: "}, File{", file: "};
+  static const std::string StripPrefix{"..."};
   const auto previouslyCreated{_uniqueJukugo.size()};
   std::ifstream f{file};
-  auto lineNumber{1};
-  for (std::string line; std::getline(f, line); ++lineNumber) try {
+  auto lineNum{1};
+  for (std::string line; std::getline(f, line); ++lineNum) try {
       if (auto i{line.find(StripPrefix)}; i == std::string::npos)
         // line has one entry with a space between the Jukugo and its bracketed
         // reading (so g*.txt files)
@@ -63,8 +62,8 @@ size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
              std::getline(ss, line, ' ');)
           createJukugo(line, grade);
     } catch (const std::exception& e) {
-      Data::usage(e.what() + Line + std::to_string(lineNumber) + File +
-                  file.filename().string());
+      error(std::string{e.what()} + " - line: " + std::to_string(lineNum) +
+            ", file: " + file.filename().string());
     }
   return _uniqueJukugo.size() - previouslyCreated;
 }
