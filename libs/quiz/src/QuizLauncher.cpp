@@ -130,7 +130,8 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
       processKanjiArg(arg);
       return;
     }
-  if (!data->debug() && !in) start(quizType, qList, question, showMeanings);
+  if (!data->debug() && (!in || quizType))
+    start(quizType, qList, question, showMeanings);
 }
 
 void QuizLauncher::start(
@@ -400,7 +401,7 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
     out() << "Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, "
              "T=Taiwan, V=Vietnam\n\n";
   }
-  out() << "Kanji " << arg << ' ' << toUnicode(arg, BracketType::Square);
+  out() << arg << ' ' << toUnicode(arg, BracketType::Square);
   if (const auto ucd{data().ucd().find(arg)}; ucd) {
     out() << ", Blk " << ucd->block() << ", Ver " << ucd->version();
     if (!ucd->sources().empty()) {

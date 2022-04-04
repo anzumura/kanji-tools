@@ -50,6 +50,18 @@ TEST_F(QuizLauncherTest, HelpMessage) {
   EXPECT_EQ(found, std::size(expected));
 }
 
+TEST_F(QuizLauncherTest, ValidOptions) {
+  for (const auto i : {"-g5", "-f2", "-kc", "-l3", "-m1", "-p4"}) {
+    const char* args[]{"", i, "-r1"};
+    if (i[1] == 'p') _is << "1\n"; // select pattern group bucket
+    _is << "/\n";                  // send 'quit' option
+    QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
+    EXPECT_TRUE(
+        _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
+    EXPECT_EQ(_es.str(), EmptyString);
+  }
+}
+
 TEST_F(QuizLauncherTest, IllegalOption) {
   const char* args[]{"", "-s", "-j"};
   const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
@@ -117,7 +129,7 @@ Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
 Suffix: .=常用 '=JLPT "=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd
 Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, T=Taiwan, V=Vietnam
 
-Kanji 奉 [5949], Blk CJK, Ver 1.1, Sources GHJKTV (J0-4A74), Jouyou (#1833)
+奉 [5949], Blk CJK, Ver 1.1, Sources GHJKTV (J0-4A74), Jouyou (#1833)
 Rad 大(37), Strokes 8, fèng, S, N1, Frq 1624, K3
     Meaning: observance
     Reading: ホウ、（ブ）、たてまつ-る
@@ -139,13 +151,37 @@ Rad 大(37), Strokes 8, fèng, S, N1, Frq 1624, K3
   }
 }
 
+TEST_F(QuizLauncherTest, ShowDetailsForNonJouyou) {
+  const auto expected{R"(>>> Legend:
+Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
+Suffix: .=常用 '=JLPT "=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd
+Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, T=Taiwan, V=Vietnam
+
+仔 [4ED4], Blk CJK, Ver 1.1, Sources GHJKTV (J0-3B46), Jinmei (#14 2004 [Print])
+Rad 人(9), Strokes 5, zǐ, KJ1
+    Meaning: small thing, child; young animal
+    Reading: シ、こ、た-える
+    Similar: 子. 好. 字. 厚. 李' 孜"
+  Morohashi: 367
+  Nelson ID: 358
+     Jukugo: 仔犬（こいぬ） 仔牛（こうし）
+
+)"};
+  for (const auto i : {"仔", "m367", "n358", "u4ed4"}) {
+    const char* args[]{"", i};
+    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+    EXPECT_EQ(_os.str(), expected);
+    reset();
+  }
+}
+
 TEST_F(QuizLauncherTest, ShowUnicodeNotInUcd) {
   const auto expected{R"(>>> Legend:
 Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
 Suffix: .=常用 '=JLPT "=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd
 Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, T=Taiwan, V=Vietnam
 
-Kanji 㐁 [3401] --- Not found in 'ucd.txt'
+㐁 [3401] --- Not found in 'ucd.txt'
 )"};
   const char* args[]{"", "u3401"};
   QuizLauncher quiz{args, _data, _groupData, _jukugoData};
