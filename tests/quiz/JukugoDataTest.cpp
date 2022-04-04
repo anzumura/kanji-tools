@@ -120,7 +120,7 @@ TEST_F(JukugoDataTest, OtherFileMissingCloseBracket) {
       std::domain_error);
 }
 
-TEST_F(JukugoDataTest, OtherFileMissingPrefix) {
+TEST_F(JukugoDataTest, OtherFileMissingDots) {
   write(OtherFile, "鶴 .. 千羽鶴(せんばづる) 丹頂鶴(たんちょうづる");
   EXPECT_THROW(
       call([] { create(); }, "line is missing '...'" + Err + OtherFile),
