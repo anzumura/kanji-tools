@@ -66,6 +66,14 @@ TEST_F(QuizLauncherTest, ValidOptions) {
     }
 }
 
+TEST_F(QuizLauncherTest, QuestionOrderQuit) {
+  const char* args[]{"", "-p1", "-r"};
+  _is << "/\n"; // quit instead of choosing a question order
+  QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
+  EXPECT_TRUE(_os.str().ends_with(
+      "List order (/=quit, b=from beginning, e=from end, r=random) def 'r': "));
+}
+
 TEST_F(QuizLauncherTest, IllegalOption) {
   const char* args[]{"", "-s", "-j"};
   const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
@@ -177,6 +185,38 @@ Rad 人(9), Strokes 5, zǐ, KJ1
     EXPECT_EQ(_os.str(), expected);
     reset();
   }
+}
+
+TEST_F(QuizLauncherTest, ShowDetailsForMultipleKanji) {
+  const auto expected{R"(>>> Legend:
+Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
+Suffix: .=常用 '=JLPT "=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd
+
+Found 3 matches for Nelson ID 1491:
+
+㡡 [3861], Blk CJK_Ext_A, Ver 3.0, Sources GJ (J4-287B), Ucd
+Rad 巾(50), Strokes 15, chú, New 幮
+    Meaning: (a variant of 幮 U+5E6E, 𢅥 U+22165) a screen used to make a temporary kitchen
+    Reading: チュ、ジウ、とばり、かや
+ Nelson IDs: 1487 1491
+
+幮 [5E6E], Blk CJK, Ver 1.1, Sources GHJKT (J14-2C21), Ucd
+Rad 巾(50), Strokes 18, chú
+    Meaning: a screen used to make a temporary kitchen
+    Reading: チュ、ジウ、とばり、かや
+  Morohashi: 9134
+  Nelson ID: 1491
+
+𢅥 [22165], Blk CJK_Ext_B, Ver 3.1, Sources G, Ucd
+Rad 巾(50), Strokes 17, chú, New 㡡
+    Meaning: variant of 㡡 U+3861, a screen to make a temporary kitchen; bed curtain
+    Reading: ジュ、チュ
+  Nelson ID: 1491
+
+)"};
+  const char* args[]{"", "n1491"};
+  QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+  EXPECT_EQ(_os.str(), expected);
 }
 
 TEST_F(QuizLauncherTest, ShowUnicodeNotInUcd) {
