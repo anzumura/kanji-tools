@@ -21,10 +21,11 @@ public:
 private:
   inline static const List EmptyList;
 
+  static size_t findOpenBracket(const std::string&, bool onePerLine);
+  static size_t findCloseBracket(const std::string&, bool onePerLine);
   static void error(const std::string&);
 
-  void createJukugo(
-      const std::string& name, const std::string& reading, KanjiGrades);
+  void createJukugo(const std::string& line, KanjiGrades);
 
   using JukugoKey = std::pair<std::string, std::string>;
   [[nodiscard]] size_t loadFile(const Data::Path&, KanjiGrades);

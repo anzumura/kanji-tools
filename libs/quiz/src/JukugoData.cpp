@@ -51,43 +51,48 @@ size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
   const auto previouslyCreated{_uniqueJukugo.size()};
   std::ifstream f{file};
   auto lineNumber{1};
-  try {
-    for (std::string line; std::getline(f, line); ++lineNumber)
-      if (auto i{line.find(StripPrefix)}; i == std::string::npos) {
+  for (std::string line; std::getline(f, line); ++lineNumber) try {
+      if (auto i{line.find(StripPrefix)}; i == std::string::npos)
         // line has one entry with a space between the Jukugo and its bracketed
         // reading (so g*.txt files)
-        i = line.find(OpenBracket);
-        if (i == std::string::npos) error("failed to find open bracket");
-        if (i < 2 || line[i - 1] != ' ')
-          error("open bracket should follow a space");
-        const auto j{line.find(CloseBracket)};
-        if (j == std::string::npos) error("failed to find close bracket");
-        if (j != line.size() - 1)
-          error("close bracket should be the last character");
-        createJukugo(
-            line.substr(0, i - 1), line.substr(i + 1, j - i - 1), grade);
-      } else
+        createJukugo(line, grade);
+      else
         // line has multiple space separated Jukugo entries for a given kanji
         // (so other.txt file), i.e.: X ... XA(reading) XB(reading) XC(reading)
         for (std::stringstream ss{line.substr(i + StripPrefix.size() + 1)};
-             std::getline(ss, line, ' ');) {
-          i = line.find(OpenBracket);
-          if (i == std::string::npos) error("failed to find open bracket");
-          const auto j{line.find(CloseBracket)};
-          if (j == std::string::npos) error("failed to find close bracket");
-          createJukugo(line.substr(0, i), line.substr(i + 1, j - i - 1), grade);
-        }
-  } catch (const std::exception& e) {
-    Data::usage(e.what() + Line + std::to_string(lineNumber) + File +
-                file.filename().string());
-  }
+             std::getline(ss, line, ' ');)
+          createJukugo(line, grade);
+    } catch (const std::exception& e) {
+      Data::usage(e.what() + Line + std::to_string(lineNumber) + File +
+                  file.filename().string());
+    }
   return _uniqueJukugo.size() - previouslyCreated;
+}
+
+size_t JukugoData::findOpenBracket(const std::string& line, bool onePerLine) {
+  const auto i{line.find("(")};
+  if (i == std::string::npos) error("failed to find open bracket");
+  if (onePerLine && (i < 2 || line[i - 1] != ' '))
+    error("open bracket should follow a space");
+  return i;
+}
+
+size_t JukugoData::findCloseBracket(const std::string& line, bool onePerLine) {
+  const auto i{line.find(")")};
+  if (i == std::string::npos) error("failed to find close bracket");
+  if (onePerLine && i != line.size() - 1)
+    error("close bracket should be the last character");
+  return i;
 }
 
 void JukugoData::error(const std::string& msg) { throw std::domain_error(msg); }
 
-void JukugoData::createJukugo(
-    const std::string& name, const std::string& reading, KanjiGrades grade) {
+void JukugoData::createJukugo(const std::string& line, KanjiGrades grade) {
+  const auto onePerLine{grade != KanjiGrades::S};
+  const auto open{findOpenBracket(line, onePerLine)};
+  const auto close{findCloseBracket(line, onePerLine)};
+  const std::string name{line.substr(0, onePerLine ? open - 1 : open)},
+      reading{line.substr(open + 1, close - open - 1)};
   // There are some duplicates in data files which makes sense for
   // 'jukugo/other.txt' since it has a line per kanji followed by jukugo, but
   // there are also duplicate in the 'jukugo/g*.txt' files. For example 一見 is
