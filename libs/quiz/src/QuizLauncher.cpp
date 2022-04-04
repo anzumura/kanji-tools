@@ -136,13 +136,15 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
 }
 
 void QuizLauncher::start(
-    OptChar quizType, OptChar qList, Question question, bool meanings) {
+    OptChar quizType, OptChar qList, Question question, bool meanings,
+    bool randomizeAnswers) {
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
     _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Test;
   }
   if (!getQuestionOrder()) return;
+  _randomizeAnswers = randomizeAnswers;
 
   const auto listQuiz{[this, question, meanings](auto f, auto& l) {
     startListQuiz(question, meanings, f, l);

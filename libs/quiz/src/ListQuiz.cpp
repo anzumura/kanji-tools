@@ -68,7 +68,8 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
       0, static_cast<Question>(questions.size()) - 1);
   std::uniform_int_distribution<ChoiceCount> randomCorrect(0, _choiceCount - 1);
 
-  const auto correctChoice{randomCorrect(RandomGen)};
+  const auto correctChoice{
+      _launcher.randomizeAnswers() ? randomCorrect(RandomGen) : ChoiceCount{}};
   // 'sameReading' prevents more than one choice having the same reading
   DataFile::Set sameReading{kanji->reading()};
   _answers[correctChoice] = _question;
@@ -118,10 +119,10 @@ bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz,
     stopQuiz = true;
   else if (answer == PrevOption)
     _question -= 2;
-  else if (static_cast<size_t>(answer - ChoiceStart) == correctChoice)
+  else if (auto c{static_cast<char>(ChoiceStart + correctChoice)}; c == answer)
     correctMessage();
   else if (answer != SkipOption)
-    incorrectMessage(name) << "  (correct answer is " << correctChoice << ")\n";
+    incorrectMessage(name) << "  (correct answer is " << c << ")\n";
   return true;
 }
 

@@ -58,7 +58,7 @@ protected:
   }
 
   void startQuiz(QuizLauncher::OptChar quizType = {},
-      QuizLauncher::OptChar questionList = {}) {
+      QuizLauncher::OptChar questionList = {}, bool randomizeAnswers = true) {
     _os.str(EmptyString);
     _es.str(EmptyString);
     // clear eofbit and failbit for output streams in case quiz is run again
@@ -67,7 +67,7 @@ protected:
     // final input needs to be '/' to 'quit' the quiz, otherwise test code will
     // hang while quiz is waiting for more input.
     _is << "/\n";
-    _quiz.start(quizType, questionList);
+    _quiz.start(quizType, questionList, {}, false, randomizeAnswers);
   }
 
   void getFirstQuestion(std::string& line, QuizLauncher::OptChar quizType = {},
@@ -171,6 +171,24 @@ TEST_F(ListQuizTest, ReviewNextPrev) {
     }
   // expect to find question 1 then 2 then 3 then 2 then 1
   EXPECT_EQ(found, 5);
+}
+
+TEST_F(ListQuizTest, ReadingQuiz) {
+  _is << "t\nb\ng\n1\n4\nr\n";
+  std::string line;
+  getFirstQuestion(line);
+  EXPECT_EQ(line, "Question 1/80:  Reading:  イチ、イツ、ひと、ひと-つ");
+}
+
+TEST_F(ListQuizTest, IncorrectResponse) {
+  _is << "t\nb\n4\nr\n2\n";
+  startQuiz('g', '1', false);
+  auto found{false};
+  std::string lastLine;
+  for (std::string line; std::getline(_os, line); lastLine = line)
+    if (line.ends_with("Incorrect  (correct answer is 1)")) found = true;
+  EXPECT_TRUE(found);
+  EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 一");
 }
 
 TEST_F(ListQuizTest, FrequencyLists) {

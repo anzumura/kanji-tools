@@ -31,7 +31,7 @@ public:
   // type of quiz/review and 'questionList' can also be provided (values depend
   // on quiz type - see Quiz.cpp 'HelpMessage' for details).
   void start(OptChar quizType, OptChar questionList, Question question = 0,
-      bool showMeanings = false);
+      bool showMeanings = false, bool randomizeAnswers = true);
 
   [[nodiscard]] auto& log(bool heading = false) const {
     return data().log(heading);
@@ -48,6 +48,7 @@ public:
   [[nodiscard]] auto& choice() const { return _choice; }
   [[nodiscard]] auto isQuit(char c) const { return _choice.isQuit(c); }
   [[nodiscard]] auto& groupData() const { return _groupData; }
+  [[nodiscard]] auto randomizeAnswers() const { return _randomizeAnswers; }
 
   void printExtraTypeInfo(const Entry&) const;
   void printLegend(KanjiInfo fields = KanjiInfo::All) const;
@@ -89,6 +90,7 @@ private:
   // otherwise they are obtained interactively
   ProgramMode _programMode;
   QuestionOrder _questionOrder;
+  bool _randomizeAnswers;
 
   const Choice _choice;
   const GroupDataPtr _groupData;
