@@ -122,7 +122,7 @@ bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
   else if (const auto c{static_cast<char>(ChoiceStart + correct)}; c == answer)
     correctMessage();
   else if (answer != SkipOption)
-    incorrectMessage(name) << "  (correct answer is " << c << ")\n";
+    incorrectMessage(name) << " (correct answer is " << c << ")\n";
   return true;
 }
 

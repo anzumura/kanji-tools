@@ -214,7 +214,7 @@ TEST_F(ListQuizTest, IncorrectResponse) {
   auto found{false};
   std::string lastLine;
   for (std::string line; std::getline(_os, line); lastLine = line)
-    if (line.ends_with("Incorrect  (correct answer is 1)")) found = true;
+    if (line.ends_with("Incorrect (correct answer is 1)")) found = true;
   EXPECT_TRUE(found);
   EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 一");
 }
