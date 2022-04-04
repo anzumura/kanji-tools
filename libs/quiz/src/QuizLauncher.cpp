@@ -135,9 +135,8 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
     start(quizType, qList, question, showMeanings);
 }
 
-void QuizLauncher::start(
-    OptChar quizType, OptChar qList, Question question, bool meanings,
-    bool randomizeAnswers) {
+void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
+    bool meanings, bool randomizeAnswers) {
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;

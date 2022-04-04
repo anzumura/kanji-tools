@@ -37,7 +37,7 @@ private:
   // only returns 'false' if the question should be repeated (for toggling
   // meanings), otherwise it returns 'true'.
   [[nodiscard]] bool getAnswer(Choices& choices, bool& stopQuiz,
-      ChoiceCount correctChoice, const std::string& name);
+      ChoiceCount correct, const std::string& name);
 
   // '_answers' contains '_choiceCount' entries and is repopulated for each
   // question (one index has the correct answer and others are randomly chosen

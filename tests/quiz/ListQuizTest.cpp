@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/quiz/ListQuiz.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -101,13 +102,29 @@ TEST_F(ListQuizTest, ListOrders) {
   }
 }
 
+TEST_F(ListQuizTest, MissingReading) {
+  // Make a list containing a Kanji without a Japanese reading for this test.
+  // This should never happen for any of the current quiz types since they only
+  // include standard Kanji with readings.
+  const std::string noReading("㐄");
+  const auto i{_data->findKanjiByName(noReading)};
+  ASSERT_TRUE(i);
+  ASSERT_FALSE((**i).hasReading());
+  Data::List questionList{*i};
+  const auto f{[&questionList, this] {
+    ListQuiz{_quiz, {}, {}, questionList, KanjiInfo::All, 1,
+        ListQuiz::QuizStyle::KanjiToReading};
+  }};
+  EXPECT_THROW(call(f, noReading + " has no reading"), std::domain_error);
+}
+
 TEST_F(ListQuizTest, QuizDefaults) {
   const auto run{[this](std::string& out) {
     startQuiz();
     std::string line;
-    // collect all lines after ">>>" (the start of the quiz), but don't add the
-    // readings for the choices since they are randomly selected (instead just
-    // get the first 8 chars, i.e., the "    #.  " part)
+    // collect all lines after ">>>" (the start of the quiz), but don't add
+    // the readings for the choices since they are randomly selected (instead
+    // just get the first 8 chars, i.e., the "    #.  " part)
     while (std::getline(_os, line))
       if (!out.empty() || line.starts_with(">>>"))
         out += line.starts_with("    ") ? line.substr(0, 8) : line;
@@ -121,8 +138,8 @@ TEST_F(ListQuizTest, QuizDefaults) {
   // - quiz type: 'g' (grade)
   // - list quiz answers: '4'
   // - list quiz style: 'k' (kanji to reading)
-  // still need to specify '1' (for grade) and 'b' (for beginning of list) since
-  // these aren't defaults
+  // still need to specify '1' (for grade) and 'b' (for beginning of list)
+  // since these aren't defaults
   _is << "\nb\n\n1\n\n\n";
   run(allWithDefaults);
   EXPECT_EQ(all, allWithDefaults);
@@ -178,6 +195,17 @@ TEST_F(ListQuizTest, ReadingQuiz) {
   std::string line;
   getFirstQuestion(line);
   EXPECT_EQ(line, "Question 1/80:  Reading:  イチ、イツ、ひと、ひと-つ");
+}
+
+TEST_F(ListQuizTest, CorrectResponse) {
+  _is << "t\nb\n4\nr\n1\n";
+  startQuiz('g', '1', false);
+  auto found{false};
+  std::string lastLine;
+  for (std::string line; std::getline(_os, line); lastLine = line)
+    if (line.ends_with("Correct! (1/1)")) found = true;
+  EXPECT_TRUE(found);
+  EXPECT_EQ(lastLine, "Final score: 1/1 - Perfect!");
 }
 
 TEST_F(ListQuizTest, IncorrectResponse) {

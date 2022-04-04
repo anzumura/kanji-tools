@@ -29,18 +29,18 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
       _choiceEnd{static_cast<char>('0' + _choiceCount)} {
   assert(_answers.size() == _choiceCount); // need () ctor
   List questions;
-  for (auto& i : list)
-    if (i->hasReading()) questions.push_back(i);
+  for (auto& i : list) {
+    if (!i->hasReading())
+      // should never happen for any of the existing list quiz types
+      throw std::domain_error{i->name() + " has no reading"};
+    questions.emplace_back(i);
+  }
   if (_launcher.questionOrder() == QuestionOrder::FromEnd)
     std::reverse(questions.begin(), questions.end());
   else if (_launcher.questionOrder() == QuestionOrder::Random)
     std::shuffle(questions.begin(), questions.end(), RandomGen);
 
-  beginQuizMessage(questions.size()) << "kanji";
-  if (questions.size() < list.size())
-    out() << " (original list had " << list.size()
-          << ", but not all entries have readings)";
-  out() << "\n>>>\n";
+  beginQuizMessage(questions.size()) << "kanji\n>>>\n";
 
   if (isKanjiToReading()) _launcher.printLegend(fields);
   start(questions);
@@ -51,12 +51,12 @@ void ListQuiz::start(const List& questions) {
   for (; !stopQuiz && _question < questions.size(); ++_question) {
     const Entry& i{questions[_question]};
     auto choices{getDefaultChoices(questions.size())};
-    const auto correctChoice{populateAnswers(i, questions)};
+    const auto correct{populateAnswers(i, questions)};
     do {
       beginQuestionMessage(questions.size());
       printQuestion(i);
       printChoices(i, questions);
-    } while (!getAnswer(choices, stopQuiz, correctChoice, i->name()));
+    } while (!getAnswer(choices, stopQuiz, correct, i->name()));
   }
   // when quitting don't count the current question in the final score
   if (stopQuiz) --_question;
@@ -68,20 +68,20 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
       0, static_cast<Question>(questions.size()) - 1);
   std::uniform_int_distribution<ChoiceCount> randomCorrect(0, _choiceCount - 1);
 
-  const auto correctChoice{
+  const auto correct{
       _launcher.randomizeAnswers() ? randomCorrect(RandomGen) : ChoiceCount{}};
   // 'sameReading' prevents more than one choice having the same reading
   DataFile::Set sameReading{kanji->reading()};
-  _answers[correctChoice] = _question;
+  _answers[correct] = _question;
   for (ChoiceCount i{}; i < _choiceCount; ++i)
-    if (i != correctChoice) do {
+    if (i != correct) do {
         if (const auto choice{randomReading(RandomGen)};
             sameReading.insert(questions[choice]->reading()).second) {
           _answers[i] = choice;
           break;
         }
       } while (true);
-  return correctChoice;
+  return correct;
 }
 
 void ListQuiz::printQuestion(const Entry& kanji) const {
@@ -106,8 +106,8 @@ void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
     _launcher.printReviewDetails(kanji);
 }
 
-bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz,
-    ChoiceCount correctChoice, const std::string& name) {
+bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
+    const std::string& name) {
   const auto answer{
       isTestMode() ? choice().get(_prompt, {ChoiceStart, _choiceEnd}, choices)
                    : get(_prompt, choices)};
@@ -119,7 +119,7 @@ bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz,
     stopQuiz = true;
   else if (answer == PrevOption)
     _question -= 2;
-  else if (auto c{static_cast<char>(ChoiceStart + correctChoice)}; c == answer)
+  else if (const auto c{static_cast<char>(ChoiceStart + correct)}; c == answer)
     correctMessage();
   else if (answer != SkipOption)
     incorrectMessage(name) << "  (correct answer is " << c << ")\n";
