@@ -34,7 +34,7 @@ protected:
     of.close();
   }
 
-  static void compare(const std::string& file, const std::string& expected) {
+  static void run(const std::string& file, const std::string& expected) {
     const auto f{_data->dataDir() / "../tests/stats" / file};
     const char* args[]{"", f.c_str()};
     run(args, expected);
@@ -61,7 +61,7 @@ protected:
 } // namespace
 
 TEST_F(StatsTest, PrintStatsForOneFile) {
-  compare("sample-data/wiki-articles/02-中島みゆき.txt",
+  run("sample-data/wiki-articles/02-中島みゆき.txt",
       R"(>>> Stats for: '02-中島みゆき.txt' - showing top 5 Kanji per type
 >>> Furigana Removed: 6, Combining Marks Replaced: 0, Variation Selectors: 0
 >>>         Hiragana:   7990, unique:   71
@@ -83,7 +83,7 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
 }
 
 TEST_F(StatsTest, PrintStatsForOneDirectory) {
-  compare("sample-data/wiki-articles",
+  run("sample-data/wiki-articles",
       R"(>>> Stats for: 'wiki-articles' (3 files) - showing top 5 Kanji per type
 >>> Furigana Removed: 39, Combining Marks Replaced: 0, Variation Selectors: 0
 >>>         Hiragana:  43197, unique:   79
@@ -116,7 +116,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
 }
 
 TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
-  compare("sample-data",
+  run("sample-data",
       R"(>>> Stats for: 'sample-data' (5 files from 3 directories) - showing top 5 Kanji per type
 >>> Furigana Removed: 3397, Combining Marks Replaced: 0, Variation Selectors: 0
 >>>         Hiragana: 162560, unique:   80
