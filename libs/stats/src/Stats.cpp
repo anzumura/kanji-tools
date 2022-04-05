@@ -1,4 +1,3 @@
-#include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/stats/MBCount.h>
 #include <kanji_tools/stats/Stats.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
