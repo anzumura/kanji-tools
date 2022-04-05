@@ -550,13 +550,13 @@ Here are some runtime memory and (statically linked) file size stats for **kanji
 
 ## Kanji Stats
 
-The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command line options. In order to get more accurate stats about percentages of *kanji*, *hiragana* and *katakana*, the program attempts to strip away all *furigana* before counting.
+The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command line options. In order to get more accurate stats about percentages of *Kanji*, *Hiragana* and *Katakana*, the program attempts to strip away all *Furigana* before counting.
 
 Here is the output from processing a set of files containing lyrics for *中島みゆき (Miyuki Nakajima)* songs:
 
 ```;
 ~/cdev/kanji-tools $ ./build/apps/kanjiStats ~/songs
->>> Stats for: songs (634 files from 62 directories) - showing top 5 most Kanji per type
+>>> Stats for: songs (634 files from 62 directories) - showing top 5 Kanji per type
 >>> Furigana Removed: 435, Combining Marks Replaced: 253, Variation Selectors: 0
 >>>         Hiragana: 146382, unique:   77
 >>>         Katakana:   9317, unique:   79
