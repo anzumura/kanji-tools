@@ -122,17 +122,17 @@ std::string StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
       isUnrecognized{_name == "Unrecognized"},
       isCommonKanji{_isKanji && _name.starts_with("Common")};
 
-  // Remove furigana when processing Hiragana or MB-Letter to remove the effect
+  // Remove Furigana when processing Hiragana or MB-Letter to remove the effect
   // on counts, i.e., furigana in .txt files will artificially inflate Hiragana
   // count (and MB-Letter because of the wide brackets)
   const auto removeFurigana{
       isHiragana || _name == "Katakana" || _name == "MB-Letter"};
 
-  if (isHiragana && verbose) _os << ">>> Showing all furigana replacements:\n";
+  if (isHiragana && verbose) _os << ">>> Showing all Furigana replacements:\n";
 
   MBCountIf count{pred,
       removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt,
-      MBCount::DefaultReplace, isHiragana && verbose};
+      MBCount::DefaultReplace, isHiragana && verbose ? &_os : nullptr};
   count.addFile(_top, _isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(count);
   CountSet frequency;

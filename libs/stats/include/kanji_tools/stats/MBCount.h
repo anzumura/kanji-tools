@@ -34,7 +34,7 @@ public:
 
   // if 'find' regex is provided it's applied before processing for counting
   MBCount(OptRegex find = {}, const std::wstring& replace = DefaultReplace,
-      bool debug = false)
+      std::ostream* debug = {})
       : _find{find}, _replace{replace}, _debug{debug} {}
 
   MBCount(const MBCount&) = delete;
@@ -121,13 +121,13 @@ private:
 
   const OptRegex _find;
   const std::wstring _replace;
-  const bool _debug;
+  std::ostream* const _debug;
 };
 
 template<typename Pred> class MBCountIf : public MBCount {
 public:
   MBCountIf(Pred pred, OptRegex find = {},
-      const std::wstring& replace = DefaultReplace, bool debug = false)
+      const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : MBCount{find, replace, debug}, _pred{pred} {}
 private:
   [[nodiscard]] bool allowAdd(const std::string& token) const override {

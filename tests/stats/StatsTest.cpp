@@ -44,9 +44,12 @@ protected:
     Stats stats(args, _data);
     std::stringstream expected{expectedIn};
     for (std::string i, j; std::getline(_os, i) && std::getline(expected, j);)
-      EXPECT_EQ(i, j);
-    EXPECT_TRUE(_os.eof()) << _os.str().substr(expected.str().size());
-    EXPECT_TRUE(expected.eof()) << expected.str().substr(_os.str().size());
+      ASSERT_EQ(i, j);
+    // if loop completed due to 'eof' then check remaining part of other stream
+    if (_os.eof())
+      EXPECT_EQ(expected.str().substr(_os.str().size()), EmptyString);
+    else if (expected.eof())
+      EXPECT_EQ(_os.str().substr(expected.str().size()), EmptyString);
   }
 
   inline static std::stringstream _os;
@@ -75,7 +78,8 @@ TEST_F(StatsTest, PrintStatsForOneFile) {
 >>>   MB-Punctuation:   2097, unique:   13
 >>>        MB-Symbol:      5, unique:    2
 >>>        MB-Letter:    244, unique:   11
->>> Total Kana+Kanji: 24807 (Hiragana: 32.2%, Katakana: 28.7%, Kanji: 39.1%))");
+>>> Total Kana+Kanji: 24807 (Hiragana: 32.2%, Katakana: 28.7%, Kanji: 39.1%)
+)");
 }
 
 TEST_F(StatsTest, PrintStatsForOneDirectory) {
@@ -96,7 +100,8 @@ TEST_F(StatsTest, PrintStatsForOneDirectory) {
 >>>   MB-Punctuation:  10247, unique:   23
 >>>        MB-Symbol:     42, unique:    8
 >>>        MB-Letter:   1204, unique:   36
->>> Total Kana+Kanji: 112846 (Hiragana: 38.3%, Katakana: 21.7%, Kanji: 40.1%))");
+>>> Total Kana+Kanji: 112846 (Hiragana: 38.3%, Katakana: 21.7%, Kanji: 40.1%)
+)");
 }
 
 TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
@@ -128,7 +133,8 @@ TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
 >>>   MB-Punctuation:  22102, unique:   23
 >>>        MB-Symbol:     45, unique:    9
 >>>        MB-Letter:   1704, unique:   39
->>> Total Kana+Kanji: 283386 (Hiragana: 57.4%, Katakana: 8.7%, Kanji: 33.9%))");
+>>> Total Kana+Kanji: 283386 (Hiragana: 57.4%, Katakana: 8.7%, Kanji: 33.9%)
+)");
 }
 
 TEST_F(StatsTest, NonUcdKanji) {
@@ -139,7 +145,8 @@ TEST_F(StatsTest, NonUcdKanji) {
   const char* args[]{"", "testDir"};
   run(args, R"(>>> Stats for: 'testDir' - showing top 5 Kanji per type
 >>>    Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)
->>> Total Kana+Kanji: 2 (Kanji: 100.0%))");
+>>> Total Kana+Kanji: 2 (Kanji: 100.0%)
+)");
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
@@ -165,7 +172,40 @@ TEST_F(StatsTest, ShowBreakdown) {
 >>> Showing Breakdown for 'Non-UCD Kanji':
   Rank  [Val Num], Unicode, Highest Count File
   1     [㐁    1],  U+3401, test.txt
->>> Total Kana+Kanji: 12 (Hiragana: 16.7%, Katakana: 8.3%, Kanji: 75.0%))");
+>>> Total Kana+Kanji: 12 (Hiragana: 16.7%, Katakana: 8.3%, Kanji: 75.0%)
+)");
+}
+
+TEST_F(StatsTest, ShowVerbose) {
+  write(R"(何時（いつ）までと区切りましょう　突然で驚かぬように
+めでたさも　かなしさも　手に負えぬ　天任せ
+行（ゆ）く方（かた）も　来こし方かたも　齢寿（よわいことぶき）天任せ
+
+１足す１が２と限らない世界
+１引く１が０（ゼロ）にならない世界
+あてにしてた梯子（はしご）が外（はず）されても
+まだまだ人は昇るつもりの世界
+)");
+  // using '-v' causes the program to show all 'Furigana' substitutions
+  const char* args[]{"", "testDir", "-v"};
+  run(args, R"(>>> Showing all Furigana replacements:
+  Tag 'test.txt'
+  1 : 何時（いつ）までと区切りましょう　突然で驚かぬように
+    : 何時までと区切りましょう　突然で驚かぬように
+  2 : 行（ゆ）く方（かた）も　来こし方かたも　齢寿（よわいことぶき）天任せ
+    : 行く方も　来こし方かたも　齢寿天任せ
+  3 : あてにしてた梯子（はしご）が外（はず）されても
+    : あてにしてた梯子が外されても
+>>> Stats for: 'testDir' - showing top 5 Kanji per type
+>>> Furigana Removed: 3, Combining Marks Replaced: 0, Variation Selectors: 0
+>>>         Hiragana:     70, unique:   32
+>>>         Katakana:      2, unique:    2
+>>>     Common Kanji:     33, unique:   26, 100.00%
+>>>        [Jouyou] :     32, unique:   25,  96.97%  (世 3, 界 3, 方 2, 任 2, 天 2)
+>>>        [Jinmei] :      1, unique:    1,   3.03%  (梯 1)
+>>>        MB-Letter:      8, unique:    5
+>>> Total Kana+Kanji: 105 (Hiragana: 66.7%, Katakana: 1.9%, Kanji: 31.4%)
+)");
 }
 
 } // namespace kanji_tools

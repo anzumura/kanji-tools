@@ -27,14 +27,14 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
     if (n != s) {
       ++_replacements;
       if (tag && tag != _lastReplaceTag) {
-        if (_debug) std::cout << ">>> Tag: " << *tag << '\n';
+        if (_debug) *_debug << "  Tag '" << *tag << "'\n";
         _lastReplaceTag = *tag;
       }
       if (_debug) {
         const auto count{std::to_string(_replacements)};
-        std::cout << count << " : " << s << '\n'
-                  << std::setw(static_cast<int>(count.size() + 3)) << ": " << n
-                  << '\n';
+        *_debug << "  " << count << " : " << s << '\n'
+                << std::setw(static_cast<int>(count.size() + 5)) << ": " << n
+                << '\n';
       }
     }
   }
