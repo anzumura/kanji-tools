@@ -245,16 +245,16 @@ TEST_F(MBCountTest, SkipSimlinksWhenRecursing) {
 }
 
 TEST_F(MBCountTest, SkipNonRegularFiles) {
-  const auto sockFile{TestDir / "socket"};
-  auto fd{socket(AF_UNIX, SOCK_STREAM, 0)};
+  const auto file{TestDir / "socket"};
+  const auto fd{socket(AF_UNIX, SOCK_STREAM, 0)};
   ASSERT_NE(fd, -1);
-  struct sockaddr_un addr;
-  memset(&addr, 0, sizeof(addr));
+  sockaddr_un addr{};
   addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, sockFile.c_str(), sizeof(addr.sun_path) - 1);
+  strncpy(addr.sun_path, file.c_str(), sizeof(addr.sun_path) - 1);
+  ASSERT_FALSE(fs::is_socket(file));
   ASSERT_NE(bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)), -1);
-  EXPECT_TRUE(fs::is_socket(sockFile));
-  EXPECT_EQ(c.addFile(sockFile), 0);
+  ASSERT_TRUE(fs::is_socket(file));
+  EXPECT_EQ(c.addFile(file), 0);
   EXPECT_EQ(c.directories(), 0);
   EXPECT_EQ(c.files(), 0);
 }
