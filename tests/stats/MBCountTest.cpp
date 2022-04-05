@@ -4,6 +4,9 @@
 
 #include <fstream>
 
+#include <sys/socket.h>
+#include <sys/un.h>
+
 namespace kanji_tools {
 
 namespace fs = std::filesystem;
@@ -239,6 +242,21 @@ TEST_F(MBCountTest, SkipSimlinksWhenRecursing) {
   EXPECT_EQ(c.addFile(TestDir, false), 13);
   EXPECT_EQ(c.directories(), 2);
   EXPECT_EQ(c.files(), 4);
+}
+
+TEST_F(MBCountTest, SkipNonRegularFiles) {
+  const auto sockFile{TestDir / "socket"};
+  auto fd{socket(AF_UNIX, SOCK_STREAM, 0)};
+  ASSERT_NE(fd, -1);
+  struct sockaddr_un addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sun_family = AF_UNIX;
+  strncpy(addr.sun_path, sockFile.c_str(), sizeof(addr.sun_path) - 1);
+  ASSERT_NE(bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)), -1);
+  EXPECT_TRUE(fs::is_socket(sockFile));
+  EXPECT_EQ(c.addFile(sockFile), 0);
+  EXPECT_EQ(c.directories(), 0);
+  EXPECT_EQ(c.files(), 0);
 }
 
 TEST_F(MBCountTest, CheckTags) {
