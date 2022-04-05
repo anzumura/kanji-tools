@@ -68,39 +68,39 @@ public:
   class RomajiVariants {
   public:
     using List = std::vector<std::string>;
+    using RMax = CharArray<RomajiArrayMaxSize>;
 
     RomajiVariants() = default;
     RomajiVariants(RomajiVariants&&) = default; // only allow moving (no copy)
 
-    template<size_t V>
-    RomajiVariants(CharArray<V> v, bool kunrei = false)
-        : _list{v}, _kunrei{kunrei} {
-      static_assert(check(V));
+    template<size_t R>
+    RomajiVariants(CharArray<R> r, bool kunrei = false)
+        : _list{r}, _kunrei{kunrei} {
+      check<R>();
     }
 
     // all instances with two variants have variants with the same size (like
     // 'fa' (ファ) which has Rōmaji variants of 'fwa' and 'hwa')
-    template<size_t V>
-    RomajiVariants(CharArray<V> v1, CharArray<V> v2, bool kunrei = false)
-        : _list{v1, v2}, _kunrei{kunrei} {
-      static_assert(check(V));
+    template<size_t R>
+    RomajiVariants(CharArray<R> r1, CharArray<R> r2, bool kunrei = false)
+        : _list{r1, r2}, _kunrei{kunrei} {
+      check<R>();
     }
 
     // no instance with three variants has 'kunrei' true, but one has differing
     // sizes so need two template params, i.e, small 'ぇ' with Rōmaji of 'le'
     // has a variant list of 'xe', 'lye' and 'xye'
-    template<size_t V1, size_t V2>
-    RomajiVariants(CharArray<V1> v1, CharArray<V2> v2, CharArray<V2> v3)
-        : _list{v1, v2, v3} {
-      static_assert(check(V1) && V2 == RomajiArrayMaxSize);
+    template<size_t R>
+    RomajiVariants(CharArray<R> r1, RMax r2, RMax r3) : _list{r1, r2, r3} {
+      check<R>();
     }
 
     [[nodiscard]] auto& list() const { return _list; }
     [[nodiscard]] auto kunrei() const { return _kunrei; }
   private:
     // all Rōmaji variants are either 2 or 3 characters long
-    [[nodiscard]] static consteval bool check(size_t x) {
-      return x > RomajiArrayMinSize && x <= RomajiArrayMaxSize;
+    template<size_t R> static consteval void check() {
+      static_assert(R > RomajiArrayMinSize && R <= RomajiArrayMaxSize);
     }
 
     List _list;
@@ -124,10 +124,9 @@ public:
     [[nodiscard]] auto& katakana() const { return _katakana; }
   private:
     friend Kana; // only Kana class can constuct
-    template<size_t N>
-    RepeatMark(CharArray<N> hiragana, CharArray<N> katakana, bool dakuten)
+    RepeatMark(CharArray<OneKanaArraySize> hiragana,
+        CharArray<OneKanaArraySize> katakana, bool dakuten)
         : _hiragana{hiragana}, _katakana{katakana}, _dakuten{dakuten} {
-      static_assert(N == OneKanaArraySize);
       validate();
     }
 
