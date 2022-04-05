@@ -34,9 +34,13 @@ protected:
     of.close();
   }
 
-  static void compare(const std::string& file, const std::string& expectedIn) {
+  static void compare(const std::string& file, const std::string& expected) {
     const auto f{_data->dataDir() / "../tests/stats" / file};
     const char* args[]{"", f.c_str()};
+    run(args, expected);
+  }
+
+  static void run(const Args& args, const std::string& expectedIn) {
     Stats stats(args, _data);
     std::stringstream expected{expectedIn};
     for (std::string i, j; std::getline(_os, i) && std::getline(expected, j);)
@@ -108,7 +112,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
 
 TEST_F(StatsTest, PrintStatsForMultipleDirectories) {
   compare("sample-data",
-    R"(>>> Stats for: 'sample-data' (5 files from 3 directories) - showing top 5 Kanji per type
+      R"(>>> Stats for: 'sample-data' (5 files from 3 directories) - showing top 5 Kanji per type
 >>> Furigana Removed: 3397, Combining Marks Replaced: 0, Variation Selectors: 0
 >>>         Hiragana: 162560, unique:   80
 >>>         Katakana:  24689, unique:   83
@@ -131,50 +135,37 @@ TEST_F(StatsTest, NonUcdKanji) {
   // 'UCD' here refers to Kanji in 'data/ucd.txt' which is a filtered set of
   // kanji from the original complete set (see scripts/parseUcdAllFlat.sh for
   // details).
-  write(
-      "丆㐁"); // include examples from both 'common' and 'rare' unicode blocks
+  write("丆㐁"); // include examples from 'common' and 'rare' unicode blocks
   const char* args[]{"", "testDir"};
-  Stats stats(args, _data);
-  const char* expected[]{"Stats for: 'testDir' - showing top 5 Kanji per type",
-      "   Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)",
-      "Total Kana+Kanji: 2 (Kanji: 100.0%)"};
-  int count{0}, maxLines{std::size(expected)};
-  for (std::string line; std::getline(_os, line); ++count) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.substr(4), expected[count]);
-  }
-  EXPECT_EQ(count, maxLines);
+  run(args, R"(>>> Stats for: 'testDir' - showing top 5 Kanji per type
+>>>    Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)
+>>> Total Kana+Kanji: 2 (Kanji: 100.0%))");
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
   write("ああア西西東南南南巽𫞉㐁");
   const char* args[]{"", "testDir", "-b"};
-  Stats stats(args, _data);
-  const char* expected[]{"Stats for: 'testDir' - showing top 5 Kanji per type",
-      "        Hiragana:      2, unique:    1",
-      "        Katakana:      1, unique:    1",
-      "    Common Kanji:      7, unique:    4, 100.00%",
-      "       [Jouyou] :      6, unique:    3,  85.71%  (南 3, 西 2, 東 1)",
-      "       [Jinmei] :      1, unique:    1,  14.29%  (巽 1)",
-      "Showing Breakdown for 'Common Kanji':",
-      "  Rank  [Val Num] Freq, LV, Type", "  1     [南    3]  341, N5, Jouyou",
-      "  2     [西    2]  259, N5, Jouyou",
-      "  3     [東    1]   37, N5, Jouyou",
-      "  4     [巽    1] 2061, N1, Jinmei",
-      "      Rare Kanji:      1, unique:    1           (𫞉 1)",
-      "Showing Breakdown for 'Rare Kanji':", "  Rank  [Val Num] Freq, LV, Type",
-      "  1     [𫞉    1]    0, --, Ucd",
-      "   Non-UCD Kanji:      1, unique:    1           (㐁 1)",
-      "Showing Breakdown for 'Non-UCD Kanji':",
-      "  Rank  [Val Num], Unicode, Highest Count File",
-      "  1     [㐁    1],  U+3401, test.txt",
-      "Total Kana+Kanji: 12 (Hiragana: 16.7%, Katakana: 8.3%, Kanji: 75.0%)"};
-  int count{0}, maxLines{std::size(expected)};
-  for (std::string line; std::getline(_os, line); ++count) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line.starts_with(">") ? line.substr(4) : line, expected[count]);
-  }
-  EXPECT_EQ(count, maxLines);
+  run(args, R"(>>> Stats for: 'testDir' - showing top 5 Kanji per type
+>>>         Hiragana:      2, unique:    1
+>>>         Katakana:      1, unique:    1
+>>>     Common Kanji:      7, unique:    4, 100.00%
+>>>        [Jouyou] :      6, unique:    3,  85.71%  (南 3, 西 2, 東 1)
+>>>        [Jinmei] :      1, unique:    1,  14.29%  (巽 1)
+>>> Showing Breakdown for 'Common Kanji':
+  Rank  [Val Num] Freq, LV, Type
+  1     [南    3]  341, N5, Jouyou
+  2     [西    2]  259, N5, Jouyou
+  3     [東    1]   37, N5, Jouyou
+  4     [巽    1] 2061, N1, Jinmei
+>>>       Rare Kanji:      1, unique:    1           (𫞉 1)
+>>> Showing Breakdown for 'Rare Kanji':
+  Rank  [Val Num] Freq, LV, Type
+  1     [𫞉    1]    0, --, Ucd
+>>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)
+>>> Showing Breakdown for 'Non-UCD Kanji':
+  Rank  [Val Num], Unicode, Highest Count File
+  1     [㐁    1],  U+3401, test.txt
+>>> Total Kana+Kanji: 12 (Hiragana: 16.7%, Katakana: 8.3%, Kanji: 75.0%))");
 }
 
 } // namespace kanji_tools
