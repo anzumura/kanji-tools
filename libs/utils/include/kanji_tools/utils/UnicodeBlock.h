@@ -326,32 +326,35 @@ template<typename... T>
       KatakanaBlocks, PunctuationBlocks, SymbolBlocks, LetterBlocks);
 }
 
-inline constexpr wchar_t WideDash{L'-'};
-
+// 'BlockRange' takes one or more 'UnicodeBlock's and populates an array that
+// can be used with 'wregex'. For each block passed to the ctor the '_range'
+// array is populated with 'block.wStart()', '-', 'block.wEnd()'.
 template<typename... Ts> class BlockRange {
 public:
   BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(0UL, block, blocks...);
+    // terminate with 0 in case a non-static instance of this class is created
+    _range[Size - 1] = L'\0';
   }
 
   [[nodiscard]] auto operator()() const noexcept { return _range; }
 
   [[nodiscard]] auto operator[](size_t i) const {
-    if (i >= Range)
+    if (i >= size())
       throw std::out_of_range("index '" + std::to_string(i) +
                               "' is out of range for BlockRange with size '" +
-                              std::to_string(Range) + "'");
+                              std::to_string(size()) + "'");
     return _range[i];
   }
 
-  [[nodiscard]] static constexpr auto size() noexcept { return Range; }
+  [[nodiscard]] static constexpr auto size() noexcept { return Size; }
 private:
-  static inline constexpr auto N{sizeof...(Ts) + 1};
-  static inline constexpr auto Range{N * 3 + 1};
+  static inline constexpr auto Blocks{sizeof...(Ts) + 1};
+  static inline constexpr auto Size{Blocks * 3 + 1};
 
   void fill(size_t i, const UnicodeBlock& block) noexcept {
     _range[i] = block.wStart();
-    _range[i + 1] = WideDash;
+    _range[i + 1] = L'-';
     _range[i + 2] = block.wEnd();
   }
 
@@ -361,7 +364,7 @@ private:
     fill(i + 3, blocks...);
   }
 
-  wchar_t _range[Range];
+  wchar_t _range[Size];
 };
 
 // 'KanjiRange' is for 'wregex' and contains the following blocks (in order):

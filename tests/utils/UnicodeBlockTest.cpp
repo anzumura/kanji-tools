@@ -93,6 +93,14 @@ TEST(UnicodeBlockTest, BlockRangeError) {
       std::out_of_range);
 }
 
+TEST(UnicodeBlockTest, CreateBlockRange) {
+  const BlockRange r{CommonKanaBlock, NonSpacingBlocks[0]};
+  ASSERT_EQ(r.size(), 7); // includes the final null
+  ASSERT_EQ(r[6], L'\0');
+  const std::wstring w{r()};
+  EXPECT_EQ(w, L"\x3040-\x30ff\xfe00-\xfe0f");
+}
+
 TEST(UnicodeBlockTest, IsNonSpacing) {
   std::u32string s{U"\x3078\x3099"}; // へ and dakuten combining mark
   EXPECT_EQ(s.size(), 2);
