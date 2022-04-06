@@ -179,7 +179,7 @@ TEST_F(StatsTest, ShowBreakdown) {
 TEST_F(StatsTest, ShowVerbose) {
   write(R"(何時（いつ）までと区切りましょう　突然で驚かぬように
 めでたさも　かなしさも　手に負えぬ　天任せ
-行（ゆ）く方（かた）も　来こし方かたも　齢寿（よわいことぶき）天任せ
+行（ゆ）く方（かた）も　来（こ）し方（かた）も　齢寿（よわいことぶき）天任せ
 
 １足す１が２と限らない世界
 １引く１が０（ゼロ）にならない世界
@@ -192,20 +192,20 @@ TEST_F(StatsTest, ShowVerbose) {
 Tag 'test.txt'
   1 : 何時（いつ）までと区切りましょう　突然で驚かぬように
     : 何時までと区切りましょう　突然で驚かぬように
-  2 : 行（ゆ）く方（かた）も　来こし方かたも　齢寿（よわいことぶき）天任せ
-    : 行く方も　来こし方かたも　齢寿天任せ
+  2 : 行（ゆ）く方（かた）も　来（こ）し方（かた）も　齢寿（よわいことぶき）天任せ
+    : 行く方も　来し方も　齢寿天任せ
   3 : １引く１が０（ゼロ）にならない世界
     : １引く１が０にならない世界
   4 : あてにしてた梯子（はしご）が外（はず）されても
     : あてにしてた梯子が外されても
 >>> Stats for: 'testDir' - showing top 5 Kanji per type
 >>> Furigana Removed: 4, Combining Marks Replaced: 0, Variation Selectors: 0
->>>         Hiragana:     70, unique:   32
+>>>         Hiragana:     67, unique:   31
 >>>     Common Kanji:     33, unique:   26, 100.00%
 >>>        [Jouyou] :     32, unique:   25,  96.97%  (世 3, 界 3, 方 2, 任 2, 天 2)
 >>>        [Jinmei] :      1, unique:    1,   3.03%  (梯 1)
 >>>        MB-Letter:      6, unique:    3
->>> Total Kana+Kanji: 103 (Hiragana: 68.0%, Kanji: 32.0%)
+>>> Total Kana+Kanji: 100 (Hiragana: 67.0%, Kanji: 33.0%)
 )");
 }
 

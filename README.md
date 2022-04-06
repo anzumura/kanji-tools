@@ -558,7 +558,7 @@ Here is the output from processing a set of files containing lyrics for *中島�
 ~/cdev/kanji-tools $ ./build/apps/kanjiStats ~/songs
 >>> Stats for: 'songs' (634 files from 62 directories) - showing top 5 Kanji per type
 >>> Furigana Removed: 436, Combining Marks Replaced: 253, Variation Selectors: 0
->>>         Hiragana: 146382, unique:   77
+>>>         Hiragana: 146379, unique:   77
 >>>         Katakana:   9315, unique:   79
 >>>     Common Kanji:  52406, unique: 1642, 100.00%
 >>>        [Jouyou] :  50804, unique: 1398,  96.94%  (人 1440, 私 836, 日 785, 見 750, 何 626)
@@ -569,7 +569,7 @@ Here is the output from processing a set of files containing lyrics for *中島�
 >>>   MB-Punctuation:    946, unique:   12
 >>>        MB-Symbol:     13, unique:    2
 >>>        MB-Letter:   1429, unique:   54
->>> Total Kana+Kanji: 208103 (Hiragana: 70.3%, Katakana: 4.5%, Kanji: 25.2%)
+>>> Total Kana+Kanji: 208100 (Hiragana: 70.3%, Katakana: 4.5%, Kanji: 25.2%)
 ```
 
 ### Aozora
