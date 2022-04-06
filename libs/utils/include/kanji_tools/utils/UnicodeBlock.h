@@ -3,6 +3,7 @@
 #include <kanji_tools/utils/MBUtils.h>
 
 #include <array>
+#include <stdexcept>
 
 namespace kanji_tools {
 
@@ -115,6 +116,11 @@ inline constexpr std::array HiraganaBlocks{
 inline constexpr std::array KatakanaBlocks{
     makeBlock<0x30a0, 0x30ff>(UVer1_1, "Katakana"),
     makeBlock<0x31f0, 0x31ff>(UVer3_2, "Katakana Phonetic Extension")};
+
+// first Katakana block immediately follows Hiragana block so create a merged
+// block (to use in 'KanaRange')
+inline constexpr auto CommonKanaBlock{
+    makeBlock<HiraganaBlocks[0].start, KatakanaBlocks[0].end>(UVer1_1, "Kana")};
 
 // Almost all 'common' Japanese Kanji are in the original CJK Unified block.
 // Extension A has one 'Kentei' and about 1000 'Ucd' Kanji. Extension B has an
@@ -320,11 +326,45 @@ template<typename... T>
       KatakanaBlocks, PunctuationBlocks, SymbolBlocks, LetterBlocks);
 }
 
-// KanjiRange is for wregex and includes the common and rare kanji as well as
-// variation selectors.
 inline constexpr wchar_t WideDash{L'-'};
 
-// 'KanjiRange' contains the following blocks (in order):
+template<typename... Ts> class BlockRange {
+public:
+  BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
+    fill(0UL, block, blocks...);
+  }
+
+  [[nodiscard]] auto operator()() const noexcept { return _range; }
+
+  [[nodiscard]] auto operator[](size_t i) const {
+    if (i >= Range)
+      throw std::out_of_range("index '" + std::to_string(i) +
+                              "' is out of range for BlockRange with size '" +
+                              std::to_string(Range) + "'");
+    return _range[i];
+  }
+
+  [[nodiscard]] static constexpr auto size() noexcept { return Range; }
+private:
+  static inline constexpr auto N{sizeof...(Ts) + 1};
+  static inline constexpr auto Range{N * 3 + 1};
+
+  void fill(size_t i, const UnicodeBlock& block) noexcept {
+    _range[i] = block.wStart();
+    _range[i + 1] = WideDash;
+    _range[i + 2] = block.wEnd();
+  }
+
+  template<typename... Bs>
+  void fill(size_t i, const UnicodeBlock& block, const Bs&... blocks) noexcept {
+    fill(i, block);
+    fill(i + 3, blocks...);
+  }
+
+  wchar_t _range[Range];
+};
+
+// 'KanjiRange' is for 'wregex' and contains the following blocks (in order):
 // - CJK Extension A
 // - CJK Unified Ideographs Kanji
 // - CJK Compatibility Ideographs
@@ -335,23 +375,15 @@ inline constexpr wchar_t WideDash{L'-'};
 // - CJK Compatibility Ideographs Supplement
 // - CJK Extension G
 
-// clang-format off
-inline constexpr wchar_t KanjiRange[]{
-  CommonKanjiBlocks[0].wStart(), WideDash, CommonKanjiBlocks[0].wEnd(),
-  CommonKanjiBlocks[1].wStart(), WideDash, CommonKanjiBlocks[1].wEnd(),
-  CommonKanjiBlocks[2].wStart(), WideDash, CommonKanjiBlocks[2].wEnd(),
-  CommonKanjiBlocks[3].wStart(), WideDash, CommonKanjiBlocks[3].wEnd(),
-  NonSpacingBlocks[0].wStart(), WideDash, NonSpacingBlocks[0].wEnd(),
-  RareKanjiBlocks[0].wStart(), WideDash, RareKanjiBlocks[0].wEnd(),
-  RareKanjiBlocks[1].wStart(), WideDash, RareKanjiBlocks[1].wEnd(),
-  RareKanjiBlocks[2].wStart(), WideDash, RareKanjiBlocks[2].wEnd(),
-  RareKanjiBlocks[3].wStart(), WideDash, RareKanjiBlocks[3].wEnd(),
-  L'\0' // null
-};
-// clang-format on
+inline static const BlockRange KanjiRange{CommonKanjiBlocks[0],
+    CommonKanjiBlocks[1], CommonKanjiBlocks[2], CommonKanjiBlocks[3],
+    NonSpacingBlocks[0], RareKanjiBlocks[0], RareKanjiBlocks[1],
+    RareKanjiBlocks[2], RareKanjiBlocks[3]};
 
-inline constexpr wchar_t HiraganaRange[]{L"\u3040-\u309f"};
-inline constexpr wchar_t KatakanaRange[]{L"\u30a0-\u30ff\u31f0-\u31ff"};
-inline constexpr wchar_t KanaRange[]{L"\u3040-\u30ff\u31f0-\u31ff"};
+inline static const BlockRange WideLetterRange{LetterBlocks[6]};
+inline static const BlockRange HiraganaRange{HiraganaBlocks[0]};
+inline static const BlockRange KatakanaRange{
+    KatakanaBlocks[0], KatakanaBlocks[1]};
+inline static const BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
 
 } // namespace kanji_tools

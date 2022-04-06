@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
 
@@ -18,7 +19,7 @@ void checkRange(const T& blocks, BlockSet* allBlocks = {}) {
 
 } // namespace
 
-TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
+TEST(UnicodeBlockTest, CheckNoOverlappingBlocks) {
   BlockSet allBlocks;
   checkRange(HiraganaBlocks, &allBlocks);
   checkRange(KatakanaBlocks, &allBlocks);
@@ -28,10 +29,12 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   checkRange(CommonKanjiBlocks, &allBlocks);
   checkRange(RareKanjiBlocks, &allBlocks);
   checkRange(NonSpacingBlocks, &allBlocks);
-  // check 'range' strings (used in regex calls to remove furigana)
+}
+
+TEST(UnicodeBlockTest, CheckKanjiBlocks) {
   ASSERT_EQ(CommonKanjiBlocks.size(), 4);
-  ASSERT_EQ(RareKanjiBlocks.size(), 4);
   ASSERT_EQ(NonSpacingBlocks.size(), 1);
+  ASSERT_EQ(RareKanjiBlocks.size(), 4);
   // KanjiRange should include all the common and rare kanji + variant selectors
   // and a null terminator
   ASSERT_EQ(std::size(KanjiRange),
@@ -45,7 +48,7 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(RareKanjiBlocks[2].range(), 544);
   EXPECT_EQ(RareKanjiBlocks[3].range(), 4944);
   EXPECT_EQ(NonSpacingBlocks[0].range(), 16);
-  int pos{};
+  size_t pos{};
   auto checkKanjiRange{[&pos](auto& blocks) {
     for (auto& i : blocks) {
       EXPECT_EQ(KanjiRange[pos++], i.start) << pos;
@@ -57,6 +60,10 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   checkKanjiRange(NonSpacingBlocks);
   checkKanjiRange(RareKanjiBlocks);
   EXPECT_EQ(KanjiRange[pos], U'\0');
+}
+
+TEST(UnicodeBlockTest, CheckOtherBlocks) {
+  ASSERT_EQ(std::size(WideLetterRange), 4);
   ASSERT_EQ(std::size(HiraganaRange), 4);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
   EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
@@ -75,6 +82,15 @@ TEST(UnicodeBlockTest, CheckNoOverlappingRanges) {
   EXPECT_EQ(KanaRange[2], KatakanaBlocks[0].end);
   EXPECT_EQ(KanaRange[3], KatakanaBlocks[1].start);
   EXPECT_EQ(KanaRange[5], KatakanaBlocks[1].end);
+}
+
+TEST(UnicodeBlockTest, BlockRangeError) {
+  EXPECT_THROW(call([] { return KanaRange[7]; },
+                   "index '7' is out of range for BlockRange with size '7'"),
+      std::out_of_range);
+  EXPECT_THROW(call([] { return HiraganaRange[6]; },
+                   "index '6' is out of range for BlockRange with size '4'"),
+      std::out_of_range);
 }
 
 TEST(UnicodeBlockTest, IsNonSpacing) {

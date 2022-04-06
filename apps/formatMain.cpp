@@ -14,8 +14,8 @@ int main(int argc, const char** argv) {
     return 1;
   }
   const auto file{argv[1]};
-  const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange + L"]{1}$"},
-      allKana{std::wstring{L"^["} + KanaRange + L"]+$"};
+  const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange() + L"]{1}$"},
+      allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
   std::fstream f{file};
   std::string line, prevLine;
   auto prevLineEndedWithKanji{false};

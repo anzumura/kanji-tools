@@ -17,19 +17,18 @@ public:
   using OptRegex = std::optional<std::wregex>;
   using OptString = std::optional<std::string>;
 
-  // 'RemoveFurigana' is a regex for removing furigana from text files - it can
-  // be passed to MBCount constructor. Furigana in a .txt file is usually a
-  // Kanji followed by one or more Kana characters inside wide brackets. This
-  // regex matches a Kanji followed by bracketed Kana (and 'DefaultReplace' will
-  // replace it with just the Kanji match part). See MBCharTest.cpp for examples
-  // of how the regex works. Note, almost all furigana is hiragana, but very
-  // occasionally katakana can also be included like: 護謨製（ゴムせい）
+  // 'RemoveFurigana' is a regex for removing Furigana from text files. It can
+  // be passed to MBCount ctor. Furigana is usually a Kanji followed by one or
+  // more Kana characters inside wide brackets. This regex matches a Kanji (or
+  // wide letter) followed by bracketed Kana (and 'DefaultReplace' replaces it
+  // with just just the Kanji match part). See MBCharTest.cpp for examples of
+  // how the regex works. Note, almost all Furigana is Hiragana, but sometimes
+  // Katakana can also be used like: 護謨製（ゴムせい）.
   static const std::wregex RemoveFurigana;
 
-  // 'DefaultReplace' is used as the default replacement string in below
-  // constructor to replace the contents in brackets with itself (and get rid of
-  // the rest of the string). It can be used in combination with
-  // 'RemoveFurigana' regex.
+  // 'DefaultReplace' is used as the default replacement string in below ctor to
+  // replace the contents in brackets with itself (and get rid of the rest of
+  // the string). It can be used in combination with 'RemoveFurigana' regex.
   static const std::wstring DefaultReplace;
 
   // if 'find' regex is provided it's applied before processing for counting

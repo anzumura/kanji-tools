@@ -189,7 +189,7 @@ TEST_F(StatsTest, ShowVerbose) {
   // using '-v' causes the program to show all 'Furigana' substitutions
   const char* args[]{"", "testDir", "-v"};
   run(args, R"(>>> Showing all Furigana replacements:
-  Tag 'test.txt'
+Tag 'test.txt'
   1 : 何時（いつ）までと区切りましょう　突然で驚かぬように
     : 何時までと区切りましょう　突然で驚かぬように
   2 : 行（ゆ）く方（かた）も　来こし方かたも　齢寿（よわいことぶき）天任せ
