@@ -70,6 +70,13 @@ TEST_F(StatsTest, HelpMessage) {
 )");
 }
 
+TEST_F(StatsTest, NoOptions) {
+  const char* args[]{""};
+  const auto f{[&args] { Stats{args, _data}; }};
+  EXPECT_THROW(call(f, "please specify at least one option or '-h' for help"),
+      std::domain_error);
+}
+
 TEST_F(StatsTest, IllegalOption) {
   const char* args[]{"", "-a"};
   const auto f{[&args] { Stats{args, _data}; }};
