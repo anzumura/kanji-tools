@@ -12,11 +12,13 @@ namespace fs = std::filesystem;
 
 namespace {
 
+// LCOV_EXCL_START - Clang coverage doesn't work properly with this constexpr
 constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
   -b: show full Kanji breakdown for 'file' (instead of just a summary)
   -h: show help message for command-line options
   -v: show 'before' and 'after' versions of lines changed by Furigana removal
 )"};
+// LCOV_EXCL_STOP
 
 [[nodiscard]] constexpr double asPercent(size_t amount, size_t total) {
   return static_cast<double>(amount) * 100. / static_cast<double>(total);
@@ -25,9 +27,7 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 // helper class for ordering and printing out kanji found in files
 class Count {
 public:
-  using OptEntry = Data::OptEntry;
-
-  Count(size_t f, const std::string& n, OptEntry e)
+  Count(size_t f, const std::string& n, Data::OptEntry e)
       : count{f}, name{n}, entry{e} {}
 
   [[nodiscard]] auto frequency() const {
@@ -53,7 +53,7 @@ public:
 
   size_t count;
   std::string name;
-  OptEntry entry;
+  Data::OptEntry entry;
 };
 
 std::ostream& operator<<(std::ostream& os, const Count& c) {
