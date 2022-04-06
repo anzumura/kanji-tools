@@ -21,6 +21,10 @@ const std::wregex MBCount::RemoveFurigana{std::wstring{L"(["} + KanjiRange() +
                                           KanaRange() + L"]+）"};
 const std::wstring MBCount::DefaultReplace{L"$1"};
 
+MBCount::MBCount(
+    OptRegex find, const std::wstring& replace, std::ostream* debug)
+    : _find{find}, _replace{replace}, _debug{debug} {}
+
 size_t MBCount::add(const std::string& s, const OptString& tag) {
   auto n{s};
   if (_find) {
@@ -51,6 +55,23 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
   _variants += c.variants();
   _combiningMarks += c.combiningMarks();
   return added;
+}
+
+size_t MBCount::addFile(const std::filesystem::path& file, bool addTag,
+    bool fileNames, bool recurse) {
+  if (!std::filesystem::exists(file))
+    throw std::domain_error{"file not found: " + file.string()};
+  return doAddFile(file, addTag, fileNames, recurse);
+}
+
+size_t MBCount::count(const std::string& s) const {
+  const auto i{_map.find(s)};
+  return i != _map.end() ? i->second : 0;
+}
+
+const MBCount::Map* MBCount::tags(const std::string& s) const {
+  const auto i{_tags.find(s)};
+  return i != _tags.end() ? &i->second : nullptr;
 }
 
 size_t MBCount::doAddFile(

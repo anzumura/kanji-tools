@@ -33,8 +33,7 @@ public:
 
   // if 'find' regex is provided it's applied before processing for counting
   MBCount(OptRegex find = {}, const std::wstring& replace = DefaultReplace,
-      std::ostream* debug = {})
-      : _find{find}, _replace{replace}, _debug{debug} {}
+      std::ostream* debug = {});
 
   MBCount(const MBCount&) = delete;
   // operator= is not generated since there are const members
@@ -51,23 +50,13 @@ public:
   // subdirectories are also searched. By default, file names are used as 'tag'
   // values when calling 'add'.
   size_t addFile(const std::filesystem::path& file, bool addTag = true,
-      bool fileNames = true, bool recurse = true) {
-    if (!std::filesystem::exists(file))
-      throw std::domain_error{"file not found: " + file.string()};
-    return doAddFile(file, addTag, fileNames, recurse);
-  }
+      bool fileNames = true, bool recurse = true);
 
   // return count for given string or 0 if not found
-  [[nodiscard]] auto count(const std::string& s) const {
-    const auto i{_map.find(s)};
-    return i != _map.end() ? i->second : 0;
-  }
+  [[nodiscard]] size_t count(const std::string& s) const;
 
   // return an optional Map of 'tag to count' for the given MBChar 's'
-  [[nodiscard]] auto tags(const std::string& s) const {
-    const auto i{_tags.find(s)};
-    return i != _tags.end() ? &i->second : nullptr;
-  }
+  [[nodiscard]] const Map* tags(const std::string& s) const;
 
   [[nodiscard]] auto uniqueEntries() const { return _map.size(); }
   [[nodiscard]] auto files() const { return _files; }
