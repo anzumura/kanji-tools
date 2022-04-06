@@ -16,8 +16,9 @@ const auto CloseWideBracketSize{CloseWideBracket.size()};
 
 namespace fs = std::filesystem;
 
-const std::wregex MBCount::RemoveFurigana{
-    std::wstring{L"(["} + KanjiRange() + L"]{1})（[" + KanaRange() + L"]+）"};
+const std::wregex MBCount::RemoveFurigana{std::wstring{L"(["} + KanjiRange() +
+                                          WideLetterRange() + L"]{1})（[" +
+                                          KanaRange() + L"]+）"};
 const std::wstring MBCount::DefaultReplace{L"$1"};
 
 size_t MBCount::add(const std::string& s, const OptString& tag) {
