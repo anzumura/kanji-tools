@@ -70,6 +70,13 @@ TEST_F(StatsTest, HelpMessage) {
 )");
 }
 
+TEST_F(StatsTest, IllegalOption) {
+  const char* args[]{"", "-a"};
+  const auto f{[&args] { Stats{args, _data}; }};
+  EXPECT_THROW(
+      call(f, "illegal option '-a' use -h for help"), std::domain_error);
+}
+
 TEST_F(StatsTest, EndOfOptions) {
   const char* args[]{"", "--", "-h"};
   const auto f{[&args] { Stats{args, _data}; }};
