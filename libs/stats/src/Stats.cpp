@@ -13,9 +13,9 @@ namespace fs = std::filesystem;
 namespace {
 
 constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
-  -b: show full kanji breakdown for 'file' (instead of just a summary)
+  -b: show full Kanji breakdown for 'file' (instead of just a summary)
   -h: show help message for command-line options
-  -v: show 'before' and 'after' versions of lines that changed due to furigana removal
+  -v: show 'before' and 'after' versions of lines changed by Furigana removal
 )"};
 
 [[nodiscard]] constexpr double asPercent(size_t amount, size_t total) {

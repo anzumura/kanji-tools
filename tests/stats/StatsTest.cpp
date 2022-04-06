@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/stats/Stats.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
 #include <sstream>
@@ -59,6 +60,21 @@ protected:
 };
 
 } // namespace
+
+TEST_F(StatsTest, HelpMessage) {
+  const char* args[]{"", "-h"};
+  run(args, R"(kanjiStats [-bhv] file [file ...]:
+  -b: show full Kanji breakdown for 'file' (instead of just a summary)
+  -h: show help message for command-line options
+  -v: show 'before' and 'after' versions of lines changed by Furigana removal
+)");
+}
+
+TEST_F(StatsTest, EndOfOptions) {
+  const char* args[]{"", "--", "-h"};
+  const auto f{[&args] { Stats{args, _data}; }};
+  EXPECT_THROW(call(f, "file not found: -h"), std::domain_error);
+}
 
 TEST_F(StatsTest, PrintStatsForOneFile) {
   run("sample-data/wiki-articles/02-中島みゆき.txt",
