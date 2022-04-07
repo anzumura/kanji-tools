@@ -22,8 +22,8 @@ protected:
     EXPECT_TRUE(fs::create_directory(TestDir));
     static const std::string HeaderRow{"Number\tName\tMembers"};
     for (auto i{1}; i < 7; ++i)
-      write("g" + std::to_string(i) + ".txt", EmptyString);
-    write(OtherFile, EmptyString);
+      write("g" + std::to_string(i) + ".txt", {});
+    write(OtherFile, {});
   }
 
   void TearDown() override { fs::remove_all(TestDir); }

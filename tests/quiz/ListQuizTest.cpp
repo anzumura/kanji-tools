@@ -58,8 +58,8 @@ protected:
 
   void startQuiz(QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}, bool randomizeAnswers = true) {
-    _os.str(EmptyString);
-    _es.str(EmptyString);
+    _os.str({});
+    _es.str({});
     // clear eofbit and failbit for output streams in case quiz is run again
     _os.clear();
     _es.clear();

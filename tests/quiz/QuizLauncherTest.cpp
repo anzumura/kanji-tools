@@ -18,9 +18,9 @@ protected:
   QuizLauncherTest() { reset(); }
 
   void reset() const {
-    _os.str(EmptyString);
+    _os.str({});
     _os.clear();
-    _es.str(EmptyString);
+    _es.str({});
     _es.clear();
   }
 
@@ -61,7 +61,7 @@ TEST_F(QuizLauncherTest, ValidOptions) {
       QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
       EXPECT_TRUE(
           _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
-      EXPECT_EQ(_es.str(), EmptyString);
+      EXPECT_EQ(_es.str(), "");
       reset();
     }
 }

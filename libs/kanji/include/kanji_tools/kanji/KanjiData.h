@@ -1,7 +1,6 @@
 #pragma once
 
 #include <kanji_tools/kanji/Data.h>
-#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 
@@ -15,15 +14,10 @@ public:
       std::ostream& err = std::cerr);
 
   // Implement the base class functions used during Kanji construction
-  [[nodiscard]] Kanji::OptFreq frequency(const std::string& s) const override {
-    const auto x{_frequency.get(s)};
-    return x ? Kanji::OptFreq{x} : std::nullopt;
-  }
+  [[nodiscard]] Kanji::OptFreq frequency(const std::string& s) const override;
   [[nodiscard]] JlptLevels level(const std::string&) const override;
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;
 private:
-  inline static const Path Jlpt{"jlpt"}, Kentei{"kentei"};
-
   // functions to print loaded data if _debug is true
   void noFreq(long f, bool brackets = false) const; // print no-freq count
   template<typename T>
@@ -34,17 +28,8 @@ private:
   void printListStats(const IterableEnumArray<T, S>&, T (Kanji::*)() const,
       const std::string&, bool showNoFrequency) const;
 
-  template<typename T> auto dataFile(T t) const {
-    const auto f{[this, t](const auto& dir) {
-      return dataDir() / dir / firstLower(kanji_tools::toString(t));
-    }}; // LCOV_EXCL_LINE - for some reason Clang marks this line as 0 coverage
-    if constexpr (std::is_same_v<T, JlptLevels>)
-      return LevelDataFile{f(Jlpt), t};
-    else {
-      static_assert(std::is_same_v<T, KenteiKyus>);
-      return KyuDataFile{f(Kentei), t};
-    }
-  }
+  LevelDataFile dataFile(JlptLevels) const;
+  KyuDataFile dataFile(KenteiKyus) const;
 
   template<typename V, size_t N> using List = const std::array<const V, N - 1>;
 

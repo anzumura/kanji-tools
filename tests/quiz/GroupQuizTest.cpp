@@ -39,8 +39,8 @@ protected:
   void startQuiz(QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}, bool meanings = false,
       bool randomizeAnswers = true) {
-    _os.str(EmptyString);
-    _es.str(EmptyString);
+    _os.str({});
+    _es.str({});
     // clear eofbit and failbit for output streams in case quiz is run again
     _os.clear();
     _es.clear();
@@ -83,8 +83,9 @@ TEST_F(GroupQuizTest, ListOrders) {
 
 TEST_F(GroupQuizTest, GroupKanjiTypes) {
   const auto f{[](int x = 0) {
-    return (x ? "showing " + std::to_string(x) + " out of " : EmptyString) +
-           "37 members";
+    std::string msg{"37 members"};
+    if (x) msg = "showing " + std::to_string(x) + " out of " + msg;
+    return msg;
   }};
   for (auto i : {std::pair{'1', f(28)}, std::pair{'2', f(31)},
            std::pair{'3', f(32)}, std::pair{'4', f()}}) {

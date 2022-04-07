@@ -25,7 +25,7 @@ protected:
     static const std::string HeaderRow{"Number\tName\tMembers"};
     write(MeaningFile, HeaderRow);
     write(PatternFile, HeaderRow);
-    _es.str(EmptyString);
+    _es.str({});
     _es.clear();
   }
 
@@ -156,7 +156,7 @@ TEST_F(GroupDataTest, SameKanjiInMultipleMeaningGroups) {
   const auto groupData{create()};
   EXPECT_EQ(groupData.meaningGroups().size(), 2);
   EXPECT_EQ(groupData.meaningMap().size(), 10);
-  EXPECT_EQ(_es.str(), EmptyString); // no errors
+  EXPECT_EQ(_es.str(), ""); // no errors
 }
 
 TEST_F(GroupDataTest, SameKanjiInMultiplePatternGroups) {
@@ -190,7 +190,7 @@ TEST_F(GroupDataTest, CreateGroupError) {
   EXPECT_THROW(call([] { create(); },
                    "group [1 方向] has 1 duplicate member: 北" + MeaningErr),
       std::domain_error);
-  EXPECT_EQ(_es.str(), EmptyString);
+  EXPECT_EQ(_es.str(), "");
 }
 
 } // namespace kanji_tools

@@ -21,7 +21,7 @@ protected:
   StatsTest() {}
 
   void SetUp() override {
-    _os.str(EmptyString);
+    _os.str({});
     _os.clear();
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
@@ -48,9 +48,9 @@ protected:
       ASSERT_EQ(i, j);
     // if loop completed due to 'eof' then check remaining part of other stream
     if (_os.eof())
-      EXPECT_EQ(expected.str().substr(_os.str().size()), EmptyString);
+      EXPECT_EQ(expected.str().substr(_os.str().size()), "");
     else if (expected.eof())
-      EXPECT_EQ(_os.str().substr(expected.str().size()), EmptyString);
+      EXPECT_EQ(_os.str().substr(expected.str().size()), "");
   }
 
   inline static std::stringstream _os;

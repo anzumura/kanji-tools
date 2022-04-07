@@ -1,6 +1,7 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 
@@ -8,9 +9,9 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path FrequencyReadingsFile{"frequency-readings"},
-    RadicalsFile{"radicals"}, StrokesFile{"strokes"},
-    WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
+const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
+    FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"},
+    StrokesFile{"strokes"}, WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
 
 } // namespace
 
@@ -56,6 +57,11 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
       _ucd.print(*this);
     }
   }
+}
+
+Kanji::OptFreq KanjiData::frequency(const std::string& s) const {
+  const auto x{_frequency.get(s)};
+  return x ? Kanji::OptFreq{x} : std::nullopt;
 }
 
 JlptLevels KanjiData::level(const std::string& k) const {
@@ -205,6 +211,14 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
     }
   }
   log() << "  Total for all " << name << "s: " << total << '\n';
+}
+
+LevelDataFile KanjiData::dataFile(JlptLevels x) const {
+  return LevelDataFile(dataDir() / Jlpt / firstLower(toString(x)), x);
+}
+
+KyuDataFile KanjiData::dataFile(KenteiKyus x) const {
+  return KyuDataFile(dataDir() / Kentei / firstLower(toString(x)), x);
 }
 
 } // namespace kanji_tools
