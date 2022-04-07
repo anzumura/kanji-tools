@@ -482,7 +482,7 @@ TEST(KanjiDataPrintTest, Debug) {
   }
   EXPECT_TRUE(lastLine.starts_with(">>>     52     [985E FE00] 類︀"));
   EXPECT_EQ(found, 12);
-  EXPECT_EQ(count, 362);
+  EXPECT_EQ(count, 361);
 }
 
 } // namespace kanji_tools
