@@ -138,24 +138,23 @@ private:
     return x == "n" || x == "N";
   }
 
-  // 'convertFromKana' takes 'kanaInput' (so 'source' is Hiragana or Katakana)
-  // and retuns converted result based on '_target' and '_flags' (result can be
+  // 'fromKana' takes a string of Kana (so 'source' is Hiragana or Katakana) and
+  // retuns converted result based on '_target' and '_flags' (result can be
   // either Rōmaji or Kana, i.e., this function can convert Hiragana to Katakana
   // and vice versa).
-  [[nodiscard]] std::string convertFromKana(
-      const std::string& kanaInput, CharType source) const;
+  [[nodiscard]] std::string fromKana(const std::string&, CharType source) const;
 
-  // helper functions used by 'convertFromKana'
+  // helper functions used by 'fromKana'
   [[nodiscard]] std::string processKana(const std::string& kanaGroup,
       CharType source, const Kana*& prevKana, bool prolong = false) const;
   [[nodiscard]] std::string processKanaMacron(bool prolong,
       const Kana*& prevKana, const Kana* kana, bool sokuon = false) const;
 
-  // 'convertToKana' takes 'romajiInput' and returns either Hiragana or Katakana
+  // 'toKana' takes a string of Rōmaji and returns either Hiragana or Katakana
   // based on '_target' and '_flags'.
-  [[nodiscard]] std::string convertToKana(const std::string& romajiInput) const;
+  [[nodiscard]] std::string toKana(const std::string&) const;
 
-  // helper functions used by 'convertToKana'
+  // helper functions used by 'toKana'
   void processRomaji(std::string& romajiLetters, std::string& result) const;
   [[nodiscard]] bool processRomajiMacron(const std::string& letter,
       std::string& letters, std::string& result) const;

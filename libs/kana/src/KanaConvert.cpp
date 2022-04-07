@@ -115,8 +115,8 @@ std::string KanaConvert::convert(CharType source, const std::string& input,
 std::string KanaConvert::convert(
     CharType source, const std::string& input) const {
   if (source == _target) return input;
-  if (source == CharType::Hiragana) return convertFromKana(input, source);
-  if (source == CharType::Katakana) return convertFromKana(input, source);
+  if (source == CharType::Hiragana) return fromKana(input, source);
+  if (source == CharType::Katakana) return fromKana(input, source);
   // For Romaji source, break into words separated by any of _narrowDelimList
   // and process each word. This helps deal with words ending in 'n'.
   std::string result;
@@ -124,10 +124,10 @@ std::string KanaConvert::convert(
   for (const auto keepSpaces{!(_flags & ConvertFlags::RemoveSpaces)};;) {
     const auto pos{input.find_first_of(tokens().narrowDelimList(), oldPos)};
     if (pos == std::string::npos) {
-      result += convertToKana(input.substr(oldPos));
+      result += toKana(input.substr(oldPos));
       break;
     }
-    result += convertToKana(input.substr(oldPos, pos - oldPos));
+    result += toKana(input.substr(oldPos, pos - oldPos));
     if (const auto delim{input[pos]};
         delim != Apostrophe && delim != Dash && (keepSpaces || delim != ' '))
       result += narrowDelims().at(delim);
@@ -136,7 +136,7 @@ std::string KanaConvert::convert(
   return result;
 }
 
-std::string KanaConvert::convertFromKana(
+std::string KanaConvert::fromKana(
     const std::string& kanaInput, CharType source) const {
   enum class State { New, SmallTsu, Done };
   State state{State::New};
@@ -255,7 +255,7 @@ std::string KanaConvert::processKanaMacron(
   return result;
 }
 
-std::string KanaConvert::convertToKana(const std::string& romajiInput) const {
+std::string KanaConvert::toKana(const std::string& romajiInput) const {
   std::string result, letters, letter;
   for (MBChar s{romajiInput}; s.next(letter, false);)
     if (isSingleByte(letter)) {

@@ -13,13 +13,11 @@ namespace fs = std::filesystem;
 
 namespace {
 
-// LCOV_EXCL_START - Clang coverage doesn't work properly with this constexpr
 constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
   -b: show full Kanji breakdown for 'file' (instead of just a summary)
   -h: show help message for command-line options
   -v: show 'before' and 'after' versions of lines changed by Furigana removal
 )"};
-// LCOV_EXCL_STOP
 
 [[nodiscard]] constexpr double asPercent(size_t amount, size_t total) {
   return static_cast<double>(amount) * 100. / static_cast<double>(total);
