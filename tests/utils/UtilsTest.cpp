@@ -21,6 +21,17 @@ TEST(UtilsTest, AddLeadingZeroes) {
   EXPECT_EQ(addLeadingZeroes("abc", 2), "abc");
 }
 
+TEST(UtilsTest, U32AddLeadingZeroes) {
+  // addLeadingZeroes returns '0' when given an empty string, otherwise it pads
+  // the string with zeroes if size is less than 'minSize' (the second param)
+  EXPECT_EQ(addLeadingZeroes(U"", 0), U"0");
+  EXPECT_EQ(addLeadingZeroes(U"", 1), U"0");
+  EXPECT_EQ(addLeadingZeroes(U"", 2), U"00");
+  EXPECT_EQ(addLeadingZeroes(U"abc", 5), U"00abc");
+  EXPECT_EQ(addLeadingZeroes(U"abc", 3), U"abc");
+  EXPECT_EQ(addLeadingZeroes(U"abc", 2), U"abc");
+}
+
 TEST(UtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode('a'), "0061");
   EXPECT_EQ(toUnicode("ぁ"), "3041");
