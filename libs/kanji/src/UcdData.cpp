@@ -34,25 +34,17 @@ const std::string& UcdData::getMeaning(const Ucd* u) const {
   return u ? u->meaning() : EmptyString;
 }
 
-const std::string& UcdData::getMeaning(const std::string& kanjiName) const {
-  return getMeaning(find(kanjiName));
-}
-
 const Ucd* UcdData::find(const std::string& kanjiName) const {
   auto r{kanjiName};
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
     const auto nonVariant{MBChar::noVariationSelector(kanjiName)};
-    // check for linked Jinmei variant first
     if (const auto i{_linkedJinmei.find(nonVariant)};
-        i == _linkedJinmei.end()) {
-      const auto j{_linkedOther.find(nonVariant)};
-      if (j == _linkedOther.end()) return nullptr;
-      // if j exists it should never by an empty vector
-      assert(!j->second.empty());
-      // if there are more than one variant, just return the first one for now.
-      r = j->second[0];
-    } else
-      r = i->second;
+        i == _linkedJinmei.end())
+      // could check _linkedOther, but so far this never happens so just return
+      // nullptr, i.e., 'variant is not found in the data loaded from ucd.txt'
+      return nullptr;
+    else
+      r = i->second; // return jinmei variant
   }
   const auto i{_map.find(r)};
   return i == _map.end() ? nullptr : &i->second;
