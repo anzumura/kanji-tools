@@ -10,9 +10,9 @@ protected:
 
   static void fill(wchar_t*, const UnicodeBlock&) noexcept;
 
-  template<typename... Bs>
+  template<typename... Ts>
   static void fill(
-      wchar_t* i, const UnicodeBlock& block, const Bs&... blocks) noexcept {
+      wchar_t* i, const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(i, block);
     fill(i + SizePerBlock, blocks...);
   }
@@ -39,7 +39,7 @@ public:
 
   [[nodiscard]] static constexpr auto size() noexcept { return Size; }
 private:
-  inline static constexpr auto Size{sizeof...(Ts) * 3 + 3};
+  inline static constexpr auto Size{(sizeof...(Ts) + 1) * SizePerBlock};
 
   wchar_t _range[size() + 1]; // add 1 for final null
 };
