@@ -1,7 +1,7 @@
 #include <kanji_tools/kana/KanaConvert.h>
 #include <kanji_tools/kana/Table.h>
 #include <kanji_tools/utils/Choice.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utils.h>
 #include <stdio.h>
 #include <unistd.h>
 

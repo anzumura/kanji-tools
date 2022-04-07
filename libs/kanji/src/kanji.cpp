@@ -1,5 +1,6 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/Kanji.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 
@@ -8,8 +9,7 @@ namespace kanji_tools {
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
     const Radical& radical, Strokes strokes, const OptString& morohashiId,
     const NelsonIds& nelsonIds, const OptString& pinyin)
-    : _name{name}, _nonVariantName{MBChar::optionalWithoutVariationSelector(
-                       name)},
+    : _name{name}, _nonVariantName{MBChar::optNoVariationSelector(name)},
       _compatibilityName{compatibilityName}, _radical{radical},
       _strokes{strokes}, _morohashiId{morohashiId},
       _nelsonIds{nelsonIds}, _pinyin{pinyin} {
@@ -63,6 +63,22 @@ bool Kanji::orderByQualifiedName(const Kanji& x) const {
                          frequencyOrMax() == x.frequencyOrMax() &&
                              toUnicode(compatibilityName()) <
                                  toUnicode(x.compatibilityName())));
+}
+
+u_int8_t Kanji::qualifiedNameRank() const {
+  const auto t{type()};
+  // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd
+  // (so the least common)
+  return t == KanjiTypes::Jouyou         ? 0
+         : hasLevel()                    ? 1
+         : frequency()                   ? 2
+         : t == KanjiTypes::Jinmei       ? 3
+         : t == KanjiTypes::LinkedJinmei ? 4
+         : t == KanjiTypes::LinkedOld    ? 5
+         : t == KanjiTypes::Extra        ? 6
+         : t == KanjiTypes::Ucd          ? 9
+         : kyu() != KenteiKyus::K1       ? 7
+                                         : 8;
 }
 
 } // namespace kanji_tools

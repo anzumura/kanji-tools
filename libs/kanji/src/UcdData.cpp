@@ -1,6 +1,7 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/utils/ColumnFile.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 
@@ -29,10 +30,18 @@ struct PrintCount {
 
 } // namespace
 
+const std::string& UcdData::getMeaning(const Ucd* u) const {
+  return u ? u->meaning() : EmptyString;
+}
+
+const std::string& UcdData::getMeaning(const std::string& kanjiName) const {
+  return getMeaning(find(kanjiName));
+}
+
 const Ucd* UcdData::find(const std::string& kanjiName) const {
   auto r{kanjiName};
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
-    const auto nonVariant{MBChar::withoutVariationSelector(kanjiName)};
+    const auto nonVariant{MBChar::noVariationSelector(kanjiName)};
     // check for linked Jinmei variant first
     if (const auto i{_linkedJinmei.find(nonVariant)};
         i == _linkedJinmei.end()) {

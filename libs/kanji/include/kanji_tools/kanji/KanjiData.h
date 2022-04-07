@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 

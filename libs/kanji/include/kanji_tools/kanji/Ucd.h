@@ -63,20 +63,14 @@ public:
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
 
   // 'has' methods
-  [[nodiscard]] auto hasLinks() const { return !_links.empty(); }
-  [[nodiscard]] auto hasTraditionalLinks() const {
-    return _linkType == UcdLinkTypes::Traditional;
-  }
-  [[nodiscard]] auto hasNonTraditionalLinks() const {
-    return hasLinks() && _linkType != UcdLinkTypes::Traditional;
-  }
-  [[nodiscard]] auto hasVariantStrokes() const { return _variantStrokes != 0; }
+  [[nodiscard]] bool hasLinks() const;
+  [[nodiscard]] bool hasTraditionalLinks() const;
+  [[nodiscard]] bool hasNonTraditionalLinks() const;
+  [[nodiscard]] bool hasVariantStrokes() const;
 
   // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if
   // variant is true), otherise it falls back to just return '_strokes'
-  [[nodiscard]] auto getStrokes(bool variant) const {
-    return variant && hasVariantStrokes() ? _variantStrokes : _strokes;
-  }
+  [[nodiscard]] Strokes getStrokes(bool variant) const;
 
   // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
   [[nodiscard]] std::string codeAndName() const;

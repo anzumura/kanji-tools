@@ -2,6 +2,7 @@
 #include <kanji_tools/quiz/ListQuiz.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
 #include <kanji_tools/utils/DisplaySize.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 

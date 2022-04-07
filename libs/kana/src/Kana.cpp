@@ -1,5 +1,6 @@
 #include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 #include <iostream>

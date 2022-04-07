@@ -18,12 +18,8 @@ public:
   UcdData& operator=(const UcdData&) = delete;
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
-  [[nodiscard]] auto& getMeaning(const Ucd* u) const {
-    return u ? u->meaning() : EmptyString;
-  }
-  [[nodiscard]] auto& getMeaning(const std::string& kanjiName) const {
-    return getMeaning(find(kanjiName));
-  }
+  [[nodiscard]] const std::string& getMeaning(const Ucd*) const;
+  [[nodiscard]] const std::string& getMeaning(const std::string& kanji) const;
 
   // 'getReadingsAsKana' returns string starting with 'onReading' converted
   // Katakana followed by 'kunReading' converted to Hiragana

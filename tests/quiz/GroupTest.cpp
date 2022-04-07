@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/quiz/Group.h>
+#include <kanji_tools/utils/Utils.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <sstream>

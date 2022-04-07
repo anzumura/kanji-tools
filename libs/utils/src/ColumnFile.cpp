@@ -1,5 +1,5 @@
 #include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 #include <set>

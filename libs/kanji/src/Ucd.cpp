@@ -1,7 +1,23 @@
 #include <kanji_tools/kanji/Ucd.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
+
+bool Ucd::hasLinks() const { return !_links.empty(); }
+
+bool Ucd::hasTraditionalLinks() const {
+  return _linkType == UcdLinkTypes::Traditional;
+}
+
+bool Ucd::hasNonTraditionalLinks() const {
+  return hasLinks() && _linkType != UcdLinkTypes::Traditional;
+}
+
+bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
+
+Ucd::Strokes Ucd::getStrokes(bool variant) const {
+  return variant && hasVariantStrokes() ? _variantStrokes : _strokes;
+}
 
 std::string Ucd::codeAndName() const {
   return toUnicode(_code, BracketType::Square) + ' ' + _name;

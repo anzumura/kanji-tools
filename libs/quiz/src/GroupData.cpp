@@ -2,6 +2,7 @@
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/DisplaySize.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 

@@ -20,89 +20,36 @@ namespace kanji_tools {
 //   means 3, etc.
 class MBChar {
 public:
+  using OptString = std::optional<std::string>;
+
   // 'isVariationSelector' returns true if s points to a UTF-8 variation
   // selector, this method is used by 'size', 'next' and 'doPeek'.
-  [[nodiscard]] static auto isVariationSelector(const unsigned char* s) {
-    // Checking for variation selectors would be easier if 'i' was char32_t, but
-    // that would involve calling more expensive conversion functions (like
-    // fromUtf8). Note, variation selectors are range 'fe00' to 'fe0f' in
-    // Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
-    return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;
-  }
-  [[nodiscard]] static auto isVariationSelector(const char* s) {
-    return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
-  }
-  [[nodiscard]] static auto isVariationSelector(const std::string& s) {
-    return isVariationSelector(s.c_str());
-  }
+  [[nodiscard]] static bool isVariationSelector(const unsigned char* s);
+  [[nodiscard]] static bool isVariationSelector(const char* s);
+  [[nodiscard]] static bool isVariationSelector(const std::string& s);
 
-  [[nodiscard]] static auto isCombiningMark(const unsigned char* s) {
-    return s && *s++ == 0xe3 && *s++ == 0x82 && (*s == 0x99 || *s == 0x9a);
-  }
-  [[nodiscard]] static auto isCombiningMark(const char* s) {
-    return isCombiningMark(reinterpret_cast<const unsigned char*>(s));
-  }
-  [[nodiscard]] static auto isCombiningMark(const std::string& s) {
-    return isCombiningMark(s.c_str());
-  }
+  [[nodiscard]] static bool isCombiningMark(const unsigned char* s);
+  [[nodiscard]] static bool isCombiningMark(const char* s);
+  [[nodiscard]] static bool isCombiningMark(const std::string& s);
 
   // 'size' with onlyMB=true only counts multi-byte 'sequence start' bytes,
   // otherwise it includes both multi-byte sequence starts as well as regular
-  // single byte values, i.e., simply don't add 'continuation' bytes to 'size'
-  // (this done by using '11 00 00 00' to grab the first two bits and only
-  // adding if the result is not binary '10 00 00 00'). Examples:
-  // - size("abc") = 0
-  // - size("abc", false) = 3
-  // - size("大blue空") = 2
-  // - size("大blue空", false) = 6
-  // Note: some Kanji can be followed by a 'variation selector' or 'combining
-  // mark' - these are not counted since they are considered part of the
-  // previous 'MB character' (as a modifier).
-  [[nodiscard]] static auto size(const char* s, bool onlyMB = true) {
-    size_t result{};
-    // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
-    // checking if the next 3 bytes represent a 'variation selector'
-    if (auto i{reinterpret_cast<const unsigned char*>(s)}; i) {
-      while (*i)
-        if (isCombiningMark(i) || isVariationSelector(i))
-          i += 3;
-        else if (onlyMB)
-          result += (*i++ & TwoBits) == TwoBits;
-        else
-          result += (*i++ & TwoBits) != Bit1;
-    }
-    return result;
-  }
-  [[nodiscard]] static auto size(const std::string& s, bool onlyMB = true) {
-    return size(s.c_str(), onlyMB);
-  }
+  // single byte values.
+  [[nodiscard]] static size_t size(const char* s, bool onlyMB = true);
+  [[nodiscard]] static size_t size(const std::string& s, bool onlyMB = true);
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so
   // 2-4 bytes) followed by a variation selector (which are always 3 bytes).
-  [[nodiscard]] static auto isMBCharWithVariationSelector(
-      const std::string& s) {
-    return s.size() > 4 && s.size() < 8 &&
-           isVariationSelector(s.substr(s.size() - 3));
-  }
-  [[nodiscard]] static auto withoutVariationSelector(const std::string& s) {
-    return isMBCharWithVariationSelector(s) ? s.substr(0, s.size() - 3) : s;
-  }
-  [[nodiscard]] static auto optionalWithoutVariationSelector(
-      const std::string& s) {
-    return isMBCharWithVariationSelector(s)
-               ? std::optional(s.substr(0, s.size() - 3))
-               : std::nullopt;
-  }
+  [[nodiscard]] static bool isMBCharWithVariationSelector(const std::string&);
+
+  // functions to remove variation selector from given string
+  [[nodiscard]] static std::string noVariationSelector(const std::string&);
+  [[nodiscard]] static OptString optNoVariationSelector(const std::string&);
 
   // 'getFirst' returns the first MBChar from 's' (including any variation
   // selector that might follow). If 's' doesn't start with a multi-byte
   // sequence then empty string is returned.
-  [[nodiscard]] static auto getFirst(const std::string& s) {
-    std::string result;
-    MBChar c{s};
-    c.next(result);
-    return result;
-  }
+  [[nodiscard]] static std::string getFirst(const std::string&);
 
   explicit MBChar(const std::string& data) : _data{data} {}
 
@@ -110,10 +57,7 @@ public:
   // operator= is not generated since there are const members
 
   // call reset in order to loop over the string again
-  void reset() {
-    _location = _data.c_str();
-    _errors = _variants = _combiningMarks = 0;
-  }
+  void reset();
 
   // 'next' populates 'result' with the full multi-byte character (so could be
   // more than one byte) returns true if result was populated. This function
@@ -130,47 +74,27 @@ public:
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
   [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
-  [[nodiscard]] auto size(bool onlyMB = true) const {
-    return size(_data, onlyMB);
-  }
-  [[nodiscard]] auto valid(bool sizeOne = true) const {
-    return validateMBUtf8(_data, sizeOne);
-  }
-  [[nodiscard]] auto isValid(bool sizeOne = true) const {
-    return valid(sizeOne) == MBUtf8Result::Valid;
-  }
+  [[nodiscard]] size_t size(bool onlyMB = true) const;
+  [[nodiscard]] MBUtf8Result valid(bool sizeOne = true) const;
+  [[nodiscard]] bool isValid(bool sizeOne = true) const;
 private:
   // 'getMBUtf8' returns a string containing one multi-byte UTF-8 sequence
-  // starting at 'location'
-  [[nodiscard]] static auto getMBUtf8(const char*& location) {
-    const auto firstOfGroup{static_cast<unsigned char>(*location)};
-    std::string result{*location++};
-    for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1)
-      result += *location++;
-    return result;
-  }
+  // starting at 'loc'
+  [[nodiscard]] static std::string getMBUtf8(const char*& loc);
 
   // 'validResult' is called from 'next' and 'peek' after determining 'location'
   // points to a valid multi-byte utf8 sequence. It sets 'result', increments
-  // 'location' and returns true if the result is valid, i.e., not a 'variation
+  // 'loc' and returns true if the result is valid, i.e., not a 'variation
   // selector' or a 'combining mark'.
-  [[nodiscard]] static auto validResult(
-      std::string& result, const char*& location) {
-    return !isVariationSelector(result = getMBUtf8(location)) &&
-           !isCombiningMark(result);
-  }
+  [[nodiscard]] static bool validResult(std::string& result, const char*& loc);
 
   // 'peekVariant' is called from 'next' and 'peek' methods. It populates
   // 'result' if 'location' starts a valid multi-byte utf8 sequence and returns
   // true if 'result' is a 'variation selector'.
-  [[nodiscard]] static auto peekVariant(
-      std::string& result, const char* location) {
-    return isValidMBUtf8(location) &&
-           isVariationSelector(result = getMBUtf8(location));
-  }
+  [[nodiscard]] static bool peekVariant(std::string& result, const char* loc);
 
   const std::string _data;
-  const char* _location{_data.c_str()};
+  const char* _loc{_data.c_str()};
   // counts of errors, variants and combiningMarks found
   size_t _errors{}, _variants{}, _combiningMarks{};
 };

@@ -126,6 +126,8 @@ std::u32string fromUtf8(const char* s) {
 #endif
 }
 
+std::u32string fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
+
 std::string toUtf8(char32_t c) {
 #ifdef USE_CODECVT_FOR_UTF_8
   return utf8Converter()->to_bytes(static_cast<wchar_t>(c));
@@ -135,6 +137,10 @@ std::string toUtf8(char32_t c) {
   return result;
 #endif
 }
+
+std::string toUtf8(int x) { return toUtf8(static_cast<char32_t>(x)); }
+
+std::string toUtf8(long x) { return toUtf8(static_cast<char32_t>(x)); }
 
 std::string toUtf8(const std::u32string& s) {
 #ifdef USE_CODECVT_FOR_UTF_8
@@ -156,6 +162,10 @@ std::wstring fromUtf8ToWstring(const char* s) {
 #else
   return convertFromUtf8<std::wstring>(s);
 #endif
+}
+
+std::wstring fromUtf8ToWstring(const std::string& s) {
+  return fromUtf8ToWstring(s.c_str());
 }
 
 std::string toUtf8(const std::wstring& s) {
@@ -209,6 +219,19 @@ MBUtf8Result validateMBUtf8(
     return err(Utf8Result::Overlong); // overlong 2 byte encoding
   return !sizeOne || !*++u ? MBUtf8Result::Valid
                            : err(Utf8Result::StringTooLong);
+}
+
+MBUtf8Result validateMBUtf8(
+    const std::string& s, Utf8Result& e, bool sizeOne) noexcept {
+  return validateMBUtf8(s.c_str(), e, sizeOne);
+}
+
+bool isValidMBUtf8(const std::string& s, bool sizeOne) noexcept {
+  return validateMBUtf8(s, sizeOne) == MBUtf8Result::Valid;
+}
+
+bool isValidUtf8(const std::string& s, bool sizeOne) noexcept {
+  return validateUtf8(s, sizeOne) == Utf8Result::Valid;
 }
 
 } // namespace kanji_tools

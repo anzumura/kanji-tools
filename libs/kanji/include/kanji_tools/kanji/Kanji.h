@@ -6,7 +6,6 @@
 #include <kanji_tools/utils/EnumBitmask.h>
 #include <kanji_tools/utils/JlptLevels.h>
 #include <kanji_tools/utils/KenteiKyus.h>
-#include <kanji_tools/utils/MBUtils.h>
 
 #include <limits>
 #include <optional>
@@ -168,21 +167,7 @@ private:
   static constexpr std::array QualifiedNames{
       '.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
 
-  [[nodiscard]] u_int8_t qualifiedNameRank() const {
-    const auto t{type()};
-    // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd
-    // (so the least common)
-    return t == KanjiTypes::Jouyou         ? 0
-           : hasLevel()                    ? 1
-           : frequency()                   ? 2
-           : t == KanjiTypes::Jinmei       ? 3
-           : t == KanjiTypes::LinkedJinmei ? 4
-           : t == KanjiTypes::LinkedOld    ? 5
-           : t == KanjiTypes::Extra        ? 6
-           : t == KanjiTypes::Ucd          ? 9
-           : kyu() != KenteiKyus::K1       ? 7
-                                           : 8;
-  }
+  [[nodiscard]] u_int8_t qualifiedNameRank() const;
 
   // name related fields
   const std::string _name;

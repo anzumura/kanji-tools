@@ -84,7 +84,7 @@ void Table::print(std::ostream& os, const Widths& widths, const Row& row,
       // wide chars then need to add difference to get 'setw' to work properly
       cell(widths[i] + (row[i].size() - displaySize(row[i])), row[i]);
     else
-      cell(widths[i], EmptyString);
+      cell(widths[i], "");
   os << delim << '\n';
 }
 

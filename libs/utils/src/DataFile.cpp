@@ -1,5 +1,6 @@
 #include <kanji_tools/utils/DataFile.h>
 #include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <fstream>
 #include <sstream>
