@@ -137,7 +137,7 @@ std::string KanaConvert::convert(
 }
 
 std::string KanaConvert::fromKana(
-    const std::string& kanaInput, CharType source) const {
+    const std::string& kanaInput, CharType source) const { // LCOV_EXCL_LINE
   enum class State { New, SmallTsu, Done };
   State state{State::New};
   std::string result, kanaGroup, kana;
