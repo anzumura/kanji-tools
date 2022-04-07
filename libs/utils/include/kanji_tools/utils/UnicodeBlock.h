@@ -75,15 +75,18 @@ private:
   friend consteval auto makeBlock(T&, const char*);
 };
 
-// 'WideBlocks' used for determining if a character is narrow or wide display
-// can be a single entry and also not start or end on an 'official' boundary.
-// gcc 11.2 didn't like using a default template (char32_t End = Start) in
-// combination with the friend declaration inside UnicodeBlock so split into two
-// functions. This also allows better static_assert (using '<' instead of '<=').
+// UnicodeBlocks defined in DisplaySize.h (WideBlocks) are used for determining
+// if a character is narrow or wide display can be a single entry and also not
+// start or end on an 'official' boundary. gcc 11.2 didn't like using a default
+// template (char32_t End = Start) in combination with the friend declaration
+// inside UnicodeBlock so split into two 'makeBlock' functions. This also allows
+// better static_assert (using '<' instead of '<=').
+
 template<char32_t Start> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkRange<Start>();
   return UnicodeBlock{Start, Start};
 }
+
 template<char32_t Start, char32_t End>
 [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkLess<Start, End>();
@@ -92,6 +95,7 @@ template<char32_t Start, char32_t End>
 
 // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
+
 template<char32_t Start, char32_t End, typename T>
 [[nodiscard]] consteval auto makeBlock(T& v, const char* n) {
   UnicodeBlock::checkLess<Start, End>();
@@ -237,92 +241,43 @@ template<typename... T>
   return true;
 }
 
-// functions for classifying 'recognized' utf-8 encoded characters: 's' should
-// contain one MB character (so 2-4 bytes) by default, but 'sizeOne' can
-// be set to 'false' to check just the first 'MB characer' in the string. There
-// are alls 'isAll' functions that return 'true' only if all the characers in
-// the string are the desired type.
+// functions for classifying 'recognized' utf-8 encoded characters. The string
+// parameter should contain one MB character (so 2-4 bytes) by default, but
+// 'sizeOne' can be set to 'false' to check just the first 'MB characer' in the
+// string. There are alls 'isAll' functions that return 'true' only if all the
+// characers in the string are the desired type.
 
-// kana
-[[nodiscard]] inline auto isHiragana(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, HiraganaBlocks);
-}
-[[nodiscard]] inline auto isAllHiragana(const std::string& s) {
-  return inWCharRange(s, HiraganaBlocks);
-}
-[[nodiscard]] inline auto isKatakana(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, KatakanaBlocks);
-}
-[[nodiscard]] inline auto isAllKatakana(const std::string& s) {
-  return inWCharRange(s, KatakanaBlocks);
-}
-[[nodiscard]] inline auto isKana(const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, HiraganaBlocks, KatakanaBlocks);
-}
-[[nodiscard]] inline auto isAllKana(const std::string& s) {
-  return inWCharRange(s, HiraganaBlocks, KatakanaBlocks);
-}
+// Kana
 
-// kanji
-[[nodiscard]] inline auto isCommonKanji(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, CommonKanjiBlocks);
-}
-[[nodiscard]] inline auto isAllCommonKanji(const std::string& s) {
-  return inWCharRange(s, CommonKanjiBlocks);
-}
-[[nodiscard]] inline auto isRareKanji(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, RareKanjiBlocks);
-}
-[[nodiscard]] inline auto isAllRareKanji(const std::string& s) {
-  return inWCharRange(s, RareKanjiBlocks);
-}
-[[nodiscard]] inline auto isKanji(const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, CommonKanjiBlocks, RareKanjiBlocks);
-}
-[[nodiscard]] inline auto isAllKanji(const std::string& s) {
-  return inWCharRange(s, CommonKanjiBlocks, RareKanjiBlocks);
-}
+[[nodiscard]] bool isHiragana(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllHiragana(const std::string&);
+[[nodiscard]] bool isKatakana(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllKatakana(const std::string&);
+[[nodiscard]] bool isKana(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllKana(const std::string&);
 
-// 'isMBPunctuation' tests for wide space by default, but also allows not
-// including spaces.
-[[nodiscard]] inline auto isMBPunctuation(
-    const std::string& s, bool includeSpace = false, bool sizeOne = true) {
-  return s.starts_with("　") ? (includeSpace && (s.size() < 4 || !sizeOne))
-                             : inWCharRange(s, sizeOne, PunctuationBlocks);
-}
-[[nodiscard]] inline auto isAllMBPunctuation(const std::string& s) {
-  return inWCharRange(s, PunctuationBlocks);
-}
-[[nodiscard]] inline auto isMBSymbol(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, SymbolBlocks);
-}
-[[nodiscard]] inline auto isAllMBSymbol(const std::string& s) {
-  return inWCharRange(s, SymbolBlocks);
-}
-[[nodiscard]] inline auto isMBLetter(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, LetterBlocks);
-}
-[[nodiscard]] inline auto isAllMBLetter(const std::string& s) {
-  return inWCharRange(s, LetterBlocks);
-}
+// Kanji
 
-// 'isRecognizedMBChar' returns true if 's' is in any UnicodeBlock defined in
-// this header file (including wide space)
-[[nodiscard]] inline auto isRecognizedMBChar(
-    const std::string& s, bool sizeOne = true) {
-  return inWCharRange(s, sizeOne, HiraganaBlocks, CommonKanjiBlocks,
-      RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks, SymbolBlocks,
-      LetterBlocks);
-}
-[[nodiscard]] inline auto isAllRecognizedCharacters(const std::string& s) {
-  return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks,
-      KatakanaBlocks, PunctuationBlocks, SymbolBlocks, LetterBlocks);
-}
+[[nodiscard]] bool isCommonKanji(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllCommonKanji(const std::string&);
+[[nodiscard]] bool isRareKanji(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllRareKanji(const std::string&);
+[[nodiscard]] bool isKanji(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllKanji(const std::string&);
+
+// other multi-byte characters
+
+[[nodiscard]] bool isMBPunctuation(
+    const std::string&, bool includeSpace = false, bool sizeOne = true);
+[[nodiscard]] bool isAllMBPunctuation(const std::string&);
+[[nodiscard]] bool isMBSymbol(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllMBSymbol(const std::string&);
+[[nodiscard]] bool isMBLetter(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllMBLetter(const std::string&);
+
+// 'isRecognizedMBChar' returns true if the string is in any UnicodeBlock
+// defined in this header file (including wide space)
+[[nodiscard]] bool isRecognizedMBChar(const std::string&, bool sizeOne = true);
+[[nodiscard]] bool isAllRecognizedCharacters(const std::string&);
 
 } // namespace kanji_tools
