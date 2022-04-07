@@ -1,6 +1,6 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/stats/MBCount.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kanji_tools/utils/BlockRange.h>
 
 #include <fstream>
 #include <iostream>

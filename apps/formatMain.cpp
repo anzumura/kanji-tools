@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kanji_tools/utils/BlockRange.h>
 
 #include <filesystem>
 #include <fstream>
