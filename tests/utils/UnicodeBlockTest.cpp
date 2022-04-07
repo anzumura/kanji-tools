@@ -70,6 +70,11 @@ TEST(UnicodeBlockTest, IsKana) {
   EXPECT_FALSE(isHiragana("ヰ"));
   EXPECT_TRUE(isRecognizedMBChar("ー"));
   EXPECT_TRUE(isRecognizedMBChar("さ"));
+  EXPECT_TRUE(isKana("は"));
+  EXPECT_TRUE(isKana("ハ"));
+  EXPECT_FALSE(isKana("犬"));
+  EXPECT_TRUE(isAllKana("あア"));
+  EXPECT_FALSE(isAllKana("あaア"));
 }
 
 TEST(UnicodeBlockTest, IsMBLetter) {
@@ -147,6 +152,8 @@ TEST(UnicodeBlockTest, IsKanji) {
   EXPECT_TRUE(isKanji("厭"));
   EXPECT_TRUE(isKanji("⺠"));
   EXPECT_TRUE(isKanji("𫠜"));
+  EXPECT_TRUE(isAllKanji("𫠜𠮟"));
+  EXPECT_FALSE(isAllKanji("𫠜か𠮟"));
   EXPECT_TRUE(isRecognizedMBChar("厭"));
   EXPECT_TRUE(isRecognizedMBChar("⺠"));
   EXPECT_TRUE(isRecognizedMBChar("𫠜"));

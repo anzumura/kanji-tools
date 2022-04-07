@@ -10,6 +10,17 @@ const std::string LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪sNow"};
 
 } // namespace
 
+TEST(UtilsTest, AddLeadingZeroes) {
+  // addLeadingZeroes returns '0' when given an empty string, otherwise it pads
+  // the string with zeroes if size is less than 'minSize' (the second param)
+  EXPECT_EQ(addLeadingZeroes("", 0), "0");
+  EXPECT_EQ(addLeadingZeroes("", 1), "0");
+  EXPECT_EQ(addLeadingZeroes("", 2), "00");
+  EXPECT_EQ(addLeadingZeroes("abc", 5), "00abc");
+  EXPECT_EQ(addLeadingZeroes("abc", 3), "abc");
+  EXPECT_EQ(addLeadingZeroes("abc", 2), "abc");
+}
+
 TEST(UtilsTest, ToUnicode) {
   EXPECT_EQ(toUnicode('a'), "0061");
   EXPECT_EQ(toUnicode("ぁ"), "3041");
