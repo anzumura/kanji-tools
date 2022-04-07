@@ -1,4 +1,5 @@
 #include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -6,6 +7,42 @@
 #include <sstream>
 
 namespace kanji_tools {
+
+namespace {
+
+using Count = std::map<KanjiTypes, int>;
+
+void printCounts(const Data& data, const Count& c, bool summary = false) {
+  const auto t{std::accumulate(c.begin(), c.end(), 0,
+      [](const auto& x, const auto& y) { return x + y.second; })};
+  data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
+  for (const auto i : AllKanjiTypes) {
+    if (const auto j{c.find(i)}; summary) {
+      if (i != AllKanjiTypes[0]) data.out() << ' ';
+      data.out() << (j == c.end() ? 0 : j->second);
+    } else
+      data.out() << std::setw(4) << (j == c.end() ? 0 : j->second);
+    if (isNextNone(i)) break;
+  }
+  data.out() << (summary ? ")\n" : ") :");
+}
+
+} // namespace
+
+const Radical& RadicalData::find(const std::string& name) const {
+  checkLoaded();
+  const auto i{_map.find(name)};
+  if (i == _map.end()) throw std::domain_error{"name not found: " + name};
+  return _radicals.at(i->second);
+}
+
+const Radical& RadicalData::find(Radical::Number number) const {
+  checkLoaded();
+  if (!number || number > _radicals.size())
+    throw std::domain_error(
+        "'" + std::to_string(number) + "' is not a valid radical number");
+  return _radicals.at(number - 1);
+}
 
 void RadicalData::load(const Data::Path& file) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
@@ -47,6 +84,11 @@ void RadicalData::print(const Data& data) const {
   printMissingRadicals(data, radicals);
 }
 
+void RadicalData::checkLoaded() const {
+  if (_radicals.empty())
+    throw std::domain_error("must call 'load' before calling 'find'");
+}
+
 void RadicalData::printRadicalLists(
     const Data& data, RadicalLists& radicals) const {
   Count total;
@@ -78,27 +120,11 @@ void RadicalData::printMissingRadicals(
   for (auto& i : _radicals)
     if (radicals.find(i) == radicals.end()) missingRadicals.emplace_back(i);
   if (!missingRadicals.empty()) {
-    data.log() << "  Found " << missingRadicals.size()
-               << " radicals with no kanji:";
+    data.log() << "  Found " << missingRadicals.size() << " radical"
+               << (missingRadicals.size() > 1 ? "s" : "") << " with no Kanji:";
     for (const auto& i : missingRadicals) data.out() << ' ' << i;
     data.out() << '\n';
   }
-}
-
-void RadicalData::printCounts(
-    const Data& data, const Count& c, bool summary) const {
-  const auto t{std::accumulate(c.begin(), c.end(), 0,
-      [](const auto& x, const auto& y) { return x + y.second; })};
-  data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
-  for (const auto i : AllKanjiTypes) {
-    if (const auto j{c.find(i)}; summary) {
-      if (i != AllKanjiTypes[0]) data.out() << ' ';
-      data.out() << (j == c.end() ? 0 : j->second);
-    } else
-      data.out() << std::setw(4) << (j == c.end() ? 0 : j->second);
-    if (isNextNone(i)) break;
-  }
-  data.out() << (summary ? ")\n" : ") :");
 }
 
 } // namespace kanji_tools

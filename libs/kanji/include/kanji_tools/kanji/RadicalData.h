@@ -1,6 +1,5 @@
 #pragma once
 
-#include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Radical.h>
 
 #include <filesystem>
@@ -22,16 +21,10 @@ public:
   // 'find' by the ideograph code in utf8 (not the unicode radical code). For
   // example, Radical number 30 (口) is Unicode 53E3, but has another 'Unicode
   // Radical' value of 2F1D
-  [[nodiscard]] auto& find(const std::string& name) const {
-    const auto i{_map.find(name)};
-    if (i == _map.end()) throw std::domain_error{"name not found: " + name};
-    return _radicals.at(i->second);
-  }
+  [[nodiscard]] const Radical& find(const std::string&) const;
 
   // 'find' by the official Radical Number (one greater than index in _radicals)
-  [[nodiscard]] auto& find(Radical::Number number) const {
-    return _radicals.at(number - 1);
-  }
+  [[nodiscard]] const Radical& find(Radical::Number) const;
 
   // 'load' and 'print' are called by 'KanjiData'
   void load(const std::filesystem::path&);
@@ -41,13 +34,13 @@ private:
   // the above 'print' function (examples are sorted by assending stroke count).
   enum Values { MaxExamples = 12 };
 
-  using Count = std::map<KanjiTypes, int>;
+  void checkLoaded() const;
+
   using KanjiList = std::vector<std::shared_ptr<class Kanji>>;
   using RadicalLists = std::map<Radical, KanjiList>;
 
   void printRadicalLists(const Data&, RadicalLists&) const;
   void printMissingRadicals(const Data&, const RadicalLists&) const;
-  void printCounts(const Data&, const Count&, bool summary = false) const;
 
   // '_radicals' is populated from radicals.txt and the index in the vector is
   // one less than the actual Radical.number().
