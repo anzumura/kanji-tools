@@ -137,7 +137,7 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
 }
 
 void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
-    bool meanings, bool randomizeAnswers) {
+    bool meanings, bool randomizeAnswers) { // LCOV_EXCL_LINE
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;

@@ -28,7 +28,9 @@ KanaConvert::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
   for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
            D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
+           // LCOV_EXCL_START - Clang coverage misses the following line
            D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
+           // LCOV_EXCL_STOP
            // Ascii 0-9
            D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"}, D{'>', "＞"},
            D{'?', "？"}, D{'@', "＠"},
