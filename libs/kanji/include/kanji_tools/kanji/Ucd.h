@@ -41,6 +41,8 @@ public:
         _links{links}, _linkType{linkType}, _linkedReadings{linkedReadings},
         _meaning{meaning}, _onReading{onReading}, _kunReading{kunReading} {}
 
+  Ucd(const Ucd&) = delete;
+
   [[nodiscard]] auto code() const { return _code; }
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& block() const { return _block; }
