@@ -10,7 +10,6 @@ std::random_device RandomDevice;
 std::mt19937 RandomGen(RandomDevice());
 
 const std::string Prompt{"  Select"};
-const std::string QuizPrompt{Prompt + " correct "};
 
 constexpr auto ChoiceStart{'1'};
 
@@ -25,12 +24,8 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
     ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
-      _quizStyle{quizStyle}, _prompt{isTestMode()
-                                         ? QuizPrompt + (isKanjiToReading()
-                                                                ? "reading"
-                                                                : "kanji")
-                                         : Prompt},
-      _choiceEnd{static_cast<char>('0' + _choiceCount)} {
+      _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{static_cast<char>(
+                                                       '0' + _choiceCount)} {
   assert(_answers.size() == _choiceCount); // need () ctor
   List questions;
   for (auto& i : list) {
@@ -64,6 +59,12 @@ void ListQuiz::start(const List& questions) {
   }
   // when quitting don't count the current question in the final score
   if (stopQuiz) --_question;
+}
+
+const std::string& ListQuiz::getPrompt() const {
+  static const std::string Reading{Prompt + " correct reading"},
+      Kanji(Prompt + " correct kanji");
+  return isTestMode() ? isKanjiToReading() ? Reading : Kanji : Prompt;
 }
 
 bool ListQuiz::isKanjiToReading() const {

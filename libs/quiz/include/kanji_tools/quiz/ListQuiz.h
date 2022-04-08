@@ -19,6 +19,7 @@ public:
 private:
   void start(const List&);
 
+  [[nodiscard]] const std::string& getPrompt() const;
   [[nodiscard]] bool isKanjiToReading() const;
 
   // populates '_answers' and returns the position corresponding to the current
