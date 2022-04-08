@@ -203,6 +203,14 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
   _questionOrder = QuestionOrder::NotAssigned;
 }
 
+bool QuizLauncher::isTestMode() const {
+  return _programMode == ProgramMode::Test;
+}
+
+std::ostream& QuizLauncher::log(bool heading) const {
+  return data().log(heading);
+}
+
 void QuizLauncher::printExtraTypeInfo(const Entry& k) const {
   out() << ", " << k->type();
   if (const auto i{k->extraTypeInfo()}; i) out() << " (" << *i << ')';

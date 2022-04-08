@@ -6,6 +6,10 @@
 
 namespace kanji_tools {
 
+bool Kanji::hasLink(KanjiTypes t) {
+  return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
+}
+
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
     const Radical& radical, Strokes strokes, const OptString& morohashiId,
     const NelsonIds& nelsonIds, const OptString& pinyin)
@@ -14,6 +18,24 @@ Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
       _strokes{strokes}, _morohashiId{morohashiId},
       _nelsonIds{nelsonIds}, _pinyin{pinyin} {
   assert(MBChar::size(_name) == 1);
+}
+
+bool Kanji::variant() const { return _nonVariantName.has_value(); }
+
+std::string Kanji::nonVariantName() const {
+  return _nonVariantName.value_or(_name);
+}
+
+std::string Kanji::compatibilityName() const {
+  return _compatibilityName.value_or(_name);
+}
+
+Kanji::Frequency Kanji::frequencyOrDefault(Frequency x) const {
+  return frequency().value_or(x);
+}
+
+Kanji::Frequency Kanji::frequencyOrMax() const {
+  return frequencyOrDefault(std::numeric_limits<Frequency>::max());
 }
 
 std::string Kanji::info(KanjiInfo fields) const {
@@ -52,6 +74,10 @@ std::string Kanji::info(KanjiInfo fields) const {
   }
   if (hasValue(fields & KanjiInfo::Kyu) && hasKyu()) add(toString(kyu()));
   return result;
+}
+
+std::string Kanji::qualifiedName() const {
+  return _name + QualifiedNames[qualifiedNameRank()];
 }
 
 bool Kanji::orderByQualifiedName(const Kanji& x) const {

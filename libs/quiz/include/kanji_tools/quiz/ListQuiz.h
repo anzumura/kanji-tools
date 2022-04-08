@@ -9,9 +9,7 @@ public:
   using ChoiceCount = u_int8_t;
 
   enum class QuizStyle { KanjiToReading, ReadingToKanji };
-  static constexpr auto toQuizStyle(char c) {
-    return c == 'k' ? QuizStyle::KanjiToReading : QuizStyle::ReadingToKanji;
-  }
+  static QuizStyle toQuizStyle(char);
 
   // 'fields' controls which fields are shown in a 'kanji to reading' quiz (see
   // Kanji.h for more details on 'KanjiInfo') and 'choiceCount' specifies the
@@ -21,9 +19,7 @@ public:
 private:
   void start(const List&);
 
-  [[nodiscard]] auto isKanjiToReading() const {
-    return _quizStyle == QuizStyle::KanjiToReading;
-  }
+  [[nodiscard]] bool isKanjiToReading() const;
 
   // populates '_answers' and returns the position corresponding to the current
   // question, i.e., the correct answer for the given Entry (kanji).

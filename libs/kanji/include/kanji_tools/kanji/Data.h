@@ -84,8 +84,8 @@ public:
   // 'kanji' has a variation selector).
   [[nodiscard]] Kanji::OptString getCompatibilityName(const std::string&) const;
 
-  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji,
-      const Ucd*, bool variant = false, bool onlyUcd = false) const;
+  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji, const Ucd*,
+      bool variant = false, bool onlyUcd = false) const;
   [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji) const;
 
   // get list by KanjiType

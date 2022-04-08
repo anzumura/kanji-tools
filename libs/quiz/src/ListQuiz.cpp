@@ -16,6 +16,10 @@ constexpr auto ChoiceStart{'1'};
 
 } // namespace
 
+ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
+  return c == 'k' ? QuizStyle::KanjiToReading : QuizStyle::ReadingToKanji;
+}
+
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
     bool showMeanings, const List& list, KanjiInfo fields,
     ChoiceCount choiceCount, QuizStyle quizStyle)
@@ -60,6 +64,10 @@ void ListQuiz::start(const List& questions) {
   }
   // when quitting don't count the current question in the final score
   if (stopQuiz) --_question;
+}
+
+bool ListQuiz::isKanjiToReading() const {
+  return _quizStyle == QuizStyle::KanjiToReading;
 }
 
 ListQuiz::ChoiceCount ListQuiz::populateAnswers(

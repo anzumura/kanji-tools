@@ -27,9 +27,7 @@ protected:
   // just letters and/or numbers).
   static constexpr auto MeaningsOption{'-'}, PrevOption{','}, SkipOption{'.'};
 
-  Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
-      : _launcher{launcher}, _question{question}, _correctAnswers{0},
-        _showMeanings{showMeanings} {}
+  Quiz(const QuizLauncher&, Question, bool showMeanings);
 
   Quiz(const Quiz&) = delete;
   Quiz& operator=(const Quiz&) = delete;
@@ -39,19 +37,13 @@ protected:
 
   // the following methods are shotcuts for calling '_launcher' methods
   [[nodiscard]] auto& choice() const { return _launcher.choice(); }
-  [[nodiscard]] auto get(const std::string& msg, const Choices& choices,
-      OptChar def = {}, bool useQuit = true) const {
-    return choice().get(msg, useQuit, choices, def);
-  }
+  [[nodiscard]] char get(const std::string& msg, const Choices&,
+      OptChar def = {}, bool useQuit = true) const;
   [[nodiscard]] auto isQuit(char c) const { return _launcher.isQuit(c); }
   [[nodiscard]] auto isTestMode() const { return _launcher.isTestMode(); }
-  [[nodiscard]] auto& log(bool heading = false) const {
-    return _launcher.log(heading);
-  }
+  [[nodiscard]] std::ostream& log(bool heading = false) const;
   [[nodiscard]] auto& out() const { return _launcher.out(); }
-  void printMeaning(const Entry& kanji, bool useNewLine = false) const {
-    _launcher.printMeaning(kanji, useNewLine, _showMeanings);
-  }
+  void printMeaning(const Entry& kanji, bool useNewLine = false) const;
 
   void correctMessage(); // increments '_correctAnswers'
   std::ostream& incorrectMessage(const std::string& name);

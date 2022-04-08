@@ -41,9 +41,8 @@ public:
   using OptString = std::optional<std::string>;
   using Strokes = Ucd::Strokes;
 
-  static auto hasLink(KanjiTypes t) {
-    return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
-  }
+  // returns true for types that have a 'link' member (so 'LinkedKanji' types)
+  static bool hasLink(KanjiTypes);
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
@@ -94,20 +93,12 @@ public:
   // case 'nonVariantName' returns the non-variant name and 'compatibilityName'
   // returns the UCD 'compatibility' code (which is a single MB char without a
   // variation selector).
-  [[nodiscard]] auto variant() const { return _nonVariantName.has_value(); }
-  [[nodiscard]] auto nonVariantName() const {
-    return _nonVariantName.value_or(_name);
-  }
-  [[nodiscard]] auto compatibilityName() const {
-    return _compatibilityName.value_or(_name);
-  }
+  [[nodiscard]] bool variant() const;
+  [[nodiscard]] std::string nonVariantName() const;
+  [[nodiscard]] std::string compatibilityName() const;
 
-  [[nodiscard]] auto frequencyOrDefault(Frequency x) const {
-    return frequency().value_or(x);
-  }
-  [[nodiscard]] auto frequencyOrMax() const {
-    return frequencyOrDefault(std::numeric_limits<Frequency>::max());
-  }
+  [[nodiscard]] Frequency frequencyOrDefault(Frequency x) const;
+  [[nodiscard]] Frequency frequencyOrMax() const;
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
   [[nodiscard]] auto& pinyin() const { return _pinyin; }
@@ -140,9 +131,7 @@ public:
   //   @ = <K1 Kentei    : 268 non-K1 Kentei Kanji that aren't included above
   //   # = K1 Kentei     : 2554 K1 Kentei Kanji that aren't included above
   //   * = Ucd           : kanji loaded from 'ucd.txt' not included above
-  [[nodiscard]] auto qualifiedName() const {
-    return _name + QualifiedNames[qualifiedNameRank()];
-  }
+  [[nodiscard]] std::string qualifiedName() const;
 
   // Used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
   // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the

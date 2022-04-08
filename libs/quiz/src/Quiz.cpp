@@ -15,6 +15,10 @@ void Quiz::run(const Args& args, std::ostream& out) {
       std::make_shared<JukugoData>(data));
 }
 
+Quiz::Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
+    : _launcher{launcher}, _question{question}, _correctAnswers{0},
+      _showMeanings{showMeanings} {}
+
 Quiz::~Quiz() {
   if (isTestMode()) {
     out() << "\nFinal score: " << _correctAnswers << '/' << _question;
@@ -33,6 +37,17 @@ Quiz::~Quiz() {
       out() << '\n';
     }
   }
+}
+
+char Quiz::get(const std::string& msg, const Choices& choices, OptChar def,
+    bool useQuit) const {
+  return choice().get(msg, useQuit, choices, def);
+}
+
+std::ostream& Quiz::log(bool heading) const { return _launcher.log(heading); }
+
+void Quiz::printMeaning(const Entry& kanji, bool useNewLine) const {
+  _launcher.printMeaning(kanji, useNewLine, _showMeanings);
 }
 
 std::ostream& Quiz::beginQuizMessage(size_t totalQuestions) {

@@ -33,17 +33,13 @@ public:
   void start(OptChar quizType, OptChar questionList, Question question = 0,
       bool showMeanings = false, bool randomizeAnswers = true);
 
-  [[nodiscard]] auto& log(bool heading = false) const {
-    return data().log(heading);
-  }
+  [[nodiscard]] std::ostream& log(bool heading = false) const;
   [[nodiscard]] auto& out() const { return data().out(); }
 
   enum class ProgramMode { Review, Test, NotAssigned };
   enum class QuestionOrder { FromBeginning, FromEnd, Random, NotAssigned };
 
-  [[nodiscard]] auto isTestMode() const {
-    return _programMode == ProgramMode::Test;
-  }
+  [[nodiscard]] bool isTestMode() const;
   [[nodiscard]] auto questionOrder() const { return _questionOrder; }
   [[nodiscard]] auto& choice() const { return _choice; }
   [[nodiscard]] auto isQuit(char c) const { return _choice.isQuit(c); }
