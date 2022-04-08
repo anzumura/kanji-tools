@@ -42,13 +42,13 @@ public:
 
   // constants for UTF-8 Kana string and array sizes containing Kana (an array
   // is one bigger to hold the final null character)
-  inline static constexpr u_int8_t OneKanaSize{3}; // all Kana are 3 bytes
-  inline static constexpr u_int8_t OneKanaArraySize{OneKanaSize + 1},
+  static constexpr u_int8_t OneKanaSize{3}; // all Kana are 3 bytes
+  static constexpr u_int8_t OneKanaArraySize{OneKanaSize + 1},
       TwoKanaSize{OneKanaSize * 2}, TwoKanaArraySize{OneKanaSize * 2 + 1};
 
   // sizes for Rōmaji strings and arrays
-  inline static constexpr u_int8_t RomajiArrayMinSize{2}, RomajiArrayMaxSize{4};
-  inline static constexpr u_int8_t RomajiStringMaxSize{RomajiArrayMaxSize - 1};
+  static constexpr u_int8_t RomajiArrayMinSize{2}, RomajiArrayMaxSize{4};
+  static constexpr u_int8_t RomajiStringMaxSize{RomajiArrayMaxSize - 1};
 
   [[nodiscard]] static const Map& getMap(CharType);
 

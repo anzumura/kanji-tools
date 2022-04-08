@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 class BaseBlockRange {
 protected:
-  inline static constexpr size_t SizePerBlock{3};
+  static constexpr size_t SizePerBlock{3};
 
   static void fill(wchar_t*, const UnicodeBlock&) noexcept;
 
@@ -39,7 +39,7 @@ public:
 
   [[nodiscard]] static constexpr auto size() noexcept { return Size; }
 private:
-  inline static constexpr auto Size{(sizeof...(Ts) + 1) * SizePerBlock};
+  static constexpr auto Size{(sizeof...(Ts) + 1) * SizePerBlock};
 
   wchar_t _range[size() + 1]; // add 1 for final null
 };
@@ -55,15 +55,14 @@ private:
 // - CJK Compatibility Ideographs Supplement
 // - CJK Extension G
 
-inline const BlockRange KanjiRange{CommonKanjiBlocks[0],
-    CommonKanjiBlocks[1], CommonKanjiBlocks[2], CommonKanjiBlocks[3],
-    NonSpacingBlocks[0], RareKanjiBlocks[0], RareKanjiBlocks[1],
-    RareKanjiBlocks[2], RareKanjiBlocks[3]};
+inline const BlockRange KanjiRange{CommonKanjiBlocks[0], CommonKanjiBlocks[1],
+    CommonKanjiBlocks[2], CommonKanjiBlocks[3], NonSpacingBlocks[0],
+    RareKanjiBlocks[0], RareKanjiBlocks[1], RareKanjiBlocks[2],
+    RareKanjiBlocks[3]};
 
 inline const BlockRange WideLetterRange{LetterBlocks[6]};
 inline const BlockRange HiraganaRange{HiraganaBlocks[0]};
-inline const BlockRange KatakanaRange{
-    KatakanaBlocks[0], KatakanaBlocks[1]};
+inline const BlockRange KatakanaRange{KatakanaBlocks[0], KatakanaBlocks[1]};
 inline const BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
 
 } // namespace kanji_tools
