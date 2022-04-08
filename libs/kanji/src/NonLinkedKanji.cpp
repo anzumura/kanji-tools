@@ -11,7 +11,7 @@ Kanji::LinkNames NonLinkedKanji::linkNames(const Ucd* u) {
 }
 
 NonLinkedKanji::NonLinkedKanji(const Data& d, const std::string& name,
-    // LCOV_EXCL_START
+    // LCOV_EXCL_START - shouldn't be needed
     const Radical& rad, const std::string& meaning, const std::string& reading,
     // LCOV_EXCL_STOP
     Strokes s, const Ucd* u)

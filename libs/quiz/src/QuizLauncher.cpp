@@ -12,7 +12,7 @@ namespace {
 
 // Clang marks some lines in 'HelpMessage' as '0' coverage whereas GCC doesn't
 // count them at all (which seems like the correct way to go for 'constexpr')
-// LCOV_EXCL_START
+// LCOV_EXCL_START - shouldn't be needed
 constexpr auto HelpMessage{
     R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]

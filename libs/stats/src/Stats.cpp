@@ -11,7 +11,7 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-// LCOV_EXCL_START
+// LCOV_EXCL_START - shouldn't be needed
 namespace {
 
 constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:

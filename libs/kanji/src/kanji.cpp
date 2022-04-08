@@ -11,7 +11,9 @@ bool Kanji::hasLink(KanjiTypes t) {
 }
 
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
+    // LCOV_EXCL_START - shouldn't be needed
     const Radical& radical, Strokes strokes, const OptString& morohashiId,
+    // LCOV_EXCL_STOP
     const NelsonIds& nelsonIds, const OptString& pinyin)
     : _name{name}, _nonVariantName{MBChar::optNoVariationSelector(name)},
       _compatibilityName{compatibilityName}, _radical{radical},
