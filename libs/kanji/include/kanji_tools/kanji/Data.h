@@ -55,9 +55,7 @@ public:
   virtual ~Data() = default;
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
-  [[nodiscard]] auto findUcd(const std::string& kanjiName) const {
-    return _ucd.find(kanjiName);
-  }
+  [[nodiscard]] const Ucd* findUcd(const std::string& kanjiName) const;
 
   // functions used by 'Kanji' classes during construction, each take kanji name
   [[nodiscard]] virtual Kanji::OptFreq frequency(const std::string&) const = 0;

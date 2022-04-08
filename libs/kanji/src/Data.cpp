@@ -49,6 +49,10 @@ Data::Data(const Path& dataDir, DebugMode debugMode, std::ostream& out,
   if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
 }
 
+const Ucd* Data::findUcd(const std::string& kanjiName) const {
+  return _ucd.find(kanjiName);
+}
+
 KanjiTypes Data::getType(const std::string& name) const {
   const auto i{findKanjiByName(name)};
   return i ? (**i).type() : KanjiTypes::None;
