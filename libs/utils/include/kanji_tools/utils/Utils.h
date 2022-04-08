@@ -151,7 +151,7 @@ template<typename T>
   return result;
 }
 
-inline static const std::string EmptyString;
-inline static const std::u32string EmptyU32String;
+inline const std::string EmptyString;
+inline const std::u32string EmptyU32String;
 
 } // namespace kanji_tools

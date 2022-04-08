@@ -55,15 +55,15 @@ private:
 // - CJK Compatibility Ideographs Supplement
 // - CJK Extension G
 
-inline static const BlockRange KanjiRange{CommonKanjiBlocks[0],
+inline const BlockRange KanjiRange{CommonKanjiBlocks[0],
     CommonKanjiBlocks[1], CommonKanjiBlocks[2], CommonKanjiBlocks[3],
     NonSpacingBlocks[0], RareKanjiBlocks[0], RareKanjiBlocks[1],
     RareKanjiBlocks[2], RareKanjiBlocks[3]};
 
-inline static const BlockRange WideLetterRange{LetterBlocks[6]};
-inline static const BlockRange HiraganaRange{HiraganaBlocks[0]};
-inline static const BlockRange KatakanaRange{
+inline const BlockRange WideLetterRange{LetterBlocks[6]};
+inline const BlockRange HiraganaRange{HiraganaBlocks[0]};
+inline const BlockRange KatakanaRange{
     KatakanaBlocks[0], KatakanaBlocks[1]};
-inline static const BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
+inline const BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
 
 } // namespace kanji_tools
