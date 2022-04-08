@@ -29,7 +29,6 @@ public:
 
   static void print(std::ostream&, const List&, const std::string& type,
       const std::string& group, bool isError = false);
-  static void print(std::ostream&, const List&, const std::string& type);
 
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
 

@@ -35,11 +35,6 @@ void DataFile::print(std::ostream& out, const List& l, const std::string& type,
   }
 }
 
-void DataFile::print(
-    std::ostream& out, const List& l, const std::string& type) {
-  print(out, l, type, {}, false);
-}
-
 void DataFile::clearUniqueCheckData() {
   UniqueNames.clear();
   for (auto i : OtherUniqueNames) i->clear();
