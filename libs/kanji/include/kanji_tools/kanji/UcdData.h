@@ -20,8 +20,9 @@ public:
   // 'getMeaning' returns 'meaning' loaded from UCD file
   [[nodiscard]] const std::string& getMeaning(const Ucd*) const;
 
-  // 'getReadingsAsKana' returns string starting with 'onReading' converted
-  // Katakana followed by 'kunReading' converted to Hiragana
+  // 'getReadingsAsKana' returns a (wide) comma separated string starting with
+  // 'onReading' converted to Katakana followed by 'kunReading' converted to
+  // Hiragana (spaces within the readings are also converted to wide commas)
   [[nodiscard]] std::string getReadingsAsKana(const Ucd*) const;
 
   // 'find' returns a pointer to a Ucd instance if 'kanjiName' is in _ucdMap. If
