@@ -60,7 +60,7 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
 }
 
 Kanji::OptFreq KanjiData::frequency(const std::string& s) const {
-  const auto x{_frequency.get(s)};
+  const auto x{_frequency.getIndex(s)};
   return x ? Kanji::OptFreq{x} : std::nullopt;
 }
 

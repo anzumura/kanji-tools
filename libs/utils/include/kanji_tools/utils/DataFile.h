@@ -29,35 +29,25 @@ public:
 
   static void print(std::ostream&, const List&, const std::string& type,
       const std::string& group, bool isError = false);
-  static void print(std::ostream& out, const List& l, const std::string& type) {
-    print(out, l, type, {}, false);
-  }
+  static void print(std::ostream&, const List&, const std::string& type);
 
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
 
   // should be called after loading all lists to clean up unneeded static data
-  static void clearUniqueCheckData() {
-    UniqueNames.clear();
-    for (auto i : OtherUniqueNames) i->clear();
-  }
+  static void clearUniqueCheckData();
 
   enum class FileType { MultiplePerLine, OnePerLine };
 
-  DataFile(const Path& p, FileType fileType) : DataFile{p, fileType, nullptr} {}
-  DataFile(const Path& p) : DataFile{p, FileType::OnePerLine, nullptr} {}
+  DataFile(const Path&, FileType);
+  DataFile(const Path&);
 
   DataFile(const DataFile&) = delete;
   // operator= is not generated since there are const members
 
   virtual ~DataFile() = default;
 
-  [[nodiscard]] auto exists(const std::string& s) const {
-    return _map.find(s) != _map.end();
-  }
-  [[nodiscard]] auto get(const std::string& name) const {
-    const auto i{_map.find(name)};
-    return i != _map.end() ? i->second : 0;
-  }
+  [[nodiscard]] bool exists(const std::string& name) const;
+  [[nodiscard]] size_t getIndex(const std::string& name) const;
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
@@ -65,14 +55,7 @@ public:
   [[nodiscard]] auto size() const { return _list.size(); }
 
   // return the full contents of this list in a string (with no separates)
-  [[nodiscard]] auto toString() const {
-    std::string result;
-    // reserve for efficiency - make a guess that each entry in the list is a 3
-    // byte utf8 character
-    result.reserve(_list.size() * 3);
-    for (auto& i : _list) result += i;
-    return result;
-  }
+  [[nodiscard]] std::string toString() const;
 protected:
   DataFile(const Path&, FileType, Set*, const std::string& name = {});
 private:

@@ -95,7 +95,7 @@ TEST_F(DataFileTest, GoodOnePerLine) {
   for (size_t pos{}; auto r : results) {
     EXPECT_TRUE(f.exists(r));
     // numbers start at 1
-    EXPECT_EQ(f.get(r), ++pos);
+    EXPECT_EQ(f.getIndex(r), ++pos);
   }
   EXPECT_EQ(f.toString(), "北海道");
 }
@@ -109,7 +109,7 @@ TEST_F(DataFileTest, GoodOnePerLineLevel) {
   EXPECT_EQ(f.list().size(), results.size());
   for (size_t pos{}; auto r : results) {
     EXPECT_TRUE(f.exists(r));
-    EXPECT_EQ(f.get(r), ++pos);
+    EXPECT_EQ(f.getIndex(r), ++pos);
   }
 }
 
@@ -128,7 +128,7 @@ TEST_F(DataFileTest, MultiplePerLine) {
   EXPECT_EQ(f.list().size(), results.size());
   for (size_t pos{}; auto r : results) {
     EXPECT_TRUE(f.exists(r));
-    EXPECT_EQ(f.get(r), ++pos);
+    EXPECT_EQ(f.getIndex(r), ++pos);
   }
 }
 

@@ -35,6 +35,22 @@ void DataFile::print(std::ostream& out, const List& l, const std::string& type,
   }
 }
 
+void DataFile::print(
+    std::ostream& out, const List& l, const std::string& type) {
+  print(out, l, type, {}, false);
+}
+
+void DataFile::clearUniqueCheckData() {
+  UniqueNames.clear();
+  for (auto i : OtherUniqueNames) i->clear();
+}
+
+DataFile::DataFile(const Path& p, FileType fileType)
+    : DataFile{p, fileType, nullptr} {}
+
+DataFile::DataFile(const Path& p)
+    : DataFile{p, FileType::OnePerLine, nullptr} {}
+
 DataFile::DataFile(const Path& fileIn, FileType fileType, Set* uniqueTypeNames,
     const std::string& name)
     : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
@@ -58,13 +74,12 @@ DataFile::DataFile(const Path& fileIn, FileType fileType, Set* uniqueTypeNames,
         error("got multiple tokens");
       if (!isValidMBUtf8(token, true))
         error("invalid multi-byte token '" + token + "'");
-      // check uniqueness with file
+      // check uniqueness within file
       if (_map.find(token) != _map.end())
         error("got duplicate token '" + token);
       // check uniqueness across files
       if (uniqueTypeNames) {
-        const auto i{uniqueTypeNames->insert(token)};
-        if (!i.second) {
+        if (const auto i{uniqueTypeNames->insert(token)}; !i.second) {
           dups.emplace_back(*i.first);
           continue;
         }
@@ -78,12 +93,27 @@ DataFile::DataFile(const Path& fileIn, FileType fileType, Set* uniqueTypeNames,
   if (!dups.empty()) {
     std::string msg{"found " + std::to_string(dups.size()) + " duplicates in " +
                     _name + ":"};
-    for (const auto& i : dups) {
-      msg += ' ';
-      msg += i;
-    }
+    for (const auto& i : dups) msg += ' ' + i;
     error(msg, false);
   }
+}
+
+bool DataFile::exists(const std::string& s) const {
+  return _map.find(s) != _map.end();
+}
+
+size_t DataFile::getIndex(const std::string& name) const {
+  const auto i{_map.find(name)};
+  return i != _map.end() ? i->second : 0;
+}
+
+std::string DataFile::toString() const {
+  std::string result;
+  // reserve for efficiency - make a guess that each entry in the list is a 3
+  // byte utf8 character
+  result.reserve(_list.size() * 3);
+  for (auto& i : _list) result += i;
+  return result;
 }
 
 } // namespace kanji_tools
