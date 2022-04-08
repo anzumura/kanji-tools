@@ -190,7 +190,7 @@ inline constexpr std::array NonSpacingBlocks{
 // 't'. The blocks in 't' are assumed to be in order (order is checked by
 // automated tests for all the arrays defined above).
 template<size_t N>
-[[nodiscard]] constexpr bool inRange(
+[[nodiscard]] constexpr auto inRange(
     char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
   for (auto& i : t) {
     if (c < i.start) break;
