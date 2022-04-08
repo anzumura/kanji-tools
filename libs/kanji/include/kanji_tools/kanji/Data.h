@@ -62,56 +62,31 @@ public:
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual const Radical& ucdRadical(
-      const std::string& kanjiName, const Ucd* u) const {
-    if (u) return _radicals.find(u->radical());
-    // 'throw' should never happen - every 'Kanji' class instance should have
-    // also exist in the data loaded from Unicode.
-    throw std::domain_error{"UCD entry not found: " + kanjiName};
-  }
+      const std::string& kanji, const Ucd*) const;
 
   // 'getRadicalByName' is used by 'ExtraKanji' classes during construction. It
   // returns the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   [[nodiscard]] virtual const Radical& getRadicalByName(
-      const std::string& radicalName) const {
-    return _radicals.find(radicalName);
-  }
+      const std::string& radicalName) const;
 
   // 'getPinyin' returns 'optional' since not all Kanji have a Pinyin reading
-  [[nodiscard]] auto getPinyin(const Ucd* u) const {
-    return u && !u->pinyin().empty() ? Kanji::OptString{u->pinyin()}
-                                     : std::nullopt;
-  }
+  [[nodiscard]] Kanji::OptString getPinyin(const Ucd*) const;
 
   // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see
   // comments in scripts/parseUcdAllFlat.sh)
-  [[nodiscard]] auto getMorohashiId(const Ucd* u) const {
-    return u && !u->morohashiId().empty() ? Kanji::OptString{u->morohashiId()}
-                                          : std::nullopt;
-  }
+  [[nodiscard]] Kanji::OptString getMorohashiId(const Ucd*) const;
 
   // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
   Kanji::NelsonIds getNelsonIds(const Ucd*) const;
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given
-  // 'kanjiName' if it exists (_ucd.find method takes care of checking whether
-  // kanjiName has a variation selector).
-  [[nodiscard]] auto getCompatibilityName(const std::string& kanjiName) const {
-    const auto u{_ucd.find(kanjiName)};
-    return u && u->name() != kanjiName ? Kanji::OptString{u->name()}
-                                       : std::nullopt;
-  }
+  // 'kanji' if it exists (_ucd.find method takes care of checking whether
+  // 'kanji' has a variation selector).
+  [[nodiscard]] Kanji::OptString getCompatibilityName(const std::string&) const;
 
-  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanjiName,
-      const Ucd* u, bool variant = false, bool onlyUcd = false) const {
-    if (!onlyUcd) {
-      if (const auto i{_strokes.find(kanjiName)}; i != _strokes.end())
-        return i->second;
-    }
-    return u ? u->getStrokes(variant) : 0;
-  }
-  [[nodiscard]] auto getStrokes(const std::string& kanjiName) const {
-    return getStrokes(kanjiName, findUcd(kanjiName));
-  }
+  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji,
+      const Ucd*, bool variant = false, bool onlyUcd = false) const;
+  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji) const;
 
   // get list by KanjiType
   [[nodiscard]] auto& types(KanjiTypes t) const { return _types[t]; }
@@ -132,52 +107,28 @@ public:
   // See comment for '_frequencies' private data member for more details about
   // frequency lists
   static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
-  [[nodiscard]] auto& frequencies(size_t f) const {
-    return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
-  }
-  [[nodiscard]] auto frequencySize(size_t f) const {
-    return frequencies(f).size();
-  }
+  [[nodiscard]] const List& frequencies(size_t) const;
+  [[nodiscard]] size_t frequencySize(size_t) const;
 
   [[nodiscard]] KanjiTypes getType(const std::string& name) const;
 
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including
   // 'variation selectors', i.e., the same result is returned for '侮︀ [4FAE
   // FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
-  [[nodiscard]] OptEntry findKanjiByName(const std::string& s) const {
-    const auto i{_compatibilityMap.find(s)};
-    if (const auto j{
-            _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
-        j != _kanjiNameMap.end())
-      return j->second;
-    return {};
-  }
+  [[nodiscard]] OptEntry findKanjiByName(const std::string&) const;
 
   // 'findKanjiByFrequency' returns the Kanji with the given 'freq' (should be a
   // value from 1 to 2501)
-  [[nodiscard]] OptEntry findKanjiByFrequency(Kanji::Frequency freq) const {
-    if (!freq || freq >= _maxFrequency) return {};
-    auto bucket{--freq};
-    bucket /= FrequencyEntries;
-    if (bucket == FrequencyBuckets)
-      --bucket; // last bucket contains FrequencyEntries + 1
-    return _frequencies[bucket][freq - bucket * FrequencyEntries];
-  }
+  [[nodiscard]] OptEntry findKanjiByFrequency(Kanji::Frequency freq) const;
 
   // 'findKanjisByMorohashiId' can return more than one entry. Ids are usually
   // just numeric, but they can also be an index number followed by a 'P'. For
   // example, '4138' maps to 嗩 and '4138P' maps to 嘆.
-  [[nodiscard]] auto& findKanjisByMorohashiId(const std::string& id) const {
-    const auto i{_morohashiMap.find(id)};
-    return i != _morohashiMap.end() ? i->second : BaseEnumMap<List>::Empty;
-  }
+  [[nodiscard]] const List& findKanjisByMorohashiId(const std::string&) const;
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] auto& findKanjisByNelsonId(Kanji::NelsonId id) const {
-    const auto i{_nelsonMap.find(id)};
-    return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
-  }
+  [[nodiscard]] const List& findKanjisByNelsonId(Kanji::NelsonId) const;
 
   void printError(const std::string&) const;
 
@@ -192,9 +143,7 @@ public:
 
   // 'log' can be used for putting a standard prefix to output messages (used
   // for some debug messages)
-  [[nodiscard]] auto& log(bool heading = false) const {
-    return heading ? _out << ">>>\n>>> " : _out << ">>> ";
-  }
+  [[nodiscard]] std::ostream& log(bool heading = false) const;
 
   [[nodiscard]] static auto maxFrequency() { return _maxFrequency; }
 protected:

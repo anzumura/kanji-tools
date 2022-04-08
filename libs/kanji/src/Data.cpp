@@ -53,9 +53,25 @@ const Ucd* Data::findUcd(const std::string& kanjiName) const {
   return _ucd.find(kanjiName);
 }
 
-KanjiTypes Data::getType(const std::string& name) const {
-  const auto i{findKanjiByName(name)};
-  return i ? (**i).type() : KanjiTypes::None;
+const Radical& Data::ucdRadical(const std::string& kanji, const Ucd* u) const {
+  if (u) return _radicals.find(u->radical());
+  // 'throw' should never happen - every 'Kanji' class instance should have
+  // also exist in the data loaded from Unicode.
+  throw std::domain_error{"UCD entry not found: " + kanji};
+}
+
+const Radical& Data::getRadicalByName(const std::string& radicalName) const {
+  return _radicals.find(radicalName);
+}
+
+Kanji::OptString Data::getPinyin(const Ucd* u) const {
+  return u && !u->pinyin().empty() ? Kanji::OptString{u->pinyin()}
+                                   : std::nullopt;
+}
+
+Kanji::OptString Data::getMorohashiId(const Ucd* u) const {
+  return u && !u->morohashiId().empty() ? Kanji::OptString{u->morohashiId()}
+                                        : std::nullopt;
 }
 
 Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
@@ -69,6 +85,67 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
     return ids;
   }
   return EmptyNelsonIds;
+}
+
+Kanji::OptString Data::getCompatibilityName(const std::string& kanji) const {
+  const auto u{_ucd.find(kanji)};
+  return u && u->name() != kanji ? Kanji::OptString{u->name()} : std::nullopt;
+}
+
+Ucd::Strokes Data::getStrokes(
+    const std::string& kanji, const Ucd* u, bool variant, bool onlyUcd) const {
+  if (!onlyUcd) {
+    if (const auto i{_strokes.find(kanji)}; i != _strokes.end())
+      return i->second;
+  }
+  return u ? u->getStrokes(variant) : 0;
+}
+
+Ucd::Strokes Data::getStrokes(const std::string& kanji) const {
+  return getStrokes(kanji, findUcd(kanji));
+}
+
+const Data::List& Data::frequencies(size_t f) const {
+  return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
+}
+
+size_t Data::frequencySize(size_t f) const { return frequencies(f).size(); }
+
+KanjiTypes Data::getType(const std::string& name) const {
+  const auto i{findKanjiByName(name)};
+  return i ? (**i).type() : KanjiTypes::None;
+}
+
+Data::OptEntry Data::findKanjiByName(const std::string& s) const {
+  const auto i{_compatibilityMap.find(s)};
+  if (const auto j{
+          _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
+      j != _kanjiNameMap.end())
+    return j->second;
+  return {};
+}
+
+Data::OptEntry Data::findKanjiByFrequency(Kanji::Frequency freq) const {
+  if (!freq || freq >= _maxFrequency) return {};
+  auto bucket{--freq};
+  bucket /= FrequencyEntries;
+  if (bucket == FrequencyBuckets)
+    --bucket; // last bucket contains FrequencyEntries + 1
+  return _frequencies[bucket][freq - bucket * FrequencyEntries];
+}
+
+const Data::List& Data::findKanjisByMorohashiId(const std::string& id) const {
+  const auto i{_morohashiMap.find(id)};
+  return i != _morohashiMap.end() ? i->second : BaseEnumMap<List>::Empty;
+}
+
+const Data::List& Data::findKanjisByNelsonId(Kanji::NelsonId id) const {
+  const auto i{_nelsonMap.find(id)};
+  return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
+}
+
+std::ostream& Data::log(bool heading) const {
+  return heading ? _out << ">>>\n>>> " : _out << ">>> ";
 }
 
 fs::path Data::getDataDir(const Args& args) {
