@@ -11,7 +11,7 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-namespace {
+namespace { // LCOV_EXCL_LINE
 
 const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"},
     LinkedJinmeiFile{"linked-jinmei"}, ExtraFile{"extra"};

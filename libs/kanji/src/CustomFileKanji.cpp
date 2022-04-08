@@ -16,7 +16,7 @@ const Ucd* CustomFileKanji::findUcd(const Data& d, const std::string& name) {
 
 CustomFileKanji::CustomFileKanji(const Data& d, const ColumnFile& f,
     const std::string& name, Strokes strokes, const std::string& meaning,
-    const LinkNames& oldNames, const Ucd* u)
+    const LinkNames& oldNames, const Ucd* u) // LCOV_EXCL_LINE
     : NonLinkedKanji{d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
           f.get(ReadingCol), strokes, u},
       _kyu{d.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
