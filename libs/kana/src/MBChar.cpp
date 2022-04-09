@@ -136,7 +136,7 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
       [](const auto& r, const auto& i) { return i ? *i : r; }};
   for (auto location{_loc}; *location;) {
     switch (validateMBUtf8(location)) {
-    case MBUtf8Result::NotMultiByte:
+    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE
       if (!onlyMB) {
         result = *location;
         return true;
