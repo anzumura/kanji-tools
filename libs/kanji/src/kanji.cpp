@@ -6,10 +6,6 @@
 
 namespace kanji_tools {
 
-bool Kanji::hasLink(KanjiTypes t) {
-  return t == KanjiTypes::LinkedJinmei || t == KanjiTypes::LinkedOld;
-}
-
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
     // LCOV_EXCL_START - shouldn't be needed
     const Radical& radical, Strokes strokes, const OptString& morohashiId,

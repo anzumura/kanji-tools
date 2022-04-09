@@ -41,9 +41,6 @@ public:
   using OptString = std::optional<std::string>;
   using Strokes = Ucd::Strokes;
 
-  // returns true for types that have a 'link' member (so 'LinkedKanji' types)
-  static bool hasLink(KanjiTypes);
-
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
 
