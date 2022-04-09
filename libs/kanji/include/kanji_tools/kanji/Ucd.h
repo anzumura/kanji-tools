@@ -77,25 +77,16 @@ public:
   [[nodiscard]] std::string linkCodeAndNames() const;
 private:
   const char32_t _code;
-  const std::string _name;
-  const std::string _block;
-  const std::string _version;
+  const std::string _name, _block, _version;
   const Radical::Number _radical;
-  const Strokes _strokes;
-  const Strokes _variantStrokes; // 0 if no variants (see 'parseUcdAllFlat.sh')
-  const std::string _pinyin;
-  const std::string _morohashiId;
-  const std::string _nelsonIds;
-  const std::string _sources;
-  const std::string _jSource;
-  const bool _joyo;
-  const bool _jinmei;
+  // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
+  const Strokes _strokes, _variantStrokes;
+  const std::string _pinyin, _morohashiId, _nelsonIds, _sources, _jSource;
+  const bool _joyo, _jinmei;
   const Links _links;
   const UcdLinkTypes _linkType;
   const bool _linkedReadings;
-  const std::string _meaning;
-  const std::string _onReading;
-  const std::string _kunReading;
+  const std::string _meaning, _onReading, _kunReading;
 };
 
 } // namespace kanji_tools
