@@ -15,10 +15,6 @@ bool Ucd::hasNonTraditionalLinks() const {
 
 bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
 
-Ucd::Strokes Ucd::getStrokes(bool variant) const {
-  return variant && hasVariantStrokes() ? _variantStrokes : _strokes;
-}
-
 std::string Ucd::codeAndName() const {
   return toUnicode(_code, BracketType::Square) + ' ' + _name;
 }

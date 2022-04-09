@@ -68,10 +68,6 @@ public:
   [[nodiscard]] bool hasNonTraditionalLinks() const;
   [[nodiscard]] bool hasVariantStrokes() const;
 
-  // 'getStrokes' will try to retrun '_variantStrokes' if it exists (and if
-  // variant is true), otherise it falls back to just return '_strokes'
-  [[nodiscard]] Strokes getStrokes(bool variant) const;
-
   // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
