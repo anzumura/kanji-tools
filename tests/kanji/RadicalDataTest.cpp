@@ -14,9 +14,7 @@ const fs::path TestFile{TestDir / "radicals.txt"};
 
 class RadicalDataTest : public TestData {
 protected:
-  void SetUp() override {
-    write("Number\tName\tLongName\tReading");
-  }
+  void SetUp() override { write("Number\tName\tLongName\tReading"); }
 
   void write(const std::string& s) {
     std::ofstream of{TestFile, std::ios_base::app};
