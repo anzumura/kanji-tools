@@ -3,8 +3,6 @@
 #include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/kanji/UcdLinkTypes.h>
 
-#include <vector>
-
 namespace kanji_tools {
 
 // 'Ucd' holds the data loaded from 'ucd.txt' which is an extract from the
