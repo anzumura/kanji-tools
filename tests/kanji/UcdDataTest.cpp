@@ -1,6 +1,7 @@
 #include <kanji_tools/kanji/UcdData.h>
 #include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/TestKanji.h>
+#include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
@@ -284,6 +285,17 @@ TEST_F(UcdDataTest, PrintWithMissingEntry) {
   for (std::string line; std::getline(_os, line);)
     if (line == "  ERROR: 四 not found in UCD") found = true;
   EXPECT_TRUE(found);
+}
+
+TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
+  // add an entry with a variation selector to 'Data' that doesn't exist in
+  // '_ucd' (should never happen when loading from actual data files)
+  auto testKanji{std::make_shared<TestKanji>("僧︀")};
+  const Ucd u{TestUcd{}.name(testKanji->name()).create()};
+  checkInsert(testKanji, &u);
+  EXPECT_THROW(
+      call([this] { _ucd.print(*this); }, "UCD not found for '僧︀'"),
+      std::domain_error);
 }
 
 // link validation tests

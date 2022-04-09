@@ -207,12 +207,10 @@ void UcdData::printVariationSelectorKanji(const Data& data) const {
                  << toUnicode(k.name(), BracketType::Square) << ' ' << k.name()
                  << " variant of " << k.nonVariantName() << "    ";
       const auto u{find(k.name())};
-      if (u) {
-        data.out() << u->codeAndName();
-        if (u->hasLinks())
-          data.out() << " variant of " << u->linkCodeAndNames();
-      } else
-        data.out() << "UCD not found";
+      // ucd entry should always exist
+      if (!u) Data::usage("UCD not found for '" + k.name() + "'"); 
+      data.out() << u->codeAndName();
+      if (u->hasLinks()) data.out() << " variant of " << u->linkCodeAndNames();
       data.out() << '\n';
     }
 }
