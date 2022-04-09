@@ -14,7 +14,7 @@ namespace kanji_tools {
 class Data {
 public:
   using Entry = std::shared_ptr<Kanji>;
-  using OptEntry = std::optional<const Entry>;
+  using OptEntry = std::optional<Entry>;
   using List = std::vector<Entry>;
   using Map = std::map<std::string, Entry>;
   template<typename T> using EnumList = EnumMap<T, List>;
@@ -41,9 +41,7 @@ public:
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
   static constexpr auto OrderByQualifiedName{
-      [](const Entry& a, const Entry& b) {
-        return a->orderByQualifiedName(*b);
-      }};
+      [](Entry& a, Entry& b) { return a->orderByQualifiedName(*b); }};
 
   Data(const Path& dataDir, DebugMode, std::ostream& out = std::cout,
       std::ostream& err = std::cerr);
@@ -61,8 +59,8 @@ public:
   [[nodiscard]] virtual const Radical& ucdRadical(
       const std::string&, const Ucd*) const;
 
-  // 'getRadicalByName' is used by 'ExtraKanji' classes during construction. It
-  // returns the Radical for the given 'radicalName' (like 二, 木, 言, etc.).
+  // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
+  // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   [[nodiscard]] virtual const Radical& getRadicalByName(
       const std::string& radicalName) const;
 
@@ -101,8 +99,7 @@ public:
   [[nodiscard]] auto& kyus(KenteiKyus k) const { return _kyus[k]; }
   [[nodiscard]] auto kyuSize(KenteiKyus k) const { return kyus(k).size(); }
 
-  // See comment for '_frequencies' private data member for more details about
-  // frequency lists
+  // See comment for '_frequencies' private data member for more details
   static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
   [[nodiscard]] const List& frequencies(size_t) const;
   [[nodiscard]] size_t frequencySize(size_t) const;
@@ -176,7 +173,9 @@ protected:
   // '_radicals' holds the 214 official Kanji Radicals
   RadicalData _radicals;
 
-  // '_ucd' is used to get Kanji attributes like radical, meaning and reading
+  // '_ucd' is used by 'Kanji' class ctors to get 'pinyin', 'morohashiId' and
+  // 'nelsonIds' attributes. It also provides 'radical', 'strokes', 'meaning'
+  // and 'reading' when needed (mostly by non-CustomFileKanji classes).
   UcdData _ucd;
 
   // '_strokes' is populated from strokes.txt and supplements jinmei Kanji (file
@@ -186,6 +185,9 @@ protected:
   std::map<std::string, Ucd::Strokes> _strokes;
 
   EnumList<KanjiTypes> _types;
+
+  // checkInsert is non-private to help support testing
+  bool checkInsert(const Entry&, const Ucd* = {});
 private:
   using OptPath = std::optional<Path>;
 
@@ -198,9 +200,8 @@ private:
   void populateLinkedKanji();
 
   // helper functions for checking and inserting into '_kanjiNameMap'
-  bool checkInsert(const Entry&);
   bool checkInsert(List&, const Entry&);
-  void insertSanityChecks(const Kanji&) const;
+  void insertSanityChecks(const Kanji&, const Ucd*) const;
 
   const Path _dataDir;
   const DebugMode _debugMode;
@@ -231,7 +232,7 @@ private:
   std::map<std::string, List> _morohashiMap;  // lookup by Dai Kan-Wa Jiten ID
   std::map<Kanji::NelsonId, List> _nelsonMap; // lookup by Nelson ID
 
-  // 'maxFrequency' is set to 1 larger than the highest frequency of any kanji
+  // 'maxFrequency' is set to 1 larger than the highest frequency of any Kanji
   // put into '_kanjiNameMap'
   inline static constinit Kanji::Frequency _maxFrequency;
 

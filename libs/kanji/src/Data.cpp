@@ -225,7 +225,7 @@ bool Data::isValidDataDir(const Path& p) {
              }) == TextFilesInDataDir;
 }
 
-bool Data::checkInsert(const Entry& kanji) {
+bool Data::checkInsert(const Entry& kanji, const Ucd* ucd) {
   auto& k{*kanji};
   if (!_kanjiNameMap.emplace(k.name(), kanji).second) {
     printError("failed to insert " + k.name() + " into map");
@@ -235,7 +235,7 @@ bool Data::checkInsert(const Entry& kanji) {
   // messages getting printed to stderr, but the program is allowed to continue
   // since it can be helpful to see more than one error printed out if something
   // goes wrong. Any failures should be fixed right away.
-  insertSanityChecks(k);
+  insertSanityChecks(k, ucd);
   // update _maxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
   // applicable
   if (k.frequency() && *k.frequency() >= _maxFrequency)
@@ -254,7 +254,7 @@ bool Data::checkInsert(List& s, const Entry& kanji) {
   return true;
 }
 
-void Data::insertSanityChecks(const Kanji& kanji) const {
+void Data::insertSanityChecks(const Kanji& kanji, const Ucd* ucdIn) const {
   const auto error{[this, &kanji](const std::string& s) {
     std::string v;
     if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";
@@ -264,7 +264,7 @@ void Data::insertSanityChecks(const Kanji& kanji) const {
   }};
 
   const auto kanjiType{kanji.type()};
-  if (const auto ucd{_ucd.find(kanji.name())}; !ucd)
+  if (const auto ucd{ucdIn ? ucdIn : _ucd.find(kanji.name())}; !ucd)
     error("not found");
   else if (kanjiType == KanjiTypes::Jouyou && !ucd->joyo())
     error("not marked as 'Joyo'");

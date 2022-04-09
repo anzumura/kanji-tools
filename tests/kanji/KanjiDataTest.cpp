@@ -412,7 +412,7 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
   auto jinmei4stroke1{find("云", KanjiTypes::Jinmei, 4, {}, "4E91")};
   auto jinmei4stroke2{find("勿", KanjiTypes::Jinmei, 4, {}, "52FF")};
 
-  const auto check{[](const auto& x, const auto& y) {
+  const auto check{[](auto& x, auto& y) {
     EXPECT_TRUE(Data::OrderByQualifiedName(x, y));
     EXPECT_FALSE(Data::OrderByQualifiedName(y, x));
   }};
