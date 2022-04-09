@@ -1,6 +1,5 @@
-#include <gtest/gtest.h>
-#include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/kanji/RadicalData.h>
+#include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
@@ -11,33 +10,12 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path TestDir{"testDir"};
 const fs::path TestFile{TestDir / "radicals.txt"};
 
-class RadicalDataTest : public ::testing::Test, public Data {
-public:
-  [[nodiscard]] Kanji::OptFreq frequency(const std::string&) const override {
-    return {};
-  }
-  [[nodiscard]] JlptLevels level(const std::string&) const override {
-    return JlptLevels::None;
-  }
-  [[nodiscard]] KenteiKyus kyu(const std::string&) const override {
-    return KenteiKyus::None;
-  }
+class RadicalDataTest : public TestData {
 protected:
-  RadicalDataTest() : Data{TestDir, DebugMode::None, _os} {}
-
   void SetUp() override {
-    if (fs::exists(TestDir)) TearDown();
-    EXPECT_TRUE(fs::create_directory(TestDir));
     write("Number\tName\tLongName\tReading");
-  }
-
-  void TearDown() override {
-    _os.str({});
-    _os.clear();
-    fs::remove_all(TestDir);
   }
 
   void write(const std::string& s) {
@@ -50,8 +28,6 @@ protected:
     write("001\t一\t一部（いちぶ）\tイチ");
     _radicals.load(TestFile);
   }
-
-  inline static std::stringstream _os;
 };
 
 } // namespace
