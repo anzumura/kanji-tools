@@ -291,7 +291,7 @@ TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
   // add an entry with a variation selector to 'Data' that doesn't exist in
   // '_ucd' (should never happen when loading from actual data files)
   auto testKanji{std::make_shared<TestKanji>("僧︀")};
-  const Ucd u{TestUcd{}.name(testKanji->name()).create()};
+  const Ucd u{TestUcd{testKanji->name()}};
   checkInsert(testKanji, &u);
   EXPECT_THROW(
       call([this] { _ucd.print(*this); }, "UCD not found for '僧︀'"),

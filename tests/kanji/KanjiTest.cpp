@@ -3,6 +3,7 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
 #include <kanji_tools/kanji/UcdFileKanji.h>
+#include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
@@ -171,9 +172,10 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   const Radical rad{1, "TestRadical", Radical::AltForms(), "", ""};
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
   const std::string sampleLink{"sampleLink"};
-  const Ucd ucd{0, "侭", "", "", 0, 0, 0, "", "123P", "456 789", "", "", false,
-      false, Ucd::Links{Ucd::Link{1, sampleLink}}, UcdLinkTypes::Simplified,
-      false, "utmost", "JIN", "MAMA"};
+  const Ucd ucd{TestUcd{"侭"}
+                    .ids("123P", "456 789")
+                    .links({{1, sampleLink}}, UcdLinkTypes::Simplified)
+                    .meaningAndReadings("utmost", "JIN", "MAMA")};
   const UcdKanji k{_data, ucd};
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");
@@ -195,15 +197,17 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
 TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   const Radical rad{1, "TestRadical", Radical::AltForms(), "", ""};
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  const Ucd ucd{0, "侭", "", "", 0, 0, 0, "", "", "", "GJ", "J0-4B79", false,
-      false, Ucd::Links{Ucd::Link{1, "old1"}, Ucd::Link{2, "old2"}},
-      UcdLinkTypes::Traditional, true, "utmost", "JIN", "MAMA"};
+  const Ucd ucd{TestUcd{"侭"}
+                    .sources("GJ", "J0-4B79")
+                    .links({{1, "o1"}, {2, "o2"}}, UcdLinkTypes::Traditional)
+                    .linkedReadings(true)
+                    .meaningAndReadings("utmost", "JIN", "MAMA")};
   EXPECT_EQ(ucd.sources(), "GJ");
   EXPECT_EQ(ucd.jSource(), "J0-4B79");
   const UcdKanji k{_data, ucd};
   ASSERT_FALSE(k.newName());
-  EXPECT_EQ(k.oldNames(), (Kanji::LinkNames{"old1", "old2"}));
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), Old old1*／old2");
+  EXPECT_EQ(k.oldNames(), (Kanji::LinkNames{"o1", "o2"}));
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Old o1*／o2");
 }
 
 TEST_F(KanjiTest, ExtraFile) {

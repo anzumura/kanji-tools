@@ -4,9 +4,9 @@
 
 namespace kanji_tools {
 
-// 'TestUcd' creates a 'Ucd' instance for Kanji '一' by default, but any field
-// can be overridden before calling 'create', for example:
-//   TestUcd{}.name("龍").joyo(false).create();
+// 'TestUcd' creates an empty 'Ucd' instance via a conversion operator, but any
+// field can be overridden before creating, for example:
+//   const Ucd ucd{TestUcd{"龍"}.jinmei(true)};
 class TestUcd {
 private:
   template<typename T> auto& set(T& x, const T& y) {
@@ -14,20 +14,22 @@ private:
     return *this;
   }
 
-  char32_t _code{U'\x4e00'};
-  std::string _name{"一"}, _block{"CJK"}, _version{"1.1"};
-  Radical::Number _radical{1};
-  Ucd::Strokes _strokes{1}, _variantStrokes{0};
-  std::string _pinyin{"yī"}, _morohashiId{"1"}, _nelsonIds{"1"},
-      _sources{"GHJKTV"}, _jSource{"J0-306C"};
-  bool _joyo{true}, _jinmei{false};
-  Ucd::Links _links{};
+  char32_t _code{};
+  std::string _name, _block, _version;
+  Radical::Number _radical{};
+  Ucd::Strokes _strokes{}, _variantStrokes{};
+  std::string _pinyin, _morohashiId, _nelsonIds, _sources, _jSource;
+  bool _joyo{}, _jinmei{};
+  Ucd::Links _links;
   UcdLinkTypes _linkType{UcdLinkTypes::None};
-  bool _linkedReadings{false};
-  std::string _meaning{"one; a, an; alone"}, _onReading{"ICHI ITSU"},
-      _kunReading{"HITOTSU HITOTABI HAJIME"};
+  bool _linkedReadings{};
+  std::string _meaning, _onReading, _kunReading;
 public:
-  [[nodiscard]] Ucd create() const {
+  // allow setting 'name' via the ctor since it's the more commonly used field
+  TestUcd(const std::string& name = {}) : _name(name) {}
+
+  // conversion opterator to create a Ucd instance
+  [[nodiscard]] operator Ucd() const {
     return Ucd{_code, _name, _block, _version, _radical, _strokes,
         _variantStrokes, _pinyin, _morohashiId, _nelsonIds, _sources, _jSource,
         _joyo, _jinmei, _links, _linkType, _linkedReadings, _meaning,
@@ -58,6 +60,23 @@ public:
   auto& meaning(const std::string& x) { return set(_meaning, x); }
   auto& onReading(const std::string& x) { return set(_onReading, x); }
   auto& kunReading(const std::string& x) { return set(_kunReading, x); }
+  // compound setters
+  auto& ids(const std::string& m, const std::string& n) {
+    return morohashiId(m).nelsonIds(n);
+  }
+  auto& sources(const std::string& s, const std::string& j) {
+    return sources(s).jSource(j);
+  }
+  auto& links(const Ucd::Links& x, UcdLinkTypes t) {
+    return links(x).linkType(t);
+  }
+  auto& readings(const std::string& on, const std::string& kun) {
+    return onReading(on).kunReading(kun);
+  }
+  auto& meaningAndReadings(
+      const std::string& m, const std::string on, const std::string& kun) {
+    return meaning(m).readings(on, kun);
+  }
 };
 
 } // namespace kanji_tools
