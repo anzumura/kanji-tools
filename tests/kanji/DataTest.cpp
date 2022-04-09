@@ -1,4 +1,6 @@
 #include <tests/kanji_tools/TestData.h>
+#include <tests/kanji_tools/TestKanji.h>
+#include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
@@ -8,12 +10,15 @@ namespace fs = std::filesystem;
 namespace {
 
 constexpr auto Arg0{"test"};
-
-namespace fs = std::filesystem;
+auto TestOne{std::make_shared<TestKanji>("一")};
+auto TestVariant{std::make_shared<TestKanji>("侮︀")};
+const std::string InUcd{" in _ucd\n"};
 
 class DataTest : public TestData {
 protected:
-  DataTest() : TestData(false), _currentDir(fs::current_path()) {}
+  DataTest() : TestData(false), _currentDir(fs::current_path()) {
+    TestOne->type(KanjiTypes::None);
+  }
 
   void TearDown() override { fs::current_path(_currentDir); }
 
@@ -26,6 +31,8 @@ TEST_F(DataTest, Usage) {
   const std::string msg{"error msg"};
   EXPECT_THROW(call([&msg] { Data::usage(msg); }, msg), std::domain_error);
 }
+
+// command line args tests
 
 TEST_F(DataTest, NextArgWithNoArgs) {
   // passing no args returns 0
@@ -167,6 +174,70 @@ TEST_F(DataTest, BothDebugAndInfoArgs) {
   EXPECT_THROW(call([&args] { return getDebugMode(args); },
                    "can only specify one '-debug' or '-info' option"),
       std::domain_error);
+}
+
+// creation sanity checks
+
+TEST_F(DataTest, DuplicateEntry) {
+  const Ucd ucd{TestUcd{}};
+  EXPECT_TRUE(checkInsert(TestOne, &ucd));
+  EXPECT_FALSE(checkInsert(TestOne));
+  EXPECT_TRUE(_es.str().ends_with("failed to insert '一' into map\n"));
+}
+
+TEST_F(DataTest, UcdNotFound) {
+  // successful insert returns true
+  EXPECT_TRUE(checkInsert(TestOne));
+  // sanity check failure printed to stderr
+  EXPECT_TRUE(_es.str().ends_with("一 [4E00] not found" + InUcd));
+}
+
+TEST_F(DataTest, UcdNotFoundForVariant) {
+  // successful insert returns true
+  EXPECT_TRUE(checkInsert(TestVariant));
+  // sanity check failure printed to stderr
+  EXPECT_TRUE(_es.str().ends_with(
+      "侮︀ [4FAE FE00] (non-variant: 侮) not found" + InUcd));
+}
+
+TEST_F(DataTest, UcdNotJoyo) {
+  const Ucd ucd{TestUcd{}};
+  TestOne->type(KanjiTypes::Jouyou);
+  EXPECT_TRUE(checkInsert(TestOne, &ucd));
+  EXPECT_TRUE(_es.str().ends_with("一 [4E00] not marked as 'Joyo'" + InUcd));
+}
+
+TEST_F(DataTest, UcdNotJinmei) {
+  const Ucd ucd{TestUcd{}};
+  TestOne->type(KanjiTypes::Jinmei);
+  EXPECT_TRUE(checkInsert(TestOne, &ucd));
+  EXPECT_TRUE(_es.str().ends_with("一 [4E00] not marked as 'Jinmei'" + InUcd));
+}
+
+TEST_F(DataTest, UcdNotLinkedJinmei) {
+  const Ucd ucd{TestUcd{}};
+  TestOne->type(KanjiTypes::LinkedJinmei);
+  EXPECT_TRUE(checkInsert(TestOne, &ucd));
+  EXPECT_TRUE(_es.str().ends_with(
+      "一 [4E00] with link not marked as 'Jinmei'" + InUcd));
+}
+
+TEST_F(DataTest, UcdMissingJinmeiLinks) {
+  const Ucd ucd{TestUcd{"二"}.code(U'\x4ebc').jinmei(true)};
+  TestOne->type(KanjiTypes::LinkedJinmei);
+  EXPECT_TRUE(checkInsert(TestOne, &ucd));
+  EXPECT_TRUE(_es.str().ends_with(
+      "一 [4E00] missing 'JinmeiLink' for [4EBC] 二" + InUcd));
+}
+
+TEST_F(DataTest, DuplicateCompatibilityName) {
+  const Ucd ucd{TestUcd{}};
+  // real Kanji with variation selectors, but with fake 'compatibility names'
+  const auto k1{std::make_shared<TestKanji>("嘆︀", "十")};
+  const auto k2{std::make_shared<TestKanji>("器︀", "十")};
+  EXPECT_TRUE(checkInsert(k1, &ucd));
+  EXPECT_TRUE(checkInsert(k2, &ucd));
+  EXPECT_TRUE(_es.str().ends_with("failed to insert variant '器︀' into map\n"));
 }
 
 } // namespace kanji_tools

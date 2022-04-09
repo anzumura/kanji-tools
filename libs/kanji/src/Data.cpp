@@ -228,7 +228,7 @@ bool Data::isValidDataDir(const Path& p) {
 bool Data::checkInsert(const Entry& kanji, const Ucd* ucd) {
   auto& k{*kanji};
   if (!_kanjiNameMap.emplace(k.name(), kanji).second) {
-    printError("failed to insert " + k.name() + " into map");
+    printError("failed to insert '" + k.name() + "' into map");
     return false;
   }
   // Perform some sanity checks on newly created kanji, failures result in error
@@ -242,7 +242,7 @@ bool Data::checkInsert(const Entry& kanji, const Ucd* ucd) {
     _maxFrequency = *k.frequency() + 1U;
   if (k.variant() &&
       !_compatibilityMap.emplace(k.compatibilityName(), k.name()).second)
-    printError("failed to insert variant " + k.name() + " into map");
+    printError("failed to insert variant '" + k.name() + "' into map");
   if (k.morohashiId()) _morohashiMap[*k.morohashiId()].emplace_back(kanji);
   for (const auto id : k.nelsonIds()) _nelsonMap[id].emplace_back(kanji);
   return true;
@@ -259,7 +259,7 @@ void Data::insertSanityChecks(const Kanji& kanji, const Ucd* ucdIn) const {
     std::string v;
     if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";
     printError(kanji.name() + ' ' +
-               toUnicode(kanji.name(), BracketType::Square) + ' ' + v + " " +
+               toUnicode(kanji.name(), BracketType::Square) + v + " " +
                s + " in _ucd");
   }};
 
