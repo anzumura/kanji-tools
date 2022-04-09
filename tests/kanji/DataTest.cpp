@@ -1,5 +1,3 @@
-#include <gtest/gtest.h>
-#include <kanji_tools/kanji/Data.h>
 #include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -59,13 +57,13 @@ TEST_F(DataTest, NextArgWithDebugArg) {
 }
 
 TEST_F(DataTest, NextArgWithDataArg) {
-  const char* args[]{Arg0, DataArg.c_str(), TestDataDir};
+  const char* args[]{Arg0, DataArg.c_str(), TestDirArg};
   // skip '-data some-dir'
   EXPECT_EQ(nextArg(args), 3);
 }
 
 TEST_F(DataTest, NextArgWithDebugAndDataArgs) {
-  const char* args[]{Arg0, DebugArg.c_str(), DataArg.c_str(), TestDataDir};
+  const char* args[]{Arg0, DebugArg.c_str(), DataArg.c_str(), TestDirArg};
   // skip '-data some-dir'
   EXPECT_EQ(nextArg(args), 4);
 }
@@ -73,7 +71,7 @@ TEST_F(DataTest, NextArgWithDebugAndDataArgs) {
 TEST_F(DataTest, NextArgWithMultipleArgs) {
   auto arg1{"arg1"}, arg3{"arg3"}, arg6{"arg6"};
   const char* argv[]{
-      Arg0, arg1, DebugArg.c_str(), arg3, DataArg.c_str(), TestDataDir, arg6};
+      Arg0, arg1, DebugArg.c_str(), arg3, DataArg.c_str(), TestDirArg, arg6};
   const Args args{argv};
   std::vector<const char*> actualArgs;
   for (auto i{nextArg(args)}; i < args.size(); i = nextArg(args, i))
@@ -89,9 +87,9 @@ TEST_F(DataTest, MissingDataDirArg) {
 }
 
 TEST_F(DataTest, BadDataDirArg) {
-  const char* args[]{Arg0, DataArg.c_str(), TestDataDir};
+  const char* args[]{Arg0, DataArg.c_str(), TestDirArg};
   EXPECT_THROW(call([&args] { return getDataDir(args); },
-                   "'dir' is not a valid directory"),
+                   "'testDir' is not a valid directory"),
       std::domain_error);
 }
 

@@ -1,5 +1,3 @@
-#include <gtest/gtest.h>
-#include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/kanji/UcdData.h>
 #include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/TestKanji.h>
@@ -13,7 +11,7 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path TestFile{TestDataPath / "ucd.txt"};
+const fs::path TestFile{TestDir / "ucd.txt"};
 
 const std::string FileMsg{" - file: ucd.txt, row: 1"};
 

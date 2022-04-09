@@ -6,8 +6,8 @@
 
 namespace kanji_tools {
 
-inline constexpr auto TestDataDir{"dir"};
-inline const std::filesystem::path TestDataPath{TestDataDir};
+inline constexpr auto TestDirArg{"testDir"};
+inline const std::filesystem::path TestDir{TestDirArg};
 
 class TestData : public ::testing::Test, public Data {
 public:
@@ -21,19 +21,19 @@ public:
     return KenteiKyus::None;
   }
 protected:
-  TestData(bool create = true) : Data{TestDataPath, DebugMode::None, _os, _es} {
-    clear();
-    if (create) std::filesystem::create_directory(TestDataPath);
+  TestData(bool createDir = true) : Data{TestDir, DebugMode::None, _os, _es} {
+    clear(createDir);
   }
 
   ~TestData() override { clear(); }
 
-  void clear() {
+  void clear(bool createDir = false) {
     _os.str({});
     _os.clear();
     _es.str({});
     _es.clear();
-    std::filesystem::remove_all(TestDataPath);
+    std::filesystem::remove_all(TestDir);
+    if (createDir) std::filesystem::create_directory(TestDir);
   }
 
   inline static std::stringstream _os, _es;
