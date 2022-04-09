@@ -51,7 +51,7 @@ protected:
 
   // ctor used by 'OfficialKanji': 'meaning' gets looked up from 'ucd.txt'
   CustomFileKanji(const Data&, const ColumnFile&, const std::string& name,
-      Strokes, const LinkNames&);
+      Strokes, const LinkNames&, const Ucd*);
 private:
   const KenteiKyus _kyu;
   const Number _number;
@@ -69,7 +69,8 @@ public:
   [[nodiscard]] auto year() const { return _year; }
 protected:
   // ctor used by 'JinmeiKanji' calls base without 'meaning' field
-  OfficialKanji(const Data&, const ColumnFile&, const std::string& name);
+  OfficialKanji(
+      const Data&, const ColumnFile&, const std::string& name, const Ucd*);
 
   // ctor used by 'JouyouKanji' calls base with 'meaning' field
   OfficialKanji(const Data&, const ColumnFile&, const std::string& name,

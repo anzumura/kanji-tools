@@ -30,8 +30,6 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
   _ucd.load(DataFile::getFile(dataDir(), UcdFile));
   _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));
-  loadStrokes(DataFile::getFile(dataDir(), StrokesFile));
-  loadStrokes(DataFile::getFile(dataDir(), WikiStrokesFile), false);
   loadFrequencyReadings(DataFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
   populateJinmei();

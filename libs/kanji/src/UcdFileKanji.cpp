@@ -14,7 +14,7 @@ Kanji::OptString UcdFileKanji::newName() const {
 UcdFileKanji::UcdFileKanji(const Data& d, const std::string& name,
     const std::string& reading, const Ucd* u)
     : NonLinkedKanji{d, name, d.ucdRadical(name, u), reading,
-          d.getStrokes(name, u), u},
+          d.ucdStrokes(name, u), u},
       _hasOldLinks{u && u->hasTraditionalLinks()}, _linkNames{linkNames(u)},
       _linkedReadings{u && u->linkedReadings()} {}
 

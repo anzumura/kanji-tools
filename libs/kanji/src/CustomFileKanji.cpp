@@ -22,9 +22,10 @@ CustomFileKanji::CustomFileKanji(const Data& d, const ColumnFile& f,
       _kyu{d.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 CustomFileKanji::CustomFileKanji(const Data& d, const ColumnFile& f,
-    const std::string& name, Strokes strokes, const LinkNames& oldNames)
+    const std::string& name, Strokes strokes, const LinkNames& oldNames,
+    const Ucd* u)
     : NonLinkedKanji{d, name, d.getRadicalByName(f.get(RadicalCol)),
-          f.get(ReadingCol), strokes, findUcd(d, name)},
+          f.get(ReadingCol), strokes, u},
       _kyu{d.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 // OfficialKanji
@@ -36,8 +37,8 @@ Kanji::OptString OfficialKanji::extraTypeInfo() const {
 }
 
 OfficialKanji::OfficialKanji(
-    const Data& d, const ColumnFile& f, const std::string& name)
-    : CustomFileKanji{d, f, name, d.getStrokes(name), getOldNames(f)},
+    const Data& d, const ColumnFile& f, const std::string& name, const Ucd* u)
+    : CustomFileKanji{d, f, name, d.ucdStrokes(name, u), getOldNames(f), u},
       _frequency{d.frequency(name)}, _level{d.level(name)}, _year{f.getOptU16(
                                                                 YearCol)} {}
 
@@ -58,9 +59,8 @@ Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
 // JinmeiKanji
 
 JinmeiKanji::JinmeiKanji(const Data& d, const ColumnFile& f)
-    : OfficialKanji{d, f, f.get(NameCol)}, _reason{
-                                               AllJinmeiKanjiReasons.fromString(
-                                                   f.get(ReasonCol))} {}
+    : OfficialKanji{d, f, f.get(NameCol), d.findUcd(f.get(NameCol))},
+      _reason{AllJinmeiKanjiReasons.fromString(f.get(ReasonCol))} {}
 
 Kanji::OptString JinmeiKanji::extraTypeInfo() const {
   return *OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']';

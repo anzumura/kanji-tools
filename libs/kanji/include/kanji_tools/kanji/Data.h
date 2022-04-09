@@ -58,6 +58,8 @@ public:
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual const Radical& ucdRadical(
       const std::string&, const Ucd*) const;
+  [[nodiscard]] virtual Ucd::Strokes ucdStrokes(
+      const std::string&, const Ucd*) const;
 
   // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
   // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).
@@ -78,10 +80,6 @@ public:
   // 'kanji' if it exists (_ucd.find method takes care of checking whether
   // 'kanji' has a variation selector).
   [[nodiscard]] Kanji::OptString getCompatibilityName(const std::string&) const;
-
-  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji, const Ucd*,
-      bool variant = false, bool onlyUcd = false) const;
-  [[nodiscard]] Ucd::Strokes getStrokes(const std::string& kanji) const;
 
   // get list by KanjiType
   [[nodiscard]] auto& types(KanjiTypes t) const { return _types[t]; }
@@ -164,10 +162,9 @@ protected:
   void processList(const DataFile&);
   void processUcd(); // should be called after processing all other types
 
-  // 'checkStrokes' should be called after all lists are populated. If debug is
-  // enabled (-debug) then this function will print any entries in _strokes that
-  // are 'Frequency' type or not found. It also compares stroke values loaded
-  // from other files to strokes in 'ucd.txt'
+  // 'checkStrokes' should be called after all lists are populated. It compares
+  // stroke values loaded from other files to strokes in 'ucd.txt' and prints
+  // the results (if -debug is specified)
   void checkStrokes() const;
 
   // '_radicals' holds the 214 official Kanji Radicals
@@ -177,12 +174,6 @@ protected:
   // 'nelsonIds' attributes. It also provides 'radical', 'strokes', 'meaning'
   // and 'reading' when needed (mostly by non-CustomFileKanji classes).
   UcdData _ucd;
-
-  // '_strokes' is populated from strokes.txt and supplements jinmei Kanji (file
-  // doesn't have 'Strokes' column) as well as old Kanji from jouyou and jinmei
-  // files. This file contains stroke counts followed by one or more lines each
-  // with a single kanji that has the given number of strokes.
-  std::map<std::string, Ucd::Strokes> _strokes;
 
   EnumList<KanjiTypes> _types;
 

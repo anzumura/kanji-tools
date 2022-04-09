@@ -463,8 +463,6 @@ The **data** directory contains the following files:
 - **ucd.txt**: data extracted from Unicode 'UCD' (see *scripts/parseUcdAllFlat.sh* for details and links)
 - **frequency-readings.txt**: holds readings of some Top Frequency kanji that aren't in Jouyou or Jinmei lists
 - **radicals.txt**: loaded from [here](http://etc.dounokouno.com/bushu-search/bushu-list.html)
-- **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō kanji and some old forms.
-- **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Frequency' type Kanji.
 - **jlpt/n[1-5].txt**: loaded from various sites such as [FreeTag](http://freetag.jp/index_jlpt_kanji_list.html) and [JLPT Study](https://jlptstudy.net/N2/).
 - **kentei/k\*.txt**: loaded from [here](https://kanjijoho.com/cat/kyu.html)
 - **jukugo/*.txt**: loaded from [here](https://sites.google.com/a/h7a.org/kanjicompounds/)
@@ -472,6 +470,11 @@ The **data** directory contains the following files:
 - **pattern-groups.txt**: meant to hold groups of kanji with related patterns (see *Group.h* for more details)
 
 No external databases are used so far, but while writing some of the code (like in *UnicodeBlock.h* for example), the following links were very useful: [Unicode Office Site - Charts](https://www.unicode.org/charts/) and [Compat](https://www.compart.com/en/unicode/).
+
+The following 'strokes' related files used to be in the **data** directory, but strokes are now loaded from **ucd.txt** and used for all Kanji types except *Jouyou* and *Extra* (their files have a *Strokes* column). Ucd data has some unexpected stroke counts here and there (see *scripts/parseUcdAllFlat.sh* for a more detailed explanation), but so did the below files:
+
+- **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō kanji and some old forms.
+- **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Frequency' type Kanji.
 
 ## Kanji Quiz
 

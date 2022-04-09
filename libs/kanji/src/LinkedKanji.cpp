@@ -12,7 +12,7 @@ Kanji::OptString LinkedKanji::newName() const { return _link->name(); }
 LinkedKanji::LinkedKanji(const Data& d, const std::string& name,
     const Data::Entry& link, const Ucd* u)
     : Kanji{name, d.getCompatibilityName(name), d.ucdRadical(name, u),
-          d.getStrokes(name, u), d.getMorohashiId(u), d.getNelsonIds(u),
+          d.ucdStrokes(name, u), d.getMorohashiId(u), d.getNelsonIds(u),
           d.getPinyin(u)},
       _frequency{d.frequency(name)}, _kyu{d.kyu(name)}, _link{link} {}
 

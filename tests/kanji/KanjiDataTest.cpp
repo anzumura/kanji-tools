@@ -37,9 +37,6 @@ protected:
         }
         ++variants;
       }
-      if (!Kanji::hasLink(i->type()))
-        EXPECT_TRUE(_data->getStrokes(i->name()))
-            << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_EQ(MBChar::size(i->name()), 1)
           << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_TRUE(isKanji(i->name()))
@@ -57,7 +54,6 @@ TEST_F(KanjiDataTest, BasicChecks) {
   EXPECT_EQ(_data->kanjiNameMap().size(), 23715);
   EXPECT_EQ(_data->level("院"), JlptLevels::N4);
   EXPECT_EQ(_data->frequency("蝦"), 2501);
-  EXPECT_EQ(_data->getStrokes("廳"), 25);
 }
 
 TEST_F(KanjiDataTest, FrequencyKanjiChecks) {
@@ -472,8 +468,8 @@ TEST(KanjiDataPrintTest, Debug) {
       if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
       if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
       if (s.starts_with("12 non-JLPT Linked Jinmei in Frequency")) ++found;
-      if (s.starts_with("4 Kanji in 'Frequency' group in _strokes")) ++found;
-      if (s.starts_with("51 Kanji with differrent strokes in _ucd")) ++found;
+      if (s.starts_with("12 Jouyou Kanji with differrent strokes")) ++found;
+      if (s.starts_with("1 Extra Kanji with differrent strokes")) ++found;
     } else {
       if (line == ">>> Frequency Kanji with links 15:") ++found;
       if (line == ">>> Extra Kanji with links 10:") ++found;

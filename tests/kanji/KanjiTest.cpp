@@ -20,23 +20,17 @@ namespace {
 
 class MockData : public Data {
 public:
-  MockData(const Path& p) : Data{p, Data::DebugMode::None} {
-    strokes("亘", 6);
-    strokes("亙", 6);
-    strokes("云", 6);
-  }
+  MockData(const Path& p) : Data{p, Data::DebugMode::None} {}
   MOCK_METHOD(
       Kanji::OptFreq, frequency, (const std::string&), (const, override));
   MOCK_METHOD(JlptLevels, level, (const std::string&), (const, override));
   MOCK_METHOD(KenteiKyus, kyu, (const std::string&), (const, override));
   MOCK_METHOD(const Radical&, ucdRadical, (const std::string&, const Ucd*),
       (const, override));
+  MOCK_METHOD(Ucd::Strokes, ucdStrokes, (const std::string&, const Ucd*),
+      (const, override));
   MOCK_METHOD(const Radical&, getRadicalByName, (const std::string&),
       (const, override));
-private:
-  void strokes(const std::string& kanjiName, int count) {
-    _strokes.emplace(kanjiName, count);
-  }
 };
 
 class KanjiTest : public ::testing::Test {
@@ -296,6 +290,8 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_CALL(_data, kyu("亘")).WillOnce(Return(KenteiKyus::KJ1));
   const Radical rad{1, "二", {}, "", ""};
   EXPECT_CALL(_data, getRadicalByName("二")).WillRepeatedly(ReturnRef(rad));
+  EXPECT_CALL(_data, ucdStrokes("云", nullptr)).WillOnce(Return(4));
+  EXPECT_CALL(_data, ucdStrokes("亘", nullptr)).WillOnce(Return(6));
   const auto results{fromFile<JinmeiKanji>()};
   ASSERT_EQ(results.size(), 2);
 
@@ -304,7 +300,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.name(), "云");
-  EXPECT_EQ(k.strokes(), 6);
+  EXPECT_EQ(k.strokes(), 4);
   EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
   ASSERT_EQ(k.type(), KanjiTypes::Jinmei);
   EXPECT_EQ(k.radical().name(), "二");
@@ -328,6 +324,8 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_CALL(_data, ucdRadical("亙", _)).WillOnce(ReturnRef(rad));
   EXPECT_CALL(_data, frequency("亙")).WillOnce(Return(std::nullopt));
   EXPECT_CALL(_data, kyu("亙")).WillOnce(Return(KenteiKyus::KJ1));
+  EXPECT_CALL(_data, ucdStrokes("亘", nullptr)).WillOnce(Return(6));
+  EXPECT_CALL(_data, ucdStrokes("亙", nullptr)).WillOnce(Return(6));
   const auto results{fromFile<JinmeiKanji>()};
   ASSERT_EQ(results.size(), 1);
   const LinkedJinmeiKanji k{_data, "亙", results[0]};

@@ -18,7 +18,7 @@ const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"},
 
 // This value is used for finding the location of 'data' directory. It will of
 // course need to be updated if the number of '.txt' files changes.
-constexpr size_t TextFilesInDataDir{12};
+constexpr size_t TextFilesInDataDir{10};
 
 } // namespace
 
@@ -60,6 +60,11 @@ const Radical& Data::ucdRadical(const std::string& kanji, const Ucd* u) const {
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
+Ucd::Strokes Data::ucdStrokes(const std::string& kanji, const Ucd* u) const {
+  if (u) return u->strokes();
+  throw std::domain_error{"UCD entry not found: " + kanji};
+}
+
 const Radical& Data::getRadicalByName(const std::string& radicalName) const {
   return _radicals.find(radicalName);
 }
@@ -90,19 +95,6 @@ Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
 Kanji::OptString Data::getCompatibilityName(const std::string& kanji) const {
   const auto u{_ucd.find(kanji)};
   return u && u->name() != kanji ? Kanji::OptString{u->name()} : std::nullopt;
-}
-
-Ucd::Strokes Data::getStrokes(
-    const std::string& kanji, const Ucd* u, bool variant, bool onlyUcd) const {
-  if (!onlyUcd) {
-    if (const auto i{_strokes.find(kanji)}; i != _strokes.end())
-      return i->second;
-  }
-  return u ? u->getStrokes(variant) : 0;
-}
-
-Ucd::Strokes Data::getStrokes(const std::string& kanji) const {
-  return getStrokes(kanji, findUcd(kanji));
 }
 
 const Data::List& Data::frequencies(size_t f) const {
@@ -259,8 +251,8 @@ void Data::insertSanityChecks(const Kanji& kanji, const Ucd* ucdIn) const {
     std::string v;
     if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";
     printError(kanji.name() + ' ' +
-               toUnicode(kanji.name(), BracketType::Square) + v + " " +
-               s + " in _ucd");
+               toUnicode(kanji.name(), BracketType::Square) + v + " " + s +
+               " in _ucd");
   }};
 
   const auto kanjiType{kanji.type()};
@@ -281,29 +273,6 @@ void Data::printError(const std::string& msg) const {
   static size_t count;
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- "
        << msg << std::setfill(' ') << '\n';
-}
-
-void Data::loadStrokes(const Path& file, bool checkDuplicates) {
-  std::ifstream f{file};
-  Ucd::Strokes strokes{};
-  for (std::string line; std::getline(f, line);)
-    if (::isdigit(line[0])) {
-      const auto newStrokes{std::stoul(line)};
-      assert(newStrokes <= std::numeric_limits<Ucd::Strokes>::max());
-      assert(newStrokes > strokes);
-      strokes = static_cast<Ucd::Strokes>(newStrokes);
-    } else {
-      assert(strokes != 0); // first line must have a stroke count
-      for (std::stringstream ss{line}; std::getline(ss, line, ' ');)
-        if (const auto i{_strokes.insert(std::pair(line, strokes))};
-            !i.second) {
-          if (checkDuplicates)
-            printError("duplicate entry in " + file.string() + ": " + line);
-          else if (i.first->second != strokes)
-            printError("found entry with different count in " + file.string() +
-                       ": " + line);
-        }
-    }
 }
 
 void Data::loadFrequencyReadings(const Path& file) {
@@ -456,47 +425,19 @@ void Data::processUcd() {
 }
 
 void Data::checkStrokes() const {
-  DataFile::List strokesFrequency, strokesNotFound, strokeDiffs, vStrokeDiffs,
-      missingDiffs, missingUcd;
-  for (const auto& i : _strokes) {
-    const auto u{findUcd(i.first)};
-    const auto ucdStrokes{getStrokes(i.first, u, false, true)};
-    const auto k{findKanjiByName(i.first)};
-    if (ucdStrokes) {
-      // If a Kanji object exists, prefer to use its 'strokes' since this it's
-      // more accurate, i.e., there are some incorrect stroke counts in
-      // 'wiki-strokes.txt', but they aren't used because the actual stroke
-      // count comes from 'jouyou.txt', 'jinmei.txt' or 'extra.txt'
-      if (k) {
-        if ((**k).variant()) {
-          if ((**k).strokes() != getStrokes(i.first, u, true, true))
-            vStrokeDiffs.emplace_back(i.first);
-        } else if ((**k).strokes() != ucdStrokes)
-          strokeDiffs.emplace_back(i.first);
-      } else if (i.second != ucdStrokes)
-        missingDiffs.emplace_back(i.first);
-    } else
-      missingUcd.emplace_back(i.first);
-    if (k) {
-      if ((**k).type() == KanjiTypes::Frequency)
-        strokesFrequency.emplace_back(i.first);
-    } else
-      strokesNotFound.emplace_back(i.first);
-  }
-  if (debug()) {
-    DataFile::print(_out, strokesNotFound, "Kanji not loaded", "_strokes");
-    DataFile::print(
-        _out, vStrokeDiffs, "Variant kanji with differrent strokes", "_ucd");
-    DataFile::print(_out, missingDiffs,
-        "'_stokes only' Kanji with differrent strokes", "_ucd");
-    DataFile::print(
-        _out, missingUcd, "Kanji in _strokes, but not found", "_ucd");
-    if (fullDebug()) {
+  if (fullDebug()) {
+    const auto f{[this](KanjiTypes t) {
+      DataFile::List l;
+      for (auto& i : _types[t])
+        if (const auto u{findUcd(i->name())}; u && i->strokes() != u->strokes())
+          l.emplace_back(i->name());
       DataFile::print(
-          _out, strokesFrequency, "Kanji in 'Frequency' group", "_strokes");
-      DataFile::print(
-          _out, strokeDiffs, "Kanji with differrent strokes", "_ucd");
-    }
+          _out, l, toString(t) + " Kanji with differrent strokes", "_ucd");
+    }};
+    // compare Jouyou and Extra type Kanji strokes with Ucd values (all other
+    // types load strokes from Ucd so no point comparing)
+    f(KanjiTypes::Jouyou);
+    f(KanjiTypes::Extra);
   }
 }
 

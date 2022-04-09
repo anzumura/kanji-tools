@@ -113,7 +113,7 @@ TEST_F(DataTest, DataDirArgToInvalidData) {
   const auto dir{_currentDir.root_directory()};
   const char* args[]{Arg0, DataArg.c_str(), dir.c_str()};
   const std::string msg{
-      "'" + dir.string() + "' does not contain 12 expected '.txt' files"};
+      "'" + dir.string() + "' does not contain 10 expected '.txt' files"};
   EXPECT_THROW(
       call([&args] { return getDataDir(args); }, msg), std::domain_error);
 }
@@ -133,7 +133,7 @@ TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
 TEST_F(DataTest, FailToFindDataDirNoArg0) {
   fs::current_path(_currentDir.root_directory());
   const std::string msg{
-      "couldn't find 'data' directory with 12 expected '.txt' files:\n- "
+      "couldn't find 'data' directory with 10 expected '.txt' files:\n- "
       "searched up from current: " +
       fs::current_path().string() +
       "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
@@ -144,7 +144,7 @@ TEST_F(DataTest, FailToFindDataDirWithArg0) {
   fs::current_path(_currentDir.root_directory());
   const std::string arg0{fs::current_path() / "testProgramName"};
   const std::string msg{
-      "couldn't find 'data' directory with 12 expected '.txt' files:\n- "
+      "couldn't find 'data' directory with 10 expected '.txt' files:\n- "
       "searched up from current: " +
       fs::current_path().string() + "\n- searched up from arg0: " + arg0 +
       "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
@@ -237,7 +237,8 @@ TEST_F(DataTest, DuplicateCompatibilityName) {
   const auto k2{std::make_shared<TestKanji>("器︀", "十")};
   EXPECT_TRUE(checkInsert(k1, &ucd));
   EXPECT_TRUE(checkInsert(k2, &ucd));
-  EXPECT_TRUE(_es.str().ends_with("failed to insert variant '器︀' into map\n"));
+  EXPECT_TRUE(
+      _es.str().ends_with("failed to insert variant '器︀' into map\n"));
 }
 
 } // namespace kanji_tools
