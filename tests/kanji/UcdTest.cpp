@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/Ucd.h>
 #include <tests/kanji_tools/TestUcd.h>
 
 namespace kanji_tools {
