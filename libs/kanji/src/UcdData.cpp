@@ -67,6 +67,7 @@ std::string UcdData::getReadingsAsKana(const Ucd* u) const {
 }
 
 void UcdData::load(const Data::Path& file) {
+  static const std::string OutOfRange{"' out of range"};
   const ColumnFile::Column codeCol{"Code"}, nameCol{"Name"}, blockCol{"Block"},
       versionCol{"Version"}, radicalCol{"Radical"}, strokesCol{"Strokes"},
       vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"Morohashi"},
@@ -84,22 +85,25 @@ void UcdData::load(const Data::Path& file) {
         f.isEmpty(jSourceCol))
       f.error("one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated");
     auto& name{f.get(nameCol)};
-    if (name.size() > 4) f.error("name greater than 4");
-    if (f.get(vStrokesCol) == "0") f.error("VStrokes shouldn't be 0");
+    if (name.size() > 4) f.error("name more than 4 bytes");
+    if (f.get(vStrokesCol) == "0") f.error("variant strokes shouldn't be 0");
 
     const auto radical{f.getULong(radicalCol)}, strokes{f.getULong(strokesCol)},
         vStrokes{f.isEmpty(vStrokesCol) ? 0 : f.getULong(vStrokesCol)};
-    if (radical < 1 || radical > 214) f.error("radical out of range");
+    if (radical < 1 || radical > 214)
+      f.error("radical '" + std::to_string(radical) + OutOfRange);
     // 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
-    if (strokes < 1 || strokes > 53) f.error("strokes out of range");
-    if (vStrokes == 1 || vStrokes > 33) f.error("variant strokes out of range");
+    if (strokes < 1 || strokes > 53)
+      f.error("strokes '" + std::to_string(strokes) + OutOfRange);
+    if (vStrokes == 1 || vStrokes > 33)
+      f.error("variant strokes '" + std::to_string(vStrokes) + OutOfRange);
 
     const auto joyo{f.getBool(joyoCol)}, jinmei{f.getBool(jinmeiCol)};
     if (joyo) {
       if (jinmei) f.error("can't be both joyo and jinmei");
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it
       // shouldn't be empty for Joyo
-      if (f.isEmpty(meaningCol)) f.error("meaning is empty for Joyo Kanji");
+      if (f.isEmpty(meaningCol)) f.error("meaning is empty for Jōyō Kanji");
     }
 
     Ucd::Links links;
@@ -109,18 +113,18 @@ void UcdData::load(const Data::Path& file) {
         if (std::string linkCode; std::getline(codes, linkCode, ','))
           links.emplace_back(f.getWChar(linkCodesCol, linkCode), linkName);
         else
-          f.error("LinkName has more values than LinkCode");
+          f.error("LinkNames has more values than LinkCodes");
       // Joyo are standard Kanji so they shouldn't have a link back to a
       // standard form. However, Some Jinmei do have links since they are
       // 'officially allowed variants/old forms'. There are links in raw XML
       // data for joyo, but the parse script ignores them.
       if (joyo) f.error("joyo shouldn't have links");
       if (f.isEmpty(linkTypeCol))
-        f.error("LinkName has a value, but LinkType is empty");
+        f.error("LinkNames has a value, but LinkType is empty");
     } else if (!f.isEmpty(linkTypeCol))
-      f.error("LinkType has a value, but LinkName is empty");
+      f.error("LinkType has a value, but LinkNames is empty");
     else if (!f.isEmpty(linkCodesCol))
-      f.error("LinkCode has a value, but LinkName is empty");
+      f.error("LinkCodes has a value, but LinkNames is empty");
 
     auto linkType{f.get(linkTypeCol)};
     const auto linkedReadings{linkType.ends_with("*")};
@@ -140,8 +144,8 @@ void UcdData::load(const Data::Path& file) {
         _linkedOther[link.name()].emplace_back(name);
       else if (const auto i{_linkedJinmei.emplace(link.name(), name)};
                !i.second)
-        f.error("jinmei link " + link.name() + " to " + name +
-                " failed - has " + i.first->second);
+        f.error("jinmei entry '" + name + "' with link '" + link.name() +
+                "' failed - link already points to '" + i.first->second + "'");
   }
 }
 

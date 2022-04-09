@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kanji/Data.h>
+#include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
@@ -8,26 +9,13 @@ namespace fs = std::filesystem;
 
 namespace {
 
-constexpr auto Arg0{"test"}, TestDataDir{"dir"};
+constexpr auto Arg0{"test"};
 
 namespace fs = std::filesystem;
 
-const fs::path DataDirPath{TestDataDir};
-
-class DataTest : public ::testing::Test, public Data {
-public:
-  [[nodiscard]] Kanji::OptFreq frequency(const std::string&) const override {
-    return {};
-  }
-  [[nodiscard]] JlptLevels level(const std::string&) const override {
-    return JlptLevels::None;
-  }
-  [[nodiscard]] KenteiKyus kyu(const std::string&) const override {
-    return KenteiKyus::None;
-  }
+class DataTest : public TestData {
 protected:
-  DataTest()
-      : Data{DataDirPath, DebugMode::None}, _currentDir(fs::current_path()) {}
+  DataTest() : TestData(false), _currentDir(fs::current_path()) {}
 
   void TearDown() override { fs::current_path(_currentDir); }
 

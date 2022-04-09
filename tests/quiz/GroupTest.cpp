@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/quiz/Group.h>
 #include <kanji_tools/utils/Utils.h>
+#include <tests/kanji_tools/TestKanji.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <sstream>
@@ -8,18 +9,6 @@
 namespace kanji_tools {
 
 namespace {
-
-const Radical TestRadical{1, EmptyString, {}, EmptyString, EmptyString};
-
-class TestKanji : public Kanji {
-public:
-  TestKanji(const std::string& name)
-      : Kanji{name, name, TestRadical, 0, {}, {}, EmptyString} {}
-
-  KanjiTypes type() const override { return KanjiTypes::None; }
-  const std::string& meaning() const override { return EmptyString; }
-  const std::string& reading() const override { return EmptyString; }
-};
 
 const Data::List TestMembers{
     std::make_shared<TestKanji>("甲"), std::make_shared<TestKanji>("乙")};
