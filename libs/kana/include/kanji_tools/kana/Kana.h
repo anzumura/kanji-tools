@@ -112,7 +112,6 @@ public:
   class RepeatMark {
   public:
     RepeatMark(const RepeatMark&) = delete;
-    // operator= is not generated since there are const members
 
     [[nodiscard]] auto matches(CharType t, const std::string& s) const {
       return t == CharType::Hiragana && _hiragana == s ||
@@ -172,7 +171,6 @@ public:
 
   virtual ~Kana() = default;
   Kana(const Kana&) = delete;
-  // operator= is not generated since there are const members
 
   // 'dakuten' and 'hanDakuten' are overridden by derived classes to
   // return the accented versions

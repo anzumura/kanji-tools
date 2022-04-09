@@ -41,7 +41,6 @@ public:
   DataFile(const Path&);
 
   DataFile(const DataFile&) = delete;
-  // operator= is not generated since there are const members
 
   virtual ~DataFile() = default;
 

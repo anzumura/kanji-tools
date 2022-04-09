@@ -7,8 +7,6 @@
 #include <kanji_tools/utils/DataFile.h>
 #include <kanji_tools/utils/EnumMap.h>
 
-#include <optional>
-
 namespace kanji_tools {
 
 // 'Data' provides methods used by 'Kanji' classes during loading and is the
@@ -51,18 +49,17 @@ public:
       std::ostream& err = std::cerr);
 
   Data(const Data&) = delete;
-  // operator= is not generated since there are const members
   virtual ~Data() = default;
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
   [[nodiscard]] const Ucd* findUcd(const std::string& kanjiName) const;
 
-  // functions used by 'Kanji' classes during construction, each take kanji name
+  // functions used by 'Kanji' class ctors, each takes a Kanji name string
   [[nodiscard]] virtual Kanji::OptFreq frequency(const std::string&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual const Radical& ucdRadical(
-      const std::string& kanji, const Ucd*) const;
+      const std::string&, const Ucd*) const;
 
   // 'getRadicalByName' is used by 'ExtraKanji' classes during construction. It
   // returns the Radical for the given 'radicalName' (like 二, 木, 言, etc.).

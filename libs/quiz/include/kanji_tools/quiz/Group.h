@@ -42,7 +42,6 @@ public:
   Group(size_t number, const std::string& name, const Data::List& members);
 
   Group(const Group&) = delete;
-  // operator= is not generated since there are const members
   virtual ~Group() = default;
 
   [[nodiscard]] virtual GroupType type() const = 0;

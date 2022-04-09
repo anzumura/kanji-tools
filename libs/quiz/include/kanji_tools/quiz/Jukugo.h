@@ -9,7 +9,6 @@ public:
   Jukugo(const std::string& name, const std::string& reading, KanjiGrades);
 
   Jukugo(const Jukugo&) = delete;
-  // operator= is not generated since there are const members
 
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& reading() const { return _reading; }

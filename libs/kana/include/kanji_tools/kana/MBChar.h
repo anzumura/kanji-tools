@@ -54,7 +54,6 @@ public:
   explicit MBChar(const std::string& data) : _data{data} {}
 
   MBChar(const MBChar&) = delete;
-  // operator= is not generated since there are const members
 
   // call reset in order to loop over the string again
   void reset();

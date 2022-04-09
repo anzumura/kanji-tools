@@ -36,7 +36,6 @@ public:
       std::ostream* debug = {});
 
   MBCount(const MBCount&) = delete;
-  // operator= is not generated since there are const members
   virtual ~MBCount() = default;
 
   // 'add' adds all the 'MBChars' from the given string 's' and returns the

@@ -15,7 +15,6 @@ public:
       const std::string& longName, const std::string& reading);
 
   Radical(const Radical&) = default;
-  // operator= is not generated since there are const members
 
   [[nodiscard]] bool operator==(const Radical&) const;
   [[nodiscard]] bool operator<(const Radical&) const;
