@@ -24,7 +24,7 @@ fs::path DataFile::getFile(const Path& dir, const Path& file) {
 }
 
 void DataFile::print(std::ostream& out, const List& l, const std::string& type,
-    const std::string& group, bool isError) { // LCOV_EXCL_LINE
+    const std::string& group, bool isError) { // LCOV_EXCL_LINE - gcov bug
   if (!l.empty()) {
     out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' '
         << type;

@@ -11,7 +11,7 @@ Kanji::OptString CustomFileKanji::extraTypeInfo() const {
 }
 
 CustomFileKanji::CustomFileKanji(const Data& data, const ColumnFile& f,
-    // LCOV_EXCL_START
+    // LCOV_EXCL_START - gcov bug
     const std::string& name, Strokes strokes, const std::string& meaning,
     // LCOV_EXCL_STOP
     const LinkNames& oldNames, const Ucd* u)
@@ -21,7 +21,7 @@ CustomFileKanji::CustomFileKanji(const Data& data, const ColumnFile& f,
 
 CustomFileKanji::CustomFileKanji(const Data& data, const ColumnFile& f,
     const std::string& name, Strokes strokes, const LinkNames& oldNames,
-    const Ucd* u) // LCOV_EXCL_LINE
+    const Ucd* u) // LCOV_EXCL_LINE - gcov bug
     : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
           strokes, f.get(ReadingCol), u},
       _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
@@ -42,7 +42,7 @@ OfficialKanji::OfficialKanji(const Data& data, const ColumnFile& f,
       _year{f.getOptU16(YearCol)} {}
 
 OfficialKanji::OfficialKanji(const Data& data, const ColumnFile& f,
-    // LCOV_EXCL_START
+    // LCOV_EXCL_START - gcov bug
     const std::string& name, Strokes strokes, const std::string& meaning)
     // LCOV_EXCL_STOP
     : CustomFileKanji{data, f, name, strokes, meaning, getOldNames(f),

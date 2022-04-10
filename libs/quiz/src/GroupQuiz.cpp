@@ -28,7 +28,7 @@ constexpr auto TotalLetters{'z' - 'a'};
 } // namespace
 
 GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
-    // LCOV_EXCL_START - Clang (incorrectly) doesn't count the following line
+    // LCOV_EXCL_START - gcov bug
     bool showMeanings, const GroupData::List& list, MemberType memberType)
     // LCOV_EXCL_STOP
     : Quiz{launcher, question, showMeanings}, _groupType{getGroupType(list)} {

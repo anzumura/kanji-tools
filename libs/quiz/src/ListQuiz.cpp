@@ -11,7 +11,7 @@ std::mt19937 RandomGen(RandomDevice());
 
 const std::string Prompt{"  Select"};
 
-constexpr auto ChoiceStart{'1'}; // LCOV_EXCL_LINE
+constexpr auto ChoiceStart{'1'}; // LCOV_EXCL_LINE - gcov bug
 
 } // namespace
 

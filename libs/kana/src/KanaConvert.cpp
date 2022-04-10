@@ -28,7 +28,7 @@ KanaConvert::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
   for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
            D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
-           // LCOV_EXCL_START - Clang coverage misses the following line
+           // LCOV_EXCL_START - gcov bug
            D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
            // LCOV_EXCL_STOP
            // Ascii 0-9
@@ -222,9 +222,9 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
                    ? processKanaMacron(prolong, prevKana, i->second, true)
                    : processKana(firstKana, source, prevKana) +
                          processKanaMacron(prolong, prevKana, i->second);
-      // LCOV_EXCL_START
       // return second part unconverted - this should be impossible by design
       // since only Kana that exists in sourceMap are added to 'kanaGroup'
+      // LCOV_EXCL_START
       return processKana(firstKana, source, prevKana) +
              kanaGroup.substr(Kana::OneKanaSize);
       // LCOV_EXCL_STOP
