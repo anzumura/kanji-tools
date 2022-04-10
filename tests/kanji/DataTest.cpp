@@ -3,6 +3,8 @@
 #include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
+#include <fstream>
+
 namespace kanji_tools {
 
 namespace fs = std::filesystem;
@@ -10,13 +12,15 @@ namespace fs = std::filesystem;
 namespace {
 
 constexpr auto Arg0{"test"};
-auto TestOne{std::make_shared<TestKanji>("一")};
-auto TestVariant{std::make_shared<TestKanji>("侮︀")};
+
+const auto TestOne{std::make_shared<TestKanji>("一")},
+    TestVariant{std::make_shared<TestKanji>("侮︀")};
+
 const std::string InUcd{" in _ucd\n"};
 
 class DataTest : public TestData {
 protected:
-  DataTest() : TestData(false), _currentDir(fs::current_path()) {
+  DataTest() : _currentDir(fs::current_path()) {
     TestOne->type(KanjiTypes::None);
   }
 
@@ -239,6 +243,16 @@ TEST_F(DataTest, DuplicateCompatibilityName) {
   EXPECT_TRUE(checkInsert(k2, &ucd));
   EXPECT_TRUE(
       _es.str().ends_with("failed to insert variant '器︀' into map\n"));
+}
+
+// test loading from files
+
+TEST_F(DataTest, DuplicateFrequencyReading) {
+  write("Name\tReading\n呑\tトン、ドン、の-む\n呑\tトン、ドン、の-む");
+  EXPECT_TRUE(fs::is_regular_file(TestFile));
+  EXPECT_THROW(call([this] { loadFrequencyReadings(TestFile); },
+                   "duplicate name - file: testFile.txt, row: 2"),
+      std::domain_error);
 }
 
 } // namespace kanji_tools

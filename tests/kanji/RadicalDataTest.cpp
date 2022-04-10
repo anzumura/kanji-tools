@@ -2,25 +2,15 @@
 #include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
-#include <fstream>
-
 namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path TestFile{TestDir / "radicals.txt"};
-
 class RadicalDataTest : public TestData {
 protected:
   void SetUp() override { write("Number\tName\tLongName\tReading"); }
-
-  void write(const std::string& s) {
-    std::ofstream of{TestFile, std::ios_base::app};
-    of << s << '\n';
-    of.close();
-  }
 
   void loadOne() {
     write("001\t一\t一部（いちぶ）\tイチ");
@@ -66,7 +56,7 @@ TEST_F(RadicalDataTest, InvalidNumbering) {
   write("003\t一\t一部（いちぶ）\tイチ");
   EXPECT_THROW(
       call([this] { _radicals.load(TestFile); },
-          "radicals must be ordered by 'number' - file: radicals.txt, row: 1"),
+          "radicals must be ordered by 'number' - file: testFile.txt, row: 1"),
       std::domain_error);
 }
 

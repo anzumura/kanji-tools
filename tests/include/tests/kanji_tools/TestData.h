@@ -1,13 +1,15 @@
 #pragma once
 
+#include <gtest/gtest.h>
 #include <kanji_tools/kanji/Data.h>
 
-#include <gtest/gtest.h>
+#include <fstream>
 
 namespace kanji_tools {
 
 inline constexpr auto TestDirArg{"testDir"};
 inline const std::filesystem::path TestDir{TestDirArg};
+inline const std::filesystem::path TestFile{TestDir / "testFile.txt"};
 
 class TestData : public ::testing::Test, public Data {
 public:
@@ -21,19 +23,24 @@ public:
     return KenteiKyus::None;
   }
 protected:
-  TestData(bool createDir = true) : Data{TestDir, DebugMode::None, _os, _es} {
-    clear(createDir);
-  }
+  TestData() : Data{TestDir, DebugMode::None, _os, _es} {}
 
   ~TestData() override { clear(); }
 
-  void clear(bool createDir = false) {
+  void clear() {
     _os.str({});
     _os.clear();
     _es.str({});
     _es.clear();
     std::filesystem::remove_all(TestDir);
-    if (createDir) std::filesystem::create_directory(TestDir);
+  }
+
+  static void write(const std::string& s) {
+    if (!std::filesystem::exists(TestDir))
+      std::filesystem::create_directory(TestDir);
+    std::ofstream of{TestFile, std::ios_base::app};
+    of << s << '\n';
+    of.close();
   }
 
   inline static std::stringstream _os, _es;
