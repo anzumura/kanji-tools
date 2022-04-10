@@ -9,9 +9,8 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path Jlpt{"jlpt"}, Kentei{"kentei"},
-    FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"},
-    StrokesFile{"strokes"}, WikiStrokesFile{"wiki-strokes"}, UcdFile{"ucd"};
+const fs::path Jlpt{"jlpt"}, Kentei{"kentei"}, UcdFile{"ucd"},
+    FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"};
 
 } // namespace
 
