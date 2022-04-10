@@ -10,23 +10,21 @@ Kanji::OptString CustomFileKanji::extraTypeInfo() const {
   return '#' + std::to_string(_number);
 }
 
-const Ucd* CustomFileKanji::findUcd(const Data& d, const std::string& name) {
-  return d.findUcd(name);
-}
-
-CustomFileKanji::CustomFileKanji(const Data& d, const ColumnFile& f,
+CustomFileKanji::CustomFileKanji(const Data& data, const ColumnFile& f,
+    // LCOV_EXCL_START
     const std::string& name, Strokes strokes, const std::string& meaning,
-    const LinkNames& oldNames, const Ucd* u) // LCOV_EXCL_LINE
-    : NonLinkedKanji{d, name, d.getRadicalByName(f.get(RadicalCol)), meaning,
-          f.get(ReadingCol), strokes, u},
-      _kyu{d.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
+    // LCOV_EXCL_STOP
+    const LinkNames& oldNames, const Ucd* u)
+    : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
+          strokes, meaning, f.get(ReadingCol), u},
+      _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
-CustomFileKanji::CustomFileKanji(const Data& d, const ColumnFile& f,
+CustomFileKanji::CustomFileKanji(const Data& data, const ColumnFile& f,
     const std::string& name, Strokes strokes, const LinkNames& oldNames,
-    const Ucd* u)
-    : NonLinkedKanji{d, name, d.getRadicalByName(f.get(RadicalCol)),
-          f.get(ReadingCol), strokes, u},
-      _kyu{d.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
+    const Ucd* u) // LCOV_EXCL_LINE
+    : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
+          strokes, f.get(ReadingCol), u},
+      _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 // OfficialKanji
 
@@ -36,17 +34,21 @@ Kanji::OptString OfficialKanji::extraTypeInfo() const {
                : CustomFileKanji::extraTypeInfo();
 }
 
-OfficialKanji::OfficialKanji(
-    const Data& d, const ColumnFile& f, const std::string& name, const Ucd* u)
-    : CustomFileKanji{d, f, name, d.ucdStrokes(name, u), getOldNames(f), u},
-      _frequency{d.frequency(name)}, _level{d.level(name)}, _year{f.getOptU16(
-                                                                YearCol)} {}
+OfficialKanji::OfficialKanji(const Data& data, const ColumnFile& f,
+    const std::string& name, const Ucd* u)
+    : CustomFileKanji{data, f, name, data.ucdStrokes(name, u), getOldNames(f),
+          u},
+      _frequency{data.frequency(name)}, _level{data.level(name)},
+      _year{f.getOptU16(YearCol)} {}
 
-OfficialKanji::OfficialKanji(const Data& d, const ColumnFile& f,
-    const std::string& name, Strokes s, const std::string& meaning)
-    : CustomFileKanji{d, f, name, s, meaning, getOldNames(f), findUcd(d, name)},
-      _frequency{d.frequency(name)}, _level{d.level(name)}, _year{f.getOptU16(
-                                                                YearCol)} {}
+OfficialKanji::OfficialKanji(const Data& data, const ColumnFile& f,
+    // LCOV_EXCL_START
+    const std::string& name, Strokes strokes, const std::string& meaning)
+    // LCOV_EXCL_STOP
+    : CustomFileKanji{data, f, name, strokes, meaning, getOldNames(f),
+          data.findUcd(name)},
+      _frequency{data.frequency(name)}, _level{data.level(name)},
+      _year{f.getOptU16(YearCol)} {}
 
 Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
   LinkNames result;
@@ -58,8 +60,8 @@ Kanji::LinkNames OfficialKanji::getOldNames(const ColumnFile& f) {
 
 // JinmeiKanji
 
-JinmeiKanji::JinmeiKanji(const Data& d, const ColumnFile& f)
-    : OfficialKanji{d, f, f.get(NameCol), d.findUcd(f.get(NameCol))},
+JinmeiKanji::JinmeiKanji(const Data& data, const ColumnFile& f)
+    : OfficialKanji{data, f, f.get(NameCol), data.findUcd(f.get(NameCol))},
       _reason{AllJinmeiKanjiReasons.fromString(f.get(ReasonCol))} {}
 
 Kanji::OptString JinmeiKanji::extraTypeInfo() const {
@@ -68,8 +70,8 @@ Kanji::OptString JinmeiKanji::extraTypeInfo() const {
 
 // JouyouKanji
 
-JouyouKanji::JouyouKanji(const Data& d, const ColumnFile& f)
-    : OfficialKanji{d, f, f.get(NameCol), f.getU8(StrokesCol),
+JouyouKanji::JouyouKanji(const Data& data, const ColumnFile& f)
+    : OfficialKanji{data, f, f.get(NameCol), f.getU8(StrokesCol),
           f.get(MeaningCol)},
       _grade{getGrade(f.get(GradeCol))} {}
 
@@ -79,16 +81,16 @@ KanjiGrades JouyouKanji::getGrade(const std::string& s) {
 
 // ExtraKanji
 
-ExtraKanji::ExtraKanji(const Data& d, const ColumnFile& f)
-    : ExtraKanji{d, f, f.get(NameCol)} {}
+ExtraKanji::ExtraKanji(const Data& data, const ColumnFile& f)
+    : ExtraKanji{data, f, f.get(NameCol)} {}
 
 ExtraKanji::ExtraKanji(
-    const Data& d, const ColumnFile& f, const std::string& name)
-    : ExtraKanji{d, f, name, findUcd(d, name)} {}
+    const Data& data, const ColumnFile& f, const std::string& name)
+    : ExtraKanji{data, f, name, data.findUcd(name)} {}
 
-ExtraKanji::ExtraKanji(
-    const Data& d, const ColumnFile& f, const std::string& name, const Ucd* u)
-    : CustomFileKanji{d, f, name, f.getU8(StrokesCol), f.get(MeaningCol),
+ExtraKanji::ExtraKanji(const Data& data, const ColumnFile& f,
+    const std::string& name, const Ucd* u)
+    : CustomFileKanji{data, f, name, f.getU8(StrokesCol), f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? linkNames(u) : EmptyLinkNames, u},
       _newName{u && u->hasNonTraditionalLinks()
                    ? OptString{u->links()[0].name()}

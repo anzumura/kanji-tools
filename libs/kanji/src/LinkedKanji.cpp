@@ -9,12 +9,12 @@ const std::string& LinkedKanji::reading() const { return _link->reading(); }
 
 Kanji::OptString LinkedKanji::newName() const { return _link->name(); }
 
-LinkedKanji::LinkedKanji(const Data& d, const std::string& name,
+LinkedKanji::LinkedKanji(const Data& data, const std::string& name,
     const Data::Entry& link, const Ucd* u)
-    : Kanji{name, d.getCompatibilityName(name), d.ucdRadical(name, u),
-          d.ucdStrokes(name, u), d.getMorohashiId(u), d.getNelsonIds(u),
-          d.getPinyin(u)},
-      _frequency{d.frequency(name)}, _kyu{d.kyu(name)}, _link{link} {}
+    : Kanji{name, data.getCompatibilityName(name), data.ucdRadical(name, u),
+          data.ucdStrokes(name, u), data.getMorohashiId(u),
+          data.getNelsonIds(u), data.getPinyin(u)},
+      _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
 
 const std::string& LinkedKanji::checkType(
     const std::string& name, const Data::Entry& link, bool isJinmei) {
@@ -30,11 +30,12 @@ const std::string& LinkedKanji::checkType(
 }
 
 LinkedJinmeiKanji::LinkedJinmeiKanji(
-    const Data& d, const std::string& name, const Data::Entry& link)
-    : LinkedKanji{d, checkType(name, link, true), link, d.findUcd(name)} {}
+    const Data& data, const std::string& name, const Data::Entry& link)
+    : LinkedKanji{data, checkType(name, link, true), link, data.findUcd(name)} {
+}
 
 LinkedOldKanji::LinkedOldKanji(
-    const Data& d, const std::string& name, const Data::Entry& link)
-    : LinkedKanji{d, checkType(name, link), link, d.findUcd(name)} {}
+    const Data& data, const std::string& name, const Data::Entry& link)
+    : LinkedKanji{data, checkType(name, link), link, data.findUcd(name)} {}
 
 } // namespace kanji_tools

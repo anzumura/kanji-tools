@@ -28,13 +28,14 @@ public:
   //   for the given Kanji type 'T' (and the first line must have header names
   //   that match the static 'Column' instances below)
   template<typename T>
-  [[nodiscard]] static Data::List fromFile(const Data& d, const Data::Path& f) {
+  [[nodiscard]] static Data::List fromFile(
+      const Data& data, const Data::Path& f) {
     // all 'CustomFileKanji' files must have at least the following columns
     ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
     for (auto& i : T::RequiredColumns) columns.emplace_back(i);
     Data::List results;
     for (ColumnFile file{f, columns}; file.nextRow();)
-      results.emplace_back(std::make_shared<T>(d, file));
+      results.emplace_back(std::make_shared<T>(data, file));
     return results;
   }
 protected:
@@ -42,8 +43,6 @@ protected:
       RadicalCol{"Radical"}, OldNamesCol{"OldNames"}, YearCol{"Year"},
       StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"},
       ReadingCol{"Reading"}, ReasonCol{"Reason"};
-
-  [[nodiscard]] static const Ucd* findUcd(const Data&, const std::string& name);
 
   // ctor used by 'CustomFileKanji' and 'ExtraKanji': has a 'meaning' field
   CustomFileKanji(const Data&, const ColumnFile&, const std::string& name,

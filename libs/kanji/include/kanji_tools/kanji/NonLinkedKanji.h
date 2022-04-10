@@ -16,14 +16,13 @@ protected:
   [[nodiscard]] static LinkNames linkNames(const Ucd*);
 
   // ctor used by 'CustomFileKanji': has 'meaning' and 'reading'
-  NonLinkedKanji(const Data&, const std::string& name, const Radical&,
-      const std::string& meaning, const std::string& reading, Strokes,
-      const Ucd*);
+  NonLinkedKanji(const Data&, const std::string& name, const Radical&, Strokes,
+      const std::string& meaning, const std::string& reading, const Ucd*);
 
   // ctor used by 'CustomFileKanji' and 'UcdFileKanji': has 'reading' and
   // looks up 'meaning' from 'ucd.txt'
-  NonLinkedKanji(const Data&, const std::string& name, const Radical&,
-      const std::string& reading, Strokes strokes, const Ucd*);
+  NonLinkedKanji(const Data&, const std::string& name, const Radical&, Strokes,
+      const std::string& reading, const Ucd*);
 private:
   const std::string _meaning;
   const std::string _reading;

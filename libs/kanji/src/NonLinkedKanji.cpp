@@ -10,17 +10,19 @@ Kanji::LinkNames NonLinkedKanji::linkNames(const Ucd* u) {
   return result;
 }
 
-NonLinkedKanji::NonLinkedKanji(const Data& d, const std::string& name,
-    // LCOV_EXCL_START - shouldn't be needed
-    const Radical& rad, const std::string& meaning, const std::string& reading,
+NonLinkedKanji::NonLinkedKanji(const Data& data, const std::string& name,
+    // LCOV_EXCL_START
+    const Radical& radical, Strokes strokes, const std::string& meaning,
     // LCOV_EXCL_STOP
-    Strokes s, const Ucd* u)
-    : Kanji{name, d.getCompatibilityName(name), rad, s, d.getMorohashiId(u),
-          d.getNelsonIds(u), d.getPinyin(u)},
+    const std::string& reading, const Ucd* u)
+    : Kanji{name, data.getCompatibilityName(name), radical, strokes,
+          data.getMorohashiId(u), data.getNelsonIds(u), data.getPinyin(u)},
       _meaning{meaning}, _reading{reading} {}
 
-NonLinkedKanji::NonLinkedKanji(const Data& d, const std::string& name,
-    const Radical& rad, const std::string& reading, Strokes s, const Ucd* u)
-    : NonLinkedKanji{d, name, rad, d.ucd().getMeaning(u), reading, s, u} {}
+NonLinkedKanji::NonLinkedKanji(const Data& data, const std::string& name,
+    const Radical& radical, Strokes strokes, const std::string& reading,
+    const Ucd* u) // LCOV_EXCL_LINE
+    : NonLinkedKanji{
+          data, name, radical, strokes, data.ucd().getMeaning(u), reading, u} {}
 
 } // namespace kanji_tools

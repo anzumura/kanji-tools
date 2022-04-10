@@ -58,7 +58,7 @@ private:
 class FrequencyKanji : public StandardKanji {
 public:
   // ctor used for 'FrequencyKanji' without a reading
-  FrequencyKanji(const Data& d, const std::string& name, Frequency);
+  FrequencyKanji(const Data&, const std::string& name, Frequency);
 
   // ctor used for 'FrequencyKanji' with readings from 'frequency-readings.txt'
   FrequencyKanji(const Data&, const std::string& name,
