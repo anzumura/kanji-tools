@@ -426,18 +426,16 @@ void Data::processUcd() {
 
 void Data::checkStrokes() const {
   if (fullDebug()) {
-    const auto f{[this](KanjiTypes t) {
+    // Jouyou and Extra type Kanji load strokes from their own files so print
+    // any differences with data in _ucd (other types shouldn't have any diffs)
+    for (auto t : AllKanjiTypes) {
       DataFile::List l;
       for (auto& i : _types[t])
         if (const auto u{findUcd(i->name())}; u && i->strokes() != u->strokes())
           l.emplace_back(i->name());
       DataFile::print(
           _out, l, toString(t) + " Kanji with differrent strokes", "_ucd");
-    }};
-    // compare Jouyou and Extra type Kanji strokes with Ucd values (all other
-    // types load strokes from Ucd so no point comparing)
-    f(KanjiTypes::Jouyou);
-    f(KanjiTypes::Extra);
+    }
   }
 }
 
