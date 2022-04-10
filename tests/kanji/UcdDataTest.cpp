@@ -4,17 +4,13 @@
 #include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
-#include <fstream>
-
 namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path TestFile{TestDir / "ucd.txt"};
-
-const std::string FileMsg{" - file: ucd.txt, row: 1"};
+const std::string FileMsg{" - file: testFile.txt, row: 1"};
 
 class UcdDataTest : public TestData {
 protected:
@@ -22,12 +18,6 @@ protected:
     write("Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t"
           "Morohashi\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\t"
           "LinkNames\tLinkType\tMeaning\tOn\tKun");
-  }
-
-  void write(const std::string& s) {
-    std::ofstream of{TestFile, std::ios_base::app};
-    of << s << '\n';
-    of.close();
   }
 
   void writeOne(bool includeOn = true, bool includeKun = true) {
@@ -271,7 +261,7 @@ TEST_F(UcdDataTest, MissingMeaningForJouyou) {
 TEST_F(UcdDataTest, DuplicateEntry) {
   writeOne();
   EXPECT_THROW(call([this] { loadOne(); },
-                   "duplicate entry '一' - file: ucd.txt, row: 2"),
+                   "duplicate entry '一' - file: testFile.txt, row: 2"),
       std::domain_error);
 }
 
@@ -348,7 +338,7 @@ TEST_F(UcdDataTest, BadJinmeiLink) {
   writeOne(); // write an entry that mimics a Linked Jinmei Kanji
   const auto msg{"jinmei entry '僧' with link '" + _testLinkNames +
                  "' failed - link already points to '" + _testName +
-                 "' - file: ucd.txt, row: 3"};
+                 "' - file: testFile.txt, row: 3"};
   EXPECT_THROW(call([this] { loadLinkedJinmei(); }, msg), std::domain_error);
 }
 
