@@ -157,8 +157,9 @@ protected:
 
   void populateJouyou();
   // 'populateLinkedKanji' should be called immediately after 'populateJouyou'.
-  // It reads data from 'linked-jinmei.txt' and creates either a LinkedJinmei or
-  // a LinkedOld kanji for each entry.
+  // This function creates a LinkedJinmei Kanji for each entry in the file (each
+  // line should start with a Jouyou Kanji). It then creates LinkedOld Kanji for
+  // all Jouyou Kanji 'oldNames' that aren't already LinkedJinmei.
   void populateLinkedKanji(const Path&);
   void populateJinmei();
   void populateExtra();
