@@ -247,11 +247,25 @@ TEST_F(DataTest, DuplicateCompatibilityName) {
 
 // test loading from files
 
-TEST_F(DataTest, DuplicateFrequencyReading) {
+TEST_F(DataTest, FrequencyReadingDuplicate) {
   write("Name\tReading\n呑\tトン、ドン、の-む\n呑\tトン、ドン、の-む");
-  EXPECT_TRUE(fs::is_regular_file(TestFile));
   EXPECT_THROW(call([this] { loadFrequencyReadings(TestFile); },
                    "duplicate name - file: testFile.txt, row: 2"),
+      std::domain_error);
+}
+
+TEST_F(DataTest, LinkedJinmeiEntryNotFound) {
+  write("亜\t亞");
+  // no Jouyou Kanji are loaded at this point so any entry will cause an error
+  EXPECT_THROW(call([this] { populateLinkedKanji(TestFile); },
+                   "'亜' not found - file: testFile.txt"),
+      std::domain_error);
+}
+
+TEST_F(DataTest, LinkedJinmeiBadLine) {
+  write("亜亞");
+  EXPECT_THROW(call([this] { populateLinkedKanji(TestFile); },
+                   "bad line '亜亞' - file: testFile.txt"),
       std::domain_error);
 }
 

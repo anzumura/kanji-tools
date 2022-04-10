@@ -294,20 +294,20 @@ void Data::populateJouyou() {
 
 void Data::populateLinkedKanji(const Path& file) {
   std::ifstream f{file};
-  // populate _linkedJinmeiKanji that are linked to Jouyou
+  // each line in 'file' should be a Jouyou Kanji followed by the officially
+  // recognized 'Jinmei Variant' (so populateJouyou must be called first)
   auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
   for (std::string line; std::getline(f, line);) {
     std::stringstream ss{line};
     if (std::string jouyou, linked;
         std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
       if (const auto i{_kanjiNameMap.find(jouyou)}; i == _kanjiNameMap.end())
-        printError(
-            "can't find " + jouyou + " while processing " + file.string());
+        usage("'" + jouyou + "' not found - file: " + file.filename().string());
       else
         checkInsert(linkedJinmei,
             std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second));
     } else
-      printError("bad line in " + file.string() + ": " + line);
+      usage("bad line '" + line + "' - file: " + file.filename().string());
   }
   // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not
   // LinkedJinmei created above)
