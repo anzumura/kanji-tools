@@ -30,6 +30,29 @@ function changeDir() {
   log "current directory: $PWD"
 }
 
+# allow changing the report type via command line - here are some of the types:
+# --txt: compact human-readable summaries
+# --html: overview of all files
+# --html-details: annotated source files
+# --cobertura: (same as -x, the default for this script)
+[[ $# -gt 0 ]] && report=$1 || report=-x
+
+reportDir=build
+reportFile=coverage.
+# try to use an appropriate suffix for report file
+case $report in
+*html*)
+  reportDir+=/html
+  reportFile+=html
+  ;;
+*json* | --coveralls)
+  reportDir+=/json
+  reportFile+=json
+  ;;
+*csv*) reportFile+=csv ;;
+*) reportFile+=xml ;;
+esac
+
 log "PATH=$PATH"
 
 changeDir "$testDir"
@@ -60,13 +83,21 @@ done
 
 if [[ -n $cov ]]; then
   changeDir "$topDir"
+  if [[ $reportDir != build ]]; then
+    if [[ -d $reportDir ]]; then
+      log "cleaning up files in: $reportDir"
+      rm -rf $reportDir/*
+    else
+      mkdir $reportDir
+    fi
+  fi
   log "running: $(which gcovr)"
   # 'gcovr' 5.0 worked fine for both Clang and GCC, but version 5.1 gets a few
   # parse errors for GCC which don't seem to affect the overall coverage so for
   # now use '--gcov-ignore-parse-errors' to allow the report to get generated
-  gcovr --gcov-executable=$cov -x -d -flibs --gcov-ignore-parse-errors \
-    --exclude-unreachable-branches --exclude-throw-branches build/libs \
-    build/tests >build/coverage.xml
+  gcovr --gcov-executable=$cov $report $reportDir/$reportFile -d -flibs \
+    --gcov-ignore-parse-errors --exclude-unreachable-branches \
+    --exclude-throw-branches build/libs build/tests
 fi
 
 # set the following values for the actions:
