@@ -9,8 +9,9 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path Jlpt{"jlpt"}, Kentei{"kentei"}, UcdFile{"ucd"},
-    FrequencyReadingsFile{"frequency-readings"}, RadicalsFile{"radicals"};
+const fs::path UcdFile{"ucd"}, RadicalsFile{"radicals"},
+    FrequencyReadingsFile{"frequency-readings"},
+    LinkedJinmeiFile{"linked-jinmei"}, Jlpt{"jlpt"}, Kentei{"kentei"};
 
 } // namespace
 
@@ -31,6 +32,7 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
   _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));
   loadFrequencyReadings(DataFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
+  populateLinkedKanji(DataFile::getFile(dataDir(), LinkedJinmeiFile));
   populateJinmei();
   populateExtra();
   for (auto& i : _levels) processList(i);

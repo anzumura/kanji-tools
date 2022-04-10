@@ -13,8 +13,7 @@ namespace fs = std::filesystem;
 
 namespace { // LCOV_EXCL_LINE
 
-const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"},
-    LinkedJinmeiFile{"linked-jinmei"}, ExtraFile{"extra"};
+const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"}, ExtraFile{"extra"};
 
 // This value is used for finding the location of 'data' directory. It will of
 // course need to be updated if the number of '.txt' files changes.
@@ -291,11 +290,9 @@ void Data::populateJouyou() {
     if (checkInsert(i)) _grades[i->grade()].emplace_back(i);
   }
   _types[KanjiTypes::Jouyou] = std::move(results);
-  populateLinkedKanji();
 }
 
-void Data::populateLinkedKanji() {
-  Path file{DataFile::getFile(_dataDir, LinkedJinmeiFile)};
+void Data::populateLinkedKanji(const Path& file) {
   std::ifstream f{file};
   // populate _linkedJinmeiKanji that are linked to Jouyou
   auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};

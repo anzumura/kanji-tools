@@ -155,8 +155,11 @@ protected:
   void loadStrokes(const Path&, bool checkDuplicates = true);
   void loadFrequencyReadings(const Path&);
 
-  // populate Lists (_types datastructure)
   void populateJouyou();
+  // 'populateLinkedKanji' should be called immediately after 'populateJouyou'.
+  // It reads data from 'linked-jinmei.txt' and creates either a LinkedJinmei or
+  // a LinkedOld kanji for each entry.
+  void populateLinkedKanji(const Path&);
   void populateJinmei();
   void populateExtra();
   void processList(const DataFile&);
@@ -184,11 +187,6 @@ private:
 
   [[nodiscard]] static OptPath searchUpForDataDir(Path);
   [[nodiscard]] static bool isValidDataDir(const Path&);
-
-  // 'populateLinkedKanji' is called by 'populateJouyou' function. It reads data
-  // from 'linked-jinmei.txt' and creates either a LinkedJinmei or a LinkedOld
-  // kanji for each entry.
-  void populateLinkedKanji();
 
   // helper functions for checking and inserting into '_kanjiNameMap'
   bool checkInsert(List&, const Entry&);
