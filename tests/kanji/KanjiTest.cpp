@@ -25,12 +25,12 @@ public:
       Kanji::OptFreq, frequency, (const std::string&), (const, override));
   MOCK_METHOD(JlptLevels, level, (const std::string&), (const, override));
   MOCK_METHOD(KenteiKyus, kyu, (const std::string&), (const, override));
-  MOCK_METHOD(const Radical&, ucdRadical, (const std::string&, const Ucd*),
+  MOCK_METHOD(
+      RadicalRef, ucdRadical, (const std::string&, UcdPtr), (const, override));
+  MOCK_METHOD(Ucd::Strokes, ucdStrokes, (const std::string&, UcdPtr),
       (const, override));
-  MOCK_METHOD(Ucd::Strokes, ucdStrokes, (const std::string&, const Ucd*),
-      (const, override));
-  MOCK_METHOD(const Radical&, getRadicalByName, (const std::string&),
-      (const, override));
+  MOCK_METHOD(
+      RadicalRef, getRadicalByName, (const std::string&), (const, override));
 };
 
 class KanjiTest : public ::testing::Test {

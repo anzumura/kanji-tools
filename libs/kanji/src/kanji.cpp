@@ -1,28 +1,26 @@
 #include <kanji_tools/kana/MBChar.h>
-#include <kanji_tools/kanji/Kanji.h>
+#include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 
 namespace kanji_tools {
 
-Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
-    // LCOV_EXCL_START: gcov bug
-    const Radical& radical, Strokes strokes, const OptString& morohashiId,
-    // LCOV_EXCL_STOP
-    const NelsonIds& nelsonIds, const OptString& pinyin)
-    : _name{name}, _nonVariantName{MBChar::optNoVariationSelector(name)},
-      _compatibilityName{compatibilityName}, _radical{radical},
-      _strokes{strokes}, _morohashiId{morohashiId},
-      _nelsonIds{nelsonIds}, _pinyin{pinyin} {
+Kanji::KanjiName::KanjiName(const std::string& name) : _name{name} {
   assert(MBChar::size(_name) == 1);
 }
 
-bool Kanji::variant() const { return _nonVariantName.has_value(); }
-
-std::string Kanji::nonVariantName() const {
-  return _nonVariantName.value_or(_name);
+bool Kanji::KanjiName::isVariant() const {
+  return MBChar::isMBCharWithVariationSelector(_name);
 }
+
+std::string Kanji::KanjiName::nonVariant() const {
+  return MBChar::noVariationSelector(_name);
+}
+
+Kanji::Kanji(DataRef d, Name n, RadicalRef radical, Strokes strokes, UcdPtr u)
+    : Kanji{n, d.getCompatibilityName(n), radical, strokes, d.getMorohashiId(u),
+          d.getNelsonIds(u), d.getPinyin(u)} {}
 
 std::string Kanji::compatibilityName() const {
   return _compatibilityName.value_or(_name);
@@ -75,7 +73,7 @@ std::string Kanji::info(KanjiInfo fields) const {
 }
 
 std::string Kanji::qualifiedName() const {
-  return _name + QualifiedNames[qualifiedNameRank()];
+  return name() + QualifiedNames[qualifiedNameRank()];
 }
 
 bool Kanji::orderByQualifiedName(const Kanji& x) const {

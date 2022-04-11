@@ -3,21 +3,17 @@
 
 namespace kanji_tools {
 
-const std::string& LinkedKanji::meaning() const { return _link->meaning(); }
+Kanji::Meaning LinkedKanji::meaning() const { return _link->meaning(); }
 
-const std::string& LinkedKanji::reading() const { return _link->reading(); }
+Kanji::Reading LinkedKanji::reading() const { return _link->reading(); }
 
 Kanji::OptString LinkedKanji::newName() const { return _link->name(); }
 
-LinkedKanji::LinkedKanji(const Data& data, const std::string& name,
-    const Data::Entry& link, const Ucd* u)
-    : Kanji{name, data.getCompatibilityName(name), data.ucdRadical(name, u),
-          data.ucdStrokes(name, u), data.getMorohashiId(u),
-          data.getNelsonIds(u), data.getPinyin(u)},
+LinkedKanji::LinkedKanji(DataRef data, Name name, Link link, UcdPtr u)
+    : Kanji{data, name, data.ucdRadical(name, u), data.ucdStrokes(name, u), u},
       _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
 
-const std::string& LinkedKanji::checkType(
-    const std::string& name, const Data::Entry& link, bool isJinmei) {
+Kanji::Name LinkedKanji::checkType(Name name, Link link, bool isJinmei) {
   if (const auto t{link->type()};
       t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
     throw std::domain_error{
@@ -29,13 +25,11 @@ const std::string& LinkedKanji::checkType(
   return name;
 }
 
-LinkedJinmeiKanji::LinkedJinmeiKanji(
-    const Data& data, const std::string& name, const Data::Entry& link)
+LinkedJinmeiKanji::LinkedJinmeiKanji(DataRef data, Name name, Link link)
     : LinkedKanji{data, checkType(name, link, true), link, data.findUcd(name)} {
 }
 
-LinkedOldKanji::LinkedOldKanji(
-    const Data& data, const std::string& name, const Data::Entry& link)
+LinkedOldKanji::LinkedOldKanji(DataRef data, Name name, const Data::Entry& link)
     : LinkedKanji{data, checkType(name, link), link, data.findUcd(name)} {}
 
 } // namespace kanji_tools

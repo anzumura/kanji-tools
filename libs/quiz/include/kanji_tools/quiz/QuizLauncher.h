@@ -53,7 +53,7 @@ public:
 private:
   static constexpr u_int8_t JukugoPerLine{3}, MaxJukugoSize{30};
 
-  [[nodiscard]] const Data& data() const { return _groupData->data(); }
+  [[nodiscard]] DataRef data() const { return _groupData->data(); }
 
   void startListQuiz(Question question, bool showMeanings,
       KanjiInfo excludeField, const List&) const;

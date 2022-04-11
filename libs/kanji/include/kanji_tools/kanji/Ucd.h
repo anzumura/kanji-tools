@@ -85,4 +85,6 @@ private:
   const std::string _meaning, _onReading, _kunReading;
 };
 
+using UcdPtr = const Ucd*;
+
 } // namespace kanji_tools

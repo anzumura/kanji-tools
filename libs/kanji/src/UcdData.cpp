@@ -30,11 +30,11 @@ struct PrintCount {
 
 } // namespace
 
-const std::string& UcdData::getMeaning(const Ucd* u) const {
+const std::string& UcdData::getMeaning(UcdPtr u) const {
   return u ? u->meaning() : EmptyString;
 }
 
-const Ucd* UcdData::find(const std::string& kanjiName) const {
+UcdPtr UcdData::find(const std::string& kanjiName) const {
   auto r{kanjiName};
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
     const auto nonVariant{MBChar::noVariationSelector(kanjiName)};
@@ -49,7 +49,7 @@ const Ucd* UcdData::find(const std::string& kanjiName) const {
   return i == _map.end() ? nullptr : &i->second;
 }
 
-std::string UcdData::getReadingsAsKana(const Ucd* u) const {
+std::string UcdData::getReadingsAsKana(UcdPtr u) const {
   if (u) {
     auto s{u->onReading()};
     std::replace(s.begin(), s.end(), ' ', ',');
@@ -149,7 +149,7 @@ void UcdData::load(const Data::Path& file) {
   }
 }
 
-void UcdData::print(const Data& data) const {
+void UcdData::print(DataRef data) const {
   const auto print{[&data](const char* s, auto x, auto y, auto z) {
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x
                << ", Jinmei " << y << ", Other " << z << ")\n";
@@ -193,7 +193,7 @@ void UcdData::print(const Data& data) const {
   printVariationSelectorKanji(data);
 }
 
-void UcdData::printVariationSelectorKanji(const Data& data) const {
+void UcdData::printVariationSelectorKanji(DataRef data) const {
   data.log()
       << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
   data.log()

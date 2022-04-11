@@ -11,42 +11,35 @@ Kanji::OptString UcdFileKanji::newName() const {
                                             : OptString{_linkNames[0]};
 }
 
-UcdFileKanji::UcdFileKanji(const Data& data, const std::string& name,
-    const std::string& reading, const Ucd* u)
-    : NonLinkedKanji{data, name, data.ucdRadical(name, u),
-          data.ucdStrokes(name, u), reading, u},
+UcdFileKanji::UcdFileKanji(DataRef data, Name name, Reading reading, UcdPtr u)
+    : NonLinkedKanji{data, name, data.ucdRadical(name, u), reading, u},
       _hasOldLinks{u && u->hasTraditionalLinks()}, _linkNames{linkNames(u)},
       _linkedReadings{u && u->linkedReadings()} {}
 
-UcdFileKanji::UcdFileKanji(
-    const Data& data, const std::string& name, const Ucd* u) // LCOV_EXCL_LINE
+UcdFileKanji::UcdFileKanji(DataRef data, Name name, UcdPtr u) // LCOV_EXCL_LINE
     : UcdFileKanji{data, name, data.ucd().getReadingsAsKana(u), u} {}
 
-StandardKanji::StandardKanji(
-    const Data& data, const std::string& name, const std::string& reading)
+StandardKanji::StandardKanji(DataRef data, Name name, Reading reading)
     : UcdFileKanji{data, name, reading, data.findUcd(name)}, _kyu{data.kyu(
                                                                  name)} {}
 
-StandardKanji::StandardKanji(const Data& data, const std::string& name)
+StandardKanji::StandardKanji(DataRef data, Name name)
     : StandardKanji{data, name, data.kyu(name)} {}
 
-StandardKanji::StandardKanji(
-    const Data& data, const std::string& name, KenteiKyus kyu)
+StandardKanji::StandardKanji(DataRef data, Name name, KenteiKyus kyu)
     : UcdFileKanji{data, name, data.findUcd(name)}, _kyu{kyu} {}
 
+FrequencyKanji::FrequencyKanji(DataRef data, Name name, Frequency frequency)
+    : StandardKanji{data, KanjiName(name)}, _frequency{frequency} {}
+
 FrequencyKanji::FrequencyKanji(
-    const Data& data, const std::string& name, Frequency frequency)
-    : StandardKanji{data, name}, _frequency{frequency} {}
+    DataRef data, const std::string& name, Reading reading, Frequency frequency)
+    : StandardKanji{data, KanjiName(name), reading}, _frequency{frequency} {}
 
-FrequencyKanji::FrequencyKanji(const Data& data, const std::string& name,
-    const std::string& reading, Frequency frequency)
-    : StandardKanji{data, name, reading}, _frequency{frequency} {}
+KenteiKanji::KenteiKanji(DataRef data, Name name, KenteiKyus kyu)
+    : StandardKanji{data, KanjiName(name), kyu} {}
 
-KenteiKanji::KenteiKanji(
-    const Data& data, const std::string& name, KenteiKyus kyu)
-    : StandardKanji{data, name, kyu} {}
-
-UcdKanji::UcdKanji(const Data& data, const Ucd& u)
-    : UcdFileKanji{data, u.name(), &u} {}
+UcdKanji::UcdKanji(DataRef data, const Ucd& u)
+    : UcdFileKanji{data, KanjiName(u.name()), &u} {}
 
 } // namespace kanji_tools

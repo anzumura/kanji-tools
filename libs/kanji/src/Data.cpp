@@ -48,37 +48,37 @@ Data::Data(const Path& dataDir, DebugMode debugMode, std::ostream& out,
   if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
 }
 
-const Ucd* Data::findUcd(const std::string& kanjiName) const {
+UcdPtr Data::findUcd(const std::string& kanjiName) const {
   return _ucd.find(kanjiName);
 }
 
-const Radical& Data::ucdRadical(const std::string& kanji, const Ucd* u) const {
+RadicalRef Data::ucdRadical(const std::string& kanji, UcdPtr u) const {
   if (u) return _radicals.find(u->radical());
   // 'throw' should never happen - every 'Kanji' class instance should have
   // also exist in the data loaded from Unicode.
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
-Ucd::Strokes Data::ucdStrokes(const std::string& kanji, const Ucd* u) const {
+Ucd::Strokes Data::ucdStrokes(const std::string& kanji, UcdPtr u) const {
   if (u) return u->strokes();
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
-const Radical& Data::getRadicalByName(const std::string& radicalName) const {
+RadicalRef Data::getRadicalByName(const std::string& radicalName) const {
   return _radicals.find(radicalName);
 }
 
-Kanji::OptString Data::getPinyin(const Ucd* u) const {
+Kanji::OptString Data::getPinyin(UcdPtr u) const {
   return u && !u->pinyin().empty() ? Kanji::OptString{u->pinyin()}
                                    : std::nullopt;
 }
 
-Kanji::OptString Data::getMorohashiId(const Ucd* u) const {
+Kanji::OptString Data::getMorohashiId(UcdPtr u) const {
   return u && !u->morohashiId().empty() ? Kanji::OptString{u->morohashiId()}
                                         : std::nullopt;
 }
 
-Kanji::NelsonIds Data::getNelsonIds(const Ucd* u) const {
+Kanji::NelsonIds Data::getNelsonIds(UcdPtr u) const {
   if (u && !u->nelsonIds().empty()) {
     Kanji::NelsonIds ids;
     auto s{u->nelsonIds()};
@@ -216,7 +216,7 @@ bool Data::isValidDataDir(const Path& p) {
              }) == TextFilesInDataDir;
 }
 
-bool Data::checkInsert(const Entry& kanji, const Ucd* ucd) {
+bool Data::checkInsert(const Entry& kanji, UcdPtr ucd) {
   auto& k{*kanji};
   if (!_kanjiNameMap.emplace(k.name(), kanji).second) {
     printError("failed to insert '" + k.name() + "' into map");
@@ -245,7 +245,7 @@ bool Data::checkInsert(List& s, const Entry& kanji) {
   return true;
 }
 
-void Data::insertSanityChecks(const Kanji& kanji, const Ucd* ucdIn) const {
+void Data::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
   const auto error{[this, &kanji](const std::string& s) {
     std::string v;
     if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";

@@ -50,31 +50,30 @@ public:
   virtual ~Data() = default;
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
-  [[nodiscard]] const Ucd* findUcd(const std::string& kanjiName) const;
+  [[nodiscard]] UcdPtr findUcd(const std::string& kanjiName) const;
 
   // functions used by 'Kanji' class ctors, each takes a Kanji name string
   [[nodiscard]] virtual Kanji::OptFreq frequency(const std::string&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
-  [[nodiscard]] virtual const Radical& ucdRadical(
-      const std::string&, const Ucd*) const;
+  [[nodiscard]] virtual RadicalRef ucdRadical(const std::string&, UcdPtr) const;
   [[nodiscard]] virtual Ucd::Strokes ucdStrokes(
-      const std::string&, const Ucd*) const;
+      const std::string&, UcdPtr) const;
 
   // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
   // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).
-  [[nodiscard]] virtual const Radical& getRadicalByName(
+  [[nodiscard]] virtual RadicalRef getRadicalByName(
       const std::string& radicalName) const;
 
   // 'getPinyin' returns 'optional' since not all Kanji have a Pinyin reading
-  [[nodiscard]] Kanji::OptString getPinyin(const Ucd*) const;
+  [[nodiscard]] Kanji::OptString getPinyin(UcdPtr) const;
 
   // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see
   // comments in scripts/parseUcdAllFlat.sh)
-  [[nodiscard]] Kanji::OptString getMorohashiId(const Ucd*) const;
+  [[nodiscard]] Kanji::OptString getMorohashiId(UcdPtr) const;
 
   // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
-  Kanji::NelsonIds getNelsonIds(const Ucd*) const;
+  Kanji::NelsonIds getNelsonIds(UcdPtr) const;
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given
   // 'kanji' if it exists (_ucd.find method takes care of checking whether
@@ -182,7 +181,7 @@ protected:
   EnumList<KanjiTypes> _types;
 
   // checkInsert is non-private to help support testing
-  bool checkInsert(const Entry&, const Ucd* = {});
+  bool checkInsert(const Entry&, UcdPtr = {});
 private:
   using OptPath = std::optional<Path>;
 
@@ -191,7 +190,7 @@ private:
 
   // helper functions for checking and inserting into '_kanjiNameMap'
   bool checkInsert(List&, const Entry&);
-  void insertSanityChecks(const Kanji&, const Ucd*) const;
+  void insertSanityChecks(const Kanji&, UcdPtr) const;
 
   const Path _dataDir;
   const DebugMode _debugMode;
@@ -232,5 +231,6 @@ private:
 };
 
 using DataPtr = std::shared_ptr<const Data>;
+using DataRef = const Data&;
 
 } // namespace kanji_tools

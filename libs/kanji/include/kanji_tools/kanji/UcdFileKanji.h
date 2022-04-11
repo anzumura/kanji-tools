@@ -17,10 +17,9 @@ public:
   [[nodiscard]] bool linkedReadings() const override { return _linkedReadings; }
 protected:
   // ctor used by 'StandardKanji': has 'reading'
-  UcdFileKanji(const Data&, const std::string& name, const std::string& reading,
-      const Ucd*);
+  UcdFileKanji(DataRef, Name, Reading, UcdPtr);
   // ctor used by 'StandardKanji' and 'UcdKanji': looks up 'reading'
-  UcdFileKanji(const Data&, const std::string& name, const Ucd*);
+  UcdFileKanji(DataRef, Name, UcdPtr);
 private:
   const bool _hasOldLinks;
 
@@ -42,13 +41,13 @@ public:
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
 protected:
   // ctor used by 'FrequencyKanji': has 'reading' and looks up 'kyu'
-  StandardKanji(const Data&, const std::string&, const std::string& reading);
+  StandardKanji(DataRef, Name, Reading);
 
   // ctor used by 'FrequencyKanji': looks up 'kyu'
-  StandardKanji(const Data&, const std::string&);
+  StandardKanji(DataRef, Name);
 
   // ctor used by 'KenteiKanji': has 'kyu'
-  StandardKanji(const Data&, const std::string&, KenteiKyus);
+  StandardKanji(DataRef, Name, KenteiKyus);
 private:
   const KenteiKyus _kyu;
 };
@@ -58,11 +57,10 @@ private:
 class FrequencyKanji : public StandardKanji {
 public:
   // ctor used for 'FrequencyKanji' without a reading
-  FrequencyKanji(const Data&, const std::string& name, Frequency);
+  FrequencyKanji(DataRef, Name, Frequency);
 
   // ctor used for 'FrequencyKanji' with readings from 'frequency-readings.txt'
-  FrequencyKanji(const Data&, const std::string& name,
-      const std::string& reading, Frequency);
+  FrequencyKanji(DataRef, Name, Reading, Frequency);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::Frequency;
@@ -76,7 +74,7 @@ private:
 // pulled in from other files
 class KenteiKanji : public StandardKanji {
 public:
-  KenteiKanji(const Data&, const std::string& name, KenteiKyus);
+  KenteiKanji(DataRef, Name, KenteiKyus);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
@@ -87,7 +85,7 @@ public:
 // Japanese reading.
 class UcdKanji : public UcdFileKanji {
 public:
-  UcdKanji(const Data&, const Ucd&);
+  UcdKanji(DataRef, const Ucd&);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };

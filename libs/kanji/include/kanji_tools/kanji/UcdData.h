@@ -18,18 +18,18 @@ public:
   UcdData& operator=(const UcdData&) = delete;
 
   // 'getMeaning' returns 'meaning' loaded from UCD file
-  [[nodiscard]] const std::string& getMeaning(const Ucd*) const;
+  [[nodiscard]] const std::string& getMeaning(UcdPtr) const;
 
   // 'getReadingsAsKana' returns a (wide) comma separated string starting with
   // 'onReading' converted to Katakana followed by 'kunReading' converted to
   // Hiragana (spaces within the readings are also converted to wide commas)
-  [[nodiscard]] std::string getReadingsAsKana(const Ucd*) const;
+  [[nodiscard]] std::string getReadingsAsKana(UcdPtr) const;
 
   // 'find' returns a pointer to a Ucd instance if 'kanjiName' is in _ucdMap. If
   // 'kanjiName' has a 'variation selector' then _linkedJinmei then _linkedOther
   // maps are used to get a Ucd variant (variant returned is the same displayed
   // character for Jinmei ones)
-  [[nodiscard]] const Ucd* find(const std::string& kanjiName) const;
+  [[nodiscard]] UcdPtr find(const std::string& kanjiName) const;
 
   [[nodiscard]] auto& map() const { return _map; }
 

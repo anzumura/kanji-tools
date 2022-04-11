@@ -12,7 +12,7 @@ namespace {
 
 using Count = std::map<KanjiTypes, int>;
 
-void printCounts(const Data& data, const Count& c, bool summary = false) {
+void printCounts(DataRef data, const Count& c, bool summary = false) {
   const auto t{std::accumulate(c.begin(), c.end(), 0,
       [](const auto& x, const auto& y) { return x + y.second; })};
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
@@ -29,14 +29,14 @@ void printCounts(const Data& data, const Count& c, bool summary = false) {
 
 } // namespace
 
-const Radical& RadicalData::find(const std::string& name) const {
+RadicalRef RadicalData::find(const std::string& name) const {
   checkLoaded();
   const auto i{_map.find(name)};
   if (i == _map.end()) throw std::domain_error{"name not found: " + name};
   return _radicals.at(i->second);
 }
 
-const Radical& RadicalData::find(Radical::Number number) const {
+RadicalRef RadicalData::find(Radical::Number number) const {
   checkLoaded();
   if (!number || number > _radicals.size())
     throw std::domain_error(
@@ -66,7 +66,7 @@ void RadicalData::load(const Data::Path& file) {
   }
 }
 
-void RadicalData::print(const Data& data) const {
+void RadicalData::print(DataRef data) const {
   data.log() << "Common Kanji Radicals (";
   for (auto i : AllKanjiTypes) {
     data.out() << i;
@@ -90,7 +90,7 @@ void RadicalData::checkLoaded() const {
 }
 
 void RadicalData::printRadicalLists(
-    const Data& data, RadicalLists& radicals) const {
+    DataRef data, RadicalLists& radicals) const {
   Count total;
   for (auto& i : radicals) {
     auto& l{i.second};
@@ -115,7 +115,7 @@ void RadicalData::printRadicalLists(
 }
 
 void RadicalData::printMissingRadicals(
-    const Data& data, const RadicalLists& radicals) const {
+    DataRef data, const RadicalLists& radicals) const {
   std::vector<Radical> missingRadicals;
   for (auto& i : _radicals)
     if (radicals.find(i) == radicals.end()) missingRadicals.emplace_back(i);

@@ -22,10 +22,10 @@ public:
   // 'find' by the ideograph code in utf8 (not the unicode radical code). For
   // example, Radical number 30 (口) is Unicode 53E3, but has another 'Unicode
   // Radical' value of 2F1D
-  [[nodiscard]] const Radical& find(const std::string&) const;
+  [[nodiscard]] RadicalRef find(const std::string&) const;
 
   // 'find' by the official Radical Number (one greater than index in _radicals)
-  [[nodiscard]] const Radical& find(Radical::Number) const;
+  [[nodiscard]] RadicalRef find(Radical::Number) const;
 
   // 'load' and 'print' are called by 'KanjiData'
   void load(const std::filesystem::path&);

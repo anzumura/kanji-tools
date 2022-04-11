@@ -40,13 +40,18 @@ public:
   using OptFreq = std::optional<Frequency>;
   using OptString = std::optional<std::string>;
   using Strokes = Ucd::Strokes;
+  // some type aliases to help make Kanji class functions shorter and clearer
+  using Meaning = const std::string&;
+  using Name = const std::string&;
+  using OldNames = const LinkNames&;
+  using Reading = const std::string&;
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
 
   [[nodiscard]] virtual KanjiTypes type() const = 0;
-  [[nodiscard]] virtual const std::string& meaning() const = 0;
-  [[nodiscard]] virtual const std::string& reading() const = 0;
+  [[nodiscard]] virtual Meaning meaning() const = 0;
+  [[nodiscard]] virtual Reading reading() const = 0;
 
   [[nodiscard]] virtual OptFreq frequency() const { return {}; }
   [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
@@ -67,9 +72,7 @@ public:
   //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these
   //     will have an 'oldName'
   // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
-  [[nodiscard]] virtual const LinkNames& oldNames() const {
-    return EmptyLinkNames;
-  }
+  [[nodiscard]] virtual OldNames oldNames() const { return EmptyLinkNames; }
 
   // UcdFileKanji have an optional 'newName' field (based on Link field loaded
   // from ucd.txt). LinkedKanji also have a 'newName', i.e., the linked kanji
@@ -83,14 +86,13 @@ public:
   // JinmeiKanji class)
   [[nodiscard]] virtual OptString extraTypeInfo() const { return {}; }
 
-  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] const std::string& name() const { return _name; }
+  [[nodiscard]] auto variant() const { return _name.isVariant(); }
+  [[nodiscard]] auto nonVariantName() const { return _name.nonVariant(); }
 
-  // 'variant' is true if _name includes a Unicode 'variation selector'. In this
-  // case 'nonVariantName' returns the non-variant name and 'compatibilityName'
-  // returns the UCD 'compatibility' code (which is a single MB char without a
-  // variation selector).
-  [[nodiscard]] bool variant() const;
-  [[nodiscard]] std::string nonVariantName() const;
+  // 'compatibilityName' returns 'compatibilityName' if it exists, otherwise it
+  // returns the string value of '_name'.
+  // (which is should be a single MB char without a variation selector)
   [[nodiscard]] std::string compatibilityName() const;
 
   [[nodiscard]] Frequency frequencyOrDefault(Frequency x) const;
@@ -141,9 +143,32 @@ public:
   static constexpr auto Legend{".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO "
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
-  Kanji(const std::string& name, const OptString& compatibilityName,
-      const Radical& radical, Strokes strokes, const OptString& morohashiId,
-      const NelsonIds& nelsonIds, const OptString& pinyin);
+  // helper class for holding a Kanji name
+  class KanjiName {
+  public:
+    explicit KanjiName(const std::string& name);
+
+    [[nodiscard]] operator const std::string&() const { return _name; }
+
+    // 'isVariant' is true if _name includes a Unicode 'variation selector'. In
+    // this case 'nonVariant' returns _name without the selector.
+    [[nodiscard]] bool isVariant() const;
+    [[nodiscard]] std::string nonVariant() const;
+  private:
+    const std::string _name;
+  };
+
+  // ctor used by 'LinkedKanji' and 'NonLinkedKanji' classes
+  Kanji(const class Data&, Name, RadicalRef, Strokes, UcdPtr);
+
+  // ctor used by above ctor as well as 'TestKanji' class
+  Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
+      Strokes strokes, const OptString& morohashiId, const NelsonIds& nelsonIds,
+      const OptString& pinyin)
+      : _name{KanjiName{name}}, _compatibilityName{compatibilityName},
+        _radical{radical}, _strokes{strokes}, _morohashiId{morohashiId},
+        _nelsonIds{nelsonIds}, _pinyin{pinyin} {}
+
   inline static const LinkNames EmptyLinkNames;
 private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most
@@ -155,12 +180,11 @@ private:
   [[nodiscard]] u_int8_t qualifiedNameRank() const;
 
   // name related fields
-  const std::string _name;
-  const OptString _nonVariantName;
+  const KanjiName _name;
   const OptString _compatibilityName;
 
   // all kanji have an official radical and non-zero strokes
-  const Radical& _radical; // reference to an entry in RadicalData::_radicals
+  RadicalRef _radical; // reference to an entry in RadicalData::_radicals
   const Strokes _strokes;
 
   // optional fields

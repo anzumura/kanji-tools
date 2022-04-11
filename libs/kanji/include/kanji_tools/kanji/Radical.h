@@ -32,6 +32,8 @@ private:
   const std::string _reading;
 };
 
-std::ostream& operator<<(std::ostream&, const Radical&);
+using RadicalRef = const Radical&;
+
+std::ostream& operator<<(std::ostream&, RadicalRef);
 
 } // namespace kanji_tools

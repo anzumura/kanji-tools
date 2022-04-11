@@ -17,7 +17,7 @@ public:
 
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
   [[nodiscard]] OptString extraTypeInfo() const override;
-  [[nodiscard]] const LinkNames& oldNames() const override { return _oldNames; }
+  [[nodiscard]] OldNames oldNames() const override { return _oldNames; }
 
   [[nodiscard]] auto number() const { return _number; }
 
@@ -28,8 +28,7 @@ public:
   //   for the given Kanji type 'T' (and the first line must have header names
   //   that match the static 'Column' instances below)
   template<typename T>
-  [[nodiscard]] static Data::List fromFile(
-      const Data& data, const Data::Path& f) {
+  [[nodiscard]] static Data::List fromFile(DataRef data, const Data::Path& f) {
     // all 'CustomFileKanji' files must have at least the following columns
     ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
     for (auto& i : T::RequiredColumns) columns.emplace_back(i);
@@ -39,18 +38,19 @@ public:
     return results;
   }
 protected:
+  static Name name(ColumnFileRef);
+
   inline static const ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"},
       RadicalCol{"Radical"}, OldNamesCol{"OldNames"}, YearCol{"Year"},
       StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"},
       ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
   // ctor used by 'CustomFileKanji' and 'ExtraKanji': has a 'meaning' field
-  CustomFileKanji(const Data&, const ColumnFile&, const std::string& name,
-      Strokes, const std::string& meaning, const LinkNames&, const Ucd*);
+  CustomFileKanji(
+      DataRef, ColumnFileRef, Name, Strokes, Meaning, OldNames, UcdPtr);
 
   // ctor used by 'OfficialKanji': 'meaning' gets looked up from 'ucd.txt'
-  CustomFileKanji(const Data&, const ColumnFile&, const std::string& name,
-      Strokes, const LinkNames&, const Ucd*);
+  CustomFileKanji(DataRef, ColumnFileRef, Name, OldNames, UcdPtr);
 private:
   const KenteiKyus _kyu;
   const Number _number;
@@ -67,15 +67,13 @@ public:
 
   [[nodiscard]] auto year() const { return _year; }
 protected:
-  // ctor used by 'JinmeiKanji' calls base without 'meaning' field
-  OfficialKanji(
-      const Data&, const ColumnFile&, const std::string& name, const Ucd*);
+  // ctor used by 'JinmeiKanji'
+  OfficialKanji(DataRef, ColumnFileRef, Name, UcdPtr);
 
-  // ctor used by 'JouyouKanji' calls base with 'meaning' field
-  OfficialKanji(const Data&, const ColumnFile&, const std::string& name,
-      Strokes, const std::string& meaning);
+  // ctor used by 'JouyouKanji' calls base with 'strokes' and 'meaning' fields
+  OfficialKanji(DataRef, ColumnFileRef, Name, Strokes, Meaning);
 private:
-  [[nodiscard]] static LinkNames getOldNames(const ColumnFile&);
+  [[nodiscard]] static LinkNames getOldNames(ColumnFileRef);
 
   const OptFreq _frequency;
   const JlptLevels _level;
@@ -84,7 +82,7 @@ private:
 
 class JinmeiKanji : public OfficialKanji {
 public:
-  JinmeiKanji(const Data&, const ColumnFile&);
+  JinmeiKanji(DataRef, ColumnFileRef);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   [[nodiscard]] OptString extraTypeInfo() const override;
@@ -98,7 +96,7 @@ private:
 
 class JouyouKanji : public OfficialKanji {
 public:
-  JouyouKanji(const Data&, const ColumnFile&);
+  JouyouKanji(DataRef, ColumnFileRef);
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
 
@@ -114,15 +112,15 @@ private:
 // links). They should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(const Data&, const ColumnFile&);
+  ExtraKanji(DataRef, ColumnFileRef);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
   [[nodiscard]] OptString newName() const override { return _newName; }
 
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 private:
-  ExtraKanji(const Data&, const ColumnFile&, const std::string&);
-  ExtraKanji(const Data&, const ColumnFile&, const std::string&, const Ucd*);
+  ExtraKanji(DataRef, ColumnFileRef, Name);
+  ExtraKanji(DataRef, ColumnFileRef, Name, UcdPtr);
 
   const OptString _newName;
 };
