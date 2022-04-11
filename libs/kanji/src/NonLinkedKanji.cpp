@@ -11,7 +11,7 @@ Kanji::LinkNames NonLinkedKanji::linkNames(const Ucd* u) {
 }
 
 NonLinkedKanji::NonLinkedKanji(const Data& data, const std::string& name,
-    // LCOV_EXCL_START - gcov bug
+    // LCOV_EXCL_START: gcov bug
     const Radical& radical, Strokes strokes, const std::string& meaning,
     // LCOV_EXCL_STOP
     const std::string& reading, const Ucd* u)
@@ -21,7 +21,7 @@ NonLinkedKanji::NonLinkedKanji(const Data& data, const std::string& name,
 
 NonLinkedKanji::NonLinkedKanji(const Data& data, const std::string& name,
     const Radical& radical, Strokes strokes, const std::string& reading,
-    const Ucd* u) // LCOV_EXCL_LINE - gcov bug
+    const Ucd* u) // LCOV_EXCL_LINE: gcov bug
     : NonLinkedKanji{
           data, name, radical, strokes, data.ucd().getMeaning(u), reading, u} {}
 

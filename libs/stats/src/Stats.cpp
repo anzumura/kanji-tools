@@ -11,7 +11,7 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-// LCOV_EXCL_START - gcov bug
+// LCOV_EXCL_START: gcov bug
 namespace {
 
 constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
@@ -27,7 +27,7 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 
 // helper class for ordering and printing out kanji found in files
 class Count {
-public: // LCOV_EXCL_LINE - gcov bug
+public: // LCOV_EXCL_LINE: gcov bug
   Count(size_t f, const std::string& n, Data::OptEntry e)
       : count{f}, name{n}, entry{e} {}
 

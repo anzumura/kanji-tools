@@ -100,7 +100,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
   }};
   while (*_loc) {
     switch (validateMBUtf8(_loc)) {
-    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE - gcov bug
+    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE: gcov bug
       if (!onlyMB) {
         result = *_loc++;
         return true;
@@ -136,7 +136,7 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
       [](const auto& r, const auto& i) { return i ? *i : r; }};
   for (auto location{_loc}; *location;) {
     switch (validateMBUtf8(location)) {
-    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE - gcov bug
+    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE: gcov bug
       if (!onlyMB) {
         result = *location;
         return true;

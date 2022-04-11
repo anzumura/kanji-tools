@@ -7,7 +7,7 @@
 namespace kanji_tools {
 
 Kanji::Kanji(const std::string& name, const OptString& compatibilityName,
-    // LCOV_EXCL_START - gcov bug
+    // LCOV_EXCL_START: gcov bug
     const Radical& radical, Strokes strokes, const OptString& morohashiId,
     // LCOV_EXCL_STOP
     const NelsonIds& nelsonIds, const OptString& pinyin)

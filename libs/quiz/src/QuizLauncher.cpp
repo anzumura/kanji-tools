@@ -12,7 +12,7 @@ namespace {
 
 // Clang marks some lines in 'HelpMessage' as '0' coverage whereas GCC doesn't
 // count them at all (which seems like the correct way to go for 'constexpr')
-// LCOV_EXCL_START - gcov bug
+// LCOV_EXCL_START: gcov bug
 constexpr auto HelpMessage{
     R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]
@@ -137,7 +137,7 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
 }
 
 void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
-    bool meanings, bool randomizeAnswers) { // LCOV_EXCL_LINE - gcov bug
+    bool meanings, bool randomizeAnswers) { // LCOV_EXCL_LINE: gcov bug
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
@@ -425,7 +425,7 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
       printMeaning(*k, true);
       printReviewDetails(*k);
     } else // should never happen since all kanji in ucd.txt should be loaded
-      out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE - gcov bug
+      out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE: gcov bug
   } else
     // can happen for non=supported rare kanji (see parseUcdAllFlat.sh)
     out() << " --- Not found in 'ucd.txt'\n";
