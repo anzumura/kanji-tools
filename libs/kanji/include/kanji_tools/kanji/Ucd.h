@@ -10,28 +10,32 @@ namespace kanji_tools {
 // scripts/parseUcdAllFlat.sh for more details.
 class Ucd {
 public:
+  using Code = char32_t;
+  using Meaning = const std::string&;
+  using Name = Radical::Name;
+  using Reading = Radical::Reading;
   using Strokes = u_int8_t;
 
   class Link {
   public:
-    Link(char32_t code, const std::string& name) : _code{code}, _name{name} {}
+    Link(Code code, Name name) : _code{code}, _name{name} {}
     [[nodiscard]] auto code() const { return _code; }
     [[nodiscard]] auto& name() const { return _name; }
     [[nodiscard]] std::string codeAndName() const;
   private:
-    const char32_t _code;
+    const Code _code;
     const std::string _name;
   };
   using Links = std::vector<Link>;
 
-  Ucd(char32_t code, const std::string& name, const std::string& block,
+  Ucd(Code code, Name name, const std::string& block,
       const std::string& version, Radical::Number radical, Strokes strokes,
       Strokes variantStrokes, const std::string& pinyin,
       const std::string& morohashiId, const std::string& nelsonIds,
       const std::string& sources, const std::string& jSource, bool joyo,
       bool jinmei, const Links& links, UcdLinkTypes linkType,
-      bool linkedReadings, const std::string& meaning,
-      const std::string& onReading, const std::string& kunReading)
+      bool linkedReadings, Meaning meaning, Reading onReading,
+      Reading kunReading)
       : _code{code}, _name{name}, _block{block}, _version{version},
         _radical{radical}, _strokes{strokes}, _variantStrokes{variantStrokes},
         _pinyin{pinyin}, _morohashiId{morohashiId}, _nelsonIds{nelsonIds},
@@ -72,7 +76,7 @@ public:
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
 private:
-  const char32_t _code;
+  const Code _code;
   const std::string _name, _block, _version;
   const Radical::Number _radical;
   // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')

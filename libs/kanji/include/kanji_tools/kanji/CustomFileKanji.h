@@ -13,6 +13,7 @@ namespace kanji_tools {
 //   'strokes.txt' or 'ucd.txt'
 class CustomFileKanji : public NonLinkedKanji {
 public:
+  using File = const ColumnFile&;
   using Number = u_int16_t;
 
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
@@ -38,7 +39,7 @@ public:
     return results;
   }
 protected:
-  static Name name(ColumnFileRef);
+  static Name name(File);
 
   inline static const ColumnFile::Column NumberCol{"Number"}, NameCol{"Name"},
       RadicalCol{"Radical"}, OldNamesCol{"OldNames"}, YearCol{"Year"},
@@ -46,11 +47,10 @@ protected:
       ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
   // ctor used by 'CustomFileKanji' and 'ExtraKanji': has a 'meaning' field
-  CustomFileKanji(
-      DataRef, ColumnFileRef, Name, Strokes, Meaning, OldNames, UcdPtr);
+  CustomFileKanji(DataRef, File, Name, Strokes, Meaning, OldNames, UcdPtr);
 
-  // ctor used by 'OfficialKanji': 'meaning' gets looked up from 'ucd.txt'
-  CustomFileKanji(DataRef, ColumnFileRef, Name, OldNames, UcdPtr);
+  // ctor used by 'OfficialKanji': 'strokes' and 'meaning' loaded from 'ucd.txt'
+  CustomFileKanji(DataRef, File, Name, OldNames, UcdPtr);
 private:
   const KenteiKyus _kyu;
   const Number _number;
@@ -68,12 +68,12 @@ public:
   [[nodiscard]] auto year() const { return _year; }
 protected:
   // ctor used by 'JinmeiKanji'
-  OfficialKanji(DataRef, ColumnFileRef, Name, UcdPtr);
+  OfficialKanji(DataRef, File, Name, UcdPtr);
 
   // ctor used by 'JouyouKanji' calls base with 'strokes' and 'meaning' fields
-  OfficialKanji(DataRef, ColumnFileRef, Name, Strokes, Meaning);
+  OfficialKanji(DataRef, File, Name, Strokes, Meaning);
 private:
-  [[nodiscard]] static LinkNames getOldNames(ColumnFileRef);
+  [[nodiscard]] static LinkNames getOldNames(File);
 
   const OptFreq _frequency;
   const JlptLevels _level;
@@ -82,7 +82,7 @@ private:
 
 class JinmeiKanji : public OfficialKanji {
 public:
-  JinmeiKanji(DataRef, ColumnFileRef);
+  JinmeiKanji(DataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   [[nodiscard]] OptString extraTypeInfo() const override;
@@ -96,7 +96,7 @@ private:
 
 class JouyouKanji : public OfficialKanji {
 public:
-  JouyouKanji(DataRef, ColumnFileRef);
+  JouyouKanji(DataRef, File);
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
 
@@ -112,15 +112,15 @@ private:
 // links). They should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(DataRef, ColumnFileRef);
+  ExtraKanji(DataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
   [[nodiscard]] OptString newName() const override { return _newName; }
 
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 private:
-  ExtraKanji(DataRef, ColumnFileRef, Name);
-  ExtraKanji(DataRef, ColumnFileRef, Name, UcdPtr);
+  ExtraKanji(DataRef, File, Name);
+  ExtraKanji(DataRef, File, Name, UcdPtr);
 
   const OptString _newName;
 };

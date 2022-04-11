@@ -166,6 +166,4 @@ private:
   inline static std::map<std::string, size_t> _allColumns;
 };
 
-using ColumnFileRef = const ColumnFile&;
-
 } // namespace kanji_tools

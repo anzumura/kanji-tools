@@ -39,12 +39,12 @@ public:
   using NelsonIds = std::vector<NelsonId>;
   using OptFreq = std::optional<Frequency>;
   using OptString = std::optional<std::string>;
-  using Strokes = Ucd::Strokes;
   // some type aliases to help make Kanji class functions shorter and clearer
-  using Meaning = const std::string&;
-  using Name = const std::string&;
+  using Meaning = Ucd::Meaning;
+  using Name = Ucd::Name;
   using OldNames = const LinkNames&;
-  using Reading = const std::string&;
+  using Reading = Ucd::Reading;
+  using Strokes = Ucd::Strokes;
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
@@ -86,7 +86,7 @@ public:
   // JinmeiKanji class)
   [[nodiscard]] virtual OptString extraTypeInfo() const { return {}; }
 
-  [[nodiscard]] const std::string& name() const { return _name; }
+  [[nodiscard]] Name name() const { return _name; }
   [[nodiscard]] auto variant() const { return _name.isVariant(); }
   [[nodiscard]] auto nonVariantName() const { return _name.nonVariant(); }
 
@@ -146,9 +146,9 @@ protected:
   // helper class for holding a Kanji name
   class KanjiName {
   public:
-    explicit KanjiName(const std::string& name);
+    explicit KanjiName(Name name);
 
-    [[nodiscard]] operator const std::string&() const { return _name; }
+    [[nodiscard]] operator Name() const { return _name; }
 
     // 'isVariant' is true if _name includes a Unicode 'variation selector'. In
     // this case 'nonVariant' returns _name without the selector.

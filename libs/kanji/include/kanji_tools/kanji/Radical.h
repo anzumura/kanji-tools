@@ -9,10 +9,12 @@ namespace kanji_tools {
 class Radical {
 public:
   using AltForms = std::vector<std::string>;
+  using Name = const std::string&;
+  using Reading = const std::string&;
+
   using Number = u_int8_t;
 
-  Radical(Number number, const std::string& name, const AltForms& altForms,
-      const std::string& longName, const std::string& reading);
+  Radical(Number, Name, const AltForms&, const std::string& longName, Reading);
 
   Radical(const Radical&) = default;
 
