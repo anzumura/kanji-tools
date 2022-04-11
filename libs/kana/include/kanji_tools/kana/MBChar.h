@@ -42,9 +42,8 @@ public:
   // 2-4 bytes) followed by a variation selector (which are always 3 bytes).
   [[nodiscard]] static bool isMBCharWithVariationSelector(const std::string&);
 
-  // functions to remove variation selector from given string
+  // return copy of given string with variation selector removed (if it has one)
   [[nodiscard]] static std::string noVariationSelector(const std::string&);
-  [[nodiscard]] static OptString optNoVariationSelector(const std::string&);
 
   // 'getFirst' returns the first MBChar from 's' (including any variation
   // selector that might follow). If 's' doesn't start with a multi-byte

@@ -70,12 +70,6 @@ std::string MBChar::noVariationSelector(const std::string& s) {
   return isMBCharWithVariationSelector(s) ? s.substr(0, s.size() - 3) : s;
 }
 
-MBChar::OptString MBChar::optNoVariationSelector(const std::string& s) {
-  return isMBCharWithVariationSelector(s)
-             ? std::optional(s.substr(0, s.size() - 3))
-             : std::nullopt;
-}
-
 std::string MBChar::getFirst(const std::string& s) {
   std::string result;
   MBChar c{s};
