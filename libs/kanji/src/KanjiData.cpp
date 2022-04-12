@@ -28,8 +28,8 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
       _frequency{dataDir() / "frequency"} {
   DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
-  _ucd.load(DataFile::getFile(dataDir(), UcdFile));
-  _radicals.load(DataFile::getFile(dataDir(), RadicalsFile));
+  ucd().load(DataFile::getFile(dataDir(), UcdFile));
+  radicals().load(DataFile::getFile(dataDir(), RadicalsFile));
   loadFrequencyReadings(DataFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
   populateLinkedKanji(DataFile::getFile(dataDir(), LinkedJinmeiFile));
@@ -52,8 +52,8 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
     if (fullDebug()) {
       printListStats(AllJlptLevels, &Kanji::level, "Level", true);
       printListStats(AllKenteiKyus, &Kanji::kyu, "Kyu", false);
-      _radicals.print(*this);
-      _ucd.print(*this);
+      radicals().print(*this);
+      ucd().print(*this);
     }
   }
 }
@@ -92,7 +92,7 @@ void KanjiData::printCount(
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<std::string>> examples;
   size_t total{};
-  for (auto i{AllKanjiTypes.begin()}; auto& l : _types) {
+  for (auto i{AllKanjiTypes.begin()}; auto& l : types()) {
     size_t count{};
     const auto t{*i++};
     if (printExamples)
@@ -121,7 +121,7 @@ void KanjiData::printCount(
 
 void KanjiData::printStats() const {
   log() << "Loaded " << kanjiNameMap().size() << " Kanji (";
-  for (auto i{AllKanjiTypes.begin()}; auto& j : _types) {
+  for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
     if (i != AllKanjiTypes.begin()) out() << ' ';
     out() << *i++ << ' ' << j.size();
   }
@@ -184,7 +184,7 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
   for (const auto i : all) {
     std::vector<std::pair<KanjiTypes, size_t>> counts;
     size_t iTotal{};
-    for (auto j{AllKanjiTypes.begin()}; auto& l : _types) {
+    for (auto j{AllKanjiTypes.begin()}; auto& l : types()) {
       const auto t{*j++};
       if (const auto c{static_cast<size_t>(std::count_if(l.begin(), l.end(),
               [i, &p](auto& x) { return ((*x).*p)() == i; }))};

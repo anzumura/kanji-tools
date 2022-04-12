@@ -33,8 +33,8 @@ protected:
 
   const Ucd& loadOne(bool includeOn = true, bool includeKun = true) {
     writeOne(includeOn, includeKun);
-    _ucd.load(TestFile);
-    return *_ucd.find("一");
+    ucd().load(TestFile);
+    return *ucd().find("一");
   }
 
   const Ucd& loadLinkedJinmei() {
@@ -46,8 +46,8 @@ protected:
     write("FA31\t僧\tCJK_Compat_Ideographs\t3.2\t9\t14\t\t\t\t\tJ\tJ3-2E49\t\t"
           "Y\t50E7\t僧\tJinmei*\tBuddhist priest, monk; san of Sanskrit sangha"
           "\tSOU\tBOUZU");
-    _ucd.load(TestFile);
-    return *_ucd.find("僧");
+    ucd().load(TestFile);
+    return *ucd().find("僧");
   }
 
   std::string _testName{"一"}, _testRadical{"1"}, _testStrokes{"1"},
@@ -121,34 +121,35 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
 
 TEST_F(UcdDataTest, GetMeaning) {
   auto& u{loadOne()};
-  EXPECT_EQ(_ucd.getMeaning(&u), "one; a, an; alone");
-  EXPECT_EQ(_ucd.getMeaning({}), ""); // null ptr returns empty string
+  EXPECT_EQ(ucd().getMeaning(&u), "one; a, an; alone");
+  EXPECT_EQ(ucd().getMeaning({}), ""); // null ptr returns empty string
 }
 
 TEST_F(UcdDataTest, GetReadingAsKana) {
   auto& u{loadOne()};
-  EXPECT_EQ(_ucd.getReadingsAsKana(&u), "イチ、イツ、ひとつ、ひとたび、はじめ");
-  EXPECT_EQ(_ucd.getReadingsAsKana({}), ""); // null ptr returns empty string
+  EXPECT_EQ(
+      ucd().getReadingsAsKana(&u), "イチ、イツ、ひとつ、ひとたび、はじめ");
+  EXPECT_EQ(ucd().getReadingsAsKana({}), ""); // null ptr returns empty string
 }
 
 TEST_F(UcdDataTest, GetReadingAsKanaForEntryWithoutOnReading) {
   auto& u{loadOne(false)};
-  EXPECT_EQ(_ucd.getReadingsAsKana(&u), "ひとつ、ひとたび、はじめ");
+  EXPECT_EQ(ucd().getReadingsAsKana(&u), "ひとつ、ひとたび、はじめ");
 }
 
 TEST_F(UcdDataTest, GetReadingAsKanaForEntryWithoutKunReading) {
   auto& u{loadOne(true, false)};
-  EXPECT_EQ(_ucd.getReadingsAsKana(&u), "イチ、イツ");
+  EXPECT_EQ(ucd().getReadingsAsKana(&u), "イチ、イツ");
 }
 
 TEST_F(UcdDataTest, GetReadingAsKanaForEntryWithNoReadings) {
   auto& u{loadOne(false, false)};
-  EXPECT_EQ(_ucd.getReadingsAsKana(&u), "");
+  EXPECT_EQ(ucd().getReadingsAsKana(&u), "");
 }
 
 TEST_F(UcdDataTest, NotFound) {
   loadOne();
-  EXPECT_EQ(_ucd.find("虎"), nullptr);
+  EXPECT_EQ(ucd().find("虎"), nullptr);
 }
 
 TEST_F(UcdDataTest, FindIncludingVariations) {
@@ -159,15 +160,15 @@ TEST_F(UcdDataTest, FindIncludingVariations) {
   EXPECT_EQ(jinmei.size(), 3);
   EXPECT_EQ(jinmeiVariant.size(), 6); // it has a 'variation selector'
   EXPECT_EQ(otherVariant.size(), 6);
-  auto u{_ucd.find(jouyou)};
+  auto u{ucd().find(jouyou)};
   ASSERT_TRUE(u);
   EXPECT_EQ(u->code(), U'\x50E7');
-  ASSERT_TRUE(u = _ucd.find(jinmei));
+  ASSERT_TRUE(u = ucd().find(jinmei));
   EXPECT_EQ(u->code(), U'\xfa31');
-  ASSERT_TRUE(u = _ucd.find(jinmeiVariant));
+  ASSERT_TRUE(u = ucd().find(jinmeiVariant));
   EXPECT_EQ(u->code(), U'\xfa31'); // returns the correct variant
   // should fail to find other variant since it hasn't been loaded
-  EXPECT_FALSE(_ucd.find(otherVariant));
+  EXPECT_FALSE(ucd().find(otherVariant));
 }
 
 TEST_F(UcdDataTest, LoadWithNoReadingsOrMorohashiId) {
@@ -266,11 +267,11 @@ TEST_F(UcdDataTest, DuplicateEntry) {
 }
 
 TEST_F(UcdDataTest, PrintWithMissingEntry) {
-  // add an entry to 'Data' that doesn't exist in '_ucd' (should never happen
+  // add an entry to 'Data' that doesn't exist in 'ucd()' (should never happen
   // when loading from actual data files)
   auto testKanji{std::make_shared<TestKanji>("四")};
-  _types[KanjiTypes::Frequency].emplace_back(testKanji);
-  _ucd.print(*this);
+  types()[KanjiTypes::Frequency].emplace_back(testKanji);
+  ucd().print(*this);
   auto found{false};
   for (std::string line; std::getline(_os, line);)
     if (line == "  ERROR: 四 not found in UCD") found = true;
@@ -279,12 +280,12 @@ TEST_F(UcdDataTest, PrintWithMissingEntry) {
 
 TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
   // add an entry with a variation selector to 'Data' that doesn't exist in
-  // '_ucd' (should never happen when loading from actual data files)
+  // 'ucd()' (should never happen when loading from actual data files)
   auto testKanji{std::make_shared<TestKanji>("僧︀")};
   const Ucd u{TestUcd{testKanji->name()}};
   checkInsert(testKanji, &u);
   EXPECT_THROW(
-      call([this] { _ucd.print(*this); }, "UCD not found for '僧︀'"),
+      call([this] { ucd().print(*this); }, "UCD not found for '僧︀'"),
       std::domain_error);
 }
 

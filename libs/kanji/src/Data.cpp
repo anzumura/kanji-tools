@@ -38,6 +38,8 @@ Args::Size Data::nextArg(const Args& args, Args::Size current) {
   return result;
 }
 
+Kanji::Frequency Data::maxFrequency() { return _maxFrequency; }
+
 Data::Data(const Path& dataDir, DebugMode debugMode, std::ostream& out,
     std::ostream& err)
     : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
@@ -84,7 +86,7 @@ Kanji::NelsonIds Data::getNelsonIds(UcdPtr u) const {
     auto s{u->nelsonIds()};
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss{s};
-    Kanji::NelsonId id;
+    Kanji::NelsonId id{};
     while (ss >> id) ids.emplace_back(id);
     return ids;
   }
@@ -227,7 +229,7 @@ bool Data::checkInsert(const Entry& kanji, UcdPtr ucd) {
   // since it can be helpful to see more than one error printed out if something
   // goes wrong. Any failures should be fixed right away.
   insertSanityChecks(k, ucd);
-  // update _maxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
+  // update MaxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
   // applicable
   if (k.frequency() && *k.frequency() >= _maxFrequency)
     _maxFrequency = *k.frequency() + 1U;

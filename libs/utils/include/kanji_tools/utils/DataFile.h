@@ -77,8 +77,10 @@ protected:
             kanji_tools::toString(type)},
         _type{type} {}
 protected:
-  const T _type;
+  [[nodiscard]] T type() const { return _type; }
 private:
+  const T _type;
+
   inline static Set UniqueTypeNames;
 };
 
@@ -86,14 +88,14 @@ class LevelDataFile : public TypedDataFile<JlptLevels> {
 public:
   LevelDataFile(const Path& p, JlptLevels level) : TypedDataFile{p, level} {}
 
-  [[nodiscard]] JlptLevels level() const override { return _type; }
+  [[nodiscard]] JlptLevels level() const override { return type(); }
 };
 
 class KyuDataFile : public TypedDataFile<KenteiKyus> {
 public:
   KyuDataFile(const Path& p, KenteiKyus kyu) : TypedDataFile{p, kyu} {}
 
-  [[nodiscard]] KenteiKyus kyu() const override { return _type; }
+  [[nodiscard]] KenteiKyus kyu() const override { return type(); }
 };
 
 } // namespace kanji_tools

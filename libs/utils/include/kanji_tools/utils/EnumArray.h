@@ -91,8 +91,9 @@ protected:
     if (!_nameMap.emplace(name, static_cast<T>(index)).second)
       throw std::domain_error{"duplicate name '" + name + "'"};
   }
-
+private:
   std::map<std::string, T> _nameMap;
+
   inline static constinit const BaseEnumArray<T>* _instance;
 };
 
@@ -115,14 +116,14 @@ public:
     [[nodiscard]] auto operator*() const {
       // exception should only happen when dereferencing 'end' since other
       // methods prevent moving out of range
-      if (iBase::_index >= N)
-        iBase::error(base::Index + std::to_string(iBase::_index) + base::Range);
-      return static_cast<T>(iBase::_index);
+      if (iBase::index() >= N)
+        iBase::error(base::Index + std::to_string(iBase::index()) + base::Range);
+      return static_cast<T>(iBase::index());
     }
 
     // random-access iterator requirements
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
-      return iBase::_index - x._index;
+      return iBase::index() - x.index();
     }
   };
 

@@ -12,7 +12,7 @@ public:
   using Size = u_int8_t;
   using List = const char* const*;
 
-  Args() noexcept : _size{}, _args{} {}
+  Args() noexcept = default;
   template<size_t N>
   Args(const char* (&args)[N]) noexcept : _size{N}, _args{args} {
     static_assert(N <= std::numeric_limits<Size>::max());
@@ -27,8 +27,8 @@ public:
 private:
   [[nodiscard]] static Size checkInt(int);
 
-  const Size _size;
-  List _args;
+  const Size _size{};
+  List _args{};
 };
 
 } // namespace kanji_tools

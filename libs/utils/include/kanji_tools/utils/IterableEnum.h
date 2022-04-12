@@ -33,7 +33,10 @@ protected:
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
     BaseIterator(size_t index = 0) noexcept : _index{index} {}
-
+  
+    [[nodiscard]] auto& index() { return _index; }
+    [[nodiscard]] auto index() const { return _index; }
+  private:
     size_t _index;
   };
 
@@ -57,8 +60,8 @@ protected:
   public:
     // common requirements for iterators
     auto& operator++() {
-      if (_index >= N) error(BadEnd);
-      ++_index;
+      if (index() >= N) error(BadEnd);
+      ++index();
       return derived();
     }
     auto operator++(int) {
@@ -69,8 +72,8 @@ protected:
 
     // bi-directional iterator requirements
     auto& operator--() {
-      if (_index == 0) error(BadBegin);
-      --_index;
+      if (!index()) error(BadBegin);
+      --index();
       return derived();
     }
     auto operator--(int) {
@@ -84,11 +87,11 @@ protected:
       return *(derived() + i);
     }
     auto& operator+=(difference_type i) {
-      if ((i += static_cast<difference_type>(_index)) < 0) error(BadBegin);
+      if ((i += static_cast<difference_type>(index())) < 0) error(BadBegin);
       if (const auto j{static_cast<size_t>(i)}; j > N)
         error(BadEnd);
       else
-        _index = j;
+        index() = j;
       return derived();
     }
     auto& operator-=(difference_type i) { return *this += -i; }

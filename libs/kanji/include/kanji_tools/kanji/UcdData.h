@@ -12,7 +12,7 @@ class UcdData {
 public:
   using Map = std::map<std::string, Ucd>;
 
-  UcdData() {}
+  UcdData() = default;
 
   UcdData(const UcdData&) = delete;
   UcdData& operator=(const UcdData&) = delete;

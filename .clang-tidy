@@ -1,0 +1,9 @@
+---
+Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,
+         -*-avoid-c-arrays,
+         -cppcoreguidelines-avoid-non-const-global-variables,
+         -cppcoreguidelines-pro-bounds-constant-array-index,
+         -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+         -cppcoreguidelines-pro-type-static-cast-downcast,
+         -cppcoreguidelines-special-member-functions,
+         -modernize-pass-by-value,-modernize-use-trailing-return-type'

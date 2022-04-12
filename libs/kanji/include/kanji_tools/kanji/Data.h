@@ -43,6 +43,8 @@ public:
   static constexpr auto OrderByQualifiedName{
       [](Entry& a, Entry& b) { return a->orderByQualifiedName(*b); }};
 
+  [[nodiscard]] static Kanji::Frequency maxFrequency();
+
   Data(const Path& dataDir, DebugMode, std::ostream& out = std::cout,
       std::ostream& err = std::cerr);
 
@@ -135,8 +137,6 @@ public:
   // 'log' can be used for putting a standard prefix to output messages (used
   // for some debug messages)
   [[nodiscard]] std::ostream& log(bool heading = false) const;
-
-  [[nodiscard]] static auto maxFrequency() { return _maxFrequency; }
 protected:
   // 'getDataDir' looks for a directory called 'data' containing expected number
   // of .txt files based on checking directories starting at 'current dir' and
@@ -170,6 +170,20 @@ protected:
   // the results (if -debug is specified)
   void checkStrokes() const;
 
+  // used by derived classes
+  auto& radicals() { return _radicals; }
+  auto& ucd() { return _ucd; }
+  auto& types() { return _types; }
+  auto& types() const { return _types; }
+
+  // checkInsert is non-private to help support testing
+  bool checkInsert(const Entry&, UcdPtr = {});
+private:
+  using OptPath = std::optional<Path>;
+
+  [[nodiscard]] static OptPath searchUpForDataDir(Path);
+  [[nodiscard]] static bool isValidDataDir(const Path&);
+
   // '_radicals' holds the 214 official Kanji Radicals
   RadicalData _radicals;
 
@@ -179,14 +193,6 @@ protected:
   UcdData _ucd;
 
   EnumList<KanjiTypes> _types;
-
-  // checkInsert is non-private to help support testing
-  bool checkInsert(const Entry&, UcdPtr = {});
-private:
-  using OptPath = std::optional<Path>;
-
-  [[nodiscard]] static OptPath searchUpForDataDir(Path);
-  [[nodiscard]] static bool isValidDataDir(const Path&);
 
   // helper functions for checking and inserting into '_kanjiNameMap'
   bool checkInsert(List&, const Entry&);

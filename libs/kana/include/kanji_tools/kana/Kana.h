@@ -199,8 +199,12 @@ public:
 
   // A 'Kana' instance can either be a single symbol or two symbols. This is
   // enforced by assertions in the constructor as well as unit tests.
-  [[nodiscard]] auto isMonograph() const { return _hiragana.size() == 3; }
-  [[nodiscard]] auto isDigraph() const { return _hiragana.size() == 6; }
+  [[nodiscard]] auto isMonograph() const {
+    return _hiragana.size() == OneKanaSize;
+  }
+  [[nodiscard]] auto isDigraph() const {
+    return _hiragana.size() == TwoKanaSize;
+  }
 
   // Test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana,
   // i.e., the class of 'this' is 'Kana', but we are a member of a 'DakutenKana'

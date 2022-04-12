@@ -32,15 +32,18 @@ enum class BracketType { Curly, Round, Square, None };
 // 'x' is char then toHex returns a string of size 2 and toBinary returns a
 // string of size 8. 'minSize' is ignored if it's less than 'result' size.
 
+constexpr auto BinaryDigits{2}, DecimalDigits{10}, HexDigits{16}, Bits{8},
+    SevenBitMax{128};
+
 template<typename T>
 [[nodiscard]] inline auto toBinary(
     T x, BracketType brackets, size_t minSize = 0) {
   static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + static_cast<char>(x % 2));
+    result.insert(result.begin(), '0' + static_cast<char>(x % BinaryDigits));
   return addBrackets(
-      addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 8), brackets);
+      addLeadingZeroes(result, minSize ? minSize : sizeof(T) * Bits), brackets);
 }
 
 template<typename T>
@@ -56,9 +59,11 @@ template<typename T>
   static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 4) {
-    const char i = x % 16;
+    const char i = x % HexDigits;
     result.insert(result.begin(),
-        (i < 10 ? '0' + i : (hexCase == HexCase::Upper ? 'A' : 'a') + i - 10));
+        (i < DecimalDigits
+                ? '0' + i
+                : (hexCase == HexCase::Upper ? 'A' : 'a') + i - DecimalDigits));
   }
   return addBrackets(
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 2), brackets);
@@ -99,7 +104,7 @@ template<>
   return x >= 0;
 }
 [[nodiscard]] constexpr auto isSingleByteChar(char32_t x) noexcept {
-  return x < 128;
+  return x < SevenBitMax;
 }
 
 [[nodiscard]] bool isSingleByte(

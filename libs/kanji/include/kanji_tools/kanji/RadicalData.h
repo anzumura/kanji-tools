@@ -14,7 +14,7 @@ public:
   using Map = std::map<std::string, Radical::Number>;
   using List = std::vector<Radical>;
 
-  RadicalData() {}
+  RadicalData() = default;
 
   RadicalData(const RadicalData&) = delete;
   RadicalData& operator=(const RadicalData&) = delete;
