@@ -33,7 +33,7 @@ enum class BracketType { Curly, Round, Square, None };
 // string of size 8. 'minSize' is ignored if it's less than 'result' size.
 
 constexpr auto BinaryDigits{2}, DecimalDigits{10}, HexDigits{16}, Bits{8},
-    SevenBitMax{128};
+    SevenBitMax{128}, UnicodeStringMinSize{4}, UnicodeStringMaxSize{5};
 
 template<typename T>
 [[nodiscard]] inline auto toBinary(

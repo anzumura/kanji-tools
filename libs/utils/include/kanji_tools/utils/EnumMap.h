@@ -41,6 +41,20 @@ private:
 
   std::array<V, N> _values;
 public:
+  EnumMap() noexcept = default;
+
+  // return 'value' for the given enum value 'i' and allow it to be modified
+  [[nodiscard]] auto& operator[](T i) {
+    return _values[base::checkIndex(i, base::Index)];
+  }
+
+  // operator[] const version also supports returning an empty 'value' if 'i' is
+  // the 'None' enum value (this is fine since it can't be modified).
+  [[nodiscard]] auto& operator[](T i) const {
+    return i == T::None ? BaseEnumMap<V>::Empty
+                        : _values[base::checkIndex(i, base::Index)];
+  }
+
   class ConstIterator : public base::template Iterator<ConstIterator> {
   private:
     friend EnumMap<T, V>;
@@ -98,14 +112,6 @@ public:
   // only support 'const' iteration
   [[nodiscard]] auto begin() const noexcept { return ConstIterator{0, *this}; }
   [[nodiscard]] auto end() const noexcept { return ConstIterator{N, *this}; }
-
-  [[nodiscard]] auto& operator[](T i) const {
-    return i == T::None ? BaseEnumMap<V>::Empty
-                        : _values[base::checkIndex(i, base::Index)];
-  }
-  [[nodiscard]] auto& operator[](T i) {
-    return _values[base::checkIndex(i, base::Index)];
-  }
 };
 
 } // namespace kanji_tools

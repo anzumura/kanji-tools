@@ -101,7 +101,7 @@ const std::string& ColumnFile::get(const Column& column) const {
 
 unsigned long ColumnFile::processULong(
     const std::string& s, const Column& column, unsigned long maxValue) const {
-  unsigned long i;
+  unsigned long i{};
   try {
     i = std::stoul(s);
   } catch (...) {
@@ -126,12 +126,12 @@ bool ColumnFile::getBool(const Column& column) const {
 
 char32_t ColumnFile::getWChar(
     const Column& column, const std::string& s) const {
-  if (s.size() < 4 || s.size() > 5)
+  if (s.size() < UnicodeStringMinSize || s.size() > UnicodeStringMaxSize)
     error("failed to convert to char32_t, size must be 4 or 5", column, s);
   for (const char c : s)
     if (c < '0' || c > 'F' || (c < 'A' && c > '9'))
       error("failed to convert to char32_t, invalid hex", column, s);
-  return static_cast<char32_t>(std::strtol(s.c_str(), nullptr, 16));
+  return static_cast<char32_t>(std::strtol(s.c_str(), nullptr, HexDigits));
 }
 
 } // namespace kanji_tools
