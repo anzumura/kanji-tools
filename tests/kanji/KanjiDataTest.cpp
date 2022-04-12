@@ -121,12 +121,6 @@ TEST_F(KanjiDataTest, RadicalChecks) {
   EXPECT_EQ(radical.reading(), "しか");
 }
 
-TEST_F(KanjiDataTest, BadUcdRadical) {
-  EXPECT_THROW(call([] { return _data->ucdRadical("blah", {}); },
-                   "UCD entry not found: blah"),
-      std::domain_error);
-}
-
 TEST_F(KanjiDataTest, TotalsChecks) {
   EXPECT_EQ(_data->gradeSize(KanjiGrades::G1), 80);
   EXPECT_EQ(_data->gradeSize(KanjiGrades::G2), 160);

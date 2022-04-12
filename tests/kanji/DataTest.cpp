@@ -36,6 +36,18 @@ TEST_F(DataTest, Usage) {
   EXPECT_THROW(call([&msg] { Data::usage(msg); }, msg), std::domain_error);
 }
 
+TEST_F(DataTest, MissingRadical) {
+  EXPECT_THROW(call([this] { return ucdRadical("鼠", {}); },
+                   "UCD entry not found: 鼠"),
+      std::domain_error);
+}
+
+TEST_F(DataTest, MissingStrokes) {
+  EXPECT_THROW(call([this] { return ucdStrokes("蛇", {}); },
+                   "UCD entry not found: 蛇"),
+      std::domain_error);
+}
+
 // command line args tests
 
 TEST_F(DataTest, NextArgWithNoArgs) {
@@ -112,8 +124,8 @@ TEST_F(DataTest, GoodDataDirArg) {
 }
 
 TEST_F(DataTest, DataDirArgToInvalidData) {
-  // get a valid directory that isn't a 'data' directory, i.e., it doesn't have
-  // the expected .txt files
+  // get a valid directory that isn't a 'data' directory, i.e., it doesn't
+  // have the expected .txt files
   const auto dir{_currentDir.root_directory()};
   const char* args[]{Arg0, DataArg.c_str(), dir.c_str()};
   const std::string msg{
@@ -124,7 +136,8 @@ TEST_F(DataTest, DataDirArgToInvalidData) {
 
 TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
   // get 'data' directory based on 'current directory' logic, i.e., look in
-  // current directory for 'data' and if not found check all parent directories
+  // current directory for 'data' and if not found check all parent
+  // directories
   const auto expected{getDataDir({})};
   // change to a directory that shouldn't have a 'data' directory
   fs::current_path(expected.root_directory());
