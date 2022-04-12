@@ -37,14 +37,14 @@ TEST_F(DataTest, Usage) {
 }
 
 TEST_F(DataTest, MissingRadical) {
-  EXPECT_THROW(call([this] { return ucdRadical("鼠", {}); },
-                   "UCD entry not found: 鼠"),
+  EXPECT_THROW(
+      call([this] { return ucdRadical("鼠", {}); }, "UCD entry not found: 鼠"),
       std::domain_error);
 }
 
 TEST_F(DataTest, MissingStrokes) {
-  EXPECT_THROW(call([this] { return ucdStrokes("蛇", {}); },
-                   "UCD entry not found: 蛇"),
+  EXPECT_THROW(
+      call([this] { return ucdStrokes("蛇", {}); }, "UCD entry not found: 蛇"),
       std::domain_error);
 }
 

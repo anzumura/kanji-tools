@@ -16,18 +16,19 @@ void Quiz::run(const Args& args, std::ostream& out) {
 }
 
 Quiz::Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
-    : _launcher{launcher}, _question{question}, _correctAnswers{0},
+    : _launcher{launcher}, _currentQuestion{question}, _correctAnswers{0},
       _showMeanings{showMeanings} {}
 
 Quiz::~Quiz() {
   if (isTestMode()) {
-    out() << "\nFinal score: " << _correctAnswers << '/' << _question;
-    if (!_question)
+    out() << "\nFinal score: " << _correctAnswers << '/' << _currentQuestion;
+    if (!_currentQuestion)
       out() << '\n';
-    else if (_correctAnswers == _question)
+    else if (_correctAnswers == _currentQuestion)
       out() << " - Perfect!\n";
     else {
-      if (const auto skipped{_question - _correctAnswers - _mistakes.size()};
+      if (const auto skipped{
+              _currentQuestion - _correctAnswers - _mistakes.size()};
           skipped)
         out() << ", skipped: " << skipped;
       if (!_mistakes.empty()) {
@@ -51,29 +52,30 @@ void Quiz::printMeaning(const Entry& kanji, bool useNewLine) const {
 }
 
 std::ostream& Quiz::beginQuizMessage(size_t totalQuestions) {
-  // _question can be set to non-zero from command line -r or -t options, report
-  // an error if it's out of range, otherwise subtract one since 'question' list
-  // index starts at zero.
-  if (_question) {
-    if (_question > totalQuestions)
-      Data::usage("entry num '" + std::to_string(_question) +
+  // _currentQuestion can be set to non-zero from command line -r or -t options,
+  // report an error if it's out of range, otherwise subtract one since
+  // 'question' list index starts at zero.
+  if (_currentQuestion) {
+    if (_currentQuestion > totalQuestions)
+      Data::usage("entry num '" + std::to_string(_currentQuestion) +
                   "' is larger than total questions: " +
                   std::to_string(totalQuestions));
-    --_question;
+    --_currentQuestion;
   }
   return log(true) << "Starting " << (isTestMode() ? "quiz" : "review")
                    << " for " << totalQuestions << ' ';
 }
 
 std::ostream& Quiz::beginQuestionMessage(size_t totalQuestions) const {
-  return out() << (isTestMode() ? "\nQuestion " : "\n") << _question + 1 << '/'
-               << totalQuestions << ":  ";
+  return out() << (isTestMode() ? "\nQuestion " : "\n") << _currentQuestion + 1
+               << '/' << totalQuestions << ":  ";
 }
 
 bool Quiz::showMeanings() const { return _showMeanings; }
 
 void Quiz::correctMessage() {
-  out() << "  Correct! (" << ++_correctAnswers << '/' << _question + 1 << ")\n";
+  out() << "  Correct! (" << ++_correctAnswers << '/' << _currentQuestion + 1
+        << ")\n";
 }
 
 std::ostream& Quiz::incorrectMessage(const std::string& name) {
@@ -84,10 +86,10 @@ std::ostream& Quiz::incorrectMessage(const std::string& name) {
 Choice::Choices Quiz::getDefaultChoices(size_t totalQuestions) const {
   Choice::Choices c{
       {MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
-      {SkipOption, _question + 1U == totalQuestions ? "finish"
-                   : !isTestMode()                  ? "next"
-                                                    : "skip"}};
-  if (!isTestMode() && _question) c[PrevOption] = "prev";
+      {SkipOption, _currentQuestion + 1U == totalQuestions ? "finish"
+                   : !isTestMode()                         ? "next"
+                                                           : "skip"}};
+  if (!isTestMode() && _currentQuestion) c[PrevOption] = "prev";
   return c;
 }
 

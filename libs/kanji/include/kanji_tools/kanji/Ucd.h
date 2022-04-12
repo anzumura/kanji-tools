@@ -16,6 +16,9 @@ public:
   using Reading = Radical::Reading;
   using Strokes = u_int8_t;
 
+  // max number of strokes and variant strokes in current 'ucd.txt' data
+  inline static constexpr Strokes MaxStrokes{53}, MaxVariantStrokes{33};
+
   class Link {
   public:
     Link(Code code, Name name) : _code{code}, _name{name} {}

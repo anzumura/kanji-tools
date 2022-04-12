@@ -13,6 +13,8 @@ const fs::path UcdFile{"ucd"}, RadicalsFile{"radicals"},
     FrequencyReadingsFile{"frequency-readings"},
     LinkedJinmeiFile{"linked-jinmei"}, Jlpt{"jlpt"}, Kentei{"kentei"};
 
+constexpr auto MaxVariantSelectorExamples{5};
+
 } // namespace
 
 KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
@@ -139,7 +141,8 @@ void KanjiData::printStats() const {
     printCount("  NF (no-frequency)", [](auto& x) { return !x->frequency(); });
     printCount("  Has Strokes", [](auto& x) { return x->strokes() != 0; });
     printCount(
-        "  Has Variation Selectors", [](auto& x) { return x->variant(); }, 5);
+        "  Has Variation Selectors", [](auto& x) { return x->variant(); },
+        MaxVariantSelectorExamples);
     printCount("Old Forms", [](auto& x) { return !x->oldNames().empty(); });
   }
 }
@@ -213,11 +216,11 @@ void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
 }
 
 LevelDataFile KanjiData::dataFile(JlptLevels x) const {
-  return LevelDataFile(dataDir() / Jlpt / firstLower(toString(x)), x);
+  return {dataDir() / Jlpt / firstLower(toString(x)), x};
 }
 
 KyuDataFile KanjiData::dataFile(KenteiKyus x) const {
-  return KyuDataFile(dataDir() / Kentei / firstLower(toString(x)), x);
+  return {dataDir() / Kentei / firstLower(toString(x)), x};
 }
 
 } // namespace kanji_tools

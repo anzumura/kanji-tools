@@ -11,7 +11,7 @@ namespace kanji_tools {
 namespace {
 
 const std::string WideColon{"："};
-constexpr u_int8_t MissingTypeExamples{12}; // LCOV_EXCL_LINE: gcov bug
+constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
 
 } // namespace
 
@@ -145,8 +145,8 @@ void GroupData::printMeaningGroup(
 
 void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
   if (fullDebug())
-    out() << std::setw(wideSetw(group.name(), 25)) << group.name() << '('
-          << std::setw(2) << group.members().size() << ")   ";
+    out() << std::setw(wideSetw(group.name(), PatternGroupSetW)) << group.name()
+          << '(' << std::setw(2) << group.members().size() << ")   ";
   for (auto& i : group.members()) {
     types[i->type()].emplace_back(i->name());
     if (fullDebug()) {
@@ -194,8 +194,8 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
   for (auto i : AllKanjiTypes)
     if (auto j{types.find(i)}; j != types.end()) {
       auto& list{_data->types(i)};
-      out() << std::right << std::setw(14) << i << ": " << j->second.size()
-            << " / " << list.size();
+      out() << std::right << std::setw(BreakdownSetW) << i << ": "
+            << j->second.size() << " / " << list.size();
       if (const auto missing{list.size() - j->second.size()}; missing) {
         std::sort(j->second.begin(), j->second.end());
         out() << " (";

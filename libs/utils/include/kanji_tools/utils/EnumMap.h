@@ -83,7 +83,8 @@ public:
     [[nodiscard]] auto& operator*() const {
       if (!_map) throw std::domain_error{"not initialized"};
       if (iBase::index() >= N)
-        iBase::error(base::Index + std::to_string(iBase::index()) + base::Range);
+        iBase::error(
+            base::Index + std::to_string(iBase::index()) + base::Range);
       return (*_map)[static_cast<T>(iBase::index())];
     }
 

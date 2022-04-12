@@ -39,7 +39,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
   static const std::string CommaSpace{", "}, Equals{"="}, Dash{"-"};
 
   OptChar rangeStart;
-  char prevChar;
+  char prevChar{};
   const auto completeRange{[&prompt, &rangeStart, &prevChar]() {
     if (rangeStart != prevChar) prompt += Dash + prevChar;
   }};

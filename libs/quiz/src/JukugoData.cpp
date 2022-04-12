@@ -7,6 +7,12 @@
 
 namespace kanji_tools {
 
+namespace {
+
+constexpr auto JukugoSetW{14}, JukugoMaxExamples{12};
+
+} // namespace
+
 namespace fs = std::filesystem;
 
 JukugoData::JukugoData(DataPtr data, const Data::Path* dir) {
@@ -31,9 +37,9 @@ JukugoData::JukugoData(DataPtr data, const Data::Path* dir) {
     for (auto& i : _kanjiToJukugo)
       types[data->getType(i.first)].emplace_back(i.first);
     for (auto& i : types) {
-      data->out() << std::right << std::setw(14) << i.first << ": "
+      data->out() << std::right << std::setw(JukugoSetW) << i.first << ": "
                   << i.second.size() << ' ';
-      for (size_t j{}; j < i.second.size() && j < 12; ++j)
+      for (size_t j{}; j < i.second.size() && j < JukugoMaxExamples; ++j)
         data->out() << (j == 0 ? '(' : ' ') << i.second[j];
       data->out() << ")\n";
     }

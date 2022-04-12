@@ -39,7 +39,7 @@ public:
   using NelsonIds = std::vector<NelsonId>;
   using OptFreq = std::optional<Frequency>;
   using OptString = std::optional<std::string>;
-  // some type aliases to help make Kanji class functions shorter and clearer
+  // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
   using Name = Ucd::Name;
   using OldNames = const LinkNames&;

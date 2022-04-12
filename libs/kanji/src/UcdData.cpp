@@ -90,12 +90,12 @@ void UcdData::load(const Data::Path& file) {
 
     const auto radical{f.getULong(radicalCol)}, strokes{f.getULong(strokesCol)},
         vStrokes{f.isEmpty(vStrokesCol) ? 0 : f.getULong(vStrokesCol)};
-    if (radical < 1 || radical > 214)
+    if (radical < 1 || radical > Radical::MaxRadicals)
       f.error("radical '" + std::to_string(radical) + OutOfRange);
     // 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
-    if (strokes < 1 || strokes > 53)
+    if (strokes < 1 || strokes > Ucd::MaxStrokes)
       f.error("strokes '" + std::to_string(strokes) + OutOfRange);
-    if (vStrokes == 1 || vStrokes > 33)
+    if (vStrokes == 1 || vStrokes > Ucd::MaxVariantStrokes)
       f.error("variant strokes '" + std::to_string(vStrokes) + OutOfRange);
 
     const auto joyo{f.getBool(joyoCol)}, jinmei{f.getBool(jinmeiCol)};

@@ -117,7 +117,8 @@ public:
       // exception should only happen when dereferencing 'end' since other
       // methods prevent moving out of range
       if (iBase::index() >= N)
-        iBase::error(base::Index + std::to_string(iBase::index()) + base::Range);
+        iBase::error(
+            base::Index + std::to_string(iBase::index()) + base::Range);
       return static_cast<T>(iBase::index());
     }
 

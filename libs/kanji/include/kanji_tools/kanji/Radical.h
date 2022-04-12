@@ -9,10 +9,12 @@ namespace kanji_tools {
 class Radical {
 public:
   using AltForms = std::vector<std::string>;
+  using Number = u_int8_t;
+  // some type aliases to help make parameter lists shorter and clearer
   using Name = const std::string&;
   using Reading = const std::string&;
 
-  using Number = u_int8_t;
+  inline static constexpr Number MaxRadicals{214};
 
   Radical(Number, Name, const AltForms&, const std::string& longName, Reading);
 

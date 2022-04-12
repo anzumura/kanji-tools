@@ -78,10 +78,10 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 
 QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
     GroupDataPtr groupData, JukugoDataPtr jukugoData, std::istream* in)
-    : _programMode(ProgramMode::NotAssigned),
-      _questionOrder(QuestionOrder::NotAssigned),
-      _choice(data->out(), in, QuitOption), _groupData(groupData),
-      _jukugoData(jukugoData) {
+    : _programMode{ProgramMode::NotAssigned},
+      _questionOrder{QuestionOrder::NotAssigned},
+      _randomizeAnswers{true}, _choice{data->out(), in, QuitOption},
+      _groupData{groupData}, _jukugoData{jukugoData} {
   OptChar quizType, qList;
   // checkType is called to check f, g, l, k, m and p args (so ok to assume
   // size is at least 2) and set quizType and qList (list of questions choice)

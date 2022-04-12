@@ -2,7 +2,8 @@
 #include <kanji_tools/kana/Table.h>
 #include <kanji_tools/utils/Choice.h>
 #include <kanji_tools/utils/Utils.h>
-#include <stdio.h>
+
+#include <cstdio>
 #include <unistd.h>
 
 #include <filesystem>
@@ -42,9 +43,8 @@ private:
 };
 
 ConvertMain::ConvertMain(int argc, const char** argv)
-    : _choice{std::cout}, _program{argc > 0
-                                       ? fs::path(argv[0]).filename().string()
-                                       : std::string{"kanaConvert"}} {
+    : _choice{std::cout}, _program{argc ? fs::path(argv[0]).filename().string()
+                                        : std::string{"kanaConvert"}} {
   auto finishedOptions{false}, printKana{false}, printMarkdown{false};
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     if (_interactive || _suppressNewLine || printKana || printMarkdown)

@@ -51,7 +51,7 @@ private:
 
   // 'printAssignedAnswer' prints ' x->' if 'choice' is assigned to entry 'x',
   // otherwise prints 4 spaces
-  std::ostream& printAssignedAnswer(char choice) const;
+  [[nodiscard]] std::ostream& printAssignedAnswer(char choice) const;
 
   void showGroup(const List&, const List&, Choices&, bool repeatQuestion) const;
 

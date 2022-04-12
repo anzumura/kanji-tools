@@ -39,7 +39,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
     if (isQuit(c)) return;
     bucket = c - '1';
   }
-  if (_launcher.questionOrder() == QuestionOrder::FromBeginning &&
+  if (launcher.questionOrder() == QuestionOrder::FromBeginning &&
       memberType == All && !bucket)
     start(list, memberType);
   else {
@@ -61,9 +61,9 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
         if (memberCount > 1) newList.push_back(i);
       }
     }
-    if (_launcher.questionOrder() == QuestionOrder::FromEnd)
+    if (launcher.questionOrder() == QuestionOrder::FromEnd)
       std::reverse(newList.begin(), newList.end());
-    else if (_launcher.questionOrder() == QuestionOrder::Random)
+    else if (launcher.questionOrder() == QuestionOrder::Random)
       std::shuffle(newList.begin(), newList.end(), RandomGen);
     start(newList, memberType);
   }
@@ -101,9 +101,9 @@ void GroupQuiz::addOtherGroupName(
     }
   }};
   if (_groupType == GroupType::Meaning)
-    add(_launcher.groupData()->patternMap());
+    add(launcher().groupData()->patternMap());
   else
-    add(_launcher.groupData()->meaningMap());
+    add(launcher().groupData()->meaningMap());
 }
 
 void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
@@ -111,15 +111,15 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
   if (memberType) log() << "  " << Kanji::Legend << '\n';
 
   auto stopQuiz{false};
-  for (; _question < list.size() && !stopQuiz; ++_question) {
-    auto& i{list[_question]};
+  for (; currentQuestion() < list.size() && !stopQuiz; ++currentQuestion()) {
+    auto& i{list[currentQuestion()]};
     List questions, readings;
     for (auto& j : i->members())
       if (includeMember(j, memberType)) {
         questions.emplace_back(j);
         readings.emplace_back(j);
       }
-    if (isTestMode() && _launcher.randomizeAnswers()) {
+    if (isTestMode() && launcher().randomizeAnswers()) {
       std::shuffle(questions.begin(), questions.end(), RandomGen);
       std::shuffle(readings.begin(), readings.end(), RandomGen);
     }
@@ -142,7 +142,7 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
       repeatQuestion = true;
     } while (!stopQuiz && !skipGroup);
   }
-  if (stopQuiz) --_question;
+  if (stopQuiz) --currentQuestion();
 }
 
 void GroupQuiz::printAssignedAnswers() const {
@@ -209,7 +209,7 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
       toggleMeanings(choices);
       break;
     case PrevOption:
-      _question -= 2;
+      currentQuestion() -= 2;
       skipGroup = true;
       break;
     case SkipOption: skipGroup = true; break;

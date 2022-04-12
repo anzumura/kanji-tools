@@ -60,7 +60,8 @@ private:
   void startGroupQuiz(Question question, bool showMeanings,
       OptChar questionList, const GroupData::List& list) const;
 
-  Kanji::NelsonId getId(const std::string& msg, const std::string& arg) const;
+  [[nodiscard]] Kanji::NelsonId getId(
+      const std::string& msg, const std::string& arg) const;
 
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets
   // '_programMode'. It can also set '_questionOrder' depending on the value of

@@ -10,6 +10,9 @@ class Quiz {
 public:
   using List = QuizLauncher::List;
 
+  Quiz(const Quiz&) = delete;
+  Quiz& operator=(const Quiz&) = delete;
+
   // 'run' is called by 'quizMain.cpp'. it creates 'QuizLauncher' as well as its
   // dependencies. 'QuizLauncher' constructor creates and starts an instance of
   // either 'ListQuiz' or 'GroupQuiz' depending on command line args.
@@ -29,13 +32,11 @@ protected:
 
   Quiz(const QuizLauncher&, Question, bool showMeanings);
 
-  Quiz(const Quiz&) = delete;
-  Quiz& operator=(const Quiz&) = delete;
-
   // destructor prints the final score when in test mode
   virtual ~Quiz();
 
   // the following methods are shotcuts for calling '_launcher' methods
+  [[nodiscard]] auto& launcher() const { return _launcher; }
   [[nodiscard]] auto& choice() const { return _launcher.choice(); }
   [[nodiscard]] char get(const std::string& msg, const Choices&,
       OptChar def = {}, bool useQuit = true) const;
@@ -59,10 +60,10 @@ protected:
   // display of English 'meanings' can be toggled on and off
   void toggleMeanings(Choices&);
 
-  const QuizLauncher& _launcher;
-  Question _question;
+  [[nodiscard]] auto& currentQuestion() { return _currentQuestion; }
 private:
-  Question _correctAnswers;
+  const QuizLauncher& _launcher;
+  Question _currentQuestion, _correctAnswers;
   DataFile::List _mistakes;
   bool _showMeanings;
 };

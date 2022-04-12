@@ -88,19 +88,19 @@ bool Kanji::orderByQualifiedName(const Kanji& x) const {
 }
 
 u_int8_t Kanji::qualifiedNameRank() const {
+  // use an enum to avoid magic numbers, note 'Ucd' is the least common type
+  enum Values { Jou, Jlpt, Freq, Jinmei, LJinmei, LOld, Extra, NonK1, K1, Ucd };
   const auto t{type()};
-  // Note: '7' is for non-K1 Kentei, '8' is for K1 Kentei and '9' is for Ucd
-  // (so the least common)
-  return t == KanjiTypes::Jouyou         ? 0
-         : hasLevel()                    ? 1
-         : frequency()                   ? 2
-         : t == KanjiTypes::Jinmei       ? 3
-         : t == KanjiTypes::LinkedJinmei ? 4
-         : t == KanjiTypes::LinkedOld    ? 5
-         : t == KanjiTypes::Extra        ? 6
-         : t == KanjiTypes::Ucd          ? 9
-         : kyu() != KenteiKyus::K1       ? 7
-                                         : 8;
+  return t == KanjiTypes::Jouyou         ? Jou
+         : hasLevel()                    ? Jlpt
+         : frequency()                   ? Freq
+         : t == KanjiTypes::Jinmei       ? Jinmei
+         : t == KanjiTypes::LinkedJinmei ? LJinmei
+         : t == KanjiTypes::LinkedOld    ? LOld
+         : t == KanjiTypes::Extra        ? Extra
+         : t == KanjiTypes::Ucd          ? Ucd
+         : kyu() != KenteiKyus::K1       ? NonK1
+                                         : K1;
 }
 
 } // namespace kanji_tools

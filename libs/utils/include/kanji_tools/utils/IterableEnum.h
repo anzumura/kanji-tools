@@ -33,7 +33,7 @@ protected:
     static void error(const std::string& s) { throw std::out_of_range(s); }
 
     BaseIterator(size_t index = 0) noexcept : _index{index} {}
-  
+
     [[nodiscard]] auto& index() { return _index; }
     [[nodiscard]] auto index() const { return _index; }
   private:
