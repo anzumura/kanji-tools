@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/kana/Converter.h>
 #include <kanji_tools/kanji/Ucd.h>
 
 #include <filesystem>
@@ -52,7 +52,7 @@ private:
 
   // '_converter' is used by 'getReadingsAsKana' to convert the Romaji readings
   // loaded from UCD (Katakana for 'onReading' and Hiragana for 'kunReading').
-  mutable KanaConvert _converter;
+  mutable Converter _converter;
 };
 
 } // namespace kanji_tools

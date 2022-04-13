@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/kana/Converter.h>
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 #include <kanji_tools/utils/Utils.h>
@@ -7,7 +7,7 @@
 
 namespace kanji_tools {
 
-KanaConvert::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
+Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   for (auto& i : Kana::getMap(CharType::Hiragana))
     if (auto& r{i.second->romaji()}; !r.starts_with("n")) {
       if (r.size() == 1 || r == "ya" || r == "yu" || r == "yo") {
@@ -46,7 +46,7 @@ KanaConvert::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   verifyData();
 }
 
-void KanaConvert::Tokens::verifyData() const {
+void Converter::Tokens::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
   assert(_repeatingConsonents.size() == 18);
@@ -67,15 +67,15 @@ void KanaConvert::Tokens::verifyData() const {
   assert(_narrowDelims.size() == _wideDelims.size());
 }
 
-const KanaConvert::Tokens& KanaConvert::tokens() {
+const Converter::Tokens& Converter::tokens() {
   static const Tokens tokens;
   return tokens;
 }
 
-KanaConvert::KanaConvert(CharType target, ConvertFlags flags)
+Converter::Converter(CharType target, ConvertFlags flags)
     : _target{target}, _flags{flags} {}
 
-std::string KanaConvert::flagString() const {
+std::string Converter::flagString() const {
   if (_flags == ConvertFlags::None) return "None";
   std::string result;
   const auto flag{[this, &result](auto f, const char* v) {
@@ -91,28 +91,28 @@ std::string KanaConvert::flagString() const {
   return result;
 }
 
-std::string KanaConvert::convert(const std::string& input) const {
+std::string Converter::convert(const std::string& input) const {
   std::string result{input};
   for (const auto i : CharTypes)
     if (_target != i) result = convert(i, result);
   return result;
 }
 
-std::string KanaConvert::convert(
+std::string Converter::convert(
     const std::string& input, CharType target, ConvertFlags flags) {
   _target = target;
   _flags = flags;
   return convert(input);
 }
 
-std::string KanaConvert::convert(CharType source, const std::string& input,
+std::string Converter::convert(CharType source, const std::string& input,
     CharType target, ConvertFlags flags) {
   _target = target;
   _flags = flags;
   return convert(source, input);
 }
 
-std::string KanaConvert::convert(
+std::string Converter::convert(
     CharType source, const std::string& input) const {
   if (source == _target) return input;
   if (source == CharType::Hiragana) return fromKana(input, source);
@@ -136,7 +136,7 @@ std::string KanaConvert::convert(
   return result;
 }
 
-std::string KanaConvert::fromKana(
+std::string Converter::fromKana(
     const std::string& kanaInput, CharType source) const { // LCOV_EXCL_LINE
   enum class State { New, SmallTsu, Done };
   State state{State::New};
@@ -205,7 +205,7 @@ std::string KanaConvert::fromKana(
   return result + processKana(kanaGroup, source, prevKana);
 }
 
-std::string KanaConvert::processKana(const std::string& kanaGroup,
+std::string Converter::processKana(const std::string& kanaGroup,
     CharType source, const Kana*& prevKana, bool prolong) const {
   if (!kanaGroup.empty()) {
     prevKana = nullptr;
@@ -236,7 +236,7 @@ std::string KanaConvert::processKana(const std::string& kanaGroup,
   return kanaGroup;
 }
 
-std::string KanaConvert::processKanaMacron(
+std::string Converter::processKanaMacron(
     bool prolong, const Kana*& prevKana, const Kana* kana, bool sokuon) const {
   const auto& result{sokuon ? kana->getSokuonRomaji(_flags) : get(*kana)};
   if (prolong) {
@@ -255,7 +255,7 @@ std::string KanaConvert::processKanaMacron(
   return result;
 }
 
-std::string KanaConvert::toKana(const std::string& romajiInput) const {
+std::string Converter::toKana(const std::string& romajiInput) const {
   std::string result, letters, letter;
   for (MBChar s{romajiInput}; s.next(letter, false);)
     if (isSingleByte(letter)) {
@@ -288,8 +288,7 @@ std::string KanaConvert::toKana(const std::string& romajiInput) const {
   return result;
 }
 
-void KanaConvert::processRomaji(
-    std::string& letters, std::string& result) const {
+void Converter::processRomaji(std::string& letters, std::string& result) const {
   auto& sourceMap{Kana::getMap(CharType::Romaji)};
   std::string lower{toLower(letters)};
   if (const auto i{sourceMap.find(lower)}; i != sourceMap.end()) {
@@ -311,7 +310,7 @@ void KanaConvert::processRomaji(
   }
 }
 
-bool KanaConvert::processRomajiMacron(const std::string& letter,
+bool Converter::processRomajiMacron(const std::string& letter,
     std::string& letters, std::string& result) const {
   static const std::map<std::string, std::pair<char, std::string>> Macrons{
       {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, {"ū", {'u', "う"}},

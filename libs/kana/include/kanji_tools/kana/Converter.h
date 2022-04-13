@@ -7,18 +7,18 @@
 
 namespace kanji_tools {
 
-// 'KanaConvert' supports converting between Rōmaji (ローマジ), Hiragana
+// 'Converter' supports converting between Rōmaji (ローマジ), Hiragana
 // (平仮名) and Katakana (片仮名) - see comments at the bottom of this file more
 // details
-class KanaConvert {
+class Converter {
 public:
-  // 'KanaConvert' constructor defaults the 'target' for conversion to Hiragana
+  // 'Converter' constructor defaults the 'target' for conversion to Hiragana
   // and sets 'flags' to None (which means no special conversion flags). Calling
   // the below 'convert' functions can override these values.
-  KanaConvert(CharType target = CharType::Hiragana,
+  Converter(CharType target = CharType::Hiragana,
       ConvertFlags flags = ConvertFlags::None);
 
-  KanaConvert(const KanaConvert&) = delete;
+  Converter(const Converter&) = delete;
 
   [[nodiscard]] CharType target() const { return _target; }
   void target(CharType target) { _target = target; }
@@ -181,7 +181,7 @@ private:
 // from Kana to Rōmaji the standard form is used as output).
 //
 // Note: a number of delimiters are also supported and get converted from narrow
-// to wide and vice versa (see KanaConvert.cpp 'Delimiters'). When converting
+// to wide and vice versa (see Converter.cpp 'Delimiters'). When converting
 // from Rōmaji, case is ignored so both 'Dare' and 'dARe' convert to 'だれ'.
 
 } // namespace kanji_tools

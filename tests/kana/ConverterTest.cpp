@@ -1,32 +1,37 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/kana/Converter.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 namespace kanji_tools {
 
 namespace {
 
-class KanaConvertTest : public ::testing::Test {
+class ConverterTest : public ::testing::Test {
 protected:
   [[nodiscard]] auto romajiToHiragana(
       const std::string& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Romaji, s, CharType::Hiragana, flags);
   }
+
   [[nodiscard]] auto romajiToKatakana(
       const std::string& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Romaji, s, CharType::Katakana, flags);
   }
+
   [[nodiscard]] auto hiraganaToRomaji(
       const std::string& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Hiragana, s, CharType::Romaji, flags);
   }
+
   [[nodiscard]] auto hiraganaToKatakana(const std::string& s) {
     return _converter.convert(CharType::Hiragana, s, CharType::Katakana);
   }
+
   [[nodiscard]] auto katakanaToRomaji(
       const std::string& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Katakana, s, CharType::Romaji, flags);
   }
+
   [[nodiscard]] auto katakanaToHiragana(const std::string& s) {
     return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
@@ -85,12 +90,12 @@ protected:
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
   }
 
-  KanaConvert _converter;
+  Converter _converter;
 };
 
 } // namespace
 
-TEST_F(KanaConvertTest, FlagString) {
+TEST_F(ConverterTest, FlagString) {
   EXPECT_EQ(_converter.flagString(), "None");
   _converter.flags(ConvertFlags::Hepburn);
   EXPECT_EQ(_converter.flagString(), "Hepburn");
@@ -102,30 +107,30 @@ TEST_F(KanaConvertTest, FlagString) {
   EXPECT_EQ(_converter.flagString(), "Kunrei|RemoveSpaces");
 }
 
-TEST_F(KanaConvertTest, CheckConvertTarget) {
+TEST_F(ConverterTest, CheckConvertTarget) {
   EXPECT_EQ(_converter.target(), CharType::Hiragana); // check default ctor
-  KanaConvert converter(CharType::Katakana);
+  Converter converter(CharType::Katakana);
   EXPECT_EQ(converter.target(), CharType::Katakana); // check ctor
   converter.target(CharType::Romaji);
   EXPECT_EQ(converter.target(), CharType::Romaji); // check update
 }
 
-TEST_F(KanaConvertTest, CheckConvertFlags) {
+TEST_F(ConverterTest, CheckConvertFlags) {
   EXPECT_EQ(_converter.flags(), ConvertFlags::None); // check default ctor
-  KanaConvert converter(CharType::Romaji, ConvertFlags::Hepburn);
+  Converter converter(CharType::Romaji, ConvertFlags::Hepburn);
   EXPECT_EQ(converter.flags(), ConvertFlags::Hepburn); // check ctor
   converter.flags(ConvertFlags::Kunrei);
   EXPECT_EQ(converter.flags(), ConvertFlags::Kunrei); // check update
 }
 
-TEST_F(KanaConvertTest, NoConversionIfSourceAndTargetAreTheSame) {
+TEST_F(ConverterTest, NoConversionIfSourceAndTargetAreTheSame) {
   std::string s{"atatakaiあたたかいアタタカイ"};
   EXPECT_EQ(_converter.convert(CharType::Romaji, s, CharType::Romaji), s);
   EXPECT_EQ(_converter.convert(CharType::Hiragana, s, CharType::Hiragana), s);
   EXPECT_EQ(_converter.convert(CharType::Katakana, s, CharType::Katakana), s);
 }
 
-TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
+TEST_F(ConverterTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("a"), "あ");
   EXPECT_EQ(romajiToHiragana("ka"), "か");
   EXPECT_EQ(romajiToHiragana("kitte"), "きって");
@@ -135,7 +140,7 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   // ō or other macrons map to the same vowel in hiragana which is of course not
   // always correct so to preserve round-trip a macron is mapped to a prolonged
   // mark (ー). This isn't standard and can be turned off by a flag (see
-  // KanaConvert.h for details). 'ou' can be used instead to avoid ambiguity.
+  // Converter.h for details). 'ou' can be used instead to avoid ambiguity.
   EXPECT_EQ(romajiToHiragana("tōkyō"), "とーきょー");
   EXPECT_EQ(romajiToHiragana("toukyou"), "とうきょう");
   // This next case is of course incorrect, but it's the standard mapping for
@@ -163,7 +168,7 @@ TEST_F(KanaConvertTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("[サメはkowai!]"), "「サメはこわい！」");
 }
 
-TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
+TEST_F(ConverterTest, ConvertRomajiToKatakana) {
   EXPECT_EQ(romajiToKatakana("i"), "イ");
   EXPECT_EQ(romajiToKatakana("ke"), "ケ");
   // support both standard way (t+chi) as well as the wāpuro way (c+chi)
@@ -181,7 +186,7 @@ TEST_F(KanaConvertTest, ConvertRomajiToKatakana) {
   EXPECT_EQ(romajiToKatakana("(hello world)"), "（ヘlォ　ヲrld）");
 }
 
-TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
+TEST_F(ConverterTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("う"), "u");
   EXPECT_EQ(hiraganaToRomaji("かつ　さんど！"), "katsu sando!");
   EXPECT_EQ(hiraganaToRomaji("うぃき"), "wiki");
@@ -208,7 +213,7 @@ TEST_F(KanaConvertTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("いっって"), "iltutte");
 }
 
-TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
+TEST_F(ConverterTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("エ"), "e");
   EXPECT_EQ(katakanaToRomaji("アカ　サカ！"), "aka saka!");
   EXPECT_EQ(katakanaToRomaji("イェビス"), "yebisu");
@@ -233,7 +238,7 @@ TEST_F(KanaConvertTest, ConvertKatakanaToRomaji) {
   EXPECT_EQ(katakanaToRomaji("イッッテ"), "iltutte");
 }
 
-TEST_F(KanaConvertTest, ProlongMark) {
+TEST_F(ConverterTest, ProlongMark) {
   // prolonged sound mark is mainly for Katakana, but also works for Hiragana,
   // for now using this mark is the only way to get a macron (bar over letter)
   // in Romaji output.
@@ -250,7 +255,7 @@ TEST_F(KanaConvertTest, ProlongMark) {
   EXPECT_EQ(katakanaToRomaji("ホンート"), "honーto");
 }
 
-TEST_F(KanaConvertTest, HepburnAndKunrei) {
+TEST_F(ConverterTest, HepburnAndKunrei) {
   // third param is 'Hepburn', fourth is 'Kunrei', fifth is both flags enabled
   check("ちぢむ", "チヂム", "chidimu", "chijimu", "tizimu", "tijimu");
   check("つづき", "ツヅキ", "tsuduki", "tsuzuki", "tuzuki", "tuzuki");
@@ -263,7 +268,7 @@ TEST_F(KanaConvertTest, HepburnAndKunrei) {
   // surprising results (see 'HepburnVersusKunrei' test below to see all values)
 }
 
-TEST_F(KanaConvertTest, ConvertBetweenKana) {
+TEST_F(ConverterTest, ConvertBetweenKana) {
   for (auto& i : Kana::getMap(CharType::Hiragana)) {
     const auto r{
         _converter.convert(CharType::Hiragana, i.first, CharType::Katakana)};
@@ -286,7 +291,7 @@ TEST_F(KanaConvertTest, ConvertBetweenKana) {
   kanaConvertCheck("じょん・どー", "ジョン・ドー");
 }
 
-TEST_F(KanaConvertTest, RepeatSymbol) {
+TEST_F(ConverterTest, RepeatSymbol) {
   kanaConvertCheck("かゝ", "カヽ", "kaka");
   kanaConvertCheck("かゞ", "カヾ", "kaga");
   kanaConvertCheck("がゝ", "ガヽ", "gaka");
@@ -320,7 +325,7 @@ TEST_F(KanaConvertTest, RepeatSymbol) {
   kanaConvertCheck("ゝろ", "ヽロ", "ro");
 }
 
-TEST_F(KanaConvertTest, ConvertAllToOneType) {
+TEST_F(ConverterTest, ConvertAllToOneType) {
   EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Romaji),
       "ima kurisumasu desu.");
   EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Hiragana),
@@ -335,13 +340,13 @@ TEST_F(KanaConvertTest, ConvertAllToOneType) {
       "ラーメンラーメンラーメン！！");
 }
 
-TEST_F(KanaConvertTest, UnsupportedKana) {
+TEST_F(ConverterTest, UnsupportedKana) {
   // leave unsupported Kana symbols unconverted
   EXPECT_EQ(hiraganaToRomaji("かゟこ"), "kaゟko"); // Hiragana 'yori'
   EXPECT_EQ(katakanaToRomaji("カヿコ"), "kaヿko"); // Katakana 'koto'
 }
 
-TEST_F(KanaConvertTest, UnsupportedRomaji) {
+TEST_F(ConverterTest, UnsupportedRomaji) {
   // leave unsupported Rōmaji combinations unconverted
   EXPECT_EQ(romajiToHiragana("TGIF"), "TぎF");
   EXPECT_EQ(romajiToKatakana("Alba"), "アlバ");
@@ -351,7 +356,7 @@ TEST_F(KanaConvertTest, UnsupportedRomaji) {
   EXPECT_EQ(romajiToKatakana("Vyī"), "Vyイ");
 }
 
-TEST_F(KanaConvertTest, HepburnVersusKunrei) {
+TEST_F(ConverterTest, HepburnVersusKunrei) {
   // Romaji output is usually Modern Hepburn by default, but will be Nihon Shiki
   // sometimes in order to be unique for round-trips (plus there are a lot of
   // extra wāpuro entries). Below are the entries from the Differences among
@@ -493,7 +498,7 @@ TEST_F(KanaConvertTest, HepburnVersusKunrei) {
   check("ゔ", "ヴ", "vu");
 }
 
-TEST_F(KanaConvertTest, CheckDelims) {
+TEST_F(ConverterTest, CheckDelims) {
   using P = std::pair<char, const char*>;
   for (const auto& i : {P{' ', "　"}, P{'.', "。"}, P{',', "、"}, P{':', "："},
            P{';', "；"}, P{'/', "・"}, P{'!', "！"}, P{'?', "？"}, P{'(', "（"},

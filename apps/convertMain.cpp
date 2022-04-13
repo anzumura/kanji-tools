@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/KanaConvert.h>
+#include <kanji_tools/kana/Converter.h>
 #include <kanji_tools/kana/Table.h>
 #include <kanji_tools/utils/Choice.h>
 #include <kanji_tools/utils/Utils.h>
@@ -37,7 +37,7 @@ private:
   bool _suppressNewLine{false};
   std::optional<CharType> _source{};
   std::vector<std::string> _strings;
-  KanaConvert _converter;
+  Converter _converter;
   const Choice _choice;
   const std::string _program;
 };
