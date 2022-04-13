@@ -11,18 +11,19 @@ void KanaConvert::error(const std::string& msg) {
   throw std::domain_error(msg);
 }
 
-KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream& in)
-    : _out(out), _in(in), _choice{out, &in} {
+KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
+    : _out(out), _in(in), _choice{out, in} {
   auto finishedOptions{false}, printKana{false}, printMarkdown{false};
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     if (_interactive || _suppressNewLine || printKana || printMarkdown)
       error("can only specify one of -i, -m, -n, or -p");
     b = true;
   }};
+  List strings;
   for (Args::Size i{1}; i < args.size(); ++i) {
     std::string arg{args[i]};
     if (finishedOptions)
-      _strings.push_back(arg);
+      strings.emplace_back(arg);
     else if (arg == "--")
       finishedOptions = true; // any more args will be added to 'files'
     else if (arg == "-i")
@@ -47,14 +48,14 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream& in)
     } else if (arg.starts_with("-")) {
       if (!charTypeArgs(arg)) error("illegal option: " + arg);
     } else
-      _strings.emplace_back(arg);
+      strings.emplace_back(arg);
   }
-  if (_strings.empty()) {
+  if (strings.empty()) {
     if (printKana)
       printKanaChart();
     else if (printMarkdown)
       printKanaChart(true);
-    else if (isatty(fileno(stdin))) {
+    else if (_in || isatty(fileno(stdin))) {
       if (!_interactive)
         error("provide one or more 'strings' to convert or specify '-i' for "
               "interactive mode");
@@ -65,7 +66,7 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream& in)
   } else if (_interactive)
     error("'-i' can't be combined with other 'string' arguments");
   else
-    start();
+    start(strings);
 }
 
 bool KanaConvert::charTypeArgs(const std::string& arg) {
@@ -129,11 +130,11 @@ void KanaConvert::usage(bool showAllOptions) const {
   }
 }
 
-void KanaConvert::start() {
-  if (_strings.empty())
+void KanaConvert::start(const List& strings) {
+  if (strings.empty())
     getInput();
   else {
-    for (auto space{false}; const auto& i : _strings) {
+    for (auto space{false}; auto& i : strings) {
       if (space)
         _out << (_converter.target() == CharType::Romaji ? " " : "　");
       else
@@ -159,7 +160,8 @@ void KanaConvert::getInput() {
               "-k|-h|-r|-K|-H|-R):\n";
       outputCurrentOptions = false;
     }
-    if (std::string line; std::getline(_in, line) && line != "q") {
+    if (std::string line;
+        std::getline(_in ? *_in : std::cin, line) && line != "q") {
       if (_interactive) {
         if (line.empty()) continue;
         if (line == "c" || line == "f" || line == "h" ||
@@ -180,7 +182,7 @@ void KanaConvert::getInput() {
         }
       }
       processOneLine(line);
-      if (!_suppressNewLine) std::cout << '\n';
+      if (!_suppressNewLine) _out << '\n';
     } else
       break;
   } while (true);

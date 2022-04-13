@@ -8,8 +8,10 @@ namespace kanji_tools {
 
 class KanaConvert {
 public:
-  KanaConvert(Args, std::ostream& = std::cout, std::istream& = std::cin);
+  KanaConvert(Args, std::ostream& = std::cout, std::istream* = {});
 private:
+  using List = std::vector<std::string>;
+
   // 'error' throws an exception (used during processing of command line args)
   static void error(const std::string&);
 
@@ -20,18 +22,17 @@ private:
   // 'showAllOptions' to false causes it to print a shorted message
   void usage(bool showAllOptions = true) const;
 
-  void start();
+  void start(const List& = {});
   void getInput();
   void processOneLine(const std::string&);
   void setFlag(ConvertFlags);
   void printKanaChart(bool markdown = false) const;
 
   std::ostream& _out;
-  std::istream& _in;
+  std::istream* _in;
   bool _interactive{false}, _suppressNewLine{false};
   std::optional<CharType> _source{};
-  std::vector<std::string> _strings;
-  Converter _converter;
+	  Converter _converter;
   const Choice _choice;
 };
 
