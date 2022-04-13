@@ -352,7 +352,7 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(
 Kanji::NelsonId QuizLauncher::getId(
     const std::string& msg, const std::string& arg) const {
   std::stringstream ss{arg};
-  Kanji::NelsonId id;
+  Kanji::NelsonId id{};
   if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
   return id;
 }

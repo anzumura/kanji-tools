@@ -1,6 +1,6 @@
 ---
 Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,
-         -*-avoid-c-arrays,
+         -*-avoid-c-arrays,-clang-diagnostic-pragma-once-outside-header,
          -cppcoreguidelines-avoid-non-const-global-variables,
          -cppcoreguidelines-pro-bounds-constant-array-index,
          -cppcoreguidelines-pro-bounds-array-to-pointer-decay,

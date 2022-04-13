@@ -24,9 +24,11 @@ protected:
     TestOne->type(KanjiTypes::None);
   }
 
-  void TearDown() override { fs::current_path(_currentDir); }
+  void TearDown() override { fs::current_path(currentDir()); }
 
-  Path _currentDir;
+  [[nodiscard]] const Path& currentDir() const { return _currentDir; }
+private:
+  const Path _currentDir;
 };
 
 } // namespace
@@ -126,7 +128,7 @@ TEST_F(DataTest, GoodDataDirArg) {
 TEST_F(DataTest, DataDirArgToInvalidData) {
   // get a valid directory that isn't a 'data' directory, i.e., it doesn't
   // have the expected .txt files
-  const auto dir{_currentDir.root_directory()};
+  const auto dir{currentDir().root_directory()};
   const char* args[]{Arg0, DataArg.c_str(), dir.c_str()};
   const std::string msg{
       "'" + dir.string() + "' does not contain 10 expected '.txt' files"};
@@ -148,7 +150,7 @@ TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
 }
 
 TEST_F(DataTest, FailToFindDataDirNoArg0) {
-  fs::current_path(_currentDir.root_directory());
+  fs::current_path(currentDir().root_directory());
   const std::string msg{
       "couldn't find 'data' directory with 10 expected '.txt' files:\n- "
       "searched up from current: " +
@@ -158,7 +160,7 @@ TEST_F(DataTest, FailToFindDataDirNoArg0) {
 }
 
 TEST_F(DataTest, FailToFindDataDirWithArg0) {
-  fs::current_path(_currentDir.root_directory());
+  fs::current_path(currentDir().root_directory());
   const std::string arg0{fs::current_path() / "testProgramName"};
   const std::string msg{
       "couldn't find 'data' directory with 10 expected '.txt' files:\n- "

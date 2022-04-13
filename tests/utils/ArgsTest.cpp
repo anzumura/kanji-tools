@@ -26,7 +26,9 @@ TEST(ArgsTest, IntArgsOutOfRange) {
   const char* argv[]{"a", "bb", "ccc"};
   const auto small{[&] { Args{-1, argv}; }};
   EXPECT_THROW(call(small, "size -1 is less than 0"), std::domain_error);
-  const auto big{[&argv] { Args{256, argv}; }};
+  const auto big{[&argv] {
+    Args{std::numeric_limits<Args::Size>::max() + 1, argv};
+  }};
   EXPECT_THROW(call(big, "size 256 is greater than 255"), std::domain_error);
 }
 

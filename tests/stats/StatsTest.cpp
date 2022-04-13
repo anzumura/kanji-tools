@@ -18,8 +18,6 @@ protected:
     _data = std::make_shared<KanjiData>(Args{}, _os);
   }
 
-  StatsTest() {}
-
   void SetUp() override {
     _os.str({});
     _os.clear();
