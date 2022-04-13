@@ -45,10 +45,10 @@ protected:
     for (std::string i, j; std::getline(_os, i) && std::getline(expected, j);)
       ASSERT_EQ(i, j);
     // if loop completed due to 'eof' then check remaining part of other stream
-    if (_os.eof())
-      EXPECT_EQ(expected.str().substr(_os.str().size()), "");
-    else if (expected.eof())
-      EXPECT_EQ(_os.str().substr(expected.str().size()), "");
+    if (_os.eof() && expectedIn.size() > _os.str().size())
+      EXPECT_EQ(expectedIn.substr(_os.str().size()), "");
+    else if (expected.eof() && _os.str().size() > expectedIn.size())
+      EXPECT_EQ(_os.str().substr(expectedIn.size()), "");
   }
 
   inline static std::stringstream _os;
