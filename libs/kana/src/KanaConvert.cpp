@@ -5,20 +5,14 @@
 #include <cstdio>
 #include <unistd.h>
 
-#include <filesystem>
-
 namespace kanji_tools {
-
-namespace fs = std::filesystem;
 
 void KanaConvert::error(const std::string& msg) {
   throw std::domain_error(msg);
 }
 
-KanaConvert::KanaConvert(Args args, std::istream& in, std::ostream& out)
-    : _in(in), _out(out), _choice{out, &in},
-      _program{args ? fs::path(args[0]).filename().string()
-                    : std::string{"kanaConvert"}} {
+KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream& in)
+    : _out(out), _in(in), _choice{out, &in} {
   auto finishedOptions{false}, printKana{false}, printMarkdown{false};
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     if (_interactive || _suppressNewLine || printKana || printMarkdown)
@@ -56,17 +50,18 @@ KanaConvert::KanaConvert(Args args, std::istream& in, std::ostream& out)
       _strings.emplace_back(arg);
   }
   if (_strings.empty()) {
-    if (isatty(fileno(stdin))) {
-      if (printKana)
-        printKanaChart();
-      else if (printMarkdown)
-        printKanaChart(true);
-      else if (!_interactive)
+    if (printKana)
+      printKanaChart();
+    else if (printMarkdown)
+      printKanaChart(true);
+    else if (isatty(fileno(stdin))) {
+      if (!_interactive)
         error("provide one or more 'strings' to convert or specify '-i' for "
               "interactive mode");
       else
         start();
-    }
+    } else
+      start();
   } else if (_interactive)
     error("'-i' can't be combined with other 'string' arguments");
   else
@@ -107,8 +102,8 @@ bool KanaConvert::flagArgs(char arg) {
 
 void KanaConvert::usage(bool showAllOptions) const {
   if (showAllOptions)
-    _out << "usage: " << _program
-         << " [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-m|-n|-p] [string ...]\n";
+    _out << "usage: kanaConvert [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-m|-n|-p] "
+            "[string ...]\n";
   _out << "  -h: set conversion output to Hiragana"
        << (showAllOptions ? " (default)" : "") << R"(
   -k: set conversion output to Katakana
@@ -119,17 +114,17 @@ void KanaConvert::usage(bool showAllOptions) const {
 )";
   if (showAllOptions) {
     _out << R"(  -?: prints this usage message
-  -f option: set 'option' (-f can be used multiple times to combine options). Valid options are:
+  -f opt: set 'opt' (can use multiple times to combine options). Options are:
       h: conform Rōmaji output more closely to 'Modern Hepburn' style
       k: conform Rōmaji output more closely to 'Kunrei Shiki' style
-      n: no prolonged sound marks on Hiragana output, i.e., vowels are repeated instead of 'ー'
+      n: no prolonged marks (repeat vowels instead of 'ー' for Hiragana output)
       r: remove spaces on output (only applies to Hiragana and Katakana output)
   -i: interactive mode
   -m: print Kana chart in 'Markdown' format and exit
   -n: suppress newline on output (for non-interactive mode)
   -p: print Kana chart aligned for terminal output and exit
-  --: finish parsing options, all further arguments will be treated as input files
-  [string ...]: provide one or more strings to convert, no strings means process standard input
+  --: finish options, all further arguments will be treated as input files
+  [string ...]: one or more strings to convert, no strings means read stdin
 )";
   }
 }
@@ -156,12 +151,12 @@ void KanaConvert::getInput() {
   auto outputCurrentOptions{true};
   do {
     if (_interactive && outputCurrentOptions) {
-      _out << ">>> Current options: source="
+      _out << ">>> current options: source="
            << (_source ? toString(*_source) : "any")
            << ", target=" << toString(_converter.target())
            << ", flags=" << _converter.flagString()
-           << "\n>>> Enter string or 'c'=clear flags, 'f'=set flag, "
-              "'q'=quit, 'h'=help or -k|-h|-r|-K|-H|-R:\n";
+           << "\n>>> enter string (c=clear flags, f=set flag, q=quit, h=help, "
+              "-k|-h|-r|-K|-H|-R):\n";
       outputCurrentOptions = false;
     }
     if (std::string line; std::getline(_in, line) && line != "q") {
@@ -172,7 +167,7 @@ void KanaConvert::getInput() {
           if (line == "c")
             _converter.flags(ConvertFlags::None);
           else if (line == "f")
-            flagArgs(_choice.get(">>> Enter flag option", FlagChoices));
+            flagArgs(_choice.get(">>> enter flag option", FlagChoices));
           else if (line == "h") {
             usage(false);
             line = "q";

@@ -8,7 +8,7 @@ namespace kanji_tools {
 
 class KanaConvert {
 public:
-  KanaConvert(Args, std::istream& = std::cin, std::ostream& = std::cout);
+  KanaConvert(Args, std::ostream& = std::cout, std::istream& = std::cin);
 private:
   // 'error' throws an exception (used during processing of command line args)
   static void error(const std::string&);
@@ -26,14 +26,13 @@ private:
   void setFlag(ConvertFlags);
   void printKanaChart(bool markdown = false) const;
 
-  std::istream& _in;
   std::ostream& _out;
+  std::istream& _in;
   bool _interactive{false}, _suppressNewLine{false};
   std::optional<CharType> _source{};
   std::vector<std::string> _strings;
   Converter _converter;
   const Choice _choice;
-  const std::string _program;
 };
 
 } // namespace kanji_tools
