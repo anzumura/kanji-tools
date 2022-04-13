@@ -55,14 +55,15 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
       printKanaChart();
     else if (printMarkdown)
       printKanaChart(true);
-    else if (_in || isatty(fileno(stdin))) {
-      if (!_interactive)
+    else {
+      // when testing ('_in' is defined) or reading from a tty then require '-i'
+      // if no string args are provided. If stdin is not a tty (like a pipe)
+      // then '-i' isn't required, e.g.: 'echo hi | kanaConvert'
+      if ((_in || isatty(fileno(stdin))) && !_interactive)
         error("provide one or more 'strings' to convert or specify '-i' for "
               "interactive mode");
-      else
-        start();
-    } else
       start();
+    }
   } else if (_interactive)
     error("'-i' can't be combined with other 'string' arguments");
   else
