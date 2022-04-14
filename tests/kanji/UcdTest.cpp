@@ -10,6 +10,7 @@ TEST(UcdTest, CodeAndName) {
   EXPECT_EQ(ucd.version(), "1.1");
   EXPECT_EQ(ucd.linkType(), UcdLinkTypes::None);
   EXPECT_EQ(ucd.codeAndName(), "[5B66] 学");
+  EXPECT_EQ(sizeof(ucd), 408);
 }
 
 TEST(UcdLinkTypesTest, LinkCodeAndNames) {

@@ -87,7 +87,7 @@ bool Kanji::orderByQualifiedName(const Kanji& x) const {
                                  toUnicode(x.compatibilityName())));
 }
 
-u_int8_t Kanji::qualifiedNameRank() const {
+u_int16_t Kanji::qualifiedNameRank() const {
   // use an enum to avoid magic numbers, note 'Ucd' is the least common type
   enum Values { Jou, Jlpt, Freq, Jinmei, LJinmei, LOld, Extra, NonK1, K1, Ucd };
   const auto t{type()};

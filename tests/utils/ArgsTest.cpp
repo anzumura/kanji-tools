@@ -29,7 +29,7 @@ TEST(ArgsTest, IntArgsOutOfRange) {
   const auto big{[&argv] {
     Args{std::numeric_limits<Args::Size>::max() + 1, argv};
   }};
-  EXPECT_THROW(call(big, "size 256 is greater than 255"), std::domain_error);
+  EXPECT_THROW(call(big, "size 65536 is greater than 65535"), std::domain_error);
 }
 
 TEST(ArgsTest, Index) {

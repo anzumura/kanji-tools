@@ -221,10 +221,10 @@ void KanaConvert::printKanaChart(bool markdown) const {
   - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
 )";
-  u_int16_t hanDakutenMonographs{}, small{}, plainMonographs{},
+  size_t hanDakutenMonographs{}, small{}, plainMonographs{},
       dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
       dakutenDigraphs{}, romajiVariants{};
-  constexpr u_int16_t noneTypeKana{4};
+  constexpr size_t noneTypeKana{4};
   Table table{{"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
                   "Kunr", "Roma Variants"},
       true};
@@ -235,7 +235,7 @@ void KanaConvert::printKanaChart(bool markdown) const {
       "la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i{*entry.second};
-    romajiVariants += static_cast<u_int16_t>(i.romajiVariants().size());
+    romajiVariants += i.romajiVariants().size();
     if (i.isSmall())
       ++small;
     else if (i.isMonograph()) {

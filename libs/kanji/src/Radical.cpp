@@ -17,7 +17,7 @@ bool Radical::operator<(RadicalRef rhs) const { return _number < rhs._number; }
 
 std::ostream& operator<<(std::ostream& os, RadicalRef r) {
   return os << '[' << std::right << std::setfill('0') << std::setw(3)
-            << static_cast<int>(r.number()) << "] " << r.name();
+            << r.number() << "] " << r.name();
 }
 
 } // namespace kanji_tools

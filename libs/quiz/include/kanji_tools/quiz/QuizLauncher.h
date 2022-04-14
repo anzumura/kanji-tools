@@ -51,7 +51,7 @@ public:
       const Entry&, bool useNewLine = false, bool showMeaning = true) const;
   void printReviewDetails(const Entry&) const;
 private:
-  static constexpr u_int8_t JukugoPerLine{3}, MaxJukugoSize{30};
+  static constexpr u_int16_t JukugoPerLine{3}, MaxJukugoSize{30};
 
   [[nodiscard]] DataRef data() const { return _groupData->data(); }
 

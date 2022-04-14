@@ -14,7 +14,7 @@ public:
   using Meaning = const std::string&;
   using Name = Radical::Name;
   using Reading = Radical::Reading;
-  using Strokes = u_int8_t;
+  using Strokes = u_int16_t;
 
   // max number of strokes and variant strokes in current 'ucd.txt' data
   inline static constexpr Strokes MaxStrokes{53}, MaxVariantStrokes{33};

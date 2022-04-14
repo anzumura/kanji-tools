@@ -177,7 +177,7 @@ private:
   static constexpr std::array QualifiedNames{
       '.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
 
-  [[nodiscard]] u_int8_t qualifiedNameRank() const;
+  [[nodiscard]] u_int16_t qualifiedNameRank() const;
 
   // name related fields
   const KanjiName _name;

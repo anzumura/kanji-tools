@@ -9,7 +9,7 @@ namespace kanji_tools {
 // helper class to hold command line args
 class Args {
 public:
-  using Size = u_int8_t;
+  using Size = u_int16_t;
   using List = const char* const*;
 
   Args() noexcept = default;
