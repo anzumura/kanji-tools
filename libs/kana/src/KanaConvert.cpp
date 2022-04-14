@@ -125,7 +125,7 @@ void KanaConvert::usage(bool showAllOptions) const {
   -m: print Kana chart in 'Markdown' format and exit
   -n: suppress newline on output (for non-interactive mode)
   -p: print Kana chart aligned for terminal output and exit
-  --: finish options, all further arguments will be treated as input files
+  --: finish options, subsequent args are treated as strings to convert
   [string ...]: one or more strings to convert, no strings means read stdin
 )";
   }
