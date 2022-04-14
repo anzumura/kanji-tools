@@ -3,6 +3,8 @@
 #include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/kanji/UcdLinkTypes.h>
 
+#include <bitset>
+
 namespace kanji_tools {
 
 class UcdEntry {
@@ -42,9 +44,8 @@ private:
   const bool _linkedReadings;
 };
 
-// 'Ucd' holds the data loaded from 'ucd.txt' which is an extract from the
-// official Unicode 'ucd.all.flat.xml' file - see comments in
-// scripts/parseUcdAllFlat.sh for more details.
+// 'Ucd' holds data loaded from 'ucd.txt' which is an extract of the Unicode
+// 'ucd.all.flat.xml' file - see scripts/parseUcdAllFlat.sh for more details
 class Ucd {
 public:
   using Meaning = const std::string&;
@@ -54,18 +55,12 @@ public:
   // max number of strokes and variant strokes in current 'ucd.txt' data
   inline static constexpr Strokes MaxStrokes{53}, MaxVariantStrokes{33};
 
-  Ucd(const UcdEntry& entry, const std::string& block,
-      const std::string& version, Radical::Number radical, Strokes strokes,
-      Strokes variantStrokes, const std::string& pinyin,
-      const std::string& morohashiId, const std::string& nelsonIds,
-      const std::string& sources, const std::string& jSource, bool joyo,
-      bool jinmei, const UcdLinks& links, Meaning meaning, Reading onReading,
-      Reading kunReading)
-      : _entry{entry}, _block{block}, _version{version}, _radical{radical},
-        _strokes{strokes}, _variantStrokes{variantStrokes}, _pinyin{pinyin},
-        _morohashiId{morohashiId}, _nelsonIds{nelsonIds}, _sources{sources},
-        _jSource{jSource}, _joyo{joyo}, _jinmei{jinmei}, _links{links},
-        _meaning{meaning}, _onReading{onReading}, _kunReading{kunReading} {}
+  Ucd(const UcdEntry&, const std::string& block, const std::string& version,
+      Radical::Number, Strokes strokes, Strokes variantStrokes,
+      const std::string& pinyin, const std::string& morohashiId,
+      const std::string& nelsonIds, const std::string& sources,
+      const std::string& jSource, bool joyo, bool jinmei, const UcdLinks&,
+      Meaning, Reading onReading, Reading kunReading);
 
   Ucd(const Ucd&) = delete;
 
@@ -78,14 +73,16 @@ public:
   [[nodiscard]] auto& pinyin() const { return _pinyin; }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
-  [[nodiscard]] auto& sources() const { return _sources; }
   [[nodiscard]] auto& jSource() const { return _jSource; }
-  [[nodiscard]] auto joyo() const { return _joyo; }
-  [[nodiscard]] auto jinmei() const { return _jinmei; }
   [[nodiscard]] auto& links() const { return _links; }
   [[nodiscard]] auto& meaning() const { return _meaning; }
   [[nodiscard]] auto& onReading() const { return _onReading; }
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
+
+  // values for these fields are stored in _sources bitset;
+  [[nodiscard]] std::string sources() const;
+  [[nodiscard]] bool joyo() const;
+  [[nodiscard]] bool jinmei() const;
 
   // 'has' methods
   [[nodiscard]] bool hasLinks() const;
@@ -99,15 +96,21 @@ public:
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
 private:
+  // there are 6 source types (G, H, J, K, T, V) plus joyo and jinmei flags
+  static constexpr auto SourcesSize{8};
+
+  [[nodiscard]] static std::bitset<SourcesSize> getSources(
+      const std::string& sources, bool joyo, bool jinmei);
+
   const UcdEntry _entry;
   const std::string _block, _version;
   const Radical::Number _radical;
   // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
   const Strokes _strokes, _variantStrokes;
-  const std::string _pinyin, _morohashiId, _nelsonIds, _sources, _jSource;
-  const bool _joyo, _jinmei;
+  const std::string _pinyin, _morohashiId, _nelsonIds, _jSource;
   const UcdLinks _links;
   const std::string _meaning, _onReading, _kunReading;
+  const std::bitset<SourcesSize> _sources;
 };
 
 using UcdPtr = const Ucd*;
