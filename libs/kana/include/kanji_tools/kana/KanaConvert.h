@@ -6,9 +6,14 @@
 
 namespace kanji_tools {
 
+// 'KanaConvert' provides a command line interface as well as an interactive
+// mode for converting between Hiragana, Katakana and Rōmaji.
 class KanaConvert {
 public:
+  // allow overriding in and out streams for testing
   KanaConvert(Args, std::ostream& = std::cout, std::istream* = {});
+
+  KanaConvert(const KanaConvert&) = delete;
 private:
   using List = std::vector<std::string>;
 
@@ -32,7 +37,7 @@ private:
   std::istream* _in;
   bool _interactive{false}, _suppressNewLine{false};
   std::optional<CharType> _source{};
-	  Converter _converter;
+  Converter _converter;
   const Choice _choice;
 };
 
