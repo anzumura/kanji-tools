@@ -49,25 +49,30 @@ protected:
 TEST_F(KanaConvertTest, Usage) {
   const char* args[]{"", "-?"};
   run(args,
-      R"(usage: kanaConvert [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-m|-n|-p] [string ...]
+      R"(usage: kanaConvert -i
+       kanaConvert [-n] string ...
+       kanaConvert -m|-p|-?
+  -i: interactive mode
+  -n: suppress newline on output (for non-interactive mode)
+  -m: print Kana chart in 'Markdown' format and exit
+  -p: print Kana chart aligned for terminal output and exit
+  -?: prints this usage message
+  --: finish options, subsequent args are treated as strings to convert
+  string ...: one or more strings to convert, no strings means read stdin
+  
+options for setting conversion source and target types as well as conversion
+related flags can also be specified:
+  -f opt: set 'opt' (can use multiple times to combine options). Options are:
+    h: conform Rōmaji output more closely to 'Modern Hepburn' style
+    k: conform Rōmaji output more closely to 'Kunrei Shiki' style
+    n: no prolonged marks (repeat vowels instead of 'ー' for Hiragana output)
+    r: remove spaces on output (only applies to Hiragana and Katakana output)
   -h: set conversion output to Hiragana (default)
   -k: set conversion output to Katakana
   -r: set conversion output to Rōmaji
   -H: restrict conversion input to Hiragana
   -K: restrict conversion input to Katakana
   -R: restrict conversion input to Rōmaji
-  -?: prints this usage message
-  -f opt: set 'opt' (can use multiple times to combine options). Options are:
-      h: conform Rōmaji output more closely to 'Modern Hepburn' style
-      k: conform Rōmaji output more closely to 'Kunrei Shiki' style
-      n: no prolonged marks (repeat vowels instead of 'ー' for Hiragana output)
-      r: remove spaces on output (only applies to Hiragana and Katakana output)
-  -i: interactive mode
-  -m: print Kana chart in 'Markdown' format and exit
-  -n: suppress newline on output (for non-interactive mode)
-  -p: print Kana chart aligned for terminal output and exit
-  --: finish options, subsequent args are treated as strings to convert
-  [string ...]: one or more strings to convert, no strings means read stdin
 )");
 }
 
@@ -93,7 +98,7 @@ TEST_F(KanaConvertTest, IllegalFlagOption) {
 }
 
 TEST_F(KanaConvertTest, MultipleProgramModes) {
-  for (const auto i : {"-m", "-n", "-p"}) {
+  for (const auto i : {"-i", "-m", "-n", "-p"}) {
     const char* args[]{"", "-i", i};
     const auto f{[&args] { KanaConvert{args}; }};
     EXPECT_THROW(call(f, "can only specify one of -i, -m, -n, or -p"),
@@ -101,11 +106,14 @@ TEST_F(KanaConvertTest, MultipleProgramModes) {
   }
 }
 
-TEST_F(KanaConvertTest, InteractiveModeAndStrings) {
-  const char* args[]{"", "-i", "hi"};
-  const auto f{[&args] { KanaConvert{args}; }};
-  EXPECT_THROW(call(f, "'-i' can't be combined with other 'string' arguments"),
-      std::domain_error);
+TEST_F(KanaConvertTest, InteractiveOrPrintOptionsAndStrings) {
+  for (const auto i : {"-i", "-m", "-p"}) {
+    const char* args[]{"", i, "hi"};
+    const auto f{[&args] { KanaConvert{args}; }};
+    EXPECT_THROW(
+        call(f, "'string' args can't be combined with '-i', '-m' or '-p'"),
+        std::domain_error);
+  }
 }
 
 TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {

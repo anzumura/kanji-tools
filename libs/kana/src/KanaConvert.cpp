@@ -64,8 +64,8 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
               "interactive mode");
       start();
     }
-  } else if (_interactive)
-    error("'-i' can't be combined with other 'string' arguments");
+  } else if (_interactive || printKana || printMarkdown)
+    error("'string' args can't be combined with '-i', '-m' or '-p'");
   else
     start(strings);
 }
@@ -103,9 +103,27 @@ bool KanaConvert::flagArgs(char arg) {
 }
 
 void KanaConvert::usage(bool showAllOptions) const {
-  if (showAllOptions)
-    _out << "usage: kanaConvert [-h|-k|-r] [-H|-K|-R] [-f h|n|r] [-i|-m|-n|-p] "
-            "[string ...]\n";
+  if (showAllOptions) {
+    _out << R"(usage: kanaConvert -i
+       kanaConvert [-n] string ...
+       kanaConvert -m|-p|-?
+  -i: interactive mode
+  -n: suppress newline on output (for non-interactive mode)
+  -m: print Kana chart in 'Markdown' format and exit
+  -p: print Kana chart aligned for terminal output and exit
+  -?: prints this usage message
+  --: finish options, subsequent args are treated as strings to convert
+  string ...: one or more strings to convert, no strings means read stdin
+  
+options for setting conversion source and target types as well as conversion
+related flags can also be specified:
+  -f opt: set 'opt' (can use multiple times to combine options). Options are:
+    h: conform Rōmaji output more closely to 'Modern Hepburn' style
+    k: conform Rōmaji output more closely to 'Kunrei Shiki' style
+    n: no prolonged marks (repeat vowels instead of 'ー' for Hiragana output)
+    r: remove spaces on output (only applies to Hiragana and Katakana output)
+)";
+  }
   _out << "  -h: set conversion output to Hiragana"
        << (showAllOptions ? " (default)" : "") << R"(
   -k: set conversion output to Katakana
@@ -114,21 +132,6 @@ void KanaConvert::usage(bool showAllOptions) const {
   -K: restrict conversion input to Katakana
   -R: restrict conversion input to Rōmaji
 )";
-  if (showAllOptions) {
-    _out << R"(  -?: prints this usage message
-  -f opt: set 'opt' (can use multiple times to combine options). Options are:
-      h: conform Rōmaji output more closely to 'Modern Hepburn' style
-      k: conform Rōmaji output more closely to 'Kunrei Shiki' style
-      n: no prolonged marks (repeat vowels instead of 'ー' for Hiragana output)
-      r: remove spaces on output (only applies to Hiragana and Katakana output)
-  -i: interactive mode
-  -m: print Kana chart in 'Markdown' format and exit
-  -n: suppress newline on output (for non-interactive mode)
-  -p: print Kana chart aligned for terminal output and exit
-  --: finish options, subsequent args are treated as strings to convert
-  [string ...]: one or more strings to convert, no strings means read stdin
-)";
-  }
 }
 
 void KanaConvert::start(const List& strings) {
