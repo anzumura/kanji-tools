@@ -3,23 +3,11 @@
 
 namespace kanji_tools {
 
-bool Ucd::hasLinks() const { return !_links.empty(); }
-
-bool Ucd::hasTraditionalLinks() const {
-  return _linkType == UcdLinkTypes::Traditional;
-}
-
-bool Ucd::hasNonTraditionalLinks() const {
-  return hasLinks() && _linkType != UcdLinkTypes::Traditional;
-}
-
-bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
-
-std::string Ucd::codeAndName() const {
+std::string UcdEntry::codeAndName() const {
   return toUnicode(_code, BracketType::Square) + ' ' + _name;
 }
 
-std::string Ucd::linkCodeAndNames() const {
+std::string UcdLinks::codeAndNames() const {
   std::string result;
   for (auto& i : _links) {
     if (!result.empty()) result += ", ";
@@ -27,5 +15,21 @@ std::string Ucd::linkCodeAndNames() const {
   }
   return result;
 }
+
+bool Ucd::hasLinks() const { return !_links.empty(); }
+
+bool Ucd::hasTraditionalLinks() const {
+  return linkType() == UcdLinkTypes::Traditional;
+}
+
+bool Ucd::hasNonTraditionalLinks() const {
+  return hasLinks() && linkType() != UcdLinkTypes::Traditional;
+}
+
+bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
+
+std::string Ucd::codeAndName() const { return _entry.codeAndName(); }
+
+std::string Ucd::linkCodeAndNames() const { return _links.codeAndNames(); }
 
 } // namespace kanji_tools

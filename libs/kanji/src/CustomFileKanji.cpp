@@ -85,7 +85,7 @@ ExtraKanji::ExtraKanji(DataRef data, File f, Name name, UcdPtr u)
     : CustomFileKanji{data, f, name, f.getU8(StrokesCol), f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? linkNames(u) : EmptyLinkNames, u},
       _newName{u && u->hasNonTraditionalLinks()
-                   ? OptString{u->links()[0].name()}
+                   ? OptString{u->links().links()[0].name()}
                    : std::nullopt} {}
 
 } // namespace kanji_tools

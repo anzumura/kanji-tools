@@ -41,7 +41,7 @@ public:
   using OptString = std::optional<std::string>;
   // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
-  using Name = Ucd::Name;
+  using Name = UcdEntry::Name;
   using OldNames = const LinkNames&;
   using Reading = Ucd::Reading;
   using Strokes = Ucd::Strokes;
