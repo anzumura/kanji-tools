@@ -10,7 +10,13 @@ TEST(UcdTest, CodeAndName) {
   EXPECT_EQ(ucd.version(), "1.1");
   EXPECT_EQ(ucd.linkType(), UcdLinkTypes::None);
   EXPECT_EQ(ucd.codeAndName(), "[5B66] 学");
-  EXPECT_EQ(sizeof(ucd), 408);
+#ifdef __clang__
+  EXPECT_EQ(sizeof(std::string), 24);
+  EXPECT_EQ(sizeof(Ucd), 320);
+#else
+  EXPECT_EQ(sizeof(std::string), 32);
+  EXPECT_EQ(sizeof(Ucd), 408);
+#endif
 }
 
 TEST(UcdLinkTypesTest, LinkCodeAndNames) {
