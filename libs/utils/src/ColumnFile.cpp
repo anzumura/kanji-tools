@@ -15,6 +15,13 @@ constexpr auto ColNotFound{std::numeric_limits<size_t>::max()};
 
 namespace fs = std::filesystem;
 
+ColumnFile::Column::Column(const std::string& name)
+    : _name{name}, _number{ColumnFile::getColumnNumber(name)} {}
+
+bool ColumnFile::Column::operator==(const Column& rhs) const {
+  return _number == rhs._number;
+}
+
 size_t ColumnFile::getColumnNumber(const std::string& name) {
   const auto i{_allColumns.find(name)};
   if (i == _allColumns.end()) return _allColumns[name] = _allColumns.size();
@@ -99,16 +106,28 @@ const std::string& ColumnFile::get(const Column& column) const {
   return _rowValues[pos];
 }
 
+bool ColumnFile::isEmpty(const Column& c) const { return get(c).empty(); }
+
+ColumnFile::ULong ColumnFile::getULong(const Column& c, ULong max) const {
+  return processULong(get(c), c, max);
+}
+
+ColumnFile::OptULong ColumnFile::getOptULong(const Column& c, ULong max) const {
+  auto& s{get(c)};
+  if (s.empty()) return {};
+  return processULong(s, c, max);
+}
+
 unsigned long ColumnFile::processULong(
-    const std::string& s, const Column& column, unsigned long maxValue) const {
+    const std::string& s, const Column& column, ULong max) const {
   unsigned long i{};
   try {
     i = std::stoul(s);
   } catch (...) {
     error("failed to convert to unsigned long", column, s);
   }
-  if (maxValue && maxValue < i)
-    error("exceeded max value of " + std::to_string(maxValue), column, s);
+  if (max && max < i)
+    error("exceeded max value of " + std::to_string(max), column, s);
   return i;
 }
 
@@ -124,7 +143,7 @@ bool ColumnFile::getBool(const Column& column) const {
   return false;
 }
 
-char32_t ColumnFile::getWChar(
+char32_t ColumnFile::getChar32(
     const Column& column, const std::string& s) const {
   if (s.size() < UnicodeStringMinSize || s.size() > UnicodeStringMaxSize)
     error("failed to convert to char32_t, size must be 4 or 5", column, s);
@@ -132,6 +151,26 @@ char32_t ColumnFile::getWChar(
     if (c < '0' || c > 'F' || (c < 'A' && c > '9'))
       error("failed to convert to char32_t, invalid hex", column, s);
   return static_cast<char32_t>(std::strtol(s.c_str(), nullptr, HexDigits));
+}
+
+char32_t ColumnFile::getChar32(const Column& c) const {
+  return getChar32(c, get(c));
+}
+
+void ColumnFile::error(const std::string& msg) const {
+  throw std::domain_error(errorMsg(msg));
+}
+
+void ColumnFile::error(
+    const std::string& msg, const Column& c, const std::string& s) const {
+  throw std::domain_error{
+      errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'"};
+}
+
+std::string ColumnFile::errorMsg(const std::string& msg) const {
+  auto result{msg + " - file: " + _name};
+  if (_currentRow) result += ", row: " + std::to_string(_currentRow);
+  return result;
 }
 
 } // namespace kanji_tools

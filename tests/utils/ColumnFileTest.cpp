@@ -334,8 +334,8 @@ TEST_F(ColumnFileTest, GetWChar) {
   const ColumnFile::Column c1{"1"}, c2{"2"};
   auto f{write({c1, c2}, "1\t2\n898B\t20B9F")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getWChar(c1), 35211);
-  EXPECT_EQ(f.getWChar(c2), 134047);
+  EXPECT_EQ(f.getChar32(c1), 35211);
+  EXPECT_EQ(f.getChar32(c2), 134047);
 }
 
 TEST_F(ColumnFileTest, GetWCharError) {
@@ -349,7 +349,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
   for (auto i : _) {
     f.nextRow();
     EXPECT_THROW(
-        call([&] { f.getWChar(Col); }, ConvertError + "char32_t, " + i),
+        call([&] { f.getChar32(Col); }, ConvertError + "char32_t, " + i),
         std::domain_error);
   }
 }

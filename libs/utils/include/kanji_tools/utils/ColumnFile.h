@@ -13,18 +13,17 @@ namespace kanji_tools {
 // tab) separated text file with a header row (containing the column names).
 class ColumnFile {
 public:
+  using ULong = unsigned long;
+
   // 'Column' has a name that must match a column header in the file being
   // processed. The set of columns for a 'ColumnFile' are passed into its
   // constructor and the same column instances are used to get values from each
   // row. A 'Column' can be used across multiple 'ColumnFile' instances.
   class Column {
   public:
-    Column(const std::string& name)
-        : _name{name}, _number{ColumnFile::getColumnNumber(name)} {}
+    Column(const std::string& name);
 
-    [[nodiscard]] auto operator==(const Column& rhs) const {
-      return _number == rhs._number;
-    }
+    [[nodiscard]] bool operator==(const Column&) const;
 
     [[nodiscard]] auto& name() const { return _name; }
     [[nodiscard]] auto number() const { return _number; }
@@ -34,7 +33,7 @@ public:
   };
 
   using Columns = std::vector<Column>;
-  using OptULong = std::optional<unsigned long>;
+  using OptULong = std::optional<ULong>;
 
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a
   // regular file) or if the list of 'columns' doesn't match the first row of
@@ -55,23 +54,14 @@ public:
   // column was not passed in to the constructor.
   const std::string& get(const Column&) const;
 
-  [[nodiscard]] auto isEmpty(const Column& column) const {
-    return get(column).empty();
-  }
+  [[nodiscard]] bool isEmpty(const Column&) const;
 
-  // convert to 'unsigned long' or call 'error' (if maxValue is non-zero and
+  // convert to 'ULong' or call 'error' (if maxValue is non-zero and
   // value exceeds it then call 'error')
-  unsigned long getULong(
-      const Column& column, unsigned long maxValue = 0) const {
-    return processULong(get(column), column, maxValue);
-  }
+  ULong getULong(const Column&, ULong maxValue = 0) const;
 
   // return std::nullopt if column is empty or call 'processULong'
-  OptULong getOptULong(const Column& column, unsigned long maxValue = 0) const {
-    auto& s{get(column)};
-    if (s.empty()) return {};
-    return processULong(s, column, maxValue);
-  }
+  OptULong getOptULong(const Column&, ULong maxValue = 0) const;
 
   // getUInt takes a numeric type T (like u_int16_t) and then calls getLong with
   // the appropriate max value
@@ -99,46 +89,33 @@ public:
   bool getBool(const Column&) const;
 
   // overload for a specific 's' (can be used for columns with multiple values)
-  char32_t getWChar(const Column&, const ::std::string& s) const;
+  char32_t getChar32(const Column&, const ::std::string& s) const;
 
   // convert from Unicode (4 or 5 hex code) or call 'error'
-  auto getWChar(const Column& c) const { return getWChar(c, get(c)); }
+  char32_t getChar32(const Column&) const;
 
   // throw a 'domain_error' exception with 'what' string made from 'msg' plus
   // '_name'. '_currentRow' is also added if it's not zero.
-  void error(const std::string& msg) const {
-    throw std::domain_error(errorMsg(msg));
-  }
+  void error(const std::string& msg) const;
 
-  // overload for reporting a problem with a specific value for a column
-  void error(
-      const std::string& msg, const Column& c, const std::string& s) const {
-    throw std::domain_error{
-        errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'"};
-  }
+  // overload for reporting a problem with a specific value 's' for a column
+  void error(const std::string& msg, const Column&, const std::string& s) const;
 
   [[nodiscard]] auto columns() const { return _rowValues.size(); }
   [[nodiscard]] auto currentRow() const { return _currentRow; }
   [[nodiscard]] auto& name() const { return _name; }
 private:
-  friend Column;
-
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const std::string& name);
 
-  unsigned long processULong(
-      const std::string&, const Column&, unsigned long maxValue) const;
+  ULong processULong(const std::string&, const Column&, ULong maxValue) const;
 
   using ColNames = std::map<std::string, Column>;
 
   void processHeaderRow(const std::string&, ColNames&);
   void verifyHeaderColumns(const ColNames&) const;
 
-  [[nodiscard]] std::string errorMsg(const std::string& msg) const {
-    auto result{msg + " - file: " + _name};
-    if (_currentRow) result += ", row: " + std::to_string(_currentRow);
-    return result;
-  }
+  [[nodiscard]] std::string errorMsg(const std::string&) const;
 
   std::fstream _file;
   const char _delimiter;
