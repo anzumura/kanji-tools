@@ -31,7 +31,7 @@ size_t ColumnFile::getColumnNumber(const std::string& name) {
 ColumnFile::ColumnFile(
     const fs::path& p, const Columns& columns, char delimiter)
     : _file{std::fstream(p)}, _delimiter{delimiter},
-      _name{p.filename().string()}, _rowValues{columns.size()},
+      _fileName{p.filename().string()}, _rowValues{columns.size()},
       _columnToPosition(_allColumns.size(), ColNotFound) {
   assert(_columnToPosition.size() == _allColumns.size()); // need () ctor
   if (columns.empty()) error("must specify at least one column");
@@ -168,7 +168,7 @@ void ColumnFile::error(
 }
 
 std::string ColumnFile::errorMsg(const std::string& msg) const {
-  auto result{msg + " - file: " + _name};
+  auto result{msg + " - file: " + _fileName};
   if (_currentRow) result += ", row: " + std::to_string(_currentRow);
   return result;
 }

@@ -16,9 +16,9 @@ public:
   using ULong = unsigned long;
 
   // 'Column' has a name that must match a column header in the file being
-  // processed. The set of columns for a 'ColumnFile' are passed into its
-  // constructor and the same column instances are used to get values from each
-  // row. A 'Column' can be used across multiple 'ColumnFile' instances.
+  // processed. The set of columns for a 'ColumnFile' are passed into its ctor
+  // and the same column instances are used to get values rows. A 'Column' can
+  // be used across multiple 'ColumnFile' instances.
   class Column {
   public:
     Column(const std::string& name);
@@ -36,11 +36,10 @@ public:
   using OptULong = std::optional<ULong>;
 
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a
-  // regular file) or if the list of 'columns' doesn't match the first row of
-  // the file. Note, the columns in the file can be in a different order than
-  // 'columns', but the names must all be found.
-  ColumnFile(const std::filesystem::path& p, const Columns& columns,
-      char delimiter = '\t');
+  // regular file) or if the list of columns doesn't match the first row of the
+  // file. Note, columns in the file can be in a different order than the list
+  // provided to this ctor, but the names must all be found.
+  ColumnFile(const std::filesystem::path& p, const Columns&, char delim = '\t');
 
   ColumnFile(const ColumnFile&) = delete;
 
@@ -95,7 +94,7 @@ public:
   char32_t getChar32(const Column&) const;
 
   // throw a 'domain_error' exception with 'what' string made from 'msg' plus
-  // '_name'. '_currentRow' is also added if it's not zero.
+  // '_fileName'. '_currentRow' is also added if it's not zero.
   void error(const std::string& msg) const;
 
   // overload for reporting a problem with a specific value 's' for a column
@@ -103,12 +102,13 @@ public:
 
   [[nodiscard]] auto columns() const { return _rowValues.size(); }
   [[nodiscard]] auto currentRow() const { return _currentRow; }
-  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] auto& fileName() const { return _fileName; }
 private:
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const std::string& name);
 
-  ULong processULong(const std::string&, const Column&, ULong maxValue) const;
+  [[nodiscard]] ULong processULong(
+      const std::string&, const Column&, ULong maxValue) const;
 
   using ColNames = std::map<std::string, Column>;
 
@@ -120,8 +120,8 @@ private:
   std::fstream _file;
   const char _delimiter;
 
-  // '_name' holds the 'last component name' of the file being processed.
-  const std::string _name;
+  // '_fileName' holds the 'last component name' of the file being processed
+  const std::string _fileName;
 
   // '_currentRow' starts at 0 and is incremented each time 'nextRow' is called
   size_t _currentRow{};

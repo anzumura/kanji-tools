@@ -75,7 +75,7 @@ TEST_F(ColumnFileTest, CreateColumns) {
 
 TEST_F(ColumnFileTest, SingleColumnFile) {
   const auto f{write({Col}, "Col")};
-  EXPECT_EQ(f.name(), "testFile.txt");
+  EXPECT_EQ(f.fileName(), "testFile.txt");
   EXPECT_EQ(f.columns(), 1);
   EXPECT_EQ(f.currentRow(), 0);
 }

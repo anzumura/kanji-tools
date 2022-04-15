@@ -113,7 +113,8 @@
     "__memory": "cpp",
     "__bits": "cpp",
     "__functional_03": "cpp",
-    "future": "cpp"
+    "future": "cpp",
+    "version": "cpp"
   },
   "cSpell.words": [
     "akai",
