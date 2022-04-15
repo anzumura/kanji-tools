@@ -215,7 +215,7 @@ MBUtf8Result validateMBUtf8(
       return err(Utf8Result::Overlong); // overlong 3 byte encoding
     else if (c >= MinSurrogate && c <= MaxSurrogate)
       return err(Utf8Result::InvalidCodePoint);
-  } else if ((byte1 ^ TwoBits) < 2) // LCOV_EXCL_LINE: gcov-11 bug
+  } else if ((byte1 ^ TwoBits) < 2)   // LCOV_EXCL_LINE: gcov-11 bug
     return err(Utf8Result::Overlong); // overlong 2 byte encoding
   return !sizeOne || !*++u ? MBUtf8Result::Valid
                            : err(Utf8Result::StringTooLong);
