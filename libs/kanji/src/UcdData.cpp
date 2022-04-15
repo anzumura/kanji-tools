@@ -111,7 +111,7 @@ void UcdData::load(const Data::Path& file) {
       std::stringstream names{f.get(linkNamesCol)}, codes{f.get(linkCodesCol)};
       for (std::string linkName; std::getline(names, linkName, ',');)
         if (std::string linkCode; std::getline(codes, linkCode, ','))
-          links.emplace_back(f.getWChar(linkCodesCol, linkCode), linkName);
+          links.emplace_back(f.getChar32(linkCodesCol, linkCode), linkName);
         else
           f.error("LinkNames has more values than LinkCodes");
       // Joyo are standard Kanji so they shouldn't have a link back to a
@@ -131,7 +131,7 @@ void UcdData::load(const Data::Path& file) {
     if (linkedReadings) linkType.pop_back();
 
     if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
-                 std::make_tuple(UcdEntry{f.getWChar(codeCol), name},
+                 std::make_tuple(UcdEntry{f.getChar32(codeCol), name},
                      f.get(blockCol), f.get(versionCol), radical, strokes,
                      vStrokes, f.get(pinyinCol), f.get(morohashiCol),
                      f.get(nelsonIdsCol), f.get(sourcesCol), f.get(jSourceCol),

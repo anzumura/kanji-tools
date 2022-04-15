@@ -66,7 +66,7 @@ const std::string BeforeSurrogateRange{'\xED', '\x9F', '\xBF'}, // U+D7FF
     AfterSurrogateRange{'\xEE', '\x80', '\x80'},                // U+E000
     Dog{"犬"};
 
-const char32_t MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
+const Code MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
 
 } // namespace
 

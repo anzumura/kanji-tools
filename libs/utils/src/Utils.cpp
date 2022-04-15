@@ -27,7 +27,7 @@ std::u32string addLeadingZeroes(const std::u32string& s, size_t minSize) {
   return s;
 }
 
-std::string toUnicode(char32_t s, BracketType brackets) {
+std::string toUnicode(Code s, BracketType brackets) {
   return toHex(s, brackets, HexCase::Upper, 4);
 }
 

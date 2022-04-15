@@ -16,7 +16,7 @@ namespace {
 //   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
-constexpr char32_t MinSurrogate{0xd800}, MaxSurrogate{0xdfff};
+constexpr Code MinSurrogate{0xd800}, MaxSurrogate{0xdfff};
 
 #ifdef USE_CODECVT_FOR_UTF_8
 inline auto utf8Converter() {
@@ -24,7 +24,7 @@ inline auto utf8Converter() {
   return &conv;
 }
 #else
-constexpr char32_t ErrorReplacement{0xfffd};
+constexpr Code ErrorReplacement{0xfffd};
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
@@ -89,10 +89,10 @@ template<typename R, typename T = typename R::value_type>
   return result;
 }
 
-void convertToUtf8(char32_t c, std::string& s) {
-  static constexpr char32_t FirstThree{0b111 << 18}, FirstFour{0b11'11 << 12},
+void convertToUtf8(Code c, std::string& s) {
+  static constexpr Code FirstThree{0b111 << 18}, FirstFour{0b11'11 << 12},
       FirstFive{0b1'11'11 << 6}, Six{0b11'11'11};
-  static constexpr char32_t SecondSix{Six << 6}, ThirdSix{Six << 12};
+  static constexpr Code SecondSix{Six << 6}, ThirdSix{Six << 12};
   if (c <= 0x7f)
     s += static_cast<char>(c);
   else if (c <= 0x7ff) {
@@ -120,7 +120,7 @@ void convertToUtf8(char32_t c, std::string& s) {
 std::u32string fromUtf8(const char* s) {
 #ifdef USE_CODECVT_FOR_UTF_8
   const auto r{utf8Converter()->from_bytes(s)};
-  return std::u32string(reinterpret_cast<const char32_t*>(r.c_str()));
+  return std::u32string(reinterpret_cast<const Code*>(r.c_str()));
 #else
   return convertFromUtf8<std::u32string>(s);
 #endif
@@ -128,7 +128,7 @@ std::u32string fromUtf8(const char* s) {
 
 std::u32string fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
 
-std::string toUtf8(char32_t c) {
+std::string toUtf8(Code c) {
 #ifdef USE_CODECVT_FOR_UTF_8
   return utf8Converter()->to_bytes(static_cast<wchar_t>(c));
 #else
@@ -138,9 +138,9 @@ std::string toUtf8(char32_t c) {
 #endif
 }
 
-std::string toUtf8(int x) { return toUtf8(static_cast<char32_t>(x)); }
+std::string toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
 
-std::string toUtf8(long x) { return toUtf8(static_cast<char32_t>(x)); }
+std::string toUtf8(long x) { return toUtf8(static_cast<Code>(x)); }
 
 std::string toUtf8(const std::u32string& s) {
 #ifdef USE_CODECVT_FOR_UTF_8
@@ -175,7 +175,7 @@ std::string toUtf8(const std::wstring& s) {
   std::string result;
   // result will be bigger than 's' if there are any multibyte chars
   result.reserve(s.size());
-  for (auto c : s) convertToUtf8(static_cast<char32_t>(c), result);
+  for (auto c : s) convertToUtf8(static_cast<Code>(c), result);
   return result;
 #endif
 }

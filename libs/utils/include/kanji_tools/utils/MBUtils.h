@@ -4,12 +4,16 @@
 
 namespace kanji_tools {
 
-// UTF-8 conversion functions (between 'char' strings and 'char32_t' wstrings)
+// UTF-8 conversion functions (between 'char' strings and 'wchar_t' wstrings)
 // were originally implemented using 'codecvt', but this was changed to local
 // implementations to remove the dependency and allow more flexibility. For
 // example, the local implementations use 'U+FFFD' for errors instead of
 // throwing a 'range_error'. Also, 'wstring_convert' was deprecated as of C++17
 // (see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
+
+// type alias for a Unicode code point - use instead of wchar_t since it's more
+// explicit than 'wchar_t', i.e., it's 32 bits instead of platform dependent.
+using Code = char32_t;
 
 // uncomment the following line to use 'codecvt' (may remove this later):
 //#define USE_CODECVT_FOR_UTF_8
@@ -17,7 +21,7 @@ namespace kanji_tools {
 [[nodiscard]] std::u32string fromUtf8(const char*);
 [[nodiscard]] std::u32string fromUtf8(const std::string&);
 
-[[nodiscard]] std::string toUtf8(char32_t);
+[[nodiscard]] std::string toUtf8(Code);
 [[nodiscard]] std::string toUtf8(int);
 [[nodiscard]] std::string toUtf8(long x);
 [[nodiscard]] std::string toUtf8(const std::u32string&);

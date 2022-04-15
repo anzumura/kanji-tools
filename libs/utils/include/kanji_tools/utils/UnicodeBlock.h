@@ -34,8 +34,8 @@ public:
     return end - start + 1;
   }
 
-  // 'opterator()' returns true if the given character is in this block
-  [[nodiscard]] constexpr auto operator()(char32_t x) const noexcept {
+  // 'opterator()' returns true if 'x' is in this block
+  [[nodiscard]] constexpr auto operator()(Code x) const noexcept {
     return x >= start && x <= end;
   }
 
@@ -47,48 +47,45 @@ public:
     return static_cast<wchar_t>(end);
   }
 
-  const char32_t start;
-  const char32_t end;
+  const Code start;
+  const Code end;
   const UnicodeVersion* const version;
   const char* const name;
 private:
-  template<char32_t Start, char32_t End = Start>
-  static consteval void checkRange() {
+  template<Code Start, Code End = Start> static consteval void checkRange() {
     static_assert(Start > 0x7f);
     static_assert(End <= MaxUnicode);
   }
 
-  template<char32_t Start, char32_t End> static consteval void checkLess() {
+  template<Code Start, Code End> static consteval void checkLess() {
     checkRange<Start, End>();
     static_assert(Start < End);
   }
 
   consteval UnicodeBlock(
-      char32_t s, char32_t e, const UnicodeVersion* v = {}, const char* n = {})
+      Code s, Code e, const UnicodeVersion* v = {}, const char* n = {})
       : start{s}, end{e}, version{v}, name{n} {}
 
-  template<char32_t Start> friend consteval auto makeBlock();
-
-  template<char32_t Start, char32_t End> friend consteval auto makeBlock();
-
-  template<char32_t Start, char32_t End, typename T>
+  // grant access to 'makeBlock' functions
+  template<Code Start> friend consteval auto makeBlock();
+  template<Code Start, Code End> friend consteval auto makeBlock();
+  template<Code Start, Code End, typename T>
   friend consteval auto makeBlock(T&, const char*);
 };
 
 // UnicodeBlocks defined in DisplaySize.h (WideBlocks) are used for determining
 // if a character is narrow or wide display can be a single entry and also not
 // start or end on an 'official' boundary. gcc 11.2 didn't like using a default
-// template (char32_t End = Start) in combination with the friend declaration
+// template (Code End = Start) in combination with the friend declaration
 // inside UnicodeBlock so split into two 'makeBlock' functions. This also allows
 // better static_assert (using '<' instead of '<=').
 
-template<char32_t Start> [[nodiscard]] consteval auto makeBlock() {
+template<Code Start> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkRange<Start>();
   return UnicodeBlock{Start, Start};
 }
 
-template<char32_t Start, char32_t End>
-[[nodiscard]] consteval auto makeBlock() {
+template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkLess<Start, End>();
   return UnicodeBlock{Start, End};
 }
@@ -96,7 +93,7 @@ template<char32_t Start, char32_t End>
 // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 
-template<char32_t Start, char32_t End, typename T>
+template<Code Start, Code End, typename T>
 [[nodiscard]] consteval auto makeBlock(T& v, const char* n) {
   UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % 16 == 0);
@@ -191,7 +188,7 @@ inline constexpr std::array NonSpacingBlocks{
 // automated tests for all the arrays defined above).
 template<size_t N>
 [[nodiscard]] constexpr auto inRange(
-    char32_t c, const std::array<UnicodeBlock, N>& t) noexcept {
+    Code c, const std::array<UnicodeBlock, N>& t) noexcept {
   for (auto& i : t) {
     if (c < i.start) break;
     if (i(c)) return true;
@@ -204,11 +201,11 @@ template<size_t N>
 // wouldn't work anyway for overlapping ranges).
 template<size_t N, typename... Ts>
 [[nodiscard]] constexpr bool inRange(
-    char32_t c, const std::array<UnicodeBlock, N>& t, Ts&... args) noexcept {
+    Code c, const std::array<UnicodeBlock, N>& t, Ts&... args) noexcept {
   return inRange(c, t) || inRange(c, args...);
 }
 
-[[nodiscard]] constexpr auto isNonSpacing(char32_t c) noexcept {
+[[nodiscard]] constexpr auto isNonSpacing(Code c) noexcept {
   return inRange(c, NonSpacingBlocks) || c == CombiningVoicedChar ||
          c == CombiningSemiVoicedChar;
 }

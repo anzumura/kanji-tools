@@ -4,7 +4,7 @@
 namespace kanji_tools {
 
 bool MBChar::isVariationSelector(const unsigned char* s) {
-  // Checking for variation selectors would be easier if 'i' was char32_t, but
+  // Checking for variation selectors would be easier if 'i' was Code, but
   // that would involve calling more expensive conversion functions (like
   // fromUtf8). Note, variation selectors are range 'fe00' to 'fe0f' in
   // Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
