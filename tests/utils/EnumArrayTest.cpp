@@ -86,6 +86,16 @@ TEST(EnumArrayTest, BadAccess) {
       std::out_of_range);
 }
 
+TEST(EnumArrayTest, IteratorIncrementAndDecrement) {
+  auto i{AllColors.begin()};
+  ASSERT_NE(i, AllColors.end());
+  auto j{i};
+  EXPECT_NE(++i, j);
+  EXPECT_EQ(--i, j);
+  EXPECT_EQ(i++, j);
+  EXPECT_NE(i--, j);
+}
+
 TEST(EnumArrayTest, RangeBasedForLoop) {
   std::vector<Colors> colors;
   for (auto c : AllColors) colors.emplace_back(c);
