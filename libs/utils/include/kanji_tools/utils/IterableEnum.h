@@ -44,7 +44,6 @@ protected:
   private:
     Index _index;
   };
-  friend BaseIterator; // calls 'error' function
 
   static void rangeError(const std::string&);
 

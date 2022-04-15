@@ -108,14 +108,17 @@ private:
 
 // 'IterableEnumArray' adds functionality to the iterator from 'IterableEnum'
 // that is common to both derived classes ('EnumArray' and 'EnumArrayWithNone')
+// and has public 'begin', 'end' and 'operator[]' functions.
 template<typename T, size_t N>
 class IterableEnumArray : public IterableEnum<T, N>, public TypedEnumArray<T> {
+public:
 private:
   using base = IterableEnum<T, N>;
 public:
   class ConstIterator : public base::template Iterator<ConstIterator> {
   private:
-    friend IterableEnumArray<T, N>;
+    friend IterableEnumArray<T, N>; // calls private ctor
+
     using iBase = typename base::template Iterator<ConstIterator>;
 
     ConstIterator(BaseIterableEnum::Index index) noexcept : iBase{index} {}
@@ -161,7 +164,7 @@ public:
     return base::find(s);
   }
 private:
-  friend TypedEnumArray<T>; // 'create' calls private constructor
+  friend TypedEnumArray<T>; // 'create' calls private ctor
 
   EnumArray(const std::string& name) { setName(name, N - 1); }
 
@@ -197,7 +200,7 @@ public:
   }
 private:
   inline const static std::string None{"None"};
-  friend TypedEnumArray<T>; // 'create' calls private constructor
+  friend TypedEnumArray<T>; // 'create' calls private ctor
 
   EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
 

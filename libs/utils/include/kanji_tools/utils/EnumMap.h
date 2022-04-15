@@ -57,7 +57,8 @@ public:
 
   class ConstIterator : public base::template Iterator<ConstIterator> {
   private:
-    friend EnumMap<T, V>;
+    friend EnumMap<T, V>; // calls private ctor
+
     using iBase = typename base::template Iterator<ConstIterator>;
 
     ConstIterator(BaseIterableEnum::Index i, const EnumMap<T, V>& m) noexcept
