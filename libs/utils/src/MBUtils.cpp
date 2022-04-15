@@ -46,7 +46,7 @@ template<typename R, typename T = typename R::value_type>
       result += static_cast<T>(*u++);
     else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
       // first byte was '10' or started with more than four '1's
-      result += TError;
+      result += TError; // LCOV_EXCL_LINE: gcov-11 bug
       ++u;
     } else {
       const unsigned byte1{*u};
