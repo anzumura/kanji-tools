@@ -59,6 +59,20 @@ protected:
 
 } // namespace
 
+TEST_F(ColumnFileTest, CreateColumns) {
+  const ColumnFile::Column test1{"test1"};
+  EXPECT_EQ(test1.name(), "test1");
+  const ColumnFile::Column diff{"diff"}, same{"test1"};
+  // 'test1' and 'diff' have different name and number and are 'not equal'
+  EXPECT_EQ(diff.name(), "diff");
+  EXPECT_NE(test1.number(), diff.number());
+  EXPECT_NE(test1, diff);
+  // 'test1' and 'same' should have the same name and number and be 'equal'
+  EXPECT_EQ(same.name(), test1.name());
+  EXPECT_EQ(same.number(), test1.number());
+  EXPECT_EQ(test1, same);
+}
+
 TEST_F(ColumnFileTest, SingleColumnFile) {
   const auto f{write({Col}, "Col")};
   EXPECT_EQ(f.name(), "testFile.txt");
