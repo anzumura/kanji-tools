@@ -36,7 +36,7 @@ template<typename T, typename V, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 class EnumMap : public IterableEnum<T, static_cast<size_t>(T::None)>,
                 public BaseEnumMap<V> {
 private:
-  static constexpr auto N{static_cast<size_t>(T::None)};
+  static constexpr auto N{static_cast<BaseIterableEnum::Index>(T::None)};
   using base = IterableEnum<T, N>;
 
   std::array<V, N> _values;
@@ -45,14 +45,14 @@ public:
 
   // return 'value' for the given enum value 'i' and allow it to be modified
   [[nodiscard]] auto& operator[](T i) {
-    return _values[base::checkIndex(i, base::Index)];
+    return _values[base::checkIndex(i, base::IndexMsg)];
   }
 
   // operator[] const version also supports returning an empty 'value' if 'i' is
   // the 'None' enum value (this is fine since it can't be modified).
   [[nodiscard]] auto& operator[](T i) const {
     return i == T::None ? BaseEnumMap<V>::Empty
-                        : _values[base::checkIndex(i, base::Index)];
+                        : _values[base::checkIndex(i, base::IndexMsg)];
   }
 
   class ConstIterator : public base::template Iterator<ConstIterator> {
@@ -60,12 +60,8 @@ public:
     friend EnumMap<T, V>;
     using iBase = typename base::template Iterator<ConstIterator>;
 
-    ConstIterator(size_t index, const EnumMap<T, V>& map) noexcept
-        : iBase{index}, _map{&map} {}
-
-    void checkComparable(const ConstIterator& x) const {
-      if (_map != x._map) throw std::domain_error{"not comparable"};
-    }
+    ConstIterator(BaseIterableEnum::Index i, const EnumMap<T, V>& m) noexcept
+        : iBase{i}, _map{&m} {}
 
     const EnumMap<T, V>* _map{};
   public:
@@ -73,11 +69,11 @@ public:
     ConstIterator() noexcept : iBase{0} {}
 
     [[nodiscard]] bool operator==(const ConstIterator& x) const {
-      checkComparable(x);
+      iBase::comparable(_map == x._map);
       return iBase::operator==(x);
     }
     [[nodiscard]] bool operator<(const ConstIterator& x) const {
-      checkComparable(x);
+      iBase::comparable(_map == x._map);
       return iBase::index() < x.index();
     }
     [[nodiscard]] bool operator!=(const ConstIterator& x) const {
@@ -95,16 +91,16 @@ public:
 
     // input iterator requirements (except operator->)
     [[nodiscard]] auto& operator*() const {
-      if (!_map) throw std::domain_error{"not initialized"};
+      iBase::initialized(_map);
       if (iBase::index() >= N)
-        iBase::error(
-            base::Index + std::to_string(iBase::index()) + base::Range);
+        iBase::rangeError(
+            base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
       return (*_map)[static_cast<T>(iBase::index())];
     }
 
     // random-access iterator requirements
     [[nodiscard]] auto operator-(const ConstIterator& x) const {
-      checkComparable(x);
+      iBase::comparable(_map == x._map);
       return iBase::index() - x.index();
     }
   };

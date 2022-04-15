@@ -16,7 +16,7 @@ enum class JinmeiKanjiReasons { Names, Print, Variant, Moved, Simple, Other };
 template<> inline constexpr auto is_enumarray<JinmeiKanjiReasons>{true};
 
 inline const auto AllJinmeiKanjiReasons{
-    BaseEnumArray<JinmeiKanjiReasons>::create(
+    TypedEnumArray<JinmeiKanjiReasons>::create(
         "Names", "Print", "Variant", "Moved", "Simple", "Other")};
 
 } // namespace kanji_tools

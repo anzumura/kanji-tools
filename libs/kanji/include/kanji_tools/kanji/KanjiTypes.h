@@ -32,7 +32,7 @@ enum class KanjiTypes {
 template<> inline constexpr auto is_enumarray_with_none<KanjiTypes>{true};
 
 inline const auto AllKanjiTypes{
-    BaseEnumArray<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
+    TypedEnumArray<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
         "LinkedOld", "Frequency", "Extra", "Kentei", "Ucd")};
 
 } // namespace kanji_tools

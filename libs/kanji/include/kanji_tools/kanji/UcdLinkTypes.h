@@ -19,7 +19,7 @@ enum class UcdLinkTypes {
 template<> inline constexpr auto is_enumarray_with_none<UcdLinkTypes>{true};
 
 inline const auto AllUcdLinkTypes{
-    BaseEnumArray<UcdLinkTypes>::create("Compatibility", "Definition", "Jinmei",
-        "Semantic", "Simplified", "Traditional")};
+    TypedEnumArray<UcdLinkTypes>::create("Compatibility", "Definition",
+        "Jinmei", "Semantic", "Simplified", "Traditional")};
 
 } // namespace kanji_tools

@@ -4,18 +4,19 @@
 
 #include <compare>
 #include <concepts>
-#include <stdexcept>
 #include <string>
 
 namespace kanji_tools {
 
 class BaseIterableEnum {
 public:
+  using Index = size_t;
+
   BaseIterableEnum(const BaseIterableEnum&) = delete;
   BaseIterableEnum& operator=(const BaseIterableEnum&) = delete;
 protected:
-  inline static const std::string Index{"index '"}, Enum{"enum '"},
-      Range{"' is out of range"};
+  inline static const std::string IndexMsg{"index '"}, EnumMsg{"enum '"},
+      RangeMsg{"' is out of range"};
 
   class BaseIterator {
   public:
@@ -25,20 +26,27 @@ protected:
     // operator<=> enables == and != needed for 'input interator' and <, >, <=
     // and >= needed for 'random access iterator'
     [[nodiscard]] auto operator<=>(
-        const BaseIterator& x) const noexcept = default;
+        const BaseIterator&) const noexcept = default;
   protected:
     inline static const std::string BadBegin{"can't decrement past zero"},
         BadEnd{"can't increment past end"};
 
-    static void error(const std::string& s) { throw std::out_of_range(s); }
+    // helper functions for throwing errors if the value passed in is 'false'
+    static void comparable(bool);
+    static void initialized(bool);
 
-    BaseIterator(size_t index = 0) noexcept : _index{index} {}
+    static void rangeError(const std::string&);
 
-    [[nodiscard]] auto& index() { return _index; }
-    [[nodiscard]] auto index() const { return _index; }
+    BaseIterator(Index index = 0) noexcept;
+
+    [[nodiscard]] Index& index();
+    [[nodiscard]] Index index() const;
   private:
-    size_t _index;
+    Index _index;
   };
+  friend BaseIterator; // calls 'error' function
+
+  static void rangeError(const std::string&);
 
   BaseIterableEnum() noexcept = default;
 };
@@ -50,7 +58,7 @@ public:
   [[nodiscard]] static constexpr size_t size() noexcept { return N; }
 protected:
   [[nodiscard]] static auto getIndex(T x) {
-    return checkIndex(to_underlying(x), Enum);
+    return checkIndex(to_underlying(x), EnumMsg);
   }
 
   IterableEnum() noexcept = default;
@@ -60,7 +68,7 @@ protected:
   public:
     // common requirements for iterators
     auto& operator++() {
-      if (index() >= N) error(BadEnd);
+      if (index() >= N) rangeError(BadEnd);
       ++index();
       return derived();
     }
@@ -72,7 +80,7 @@ protected:
 
     // bi-directional iterator requirements
     auto& operator--() {
-      if (!index()) error(BadBegin);
+      if (!index()) rangeError(BadBegin);
       --index();
       return derived();
     }
@@ -87,9 +95,10 @@ protected:
       return *(derived() + i);
     }
     auto& operator+=(difference_type i) {
-      if ((i += static_cast<difference_type>(index())) < 0) error(BadBegin);
-      if (const auto j{static_cast<size_t>(i)}; j > N)
-        error(BadEnd);
+      if ((i += static_cast<difference_type>(index())) < 0)
+        rangeError(BadBegin);
+      if (const auto j{static_cast<Index>(i)}; j > N)
+        rangeError(BadEnd);
       else
         index() = j;
       return derived();
@@ -104,11 +113,12 @@ protected:
       return x -= i;
     }
   protected:
-    Iterator(size_t index) noexcept : BaseIterator{index} {}
+    Iterator(Index index) noexcept : BaseIterator{index} {}
   private:
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);
     }
+
     [[nodiscard]] auto& derived() const noexcept {
       return static_cast<const Derived&>(*this);
     }
@@ -117,14 +127,14 @@ protected:
   template<typename I>
   requires std::integral<I> || std::same_as<T, I>
   [[nodiscard]] static auto checkIndex(I i, const std::string& name) {
-    const auto x{static_cast<size_t>(i)};
+    const auto x{static_cast<Index>(i)};
     if (x >= N) {
       std::string msg{name};
       if constexpr (std::is_same_v<I, T>)
         msg += "enum value " + std::to_string(x);
       else // use original value in error message (so int '-1' is preserved)
         msg += std::to_string(i);
-      throw std::out_of_range{msg + Range};
+      rangeError(msg + RangeMsg);
     }
     return x;
   }

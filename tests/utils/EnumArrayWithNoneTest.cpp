@@ -18,20 +18,20 @@ enum class TestEnum { A, B, C, None };
 template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
 
 inline const auto AllColors{
-    BaseEnumArray<Colors>::create("Red", "Green", "Blue")};
+    TypedEnumArray<Colors>::create("Red", "Green", "Blue")};
 
 template<> inline constexpr auto is_enumarray_with_none<TestEnum>{true};
 
 TEST(EnumArrayWithNoneTest, FailForDuplicateName) {
   EXPECT_THROW(
-      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "B"); },
+      call([] { return TypedEnumArray<TestEnum>::create("A", "B", "B"); },
           "duplicate name 'B'"),
       std::domain_error);
 }
 
 TEST(EnumArrayWithNoneTest, FailForNoneName) {
   EXPECT_THROW(
-      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "None"); },
+      call([] { return TypedEnumArray<TestEnum>::create("A", "B", "None"); },
           "'None' should not be specified"),
       std::domain_error);
 }
@@ -45,29 +45,30 @@ TEST(EnumArrayWithNoneTest, CallInstanceBeforeCreate) {
 
 TEST(EnumArrayWithNoneTest, DestructorClearsInstance) {
   for (auto _{2}; _--;) {
-    EXPECT_FALSE(BaseEnumArray<TestEnum>::isCreated());
-    const auto x{BaseEnumArray<TestEnum>::create("A", "B", "C")};
-    EXPECT_TRUE(BaseEnumArray<TestEnum>::isCreated());
+    EXPECT_FALSE(TypedEnumArray<TestEnum>::isCreated());
+    const auto x{TypedEnumArray<TestEnum>::create("A", "B", "C")};
+    EXPECT_TRUE(TypedEnumArray<TestEnum>::isCreated());
   }
 }
 
 TEST(EnumArrayWithNoneTest, CallCreateTwice) {
-  const auto enumArray{BaseEnumArray<TestEnum>::create("A", "B", "C")};
+  const auto enumArray{TypedEnumArray<TestEnum>::create("A", "B", "C")};
   // 'create' returns an 'EnumArray' for the given enum with a second template
   // parameter for the number of names provided (the actual enum should have one
   // more 'None' value at the end)
   EXPECT_EQ(typeid(enumArray), typeid(EnumArrayWithNone<TestEnum, 3>));
   EXPECT_EQ(enumArray.size(), 4); // 'size' includes final 'None' value
-  // 'instance' returns 'const BaseEnumArray&', but the object returned is
+  // 'instance' returns 'const TypedEnumArray&', but the object returned is
   // 'EnumArrayWithNone'
   auto& instance{enumArray.instance()};
   EXPECT_EQ(
-      typeid(std::result_of_t<decltype (&BaseEnumArray<TestEnum>::instance)()>),
-      typeid(const BaseEnumArray<TestEnum>&));
+      typeid(
+          std::result_of_t<decltype (&TypedEnumArray<TestEnum>::instance)()>),
+      typeid(const TypedEnumArray<TestEnum>&));
   EXPECT_EQ(typeid(instance), typeid(const EnumArrayWithNone<TestEnum, 3>&));
   // calling 'create' again should throw an exception
   EXPECT_THROW(
-      call([] { return BaseEnumArray<TestEnum>::create("A", "B", "C"); },
+      call([] { return TypedEnumArray<TestEnum>::create("A", "B", "C"); },
           "'create' should only be called once"),
       std::domain_error);
 }

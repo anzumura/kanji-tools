@@ -10,6 +10,6 @@ enum class JlptLevels { N5, N4, N3, N2, N1, None };
 template<> inline constexpr auto is_enumarray_with_none<JlptLevels>{true};
 
 inline const auto AllJlptLevels{
-    BaseEnumArray<JlptLevels>::create("N5", "N4", "N3", "N2", "N1")};
+    TypedEnumArray<JlptLevels>::create("N5", "N4", "N3", "N2", "N1")};
 
 } // namespace kanji_tools

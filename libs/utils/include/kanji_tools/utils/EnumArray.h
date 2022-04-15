@@ -22,7 +22,7 @@ namespace kanji_tools {
 //
 //   enum class Colors { Red, Green, Blue };
 //   template<> inline constexpr auto is_enumarray<Colors>{true};
-//   inline const auto AllColors{BaseEnumArray<Colors>::create("Red", "Green",
+//   inline const auto AllColors{TypedEnumArray<Colors>::create("Red", "Green",
 //     "Blue")};
 //
 //   for (auto c : AllColors) { std::cout << c << '\n'; }
@@ -38,7 +38,7 @@ namespace kanji_tools {
 //
 //   enum class Colors { Red, Green, Blue, None };
 //   template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
-//   inline const auto AllColors{BaseEnumArray<Colors>::create("Red", "Green",
+//   inline const auto AllColors{TypedEnumArray<Colors>::create("Red", "Green",
 //     "Blue")};
 //
 //   // prints all Colors including 'None'
@@ -55,18 +55,28 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 inline constexpr auto is_enumarray_with_none{false};
 
 template<typename T, typename _ = int>
-using isBaseEnumArray =
+using isEnumArray =
     std::enable_if_t<is_enumarray<T> || is_enumarray_with_none<T>, _>;
 
-template<typename T, isBaseEnumArray<T> = 0> class BaseEnumArray {
+class BaseEnumArray {
+public:
+  virtual ~BaseEnumArray() = 0;
+protected:
+  static void domainError(const std::string&);
+};
+
+// 'TypedEnumArray' has a pure virtual 'toString' function and has a map from
+// 'std::string' to T names used by derived class 'fromString' methods. It also
+// has a static '_instance' member.
+template<typename T, isEnumArray<T> = 0>
+class TypedEnumArray : public BaseEnumArray {
 public:
   // 'create' requires at least one 'name' (see comments above)
   template<typename... Names>
   [[nodiscard]] static auto create(const std::string& name, Names...);
 
   [[nodiscard]] static auto& instance() {
-    if (!_instance)
-      throw std::domain_error{"must call 'create' before calling 'instance'"};
+    if (!_instance) domainError("must call 'create' before calling 'instance'");
     return *_instance;
   }
 
@@ -74,31 +84,32 @@ public:
     return _instance != nullptr;
   }
 
-  virtual ~BaseEnumArray() { _instance = nullptr; }
+  ~TypedEnumArray() override { _instance = nullptr; }
 
   [[nodiscard]] virtual const std::string& toString(T) const = 0;
 protected:
-  BaseEnumArray() noexcept { _instance = this; }
+  TypedEnumArray() noexcept { _instance = this; }
 
   [[nodiscard]] auto find(const std::string& name) const {
     const auto i{_nameMap.find(name)};
-    if (i == _nameMap.end())
-      throw std::domain_error{"name '" + name + "' not found"};
+    if (i == _nameMap.end()) domainError("name '" + name + "' not found");
     return i->second;
   }
 
-  void insert(const std::string& name, size_t index) {
+  void insert(const std::string& name, BaseIterableEnum::Index index) {
     if (!_nameMap.emplace(name, static_cast<T>(index)).second)
-      throw std::domain_error{"duplicate name '" + name + "'"};
+      domainError("duplicate name '" + name + "'");
   }
 private:
   std::map<std::string, T> _nameMap;
 
-  inline static constinit const BaseEnumArray<T>* _instance;
+  inline static constinit const TypedEnumArray<T>* _instance;
 };
 
+// 'IterableEnumArray' adds functionality to the iterator from 'IterableEnum'
+// that is common to both derived classes ('EnumArray' and 'EnumArrayWithNone')
 template<typename T, size_t N>
-class IterableEnumArray : public IterableEnum<T, N>, public BaseEnumArray<T> {
+class IterableEnumArray : public IterableEnum<T, N>, public TypedEnumArray<T> {
 private:
   using base = IterableEnum<T, N>;
 public:
@@ -107,7 +118,7 @@ public:
     friend IterableEnumArray<T, N>;
     using iBase = typename base::template Iterator<ConstIterator>;
 
-    ConstIterator(size_t index) noexcept : iBase{index} {}
+    ConstIterator(BaseIterableEnum::Index index) noexcept : iBase{index} {}
   public:
     // forward iterator requirements (a default constructor)
     ConstIterator() noexcept = default;
@@ -117,8 +128,8 @@ public:
       // exception should only happen when dereferencing 'end' since other
       // methods prevent moving out of range
       if (iBase::index() >= N)
-        iBase::error(
-            base::Index + std::to_string(iBase::index()) + base::Range);
+        iBase::rangeError(
+            base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
       return static_cast<T>(iBase::index());
     }
 
@@ -132,10 +143,11 @@ public:
   [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
 
   template<std::integral I> [[nodiscard]] auto operator[](I i) const {
-    return static_cast<T>(base::checkIndex(i, base::Index));
+    return static_cast<T>(base::checkIndex(i, base::IndexMsg));
   }
 };
 
+// see comments at the top of this file (EnumArray.h) for more details
 template<typename T, size_t N>
 class EnumArray : public IterableEnumArray<T, N> {
 public:
@@ -149,7 +161,7 @@ public:
     return base::find(s);
   }
 private:
-  friend BaseEnumArray<T>; // 'create' calls private constructor
+  friend TypedEnumArray<T>; // 'create' calls private constructor
 
   EnumArray(const std::string& name) { setName(name, N - 1); }
 
@@ -158,7 +170,7 @@ private:
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const std::string& name, size_t index) {
+  void setName(const std::string& name, BaseIterableEnum::Index index) {
     base::insert(_names[index] = name, index);
   }
 
@@ -185,7 +197,7 @@ public:
   }
 private:
   inline const static std::string None{"None"};
-  friend BaseEnumArray<T>; // 'create' calls private constructor
+  friend TypedEnumArray<T>; // 'create' calls private constructor
 
   EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
 
@@ -195,21 +207,23 @@ private:
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const std::string& name, size_t index) {
-    if (name == None) throw std::domain_error{"'None' should not be specified"};
+  void setName(const std::string& name, BaseIterableEnum::Index index) {
+    if (name == None) base::domainError("'None' should not be specified");
     base::insert(_names[index] = name, index);
   }
 
   std::array<std::string, N> _names;
 };
 
-template<typename T, isBaseEnumArray<T> _>
+// out of class member definition for 'TypedEnumArray<T>::create'
+
+template<typename T, isEnumArray<T> _>
 template<typename... Names>
-[[nodiscard]] auto BaseEnumArray<T, _>::create(
+[[nodiscard]] auto TypedEnumArray<T, _>::create(
     const std::string& name, Names... args) {
   static_assert(is_enumarray<T> != is_enumarray_with_none<T>,
       "both 'is_enumarray' and 'is_enumarray_with_none' are true");
-  if (_instance) throw std::domain_error{"'create' should only be called once"};
+  if (_instance) domainError("'create' should only be called once");
   if constexpr (is_enumarray<T>)
     return EnumArray<T, sizeof...(args) + 1>{name, args...};
   else {
@@ -221,13 +235,16 @@ template<typename... Names>
   }
 }
 
+// below are some global functions that are enabled for enums types that have
+// instances of 'EnumArray' or 'EnumArrayWithNone'
+
 template<typename T>
-[[nodiscard]] isBaseEnumArray<T, const std::string&> toString(T x) {
-  return BaseEnumArray<T>::instance().toString(x);
+[[nodiscard]] isEnumArray<T, const std::string&> toString(T x) {
+  return TypedEnumArray<T>::instance().toString(x);
 }
 
 template<typename T>
-isBaseEnumArray<T, std::ostream&> operator<<(std::ostream& os, T x) {
+isEnumArray<T, std::ostream&> operator<<(std::ostream& os, T x) {
   return os << toString(x);
 }
 
