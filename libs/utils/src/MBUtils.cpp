@@ -105,13 +105,13 @@ void convertToUtf8(char32_t c, std::string& s) {
       s += static_cast<char>((Six & c) + Bit1);
     } else
       s += ReplacementCharacter;
-  } else if (c <= MaxUnicode) {
+  } else if (c <= MaxUnicode) { // LCOV_EXCL_LINE: gcov-11 bug
     s += static_cast<char>(((FirstThree & c) >> 18) + FourBits);
     s += static_cast<char>(((ThirdSix & c) >> 12) + Bit1);
     s += static_cast<char>(((SecondSix & c) >> 6) + Bit1);
     s += static_cast<char>((Six & c) + Bit1);
   } else
-    s += ReplacementCharacter;
+    s += ReplacementCharacter; // LCOV_EXCL_LINE: gcov-11 bug
 }
 #endif
 
@@ -215,7 +215,7 @@ MBUtf8Result validateMBUtf8(
       return err(Utf8Result::Overlong); // overlong 3 byte encoding
     else if (c >= MinSurrogate && c <= MaxSurrogate)
       return err(Utf8Result::InvalidCodePoint);
-  } else if ((byte1 ^ TwoBits) < 2)
+  } else if ((byte1 ^ TwoBits) < 2) // LCOV_EXCL_LINE: gcov-11 bug
     return err(Utf8Result::Overlong); // overlong 2 byte encoding
   return !sizeOne || !*++u ? MBUtf8Result::Valid
                            : err(Utf8Result::StringTooLong);

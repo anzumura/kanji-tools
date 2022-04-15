@@ -313,8 +313,8 @@ void Converter::processRomaji(std::string& letters, std::string& result) const {
 bool Converter::processRomajiMacron(const std::string& letter,
     std::string& letters, std::string& result) const {
   static const std::map<std::string, std::pair<char, std::string>> Macrons{
-      {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, {"ū", {'u', "う"}},
-      {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
+      {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, // LCOV_EXCL_LINE: gcov-11 bug
+      {"ū", {'u', "う"}}, {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
 
   if (const auto i{Macrons.find(letter)}; i != Macrons.end()) {
     processRomaji(letters += i->second.first, result);

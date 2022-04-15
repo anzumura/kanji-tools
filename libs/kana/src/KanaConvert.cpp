@@ -151,8 +151,8 @@ void KanaConvert::start(const List& strings) {
 }
 
 void KanaConvert::getInput() {
-  static const Choice::Choices FlagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
-      {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
+  static const Choice::Choices FlagChoices{{'h', "Hepburn"}, // LCOV_EXCL_LINE
+      {'k', "Kunrei"}, {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
   auto outputCurrentOptions{true};
   do {
     if (_interactive && outputCurrentOptions) {
