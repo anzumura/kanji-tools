@@ -47,21 +47,21 @@ private:
 
 class UcdBlock : public Symbol<UcdBlock> {
 public:
-  UcdBlock(const std::string& s) : Symbol<UcdBlock>{s} {}
+  inline static const std::string Type{"UcdBlock"};
+  UcdBlock(const std::string& name) : Symbol<UcdBlock>{name} {}
 };
-template<> inline const std::string Symbol<UcdBlock>::Type{"UcdBlock"};
 
 class UcdVersion : public Symbol<UcdVersion> {
 public:
-  UcdVersion(const std::string& s) : Symbol<UcdVersion>{s} {}
+  inline static const std::string Type{"UcdVersion"};
+  UcdVersion(const std::string& name) : Symbol<UcdVersion>{name} {}
 };
-template<> inline const std::string Symbol<UcdVersion>::Type{"UcdVersion"};
 
 class Pinyin : public Symbol<Pinyin> {
 public:
-  Pinyin(const std::string& s) : Symbol<Pinyin>{s} {}
+  inline static const std::string Type{"Pinyin"};
+  Pinyin(const std::string& name) : Symbol<Pinyin>{name} {}
 };
-template<> inline const std::string Symbol<Pinyin>::Type{"Pinyin"};
 
 // 'Ucd' holds data loaded from 'ucd.txt' which is an extract of the Unicode
 // 'ucd.all.flat.xml' file - see scripts/parseUcdAllFlat.sh for more details

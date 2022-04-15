@@ -16,6 +16,13 @@ namespace kanji_tools {
 // symbols per type (an exception is thrown if this limit is exceeded). If there
 // are more than 65K values then 'Symbol' was probably not a good design choice
 // in the first place.
+//
+// Classes should derive from 'Symbol' and define 'Type', for example:
+//   class TestSymbol : public Symbol<TestSymbol> {
+//   public:
+//     inline static const std::string Type{"TestSymbol"};
+//     TestSymbol(const std::string& name) : Symbol<TestSymbol>{name} {}
+//   };
 
 class BaseSymbol {
 public:
@@ -23,37 +30,32 @@ public:
 
   [[nodiscard]] Id id() const { return _id; }
 protected:
+  using Map = std::map<std::string, Id>;
+  using List = std::vector<const std::string*>;
+
   BaseSymbol(Id id) noexcept : _id{id} {}
 
-  [[nodiscard]] static Id check(size_t, const std::string&, const std::string&);
+  [[nodiscard]] static Id getId(
+      const std::string& type, const std::string& name, Map&, List&);
 private:
   const Id _id;
 };
 
 template<typename T> class Symbol : public BaseSymbol {
 public:
-  [[nodiscard]] static const std::string& type() { return Type; }
-  [[nodiscard]] static auto symbols() { return _list.size(); }
+  [[nodiscard]] static const std::string& type() { return T::Type; }
+  [[nodiscard]] static auto size() { return _list.size(); }
+  [[nodiscard]] static auto exists(const std::string& name) {
+    return _map.contains(name);
+  }
 
-  [[nodiscard]] auto& name() const { return _list.at(id()); }
+  [[nodiscard]] auto& name() const { return *_list.at(id()); }
 protected:
-  Symbol(const std::string& symbol) : BaseSymbol{getId(symbol)} {}
+  Symbol(const std::string& name)
+      : BaseSymbol{getId(type(), name, _map, _list)} {}
 private:
-  using Map = std::map<std::string, Id>;
-  using List = std::vector<std::string>;
-
-  static const std::string Type; // must be defined for each derived class
-
   inline static Map _map;
   inline static List _list;
-
-  [[nodiscard]] static Id getId(const std::string& symbol) {
-    if (const auto i{_map.find(symbol)}; i != _map.end()) return i->second;
-    const auto id{check(_list.size(), Type, symbol)};
-    _map.emplace(symbol, id);
-    _list.emplace_back(symbol);
-    return id;
-  }
 };
 
 } // namespace kanji_tools

@@ -5,12 +5,13 @@
 
 namespace kanji_tools {
 
-BaseSymbol::Id BaseSymbol::check(
-    size_t id, const std::string& symbolType, const std::string& symbol) {
-  if (id == std::numeric_limits<Id>::max())
-    throw std::domain_error{
-        symbolType + ": can't add '" + symbol + "' - max capacity"};
-  return static_cast<Id>(id);
+BaseSymbol::Id BaseSymbol::getId(
+    const std::string& type, const std::string& name, Map& m, List& l) {
+  if (l.size() == std::numeric_limits<Id>::max())
+    throw std::domain_error{type + ": can't add '" + name + "' - max capacity"};
+  const auto i{m.emplace(name, l.size())};
+  if (i.second) l.emplace_back(&i.first->first);
+  return i.first->second;
 }
 
 } // namespace kanji_tools
