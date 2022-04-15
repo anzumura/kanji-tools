@@ -84,13 +84,12 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
   DataFile::Set sameReading{kanji->reading()};
   _answers[correct] = currentQuestion();
   for (ChoiceCount i{}; i < _choiceCount; ++i)
-    if (i != correct) do {
-        if (const auto choice{randomReading(RandomGen)};
-            sameReading.insert(questions[choice]->reading()).second) {
-          _answers[i] = choice;
-          break;
-        }
-      } while (true);
+    while (i != correct)
+      if (const auto choice{randomReading(RandomGen)};
+          sameReading.insert(questions[choice]->reading()).second) {
+        _answers[i] = choice;
+        break;
+      }
   return correct;
 }
 
