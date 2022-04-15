@@ -1,2 +1,2 @@
 add_library(${TARGET} Args.cpp BlockRange.cpp Choice.cpp ColumnFile.cpp
-  DataFile.cpp MBUtils.cpp UnicodeBlock.cpp Utils.cpp)
+  DataFile.cpp MBUtils.cpp Symbol.cpp UnicodeBlock.cpp Utils.cpp)

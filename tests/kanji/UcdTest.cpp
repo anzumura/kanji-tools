@@ -6,11 +6,19 @@ namespace kanji_tools {
 
 TEST(UcdTest, Size) {
 #ifdef __clang__
+  EXPECT_EQ(sizeof(Ucd), 232);
+  EXPECT_EQ(sizeof(UcdLinks), 32);
+  EXPECT_EQ(sizeof(UcdLinks::Links), 24);
+  EXPECT_EQ(sizeof(UcdEntry), 32);
+  EXPECT_EQ(sizeof(UcdLinkTypes), 4);
   EXPECT_EQ(sizeof(std::string), 24);
-  EXPECT_EQ(sizeof(Ucd), 296);
 #else
+  EXPECT_EQ(sizeof(Ucd), 288);
+  EXPECT_EQ(sizeof(UcdLinks), 32);
+  EXPECT_EQ(sizeof(UcdLinks::Links), 24);
+  EXPECT_EQ(sizeof(UcdEntry), 40);
+  EXPECT_EQ(sizeof(UcdLinkTypes), 4);
   EXPECT_EQ(sizeof(std::string), 32);
-  EXPECT_EQ(sizeof(Ucd), 376);
 #endif
 }
 

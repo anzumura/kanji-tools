@@ -2,6 +2,7 @@
 
 #include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/kanji/UcdLinkTypes.h>
+#include <kanji_tools/utils/Symbol.h>
 
 #include <bitset>
 
@@ -44,6 +45,24 @@ private:
   const bool _linkedReadings;
 };
 
+class UcdBlock : public Symbol<UcdBlock> {
+public:
+  UcdBlock(const std::string& s) : Symbol<UcdBlock>{s} {}
+};
+template<> inline const std::string Symbol<UcdBlock>::Type{"UcdBlock"};
+
+class UcdVersion : public Symbol<UcdVersion> {
+public:
+  UcdVersion(const std::string& s) : Symbol<UcdVersion>{s} {}
+};
+template<> inline const std::string Symbol<UcdVersion>::Type{"UcdVersion"};
+
+class Pinyin : public Symbol<Pinyin> {
+public:
+  Pinyin(const std::string& s) : Symbol<Pinyin>{s} {}
+};
+template<> inline const std::string Symbol<Pinyin>::Type{"Pinyin"};
+
 // 'Ucd' holds data loaded from 'ucd.txt' which is an extract of the Unicode
 // 'ucd.all.flat.xml' file - see scripts/parseUcdAllFlat.sh for more details
 class Ucd {
@@ -65,12 +84,12 @@ public:
   Ucd(const Ucd&) = delete;
 
   [[nodiscard]] auto& entry() const { return _entry; }
-  [[nodiscard]] auto& block() const { return _block; }
-  [[nodiscard]] auto& version() const { return _version; }
+  [[nodiscard]] auto& block() const { return _block.name(); }
+  [[nodiscard]] auto& version() const { return _version.name(); }
+  [[nodiscard]] auto& pinyin() const { return _pinyin.name(); }
   [[nodiscard]] auto radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
   [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }
-  [[nodiscard]] auto& pinyin() const { return _pinyin; }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
   [[nodiscard]] auto& jSource() const { return _jSource; }
@@ -103,11 +122,13 @@ private:
       const std::string& sources, bool joyo, bool jinmei);
 
   const UcdEntry _entry;
-  const std::string _block, _version;
+  const UcdBlock _block;
+  const UcdVersion _version;
+  const Pinyin _pinyin;
   const Radical::Number _radical;
   // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
   const Strokes _strokes, _variantStrokes;
-  const std::string _pinyin, _morohashiId, _nelsonIds, _jSource;
+  const std::string _morohashiId, _nelsonIds, _jSource;
   const UcdLinks _links;
   const std::string _meaning, _onReading, _kunReading;
   const std::bitset<SourcesSize> _sources;
