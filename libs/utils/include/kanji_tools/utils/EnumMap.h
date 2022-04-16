@@ -35,12 +35,10 @@ protected:
 template<typename T, typename V, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 class EnumMap : public IterableEnum<T, static_cast<size_t>(T::None)>,
                 public BaseEnumMap<V> {
-private:
+public:
   static constexpr auto N{static_cast<BaseIterableEnum::Index>(T::None)};
   using base = IterableEnum<T, N>;
 
-  std::array<V, N> _values;
-public:
   EnumMap() noexcept = default;
 
   // return 'value' for the given enum value 'i' and allow it to be modified
@@ -55,42 +53,31 @@ public:
                         : _values[base::checkIndex(i, base::IndexMsg)];
   }
 
-  class ConstIterator : public base::template Iterator<ConstIterator> {
-  private:
-    friend EnumMap<T, V>; // calls private ctor
+  // only support 'const' iteration
+  [[nodiscard]] auto begin() const noexcept { return ConstIterator{0, *this}; }
+  [[nodiscard]] auto end() const noexcept { return ConstIterator{N, *this}; }
 
+  class ConstIterator : public base::template Iterator<ConstIterator> {
+  public:
+    // base iterator implements some operations such as prefix and postfix
+    // increment and decrement, operator[], +=, -=, + and -.
     using iBase = typename base::template Iterator<ConstIterator>;
 
-    ConstIterator(BaseIterableEnum::Index i, const EnumMap<T, V>& m) noexcept
-        : iBase{i}, _map{&m} {}
+    // forward iterator requirements (default ctor, equal)
 
-    const EnumMap<T, V>* _map{};
-  public:
-    // forward iterator requirements (a default constructor)
     ConstIterator() noexcept : iBase{0} {}
 
     [[nodiscard]] bool operator==(const ConstIterator& x) const {
       iBase::comparable(_map == x._map);
       return iBase::operator==(x);
     }
-    [[nodiscard]] bool operator<(const ConstIterator& x) const {
-      iBase::comparable(_map == x._map);
-      return iBase::index() < x.index();
-    }
+
     [[nodiscard]] bool operator!=(const ConstIterator& x) const {
       return !(*this == x);
     }
-    [[nodiscard]] bool operator<=(const ConstIterator& x) const {
-      return *this < x || *this == x;
-    }
-    [[nodiscard]] bool operator>=(const ConstIterator& x) const {
-      return !(*this < x);
-    }
-    [[nodiscard]] bool operator>(const ConstIterator& x) const {
-      return !(*this <= x);
-    }
 
     // input iterator requirements (except operator->)
+
     [[nodiscard]] auto& operator*() const {
       iBase::initialized(_map);
       if (iBase::index() >= N)
@@ -99,16 +86,40 @@ public:
       return (*_map)[static_cast<T>(iBase::index())];
     }
 
-    // random-access iterator requirements
+    // random-access iterator requirements (compare, subtracting iterators)
+
+    [[nodiscard]] bool operator<(const ConstIterator& x) const {
+      iBase::comparable(_map == x._map);
+      return iBase::index() < x.index();
+    }
+
+    [[nodiscard]] bool operator<=(const ConstIterator& x) const {
+      return *this < x || *this == x;
+    }
+
+    [[nodiscard]] bool operator>=(const ConstIterator& x) const {
+      return !(*this < x);
+    }
+
+    [[nodiscard]] bool operator>(const ConstIterator& x) const {
+      return !(*this <= x);
+    }
+
+    using iBase::operator-;
     [[nodiscard]] auto operator-(const ConstIterator& x) const {
       iBase::comparable(_map == x._map);
       return iBase::index() - x.index();
     }
-  };
+  private:
+    friend EnumMap<T, V>; // calls private ctor
 
-  // only support 'const' iteration
-  [[nodiscard]] auto begin() const noexcept { return ConstIterator{0, *this}; }
-  [[nodiscard]] auto end() const noexcept { return ConstIterator{N, *this}; }
+    ConstIterator(BaseIterableEnum::Index i, const EnumMap<T, V>& m) noexcept
+        : iBase{i}, _map{&m} {}
+
+    const EnumMap<T, V>* _map{};
+  };
+private:
+  std::array<V, N> _values;
 };
 
 } // namespace kanji_tools

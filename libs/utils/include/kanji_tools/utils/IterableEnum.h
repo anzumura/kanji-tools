@@ -37,7 +37,7 @@ protected:
 
     static void rangeError(const std::string&);
 
-    BaseIterator(Index index = 0) noexcept;
+    explicit BaseIterator(Index index) noexcept;
 
     [[nodiscard]] Index& index();
     [[nodiscard]] Index index() const;
@@ -66,11 +66,13 @@ protected:
   template<typename Derived> class Iterator : public BaseIterator {
   public:
     // common requirements for iterators
+
     auto& operator++() {
       if (index() >= N) rangeError(BadEnd);
       ++index();
       return derived();
     }
+
     auto operator++(int) {
       Derived x{derived()};
       ++*this;
@@ -78,11 +80,13 @@ protected:
     }
 
     // bi-directional iterator requirements
+
     auto& operator--() {
       if (!index()) rangeError(BadBegin);
       --index();
       return derived();
     }
+
     auto operator--(int) {
       Derived x{derived()};
       --*this;
@@ -90,9 +94,11 @@ protected:
     }
 
     // random-access iterator requirements (except non-const operator[])
+
     [[nodiscard]] auto operator[](difference_type i) const {
       return *(derived() + i);
     }
+
     auto& operator+=(difference_type i) {
       if ((i += static_cast<difference_type>(index())) < 0)
         rangeError(BadBegin);
@@ -102,17 +108,20 @@ protected:
         index() = j;
       return derived();
     }
+
     auto& operator-=(difference_type i) { return *this += -i; }
+
     [[nodiscard]] auto operator+(difference_type i) const {
       Derived x{derived()};
       return x += i;
     }
+
     [[nodiscard]] auto operator-(difference_type i) const {
       Derived x{derived()};
       return x -= i;
     }
   protected:
-    Iterator(Index index) noexcept : BaseIterator{index} {}
+    explicit Iterator(Index index) noexcept : BaseIterator{index} {}
   private:
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);

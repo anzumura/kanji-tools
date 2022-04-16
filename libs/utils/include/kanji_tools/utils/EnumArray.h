@@ -112,17 +112,17 @@ public:
   }
 
   class ConstIterator : public base::template Iterator<ConstIterator> {
-  private:
-    friend IterableEnumArray<T, N>; // calls private ctor
-
+  public:
+    // base iterator implements some operations such as prefix and postfix
+    // increment and decrement, operator[], +=, -=, + and -.
     using iBase = typename base::template Iterator<ConstIterator>;
 
-    ConstIterator(BaseIterableEnum::Index index) noexcept : iBase{index} {}
-  public:
-    // forward iterator requirements (a default constructor)
-    ConstIterator() noexcept = default;
+    // forward iterator requirements (default ctor)
+
+    ConstIterator() noexcept : iBase{0} {}
 
     // input iterator requirements (except operator->)
+
     [[nodiscard]] auto operator*() const {
       // exception should only happen when dereferencing 'end' since other
       // methods prevent moving out of range
@@ -133,9 +133,16 @@ public:
     }
 
     // random-access iterator requirements
+
+    using iBase::operator-;
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
       return iBase::index() - x.index();
     }
+  private:
+    friend IterableEnumArray<T, N>; // calls private ctor
+
+    explicit ConstIterator(BaseIterableEnum::Index index) noexcept
+        : iBase{index} {}
   };
 };
 

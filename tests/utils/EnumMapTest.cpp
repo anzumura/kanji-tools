@@ -58,6 +58,26 @@ TEST_F(EnumMapTest, BadAccess) {
       std::out_of_range);
 }
 
+TEST_F(EnumMapTest, IteratorIncrementAndDecrement) {
+  auto i{_map.begin()};
+  ASSERT_NE(i, _map.end());
+  auto j{i};
+  EXPECT_NE(++i, j);
+  EXPECT_EQ(--i, j);
+  EXPECT_EQ(i++, j);
+  EXPECT_NE(i--, j);
+}
+
+TEST_F(EnumMapTest, IteratorAdditionAndSubtraction) {
+  auto i{_map.begin()};
+  ASSERT_NE(i, _map.end());
+  auto j{i};
+  EXPECT_NE(i + 1, j);
+  EXPECT_EQ(i + 2, j += 2);
+  EXPECT_NE(i, j - 1);
+  EXPECT_EQ(i, j -= 2);
+}
+
 TEST_F(EnumMapTest, BadIncrement) {
   auto i{_map.begin()};
   i = i + 1;

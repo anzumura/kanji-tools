@@ -97,6 +97,16 @@ TEST(EnumArrayTest, IteratorIncrementAndDecrement) {
   EXPECT_NE(i--, j);
 }
 
+TEST(EnumArrayTest, IteratorAdditionAndSubtraction) {
+  auto i{AllColors.begin()};
+  ASSERT_NE(i, AllColors.end());
+  auto j{i};
+  EXPECT_NE(i + 1, j);
+  EXPECT_EQ(i + 2, j += 2);
+  EXPECT_NE(i, j - 1);
+  EXPECT_EQ(i, j -= 2);
+}
+
 TEST(EnumArrayTest, RangeBasedForLoop) {
   std::vector<Colors> colors;
   for (auto c : AllColors) colors.emplace_back(c);
