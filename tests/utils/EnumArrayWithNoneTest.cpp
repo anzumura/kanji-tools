@@ -11,6 +11,8 @@ namespace {
 
 enum class Colors { Red, Green, Blue, None };
 
+constexpr Colors BadColor{29};
+
 enum class TestEnum { A, B, C, None };
 
 } // namespace
@@ -152,8 +154,8 @@ TEST(EnumArrayWithNoneTest, ToString) {
 }
 
 TEST(EnumArrayWithNoneTest, BadToString) {
-  EXPECT_THROW(call([] { return toString(static_cast<Colors>(7)); },
-                   "enum '7' is out of range"),
+  EXPECT_THROW(call([] { return toString(BadColor); },
+                   "enum '29' is out of range"),
       std::out_of_range);
 }
 
@@ -184,13 +186,13 @@ TEST(EnumArrayWithNoneTest, BadFromString) {
 TEST(EnumArrayWithNoneTest, HasValue) {
   EXPECT_FALSE(hasValue(Colors::None)); // only 'None' is false
   EXPECT_TRUE(hasValue(Colors::Blue));
-  EXPECT_TRUE(hasValue(static_cast<Colors>(29))); // bad value
+  EXPECT_TRUE(hasValue(BadColor)); // bad value
 }
 
 TEST(EnumArrayWithNoneTest, OperatorNot) {
   EXPECT_TRUE(!Colors::None); // only 'None' is true
   EXPECT_FALSE(!Colors::Blue);
-  EXPECT_FALSE(!static_cast<Colors>(29)); // bad value
+  EXPECT_FALSE(!BadColor); // bad value
 }
 
 TEST(EnumArrayWithNoneTest, IsNextNone) {
@@ -198,7 +200,7 @@ TEST(EnumArrayWithNoneTest, IsNextNone) {
   EXPECT_FALSE(isNextNone(Colors::Green));
   EXPECT_TRUE(isNextNone(Colors::Blue));
   EXPECT_FALSE(isNextNone(Colors::None));
-  EXPECT_FALSE(isNextNone(static_cast<Colors>(4))); // bad value
+  EXPECT_FALSE(isNextNone(BadColor)); // bad value
 }
 
 } // namespace kanji_tools

@@ -8,28 +8,33 @@ namespace {
 
 enum class TestEnum { One = 1, Two, Four = 4, Eight = 8, All = 15 };
 
+// conversion function to help test bitwise results
+TestEnum toEnum(int x) {
+  return static_cast<TestEnum>(x);
+}
+
 } // namespace
 
 template<> inline constexpr auto is_bitmask<TestEnum>{true};
 
 TEST(EnumBitmaskTest, BitwiseAndOperator) {
   EXPECT_EQ(TestEnum::All & TestEnum::Two, TestEnum::Two);
-  EXPECT_EQ(TestEnum::One & TestEnum::Two, static_cast<TestEnum>(0));
+  EXPECT_EQ(TestEnum::One & TestEnum::Two, toEnum(0));
 }
 
 TEST(EnumBitmaskTest, BitwiseOrOperator) {
-  EXPECT_EQ(TestEnum::Two | TestEnum::Four, static_cast<TestEnum>(2 | 4));
+  EXPECT_EQ(TestEnum::Two | TestEnum::Four, toEnum(2 | 4));
   EXPECT_EQ(TestEnum::One | TestEnum::Two | TestEnum::Four | TestEnum::Eight,
       TestEnum::All);
 }
 
 TEST(EnumBitmaskTest, BitwiseXOrOperator) {
-  EXPECT_EQ(TestEnum::All ^ TestEnum::Eight, static_cast<TestEnum>(15 ^ 8));
-  EXPECT_EQ(TestEnum::Four ^ TestEnum::Four, static_cast<TestEnum>(0));
+  EXPECT_EQ(TestEnum::All ^ TestEnum::Eight, toEnum(15 ^ 8));
+  EXPECT_EQ(TestEnum::Four ^ TestEnum::Four, toEnum(0));
 }
 
 TEST(EnumBitmaskTest, BitwiseComplementOperator) {
-  EXPECT_EQ(~TestEnum::Four, static_cast<TestEnum>(~4));
+  EXPECT_EQ(~TestEnum::Four, toEnum(~4));
   auto x{TestEnum::Two | TestEnum::Four};
   EXPECT_EQ(x &= ~TestEnum::Two, TestEnum::Four);
 }
@@ -45,8 +50,8 @@ TEST(EnumBitmaskTest, BitwiseAndEqualOperator) {
 
 TEST(EnumBitmaskTest, BitwiseOrEqualOperator) {
   auto x{TestEnum::Two};
-  EXPECT_EQ(x |= TestEnum::One, static_cast<TestEnum>(1 | 2));
-  EXPECT_EQ(x |= TestEnum::Four, static_cast<TestEnum>(1 | 2 | 4));
+  EXPECT_EQ(x |= TestEnum::One, toEnum(1 | 2));
+  EXPECT_EQ(x |= TestEnum::Four, toEnum(1 | 2 | 4));
   // test chaining
   auto y{TestEnum::One};
   ((y |= TestEnum::Two) |= TestEnum::Four) |= TestEnum::Eight;
@@ -55,8 +60,8 @@ TEST(EnumBitmaskTest, BitwiseOrEqualOperator) {
 
 TEST(EnumBitmaskTest, BitwiseXOrEqualOperator) {
   auto x{TestEnum::All};
-  EXPECT_EQ(x ^= TestEnum::Four, static_cast<TestEnum>(1 | 2 | 8));
-  EXPECT_EQ(x ^= TestEnum::Eight, static_cast<TestEnum>(1 | 2));
+  EXPECT_EQ(x ^= TestEnum::Four, toEnum(1 | 2 | 8));
+  EXPECT_EQ(x ^= TestEnum::Eight, toEnum(1 | 2));
   // test chaining
   auto y{TestEnum::All};
   ((y ^= TestEnum::Two) ^= TestEnum::Four) ^= TestEnum::Eight;
