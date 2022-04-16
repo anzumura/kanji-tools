@@ -65,9 +65,9 @@ protected:
   static void domainError(const std::string&);
 };
 
-// 'TypedEnumArray' has a pure virtual 'toString' function and has a map from
-// 'std::string' to T names used by derived class 'fromString' methods. It also
-// has a static '_instance' member.
+// 'TypedEnumArray' has a pure virtual 'toString' function holds a map from
+// 'std::string' to 'Ts' used by derived class 'fromString' methods. It also
+// has static 'create', 'isCreated' and 'instance' public functions.
 template<typename T, isEnumArray<T> = 0>
 class TypedEnumArray : public BaseEnumArray {
 public:
@@ -75,13 +75,11 @@ public:
   template<typename... Names>
   [[nodiscard]] static auto create(const std::string& name, Names...);
 
+  [[nodiscard]] static bool isCreated() noexcept { return _instance; }
+
   [[nodiscard]] static auto& instance() {
     if (!_instance) domainError("must call 'create' before calling 'instance'");
     return *_instance;
-  }
-
-  [[nodiscard]] static auto isCreated() noexcept {
-    return _instance != nullptr;
   }
 
   ~TypedEnumArray() override { _instance = nullptr; }
@@ -90,20 +88,12 @@ public:
 protected:
   TypedEnumArray() noexcept { _instance = this; }
 
-  [[nodiscard]] auto find(const std::string& name) const {
-    const auto i{_nameMap.find(name)};
-    if (i == _nameMap.end()) domainError("name '" + name + "' not found");
-    return i->second;
-  }
-
-  void insert(const std::string& name, BaseIterableEnum::Index index) {
-    if (!_nameMap.emplace(name, static_cast<T>(index)).second)
-      domainError("duplicate name '" + name + "'");
-  }
+  [[nodiscard]] T find(const std::string& name) const;
+  void insert(const std::string& name, BaseIterableEnum::Index index);
 private:
-  std::map<std::string, T> _nameMap;
-
   inline static constinit const TypedEnumArray<T>* _instance;
+
+  std::map<std::string, T> _nameMap;
 };
 
 // 'IterableEnumArray' adds functionality to the iterator from 'IterableEnum'
@@ -112,9 +102,15 @@ private:
 template<typename T, size_t N>
 class IterableEnumArray : public IterableEnum<T, N>, public TypedEnumArray<T> {
 public:
-private:
   using base = IterableEnum<T, N>;
-public:
+
+  [[nodiscard]] static auto begin() noexcept { return ConstIterator{0}; }
+  [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
+
+  template<std::integral I> [[nodiscard]] auto operator[](I i) const {
+    return static_cast<T>(base::checkIndex(i, base::IndexMsg));
+  }
+
   class ConstIterator : public base::template Iterator<ConstIterator> {
   private:
     friend IterableEnumArray<T, N>; // calls private ctor
@@ -141,13 +137,6 @@ public:
       return iBase::index() - x.index();
     }
   };
-
-  [[nodiscard]] static auto begin() noexcept { return ConstIterator{0}; }
-  [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
-
-  template<std::integral I> [[nodiscard]] auto operator[](I i) const {
-    return static_cast<T>(base::checkIndex(i, base::IndexMsg));
-  }
 };
 
 // see comments at the top of this file (EnumArray.h) for more details
@@ -218,7 +207,7 @@ private:
   std::array<std::string, N> _names;
 };
 
-// out of class member definition for 'TypedEnumArray<T>::create'
+// out of class member definitions for 'TypedEnumArray<T>'
 
 template<typename T, isEnumArray<T> _>
 template<typename... Names>
@@ -236,6 +225,20 @@ template<typename... Names>
     static_assert(static_cast<T>(sizeof...(Names) + 1) == T::None);
     return EnumArrayWithNone<T, sizeof...(args) + 1>{name, args...};
   }
+}
+
+template<typename T, isEnumArray<T> _>
+T TypedEnumArray<T, _>::find(const std::string& name) const {
+  const auto i{_nameMap.find(name)};
+  if (i == _nameMap.end()) domainError("name '" + name + "' not found");
+  return i->second;
+}
+
+template<typename T, isEnumArray<T> _>
+void TypedEnumArray<T, _>::insert(
+    const std::string& name, BaseIterableEnum::Index index) {
+  if (!_nameMap.emplace(name, static_cast<T>(index)).second)
+    domainError("duplicate name '" + name + "'");
 }
 
 // below are some global functions that are enabled for enums types that have
