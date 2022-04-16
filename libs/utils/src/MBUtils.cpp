@@ -1,4 +1,5 @@
 #include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utils.h>
 
 #ifdef USE_CODECVT_FOR_UTF_8
 #include <codecvt> // for codecvt_utf8
@@ -94,22 +95,22 @@ void convertToUtf8(Code c, std::string& s) {
       FirstFive{0b1'11'11 << 6}, Six{0b11'11'11};
   static constexpr Code SecondSix{Six << 6}, ThirdSix{Six << 12};
   if (c <= 0x7f)
-    s += static_cast<char>(c);
+    s += toChar(c);
   else if (c <= 0x7ff) {
-    s += static_cast<char>(((FirstFive & c) >> 6) + TwoBits);
-    s += static_cast<char>((Six & c) + Bit1);
+    s += toChar(((FirstFive & c) >> 6) + TwoBits);
+    s += toChar((Six & c) + Bit1);
   } else if (c <= 0xffff) {
     if (c < MinSurrogate || c > MaxSurrogate) {
-      s += static_cast<char>(((FirstFour & c) >> 12) + ThreeBits);
-      s += static_cast<char>(((SecondSix & c) >> 6) + Bit1);
-      s += static_cast<char>((Six & c) + Bit1);
+      s += toChar(((FirstFour & c) >> 12) + ThreeBits);
+      s += toChar(((SecondSix & c) >> 6) + Bit1);
+      s += toChar((Six & c) + Bit1);
     } else
       s += ReplacementCharacter;
   } else if (c <= MaxUnicode) { // LCOV_EXCL_LINE: gcov-11 bug
-    s += static_cast<char>(((FirstThree & c) >> 18) + FourBits);
-    s += static_cast<char>(((ThirdSix & c) >> 12) + Bit1);
-    s += static_cast<char>(((SecondSix & c) >> 6) + Bit1);
-    s += static_cast<char>((Six & c) + Bit1);
+    s += toChar(((FirstThree & c) >> 18) + FourBits);
+    s += toChar(((ThirdSix & c) >> 12) + Bit1);
+    s += toChar(((SecondSix & c) >> 6) + Bit1);
+    s += toChar((Six & c) + Bit1);
   } else
     s += ReplacementCharacter; // LCOV_EXCL_LINE: gcov-11 bug
 }

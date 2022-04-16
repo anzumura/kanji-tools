@@ -26,6 +26,19 @@ enum class BracketType { Curly, Round, Square, None };
 [[nodiscard]] std::string toUnicode(
     const std::u32string&, BracketType = BracketType::None);
 
+// 'toChar' safely converts 'x' to a char. If 'x' is out of range then an
+// exception is thrown. If 'allowNegative' is true (the default) then 'x' can't
+// be less than -128, otherwise 'x' must be positive. 'x' must be less then 256
+// regardless of the value of 'allowNegative'.
+[[nodiscard]] char toChar(int x, bool allowNegative = true);
+
+// 'toChar' overloads for common unsigned types (don't need 'allowNegative')
+[[nodiscard]] char toChar(unsigned char);
+[[nodiscard]] char toChar(u_int16_t);
+[[nodiscard]] char toChar(unsigned int);
+[[nodiscard]] char toChar(size_t);
+[[nodiscard]] char toChar(char32_t);
+
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
 // of 'x' ('x' must be integral). 'minSize' 0 (the default) causes leading
 // zeroes to be added to make strings the same size for a given type, i.e., if
@@ -41,7 +54,7 @@ template<typename T>
   static_assert(std::is_integral_v<T>);
   std::string result;
   for (; x > 0; x >>= 1)
-    result.insert(result.begin(), '0' + static_cast<char>(x % BinaryDigits));
+    result.insert(result.begin(), '0' + toChar(x % BinaryDigits));
   return addBrackets(
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * Bits), brackets);
 }
@@ -122,7 +135,7 @@ template<typename T>
 [[nodiscard]] inline auto firstConvert(T pred, T conv, const std::string& s) {
   if (s.size() && pred(s[0])) {
     std::string result{s};
-    result[0] = static_cast<char>(conv(result[0]));
+    result[0] = toChar(conv(result[0]));
     return result;
   }
   return s;

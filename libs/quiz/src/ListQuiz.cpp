@@ -1,4 +1,5 @@
 #include <kanji_tools/quiz/ListQuiz.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <random>
 
@@ -24,7 +25,7 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
     ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
-      _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{static_cast<char>(
+      _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{toChar(
                                                        '0' + _choiceCount)} {
   assert(_answers.size() == _choiceCount); // need () ctor
   List questions;
@@ -128,7 +129,7 @@ bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
     stopQuiz = true;
   else if (answer == PrevOption)
     currentQuestion() -= 2;
-  else if (const auto c{static_cast<char>(ChoiceStart + correct)}; c == answer)
+  else if (const auto c{toChar(ChoiceStart + correct)}; c == answer)
     correctMessage();
   else if (answer != SkipOption)
     incorrectMessage(name) << " (correct answer is " << c << ")\n";

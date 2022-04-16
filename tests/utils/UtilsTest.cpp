@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Utils.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
 
@@ -141,6 +142,60 @@ TEST(UtilsTest, ToUpper) {
   EXPECT_EQ(toUpper(LowerString), "ABCD");
   EXPECT_EQ(toUpper(UpperString), "EFGH");
   EXPECT_EQ(toUpper(MBString), "雪SNOW");
+}
+
+TEST(UtilsTest, IntToChar) {
+  EXPECT_EQ(toChar(-128), '\x80');
+  EXPECT_EQ(toChar(0), '\0');
+  EXPECT_EQ(toChar(255), '\xff');
+  EXPECT_THROW(
+      call([] { return toChar(256); }, "toChar (int): '256' out of range"),
+      std::out_of_range);
+  EXPECT_THROW(
+      call([] { return toChar(-129); }, "toChar (int): '-129' out of range"),
+      std::out_of_range);
+}
+
+TEST(UtilsTest, IntToCharOnlyPositive) {
+  EXPECT_EQ(toChar(0, false), '\0');
+  EXPECT_EQ(toChar(255, false), '\xff');
+  EXPECT_THROW(call([] { return toChar(-1, false); },
+                   "toChar (positive int): '-1' out of range"),
+      std::out_of_range);
+  EXPECT_THROW(call([] { return toChar(256, false); },
+                   "toChar (int): '256' out of range"),
+      std::out_of_range);
+}
+
+TEST(UtilsTest, UCharToChar) {
+  unsigned char x{0};
+  EXPECT_EQ(toChar(x), '\0');
+  EXPECT_EQ(toChar(x = 0xff), '\xff');
+  // no chance for an exception
+}
+
+TEST(UtilsTest, UIntToChar) {
+  EXPECT_EQ(toChar(0U), '\0');
+  EXPECT_EQ(toChar(255U), '\xff');
+  EXPECT_THROW(call([] { return toChar(256U); },
+                   "toChar (unsigned int): '256' out of range"),
+      std::out_of_range);
+}
+
+TEST(UtilsTest, ULongToChar) {
+  EXPECT_EQ(toChar(0UL), '\0');
+  EXPECT_EQ(toChar(255UL), '\xff');
+  EXPECT_THROW(
+      call([] { return toChar(256UL); }, "toChar (size_t): '256' out of range"),
+      std::out_of_range);
+}
+
+TEST(UtilsTest, Char32ToChar) {
+  EXPECT_EQ(toChar(U'\x0'), '\0');
+  EXPECT_EQ(toChar(U'\xff'), '\xff');
+  EXPECT_THROW(call([] { return toChar(U'\xa00'); },
+                   "toChar (char32_t): '0a00' out of range"),
+      std::out_of_range);
 }
 
 } // namespace kanji_tools

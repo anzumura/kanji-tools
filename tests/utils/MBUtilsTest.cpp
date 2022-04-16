@@ -47,11 +47,9 @@ void toUtf8Error(
 
 namespace bytes {
 
-const auto GoodFirst{static_cast<char>(0b11'11'01'00)},
-    GoodSecond{static_cast<char>(0b10'00'11'11)},
-    GoodNext{static_cast<char>(0b10'11'11'11)};
-const auto BadSecond{static_cast<char>(GoodSecond + 1)},
-    BadNext{static_cast<char>(Bit1)};
+const auto GoodFirst{toChar(0b11'11'01'00)}, GoodSecond{toChar(0b10'00'11'11)},
+    GoodNext{toChar(0b10'11'11'11)};
+const auto BadSecond{toChar(GoodSecond + 1)}, BadNext{toChar(Bit1)};
 
 const std::string MaxUnicodeUtf8{GoodFirst, GoodSecond, GoodNext, GoodNext},
     BeyondMaxUnicodeUtf8{GoodFirst, BadSecond, BadNext, BadNext};
@@ -115,7 +113,7 @@ TEST(MBUtilsTest, NotValidWithFiveByte) {
   EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidMBUtf8(x));
   // try to make a 'fake valid' string with 5 bytes (which is not valid)
-  x[0] = static_cast<char>(0b11'11'10'10);
+  x[0] = toChar(0b11'11'10'10);
   EXPECT_EQ(x.size(), 4);
   auto e{Utf8Result::Valid};
   EXPECT_EQ(validateMBUtf8(x, e), MBUtf8Result::NotValid);
@@ -144,10 +142,9 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   // overlong single byte ascii
   const unsigned char bang{33};
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
-  EXPECT_EQ(validateMBUtf8(std::string{static_cast<char>(bang)}),
-      MBUtf8Result::NotMultiByte);
-  EXPECT_EQ(validateUtf8(std::string{
-                static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)}),
+  EXPECT_EQ(
+      validateMBUtf8(std::string{toChar(bang)}), MBUtf8Result::NotMultiByte);
+  EXPECT_EQ(validateUtf8(std::string{toChar(TwoBits), toChar(Bit1 | bang)}),
       Utf8Result::Overlong);
   // overlong ō with 3 bytes
   const std::string o{"ō"};
@@ -155,8 +152,8 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   EXPECT_EQ(validateUtf8(o), Utf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
   EXPECT_EQ(toBinary(0x014d, 16), "0000000101001101");
-  const std::string overlongO{static_cast<char>(ThreeBits),
-      static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)};
+  const std::string overlongO{
+      toChar(ThreeBits), toChar(Bit1 | 0b101), toChar(Bit1 | 0b1101)};
   EXPECT_EQ(validateUtf8(overlongO), Utf8Result::Overlong);
   // overlong Euro symbol with 4 bytes
   const std::string x{"\xF0\x82\x82\xAC"};
@@ -174,17 +171,15 @@ TEST(MBUtilsTest, FromUTF8String) {
   const auto wideSingle{fromUtf8("single .")};
   ASSERT_EQ(wideSingle, U"single .");
   // first byte error cases
-  fromUtf8Error(std::string{static_cast<char>(Bit1)});
-  fromUtf8Error(std::string{static_cast<char>(FiveBits)});
+  fromUtf8Error(std::string{toChar(Bit1)});
+  fromUtf8Error(std::string{toChar(FiveBits)});
   // second byte not continuation
-  fromUtf8Error(std::string{static_cast<char>(TwoBits), 'a'}, U"\ufffda");
-  const auto cont{static_cast<char>(Bit1)};
+  fromUtf8Error(std::string{toChar(TwoBits), 'a'}, U"\ufffda");
+  const auto cont{toChar(Bit1)};
   // third byte not continuation
-  fromUtf8Error(
-      std::string{static_cast<char>(ThreeBits), cont, 'a'}, U"\ufffda");
+  fromUtf8Error(std::string{toChar(ThreeBits), cont, 'a'}, U"\ufffda");
   // fourth byte not continuation
-  fromUtf8Error(
-      std::string{static_cast<char>(FourBits), cont, cont, 'a'}, U"\ufffda");
+  fromUtf8Error(std::string{toChar(FourBits), cont, cont, 'a'}, U"\ufffda");
   ASSERT_EQ(Dog.size(), 3);
   EXPECT_EQ(Dog[0], '\xe7');
   EXPECT_EQ(Dog[1], '\x8a');
@@ -231,12 +226,10 @@ TEST(MBUtilsTest, ErrorForOverlong) {
   // overlong single byte ascii
   const unsigned char bang{33};
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
-  fromUtf8Error(
-      std::string{static_cast<char>(TwoBits), static_cast<char>(Bit1 | bang)},
-      U"\ufffd");
+  fromUtf8Error(std::string{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
   // overlong ō with 3 bytes
-  std::string overlongO{static_cast<char>(ThreeBits),
-      static_cast<char>(Bit1 | 0b101), static_cast<char>(Bit1 | 0b1101)};
+  std::string overlongO{
+      toChar(ThreeBits), toChar(Bit1 | 0b101), toChar(Bit1 | 0b1101)};
   fromUtf8Error(overlongO, U"\ufffd");
   // overlong Euro symbol with 4 bytes
   std::string x{"\xF0\x82\x82\xAC"};

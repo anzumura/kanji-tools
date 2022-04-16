@@ -1,5 +1,6 @@
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <kanji_tools/utils/DisplaySize.h>
+#include <kanji_tools/utils/Utils.h>
 
 #include <optional>
 #include <random>
@@ -164,11 +165,10 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
 void GroupQuiz::showGroup(const List& questions, const List& readings,
     Choices& choices, bool repeatQuestion) const {
   for (size_t count{}; auto& i : questions) {
-    const char choice{isTestMode()
-                          ? static_cast<char>(count < TotalLetters
-                                                  ? 'a' + count
-                                                  : 'A' + count - TotalLetters)
-                          : ' '};
+    const char choice{
+        isTestMode() ? toChar(count < TotalLetters ? 'a' + count
+                                                   : 'A' + count - TotalLetters)
+                     : ' '};
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s{i->qualifiedName()};
     addPinyin(i, s);
