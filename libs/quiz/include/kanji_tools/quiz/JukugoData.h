@@ -12,7 +12,7 @@ public:
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()/jukugo'
   // when looking for jukugo files (to help with testing)
-  JukugoData(DataPtr, const Data::Path* dir = {});
+  explicit JukugoData(DataPtr, const Data::Path* dir = {});
 
   JukugoData(const JukugoData&) = delete;
   JukugoData& operator=(const JukugoData&) = delete;

@@ -32,8 +32,8 @@ public:
   static const std::wstring DefaultReplace;
 
   // if 'find' regex is provided it's applied before processing for counting
-  MBCount(OptRegex find = {}, const std::wstring& replace = DefaultReplace,
-      std::ostream* debug = {});
+  explicit MBCount(OptRegex find = {},
+      const std::wstring& replace = DefaultReplace, std::ostream* debug = {});
 
   MBCount(const MBCount&) = delete;
   virtual ~MBCount() = default;

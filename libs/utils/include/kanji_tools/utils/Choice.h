@@ -26,7 +26,7 @@ public:
   // There is no 'quit' option by default, but it can be specified in the
   // constructor or changed later via 'setQuit' and 'clearQuit' methods. An
   // 'istream' of '0' (the default) means read from stdin.
-  Choice(std::ostream& out, OptChar quit = {},
+  explicit Choice(std::ostream& out, OptChar quit = {},
       const std::string& d = DefaultQuitDescription)
       : Choice{out, nullptr, quit, d} {}
   Choice(std::ostream& out, std::istream* in, OptChar quit = {},

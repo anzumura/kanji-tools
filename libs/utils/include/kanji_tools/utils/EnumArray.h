@@ -144,6 +144,8 @@ public:
     explicit ConstIterator(BaseIterableEnum::Index index) noexcept
         : iBase{index} {}
   };
+protected:
+  IterableEnumArray() noexcept = default;
 };
 
 // see comments at the top of this file (EnumArray.h) for more details
@@ -162,7 +164,7 @@ public:
 private:
   friend TypedEnumArray<T>; // 'create' calls private ctor
 
-  EnumArray(const std::string& name) { setName(name, N - 1); }
+  explicit EnumArray(const std::string& name) { setName(name, N - 1); }
 
   template<typename... Names>
   EnumArray(const std::string& name, Names... args) : EnumArray{args...} {
@@ -198,7 +200,7 @@ private:
   inline const static std::string None{"None"};
   friend TypedEnumArray<T>; // 'create' calls private ctor
 
-  EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
+  explicit EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
 
   template<typename... Names>
   EnumArrayWithNone(const std::string& name, Names... args)

@@ -25,7 +25,7 @@ protected:
 // array is populated with 'block.wStart()', '-', 'block.wEnd()'.
 template<typename... Ts> class BlockRange : public BaseBlockRange {
 public:
-  BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
+  explicit BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(_range, block, blocks...);
     // terminate with 0 in case a non-static instance of this class is created
     _range[size()] = L'\0';

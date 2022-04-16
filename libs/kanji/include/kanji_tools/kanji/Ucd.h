@@ -48,19 +48,19 @@ private:
 class UcdBlock : public Symbol<UcdBlock> {
 public:
   inline static const std::string Type{"UcdBlock"};
-  UcdBlock(const std::string& name) : Symbol<UcdBlock>{name} {}
+  explicit UcdBlock(const std::string& name) : Symbol<UcdBlock>{name} {}
 };
 
 class UcdVersion : public Symbol<UcdVersion> {
 public:
   inline static const std::string Type{"UcdVersion"};
-  UcdVersion(const std::string& name) : Symbol<UcdVersion>{name} {}
+  explicit UcdVersion(const std::string& name) : Symbol<UcdVersion>{name} {}
 };
 
 class Pinyin : public Symbol<Pinyin> {
 public:
   inline static const std::string Type{"Pinyin"};
-  Pinyin(const std::string& name) : Symbol<Pinyin>{name} {}
+  explicit Pinyin(const std::string& name) : Symbol<Pinyin>{name} {}
 };
 
 // 'Ucd' holds data loaded from 'ucd.txt' which is an extract of the Unicode

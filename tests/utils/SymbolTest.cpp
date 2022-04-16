@@ -9,7 +9,7 @@ namespace {
 class TestSymbol : public Symbol<TestSymbol> {
 public:
   inline static const std::string Type{"TestSymbol"};
-  TestSymbol(const std::string& name) : Symbol<TestSymbol>{name} {}
+  explicit TestSymbol(const std::string& name) : Symbol<TestSymbol>{name} {}
 };
 
 } // namespace

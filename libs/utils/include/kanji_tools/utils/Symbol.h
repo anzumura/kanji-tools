@@ -21,7 +21,8 @@ namespace kanji_tools {
 //   class TestSymbol : public Symbol<TestSymbol> {
 //   public:
 //     inline static const std::string Type{"TestSymbol"};
-//     TestSymbol(const std::string& name) : Symbol<TestSymbol>{name} {}
+//     explicit TestSymbol(const std::string& name)
+//         : Symbol<TestSymbol>{name} {}
 //   };
 
 class BaseSymbol {
@@ -33,7 +34,7 @@ protected:
   using Map = std::map<std::string, Id>;
   using List = std::vector<const std::string*>;
 
-  BaseSymbol(Id id) noexcept : _id{id} {}
+  explicit BaseSymbol(Id id) noexcept : _id{id} {}
 
   [[nodiscard]] static Id getId(
       const std::string& type, const std::string& name, Map&, List&);
@@ -51,7 +52,7 @@ public:
 
   [[nodiscard]] auto& name() const { return *_list.at(id()); }
 protected:
-  Symbol(const std::string& name)
+  explicit Symbol(const std::string& name)
       : BaseSymbol{getId(type(), name, _map, _list)} {}
 private:
   inline static Map _map;

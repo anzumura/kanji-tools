@@ -16,7 +16,7 @@ public:
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()' when
   // looking for group files (to help with testing)
-  GroupData(DataPtr data, const Data::Path* dir = {});
+  explicit GroupData(DataPtr data, const Data::Path* dir = {});
 
   GroupData(const GroupData&) = delete;
   GroupData& operator=(const GroupData&) = delete;

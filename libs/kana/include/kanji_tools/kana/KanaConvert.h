@@ -11,7 +11,7 @@ namespace kanji_tools {
 class KanaConvert {
 public:
   // allow overriding in and out streams for testing
-  KanaConvert(Args, std::ostream& = std::cout, std::istream* = {});
+  explicit KanaConvert(Args, std::ostream& = std::cout, std::istream* = {});
 
   KanaConvert(const KanaConvert&) = delete;
 private:

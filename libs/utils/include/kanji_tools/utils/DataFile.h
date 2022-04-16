@@ -38,7 +38,7 @@ public:
   enum class FileType { MultiplePerLine, OnePerLine };
 
   DataFile(const Path&, FileType);
-  DataFile(const Path&);
+  explicit DataFile(const Path&);
 
   DataFile(const DataFile&) = delete;
 

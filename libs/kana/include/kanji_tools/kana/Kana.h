@@ -71,10 +71,10 @@ public:
     using RMax = CharArray<RomajiArrayMaxSize>;
 
     RomajiVariants() = default;
-    RomajiVariants(RomajiVariants&&) = default; // only allow moving (no copy)
+    explicit RomajiVariants(RomajiVariants&&) = default; // only allow moving
 
     template<size_t R>
-    RomajiVariants(CharArray<R> r, bool kunrei = false)
+    explicit RomajiVariants(CharArray<R> r, bool kunrei = false)
         : _list{r}, _kunrei{kunrei} {
       check<R>();
     }
@@ -252,7 +252,7 @@ protected:
   // non-const '_variants' field, but other fields will get copied because they
   // are all 'const' (copy is fine since the other fields are all short strings
   // that would not benefit from move anyway because of SSO).
-  Kana(Kana&&) = default;
+  explicit Kana(Kana&&) = default;
 private:
   template<size_t R, size_t N>
   Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,

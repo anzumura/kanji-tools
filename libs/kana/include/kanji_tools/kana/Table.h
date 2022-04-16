@@ -24,7 +24,7 @@ public:
   using Row = std::vector<std::string>;
   using Rows = std::vector<Row>;
 
-  Table(const Row& title = {}, bool countInFirstColumn = false)
+  explicit Table(const Row& title = {}, bool countInFirstColumn = false)
       : _title{title}, _countInFirstColumn{countInFirstColumn} {}
 
   Table(const Table&) = delete;

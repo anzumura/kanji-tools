@@ -15,7 +15,7 @@ public:
   // 'Converter' constructor defaults the 'target' for conversion to Hiragana
   // and sets 'flags' to None (which means no special conversion flags). Calling
   // the below 'convert' functions can override these values.
-  Converter(CharType target = CharType::Hiragana,
+  explicit Converter(CharType target = CharType::Hiragana,
       ConvertFlags flags = ConvertFlags::None);
 
   Converter(const Converter&) = delete;
