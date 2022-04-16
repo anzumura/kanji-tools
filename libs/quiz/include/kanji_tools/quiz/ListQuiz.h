@@ -15,7 +15,7 @@ public:
   // Kanji.h for more details on 'KanjiInfo') and 'choiceCount' specifies the
   // number of choices per question (2 to 9).
   ListQuiz(const QuizLauncher&, Question, bool showMeanings, const List&,
-      KanjiInfo, ChoiceCount choiceCount, QuizStyle);
+      KanjiInfo, ChoiceCount, QuizStyle);
 private:
   void start(const List&);
 

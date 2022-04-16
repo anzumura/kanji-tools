@@ -16,7 +16,7 @@ public:
   // - All: include all members (as long as they have readings)
   enum MemberType { Jouyou, JLPT, Frequency, All };
 
-  GroupQuiz(const QuizLauncher&, Question question, bool showMeanings,
+  GroupQuiz(const QuizLauncher&, Question, bool showMeanings,
       const GroupData::List&, MemberType);
 private:
   // 'GroupEntryWidth' is the width required for 'qualified name', 'pinyin' and
