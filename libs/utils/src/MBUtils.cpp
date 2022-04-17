@@ -4,6 +4,8 @@
 #ifdef USE_CODECVT_FOR_UTF_8
 #include <codecvt> // for codecvt_utf8
 #include <locale>  // for wstring_convert
+#else
+#include <array>
 #endif
 
 namespace kanji_tools {
@@ -31,57 +33,60 @@ constexpr Code ErrorReplacement{0xfffd};
 // invalid code points
 constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
 
+constexpr auto Error{0}, MinSur{1}, MaxSur{2}, MaxUni{3};
+constexpr std::array U32Consts{toU32(ErrorReplacement), toU32(MinSurrogate),
+    toU32(MaxSurrogate), toU32(MaxUnicode)};
+constexpr std::array WCharConsts{toWChar(ErrorReplacement),
+    toWChar(MinSurrogate), toWChar(MaxSurrogate), toWChar(MaxUnicode)};
+
 template<typename R, typename T = typename R::value_type>
-[[nodiscard]] R convertFromUtf8(const char* s) {
-  static_assert(std::is_integral_v<T>);
-  static_assert(sizeof(T) == 4);
-  static constexpr T TError{static_cast<T>(ErrorReplacement)},
-      TMinSur{static_cast<T>(MinSurrogate)},
-      TMaxSur{static_cast<T>(MaxSurrogate)},
-      TMaxUni{static_cast<T>(MaxUnicode)};
+[[nodiscard]] R convertFromUtf8(const char* s, const std::array<T, 4>& vals) {
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
   do {
-    if (*u <= 0x7fU) // one byte case
-      result += static_cast<T>(*u++);
-    else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
+    if (*u <= 0x7fU) {
+      const T t{*u++}; // one byte case
+      result += t;
+    } else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
       // first byte was '10' or started with more than four '1's
-      result += TError; // LCOV_EXCL_LINE: gcov-11 bug
+      result += vals[Error]; // LCOV_EXCL_LINE: gcov-11 bug
       ++u;
     } else {
       const unsigned byte1{*u};
       if ((*++u & TwoBits) != Bit1)
-        result += TError; // second byte didn't start with '10'
+        result += vals[Error]; // second byte didn't start with '10'
       else {
         const unsigned byte2 = *u ^ Bit1; // last 6 bits of the second byte
         if (byte1 & Bit3) {
           if ((*++u & TwoBits) != Bit1)
-            result += TError; // third byte didn't start with '10'
+            result += vals[Error]; // third byte didn't start with '10'
           else if (byte1 & Bit4) {
             const unsigned byte3 = *u ^ Bit1; // last 6 bits of the third byte
             if ((*++u & TwoBits) != Bit1)
-              result += TError; // fourth byte didn't start with '10'
+              result += vals[Error]; // fourth byte didn't start with '10'
             else {
               // four byte case - check for overlong and max unicode
               const auto c{
                   static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
                                  (byte3 << 6) + (*u ^ Bit1))};
-              result += c > 0xffff && c <= TMaxUni ? c : TError;
+              result += c > 0xffff && c <= vals[MaxUni] ? c : vals[Error];
               ++u;
             }
           } else {
             // three byte case - check for overlong and surrogate range
             const auto c{static_cast<T>(
                 ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1))};
-            result += c > 0x7ff && (c < TMinSur || c > TMaxSur) ? c : TError;
+            result += c > 0x7ff && (c < vals[MinSur] || c > vals[MaxSur])
+                          ? c
+                          : vals[Error];
             ++u;
           }
         } else {
           // two byte case - check for overlong
           result += (byte1 ^ TwoBits) > 1
                         ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
-                        : TError;
+                        : vals[Error];
           ++u;
         }
       }
@@ -123,7 +128,7 @@ std::u32string fromUtf8(const char* s) {
   const auto r{utf8Converter()->from_bytes(s)};
   return std::u32string(reinterpret_cast<const Code*>(r.c_str()));
 #else
-  return convertFromUtf8<std::u32string>(s);
+  return convertFromUtf8<std::u32string>(s, U32Consts);
 #endif
 }
 
@@ -161,7 +166,7 @@ std::wstring fromUtf8ToWstring(const char* s) {
 #ifdef USE_CODECVT_FOR_UTF_8
   return utf8Converter()->from_bytes(s);
 #else
-  return convertFromUtf8<std::wstring>(s);
+  return convertFromUtf8<std::wstring>(s, WCharConsts);
 #endif
 }
 

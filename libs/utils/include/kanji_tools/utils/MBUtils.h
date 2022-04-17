@@ -26,13 +26,17 @@ using Code = char32_t;
 [[nodiscard]] std::string toUtf8(long x);
 [[nodiscard]] std::string toUtf8(const std::u32string&);
 
-// keep wstring versions of conversion functions for now to work with wregex
-
-// convert Code to wchar_t assumes they are the same size via a static_assert
+// safe conversions of Code to u_int32_t and wchar_t
+inline constexpr u_int32_t toU32(Code x) noexcept {
+  static_assert(sizeof(u_int32_t) == sizeof(Code));
+  return static_cast<u_int32_t>(x);
+}
 inline constexpr wchar_t toWChar(Code x) noexcept {
   static_assert(sizeof(wchar_t) == sizeof(Code));
   return static_cast<wchar_t>(x);
 }
+
+// keep wstring versions of conversion functions for now to work with wregex
 
 [[nodiscard]] std::wstring fromUtf8ToWstring(const char*);
 [[nodiscard]] std::wstring fromUtf8ToWstring(const std::string&);
