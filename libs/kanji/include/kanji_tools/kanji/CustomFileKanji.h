@@ -28,11 +28,12 @@ public:
   //   for the given Kanji type 'T' (and the first line must have header names
   //   that match the static 'Column' instances below)
   template<typename T>
-  [[nodiscard]] static Data::List fromFile(DataRef data, const Data::Path& f) {
+  [[nodiscard]] static Data::KanjiList fromFile(
+      DataRef data, const Data::Path& f) {
     // all 'CustomFileKanji' files must have at least the following columns
     ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
     for (auto& i : T::RequiredColumns) columns.emplace_back(i);
-    Data::List results;
+    Data::KanjiList results;
     for (ColumnFile file{f, columns}; file.nextRow();)
       results.emplace_back(std::make_shared<T>(data, file));
     return results;

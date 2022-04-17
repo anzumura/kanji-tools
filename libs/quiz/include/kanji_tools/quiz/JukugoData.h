@@ -7,8 +7,7 @@ namespace kanji_tools {
 
 class JukugoData {
 public:
-  using Entry = std::shared_ptr<Jukugo>;
-  using List = std::vector<Entry>;
+  using List = std::vector<JukugoPtr>;
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()/jukugo'
   // when looking for jukugo files (to help with testing)
@@ -30,7 +29,7 @@ private:
   using JukugoKey = std::pair<std::string, std::string>;
   [[nodiscard]] size_t loadFile(const Data::Path&, KanjiGrades);
 
-  std::map<JukugoKey, Entry> _uniqueJukugo;
+  std::map<JukugoKey, JukugoPtr> _uniqueJukugo;
   std::map<std::string, List> _kanjiToJukugo;
 };
 

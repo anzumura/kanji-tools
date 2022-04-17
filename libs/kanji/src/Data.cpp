@@ -98,8 +98,8 @@ Kanji::OptString Data::getCompatibilityName(const std::string& kanji) const {
   return u && u->name() != kanji ? Kanji::OptString{u->name()} : std::nullopt;
 }
 
-const Data::List& Data::frequencies(size_t f) const {
-  return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
+const Data::KanjiList& Data::frequencies(size_t f) const {
+  return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<KanjiList>::Empty;
 }
 
 size_t Data::frequencySize(size_t f) const { return frequencies(f).size(); }
@@ -127,14 +127,15 @@ OptKanjiPtr Data::findKanjiByFrequency(Kanji::Frequency freq) const {
   return _frequencies[bucket][freq - bucket * FrequencyEntries];
 }
 
-const Data::List& Data::findKanjisByMorohashiId(const std::string& id) const {
+const Data::KanjiList& Data::findKanjisByMorohashiId(
+    const std::string& id) const {
   const auto i{_morohashiMap.find(id)};
-  return i != _morohashiMap.end() ? i->second : BaseEnumMap<List>::Empty;
+  return i != _morohashiMap.end() ? i->second : BaseEnumMap<KanjiList>::Empty;
 }
 
-const Data::List& Data::findKanjisByNelsonId(Kanji::NelsonId id) const {
+const Data::KanjiList& Data::findKanjisByNelsonId(Kanji::NelsonId id) const {
   const auto i{_nelsonMap.find(id)};
-  return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
+  return i != _nelsonMap.end() ? i->second : BaseEnumMap<KanjiList>::Empty;
 }
 
 std::ostream& Data::log(bool heading) const {
@@ -241,7 +242,7 @@ bool Data::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   return true;
 }
 
-bool Data::checkInsert(List& s, const KanjiPtr& kanji) {
+bool Data::checkInsert(KanjiList& s, const KanjiPtr& kanji) {
   if (!checkInsert(kanji)) return false;
   s.emplace_back(kanji);
   return true;

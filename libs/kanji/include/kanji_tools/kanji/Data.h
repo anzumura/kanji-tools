@@ -13,9 +13,9 @@ namespace kanji_tools {
 // base class for 'KanjiData'
 class Data {
 public:
-  using List = std::vector<KanjiPtr>;
-  using Map = std::map<std::string, KanjiPtr>;
-  template<typename T> using EnumList = EnumMap<T, List>;
+  using KanjiList = std::vector<KanjiPtr>;
+  using KanjiMap = std::map<std::string, KanjiPtr>;
+  template<typename T> using EnumList = EnumMap<T, KanjiList>;
   using Path = DataFile::Path;
 
   // DataArg (to specify location of 'data' dir), DebugArg and InfoArg are
@@ -98,7 +98,7 @@ public:
 
   // See comment for '_frequencies' private data member for more details
   static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
-  [[nodiscard]] const List& frequencies(size_t) const;
+  [[nodiscard]] const KanjiList& frequencies(size_t) const;
   [[nodiscard]] size_t frequencySize(size_t) const;
 
   [[nodiscard]] KanjiTypes getType(const std::string& name) const;
@@ -115,11 +115,12 @@ public:
   // 'findKanjisByMorohashiId' can return more than one entry. Ids are usually
   // just numeric, but they can also be an index number followed by a 'P'. For
   // example, '4138' maps to 嗩 and '4138P' maps to 嘆.
-  [[nodiscard]] const List& findKanjisByMorohashiId(const std::string&) const;
+  [[nodiscard]] const KanjiList& findKanjisByMorohashiId(
+      const std::string&) const;
 
   // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] const List& findKanjisByNelsonId(Kanji::NelsonId) const;
+  [[nodiscard]] const KanjiList& findKanjisByNelsonId(Kanji::NelsonId) const;
 
   void printError(const std::string&) const;
 
@@ -193,7 +194,7 @@ private:
   EnumList<KanjiTypes> _types;
 
   // helper functions for checking and inserting into '_kanjiNameMap'
-  bool checkInsert(List&, const KanjiPtr&);
+  bool checkInsert(KanjiList&, const KanjiPtr&);
   void insertSanityChecks(const Kanji&, UcdPtr) const;
 
   const Path _dataDir;
@@ -219,11 +220,12 @@ private:
   // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500,
   // 1501-2000, 2001-2501. The last list is one longer in order to hold the full
   // frequency list (of 2501 kanji).
-  std::array<List, FrequencyBuckets> _frequencies;
+  std::array<KanjiList, FrequencyBuckets> _frequencies;
 
-  Map _kanjiNameMap;                          // lookup by UTF-8 name
-  std::map<std::string, List> _morohashiMap;  // lookup by Dai Kan-Wa Jiten ID
-  std::map<Kanji::NelsonId, List> _nelsonMap; // lookup by Nelson ID
+  KanjiMap _kanjiNameMap; // lookup by UTF-8 name
+  std::map<std::string, KanjiList>
+      _morohashiMap; // lookup by Dai Kan-Wa Jiten ID
+  std::map<Kanji::NelsonId, KanjiList> _nelsonMap; // lookup by Nelson ID
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any Kanji
   // put into '_kanjiNameMap'

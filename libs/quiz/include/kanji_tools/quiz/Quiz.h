@@ -8,7 +8,7 @@ namespace kanji_tools {
 // including current question number, correct answer count and list of mistakes.
 class Quiz {
 public:
-  using List = QuizLauncher::List;
+  using List = QuizLauncher::KanjiList;
 
   Quiz(const Quiz&) = delete;
   Quiz& operator=(const Quiz&) = delete;

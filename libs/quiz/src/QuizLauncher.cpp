@@ -244,7 +244,7 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
       i != _groupData->patternMap().end() &&
       i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
-    Data::List sorted(i->second->members());
+    Data::KanjiList sorted(i->second->members());
     std::sort(sorted.begin(), sorted.end(), Data::OrderByQualifiedName);
     for (auto& j : sorted)
       if (*j != kanji) out() << ' ' << j->qualifiedName();
@@ -294,7 +294,7 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
 }
 
 void QuizLauncher::startListQuiz(Question question, bool showMeanings,
-    KanjiInfo excludeField, const List& list) const {
+    KanjiInfo excludeField, const KanjiList& list) const {
   ListQuiz::ChoiceCount choiceCount{1};
   auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
@@ -393,8 +393,8 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     Data::usage("unrecognized 'kanji' value '" + arg + "', use -h for help");
 }
 
-void QuizLauncher::printDetails(const Data::List& list, const std::string& name,
-    const std::string& arg) const {
+void QuizLauncher::printDetails(const Data::KanjiList& list,
+    const std::string& name, const std::string& arg) const {
   if (list.size() != 1) {
     if (list.size() > 1) {
       printLegend();

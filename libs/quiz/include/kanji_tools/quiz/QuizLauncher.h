@@ -12,7 +12,7 @@ class QuizLauncher {
 public:
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
-  using List = Data::List;
+  using KanjiList = Data::KanjiList;
   using Question = u_int16_t;
 
   static constexpr char QuitOption{'/'};
@@ -55,7 +55,7 @@ private:
   [[nodiscard]] DataRef data() const { return _groupData->data(); }
 
   void startListQuiz(Question question, bool showMeanings,
-      KanjiInfo excludeField, const List&) const;
+      KanjiInfo excludeField, const KanjiList&) const;
   void startGroupQuiz(Question question, bool showMeanings,
       OptChar questionList, const GroupData::List& list) const;
 
@@ -73,8 +73,8 @@ private:
 
   // 'printDetails' prints info about a kanji provided on the command line
   // (instead of running a quiz)
-  void printDetails(
-      const Data::List&, const std::string& name, const std::string& arg) const;
+  void printDetails(const Data::KanjiList&, const std::string& name,
+      const std::string& arg) const;
   void printDetails(const std::string&, bool showLegend = true) const;
 
   [[nodiscard]] bool getQuestionOrder();

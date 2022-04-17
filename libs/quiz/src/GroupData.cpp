@@ -33,7 +33,7 @@ GroupData::GroupData(DataPtr data, const Data::Path* dir) : _data{data} {
 }
 
 void GroupData::add(
-    const std::string& name, Map& groups, const Entry& group) const {
+    const std::string& name, Map& groups, const GroupPtr& group) const {
   const auto i{groups.emplace(name, group)};
   if (!i.second)
     _data->printError(name + " from " + group->toString() + " already in " +
@@ -41,7 +41,7 @@ void GroupData::add(
 }
 
 void GroupData::add(
-    const std::string& name, MultiMap& groups, const Entry& group) const {
+    const std::string& name, MultiMap& groups, const GroupPtr& group) const {
   groups.emplace(name, group);
 }
 
@@ -71,7 +71,7 @@ void GroupData::loadGroup(
     std::string member;
     for (std::stringstream ss{members}; std::getline(ss, member, ',');)
       kanjiNames.emplace_back(member);
-    Data::List memberKanji;
+    Data::KanjiList memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findKanjiByName(i)}; k)
         memberKanji.emplace_back(*k);
@@ -91,8 +91,8 @@ void GroupData::loadGroup(
   }
 }
 
-GroupData::Entry GroupData::createGroup(size_t number, const std::string& name,
-    const Data::List& members, Group::PatternType patternType) const {
+GroupPtr GroupData::createGroup(size_t number, const std::string& name,
+    const Data::KanjiList& members, Group::PatternType patternType) const {
   if (patternType == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, patternType);

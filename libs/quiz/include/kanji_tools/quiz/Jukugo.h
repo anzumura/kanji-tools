@@ -2,6 +2,8 @@
 
 #include <kanji_tools/kanji/KanjiGrades.h>
 
+#include <memory>
+
 namespace kanji_tools {
 
 class Jukugo {
@@ -21,5 +23,7 @@ private:
   const std::string _reading;
   const KanjiGrades _grade;
 };
+
+using JukugoPtr = std::shared_ptr<Jukugo>;
 
 } // namespace kanji_tools

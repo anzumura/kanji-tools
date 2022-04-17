@@ -108,7 +108,7 @@ TEST_F(ListQuizTest, MissingReading) {
   const auto i{_data->findKanjiByName(noReading)};
   ASSERT_TRUE(i);
   ASSERT_FALSE((**i).hasReading());
-  Data::List questionList{*i};
+  Data::KanjiList questionList{*i};
   const auto f{[&questionList, this] {
     ListQuiz{_quiz, {}, {}, questionList, KanjiInfo::All, 1,
         ListQuiz::QuizStyle::KanjiToReading};

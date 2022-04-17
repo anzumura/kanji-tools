@@ -45,7 +45,7 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  template<typename T> [[nodiscard]] Data::List fromFile() {
+  template<typename T> [[nodiscard]] Data::KanjiList fromFile() {
     return CustomFileKanji::fromFile<T>(_data, TestFile);
   }
 

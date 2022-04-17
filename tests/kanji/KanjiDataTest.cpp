@@ -23,7 +23,7 @@ protected:
 
   KanjiDataTest() {}
 
-  [[nodiscard]] auto checkKanji(const Data::List& l) const {
+  [[nodiscard]] auto checkKanji(const Data::KanjiList& l) const {
     size_t variants{};
     for (auto& i : l) {
       if (i->variant()) {
@@ -146,7 +146,7 @@ TEST_F(KanjiDataTest, TotalsChecks) {
 
 TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
   std::vector<std::string> list{"弓", "弖", "窮", "弼", "穹", "躬"};
-  Data::List kanjis;
+  Data::KanjiList kanjis;
   for (auto& i : list) {
     const auto k{_data->findKanjiByName(i)};
     ASSERT_TRUE(k);

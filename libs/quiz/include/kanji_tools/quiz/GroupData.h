@@ -9,10 +9,9 @@ namespace kanji_tools {
 // multiple Pattern Groups (see comments at the bottom of this file for details)
 class GroupData {
 public:
-  using Entry = std::shared_ptr<Group>;
-  using MultiMap = std::multimap<std::string, Entry>;
-  using Map = std::map<std::string, Entry>;
-  using List = std::vector<Entry>;
+  using MultiMap = std::multimap<std::string, GroupPtr>;
+  using Map = std::map<std::string, GroupPtr>;
+  using List = std::vector<GroupPtr>;
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()' when
   // looking for group files (to help with testing)
@@ -34,15 +33,15 @@ private:
   const Data::Path& dataDir(const Data::Path*) const;
 
   // add 'kanji'->'group' mapping or log an error if it's already been added
-  void add(const std::string& kanji, Map&, const Entry& group) const;
+  void add(const std::string& kanji, Map&, const GroupPtr& group) const;
 
   // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
-  void add(const std::string& kanji, MultiMap&, const Entry& group) const;
+  void add(const std::string& kanji, MultiMap&, const GroupPtr& group) const;
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
-  [[nodiscard]] Entry createGroup(size_t number, const std::string& name,
-      const Data::List& members, Group::PatternType) const;
+  [[nodiscard]] GroupPtr createGroup(size_t number, const std::string& name,
+      const Data::KanjiList& members, Group::PatternType) const;
 
   template<typename T> void printGroups(const T&, const List&) const;
 
