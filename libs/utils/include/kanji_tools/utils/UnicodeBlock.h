@@ -40,12 +40,10 @@ public:
   }
 
   // 'wStart' and 'wEnd' are needed for wregex (may remove later)
-  [[nodiscard]] constexpr wchar_t wStart() const noexcept {
-    return static_cast<wchar_t>(start);
+  [[nodiscard]] constexpr auto wStart() const noexcept {
+    return toWChar(start);
   }
-  [[nodiscard]] constexpr wchar_t wEnd() const noexcept {
-    return static_cast<wchar_t>(end);
-  }
+  [[nodiscard]] constexpr auto wEnd() const noexcept { return toWChar(end); }
 
   const Code start;
   const Code end;

@@ -131,7 +131,7 @@ std::u32string fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
 
 std::string toUtf8(Code c) {
 #ifdef USE_CODECVT_FOR_UTF_8
-  return utf8Converter()->to_bytes(static_cast<wchar_t>(c));
+  return utf8Converter()->to_bytes(toWChar(c));
 #else
   std::string result;
   convertToUtf8(c, result);

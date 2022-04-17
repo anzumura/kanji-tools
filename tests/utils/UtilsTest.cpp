@@ -167,13 +167,6 @@ TEST(UtilsTest, IntToCharOnlyPositive) {
       std::out_of_range);
 }
 
-TEST(UtilsTest, UCharToChar) {
-  unsigned char x{0};
-  EXPECT_EQ(toChar(x), '\0');
-  EXPECT_EQ(toChar(x = 0xff), '\xff');
-  // no chance for an exception
-}
-
 TEST(UtilsTest, UInt16ToChar) {
   u_int16_t x{0};
   EXPECT_EQ(toChar(x), '\0');
@@ -205,6 +198,19 @@ TEST(UtilsTest, Char32ToChar) {
   EXPECT_THROW(call([] { return toChar(U'\xa00'); },
                    "toChar (char32_t): '0a00' out of range"),
       std::out_of_range);
+}
+
+TEST(UtilsTest, UCharToChar) {
+  unsigned char x{0};
+  EXPECT_EQ(toChar(x), '\0');
+  EXPECT_EQ(toChar(x = 0xff), '\xff');
+  // no chance for an exception
+}
+
+TEST(UtilsTest, CharToUChar) {
+  EXPECT_EQ(toUChar(0), '\0');
+  EXPECT_EQ(toChar(0xff), '\xff');
+  // no chance for an exception
 }
 
 } // namespace kanji_tools

@@ -1,5 +1,6 @@
 #include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 
@@ -166,7 +167,7 @@ bool MBChar::isValid(bool sizeOne) const {
 }
 
 std::string MBChar::getMBUtf8(const char*& loc) {
-  const auto firstOfGroup{static_cast<unsigned char>(*loc)};
+  const auto firstOfGroup{toUChar(*loc)};
   std::string result{*loc++};
   for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1) result += *loc++;
   return result;

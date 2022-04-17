@@ -15,10 +15,12 @@ template<> void rangeError<char32_t>(const std::string& msg, char32_t x) {
   throw std::out_of_range(msg + ": '" + toHex(x, 4) + "' out of range");
 }
 
+template<typename T, typename U> auto cast(U u) { return static_cast<T>(u); }
+
 template<typename T> char toCharUnsigned(T x, const std::string& type) {
   if (x > std::numeric_limits<u_int8_t>::max())
     rangeError("toChar (" + type + ")", x);
-  return static_cast<char>(x);
+  return cast<char>(x);
 }
 
 } // namespace
@@ -69,6 +71,8 @@ std::string toUnicode(const std::u32string& s, BracketType brackets) {
   return addBrackets(result, brackets);
 }
 
+// conversion functions
+
 char toChar(int x, bool allowNegative) {
   static const std::string Type{"int"};
   if (allowNegative) {
@@ -77,8 +81,6 @@ char toChar(int x, bool allowNegative) {
     rangeError("toChar (positive int)", x);
   return toCharUnsigned(x, Type);
 }
-
-char toChar(unsigned char x) { return toCharUnsigned(x, {}); }
 
 char toChar(unsigned int x) {
   static const std::string Type{"unsigned int"};
@@ -99,6 +101,12 @@ char toChar(char32_t x) {
   static const std::string Type{"char32_t"};
   return toCharUnsigned(x, Type);
 }
+
+char toChar(unsigned char x) { return toCharUnsigned(x, {}); }
+
+unsigned char toUChar(char x) { return cast<unsigned char>(x); }
+
+// 'is' functions for testing single bytes
 
 bool isSingleByte(const std::string& s, bool sizeOne) noexcept {
   return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);

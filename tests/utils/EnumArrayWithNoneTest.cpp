@@ -154,8 +154,8 @@ TEST(EnumArrayWithNoneTest, ToString) {
 }
 
 TEST(EnumArrayWithNoneTest, BadToString) {
-  EXPECT_THROW(call([] { return toString(BadColor); },
-                   "enum '29' is out of range"),
+  EXPECT_THROW(
+      call([] { return toString(BadColor); }, "enum '29' is out of range"),
       std::out_of_range);
 }
 

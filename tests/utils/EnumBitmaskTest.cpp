@@ -9,9 +9,7 @@ namespace {
 enum class TestEnum { One = 1, Two, Four = 4, Eight = 8, All = 15 };
 
 // conversion function to help test bitwise results
-TestEnum toEnum(int x) {
-  return static_cast<TestEnum>(x);
-}
+TestEnum toEnum(int x) { return static_cast<TestEnum>(x); }
 
 } // namespace
 

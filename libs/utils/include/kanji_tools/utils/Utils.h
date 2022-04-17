@@ -33,11 +33,14 @@ enum class BracketType { Curly, Round, Square, None };
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
 // 'toChar' overloads for common unsigned types (don't need 'allowNegative')
-[[nodiscard]] char toChar(unsigned char);
 [[nodiscard]] char toChar(u_int16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);
 [[nodiscard]] char toChar(char32_t);
+
+// conversion functions that don't throw since size is the same
+[[nodiscard]] char toChar(unsigned char);
+[[nodiscard]] unsigned char toUChar(char);
 
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
 // of 'x' ('x' must be integral). 'minSize' 0 (the default) causes leading
@@ -102,13 +105,13 @@ template<typename T> [[nodiscard]] inline auto toHex(T x, size_t minSize = 0) {
 template<>
 [[nodiscard]] inline auto toBinary(
     char x, BracketType brackets, size_t minSize) {
-  return toBinary(static_cast<unsigned char>(x), brackets, minSize);
+  return toBinary(toUChar(x), brackets, minSize);
 }
 
 template<>
 [[nodiscard]] inline auto toHex(
     char x, BracketType brackets, HexCase hexCase, size_t minSize) {
-  return toHex(static_cast<unsigned char>(x), brackets, hexCase, minSize);
+  return toHex(toUChar(x), brackets, hexCase, minSize);
 }
 
 // 'isSingle..' functions return false if a given char or string is 'multi-byte'

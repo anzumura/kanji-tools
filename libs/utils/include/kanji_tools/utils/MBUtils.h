@@ -28,6 +28,12 @@ using Code = char32_t;
 
 // keep wstring versions of conversion functions for now to work with wregex
 
+// convert Code to wchar_t assumes they are the same size via a static_assert
+inline constexpr wchar_t toWChar(Code x) noexcept {
+  static_assert(sizeof(wchar_t) == sizeof(Code));
+  return static_cast<wchar_t>(x);
+}
+
 [[nodiscard]] std::wstring fromUtf8ToWstring(const char*);
 [[nodiscard]] std::wstring fromUtf8ToWstring(const std::string&);
 [[nodiscard]] std::string toUtf8(const std::wstring&);
