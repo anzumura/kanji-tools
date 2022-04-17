@@ -362,7 +362,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     const auto kanji{
         _groupData->data().findKanjiByFrequency(getId("frequency", arg))};
     if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
-    printDetails((**kanji).name());
+    printDetails(kanji->name());
   } else if (arg.starts_with("m")) {
     const auto id{arg.substr(1)};
     // a valid Morohashi ID should be numeric followed by an optional 'P'
@@ -418,10 +418,10 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
       if (!ucd->jSource().empty()) out() << " (" << ucd->jSource() << ')';
     }
     if (const auto k{data().findKanjiByName(arg)}; k) {
-      printExtraTypeInfo(**k);
-      out() << '\n' << (**k).info();
-      printMeaning(**k, true);
-      printReviewDetails(**k);
+      printExtraTypeInfo(*k);
+      out() << '\n' << k->info();
+      printMeaning(*k, true);
+      printReviewDetails(*k);
     } else // should never happen since all kanji in ucd.txt should be loaded
       out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE: gcov bug
   } else

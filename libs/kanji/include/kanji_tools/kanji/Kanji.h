@@ -33,7 +33,6 @@ enum class KanjiInfo {
 template<> inline constexpr auto is_bitmask<KanjiInfo>{true};
 
 using KanjiPtr = std::shared_ptr<class Kanji>;
-using OptKanjiPtr = std::optional<KanjiPtr>;
 
 class Kanji {
 public:
@@ -62,7 +61,7 @@ public:
   [[nodiscard]] virtual KanjiGrades grade() const;
   [[nodiscard]] virtual KenteiKyus kyu() const;
   [[nodiscard]] virtual JlptLevels level() const;
-  [[nodiscard]] virtual OptKanjiPtr link() const;
+  [[nodiscard]] virtual KanjiPtr link() const;
   [[nodiscard]] virtual JinmeiReasons reason() const;
   [[nodiscard]] virtual Year year() const;
 

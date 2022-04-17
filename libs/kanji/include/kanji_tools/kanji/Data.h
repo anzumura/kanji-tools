@@ -106,11 +106,11 @@ public:
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including
   // 'variation selectors', i.e., the same result is returned for '侮︀ [4FAE
   // FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
-  [[nodiscard]] OptKanjiPtr findKanjiByName(const std::string&) const;
+  [[nodiscard]] KanjiPtr findKanjiByName(const std::string&) const;
 
   // 'findKanjiByFrequency' returns the Kanji with the given 'freq' (should be a
   // value from 1 to 2501)
-  [[nodiscard]] OptKanjiPtr findKanjiByFrequency(Kanji::Frequency freq) const;
+  [[nodiscard]] KanjiPtr findKanjiByFrequency(Kanji::Frequency freq) const;
 
   // 'findByMorohashiId' can return more than one Kanji. Ids are usually just
   // numeric, but they can also be a number followed by a 'P'. For example,

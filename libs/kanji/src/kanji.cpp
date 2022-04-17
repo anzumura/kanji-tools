@@ -14,7 +14,7 @@ KenteiKyus Kanji::kyu() const { return KenteiKyus::None; }
 
 JlptLevels Kanji::level() const { return JlptLevels::None; }
 
-OptKanjiPtr Kanji::link() const { return {}; }
+KanjiPtr Kanji::link() const { return {}; }
 
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
 

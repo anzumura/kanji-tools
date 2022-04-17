@@ -106,10 +106,10 @@ size_t Data::frequencySize(size_t f) const { return frequencies(f).size(); }
 
 KanjiTypes Data::getType(const std::string& name) const {
   const auto i{findKanjiByName(name)};
-  return i ? (**i).type() : KanjiTypes::None;
+  return i ? i->type() : KanjiTypes::None;
 }
 
-OptKanjiPtr Data::findKanjiByName(const std::string& s) const {
+KanjiPtr Data::findKanjiByName(const std::string& s) const {
   const auto i{_compatibilityMap.find(s)};
   if (const auto j{
           _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
@@ -118,7 +118,7 @@ OptKanjiPtr Data::findKanjiByName(const std::string& s) const {
   return {};
 }
 
-OptKanjiPtr Data::findKanjiByFrequency(Kanji::Frequency freq) const {
+KanjiPtr Data::findKanjiByFrequency(Kanji::Frequency freq) const {
   if (!freq || freq >= _maxFrequency) return {};
   auto bucket{--freq};
   bucket /= FrequencyEntries;
@@ -351,7 +351,7 @@ void Data::processList(const DataFile& list) {
     auto& name{list.list()[i]};
     KanjiPtr kanji;
     if (const auto j{findKanjiByName(name)}; j) {
-      kanji = *j;
+      kanji = j;
       if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou)
         found[kanji->type()].push_back(name);
     } else {

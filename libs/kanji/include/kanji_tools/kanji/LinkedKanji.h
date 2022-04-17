@@ -11,7 +11,7 @@ public:
 
   [[nodiscard]] OptFreq frequency() const override { return _frequency; }
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
-  [[nodiscard]] OptKanjiPtr link() const override { return _link; }
+  [[nodiscard]] KanjiPtr link() const override { return _link; }
 
   [[nodiscard]] bool linkedReadings() const override { return true; }
   [[nodiscard]] OptString newName() const override;

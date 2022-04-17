@@ -74,7 +74,7 @@ void GroupData::loadGroup(
     Data::KanjiList memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findKanjiByName(i)}; k)
-        memberKanji.emplace_back(*k);
+        memberKanji.emplace_back(k);
       else
         _data->printError("failed to find member " + i + " in group: '" + name +
                           "', number: " + f.get(numberCol));

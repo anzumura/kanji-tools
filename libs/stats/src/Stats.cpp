@@ -28,15 +28,15 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 // helper class for ordering and printing out kanji found in files
 class Count {
 public: // LCOV_EXCL_LINE: gcov bug
-  Count(size_t f, const std::string& n, OptKanjiPtr e)
+  Count(size_t f, const std::string& n, KanjiPtr e)
       : count{f}, name{n}, entry{e} {}
 
   [[nodiscard]] auto frequency() const {
-    return entry ? (**entry).frequencyOrDefault(Data::maxFrequency())
+    return entry ? entry->frequencyOrDefault(Data::maxFrequency())
                  : Data::maxFrequency() + 1;
   }
   [[nodiscard]] auto type() const {
-    return entry ? (**entry).type() : KanjiTypes::None;
+    return entry ? entry->type() : KanjiTypes::None;
   }
 
   // Sort to have largest 'count' first followed by lowest frequency number.
@@ -54,16 +54,15 @@ public: // LCOV_EXCL_LINE: gcov bug
 
   size_t count;
   std::string name;
-  OptKanjiPtr entry;
+  KanjiPtr entry;
 };
 
 std::ostream& operator<<(std::ostream& os, const Count& c) {
   os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
   if (c.entry)
-    os << std::setw(5) << (**c.entry).frequencyOrDefault(0) << ", "
-       << ((**c.entry).hasLevel() ? toString((**c.entry).level())
-                                  : std::string{"--"})
-       << ", " << (**c.entry).type();
+    os << std::setw(5) << c.entry->frequencyOrDefault(0) << ", "
+       << (c.entry->hasLevel() ? toString(c.entry->level()) : std::string{"--"})
+       << ", " << c.entry->type();
   else
     os << ", " << std::setw(7) << "U+" + toUnicode(c.name);
   return os;
@@ -140,7 +139,7 @@ std::string StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   for (const auto& i : count.map()) {
     _total += i.second;
     frequency.emplace(i.second, i.first,
-        _isKanji ? _data->findKanjiByName(i.first) : std::nullopt);
+        _isKanji ? _data->findKanjiByName(i.first) : KanjiPtr{});
   }
   if (_total) {
     printTotalAndUnique(_name, _total, frequency.size());

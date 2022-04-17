@@ -23,11 +23,11 @@ protected:
 private:
   const bool _hasOldLinks;
 
-  // Use 'LinkNames' instead of trying to hold an OptEntry (shared pointer to
-  // another kanji) since 'ucd links' are more arbitrary than the standard
-  // 'official' jinmei and jouyou linked kanji (ie official variants). Ucd links
-  // can potentially even be circular depending on how the source data is parsed
-  // and there are also cases of links to another ucd kanji with a link.
+  // Use 'LinkNames' instead of trying to hold pointers to other Kanji since
+  // 'ucd links' are more arbitrary than the standard 'official' Jinmei and
+  // Jouyou linked Kanji (ie official variants). Ucd links can potentially even
+  // be circular depending on how the source data is parsed and there are also
+  // cases of links to another ucd Kanji with a link.
   const LinkNames _linkNames;
 
   const bool _linkedReadings;
