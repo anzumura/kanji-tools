@@ -28,7 +28,7 @@ public:
   [[nodiscard]] static Path getFile(const Path& dir, const Path& file);
 
   static void print(std::ostream&, const StringList&, const std::string& type,
-      const std::string& group, bool isError = false);
+      const std::string& group);
 
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
 

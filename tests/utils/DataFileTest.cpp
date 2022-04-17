@@ -60,23 +60,14 @@ TEST_F(DataFileTest, MissingFileWithoutExtension) {
 
 TEST_F(DataFileTest, PrintEmptyList) {
   std::stringstream s;
-  // no output regardless of 'isError' value
-  for (auto isError : {false, true}) {
-    DataFile::print(s, {}, "items", {}, isError);
-    EXPECT_EQ(s.str(), "");
-  }
+  DataFile::print(s, {}, "items", {});
+  EXPECT_EQ(s.str(), "");
 }
 
 TEST_F(DataFileTest, PrintNonEmptyList) {
   std::stringstream s;
   DataFile::print(s, {"foo", "bar"}, "items", {});
   EXPECT_EQ(s.str(), ">>> Found 2 items: foo bar\n");
-}
-
-TEST_F(DataFileTest, PrintNonEmptyListAsError) {
-  std::stringstream s;
-  DataFile::print(s, {"foo", "bar"}, "items", {}, true);
-  EXPECT_EQ(s.str(), "ERROR --- Found 2 items: foo bar\n");
 }
 
 TEST_F(DataFileTest, PrintWithGroupName) {

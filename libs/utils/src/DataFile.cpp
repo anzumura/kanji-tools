@@ -24,10 +24,9 @@ fs::path DataFile::getFile(const Path& dir, const Path& file) {
 }
 
 void DataFile::print(std::ostream& out, const StringList& l,
-    const std::string& type, const std::string& group, bool isError) {
+    const std::string& type, const std::string& group) {
   if (!l.empty()) {
-    out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' '
-        << type;
+    out << ">>> Found " << l.size() << ' ' << type;
     if (!group.empty()) out << " in " << group;
     out << ':';
     for (auto& i : l) out << ' ' << i;
