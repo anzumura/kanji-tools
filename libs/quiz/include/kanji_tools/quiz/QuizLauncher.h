@@ -12,7 +12,6 @@ class QuizLauncher {
 public:
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
-  using Entry = Data::Entry;
   using List = Data::List;
   using Question = u_int16_t;
 
@@ -45,11 +44,11 @@ public:
   [[nodiscard]] auto& groupData() const { return _groupData; }
   [[nodiscard]] auto randomizeAnswers() const { return _randomizeAnswers; }
 
-  void printExtraTypeInfo(const Entry&) const;
+  void printExtraTypeInfo(const Kanji&) const;
   void printLegend(KanjiInfo fields = KanjiInfo::All) const;
   void printMeaning(
-      const Entry&, bool useNewLine = false, bool showMeaning = true) const;
-  void printReviewDetails(const Entry&) const;
+      const Kanji&, bool useNewLine = false, bool showMeaning = true) const;
+  void printReviewDetails(const Kanji&) const;
 private:
   static constexpr u_int16_t JukugoPerLine{3}, MaxJukugoSize{30};
 

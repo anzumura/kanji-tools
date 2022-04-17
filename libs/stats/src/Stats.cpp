@@ -28,7 +28,7 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 // helper class for ordering and printing out kanji found in files
 class Count {
 public: // LCOV_EXCL_LINE: gcov bug
-  Count(size_t f, const std::string& n, Data::OptEntry e)
+  Count(size_t f, const std::string& n, OptKanjiPtr e)
       : count{f}, name{n}, entry{e} {}
 
   [[nodiscard]] auto frequency() const {
@@ -54,7 +54,7 @@ public: // LCOV_EXCL_LINE: gcov bug
 
   size_t count;
   std::string name;
-  Data::OptEntry entry;
+  OptKanjiPtr entry;
 };
 
 std::ostream& operator<<(std::ostream& os, const Count& c) {

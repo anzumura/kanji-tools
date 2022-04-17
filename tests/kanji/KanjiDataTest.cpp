@@ -370,7 +370,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 90);
   u_int32_t officialLinksToJinmei{}, officialLinksToJouyou{};
   for (auto& i : _data->types(KanjiTypes::LinkedJinmei)) {
-    auto& link{*static_cast<const LinkedKanji&>(*i).link()};
+    auto& link{**(i->link())};
     if (link.type() == KanjiTypes::Jouyou)
       ++officialLinksToJouyou;
     else if (link.type() == KanjiTypes::Jinmei)

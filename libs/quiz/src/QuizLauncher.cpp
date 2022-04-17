@@ -211,9 +211,9 @@ std::ostream& QuizLauncher::log(bool heading) const {
   return data().log(heading);
 }
 
-void QuizLauncher::printExtraTypeInfo(const Entry& k) const {
-  out() << ", " << k->type();
-  if (const auto i{k->extraTypeInfo()}; i) out() << " (" << *i << ')';
+void QuizLauncher::printExtraTypeInfo(const Kanji& k) const {
+  out() << ", " << k.type();
+  if (const auto i{k.extraTypeInfo()}; i) out() << " (" << *i << ')';
 }
 
 void QuizLauncher::printLegend(KanjiInfo fields) const {
@@ -231,35 +231,35 @@ void QuizLauncher::printLegend(KanjiInfo fields) const {
 }
 
 void QuizLauncher::printMeaning(
-    const Entry& k, bool useNewLine, bool showMeaning) const {
-  if (showMeaning && k->hasMeaning())
-    out() << (useNewLine ? "\n    Meaning: " : " : ") << k->meaning();
+    const Kanji& k, bool useNewLine, bool showMeaning) const {
+  if (showMeaning && k.hasMeaning())
+    out() << (useNewLine ? "\n    Meaning: " : " : ") << k.meaning();
   out() << '\n';
 }
 
-void QuizLauncher::printReviewDetails(const Entry& kanji) const {
-  out() << "    Reading: " << kanji->reading() << '\n';
+void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
+  out() << "    Reading: " << kanji.reading() << '\n';
   // Similar Kanji
-  if (const auto i{_groupData->patternMap().find(kanji->name())};
+  if (const auto i{_groupData->patternMap().find(kanji.name())};
       i != _groupData->patternMap().end() &&
       i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
     Data::List sorted(i->second->members());
     std::sort(sorted.begin(), sorted.end(), Data::OrderByQualifiedName);
     for (auto& j : sorted)
-      if (j != kanji) out() << ' ' << j->qualifiedName();
+      if (*j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
   }
   // Morohashi and Nelson IDs
-  if (kanji->morohashiId())
-    out() << "  Morohashi: " << *kanji->morohashiId() << '\n';
-  if (kanji->hasNelsonIds()) {
-    out() << (kanji->nelsonIds().size() == 1 ? "  Nelson ID:" : " Nelson IDs:");
-    for (auto& i : kanji->nelsonIds()) out() << ' ' << i;
+  if (kanji.morohashiId())
+    out() << "  Morohashi: " << *kanji.morohashiId() << '\n';
+  if (kanji.hasNelsonIds()) {
+    out() << (kanji.nelsonIds().size() == 1 ? "  Nelson ID:" : " Nelson IDs:");
+    for (auto& i : kanji.nelsonIds()) out() << ' ' << i;
     out() << '\n';
   }
   // Categories
-  if (const auto i{_groupData->meaningMap().equal_range(kanji->name())};
+  if (const auto i{_groupData->meaningMap().equal_range(kanji.name())};
       i.first != i.second) {
     auto j{i.first};
     out() << (++j == i.second ? "   Category: " : " Categories: ");
@@ -272,15 +272,15 @@ void QuizLauncher::printReviewDetails(const Entry& kanji) const {
   // Jukugo Lists
   static const std::string Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
       OtherGrade{"Other Grade Jukugo"};
-  if (auto& list{_jukugoData->find(kanji->name())}; !list.empty()) {
+  if (auto& list{_jukugoData->find(kanji.name())}; !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
     // lists, one for the same grade of the given kanji and one for other
     // grades. For example, 一生（いっしょう） is a grade 1 Jukugo for '一', but
     // 一縷（いちる） is a secondary school Jukugo (which also contains '一').
     if (JukugoData::List same, other;
-        kanji->hasGrade() && list.size() > JukugoPerLine) {
+        kanji.hasGrade() && list.size() > JukugoPerLine) {
       for (auto& i : list)
-        (kanji->grade() == i->grade() ? same : other).push_back(i);
+        (kanji.grade() == i->grade() ? same : other).push_back(i);
       if (other.empty())
         printJukugoList(Jukugo, list);
       else {
@@ -420,10 +420,10 @@ void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
       if (!ucd->jSource().empty()) out() << " (" << ucd->jSource() << ')';
     }
     if (const auto k{data().findKanjiByName(arg)}; k) {
-      printExtraTypeInfo(*k);
+      printExtraTypeInfo(**k);
       out() << '\n' << (**k).info();
-      printMeaning(*k, true);
-      printReviewDetails(*k);
+      printMeaning(**k, true);
+      printReviewDetails(**k);
     } else // should never happen since all kanji in ucd.txt should be loaded
       out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE: gcov bug
   } else

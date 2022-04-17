@@ -8,7 +8,7 @@
 #include <kanji_tools/utils/JlptLevels.h>
 #include <kanji_tools/utils/KenteiKyus.h>
 
-#include <limits>
+#include <memory>
 #include <optional>
 
 namespace kanji_tools {
@@ -31,6 +31,9 @@ enum class KanjiInfo {
 
 // enable bitwise operators for 'KanjiInfo'
 template<> inline constexpr auto is_bitmask<KanjiInfo>{true};
+
+using KanjiPtr = std::shared_ptr<class Kanji>;
+using OptKanjiPtr = std::optional<KanjiPtr>;
 
 class Kanji {
 public:
@@ -59,6 +62,7 @@ public:
   [[nodiscard]] virtual KanjiGrades grade() const;
   [[nodiscard]] virtual KenteiKyus kyu() const;
   [[nodiscard]] virtual JlptLevels level() const;
+  [[nodiscard]] virtual OptKanjiPtr link() const;
   [[nodiscard]] virtual JinmeiReasons reason() const;
   [[nodiscard]] virtual Year year() const;
 
@@ -140,6 +144,8 @@ public:
   // same 'qualifiedNameRank' then sort by strokes, frequency (if exists) and
   // finally andcompatibilityName (in unicode).
   [[nodiscard]] bool orderByQualifiedName(const Kanji&) const;
+
+  [[nodiscard]] bool operator==(const Kanji&) const;
 
   // 'Legend' is meant to be used in output to briefly describe the suffix added
   // to a kanji when using the 'qualifiedName' method. See comments for

@@ -30,10 +30,10 @@ private:
   // 'includeMember' returns true if a member can be included in group quiz
   // question. The member must have a reading as well as meet the criteria of
   // the given MemberType.
-  [[nodiscard]] static bool includeMember(const Entry&, MemberType);
+  [[nodiscard]] static bool includeMember(const Kanji&, MemberType);
 
   // 'addPinyin' adds optional pinyin for 'kanji' to 's' padded to 'PinyinWidth'
-  static void addPinyin(const Entry& kanji, std::string& s);
+  static void addPinyin(const Kanji&, std::string& s);
 
   // 'addOtherGroupName' is used in review mode to show other groups that 'name'
   // may belong to. 'z:y' is optionally added to 's' where 'x' is either 'm' or

@@ -56,7 +56,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
         startIncluding = true;
       if (size_t memberCount{}; startIncluding) {
         for (auto& j : i->members())
-          if (includeMember(j, memberType)) ++memberCount;
+          if (includeMember(*j, memberType)) ++memberCount;
         // only include groups that have 2 or more members after applying the
         // 'include member' filter
         if (memberCount > 1) newList.push_back(i);
@@ -76,16 +76,16 @@ GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
                          : throw std::domain_error{"empty group list"};
 }
 
-bool GroupQuiz::includeMember(const Entry& k, MemberType memberType) {
-  return k->hasReading() &&
-         (k->is(KanjiTypes::Jouyou) || memberType && k->hasLevel() ||
-             memberType > 1 && k->frequency() || memberType > 2);
+bool GroupQuiz::includeMember(const Kanji& k, MemberType memberType) {
+  return k.hasReading() &&
+         (k.is(KanjiTypes::Jouyou) || memberType && k.hasLevel() ||
+             memberType > 1 && k.frequency() || memberType > 2);
 }
 
-void GroupQuiz::addPinyin(const Entry& kanji, std::string& s) {
+void GroupQuiz::addPinyin(const Kanji& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
-  if (kanji->pinyin()) {
-    const auto p{"  (" + *kanji->pinyin() + ')'};
+  if (kanji.pinyin()) {
+    const auto p{"  (" + *kanji.pinyin() + ')'};
     // use 'displaySize' since Pinyin can contain multi-byte chars (for tones)
     s += p + std::string(PinyinWidth - displaySize(p), ' ');
   } else
@@ -116,7 +116,7 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
     auto& i{list[currentQuestion()]};
     List questions, readings;
     for (auto& j : i->members())
-      if (includeMember(j, memberType)) {
+      if (includeMember(*j, memberType)) {
         questions.emplace_back(j);
         readings.emplace_back(j);
       }
@@ -171,12 +171,12 @@ void GroupQuiz::showGroup(const List& questions, const List& readings,
                      : ' '};
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s{i->qualifiedName()};
-    addPinyin(i, s);
+    addPinyin(*i, s);
     if (!isTestMode()) addOtherGroupName(i->name(), s);
     out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
     printAssignedAnswer(choice)
         << choice << ":  " << readings[count]->reading();
-    printMeaning(readings[count++]);
+    printMeaning(*readings[count++]);
     if (!repeatQuestion && isTestMode()) choices[choice] = {};
   }
   out() << '\n';

@@ -23,12 +23,12 @@ private:
   [[nodiscard]] bool isKanjiToReading() const;
 
   // populates '_answers' and returns the position corresponding to the current
-  // question, i.e., the correct answer for the given Entry (kanji).
+  // question, i.e., the correct answer for the given Kanji.
   [[nodiscard]] ChoiceCount populateAnswers(
-      const Entry&, const List& questions);
+      const Kanji&, const List& questions);
 
-  void printQuestion(const Entry& kanji) const;
-  void printChoices(const Entry& kanji, const List& questions) const;
+  void printQuestion(const Kanji&) const;
+  void printChoices(const Kanji&, const List& questions) const;
 
   // 'getAnswer' prompts for an answer and processes the result. This method
   // only returns 'false' if the question should be repeated (for toggling

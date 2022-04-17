@@ -6,31 +6,30 @@ namespace kanji_tools {
 
 class LinkedKanji : public Kanji {
 public:
-  using Link = const Data::Entry&;
+  [[nodiscard]] Meaning meaning() const override;
+  [[nodiscard]] Reading reading() const override;
 
   [[nodiscard]] OptFreq frequency() const override { return _frequency; }
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
-  [[nodiscard]] Meaning meaning() const override;
-  [[nodiscard]] Reading reading() const override;
-  [[nodiscard]] OptString newName() const override;
-  [[nodiscard]] bool linkedReadings() const override { return true; }
+  [[nodiscard]] OptKanjiPtr link() const override { return _link; }
 
-  [[nodiscard]] auto& link() const { return _link; }
+  [[nodiscard]] bool linkedReadings() const override { return true; }
+  [[nodiscard]] OptString newName() const override;
 protected:
-  LinkedKanji(DataRef, Name, Link, UcdPtr);
+  LinkedKanji(DataRef, Name, KanjiPtr, UcdPtr);
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to
   // either Jouyou or Jinmei
-  [[nodiscard]] static Name checkType(Name, Link, bool isJinmei = false);
+  [[nodiscard]] static Name checkType(Name, KanjiPtr, bool isJinmei = false);
 private:
   const OptFreq _frequency;
   const KenteiKyus _kyu;
-  const Data::Entry _link;
+  const KanjiPtr _link;
 };
 
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
-  LinkedJinmeiKanji(DataRef, Name, Link);
+  LinkedJinmeiKanji(DataRef, Name, KanjiPtr);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::LinkedJinmei;
@@ -39,7 +38,7 @@ public:
 
 class LinkedOldKanji : public LinkedKanji {
 public:
-  LinkedOldKanji(DataRef, Name, Link);
+  LinkedOldKanji(DataRef, Name, KanjiPtr);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::LinkedOld;

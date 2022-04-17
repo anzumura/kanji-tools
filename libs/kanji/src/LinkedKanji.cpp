@@ -9,11 +9,11 @@ Kanji::Reading LinkedKanji::reading() const { return _link->reading(); }
 
 Kanji::OptString LinkedKanji::newName() const { return _link->name(); }
 
-LinkedKanji::LinkedKanji(DataRef data, Name name, Link link, UcdPtr u)
+LinkedKanji::LinkedKanji(DataRef data, Name name, KanjiPtr link, UcdPtr u)
     : Kanji{data, name, data.ucdRadical(name, u), data.ucdStrokes(name, u), u},
       _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
 
-Kanji::Name LinkedKanji::checkType(Name name, Link link, bool isJinmei) {
+Kanji::Name LinkedKanji::checkType(Name name, KanjiPtr link, bool isJinmei) {
   if (const auto t{link->type()};
       t != KanjiTypes::Jouyou && (!isJinmei || t != KanjiTypes::Jinmei))
     throw std::domain_error{
@@ -25,11 +25,11 @@ Kanji::Name LinkedKanji::checkType(Name name, Link link, bool isJinmei) {
   return name;
 }
 
-LinkedJinmeiKanji::LinkedJinmeiKanji(DataRef data, Name name, Link link)
+LinkedJinmeiKanji::LinkedJinmeiKanji(DataRef data, Name name, KanjiPtr link)
     : LinkedKanji{data, checkType(name, link, true), link, data.findUcd(name)} {
 }
 
-LinkedOldKanji::LinkedOldKanji(DataRef data, Name name, const Data::Entry& link)
+LinkedOldKanji::LinkedOldKanji(DataRef data, Name name, KanjiPtr link)
     : LinkedKanji{data, checkType(name, link), link, data.findUcd(name)} {}
 
 } // namespace kanji_tools

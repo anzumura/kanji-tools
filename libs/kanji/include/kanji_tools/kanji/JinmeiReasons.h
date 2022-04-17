@@ -17,8 +17,7 @@ enum class JinmeiReasons { Names, Print, Variant, Moved, Simple, Other, None };
 
 template<> inline constexpr auto is_enumarray_with_none<JinmeiReasons>{true};
 
-inline const auto AllJinmeiReasons{
-    TypedEnumArray<JinmeiReasons>::create(
-        "Names", "Print", "Variant", "Moved", "Simple", "Other")};
+inline const auto AllJinmeiReasons{TypedEnumArray<JinmeiReasons>::create(
+    "Names", "Print", "Variant", "Moved", "Simple", "Other")};
 
 } // namespace kanji_tools

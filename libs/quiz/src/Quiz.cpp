@@ -47,7 +47,7 @@ char Quiz::get(const std::string& msg, const Choices& choices, OptChar def,
 
 std::ostream& Quiz::log(bool heading) const { return _launcher.log(heading); }
 
-void Quiz::printMeaning(const Entry& kanji, bool useNewLine) const {
+void Quiz::printMeaning(const Kanji& kanji, bool useNewLine) const {
   _launcher.printMeaning(kanji, useNewLine, _showMeanings);
 }
 

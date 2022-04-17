@@ -14,6 +14,8 @@ KenteiKyus Kanji::kyu() const { return KenteiKyus::None; }
 
 JlptLevels Kanji::level() const { return JlptLevels::None; }
 
+OptKanjiPtr Kanji::link() const { return {}; }
+
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
 
 Kanji::Year Kanji::year() const { return {}; }
@@ -100,6 +102,8 @@ bool Kanji::orderByQualifiedName(const Kanji& x) const {
                              toUnicode(compatibilityName()) <
                                  toUnicode(x.compatibilityName())));
 }
+
+bool Kanji::operator==(const Kanji& x) const { return name() == x.name(); }
 
 u_int16_t Kanji::qualifiedNameRank() const {
   // use an enum to avoid magic numbers, note 'Ucd' is the least common type

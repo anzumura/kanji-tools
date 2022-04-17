@@ -109,7 +109,7 @@ KanjiTypes Data::getType(const std::string& name) const {
   return i ? (**i).type() : KanjiTypes::None;
 }
 
-Data::OptEntry Data::findKanjiByName(const std::string& s) const {
+OptKanjiPtr Data::findKanjiByName(const std::string& s) const {
   const auto i{_compatibilityMap.find(s)};
   if (const auto j{
           _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
@@ -118,7 +118,7 @@ Data::OptEntry Data::findKanjiByName(const std::string& s) const {
   return {};
 }
 
-Data::OptEntry Data::findKanjiByFrequency(Kanji::Frequency freq) const {
+OptKanjiPtr Data::findKanjiByFrequency(Kanji::Frequency freq) const {
   if (!freq || freq >= _maxFrequency) return {};
   auto bucket{--freq};
   bucket /= FrequencyEntries;
@@ -218,7 +218,7 @@ bool Data::isValidDataDir(const Path& p) {
              }) == TextFilesInDataDir;
 }
 
-bool Data::checkInsert(const Entry& kanji, UcdPtr ucd) {
+bool Data::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   auto& k{*kanji};
   if (!_kanjiNameMap.emplace(k.name(), kanji).second) {
     printError("failed to insert '" + k.name() + "' into map");
@@ -241,7 +241,7 @@ bool Data::checkInsert(const Entry& kanji, UcdPtr ucd) {
   return true;
 }
 
-bool Data::checkInsert(List& s, const Entry& kanji) {
+bool Data::checkInsert(List& s, const KanjiPtr& kanji) {
   if (!checkInsert(kanji)) return false;
   s.emplace_back(kanji);
   return true;
@@ -349,7 +349,7 @@ void Data::processList(const DataFile& list) {
       _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency]};
   for (size_t i{}; i < list.list().size(); ++i) {
     auto& name{list.list()[i]};
-    Entry kanji;
+    KanjiPtr kanji;
     if (const auto j{findKanjiByName(name)}; j) {
       kanji = *j;
       if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou)

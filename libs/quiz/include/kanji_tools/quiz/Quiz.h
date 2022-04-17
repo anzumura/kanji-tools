@@ -19,7 +19,6 @@ public:
   static void run(const Args&, std::ostream& out = std::cout);
 protected:
   using Choices = QuizLauncher::Choices;
-  using Entry = QuizLauncher::Entry;
   using OptChar = QuizLauncher::OptChar;
   using Question = QuizLauncher::Question;
   using QuestionOrder = QuizLauncher::QuestionOrder;
@@ -44,7 +43,7 @@ protected:
   [[nodiscard]] auto isTestMode() const { return _launcher.isTestMode(); }
   [[nodiscard]] std::ostream& log(bool heading = false) const;
   [[nodiscard]] auto& out() const { return _launcher.out(); }
-  void printMeaning(const Entry& kanji, bool useNewLine = false) const;
+  void printMeaning(const Kanji&, bool useNewLine = false) const;
 
   void correctMessage(); // increments '_correctAnswers'
   std::ostream& incorrectMessage(const std::string& name);

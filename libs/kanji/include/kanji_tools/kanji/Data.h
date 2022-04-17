@@ -13,10 +13,8 @@ namespace kanji_tools {
 // base class for 'KanjiData'
 class Data {
 public:
-  using Entry = std::shared_ptr<Kanji>;
-  using OptEntry = std::optional<Entry>;
-  using List = std::vector<Entry>;
-  using Map = std::map<std::string, Entry>;
+  using List = std::vector<KanjiPtr>;
+  using Map = std::map<std::string, KanjiPtr>;
   template<typename T> using EnumList = EnumMap<T, List>;
   using Path = DataFile::Path;
 
@@ -41,7 +39,7 @@ public:
 
   static void usage(const std::string& msg) { DataFile::usage(msg); }
   static constexpr auto OrderByQualifiedName{
-      [](Entry& a, Entry& b) { return a->orderByQualifiedName(*b); }};
+      [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
 
   [[nodiscard]] static Kanji::Frequency maxFrequency();
 
@@ -108,11 +106,11 @@ public:
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including
   // 'variation selectors', i.e., the same result is returned for '侮︀ [4FAE
   // FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
-  [[nodiscard]] OptEntry findKanjiByName(const std::string&) const;
+  [[nodiscard]] OptKanjiPtr findKanjiByName(const std::string&) const;
 
   // 'findKanjiByFrequency' returns the Kanji with the given 'freq' (should be a
   // value from 1 to 2501)
-  [[nodiscard]] OptEntry findKanjiByFrequency(Kanji::Frequency freq) const;
+  [[nodiscard]] OptKanjiPtr findKanjiByFrequency(Kanji::Frequency freq) const;
 
   // 'findKanjisByMorohashiId' can return more than one entry. Ids are usually
   // just numeric, but they can also be an index number followed by a 'P'. For
@@ -177,7 +175,7 @@ protected:
   auto& types() const { return _types; }
 
   // checkInsert is non-private to help support testing
-  bool checkInsert(const Entry&, UcdPtr = {});
+  bool checkInsert(const KanjiPtr&, UcdPtr = {});
 private:
   using OptPath = std::optional<Path>;
 
@@ -195,7 +193,7 @@ private:
   EnumList<KanjiTypes> _types;
 
   // helper functions for checking and inserting into '_kanjiNameMap'
-  bool checkInsert(List&, const Entry&);
+  bool checkInsert(List&, const KanjiPtr&);
   void insertSanityChecks(const Kanji&, UcdPtr) const;
 
   const Path _dataDir;

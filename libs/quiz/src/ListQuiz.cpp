@@ -50,14 +50,14 @@ void ListQuiz::start(const List& questions) {
   auto stopQuiz{false};
   for (; !stopQuiz && currentQuestion() < questions.size();
        ++currentQuestion()) {
-    const Entry& i{questions[currentQuestion()]};
+    const Kanji& i{*questions[currentQuestion()]};
     auto choices{getDefaultChoices(questions.size())};
     const auto correct{populateAnswers(i, questions)};
     do {
       beginQuestionMessage(questions.size());
       printQuestion(i);
       printChoices(i, questions);
-    } while (!getAnswer(choices, stopQuiz, correct, i->name()));
+    } while (!getAnswer(choices, stopQuiz, correct, i.name()));
   }
   // when quitting don't count the current question in the final score
   if (stopQuiz) --currentQuestion();
@@ -74,7 +74,7 @@ bool ListQuiz::isKanjiToReading() const {
 }
 
 ListQuiz::ChoiceCount ListQuiz::populateAnswers(
-    const Entry& kanji, const List& questions) {
+    const Kanji& kanji, const List& questions) {
   std::uniform_int_distribution<Question> randomReading(
       0, static_cast<Question>(questions.size()) - 1);
   std::uniform_int_distribution<ChoiceCount> randomCorrect(0, _choiceCount - 1);
@@ -82,7 +82,7 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
   const auto correct{
       launcher().randomizeAnswers() ? randomCorrect(RandomGen) : ChoiceCount{}};
   // 'sameReading' prevents more than one choice having the same reading
-  DataFile::Set sameReading{kanji->reading()};
+  DataFile::Set sameReading{kanji.reading()};
   _answers[correct] = currentQuestion();
   for (ChoiceCount i{}; i < _choiceCount; ++i)
     while (i != correct)
@@ -94,18 +94,18 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
   return correct;
 }
 
-void ListQuiz::printQuestion(const Entry& kanji) const {
+void ListQuiz::printQuestion(const Kanji& kanji) const {
   if (isKanjiToReading()) {
-    out() << kanji->name();
-    if (const auto info{kanji->info(_infoFields)}; !info.empty())
+    out() << kanji.name();
+    if (const auto info{kanji.info(_infoFields)}; !info.empty())
       out() << "  " << info;
     if (!isTestMode()) launcher().printExtraTypeInfo(kanji);
   } else
-    out() << "Reading:  " << kanji->reading();
+    out() << "Reading:  " << kanji.reading();
   printMeaning(kanji, !isTestMode());
 }
 
-void ListQuiz::printChoices(const Entry& kanji, const List& questions) const {
+void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
   if (isTestMode())
     for (ChoiceCount i{}; i < _choiceCount; ++i)
       out() << "    " << i + 1 << ".  "
