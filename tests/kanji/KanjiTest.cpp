@@ -124,6 +124,7 @@ TEST_F(KanjiTest, FrequencyKanji) {
   EXPECT_EQ(k.name(), "呑");
   EXPECT_EQ(k.radical(), rad);
   EXPECT_EQ(k.strokes(), 7);
+  EXPECT_FALSE(k.link());
   EXPECT_EQ(k.frequency(), Kanji::OptFreq{frequency});
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.hasGrade());
