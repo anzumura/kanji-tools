@@ -14,10 +14,10 @@ public:
   // 'fields' controls which fields are shown in a 'kanji to reading' quiz (see
   // Kanji.h for more details on 'KanjiInfo') and 'choiceCount' specifies the
   // number of choices per question (2 to 9).
-  ListQuiz(const QuizLauncher&, Question, bool showMeanings, const List&,
+  ListQuiz(const QuizLauncher&, Question, bool showMeanings, const KanjiList&,
       KanjiInfo, ChoiceCount, QuizStyle);
 private:
-  void start(const List&);
+  void start(const KanjiList&);
 
   [[nodiscard]] const std::string& getPrompt() const;
   [[nodiscard]] bool isKanjiToReading() const;
@@ -25,10 +25,10 @@ private:
   // populates '_answers' and returns the position corresponding to the current
   // question, i.e., the correct answer for the given Kanji.
   [[nodiscard]] ChoiceCount populateAnswers(
-      const Kanji&, const List& questions);
+      const Kanji&, const KanjiList& questions);
 
   void printQuestion(const Kanji&) const;
-  void printChoices(const Kanji&, const List& questions) const;
+  void printChoices(const Kanji&, const KanjiList& questions) const;
 
   // 'getAnswer' prompts for an answer and processes the result. This method
   // only returns 'false' if the question should be repeated (for toggling

@@ -16,9 +16,9 @@ namespace kanji_tools {
 // entries are for a 'JLPT Level' or a 'Kentei Kyu'.
 class DataFile {
 public:
-  using List = std::vector<std::string>;
   using Path = std::filesystem::path;
-  using Set = std::set<std::string>;
+  using StringList = std::vector<std::string>;
+  using StringSet = std::set<std::string>;
 
   inline static const std::string TextFileExtension{".txt"};
 
@@ -27,7 +27,7 @@ public:
   // 'file' isn't found and doesn't already have an extension.
   [[nodiscard]] static Path getFile(const Path& dir, const Path& file);
 
-  static void print(std::ostream&, const List&, const std::string& type,
+  static void print(std::ostream&, const StringList&, const std::string& type,
       const std::string& group, bool isError = false);
 
   static void usage(const std::string& msg) { throw std::domain_error(msg); }
@@ -55,17 +55,17 @@ public:
   // return the full contents of this list in a string (with no separates)
   [[nodiscard]] std::string toString() const;
 protected:
-  DataFile(const Path&, FileType, Set*, const std::string& name = {});
+  DataFile(const Path&, FileType, StringSet*, const std::string& name = {});
 private:
   using Map = std::map<std::string, size_t>;
 
   // 'UniqueNames': ensures uniqueness across non-typed DataFiles (currently
   // only frequency.txt)
-  inline static Set UniqueNames;
-  inline static std::set<Set*> OtherUniqueNames;
+  inline static StringSet UniqueNames;
+  inline static std::set<StringSet*> OtherUniqueNames;
 
   const std::string _name;
-  List _list;
+  StringList _list;
   Map _map;
 };
 
@@ -81,7 +81,7 @@ protected:
 private:
   const T _type;
 
-  inline static Set UniqueTypeNames;
+  inline static StringSet UniqueTypeNames;
 };
 
 class LevelDataFile : public TypedDataFile<JlptLevels> {

@@ -8,7 +8,7 @@ namespace kanji_tools {
 // including current question number, correct answer count and list of mistakes.
 class Quiz {
 public:
-  using List = QuizLauncher::KanjiList;
+  using KanjiList = QuizLauncher::KanjiList;
 
   Quiz(const Quiz&) = delete;
   Quiz& operator=(const Quiz&) = delete;
@@ -63,7 +63,7 @@ protected:
 private:
   const QuizLauncher& _launcher;
   Question _currentQuestion, _correctAnswers;
-  DataFile::List _mistakes;
+  DataFile::StringList _mistakes;
   bool _showMeanings;
 };
 

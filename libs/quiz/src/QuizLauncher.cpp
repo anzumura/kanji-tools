@@ -369,14 +369,12 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (const auto noP{id.ends_with("P") ? id.substr(0, id.size() - 1) : id};
         id.empty() || !std::all_of(noP.begin(), noP.end(), ::isdigit))
       Data::usage("invalid Morohashi ID '" + id + "'");
-    printDetails(
-        _groupData->data().findKanjisByMorohashiId(id), "Morohashi", id);
+    printDetails(_groupData->data().findByMorohashiId(id), "Morohashi", id);
   } else if (arg.starts_with("n")) {
     const auto id{arg.substr(1)};
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
       Data::usage("invalid Nelson ID '" + id + "'");
-    printDetails(
-        _groupData->data().findKanjisByNelsonId(getId("Nelson ID", id)),
+    printDetails(_groupData->data().findByNelsonId(getId("Nelson ID", id)),
         "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id{arg.substr(1)};

@@ -197,28 +197,28 @@ TEST_F(KanjiDataTest, FindKanjiByFrequency) {
 }
 
 TEST_F(KanjiDataTest, FindKanjisByMorohashiId) {
-  auto& morohashi{_data->findKanjisByMorohashiId("4138")};
+  auto& morohashi{_data->findByMorohashiId("4138")};
   ASSERT_EQ(morohashi.size(), 1);
   EXPECT_EQ(morohashi[0]->name(), "嗩");
-  auto& morohashiPrime{_data->findKanjisByMorohashiId("4138P")};
+  auto& morohashiPrime{_data->findByMorohashiId("4138P")};
   ASSERT_EQ(morohashiPrime.size(), 1);
   EXPECT_EQ(morohashiPrime[0]->name(), "嘆");
-  auto& multiMorohashi{_data->findKanjisByMorohashiId("3089")};
+  auto& multiMorohashi{_data->findByMorohashiId("3089")};
   ASSERT_EQ(multiMorohashi.size(), 2);
   EXPECT_EQ(multiMorohashi[0]->name(), "叁"); // Unicode 53C1
   EXPECT_EQ(multiMorohashi[1]->name(), "叄"); // Unicode 53C4
 }
 
 TEST_F(KanjiDataTest, FindKanjisByNelsonId) {
-  ASSERT_TRUE(_data->findKanjisByNelsonId(0).empty());
-  ASSERT_TRUE(_data->findKanjisByNelsonId(5447).empty());
+  ASSERT_TRUE(_data->findByNelsonId(0).empty());
+  ASSERT_TRUE(_data->findByNelsonId(5447).empty());
   std::vector<u_int> missingNelsonIds;
   for (Kanji::NelsonId i{1}; i < 5447; ++i)
-    if (_data->findKanjisByNelsonId(i).empty()) missingNelsonIds.push_back(i);
+    if (_data->findByNelsonId(i).empty()) missingNelsonIds.push_back(i);
   // There are a few Nelson IDs that are missing from UCD data
   EXPECT_EQ(missingNelsonIds, (std::vector{125U, 149U, 489U, 1639U}));
-  EXPECT_EQ(_data->findKanjisByNelsonId(1)[0]->name(), "一");
-  EXPECT_EQ(_data->findKanjisByNelsonId(5446)[0]->name(), "龠");
+  EXPECT_EQ(_data->findByNelsonId(1)[0]->name(), "一");
+  EXPECT_EQ(_data->findByNelsonId(5446)[0]->name(), "龠");
 }
 
 TEST_F(KanjiDataTest, KanjiWithMultipleOldNames) {
@@ -257,7 +257,7 @@ TEST_F(KanjiDataTest, KanjiWithMultipleNelsonIds) {
   EXPECT_EQ(ucdNelson->nelsonIds(), "1487,1491");
   auto& kanjiNelson{**_data->findKanjiByName(ucdNelson->name())};
   EXPECT_EQ(kanjiNelson.nelsonIds(), (Kanji::NelsonIds{1487, 1491}));
-  auto& ids{_data->findKanjisByNelsonId(1491)};
+  auto& ids{_data->findByNelsonId(1491)};
   ASSERT_EQ(ids.size(), 3);
 }
 

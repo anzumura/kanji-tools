@@ -112,15 +112,14 @@ public:
   // value from 1 to 2501)
   [[nodiscard]] OptKanjiPtr findKanjiByFrequency(Kanji::Frequency freq) const;
 
-  // 'findKanjisByMorohashiId' can return more than one entry. Ids are usually
-  // just numeric, but they can also be an index number followed by a 'P'. For
-  // example, '4138' maps to 嗩 and '4138P' maps to 嘆.
-  [[nodiscard]] const KanjiList& findKanjisByMorohashiId(
-      const std::string&) const;
+  // 'findByMorohashiId' can return more than one Kanji. Ids are usually just
+  // numeric, but they can also be a number followed by a 'P'. For example,
+  // '4138' maps to 嗩 and '4138P' maps to 嘆.
+  [[nodiscard]] const KanjiList& findByMorohashiId(const std::string&) const;
 
-  // 'findKanjisByNelsonId' can return more than one entry. For example, 1491
+  // 'findKanjisByNelsonId' can return more than one Kanji. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] const KanjiList& findKanjisByNelsonId(Kanji::NelsonId) const;
+  [[nodiscard]] const KanjiList& findByNelsonId(Kanji::NelsonId) const;
 
   void printError(const std::string&) const;
 
@@ -222,10 +221,9 @@ private:
   // frequency list (of 2501 kanji).
   std::array<KanjiList, FrequencyBuckets> _frequencies;
 
-  KanjiMap _kanjiNameMap; // lookup by UTF-8 name
-  std::map<std::string, KanjiList>
-      _morohashiMap; // lookup by Dai Kan-Wa Jiten ID
-  std::map<Kanji::NelsonId, KanjiList> _nelsonMap; // lookup by Nelson ID
+  KanjiMap _kanjiNameMap;                          // UTF-8 name to Kanji
+  std::map<std::string, KanjiList> _morohashiMap;  // Dai Kan-Wa Jiten ID lookup
+  std::map<Kanji::NelsonId, KanjiList> _nelsonMap; // Nelson ID lookup
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any Kanji
   // put into '_kanjiNameMap'

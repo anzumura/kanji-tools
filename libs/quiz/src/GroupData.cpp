@@ -57,7 +57,7 @@ void GroupData::loadGroup(
     if (isAnySingleByte(name)) f.error("group name must be all MB characters");
     if (members.ends_with(",")) f.error("members ends with ,");
 
-    DataFile::List kanjiNames;
+    DataFile::StringList kanjiNames;
     auto patternType{Group::PatternType::None};
     if (groupType == GroupType::Pattern) {
       patternType = name.starts_with(WideColon) ? Group::PatternType::Peer

@@ -53,7 +53,8 @@ private:
   // otherwise prints 4 spaces
   [[nodiscard]] std::ostream& printAssignedAnswer(char choice) const;
 
-  void showGroup(const List&, const List&, Choices&, bool repeatQuestion) const;
+  void showGroup(
+      const KanjiList&, const KanjiList&, Choices&, bool repeatQuestion) const;
 
   [[nodiscard]] bool getAnswers(
       size_t totalQuestions, Choices&, bool& skipGroup, bool& stopQuiz);
@@ -62,7 +63,8 @@ private:
   void editAnswer(Choices&);
   [[nodiscard]] size_t getAnswerToEdit() const;
 
-  void checkAnswers(const List&, const List&, const std::string& name);
+  void checkAnswers(const KanjiList& questions, const KanjiList& readings,
+      const std::string& kanjiName);
 
   // '_answers' holds answers for the current question, i.e., the reading
   // selected for each group member

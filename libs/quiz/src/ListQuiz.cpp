@@ -21,14 +21,14 @@ ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
 }
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
-    bool showMeanings, const List& list, KanjiInfo fields, // LCOV_EXCL_LINE
+    bool showMeanings, const KanjiList& list, KanjiInfo fields,
     ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
       _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{toChar(
                                                        '0' + _choiceCount)} {
   assert(_answers.size() == _choiceCount); // need () ctor
-  List questions;
+  KanjiList questions;
   for (auto& i : list) {
     if (!i->hasReading())
       // should never happen for any of the existing list quiz types
@@ -46,7 +46,7 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
   start(questions);
 }
 
-void ListQuiz::start(const List& questions) {
+void ListQuiz::start(const KanjiList& questions) {
   auto stopQuiz{false};
   for (; !stopQuiz && currentQuestion() < questions.size();
        ++currentQuestion()) {
@@ -74,7 +74,7 @@ bool ListQuiz::isKanjiToReading() const {
 }
 
 ListQuiz::ChoiceCount ListQuiz::populateAnswers(
-    const Kanji& kanji, const List& questions) {
+    const Kanji& kanji, const KanjiList& questions) {
   std::uniform_int_distribution<Question> randomReading(
       0, static_cast<Question>(questions.size()) - 1);
   std::uniform_int_distribution<ChoiceCount> randomCorrect(0, _choiceCount - 1);
@@ -82,7 +82,7 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
   const auto correct{
       launcher().randomizeAnswers() ? randomCorrect(RandomGen) : ChoiceCount{}};
   // 'sameReading' prevents more than one choice having the same reading
-  DataFile::Set sameReading{kanji.reading()};
+  DataFile::StringSet sameReading{kanji.reading()};
   _answers[correct] = currentQuestion();
   for (ChoiceCount i{}; i < _choiceCount; ++i)
     while (i != correct)
@@ -105,7 +105,8 @@ void ListQuiz::printQuestion(const Kanji& kanji) const {
   printMeaning(kanji, !isTestMode());
 }
 
-void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
+void ListQuiz::printChoices(
+    const Kanji& kanji, const KanjiList& questions) const {
   if (isTestMode())
     for (ChoiceCount i{}; i < _choiceCount; ++i)
       out() << "    " << i + 1 << ".  "
@@ -117,7 +118,7 @@ void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
 }
 
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
-    const std::string& name) {
+    const std::string& kanjiName) {
   const auto answer{
       isTestMode() ? choice().get(_prompt, {ChoiceStart, _choiceEnd}, choices)
                    : get(_prompt, choices)};
@@ -132,7 +133,7 @@ bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
   else if (const auto c{toChar(ChoiceStart + correct)}; c == answer)
     correctMessage();
   else if (answer != SkipOption)
-    incorrectMessage(name) << " (correct answer is " << c << ")\n";
+    incorrectMessage(kanjiName) << " (correct answer is " << c << ")\n";
   return true;
 }
 

@@ -114,7 +114,7 @@ void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
   auto stopQuiz{false};
   for (; currentQuestion() < list.size() && !stopQuiz; ++currentQuestion()) {
     auto& i{list[currentQuestion()]};
-    List questions, readings;
+    KanjiList questions, readings;
     for (auto& j : i->members())
       if (includeMember(*j, memberType)) {
         questions.emplace_back(j);
@@ -162,7 +162,7 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
   return out() << "    ";
 }
 
-void GroupQuiz::showGroup(const List& questions, const List& readings,
+void GroupQuiz::showGroup(const KanjiList& questions, const KanjiList& readings,
     Choices& choices, bool repeatQuestion) const {
   for (size_t count{}; auto& i : questions) {
     const char choice{
@@ -256,8 +256,8 @@ size_t GroupQuiz::getAnswerToEdit() const {
   return static_cast<size_t>(std::distance(_answers.begin(), index));
 }
 
-void GroupQuiz::checkAnswers(
-    const List& questions, const List& readings, const std::string& name) {
+void GroupQuiz::checkAnswers(const KanjiList& questions,
+    const KanjiList& readings, const std::string& kanjiName) {
   size_t correctCount{};
   for (size_t count{}; auto i : _answers) {
     const auto answer{
@@ -273,8 +273,8 @@ void GroupQuiz::checkAnswers(
   if (correctCount == _answers.size())
     correctMessage();
   else
-    incorrectMessage(name) << " (got " << correctCount << " right out of "
-                           << _answers.size() << ")\n";
+    incorrectMessage(kanjiName) << " (got " << correctCount << " right out of "
+                                << _answers.size() << ")\n";
 }
 
 } // namespace kanji_tools

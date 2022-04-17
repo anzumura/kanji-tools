@@ -127,13 +127,12 @@ OptKanjiPtr Data::findKanjiByFrequency(Kanji::Frequency freq) const {
   return _frequencies[bucket][freq - bucket * FrequencyEntries];
 }
 
-const Data::KanjiList& Data::findKanjisByMorohashiId(
-    const std::string& id) const {
+const Data::KanjiList& Data::findByMorohashiId(const std::string& id) const {
   const auto i{_morohashiMap.find(id)};
   return i != _morohashiMap.end() ? i->second : BaseEnumMap<KanjiList>::Empty;
 }
 
-const Data::KanjiList& Data::findKanjisByNelsonId(Kanji::NelsonId id) const {
+const Data::KanjiList& Data::findByNelsonId(Kanji::NelsonId id) const {
   const auto i{_nelsonMap.find(id)};
   return i != _nelsonMap.end() ? i->second : BaseEnumMap<KanjiList>::Empty;
 }
@@ -344,8 +343,8 @@ void Data::populateExtra() {
 
 void Data::processList(const DataFile& list) {
   const auto kenteiList{hasValue(list.kyu())};
-  DataFile::List created;
-  std::map<KanjiTypes, DataFile::List> found;
+  DataFile::StringList created;
+  std::map<KanjiTypes, DataFile::StringList> found;
   auto& newKanji{
       _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency]};
   for (size_t i{}; i < list.list().size(); ++i) {
@@ -399,7 +398,7 @@ void Data::processList(const DataFile& list) {
       std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
           std::pair{&found[KanjiTypes::LinkedJinmei], "Linked "}};
       for (const auto& i : lists) {
-        DataFile::List jlptJinmei, otherJinmei;
+        DataFile::StringList jlptJinmei, otherJinmei;
         for (auto& j : *i.first)
           (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
         DataFile::print(_out, jlptJinmei,
@@ -429,7 +428,7 @@ void Data::checkStrokes() const {
     // Jouyou and Extra type Kanji load strokes from their own files so print
     // any differences with data in _ucd (other types shouldn't have any diffs)
     for (auto t : AllKanjiTypes) {
-      DataFile::List l;
+      DataFile::StringList l;
       for (auto& i : _types[t])
         if (const auto u{findUcd(i->name())}; u && i->strokes() != u->strokes())
           l.emplace_back(i->name());

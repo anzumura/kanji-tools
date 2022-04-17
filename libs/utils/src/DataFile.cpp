@@ -23,8 +23,9 @@ fs::path DataFile::getFile(const Path& dir, const Path& file) {
   return p;
 }
 
-void DataFile::print(std::ostream& out, const List& l, const std::string& type,
-    const std::string& group, bool isError) { // LCOV_EXCL_LINE: gcov bug
+void DataFile::print(std::ostream& out, const StringList& l,
+    const std::string& type, const std::string& group,
+    bool isError) { // LCOV_EXCL_LINE: gcov bug
   if (!l.empty()) {
     out << (isError ? "ERROR ---" : ">>>") << " Found " << l.size() << ' '
         << type;
@@ -46,8 +47,8 @@ DataFile::DataFile(const Path& p, FileType fileType)
 DataFile::DataFile(const Path& p)
     : DataFile{p, FileType::OnePerLine, nullptr} {}
 
-DataFile::DataFile(const Path& fileIn, FileType fileType, Set* uniqueTypeNames,
-    const std::string& name)
+DataFile::DataFile(const Path& fileIn, FileType fileType,
+    StringSet* uniqueTypeNames, const std::string& name)
     : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
   auto file{fileIn};
   // try adding .txt if file isn't found
@@ -61,7 +62,7 @@ DataFile::DataFile(const Path& fileIn, FileType fileType, Set* uniqueTypeNames,
           ", file: " + file.string());
   }};
   std::ifstream f{file};
-  DataFile::List dups;
+  DataFile::StringList dups;
   for (std::string line; std::getline(f, line); ++lineNum) {
     std::stringstream ss{line};
     for (std::string token; std::getline(ss, token, ' ');) {
