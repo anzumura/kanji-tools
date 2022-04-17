@@ -64,8 +64,7 @@ public:
   [[nodiscard]] OptString extraTypeInfo() const override;
   [[nodiscard]] OptFreq frequency() const override { return _frequency; }
   [[nodiscard]] JlptLevels level() const override { return _level; }
-
-  [[nodiscard]] auto year() const { return _year; }
+  [[nodiscard]] Year year() const override { return _year; }
 protected:
   // ctor used by 'JinmeiKanji'
   OfficialKanji(DataRef, File, Name, UcdPtr);
@@ -77,7 +76,7 @@ private:
 
   const OptFreq _frequency;
   const JlptLevels _level;
-  const OptFreq _year;
+  const Year _year;
 };
 
 class JinmeiKanji : public OfficialKanji {

@@ -39,6 +39,7 @@ public:
   using NelsonIds = std::vector<NelsonId>;
   using OptFreq = std::optional<Frequency>;
   using OptString = std::optional<std::string>;
+  using Year = std::optional<u_int16_t>;
   // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
   using Name = UcdEntry::Name;
@@ -57,6 +58,7 @@ public:
   [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
+  [[nodiscard]] virtual Year year() const { return {}; }
 
   // 'linkedReadings' returns true if readings were loaded from a linked kanji
   [[nodiscard]] virtual bool linkedReadings() const { return false; }

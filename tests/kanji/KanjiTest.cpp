@@ -71,8 +71,9 @@ protected:
     EXPECT_FALSE(k.hasLevel());
     EXPECT_TRUE(k.hasMeaning());
     EXPECT_TRUE(k.hasReading());
-    ASSERT_EQ(k.type(), KanjiTypes::Extra);
+    EXPECT_EQ(k.type(), KanjiTypes::Extra);
     EXPECT_EQ(k.radical().name(), "雨");
+    EXPECT_FALSE(k.year());
   }
 
   void checkJinmeiKanji(const Kanji& k) const {
@@ -90,8 +91,8 @@ protected:
     EXPECT_EQ(k.info(), "Rad 二(1), Strokes 6, N1, Frq 1728, Old 亙, KJ1");
     EXPECT_EQ(k.radical().name(), "二");
     EXPECT_EQ(k.oldNames(), Kanji::LinkNames{"亙"});
+    EXPECT_EQ(k.year(), 1951);
     auto& e{static_cast<const JinmeiKanji&>(k)};
-    EXPECT_EQ(e.year(), 1951);
     EXPECT_EQ(e.reason(), JinmeiKanjiReasons::Names);
   }
 
@@ -305,8 +306,8 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_EQ(k.radical().name(), "二");
   EXPECT_EQ(k.extraTypeInfo(), "#7 2004 [Print]");
   EXPECT_TRUE(k.oldNames().empty());
+  EXPECT_EQ(k.year(), 2004);
   auto& e{static_cast<const JinmeiKanji&>(k)};
-  EXPECT_EQ(e.year(), 2004);
   EXPECT_EQ(e.reason(), JinmeiKanjiReasons::Print);
   checkJinmeiKanji(*results[1]);
 }
@@ -380,8 +381,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 
   for (auto& i : results) {
     auto& k{*i};
-    ASSERT_EQ(k.type(), KanjiTypes::Jouyou);
-    auto& e{static_cast<const JouyouKanji&>(k)};
+    EXPECT_EQ(k.type(), KanjiTypes::Jouyou);
     if (k.grade() == KanjiGrades::G4) {
       EXPECT_EQ(k.level(), JlptLevels::N3);
       EXPECT_EQ(k.kyu(), KenteiKyus::K7);
@@ -394,7 +394,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.info(), "Rad 心(1), Strokes 13, G4, N3, Frq 640, K7");
       EXPECT_TRUE(k.oldNames().empty());
       EXPECT_EQ(k.extraTypeInfo(), "#4");
-      EXPECT_EQ(e.year(), std::nullopt);
+      EXPECT_EQ(k.year(), std::nullopt);
     } else {
       EXPECT_EQ(k.grade(), KanjiGrades::S);
       EXPECT_EQ(k.level(), JlptLevels::N1);
@@ -418,7 +418,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.info(KanjiInfo::Grade | KanjiInfo::Old), "S, Old 艷");
       EXPECT_EQ(
           k.info(KanjiInfo::Strokes | KanjiInfo::Level), "Strokes 19, N1");
-      EXPECT_EQ(e.year(), 2010);
+      EXPECT_EQ(k.year(), 2010);
     }
   }
 }
