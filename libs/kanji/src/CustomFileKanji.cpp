@@ -58,7 +58,7 @@ Kanji::LinkNames OfficialKanji::getOldNames(File f) {
 
 JinmeiKanji::JinmeiKanji(DataRef data, File f)
     : OfficialKanji{data, f, name(f), data.findUcd(f.get(NameCol))},
-      _reason{AllJinmeiKanjiReasons.fromString(f.get(ReasonCol))} {}
+      _reason{AllJinmeiReasons.fromString(f.get(ReasonCol))} {}
 
 Kanji::OptString JinmeiKanji::extraTypeInfo() const {
   return *OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']';

@@ -73,6 +73,7 @@ protected:
     EXPECT_TRUE(k.hasReading());
     EXPECT_EQ(k.type(), KanjiTypes::Extra);
     EXPECT_EQ(k.radical().name(), "雨");
+    EXPECT_EQ(k.reason(), JinmeiReasons::None);
     EXPECT_FALSE(k.year());
   }
 
@@ -92,8 +93,7 @@ protected:
     EXPECT_EQ(k.radical().name(), "二");
     EXPECT_EQ(k.oldNames(), Kanji::LinkNames{"亙"});
     EXPECT_EQ(k.year(), 1951);
-    auto& e{static_cast<const JinmeiKanji&>(k)};
-    EXPECT_EQ(e.reason(), JinmeiKanjiReasons::Names);
+    EXPECT_EQ(k.reason(), JinmeiReasons::Names);
   }
 
   const MockData _data;
@@ -307,8 +307,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_EQ(k.extraTypeInfo(), "#7 2004 [Print]");
   EXPECT_TRUE(k.oldNames().empty());
   EXPECT_EQ(k.year(), 2004);
-  auto& e{static_cast<const JinmeiKanji&>(k)};
-  EXPECT_EQ(e.reason(), JinmeiKanjiReasons::Print);
+  EXPECT_EQ(k.reason(), JinmeiReasons::Print);
   checkJinmeiKanji(*results[1]);
 }
 

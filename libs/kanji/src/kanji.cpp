@@ -6,6 +6,20 @@
 
 namespace kanji_tools {
 
+Kanji::OptFreq Kanji::frequency() const { return {}; }
+
+KanjiGrades Kanji::grade() const { return KanjiGrades::None; }
+
+KenteiKyus Kanji::kyu() const { return KenteiKyus::None; }
+
+JlptLevels Kanji::level() const { return JlptLevels::None; }
+
+JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
+
+Kanji::Year Kanji::year() const { return {}; }
+
+bool Kanji::linkedReadings() const { return false; }
+
 Kanji::KanjiName::KanjiName(const std::string& name) : _name{name} {
   assert(MBChar::size(_name) == 1);
 }

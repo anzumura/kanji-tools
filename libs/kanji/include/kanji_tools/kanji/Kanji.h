@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kanji_tools/kanji/JinmeiReasons.h>
 #include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Ucd.h>
@@ -54,14 +55,15 @@ public:
   [[nodiscard]] virtual Meaning meaning() const = 0;
   [[nodiscard]] virtual Reading reading() const = 0;
 
-  [[nodiscard]] virtual OptFreq frequency() const { return {}; }
-  [[nodiscard]] virtual KanjiGrades grade() const { return KanjiGrades::None; }
-  [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
-  [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
-  [[nodiscard]] virtual Year year() const { return {}; }
+  [[nodiscard]] virtual OptFreq frequency() const;
+  [[nodiscard]] virtual KanjiGrades grade() const;
+  [[nodiscard]] virtual KenteiKyus kyu() const;
+  [[nodiscard]] virtual JlptLevels level() const;
+  [[nodiscard]] virtual JinmeiReasons reason() const;
+  [[nodiscard]] virtual Year year() const;
 
   // 'linkedReadings' returns true if readings were loaded from a linked kanji
-  [[nodiscard]] virtual bool linkedReadings() const { return false; }
+  [[nodiscard]] virtual bool linkedReadings() const;
 
   // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
   // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁

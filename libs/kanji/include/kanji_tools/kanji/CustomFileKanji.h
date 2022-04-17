@@ -1,6 +1,5 @@
 #pragma once
 
-#include <kanji_tools/kanji/JinmeiKanjiReasons.h>
 #include <kanji_tools/kanji/NonLinkedKanji.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
@@ -84,13 +83,13 @@ public:
   JinmeiKanji(DataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
+  [[nodiscard]] JinmeiReasons reason() const override { return _reason; }
   [[nodiscard]] OptString extraTypeInfo() const override;
-  [[nodiscard]] auto reason() const { return _reason; }
 
   inline static const std::array RequiredColumns{
       OldNamesCol, YearCol, ReasonCol};
 private:
-  const JinmeiKanjiReasons _reason;
+  const JinmeiReasons _reason;
 };
 
 class JouyouKanji : public OfficialKanji {
