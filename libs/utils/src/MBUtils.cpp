@@ -39,58 +39,55 @@ constexpr std::array U32Consts{toU32(ErrorReplacement), toU32(MinSurrogate),
 constexpr std::array WCharConsts{toWChar(ErrorReplacement),
     toWChar(MinSurrogate), toWChar(MaxSurrogate), toWChar(MaxUnicode)};
 
+// 'R' is the sequence (so wstring or u32string) and 'T' is wchar_t or u_int32_t
 template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(const char* s, const std::array<T, 4>& vals) {
+  using uInt = const unsigned int;
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
+
+  // return a 'T' that represents a 2-byte UTF-8 character (U+0080 to U+07FF)
+  const auto twoByteUtf8{[&u, &vals](uInt byte1, uInt byte2) {
+    ++u;
+    return (byte1 ^ TwoBits) > 1
+               ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
+               : vals[Error];
+  }};
+
+  // return a 'T' that represents a 3-byte UTF-8 character (U+0800 to U+FFFF)
+  const auto threeByteUtf8{[&u, &vals](uInt byte1, uInt byte2) {
+    const auto c{static_cast<T>(
+        ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1))};
+    ++u;
+    return c > 0x7ff && (c < vals[MinSur] || c > vals[MaxSur]) ? c
+                                                               : vals[Error];
+  }};
+
+  // return a 'T' that represents a 4-byte UTF-8 character (U+10080 to U+10FFFF)
+  const auto fourByteUtf8{[&u, &vals](uInt byte1, uInt byte2, uInt byte3) {
+    if ((*++u & TwoBits) != Bit1) return vals[Error]; // 4th byte not '10...'
+    const auto c{static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
+                                (byte3 << 6) + (*u ^ Bit1))};
+    ++u;
+    return c > 0xffff && c <= vals[MaxUni] ? c : vals[Error];
+  }};
+
   do {
     if (*u <= 0x7fU) {
-      const T t{*u++}; // one byte case
-      result += t;
+      const T t{*u++};
+      result += t; // single byte UTF-8 case (so regular Ascii)
     } else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
-      // first byte was '10' or started with more than four '1's
-      result += vals[Error]; // LCOV_EXCL_LINE: gcov-11 bug
       ++u;
-    } else {
-      const unsigned byte1{*u};
-      if ((*++u & TwoBits) != Bit1)
-        result += vals[Error]; // second byte didn't start with '10'
-      else {
-        const unsigned byte2 = *u ^ Bit1; // last 6 bits of the second byte
-        if (byte1 & Bit3) {
-          if ((*++u & TwoBits) != Bit1)
-            result += vals[Error]; // third byte didn't start with '10'
-          else if (byte1 & Bit4) {
-            const unsigned byte3 = *u ^ Bit1; // last 6 bits of the third byte
-            if ((*++u & TwoBits) != Bit1)
-              result += vals[Error]; // fourth byte didn't start with '10'
-            else {
-              // four byte case - check for overlong and max unicode
-              const auto c{
-                  static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
-                                 (byte3 << 6) + (*u ^ Bit1))};
-              result += c > 0xffff && c <= vals[MaxUni] ? c : vals[Error];
-              ++u;
-            }
-          } else {
-            // three byte case - check for overlong and surrogate range
-            const auto c{static_cast<T>(
-                ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1))};
-            result += c > 0x7ff && (c < vals[MinSur] || c > vals[MaxSur])
-                          ? c
-                          : vals[Error];
-            ++u;
-          }
-        } else {
-          // two byte case - check for overlong
-          result += (byte1 ^ TwoBits) > 1
-                        ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
-                        : vals[Error];
-          ++u;
-        }
-      }
-    }
+      result += vals[Error]; // 1st byte was '10...' or more than four '1's
+    } else if (uInt byte1{*u}; (*++u & TwoBits) != Bit1)
+      result += vals[Error]; // 2nd byte not '10...'
+    else if (uInt byte2 = *u ^ Bit1; byte1 & Bit3)
+      result += (*++u & TwoBits) != Bit1 ? vals[Error] // 3rd not '10...'
+                : (byte1 & Bit4)         ? fourByteUtf8(byte1, byte2, *u ^ Bit1)
+                                         : threeByteUtf8(byte1, byte2);
+    else
+      result += twoByteUtf8(byte1, byte2);
   } while (*u);
   return result;
 }
