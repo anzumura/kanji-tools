@@ -21,7 +21,7 @@ ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
 }
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
-    bool showMeanings, const List& list, KanjiInfo fields,
+    bool showMeanings, const List& list, KanjiInfo fields, // LCOV_EXCL_LINE
     ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
