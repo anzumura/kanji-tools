@@ -71,7 +71,7 @@ RadicalRef Data::getRadicalByName(const std::string& radicalName) const {
 }
 
 const Pinyin& Data::getPinyin(UcdPtr u) const {
-  static const Pinyin EmptyPinyin;
+  static constexpr Pinyin EmptyPinyin;
   return u ? u->pinyin() : EmptyPinyin;
 }
 
