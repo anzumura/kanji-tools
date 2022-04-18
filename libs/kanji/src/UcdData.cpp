@@ -136,7 +136,8 @@ void UcdData::load(const Data::Path& file) {
                      vStrokes, f.get(pinyinCol), f.get(morohashiCol),
                      f.get(nelsonIdsCol), f.get(sourcesCol), f.get(jSourceCol),
                      joyo, jinmei,
-                     UcdLinks{links, AllUcdLinkTypes.fromString(linkType, true),
+                     UcdLinks{links,
+                         AllUcdLinkTypes.fromStringAllowEmpty(linkType),
                          linkedReadings},
                      f.get(meaningCol), f.get(onCol), f.get(kunCol)))
              .second)

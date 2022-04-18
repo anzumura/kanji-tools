@@ -66,8 +66,8 @@ protected:
 };
 
 // 'TypedEnumArray' has a pure virtual 'toString' function holds a map from
-// 'std::string' to 'Ts' used by derived class 'fromString' methods. It also
-// has static 'create', 'isCreated' and 'instance' public functions.
+// 'std::string' to 'Ts' used by 'fromString' methods. It also has static
+// 'create', 'isCreated' and 'instance' public functions.
 template<typename T, isEnumArray<T> = 0>
 class TypedEnumArray : public BaseEnumArray {
 public:
@@ -85,10 +85,13 @@ public:
   ~TypedEnumArray() override { _instance = nullptr; }
 
   [[nodiscard]] virtual const std::string& toString(T) const = 0;
+
+  // returns 'T' instance for the given string (does not support T::None). See
+  // EnumArrayWithNone form more 'fromString...' methods that support T::None.
+  [[nodiscard]] T fromString(const std::string& name) const;
 protected:
   TypedEnumArray() noexcept { _instance = this; }
 
-  [[nodiscard]] T find(const std::string& name) const;
   void insert(const std::string& name, BaseIterableEnum::Index index);
 private:
   inline static constinit const TypedEnumArray<T>* _instance;
@@ -157,10 +160,6 @@ public:
   [[nodiscard]] const std::string& toString(T x) const override {
     return _names[base::getIndex(x)];
   }
-
-  [[nodiscard]] auto fromString(const std::string& s) const {
-    return base::find(s);
-  }
 private:
   friend TypedEnumArray<T>; // 'create' calls private ctor
 
@@ -192,9 +191,16 @@ public:
     return i < N ? _names[i] : None;
   }
 
-  [[nodiscard]] auto fromString(
-      const std::string& s, bool allowEmptyAsNone = false) const {
-    return allowEmptyAsNone && s.empty() || s == None ? T::None : base::find(s);
+  [[nodiscard]] auto fromStringAllowEmpty(const std::string& s) const {
+    return s.empty() ? T::None : base::fromString(s);
+  }
+
+  [[nodiscard]] auto fromStringAllowNone(const std::string& s) const {
+    return s == None ? T::None : base::fromString(s);
+  }
+
+  [[nodiscard]] auto fromStringAllowEmptyAndNone(const std::string& s) const {
+    return s.empty() || s == None ? T::None : base::fromString(s);
   }
 private:
   inline const static std::string None{"None"};
@@ -237,7 +243,7 @@ template<typename... Names>
 }
 
 template<typename T, isEnumArray<T> _>
-T TypedEnumArray<T, _>::find(const std::string& name) const {
+T TypedEnumArray<T, _>::fromString(const std::string& name) const {
   const auto i{_nameMap.find(name)};
   if (i == _nameMap.end()) domainError("name '" + name + "' not found");
   return i->second;

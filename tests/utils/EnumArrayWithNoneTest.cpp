@@ -169,18 +169,30 @@ TEST(EnumArrayWithNoneTest, FromString) {
   EXPECT_EQ(AllColors.fromString("Red"), Colors::Red);
   EXPECT_EQ(AllColors.fromString("Green"), Colors::Green);
   EXPECT_EQ(AllColors.fromString("Blue"), Colors::Blue);
-  EXPECT_EQ(AllColors.fromString("None"), Colors::None);
-  // set allowEmptyAsNone to true
-  EXPECT_EQ(AllColors.fromString("", true), Colors::None);
+  EXPECT_EQ(AllColors.fromStringAllowEmpty(""), Colors::None);
+  EXPECT_EQ(AllColors.fromStringAllowNone("None"), Colors::None);
+  EXPECT_EQ(AllColors.fromStringAllowEmptyAndNone(""), Colors::None);
+  EXPECT_EQ(AllColors.fromStringAllowEmptyAndNone("None"), Colors::None);
 }
 
 TEST(EnumArrayWithNoneTest, BadFromString) {
-  EXPECT_THROW(
-      call([] { return AllColors.fromString(""); }, "name '' not found"),
-      std::domain_error);
-  EXPECT_THROW(call([] { return AllColors.fromString("Blah"); },
-                   "name 'Blah' not found"),
-      std::domain_error);
+  for (auto i : {"", "None", "Blah"}) {
+    const std::string s{i};
+    const std::string msg{"name '" + s + "' not found"};
+    EXPECT_THROW(
+        call([&s] { return AllColors.fromString(s); }, msg), std::domain_error);
+    if (s != "None")
+      EXPECT_THROW(call([&s] { return AllColors.fromStringAllowNone(s); }, msg),
+          std::domain_error);
+    if (!s.empty())
+      EXPECT_THROW(
+          call([&s] { return AllColors.fromStringAllowEmpty(s); }, msg),
+          std::domain_error);
+    if (!s.empty() && s != "None")
+      EXPECT_THROW(
+          call([&s] { return AllColors.fromStringAllowEmptyAndNone(s); }, msg),
+          std::domain_error);
+  }
 }
 
 TEST(EnumArrayWithNoneTest, HasValue) {
