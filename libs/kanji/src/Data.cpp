@@ -70,9 +70,9 @@ RadicalRef Data::getRadicalByName(const std::string& radicalName) const {
   return _radicals.find(radicalName);
 }
 
-Kanji::OptString Data::getPinyin(UcdPtr u) const {
-  return u && !u->pinyin().empty() ? Kanji::OptString{u->pinyin()}
-                                   : std::nullopt;
+const Pinyin& Data::getPinyin(UcdPtr u) const {
+  static const Pinyin EmptyPinyin;
+  return u ? u->pinyin() : EmptyPinyin;
 }
 
 Kanji::OptString Data::getMorohashiId(UcdPtr u) const {

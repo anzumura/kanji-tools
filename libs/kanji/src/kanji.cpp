@@ -35,8 +35,8 @@ std::string Kanji::KanjiName::nonVariant() const {
 }
 
 Kanji::Kanji(DataRef d, Name n, RadicalRef radical, Strokes strokes, UcdPtr u)
-    : Kanji{n, d.getCompatibilityName(n), radical, strokes, d.getMorohashiId(u),
-          d.getNelsonIds(u), d.getPinyin(u)} {}
+    : Kanji{n, d.getCompatibilityName(n), radical, strokes, d.getPinyin(u),
+          d.getMorohashiId(u), d.getNelsonIds(u)} {}
 
 std::string Kanji::compatibilityName() const {
   return _compatibilityName.value_or(_name);
@@ -64,7 +64,7 @@ std::string Kanji::info(KanjiInfo fields) const {
         ')');
   if (hasValue(fields & KanjiInfo::Strokes) && strokes())
     add(StrokesMsg + std::to_string(strokes()));
-  if (hasValue(fields & KanjiInfo::Pinyin) && pinyin()) add(*pinyin());
+  if (hasValue(fields & KanjiInfo::Pinyin) && _pinyin) add(_pinyin.name());
   if (hasValue(fields & KanjiInfo::Grade) && hasGrade()) add(toString(grade()));
   if (hasValue(fields & KanjiInfo::Level) && hasLevel()) add(toString(level()));
   if (hasValue(fields & KanjiInfo::Freq) && frequency())

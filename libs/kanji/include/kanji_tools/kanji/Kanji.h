@@ -172,11 +172,11 @@ protected:
 
   // ctor used by above ctor as well as 'TestKanji' class
   Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
-      Strokes strokes, const OptString& morohashiId, const NelsonIds& nelsonIds,
-      const OptString& pinyin)
+      Strokes strokes, const Pinyin& pinyin, const OptString& morohashiId,
+      const NelsonIds& nelsonIds)
       : _name{KanjiName{name}}, _compatibilityName{compatibilityName},
-        _radical{radical}, _strokes{strokes}, _morohashiId{morohashiId},
-        _nelsonIds{nelsonIds}, _pinyin{pinyin} {}
+        _radical{radical}, _strokes{strokes}, _pinyin{pinyin},
+        _morohashiId{morohashiId}, _nelsonIds{nelsonIds} {}
 
   inline static const LinkNames EmptyLinkNames;
 private:
@@ -197,9 +197,9 @@ private:
   const Strokes _strokes;
 
   // optional fields
+  const Pinyin _pinyin;
   const OptString _morohashiId;
   const NelsonIds _nelsonIds;
-  const OptString _pinyin;
 };
 
 } // namespace kanji_tools

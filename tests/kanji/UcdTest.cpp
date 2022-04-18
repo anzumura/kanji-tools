@@ -58,8 +58,8 @@ TEST(UcdTest, SetSources) {
 TEST(UcdTest, CodeAndName) {
   const Ucd ucd{TestUcd{"学"}.code(u'\x5b66').block("CJK").version("1.1")};
   EXPECT_EQ(ucd.code(), u'\x5b66');
-  EXPECT_EQ(ucd.block(), "CJK");
-  EXPECT_EQ(ucd.version(), "1.1");
+  EXPECT_EQ(ucd.block().name(), "CJK");
+  EXPECT_EQ(ucd.version().name(), "1.1");
   EXPECT_EQ(ucd.linkType(), UcdLinkTypes::None);
   EXPECT_EQ(ucd.codeAndName(), "[5B66] 学");
 }

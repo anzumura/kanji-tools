@@ -48,19 +48,19 @@ private:
 class UcdBlock : public Symbol<UcdBlock> {
 public:
   inline static const std::string Type{"UcdBlock"};
-  explicit UcdBlock(const std::string& name) : Symbol<UcdBlock>{name} {}
+  using Symbol::Symbol;
 };
 
 class UcdVersion : public Symbol<UcdVersion> {
 public:
   inline static const std::string Type{"UcdVersion"};
-  explicit UcdVersion(const std::string& name) : Symbol<UcdVersion>{name} {}
+  using Symbol::Symbol;
 };
 
 class Pinyin : public Symbol<Pinyin> {
 public:
   inline static const std::string Type{"Pinyin"};
-  explicit Pinyin(const std::string& name) : Symbol<Pinyin>{name} {}
+  using Symbol::Symbol;
 };
 
 // 'Ucd' holds data loaded from 'ucd.txt' which is an extract of the Unicode
@@ -84,9 +84,9 @@ public:
   Ucd(const Ucd&) = delete;
 
   [[nodiscard]] auto& entry() const { return _entry; }
-  [[nodiscard]] auto& block() const { return _block.name(); }
-  [[nodiscard]] auto& version() const { return _version.name(); }
-  [[nodiscard]] auto& pinyin() const { return _pinyin.name(); }
+  [[nodiscard]] auto& block() const { return _block; }
+  [[nodiscard]] auto& version() const { return _version; }
+  [[nodiscard]] auto& pinyin() const { return _pinyin; }
   [[nodiscard]] auto radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
   [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }

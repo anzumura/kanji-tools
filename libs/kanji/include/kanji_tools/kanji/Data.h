@@ -65,8 +65,7 @@ public:
   [[nodiscard]] virtual RadicalRef getRadicalByName(
       const std::string& radicalName) const;
 
-  // 'getPinyin' returns 'optional' since not all Kanji have a Pinyin reading
-  [[nodiscard]] Kanji::OptString getPinyin(UcdPtr) const;
+  [[nodiscard]] const Pinyin& getPinyin(UcdPtr) const;
 
   // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see
   // comments in scripts/parseUcdAllFlat.sh)

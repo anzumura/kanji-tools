@@ -112,6 +112,18 @@ TEST_F(KanjiTest, Equals) {
   EXPECT_NE(first, diffName);
 }
 
+TEST_F(KanjiTest, Size) {
+  EXPECT_EQ(sizeof(Kanji::Year), 4);
+  EXPECT_EQ(sizeof(KanjiPtr), 16);
+#ifdef __clang__
+  EXPECT_EQ(sizeof(Kanji::OptString), 32);
+  EXPECT_EQ(sizeof(Kanji), 136);
+#else
+  EXPECT_EQ(sizeof(Kanji::OptString), 40);
+  EXPECT_EQ(sizeof(Kanji), 160);
+#endif
+}
+
 TEST_F(KanjiTest, FrequencyKanji) {
   const Kanji::Frequency frequency{2362};
   const auto kyu{KenteiKyus::KJ1};

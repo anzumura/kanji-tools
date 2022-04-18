@@ -85,7 +85,7 @@ bool GroupQuiz::includeMember(const Kanji& k, MemberType memberType) {
 void GroupQuiz::addPinyin(const Kanji& kanji, std::string& s) {
   static const std::string NoPinyin(PinyinWidth, ' ');
   if (kanji.pinyin()) {
-    const auto p{"  (" + *kanji.pinyin() + ')'};
+    const auto p{"  (" + kanji.pinyin().name() + ')'};
     // use 'displaySize' since Pinyin can contain multi-byte chars (for tones)
     s += p + std::string(PinyinWidth - displaySize(p), ' ');
   } else
