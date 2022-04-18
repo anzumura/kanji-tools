@@ -3,7 +3,7 @@
 #include <kanji_tools/utils/Utils.h>
 
 #ifdef USE_CODECVT_FOR_UTF_8
-#include <kanji_tools/tests/WhatMismatch.h>
+#include <tests/kanji_tools/WhatMismatch.h>
 #endif
 
 namespace kanji_tools {

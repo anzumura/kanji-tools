@@ -1,8 +1,6 @@
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Utils.h>
 
-#include <iostream>
-
 #ifdef USE_CODECVT_FOR_UTF_8
 #include <codecvt> // for codecvt_utf8
 #include <locale>  // for wstring_convert
