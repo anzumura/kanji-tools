@@ -36,16 +36,17 @@ public:
 
   [[nodiscard]] constexpr auto id() const { return _id; }
 
-  [[nodiscard]] constexpr operator bool() const { return _id; }
+  [[nodiscard]] explicit constexpr operator bool() const { return _id; }
 protected:
   using Map = std::map<std::string, Id>;
   using List = std::vector<const std::string*>;
 
   constexpr explicit BaseSymbol(Id id) noexcept : _id{id} {}
-
+  BaseSymbol(const std::string& type, const std::string& name, Map&, List&);
+private:
   [[nodiscard]] static Id getId(
       const std::string& type, const std::string& name, Map&, List&);
-private:
+
   const Id _id;
 };
 
@@ -63,10 +64,20 @@ public:
 
   constexpr Symbol() noexcept : BaseSymbol{0} {}
   explicit Symbol(const std::string& name)
-      : BaseSymbol{getId(type(), name, _map, _list)} {}
+      : BaseSymbol{type(), name, _map, _list} {}
 
   [[nodiscard]] auto& name() const {
     return id() ? *_list.at(id() - 1) : EmptyString;
+  }
+
+  template<typename U>
+  [[nodiscard]] constexpr auto operator==(const Symbol<U>& x) const noexcept {
+    return std::is_same_v<T, U> && id() == x.id();
+  }
+
+  template<typename U>
+  [[nodiscard]] constexpr auto operator!=(const Symbol<U>& x) const noexcept {
+    return !operator==(x);
   }
 private:
   inline static Map _map;
