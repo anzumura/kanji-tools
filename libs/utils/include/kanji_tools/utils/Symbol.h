@@ -32,9 +32,9 @@ public:
   using Id = u_int16_t;
 
   // '0' is used as the 'id' for 'empty' symbols (non-empty start at '1')
-  constexpr static Id Max{std::numeric_limits<BaseSymbol::Id>::max() - 1};
+  static constexpr auto Max{std::numeric_limits<Id>::max() - 1};
 
-  [[nodiscard]] constexpr Id id() const { return _id; }
+  [[nodiscard]] constexpr auto id() const { return _id; }
 
   [[nodiscard]] constexpr operator bool() const { return _id; }
 protected:
@@ -58,8 +58,7 @@ public:
 
   // 'exists' returns true if a symbol exists for the given (non-empty) name
   [[nodiscard]] static auto exists(const std::string& name) {
-    if (name.empty()) return false;
-    return _map.contains(name);
+    return !name.empty() && _map.contains(name);
   }
 
   constexpr Symbol() noexcept : BaseSymbol{0} {}
