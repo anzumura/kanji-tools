@@ -70,11 +70,11 @@ public:
     return id() ? *_list.at(id() - 1) : EmptyString;
   }
 
-  [[nodiscard]] constexpr auto operator==(const Symbol<T>& x) const noexcept {
+  [[nodiscard]] constexpr auto operator==(const Symbol& x) const noexcept {
     return id() == x.id();
   }
 
-  [[nodiscard]] constexpr auto operator!=(const Symbol<T>& x) const noexcept {
+  [[nodiscard]] constexpr auto operator!=(const Symbol& x) const noexcept {
     return !operator==(x);
   }
 private:
