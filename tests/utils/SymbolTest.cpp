@@ -49,6 +49,9 @@ TEST(SymbolTest, OperatorBool) {
   const TestSymbol nonEmpty{"nonEmpty"}, empty{};
   EXPECT_TRUE(nonEmpty);
   EXPECT_FALSE(empty);
+  EXPECT_EQ(empty.name(), EmptyString);
+  EXPECT_TRUE(TestSymbol::exists(nonEmpty.name()));
+  EXPECT_FALSE(TestSymbol::exists(empty.name()));
 }
 
 TEST(SymbolTest, OstreamOperator) {
