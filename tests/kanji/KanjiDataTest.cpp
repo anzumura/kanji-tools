@@ -54,6 +54,11 @@ TEST_F(KanjiDataTest, BasicChecks) {
   EXPECT_EQ(_data->kanjiNameMap().size(), 23715);
   EXPECT_EQ(_data->level("院"), JlptLevels::N4);
   EXPECT_EQ(_data->frequency("蝦"), 2501);
+  // Ucd data related
+  EXPECT_EQ(_data->ucd().map().size(), _data->kanjiNameMap().size());
+  EXPECT_EQ(Pinyin::size(), 1337);
+  EXPECT_EQ(UcdBlock::size(), 8);
+  EXPECT_EQ(UcdVersion::size(), 10);
 }
 
 TEST_F(KanjiDataTest, FrequencyKanjiChecks) {
