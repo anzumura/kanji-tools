@@ -70,13 +70,11 @@ public:
     return id() ? *_list.at(id() - 1) : EmptyString;
   }
 
-  template<typename U>
-  [[nodiscard]] constexpr auto operator==(const Symbol<U>& x) const noexcept {
-    return std::is_same_v<T, U> && id() == x.id();
+  [[nodiscard]] constexpr auto operator==(const Symbol<T>& x) const noexcept {
+    return id() == x.id();
   }
 
-  template<typename U>
-  [[nodiscard]] constexpr auto operator!=(const Symbol<U>& x) const noexcept {
+  [[nodiscard]] constexpr auto operator!=(const Symbol<T>& x) const noexcept {
     return !operator==(x);
   }
 private:

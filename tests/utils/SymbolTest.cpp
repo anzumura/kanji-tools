@@ -12,18 +12,6 @@ public:
   using Symbol::Symbol;
 };
 
-class TestSymbolA : public Symbol<TestSymbolA> {
-public:
-  inline static const std::string Type{"TestSymbolA"};
-  using Symbol::Symbol;
-};
-
-class TestSymbolB : public Symbol<TestSymbolB> {
-public:
-  inline static const std::string Type{"TestSymbolB"};
-  using Symbol::Symbol;
-};
-
 } // namespace
 
 TEST(SymbolTest, SymbolSizeAndType) {
@@ -73,6 +61,12 @@ TEST(SymbolTest, OstreamOperator) {
   EXPECT_EQ(s.str(), x.name());
 }
 
+TEST(SymbolTest, Equality) {
+  const TestSymbol a1{"a1"}, a2{"a2"}, anotherA1{"a1"};
+  EXPECT_NE(a1, a2);
+  EXPECT_EQ(a1, anotherA1);
+}
+
 TEST(SymbolTest, TooManySymbols) {
   size_t name{};
   while (TestSymbol::size() < BaseSymbol::Max)
@@ -87,18 +81,6 @@ TEST(SymbolTest, TooManySymbols) {
   // allow creating a new symbol with an existing name (so just a lookup)
   const TestSymbol oneMore{"name-1"};
   EXPECT_EQ(oneMore.name(), "name-1");
-}
-
-TEST(SymbolTest, Equality) {
-  const TestSymbolA a1{"a1"}, a2{"a2"}, anotherA1{"a1"};
-  EXPECT_NE(a1, a2);
-  EXPECT_EQ(a1, anotherA1);
-  // use same name for the symbol to prove different types aren't equal
-  const TestSymbolB b1{"a1"}, anotherB1{"a1"};
-  EXPECT_EQ(a1.id(), b1.id());
-  EXPECT_EQ(a1.name(), b1.name());
-  EXPECT_NE(a1, b1); // name and id are the same, but different symbol type
-  EXPECT_EQ(b1, anotherB1);
 }
 
 } // namespace kanji_tools
