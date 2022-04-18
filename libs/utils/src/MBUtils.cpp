@@ -34,12 +34,12 @@ constexpr Code ErrorReplacement{0xfffd};
 constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
 
 constexpr auto Error{0}, MinSur{1}, MaxSur{2}, MaxUni{3};
-constexpr std::array U32Consts{toU32(ErrorReplacement), toU32(MinSurrogate),
-    toU32(MaxSurrogate), toU32(MaxUnicode)};
-constexpr std::array WCharConsts{toWChar(ErrorReplacement),
+constexpr std::array Char32Vals{
+    ErrorReplacement, MinSurrogate, MaxSurrogate, MaxUnicode};
+constexpr std::array WCharVals{toWChar(ErrorReplacement),
     toWChar(MinSurrogate), toWChar(MaxSurrogate), toWChar(MaxUnicode)};
 
-// 'R' is the sequence (so wstring or u32string) and 'T' is wchar_t or u_int32_t
+// 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
 template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(const char* s, const std::array<T, 4>& vals) {
   using uInt = const unsigned int;
@@ -127,7 +127,7 @@ std::u32string fromUtf8(const char* s) {
   const auto r{utf8Converter()->from_bytes(s)};
   return std::u32string(reinterpret_cast<const Code*>(r.c_str()));
 #else
-  return convertFromUtf8<std::u32string>(s, U32Consts);
+  return convertFromUtf8<std::u32string>(s, Char32Vals);
 #endif
 }
 
@@ -165,7 +165,7 @@ std::wstring fromUtf8ToWstring(const char* s) {
 #ifdef USE_CODECVT_FOR_UTF_8
   return utf8Converter()->from_bytes(s);
 #else
-  return convertFromUtf8<std::wstring>(s, WCharConsts);
+  return convertFromUtf8<std::wstring>(s, WCharVals);
 #endif
 }
 

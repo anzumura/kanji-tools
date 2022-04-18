@@ -26,11 +26,7 @@ using Code = char32_t;
 [[nodiscard]] std::string toUtf8(long x);
 [[nodiscard]] std::string toUtf8(const std::u32string&);
 
-// safe conversions of Code to u_int32_t and wchar_t
-inline constexpr u_int32_t toU32(Code x) noexcept {
-  static_assert(sizeof(u_int32_t) == sizeof(Code));
-  return static_cast<u_int32_t>(x);
-}
+// safe conversions of Code to wchar_t
 inline constexpr wchar_t toWChar(Code x) noexcept {
   static_assert(sizeof(wchar_t) == sizeof(Code));
   return static_cast<wchar_t>(x);
