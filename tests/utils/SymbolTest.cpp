@@ -9,7 +9,7 @@ namespace {
 class TestSymbol : public Symbol<TestSymbol> {
 public:
   inline static const std::string Type{"TestSymbol"};
-  explicit TestSymbol(const std::string& name) : Symbol<TestSymbol>{name} {}
+  using Symbol::Symbol;
 };
 
 } // namespace
@@ -26,10 +26,9 @@ TEST(SymbolTest, CreateSymbols) {
   const auto before{TestSymbol::size()};
   const TestSymbol t1{"t1"}, t2{"t2"};
   EXPECT_EQ(t1.name(), "t1");
-  EXPECT_EQ(t1.id(), 0);
+  EXPECT_EQ(t1.id(), before + 1);
   EXPECT_EQ(t2.name(), "t2");
-  EXPECT_EQ(t2.id(), 1);
-  EXPECT_EQ(TestSymbol::size(), 2);
+  EXPECT_EQ(t2.id(), before + 2);
   EXPECT_EQ(TestSymbol::size(), before + 2);
   EXPECT_TRUE(TestSymbol::exists("t1"));
   EXPECT_TRUE(TestSymbol::exists("t2"));
@@ -46,9 +45,22 @@ TEST(SymbolTest, CreateDuplicateSymbols) {
   EXPECT_EQ(TestSymbol::size(), before + 1);
 }
 
+TEST(SymbolTest, OperatorBool) {
+  const TestSymbol nonEmpty{"nonEmpty"}, empty{};
+  EXPECT_TRUE(nonEmpty);
+  EXPECT_FALSE(empty);
+}
+
+TEST(SymbolTest, OstreamOperator) {
+  std::stringstream s;
+  const TestSymbol x{"outTest"};
+  s << x;
+  EXPECT_EQ(s.str(), x.name());
+}
+
 TEST(SymbolTest, TooManySymbols) {
   size_t name{};
-  while (TestSymbol::size() < std::numeric_limits<BaseSymbol::Id>::max())
+  while (TestSymbol::size() < BaseSymbol::Max)
     TestSymbol{"name-" + std::to_string(++name)};
   const auto before{TestSymbol::size()};
   EXPECT_THROW(call([] { TestSymbol{"foo"}; },
