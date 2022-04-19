@@ -52,7 +52,7 @@ protected:
 
 // 'to_index' and 'from_index' convert between 'size_t' and a scoped enum value.
 // These functions are used in EnumMap and EnumArray classes (where the scoped
-// enum is used as an index) and are safer than plain static cast since there
+// enum is used as an index) and are safer than plain static cast since they do
 // more compile time type checks on the types.
 
 template<typename T>
