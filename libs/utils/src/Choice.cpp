@@ -14,11 +14,12 @@ const std::string AlreadyInChoices{"' already in choices"};
 
 // LCOV_EXCL_START - this code requires user input (so not covered by tests)
 char Choice::getOneChar() {
+  static constexpr tcflag_t Icanon{ICANON}, Echo{ECHO};
   struct termios settings {};
   if (tcgetattr(0, &settings) < 0) perror("tcsetattr()");
   // turn raw mode on - allows getting single char without waiting for 'return'
-  settings.c_lflag &= ~static_cast<tcflag_t>(ICANON);
-  settings.c_lflag &= ~static_cast<tcflag_t>(ECHO);
+  settings.c_lflag &= ~Icanon;
+  settings.c_lflag &= ~Echo;
   settings.c_cc[VMIN] = 1;
   settings.c_cc[VTIME] = 0;
   if (tcsetattr(0, TCSANOW, &settings) < 0)
@@ -27,8 +28,8 @@ char Choice::getOneChar() {
   char result{};
   if (read(0, &result, 1) < 0) perror("read()");
   // turn raw mode off
-  settings.c_lflag |= ICANON;
-  settings.c_lflag |= ECHO;
+  settings.c_lflag |= Icanon;
+  settings.c_lflag |= Echo;
   if (tcsetattr(0, TCSADRAIN, &settings) < 0)
     perror("tcsetattr() - turning off raw mode");
   return result;
