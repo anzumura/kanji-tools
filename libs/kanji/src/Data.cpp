@@ -11,7 +11,7 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-namespace { // LCOV_EXCL_LINE: gcov bug
+namespace { // LCOV_EXCL_LINE: covered
 
 const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"}, ExtraFile{"extra"};
 

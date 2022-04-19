@@ -24,12 +24,12 @@ constexpr std::array PatternGroups{"：カ", "：サ", "：タ", "：ハ", "：�
 
 constexpr auto RefreshOption{'\''}, EditOption{'*'};
 
-constexpr auto TotalLetters{'z' - 'a'}; // LCOV_EXCL_LINE: gcov bug
+constexpr auto TotalLetters{'z' - 'a'}; // LCOV_EXCL_LINE: covered
 
 } // namespace
 
 GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
-    // LCOV_EXCL_START: gcov bug
+    // LCOV_EXCL_START: covered
     bool showMeanings, const GroupData::List& list, MemberType memberType)
     // LCOV_EXCL_STOP
     : Quiz{launcher, question, showMeanings}, _groupType{getGroupType(list)} {

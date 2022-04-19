@@ -12,7 +12,7 @@ std::mt19937 RandomGen(RandomDevice());
 
 const std::string Prompt{"  Select"};
 
-constexpr auto ChoiceStart{'1'}; // LCOV_EXCL_LINE: gcov bug
+constexpr auto ChoiceStart{'1'}; // LCOV_EXCL_LINE: covered
 
 } // namespace
 
@@ -21,7 +21,7 @@ ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
 }
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
-    bool showMeanings, const KanjiList& list, // LCOV_EXCL_LINE: gcov bug
+    bool showMeanings, const KanjiList& list, // LCOV_EXCL_LINE: covered
     KanjiInfo fields, ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},

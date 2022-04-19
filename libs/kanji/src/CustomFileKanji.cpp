@@ -19,7 +19,7 @@ CustomFileKanji::CustomFileKanji(DataRef data, File f, Name name,
       _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 CustomFileKanji::CustomFileKanji(
-    // LCOV_EXCL_START: gcov bug
+    // LCOV_EXCL_START: covered
     DataRef data, File f, Name name, OldNames oldNames, UcdPtr u)
     // LCOV_EXCL_STOP
     : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),

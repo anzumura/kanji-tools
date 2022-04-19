@@ -11,7 +11,7 @@ namespace kanji_tools {
 namespace {
 
 const std::string WideColon{"："};
-// LCOV_EXCL_START: gcov bug
+// LCOV_EXCL_START: covered
 constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
 // LCOV_EXCL_STOP
 

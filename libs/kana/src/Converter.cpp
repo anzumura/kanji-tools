@@ -28,7 +28,7 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
   for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
            D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
-           // LCOV_EXCL_START: gcov bug
+           // LCOV_EXCL_START: covered
            D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
            // LCOV_EXCL_STOP
            // Ascii 0-9
@@ -313,7 +313,7 @@ void Converter::processRomaji(std::string& letters, std::string& result) const {
 bool Converter::processRomajiMacron(const std::string& letter,
     std::string& letters, std::string& result) const {
   static const std::map<std::string, std::pair<char, std::string>> Macrons{
-      {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, // LCOV_EXCL_LINE: gcov-11 bug
+      {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, // GCOV_EXCL_LINE: covered
       {"ū", {'u', "う"}}, {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
 
   if (const auto i{Macrons.find(letter)}; i != Macrons.end()) {

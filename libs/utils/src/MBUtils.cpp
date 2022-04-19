@@ -120,10 +120,10 @@ template<typename R, typename T = typename R::value_type>
       const T t{*u++};
       result += t; // single byte UTF-8 case (so regular Ascii)
     } else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
-      // LCOV_EXCL_START: gcov-11 bug
+      // GCOV_EXCL_START: covered
       ++u;
       result += v[Err]; // 1st byte was '10...' or more than four '1's
-      // LCOV_EXCL_STOP
+      // GCOV_EXCL_STOP
     } else if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
       result += v[Err]; // 2nd byte not '10...'
     else if (uInt b2 = *u ^ Bit1; b1 & Bit3)
@@ -131,7 +131,7 @@ template<typename R, typename T = typename R::value_type>
                 : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
                                          : threeByte(b1, b2);
     else
-      result += twoByte(b1, b2); // LCOV_EXCL_LINE: gcov-11 bug
+      result += twoByte(b1, b2); // GCOV_EXCL_LINE: covered
   } while (*u);
   return result;
 }
@@ -152,13 +152,13 @@ void convertToUtf8(Code c, std::string& s) {
       s += toChar((Six & c) + Bit1);
     } else
       s += ReplacementCharacter;
-  } else if (c <= MaxUnicode) { // LCOV_EXCL_LINE: gcov-11 bug
+  } else if (c <= MaxUnicode) { // GCOV_EXCL_LINE: covered
     s += toChar(right18(FirstThree & c, FourBits));
     s += toChar(right12(ThirdSix & c, Bit1));
     s += toChar(right6(SecondSix & c, Bit1));
     s += toChar((Six & c) + Bit1);
   } else
-    s += ReplacementCharacter; // LCOV_EXCL_LINE: gcov-11 bug
+    s += ReplacementCharacter; // GCOV_EXCL_LINE: covered
 }
 #endif
 
@@ -251,10 +251,10 @@ MBUtf8Result validateMBUtf8(
       if (c <= Max3Uni) return err(Utf8Result::Overlong); // overlong 4 byte
       if (c > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
     } else if (uInt c{threeByteUtf8<Code>(u, b1, b2)}; c <= Max2Uni)
-      return err(Utf8Result::Overlong); // overlong 3 byte
+      return err(Utf8Result::Overlong); // GCOV_EXCL_LINE: covered
     else if (c >= MinSurrogate && c <= MaxSurrogate)
       return err(Utf8Result::InvalidCodePoint);
-  } else if ((b1 ^ TwoBits) < 2)      // LCOV_EXCL_LINE: gcov-11 bug
+  } else if ((b1 ^ TwoBits) < 2)      // GCOV_EXCL_LINE: covered
     return err(Utf8Result::Overlong); // overlong 2 byte
   return !sizeOne || !*++u ? MBUtf8Result::Valid
                            : err(Utf8Result::StringTooLong);
