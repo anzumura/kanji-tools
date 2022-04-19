@@ -16,6 +16,10 @@ TEST(MBCharTest, Size) {
   auto s{toUtf8(mbCharWithVariant)};
   EXPECT_EQ(s.size(), 6);
   EXPECT_EQ(MBChar::size(s), 1);
+  s = MBChar::noVariationSelector(s); // strip off the variation selector
+  EXPECT_EQ(s.size(), 3);
+  // char is unchanged if it doesn't have a variation selector
+  EXPECT_EQ(MBChar::noVariationSelector(s), s);
   // combining marks are not included in 'size'
   const std::string noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
   EXPECT_EQ(noMarks.size(), 27);
