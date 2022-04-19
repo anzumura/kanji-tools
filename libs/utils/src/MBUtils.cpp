@@ -27,65 +27,94 @@ inline auto utf8Converter() {
   return &conv;
 }
 #else
-constexpr Code ErrorReplacement{0xfffd};
+using uInt = const unsigned int;
+
+// constants and functions for shifting to help simplify the code and get rid
+// of 'magic' numbers
+
+constexpr uInt Shift6{6};
+constexpr uInt Shift12{Shift6 * 2}, Shift18{Shift6 * 3};
+
+constexpr auto left6(uInt x) noexcept { return x << Shift6; }
+constexpr auto left12(uInt x) noexcept { return x << Shift12; }
+constexpr auto left18(uInt x) noexcept { return x << Shift18; }
+
+constexpr auto left6(uInt x, uInt y) noexcept { return left6(x) + y; }
+constexpr auto left12(uInt x, uInt y) noexcept { return left12(x) + y; }
+constexpr auto left18(uInt x, uInt y) noexcept { return left18(x) + y; }
+
+constexpr auto right6(uInt x, uInt y) noexcept { return (x >> Shift6) + y; }
+constexpr auto right12(uInt x, uInt y) noexcept { return (x >> Shift12) + y; }
+constexpr auto right18(uInt x, uInt y) noexcept { return (x >> Shift18) + y; }
+
+// allow casting 'uInt' to 'char32_t' or 'wchar_t' (used by 'convertFromUtf8')
+template<typename T>
+constexpr std::enable_if_t<
+    std::is_same_v<T, Code> || std::is_same_v<T, wchar_t>, T>
+cast(uInt x) noexcept {
+  return static_cast<T>(x);
+}
+
+constexpr Code Max2Uni{0x7ff}, Max3Uni{0xffff}, ErrorReplacement{0xfffd};
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
 constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
 
-constexpr auto Error{0}, MinSur{1}, MaxSur{2}, MaxUni{3};
+// 'convertFromUtf8' is templated so use arrays of constants of the templated
+// type in order to avoid casting and type warnings
+
+constexpr auto Err{0}, MinSur{1}, MaxSur{2}, MaxTwo{3}, MaxThree{4}, MaxUni{5};
 constexpr std::array Char32Vals{
-    ErrorReplacement, MinSurrogate, MaxSurrogate, MaxUnicode};
-constexpr std::array WCharVals{toWChar(ErrorReplacement),
-    toWChar(MinSurrogate), toWChar(MaxSurrogate), toWChar(MaxUnicode)};
+    ErrorReplacement, MinSurrogate, MaxSurrogate, Max2Uni, Max3Uni, MaxUnicode};
+constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
+    toWChar(MaxSurrogate), toWChar(Max2Uni), toWChar(Max3Uni),
+    toWChar(MaxUnicode)};
 
 // 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
 template<typename R, typename T = typename R::value_type>
-[[nodiscard]] R convertFromUtf8(const char* s, const std::array<T, 4>& vals) {
-  using uInt = const unsigned int;
+[[nodiscard]] R convertFromUtf8(
+    const char* s, const std::array<T, Char32Vals.size()>& v) {
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
 
   // return a 'T' that represents a 2-byte UTF-8 character (U+0080 to U+07FF)
-  const auto twoByteUtf8{[&u, &vals](uInt byte1, uInt byte2) {
+  const auto twoByteUtf8{[&u, &v](uInt byte1, uInt byte2) {
     ++u;
-    return (byte1 ^ TwoBits) > 1
-               ? static_cast<T>(((byte1 ^ TwoBits) << 6) + byte2)
-               : vals[Error];
+    return (byte1 ^ TwoBits) > 1 ? cast<T>(left6(byte1 ^ TwoBits, byte2))
+                                 : v[Err];
   }};
   // return a 'T' that represents a 3-byte UTF-8 character (U+0800 to U+FFFF)
-  const auto threeByteUtf8{[&u, &vals](uInt byte1, uInt byte2) {
-    const auto c{static_cast<T>(
-        ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1))};
+  const auto threeByteUtf8{[&u, &v](uInt byte1, uInt byte2) {
+    const T t{cast<T>(left12(byte1 ^ ThreeBits, left6(byte2, *u ^ Bit1)))};
     ++u;
-    // return Error if 'c' is 'overlong' or in the Surrogate range
-    return c > 0x7ff && (c < vals[MinSur] || c > vals[MaxSur]) ? c
-                                                               : vals[Error];
+    // return Error if 't' is 'overlong' or in the Surrogate range
+    return t > v[MaxTwo] && (t < v[MinSur] || t > v[MaxSur]) ? t : v[Err];
   }};
   // return a 'T' that represents a 4-byte UTF-8 character (U+10080 to U+10FFFF)
-  const auto fourByteUtf8{[&u, &vals](uInt byte1, uInt byte2, uInt byte3) {
-    if ((*++u & TwoBits) != Bit1) return vals[Error]; // 4th byte not '10...'
-    const auto c{static_cast<T>(((byte1 ^ FourBits) << 18) + (byte2 << 12) +
-                                (byte3 << 6) + (*u ^ Bit1))};
+  const auto fourByteUtf8{[&u, &v](uInt byte1, uInt byte2, uInt byte3) {
+    if ((*++u & TwoBits) != Bit1) return v[Err]; // 4th byte not '10...'
+    const T t{cast<T>(
+        left18(byte1 ^ FourBits, left12(byte2, left6(byte3, *u ^ Bit1))))};
     ++u;
-    // return Error if 'c' is 'overlong' or beyond max Unicode range
-    return c > 0xffff && c <= vals[MaxUni] ? c : vals[Error];
+    // return Error if 't' is 'overlong' or beyond max Unicode range
+    return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
   }};
 
   do {
-    if (*u <= 0x7fU) {
+    if (*u <= MaxAscii) {
       const T t{*u++};
       result += t; // single byte UTF-8 case (so regular Ascii)
     } else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
       // LCOV_EXCL_START: gcov-11 bug
       ++u;
-      result += vals[Error]; // 1st byte was '10...' or more than four '1's
+      result += v[Err]; // 1st byte was '10...' or more than four '1's
       // LCOV_EXCL_STOP
     } else if (uInt byte1{*u}; (*++u & TwoBits) != Bit1)
-      result += vals[Error]; // 2nd byte not '10...'
+      result += v[Err]; // 2nd byte not '10...'
     else if (uInt byte2 = *u ^ Bit1; byte1 & Bit3)
-      result += (*++u & TwoBits) != Bit1 ? vals[Error] // 3rd not '10...'
+      result += (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
                 : (byte1 & Bit4)         ? fourByteUtf8(byte1, byte2, *u ^ Bit1)
                                          : threeByteUtf8(byte1, byte2);
     else
@@ -95,25 +124,25 @@ template<typename R, typename T = typename R::value_type>
 }
 
 void convertToUtf8(Code c, std::string& s) {
-  static constexpr Code FirstThree{0b111 << 18}, FirstFour{0b11'11 << 12},
-      FirstFive{0b1'11'11 << 6}, Six{0b11'11'11};
-  static constexpr Code SecondSix{Six << 6}, ThirdSix{Six << 12};
-  if (c <= 0x7f)
+  static constexpr Code FirstThree{left18(0b111)}, FirstFour{left12(0b11'11)},
+      FirstFive{left6(0b1'11'11)}, Six{0b11'11'11};
+  static constexpr Code SecondSix{left6(Six)}, ThirdSix{left12(Six)};
+  if (c <= MaxAscii)
     s += toChar(c);
-  else if (c <= 0x7ff) {
-    s += toChar(((FirstFive & c) >> 6) + TwoBits);
+  else if (c <= Max2Uni) {
+    s += toChar(right6(FirstFive & c, TwoBits));
     s += toChar((Six & c) + Bit1);
-  } else if (c <= 0xffff) {
+  } else if (c <= Max3Uni) {
     if (c < MinSurrogate || c > MaxSurrogate) {
-      s += toChar(((FirstFour & c) >> 12) + ThreeBits);
-      s += toChar(((SecondSix & c) >> 6) + Bit1);
+      s += toChar(right12(FirstFour & c, ThreeBits));
+      s += toChar(right6(SecondSix & c, Bit1));
       s += toChar((Six & c) + Bit1);
     } else
       s += ReplacementCharacter;
   } else if (c <= MaxUnicode) { // LCOV_EXCL_LINE: gcov-11 bug
-    s += toChar(((FirstThree & c) >> 18) + FourBits);
-    s += toChar(((ThirdSix & c) >> 12) + Bit1);
-    s += toChar(((SecondSix & c) >> 6) + Bit1);
+    s += toChar(right18(FirstThree & c, FourBits));
+    s += toChar(right12(ThirdSix & c, Bit1));
+    s += toChar(right6(SecondSix & c, Bit1));
     s += toChar((Six & c) + Bit1);
   } else
     s += ReplacementCharacter; // LCOV_EXCL_LINE: gcov-11 bug

@@ -51,7 +51,7 @@ public:
   const char* const name;
 private:
   template<Code Start, Code End = Start> static consteval void checkRange() {
-    static_assert(Start > 0x7f);
+    static_assert(Start > MaxAscii);
     static_assert(End <= MaxUnicode);
   }
 

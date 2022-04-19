@@ -114,8 +114,8 @@ enum BitPatterns : unsigned char {
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
 
-inline constexpr auto MaxUnicode{U'\x10ffff'}, CombiningVoicedChar{U'\x3099'},
-    CombiningSemiVoicedChar{U'\x309a'};
+inline constexpr auto MaxAscii{U'\x7f'}, MaxUnicode{U'\x10ffff'},
+    CombiningVoicedChar{U'\x3099'}, CombiningSemiVoicedChar{U'\x309a'};
 inline static const std::string CombiningVoiced{"\xe3\x82\x99"}, // U+3099
     CombiningSemiVoiced{"\xe3\x82\x9a"};                         // U+309A
 
