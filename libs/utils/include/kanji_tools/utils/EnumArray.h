@@ -237,7 +237,7 @@ template<typename... Names>
     // Make sure the scoped enum 'T' has a value of None that is just past the
     // set of string values provided - this will help ensure that any changes to
     // the enum must also be made to the call to 'create' and vice versa.
-    static_assert(static_cast<T>(sizeof...(Names) + 1) == T::None);
+    static_assert(to_enum<T>(sizeof...(Names) + 1) == T::None);
     return EnumArrayWithNone<T, sizeof...(args) + 1>{name, args...};
   }
 }
@@ -285,7 +285,7 @@ template<typename T>
 // 'isNextNone' returns true if the next value after 'x' is T::None
 template<typename T>
 [[nodiscard]] constexpr isEnumArrayWithNone<T> isNextNone(T x) noexcept {
-  return static_cast<T>(to_underlying(x) + 1) == T::None;
+  return to_enum<T>(to_underlying(x) + 1) == T::None;
 }
 
 } // namespace kanji_tools

@@ -23,4 +23,13 @@ template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
   return static_cast<std::underlying_type_t<T>>(x);
 }
 
+// cast from a scoped enum's underlying type back to the enum - this is safer
+// than a plain static_cast since T must be a scoped enum and the function param
+// is of the corresponding underlying type for T
+template<typename T>
+[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, T> to_enum(
+    std::underlying_type_t<T> u) noexcept {
+  return static_cast<T>(u);
+}
+
 } // namespace kanji_tools

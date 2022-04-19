@@ -172,7 +172,7 @@ TEST(EnumArrayTest, ToString) {
 }
 
 TEST(EnumArrayTest, BadToString) {
-  EXPECT_THROW(call([] { return toString(static_cast<Colors>(7)); },
+  EXPECT_THROW(call([] { return toString(to_enum<Colors>(7)); },
                    "enum '7' is out of range"),
       std::out_of_range);
 }

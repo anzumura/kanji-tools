@@ -26,22 +26,22 @@ using isBitmask = std::enable_if_t<is_bitmask<T>, _>;
 
 template<typename T>
 [[nodiscard]] constexpr isBitmask<T> operator&(T x, T y) noexcept {
-  return static_cast<T>(to_underlying(x) & to_underlying(y));
+  return to_enum<T>(to_underlying(x) & to_underlying(y));
 }
 
 template<typename T>
 [[nodiscard]] constexpr isBitmask<T> operator|(T x, T y) noexcept {
-  return static_cast<T>(to_underlying(x) | to_underlying(y));
+  return to_enum<T>(to_underlying(x) | to_underlying(y));
 }
 
 template<typename T>
 [[nodiscard]] constexpr isBitmask<T> operator^(T x, T y) noexcept {
-  return static_cast<T>(to_underlying(x) ^ to_underlying(y));
+  return to_enum<T>(to_underlying(x) ^ to_underlying(y));
 }
 
 template<typename T>
 [[nodiscard]] constexpr isBitmask<T> operator~(T x) noexcept {
-  return static_cast<T>(~to_underlying(x));
+  return to_enum<T>(~to_underlying(x));
 }
 
 template<typename T> constexpr isBitmask<T>& operator&=(T& x, T y) noexcept {
