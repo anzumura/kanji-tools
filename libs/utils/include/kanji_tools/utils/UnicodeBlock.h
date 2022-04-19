@@ -27,6 +27,8 @@ public:
 // version 1.1, but U+30A0 (゠) was added to the block in version 3.2.
 class UnicodeBlock {
 public:
+  static constexpr auto Mod{16}, OfficialStartMod{0}, OfficialEndMod{15};
+
   UnicodeBlock(const UnicodeBlock&) = delete;
 
   // return number of code points in the block (inclusive of start and end)
@@ -94,8 +96,8 @@ template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
 template<Code Start, Code End, typename T>
 [[nodiscard]] consteval auto makeBlock(T& v, const char* n) {
   UnicodeBlock::checkLess<Start, End>();
-  static_assert(Start % 16 == 0);
-  static_assert(End % 16 == 15);
+  static_assert(Start % UnicodeBlock::Mod == UnicodeBlock::OfficialStartMod);
+  static_assert(End % UnicodeBlock::Mod == UnicodeBlock::OfficialEndMod);
   return UnicodeBlock{Start, End, &v, n};
 }
 
@@ -214,7 +216,7 @@ template<size_t N, typename... Ts>
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(
     const std::string& s, bool sizeOne, T&... t) {
-  if (s.size() > 1 && (!sizeOne || s.size() < 9))
+  if (s.size() > 1 && (!sizeOne || s.size() <= MaxMBSize * 2))
     if (const auto w{fromUtf8(s)};
         sizeOne ? w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])
                 : w.size() >= 1)

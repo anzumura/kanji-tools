@@ -292,10 +292,11 @@ void KanaConvert::printKanaChart(bool markdown) const {
       hanDakuten{hanDakutenMonographs + hanDakutenDigraphs};
   const auto types{plain + dakuten + hanDakuten + noneTypeKana};
   const auto out{[this, markdown](const std::string& s) -> std::ostream& {
+    static constexpr auto CellWidth{10};
     if (markdown)
       _out << "- **";
     else
-      _out << std::setw(10);
+      _out << std::setw(CellWidth);
     return _out << s << (markdown ? ":** " : ": ") << std::setw(3);
   }};
   _out << '\n'

@@ -5,11 +5,12 @@
 namespace kanji_tools {
 
 bool MBChar::isVariationSelector(const unsigned char* s) {
-  // Checking for variation selectors would be easier if 'i' was Code, but
-  // that would involve calling more expensive conversion functions (like
-  // fromUtf8). Note, variation selectors are range 'fe00' to 'fe0f' in
-  // Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
-  return s && *s++ == 0xef && *s++ == 0xb8 && *s >= 0x80 && *s <= 0x8f;
+  // Checking for variation selectors would be easier if 'i' was a wide char
+  // type (like 'Code'), but that would involve calling expensive conversion
+  // functions (like fromUtf8). Note, variation selectors are range 'fe00' to
+  // 'fe0f' in Unicode which is '0xef 0xb8 0x80' to '0xef 0xb8 0x8f' in UTF-8.
+  static constexpr auto B1{0xef}, B2{0xb8}, B3Start{0x80}, B3End{0x8f};
+  return s && *s++ == B1 && *s++ == B2 && *s >= B3Start && *s <= B3End;
 }
 
 bool MBChar::isVariationSelector(const char* s) {
@@ -21,7 +22,8 @@ bool MBChar::isVariationSelector(const std::string& s) {
 }
 
 bool MBChar::isCombiningMark(const unsigned char* s) {
-  return s && *s++ == 0xe3 && *s++ == 0x82 && (*s == 0x99 || *s == 0x9a);
+  static constexpr auto B1{0xe3}, B2{0x82}, B3_1{0x99}, B3_2{0x9a};
+  return s && *s++ == B1 && *s++ == B2 && (*s == B3_1 || *s == B3_2);
 }
 
 bool MBChar::isCombiningMark(const char* s) {
@@ -49,7 +51,7 @@ size_t MBChar::size(const char* s, bool onlyMB) {
   if (auto i{reinterpret_cast<const unsigned char*>(s)}; i) {
     while (*i)
       if (isCombiningMark(i) || isVariationSelector(i))
-        i += 3;
+        i += VarSelectorSize;
       else if (onlyMB)
         result += (*i++ & TwoBits) == TwoBits;
       else
@@ -63,12 +65,20 @@ size_t MBChar::size(const std::string& s, bool onlyMB) {
 }
 
 bool MBChar::isMBCharWithVariationSelector(const std::string& s) {
-  return s.size() > 4 && s.size() < 8 &&
-         isVariationSelector(s.substr(s.size() - 3));
+  // Variation selectors are 3 bytes and min UTF-8 multi-byte char is 2 bytes so
+  // a character must be at least 5 long to include a variation selector. Also,
+  // max UTF-8 char len is 4 so a single character with a selector can't be more
+  // than 7 bytes.
+  static constexpr auto MinSize{VarSelectorSize + MinMBSize},
+      MaxSize{VarSelectorSize + MaxMBSize};
+  return s.size() >= MinSize && s.size() <= MaxSize &&
+         isVariationSelector(s.substr(s.size() - VarSelectorSize));
 }
 
 std::string MBChar::noVariationSelector(const std::string& s) {
-  return isMBCharWithVariationSelector(s) ? s.substr(0, s.size() - 3) : s;
+  return isMBCharWithVariationSelector(s)
+             ? s.substr(0, s.size() - VarSelectorSize)
+             : s;
 }
 
 std::string MBChar::getFirst(const std::string& s) {
@@ -85,7 +95,7 @@ void MBChar::reset() {
 
 bool MBChar::next(std::string& result, bool onlyMB) {
   const auto combiningMark{[this](const auto& r, const auto& i) {
-    _loc += 3;
+    _loc += VarSelectorSize;
     if (i) {
       ++_combiningMarks;
       return *i;
@@ -105,7 +115,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
     case MBUtf8Result::Valid:
       if (std::string r; validResult(r, _loc)) {
         if (std::string s; peekVariant(s, _loc)) {
-          _loc += 3;
+          _loc += VarSelectorSize;
           ++_variants;
           result = r + s;
         } else

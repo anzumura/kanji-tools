@@ -114,6 +114,11 @@ enum BitPatterns : unsigned char {
   FiveBits = 0b11'11'10'00   // illegal pattern for first byte (too long)
 };
 
+// This program supports Kanji variation selectors and Kana combining marks
+// which are both '3 byte' UTF-8 sequences (and multi-byte UTF-8 sequences range
+// from 2 to 4 bytes)
+inline constexpr auto VarSelectorSize{3}, MinMBSize{2}, MaxMBSize{4};
+
 inline constexpr auto MaxAscii{U'\x7f'}, MaxUnicode{U'\x10ffff'},
     CombiningVoicedChar{U'\x3099'}, CombiningSemiVoicedChar{U'\x309a'};
 inline static const std::string CombiningVoiced{"\xe3\x82\x99"}, // U+3099
