@@ -1,3 +1,4 @@
+#include <kanji_tools/utils/Args.h>
 #include <kanji_tools/utils/BlockRange.h>
 
 #include <filesystem>
@@ -9,11 +10,12 @@ using namespace kanji_tools;
 namespace fs = std::filesystem;
 
 int main(int argc, const char** argv) {
-  if (argc < 2) {
+  const Args args(argc, argv);
+  if (args.size() < 2) {
     std::cerr << "specify a file to format\n";
     return 1;
   }
-  const auto file{argv[1]};
+  const auto file{args[1]};
   const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange() + L"]{1}$"},
       allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
   std::fstream f{file};
