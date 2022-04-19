@@ -50,6 +50,25 @@ protected:
   BaseIterableEnum() noexcept = default;
 };
 
+// 'to_index' and 'from_index' convert between 'size_t' and a scoped enum value.
+// These functions are used in EnumMap and EnumArray classes (where the scoped
+// enum is used as an index) and are safer than plain static cast since there
+// more compile time type checks on the types.
+
+template<typename T>
+[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, size_t> to_index(
+    T t) noexcept {
+  static_assert(sizeof(T) <= sizeof(size_t));
+  return static_cast<size_t>(t);
+}
+
+template<typename T>
+[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, T> from_index(
+    size_t i) noexcept {
+  static_assert(sizeof(T) <= sizeof(size_t));
+  return static_cast<T>(i);
+}
+
 // IterableEnum is a base class for EnumArray and EnumMap classes. It provides
 // 'size' and 'getIndex' methods and an 'Iterator' (used by derived classes)
 template<typename T, size_t N> class IterableEnum : public BaseIterableEnum {

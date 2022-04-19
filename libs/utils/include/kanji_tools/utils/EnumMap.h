@@ -32,11 +32,10 @@ protected:
   BaseEnumMap() noexcept = default;
 };
 
-template<typename T, typename V, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-class EnumMap : public IterableEnum<T, static_cast<size_t>(T::None)>,
-                public BaseEnumMap<V> {
+template<typename T, typename V, size_t N = to_index(T::None),
+    std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
+class EnumMap : public IterableEnum<T, N>, public BaseEnumMap<V> {
 public:
-  static constexpr auto N{static_cast<BaseIterableEnum::Index>(T::None)};
   using base = IterableEnum<T, N>;
 
   EnumMap() noexcept = default;
@@ -83,7 +82,7 @@ public:
       if (iBase::index() >= N)
         iBase::rangeError(
             base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
-      return (*_map)[static_cast<T>(iBase::index())];
+      return (*_map)[from_index<T>(iBase::index())];
     }
 
     // random-access iterator requirements (compare, subtracting iterators)

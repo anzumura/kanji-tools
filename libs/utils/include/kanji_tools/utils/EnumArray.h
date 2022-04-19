@@ -111,7 +111,7 @@ public:
   [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
 
   template<std::integral I> [[nodiscard]] auto operator[](I i) const {
-    return static_cast<T>(base::checkIndex(i, base::IndexMsg));
+    return from_index<T>(base::checkIndex(i, base::IndexMsg));
   }
 
   class ConstIterator : public base::template Iterator<ConstIterator> {
@@ -132,7 +132,7 @@ public:
       if (iBase::index() >= N)
         iBase::rangeError(
             base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
-      return static_cast<T>(iBase::index());
+      return from_index<T>(iBase::index());
     }
 
     // random-access iterator requirements
@@ -252,7 +252,7 @@ T TypedEnumArray<T, _>::fromString(const std::string& name) const {
 template<typename T, isEnumArray<T> _>
 void TypedEnumArray<T, _>::insert(
     const std::string& name, BaseIterableEnum::Index index) {
-  if (!_nameMap.emplace(name, static_cast<T>(index)).second)
+  if (!_nameMap.emplace(name, from_index<T>(index)).second)
     domainError("duplicate name '" + name + "'");
 }
 
