@@ -10,6 +10,8 @@
 
 namespace kanji_tools {
 
+using uInt = const unsigned int;
+
 namespace {
 
 // Values for determining invalid Unicde code points when doing UTF-8
@@ -19,15 +21,8 @@ namespace {
 //   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
-constexpr Code MinSurrogate{0xd800}, MaxSurrogate{0xdfff};
-
-#ifdef USE_CODECVT_FOR_UTF_8
-inline auto utf8Converter() {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return &conv;
-}
-#else
-using uInt = const unsigned int;
+constexpr Code MinSurrogate{0xd800}, MaxSurrogate{0xdfff}, Max2Uni{0x7ff},
+    Max3Uni{0xffff};
 
 // constants and functions for shifting to help simplify the code and get rid
 // of 'magic' numbers
@@ -55,7 +50,24 @@ cast(uInt x) noexcept {
   return static_cast<T>(x);
 }
 
-constexpr Code Max2Uni{0x7ff}, Max3Uni{0xffff}, ErrorReplacement{0xfffd};
+template<typename T>
+constexpr auto threeByteUtf8(const unsigned char* u, uInt b1, uInt b2) {
+  return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
+}
+
+template<typename T>
+constexpr auto fourByteUtf8(const unsigned char* u, uInt b1, uInt b2, uInt b3) {
+  return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
+}
+
+#ifdef USE_CODECVT_FOR_UTF_8
+inline auto utf8Converter() {
+  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
+  return &conv;
+}
+#else
+
+constexpr Code ErrorReplacement{0xfffd};
 
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
@@ -71,32 +83,33 @@ constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
     toWChar(MaxSurrogate), toWChar(Max2Uni), toWChar(Max3Uni),
     toWChar(MaxUnicode)};
 
+template<typename T> using Consts = std::array<T, Char32Vals.size()>;
+
 // 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
 template<typename R, typename T = typename R::value_type>
-[[nodiscard]] R convertFromUtf8(
-    const char* s, const std::array<T, Char32Vals.size()>& v) {
+[[nodiscard]] R convertFromUtf8(const char* s, const Consts<T>& v) {
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
 
   // return a 'T' that represents a 2-byte UTF-8 character (U+0080 to U+07FF)
-  const auto twoByteUtf8{[&u, &v](uInt byte1, uInt byte2) {
+  const auto twoByte{[&u, &v](uInt b1, uInt b2) {
     ++u;
-    return (byte1 ^ TwoBits) > 1 ? cast<T>(left6(byte1 ^ TwoBits, byte2))
-                                 : v[Err];
+    return (b1 ^ TwoBits) > 1 ? cast<T>(left6(b1 ^ TwoBits, b2)) : v[Err];
   }};
+
   // return a 'T' that represents a 3-byte UTF-8 character (U+0800 to U+FFFF)
-  const auto threeByteUtf8{[&u, &v](uInt byte1, uInt byte2) {
-    const T t{cast<T>(left12(byte1 ^ ThreeBits, left6(byte2, *u ^ Bit1)))};
+  const auto threeByte{[&u, &v](uInt b1, uInt b2) {
+    const auto t{threeByteUtf8<T>(u, b1, b2)};
     ++u;
     // return Error if 't' is 'overlong' or in the Surrogate range
     return t > v[MaxTwo] && (t < v[MinSur] || t > v[MaxSur]) ? t : v[Err];
   }};
+
   // return a 'T' that represents a 4-byte UTF-8 character (U+10080 to U+10FFFF)
-  const auto fourByteUtf8{[&u, &v](uInt byte1, uInt byte2, uInt byte3) {
+  const auto fourByte{[&u, &v](uInt b1, uInt b2, uInt b3) {
     if ((*++u & TwoBits) != Bit1) return v[Err]; // 4th byte not '10...'
-    const T t{cast<T>(
-        left18(byte1 ^ FourBits, left12(byte2, left6(byte3, *u ^ Bit1))))};
+    const auto t{fourByteUtf8<T>(u, b1, b2, b3)};
     ++u;
     // return Error if 't' is 'overlong' or beyond max Unicode range
     return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
@@ -111,14 +124,14 @@ template<typename R, typename T = typename R::value_type>
       ++u;
       result += v[Err]; // 1st byte was '10...' or more than four '1's
       // LCOV_EXCL_STOP
-    } else if (uInt byte1{*u}; (*++u & TwoBits) != Bit1)
+    } else if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
       result += v[Err]; // 2nd byte not '10...'
-    else if (uInt byte2 = *u ^ Bit1; byte1 & Bit3)
+    else if (uInt b2 = *u ^ Bit1; b1 & Bit3)
       result += (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
-                : (byte1 & Bit4)         ? fourByteUtf8(byte1, byte2, *u ^ Bit1)
-                                         : threeByteUtf8(byte1, byte2);
+                : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
+                                         : threeByte(b1, b2);
     else
-      result += twoByteUtf8(byte1, byte2); // LCOV_EXCL_LINE: gcov-11 bug
+      result += twoByte(b1, b2); // LCOV_EXCL_LINE: gcov-11 bug
   } while (*u);
   return result;
 }
@@ -225,32 +238,24 @@ MBUtf8Result validateMBUtf8(
   if (!s || !(*s & Bit1)) return MBUtf8Result::NotMultiByte;
   if ((*s & TwoBits) == Bit1) return err(Utf8Result::ContinuationByte);
   auto u{reinterpret_cast<const unsigned char*>(s)};
-  const unsigned byte1{*u};
-  if ((*++u & TwoBits) != Bit1)
-    return err(Utf8Result::MissingBytes); // didn't start with '10'
-  if (byte1 & Bit3) {
-    const unsigned byte2 = *u ^ Bit1; // last 6 bits of the second byte
-    if ((*++u & TwoBits) != Bit1)
-      return err(Utf8Result::MissingBytes); // didn't start with '10'
-    if (byte1 & Bit4) {
-      if (byte1 & Bit5)
-        return err(Utf8Result::CharTooLong); // UTF-8 more than 4 bytes
-      const unsigned byte3 = *u ^ Bit1;      // last 6 bits of the third byte
-      if ((*++u & TwoBits) != Bit1)
-        return err(Utf8Result::MissingBytes); // didn't start with '10'
-      const unsigned c{((byte1 ^ FourBits) << 18) + (byte2 << 12) +
-                       (byte3 << 6) + (*u ^ Bit1)};
-      if (c <= 0xffffU)
-        return err(Utf8Result::Overlong); // overlong 4 byte encoding
+  uInt b1{*u};
+  if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+  if (b1 & Bit3) {
+    uInt b2 = *u ^ Bit1; // last 6 bits of the second byte
+    if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+    if (b1 & Bit4) {
+      if (b1 & Bit5) return err(Utf8Result::CharTooLong);
+      uInt b3 = *u ^ Bit1; // last 6 bits of the third byte
+      if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+      uInt c{fourByteUtf8<Code>(u, b1, b2, b3)};
+      if (c <= Max3Uni) return err(Utf8Result::Overlong); // overlong 4 byte
       if (c > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
-    } else if (const unsigned c{
-                   ((byte1 ^ ThreeBits) << 12) + (byte2 << 6) + (*u ^ Bit1)};
-               c <= 0x7ffU)
-      return err(Utf8Result::Overlong); // overlong 3 byte encoding
+    } else if (uInt c{threeByteUtf8<Code>(u, b1, b2)}; c <= Max2Uni)
+      return err(Utf8Result::Overlong); // overlong 3 byte
     else if (c >= MinSurrogate && c <= MaxSurrogate)
       return err(Utf8Result::InvalidCodePoint);
-  } else if ((byte1 ^ TwoBits) < 2)   // LCOV_EXCL_LINE: gcov-11 bug
-    return err(Utf8Result::Overlong); // overlong 2 byte encoding
+  } else if ((b1 ^ TwoBits) < 2)      // LCOV_EXCL_LINE: gcov-11 bug
+    return err(Utf8Result::Overlong); // overlong 2 byte
   return !sizeOne || !*++u ? MBUtf8Result::Valid
                            : err(Utf8Result::StringTooLong);
 }
