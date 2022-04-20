@@ -26,8 +26,8 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 }
 
 // helper class for ordering and printing out kanji found in files
-class Count {
-public: // LCOV_EXCL_LINE: covered
+class Count { // LCOV_EXCL_LINE: covered
+public:
   Count(size_t f, const std::string& n, KanjiPtr e)
       : count{f}, name{n}, entry{e} {}
 
