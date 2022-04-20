@@ -16,11 +16,14 @@ namespace kanji_tools {
 // entries are for a 'JLPT Level' or a 'Kentei Kyu'.
 class DataFile {
 public:
+  using Index = u_int16_t; // support up to 65K entries
   using Path = std::filesystem::path;
   using StringList = std::vector<std::string>;
   using StringSet = std::set<std::string>;
 
   inline static const std::string TextFileExtension{".txt"};
+
+  static constexpr Index MaxEntries{std::numeric_limits<Index>::max() - 1};
 
   // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and
   // then returns the full path. It will also try adding '.txt' extension if
@@ -37,15 +40,16 @@ public:
 
   enum class FileType { MultiplePerLine, OnePerLine };
 
-  DataFile(const Path&, FileType);
-  explicit DataFile(const Path&);
+  explicit DataFile(const Path&, FileType = FileType::OnePerLine);
 
   DataFile(const DataFile&) = delete;
 
   virtual ~DataFile() = default;
 
+  // return index for 'name' starting at '1' or return '0' for not found.
+  [[nodiscard]] Index getIndex(const std::string& name) const;
+
   [[nodiscard]] bool exists(const std::string& name) const;
-  [[nodiscard]] size_t getIndex(const std::string& name) const;
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
@@ -57,7 +61,7 @@ public:
 protected:
   DataFile(const Path&, FileType, StringSet*, const std::string& name = {});
 private:
-  using Map = std::map<std::string, size_t>;
+  using Map = std::map<std::string, Index>;
 
   // 'UniqueNames': ensures uniqueness across non-typed DataFiles (currently
   // only frequency.txt)

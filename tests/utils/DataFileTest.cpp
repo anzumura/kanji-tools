@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/DataFile.h>
+#include <kanji_tools/utils/UnicodeBlock.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
@@ -15,7 +16,7 @@ const fs::path GoodOnePerLine{TestDir / "goodOnePerLine"},
     GoodOnePerLineLevel{TestDir / "goodOnePerLineLevel"},
     MultiplePerLine{TestDir / "multiplePerLine"},
     BadOnePerLine{TestDir / "badOnePerLine"}, BadSymbol{TestDir / "badSymbol"},
-    DuplicateSymbol{TestDir / "duplicateSymbol"};
+    DuplicateSymbol{TestDir / "duplicateSymbol"}, BigFile{TestDir / "bigFile"};
 
 class DataFileTest : public ::testing::Test {
 protected:
@@ -141,15 +142,30 @@ TEST_F(DataFileTest, GlobalDuplicateLevel) {
 
 TEST_F(DataFileTest, BadSymbol) {
   EXPECT_THROW(
-      call([] { DataFile f(BadSymbol); },
+      call([] { DataFile{BadSymbol}; },
           "invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"),
       std::domain_error);
 }
 
 TEST_F(DataFileTest, DuplicateSymbol) {
   EXPECT_THROW(
-      call([] { DataFile f(DuplicateSymbol); },
+      call([] { DataFile{DuplicateSymbol}; },
           "got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"),
+      std::domain_error);
+}
+
+TEST_F(DataFileTest, MaxEntries) {
+  // need to write more than 65K unique multi-byte characters to a file so loop
+  // over all 'CommonKanjiBlocks' (eventhough some aren't real characters)
+  std::ofstream f{BigFile};
+  for (DataFile::Index c{}; auto& i : CommonKanjiBlocks)
+    for (auto j = i.start; j < i.end && c <= DataFile::MaxEntries + 1; ++j, ++c)
+      f << toUtf8(j) << '\n';
+  f.close();
+  DataFile::clearUniqueCheckData();
+  EXPECT_THROW(
+      call([] { DataFile{BigFile}; },
+          "exceeded '65534' entries, file: testDir/bigFile"),
       std::domain_error);
 }
 

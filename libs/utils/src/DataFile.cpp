@@ -42,9 +42,6 @@ void DataFile::clearUniqueCheckData() {
 DataFile::DataFile(const Path& p, FileType fileType)
     : DataFile{p, fileType, nullptr} {}
 
-DataFile::DataFile(const Path& p)
-    : DataFile{p, FileType::OnePerLine, nullptr} {}
-
 DataFile::DataFile(const Path& fileIn, FileType fileType,
     StringSet* uniqueTypeNames, const std::string& name)
     : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
@@ -59,6 +56,7 @@ DataFile::DataFile(const Path& fileIn, FileType fileType,
     usage(s + (pLine ? " - line: " + std::to_string(lineNum) : EmptyString) +
           ", file: " + file.string());
   }};
+  Index index{0};
   std::ifstream f{file};
   DataFile::StringList dups;
   for (std::string line; std::getline(f, line); ++lineNum) {
@@ -79,9 +77,11 @@ DataFile::DataFile(const Path& fileIn, FileType fileType,
         }
       } else if (!UniqueNames.insert(token).second)
         error("found globally non-unique entry '" + token + "'");
+      if (index == MaxEntries)
+        error("exceeded '" + std::to_string(MaxEntries) + "' entries", false);
       _list.emplace_back(token);
-      // 'value' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
-      _map[token] = _list.size();
+      // 'index' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
+      _map.emplace(token, ++index);
     }
   }
   if (!dups.empty()) {
@@ -96,9 +96,9 @@ bool DataFile::exists(const std::string& s) const {
   return _map.find(s) != _map.end();
 }
 
-size_t DataFile::getIndex(const std::string& name) const {
+DataFile::Index DataFile::getIndex(const std::string& name) const {
   const auto i{_map.find(name)};
-  return i != _map.end() ? i->second : 0;
+  return i != _map.end() ? i->second : Index{};
 }
 
 std::string DataFile::toString() const {
