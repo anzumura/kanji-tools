@@ -27,16 +27,16 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   };
   // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
   for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
-           D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
            // LCOV_EXCL_START: covered
+           D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
            D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
-           // LCOV_EXCL_STOP
            // Ascii 0-9
            D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"}, D{'>', "＞"},
            D{'?', "？"}, D{'@', "＠"},
            // Ascii A-Z
            D{'[', "「"}, D{'\\', "￥"}, D{']', "」"}, D{'^', "＾"},
            D{'_', "＿"}, D{'`', "｀"},
+           // LCOV_EXCL_STOP
            // Ascii a-z
            D{'{', "『"}, D{'|', "｜"}, D{'}', "』"}, D{'~', "〜"}}) {
     _narrowDelimList += i.narrow;

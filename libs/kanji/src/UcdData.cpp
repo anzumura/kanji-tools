@@ -26,7 +26,7 @@ struct PrintCount {
     if (!k.morohashiId().empty()) ++morohashi;
     if (!k.nelsonIds().empty()) ++nelson;
   }
-};
+}; // LCOV_EXCL_LINE: covered
 
 } // namespace
 

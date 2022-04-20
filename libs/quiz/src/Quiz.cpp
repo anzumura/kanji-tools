@@ -26,7 +26,7 @@ Quiz::~Quiz() {
       out() << '\n';
     else if (_correctAnswers == _currentQuestion)
       out() << " - Perfect!\n";
-    else {
+    else { // LCOV_EXCL_LINE: covered
       if (const auto skipped{
               _currentQuestion - _correctAnswers - _mistakes.size()};
           skipped)

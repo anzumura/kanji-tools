@@ -15,7 +15,7 @@ std::mt19937 RandomGen(RandomDevice());
 const Choice::Choices PatternGroupChoices{{'1', "ア"}, {'2', "カ"}, {'3', "サ"},
     {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}};
 
-constexpr auto DefaultPatternGroup{'1'};
+constexpr auto DefaultPatternGroup{'1'}; // LCOV_EXCL_LINE: covered
 
 // Since there are over 1000 pattern groups, split them into 6 buckets based on
 // reading. The first bucket starts at 'ア', the second bucket starts at 'カ'
