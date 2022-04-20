@@ -177,7 +177,7 @@ void KanjiData::printGrades() const {
   log() << "  Total for all grades: " << all << '\n';
 }
 
-template<typename T, size_t S>
+template<typename T, BaseEnum::Size S>
 void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
     T (Kanji::*p)() const, const std::string& name,
     bool showNoFrequency) const {

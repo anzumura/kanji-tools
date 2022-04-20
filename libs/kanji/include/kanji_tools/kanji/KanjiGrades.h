@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 // 'KanjiGrades' represents the official school grade for all Jouyou kanji.
 // S=secondary school, None=not Jouyou
-enum class KanjiGrades { G1, G2, G3, G4, G5, G6, S, None };
+enum class KanjiGrades : BaseEnum::Size { G1, G2, G3, G4, G5, G6, S, None };
 
 template<> inline constexpr auto is_enumarray_with_none<KanjiGrades>{true};
 

@@ -13,7 +13,15 @@ namespace kanji_tools {
 // - Other: reason listed as その他
 // - None: all JinmeiKanji have one of the above reasons, None is used for base
 //   class virtual function return value (similar to other Kanji related enums)
-enum class JinmeiReasons { Names, Print, Variant, Moved, Simple, Other, None };
+enum class JinmeiReasons : BaseEnum::Size {
+  Names,
+  Print,
+  Variant,
+  Moved,
+  Simple,
+  Other,
+  None
+};
 
 template<> inline constexpr auto is_enumarray_with_none<JinmeiReasons>{true};
 

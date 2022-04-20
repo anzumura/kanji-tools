@@ -4,30 +4,30 @@
 
 namespace kanji_tools {
 
-void BaseIterableEnum::BaseIterator::comparable(bool value) {
+void BaseEnum::BaseIterator::comparable(bool value) {
   if (!value) throw std::domain_error("not comparable");
 }
 
-void BaseIterableEnum::BaseIterator::initialized(bool value) {
+void BaseEnum::BaseIterator::initialized(bool value) {
   if (!value) throw std::domain_error("not initialized");
 }
 
-void BaseIterableEnum::BaseIterator::rangeError(const std::string& msg) {
-  BaseIterableEnum::rangeError(msg);
+void BaseEnum::BaseIterator::rangeError(const std::string& msg) {
+  BaseEnum::rangeError(msg);
 }
 
-BaseIterableEnum::BaseIterator::BaseIterator(Index index) noexcept
+BaseEnum::BaseIterator::BaseIterator(Size index) noexcept
     : _index{index} {}
 
-BaseIterableEnum::Index& BaseIterableEnum::BaseIterator::index() {
+BaseEnum::Size& BaseEnum::BaseIterator::index() {
   return _index;
 }
 
-BaseIterableEnum::Index BaseIterableEnum::BaseIterator::index() const {
+BaseEnum::Size BaseEnum::BaseIterator::index() const {
   return _index;
 }
 
-void BaseIterableEnum::rangeError(const std::string& msg) {
+void BaseEnum::rangeError(const std::string& msg) {
   throw std::out_of_range{msg};
 }
 

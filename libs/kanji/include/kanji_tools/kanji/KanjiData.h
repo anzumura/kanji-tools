@@ -24,7 +24,7 @@ private:
   void printCount(const std::string& name, T pred, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
-  template<typename T, size_t S>
+  template<typename T, BaseEnum::Size S>
   void printListStats(const IterableEnumArray<T, S>&, T (Kanji::*)() const,
       const std::string&, bool showNoFrequency) const;
 

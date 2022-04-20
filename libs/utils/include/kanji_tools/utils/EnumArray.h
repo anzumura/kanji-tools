@@ -20,7 +20,7 @@ namespace kanji_tools {
 //
 // Here's an example of how to create (and use) an EnumArray:
 //
-//   enum class Colors { Red, Green, Blue };
+//   enum class Colors : BaseEnum::Size { Red, Green, Blue };
 //   template<> inline constexpr auto is_enumarray<Colors>{true};
 //   inline const auto AllColors{TypedEnumArray<Colors>::create("Red", "Green",
 //     "Blue")};
@@ -36,7 +36,7 @@ namespace kanji_tools {
 //
 // Here's an example of how to create (and use) an EnumArray with 'None':
 //
-//   enum class Colors { Red, Green, Blue, None };
+//   enum class Colors : BaseEnum::Size { Red, Green, Blue, None };
 //   template<> inline constexpr auto is_enumarray_with_none<Colors>{true};
 //   inline const auto AllColors{TypedEnumArray<Colors>::create("Red", "Green",
 //     "Blue")};
@@ -92,7 +92,7 @@ public:
 protected:
   TypedEnumArray() noexcept { _instance = this; }
 
-  void insert(const std::string& name, BaseIterableEnum::Index index);
+  void insert(const std::string& name, BaseEnum::Size index);
 private:
   inline static constinit const TypedEnumArray<T>* _instance;
 
@@ -102,7 +102,7 @@ private:
 // 'IterableEnumArray' adds functionality to the iterator from 'IterableEnum'
 // that is common to both derived classes ('EnumArray' and 'EnumArrayWithNone')
 // and has public 'begin', 'end' and 'operator[]' functions.
-template<typename T, size_t N>
+template<typename T, BaseEnum::Size N>
 class IterableEnumArray : public IterableEnum<T, N>, public TypedEnumArray<T> {
 public:
   using base = IterableEnum<T, N>;
@@ -111,7 +111,7 @@ public:
   [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
 
   template<std::integral I> [[nodiscard]] auto operator[](I i) const {
-    return from_index<T>(base::checkIndex(i, base::IndexMsg));
+    return to_enum<T>(base::checkIndex(i, base::IndexMsg));
   }
 
   class ConstIterator : public base::template Iterator<ConstIterator> {
@@ -132,7 +132,7 @@ public:
       if (iBase::index() >= N)
         iBase::rangeError(
             base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
-      return from_index<T>(iBase::index());
+      return to_enum<T>(iBase::index());
     }
 
     // random-access iterator requirements
@@ -144,7 +144,7 @@ public:
   private:
     friend IterableEnumArray<T, N>; // calls private ctor
 
-    explicit ConstIterator(BaseIterableEnum::Index index) noexcept
+    explicit ConstIterator(BaseEnum::Size index) noexcept
         : iBase{index} {}
   };
 protected:
@@ -152,7 +152,7 @@ protected:
 };
 
 // see comments at the top of this file (EnumArray.h) for more details
-template<typename T, size_t N>
+template<typename T, BaseEnum::Size N>
 class EnumArray : public IterableEnumArray<T, N> {
 public:
   using base = IterableEnumArray<T, N>;
@@ -170,7 +170,7 @@ private:
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const std::string& name, BaseIterableEnum::Index index) {
+  void setName(const std::string& name, BaseEnum::Size index) {
     base::insert(_names[index] = name, index);
   }
 
@@ -181,7 +181,7 @@ private:
 // value. A string value for 'None' is not stored in '_names' or base class
 // '_nameMap' for safety (see private 'setName') as well as to support the
 // special handling in 'fromString' with 'allowEmptyAsNone'.
-template<typename T, size_t N>
+template<typename T, BaseEnum::Size N>
 class EnumArrayWithNone : public IterableEnumArray<T, N + 1> {
 public:
   using base = IterableEnumArray<T, N + 1>;
@@ -214,7 +214,7 @@ private:
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const std::string& name, BaseIterableEnum::Index index) {
+  void setName(const std::string& name, BaseEnum::Size index) {
     if (name == None) base::domainError("'None' should not be specified");
     base::insert(_names[index] = name, index);
   }
@@ -251,8 +251,8 @@ T TypedEnumArray<T, _>::fromString(const std::string& name) const {
 
 template<typename T, isEnumArray<T> _>
 void TypedEnumArray<T, _>::insert(
-    const std::string& name, BaseIterableEnum::Index index) {
-  if (!_nameMap.emplace(name, from_index<T>(index)).second)
+    const std::string& name, BaseEnum::Size index) {
+  if (!_nameMap.emplace(name, to_enum<T>(index)).second)
     domainError("duplicate name '" + name + "'");
 }
 

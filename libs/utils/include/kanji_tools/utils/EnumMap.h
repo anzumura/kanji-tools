@@ -15,7 +15,7 @@ namespace kanji_tools {
 // not valid for non-const 'operator[]' (it will throw an exception). Iteration
 // loops over only 'non-None' values. For example:
 //
-// enum class Colors { Red, Green, Blue, None };
+// enum class Colors : BaseEnum::Size { Red, Green, Blue, None };
 // EnumMap<Colors, int> m;
 // m[Colors::Red] = 2;
 // m[Colors::Green] = 4;
@@ -32,7 +32,7 @@ protected:
   BaseEnumMap() noexcept = default;
 };
 
-template<typename T, typename V, size_t N = to_index(T::None),
+template<typename T, typename V, BaseEnum::Size N = to_underlying(T::None),
     std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 class EnumMap : public IterableEnum<T, N>, public BaseEnumMap<V> {
 public:
@@ -82,7 +82,7 @@ public:
       if (iBase::index() >= N)
         iBase::rangeError(
             base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
-      return (*_map)[from_index<T>(iBase::index())];
+      return (*_map)[to_enum<T>(iBase::index())];
     }
 
     // random-access iterator requirements (compare, subtracting iterators)
@@ -112,7 +112,7 @@ public:
   private:
     friend EnumMap<T, V>; // calls private ctor
 
-    ConstIterator(BaseIterableEnum::Index i, const EnumMap<T, V>& m) noexcept
+    ConstIterator(BaseEnum::Size i, const EnumMap<T, V>& m) noexcept
         : iBase{i}, _map{&m} {}
 
     const EnumMap<T, V>* _map{};

@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 // UcdLinkTypes represents how a Ucd link was loaded (from which XML property -
 // see parse script for details)
-enum class UcdLinkTypes {
+enum class UcdLinkTypes : BaseEnum::Size {
   Compatibility,
   Definition,
   Jinmei,

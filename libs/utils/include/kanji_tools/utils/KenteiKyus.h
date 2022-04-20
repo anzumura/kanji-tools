@@ -5,7 +5,7 @@
 namespace kanji_tools {
 
 // Kanji Kentei (漢字検定) Kyū (級), K = Kanken (漢検), J=Jun (準)
-enum class KenteiKyus {
+enum class KenteiKyus : BaseEnum::Size {
   K10,
   K9,
   K8,

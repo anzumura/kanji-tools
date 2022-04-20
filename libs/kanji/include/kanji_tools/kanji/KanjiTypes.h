@@ -17,7 +17,7 @@ namespace kanji_tools {
 // - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't included above
 // - Ucd: kanji loaded from 'ucd.txt' file that aren't included above
 // - None: used as a type for a kanji that haven't been loaded
-enum class KanjiTypes {
+enum class KanjiTypes : BaseEnum::Size {
   Jouyou,
   Jinmei,
   LinkedJinmei,

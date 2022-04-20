@@ -8,12 +8,15 @@
 
 namespace kanji_tools {
 
-class BaseIterableEnum {
+class BaseEnum {
 public:
-  using Index = size_t;
+  // enforce using a small unsigned type to help make sure scoped enums being
+  // used in derived classes (EnumMap, EnumArray, etc.) don't have negative
+  // values (they are supposed to be contiguous values starting at zero).
+  using Size = u_int8_t;
 
-  BaseIterableEnum(const BaseIterableEnum&) = delete;
-  BaseIterableEnum& operator=(const BaseIterableEnum&) = delete;
+  BaseEnum(const BaseEnum&) = delete;
+  BaseEnum& operator=(const BaseEnum&) = delete;
 protected:
   inline static const std::string IndexMsg{"index '"}, EnumMsg{"enum '"},
       RangeMsg{"' is out of range"};
@@ -37,49 +40,34 @@ protected:
 
     static void rangeError(const std::string&);
 
-    explicit BaseIterator(Index index) noexcept;
+    explicit BaseIterator(Size index) noexcept;
 
-    [[nodiscard]] Index& index();
-    [[nodiscard]] Index index() const;
+    [[nodiscard]] Size& index();
+    [[nodiscard]] Size index() const;
   private:
-    Index _index;
+    Size _index;
   };
 
   static void rangeError(const std::string&);
 
-  BaseIterableEnum() noexcept = default;
+  BaseEnum() noexcept = default;
 };
-
-// 'to_index' and 'from_index' convert between 'size_t' and a scoped enum value.
-// These functions are used in EnumMap and EnumArray classes (where the scoped
-// enum is used as an index) and are safer than plain static cast since they do
-// more compile time type checks on the types.
-
-template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, size_t> to_index(
-    T t) noexcept {
-  static_assert(sizeof(T) <= sizeof(size_t));
-  return static_cast<size_t>(t);
-}
-
-template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, T> from_index(
-    size_t i) noexcept {
-  static_assert(sizeof(T) <= sizeof(size_t));
-  return static_cast<T>(i);
-}
 
 // IterableEnum is a base class for EnumArray and EnumMap classes. It provides
 // 'size' and 'getIndex' methods and an 'Iterator' (used by derived classes)
-template<typename T, size_t N> class IterableEnum : public BaseIterableEnum {
+template<typename T, BaseEnum::Size N> class IterableEnum : public BaseEnum {
 public:
-  [[nodiscard]] static constexpr size_t size() noexcept { return N; }
+  [[nodiscard]] static constexpr Size size() noexcept { return N; }
 protected:
   [[nodiscard]] static auto getIndex(T x) {
     return checkIndex(to_underlying(x), EnumMsg);
   }
 
-  IterableEnum() noexcept = default;
+  IterableEnum() noexcept {
+    // make sure enum 'T' has the same underlying type as 'Size' since derived
+    // classes (like EnumArray) are designed to only support up to 'Size' items
+    static_assert(std::is_same_v<std::underlying_type_t<T>, Size>);
+  }
 
   // Random access iterator for looping over all values of T (the scoped enum).
   template<typename Derived> class Iterator : public BaseIterator {
@@ -119,9 +107,9 @@ protected:
     }
 
     auto& operator+=(difference_type i) {
-      if ((i += static_cast<difference_type>(index())) < 0)
+      if (difference_type curIndex{index()}; (curIndex += i) < 0)
         rangeError(BadBegin);
-      if (const auto j{static_cast<Index>(i)}; j > N)
+      else if (const auto j{static_cast<Size>(curIndex)}; j > N)
         rangeError(BadEnd);
       else
         index() = j;
@@ -140,7 +128,7 @@ protected:
       return x -= i;
     }
   protected:
-    explicit Iterator(Index index) noexcept : BaseIterator{index} {}
+    explicit Iterator(Size index) noexcept : BaseIterator{index} {}
   private:
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);
@@ -154,7 +142,7 @@ protected:
   template<typename I>
   requires std::integral<I> || std::same_as<T, I>
   [[nodiscard]] static auto checkIndex(I i, const std::string& name) {
-    const auto x{static_cast<Index>(i)};
+    const auto x{static_cast<Size>(i)};
     if (x >= N) {
       std::string msg{name};
       if constexpr (std::is_same_v<I, T>)

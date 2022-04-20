@@ -9,11 +9,11 @@ namespace kanji_tools {
 
 namespace {
 
-enum class Colors { Red, Green, Blue, None };
+enum class Colors : BaseEnum::Size { Red, Green, Blue, None };
 
 constexpr Colors BadColor{29};
 
-enum class TestEnum { A, B, C, None };
+enum class TestEnum : BaseEnum::Size { A, B, C, None };
 
 } // namespace
 
