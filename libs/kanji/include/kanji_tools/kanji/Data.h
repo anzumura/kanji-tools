@@ -53,7 +53,8 @@ public:
   [[nodiscard]] UcdPtr findUcd(const std::string& kanjiName) const;
 
   // functions used by 'Kanji' class ctors, each takes a Kanji name string
-  [[nodiscard]] virtual Kanji::Frequency frequency(const std::string&) const = 0;
+  [[nodiscard]] virtual Kanji::Frequency frequency(
+      const std::string&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual RadicalRef ucdRadical(const std::string&, UcdPtr) const;

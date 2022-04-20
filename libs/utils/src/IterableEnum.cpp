@@ -16,16 +16,11 @@ void BaseEnum::BaseIterator::rangeError(const std::string& msg) {
   BaseEnum::rangeError(msg);
 }
 
-BaseEnum::BaseIterator::BaseIterator(Size index) noexcept
-    : _index{index} {}
+BaseEnum::BaseIterator::BaseIterator(Size index) noexcept : _index{index} {}
 
-BaseEnum::Size& BaseEnum::BaseIterator::index() {
-  return _index;
-}
+BaseEnum::Size& BaseEnum::BaseIterator::index() { return _index; }
 
-BaseEnum::Size BaseEnum::BaseIterator::index() const {
-  return _index;
-}
+BaseEnum::Size BaseEnum::BaseIterator::index() const { return _index; }
 
 void BaseEnum::rangeError(const std::string& msg) {
   throw std::out_of_range{msg};

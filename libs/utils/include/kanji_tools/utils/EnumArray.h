@@ -144,8 +144,7 @@ public:
   private:
     friend IterableEnumArray<T, N>; // calls private ctor
 
-    explicit ConstIterator(BaseEnum::Size index) noexcept
-        : iBase{index} {}
+    explicit ConstIterator(BaseEnum::Size index) noexcept : iBase{index} {}
   };
 protected:
   IterableEnumArray() noexcept = default;

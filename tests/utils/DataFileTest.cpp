@@ -163,9 +163,8 @@ TEST_F(DataFileTest, MaxEntries) {
       f << toUtf8(j) << '\n';
   f.close();
   DataFile::clearUniqueCheckData();
-  EXPECT_THROW(
-      call([] { DataFile{BigFile}; },
-          "exceeded '65534' entries, file: testDir/bigFile"),
+  EXPECT_THROW(call([] { DataFile{BigFile}; },
+                   "exceeded '65534' entries, file: testDir/bigFile"),
       std::domain_error);
 }
 
