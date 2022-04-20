@@ -56,6 +56,10 @@ public:
   [[nodiscard]] virtual Meaning meaning() const = 0;
   [[nodiscard]] virtual Reading reading() const = 0;
 
+  // Base Kanji class provided default implementations for the following virtual
+  // functions. For enums like KenteiKyus and KanjiGrades, 'None' is returned
+  // and for 'frequency' and 'year' zero is returned (means no value).
+
   [[nodiscard]] virtual Frequency frequency() const;
   [[nodiscard]] virtual KanjiGrades grade() const;
   [[nodiscard]] virtual KenteiKyus kyu() const;

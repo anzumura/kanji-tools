@@ -6,7 +6,7 @@
 
 namespace kanji_tools {
 
-Kanji::Frequency Kanji::frequency() const { return 0; } // 0 means no frequency
+Kanji::Frequency Kanji::frequency() const { return 0; }
 
 KanjiGrades Kanji::grade() const { return KanjiGrades::None; }
 
@@ -18,7 +18,7 @@ KanjiPtr Kanji::link() const { return {}; }
 
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
 
-Kanji::Year Kanji::year() const { return 0; } // 0 means no year
+Kanji::Year Kanji::year() const { return 0; }
 
 bool Kanji::linkedReadings() const { return false; }
 
