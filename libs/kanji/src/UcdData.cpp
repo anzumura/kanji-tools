@@ -106,7 +106,7 @@ void UcdData::load(const Data::Path& file) {
       if (f.isEmpty(meaningCol)) f.error("meaning is empty for Jōyō Kanji");
     }
 
-    UcdLinks::Links links;
+    Ucd::Links links;
     if (!f.isEmpty(linkNamesCol)) {
       std::stringstream names{f.get(linkNamesCol)}, codes{f.get(linkCodesCol)};
       for (std::string linkName; std::getline(names, linkName, ',');)
@@ -135,11 +135,10 @@ void UcdData::load(const Data::Path& file) {
                      f.get(blockCol), f.get(versionCol), radical, strokes,
                      vStrokes, f.get(pinyinCol), f.get(morohashiCol),
                      f.get(nelsonIdsCol), f.get(sourcesCol), f.get(jSourceCol),
-                     joyo, jinmei,
-                     UcdLinks{links,
-                         AllUcdLinkTypes.fromStringAllowEmpty(linkType),
-                         linkedReadings},
-                     f.get(meaningCol), f.get(onCol), f.get(kunCol)))
+                     joyo, jinmei, links,
+                     AllUcdLinkTypes.fromStringAllowEmpty(linkType),
+                     linkedReadings, f.get(meaningCol), f.get(onCol),
+                     f.get(kunCol)))
              .second)
       f.error("duplicate entry '" + name + "'");
     for (const auto& link : links)

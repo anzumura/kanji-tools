@@ -25,26 +25,6 @@ private:
   const std::string _name;
 };
 
-class UcdLinks {
-public:
-  using Links = std::vector<UcdEntry>;
-
-  UcdLinks(const Links& links, UcdLinkTypes type, bool linkedReadings)
-      : _links{links}, _type{type}, _linkedReadings{linkedReadings} {}
-
-  [[nodiscard]] auto& links() const { return _links; }
-  [[nodiscard]] auto type() const { return _type; }
-  [[nodiscard]] auto linkedReadings() const { return _linkedReadings; }
-
-  [[nodiscard]] auto empty() const { return _links.empty(); }
-  [[nodiscard]] auto size() const { return _links.size(); }
-  [[nodiscard]] std::string codeAndNames() const;
-private:
-  const Links _links;
-  const UcdLinkTypes _type;
-  const bool _linkedReadings;
-};
-
 class UcdBlock : public Symbol<UcdBlock> {
 public:
   inline static const std::string Type{"UcdBlock"};
@@ -67,6 +47,7 @@ public:
 // 'ucd.all.flat.xml' file - see scripts/parseUcdAllFlat.sh for more details
 class Ucd {
 public:
+  using Links = std::vector<UcdEntry>;
   using Meaning = const std::string&;
   using Reading = Radical::Reading;
   using Strokes = u_int16_t;
@@ -78,8 +59,9 @@ public:
       Radical::Number, Strokes strokes, Strokes variantStrokes,
       const std::string& pinyin, const std::string& morohashiId,
       const std::string& nelsonIds, const std::string& sources,
-      const std::string& jSource, bool joyo, bool jinmei, const UcdLinks&,
-      Meaning, Reading onReading, Reading kunReading);
+      const std::string& jSource, bool joyo, bool jinmei, const Links&,
+      UcdLinkTypes, bool linkedReadings, Meaning, Reading onReading,
+      Reading kunReading);
 
   Ucd(const Ucd&) = delete;
 
@@ -87,13 +69,15 @@ public:
   [[nodiscard]] auto& block() const { return _block; }
   [[nodiscard]] auto& version() const { return _version; }
   [[nodiscard]] auto& pinyin() const { return _pinyin; }
+  [[nodiscard]] auto linkType() const { return _linkType; }
+  [[nodiscard]] auto linkedReadings() const { return _linkedReadings; }
   [[nodiscard]] auto radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
   [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }
+  [[nodiscard]] auto& links() const { return _links; }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
   [[nodiscard]] auto& jSource() const { return _jSource; }
-  [[nodiscard]] auto& links() const { return _links; }
   [[nodiscard]] auto& meaning() const { return _meaning; }
   [[nodiscard]] auto& onReading() const { return _onReading; }
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
@@ -104,14 +88,13 @@ public:
   [[nodiscard]] bool jinmei() const;
 
   // 'has' methods
+  [[nodiscard]] bool hasVariantStrokes() const;
   [[nodiscard]] bool hasLinks() const;
   [[nodiscard]] bool hasTraditionalLinks() const;
   [[nodiscard]] bool hasNonTraditionalLinks() const;
-  [[nodiscard]] bool hasVariantStrokes() const;
   // helper methods
-  [[nodiscard]] auto& name() const { return _entry.name(); }
   [[nodiscard]] auto code() const { return _entry.code(); }
-  [[nodiscard]] auto linkType() const { return _links.type(); }
+  [[nodiscard]] auto& name() const { return _entry.name(); }
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
 private:
@@ -125,13 +108,15 @@ private:
   const UcdBlock _block;
   const UcdVersion _version;
   const Pinyin _pinyin;
+  const std::bitset<SourcesSize> _sources;
+  const UcdLinkTypes _linkType;
+  const bool _linkedReadings;
   const Radical::Number _radical;
   // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
   const Strokes _strokes, _variantStrokes;
+  const Links _links;
   const std::string _morohashiId, _nelsonIds, _jSource;
-  const UcdLinks _links;
   const std::string _meaning, _onReading, _kunReading;
-  const std::bitset<SourcesSize> _sources;
 };
 
 using UcdPtr = const Ucd*;

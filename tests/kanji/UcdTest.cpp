@@ -4,22 +4,65 @@
 
 namespace kanji_tools {
 
+namespace {
+
+// 'ptrCast' is used in Layout test
+template<typename T>
+[[nodiscard]] constexpr size_t ptrCast(const T& x) noexcept {
+  return reinterpret_cast<size_t>(&x);
+}
+
+} // namespace
+
 TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(bool), 1);
   EXPECT_EQ(sizeof(UcdLinkTypes), 1);
   EXPECT_EQ(sizeof(size_t), 8);
   EXPECT_EQ(sizeof(std::string*), 8);
-  EXPECT_EQ(sizeof(UcdLinks::Links), 24);
-  EXPECT_EQ(sizeof(UcdLinks), 32);
+  EXPECT_EQ(sizeof(Ucd::Links), 24);
 #ifdef __clang__
-  EXPECT_EQ(sizeof(Ucd), 232);
+  EXPECT_EQ(sizeof(Ucd), 224);
   EXPECT_EQ(sizeof(UcdEntry), 32);
   EXPECT_EQ(sizeof(std::string), 24);
 #else
-  EXPECT_EQ(sizeof(Ucd), 288);
+  EXPECT_EQ(sizeof(Ucd), 280);
   EXPECT_EQ(sizeof(UcdEntry), 40);
   EXPECT_EQ(sizeof(std::string), 32);
 #endif
+}
+
+TEST(UcdTest, Layout) {
+  const Ucd u{TestUcd{}};
+  const auto start{ptrCast(u)};
+  const auto entry{ptrCast(u.entry())};
+  const auto block{ptrCast(u.block())};
+  const auto version{ptrCast(u.version())};
+  const auto pinyin{ptrCast(u.pinyin())};
+  const auto links{ptrCast(u.links())};
+  const auto morohashiId{ptrCast(u.morohashiId())};
+  const auto nelsonIds{ptrCast(u.nelsonIds())};
+  const auto jSource{ptrCast(u.jSource())};
+  const auto meaning{ptrCast(u.meaning())};
+  const auto onReading{ptrCast(u.onReading())};
+  const auto kunReading{ptrCast(u.kunReading())};
+#ifdef __clang__
+  const size_t stringDiff{};
+#else
+  const size_t stringDiff{8}; // gcc string is 8 bytes bigger than clang
+#endif
+  EXPECT_EQ(start, entry);
+  EXPECT_EQ(block - start, 32 + stringDiff);
+  EXPECT_EQ(version - start, 34 + stringDiff);
+  EXPECT_EQ(pinyin - start, 36 + stringDiff);
+  // sources=38, linkType=39, linkedReadings=40, radical=44
+  // strokes=48, variantStrokes=52
+  EXPECT_EQ(links - start, 56 + stringDiff);
+  EXPECT_EQ(morohashiId - start, 80 + stringDiff);
+  EXPECT_EQ(nelsonIds - start, 104 + stringDiff * 2);
+  EXPECT_EQ(jSource - start, 128 + stringDiff * 3);
+  EXPECT_EQ(meaning - start, 152 + stringDiff * 4);
+  EXPECT_EQ(onReading - start, 176 + stringDiff * 5);
+  EXPECT_EQ(kunReading - start, 200 + stringDiff * 6);
 }
 
 TEST(UcdTest, SourcesTooLong) {

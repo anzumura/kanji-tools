@@ -335,7 +335,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
     else
       EXPECT_TRUE(isKanji(u.name())) << u.codeAndName();
     // make sure links point to other valid UCD entries
-    for (auto& j : u.links().links()) {
+    for (auto& j : u.links()) {
       EXPECT_NE(u.name(), j.name());
       const auto link{ucd.find(j.name())};
       ASSERT_FALSE(link == ucd.end()) << j.name();
@@ -349,7 +349,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
       if (u.hasLinks()) {
         EXPECT_EQ(u.links().size(), 1) << u.name();
         ++jinmeiLinks;
-        auto& link{ucd.find(u.links().links()[0].name())->second};
+        auto& link{ucd.find(u.links()[0].name())->second};
         if (link.joyo())
           ++jinmeiLinksToJouyou;
         else if (link.jinmei())
@@ -357,8 +357,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
         else
           FAIL() << "jinmei '" << u.name()
                  << "' shouldn't have non-official link";
-        if (link.hasLinks())
-          EXPECT_NE(link.links().links()[0].name(), u.name());
+        if (link.hasLinks()) EXPECT_NE(link.links()[0].name(), u.name());
       }
     } else if (u.hasLinks())
       ++otherLinks[_data->getType(u.name())];

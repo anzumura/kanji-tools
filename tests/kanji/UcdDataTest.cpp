@@ -75,7 +75,7 @@ TEST_F(UcdDataTest, LoadOneEntry) {
   EXPECT_FALSE(u.jinmei());
   EXPECT_TRUE(u.links().empty());
   EXPECT_EQ(u.linkType(), UcdLinkTypes::None);
-  EXPECT_FALSE(u.links().linkedReadings());
+  EXPECT_FALSE(u.linkedReadings());
   EXPECT_EQ(u.meaning(), "one; a, an; alone");
   // readings get converted to Kana during Kanji creation (when required) by
   // 'getReadingAsKana' method (tested below)
@@ -103,12 +103,11 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
   EXPECT_EQ(u.jSource(), "J3-2E49");
   EXPECT_FALSE(u.joyo());
   EXPECT_TRUE(u.jinmei());
-  const UcdLinks& links{u.links()};
-  ASSERT_EQ(links.size(), 1);
-  EXPECT_EQ(links.links()[0].code(), U'\x50E7');
-  EXPECT_EQ(links.links()[0].name(), "僧");
-  EXPECT_EQ(links.type(), UcdLinkTypes::Jinmei);
-  EXPECT_TRUE(links.linkedReadings());
+  EXPECT_EQ(u.linkType(), UcdLinkTypes::Jinmei);
+  EXPECT_TRUE(u.linkedReadings());
+  ASSERT_EQ(u.links().size(), 1);
+  EXPECT_EQ(u.links()[0].code(), U'\x50E7');
+  EXPECT_EQ(u.links()[0].name(), "僧");
   EXPECT_EQ(u.meaning(), "Buddhist priest, monk; san of Sanskrit sangha");
   EXPECT_EQ(u.onReading(), "SOU");
   EXPECT_EQ(u.kunReading(), "BOUZU");

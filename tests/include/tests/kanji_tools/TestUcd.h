@@ -15,7 +15,7 @@ private:
   }
 public:
   using Code = UcdEntry::Code;
-  using Links = UcdLinks::Links;
+  using Links = Ucd::Links;
   using Meaning = Ucd::Meaning;
   using Name = UcdEntry::Name;
   using Reading = Ucd::Reading;
@@ -28,7 +28,7 @@ public:
   [[nodiscard]] operator Ucd() const {
     return Ucd{{_code, _name}, _block, _version, _radical, _strokes,
         _variantStrokes, _pinyin, _morohashiId, _nelsonIds, _sources, _jSource,
-        _joyo, _jinmei, {_links, _linkType, _linkedReadings}, _meaning,
+        _joyo, _jinmei, _links, _linkType, _linkedReadings, _meaning,
         _onReading, _kunReading};
   }
 

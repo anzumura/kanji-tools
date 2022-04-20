@@ -26,7 +26,7 @@ std::string UcdEntry::codeAndName() const {
   return toUnicode(_code, BracketType::Square) + ' ' + _name;
 }
 
-std::string UcdLinks::codeAndNames() const {
+std::string Ucd::linkCodeAndNames() const {
   std::string result;
   for (auto& i : _links) {
     if (!result.empty()) result += ", ";
@@ -40,13 +40,14 @@ Ucd::Ucd(const UcdEntry& entry, const std::string& block,
     Strokes variantStrokes, const std::string& pinyin,
     const std::string& morohashiId, const std::string& nelsonIds,
     const std::string& sources, const std::string& jSource, bool joyo,
-    bool jinmei, const UcdLinks& links, Meaning meaning, Reading onReading,
-    Reading kunReading)
+    bool jinmei, const Links& links, UcdLinkTypes linkType, bool linkedReadings,
+    Meaning meaning, Reading onReading, Reading kunReading)
     : _entry{entry}, _block{block}, _version{version}, _pinyin{pinyin},
-      _radical{radical}, _strokes{strokes}, _variantStrokes{variantStrokes},
-      _morohashiId{morohashiId}, _nelsonIds{nelsonIds}, _jSource{jSource},
-      _links{links}, _meaning{meaning}, _onReading{onReading},
-      _kunReading{kunReading}, _sources{getSources(sources, joyo, jinmei)} {}
+      _sources{getSources(sources, joyo, jinmei)}, _linkType{linkType},
+      _linkedReadings{linkedReadings}, _radical{radical}, _strokes{strokes},
+      _variantStrokes{variantStrokes}, _links{links}, _morohashiId{morohashiId},
+      _nelsonIds{nelsonIds}, _jSource{jSource}, _meaning{meaning},
+      _onReading{onReading}, _kunReading{kunReading} {}
 
 std::string Ucd::sources() const {
   std::string result;
@@ -59,6 +60,8 @@ bool Ucd::joyo() const { return _sources[Joyo]; }
 
 bool Ucd::jinmei() const { return _sources[Jinmei]; }
 
+bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
+
 bool Ucd::hasLinks() const { return !_links.empty(); }
 
 bool Ucd::hasTraditionalLinks() const {
@@ -69,11 +72,7 @@ bool Ucd::hasNonTraditionalLinks() const {
   return hasLinks() && linkType() != UcdLinkTypes::Traditional;
 }
 
-bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
-
 std::string Ucd::codeAndName() const { return _entry.codeAndName(); }
-
-std::string Ucd::linkCodeAndNames() const { return _links.codeAndNames(); }
 
 std::bitset<Ucd::SourcesSize> Ucd::getSources(
     const std::string& sources, bool joyo, bool jinmei) {

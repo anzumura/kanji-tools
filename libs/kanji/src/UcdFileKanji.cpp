@@ -14,7 +14,7 @@ Kanji::OptString UcdFileKanji::newName() const {
 UcdFileKanji::UcdFileKanji(DataRef data, Name name, Reading reading, UcdPtr u)
     : NonLinkedKanji{data, name, data.ucdRadical(name, u), reading, u},
       _hasOldLinks{u && u->hasTraditionalLinks()}, _linkNames{linkNames(u)},
-      _linkedReadings{u && u->links().linkedReadings()} {}
+      _linkedReadings{u && u->linkedReadings()} {}
 
 UcdFileKanji::UcdFileKanji(DataRef data, Name name, UcdPtr u) // LCOV_EXCL_LINE
     : UcdFileKanji{data, name, data.ucd().getReadingsAsKana(u), u} {}
