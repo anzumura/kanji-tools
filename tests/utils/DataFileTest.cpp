@@ -35,7 +35,10 @@ protected:
     }
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() override {
+    DataFile::clearUniqueCheckData();
+    fs::remove_all(TestDir);
+  }
 };
 
 } // namespace
@@ -125,7 +128,9 @@ TEST_F(DataFileTest, MultiplePerLine) {
 }
 
 TEST_F(DataFileTest, GlobalDuplicate) {
+  const DataFile file{MultiplePerLine, DataFile::FileType::MultiplePerLine};
   const auto f{[] {
+    // trying to load the same file causes global duplicate error
     DataFile{MultiplePerLine, DataFile::FileType::MultiplePerLine};
   }};
   EXPECT_THROW(call(f, "found globally non-unique entry '東' - line: 1, file: "
@@ -134,7 +139,11 @@ TEST_F(DataFileTest, GlobalDuplicate) {
 }
 
 TEST_F(DataFileTest, GlobalDuplicateLevel) {
-  const auto f{[] { LevelDataFile{GoodOnePerLineLevel, JlptLevels::N3}; }};
+  const LevelDataFile file{GoodOnePerLineLevel, JlptLevels::N2};
+  const auto f{[] {
+    // trying to load the same 'typed' file causes duplicate error
+    LevelDataFile{GoodOnePerLineLevel, JlptLevels::N3};
+  }};
   EXPECT_THROW(call(f, "found 3 duplicates in N3: 犬 猫 虎, file: "
                        "testDir/goodOnePerLineLevel"),
       std::domain_error);
@@ -162,7 +171,6 @@ TEST_F(DataFileTest, MaxEntries) {
     for (auto j = i.start; j < i.end && c <= DataFile::MaxEntries + 1; ++j, ++c)
       f << toUtf8(j) << '\n';
   f.close();
-  DataFile::clearUniqueCheckData();
   EXPECT_THROW(call([] { DataFile{BigFile}; },
                    "exceeded '65534' entries, file: testDir/bigFile"),
       std::domain_error);
