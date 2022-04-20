@@ -30,21 +30,21 @@ CustomFileKanji::CustomFileKanji(
 
 Kanji::OptString OfficialKanji::extraTypeInfo() const {
   return _year ? OptString{*CustomFileKanji::extraTypeInfo() + ' ' +
-                           std::to_string(*_year)}
+                           std::to_string(_year)}
                : CustomFileKanji::extraTypeInfo();
 }
 
 OfficialKanji::OfficialKanji(DataRef data, File f, Name name, UcdPtr u)
     : CustomFileKanji{data, f, name, getOldNames(f), u},
       _frequency{data.frequency(name)}, _level{data.level(name)},
-      _year{f.getOptU16(YearCol)} {}
+      _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
 
 OfficialKanji::OfficialKanji(
     DataRef data, File f, Name name, Strokes strokes, Meaning meaning)
     : CustomFileKanji{data, f, name, strokes, meaning, getOldNames(f),
           data.findUcd(name)},
       _frequency{data.frequency(name)}, _level{data.level(name)},
-      _year{f.getOptU16(YearCol)} {}
+      _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
 
 Kanji::LinkNames OfficialKanji::getOldNames(File f) {
   LinkNames result;

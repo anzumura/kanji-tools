@@ -6,7 +6,7 @@
 
 namespace kanji_tools {
 
-Kanji::OptFreq Kanji::frequency() const { return {}; }
+Kanji::Frequency Kanji::frequency() const { return 0; } // 0 means no frequency
 
 KanjiGrades Kanji::grade() const { return KanjiGrades::None; }
 
@@ -18,7 +18,7 @@ KanjiPtr Kanji::link() const { return {}; }
 
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
 
-Kanji::Year Kanji::year() const { return {}; }
+Kanji::Year Kanji::year() const { return 0; } // 0 means no year
 
 bool Kanji::linkedReadings() const { return false; }
 
@@ -43,7 +43,8 @@ std::string Kanji::compatibilityName() const {
 }
 
 Kanji::Frequency Kanji::frequencyOrDefault(Frequency x) const {
-  return frequency().value_or(x);
+  const auto f{frequency()};
+  return f ? f : x;
 }
 
 Kanji::Frequency Kanji::frequencyOrMax() const {
@@ -68,7 +69,7 @@ std::string Kanji::info(KanjiInfo fields) const {
   if (hasValue(fields & KanjiInfo::Grade) && hasGrade()) add(toString(grade()));
   if (hasValue(fields & KanjiInfo::Level) && hasLevel()) add(toString(level()));
   if (hasValue(fields & KanjiInfo::Freq) && frequency())
-    add(FreqMsg + std::to_string(*frequency()));
+    add(FreqMsg + std::to_string(frequency()));
   // kanji can have a 'New' value (from a link) or an 'Old' value,but not both.
   if (newName()) {
     assert(oldNames().empty());

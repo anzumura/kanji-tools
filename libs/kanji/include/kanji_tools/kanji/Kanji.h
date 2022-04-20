@@ -40,9 +40,8 @@ public:
   using LinkNames = std::vector<std::string>;
   using NelsonId = u_int16_t;
   using NelsonIds = std::vector<NelsonId>;
-  using OptFreq = std::optional<Frequency>;
   using OptString = std::optional<std::string>;
-  using Year = std::optional<u_int16_t>;
+  using Year = u_int16_t;
   // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
   using Name = UcdEntry::Name;
@@ -57,7 +56,7 @@ public:
   [[nodiscard]] virtual Meaning meaning() const = 0;
   [[nodiscard]] virtual Reading reading() const = 0;
 
-  [[nodiscard]] virtual OptFreq frequency() const;
+  [[nodiscard]] virtual Frequency frequency() const;
   [[nodiscard]] virtual KanjiGrades grade() const;
   [[nodiscard]] virtual KenteiKyus kyu() const;
   [[nodiscard]] virtual JlptLevels level() const;

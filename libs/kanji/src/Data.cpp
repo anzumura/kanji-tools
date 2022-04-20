@@ -231,8 +231,8 @@ bool Data::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   insertSanityChecks(k, ucd);
   // update MaxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
   // applicable
-  if (k.frequency() && *k.frequency() >= _maxFrequency)
-    _maxFrequency = *k.frequency() + 1U;
+  if (k.frequency() && k.frequency() >= _maxFrequency)
+    _maxFrequency = k.frequency() + 1U;
   if (k.variant() &&
       !_compatibilityMap.emplace(k.compatibilityName(), k.name()).second)
     printError("failed to insert variant '" + k.name() + "' into map");
@@ -381,7 +381,7 @@ void Data::processList(const DataFile& list) {
       _levels[list.level()].emplace_back(kanji);
     } else {
       assert(kanji->frequency());
-      const auto index{(*kanji->frequency() - 1U) / FrequencyEntries};
+      const auto index{(kanji->frequency() - 1U) / FrequencyEntries};
       _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1]
           .emplace_back(kanji);
     }

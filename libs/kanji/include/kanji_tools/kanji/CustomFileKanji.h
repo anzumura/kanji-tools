@@ -62,7 +62,7 @@ private:
 class OfficialKanji : public CustomFileKanji {
 public:
   [[nodiscard]] OptString extraTypeInfo() const override;
-  [[nodiscard]] OptFreq frequency() const override { return _frequency; }
+  [[nodiscard]] Frequency frequency() const override { return _frequency; }
   [[nodiscard]] JlptLevels level() const override { return _level; }
   [[nodiscard]] Year year() const override { return _year; }
 protected:
@@ -74,7 +74,7 @@ protected:
 private:
   [[nodiscard]] static LinkNames getOldNames(File);
 
-  const OptFreq _frequency;
+  const Frequency _frequency;
   const JlptLevels _level;
   const Year _year;
 };

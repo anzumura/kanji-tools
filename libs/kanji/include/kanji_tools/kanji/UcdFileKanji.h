@@ -65,7 +65,7 @@ public:
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::Frequency;
   }
-  [[nodiscard]] OptFreq frequency() const override { return _frequency; }
+  [[nodiscard]] Frequency frequency() const override { return _frequency; }
 private:
   const Frequency _frequency;
 };

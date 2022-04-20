@@ -13,8 +13,8 @@ inline const std::filesystem::path TestFile{TestDir / "testFile.txt"};
 
 class TestData : public ::testing::Test, public Data {
 public:
-  [[nodiscard]] Kanji::OptFreq frequency(const std::string&) const override {
-    return {};
+  [[nodiscard]] Kanji::Frequency frequency(const std::string&) const override {
+    return Kanji::Frequency{};
   }
   [[nodiscard]] JlptLevels level(const std::string&) const override {
     return JlptLevels::None;

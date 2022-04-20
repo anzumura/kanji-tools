@@ -9,7 +9,7 @@ public:
   [[nodiscard]] Meaning meaning() const override;
   [[nodiscard]] Reading reading() const override;
 
-  [[nodiscard]] OptFreq frequency() const override { return _frequency; }
+  [[nodiscard]] Frequency frequency() const override { return _frequency; }
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
   [[nodiscard]] KanjiPtr link() const override { return _link; }
 
@@ -22,7 +22,7 @@ protected:
   // either Jouyou or Jinmei
   [[nodiscard]] static Name checkType(Name, KanjiPtr, bool isJinmei = false);
 private:
-  const OptFreq _frequency;
+  const Frequency _frequency;
   const KenteiKyus _kyu;
   const KanjiPtr _link;
 };

@@ -14,7 +14,7 @@ public:
       std::ostream& err = std::cerr);
 
   // Implement the base class functions used during Kanji construction
-  [[nodiscard]] Kanji::OptFreq frequency(const std::string& s) const override;
+  [[nodiscard]] Kanji::Frequency frequency(const std::string& s) const override;
   [[nodiscard]] JlptLevels level(const std::string&) const override;
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;
 private:

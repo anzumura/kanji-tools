@@ -387,8 +387,8 @@ TEST_F(KanjiDataTest, UcdLinks) {
 }
 
 TEST_F(KanjiDataTest, SortByQualifiedName) {
-  const auto find{[](const std::string& name, auto t, auto s, Kanji::OptFreq f,
-                      const std::string& u = EmptyString) {
+  const auto find{[](const std::string& name, auto t, auto s,
+                      Kanji::Frequency f, const std::string& u = EmptyString) {
     auto k{_data->findKanjiByName(name)};
     // can't use 'ASSERT' in a function returning non-void so throw an exception
     // if not found (which never happens by design of the rest of this test)

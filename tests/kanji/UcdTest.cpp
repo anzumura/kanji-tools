@@ -6,6 +6,7 @@ namespace kanji_tools {
 
 TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(UcdLinkTypes), 4);
+  EXPECT_EQ(sizeof(size_t), 8);
   EXPECT_EQ(sizeof(std::string*), 8);
   EXPECT_EQ(sizeof(UcdLinks::Links), 24);
   EXPECT_EQ(sizeof(UcdLinks), 32);

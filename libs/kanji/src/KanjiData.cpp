@@ -60,9 +60,8 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
   }
 }
 
-Kanji::OptFreq KanjiData::frequency(const std::string& s) const {
-  const auto x{_frequency.getIndex(s)};
-  return x ? Kanji::OptFreq{x} : std::nullopt;
+Kanji::Frequency KanjiData::frequency(const std::string& s) const {
+  return static_cast<Kanji::Frequency>(_frequency.getIndex(s));
 }
 
 JlptLevels KanjiData::level(const std::string& k) const {

@@ -23,7 +23,7 @@ class MockData : public Data {
 public:
   MockData(const Path& p) : Data{p, Data::DebugMode::None} {}
   MOCK_METHOD(
-      Kanji::OptFreq, frequency, (const std::string&), (const, override));
+      Kanji::Frequency, frequency, (const std::string&), (const, override));
   MOCK_METHOD(JlptLevels, level, (const std::string&), (const, override));
   MOCK_METHOD(KenteiKyus, kyu, (const std::string&), (const, override));
   MOCK_METHOD(
@@ -82,7 +82,7 @@ protected:
     EXPECT_FALSE(k.hasGrade());
     EXPECT_EQ(k.level(), JlptLevels::N1);
     EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
-    EXPECT_EQ(k.frequency(), Kanji::OptFreq{1728});
+    EXPECT_EQ(k.frequency(), 1728);
     EXPECT_EQ(k.frequencyOrMax(), 1728);
     EXPECT_EQ(k.name(), "亘");
     EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
@@ -113,7 +113,8 @@ TEST_F(KanjiTest, Equals) {
 }
 
 TEST_F(KanjiTest, Size) {
-  EXPECT_EQ(sizeof(Kanji::Year), 4);
+  EXPECT_EQ(sizeof(Kanji::Frequency), 2);
+  EXPECT_EQ(sizeof(Kanji::Year), 2);
   EXPECT_EQ(sizeof(KanjiPtr), 16);
 #ifdef __clang__
   EXPECT_EQ(sizeof(Kanji::OptString), 32);
@@ -137,7 +138,7 @@ TEST_F(KanjiTest, FrequencyKanji) {
   EXPECT_EQ(k.radical(), rad);
   EXPECT_EQ(k.strokes(), 7);
   EXPECT_FALSE(k.link());
-  EXPECT_EQ(k.frequency(), Kanji::OptFreq{frequency});
+  EXPECT_EQ(k.frequency(), frequency);
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.hasGrade());
   EXPECT_EQ(k.kyu(), kyu);
@@ -159,7 +160,7 @@ TEST_F(KanjiTest, FrequencyKanjiWithReading) {
   EXPECT_TRUE(k.is(KanjiTypes::Frequency));
   EXPECT_EQ(k.name(), "呑");
   EXPECT_EQ(k.radical(), rad);
-  EXPECT_EQ(k.frequency(), Kanji::OptFreq{frequency});
+  EXPECT_EQ(k.frequency(), frequency);
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.hasGrade());
   EXPECT_EQ(k.kyu(), kyu);
@@ -312,10 +313,10 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 7\t云\t二\t\t2004\tPrint\tウン、い-う、ここに\n\
 8\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
   EXPECT_CALL(_data, level("云")).WillOnce(Return(JlptLevels::None));
-  EXPECT_CALL(_data, frequency("云")).WillOnce(Return(std::nullopt));
+  EXPECT_CALL(_data, frequency("云")).WillOnce(Return(0));
   EXPECT_CALL(_data, kyu("云")).WillOnce(Return(KenteiKyus::KJ1));
   EXPECT_CALL(_data, level("亘")).WillOnce(Return(JlptLevels::N1));
-  EXPECT_CALL(_data, frequency("亘")).WillOnce(Return(Kanji::OptFreq{1728}));
+  EXPECT_CALL(_data, frequency("亘")).WillOnce(Return(1728));
   EXPECT_CALL(_data, kyu("亘")).WillOnce(Return(KenteiKyus::KJ1));
   const Radical rad{1, "二", {}, "", ""};
   EXPECT_CALL(_data, getRadicalByName("二")).WillRepeatedly(ReturnRef(rad));
@@ -345,12 +346,12 @@ TEST_F(KanjiTest, LinkedJinmei) {
 Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 1\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
   EXPECT_CALL(_data, level("亘")).WillOnce(Return(JlptLevels::N1));
-  EXPECT_CALL(_data, frequency("亘")).WillOnce(Return(Kanji::OptFreq{1728}));
+  EXPECT_CALL(_data, frequency("亘")).WillOnce(Return(1728));
   EXPECT_CALL(_data, kyu("亘")).WillOnce(Return(KenteiKyus::KJ1));
   const Radical rad{1, "TestRadical", Radical::AltForms(), "", ""};
   EXPECT_CALL(_data, getRadicalByName("二")).WillOnce(ReturnRef(rad));
   EXPECT_CALL(_data, ucdRadical("亙", _)).WillOnce(ReturnRef(rad));
-  EXPECT_CALL(_data, frequency("亙")).WillOnce(Return(std::nullopt));
+  EXPECT_CALL(_data, frequency("亙")).WillOnce(Return(0));
   EXPECT_CALL(_data, kyu("亙")).WillOnce(Return(KenteiKyus::KJ1));
   EXPECT_CALL(_data, ucdStrokes("亘", nullptr)).WillOnce(Return(6));
   EXPECT_CALL(_data, ucdStrokes("亙", nullptr)).WillOnce(Return(6));
@@ -401,10 +402,10 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_CALL(_data, getRadicalByName("色")).WillOnce(ReturnRef(color));
   EXPECT_CALL(_data, level("愛")).WillOnce(Return(JlptLevels::N3));
   EXPECT_CALL(_data, kyu("愛")).WillOnce(Return(KenteiKyus::K7));
-  EXPECT_CALL(_data, frequency("愛")).WillOnce(Return(Kanji::OptFreq{640}));
+  EXPECT_CALL(_data, frequency("愛")).WillOnce(Return(640));
   EXPECT_CALL(_data, level("艶")).WillOnce(Return(JlptLevels::N1));
   EXPECT_CALL(_data, kyu("艶")).WillOnce(Return(KenteiKyus::K2));
-  EXPECT_CALL(_data, frequency("艶")).WillOnce(Return(Kanji::OptFreq{2207}));
+  EXPECT_CALL(_data, frequency("艶")).WillOnce(Return(2207));
   const auto results{fromFile<JouyouKanji>()};
   ASSERT_EQ(results.size(), 2);
 
@@ -414,7 +415,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
     if (k.grade() == KanjiGrades::G4) {
       EXPECT_EQ(k.level(), JlptLevels::N3);
       EXPECT_EQ(k.kyu(), KenteiKyus::K7);
-      EXPECT_EQ(k.frequency(), Kanji::OptFreq{640});
+      EXPECT_EQ(k.frequency(), 640);
       EXPECT_EQ(k.name(), "愛");
       EXPECT_EQ(k.strokes(), 13);
       EXPECT_EQ(k.meaning(), "love");
@@ -423,12 +424,12 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.info(), "Rad 心(1), Strokes 13, G4, N3, Frq 640, K7");
       EXPECT_TRUE(k.oldNames().empty());
       EXPECT_EQ(k.extraTypeInfo(), "#4");
-      EXPECT_EQ(k.year(), std::nullopt);
+      EXPECT_EQ(k.year(), 0);
     } else {
       EXPECT_EQ(k.grade(), KanjiGrades::S);
       EXPECT_EQ(k.level(), JlptLevels::N1);
       EXPECT_EQ(k.kyu(), KenteiKyus::K2);
-      EXPECT_EQ(k.frequency(), Kanji::OptFreq{2207});
+      EXPECT_EQ(k.frequency(), 2207);
       EXPECT_EQ(k.name(), "艶");
       EXPECT_EQ(k.meaning(), "glossy");
       EXPECT_EQ(k.reading(), "エン、つや");
@@ -458,8 +459,8 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
   EXPECT_CALL(_data, level("艶")).WillOnce(Return(JlptLevels::N1));
   EXPECT_CALL(_data, kyu("艶")).WillOnce(Return(KenteiKyus::K2));
-  EXPECT_CALL(_data, frequency("艶")).WillOnce(Return(Kanji::OptFreq{2207}));
-  EXPECT_CALL(_data, frequency("艷")).WillOnce(Return(std::nullopt));
+  EXPECT_CALL(_data, frequency("艶")).WillOnce(Return(2207));
+  EXPECT_CALL(_data, frequency("艷")).WillOnce(Return(0));
   EXPECT_CALL(_data, kyu("艷")).WillOnce(Return(KenteiKyus::None));
   const Radical rad{1, "TestRadical", Radical::AltForms(), "", ""};
   EXPECT_CALL(_data, ucdRadical("艷", _)).WillOnce(ReturnRef(rad));
