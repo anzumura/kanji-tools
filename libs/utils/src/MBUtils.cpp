@@ -162,9 +162,7 @@ Code getCode(const char* s) {
   return convertOneUtf8(u, Char32Vals);
 }
 
-Code getCode(const std::string& s) {
-  return getCode(s.c_str());
-}
+Code getCode(const std::string& s) { return getCode(s.c_str()); }
 
 std::string toUtf8(Code c) {
   std::string result;

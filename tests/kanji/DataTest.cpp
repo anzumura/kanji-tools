@@ -242,11 +242,11 @@ TEST_F(DataTest, UcdNotLinkedJinmei) {
 }
 
 TEST_F(DataTest, UcdMissingJinmeiLinks) {
-  const Ucd ucd{TestUcd{"二"}.code(U'\x4ebc').jinmei(true)};
+  const Ucd ucd{TestUcd{"二"}.code(U'\x4e8c').jinmei(true)};
   TestOne->type(KanjiTypes::LinkedJinmei);
   EXPECT_TRUE(checkInsert(TestOne, &ucd));
   EXPECT_TRUE(_es.str().ends_with(
-      "一 [4E00] missing 'JinmeiLink' for [4EBC] 二" + InUcd));
+      "一 [4E00] missing 'JinmeiLink' for [4E8C] 二" + InUcd));
 }
 
 TEST_F(DataTest, DuplicateCompatibilityName) {

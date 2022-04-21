@@ -194,10 +194,10 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   const Radical rad{1, "TestRadical", Radical::AltForms(), "", ""};
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
   EXPECT_CALL(_data, ucdStrokes(_, _)).WillOnce(Return(8));
-  const std::string sampleLink{"sampleLink"};
+  const std::string sampleLink{"犬"};
   const Ucd ucd{TestUcd{"侭"}
                     .ids("123P", "456 789")
-                    .links({{1, sampleLink}}, UcdLinkTypes::Simplified)
+                    .links({{0x72ac, sampleLink}}, UcdLinkTypes::Simplified)
                     .meaningAndReadings("utmost", "JIN", "MAMA")};
   const UcdKanji k{_data, ucd};
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
@@ -212,8 +212,8 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_EQ(k.meaning(), "utmost");
   EXPECT_EQ(k.reading(), "ジン、まま");
   ASSERT_TRUE(k.newName());
-  EXPECT_EQ(*k.newName(), sampleLink);
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), Strokes 8, New sampleLink");
+  EXPECT_EQ(*k.newName(), "犬");
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Strokes 8, New 犬");
   EXPECT_FALSE(k.extraTypeInfo());
 }
 
@@ -221,16 +221,17 @@ TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   const Radical rad{1, "TestRadical", Radical::AltForms(), "", ""};
   EXPECT_CALL(_data, ucdStrokes(_, _)).WillOnce(Return(8));
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
-  const Ucd ucd{TestUcd{"侭"}
-                    .sources("GJ", "J0-4B79")
-                    .links({{1, "o1"}, {2, "o2"}}, UcdLinkTypes::Traditional_R)
-                    .meaningAndReadings("utmost", "JIN", "MAMA")};
+  const Ucd ucd{
+      TestUcd{"侭"}
+          .sources("GJ", "J0-4B79")
+          .links({{0x72ac, "犬"}, {0x732b, "猫"}}, UcdLinkTypes::Traditional_R)
+          .meaningAndReadings("utmost", "JIN", "MAMA")};
   EXPECT_EQ(ucd.sources(), "GJ");
   EXPECT_EQ(ucd.jSource(), "J0-4B79");
   const UcdKanji k{_data, ucd};
   ASSERT_FALSE(k.newName());
-  EXPECT_EQ(k.oldNames(), (Kanji::LinkNames{"o1", "o2"}));
-  EXPECT_EQ(k.info(), "Rad TestRadical(1), Strokes 8, Old o1*／o2");
+  EXPECT_EQ(k.oldNames(), (Kanji::LinkNames{"犬", "猫"}));
+  EXPECT_EQ(k.info(), "Rad TestRadical(1), Strokes 8, Old 犬*／猫");
 }
 
 TEST_F(KanjiTest, ExtraFile) {

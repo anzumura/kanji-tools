@@ -1,4 +1,5 @@
 #include <kanji_tools/kanji/Ucd.h>
+#include <kanji_tools/utils/UnicodeBlock.h>
 #include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
@@ -22,8 +23,18 @@ const std::map SourceLetterMap{std::pair{'G', GSource}, std::pair{'H', HSource},
 
 } // namespace
 
+UcdEntry::UcdEntry(Code code, const std::string& name) : _name{name} {
+  if (!isKanji(name))
+    throw std::domain_error{"name '" + name + "' isn't a recognized Kanji"};
+  if (const auto c{getCode(name)}; code != c)
+    throw std::domain_error{
+        "code '" + toUnicode(code) + "' doesn't match '" + toUnicode(c) + "'"};
+}
+
+Code UcdEntry::code() const { return getCode(_name); }
+
 std::string UcdEntry::codeAndName() const {
-  return toUnicode(_code, BracketType::Square) + ' ' + _name;
+  return toUnicode(code(), BracketType::Square) + ' ' + _name;
 }
 
 std::string Ucd::linkCodeAndNames() const {

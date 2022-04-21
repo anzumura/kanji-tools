@@ -291,7 +291,7 @@ TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
 // link validation tests
 
 TEST_F(UcdDataTest, MoreLinkNamesThanLinkCodes) {
-  _testLinkCodes = "ABCD";
+  _testLinkCodes = "4E8C";
   _testLinkNames = "二,三";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkNames has more values than LinkCodes" + FileMsg),
@@ -299,7 +299,7 @@ TEST_F(UcdDataTest, MoreLinkNamesThanLinkCodes) {
 }
 
 TEST_F(UcdDataTest, BadJouyouLink) {
-  _testLinkCodes = "ABCD";
+  _testLinkCodes = "4E8C";
   _testLinkNames = "二";
   EXPECT_THROW(
       call([this] { loadOne(); }, "joyo shouldn't have links" + FileMsg),
@@ -308,7 +308,7 @@ TEST_F(UcdDataTest, BadJouyouLink) {
 
 TEST_F(UcdDataTest, LinkNamesButNoLinkType) {
   _testJouyou.clear();
-  _testLinkCodes = "ABCD";
+  _testLinkCodes = "4E8C";
   _testLinkNames = "二";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkNames has a value, but LinkType is empty" + FileMsg),
@@ -332,7 +332,7 @@ TEST_F(UcdDataTest, LinkCodesButNoLinkNames) {
 TEST_F(UcdDataTest, BadJinmeiLink) {
   _testJouyou.clear();
   _testJinmei = "Y";
-  _testLinkCodes = "ABCD";
+  _testLinkCodes = "50E7";
   _testLinkNames = "僧";
   _testLinkType = "Jinmei";
   writeOne(); // write an entry that mimics a Linked Jinmei Kanji

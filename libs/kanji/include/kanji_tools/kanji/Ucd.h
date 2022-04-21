@@ -6,20 +6,25 @@
 
 namespace kanji_tools {
 
+// 'UcdEntry' is used to hold the name of an entry from 'ucd.txt' file. The file
+// contains both Unicode 'Code' and the UTF-8 string value (having both values
+// makes searching and cross-referencing easier), but only the string value is
+// stored in this class.
 class UcdEntry {
 public:
   using Code = char32_t;
   using Name = Radical::Name;
 
-  UcdEntry(Code code, Name name) : _code{code}, _name{name} {}
+  // throws an exception if 'name' is not a recognized Kanji or if 'code' is not
+  // the correct Unicode value for 'name'
+  UcdEntry(Code code, Name name);
 
-  [[nodiscard]] auto code() const { return _code; }
+  [[nodiscard]] Code code() const; // returns 'Code' calculated from '_name'
   [[nodiscard]] auto& name() const { return _name; }
 
   // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
   [[nodiscard]] std::string codeAndName() const;
 private:
-  const Code _code;
   const std::string _name;
 };
 

@@ -22,12 +22,12 @@ TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(std::string*), 8);
   EXPECT_EQ(sizeof(Ucd::Links), 24);
 #ifdef __clang__
-  EXPECT_EQ(sizeof(Ucd), 216);
-  EXPECT_EQ(sizeof(UcdEntry), 32);
+  EXPECT_EQ(sizeof(Ucd), 208);
+  EXPECT_EQ(sizeof(UcdEntry), 24);
   EXPECT_EQ(sizeof(std::string), 24);
 #else
-  EXPECT_EQ(sizeof(Ucd), 272);
-  EXPECT_EQ(sizeof(UcdEntry), 40);
+  EXPECT_EQ(sizeof(Ucd), 264);
+  EXPECT_EQ(sizeof(UcdEntry), 32);
   EXPECT_EQ(sizeof(std::string), 32);
 #endif
 }
@@ -41,19 +41,38 @@ TEST(UcdTest, Layout) {
   const Ucd u{TestUcd{}};
   const size_t start{ptrCast(u)};
   EXPECT_EQ(ptrCast(u.entry()), start);
-  EXPECT_EQ(ptrCast(u.block()) - start, 32 + stringDiff);
-  EXPECT_EQ(ptrCast(u.version()) - start, 34 + stringDiff);
-  EXPECT_EQ(ptrCast(u.pinyin()) - start, 36 + stringDiff);
-  // sources=38, linkType=39, radical=40, strokes=42, variantStrokes=44
-  // bytes 46 and 47 are padding so 'links' can align to word boundary
-  EXPECT_EQ(ptrCast(u.links()) - start, 48 + stringDiff);
-  EXPECT_EQ(ptrCast(u.morohashiId()) - start, 72 + stringDiff);
+  EXPECT_EQ(ptrCast(u.block()) - start, 24 + stringDiff);
+  EXPECT_EQ(ptrCast(u.version()) - start, 26 + stringDiff);
+  EXPECT_EQ(ptrCast(u.pinyin()) - start, 28 + stringDiff);
+  // sources=30, linkType=31, radical=32, strokes=34, variantStrokes=36
+  // bytes 38 and 39 are padding so 'links' can align to word boundary
+  EXPECT_EQ(ptrCast(u.links()) - start, 40 + stringDiff);
+  EXPECT_EQ(ptrCast(u.morohashiId()) - start, 64 + stringDiff);
   size_t i{2};
-  EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 96 + stringDiff * i);
-  EXPECT_EQ(ptrCast(u.jSource()) - start, 120 + stringDiff * ++i);
-  EXPECT_EQ(ptrCast(u.meaning()) - start, 144 + stringDiff * ++i);
-  EXPECT_EQ(ptrCast(u.onReading()) - start, 168 + stringDiff * ++i);
-  EXPECT_EQ(ptrCast(u.kunReading()) - start, 192 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 88 + stringDiff * i);
+  EXPECT_EQ(ptrCast(u.jSource()) - start, 112 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.meaning()) - start, 136 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.onReading()) - start, 160 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.kunReading()) - start, 184 + stringDiff * ++i);
+}
+
+TEST(UcdEntry, GoodCodeAndName) {
+  const UcdEntry e{0x96f7, "雷"};
+  EXPECT_EQ(e.code(), 0x96f7);
+  EXPECT_EQ(e.name(), "雷");
+}
+
+TEST(UcdEntry, BadName) {
+  const auto msg{[](std::string i) {
+    return "name '" + i + "' isn't a recognized Kanji";
+  }};
+  for (auto i : {"", "a", "こ", "。", "雷鳴", "轟く"})
+    EXPECT_THROW(call([i] { UcdEntry{{}, i}; }, msg(i)), std::domain_error);
+}
+
+TEST(UcdEntry, BadCode) {
+  const auto f{[] { UcdEntry{0xf949, "雷"}; }};
+  EXPECT_THROW(call(f, "code 'F949' doesn't match '96F7'"), std::domain_error);
 }
 
 TEST(UcdTest, SourcesTooLong) {

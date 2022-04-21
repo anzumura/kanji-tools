@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kanji_tools/kanji/Ucd.h>
+#include <kanji_tools/utils/MBUtils.h>
 
 namespace kanji_tools {
 
@@ -22,13 +23,14 @@ public:
   using Strokes = Ucd::Strokes;
 
   // allow setting 'name' via the ctor since it's the more commonly used field
-  TestUcd(Name name = {}) : _name(name) {}
+  TestUcd(Name name = "一") : _name(name) {}
 
   // conversion opterator to create a Ucd instance
   [[nodiscard]] operator Ucd() const {
-    return Ucd{{_code, _name}, _block, _version, _radical, _strokes,
-        _variantStrokes, _pinyin, _morohashiId, _nelsonIds, _sources, _jSource,
-        _joyo, _jinmei, _links, _linkType, _meaning, _onReading, _kunReading};
+    return Ucd{{_code ? _code : getCode(_name), _name}, _block, _version,
+        _radical, _strokes, _variantStrokes, _pinyin, _morohashiId, _nelsonIds,
+        _sources, _jSource, _joyo, _jinmei, _links, _linkType, _meaning,
+        _onReading, _kunReading};
   }
 
   auto& code(Code x) { return set(_code, x); }
