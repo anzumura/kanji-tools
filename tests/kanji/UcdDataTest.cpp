@@ -16,7 +16,7 @@ class UcdDataTest : public TestData {
 protected:
   void SetUp() override {
     write("Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t"
-          "Morohashi\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\t"
+          "MorohashiId\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\t"
           "LinkNames\tLinkType\tMeaning\tOn\tKun");
   }
 

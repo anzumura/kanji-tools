@@ -1,4 +1,4 @@
-Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	Morohashi	NelsonIds	Sources	JSource	Joyo	Jinmei	LinkCodes	LinkNames	LinkType	Meaning	On	Kun
+Code	Name	Block	Version	Radical	Strokes	VStrokes	Pinyin	MorohashiId	NelsonIds	Sources	JSource	Joyo	Jinmei	LinkCodes	LinkNames	LinkType	Meaning	On	Kun
 3400	㐀	CJK_Ext_A	3.0	1	5		qiū			GJT	JA-2121			4E18	丘	Definition*	hill; elder; empty; a name	KYUU	OKA
 3402	㐂	CJK_Ext_A	3.0	1	6				265	J	JA3-2E23			559C	喜	Definition*	like, love, enjoy; joyful thing	KI SHI	YOROKOBU YOROKOBI
 3404	㐄	CJK_Ext_A	3.0	2	3		kuà			GJT	JA-2123								

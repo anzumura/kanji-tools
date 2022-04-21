@@ -13,8 +13,8 @@ declare -r program=parseUcdAllFlat.sh
 # - Strokes: total strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: optional first pīnyīn (拼音) reading from 'kMandarin'
-# - Morohashi: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
-# - NelsonIds: optional list of comma-separated 'Classic Nelson' ids
+# - MorohashiId: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
+# - NelsonIds: optional list of comma-separated 'Classic Nelson' Ids
 # - Sources: list of sources (see comments at the end of this script)
 # - JSource: from kIRG_JSource (see comments et the end of this script)
 # - Joyo: 'Y' if part of Jōyō list or blank
@@ -533,7 +533,7 @@ function processRecord() {
   [[ -n $localJSource ]] && uniqueJSource[$localJSource]=1
   [[ -n $localMorohashi ]] && uniqueMorohashi[$localMorohashi]=1
   if [[ -n $kNelson ]]; then
-    # remove leading 0's from all Nelson ids in the list
+    # remove leading 0's from all Nelson Ids in the list
     kNelson=$(echo $kNelson | sed -e 's/^0*//' -e 's/ 0*/ /g')
     for s in $kNelson; do
       uniqueNelson[$s]=1
@@ -553,7 +553,7 @@ ${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\
 function printResults() {
   log "Print results to '$outFile' ... " -n
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
-Morohashi\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\tLinkNames\t\
+MorohashiId\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\tLinkNames\t\
 LinkType\tMeaning\tOn\tKun" >$outFile
   local s
   local -i count=0
@@ -626,19 +626,19 @@ $((totalReading - directReading - linkedReading)))"
 # - has Morohashi, but not Adobe: 5,721
 # - has Adobe, but not Morohashi: 1,010
 #
-# Morohashi: Unicode 14.0 has 17,830 unique 'kMorohashi' valuse. This property
+# MorohashiId: Unicode 14.0 has 17,830 unique 'kMorohashi' valuse. This property
 # has one or more index numbers into 'Dai Kan-Wa Jiten' (a huge Chinese-Japanese
 # dictionary compiled by Tetsuji Morohashi). There are plans to cleanup/expand
 # this property to cover ~50K entries by Unicode 16.0.
 #
-# Nelson: Unicode 14.0 has 5,442 unique ids in 'kNelson'. This property has one
-# or more ids from the 'Classic Nelson' Japanese-English Character Dictionary.
-# 'Classic Nelson' was first published in 1962 and the ids remained the same for
+# NelsonIds: Unicode 14.0 has 5,442 unique 'kNelson' Ids. This property has one
+# or more Ids from the 'Classic Nelson' Japanese-English Character Dictionary.
+# 'Classic Nelson' was first published in 1962 and the Ids remained the same for
 # the 'Second Revised Edition' from 1974 (including the Thirtieth Printing in
-# 1989). These ids don't match 'New Nelson' which was first publised in 1997.
+# 1989). These Ids don't match 'New Nelson' which was first publised in 1997.
 #
-# Morohashi and Nelson ids can be used for looking up kanji by the 'kanjiQuiz'
-# program (see Quiz.cpp or run 'kanjiQuiz -h' for details).
+# Morohashi and Nelson Ids can be used for looking up kanji by the 'kanjiQuiz'
+# program (see QuizLauncher.cpp or run 'kanjiQuiz -h' for details).
 #
 # Sources: a list of letters where each letter represents a 'kIRG_xSource' field
 # that has a non-empty value to help determine the country where a charater is

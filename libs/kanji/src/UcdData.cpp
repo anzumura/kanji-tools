@@ -70,7 +70,7 @@ void UcdData::load(const Data::Path& file) {
   static const std::string OutOfRange{"' out of range"};
   const ColumnFile::Column codeCol{"Code"}, nameCol{"Name"}, blockCol{"Block"},
       versionCol{"Version"}, radicalCol{"Radical"}, strokesCol{"Strokes"},
-      vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"Morohashi"},
+      vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"MorohashiId"},
       nelsonIdsCol{"NelsonIds"}, sourcesCol{"Sources"}, jSourceCol{"JSource"},
       joyoCol{"Joyo"}, jinmeiCol{"Jinmei"}, linkCodesCol{"LinkCodes"},
       linkNamesCol{"LinkNames"}, linkTypeCol{"LinkType"}, meaningCol{"Meaning"},
