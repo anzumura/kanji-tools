@@ -9,6 +9,7 @@ namespace {
 // 'ptrCast' is used in Layout test
 template<typename T>
 [[nodiscard]] constexpr size_t ptrCast(const T& x) noexcept {
+  static_assert(sizeof(size_t) == sizeof(&x));
   return reinterpret_cast<size_t>(&x);
 }
 
@@ -21,48 +22,38 @@ TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(std::string*), 8);
   EXPECT_EQ(sizeof(Ucd::Links), 24);
 #ifdef __clang__
-  EXPECT_EQ(sizeof(Ucd), 224);
+  EXPECT_EQ(sizeof(Ucd), 216);
   EXPECT_EQ(sizeof(UcdEntry), 32);
   EXPECT_EQ(sizeof(std::string), 24);
 #else
-  EXPECT_EQ(sizeof(Ucd), 280);
+  EXPECT_EQ(sizeof(Ucd), 272);
   EXPECT_EQ(sizeof(UcdEntry), 40);
   EXPECT_EQ(sizeof(std::string), 32);
 #endif
 }
 
 TEST(UcdTest, Layout) {
-  const Ucd u{TestUcd{}};
-  const auto start{ptrCast(u)};
-  const auto entry{ptrCast(u.entry())};
-  const auto block{ptrCast(u.block())};
-  const auto version{ptrCast(u.version())};
-  const auto pinyin{ptrCast(u.pinyin())};
-  const auto links{ptrCast(u.links())};
-  const auto morohashiId{ptrCast(u.morohashiId())};
-  const auto nelsonIds{ptrCast(u.nelsonIds())};
-  const auto jSource{ptrCast(u.jSource())};
-  const auto meaning{ptrCast(u.meaning())};
-  const auto onReading{ptrCast(u.onReading())};
-  const auto kunReading{ptrCast(u.kunReading())};
 #ifdef __clang__
   const size_t stringDiff{};
 #else
   const size_t stringDiff{8}; // gcc string is 8 bytes bigger than clang
 #endif
-  EXPECT_EQ(start, entry);
-  EXPECT_EQ(block - start, 32 + stringDiff);
-  EXPECT_EQ(version - start, 34 + stringDiff);
-  EXPECT_EQ(pinyin - start, 36 + stringDiff);
-  // sources=38, linkType=39, linkedReadings=40, radical=44
-  // strokes=48, variantStrokes=52
-  EXPECT_EQ(links - start, 56 + stringDiff);
-  EXPECT_EQ(morohashiId - start, 80 + stringDiff);
-  EXPECT_EQ(nelsonIds - start, 104 + stringDiff * 2);
-  EXPECT_EQ(jSource - start, 128 + stringDiff * 3);
-  EXPECT_EQ(meaning - start, 152 + stringDiff * 4);
-  EXPECT_EQ(onReading - start, 176 + stringDiff * 5);
-  EXPECT_EQ(kunReading - start, 200 + stringDiff * 6);
+  const Ucd u{TestUcd{}};
+  const size_t start{ptrCast(u)};
+  EXPECT_EQ(ptrCast(u.entry()), start);
+  EXPECT_EQ(ptrCast(u.block()) - start, 32 + stringDiff);
+  EXPECT_EQ(ptrCast(u.version()) - start, 34 + stringDiff);
+  EXPECT_EQ(ptrCast(u.pinyin()) - start, 36 + stringDiff);
+  // sources=38, linkType=39, radical=40, strokes=42, variantStrokes=44
+  // bytes 46 and 47 are padding so 'links' can align to word boundary
+  EXPECT_EQ(ptrCast(u.links()) - start, 48 + stringDiff);
+  EXPECT_EQ(ptrCast(u.morohashiId()) - start, 72 + stringDiff);
+  size_t i{2};
+  EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 96 + stringDiff * i);
+  EXPECT_EQ(ptrCast(u.jSource()) - start, 120 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.meaning()) - start, 144 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.onReading()) - start, 168 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.kunReading()) - start, 192 + stringDiff * ++i);
 }
 
 TEST(UcdTest, SourcesTooLong) {

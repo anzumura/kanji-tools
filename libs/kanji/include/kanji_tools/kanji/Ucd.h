@@ -4,8 +4,6 @@
 #include <kanji_tools/kanji/UcdLinkTypes.h>
 #include <kanji_tools/utils/Symbol.h>
 
-#include <bitset>
-
 namespace kanji_tools {
 
 class UcdEntry {
@@ -60,8 +58,7 @@ public:
       const std::string& pinyin, const std::string& morohashiId,
       const std::string& nelsonIds, const std::string& sources,
       const std::string& jSource, bool joyo, bool jinmei, const Links&,
-      UcdLinkTypes, bool linkedReadings, Meaning, Reading onReading,
-      Reading kunReading);
+      UcdLinkTypes, Meaning, Reading onReading, Reading kunReading);
 
   Ucd(const Ucd&) = delete;
 
@@ -70,7 +67,6 @@ public:
   [[nodiscard]] auto& version() const { return _version; }
   [[nodiscard]] auto& pinyin() const { return _pinyin; }
   [[nodiscard]] auto linkType() const { return _linkType; }
-  [[nodiscard]] auto linkedReadings() const { return _linkedReadings; }
   [[nodiscard]] auto radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
   [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }
@@ -82,7 +78,7 @@ public:
   [[nodiscard]] auto& onReading() const { return _onReading; }
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
 
-  // values for these fields are stored in _sources bitset;
+  // values for these fields are stored in bits of '_sources';
   [[nodiscard]] std::string sources() const;
   [[nodiscard]] bool joyo() const;
   [[nodiscard]] bool jinmei() const;
@@ -95,22 +91,19 @@ public:
   // helper methods
   [[nodiscard]] auto code() const { return _entry.code(); }
   [[nodiscard]] auto& name() const { return _entry.name(); }
+  [[nodiscard]] bool linkedReadings() const;
   [[nodiscard]] std::string codeAndName() const;
   [[nodiscard]] std::string linkCodeAndNames() const;
 private:
-  // there are 6 source types (G, H, J, K, T, V) plus joyo and jinmei flags
-  static constexpr auto SourcesSize{8};
-
-  [[nodiscard]] static std::bitset<SourcesSize> getSources(
+  [[nodiscard]] static unsigned char getSources(
       const std::string& sources, bool joyo, bool jinmei);
 
   const UcdEntry _entry;
   const UcdBlock _block;
   const UcdVersion _version;
   const Pinyin _pinyin;
-  const std::bitset<SourcesSize> _sources;
+  const unsigned char _sources;
   const UcdLinkTypes _linkType;
-  const bool _linkedReadings;
   const Radical::Number _radical;
   // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
   const Strokes _strokes, _variantStrokes;

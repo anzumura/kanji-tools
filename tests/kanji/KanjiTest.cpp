@@ -223,8 +223,7 @@ TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   EXPECT_CALL(_data, ucdRadical(_, _)).WillOnce(ReturnRef(rad));
   const Ucd ucd{TestUcd{"侭"}
                     .sources("GJ", "J0-4B79")
-                    .links({{1, "o1"}, {2, "o2"}}, UcdLinkTypes::Traditional)
-                    .linkedReadings(true)
+                    .links({{1, "o1"}, {2, "o2"}}, UcdLinkTypes::Traditional_R)
                     .meaningAndReadings("utmost", "JIN", "MAMA")};
   EXPECT_EQ(ucd.sources(), "GJ");
   EXPECT_EQ(ucd.jSource(), "J0-4B79");

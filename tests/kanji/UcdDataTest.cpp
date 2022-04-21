@@ -103,7 +103,7 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
   EXPECT_EQ(u.jSource(), "J3-2E49");
   EXPECT_FALSE(u.joyo());
   EXPECT_TRUE(u.jinmei());
-  EXPECT_EQ(u.linkType(), UcdLinkTypes::Jinmei);
+  EXPECT_EQ(u.linkType(), UcdLinkTypes::Jinmei_R);
   EXPECT_TRUE(u.linkedReadings());
   ASSERT_EQ(u.links().size(), 1);
   EXPECT_EQ(u.links()[0].code(), U'\x50E7');

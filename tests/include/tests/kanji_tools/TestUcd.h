@@ -28,34 +28,32 @@ public:
   [[nodiscard]] operator Ucd() const {
     return Ucd{{_code, _name}, _block, _version, _radical, _strokes,
         _variantStrokes, _pinyin, _morohashiId, _nelsonIds, _sources, _jSource,
-        _joyo, _jinmei, _links, _linkType, _linkedReadings, _meaning,
-        _onReading, _kunReading};
+        _joyo, _jinmei, _links, _linkType, _meaning, _onReading, _kunReading};
   }
 
   auto& code(Code x) { return set(_code, x); }
   auto& name(Name x) { return set(_name, x); }
   auto& block(const std::string& x) { return set(_block, x); }
   auto& version(const std::string& x) { return set(_version, x); }
-  auto& radical(Radical::Number x) { return set(_radical, x); }
-  auto& strokes(Strokes x) { return set(_strokes, x); }
-  auto& variantStrokes(Strokes x) { return set(_variantStrokes, x); }
   auto& pinyin(const std::string& x) { return set(_pinyin, x); }
-  auto& morohashiId(const std::string& x) { return set(_morohashiId, x); }
-  auto& nelsonIds(const std::string& x) { return set(_nelsonIds, x); }
-  auto& sources(const std::string& x) { return set(_sources, x); }
-  auto& jSource(const std::string& x) { return set(_jSource, x); }
-  auto& joyo(bool x) { return set(_joyo, x); }
-  auto& jinmei(bool x) { return set(_jinmei, x); }
+  auto& linkType(UcdLinkTypes x) { return set(_linkType, x); }
   auto& links(const Links& x) {
     _links.clear();
     std::copy(x.begin(), x.end(), std::back_inserter(_links));
     return *this;
   }
-  auto& linkType(UcdLinkTypes x) { return set(_linkType, x); }
-  auto& linkedReadings(bool x) { return set(_linkedReadings, x); }
+  auto& radical(Radical::Number x) { return set(_radical, x); }
+  auto& strokes(Strokes x) { return set(_strokes, x); }
+  auto& variantStrokes(Strokes x) { return set(_variantStrokes, x); }
+  auto& morohashiId(const std::string& x) { return set(_morohashiId, x); }
+  auto& nelsonIds(const std::string& x) { return set(_nelsonIds, x); }
+  auto& jSource(const std::string& x) { return set(_jSource, x); }
   auto& meaning(const std::string& x) { return set(_meaning, x); }
   auto& onReading(const std::string& x) { return set(_onReading, x); }
   auto& kunReading(const std::string& x) { return set(_kunReading, x); }
+  auto& sources(const std::string& x) { return set(_sources, x); }
+  auto& joyo(bool x) { return set(_joyo, x); }
+  auto& jinmei(bool x) { return set(_jinmei, x); }
   // compound setters
   auto& ids(const std::string& m, const std::string& n) {
     return morohashiId(m).nelsonIds(n);
@@ -72,15 +70,14 @@ public:
   }
 private:
   Code _code{};
-  std::string _name, _block, _version;
+  std::string _name, _block, _version, _pinyin;
+  UcdLinkTypes _linkType{UcdLinkTypes::None};
+  Links _links;
   Radical::Number _radical{};
   Strokes _strokes{}, _variantStrokes{};
-  std::string _pinyin, _morohashiId, _nelsonIds, _sources, _jSource;
-  bool _joyo{}, _jinmei{};
-  Links _links;
-  UcdLinkTypes _linkType{UcdLinkTypes::None};
-  bool _linkedReadings{};
+  std::string _morohashiId, _nelsonIds, _sources, _jSource;
   std::string _meaning, _onReading, _kunReading;
+  bool _joyo{}, _jinmei{};
 };
 
 } // namespace kanji_tools

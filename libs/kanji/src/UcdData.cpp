@@ -126,19 +126,14 @@ void UcdData::load(const Data::Path& file) {
     else if (!f.isEmpty(linkCodesCol))
       f.error("LinkCodes has a value, but LinkNames is empty");
 
-    auto linkType{f.get(linkTypeCol)};
-    const auto linkedReadings{linkType.ends_with("*")};
-    if (linkedReadings) linkType.pop_back();
-
     if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
                  std::make_tuple(UcdEntry{f.getChar32(codeCol), name},
                      f.get(blockCol), f.get(versionCol), radical, strokes,
                      vStrokes, f.get(pinyinCol), f.get(morohashiCol),
                      f.get(nelsonIdsCol), f.get(sourcesCol), f.get(jSourceCol),
                      joyo, jinmei, links,
-                     AllUcdLinkTypes.fromStringAllowEmpty(linkType),
-                     linkedReadings, f.get(meaningCol), f.get(onCol),
-                     f.get(kunCol)))
+                     AllUcdLinkTypes.fromStringAllowEmpty(f.get(linkTypeCol)),
+                     f.get(meaningCol), f.get(onCol), f.get(kunCol)))
              .second)
       f.error("duplicate entry '" + name + "'");
     for (const auto& link : links)
