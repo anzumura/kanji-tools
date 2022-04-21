@@ -108,8 +108,7 @@ template<typename T>
   }
 }
 
-// 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or
-// wchar_t
+// 'R' is a sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
 template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(
     const char* s, size_t maxSize, const Consts<T>& v) {
@@ -155,6 +154,16 @@ std::u32string fromUtf8(const char* s, size_t maxSize) {
 
 std::u32string fromUtf8(const std::string& s, size_t maxSize) {
   return fromUtf8(s.c_str(), maxSize);
+}
+
+Code getCode(const char* s) {
+  if (!s || !*s) return {};
+  auto u{reinterpret_cast<const unsigned char*>(s)};
+  return convertOneUtf8(u, Char32Vals);
+}
+
+Code getCode(const std::string& s) {
+  return getCode(s.c_str());
 }
 
 std::string toUtf8(Code c) {
