@@ -217,7 +217,7 @@ template<typename... T>
 [[nodiscard]] inline auto inWCharRange(
     const std::string& s, bool sizeOne, T&... t) {
   if (s.size() > 1 && (!sizeOne || s.size() <= MaxMBSize * 2))
-    if (const auto w{fromUtf8(s, 3)};
+    if (const auto w{fromUtf8(s, sizeOne ? 3 : 1)};
         sizeOne ? w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])
                 : w.size() >= 1)
       return inRange(w[0], t...);
