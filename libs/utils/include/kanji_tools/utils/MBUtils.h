@@ -15,11 +15,9 @@ namespace kanji_tools {
 // explicit than 'wchar_t', i.e., it's 32 bits instead of platform dependent.
 using Code = char32_t;
 
-// uncomment the following line to use 'codecvt' (may remove this later):
-//#define USE_CODECVT_FOR_UTF_8
-
-[[nodiscard]] std::u32string fromUtf8(const char*);
-[[nodiscard]] std::u32string fromUtf8(const std::string&);
+// 'maxSize' can be specified to control the number of characters converted
+[[nodiscard]] std::u32string fromUtf8(const char*, size_t maxSize = 0);
+[[nodiscard]] std::u32string fromUtf8(const std::string&, size_t maxSize = 0);
 
 [[nodiscard]] std::string toUtf8(Code);
 [[nodiscard]] std::string toUtf8(int);

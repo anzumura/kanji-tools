@@ -1,12 +1,7 @@
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Utils.h>
 
-#ifdef USE_CODECVT_FOR_UTF_8
-#include <codecvt> // for codecvt_utf8
-#include <locale>  // for wstring_convert
-#else
 #include <array>
-#endif
 
 namespace kanji_tools {
 
@@ -22,7 +17,7 @@ namespace {
 //   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
 //   encoding must be treated as an invalid byte sequence.
 constexpr Code MinSurrogate{0xd800}, MaxSurrogate{0xdfff}, Max2Uni{0x7ff},
-    Max3Uni{0xffff};
+    Max3Uni{0xffff}, ErrorReplacement{0xfffd};
 
 // constants and functions for shifting to help simplify the code and get rid
 // of 'magic' numbers
@@ -60,15 +55,6 @@ constexpr auto fourByteUtf8(const unsigned char* u, uInt b1, uInt b2, uInt b3) {
   return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
 }
 
-#ifdef USE_CODECVT_FOR_UTF_8
-inline auto utf8Converter() {
-  static std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
-  return &conv;
-}
-#else
-
-constexpr Code ErrorReplacement{0xfffd};
-
 // UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
 // invalid code points
 constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
@@ -87,7 +73,8 @@ template<typename T> using Consts = std::array<T, Char32Vals.size()>;
 
 // 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
 template<typename R, typename T = typename R::value_type>
-[[nodiscard]] R convertFromUtf8(const char* s, const Consts<T>& v) {
+[[nodiscard]] R convertFromUtf8(
+    const char* s, size_t maxSize, const Consts<T>& v) {
   R result;
   if (!s || !*s) return result;
   auto u{reinterpret_cast<const unsigned char*>(s)};
@@ -132,7 +119,7 @@ template<typename R, typename T = typename R::value_type>
                                          : threeByte(b1, b2);
     else
       result += twoByte(b1, b2); // GCOV_EXCL_LINE: covered
-  } while (*u);
+  } while (*u && (!maxSize || result.size() < maxSize));
   return result;
 }
 
@@ -160,29 +147,21 @@ void convertToUtf8(Code c, std::string& s) {
   } else
     s += ReplacementCharacter; // GCOV_EXCL_LINE: covered
 }
-#endif
 
 } // namespace
 
-std::u32string fromUtf8(const char* s) {
-#ifdef USE_CODECVT_FOR_UTF_8
-  const auto r{utf8Converter()->from_bytes(s)};
-  return std::u32string(reinterpret_cast<const Code*>(r.c_str()));
-#else
-  return convertFromUtf8<std::u32string>(s, Char32Vals);
-#endif
+std::u32string fromUtf8(const char* s, size_t maxSize) {
+  return convertFromUtf8<std::u32string>(s, maxSize, Char32Vals);
 }
 
-std::u32string fromUtf8(const std::string& s) { return fromUtf8(s.c_str()); }
+std::u32string fromUtf8(const std::string& s, size_t maxSize) {
+  return fromUtf8(s.c_str(), maxSize);
+}
 
 std::string toUtf8(Code c) {
-#ifdef USE_CODECVT_FOR_UTF_8
-  return utf8Converter()->to_bytes(toWChar(c));
-#else
   std::string result;
   convertToUtf8(c, result);
   return result;
-#endif
 }
 
 std::string toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
@@ -190,25 +169,17 @@ std::string toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
 std::string toUtf8(long x) { return toUtf8(static_cast<Code>(x)); }
 
 std::string toUtf8(const std::u32string& s) {
-#ifdef USE_CODECVT_FOR_UTF_8
-  return utf8Converter()->to_bytes(reinterpret_cast<const wchar_t*>(s.c_str()));
-#else
   std::string result;
   // result will be bigger than 's' if there are any multibyte chars
   result.reserve(s.size());
   for (auto c : s) convertToUtf8(c, result);
   return result;
-#endif
 }
 
 // wstring versions of conversion functions
 
 std::wstring fromUtf8ToWstring(const char* s) {
-#ifdef USE_CODECVT_FOR_UTF_8
-  return utf8Converter()->from_bytes(s);
-#else
-  return convertFromUtf8<std::wstring>(s, WCharVals);
-#endif
+  return convertFromUtf8<std::wstring>(s, 0, WCharVals);
 }
 
 std::wstring fromUtf8ToWstring(const std::string& s) {
@@ -216,15 +187,11 @@ std::wstring fromUtf8ToWstring(const std::string& s) {
 }
 
 std::string toUtf8(const std::wstring& s) {
-#ifdef USE_CODECVT_FOR_UTF_8
-  return utf8Converter()->to_bytes(s);
-#else
   std::string result;
   // result will be bigger than 's' if there are any multibyte chars
   result.reserve(s.size());
   for (auto c : s) convertToUtf8(static_cast<Code>(c), result);
   return result;
-#endif
 }
 
 // validateMBUtf8

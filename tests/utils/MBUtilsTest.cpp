@@ -2,47 +2,18 @@
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Utils.h>
 
-#ifdef USE_CODECVT_FOR_UTF_8
-#include <tests/kanji_tools/WhatMismatch.h>
-#endif
-
 namespace kanji_tools {
 
 namespace {
 
 void fromUtf8Error(
     const std::string& s, const std::u32string& result = U"\ufffd") {
-#ifdef USE_CODECVT_FOR_UTF_8
-  static constexpr auto Msg{
-#ifdef __clang__
-      "wstring_convert: from_bytes error"
-#else
-      "wstring_convert::from_bytes"
-#endif
-  };
-  // 'result' isn't used by codecvt since it throws an exception, but use it
-  // below to avoid a compile warning
-  EXPECT_THROW(
-      call([&] { return fromUtf8(s) + result; }, Msg), std::range_error);
-#else
   EXPECT_EQ(fromUtf8(s), result);
-#endif
 }
 
 void toUtf8Error(
     const std::u32string& s, const std::string& result = "\xEF\xBF\xBD") {
-#ifdef USE_CODECVT_FOR_UTF_8
-  static constexpr auto Msg{
-#ifdef __clang__
-      "wstring_convert: to_bytes error"
-#else
-      "wstring_convert::to_bytes"
-#endif
-  };
-  EXPECT_THROW(call([&] { return toUtf8(s) + result; }, Msg), std::range_error);
-#else
   EXPECT_EQ(toUtf8(s), result);
-#endif
 }
 
 namespace bytes {
@@ -210,7 +181,6 @@ TEST(MBUtilsTest, BeyondMaxUnicode) {
 TEST(MBUtilsTest, InvalidSurrogateRange) {
   // from UTF-8
   EXPECT_EQ(fromUtf8(BeforeSurrogateRange), U"\ud7ff");
-#ifndef USE_CODECVT_FOR_UTF_8
   fromUtf8Error(SurrogateRangeStart);
   fromUtf8Error(SurrogateRangeEnd);
   EXPECT_EQ(fromUtf8(AfterSurrogateRange), U"\ue000");
@@ -218,7 +188,6 @@ TEST(MBUtilsTest, InvalidSurrogateRange) {
   EXPECT_EQ(toUtf8(U"\ud7ff"), BeforeSurrogateRange);
   toUtf8Error(U"\xd800");
   toUtf8Error(U"\xdfff");
-#endif
   EXPECT_EQ(toUtf8(U"\ue000"), AfterSurrogateRange);
 }
 
