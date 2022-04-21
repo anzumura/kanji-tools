@@ -71,20 +71,8 @@ constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
 
 template<typename T> using Consts = std::array<T, Char32Vals.size()>;
 
-// 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
-template<typename R, typename T = typename R::value_type>
-[[nodiscard]] R convertFromUtf8(
-    const char* s, size_t maxSize, const Consts<T>& v) {
-  R result;
-  if (!s || !*s) return result;
-  auto u{reinterpret_cast<const unsigned char*>(s)};
-
-  // return a 'T' that represents a 2-byte UTF-8 character (U+0080 to U+07FF)
-  const auto twoByte{[&u, &v](uInt b1, uInt b2) {
-    ++u;
-    return (b1 ^ TwoBits) > 1 ? cast<T>(left6(b1 ^ TwoBits, b2)) : v[Err];
-  }};
-
+template<typename T>
+[[nodiscard]] T convertOneUtf8(const unsigned char*& u, const Consts<T>& v) {
   // return a 'T' that represents a 3-byte UTF-8 character (U+0800 to U+FFFF)
   const auto threeByte{[&u, &v](uInt b1, uInt b2) {
     const auto t{threeByteUtf8<T>(u, b1, b2)};
@@ -102,23 +90,34 @@ template<typename R, typename T = typename R::value_type>
     return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
   }};
 
+  if (*u <= MaxAscii)
+    return {*u++}; // single byte UTF-8 case (so regular Ascii)
+  if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
+    ++u;
+    return v[Err]; // 1st byte was '10...' or more than four '1's
+  }
+  if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
+    return v[Err]; // 2nd byte not '10...'
+  else if (uInt b2 = *u ^ Bit1; b1 & Bit3)
+    return (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
+           : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
+                                    : threeByte(b1, b2);
+  else {
+    ++u;
+    return (b1 ^ TwoBits) > 1 ? cast<T>(left6(b1 ^ TwoBits, b2)) : v[Err];
+  }
+}
+
+// 'R' is the sequence (so u32string or wstring) and 'T' is char32_t or
+// wchar_t
+template<typename R, typename T = typename R::value_type>
+[[nodiscard]] R convertFromUtf8(
+    const char* s, size_t maxSize, const Consts<T>& v) {
+  R result;
+  if (!s || !*s) return result;
+  auto u{reinterpret_cast<const unsigned char*>(s)};
   do {
-    if (*u <= MaxAscii) {
-      const T t{*u++};
-      result += t; // single byte UTF-8 case (so regular Ascii)
-    } else if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
-      // GCOV_EXCL_START: covered
-      ++u;
-      result += v[Err]; // 1st byte was '10...' or more than four '1's
-      // GCOV_EXCL_STOP
-    } else if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
-      result += v[Err]; // 2nd byte not '10...'
-    else if (uInt b2 = *u ^ Bit1; b1 & Bit3)
-      result += (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
-                : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
-                                         : threeByte(b1, b2);
-    else
-      result += twoByte(b1, b2); // GCOV_EXCL_LINE: covered
+    result += convertOneUtf8(u, v);
   } while (*u && (!maxSize || result.size() < maxSize));
   return result;
 }
