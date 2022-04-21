@@ -93,19 +93,19 @@ template<typename T>
   if (*u <= MaxAscii)
     return {*u++}; // single byte UTF-8 case (so regular Ascii)
   if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
-    ++u;
+    ++u;           // GCOV_EXCL_START: covered
     return v[Err]; // 1st byte was '10...' or more than four '1's
-  }
+  }                // GCOV_EXCL_STOP
   if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
     return v[Err]; // 2nd byte not '10...'
   else if (uInt b2 = *u ^ Bit1; b1 & Bit3)
     return (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
            : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
                                     : threeByte(b1, b2);
-  else {
+  else { // GCOV_EXCL_START: covered
     ++u;
     return (b1 ^ TwoBits) > 1 ? cast<T>(left6(b1 ^ TwoBits, b2)) : v[Err];
-  }
+  } // GCOV_EXCL_STOP
 }
 
 // 'R' is a sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
