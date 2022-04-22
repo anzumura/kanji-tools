@@ -44,23 +44,25 @@ MorohashiId::Id MorohashiId::validate(
   static constexpr auto CharZero{'0'}, CharNine{'9'};
   static constexpr MorohashiId::Id Ten{10};
 
+  const auto error{[&s](const std::string& msg) {
+    throw std::domain_error{"Morohashi ID: '" + s + "' " + msg};
+  }};
+
   if (s.empty() && !start && !end) return Id{};
-  if (s.size() - start - end == 0)
-    throw std::domain_error{"invalid Morohashi Id: " + s};
+  if (s.size() - start - end == 0) error("is invalid");
   Id result{};
   const auto typedId{start || end};
   for (auto i = start; i < s.size() - end; ++i)
     if (i == start && s[i] == CharZero)
       ++start;
     else if (s[i] < CharZero || s[i] > CharNine)
-      throw std::domain_error{"non-numeric Morohashi Id: " + s};
+      error("is non-numeric");
     else if (const Id x{static_cast<Id>(s[i] - CharZero)};
              result > MaxId / Ten || (result *= Ten) > MaxId - x)
-      throw std::domain_error{"Morohashi Id exceeds max: " + s};
+      error("exceeds max");
     else
       result += x;
-  if (typedId && !result)
-    throw std::domain_error{"typed Morohashi Id can't be zero: " + s};
+  if (typedId && !result) error("can't be zero");
   return result;
 }
 
