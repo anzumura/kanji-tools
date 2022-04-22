@@ -45,7 +45,7 @@ TEST(UcdTest, Layout) {
   EXPECT_EQ(ptrCast(u.block()) - start, 24 + stringDiff);
   EXPECT_EQ(ptrCast(u.version()) - start, 26 + stringDiff);
   EXPECT_EQ(ptrCast(u.pinyin()) - start, 28 + stringDiff);
-  // sources=30, linkType=31, radical=32, strokes=34, variantStrokes=35
+  // sources=30, linkType=31, radical=32, strokes=34
   EXPECT_EQ(ptrCast(u.morohashiId()) - start, 36 + stringDiff);
   EXPECT_EQ(ptrCast(u.links()) - start, 40 + stringDiff);
   EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 64 + stringDiff);
