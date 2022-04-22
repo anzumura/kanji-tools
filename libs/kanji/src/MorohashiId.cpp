@@ -4,16 +4,20 @@ namespace kanji_tools {
 
 namespace {
 
+constexpr auto PrimeSuffix{'P'}, AltPrimeSuffix{'\''}, SupplementalPrefix{'H'};
+
+const std::string DoublePrimeSuffix{"PP"}, AltDoublePrimeSuffix{"''"};
+
 [[nodiscard]] auto isDoublePrime(const std::string& s) {
-  return s.ends_with("PP") || s.ends_with("''");
+  return s.ends_with(DoublePrimeSuffix) || s.ends_with(AltDoublePrimeSuffix);
 }
 
 [[nodiscard]] auto isPrime(const std::string& s) {
-  return s.ends_with("P") || s.ends_with("'");
+  return s.ends_with(PrimeSuffix) || s.ends_with(AltPrimeSuffix);
 }
 
 [[nodiscard]] auto isSupplemental(const std::string& s) {
-  return s.starts_with("H");
+  return s.starts_with(SupplementalPrefix);
 }
 
 } // namespace
@@ -32,22 +36,25 @@ MorohashiId::IdType MorohashiId::getIdType(const std::string& s) {
   if (isDoublePrime(s)) return IdType::DoublePrime;
   if (isPrime(s)) return IdType::Prime;
   if (isSupplemental(s)) return IdType::Supplemental;
-  return IdType::None;
+  return IdType::Regular;
 }
 
 MorohashiId::Id MorohashiId::validate(
     const std::string& s, size_t start, size_t end) {
+  static constexpr auto CharZero{'0'}, CharNine{'9'};
+  static constexpr MorohashiId::Id Ten{10};
+
   if (s.empty() && !start && !end) return Id{};
   if (s.size() - start - end == 0) throw std::domain_error{"invalid Id: " + s};
   Id result{};
   const auto typedId{start || end};
   for (auto i = start; i < s.size() - end; ++i)
-    if (i == start && s[i] == '0')
+    if (i == start && s[i] == CharZero)
       ++start;
-    else if (s[i] < '0' || s[i] > '9')
+    else if (s[i] < CharZero || s[i] > CharNine)
       throw std::domain_error{"non-numeric Id: " + s};
-    else if (const Id x{static_cast<Id>(s[i] - '0')};
-             result > MaxId / 10 || (result *= 10) > MaxId - x)
+    else if (const Id x{static_cast<Id>(s[i] - CharZero)};
+             result > MaxId / Ten || (result *= Ten) > MaxId - x)
       throw std::domain_error{"Id exceeds max: " + s};
     else
       result += x;
@@ -59,12 +66,12 @@ MorohashiId::Id MorohashiId::validate(
 std::string MorohashiId::toString() const {
   std::string result;
   if (_id) {
-    if (_idType == IdType::Supplemental) result = "H";
+    if (_idType == IdType::Supplemental) result = SupplementalPrefix;
     result += std::to_string(_id);
     if (_idType == IdType::Prime)
-      result += 'P';
+      result += PrimeSuffix;
     else if (_idType == IdType::DoublePrime)
-      result += "PP";
+      result += DoublePrimeSuffix;
   }
   return result;
 }

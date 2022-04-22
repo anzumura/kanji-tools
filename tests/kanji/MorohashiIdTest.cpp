@@ -9,7 +9,7 @@ namespace kanji_tools {
 TEST(MorohashiIdTest, EmptyId) {
   const MorohashiId id{};
   EXPECT_EQ(id.id(), 0);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::None);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
   EXPECT_FALSE(id);
   EXPECT_EQ(id.toString(), "");
 }
@@ -17,7 +17,7 @@ TEST(MorohashiIdTest, EmptyId) {
 TEST(MorohashiIdTest, IdFromEmptyString) {
   const MorohashiId id{""};
   EXPECT_EQ(id.id(), 0);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::None);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
   EXPECT_FALSE(id);
   EXPECT_EQ(id.toString(), "");
 }
@@ -25,12 +25,12 @@ TEST(MorohashiIdTest, IdFromEmptyString) {
 TEST(MorohashiIdTest, StripLeadingZeroes) {
   const MorohashiId id{"00000"};
   EXPECT_EQ(id.id(), 0);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::None);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
   EXPECT_FALSE(id);
   EXPECT_EQ(id.toString(), "");
   const MorohashiId id1{"0001"};
   EXPECT_EQ(id1.id(), 1);
-  EXPECT_EQ(id1.idType(), MorohashiId::IdType::None);
+  EXPECT_EQ(id1.idType(), MorohashiId::IdType::Regular);
   EXPECT_TRUE(id1);
   EXPECT_EQ(id1.toString(), "1");
 }
@@ -75,14 +75,8 @@ TEST(MorohashiIdTest, BadTypedZeroIds) {
 }
 
 TEST(MorohashiIdTest, NumericString) {
-  for (MorohashiId::Id i{1}; i < MorohashiId::MaxId; ++i) {
-    const std::string s{std::to_string(i)};
-    const MorohashiId id{s};
-    ASSERT_EQ(id.id(), i);
-    ASSERT_EQ(id.idType(), MorohashiId::IdType::None);
-    ASSERT_TRUE(id);
-    ASSERT_EQ(id.toString(), s);
-  }
+  for (MorohashiId::Id i{1}; i < MorohashiId::MaxId; ++i)
+    ASSERT_EQ(MorohashiId{std::to_string(i)}.id(), i);
 }
 
 TEST(MorohashiIdTest, NonDigit) {
@@ -99,7 +93,7 @@ TEST(MorohashiIdTest, MaxIds) {
   EXPECT_EQ(idPrime.id(), MorohashiId::MaxId);
   EXPECT_EQ(idDPrime.id(), MorohashiId::MaxId);
   EXPECT_EQ(idSupplemental.id(), MorohashiId::MaxId);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::None);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
   EXPECT_EQ(idPrime.idType(), MorohashiId::IdType::Prime);
   EXPECT_EQ(idDPrime.idType(), MorohashiId::IdType::DoublePrime);
   EXPECT_EQ(idSupplemental.idType(), MorohashiId::IdType::Supplemental);
@@ -120,6 +114,24 @@ TEST(MorohashiIdTest, StreamOperator) {
   std::stringstream s;
   s << id << ' ' << idP << ' ' << idH << ' ' << idPP;
   EXPECT_EQ(s.str(), "123 45P H67 89PP");
+}
+
+TEST(MorohashiIdTest, Equals) {
+  const MorohashiId id{"123"}, diff1{"124"}, diff2{"123P"}, same{"123"};
+  EXPECT_NE(id, diff1);
+  EXPECT_NE(id, diff2);
+  EXPECT_EQ(id, same);
+}
+
+TEST(MorohashiIdTest, Compare) {
+  // sort by 'id' number, then 'idType'
+  const MorohashiId id1{"1"}, id1P{"1P"}, id1PP{"1PP"}, id1H{"H1"}, id2{"2"};
+  EXPECT_LT(id1, id1P);
+  EXPECT_LE(id1, id1P);
+  EXPECT_GE(id1PP, id1P);
+  EXPECT_GT(id1PP, id1P);
+  EXPECT_LT(id1PP, id1H);
+  EXPECT_LT(id1H, id2);
 }
 
 } // namespace kanji_tools

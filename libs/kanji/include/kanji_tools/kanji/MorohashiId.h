@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <iostream>
 #include <numeric>
 #include <string>
@@ -15,11 +16,12 @@ namespace kanji_tools {
 class MorohashiId {
 public:
   using Id = u_int16_t;
-  enum class IdType : u_int8_t { Prime, DoublePrime, Supplemental, None };
+
+  enum class IdType : u_int8_t { Regular, Prime, DoublePrime, Supplemental };
 
   static constexpr Id MaxId{std::numeric_limits<Id>::max()};
 
-  constexpr MorohashiId() noexcept : _id{0}, _idType{IdType::None} {}
+  constexpr MorohashiId() noexcept : _id{0}, _idType{IdType::Regular} {}
 
   // ctor expects a string that's a positive number (up to MaxId) optionally
   // followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
@@ -27,10 +29,14 @@ public:
   // plain and Prime values are in the current version of Unicode.
   explicit MorohashiId(const std::string&);
 
-  [[nodiscard]] constexpr auto id() const { return _id; }
-  [[nodiscard]] constexpr auto idType() const { return _idType; }
+  [[nodiscard]] constexpr auto id() const noexcept { return _id; }
+  [[nodiscard]] constexpr auto idType() const noexcept { return _idType; }
+  [[nodiscard]] explicit constexpr operator bool() const noexcept {
+    return _id;
+  }
+  [[nodiscard]] constexpr auto operator<=>(
+      const MorohashiId&) const noexcept = default;
 
-  [[nodiscard]] explicit constexpr operator bool() const { return _id; }
   [[nodiscard]] std::string toString() const;
 private:
   // helper functions used by ctor to validate and populate '_id' and '_idType'
