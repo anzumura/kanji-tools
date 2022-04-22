@@ -138,7 +138,8 @@ void KanjiData::printStats() const {
              !x->hasLevel();
     }); // LCOV_EXCL_LINE: covered
     printCount("  NF (no-frequency)", [](auto& x) { return !x->frequency(); });
-    printCount("  Has Strokes", [](auto& x) { return x->strokes() != 0; });
+    printCount("  Has Variant Strokes",
+        [](auto& x) { return x->strokes().hasVariant(); });
     printCount(
         "  Has Variation Selectors", [](auto& x) { return x->variant(); },
         MaxVariantSelectorExamples);

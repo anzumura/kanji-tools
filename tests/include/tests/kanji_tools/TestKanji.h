@@ -10,7 +10,7 @@ public:
   inline static const std::string TestMeaning{"test"}, TestReading{"テスト"};
 
   TestKanji(Name name, const OptString& compatibilityName = {})
-      : Kanji{name, compatibilityName, TestRadical, 0, {}, {}, {}} {}
+      : Kanji{name, compatibilityName, TestRadical, Strokes{1}, {}, {}, {}} {}
 
   [[nodiscard]] KanjiTypes type() const override { return _type; }
   [[nodiscard]] Meaning meaning() const override { return TestMeaning; }

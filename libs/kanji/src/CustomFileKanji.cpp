@@ -67,7 +67,8 @@ Kanji::OptString JinmeiKanji::extraTypeInfo() const {
 // JouyouKanji
 
 JouyouKanji::JouyouKanji(DataRef data, File f)
-    : OfficialKanji{data, f, name(f), f.getU8(StrokesCol), f.get(MeaningCol)},
+    : OfficialKanji{data, f, name(f), Strokes{f.getU8(StrokesCol)},
+          f.get(MeaningCol)},
       _grade{getGrade(f.get(GradeCol))} {}
 
 KanjiGrades JouyouKanji::getGrade(const std::string& s) {
@@ -82,7 +83,8 @@ ExtraKanji::ExtraKanji(DataRef data, File f, Name name)
     : ExtraKanji{data, f, name, data.findUcd(name)} {}
 
 ExtraKanji::ExtraKanji(DataRef data, File f, Name name, UcdPtr u)
-    : CustomFileKanji{data, f, name, f.getU8(StrokesCol), f.get(MeaningCol),
+    : CustomFileKanji{data, f, name, Strokes{f.getU8(StrokesCol)},
+          f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? linkNames(u) : EmptyLinkNames, u},
       _newName{u && u->hasNonTraditionalLinks()
                    ? OptString{u->links()[0].name()}

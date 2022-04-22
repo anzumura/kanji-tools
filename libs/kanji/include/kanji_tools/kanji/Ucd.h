@@ -2,6 +2,7 @@
 
 #include <kanji_tools/kanji/MorohashiId.h>
 #include <kanji_tools/kanji/Radical.h>
+#include <kanji_tools/kanji/Strokes.h>
 #include <kanji_tools/kanji/UcdLinkTypes.h>
 #include <kanji_tools/utils/Symbol.h>
 
@@ -54,17 +55,13 @@ public:
   using Links = std::vector<UcdEntry>;
   using Meaning = const std::string&;
   using Reading = Radical::Reading;
-  using Strokes = u_int16_t;
-
-  // max number of strokes and variant strokes in current 'ucd.txt' data
-  inline static constexpr Strokes MaxStrokes{53}, MaxVariantStrokes{33};
 
   Ucd(const UcdEntry&, const std::string& block, const std::string& version,
-      Radical::Number, Strokes strokes, Strokes variantStrokes,
-      const std::string& pinyin, const std::string& morohashiId,
-      const std::string& nelsonIds, const std::string& sources,
-      const std::string& jSource, bool joyo, bool jinmei, const Links&,
-      UcdLinkTypes, Meaning, Reading onReading, Reading kunReading);
+      Radical::Number, Strokes, const std::string& pinyin,
+      const std::string& morohashiId, const std::string& nelsonIds,
+      const std::string& sources, const std::string& jSource, bool joyo,
+      bool jinmei, const Links&, UcdLinkTypes, Meaning, Reading onReading,
+      Reading kunReading);
 
   Ucd(const Ucd&) = delete;
 
@@ -75,7 +72,6 @@ public:
   [[nodiscard]] auto linkType() const { return _linkType; }
   [[nodiscard]] auto radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
-  [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
   [[nodiscard]] auto& links() const { return _links; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
@@ -90,7 +86,6 @@ public:
   [[nodiscard]] bool jinmei() const;
 
   // 'has' methods
-  [[nodiscard]] bool hasVariantStrokes() const;
   [[nodiscard]] bool hasLinks() const;
   [[nodiscard]] bool hasTraditionalLinks() const;
   [[nodiscard]] bool hasNonTraditionalLinks() const;
@@ -111,8 +106,7 @@ private:
   const unsigned char _sources;
   const UcdLinkTypes _linkType;
   const Radical::Number _radical;
-  // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
-  const Strokes _strokes, _variantStrokes;
+  const Strokes _strokes;
   const MorohashiId _morohashiId;
   const Links _links;
   const std::string _nelsonIds, _jSource, _meaning, _onReading, _kunReading;

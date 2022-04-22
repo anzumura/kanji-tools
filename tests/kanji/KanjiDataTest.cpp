@@ -248,7 +248,7 @@ TEST_F(KanjiDataTest, UcdChecks) {
   // are all pulled from UCD (and readings are converted to Kana).
   auto& dull{*_data->findKanjiByName("呆")};
   EXPECT_EQ(dull.radical(), _data->getRadicalByName("口"));
-  EXPECT_EQ(dull.strokes(), 7);
+  EXPECT_EQ(dull.strokes().value(), 7);
   EXPECT_EQ(dull.meaning(), "dull; dull-minded, simple, stupid");
   // Note: unlike official lists (and 'extra.txt'), 'kun' readings from UCD
   // unfortunately don't have a dash before the Okurigana.
@@ -326,9 +326,6 @@ TEST_F(KanjiDataTest, UcdLinks) {
     auto& u{i.second};
     // every Ucd entry should be a wide character, i.e., have 'display size' 2
     EXPECT_EQ(displaySize(u.name()), 2);
-    // if 'variantStrokes' is present it should be different than 'strokes'
-    if (u.hasVariantStrokes())
-      EXPECT_NE(u.strokes(), u.variantStrokes()) << u.codeAndName();
     // make sure MBUtils UCD characters are part of MBUtils unicode blocks
     if (u.joyo() || u.jinmei())
       EXPECT_TRUE(isCommonKanji(u.name())) << u.codeAndName();
@@ -394,7 +391,7 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
     if (!k) throw std::domain_error(name + " not found");
     // verify attributes of the Kanji found match expected values
     EXPECT_EQ(k->type(), t);
-    EXPECT_EQ(k->strokes(), s);
+    EXPECT_EQ(k->strokes().value(), s);
     EXPECT_EQ(k->frequency(), f);
     if (!u.empty()) EXPECT_EQ(toUnicode(k->compatibilityName()), u);
     return k;

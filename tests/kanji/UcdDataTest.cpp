@@ -64,8 +64,7 @@ TEST_F(UcdDataTest, LoadOneEntry) {
   EXPECT_EQ(u.name(), "一");
   EXPECT_EQ(u.block().name(), "CJK");
   EXPECT_EQ(u.version().name(), "1.1");
-  EXPECT_EQ(u.strokes(), 1);
-  EXPECT_EQ(u.variantStrokes(), 0);
+  EXPECT_EQ(u.strokes(), Strokes{1});
   EXPECT_EQ(u.pinyin().name(), "yī");
   EXPECT_EQ(u.morohashiId().toString(), "1");
   EXPECT_EQ(u.nelsonIds(), "1");
@@ -85,7 +84,6 @@ TEST_F(UcdDataTest, LoadOneEntry) {
   EXPECT_FALSE(u.hasLinks());
   EXPECT_FALSE(u.hasTraditionalLinks());
   EXPECT_FALSE(u.hasNonTraditionalLinks());
-  EXPECT_FALSE(u.hasVariantStrokes());
 }
 
 TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
@@ -94,8 +92,7 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
   EXPECT_EQ(u.name(), "僧");
   EXPECT_EQ(u.block().name(), "CJK_Compat_Ideographs");
   EXPECT_EQ(u.version().name(), "3.2");
-  EXPECT_EQ(u.strokes(), 14);
-  EXPECT_EQ(u.variantStrokes(), 0);
+  EXPECT_EQ(u.strokes(), Strokes{14});
   EXPECT_FALSE(u.pinyin());
   EXPECT_FALSE(u.morohashiId());
   EXPECT_EQ(u.nelsonIds(), "");
@@ -115,7 +112,6 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
   EXPECT_TRUE(u.hasLinks());
   EXPECT_FALSE(u.hasTraditionalLinks());
   EXPECT_TRUE(u.hasNonTraditionalLinks());
-  EXPECT_FALSE(u.hasVariantStrokes());
 }
 
 TEST_F(UcdDataTest, GetMeaning) {
@@ -192,41 +188,6 @@ TEST_F(UcdDataTest, LoadFailsWithNoReadingsOrMorohashiIdOrJSource) {
 TEST_F(UcdDataTest, NameTooLong) {
   _testName = "一二";
   EXPECT_THROW(call([this] { loadOne(); }, "name more than 4 bytes" + FileMsg),
-      std::domain_error);
-}
-
-TEST_F(UcdDataTest, ZeroStrokes) {
-  _testStrokes = "0";
-  EXPECT_THROW(
-      call([this] { loadOne(); }, "strokes '0' out of range" + FileMsg),
-      std::domain_error);
-}
-
-TEST_F(UcdDataTest, BigStrokes) {
-  _testStrokes = "55";
-  EXPECT_THROW(
-      call([this] { loadOne(); }, "strokes '55' out of range" + FileMsg),
-      std::domain_error);
-}
-
-TEST_F(UcdDataTest, ZeroVStrokes) {
-  _testVStrokes = "0";
-  EXPECT_THROW(
-      call([this] { loadOne(); }, "variant strokes shouldn't be 0" + FileMsg),
-      std::domain_error);
-}
-
-TEST_F(UcdDataTest, OneVStrokes) {
-  _testVStrokes = "1";
-  EXPECT_THROW(
-      call([this] { loadOne(); }, "variant strokes '1' out of range" + FileMsg),
-      std::domain_error);
-}
-
-TEST_F(UcdDataTest, BigVStrokes) {
-  _testVStrokes = "34";
-  EXPECT_THROW(call([this] { loadOne(); },
-                   "variant strokes '34' out of range" + FileMsg),
       std::domain_error);
 }
 

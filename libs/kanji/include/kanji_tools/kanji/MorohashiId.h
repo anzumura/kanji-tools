@@ -3,7 +3,6 @@
 #include <compare>
 #include <iostream>
 #include <numeric>
-#include <string>
 
 namespace kanji_tools {
 
@@ -48,6 +47,6 @@ private:
   const IdType _idType;
 };
 
-std::ostream& operator<<(std::ostream& os, const MorohashiId&);
+std::ostream& operator<<(std::ostream&, const MorohashiId&);
 
 } // namespace kanji_tools

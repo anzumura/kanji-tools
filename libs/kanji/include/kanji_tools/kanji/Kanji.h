@@ -47,7 +47,6 @@ public:
   using Name = UcdEntry::Name;
   using OldNames = const LinkNames&;
   using Reading = Ucd::Reading;
-  using Strokes = Ucd::Strokes;
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;

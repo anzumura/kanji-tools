@@ -48,17 +48,16 @@ std::string Ucd::linkCodeAndNames() const {
 
 Ucd::Ucd(const UcdEntry& entry, const std::string& block,
     const std::string& version, Radical::Number radical, Strokes strokes,
-    Strokes variantStrokes, const std::string& pinyin,
-    const std::string& morohashiId, const std::string& nelsonIds,
-    const std::string& sources, const std::string& jSource, bool joyo,
-    bool jinmei, const Links& links, UcdLinkTypes linkType, Meaning meaning,
-    Reading onReading, Reading kunReading)
+    const std::string& pinyin, const std::string& morohashiId,
+    const std::string& nelsonIds, const std::string& sources,
+    const std::string& jSource, bool joyo, bool jinmei, const Links& links,
+    UcdLinkTypes linkType, Meaning meaning, Reading onReading,
+    Reading kunReading)
     : _entry{entry}, _block{block}, _version{version}, _pinyin{pinyin},
       _sources{getSources(sources, joyo, jinmei)}, _linkType{linkType},
-      _radical{radical}, _strokes{strokes}, _variantStrokes{variantStrokes},
-      _morohashiId{morohashiId}, _links{links},
-      _nelsonIds{nelsonIds}, _jSource{jSource}, _meaning{meaning},
-      _onReading{onReading}, _kunReading{kunReading} {}
+      _radical{radical}, _strokes{strokes}, _morohashiId{morohashiId},
+      _links{links}, _nelsonIds{nelsonIds}, _jSource{jSource},
+      _meaning{meaning}, _onReading{onReading}, _kunReading{kunReading} {}
 
 bool Ucd::linkedReadings() const {
   return _linkType < UcdLinkTypes::Compatibility;
@@ -74,8 +73,6 @@ std::string Ucd::sources() const {
 bool Ucd::joyo() const { return _sources & Joyo; }
 
 bool Ucd::jinmei() const { return _sources & Jinmei; }
-
-bool Ucd::hasVariantStrokes() const { return _variantStrokes != 0; }
 
 bool Ucd::hasLinks() const { return !_links.empty(); }
 

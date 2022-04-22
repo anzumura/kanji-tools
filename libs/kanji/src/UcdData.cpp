@@ -19,7 +19,7 @@ struct PrintCount {
   void add(const Ucd& k) {
     ++count;
     if (k.hasLinks()) ++link;
-    if (k.hasVariantStrokes()) ++variantStrokes;
+    if (k.strokes().hasVariant()) ++variantStrokes;
     if (!k.meaning().empty()) ++meaning;
     if (!k.onReading().empty()) ++onReading;
     if (!k.kunReading().empty()) ++kunReading;
@@ -67,7 +67,6 @@ std::string UcdData::getReadingsAsKana(UcdPtr u) const {
 }
 
 void UcdData::load(const Data::Path& file) {
-  static const std::string OutOfRange{"' out of range"};
   const ColumnFile::Column codeCol{"Code"}, nameCol{"Name"}, blockCol{"Block"},
       versionCol{"Version"}, radicalCol{"Radical"}, strokesCol{"Strokes"},
       vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"MorohashiId"},
@@ -87,17 +86,9 @@ void UcdData::load(const Data::Path& file) {
     auto& name{f.get(nameCol)};
     if (name.size() > 4) f.error("name more than 4 bytes");
     if (f.get(vStrokesCol) == "0") f.error("variant strokes shouldn't be 0");
-
-    const auto radical{f.getULong(radicalCol)}, strokes{f.getULong(strokesCol)},
-        vStrokes{f.isEmpty(vStrokesCol) ? 0 : f.getULong(vStrokesCol)};
+    const auto radical{f.getULong(radicalCol)};
     if (radical < 1 || radical > Radical::MaxRadicals)
-      f.error("radical '" + std::to_string(radical) + OutOfRange);
-    // 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
-    if (strokes < 1 || strokes > Ucd::MaxStrokes)
-      f.error("strokes '" + std::to_string(strokes) + OutOfRange);
-    if (vStrokes == 1 || vStrokes > Ucd::MaxVariantStrokes)
-      f.error("variant strokes '" + std::to_string(vStrokes) + OutOfRange);
-
+      f.error("radical '" + std::to_string(radical) + "' out of range");
     const auto joyo{f.getBool(joyoCol)}, jinmei{f.getBool(jinmeiCol)};
     if (joyo) {
       if (jinmei) f.error("can't be both joyo and jinmei");
@@ -126,12 +117,14 @@ void UcdData::load(const Data::Path& file) {
     else if (!f.isEmpty(linkCodesCol))
       f.error("LinkCodes has a value, but LinkNames is empty");
 
+    const auto strokes{f.isEmpty(vStrokesCol) ? Strokes{f.getU8(strokesCol)}
+                                              : Strokes{f.getU8(strokesCol),
+                                                    f.getU8(vStrokesCol)}};
     if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
                  std::make_tuple(UcdEntry{f.getChar32(codeCol), name},
                      f.get(blockCol), f.get(versionCol), radical, strokes,
-                     vStrokes, f.get(pinyinCol), f.get(morohashiCol),
-                     f.get(nelsonIdsCol), f.get(sourcesCol), f.get(jSourceCol),
-                     joyo, jinmei, links,
+                     f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol),
+                     f.get(sourcesCol), f.get(jSourceCol), joyo, jinmei, links,
                      AllUcdLinkTypes.fromStringAllowEmpty(f.get(linkTypeCol)),
                      f.get(meaningCol), f.get(onCol), f.get(kunCol)))
              .second)

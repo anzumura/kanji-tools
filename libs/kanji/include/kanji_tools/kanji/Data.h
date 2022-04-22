@@ -58,8 +58,7 @@ public:
   [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
   [[nodiscard]] virtual RadicalRef ucdRadical(const std::string&, UcdPtr) const;
-  [[nodiscard]] virtual Ucd::Strokes ucdStrokes(
-      const std::string&, UcdPtr) const;
+  [[nodiscard]] virtual Strokes ucdStrokes(const std::string&, UcdPtr) const;
 
   // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
   // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).

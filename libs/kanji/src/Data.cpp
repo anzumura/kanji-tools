@@ -61,7 +61,7 @@ RadicalRef Data::ucdRadical(const std::string& kanji, UcdPtr u) const {
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
-Ucd::Strokes Data::ucdStrokes(const std::string& kanji, UcdPtr u) const {
+Strokes Data::ucdStrokes(const std::string& kanji, UcdPtr u) const {
   if (u) return u->strokes();
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
@@ -437,7 +437,8 @@ void Data::checkStrokes() const {
     for (auto t : AllKanjiTypes) {
       DataFile::StringList l;
       for (auto& i : _types[t])
-        if (const auto u{findUcd(i->name())}; u && i->strokes() != u->strokes())
+        if (const auto u{findUcd(i->name())};
+            u && i->strokes().value() != u->strokes().value())
           l.emplace_back(i->name());
       DataFile::print(
           _out, l, toString(t) + " Kanji with differrent strokes", "_ucd");

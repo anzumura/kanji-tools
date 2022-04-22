@@ -63,8 +63,8 @@ std::string Kanji::info(KanjiInfo fields) const {
   if (hasValue(fields & KanjiInfo::Radical))
     add(RadMsg + radical().name() + '(' + std::to_string(radical().number()) +
         ')');
-  if (hasValue(fields & KanjiInfo::Strokes) && strokes())
-    add(StrokesMsg + std::to_string(strokes()));
+  if (hasValue(fields & KanjiInfo::Strokes))
+    add(StrokesMsg + strokes().toString());
   if (hasValue(fields & KanjiInfo::Pinyin) && _pinyin) add(_pinyin.name());
   if (hasValue(fields & KanjiInfo::Grade) && hasGrade()) add(toString(grade()));
   if (hasValue(fields & KanjiInfo::Level) && hasLevel()) add(toString(level()));

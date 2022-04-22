@@ -20,7 +20,6 @@ public:
   using Meaning = Ucd::Meaning;
   using Name = UcdEntry::Name;
   using Reading = Ucd::Reading;
-  using Strokes = Ucd::Strokes;
 
   // allow setting 'name' via the ctor since it's the more commonly used field
   TestUcd(Name name = "一") : _name(name) {}
@@ -28,9 +27,9 @@ public:
   // conversion opterator to create a Ucd instance
   [[nodiscard]] operator Ucd() const {
     return Ucd{{_code ? _code : getCode(_name), _name}, _block, _version,
-        _radical, _strokes, _variantStrokes, _pinyin, _morohashiId, _nelsonIds,
-        _sources, _jSource, _joyo, _jinmei, _links, _linkType, _meaning,
-        _onReading, _kunReading};
+        _radical, Strokes{_strokes, _variantStrokes}, _pinyin, _morohashiId,
+        _nelsonIds, _sources, _jSource, _joyo, _jinmei, _links, _linkType,
+        _meaning, _onReading, _kunReading};
   }
 
   auto& code(Code x) { return set(_code, x); }
@@ -45,8 +44,8 @@ public:
     return *this;
   }
   auto& radical(Radical::Number x) { return set(_radical, x); }
-  auto& strokes(Strokes x) { return set(_strokes, x); }
-  auto& variantStrokes(Strokes x) { return set(_variantStrokes, x); }
+  auto& strokes(Strokes::Size x) { return set(_strokes, x); }
+  auto& variantStrokes(Strokes::Size x) { return set(_variantStrokes, x); }
   auto& morohashiId(const std::string& x) { return set(_morohashiId, x); }
   auto& nelsonIds(const std::string& x) { return set(_nelsonIds, x); }
   auto& jSource(const std::string& x) { return set(_jSource, x); }
@@ -76,7 +75,7 @@ private:
   UcdLinkTypes _linkType{UcdLinkTypes::None};
   Links _links;
   Radical::Number _radical{};
-  Strokes _strokes{}, _variantStrokes{};
+  Strokes::Size _strokes{1}, _variantStrokes{};
   std::string _morohashiId, _nelsonIds, _sources, _jSource;
   std::string _meaning, _onReading, _kunReading;
   bool _joyo{}, _jinmei{};
