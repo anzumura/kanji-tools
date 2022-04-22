@@ -162,7 +162,7 @@ TEST(MBUtilsTest, FromUTF8String) {
   EXPECT_EQ(Dog, newDog);
 }
 
-TEST(MBUtils, fromUtf8WithMaxSize) {
+TEST(MBUtilsTest, fromUtf8WithMaxSize) {
   const std::string utf8{"生命尊重"};
   // default is '0' which means no max size
   EXPECT_EQ(fromUtf8(utf8), U"生命尊重");
@@ -173,12 +173,12 @@ TEST(MBUtils, fromUtf8WithMaxSize) {
     EXPECT_EQ(fromUtf8(utf8, i), U"生命尊重");
 }
 
-TEST(MBUtils, getCode) {
+TEST(MBUtilsTest, GetCode) {
   EXPECT_EQ(getCode("朧"), U'\u6727');
   EXPECT_EQ(getCode(std::string{"朧"}), U'\u6727');
 }
 
-TEST(MBUtils, ToUTF8IntAndLong) {
+TEST(MBUtilsTest, ToUTF8IntAndLong) {
   const int intDog{0x72ac};
   EXPECT_EQ(toUtf8(intDog), Dog);
   const long longDog{0x72ac};
