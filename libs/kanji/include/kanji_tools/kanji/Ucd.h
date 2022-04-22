@@ -1,5 +1,6 @@
 #pragma once
 
+#include <kanji_tools/kanji/MorohashiId.h>
 #include <kanji_tools/kanji/Radical.h>
 #include <kanji_tools/kanji/UcdLinkTypes.h>
 #include <kanji_tools/utils/Symbol.h>
@@ -75,8 +76,8 @@ public:
   [[nodiscard]] auto radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
   [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }
-  [[nodiscard]] auto& links() const { return _links; }
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
+  [[nodiscard]] auto& links() const { return _links; }
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
   [[nodiscard]] auto& jSource() const { return _jSource; }
   [[nodiscard]] auto& meaning() const { return _meaning; }
@@ -112,9 +113,9 @@ private:
   const Radical::Number _radical;
   // _variantStrokes is 0 if no variants (see 'parseUcdAllFlat.sh')
   const Strokes _strokes, _variantStrokes;
+  const MorohashiId _morohashiId;
   const Links _links;
-  const std::string _morohashiId, _nelsonIds, _jSource;
-  const std::string _meaning, _onReading, _kunReading;
+  const std::string _nelsonIds, _jSource, _meaning, _onReading, _kunReading;
 };
 
 using UcdPtr = const Ucd*;

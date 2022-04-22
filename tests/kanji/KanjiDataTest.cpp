@@ -290,7 +290,7 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
     auto& u{i.second};
     // at least one of 'on', 'kun', 'jSource' or 'morohashiId' must have a value
     EXPECT_FALSE(u.onReading().empty() && u.kunReading().empty() &&
-                 u.jSource().empty() && u.morohashiId().empty());
+                 u.jSource().empty() && !u.morohashiId());
     if (isRareKanji(i.first)) {
       if (const auto t{_data->getType(i.first)}; t != KanjiTypes::Ucd)
         FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);

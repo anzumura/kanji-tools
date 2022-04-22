@@ -23,7 +23,7 @@ struct PrintCount {
     if (!k.meaning().empty()) ++meaning;
     if (!k.onReading().empty()) ++onReading;
     if (!k.kunReading().empty()) ++kunReading;
-    if (!k.morohashiId().empty()) ++morohashi;
+    if (k.morohashiId()) ++morohashi;
     if (!k.nelsonIds().empty()) ++nelson;
   }
 }; // LCOV_EXCL_LINE: covered

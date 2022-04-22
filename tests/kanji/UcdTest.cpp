@@ -18,15 +18,16 @@ template<typename T>
 TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(bool), 1);
   EXPECT_EQ(sizeof(UcdLinkTypes), 1);
+  EXPECT_EQ(sizeof(MorohashiId), 4);
   EXPECT_EQ(sizeof(size_t), 8);
   EXPECT_EQ(sizeof(std::string*), 8);
   EXPECT_EQ(sizeof(Ucd::Links), 24);
 #ifdef __clang__
-  EXPECT_EQ(sizeof(Ucd), 208);
+  EXPECT_EQ(sizeof(Ucd), 192);
   EXPECT_EQ(sizeof(UcdEntry), 24);
   EXPECT_EQ(sizeof(std::string), 24);
 #else
-  EXPECT_EQ(sizeof(Ucd), 264);
+  EXPECT_EQ(sizeof(Ucd), 240);
   EXPECT_EQ(sizeof(UcdEntry), 32);
   EXPECT_EQ(sizeof(std::string), 32);
 #endif
@@ -45,15 +46,15 @@ TEST(UcdTest, Layout) {
   EXPECT_EQ(ptrCast(u.version()) - start, 26 + stringDiff);
   EXPECT_EQ(ptrCast(u.pinyin()) - start, 28 + stringDiff);
   // sources=30, linkType=31, radical=32, strokes=34, variantStrokes=36
-  // bytes 38 and 39 are padding so 'links' can align to word boundary
-  EXPECT_EQ(ptrCast(u.links()) - start, 40 + stringDiff);
-  EXPECT_EQ(ptrCast(u.morohashiId()) - start, 64 + stringDiff);
+  EXPECT_EQ(ptrCast(u.morohashiId()) - start, 38 + stringDiff);
+  // bytes 42 to 47 are padding so 'links' can align to word boundary
+  EXPECT_EQ(ptrCast(u.links()) - start, 48 + stringDiff);
+  EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 72 + stringDiff);
   size_t i{2};
-  EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 88 + stringDiff * i);
-  EXPECT_EQ(ptrCast(u.jSource()) - start, 112 + stringDiff * ++i);
-  EXPECT_EQ(ptrCast(u.meaning()) - start, 136 + stringDiff * ++i);
-  EXPECT_EQ(ptrCast(u.onReading()) - start, 160 + stringDiff * ++i);
-  EXPECT_EQ(ptrCast(u.kunReading()) - start, 184 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.jSource()) - start, 96 + stringDiff * i);
+  EXPECT_EQ(ptrCast(u.meaning()) - start, 120 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.onReading()) - start, 144 + stringDiff * ++i);
+  EXPECT_EQ(ptrCast(u.kunReading()) - start, 168 + stringDiff * ++i);
 }
 
 TEST(UcdEntry, GoodCodeAndName) {

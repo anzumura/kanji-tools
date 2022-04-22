@@ -75,9 +75,9 @@ const Pinyin& Data::getPinyin(UcdPtr u) const {
   return u ? u->pinyin() : EmptyPinyin;
 }
 
-Kanji::OptString Data::getMorohashiId(UcdPtr u) const {
-  return u && !u->morohashiId().empty() ? Kanji::OptString{u->morohashiId()}
-                                        : std::nullopt;
+const MorohashiId& Data::getMorohashiId(UcdPtr u) const {
+  static constexpr MorohashiId EmptyMorohashiId;
+  return u ? u->morohashiId() : EmptyMorohashiId;
 }
 
 Kanji::NelsonIds Data::getNelsonIds(UcdPtr u) const {
@@ -127,9 +127,16 @@ KanjiPtr Data::findKanjiByFrequency(Kanji::Frequency freq) const {
   return _frequencies[bucket][freq - bucket * FrequencyEntries];
 }
 
+const Data::KanjiList& Data::findByMorohashiId(const MorohashiId& id) const {
+  if (id) {
+    if (const auto i{_morohashiMap.find(id)}; i != _morohashiMap.end())
+      return i->second;
+  }
+  return BaseEnumMap<KanjiList>::Empty;
+}
+
 const Data::KanjiList& Data::findByMorohashiId(const std::string& id) const {
-  const auto i{_morohashiMap.find(id)};
-  return i != _morohashiMap.end() ? i->second : BaseEnumMap<KanjiList>::Empty;
+  return findByMorohashiId(MorohashiId{id});
 }
 
 const Data::KanjiList& Data::findByNelsonId(Kanji::NelsonId id) const {
@@ -236,7 +243,7 @@ bool Data::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   if (k.variant() &&
       !_compatibilityMap.emplace(k.compatibilityName(), k.name()).second)
     printError("failed to insert variant '" + k.name() + "' into map");
-  if (k.morohashiId()) _morohashiMap[*k.morohashiId()].emplace_back(kanji);
+  if (k.morohashiId()) _morohashiMap[k.morohashiId()].emplace_back(kanji);
   for (const auto id : k.nelsonIds()) _nelsonMap[id].emplace_back(kanji);
   return true;
 }

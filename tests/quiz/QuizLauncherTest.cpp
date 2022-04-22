@@ -258,7 +258,8 @@ TEST_F(QuizLauncherTest, InvalidMorohashiId) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(call(f, "invalid Morohashi ID '123Q'"), std::domain_error);
+  EXPECT_THROW(
+      call(f, "Morohashi ID '123Q' is non-numeric"), std::domain_error);
 }
 
 TEST_F(QuizLauncherTest, InvalidNelsonId) {
@@ -266,7 +267,7 @@ TEST_F(QuizLauncherTest, InvalidNelsonId) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(call(f, "invalid Nelson ID '123B'"), std::domain_error);
+  EXPECT_THROW(call(f, "Nelson ID '123B' is non-numeric"), std::domain_error);
 }
 
 TEST_F(QuizLauncherTest, InvalidUnicode) {
@@ -274,7 +275,7 @@ TEST_F(QuizLauncherTest, InvalidUnicode) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(call(f, "invalid Unicode value 'ABC'"), std::domain_error);
+  EXPECT_THROW(call(f, "Unicode value 'ABC' is invalid"), std::domain_error);
 }
 
 TEST_F(QuizLauncherTest, UnrecognizedKanji) {

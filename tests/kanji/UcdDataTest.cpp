@@ -67,7 +67,7 @@ TEST_F(UcdDataTest, LoadOneEntry) {
   EXPECT_EQ(u.strokes(), 1);
   EXPECT_EQ(u.variantStrokes(), 0);
   EXPECT_EQ(u.pinyin().name(), "yī");
-  EXPECT_EQ(u.morohashiId(), "1");
+  EXPECT_EQ(u.morohashiId().toString(), "1");
   EXPECT_EQ(u.nelsonIds(), "1");
   EXPECT_EQ(u.sources(), "GHJKTV");
   EXPECT_EQ(u.jSource(), "J0-306C");
@@ -97,7 +97,7 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
   EXPECT_EQ(u.strokes(), 14);
   EXPECT_EQ(u.variantStrokes(), 0);
   EXPECT_FALSE(u.pinyin());
-  EXPECT_EQ(u.morohashiId(), "");
+  EXPECT_FALSE(u.morohashiId());
   EXPECT_EQ(u.nelsonIds(), "");
   EXPECT_EQ(u.sources(), "J");
   EXPECT_EQ(u.jSource(), "J3-2E49");
@@ -173,7 +173,7 @@ TEST_F(UcdDataTest, FindIncludingVariations) {
 TEST_F(UcdDataTest, LoadWithNoReadingsOrMorohashiId) {
   _testMorohashi.clear();
   auto& u{loadOne(false, false)};
-  EXPECT_TRUE(u.morohashiId().empty());
+  EXPECT_FALSE(u.morohashiId());
   EXPECT_TRUE(u.onReading().empty());
   EXPECT_TRUE(u.kunReading().empty());
   EXPECT_FALSE(u.jSource().empty());

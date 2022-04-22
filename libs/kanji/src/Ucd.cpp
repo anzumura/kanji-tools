@@ -55,8 +55,8 @@ Ucd::Ucd(const UcdEntry& entry, const std::string& block,
     Reading onReading, Reading kunReading)
     : _entry{entry}, _block{block}, _version{version}, _pinyin{pinyin},
       _sources{getSources(sources, joyo, jinmei)}, _linkType{linkType},
-      _radical{radical}, _strokes{strokes},
-      _variantStrokes{variantStrokes}, _links{links}, _morohashiId{morohashiId},
+      _radical{radical}, _strokes{strokes}, _variantStrokes{variantStrokes},
+      _morohashiId{morohashiId}, _links{links},
       _nelsonIds{nelsonIds}, _jSource{jSource}, _meaning{meaning},
       _onReading{onReading}, _kunReading{kunReading} {}
 

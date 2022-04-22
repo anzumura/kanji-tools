@@ -118,10 +118,10 @@ TEST_F(KanjiTest, Size) {
   EXPECT_EQ(sizeof(KanjiPtr), 16);
 #ifdef __clang__
   EXPECT_EQ(sizeof(Kanji::OptString), 32);
-  EXPECT_EQ(sizeof(Kanji), 136);
+  EXPECT_EQ(sizeof(Kanji), 104);
 #else
   EXPECT_EQ(sizeof(Kanji::OptString), 40);
-  EXPECT_EQ(sizeof(Kanji), 160);
+  EXPECT_EQ(sizeof(Kanji), 120);
 #endif
 }
 
@@ -207,7 +207,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.hasGrade());
   EXPECT_FALSE(k.hasKyu());
-  EXPECT_EQ(k.morohashiId(), Kanji::OptString{"123P"});
+  EXPECT_EQ(k.morohashiId(), MorohashiId{"123P"});
   EXPECT_EQ(k.nelsonIds(), (Kanji::NelsonIds{456, 789}));
   EXPECT_EQ(k.meaning(), "utmost");
   EXPECT_EQ(k.reading(), "ジン、まま");

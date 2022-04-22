@@ -175,7 +175,7 @@ protected:
 
   // ctor used by above ctor as well as 'TestKanji' class
   Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
-      Strokes strokes, const Pinyin& pinyin, const OptString& morohashiId,
+      Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
       const NelsonIds& nelsonIds)
       : _name{KanjiName{name}}, _compatibilityName{compatibilityName},
         _radical{radical}, _strokes{strokes}, _pinyin{pinyin},
@@ -201,7 +201,7 @@ private:
 
   // optional fields
   const Pinyin _pinyin;
-  const OptString _morohashiId;
+  const MorohashiId _morohashiId;
   const NelsonIds _nelsonIds;
 };
 

@@ -68,9 +68,9 @@ public:
 
   [[nodiscard]] const Pinyin& getPinyin(UcdPtr) const;
 
-  // 'getMorohashiId' returns an optional 'Dai Kan-Wa Jiten' index number (see
-  // comments in scripts/parseUcdAllFlat.sh)
-  [[nodiscard]] Kanji::OptString getMorohashiId(UcdPtr) const;
+  // 'getMorohashiId' returns a 'Dai Kan-Wa Jiten' index number (see comments in
+  // scripts/parseUcdAllFlat.sh)
+  [[nodiscard]] const MorohashiId& getMorohashiId(UcdPtr) const;
 
   // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
   Kanji::NelsonIds getNelsonIds(UcdPtr) const;
@@ -115,6 +115,7 @@ public:
   // 'findByMorohashiId' can return more than one Kanji. Ids are usually just
   // numeric, but they can also be a number followed by a 'P'. For example,
   // '4138' maps to 嗩 and '4138P' maps to 嘆.
+  [[nodiscard]] const KanjiList& findByMorohashiId(const MorohashiId&) const;
   [[nodiscard]] const KanjiList& findByMorohashiId(const std::string&) const;
 
   // 'findKanjisByNelsonId' can return more than one Kanji. For example, 1491
@@ -222,7 +223,7 @@ private:
   std::array<KanjiList, FrequencyBuckets> _frequencies;
 
   KanjiMap _kanjiNameMap;                          // UTF-8 name to Kanji
-  std::map<std::string, KanjiList> _morohashiMap;  // Dai Kan-Wa Jiten ID lookup
+  std::map<MorohashiId, KanjiList> _morohashiMap;  // Dai Kan-Wa Jiten ID lookup
   std::map<Kanji::NelsonId, KanjiList> _nelsonMap; // Nelson ID lookup
 
   // 'maxFrequency' is set to 1 larger than the highest frequency of any Kanji

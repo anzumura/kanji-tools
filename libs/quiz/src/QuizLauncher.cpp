@@ -252,7 +252,7 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
   }
   // Morohashi and Nelson IDs
   if (kanji.morohashiId())
-    out() << "  Morohashi: " << *kanji.morohashiId() << '\n';
+    out() << "  Morohashi: " << kanji.morohashiId() << '\n';
   if (kanji.hasNelsonIds()) {
     out() << (kanji.nelsonIds().size() == 1 ? "  Nelson ID:" : " Nelson IDs:");
     for (auto& i : kanji.nelsonIds()) out() << ' ' << i;
@@ -364,16 +364,13 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
     printDetails(kanji->name());
   } else if (arg.starts_with("m")) {
-    const auto id{arg.substr(1)};
-    // a valid Morohashi ID should be numeric followed by an optional 'P'
-    if (const auto noP{id.ends_with("P") ? id.substr(0, id.size() - 1) : id};
-        id.empty() || !std::all_of(noP.begin(), noP.end(), ::isdigit))
-      Data::usage("invalid Morohashi ID '" + id + "'");
-    printDetails(_groupData->data().findByMorohashiId(id), "Morohashi", id);
+    const MorohashiId id{arg.substr(1)};
+    printDetails(
+        _groupData->data().findByMorohashiId(id), "Morohashi", id.toString());
   } else if (arg.starts_with("n")) {
     const auto id{arg.substr(1)};
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
-      Data::usage("invalid Nelson ID '" + id + "'");
+      Data::usage("Nelson ID '" + id + "' is non-numeric");
     printDetails(_groupData->data().findByNelsonId(getId("Nelson ID", id)),
         "Nelson", id);
   } else if (arg.starts_with("u")) {
@@ -383,7 +380,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     if (id.size() < 4 || id.size() > 5 ||
         (id.size() == 5 && id[0] != '1' && id[0] != '2') ||
         !std::all_of(id.begin(), id.end(), ::ishexnumber))
-      Data::usage("invalid Unicode value '" + id + "'");
+      Data::usage("Unicode value '" + id + "' is invalid");
     printDetails(toUtf8(std::strtol(id.c_str(), nullptr, 16)));
   } else if (isKanji(arg))
     printDetails(arg);
