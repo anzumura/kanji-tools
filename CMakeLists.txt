@@ -127,17 +127,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   endforeach()
 endif()
 
-# add this diagnostic flag here so that it only applies to main code (googletest
-# uses '0' as a pointer in 'gtest.cc' line 2660 and operator<=> equality tests
-# also produce this warning)
-add_compile_options(-Wzero-as-null-pointer-constant)
-
 # add libs
 foreach(LIB ${LIBS})
   set(TARGET ${LIB_PREFIX}${LIB})
   add_subdirectory(libs/${LIB}/src)
   target_include_directories(${TARGET} PUBLIC libs/${LIB}/include)
 endforeach()
+
+# add this diagnostic flag here so that it only applies to main code (googletest
+# uses '0' as a pointer in 'gtest.cc' line 2660 and operator<=> equality tests
+# also produce this warning)
+add_compile_options(-Wzero-as-null-pointer-constant)
 
 # add 'main' programs
 add_subdirectory(apps)
