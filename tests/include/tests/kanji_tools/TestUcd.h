@@ -27,9 +27,11 @@ public:
   // conversion opterator to create a Ucd instance
   [[nodiscard]] operator Ucd() const {
     return Ucd{{_code ? _code : getCode(_name), _name}, _block, _version,
-        _radical, Strokes{_strokes, _variantStrokes}, _pinyin, _morohashiId,
-        _nelsonIds, _sources, _jSource, _joyo, _jinmei, _links, _linkType,
-        _meaning, _onReading, _kunReading};
+        _radical,
+        _variantStrokes ? Strokes{_strokes, _variantStrokes}
+                        : Strokes{_strokes},
+        _pinyin, _morohashiId, _nelsonIds, _sources, _jSource, _joyo, _jinmei,
+        _links, _linkType, _meaning, _onReading, _kunReading};
   }
 
   auto& code(Code x) { return set(_code, x); }

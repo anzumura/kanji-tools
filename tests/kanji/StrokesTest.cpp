@@ -25,12 +25,12 @@ TEST(StrokesTest, ValidStrokes) {
 }
 
 TEST(StrokesTest, ValidStrokesWithVariant) {
-  const Strokes s{1, 2};
-  EXPECT_EQ(s.value(), 1);
-  EXPECT_EQ(s.variant(), 2);
+  const Strokes s{2, 3};
+  EXPECT_EQ(s.value(), 2);
+  EXPECT_EQ(s.variant(), 3);
   EXPECT_TRUE(s.hasVariant());
-  EXPECT_EQ(s.toString(), "1");
-  EXPECT_EQ(s.toString(true), "1/2");
+  EXPECT_EQ(s.toString(), "2");
+  EXPECT_EQ(s.toString(true), "2/3");
 }
 
 TEST(StrokesTest, MaxStrokes) {
@@ -46,15 +46,21 @@ TEST(StrokesTest, InvalidStrokes) {
 }
 
 TEST(StrokesTest, InvalidVariantStrokes) {
-  // 1 is not allowed for variant strokes (range is checked before 'same value')
-  EXPECT_THROW(call([] { Strokes{1, 1}; }, error(1, true)), std::range_error);
+  // variant strokes must be > 2
+  EXPECT_THROW(call([] { Strokes{2, 0}; }, error(0, true)), std::range_error);
+  EXPECT_THROW(call([] { Strokes{2, 1}; }, error(1, true)), std::range_error);
+  // note: range check is done before 'same value' check
+  EXPECT_THROW(call([] { Strokes{2, 2}; }, error(2, true)), std::range_error);
+  // strokes must be > 1 if there are variant strokes
+  EXPECT_THROW(call([] { Strokes{0, 3}; }, error(0)), std::range_error);
+  EXPECT_THROW(call([] { Strokes{1, 3}; }, error(1)), std::range_error);
   const Strokes::Size s{Strokes::MaxVariant + 1};
-  EXPECT_THROW(call([] { Strokes{1, s}; }, error(s, true)), std::range_error);
+  EXPECT_THROW(call([] { Strokes{2, s}; }, error(s, true)), std::range_error);
 }
 
-TEST(StokesTest, SameStrokesAndVariant) {
-  const std::string msg{"strokes and variant strokes are the same '2'"};
-  EXPECT_THROW(call([] { Strokes{2, 2}; }, msg), std::domain_error);
+TEST(StrokesTest, SameStrokesAndVariant) {
+  const std::string msg{"strokes and variant strokes are the same '3'"};
+  EXPECT_THROW(call([] { Strokes{3, 3}; }, msg), std::domain_error);
 }
 
 TEST(StrokesTest, StreamOperator) {
@@ -74,7 +80,7 @@ TEST(StrokesTest, Equals) {
 
 TEST(StrokesTest, Compare) {
   // sort by 'value', then 'variant'
-  const Strokes s1{2}, s1v{2, 3}, s2{3, 2};
+  const Strokes s1{3}, s1v{3, 4}, s2{4, 3};
   EXPECT_LT(s1, s1v);
   EXPECT_LE(s1, s1v);
   EXPECT_LE(s1v, s1v);

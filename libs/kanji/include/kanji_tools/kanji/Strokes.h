@@ -13,9 +13,12 @@ public:
   // for example, 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes
   static constexpr Size Max{53}, MaxVariant{33};
 
-  // 'value' must be between 1 and 'Max' and 'variant' should be 0 if there is
-  // no variant value or between 2 and 'MaxVariant'
-  explicit Strokes(Size value, Size variant = 0);
+  // 'value' must be between 1 and 'Max'
+  explicit Strokes(Size value);
+
+  // 'value' must be between 2 and 'Max' and 'variant' should be between 3 and
+  // 'MaxVariant' and must be different than 'value'
+  Strokes(Size value, Size variant);
 
   [[nodiscard]] constexpr Size value() const noexcept { return _value; }
   [[nodiscard]] constexpr Size variant() const noexcept { return _variant; }

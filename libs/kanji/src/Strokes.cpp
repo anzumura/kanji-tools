@@ -11,9 +11,13 @@ void rangeError(Strokes::Size value, const std::string& msg = {}) {
 
 } // namespace
 
-Strokes::Strokes(Size value, Size variant) : _value{value}, _variant{variant} {
+Strokes::Strokes(Size value) : _value{value}, _variant{} {
   if (!value || value > Max) rangeError(value);
-  if (variant == 1 || variant > MaxVariant) rangeError(variant, "variant ");
+}
+
+Strokes::Strokes(Size value, Size variant) : _value{value}, _variant{variant} {
+  if (value < 2 || value > Max) rangeError(value);
+  if (variant < 3 || variant > MaxVariant) rangeError(variant, "variant ");
   if (value == variant)
     throw std::domain_error{"strokes and variant strokes are the same '" +
                             std::to_string(value) + "'"};
