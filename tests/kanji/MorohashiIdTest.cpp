@@ -9,7 +9,7 @@ namespace kanji_tools {
 namespace {
 
 [[nodiscard]] std::string error(const std::string& id, const std::string& msg) {
-  return "Morohashi ID: '" + id + "' " + msg;
+  return "Morohashi ID '" + id + "' " + msg;
 }
 
 } // namespace

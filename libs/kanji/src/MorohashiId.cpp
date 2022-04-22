@@ -45,7 +45,7 @@ MorohashiId::Id MorohashiId::validate(
   static constexpr MorohashiId::Id Ten{10};
 
   const auto error{[&s](const std::string& msg) {
-    throw std::domain_error{"Morohashi ID: '" + s + "' " + msg};
+    throw std::domain_error{"Morohashi ID '" + s + "' " + msg};
   }};
 
   if (s.empty() && !start && !end) return Id{};
