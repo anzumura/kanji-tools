@@ -2,6 +2,8 @@
 #include <kanji_tools/kanji/MorohashiId.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
+#include <sstream>
+
 namespace kanji_tools {
 
 TEST(MorohashiIdTest, EmptyId) {
@@ -111,6 +113,13 @@ TEST(MorohashiIdTest, TooBig) {
     for (auto j : {"H" + id, id + "P", id + "PP", id + "'", id + "''"})
       EXPECT_THROW(call([j] { MorohashiId{j}; }, msg + j), std::domain_error);
   }
+}
+
+TEST(MorohashiIdTest, StreamOperator) {
+  const MorohashiId id{"123"}, idP{"045'"}, idH{"H067"}, idPP{"089PP"};
+  std::stringstream s;
+  s << id << ' ' << idP << ' ' << idH << ' ' << idPP;
+  EXPECT_EQ(s.str(), "123 45P H67 89PP");
 }
 
 } // namespace kanji_tools
