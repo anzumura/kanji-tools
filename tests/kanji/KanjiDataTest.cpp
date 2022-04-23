@@ -21,8 +21,6 @@ protected:
     _data = std::make_shared<KanjiData>();
   }
 
-  KanjiDataTest() {}
-
   [[nodiscard]] auto checkKanji(const Data::KanjiList& l) const {
     size_t variants{};
     for (auto& i : l) {
@@ -193,7 +191,7 @@ TEST_F(KanjiDataTest, FindByName) {
 TEST_F(KanjiDataTest, FindKanjiByFrequency) {
   ASSERT_FALSE(_data->findKanjiByFrequency(0));
   ASSERT_FALSE(_data->findKanjiByFrequency(2502));
-  for (Kanji::Frequency i{1}; i < 2502; ++i)
+  for (Kanji::Frequency i{1}; i < Data::maxFrequency(); ++i)
     ASSERT_TRUE(_data->findKanjiByFrequency(i));
   EXPECT_EQ(_data->findKanjiByFrequency(1)->name(), "日");
   EXPECT_EQ(_data->findKanjiByFrequency(2001)->name(), "炒");
@@ -214,10 +212,11 @@ TEST_F(KanjiDataTest, FindKanjisByMorohashiId) {
 }
 
 TEST_F(KanjiDataTest, FindKanjisByNelsonId) {
+  constexpr Kanji::NelsonId totalNelsonIds{5447};
   ASSERT_TRUE(_data->findByNelsonId(0).empty());
-  ASSERT_TRUE(_data->findByNelsonId(5447).empty());
+  ASSERT_TRUE(_data->findByNelsonId(totalNelsonIds).empty());
   std::vector<u_int> missingNelsonIds;
-  for (Kanji::NelsonId i{1}; i < 5447; ++i)
+  for (Kanji::NelsonId i{1}; i < totalNelsonIds; ++i)
     if (_data->findByNelsonId(i).empty()) missingNelsonIds.push_back(i);
   // There are a few Nelson IDs that are missing from UCD data
   EXPECT_EQ(missingNelsonIds, (std::vector{125U, 149U, 489U, 1639U}));
@@ -256,12 +255,13 @@ TEST_F(KanjiDataTest, UcdChecks) {
 }
 
 TEST_F(KanjiDataTest, KanjiWithMultipleNelsonIds) {
+  constexpr Kanji::NelsonId id{1491};
   const auto ucdNelson{_data->ucd().find("㡡")};
   ASSERT_NE(ucdNelson, nullptr);
-  EXPECT_EQ(ucdNelson->nelsonIds(), "1487,1491");
+  EXPECT_EQ(ucdNelson->nelsonIds(), "1487," + std::to_string(id));
   auto& kanjiNelson{*_data->findKanjiByName(ucdNelson->name())};
-  EXPECT_EQ(kanjiNelson.nelsonIds(), (Kanji::NelsonIds{1487, 1491}));
-  auto& ids{_data->findByNelsonId(1491)};
+  EXPECT_EQ(kanjiNelson.nelsonIds(), (Kanji::NelsonIds{1487, id}));
+  auto& ids{_data->findByNelsonId(id)};
   ASSERT_EQ(ids.size(), 3);
 }
 
@@ -396,11 +396,15 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
     if (!u.empty()) EXPECT_EQ(toUnicode(k->compatibilityName()), u);
     return k;
   }};
-  auto jouyou7stroke1{find("位", KanjiTypes::Jouyou, 7, 276)};
-  auto jouyou7stroke2{find("囲", KanjiTypes::Jouyou, 7, 771)};
-  auto jouyou10stroke{find("院", KanjiTypes::Jouyou, 10, 150)};
-  auto jinmei4stroke1{find("云", KanjiTypes::Jinmei, 4, {}, "4E91")};
-  auto jinmei4stroke2{find("勿", KanjiTypes::Jinmei, 4, {}, "52FF")};
+  // choose some existing Kanji with 'small', 'medium' and 'high' values for
+  // Strokes and Frequency to help test sorting, i.e., small < medium < high
+  constexpr Strokes::Size SmallS{4}, MediumS{7}, HighS{10};
+  constexpr Kanji::Frequency SmallF{150}, MediumF{267}, HighF{771};
+  auto jouyou7stroke1{find("位", KanjiTypes::Jouyou, MediumS, MediumF)};
+  auto jouyou7stroke2{find("囲", KanjiTypes::Jouyou, MediumS, HighF)};
+  auto jouyou10stroke{find("院", KanjiTypes::Jouyou, HighS, SmallF)};
+  auto jinmei4stroke1{find("云", KanjiTypes::Jinmei, SmallS, {}, "4E91")};
+  auto jinmei4stroke2{find("勿", KanjiTypes::Jinmei, SmallS, {}, "52FF")};
 
   const auto check{[](auto& x, auto& y) {
     EXPECT_TRUE(Data::OrderByQualifiedName(x, y));

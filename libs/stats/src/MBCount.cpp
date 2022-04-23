@@ -36,10 +36,11 @@ size_t MBCount::add(const std::string& s, const OptString& tag) {
         _lastReplaceTag = *tag;
       }
       if (_debug) {
+        static constexpr auto Indent{5};
         const auto count{std::to_string(_replacements)};
         *_debug << "  " << count << " : " << s << '\n'
-                << std::setw(static_cast<int>(count.size() + 5)) << ": " << n
-                << '\n';
+                << std::setw(static_cast<int>(count.size() + Indent)) << ": "
+                << n << '\n';
       }
     }
   }

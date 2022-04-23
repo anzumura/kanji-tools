@@ -81,6 +81,8 @@ private:
 
   void printJukugoList(const std::string& name, const JukugoData::List&) const;
 
+  [[nodiscard]] const Data::KanjiList& getKyuList(char) const;
+
   // '_programMode' and '_questionOrder' can be set via the command line,
   // otherwise they are obtained interactively
   ProgramMode _programMode;

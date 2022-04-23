@@ -58,13 +58,16 @@ protected:
     if (_os.eof()) FAIL() << "couldn't find first Question";
   }
 
-  std::stringstream _is;
-  QuizLauncher _quiz;
-
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
+
+  [[nodiscard]] auto& is() { return _is; }
+  [[nodiscard]] auto& quiz() { return _quiz; }
+private:
+  std::stringstream _is;
+  QuizLauncher _quiz;
 };
 
 } // namespace
@@ -91,7 +94,7 @@ TEST_F(GroupQuizTest, GroupKanjiTypes) {
            std::pair{'3', f(32)}, std::pair{'4', f()}}) {
     // t=test mode, b=beginning of list, and .=skip to the next question (totals
     // in this test are for question 2 since it contains Kanji of all 4 types)
-    _is << "t\nb\n.\n";
+    is() << "t\nb\n.\n";
     startQuiz('m', i.first);
     EXPECT_NE(_os.str().find(", " + i.second), std::string::npos) << i.second;
   }
@@ -99,7 +102,7 @@ TEST_F(GroupQuizTest, GroupKanjiTypes) {
 
 TEST_F(GroupQuizTest, CorrectResponse) {
   for (const auto meanings : {false, true}) {
-    _is << "t\nb\n1\na\nb\n";
+    is() << "t\nb\n1\na\nb\n";
     startQuiz('p', '1', meanings, false);
     auto found{false};
     std::string lastLine;
@@ -112,7 +115,7 @@ TEST_F(GroupQuizTest, CorrectResponse) {
 
 TEST_F(GroupQuizTest, IncorrectResponse) {
   for (const auto meanings : {false, true}) {
-    _is << "t\nb\n1\nb\na\n";
+    is() << "t\nb\n1\nb\na\n";
     startQuiz('p', '1', meanings, false);
     auto found{false};
     std::string lastLine;
@@ -126,7 +129,7 @@ TEST_F(GroupQuizTest, IncorrectResponse) {
 TEST_F(GroupQuizTest, QuizWithEmptyList) {
   // should never happen with proper '-groups.txt' files
   const auto f{[this] {
-    GroupQuiz{_quiz, {}, {}, {}, GroupQuiz::MemberType::All};
+    GroupQuiz{quiz(), {}, {}, {}, GroupQuiz::MemberType::All};
   }};
   EXPECT_THROW(call(f, "empty group list"), std::domain_error);
 }
@@ -167,9 +170,9 @@ TEST_F(GroupQuizTest, ToggleMeanings) {
 
 TEST_F(GroupQuizTest, EditAfterOneAnswer) {
   meaningQuiz();
-  _is << "a\n"; // provide an answer for the first group entry
+  is() << "a\n"; // provide an answer for the first group entry
   edit();
-  _is << "b\n"; // change the answer from 'a' to 'b'
+  is() << "b\n"; // change the answer from 'a' to 'b'
   startQuiz();
   size_t found{};
   for (std::string line; std::getline(_os, line);) {
@@ -183,10 +186,10 @@ TEST_F(GroupQuizTest, EditAfterOneAnswer) {
 
 TEST_F(GroupQuizTest, EditAfterMultipleAnswers) {
   meaningQuiz();
-  _is << "a\nb\n"; // entry 1 maps to 'a' and 2 maps to 'b'
+  is() << "a\nb\n"; // entry 1 maps to 'a' and 2 maps to 'b'
   edit();
-  _is << "a\n"; // pick the answer to change (so 1->a)
-  _is << "c\n"; // set new value (should now be 1->c and 2 still maps to 'b')
+  is() << "a\n"; // pick the answer to change (so 1->a)
+  is() << "c\n"; // set new value (should now be 1->c and 2 still maps to 'b')
   startQuiz();
   size_t found{};
   for (std::string line; std::getline(_os, line);) {
@@ -200,8 +203,8 @@ TEST_F(GroupQuizTest, EditAfterMultipleAnswers) {
 
 TEST_F(GroupQuizTest, RefreshAfterAnswer) {
   meaningQuiz();
-  _is << "a\n"; // provide an answer for the first group entry
-  _is << "'\n"; // refresh - will update the screen with '1->a:'
+  is() << "a\n"; // provide an answer for the first group entry
+  is() << "'\n"; // refresh - will update the screen with '1->a:'
   startQuiz();
   size_t found{};
   for (std::string line; std::getline(_os, line);) {
@@ -217,7 +220,7 @@ TEST_F(GroupQuizTest, RefreshAfterAnswer) {
 
 TEST_F(GroupQuizTest, PatternGroupBuckets) {
   const auto f{[this](char x) {
-    _is << "t\nb\np\n4\n" << x << "\n";
+    is() << "t\nb\np\n4\n" << x << "\n";
     std::string line;
     getFirstQuestion(line);
     return line.substr(9);
@@ -234,22 +237,22 @@ TEST_F(GroupQuizTest, LoopOverAllPatternsInABucket) {
   // the first bucket has 85 groups so specify 85 '.'s to loop through all of
   // them - this will make sure the quiz actually finishes (and the '/' from
   // the 'startQuiz' method should still be on _is).
-  _is << "r\nb\n1\n";
-  for (auto _{85}; _--;) _is << ".\n";
+  is() << "r\nb\n1\n";
+  for (auto _{85}; _--;) is() << ".\n";
   startQuiz('p', '4');
   std::string leftOverInput;
-  std::getline(_is, leftOverInput);
+  std::getline(is(), leftOverInput);
   EXPECT_EQ(leftOverInput, "/");
 }
 
 TEST_F(GroupQuizTest, QuizDefaults) {
-  _is << "t\nb\np\n2\n1\n";
+  is() << "t\nb\np\n2\n1\n";
   std::string line, lineWithDefaults;
   getFirstQuestion(line);
   EXPECT_EQ(
       line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");
   // check default 'member filter' is '2' and the default 'bucket' is '1'
-  _is << "t\nb\np\n\n\n";
+  is() << "t\nb\np\n\n\n";
   getFirstQuestion(lineWithDefaults);
   EXPECT_EQ(line, lineWithDefaults);
 }
@@ -258,8 +261,8 @@ TEST_F(GroupQuizTest, QuizReview) {
   for (auto& i :
       {std::pair{'p', "1:  華.  (huá)     m:24        :  カ、（ケ）、はな"},
           std::pair{'m', "1:  北.  (běi)     p:897       :  ホク、きた"}}) {
-    _is << "r\nb\n";
-    if (i.first == 'p') _is << "2\n"; // choose 'カ' pattern group bucket
+    is() << "r\nb\n";
+    if (i.first == 'p') is() << "2\n"; // choose 'カ' pattern group bucket
     startQuiz(i.first, '4');
     for (std::string line; std::getline(_os, line);)
       if (line.ends_with(i.second)) break;
@@ -269,7 +272,7 @@ TEST_F(GroupQuizTest, QuizReview) {
 
 TEST_F(GroupQuizTest, ReviewNextPrev) {
   // move forward twice (.) and then back twice (,)
-  _is << "r\nb\n.\n.\n,\n,\n";
+  is() << "r\nb\n.\n.\n,\n,\n";
   startQuiz('m', '4');
   size_t found{};
   std::string line;

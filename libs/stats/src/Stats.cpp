@@ -58,13 +58,15 @@ public:
 };
 
 std::ostream& operator<<(std::ostream& os, const Count& c) {
+  static constexpr auto FreqWidth{5};
   os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
   if (c.entry)
-    os << std::setw(5) << c.entry->frequencyOrDefault(0) << ", "
+    os << std::setw(FreqWidth) << c.entry->frequencyOrDefault(0) << ", "
        << (c.entry->hasLevel() ? toString(c.entry->level()) : std::string{"--"})
        << ", " << c.entry->type();
   else
-    os << ", " << std::setw(7) << "U+" + toUnicode(c.name);
+    os << ", " << std::setw(UnicodeStringMaxSize + 2)
+       << "U+" + toUnicode(c.name);
   return os;
 }
 
@@ -104,7 +106,7 @@ private:
   void printTotalAndUnique(
       const std::string& name, size_t total, size_t unique);
   void printKanjiTypeCounts(const std::set<Count>&);
-  void printExamples(const CountSet&);
+  void printRareExamples(const CountSet&);
   void printBreakdown(const CountSet&, const MBCount&);
 
   const DataPtr _data;
@@ -148,7 +150,7 @@ std::string StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
       printKanjiTypeCounts(frequency);
     } else if (_isKanji)
       // for 'Rare' and 'Non-UCD' Kanji show up to 'MaxExamples' entries
-      printExamples(frequency);
+      printRareExamples(frequency);
     else
       _os << '\n';
     if (isUnrecognized || _isKanji && _showBreakdown)
@@ -211,8 +213,10 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
     }
 }
 
-void StatsPred::printExamples(const CountSet& frequency) {
-  _os << std::setw(12) << '(';
+void StatsPred::printRareExamples(const CountSet& frequency) {
+  // percents aren't shown before rare examples so add spacing to align output
+  static constexpr auto SkipPercentageWidth{12};
+  _os << std::setw(SkipPercentageWidth) << '(';
   for (size_t i{}; auto& j : frequency) {
     if (i) _os << ", ";
     _os << j.name << ' ' << j.count;
@@ -228,9 +232,11 @@ void StatsPred::printBreakdown(
                  ? " Freq, LV, Type"
                  : ", Unicode, Highest Count File")
       << '\n';
+  static constexpr auto MinRankWidth{5};
   for (size_t rank{}; auto& i : frequency) {
     _os << "  ";
-    if (_showBreakdown) _os << std::left << std::setw(5) << ++rank << ' ';
+    if (_showBreakdown)
+      _os << std::left << std::setw(MinRankWidth) << ++rank << ' ';
     _os << i;
     if (!i.entry) {
       if (const auto tags{count.tags(i.name)}; tags) {

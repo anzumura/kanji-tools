@@ -27,8 +27,6 @@ template<typename... Ts> class BlockRange : public BaseBlockRange {
 public:
   explicit BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(_range, block, blocks...);
-    // terminate with 0 in case a non-static instance of this class is created
-    _range[size()] = L'\0';
   }
 
   [[nodiscard]] auto operator()() const noexcept { return _range; }
@@ -41,7 +39,7 @@ public:
 private:
   static constexpr auto Size{(sizeof...(Ts) + 1) * SizePerBlock};
 
-  wchar_t _range[size() + 1]; // add 1 for final null
+  wchar_t _range[size() + 1]{}; // add 1 for final null
 };
 
 // 'KanjiRange' is for 'wregex' and contains the following blocks (in order):

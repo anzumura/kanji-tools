@@ -59,8 +59,11 @@ protected:
     return result;
   }
 
-  std::stringstream _os;
-  std::stringstream _is;
+  [[nodiscard]] auto& os() { return _os; }
+  [[nodiscard]] auto& is() { return _is; }
+  [[nodiscard]] auto& choice() { return _choice; }
+private:
+  std::stringstream _os, _is;
   Choice _choice;
 };
 
@@ -128,7 +131,7 @@ TEST_F(ChoiceTest, ChoiceWithDefault) {
 TEST_F(ChoiceTest, ChooseNonDefault) {
   EXPECT_EQ(get('2', {{'1', ""}, {'2', ""}}, '1'), '2');
   EXPECT_EQ(getOutput(), "(1-2) def '1': ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, RangeWithDefault) {
@@ -150,7 +153,8 @@ TEST_F(ChoiceTest, NonPrintableFirstRange) {
 }
 
 TEST_F(ChoiceTest, NonPrintableLastRange) {
-  const auto f{[this] { rangeDef({'a', 10}); }};
+  constexpr char ten{10};
+  const auto f{[this, ten] { rangeDef({'a', ten}); }};
   EXPECT_THROW(
       call(f, "last range option is non-printable: 0x0a"), std::domain_error);
 }
@@ -158,7 +162,7 @@ TEST_F(ChoiceTest, NonPrintableLastRange) {
 TEST_F(ChoiceTest, RangeWithNoDefault) {
   EXPECT_EQ(rangeMsg('b', "pick", {'a', 'z'}), 'b');
   EXPECT_EQ(getOutput(), "pick (a-z): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, RangeAndChoices) {
@@ -166,7 +170,7 @@ TEST_F(ChoiceTest, RangeAndChoices) {
       rangeMsg('g', "pick", {'a', 'f'}, Choices{{'g', "good"}, {'y', "yes"}}),
       'g');
   EXPECT_EQ(getOutput(), "pick (a-f, g=good, y=yes): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, RangeChoicesAndDefault) {
@@ -174,111 +178,114 @@ TEST_F(ChoiceTest, RangeChoicesAndDefault) {
                 "pick", {'a', 'f'}, Choices{{'g', "good"}, {'y', "yes"}}, 'y'),
       'y');
   EXPECT_EQ(getOutput(), "pick (a-f, g=good, y=yes) def 'y': ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, NewLineWithoutDefault) {
-  _is << "\n";
+  is() << "\n";
   EXPECT_EQ(get('2', {{'1', ""}, {'2', ""}}), '2');
   // Note: new line is not sent to console when prompting for an option since
   // the user should be entering their choice on the same line as the 'prompt'
   // message. If they choose an invalid option and presss enter then the
   // 'prompt' message is sent again to output.
   EXPECT_EQ(getOutput(), "(1-2): (1-2): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, ChooseBadOption) {
-  _is << "3\n";
+  is() << "3\n";
   EXPECT_EQ(get('2', {{'1', ""}, {'2', ""}}), '2');
   EXPECT_EQ(getOutput(), "(1-2): (1-2): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, ChooseBadOptionWithDefault) {
-  _is << "3\n";
+  is() << "3\n";
   EXPECT_EQ(get('2', {{'1', ""}, {'2', ""}}, '1'), '2');
   EXPECT_EQ(getOutput(), "(1-2) def '1': (1-2) def '1': ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, QuitOption) {
-  EXPECT_FALSE(_choice.quit());
-  EXPECT_FALSE(_choice.isQuit('q'));
-  _choice.setQuit('q');
-  EXPECT_TRUE(_choice.isQuit('q'));
-  EXPECT_EQ(_choice.quit(), 'q');
-  EXPECT_EQ(_choice.quitDescription(), "quit");
+  EXPECT_FALSE(choice().quit());
+  EXPECT_FALSE(choice().isQuit('q'));
+  choice().setQuit('q');
+  EXPECT_TRUE(choice().isQuit('q'));
+  EXPECT_EQ(choice().quit(), 'q');
+  EXPECT_EQ(choice().quitDescription(), "quit");
   EXPECT_EQ(get('q', {{'1', ""}, {'2', ""}}), 'q');
   EXPECT_EQ(getOutput(), "(1-2, q=quit): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, QuitDescription) {
-  EXPECT_FALSE(_choice.quit());
-  EXPECT_FALSE(_choice.isQuit('s'));
-  _choice.setQuit('s', "終了");
-  EXPECT_TRUE(_choice.isQuit('s'));
-  EXPECT_EQ(_choice.quit(), 's');
-  EXPECT_EQ(_choice.quitDescription(), "終了");
+  EXPECT_FALSE(choice().quit());
+  EXPECT_FALSE(choice().isQuit('s'));
+  choice().setQuit('s', "終了");
+  EXPECT_TRUE(choice().isQuit('s'));
+  EXPECT_EQ(choice().quit(), 's');
+  EXPECT_EQ(choice().quitDescription(), "終了");
   EXPECT_EQ(get('s', {{'1', ""}, {'2', ""}}), 's');
   EXPECT_EQ(getOutput(), "(1-2, s=終了): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, SetQuitFromConstructor) {
-  Choice choice{_os, 'e'};
+  Choice choice{os(), 'e'};
   EXPECT_EQ(choice.quit(), 'e');
   EXPECT_EQ(choice.quitDescription(), "quit"); // default quit description
-  Choice choiceWithQuitDescription{_os, 'e', "end"};
+  Choice choiceWithQuitDescription{os(), 'e', "end"};
   EXPECT_EQ(choiceWithQuitDescription.quitDescription(), "end");
 }
 
 TEST_F(ChoiceTest, NonPrintableQuitError) {
-  EXPECT_THROW(call([this] { _choice.setQuit(22); },
+  EXPECT_THROW(call([this] { choice().setQuit(22); },
                    "quit option is non-printable: 0x16"),
       std::domain_error);
 }
 
 TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
-  const auto f{[this] { Choice{_os, 23}; }};
+  constexpr char bad{23};
+  const auto f{[this, bad] { Choice{os(), bad}; }};
   EXPECT_THROW(
       call(f, "quit option is non-printable: 0x17"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, UseQuitOption) {
-  _is << "q\n";
-  _choice.setQuit('q');
-  EXPECT_EQ(_choice.get("", true, {{'1', ""}, {'2', ""}}), 'q');
+  is() << "q\n";
+  choice().setQuit('q');
+  EXPECT_EQ(choice().get("", true, {{'1', ""}, {'2', ""}}), 'q');
   EXPECT_EQ(getOutput(), "(1-2, q=quit): ");
-  EXPECT_TRUE(_os.eof());
-  _os.clear(); // need to clear 'eof' state on _os before calling 'get' again
-  ASSERT_FALSE(_os.eof());
-  _is << "2\n";
+  EXPECT_TRUE(os().eof());
+  os().clear(); // need to clear 'eof' state on _os before calling 'get' again
+  ASSERT_FALSE(os().eof());
+  is() << "2\n";
   // specify false for 'useSkip' parameter to skip using quit option
-  EXPECT_EQ(_choice.get("", false, {{'1', ""}, {'2', ""}}), '2');
+  EXPECT_EQ(choice().get("", false, {{'1', ""}, {'2', ""}}), '2');
   EXPECT_EQ(getOutput(), "(1-2): ");
 }
 
 TEST_F(ChoiceTest, ClearQuitOption) {
-  _is << "q\n1\n";
-  _choice.setQuit('q');
-  _choice.clearQuit();
-  EXPECT_FALSE(_choice.quit());
-  EXPECT_EQ(_choice.get("", {{'1', ""}, {'2', ""}}), '1');
+  is() << "q\n1\n";
+  choice().setQuit('q');
+  choice().clearQuit();
+  EXPECT_FALSE(choice().quit());
+  EXPECT_EQ(choice().get("", {{'1', ""}, {'2', ""}}), '1');
   EXPECT_EQ(getOutput(), "(1-2): (1-2): ");
-  EXPECT_TRUE(_os.eof());
+  EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, MissingDefaultOption) {
-  const auto f{[this] { _choice.get("", {{'a', "abc"}, {'b', "123"}}, 'e'); }};
+  const auto f{[this] { choice().get("", {{'a', "abc"}, {'b', "123"}}, 'e'); }};
   EXPECT_THROW(call(f, "default option 'e' not in choices"), std::domain_error);
 }
 
 TEST_F(ChoiceTest, DuplicateQuitOption) {
-  _choice.setQuit('q');
+  choice().setQuit('q');
   for (bool useQuit : {false, true}) {
-    const auto f{[useQuit, this] { _choice.get("", useQuit, {{'q', "abc"}}); }};
+    const auto f{[useQuit, this] {
+      choice().get("", useQuit, {{'q', "abc"}});
+    }};
     EXPECT_THROW(
         call(f, "quit option 'q' already in choices"), std::domain_error);
   }
@@ -288,7 +295,7 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
   const Choices choices{{'a', "12"}, {'c', "34"}};
   const std::string start{"range option '"}, end{"' already in choices"};
   for (char rangeStart : {'a', 'b'}) {
-    const auto f{[&, this] { _choice.get("", {rangeStart, 'c'}, choices); }};
+    const auto f{[&, this] { choice().get("", {rangeStart, 'c'}, choices); }};
     EXPECT_THROW(call(f, start + (rangeStart == 'a' ? 'a' : 'c') + end),
         std::domain_error);
   }

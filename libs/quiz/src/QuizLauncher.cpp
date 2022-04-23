@@ -172,7 +172,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
                                  GradeChoices, DefaultGrade)};
         !isQuit(c))
       listQuiz(KanjiInfo::Grade,
-          data().grades(AllKanjiGrades[c == 's' ? 6 : c - '1']));
+          data().grades(c == 's' ? KanjiGrades::S : AllKanjiGrades[c - '1']));
     break;
   case 'k':
     // suppress printing 'Kyu' since it's the same for every kanji in the list
@@ -180,13 +180,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
                            : _choice.get("Choose kyu", KyuRange, KyuChoices,
                                  DefaultKyu)};
         !isQuit(c))
-      listQuiz(KanjiInfo::Kyu,
-          data().kyus(AllKenteiKyus[c == 'a'   ? 0
-                                    : c == 'c' ? 8
-                                    : c == '2' ? 9
-                                    : c == 'b' ? 10
-                                    : c == '1' ? 11
-                                               : 7 - (c - '3')]));
+      listQuiz(KanjiInfo::Kyu, getKyuList(c));
     break;
   case 'l':
     // suppress printing 'Level' since it's the same for every kanji in the list
@@ -377,11 +371,11 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     const auto id{arg.substr(1)};
     // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit
     // must be a 1 or 2)
-    if (id.size() < 4 || id.size() > 5 ||
-        (id.size() == 5 && id[0] != '1' && id[0] != '2') ||
+    if (id.size() < UnicodeStringMinSize || id.size() > UnicodeStringMaxSize ||
+        (id.size() == UnicodeStringMaxSize && id[0] != '1' && id[0] != '2') ||
         !std::all_of(id.begin(), id.end(), ::ishexnumber))
       Data::usage("Unicode value '" + id + "' is invalid");
-    printDetails(toUtf8(std::strtol(id.c_str(), nullptr, 16)));
+    printDetails(toUtf8(std::strtol(id.c_str(), nullptr, HexDigits)));
   } else if (isKanji(arg))
     printDetails(arg);
   else
@@ -444,8 +438,7 @@ void QuizLauncher::printJukugoList(
     for (auto& i : list) out() << ' ' << i->nameAndReading();
   else {
     out() << ' ' << list.size();
-    std::array<size_t, JukugoPerLine> colWidths;
-    colWidths.fill(0);
+    std::array<size_t, JukugoPerLine> colWidths{};
     // make each column wide enough to hold the longest entry plus 2 spaces
     // (upto MaxJukugoSize)
     for (size_t i{}; i < list.size(); ++i)
@@ -462,6 +455,16 @@ void QuizLauncher::printJukugoList(
     }
   }
   out() << '\n';
+}
+
+const Data::KanjiList& QuizLauncher::getKyuList(char c) const {
+  using enum KenteiKyus;
+  return data().kyus(c == 'a'   ? K10
+                     : c == 'c' ? KJ2
+                     : c == '2' ? K2
+                     : c == 'b' ? KJ1
+                     : c == '1' ? K1
+                                : AllKenteiKyus[to_underlying(K3) - (c - '3')]);
 }
 
 } // namespace kanji_tools

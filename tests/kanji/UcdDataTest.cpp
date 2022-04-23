@@ -50,6 +50,19 @@ protected:
     return *ucd().find("僧");
   }
 
+  [[nodiscard]] auto& getJinmei() { return _testJinmei; }
+  [[nodiscard]] auto& getJouyou() { return _testJouyou; }
+  [[nodiscard]] auto& getJSource() { return _testJSource; }
+  [[nodiscard]] auto& getLinkCodes() { return _testLinkCodes; }
+  [[nodiscard]] auto& getLinkNames() { return _testLinkNames; }
+  [[nodiscard]] auto& getLinkType() { return _testLinkType; }
+  [[nodiscard]] auto& getMorohashi() { return _testMorohashi; }
+  [[nodiscard]] auto& getMeaning() { return _testMeaning; }
+  [[nodiscard]] auto& getName() { return _testName; }
+  [[nodiscard]] auto& getRadical() { return _testRadical; }
+  [[nodiscard]] auto& getStrokes() { return _testStrokes; }
+  [[nodiscard]] auto& getVStrokes() { return _testVStrokes; }
+private:
   std::string _testName{"一"}, _testRadical{"1"}, _testStrokes{"1"},
       _testVStrokes{}, _testJouyou{"Y"}, _testJinmei{}, _testMorohashi{"1"},
       _testJSource{"J0-306C"}, _testMeaning{"one; a, an; alone"},
@@ -167,7 +180,7 @@ TEST_F(UcdDataTest, FindIncludingVariations) {
 }
 
 TEST_F(UcdDataTest, LoadWithNoReadingsOrMorohashiId) {
-  _testMorohashi.clear();
+  getMorohashi().clear();
   auto& u{loadOne(false, false)};
   EXPECT_FALSE(u.morohashiId());
   EXPECT_TRUE(u.onReading().empty());
@@ -176,8 +189,8 @@ TEST_F(UcdDataTest, LoadWithNoReadingsOrMorohashiId) {
 }
 
 TEST_F(UcdDataTest, LoadFailsWithNoReadingsOrMorohashiIdOrJSource) {
-  _testMorohashi.clear();
-  _testJSource.clear();
+  getMorohashi().clear();
+  getJSource().clear();
   EXPECT_THROW(
       call([this] { loadOne(false, false); },
           "one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated" +
@@ -186,72 +199,72 @@ TEST_F(UcdDataTest, LoadFailsWithNoReadingsOrMorohashiIdOrJSource) {
 }
 
 TEST_F(UcdDataTest, NameTooLong) {
-  _testName = "一二";
+  getName() = "一二";
   EXPECT_THROW(call([this] { loadOne(); }, "name more than 4 bytes" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, ZeroStrokes) {
-  _testStrokes = "0";
+  getStrokes() = "0";
   EXPECT_THROW(
       call([this] { loadOne(); }, "strokes '0' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, BigStrokes) {
-  _testStrokes = "55";
+  getStrokes() = "55";
   EXPECT_THROW(
       call([this] { loadOne(); }, "strokes '55' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, ZeroVStrokes) {
-  _testStrokes = "3";
-  _testVStrokes = "0";
+  getStrokes() = "3";
+  getVStrokes() = "0";
   EXPECT_THROW(
       call([this] { loadOne(); }, "variant strokes '0' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, OneVStrokes) {
-  _testStrokes = "3";
-  _testVStrokes = "1";
+  getStrokes() = "3";
+  getVStrokes() = "1";
   EXPECT_THROW(
       call([this] { loadOne(); }, "variant strokes '1' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, BigVStrokes) {
-  _testStrokes = "33";
-  _testVStrokes = "34";
+  getStrokes() = "33";
+  getVStrokes() = "34";
   EXPECT_THROW(call([this] { loadOne(); },
                    "variant strokes '34' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, RadicalZeroOutOfRange) {
-  _testRadical = "0";
+  getRadical() = "0";
   EXPECT_THROW(
       call([this] { loadOne(); }, "radical '0' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, RadicalOutOfRange) {
-  _testRadical = "215";
+  getRadical() = "215";
   EXPECT_THROW(
       call([this] { loadOne(); }, "radical '215' out of range" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, BothJouyouAndJinmei) {
-  _testJinmei = "Y";
+  getJinmei() = "Y";
   EXPECT_THROW(
       call([this] { loadOne(); }, "can't be both joyo and jinmei" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, MissingMeaningForJouyou) {
-  _testMeaning.clear();
+  getMeaning().clear();
   EXPECT_THROW(
       call([this] { loadOne(); }, "meaning is empty for Jōyō Kanji" + FileMsg),
       std::domain_error);
@@ -290,53 +303,53 @@ TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
 // link validation tests
 
 TEST_F(UcdDataTest, MoreLinkNamesThanLinkCodes) {
-  _testLinkCodes = "4E8C";
-  _testLinkNames = "二,三";
+  getLinkCodes() = "4E8C";
+  getLinkNames() = "二,三";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkNames has more values than LinkCodes" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, BadJouyouLink) {
-  _testLinkCodes = "4E8C";
-  _testLinkNames = "二";
+  getLinkCodes() = "4E8C";
+  getLinkNames() = "二";
   EXPECT_THROW(
       call([this] { loadOne(); }, "joyo shouldn't have links" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, LinkNamesButNoLinkType) {
-  _testJouyou.clear();
-  _testLinkCodes = "4E8C";
-  _testLinkNames = "二";
+  getJouyou().clear();
+  getLinkCodes() = "4E8C";
+  getLinkNames() = "二";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkNames has a value, but LinkType is empty" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, LinkTypeButNoLinkNames) {
-  _testLinkType = "Jinmei";
+  getLinkType() = "Jinmei";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkType has a value, but LinkNames is empty" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, LinkCodesButNoLinkNames) {
-  _testLinkCodes = "ABCD";
+  getLinkCodes() = "ABCD";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkCodes has a value, but LinkNames is empty" + FileMsg),
       std::domain_error);
 }
 
 TEST_F(UcdDataTest, BadJinmeiLink) {
-  _testJouyou.clear();
-  _testJinmei = "Y";
-  _testLinkCodes = "50E7";
-  _testLinkNames = "僧";
-  _testLinkType = "Jinmei";
+  getJouyou().clear();
+  getJinmei() = "Y";
+  getLinkCodes() = "50E7";
+  getLinkNames() = "僧";
+  getLinkType() = "Jinmei";
   writeOne(); // write an entry that mimics a Linked Jinmei Kanji
-  const auto msg{"jinmei entry '僧' with link '" + _testLinkNames +
-                 "' failed - link already points to '" + _testName +
+  const auto msg{"jinmei entry '僧' with link '" + getLinkNames() +
+                 "' failed - link already points to '" + getName() +
                  "' - file: testFile.txt, row: 3"};
   EXPECT_THROW(call([this] { loadLinkedJinmei(); }, msg), std::domain_error);
 }

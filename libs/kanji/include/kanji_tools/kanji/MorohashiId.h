@@ -20,7 +20,7 @@ public:
 
   static constexpr Id MaxId{std::numeric_limits<Id>::max()};
 
-  constexpr MorohashiId() noexcept : _id{0}, _idType{IdType::Regular} {}
+  constexpr MorohashiId() noexcept = default;
 
   // ctor expects a string that's a positive number (up to MaxId) optionally
   // followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
@@ -43,8 +43,8 @@ private:
   [[nodiscard]] static IdType getIdType(const std::string&);
   [[nodiscard]] static Id validate(const std::string&, size_t = 0, size_t = 0);
 
-  const u_int16_t _id;
-  const IdType _idType;
+  const u_int16_t _id{};
+  const IdType _idType{IdType::Regular};
 };
 
 std::ostream& operator<<(std::ostream&, const MorohashiId&);

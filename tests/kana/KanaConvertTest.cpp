@@ -41,6 +41,9 @@ protected:
       EXPECT_EQ(_os.str().substr(expectedIn.size()), "");
   }
 
+  [[nodiscard]] auto& os() { return _os; }
+  [[nodiscard]] auto& is() { return _is; }
+private:
   std::stringstream _os, _is;
 };
 
@@ -118,7 +121,7 @@ TEST_F(KanaConvertTest, InteractiveOrPrintOptionsAndStrings) {
 
 TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
   const char* args[]{""};
-  const auto f{[&args, this] { KanaConvert{args, _os, &_is}; }};
+  const auto f{[&args, this] { KanaConvert{args, os(), &is()}; }};
   EXPECT_THROW(call(f, "provide one or more 'strings' to convert or specify "
                        "'-i' for interactive mode"),
       std::domain_error);
@@ -126,12 +129,11 @@ TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
 
 TEST_F(KanaConvertTest, PrintKanaChart) {
   const char* args[]{"", "-p"};
-  std::stringstream os;
-  KanaConvert(args, _os);
+  KanaConvert(args, os());
   std::string lastLine;
   size_t count{}, found{};
   // just check for a few examples
-  for (std::string line; std::getline(_os, line); ++count, lastLine = line) {
+  for (std::string line; std::getline(os(), line); ++count, lastLine = line) {
     if (!count)
       EXPECT_EQ(line, ">>> Notes:");
     else {
@@ -149,12 +151,11 @@ TEST_F(KanaConvertTest, PrintKanaChart) {
 
 TEST_F(KanaConvertTest, PrintMarkdownKanaChart) {
   const char* args[]{"", "-m"};
-  std::stringstream os;
-  KanaConvert(args, _os);
+  KanaConvert(args, os());
   std::string lastLine;
   size_t count{}, found{};
   // just check for a few examples
-  for (std::string line; std::getline(_os, line); ++count, lastLine = line) {
+  for (std::string line; std::getline(os(), line); ++count, lastLine = line) {
     if (!count)
       EXPECT_EQ(line, "## **Kana Conversion Chart**");
     else {
@@ -258,13 +259,13 @@ TEST_F(KanaConvertTest, ConvertMultipleStringsNoSpace) {
 
 TEST_F(KanaConvertTest, InteractiveConvert) {
   const char* args[]{"", "-i"};
-  _is << "kippu\n";
+  is() << "kippu\n";
   run(args, "きっぷ\n", SkipFirstTwoLines);
 }
 
 TEST_F(KanaConvertTest, InteractiveHelp) {
   const char* args[]{"", "-i"};
-  _is << "h\n";
+  is() << "h\n";
   run(args, R"(  -h: set conversion output to Hiragana
   -k: set conversion output to Katakana
   -r: set conversion output to Rōmaji
@@ -280,7 +281,7 @@ TEST_F(KanaConvertTest, InteractiveHelp) {
 TEST_F(KanaConvertTest, InteractiveSetFlag) {
   const char* args[]{"", "-i", "-r"}; // Rōmaji target
   // set flag to Kunrei and convert 'し' (which is 'si' in Kunrei style Rōmaji)
-  _is << "f\nk\nし\n";
+  is() << "f\nk\nし\n";
   run(args,
       ">>> enter flag option (h=Hepburn, k=Kunrei, n=NoProlongMark, "
       "r=RemoveSpaces): " +
@@ -291,20 +292,20 @@ TEST_F(KanaConvertTest, InteractiveSetFlag) {
 TEST_F(KanaConvertTest, InteractiveSetAndClearFlag) {
   const char* args[]{"", "-i", "-r"};
   // 'c' clears any flags so 'し' should convert to 'shi' (the default)
-  _is << "f\nk\nc\nし\n";
+  is() << "f\nk\nc\nし\n";
   run(args, OptionsMsg + "any, target=Romaji, flags=None" + EnterMsg + "shi\n",
       SkipFirstFourLines);
 }
 
 TEST_F(KanaConvertTest, InteractiveChangeTarget) {
   const char* args[]{"", "-i"};
-  _is << "-k\nrāmen\n";
+  is() << "-k\nrāmen\n";
   run(args, "ラーメン\n", SkipFirstFourLines);
 }
 
 TEST_F(KanaConvertTest, InteractiveIllegalOption) {
   const char* args[]{"", "-i"};
-  _is << "-o\n";
+  is() << "-o\n";
   run(args, "  illegal option: -o\n" + DefOptionsMsg + "None" + EnterMsg,
       SkipFirstTwoLines);
 }

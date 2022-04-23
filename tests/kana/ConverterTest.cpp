@@ -90,25 +90,27 @@ protected:
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
   }
 
+  [[nodiscard]] auto& converter() { return _converter; }
+private:
   Converter _converter;
 };
 
 } // namespace
 
 TEST_F(ConverterTest, FlagString) {
-  EXPECT_EQ(_converter.flagString(), "None");
-  _converter.flags(ConvertFlags::Hepburn);
-  EXPECT_EQ(_converter.flagString(), "Hepburn");
-  _converter.flags(_converter.flags() | ConvertFlags::Kunrei);
-  EXPECT_EQ(_converter.flagString(), "Hepburn|Kunrei");
-  _converter.flags(_converter.flags() | ConvertFlags::NoProlongMark);
-  EXPECT_EQ(_converter.flagString(), "Hepburn|Kunrei|NoProlongMark");
-  _converter.flags(ConvertFlags::Kunrei | ConvertFlags::RemoveSpaces);
-  EXPECT_EQ(_converter.flagString(), "Kunrei|RemoveSpaces");
+  EXPECT_EQ(converter().flagString(), "None");
+  converter().flags(ConvertFlags::Hepburn);
+  EXPECT_EQ(converter().flagString(), "Hepburn");
+  converter().flags(converter().flags() | ConvertFlags::Kunrei);
+  EXPECT_EQ(converter().flagString(), "Hepburn|Kunrei");
+  converter().flags(converter().flags() | ConvertFlags::NoProlongMark);
+  EXPECT_EQ(converter().flagString(), "Hepburn|Kunrei|NoProlongMark");
+  converter().flags(ConvertFlags::Kunrei | ConvertFlags::RemoveSpaces);
+  EXPECT_EQ(converter().flagString(), "Kunrei|RemoveSpaces");
 }
 
 TEST_F(ConverterTest, CheckConvertTarget) {
-  EXPECT_EQ(_converter.target(), CharType::Hiragana); // check default ctor
+  EXPECT_EQ(converter().target(), CharType::Hiragana); // check default ctor
   Converter converter(CharType::Katakana);
   EXPECT_EQ(converter.target(), CharType::Katakana); // check ctor
   converter.target(CharType::Romaji);
@@ -116,7 +118,7 @@ TEST_F(ConverterTest, CheckConvertTarget) {
 }
 
 TEST_F(ConverterTest, CheckConvertFlags) {
-  EXPECT_EQ(_converter.flags(), ConvertFlags::None); // check default ctor
+  EXPECT_EQ(converter().flags(), ConvertFlags::None); // check default ctor
   Converter converter(CharType::Romaji, ConvertFlags::Hepburn);
   EXPECT_EQ(converter.flags(), ConvertFlags::Hepburn); // check ctor
   converter.flags(ConvertFlags::Kunrei);
@@ -125,9 +127,9 @@ TEST_F(ConverterTest, CheckConvertFlags) {
 
 TEST_F(ConverterTest, NoConversionIfSourceAndTargetAreTheSame) {
   std::string s{"atatakaiあたたかいアタタカイ"};
-  EXPECT_EQ(_converter.convert(CharType::Romaji, s, CharType::Romaji), s);
-  EXPECT_EQ(_converter.convert(CharType::Hiragana, s, CharType::Hiragana), s);
-  EXPECT_EQ(_converter.convert(CharType::Katakana, s, CharType::Katakana), s);
+  EXPECT_EQ(converter().convert(CharType::Romaji, s, CharType::Romaji), s);
+  EXPECT_EQ(converter().convert(CharType::Hiragana, s, CharType::Hiragana), s);
+  EXPECT_EQ(converter().convert(CharType::Katakana, s, CharType::Katakana), s);
 }
 
 TEST_F(ConverterTest, ConvertRomajiToHiragana) {
@@ -271,16 +273,16 @@ TEST_F(ConverterTest, HepburnAndKunrei) {
 TEST_F(ConverterTest, ConvertBetweenKana) {
   for (auto& i : Kana::getMap(CharType::Hiragana)) {
     const auto r{
-        _converter.convert(CharType::Hiragana, i.first, CharType::Katakana)};
+        converter().convert(CharType::Hiragana, i.first, CharType::Katakana)};
     EXPECT_EQ(r, i.second->katakana());
-    EXPECT_EQ(_converter.convert(CharType::Katakana, r, CharType::Hiragana),
+    EXPECT_EQ(converter().convert(CharType::Katakana, r, CharType::Hiragana),
         i.second->hiragana());
   }
   for (auto& i : Kana::getMap(CharType::Katakana)) {
     const auto r{
-        _converter.convert(CharType::Katakana, i.first, CharType::Hiragana)};
+        converter().convert(CharType::Katakana, i.first, CharType::Hiragana)};
     EXPECT_EQ(r, i.second->hiragana());
-    EXPECT_EQ(_converter.convert(CharType::Hiragana, r, CharType::Katakana),
+    EXPECT_EQ(converter().convert(CharType::Hiragana, r, CharType::Katakana),
         i.second->katakana());
   }
   kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
@@ -326,17 +328,17 @@ TEST_F(ConverterTest, RepeatSymbol) {
 }
 
 TEST_F(ConverterTest, ConvertAllToOneType) {
-  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Romaji),
+  EXPECT_EQ(converter().convert("ima クリスマス　です。", CharType::Romaji),
       "ima kurisumasu desu.");
-  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Hiragana),
+  EXPECT_EQ(converter().convert("ima クリスマス　です。", CharType::Hiragana),
       "いま　くりすます　です。");
-  EXPECT_EQ(_converter.convert("ima クリスマス　です。", CharType::Katakana),
+  EXPECT_EQ(converter().convert("ima クリスマス　です。", CharType::Katakana),
       "イマ　クリスマス　デス。");
-  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Romaji),
+  EXPECT_EQ(converter().convert("rāmenらーめんラーメン!!", CharType::Romaji),
       "rāmenrāmenrāmen!!");
-  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Hiragana),
+  EXPECT_EQ(converter().convert("rāmenらーめんラーメン!!", CharType::Hiragana),
       "らーめんらーめんらーめん！！");
-  EXPECT_EQ(_converter.convert("rāmenらーめんラーメン!!", CharType::Katakana),
+  EXPECT_EQ(converter().convert("rāmenらーめんラーメン!!", CharType::Katakana),
       "ラーメンラーメンラーメン！！");
 }
 

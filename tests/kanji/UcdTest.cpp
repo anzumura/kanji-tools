@@ -71,7 +71,8 @@ TEST(UcdEntry, BadName) {
 }
 
 TEST(UcdEntry, BadCode) {
-  const auto f{[] { UcdEntry{0xf949, "雷"}; }};
+  constexpr Code ThunderCompat{0xf949}; // normal 'thunder' is 96F7
+  const auto f{[] { UcdEntry{ThunderCompat, "雷"}; }};
   EXPECT_THROW(call(f, "code 'F949' doesn't match '96F7'"), std::domain_error);
 }
 
