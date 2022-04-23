@@ -9,17 +9,13 @@ size_t displaySize(const std::u32string& s) {
   return result;
 }
 
-size_t displaySize(const char* s) {
-  return displaySize(fromUtf8(s));
-}
+size_t displaySize(const char* s) { return displaySize(fromUtf8(s)); }
 
-size_t displaySize(const std::string& s) {
-  return displaySize(s.c_str());
-}
+size_t displaySize(const std::string& s) { return displaySize(s.c_str()); }
 
 int wideSetw(const std::string& s, size_t setwLen) {
   // cast to int since std::setw takes an int
   return static_cast<int>(setwLen + s.size() - displaySize(s));
 }
 
-}
+} // namespace kanji_tools
