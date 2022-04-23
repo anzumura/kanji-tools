@@ -399,7 +399,7 @@ TEST_F(KanjiDataTest, SortByQualifiedName) {
   // choose some existing Kanji with 'small', 'medium' and 'high' values for
   // Strokes and Frequency to help test sorting, i.e., small < medium < high
   constexpr Strokes::Size SmallS{4}, MediumS{7}, HighS{10};
-  constexpr Kanji::Frequency SmallF{150}, MediumF{267}, HighF{771};
+  constexpr Kanji::Frequency SmallF{150}, MediumF{276}, HighF{771};
   auto jouyou7stroke1{find("位", KanjiTypes::Jouyou, MediumS, MediumF)};
   auto jouyou7stroke2{find("囲", KanjiTypes::Jouyou, MediumS, HighF)};
   auto jouyou10stroke{find("院", KanjiTypes::Jouyou, HighS, SmallF)};
