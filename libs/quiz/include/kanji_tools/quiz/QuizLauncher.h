@@ -1,8 +1,8 @@
 #pragma once
 
+#include <kanji_tools/kana/Choice.h>
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/quiz/JukugoData.h>
-#include <kanji_tools/utils/Choice.h>
 
 namespace kanji_tools {
 

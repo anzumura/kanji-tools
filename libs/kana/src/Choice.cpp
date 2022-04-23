@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/Choice.h>
+#include <kanji_tools/kana/Choice.h>
 #include <kanji_tools/utils/Utils.h>
 
 #include <termios.h>

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/Choice.h>
+#include <kanji_tools/kana/Choice.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <sstream>

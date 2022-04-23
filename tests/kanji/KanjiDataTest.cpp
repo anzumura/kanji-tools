@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
+#include <kanji_tools/kana/DisplaySize.h>
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/utils/DisplaySize.h>
 #include <kanji_tools/utils/Utils.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 

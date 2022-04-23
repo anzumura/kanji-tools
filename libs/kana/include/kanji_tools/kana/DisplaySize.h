@@ -63,20 +63,11 @@ inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
     makeBlock<0x20000, 0x2FFFD>(), makeBlock<0x30000, 0x3FFFD>()};
 // --- end generated code from 'parseEastAsiaWidth.sh' ---
 
-// Return size of 's' in terms of how many columns would be required for display
-// on a terminal, i.e, 1 for a normal character and 2 for a wide character.
-[[nodiscard]] inline auto displaySize(const std::u32string& s) {
-  size_t result{};
-  for (const auto i : s)
-    if (i && !isNonSpacing(i)) result += inRange(i, WideBlocks) ? 2 : 1;
-  return result;
-}
-[[nodiscard]] inline auto displaySize(const char* s) {
-  return displaySize(fromUtf8(s));
-}
-[[nodiscard]] inline auto displaySize(const std::string& s) {
-  return displaySize(s.c_str());
-}
+// return size in terms of how many columns would be required for display on a
+// terminal, i.e, 1 for a normal character and 2 for a wide character
+[[nodiscard]] size_t displaySize(const std::u32string&);
+[[nodiscard]] size_t displaySize(const char*);
+[[nodiscard]] size_t displaySize(const std::string&);
 
 // 'wideSetw' returns a value that works for 'std::setw' when 's' contains wide
 // chars. For example, if 's' contains 1 wide char that is 3 bytes then calling
@@ -85,9 +76,6 @@ inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
 // at bytes and s already has 3 bytes. However, using this function, i.e., 'os
 // << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by returning
 // '5' (5 is 2 more than the 3 byte size of 's').
-[[nodiscard]] inline auto wideSetw(const std::string& s, size_t setwLen) {
-  // cast to int since std::setw takes an int
-  return static_cast<int>(setwLen + s.size() - displaySize(s));
-}
+[[nodiscard]] int wideSetw(const std::string& s, size_t setwLen);
 
 } // namespace kanji_tools
