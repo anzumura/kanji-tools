@@ -85,7 +85,6 @@ void UcdData::load(const Data::Path& file) {
       f.error("one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated");
     auto& name{f.get(nameCol)};
     if (name.size() > 4) f.error("name more than 4 bytes");
-    if (f.get(vStrokesCol) == "0") f.error("variant strokes shouldn't be 0");
     const auto radical{f.getULong(radicalCol)};
     if (radical < 1 || radical > Radical::MaxRadicals)
       f.error("radical '" + std::to_string(radical) + "' out of range");
@@ -116,19 +115,23 @@ void UcdData::load(const Data::Path& file) {
       f.error("LinkType has a value, but LinkNames is empty");
     else if (!f.isEmpty(linkCodesCol))
       f.error("LinkCodes has a value, but LinkNames is empty");
-
-    const auto strokes{f.isEmpty(vStrokesCol) ? Strokes{f.getU8(strokesCol)}
-                                              : Strokes{f.getU8(strokesCol),
-                                                    f.getU8(vStrokesCol)}};
-    if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
-                 std::make_tuple(UcdEntry{f.getChar32(codeCol), name},
-                     f.get(blockCol), f.get(versionCol), radical, strokes,
-                     f.get(pinyinCol), f.get(morohashiCol), f.get(nelsonIdsCol),
-                     f.get(sourcesCol), f.get(jSourceCol), joyo, jinmei, links,
-                     AllUcdLinkTypes.fromStringAllowEmpty(f.get(linkTypeCol)),
-                     f.get(meaningCol), f.get(onCol), f.get(kunCol)))
-             .second)
-      f.error("duplicate entry '" + name + "'");
+    try {
+      const auto strokes{f.isEmpty(vStrokesCol) ? Strokes{f.getU8(strokesCol)}
+                                                : Strokes{f.getU8(strokesCol),
+                                                      f.getU8(vStrokesCol)}};
+      if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
+                   std::make_tuple(UcdEntry{f.getChar32(codeCol), name},
+                       f.get(blockCol), f.get(versionCol), radical, strokes,
+                       f.get(pinyinCol), f.get(morohashiCol),
+                       f.get(nelsonIdsCol), f.get(sourcesCol),
+                       f.get(jSourceCol), joyo, jinmei, links,
+                       AllUcdLinkTypes.fromStringAllowEmpty(f.get(linkTypeCol)),
+                       f.get(meaningCol), f.get(onCol), f.get(kunCol)))
+               .second)
+        throw std::domain_error{"duplicate entry '" + name + "'"};
+    } catch (const std::exception& e) {
+      f.error(e.what());
+    }
     for (const auto& link : links)
       if (!jinmei)
         _linkedOther[link.name()].emplace_back(name);

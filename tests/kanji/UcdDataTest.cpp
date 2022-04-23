@@ -191,6 +191,44 @@ TEST_F(UcdDataTest, NameTooLong) {
       std::domain_error);
 }
 
+TEST_F(UcdDataTest, ZeroStrokes) {
+  _testStrokes = "0";
+  EXPECT_THROW(
+      call([this] { loadOne(); }, "strokes '0' out of range" + FileMsg),
+      std::domain_error);
+}
+
+TEST_F(UcdDataTest, BigStrokes) {
+  _testStrokes = "55";
+  EXPECT_THROW(
+      call([this] { loadOne(); }, "strokes '55' out of range" + FileMsg),
+      std::domain_error);
+}
+
+TEST_F(UcdDataTest, ZeroVStrokes) {
+  _testStrokes = "3";
+  _testVStrokes = "0";
+  EXPECT_THROW(
+      call([this] { loadOne(); }, "variant strokes '0' out of range" + FileMsg),
+      std::domain_error);
+}
+
+TEST_F(UcdDataTest, OneVStrokes) {
+  _testStrokes = "3";
+  _testVStrokes = "1";
+  EXPECT_THROW(
+      call([this] { loadOne(); }, "variant strokes '1' out of range" + FileMsg),
+      std::domain_error);
+}
+
+TEST_F(UcdDataTest, BigVStrokes) {
+  _testStrokes = "33";
+  _testVStrokes = "34";
+  EXPECT_THROW(call([this] { loadOne(); },
+                   "variant strokes '34' out of range" + FileMsg),
+      std::domain_error);
+}
+
 TEST_F(UcdDataTest, RadicalZeroOutOfRange) {
   _testRadical = "0";
   EXPECT_THROW(
