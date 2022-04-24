@@ -276,7 +276,9 @@ TEST_F(ChoiceTest, ClearQuitOption) {
 }
 
 TEST_F(ChoiceTest, MissingDefaultOption) {
-  const auto f{[this] { choice().get("", {{'a', "abc"}, {'b', "123"}}, 'e'); }};
+  const auto f{[this] {
+    return choice().get("", {{'a', "abc"}, {'b', "123"}}, 'e');
+  }};
   EXPECT_THROW(call(f, "default option 'e' not in choices"), std::domain_error);
 }
 
@@ -284,7 +286,7 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
   choice().setQuit('q');
   for (bool useQuit : {false, true}) {
     const auto f{[useQuit, this] {
-      choice().get("", useQuit, {{'q', "abc"}});
+      return choice().get("", useQuit, {{'q', "abc"}});
     }};
     EXPECT_THROW(
         call(f, "quit option 'q' already in choices"), std::domain_error);
@@ -295,7 +297,9 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
   const Choices choices{{'a', "12"}, {'c', "34"}};
   const std::string start{"range option '"}, end{"' already in choices"};
   for (char rangeStart : {'a', 'b'}) {
-    const auto f{[&, this] { choice().get("", {rangeStart, 'c'}, choices); }};
+    const auto f{[&, this] {
+      return choice().get("", {rangeStart, 'c'}, choices);
+    }};
     EXPECT_THROW(call(f, start + (rangeStart == 'a' ? 'a' : 'c') + end),
         std::domain_error);
   }

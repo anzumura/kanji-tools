@@ -7,11 +7,11 @@
 
 namespace kanji_tools {
 
-// 'Choice' is a class that supports presenting options and getting back a
-// choice from user input. By default choices are read from terminal input
-// (without requiring 'return'), but a istream can be passed in instead (good
-// for testing). There is also support for 'default' choices (choice when just
-// pressing 'return') and choice 'ranges' (see 'get' functions below).
+// 'Choice' supports getting a choice from user input. By default choices are
+// read from stdin (without requiring 'return'), but an istream can be also be
+// used (helps testing). There's also support for 'default' choices (when just
+// pressing 'return') and choice 'ranges' (see 'get' functions below as well as
+// 'ChoiceTest.cpp' for examples of how to use this class and expected output).
 class Choice {
 public:
   inline static const std::string DefaultQuitDescription{"quit"};
@@ -52,48 +52,35 @@ public:
   [[nodiscard]] auto quit() const { return _quit; }
   [[nodiscard]] auto& quitDescription() const { return _quitDescription; }
 
-  // 'get' prompts for one of the choices in the 'choices' structure. If a
-  // default is provided it must correspond to an entry in 'choices', otherwise
-  // an exception is thrown. If 'choices' contains two or more consecutive
-  // values with empty descriptions then they will be displayed as a range,
-  // i.e., 1-9, a-c, F-J, etc. - see ChoiceTest.cpp for examples of how to use
-  // this class and expected output. 'useQuit' can be set to false to skip
-  // providing '_quit' value (has no effect if '_quit' isn't set).
-  char get(const std::string& msg, bool useQuit, const Choices& choices,
-      OptChar def) const;
-  auto get(const std::string& msg, bool useQuit, const Choices& choices) const {
-    return get(msg, useQuit, choices, {});
-  }
-  auto get(const std::string& msg, const Choices& choices, OptChar def) const {
-    return get(msg, true, choices, def);
-  }
-  auto get(const std::string& msg, const Choices& choices) const {
-    return get(msg, choices, {});
-  }
+  // 'get' prompts for a choice from 'choices' map. Set 'useQuit' to false to
+  // skip showing '_quit' value (has no effect if '_quit' isn't set). If 'def'
+  // is provided it must be in 'choices', otherwise an exception is thrown. If
+  // 'choices' contains two or more consecutive values with empty descriptions
+  // then they are displayed as a range, i.e., 1-9, a-c, F-J, etc..
+  [[nodiscard]] char get(
+      const std::string& msg, bool useQuit, const Choices&, OptChar) const;
 
-  // 'get' with ranges are convenience methods when there is a range (inclusive)
-  // with no descriptions
-  char get(const std::string& msg, bool useQuit, const Range&, const Choices&,
-      OptChar def) const;
-  auto get(const std::string& msg, const Range& range, const Choices& choices,
-      OptChar def) const {
-    return get(msg, true, range, choices, def);
-  }
-  auto get(const std::string& msg, const Range& range,
-      const Choices& choices) const {
-    return get(msg, range, choices, {});
-  }
-  auto get(const std::string& msg, const Range& range) const {
-    return get(msg, range, {}, {});
-  }
-  auto get(const std::string& msg, const Range& range, OptChar def) const {
-    return get(msg, range, {}, def);
-  }
+  // overloads that call the above 'get' function
+  [[nodiscard]] char get(const std::string& msg, bool, const Choices&) const;
+  [[nodiscard]] char get(const std::string& msg, const Choices&, OptChar) const;
+  [[nodiscard]] char get(const std::string& msg, const Choices&) const;
+
+  // alternative 'get' functions that also take an (inclusive) range of value
+  [[nodiscard]] char get(const std::string& msg, bool useQuit, const Range&,
+      const Choices&, OptChar def) const;
+
+  // overloads that call the above 'get' function taking a range
+  [[nodiscard]] char get(
+      const std::string& msg, const Range&, const Choices&, OptChar) const;
+  [[nodiscard]] char get(
+      const std::string& msg, const Range&, const Choices&) const;
+  [[nodiscard]] char get(const std::string& msg, const Range&) const;
+  [[nodiscard]] char get(const std::string& msg, const Range&, OptChar) const;
 private:
-  static void add(std::string& prompt, const Choices& choices);
   [[nodiscard]] static char getOneChar();
+  static void add(std::string& prompt, const Choices&);
   static void checkPrintableAscii(char x, const std::string& msg);
-  static void error(const std::string& msg) { throw std::domain_error(msg); }
+  static void error(const std::string&);
 
   std::ostream& _out;
   std::istream* _in;
