@@ -81,6 +81,13 @@ private:
 
   void printJukugoList(const std::string& name, const JukugoData::List&) const;
 
+  [[nodiscard]] char chooseQuizType(OptChar) const;
+
+  [[nodiscard]] char chooseFreq(OptChar) const;
+  [[nodiscard]] char chooseGrade(OptChar) const;
+  [[nodiscard]] char chooseKyu(OptChar) const;
+  [[nodiscard]] char chooseLevel(OptChar) const;
+
   [[nodiscard]] const Data::KanjiList& getKyuList(char) const;
 
   // '_programMode' and '_questionOrder' can be set via the command line,

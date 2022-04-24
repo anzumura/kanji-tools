@@ -71,7 +71,6 @@ constexpr Choice::Range GradeRange{'1', '6'}, KyuRange{'1', '9'},
 // Default options are offered for some of the above 'Choices' (when prompting
 // the user for input):
 constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
-    DefaultQuizType{'g'}, DefaultGrade{'6'}, DefaultKyu{'2'},
     DefaultChoiceCount{'4'}, DefaultListStyle{'k'}, DefaultGroupKanji{'2'};
 
 } // namespace
@@ -153,40 +152,26 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
     startGroupQuiz(question, meanings, qList, l);
   }};
 
-  // replace 'quizType' turnary operator with 'or_else' when C++23 is available
-  switch (quizType ? *quizType
-                   : _choice.get("Type", QuizTypeChoices, DefaultQuizType)) {
+  switch (chooseQuizType(quizType)) {
   case 'f':
-    // suppress printing 'Freq' since this would work against showing the list
-    // in a random order.
-    if (const auto c{
-            qList ? *qList : _choice.get("Choose list", FrequencyChoices)};
-        !isQuit(c))
+    if (const auto c{chooseFreq(qList)}; !isQuit(c))
+      // suppress printing 'Freq' (by passing 'KanjiInfo::Freq') since this
+      // would work against showing the list in a random order
       listQuiz(
           KanjiInfo::Freq, data().frequencies(static_cast<size_t>(c - '1')));
     break;
   case 'g':
-    // suppress printing 'Grade' since it's the same for every kanji in the list
-    if (const auto c{qList ? *qList
-                           : _choice.get("Choose grade", GradeRange,
-                                 GradeChoices, DefaultGrade)};
-        !isQuit(c))
+    if (const auto c{chooseGrade(qList)}; !isQuit(c))
+      // suppress printing 'Grade' (it's the same for every kanji in the list)
       listQuiz(KanjiInfo::Grade,
           data().grades(c == 's' ? KanjiGrades::S : AllKanjiGrades[c - '1']));
     break;
   case 'k':
-    // suppress printing 'Kyu' since it's the same for every kanji in the list
-    if (const auto c{qList ? *qList
-                           : _choice.get("Choose kyu", KyuRange, KyuChoices,
-                                 DefaultKyu)};
-        !isQuit(c))
+    if (const auto c{chooseKyu(qList)}; !isQuit(c))
       listQuiz(KanjiInfo::Kyu, getKyuList(c));
     break;
   case 'l':
-    // suppress printing 'Level' since it's the same for every kanji in the list
-    if (const char c{
-            qList ? *qList : _choice.get("Choose level", LevelChoices)};
-        !isQuit(c))
+    if (const char c{chooseLevel(qList)}; !isQuit(c))
       listQuiz(KanjiInfo::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
     break;
   case 'm': groupQuiz(_groupData->meaningGroups()); break;
@@ -455,6 +440,27 @@ void QuizLauncher::printJukugoList(
     }
   }
   out() << '\n';
+}
+
+char QuizLauncher::chooseQuizType(OptChar quizType) const {
+  return quizType ? *quizType : _choice.get("Type", QuizTypeChoices, 'g');
+}
+
+char QuizLauncher::chooseFreq(OptChar qList) const {
+  return qList ? *qList : _choice.get("Choose list", FrequencyChoices);
+}
+
+char QuizLauncher::chooseGrade(OptChar qList) const {
+  return qList ? *qList
+               : _choice.get("Choose grade", GradeRange, GradeChoices, '6');
+}
+
+char QuizLauncher::chooseKyu(OptChar qList) const {
+  return qList ? *qList : _choice.get("Choose kyu", KyuRange, KyuChoices, '2');
+}
+
+char QuizLauncher::chooseLevel(OptChar qList) const {
+  return qList ? *qList : _choice.get("Choose level", LevelChoices);
 }
 
 const Data::KanjiList& QuizLauncher::getKyuList(char c) const {
