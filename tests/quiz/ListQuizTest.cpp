@@ -47,7 +47,8 @@ protected:
     _is << "t\nb\n4\nk\n";
     getFirstQuestion(otherLine, quizType, questionList);
     EXPECT_EQ(line, otherLine);
-    return line.substr(9);
+    static constexpr auto RemoveQuestionText{9};
+    return line.substr(RemoveQuestionText);
   }
 
   void skip() { _is << ".\n"; } // '.' is the option to skip a question
@@ -77,13 +78,16 @@ protected:
     if (_os.eof()) FAIL() << "couldn't find first Question";
   }
 
-  std::stringstream _is;
-  QuizLauncher _quiz;
-
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
+
+  auto& is() { return _is; }
+  auto& quiz() { return _quiz; }
+private:
+  std::stringstream _is;
+  QuizLauncher _quiz;
 };
 
 } // namespace
@@ -110,13 +114,14 @@ TEST_F(ListQuizTest, MissingReading) {
   ASSERT_FALSE(i->hasReading());
   Data::KanjiList questionList{i};
   const auto f{[&questionList, this] {
-    ListQuiz{_quiz, {}, {}, questionList, KanjiInfo::All, 1,
+    ListQuiz{quiz(), {}, {}, questionList, KanjiInfo::All, 1,
         ListQuiz::QuizStyle::KanjiToReading};
   }};
   EXPECT_THROW(call(f, noReading + " has no reading"), std::domain_error);
 }
 
 TEST_F(ListQuizTest, QuizDefaults) {
+  constexpr auto First8Chars{8};
   const auto run{[this](std::string& out) {
     startQuiz();
     std::string line;
@@ -125,7 +130,7 @@ TEST_F(ListQuizTest, QuizDefaults) {
     // just get the first 8 chars, i.e., the "    #.  " part)
     while (std::getline(_os, line))
       if (!out.empty() || line.starts_with(">>>"))
-        out += line.starts_with("    ") ? line.substr(0, 8) : line;
+        out += line.starts_with("    ") ? line.substr(0, First8Chars) : line;
   }};
   std::string all, allWithDefaults;
   gradeQuiz();
@@ -138,13 +143,13 @@ TEST_F(ListQuizTest, QuizDefaults) {
   // - list quiz style: 'k' (kanji to reading)
   // still need to specify '1' (for grade) and 'b' (for beginning of list)
   // since these aren't defaults
-  _is << "\nb\n\n1\n\n\n";
+  is() << "\nb\n\n1\n\n\n";
   run(allWithDefaults);
   EXPECT_EQ(all, allWithDefaults);
 }
 
 TEST_F(ListQuizTest, QuizReview) {
-  _is << "r\nb\ng\n1\n";
+  is() << "r\nb\ng\n1\n";
   toggleMeanings();
   startQuiz();
   std::string line, lastLine;
@@ -164,12 +169,12 @@ TEST_F(ListQuizTest, QuizReview) {
   EXPECT_EQ(lastLine, "  Select (-=hide meanings, .=next, /=quit): ");
   // should be nothing sent to _es (for errors) and nothing left in _is
   EXPECT_FALSE(std::getline(_es, line));
-  EXPECT_FALSE(std::getline(_is, line));
+  EXPECT_FALSE(std::getline(is(), line));
 }
 
 TEST_F(ListQuizTest, ReviewNextPrev) {
   // move forward twice (.) and then back twice (,)
-  _is << "r\nb\n.\n.\n,\n,\n";
+  is() << "r\nb\n.\n.\n,\n,\n";
   startQuiz('g', '2');
   size_t found{};
   std::string line;
@@ -189,14 +194,14 @@ TEST_F(ListQuizTest, ReviewNextPrev) {
 }
 
 TEST_F(ListQuizTest, ReadingQuiz) {
-  _is << "t\nb\ng\n1\n4\nr\n";
+  is() << "t\nb\ng\n1\n4\nr\n";
   std::string line;
   getFirstQuestion(line);
   EXPECT_EQ(line, "Question 1/80:  Reading:  イチ、イツ、ひと、ひと-つ");
 }
 
 TEST_F(ListQuizTest, CorrectResponse) {
-  _is << "t\nb\n4\nr\n1\n";
+  is() << "t\nb\n4\nr\n1\n";
   startQuiz('g', '1', false);
   auto found{false};
   std::string lastLine;
@@ -207,7 +212,7 @@ TEST_F(ListQuizTest, CorrectResponse) {
 }
 
 TEST_F(ListQuizTest, IncorrectResponse) {
-  _is << "t\nb\n4\nr\n2\n";
+  is() << "t\nb\n4\nr\n2\n";
   startQuiz('g', '1', false);
   auto found{false};
   std::string lastLine;

@@ -219,11 +219,12 @@ TEST_F(GroupQuizTest, RefreshAfterAnswer) {
 }
 
 TEST_F(GroupQuizTest, PatternGroupBuckets) {
+  constexpr auto RemoveQuestionText{9};
   const auto f{[this](char x) {
     is() << "t\nb\np\n4\n" << x << "\n";
     std::string line;
     getFirstQuestion(line);
-    return line.substr(9);
+    return line.substr(RemoveQuestionText);
   }};
   EXPECT_EQ(f('1'), "1/85:  [阿：ア], 3 members");
   EXPECT_EQ(f('2'), "1/269:  [華：カ], 5 members");
@@ -234,11 +235,11 @@ TEST_F(GroupQuizTest, PatternGroupBuckets) {
 }
 
 TEST_F(GroupQuizTest, LoopOverAllPatternsInABucket) {
-  // the first bucket has 85 groups so specify 85 '.'s to loop through all of
-  // them - this will make sure the quiz actually finishes (and the '/' from
-  // the 'startQuiz' method should still be on _is).
+  constexpr auto FirstBucketGroups{85};
+  // specify enough '.'s to loop through all the groups in the first bucket to
+  // complete the quiz (and test that '/' from 'startQuiz' is still on _is).
   is() << "r\nb\n1\n";
-  for (auto _{85}; _--;) is() << ".\n";
+  for (auto _{FirstBucketGroups}; _--;) is() << ".\n";
   startQuiz('p', '4');
   std::string leftOverInput;
   std::getline(is(), leftOverInput);

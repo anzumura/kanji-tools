@@ -42,7 +42,9 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  MBCount c;
+  auto& mbCount() { return _mbCount; }
+private:
+  MBCount _mbCount;
 };
 
 } // namespace
@@ -64,79 +66,79 @@ TEST_F(MBCountTest, CheckRemovingFurigana) {
 }
 
 TEST_F(MBCountTest, Add) {
-  EXPECT_EQ(c.add("hello空は青い"), 4);
-  EXPECT_EQ(c.add("箱は空です"), 5);
-  EXPECT_EQ(c.add("今日は涼しい。good bye"), 7);
+  EXPECT_EQ(mbCount().add("hello空は青い"), 4);
+  EXPECT_EQ(mbCount().add("箱は空です"), 5);
+  EXPECT_EQ(mbCount().add("今日は涼しい。good bye"), 7);
   // map only includes MB chars
-  EXPECT_EQ(c.uniqueEntries(), 12);
-  EXPECT_EQ(c.count("空"), 2);
-  EXPECT_EQ(c.count("は"), 3);
-  EXPECT_EQ(c.count("青"), 1);
-  EXPECT_EQ(c.count("い"), 2);
-  EXPECT_EQ(c.count("箱"), 1);
-  EXPECT_EQ(c.count("で"), 1);
-  EXPECT_EQ(c.count("す"), 1);
-  EXPECT_EQ(c.count("今"), 1);
-  EXPECT_EQ(c.count("日"), 1);
-  EXPECT_EQ(c.count("涼"), 1);
-  EXPECT_EQ(c.count("し"), 1);
-  EXPECT_EQ(c.count("。"), 1);
+  EXPECT_EQ(mbCount().uniqueEntries(), 12);
+  EXPECT_EQ(mbCount().count("空"), 2);
+  EXPECT_EQ(mbCount().count("は"), 3);
+  EXPECT_EQ(mbCount().count("青"), 1);
+  EXPECT_EQ(mbCount().count("い"), 2);
+  EXPECT_EQ(mbCount().count("箱"), 1);
+  EXPECT_EQ(mbCount().count("で"), 1);
+  EXPECT_EQ(mbCount().count("す"), 1);
+  EXPECT_EQ(mbCount().count("今"), 1);
+  EXPECT_EQ(mbCount().count("日"), 1);
+  EXPECT_EQ(mbCount().count("涼"), 1);
+  EXPECT_EQ(mbCount().count("し"), 1);
+  EXPECT_EQ(mbCount().count("。"), 1);
 }
 
 TEST_F(MBCountTest, AddWithErrors) {
   std::string s1{"hello空は青い"}, s2{"箱は空です"};
   s1[s1.size() - 2] = 'x'; // mess up い introducing 2 errors
   s2[0] = 'y';             // mess up 箱 introducing 2 errors
-  EXPECT_EQ(c.add(s1), 3);
-  EXPECT_EQ(c.add(s2), 4);
-  EXPECT_EQ(c.add("今日は涼しい。good bye"), 7);
+  EXPECT_EQ(mbCount().add(s1), 3);
+  EXPECT_EQ(mbCount().add(s2), 4);
+  EXPECT_EQ(mbCount().add("今日は涼しい。good bye"), 7);
   // map only includes MB chars
-  EXPECT_EQ(c.uniqueEntries(), 11);
-  EXPECT_EQ(c.errors(), 4);
-  EXPECT_EQ(c.count("空"), 2);
-  EXPECT_EQ(c.count("は"), 3);
-  EXPECT_EQ(c.count("青"), 1);
-  EXPECT_EQ(c.count("い"), 1);
-  EXPECT_EQ(c.count("で"), 1);
-  EXPECT_EQ(c.count("す"), 1);
-  EXPECT_EQ(c.count("今"), 1);
-  EXPECT_EQ(c.count("日"), 1);
-  EXPECT_EQ(c.count("涼"), 1);
-  EXPECT_EQ(c.count("し"), 1);
-  EXPECT_EQ(c.count("。"), 1);
+  EXPECT_EQ(mbCount().uniqueEntries(), 11);
+  EXPECT_EQ(mbCount().errors(), 4);
+  EXPECT_EQ(mbCount().count("空"), 2);
+  EXPECT_EQ(mbCount().count("は"), 3);
+  EXPECT_EQ(mbCount().count("青"), 1);
+  EXPECT_EQ(mbCount().count("い"), 1);
+  EXPECT_EQ(mbCount().count("で"), 1);
+  EXPECT_EQ(mbCount().count("す"), 1);
+  EXPECT_EQ(mbCount().count("今"), 1);
+  EXPECT_EQ(mbCount().count("日"), 1);
+  EXPECT_EQ(mbCount().count("涼"), 1);
+  EXPECT_EQ(mbCount().count("し"), 1);
+  EXPECT_EQ(mbCount().count("。"), 1);
 }
 
 TEST_F(MBCountTest, AddWithVariants) {
   const std::string s1{"normal中variant逸︁"}, s2{"あア謁︀"};
-  EXPECT_EQ(c.add(s1), 2);
-  EXPECT_EQ(c.add(s2), 3);
-  EXPECT_EQ(c.count("中"), 1);
-  EXPECT_EQ(c.count("逸︁"), 1);
-  EXPECT_EQ(c.count("あ"), 1);
-  EXPECT_EQ(c.count("ア"), 1);
-  EXPECT_EQ(c.count("謁︀"), 1);
-  EXPECT_EQ(c.errors(), 0);
-  EXPECT_EQ(c.variants(), 2);
+  EXPECT_EQ(mbCount().add(s1), 2);
+  EXPECT_EQ(mbCount().add(s2), 3);
+  EXPECT_EQ(mbCount().count("中"), 1);
+  EXPECT_EQ(mbCount().count("逸︁"), 1);
+  EXPECT_EQ(mbCount().count("あ"), 1);
+  EXPECT_EQ(mbCount().count("ア"), 1);
+  EXPECT_EQ(mbCount().count("謁︀"), 1);
+  EXPECT_EQ(mbCount().errors(), 0);
+  EXPECT_EQ(mbCount().variants(), 2);
 }
 
 TEST_F(MBCountTest, AddWithCombiningMarks) {
   const std::string s1{"て\xe3\x82\x99"}, // with dakuten
       s2{"フ\xe3\x82\x9a"},               // with han-dakuten
       bad{"や\xe3\x82\x9aく"};            // error, but still add や and く
-  EXPECT_EQ(c.add(s1), 1);
-  EXPECT_EQ(c.add(s2), 1);
-  EXPECT_EQ(c.combiningMarks(), 2);
-  EXPECT_EQ(c.add(bad), 2);
-  EXPECT_EQ(c.combiningMarks(), 2);
-  EXPECT_EQ(c.errors(), 1);
+  EXPECT_EQ(mbCount().add(s1), 1);
+  EXPECT_EQ(mbCount().add(s2), 1);
+  EXPECT_EQ(mbCount().combiningMarks(), 2);
+  EXPECT_EQ(mbCount().add(bad), 2);
+  EXPECT_EQ(mbCount().combiningMarks(), 2);
+  EXPECT_EQ(mbCount().errors(), 1);
   const std::string noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
   EXPECT_EQ(noMarks.size(), 27);
   EXPECT_EQ(marks.size(), 30);
-  EXPECT_EQ(c.add(noMarks), 9);
-  EXPECT_EQ(c.combiningMarks(), 2);
-  EXPECT_EQ(c.add(marks), 9);
-  EXPECT_EQ(c.combiningMarks(), 3);
-  EXPECT_EQ(c.errors(), 1);
+  EXPECT_EQ(mbCount().add(noMarks), 9);
+  EXPECT_EQ(mbCount().combiningMarks(), 2);
+  EXPECT_EQ(mbCount().add(marks), 9);
+  EXPECT_EQ(mbCount().combiningMarks(), 3);
+  EXPECT_EQ(mbCount().errors(), 1);
 }
 
 TEST_F(MBCountTest, AddWithPredicate) {
@@ -157,91 +159,91 @@ TEST_F(MBCountTest, AddWithPredicate) {
 }
 
 TEST_F(MBCountTest, AddFile) {
-  EXPECT_EQ(c.addFile(TestFile1, false, false, false), 3);
-  EXPECT_EQ(c.uniqueEntries(), 3);
-  EXPECT_EQ(c.files(), 1);
-  EXPECT_EQ(c.directories(), 0);
-  EXPECT_EQ(c.count("北"), 1);
-  EXPECT_EQ(c.count("海"), 1);
-  EXPECT_EQ(c.count("道"), 1);
+  EXPECT_EQ(mbCount().addFile(TestFile1, false, false, false), 3);
+  EXPECT_EQ(mbCount().uniqueEntries(), 3);
+  EXPECT_EQ(mbCount().files(), 1);
+  EXPECT_EQ(mbCount().directories(), 0);
+  EXPECT_EQ(mbCount().count("北"), 1);
+  EXPECT_EQ(mbCount().count("海"), 1);
+  EXPECT_EQ(mbCount().count("道"), 1);
 }
 
 TEST_F(MBCountTest, AddFileIncludingFile) {
-  EXPECT_EQ(c.addFile(TestFile1, false, true, false), 4);
-  EXPECT_EQ(c.uniqueEntries(), 4);
-  EXPECT_EQ(c.count("北"), 1);
-  EXPECT_EQ(c.count("海"), 1);
-  EXPECT_EQ(c.count("道"), 1);
-  EXPECT_EQ(c.count("甲"), 1);
+  EXPECT_EQ(mbCount().addFile(TestFile1, false, true, false), 4);
+  EXPECT_EQ(mbCount().uniqueEntries(), 4);
+  EXPECT_EQ(mbCount().count("北"), 1);
+  EXPECT_EQ(mbCount().count("海"), 1);
+  EXPECT_EQ(mbCount().count("道"), 1);
+  EXPECT_EQ(mbCount().count("甲"), 1);
 }
 
 TEST_F(MBCountTest, AddMissingFile) {
-  EXPECT_THROW(call([this] { c.addFile(TestDir / "missing"); },
+  EXPECT_THROW(call([this] { mbCount().addFile(TestDir / "missing"); },
                    "file not found: testDir/missing"),
       std::domain_error);
-  EXPECT_EQ(c.files(), 0);
-  EXPECT_EQ(c.directories(), 0);
+  EXPECT_EQ(mbCount().files(), 0);
+  EXPECT_EQ(mbCount().directories(), 0);
 }
 
 TEST_F(MBCountTest, AddDirectoryNoRecurse) {
-  EXPECT_EQ(c.addFile(TestDir, false, false, false), 5);
-  EXPECT_EQ(c.uniqueEntries(), 4);
-  EXPECT_EQ(c.files(), 2);
-  EXPECT_EQ(c.directories(), 1);
-  EXPECT_EQ(c.count("北"), 2);
-  EXPECT_EQ(c.count("南"), 1);
-  EXPECT_EQ(c.count("海"), 1);
-  EXPECT_EQ(c.count("道"), 1);
+  EXPECT_EQ(mbCount().addFile(TestDir, false, false, false), 5);
+  EXPECT_EQ(mbCount().uniqueEntries(), 4);
+  EXPECT_EQ(mbCount().files(), 2);
+  EXPECT_EQ(mbCount().directories(), 1);
+  EXPECT_EQ(mbCount().count("北"), 2);
+  EXPECT_EQ(mbCount().count("南"), 1);
+  EXPECT_EQ(mbCount().count("海"), 1);
+  EXPECT_EQ(mbCount().count("道"), 1);
 }
 
 TEST_F(MBCountTest, AddDirectoryNoRecurseIncludingFileNames) {
-  EXPECT_EQ(c.addFile(TestDir, false, true, false), 7);
-  EXPECT_EQ(c.uniqueEntries(), 6);
-  EXPECT_EQ(c.count("北"), 2);
-  EXPECT_EQ(c.count("南"), 1);
-  EXPECT_EQ(c.count("海"), 1);
-  EXPECT_EQ(c.count("道"), 1);
-  EXPECT_EQ(c.count("甲"), 1);
-  EXPECT_EQ(c.count("乙"), 1);
+  EXPECT_EQ(mbCount().addFile(TestDir, false, true, false), 7);
+  EXPECT_EQ(mbCount().uniqueEntries(), 6);
+  EXPECT_EQ(mbCount().count("北"), 2);
+  EXPECT_EQ(mbCount().count("南"), 1);
+  EXPECT_EQ(mbCount().count("海"), 1);
+  EXPECT_EQ(mbCount().count("道"), 1);
+  EXPECT_EQ(mbCount().count("甲"), 1);
+  EXPECT_EQ(mbCount().count("乙"), 1);
 }
 
 TEST_F(MBCountTest, AddDirectoryRecurse) {
-  EXPECT_EQ(c.addFile(TestDir, false, false), 10);
-  EXPECT_EQ(c.uniqueEntries(), 7);
-  EXPECT_EQ(c.files(), 4);
-  EXPECT_EQ(c.directories(), 2);
-  EXPECT_EQ(c.count("北"), 3);
-  EXPECT_EQ(c.count("東"), 2);
-  EXPECT_EQ(c.count("南"), 1);
-  EXPECT_EQ(c.count("海"), 1);
-  EXPECT_EQ(c.count("西"), 1);
-  EXPECT_EQ(c.count("道"), 1);
-  EXPECT_EQ(c.count("線"), 1);
+  EXPECT_EQ(mbCount().addFile(TestDir, false, false), 10);
+  EXPECT_EQ(mbCount().uniqueEntries(), 7);
+  EXPECT_EQ(mbCount().files(), 4);
+  EXPECT_EQ(mbCount().directories(), 2);
+  EXPECT_EQ(mbCount().count("北"), 3);
+  EXPECT_EQ(mbCount().count("東"), 2);
+  EXPECT_EQ(mbCount().count("南"), 1);
+  EXPECT_EQ(mbCount().count("海"), 1);
+  EXPECT_EQ(mbCount().count("西"), 1);
+  EXPECT_EQ(mbCount().count("道"), 1);
+  EXPECT_EQ(mbCount().count("線"), 1);
 }
 
 TEST_F(MBCountTest, AddDirectoryRecurseIncludingFileNamesButNoTags) {
-  EXPECT_EQ(c.addFile(TestDir, false), 13);
-  EXPECT_EQ(c.uniqueEntries(), 10);
-  EXPECT_EQ(c.count("北"), 3);
-  EXPECT_EQ(c.tags("北"), nullptr);
-  EXPECT_EQ(c.count("東"), 2);
-  EXPECT_EQ(c.count("南"), 1);
-  EXPECT_EQ(c.count("海"), 1);
-  EXPECT_EQ(c.count("西"), 1);
-  EXPECT_EQ(c.count("道"), 1);
-  EXPECT_EQ(c.count("線"), 1);
-  EXPECT_EQ(c.count("甲"), 1);
-  EXPECT_EQ(c.count("乙"), 1);
-  EXPECT_EQ(c.count("下"), 1);
+  EXPECT_EQ(mbCount().addFile(TestDir, false), 13);
+  EXPECT_EQ(mbCount().uniqueEntries(), 10);
+  EXPECT_EQ(mbCount().count("北"), 3);
+  EXPECT_EQ(mbCount().tags("北"), nullptr);
+  EXPECT_EQ(mbCount().count("東"), 2);
+  EXPECT_EQ(mbCount().count("南"), 1);
+  EXPECT_EQ(mbCount().count("海"), 1);
+  EXPECT_EQ(mbCount().count("西"), 1);
+  EXPECT_EQ(mbCount().count("道"), 1);
+  EXPECT_EQ(mbCount().count("線"), 1);
+  EXPECT_EQ(mbCount().count("甲"), 1);
+  EXPECT_EQ(mbCount().count("乙"), 1);
+  EXPECT_EQ(mbCount().count("下"), 1);
 }
 
 TEST_F(MBCountTest, SkipSimlinksWhenRecursing) {
   const auto link{TestDir / "link"};
   fs::create_symlink(TestSubDir.filename(), link);
   EXPECT_TRUE(fs::is_symlink(link));
-  EXPECT_EQ(c.addFile(TestDir, false), 13);
-  EXPECT_EQ(c.directories(), 2);
-  EXPECT_EQ(c.files(), 4);
+  EXPECT_EQ(mbCount().addFile(TestDir, false), 13);
+  EXPECT_EQ(mbCount().directories(), 2);
+  EXPECT_EQ(mbCount().files(), 4);
 }
 
 TEST_F(MBCountTest, SkipNonRegularFiles) {
@@ -254,15 +256,15 @@ TEST_F(MBCountTest, SkipNonRegularFiles) {
   ASSERT_FALSE(fs::is_socket(file));
   ASSERT_NE(bind(fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)), -1);
   ASSERT_TRUE(fs::is_socket(file));
-  EXPECT_EQ(c.addFile(file), 0);
-  EXPECT_EQ(c.directories(), 0);
-  EXPECT_EQ(c.files(), 0);
+  EXPECT_EQ(mbCount().addFile(file), 0);
+  EXPECT_EQ(mbCount().directories(), 0);
+  EXPECT_EQ(mbCount().files(), 0);
 }
 
 TEST_F(MBCountTest, CheckTags) {
-  EXPECT_EQ(c.addFile(TestDir), 13);
-  EXPECT_EQ(c.uniqueEntries(), 10);
-  const auto tags{c.tags("北")};
+  EXPECT_EQ(mbCount().addFile(TestDir), 13);
+  EXPECT_EQ(mbCount().uniqueEntries(), 10);
+  const auto tags{mbCount().tags("北")};
   ASSERT_TRUE(tags != nullptr);
   ASSERT_EQ(tags->size(), 3);
   auto i{tags->find("testFile甲")};

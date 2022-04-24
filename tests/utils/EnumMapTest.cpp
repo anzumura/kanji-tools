@@ -11,40 +11,47 @@ enum class Colors : BaseEnum::Size { Red, Green, Blue, None };
 
 class EnumMapTest : public ::testing::Test {
 protected:
+  // assign some sample values for testing
+  static constexpr auto RedVal{2}, GreenVal{4}, BlueVal{7};
+
   EnumMapTest() {
-    _map[Colors::Red] = 2;
-    _map[Colors::Green] = 4;
-    _map[Colors::Blue] = 7;
+    _map[Colors::Red] = RedVal;
+    _map[Colors::Green] = GreenVal;
+    _map[Colors::Blue] = BlueVal;
   }
+
+  auto& map() { return _map; }
+private:
   EnumMap<Colors, int> _map;
 };
 
 } // namespace
 
 TEST_F(EnumMapTest, SquareOperator) {
-  _map[Colors::Green] = 6;
-  const auto& cMap{_map};
-  EXPECT_EQ(_map[Colors::Green], 6);
-  EXPECT_EQ(cMap[Colors::Green], 6);
+  constexpr auto expected{6};
+  map()[Colors::Green] = expected;
+  const auto& cMap{map()};
+  EXPECT_EQ(map()[Colors::Green], expected);
+  EXPECT_EQ(cMap[Colors::Green], expected);
 }
 
 TEST_F(EnumMapTest, NoneReturnsEmptyForConstOperator) {
-  const auto& cMap{_map};
+  const auto& cMap{map()};
   EXPECT_EQ(cMap[Colors::None], 0);
   const EnumMap<Colors, std::string> stringMap;
   EXPECT_EQ(stringMap[Colors::None], std::string{});
 }
 
 TEST_F(EnumMapTest, NoneThrowsErrorForNonConstOperator) {
-  EXPECT_THROW(call([this] { return _map[Colors::None]; },
+  EXPECT_THROW(call([this] { return map()[Colors::None]; },
                    "index 'enum value 3' is out of range"),
       std::out_of_range);
 }
 
 TEST_F(EnumMapTest, RangeBasedForLoop) {
   std::vector<int> values;
-  for (auto i : _map) values.emplace_back(i);
-  EXPECT_EQ(values, (std::vector{2, 4, 7}));
+  for (auto i : map()) values.emplace_back(i);
+  EXPECT_EQ(values, (std::vector{RedVal, GreenVal, BlueVal}));
 }
 
 TEST_F(EnumMapTest, UninitializedIterator) {
@@ -53,14 +60,14 @@ TEST_F(EnumMapTest, UninitializedIterator) {
 }
 
 TEST_F(EnumMapTest, BadAccess) {
-  EXPECT_THROW(call([this] { return _map[to_enum<Colors>(4U)]; },
+  EXPECT_THROW(call([this] { return map()[to_enum<Colors>(4U)]; },
                    "index 'enum value 4' is out of range"),
       std::out_of_range);
 }
 
 TEST_F(EnumMapTest, IteratorIncrementAndDecrement) {
-  auto i{_map.begin()};
-  ASSERT_NE(i, _map.end());
+  auto i{map().begin()};
+  ASSERT_NE(i, map().end());
   auto j{i};
   EXPECT_NE(++i, j);
   EXPECT_EQ(--i, j);
@@ -69,8 +76,8 @@ TEST_F(EnumMapTest, IteratorIncrementAndDecrement) {
 }
 
 TEST_F(EnumMapTest, IteratorAdditionAndSubtraction) {
-  auto i{_map.begin()};
-  ASSERT_NE(i, _map.end());
+  auto i{map().begin()};
+  ASSERT_NE(i, map().end());
   auto j{i};
   EXPECT_NE(i + 1, j);
   EXPECT_EQ(i + 2, j += 2);
@@ -79,12 +86,12 @@ TEST_F(EnumMapTest, IteratorAdditionAndSubtraction) {
 }
 
 TEST_F(EnumMapTest, BadIncrement) {
-  auto i{_map.begin()};
+  auto i{map().begin()};
   i = i + 1;
-  EXPECT_EQ(i[1], 7);
+  EXPECT_EQ(i[1], BlueVal);
   i += 1;
-  EXPECT_EQ(*i, 7);
-  EXPECT_EQ(++i, _map.end());
+  EXPECT_EQ(*i, BlueVal);
+  EXPECT_EQ(++i, map().end());
   EXPECT_THROW(
       call([&] { return *i; }, "index '3' is out of range"), std::out_of_range);
   EXPECT_THROW(
@@ -96,17 +103,17 @@ TEST_F(EnumMapTest, BadIncrement) {
 }
 
 TEST_F(EnumMapTest, BadDecrement) {
-  auto i{_map.end()};
+  auto i{map().end()};
   EXPECT_THROW(
       call([&] { i -= 4; }, "can't decrement past zero"), std::out_of_range);
   i -= 3;
-  EXPECT_EQ(*i, 2);
+  EXPECT_EQ(*i, RedVal);
   EXPECT_THROW(
       call([&] { --i; }, "can't decrement past zero"), std::out_of_range);
 }
 
 TEST_F(EnumMapTest, IteratorCompare) {
-  auto i{_map.begin()};
+  auto i{map().begin()};
   auto j{i};
   EXPECT_EQ(i, j);
   EXPECT_LE(i, j);
@@ -127,23 +134,23 @@ TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
   EXPECT_EQ(i, j);
   EXPECT_FALSE(i != j);
   // an initialized iterator can't be compared to an initialized one
-  i = _map.begin();
+  i = map().begin();
   EXPECT_THROW(
       call([&] { return i == j; }, "not comparable"), std::domain_error);
   EnumMap<Colors, int> other; // all values are initially set to zero
-  EXPECT_EQ(_map.size(), other.size());
+  EXPECT_EQ(map().size(), other.size());
   j = other.begin();
   // iterators for different collections can't be compared even if they both
   // point to the same locations (begin, middle or end)
   for (int distance{};; ++distance, ++i, ++j) {
-    EXPECT_EQ(i - _map.begin(), distance);
+    EXPECT_EQ(i - map().begin(), distance);
     EXPECT_EQ(j - other.begin(), distance);
     EXPECT_THROW(
         call([&] { return i == j; }, "not comparable"), std::domain_error);
     EXPECT_THROW(
         call([&] { return i - j; }, "not comparable"), std::domain_error);
     // put loop break condition here to let 'end' case get tested as well
-    if (i == _map.end()) break;
+    if (i == map().end()) break;
   }
   EXPECT_EQ(j, other.end());
   EXPECT_EQ(j - other.begin(), 3);

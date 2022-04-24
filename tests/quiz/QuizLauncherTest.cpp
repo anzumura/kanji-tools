@@ -24,14 +24,16 @@ protected:
     _es.clear();
   }
 
-  std::stringstream _is;
+  inline static const std::string Help{", use -h for help"};
 
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
 
-  inline static const std::string Help{", use -h for help"};
+  auto& is() { return _is; }
+private:
+  std::stringstream _is;
 };
 
 TEST_F(QuizLauncherTest, HelpMessage) {
@@ -56,9 +58,9 @@ TEST_F(QuizLauncherTest, ValidOptions) {
     // loop over different question orders: 1=beginning, -1=end, 0=random
     for (const auto j : {"-r1", "-r-1", "-r0"}) {
       const char* args[]{"", i, j};
-      if (i[1] == 'p') _is << "1\n"; // select pattern group bucket
-      _is << "/\n";                  // send 'quit' option
-      QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
+      if (i[1] == 'p') is() << "1\n"; // select pattern group bucket
+      is() << "/\n";                  // send 'quit' option
+      QuizLauncher{args, _data, _groupData, _jukugoData, &is()};
       EXPECT_TRUE(
           _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
       EXPECT_EQ(_es.str(), "");
@@ -68,8 +70,8 @@ TEST_F(QuizLauncherTest, ValidOptions) {
 
 TEST_F(QuizLauncherTest, QuestionOrderQuit) {
   const char* args[]{"", "-p1", "-r"};
-  _is << "/\n"; // quit instead of choosing a question order
-  QuizLauncher{args, _data, _groupData, _jukugoData, &_is};
+  is() << "/\n"; // quit instead of choosing a question order
+  QuizLauncher{args, _data, _groupData, _jukugoData, &is()};
   EXPECT_TRUE(_os.str().ends_with(
       "List order (/=quit, b=from beginning, e=from end, r=random) def 'r': "));
 }
@@ -129,8 +131,8 @@ TEST_F(QuizLauncherTest, SetProgramMode) {
   for (auto& i :
       {std::pair{"--", false}, std::pair{"-r", false}, std::pair{"-t", true}}) {
     const char* args[]{"", i.first};
-    // specifying '&_is' causes launcher to not start automatically
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData, &_is};
+    // specifying '&is()' causes launcher to not start automatically
+    QuizLauncher quiz{args, _data, _groupData, _jukugoData, &is()};
     EXPECT_EQ(quiz.isTestMode(), i.second);
   }
 }

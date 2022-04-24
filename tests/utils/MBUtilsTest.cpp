@@ -84,7 +84,8 @@ TEST(MBUtilsTest, NotValidWithFiveByte) {
   EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidMBUtf8(x));
   // try to make a 'fake valid' string with 5 bytes (which is not valid)
-  x[0] = toChar(0b11'11'10'10);
+  constexpr auto fakeValid{0b11'11'10'10};
+  x[0] = toChar(fakeValid);
   EXPECT_EQ(x.size(), 4);
   auto e{Utf8Result::Valid};
   EXPECT_EQ(validateMBUtf8(x, e), MBUtf8Result::NotValid);
@@ -213,8 +214,8 @@ TEST(MBUtilsTest, ErrorForOverlong) {
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
   fromUtf8Error(std::string{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
   // overlong ō with 3 bytes
-  std::string overlongO{
-      toChar(ThreeBits), toChar(Bit1 | 0b101), toChar(Bit1 | 0b1101)};
+  constexpr auto Byte2{Bit1 | 0b101}, Byte3{Bit1 | 0b1101};
+  std::string overlongO{toChar(ThreeBits), toChar(Byte2), toChar(Byte3)};
   fromUtf8Error(overlongO, U"\ufffd");
   // overlong Euro symbol with 4 bytes
   std::string x{"\xF0\x82\x82\xAC"};

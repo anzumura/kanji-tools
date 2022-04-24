@@ -118,7 +118,7 @@ public:
     const EnumMap<T, V>* _map{};
   };
 private:
-  std::array<V, N> _values;
+  std::array<V, N> _values{};
 };
 
 } // namespace kanji_tools

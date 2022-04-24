@@ -21,7 +21,9 @@ protected:
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
     static const std::string HeaderRow{"Number\tName\tMembers"};
-    for (auto i{1}; i < 7; ++i) write("g" + std::to_string(i) + ".txt", {});
+    // make files for each grade ('g1' to 'g6')
+    for (auto i{1}; i < AllKanjiGrades.size() - 1; ++i)
+      write("g" + std::to_string(i) + ".txt", {});
     write(OtherFile, {});
   }
 
