@@ -49,8 +49,8 @@ public:
 private:
   using Widths = std::vector<size_t>;
 
-  void print(std::ostream&, const Widths&, const Row&, char fill = ' ',
-      char delim = '|') const;
+  static void print(std::ostream&, const Widths&, const Row&, char fill = ' ',
+      char delim = '|');
 
   // 'border' prints a horizontal border row
   void border(std::ostream& os, const Widths& w) const {

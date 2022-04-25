@@ -95,7 +95,7 @@ public:
   // JinmeiKanji class)
   [[nodiscard]] virtual OptString extraTypeInfo() const { return {}; }
 
-  [[nodiscard]] Name name() const { return _name; }
+  [[nodiscard]] Name name() const { return _name.name(); }
   [[nodiscard]] auto variant() const { return _name.isVariant(); }
   [[nodiscard]] auto nonVariantName() const { return _name.nonVariant(); }
 
@@ -154,12 +154,26 @@ public:
   static constexpr auto Legend{".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO "
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
-  // helper class for holding a Kanji name
+  // ctor used by 'LinkedKanji' and 'NonLinkedKanji' classes
+  Kanji(const class Data&, Name, RadicalRef, Strokes, UcdPtr);
+
+  // ctor used by above ctor as well as 'TestKanji' class
+  Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
+      Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
+      const NelsonIds& nelsonIds)
+      : _name{name}, _compatibilityName{compatibilityName}, _radical{radical},
+        _strokes{strokes}, _pinyin{pinyin}, _morohashiId{morohashiId},
+        _nelsonIds{nelsonIds} {}
+
+  inline static const LinkNames EmptyLinkNames;
+private:
+  // 'KanjiName' is a helper class that provides additional checks and methods
+  // related to the string 'name' of a Kanji (possibly extend this more later)
   class KanjiName {
   public:
     explicit KanjiName(Name name);
 
-    [[nodiscard]] operator Name() const { return _name; }
+    [[nodiscard]] Name name() const { return _name; }
 
     // 'isVariant' is true if _name includes a Unicode 'variation selector'. In
     // this case 'nonVariant' returns _name without the selector.
@@ -169,19 +183,6 @@ protected:
     const std::string _name;
   };
 
-  // ctor used by 'LinkedKanji' and 'NonLinkedKanji' classes
-  Kanji(const class Data&, Name, RadicalRef, Strokes, UcdPtr);
-
-  // ctor used by above ctor as well as 'TestKanji' class
-  Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
-      Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
-      const NelsonIds& nelsonIds)
-      : _name{KanjiName{name}}, _compatibilityName{compatibilityName},
-        _radical{radical}, _strokes{strokes}, _pinyin{pinyin},
-        _morohashiId{morohashiId}, _nelsonIds{nelsonIds} {}
-
-  inline static const LinkNames EmptyLinkNames;
-private:
   // 'QualifiedNames' stores the suffixes for qualified names in order of most
   // common to least common (see comments for 'qualifiedName' method and
   // 'Legend' string above for more details).

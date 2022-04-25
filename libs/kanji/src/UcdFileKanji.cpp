@@ -30,16 +30,16 @@ StandardKanji::StandardKanji(DataRef data, Name name, KenteiKyus kyu)
     : UcdFileKanji{data, name, data.findUcd(name)}, _kyu{kyu} {}
 
 FrequencyKanji::FrequencyKanji(DataRef data, Name name, Frequency frequency)
-    : StandardKanji{data, KanjiName(name)}, _frequency{frequency} {}
+    : StandardKanji{data, name}, _frequency{frequency} {}
 
 FrequencyKanji::FrequencyKanji(
     DataRef data, const std::string& name, Reading reading, Frequency frequency)
-    : StandardKanji{data, KanjiName(name), reading}, _frequency{frequency} {}
+    : StandardKanji{data, name, reading}, _frequency{frequency} {}
 
 KenteiKanji::KenteiKanji(DataRef data, Name name, KenteiKyus kyu)
-    : StandardKanji{data, KanjiName(name), kyu} {}
+    : StandardKanji{data, name, kyu} {}
 
 UcdKanji::UcdKanji(DataRef data, const Ucd& u)
-    : UcdFileKanji{data, KanjiName(u.name()), &u} {}
+    : UcdFileKanji{data, u.name(), &u} {}
 
 } // namespace kanji_tools

@@ -35,11 +35,11 @@ std::string Kanji::KanjiName::nonVariant() const {
 }
 
 Kanji::Kanji(DataRef d, Name n, RadicalRef radical, Strokes strokes, UcdPtr u)
-    : Kanji{n, d.getCompatibilityName(n), radical, strokes, d.getPinyin(u),
-          d.getMorohashiId(u), d.getNelsonIds(u)} {}
+    : Kanji{n, d.getCompatibilityName(n), radical, strokes, Data::getPinyin(u),
+          Data::getMorohashiId(u), Data::getNelsonIds(u)} {}
 
 std::string Kanji::compatibilityName() const {
-  return _compatibilityName.value_or(_name);
+  return _compatibilityName.value_or(_name.name());
 }
 
 Kanji::Frequency Kanji::frequencyOrDefault(Frequency x) const {

@@ -12,13 +12,14 @@ class UcdData {
 public:
   using Map = std::map<std::string, Ucd>;
 
+  // 'getMeaning' is a helper function that returns 'meaning' from the given
+  // pointer if it's non-null or an empty string
+  [[nodiscard]] static Ucd::Meaning getMeaning(UcdPtr);
+
   UcdData() = default;
 
   UcdData(const UcdData&) = delete;
   UcdData& operator=(const UcdData&) = delete;
-
-  // 'getMeaning' returns 'meaning' loaded from UCD file
-  [[nodiscard]] const std::string& getMeaning(UcdPtr) const;
 
   // 'getReadingsAsKana' returns a (wide) comma separated string starting with
   // 'onReading' converted to Katakana followed by 'kunReading' converted to

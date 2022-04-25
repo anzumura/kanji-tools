@@ -165,7 +165,8 @@ private:
   explicit EnumArray(const std::string& name) { setName(name, N - 1); }
 
   template<typename... Names>
-  EnumArray(const std::string& name, Names... args) : EnumArray{args...} {
+  explicit EnumArray(const std::string& name, Names... args)
+      : EnumArray{args...} {
     setName(name, N - 1 - sizeof...(args));
   }
 
@@ -208,7 +209,7 @@ private:
   explicit EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
 
   template<typename... Names>
-  EnumArrayWithNone(const std::string& name, Names... args)
+  explicit EnumArrayWithNone(const std::string& name, Names... args)
       : EnumArrayWithNone{args...} {
     setName(name, N - 1 - sizeof...(args));
   }

@@ -136,7 +136,7 @@ template<>
 
 template<typename T>
 [[nodiscard]] inline auto firstConvert(T pred, T conv, const std::string& s) {
-  if (s.size() && pred(s[0])) {
+  if (!s.empty() && pred(s[0])) {
     std::string result{s};
     result[0] = toChar(conv(result[0]));
     return result;

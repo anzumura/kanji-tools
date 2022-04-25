@@ -12,25 +12,35 @@ namespace {
 // 'PrintCount' is used for debug printing. Some combinations are prevented by
 // 'load' function (like Joyo with a link or missing meaning), but count all
 // cases for completeness.
-struct PrintCount {
-  size_t count{}, link{}, variantStrokes{}, meaning{}, onReading{},
-      kunReading{}, morohashi{}, nelson{};
-
+class PrintCount {
+public:
   void add(const Ucd& k) {
-    ++count;
-    if (k.hasLinks()) ++link;
-    if (k.strokes().hasVariant()) ++variantStrokes;
-    if (!k.meaning().empty()) ++meaning;
-    if (!k.onReading().empty()) ++onReading;
-    if (!k.kunReading().empty()) ++kunReading;
-    if (k.morohashiId()) ++morohashi;
-    if (!k.nelsonIds().empty()) ++nelson;
+    ++_count;
+    if (k.hasLinks()) ++_link;
+    if (k.strokes().hasVariant()) ++_variantStrokes;
+    if (!k.meaning().empty()) ++_meaning;
+    if (!k.onReading().empty()) ++_onReading;
+    if (!k.kunReading().empty()) ++_kunReading;
+    if (k.morohashiId()) ++_morohashi;
+    if (!k.nelsonIds().empty()) ++_nelson;
   }
-}; // LCOV_EXCL_LINE: covered
+
+  [[nodiscard]] auto count() const { return _count; }
+  [[nodiscard]] auto link() const { return _link; }
+  [[nodiscard]] auto variantStrokes() const { return _variantStrokes; }
+  [[nodiscard]] auto meaning() const { return _meaning; }
+  [[nodiscard]] auto onReading() const { return _onReading; }
+  [[nodiscard]] auto kunReading() const { return _kunReading; }
+  [[nodiscard]] auto morohashi() const { return _morohashi; }
+  [[nodiscard]] auto nelson() const { return _nelson; }
+private:
+  size_t _count{}, _link{}, _variantStrokes{}, _meaning{}, _onReading{},
+      _kunReading{}, _morohashi{}, _nelson{};
+};
 
 } // namespace
 
-const std::string& UcdData::getMeaning(UcdPtr u) const {
+Ucd::Meaning UcdData::getMeaning(UcdPtr u) {
   return u ? u->meaning() : EmptyString;
 }
 
@@ -143,11 +153,12 @@ void UcdData::load(const Data::Path& file) {
 }
 
 void UcdData::print(DataRef data) const {
-  const auto print{[&data](const char* s, auto x, auto y, auto z) {
+  PrintCount joyo, jinmei, other;
+  const auto print{[&](const char* s, auto f) {
+    const auto x{(joyo.*f)()}, y{(jinmei.*f)()}, z{(other.*f)()};
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x
                << ", Jinmei " << y << ", Other " << z << ")\n";
   }};
-  PrintCount joyo, jinmei, other;
   data.log() << "Kanji Loaded from Unicode 'ucd' file:\n";
   for (auto& i : _map)
     if (auto& k{i.second}; k.joyo())
@@ -156,15 +167,14 @@ void UcdData::print(DataRef data) const {
       jinmei.add(k);
     else
       other.add(k);
-  print("Total", joyo.count, jinmei.count, other.count);
-  print("Links", joyo.link, jinmei.link, other.link);
-  print("VStrokes", joyo.variantStrokes, jinmei.variantStrokes,
-      other.variantStrokes);
-  print("Meanings", joyo.meaning, jinmei.meaning, other.meaning);
-  print("On Readdings", joyo.onReading, jinmei.onReading, other.onReading);
-  print("Kun Readings", joyo.kunReading, jinmei.kunReading, other.kunReading);
-  print("Morohashi Ids", joyo.morohashi, jinmei.morohashi, other.morohashi);
-  print("Nelson Ids", joyo.nelson, jinmei.nelson, other.nelson);
+  print("Total", &PrintCount::count);
+  print("Links", &PrintCount::link);
+  print("VStrokes", &PrintCount::variantStrokes);
+  print("Meanings", &PrintCount::meaning);
+  print("On Readdings", &PrintCount::onReading);
+  print("Kun Readings", &PrintCount::kunReading);
+  print("Morohashi Ids", &PrintCount::morohashi);
+  print("Nelson Ids", &PrintCount::nelson);
   const auto pLinks{[this, &data](const std::string& name, const auto& list) {
     const auto count{
         std::count_if(list.begin(), list.end(), [this](const auto& i) {

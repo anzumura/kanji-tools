@@ -80,7 +80,7 @@ protected:
       : DataFile{p, FileType::MultiplePerLine, &UniqueTypeNames,
             kanji_tools::toString(type)},
         _type{type} {}
-protected:
+
   [[nodiscard]] T type() const { return _type; }
 private:
   const T _type;

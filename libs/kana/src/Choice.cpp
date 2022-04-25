@@ -80,7 +80,7 @@ char Choice::get(const std::string& msg, bool useQuit, const Range& range,
   auto choices{choicesIn};
   for (auto i{range.first}; i <= range.second; ++i)
     if (!choices.emplace(i, EmptyString).second)
-      error(RangeError + " '" + i + AlreadyInChoices);
+      error((RangeError + " '") += (i + AlreadyInChoices));
   return get(msg, useQuit, choices, def);
 }
 
