@@ -86,22 +86,18 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
   auto endOptions{false}, showMeanings{false};
   for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
     if (std::string arg{args[i]};
-        !endOptions && arg.starts_with("-") && arg.size() > 1) {
-      if (arg == "-h") {
-        out() << HelpMessage;
-        return;
-      }
-      if (arg == "--")
-        endOptions = true;
-      else if (arg == "-s")
-        showMeanings = true;
-      else if (const auto c{processArg(question, quizType, arg)}; c)
-        qList = c; // only set 'qList' if a non-empty value was returned
-    } else {
-      // show details for a 'kanji' (instead of running a test or review)
+        endOptions || !arg.starts_with("-") || arg.size() < 2) {
       processKanjiArg(arg);
-      return;
-    }
+      return; // exit after showing info for a Kanji, i.e., don't start a quiz
+    } else if (arg == "-h") {
+      out() << HelpMessage;
+      return; // exit after showing help message
+    } else if (arg == "--")
+      endOptions = true;
+    else if (arg == "-s")
+      showMeanings = true;
+    else if (const auto c{processArg(question, quizType, arg)}; c)
+      qList = c; // only set 'qList' if a non-empty value was returned
   if (!data->debug() && (!in || quizType))
     start(quizType, qList, question, showMeanings);
 }
