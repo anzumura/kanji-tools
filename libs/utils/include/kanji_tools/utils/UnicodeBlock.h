@@ -10,13 +10,17 @@ namespace kanji_tools {
 class UnicodeVersion {
 public:
   consteval UnicodeVersion(const char* v, uint8_t m, uint16_t y)
-      : version{v}, month{m}, year{y} {}
+      : _version{v}, _month{m}, _year{y} {}
 
   UnicodeVersion(const UnicodeVersion&) = delete;
 
-  const char* const version;
-  const uint8_t month;
-  const uint16_t year;
+  constexpr auto version() const { return _version; }
+  constexpr auto month() const { return _month; }
+  constexpr auto year() const { return _year; }
+private:
+  const char* const _version;
+  const uint8_t _month;
+  const uint16_t _year;
 };
 
 // 'UnicodeBlock' holds a range which is used in the 'is' functions ('isKanji',

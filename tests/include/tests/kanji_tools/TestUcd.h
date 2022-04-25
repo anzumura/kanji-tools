@@ -22,10 +22,10 @@ public:
   using Reading = Ucd::Reading;
 
   // allow setting 'name' via the ctor since it's the more commonly used field
-  TestUcd(Name name = "一") : _name(name) {}
+  explicit TestUcd(Name name = "一") : _name(name) {}
 
   // conversion opterator to create a Ucd instance
-  [[nodiscard]] operator Ucd() const {
+  [[nodiscard]] explicit operator Ucd() const {
     return Ucd{{_code ? _code : getCode(_name), _name}, _block, _version,
         _radical,
         _variantStrokes ? Strokes{_strokes, _variantStrokes}

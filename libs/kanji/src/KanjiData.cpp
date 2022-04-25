@@ -76,7 +76,7 @@ KenteiKyus KanjiData::kyu(const std::string& k) const {
   return KenteiKyus::None;
 }
 
-void KanjiData::noFreq(long f, bool brackets) const {
+void KanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
   if (f) {
     if (brackets)
       out() << " (";

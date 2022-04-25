@@ -40,6 +40,29 @@ Args::Size Data::nextArg(const Args& args, Args::Size current) {
 
 Kanji::Frequency Data::maxFrequency() { return _maxFrequency; }
 
+const Pinyin& Data::getPinyin(UcdPtr u) {
+  static constexpr Pinyin EmptyPinyin;
+  return u ? u->pinyin() : EmptyPinyin;
+}
+
+const MorohashiId& Data::getMorohashiId(UcdPtr u) {
+  static constexpr MorohashiId EmptyMorohashiId;
+  return u ? u->morohashiId() : EmptyMorohashiId;
+}
+
+Kanji::NelsonIds Data::getNelsonIds(UcdPtr u) {
+  if (u && !u->nelsonIds().empty()) {
+    Kanji::NelsonIds ids;
+    auto s{u->nelsonIds()};
+    std::replace(s.begin(), s.end(), ',', ' ');
+    std::stringstream ss{s};
+    Kanji::NelsonId id{};
+    while (ss >> id) ids.emplace_back(id);
+    return ids;
+  }
+  return EmptyNelsonIds;
+}
+
 Data::Data(const Path& dataDir, DebugMode debugMode, std::ostream& out,
     std::ostream& err)
     : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
@@ -68,29 +91,6 @@ Strokes Data::ucdStrokes(const std::string& kanji, UcdPtr u) const {
 
 RadicalRef Data::getRadicalByName(const std::string& radicalName) const {
   return _radicals.find(radicalName);
-}
-
-const Pinyin& Data::getPinyin(UcdPtr u) const {
-  static constexpr Pinyin EmptyPinyin;
-  return u ? u->pinyin() : EmptyPinyin;
-}
-
-const MorohashiId& Data::getMorohashiId(UcdPtr u) const {
-  static constexpr MorohashiId EmptyMorohashiId;
-  return u ? u->morohashiId() : EmptyMorohashiId;
-}
-
-Kanji::NelsonIds Data::getNelsonIds(UcdPtr u) const {
-  if (u && !u->nelsonIds().empty()) {
-    Kanji::NelsonIds ids;
-    auto s{u->nelsonIds()};
-    std::replace(s.begin(), s.end(), ',', ' ');
-    std::stringstream ss{s};
-    Kanji::NelsonId id{};
-    while (ss >> id) ids.emplace_back(id);
-    return ids;
-  }
-  return EmptyNelsonIds;
 }
 
 Kanji::OptString Data::getCompatibilityName(const std::string& kanji) const {

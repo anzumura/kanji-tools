@@ -113,7 +113,7 @@ private:
 
 template<typename Pred> class MBCountIf : public MBCount {
 public:
-  MBCountIf(Pred pred, OptRegex find = {},
+  explicit MBCountIf(Pred pred, OptRegex find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : MBCount{find, replace, debug}, _pred{pred} {}
 private:

@@ -9,7 +9,7 @@ public:
   inline static const Radical TestRadical{1, {}, {}, {}, {}};
   inline static const std::string TestMeaning{"test"}, TestReading{"テスト"};
 
-  TestKanji(Name name, const OptString& compatibilityName = {})
+  explicit TestKanji(Name name, const OptString& compatibilityName = {})
       : Kanji{name, compatibilityName, TestRadical, Strokes{1}, {}, {}, {}} {}
 
   [[nodiscard]] KanjiTypes type() const override { return _type; }

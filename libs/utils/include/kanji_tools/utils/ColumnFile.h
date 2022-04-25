@@ -13,7 +13,7 @@ namespace kanji_tools {
 // tab) separated text file with a header row (containing the column names).
 class ColumnFile {
 public:
-  using ULong = unsigned long;
+  using ULong = uint64_t;
 
   // 'Column' has a name that must match a column header in the file being
   // processed. The set of columns for a 'ColumnFile' are passed into its ctor

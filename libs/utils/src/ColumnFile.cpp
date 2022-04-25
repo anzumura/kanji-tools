@@ -118,7 +118,7 @@ ColumnFile::OptULong ColumnFile::getOptULong(const Column& c, ULong max) const {
   return processULong(s, c, max);
 }
 
-unsigned long ColumnFile::processULong(
+ColumnFile::ULong ColumnFile::processULong(
     const std::string& s, const Column& column, ULong max) const {
   unsigned long i{};
   try {

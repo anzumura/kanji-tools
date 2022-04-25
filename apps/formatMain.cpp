@@ -6,16 +6,12 @@
 #include <iostream>
 #include <regex>
 
-using namespace kanji_tools;
-namespace fs = std::filesystem;
+using kanji_tools::Args, kanji_tools::KanjiRange, kanji_tools::KanaRange,
+    kanji_tools::fromUtf8ToWstring;
 
-int main(int argc, const char** argv) {
-  const Args args(argc, argv);
-  if (args.size() < 2) {
-    std::cerr << "specify a file to format\n";
-    return 1;
-  }
-  const auto file{args[1]};
+void format(Args args) {
+  if (args.size() < 2) throw std::domain_error{"specify a file to format"};
+  const auto* const file{args[1]};
   const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange() + L"]{1}$"},
       allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
   std::fstream f{file};
@@ -41,6 +37,15 @@ int main(int argc, const char** argv) {
     else
       std::cout << line << '\n';
     prevLine = line;
+  }
+}
+
+int main(int argc, const char** argv) {
+  try {
+    format({argc, argv});
+  } catch (const std::exception& err) {
+    std::cerr << err.what() << '\n';
+    return 1;
   }
   return 0;
 }

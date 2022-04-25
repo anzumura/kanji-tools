@@ -43,6 +43,17 @@ public:
 
   [[nodiscard]] static Kanji::Frequency maxFrequency();
 
+  // 'getPinyin' is a helper function to return pinyin value from the UcdPtr
+  // if the pointer is non-null, otherwise an empty value is returned.
+  [[nodiscard]] static const Pinyin& getPinyin(UcdPtr);
+
+  // 'getMorohashiId' returns a 'Dai Kan-Wa Jiten' index number (see comments in
+  // scripts/parseUcdAllFlat.sh)
+  [[nodiscard]] static const MorohashiId& getMorohashiId(UcdPtr);
+
+  // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
+  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr);
+
   Data(const Path& dataDir, DebugMode, std::ostream& out = std::cout,
       std::ostream& err = std::cerr);
 
@@ -64,15 +75,6 @@ public:
   // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   [[nodiscard]] virtual RadicalRef getRadicalByName(
       const std::string& radicalName) const;
-
-  [[nodiscard]] const Pinyin& getPinyin(UcdPtr) const;
-
-  // 'getMorohashiId' returns a 'Dai Kan-Wa Jiten' index number (see comments in
-  // scripts/parseUcdAllFlat.sh)
-  [[nodiscard]] const MorohashiId& getMorohashiId(UcdPtr) const;
-
-  // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
-  Kanji::NelsonIds getNelsonIds(UcdPtr) const;
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given
   // 'kanji' if it exists (_ucd.find method takes care of checking whether

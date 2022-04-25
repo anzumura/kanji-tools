@@ -19,7 +19,7 @@ public:
   [[nodiscard]] KenteiKyus kyu(const std::string&) const override;
 private:
   // functions to print loaded data if _debug is true
-  void noFreq(long f, bool brackets = false) const; // print no-freq count
+  void noFreq(std::ptrdiff_t f, bool brackets = false) const;
   template<typename T>
   void printCount(const std::string& name, T pred, size_t = 0) const;
   void printStats() const;

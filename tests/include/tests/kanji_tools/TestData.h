@@ -27,7 +27,7 @@ protected:
 
   ~TestData() override { clear(); }
 
-  void clear() {
+  static void clear() {
     _os.str({});
     _os.clear();
     _es.str({});

@@ -109,17 +109,17 @@ private:
   // function to avoid order of static initialization problems
   static const Tokens& tokens();
 
-  [[nodiscard]] auto& afterN(CharType source) const {
+  [[nodiscard]] static auto& afterN(CharType source) {
     return tokens().afterN(source);
   }
-  [[nodiscard]] auto& smallKana(CharType source) const {
+  [[nodiscard]] static auto& smallKana(CharType source) {
     return tokens().smallKana(source);
   }
   [[nodiscard]] static auto& repeatingConsonents() {
     return tokens().repeatingConsonents();
   }
-  [[nodiscard]] auto& narrowDelims() const { return tokens().narrowDelims(); }
-  [[nodiscard]] auto& wideDelims() const { return tokens().wideDelims(); }
+  [[nodiscard]] static auto& narrowDelims() { return tokens().narrowDelims(); }
+  [[nodiscard]] static auto& wideDelims() { return tokens().wideDelims(); }
 
   [[nodiscard]] auto romajiTarget() const {
     return _target == CharType::Romaji;

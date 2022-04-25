@@ -1,9 +1,20 @@
----
-Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,
-         -*-avoid-c-arrays,-clang-diagnostic-pragma-once-outside-header,
+# enable a broad set of checks using 'blah-*', then disable the most noisy (or
+# unwanted) ones for now - some of the checks are of couse 'style related' ...
+
+Checks: 'bugprone-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,
+         google-*,hicpp-*,llvm-*,misc-*,modernize-*,performance-*,readability-*,
+         -*-avoid-c-arrays,-*-braces-around-statements,-*-named-parameter,
+         -*-qualified-auto,-*-special-member-functions,
+         -clang-diagnostic-pragma-once-outside-header,
          -cppcoreguidelines-avoid-non-const-global-variables,
          -cppcoreguidelines-pro-bounds-constant-array-index,
          -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
          -cppcoreguidelines-pro-type-static-cast-downcast,
-         -cppcoreguidelines-special-member-functions,
-         -modernize-pass-by-value,-modernize-use-trailing-return-type'
+         -hicpp-no-array-decay,-llvm-header-guard,
+         -modernize-pass-by-value,-modernize-use-trailing-return-type,
+         -readability-implicit-bool-conversion,-readability-isolate-declaration'
+
+# Note on 'pragma' related:
+# - 'clang-diagnostic-pragma-once-outside-header': shouldn't need to turn this
+#   off but is seems like there's a bug somewhere in VS Code or clang-tidy ...
+# - 'llvm-header-guard': guards were used at first, but changed to #pragma once

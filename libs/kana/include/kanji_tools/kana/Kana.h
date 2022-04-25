@@ -71,7 +71,7 @@ public:
     using RMax = CharArray<RomajiArrayMaxSize>;
 
     RomajiVariants() = default;
-    explicit RomajiVariants(RomajiVariants&&) = default; // only allow moving
+    RomajiVariants(RomajiVariants&&) = default; // only allow moving
 
     template<size_t R>
     explicit RomajiVariants(CharArray<R> r, bool kunrei = false)
@@ -252,7 +252,7 @@ protected:
   // non-const '_variants' field, but other fields will get copied because they
   // are all 'const' (copy is fine since the other fields are all short strings
   // that would not benefit from move anyway because of SSO).
-  explicit Kana(Kana&&) = default;
+  Kana(Kana&&) = default;
 private:
   template<size_t R, size_t N>
   Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
@@ -289,7 +289,7 @@ private:
 class DakutenKana : public Kana {
 public:
   template<typename... T>
-  DakutenKana(Kana&& dakuten, T&&... t)
+  explicit DakutenKana(Kana&& dakuten, T&&... t)
       : Kana{std::forward<T>(t)...}, _dakuten{std::move(dakuten), *this} {}
 
   [[nodiscard]] const Kana* dakuten() const override { return &_dakuten; }
@@ -321,7 +321,7 @@ private:
 class HanDakutenKana : public DakutenKana {
 public:
   template<typename... T>
-  HanDakutenKana(Kana&& hanDakuten, T&&... t)
+  explicit HanDakutenKana(Kana&& hanDakuten, T&&... t)
       : DakutenKana{std::forward<T>(t)...}, _hanDakuten{
                                                 std::move(hanDakuten), *this} {}
 
