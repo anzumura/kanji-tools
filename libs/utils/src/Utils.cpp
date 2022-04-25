@@ -1,7 +1,6 @@
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Utils.h>
 
-#include <algorithm>
 #include <numeric>
 #include <stdexcept>
 
