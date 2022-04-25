@@ -48,12 +48,12 @@ UcdPtr UcdData::find(const std::string& kanjiName) const {
   auto r{kanjiName};
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
     const auto nonVariant{MBChar::noVariationSelector(kanjiName)};
-    if (const auto i{_linkedJinmei.find(nonVariant)}; i == _linkedJinmei.end())
+    if (const auto i{_linkedJinmei.find(nonVariant)}; i != _linkedJinmei.end())
+      r = i->second; // return jinmei variant
+    else
       // could check _linkedOther, but so far this never happens so just return
       // nullptr, i.e., 'variant is not found in the data loaded from ucd.txt'
-      return nullptr;
-    else
-      r = i->second; // return jinmei variant
+      return {};
   }
   const auto i{_map.find(r)};
   return i == _map.end() ? nullptr : &i->second;

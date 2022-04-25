@@ -179,7 +179,7 @@ bool MBChar::isValid(bool sizeOne) const {
 std::string MBChar::getMBUtf8(const char*& loc) {
   const auto firstOfGroup{toUChar(*loc)};
   std::string result{*loc++};
-  for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1) result += *loc++;
+  for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1U) result += *loc++;
   return result;
 }
 

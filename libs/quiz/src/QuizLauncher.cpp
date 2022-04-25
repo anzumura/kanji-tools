@@ -75,8 +75,9 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 
 } // namespace
 
-QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
-    GroupDataPtr groupData, JukugoDataPtr jukugoData, std::istream* in)
+QuizLauncher::QuizLauncher(const Args& args, const DataPtr& data,
+    const GroupDataPtr& groupData, const JukugoDataPtr& jukugoData,
+    std::istream* in)
     : _programMode{ProgramMode::NotAssigned},
       _questionOrder{QuestionOrder::NotAssigned},
       _randomizeAnswers{true}, _choice{data->out(), in, QuitOption},

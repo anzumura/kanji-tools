@@ -26,7 +26,7 @@ protected:
   NonLinkedKanji(
       DataRef data, Name name, RadicalRef radical, Reading reading, UcdPtr u)
       : NonLinkedKanji{data, name, radical, data.ucdStrokes(name, u),
-            data.ucd().getMeaning(u), reading, u} {}
+            UcdData::getMeaning(u), reading, u} {}
 private:
   const std::string _meaning;
   const std::string _reading;

@@ -84,13 +84,7 @@ void RadicalData::print(DataRef data) const {
   printMissingRadicals(data, radicals);
 }
 
-void RadicalData::checkLoaded() const {
-  if (_radicals.empty())
-    throw std::domain_error("must call 'load' before calling 'find'");
-}
-
-void RadicalData::printRadicalLists(
-    DataRef data, RadicalLists& radicals) const {
+void RadicalData::printRadicalLists(DataRef data, RadicalLists& radicals) {
   Count total;
   for (auto& i : radicals) {
     auto& l{i.second};
@@ -112,6 +106,11 @@ void RadicalData::printRadicalLists(
   }
   data.log() << "  Total for " << radicals.size() << " radicals: ";
   printCounts(data, total, true);
+}
+
+void RadicalData::checkLoaded() const {
+  if (_radicals.empty())
+    throw std::domain_error("must call 'load' before calling 'find'");
 }
 
 void RadicalData::printMissingRadicals(

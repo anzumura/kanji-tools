@@ -53,9 +53,7 @@ private:
       char delim = '|');
 
   // 'border' prints a horizontal border row
-  void border(std::ostream& os, const Widths& w) const {
-    print(os, w, {}, '-', '+');
-  }
+  static void border(std::ostream&, const Widths&);
 
   const Row _title;
   const bool _countInFirstColumn;

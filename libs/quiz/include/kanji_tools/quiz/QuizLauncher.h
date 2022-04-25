@@ -19,8 +19,8 @@ public:
 
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.
-  QuizLauncher(
-      const Args&, DataPtr, GroupDataPtr, JukugoDataPtr, std::istream* in = {});
+  QuizLauncher(const Args&, const DataPtr&, const GroupDataPtr&,
+      const JukugoDataPtr&, std::istream* in = {});
 
   QuizLauncher(const QuizLauncher&) = delete;
 
@@ -28,7 +28,7 @@ public:
   // or Group based). 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the
   // type of quiz/review and 'questionList' can also be provided (values depend
   // on quiz type - see Quiz.cpp 'HelpMessage' for details).
-  void start(OptChar quizType, OptChar questionList, Question question = 0,
+  void start(OptChar quizType, OptChar qList, Question question = 0,
       bool showMeanings = false, bool randomizeAnswers = true);
 
   [[nodiscard]] std::ostream& log(bool heading = false) const;
@@ -56,8 +56,8 @@ private:
 
   void startListQuiz(Question question, bool showMeanings,
       KanjiInfo excludeField, const KanjiList&) const;
-  void startGroupQuiz(Question question, bool showMeanings,
-      OptChar questionList, const GroupData::List& list) const;
+  void startGroupQuiz(Question question, bool showMeanings, OptChar qList,
+      const GroupData::List& list) const;
 
   [[nodiscard]] Kanji::NelsonId getId(
       const std::string& msg, const std::string& arg) const;

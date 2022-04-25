@@ -88,4 +88,8 @@ void Table::print(std::ostream& os, const Widths& widths, const Row& row,
   os << delim << '\n';
 }
 
+void Table::border(std::ostream& os, const Widths& w) {
+  print(os, w, {}, '-', '+');
+}
+
 } // namespace kanji_tools

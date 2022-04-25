@@ -21,7 +21,7 @@ const Data::Path& GroupData::dataDir(const Data::Path* dir) const {
   return dir ? *dir : _data->dataDir();
 }
 
-GroupData::GroupData(DataPtr data, const Data::Path* dir) : _data{data} {
+GroupData::GroupData(const DataPtr& data, const Data::Path* dir) : _data{data} {
   loadGroup(DataFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
       _meaningGroups, GroupType::Meaning);
   loadGroup(DataFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
@@ -33,16 +33,16 @@ GroupData::GroupData(DataPtr data, const Data::Path* dir) : _data{data} {
 }
 
 void GroupData::add(
-    const std::string& name, Map& groups, const GroupPtr& group) const {
-  const auto i{groups.emplace(name, group)};
-  if (!i.second)
-    _data->printError(name + " from " + group->toString() + " already in " +
-                      i.first->second->toString());
+    const std::string& kanji, MultiMap& groups, const GroupPtr& group) {
+  groups.emplace(kanji, group);
 }
 
 void GroupData::add(
-    const std::string& name, MultiMap& groups, const GroupPtr& group) const {
-  groups.emplace(name, group);
+    const std::string& kanji, Map& groups, const GroupPtr& group) const {
+  const auto i{groups.emplace(kanji, group)};
+  if (!i.second)
+    _data->printError(kanji + " from " + group->toString() + " already in " +
+                      i.first->second->toString());
 }
 
 template<typename T>

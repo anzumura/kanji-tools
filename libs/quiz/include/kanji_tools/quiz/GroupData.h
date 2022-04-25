@@ -15,7 +15,7 @@ public:
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()' when
   // looking for group files (to help with testing)
-  explicit GroupData(DataPtr data, const Data::Path* dir = {});
+  explicit GroupData(const DataPtr&, const Data::Path* dir = {});
 
   GroupData(const GroupData&) = delete;
   GroupData& operator=(const GroupData&) = delete;
@@ -32,11 +32,11 @@ public:
 private:
   const Data::Path& dataDir(const Data::Path*) const;
 
+  // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
+  static void add(const std::string& kanji, MultiMap&, const GroupPtr& group);
+
   // add 'kanji'->'group' mapping or log an error if it's already been added
   void add(const std::string& kanji, Map&, const GroupPtr& group) const;
-
-  // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
-  void add(const std::string& kanji, MultiMap&, const GroupPtr& group) const;
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 

@@ -16,11 +16,11 @@ public:
   [[nodiscard]] bool linkedReadings() const override { return true; }
   [[nodiscard]] OptString newName() const override;
 protected:
-  LinkedKanji(DataRef, Name, KanjiPtr, UcdPtr);
+  LinkedKanji(DataRef, Name, const KanjiPtr&, UcdPtr);
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to
   // either Jouyou or Jinmei
-  [[nodiscard]] static Name checkType(Name, KanjiPtr, bool isJinmei = false);
+  [[nodiscard]] static Name checkType(Name, const Kanji&, bool isJouyou = true);
 private:
   const Frequency _frequency;
   const KenteiKyus _kyu;
@@ -29,7 +29,7 @@ private:
 
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
-  LinkedJinmeiKanji(DataRef, Name, KanjiPtr);
+  LinkedJinmeiKanji(DataRef, Name, const KanjiPtr&);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::LinkedJinmei;
@@ -38,7 +38,7 @@ public:
 
 class LinkedOldKanji : public LinkedKanji {
 public:
-  LinkedOldKanji(DataRef, Name, KanjiPtr);
+  LinkedOldKanji(DataRef, Name, const KanjiPtr&);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::LinkedOld;

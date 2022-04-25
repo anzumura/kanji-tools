@@ -35,12 +35,13 @@ private:
   // the above 'print' function (examples are sorted by assending stroke count).
   enum Values { MaxExamples = 12 };
 
-  void checkLoaded() const;
-
   using KanjiList = std::vector<std::shared_ptr<class Kanji>>;
   using RadicalLists = std::map<Radical, KanjiList>;
 
-  void printRadicalLists(const Data&, RadicalLists&) const;
+  static void printRadicalLists(const Data&, RadicalLists&);
+
+  void checkLoaded() const;
+
   void printMissingRadicals(const Data&, const RadicalLists&) const;
 
   // '_radicals' is populated from radicals.txt and the index in the vector is
