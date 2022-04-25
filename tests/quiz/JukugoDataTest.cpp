@@ -15,7 +15,7 @@ class JukugoDataTest : public ::testing::Test {
 protected:
   static JukugoData create() { return JukugoData{_data, &TestDir}; }
 
-  static void SetUpTestCase() { _data = std::make_shared<KanjiData>(); }
+  static void SetUpTestSuite() { _data = std::make_shared<KanjiData>(); }
 
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();

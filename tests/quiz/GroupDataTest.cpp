@@ -15,7 +15,7 @@ class GroupDataTest : public ::testing::Test {
 protected:
   static GroupData create() { return GroupData{_data, &TestDir}; }
 
-  static void SetUpTestCase() {
+  static void SetUpTestSuite() {
     _data = std::make_shared<KanjiData>(Args{}, _os, _es);
   }
 
@@ -31,7 +31,7 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  void write(const fs::path& f, const std::string& s) {
+  static void write(const fs::path& f, const std::string& s) {
     std::ofstream of{f, std::ios_base::app};
     of << s;
     of.close();
@@ -56,10 +56,10 @@ TEST_F(GroupDataTest, SanityChecks) {
   // numbers are unique and each group member is in 'groupMap'
   const auto checkNumber{[](const GroupData::List& list, const auto& groupMap) {
     std::set<size_t> uniqueNumbers;
-    for (auto i : list) {
+    for (const auto& i : list) {
       EXPECT_TRUE(uniqueNumbers.insert(i->number()).second)
           << i->name() << " has duplicate number " << i->number();
-      for (auto j : i->members())
+      for (const auto& j : i->members())
         EXPECT_TRUE(groupMap.contains(j->name()))
             << j->name() << "from group " << i->name() << " missing from map";
     }

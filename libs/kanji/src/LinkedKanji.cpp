@@ -14,8 +14,7 @@ LinkedKanji::LinkedKanji(
     : Kanji{data, name, data.ucdRadical(name, u), data.ucdStrokes(name, u), u},
       _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
 
-Kanji::Name LinkedKanji::checkType(
-    Name name, const Kanji& link, bool isJouyou) {
+Kanji::Name LinkedKanji::linkType(Name name, const Kanji& link, bool isJouyou) {
   if (const auto t{link.type()};
       t != KanjiTypes::Jouyou && (isJouyou || t != KanjiTypes::Jinmei))
     throw std::domain_error{
@@ -30,9 +29,9 @@ Kanji::Name LinkedKanji::checkType(
 LinkedJinmeiKanji::LinkedJinmeiKanji(
     DataRef data, Name name, const KanjiPtr& link)
     : LinkedKanji{
-          data, checkType(name, *link, false), link, data.findUcd(name)} {}
+          data, linkType(name, *link, false), link, data.findUcd(name)} {}
 
 LinkedOldKanji::LinkedOldKanji(DataRef data, Name name, const KanjiPtr& link)
-    : LinkedKanji{data, checkType(name, *link), link, data.findUcd(name)} {}
+    : LinkedKanji{data, linkType(name, *link), link, data.findUcd(name)} {}
 
 } // namespace kanji_tools

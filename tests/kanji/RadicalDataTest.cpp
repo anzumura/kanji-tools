@@ -4,8 +4,6 @@
 
 namespace kanji_tools {
 
-namespace fs = std::filesystem;
-
 namespace {
 
 class RadicalDataTest : public TestData {

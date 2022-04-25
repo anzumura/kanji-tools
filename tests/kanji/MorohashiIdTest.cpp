@@ -111,7 +111,7 @@ TEST(MorohashiIdTest, TooBig) {
   const size_t big{MorohashiId::MaxId + 1};
   for (auto i : {big, big + 10, big + 100, big * 2}) {
     const std::string id{std::to_string(i)};
-    for (auto j : {"H" + id, id + "P", id + "PP", id + "'", id + "''"})
+    for (const auto& j : {"H" + id, id + "P", id + "PP", id + "'", id + "''"})
       EXPECT_THROW(call([j] { MorohashiId{j}; }, error(j, "exceeds max")),
           std::domain_error);
   }

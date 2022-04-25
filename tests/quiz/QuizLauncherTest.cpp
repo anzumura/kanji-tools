@@ -9,7 +9,7 @@ namespace kanji_tools {
 
 class QuizLauncherTest : public ::testing::Test {
 protected:
-  static void SetUpTestCase() {
+  static void SetUpTestSuite() {
     _data = std::make_shared<KanjiData>(Args{}, _os, _es);
     _groupData = std::make_shared<GroupData>(_data);
     _jukugoData = std::make_shared<JukugoData>(_data);

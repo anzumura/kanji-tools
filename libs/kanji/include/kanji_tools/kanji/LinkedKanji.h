@@ -20,7 +20,7 @@ protected:
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to
   // either Jouyou or Jinmei
-  [[nodiscard]] static Name checkType(Name, const Kanji&, bool isJouyou = true);
+  [[nodiscard]] static Name linkType(Name, const Kanji&, bool isJouyou = true);
 private:
   const Frequency _frequency;
   const KenteiKyus _kyu;

@@ -14,7 +14,7 @@ namespace {
 
 class StatsTest : public ::testing::Test {
 protected:
-  static void SetUpTestCase() {
+  static void SetUpTestSuite() {
     _data = std::make_shared<KanjiData>(Args{}, _os);
   }
 

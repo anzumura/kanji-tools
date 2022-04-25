@@ -6,8 +6,6 @@
 
 namespace kanji_tools {
 
-namespace fs = std::filesystem;
-
 namespace {
 
 const std::string FileMsg{" - file: testFile.txt, row: 1"};

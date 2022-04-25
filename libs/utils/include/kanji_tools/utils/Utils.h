@@ -56,7 +56,7 @@ template<typename T>
     T x, BracketType brackets, size_t minSize = 0) {
   static_assert(std::is_integral_v<T>);
   std::string result;
-  for (; x > 0; x >>= 1)
+  for (; x > 0; x >>= 1U)
     result.insert(result.begin(), '0' + toChar(x % BinaryDigits));
   return addBrackets(
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * Bits), brackets);

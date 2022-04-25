@@ -166,7 +166,7 @@ TEST_F(ColumnFileTest, TooManyColumns) {
 }
 
 TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
-  const ColumnFile::Columns c{{"B"}};
+  const ColumnFile::Columns c{ColumnFile::Column{"B"}};
   EXPECT_THROW(
       call([&c] { write(c, "A"); }, "unrecognized header 'A'" + FileMsg),
       std::domain_error);
@@ -360,7 +360,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
           ", row: 2, column: 'Col', value: '123456'",
       "invalid hex" + FileMsg + ", row: 3, column: 'Col', value: 'ABCd'",
       "invalid hex" + FileMsg + ", row: 4, column: 'Col', value: 'DEFG'"};
-  for (auto i : _) {
+  for (auto& i : _) {
     f.nextRow();
     EXPECT_THROW(
         call([&] { f.getChar32(Col); }, ConvertError + "char32_t, " + i),

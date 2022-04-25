@@ -63,7 +63,7 @@ TEST(UcdEntry, GoodCodeAndName) {
 }
 
 TEST(UcdEntry, BadName) {
-  const auto msg{[](std::string i) {
+  const auto msg{[](const std::string& i) {
     return "name '" + i + "' isn't a recognized Kanji";
   }};
   for (auto i : {"", "a", "こ", "。", "雷鳴", "轟く"})

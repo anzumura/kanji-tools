@@ -1,6 +1,7 @@
 #include <kanji_tools/utils/MBUtils.h>
 #include <kanji_tools/utils/Utils.h>
 
+#include <algorithm>
 #include <numeric>
 #include <stdexcept>
 
@@ -117,27 +118,23 @@ bool isSingleByte(const std::u32string& s, bool sizeOne) noexcept {
 }
 
 bool isAllSingleByte(const std::string& s) noexcept {
-  for (const auto i : s)
-    if (!isSingleByteChar(i)) return false;
-  return true;
+  return std::all_of(
+      s.begin(), s.end(), [](auto i) { return isSingleByteChar(i); });
 }
 
 bool isAllSingleByte(const std::u32string& s) noexcept {
-  for (const auto i : s)
-    if (!isSingleByteChar(i)) return false;
-  return true;
+  return std::all_of(
+      s.begin(), s.end(), [](auto i) { return isSingleByteChar(i); });
 }
 
 bool isAnySingleByte(const std::string& s) noexcept {
-  for (const auto i : s)
-    if (isSingleByteChar(i)) return true;
-  return false;
+  return std::any_of(
+      s.begin(), s.end(), [](auto i) { return isSingleByteChar(i); });
 }
 
 bool isAnySingleByte(const std::u32string& s) noexcept {
-  for (const auto i : s)
-    if (isSingleByteChar(i)) return true;
-  return false;
+  return std::any_of(
+      s.begin(), s.end(), [](auto i) { return isSingleByteChar(i); });
 }
 
 } // namespace kanji_tools

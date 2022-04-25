@@ -11,7 +11,7 @@ namespace {
 
 class GroupQuizTest : public ::testing::Test {
 protected:
-  static void SetUpTestCase() {
+  static void SetUpTestSuite() {
     _data = std::make_shared<KanjiData>(Args{}, _os, _es);
     _groupData = std::make_shared<GroupData>(_data);
     _jukugoData = std::make_shared<JukugoData>(_data);
@@ -142,7 +142,7 @@ TEST_F(GroupQuizTest, SkipQuestions) {
     std::string line, lastLine;
     while (std::getline(_os, line)) lastLine = line;
     const auto skipped{std::to_string(i)};
-    EXPECT_EQ(lastLine, "Final score: 0/" + skipped + ", skipped: " + skipped);
+    EXPECT_EQ(lastLine, "Final score: 0/" + skipped += ", skipped: " + skipped);
   }
 }
 

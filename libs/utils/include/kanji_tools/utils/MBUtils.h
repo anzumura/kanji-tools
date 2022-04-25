@@ -119,7 +119,7 @@ enum BitPatterns : unsigned char {
 // This program supports Kanji variation selectors and Kana combining marks
 // which are both '3 byte' UTF-8 sequences (and multi-byte UTF-8 sequences range
 // from 2 to 4 bytes)
-inline constexpr u_int16_t VarSelectorSize{3}, MinMBSize{2}, MaxMBSize{4};
+inline constexpr size_t VarSelectorSize{3}, MinMBSize{2}, MaxMBSize{4};
 
 inline constexpr auto MaxAscii{U'\x7f'}, MaxUnicode{U'\x10ffff'},
     CombiningVoicedChar{U'\x3099'}, CombiningSemiVoicedChar{U'\x309a'};

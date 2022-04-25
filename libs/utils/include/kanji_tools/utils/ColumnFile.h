@@ -21,7 +21,7 @@ public:
   // be used across multiple 'ColumnFile' instances.
   class Column {
   public:
-    Column(const std::string& name);
+    explicit Column(const std::string& name);
 
     [[nodiscard]] bool operator==(const Column&) const;
 
