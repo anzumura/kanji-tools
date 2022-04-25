@@ -82,24 +82,6 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
       _randomizeAnswers{true}, _choice{data->out(), in, QuitOption},
       _groupData{groupData}, _jukugoData{jukugoData} {
   OptChar quizType, qList;
-  // checkType is called to check f, g, l, k, m and p args (so ok to assume
-  // size is at least 2) and set quizType and qList (list of questions choice)
-  const auto checkType{[&quizType, &qList](const auto& arg, auto& choices,
-                           std::optional<Choice::Range> r = std::nullopt) {
-    if (quizType)
-      Data::usage("only one quiz type can be specified, use -h for help");
-    quizType = arg[1];
-    if (arg.size() > 2) {
-      if (auto c{arg[2]};
-          arg.size() == 3 &&
-          (choices.contains(c) || r && r->first <= c && r->second >= c))
-        qList = c;
-      else
-        Data::usage(
-            "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
-    }
-  }};
-
   Question question{};
   auto endOptions{false}, showMeanings{false};
   for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
@@ -113,19 +95,8 @@ QuizLauncher::QuizLauncher(const Args& args, DataPtr data,
         endOptions = true;
       else if (arg == "-s")
         showMeanings = true;
-      else
-        switch (arg[1]) {
-        case 'r': // intentional fallthrough
-        case 't': question = processProgramModeArg(arg); break;
-        case 'f': checkType(arg, FrequencyChoices); break;
-        case 'g': checkType(arg, GradeChoices, GradeRange); break;
-        case 'k': checkType(arg, KyuChoices, KyuRange); break;
-        case 'l': checkType(arg, LevelChoices); break;
-        case 'm': // intentional fallthrough
-        // Clang (incorrectly) thinks the following line isn't covered
-        case 'p': checkType(arg, GroupKanjiChoices); break; // LCOV_EXCL_LINE
-        default: Data::usage("illegal option '" + arg + "', use -h for help");
-        }
+      else if (const auto c{processArg(question, quizType, arg)}; c)
+        qList = c; // only set 'qList' if a non-empty value was returned
     } else {
       // show details for a 'kanji' (instead of running a test or review)
       processKanjiArg(arg);
@@ -296,6 +267,39 @@ void QuizLauncher::startGroupQuiz(Question question, bool showMeanings,
       !isQuit(c))
     GroupQuiz(*this, question, showMeanings, list,
         static_cast<GroupQuiz::MemberType>(c - '1'));
+}
+
+QuizLauncher::OptChar QuizLauncher::processArg(
+    Question& question, OptChar& quizType, const std::string& arg) {
+  switch (arg[1]) {
+  case 'r': // intentional fallthrough
+  case 't': question = processProgramModeArg(arg); break;
+  case 'f': return setQuizType(quizType, arg, FrequencyChoices);
+  case 'g': return setQuizType(quizType, arg, GradeChoices, GradeRange);
+  case 'k': return setQuizType(quizType, arg, KyuChoices, KyuRange);
+  case 'l': return setQuizType(quizType, arg, LevelChoices);
+  case 'm': // intentional fallthrough
+  case 'p': return setQuizType(quizType, arg, GroupKanjiChoices);
+  default: Data::usage("illegal option '" + arg + "', use -h for help");
+  }
+  return {};
+}
+
+QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
+    const std::string& arg, const Choices& choices,
+    const std::optional<Choice::Range>& r) const {
+  if (quizType)
+    Data::usage("only one quiz type can be specified, use -h for help");
+  quizType = arg[1];
+  if (arg.size() > 2) {
+    if (const auto c{arg[2]};
+        arg.size() == 3 &&
+        (choices.contains(c) || r && r->first <= c && r->second >= c))
+      return c;
+    Data::usage(
+        "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
+  }
+  return {};
 }
 
 QuizLauncher::Question QuizLauncher::processProgramModeArg(

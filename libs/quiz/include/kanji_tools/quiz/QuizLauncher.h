@@ -62,13 +62,22 @@ private:
   [[nodiscard]] Kanji::NelsonId getId(
       const std::string& msg, const std::string& arg) const;
 
+  // top level function for processing args (program mode and quiz types)
+  [[nodiscard]] OptChar processArg(Question&, OptChar&, const std::string& arg);
+
+  // 'setQuizType' is called for -f, -g, -l, -k, -m and -p args (so ok to assume
+  // size is at least 2) and sets 'quizType'. It also returns optional 'question
+  // list' that may be part of the arg, i.e., '-g6' arg represents 'Grade' '6'.
+  [[nodiscard]] OptChar setQuizType(OptChar& quizType, const std::string& arg,
+      const Choices&, const std::optional<Choice::Range>& = {}) const;
+
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets
-  // '_programMode'. It can also set '_questionOrder' depending on the value of
-  // 'arg' and returns the question to start from.
+  // '_programMode'. It can also set '_questionOrder' depending on the value
+  // of 'arg' and returns the question to start from.
   [[nodiscard]] Question processProgramModeArg(const std::string& arg);
 
-  // 'processKanjiArg' is called when a kanji arg is passed to the program (see
-  // 'HelpMessage' in QuizLauncher.cpp)
+  // 'processKanjiArg' is called when a kanji arg is passed to the program
+  // (see 'HelpMessage' in QuizLauncher.cpp)
   void processKanjiArg(const std::string& arg) const;
 
   // 'printDetails' prints info about a kanji provided on the command line
