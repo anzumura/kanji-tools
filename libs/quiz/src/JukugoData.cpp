@@ -15,7 +15,7 @@ constexpr auto JukugoSetW{14}, JukugoMaxExamples{12};
 
 namespace fs = std::filesystem;
 
-JukugoData::JukugoData(DataPtr data, const Data::Path* dir) {
+JukugoData::JukugoData(const DataPtr& data, const Data::Path* dir) {
   const auto jukugoDir{dir ? *dir : data->dataDir() / "jukugo"};
   const auto f{[this, &jukugoDir, data](const char* file, KanjiGrades grade) {
     const auto loaded{loadFile(DataFile::getFile(jukugoDir, file), grade)};
@@ -80,7 +80,7 @@ size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
 }
 
 size_t JukugoData::findOpenBracket(const std::string& line, bool onePerLine) {
-  const auto i{line.find("(")};
+  const auto i{line.find('(')};
   if (i == std::string::npos) error("failed to find open bracket");
   if (onePerLine && (i < 2 || line[i - 1] != ' '))
     error("open bracket should follow a space");
@@ -88,7 +88,7 @@ size_t JukugoData::findOpenBracket(const std::string& line, bool onePerLine) {
 }
 
 size_t JukugoData::findCloseBracket(const std::string& line, bool onePerLine) {
-  const auto i{line.find(")")};
+  const auto i{line.find(')')};
   if (i == std::string::npos) error("failed to find close bracket");
   if (onePerLine && i != line.size() - 1)
     error("close bracket should be the last character");

@@ -59,17 +59,18 @@ private:
   void startGroupQuiz(Question question, bool showMeanings, OptChar qList,
       const GroupData::List& list) const;
 
-  [[nodiscard]] Kanji::NelsonId getId(
-      const std::string& msg, const std::string& arg) const;
-
-  // top level function for processing args (program mode and quiz types)
-  [[nodiscard]] OptChar processArg(Question&, OptChar&, const std::string& arg);
+  [[nodiscard]] static Kanji::NelsonId getId(
+      const std::string& msg, const std::string& arg);
 
   // 'setQuizType' is called for -f, -g, -l, -k, -m and -p args (so ok to assume
   // size is at least 2) and sets 'quizType'. It also returns optional 'question
   // list' that may be part of the arg, i.e., '-g6' arg represents 'Grade' '6'.
-  [[nodiscard]] OptChar setQuizType(OptChar& quizType, const std::string& arg,
-      const Choices&, const std::optional<Choice::Range>& = {}) const;
+  [[nodiscard]] static OptChar setQuizType(OptChar& quizType,
+      const std::string& arg, const Choices&,
+      const std::optional<Choice::Range>& = {});
+
+  // top level function for processing args (program mode and quiz types)
+  [[nodiscard]] OptChar processArg(Question&, OptChar&, const std::string& arg);
 
   // 'processProgramModeArg' is called for '-r' and '-t' args and sets
   // '_programMode'. It can also set '_questionOrder' depending on the value

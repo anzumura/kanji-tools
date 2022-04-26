@@ -259,10 +259,10 @@ void KanaConvert::printKanaChart(bool markdown) const {
     auto& k{i.katakana()};
     auto hepb{i.getRomaji(ConvertFlags::Hepburn)},
         kunr{i.getRomaji(ConvertFlags::Kunrei)};
-    hepb = romaji == hepb ? EmptyString : ('(' + hepb += ')');
+    hepb = romaji == hepb ? EmptyString : addBrackets(hepb, BracketType::Round);
     kunr = romaji == kunr      ? EmptyString
            : i.kunreiVariant() ? kunr
-                               : ('(' + kunr += ')');
+                               : addBrackets(kunr, BracketType::Round);
     std::string vars;
     for (auto& j : i.romajiVariants()) {
       if (!vars.empty()) vars += ", ";

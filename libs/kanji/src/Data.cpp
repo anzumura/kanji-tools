@@ -152,8 +152,7 @@ fs::path Data::getDataDir(const Args& args) {
   static const std::string ExpectedTextFiles{
       std::to_string(TextFilesInDataDir) + " expected '" +
       DataFile::TextFileExtension + "' files"};
-  OptPath found;
-  for (Args::Size i{1}; !found && i < args.size(); ++i)
+  for (Args::Size i{1}; i < args.size(); ++i)
     if (args[i] == DataArg) {
       if (i + 1 == args.size())
         usage("'-data' must be followed by a directory name");
@@ -162,28 +161,27 @@ fs::path Data::getDataDir(const Args& args) {
         usage("'" + data.string() + "' is not a valid directory");
       if (!isValidDataDir(data))
         usage("'" + data.string() + "' does not contain " + ExpectedTextFiles);
-      found = data;
+      return data;
     }
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
-  if (!found) {
-    static const std::string NotFound{"couldn't find 'data' directory with " +
-                                      ExpectedTextFiles +
-                                      ":\n- searched up from current: "};
-    static const std::string NotFoundEnd{
-        "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
-    // search up from current directory
-    const auto cur{fs::current_path()};
-    if (found = searchUpForDataDir(cur); !found && args) {
-      Path p{args[0]}; // search up from 'args[0]'
-      if (p = p.parent_path(); fs::is_directory(p)) {
-        static const std::string Arg0Msg{"\n- searched up from arg0: "};
-        if (found = searchUpForDataDir(p.parent_path()); !found)
-          usage(NotFound + cur.string() + Arg0Msg + args[0] + NotFoundEnd);
-      }
+  static const std::string NotFound{"couldn't find 'data' directory with " +
+                                    ExpectedTextFiles +
+                                    ":\n- searched up from current: "},
+      NotFoundEnd{"\nrun in a directory where 'data' can be found or use "
+                  "'-data <dir>'"};
+  // search up from current directory
+  const auto cur{fs::current_path()};
+  OptPath found;
+  if (found = searchUpForDataDir(cur); !found && args) {
+    Path p{args[0]}; // search up from 'args[0]'
+    if (p = p.parent_path(); fs::is_directory(p)) {
+      static const std::string Arg0Msg{"\n- searched up from arg0: "};
+      if (found = searchUpForDataDir(p.parent_path()); !found)
+        usage(NotFound + cur.string() + Arg0Msg + args[0] + NotFoundEnd);
     }
-    if (!found) usage(NotFound + cur.string() + NotFoundEnd);
   }
+  if (!found) usage(NotFound + cur.string() + NotFoundEnd);
   return *found;
 }
 

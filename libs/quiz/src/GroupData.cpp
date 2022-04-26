@@ -76,8 +76,9 @@ void GroupData::loadGroup(
       if (const auto k{_data->findKanjiByName(i)}; k)
         memberKanji.emplace_back(k);
       else
-        _data->printError("failed to find member " + i + " in group: '" + name +
-                          "', number: " + f.get(numberCol));
+        _data->printError("failed to find member " + i +=
+                          " in group: '" + (name + "', number: ") +=
+                          f.get(numberCol));
     if (memberKanji.size() < kanjiNames.size())
       f.error("group failed to load all members");
     try {
@@ -92,7 +93,7 @@ void GroupData::loadGroup(
 }
 
 GroupPtr GroupData::createGroup(size_t number, const std::string& name,
-    const Data::KanjiList& members, Group::PatternType patternType) const {
+    const Data::KanjiList& members, Group::PatternType patternType) {
   if (patternType == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, patternType);
@@ -195,23 +196,27 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
         << " missing examples per type)\n";
   for (auto i : AllKanjiTypes)
     if (auto j{types.find(i)}; j != types.end()) {
-      auto& list{_data->types(i)};
+      auto& all{_data->types(i)};
       out() << std::right << std::setw(BreakdownSetW) << i << ": "
-            << j->second.size() << " / " << list.size();
-      if (const auto missing{list.size() - j->second.size()}; missing) {
-        std::sort(j->second.begin(), j->second.end());
-        out() << " (";
-        for (size_t count{}; auto& k : list)
-          if (!std::binary_search(
-                  j->second.begin(), j->second.end(), k->name())) {
-            if (count) out() << ' ';
-            out() << k->name();
-            if (++count == missing || count == MissingTypeExamples) break;
-          }
-        out() << ')';
-      }
+            << j->second.size() << " / " << all.size();
+      printMissingFromType(all, j->second);
       out() << '\n';
     }
+}
+
+void GroupData::printMissingFromType(
+    const Data::KanjiList& all, StringList& found) const {
+  if (const auto missing{all.size() - found.size()}; missing) {
+    std::sort(found.begin(), found.end());
+    out() << " (";
+    for (size_t count{}; auto& i : all)
+      if (!std::binary_search(found.begin(), found.end(), i->name())) {
+        if (count) out() << ' ';
+        out() << i->name();
+        if (++count == missing || count == MissingTypeExamples) break;
+      }
+    out() << ')';
+  }
 }
 
 } // namespace kanji_tools

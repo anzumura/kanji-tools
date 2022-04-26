@@ -40,18 +40,20 @@ private:
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
-  [[nodiscard]] GroupPtr createGroup(size_t number, const std::string& name,
-      const Data::KanjiList& members, Group::PatternType) const;
+  [[nodiscard]] static GroupPtr createGroup(size_t number,
+      const std::string& name, const Data::KanjiList&, Group::PatternType);
 
   template<typename T> void printGroups(const T&, const List&) const;
 
-  using TypeMap = std::map<KanjiTypes, std::vector<std::string>>;
+  using StringList = std::vector<std::string>;
+  using TypeMap = std::map<KanjiTypes, StringList>;
   using StringSet = std::set<std::string>;
 
   void printMeaningGroup(const Group&, TypeMap&, StringSet&) const;
   void printPatternGroup(const Group&, TypeMap&) const;
   template<typename T> void printUniqueNames(const T&, const StringSet&) const;
   void printTypeBreakdown(TypeMap&) const;
+  void printMissingFromType(const Data::KanjiList&, StringList&) const;
 
   [[nodiscard]] auto fullDebug() const { return _data->fullDebug(); }
 

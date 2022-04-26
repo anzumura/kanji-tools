@@ -282,23 +282,6 @@ QuizLauncher::OptChar QuizLauncher::processArg(
   return {};
 }
 
-QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
-    const std::string& arg, const Choices& choices,
-    const std::optional<Choice::Range>& r) const {
-  if (quizType)
-    Data::usage("only one quiz type can be specified, use -h for help");
-  quizType = arg[1];
-  if (arg.size() > 2) {
-    if (const auto c{arg[2]};
-        arg.size() == 3 &&
-        (choices.contains(c) || r && r->first <= c && r->second >= c))
-      return c;
-    Data::usage(
-        "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
-  }
-  return {};
-}
-
 QuizLauncher::Question QuizLauncher::processProgramModeArg(
     const std::string& arg) {
   if (_programMode != ProgramMode::NotAssigned)
@@ -330,11 +313,28 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(
 }
 
 Kanji::NelsonId QuizLauncher::getId(
-    const std::string& msg, const std::string& arg) const {
+    const std::string& msg, const std::string& arg) {
   std::stringstream ss{arg};
   Kanji::NelsonId id{};
   if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
   return id;
+}
+
+QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
+    const std::string& arg, const Choices& choices,
+    const std::optional<Choice::Range>& r) {
+  if (quizType)
+    Data::usage("only one quiz type can be specified, use -h for help");
+  quizType = arg[1];
+  if (arg.size() > 2) {
+    if (const auto c{arg[2]};
+        arg.size() == 3 &&
+        (choices.contains(c) || r && r->first <= c && r->second >= c))
+      return c;
+    Data::usage(
+        "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
+  }
+  return {};
 }
 
 void QuizLauncher::processKanjiArg(const std::string& arg) const {
@@ -376,7 +376,7 @@ void QuizLauncher::printDetails(const Data::KanjiList& list,
       out() << '\n';
     }
     out() << "Found " << list.size() << " matches for " << name << " ID " << arg
-          << (list.size() ? ":\n\n" : "\n");
+          << (list.empty() ? "\n" : ":\n\n");
   }
   for (auto& kanji : list) printDetails(kanji->name(), list.size() == 1);
 }
