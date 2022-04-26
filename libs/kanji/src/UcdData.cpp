@@ -15,7 +15,7 @@ namespace {
 class PrintCount {
 public:
   PrintCount() noexcept = default;
-  PrintCount(const PrintCount&) = delete;
+  PrintCount(const PrintCount&) = delete; // LCOV_EXCL_LINE: covered
   PrintCount& operator=(const PrintCount&) = delete;
 
   void add(const Ucd& k) {
