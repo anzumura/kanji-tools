@@ -29,7 +29,7 @@ protected:
     // operator<=> enables == and != needed for 'input interator' and <, >, <=
     // and >= needed for 'random access iterator'
     [[nodiscard]] auto operator<=>(
-        const BaseIterator&) const noexcept = default; // NOLINT(*-use-nullptr)
+        const BaseIterator&) const noexcept = default; // NOLINT: nullptr
   protected:
     inline static const std::string BadBegin{"can't decrement past zero"},
         BadEnd{"can't increment past end"};
