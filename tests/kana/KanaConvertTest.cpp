@@ -21,18 +21,16 @@ protected:
   void run(
       const Args& args, const std::string& expectedIn, size_t skipLines = 0) {
     _is << "q\n"; // send 'quit' option to make sure the program exits
-    KanaConvert{args, _os, &_is};
-    std::stringstream expected{expectedIn};
-    if (skipLines) {
+    if (KanaConvert{args, _os, &_is}; skipLines) {
       size_t skipped{0};
       for (std::string i; skipped < skipLines && std::getline(_os, i);)
         ++skipped;
       ASSERT_EQ(skipped, skipLines);
     }
+    std::stringstream expected{expectedIn};
     for (std::string i, j; std::getline(_os, i) && std::getline(expected, j);)
       ASSERT_EQ(i, j);
-    // if loop completed due to 'eof' then check remaining part of other
-    // stream
+    // if loop ended due to 'eof' then check remaining part of other stream
     if (_os.eof() && expectedIn.size() > _os.str().size())
       EXPECT_EQ(expectedIn.substr(_os.str().size()), "");
     else if (expected.eof() && _os.str().size() > expectedIn.size())

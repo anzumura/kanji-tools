@@ -123,9 +123,10 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   EXPECT_EQ(o.size(), 2);
   EXPECT_EQ(validateUtf8(o), Utf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
-  EXPECT_EQ(toBinary(0x014d, 16), "0000000101001101");
+  constexpr u_int32_t macronO{0x014d};
+  EXPECT_EQ(toBinary(macronO, 16), "0000000101001101");
   const std::string overlongO{
-      toChar(ThreeBits), toChar(Bit1 | 0b101), toChar(Bit1 | 0b1101)};
+      toChar(ThreeBits), toChar(Bit1 | 0b101U), toChar(Bit1 | 0b1101U)};
   EXPECT_EQ(validateUtf8(overlongO), Utf8Result::Overlong);
   // overlong Euro symbol with 4 bytes
   const std::string x{"\xF0\x82\x82\xAC"};
@@ -214,7 +215,7 @@ TEST(MBUtilsTest, ErrorForOverlong) {
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
   fromUtf8Error(std::string{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
   // overlong ō with 3 bytes
-  constexpr auto Byte2{Bit1 | 0b101}, Byte3{Bit1 | 0b1101};
+  constexpr auto Byte2{Bit1 | 0b101U}, Byte3{Bit1 | 0b1101U};
   std::string overlongO{toChar(ThreeBits), toChar(Byte2), toChar(Byte3)};
   fromUtf8Error(overlongO, U"\ufffd");
   // overlong Euro symbol with 4 bytes

@@ -54,7 +54,7 @@ constexpr auto BinaryDigits{2}, DecimalDigits{10}, HexDigits{16}, Bits{8},
 template<typename T>
 [[nodiscard]] inline auto toBinary(
     T x, BracketType brackets, size_t minSize = 0) {
-  static_assert(std::is_integral_v<T>);
+  static_assert(std::is_unsigned_v<T>);
   std::string result;
   for (; x > 0; x >>= 1U)
     result.insert(result.begin(), '0' + toChar(x % BinaryDigits));

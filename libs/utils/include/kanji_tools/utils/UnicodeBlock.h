@@ -37,24 +37,24 @@ public:
 
   // return number of code points in the block (inclusive of start and end)
   [[nodiscard]] constexpr auto range() const noexcept {
-    return end - start + 1;
+    return _end - _start + 1;
   }
 
   // 'opterator()' returns true if 'x' is in this block
   [[nodiscard]] constexpr auto operator()(Code x) const noexcept {
-    return x >= start && x <= end;
+    return x >= _start && x <= _end;
   }
 
   // 'wStart' and 'wEnd' are needed for wregex (may remove later)
   [[nodiscard]] constexpr auto wStart() const noexcept {
-    return toWChar(start);
+    return toWChar(_start);
   }
-  [[nodiscard]] constexpr auto wEnd() const noexcept { return toWChar(end); }
+  [[nodiscard]] constexpr auto wEnd() const noexcept { return toWChar(_end); }
 
-  const Code start;
-  const Code end;
-  const UnicodeVersion* const version;
-  const char* const name;
+  [[nodiscard]] constexpr auto start() const { return _start; }
+  [[nodiscard]] constexpr auto end() const { return _end; }
+  [[nodiscard]] constexpr auto version() const { return _version; }
+  [[nodiscard]] constexpr auto name() const { return _name; }
 private:
   template<Code Start, Code End = Start> static consteval void checkRange() {
     static_assert(Start > MaxAscii);
@@ -68,13 +68,18 @@ private:
 
   consteval UnicodeBlock(
       Code s, Code e, const UnicodeVersion* v = {}, const char* n = {})
-      : start{s}, end{e}, version{v}, name{n} {}
+      : _start{s}, _end{e}, _version{v}, _name{n} {}
 
   // grant access to 'makeBlock' functions
   template<Code Start> friend consteval auto makeBlock();
   template<Code Start, Code End> friend consteval auto makeBlock();
   template<Code Start, Code End, typename T>
   friend consteval auto makeBlock(T&, const char*);
+
+  const Code _start;
+  const Code _end;
+  const UnicodeVersion* const _version;
+  const char* const _name;
 };
 
 // UnicodeBlocks defined in DisplaySize.h (WideBlocks) are used for determining
@@ -124,7 +129,8 @@ inline constexpr std::array KatakanaBlocks{
 // first Katakana block immediately follows Hiragana block so create a merged
 // block (to use in 'KanaRange')
 inline constexpr auto CommonKanaBlock{
-    makeBlock<HiraganaBlocks[0].start, KatakanaBlocks[0].end>(UVer1_1, "Kana")};
+    makeBlock<HiraganaBlocks[0].start(), KatakanaBlocks[0].end()>(
+        UVer1_1, "Kana")};
 
 // Almost all 'common' Japanese Kanji are in the original CJK Unified block.
 // Extension A has one 'Kentei' and about 1000 'Ucd' Kanji. Extension B has an
@@ -194,7 +200,7 @@ template<size_t N>
 [[nodiscard]] constexpr auto inRange(
     Code c, const std::array<UnicodeBlock, N>& t) noexcept {
   for (auto& i : t) {
-    if (c < i.start) break;
+    if (c < i.start()) break;
     if (i(c)) return true;
   }
   return false;

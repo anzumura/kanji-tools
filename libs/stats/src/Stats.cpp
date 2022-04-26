@@ -28,15 +28,15 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 // helper class for ordering and printing out kanji found in files
 class Count { // LCOV_EXCL_LINE: covered
 public:
-  Count(size_t f, const std::string& n, KanjiPtr e)
-      : count{f}, name{n}, entry{e} {}
+  Count(size_t f, const std::string& n, const KanjiPtr& e)
+      : _count{f}, _name{n}, _entry{e} {}
 
   [[nodiscard]] auto frequency() const {
-    return entry ? entry->frequencyOrDefault(Data::maxFrequency())
-                 : Data::maxFrequency() + 1;
+    return _entry ? _entry->frequencyOrDefault(Data::maxFrequency())
+                  : Data::maxFrequency() + 1;
   }
   [[nodiscard]] auto type() const {
-    return entry ? entry->type() : KanjiTypes::None;
+    return _entry ? _entry->type() : KanjiTypes::None;
   }
 
   // Sort to have largest 'count' first followed by lowest frequency number.
@@ -46,27 +46,33 @@ public:
   // kanji to have even higher (worse) frequency. If kanjis both have the same
   // 'count' and 'frequency' then sort by type then name.
   [[nodiscard]] auto operator<(const Count& x) const {
-    return count > x.count ||
-           (count == x.count && frequency() < x.frequency() ||
+    return _count > x._count ||
+           (_count == x._count && frequency() < x.frequency() ||
                (frequency() == x.frequency() && type() < x.type() ||
-                   (type() == x.type() && name < x.name)));
+                   (type() == x.type() && _name < x._name)));
   }
 
-  size_t count;
-  std::string name;
-  KanjiPtr entry;
+  [[nodiscard]] auto count() const { return _count; }
+  [[nodiscard]] auto& name() const { return _name; }
+  [[nodiscard]] auto& entry() const { return _entry; }
+private:
+  size_t _count;
+  std::string _name;
+  KanjiPtr _entry;
 };
 
 std::ostream& operator<<(std::ostream& os, const Count& c) {
   static constexpr auto FreqWidth{5};
-  os << '[' << c.name << ' ' << std::right << std::setw(4) << c.count << ']';
-  if (c.entry)
-    os << std::setw(FreqWidth) << c.entry->frequencyOrDefault(0) << ", "
-       << (c.entry->hasLevel() ? toString(c.entry->level()) : std::string{"--"})
-       << ", " << c.entry->type();
+  os << '[' << c.name() << ' ' << std::right << std::setw(4) << c.count()
+     << ']';
+  if (c.entry())
+    os << std::setw(FreqWidth) << c.entry()->frequencyOrDefault(0) << ", "
+       << (c.entry()->hasLevel() ? toString(c.entry()->level())
+                                 : std::string{"--"})
+       << ", " << c.entry()->type();
   else
     os << ", " << std::setw(UnicodeStringMaxSize + 2)
-       << "U+" + toUnicode(c.name);
+       << "U+" + toUnicode(c.name());
   return os;
 }
 
@@ -80,7 +86,7 @@ constexpr size_t IncludeInTotals{5}, MaxExamples{5};
 // results can be retrieved via the 'total' and 'str' methods.
 class StatsPred {
 public:
-  StatsPred(const DataPtr data, const fs::path& top, const std::string& name,
+  StatsPred(const DataPtr& data, const fs::path& top, const std::string& name,
       bool showBreakdown)
       : _data{data}, _top{top}, _name{name},
         _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
@@ -191,7 +197,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
   std::map<KanjiTypes, std::vector<Count>> found;
   for (const auto& i : frequency) {
     const auto t{i.type()};
-    totalKanjiPerType[t] += i.count;
+    totalKanjiPerType[t] += i.count();
     uniqueKanjiPerType[t]++;
     if (auto& j{found[t]}; j.size() < MaxExamples) j.emplace_back(i);
   }
@@ -207,7 +213,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
       const auto& j{found[t]};
       for (size_t k{}; k < j.size(); ++k) {
         if (k) _os << ", ";
-        _os << j[k].name << ' ' << j[k].count;
+        _os << j[k].name() << ' ' << j[k].count();
       }
       _os << ")\n";
     }
@@ -219,7 +225,7 @@ void StatsPred::printRareExamples(const CountSet& frequency) {
   _os << std::setw(SkipPercentageWidth) << '(';
   for (size_t i{}; auto& j : frequency) {
     if (i) _os << ", ";
-    _os << j.name << ' ' << j.count;
+    _os << j.name() << ' ' << j.count();
     if (++i == MaxExamples) break;
   }
   _os << ")\n";
@@ -238,8 +244,8 @@ void StatsPred::printBreakdown(
     if (_showBreakdown)
       _os << std::left << std::setw(MinRankWidth) << ++rank << ' ';
     _os << i;
-    if (!i.entry) {
-      if (const auto tags{count.tags(i.name)}; tags) {
+    if (!i.entry()) {
+      if (const auto tags{count.tags(i.name())}; tags) {
         std::string file;
         for (size_t maxCount{}; auto& j : *tags)
           if (j.second > maxCount) {
@@ -255,7 +261,7 @@ void StatsPred::printBreakdown(
 
 } // namespace
 
-Stats::Stats(const Args& args, DataPtr data) : _data(data) {
+Stats::Stats(const Args& args, const DataPtr& data) : _data(data) {
   auto breakdown{false}, endOptions{false}, verbose{false};
   std::vector<std::string> files;
   for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))

@@ -114,7 +114,8 @@
     "__bits": "cpp",
     "__functional_03": "cpp",
     "future": "cpp",
-    "version": "cpp"
+    "version": "cpp",
+    "ranges": "cpp"
   },
   "cSpell.words": [
     "akai",

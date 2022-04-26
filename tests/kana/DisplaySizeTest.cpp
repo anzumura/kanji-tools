@@ -9,9 +9,9 @@ TEST(DisplaySizeTest, WideBlocksRange) {
   EXPECT_EQ(WideBlocks.size(), 121);
   // make sure 'WideBlocks' (from generated code) has no overlaps
   for (Code oldEnd{}; auto& i : WideBlocks) {
-    EXPECT_LT(oldEnd, i.start);
-    oldEnd = i.end;
-    EXPECT_LE(i.start, i.end);
+    EXPECT_LT(oldEnd, i.start());
+    oldEnd = i.end();
+    EXPECT_LE(i.start(), i.end());
   }
 }
 

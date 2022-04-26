@@ -300,7 +300,7 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
     const auto f{[&, this] {
       return choice().get("", {rangeStart, 'c'}, choices);
     }};
-    EXPECT_THROW(call(f, start + (rangeStart == 'a' ? 'a' : 'c') + end),
+    EXPECT_THROW(call(f, start + (rangeStart == 'a' ? 'a' : 'c') += end),
         std::domain_error);
   }
 }

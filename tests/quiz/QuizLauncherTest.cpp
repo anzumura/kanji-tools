@@ -15,14 +15,14 @@ protected:
     _jukugoData = std::make_shared<JukugoData>(_data);
   }
 
-  QuizLauncherTest() { reset(); }
-
-  void reset() const {
+  static void reset() {
     _os.str({});
     _os.clear();
     _es.str({});
     _es.clear();
   }
+
+  QuizLauncherTest() { reset(); }
 
   inline static const std::string Help{", use -h for help"};
 

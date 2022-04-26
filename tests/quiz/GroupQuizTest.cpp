@@ -207,14 +207,10 @@ TEST_F(GroupQuizTest, RefreshAfterAnswer) {
   is() << "'\n"; // refresh - will update the screen with '1->a:'
   startQuiz();
   size_t found{};
-  for (std::string line; std::getline(_os, line);) {
-    if (line.starts_with("   1:  ")) {
-      if (!found)
-        ++found;
-      else if (line.find("1->a:") != std::string::npos)
-        ++found;
-    }
-  }
+  for (std::string line; std::getline(_os, line);)
+    if (line.starts_with("   1:  ") &&
+        (!found || line.find("1->a:") != std::string::npos))
+      ++found;
   EXPECT_EQ(found, 2);
 }
 

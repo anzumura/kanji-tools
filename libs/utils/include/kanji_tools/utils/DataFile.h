@@ -49,7 +49,7 @@ public:
   // return index for 'name' starting at '1' or return '0' for not found.
   [[nodiscard]] Index getIndex(const std::string& name) const;
 
-  [[nodiscard]] bool exists(const std::string& name) const;
+  [[nodiscard]] bool exists(const std::string&) const;
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }

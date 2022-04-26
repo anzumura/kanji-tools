@@ -32,7 +32,7 @@ public:
   static const std::wstring DefaultReplace;
 
   // if 'find' regex is provided it's applied before processing for counting
-  explicit MBCount(OptRegex find = {},
+  explicit MBCount(const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {});
 
   MBCount(const MBCount&) = delete;
@@ -113,7 +113,7 @@ private:
 
 template<typename Pred> class MBCountIf : public MBCount {
 public:
-  explicit MBCountIf(Pred pred, OptRegex find = {},
+  explicit MBCountIf(Pred pred, const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : MBCount{find, replace, debug}, _pred{pred} {}
 private:

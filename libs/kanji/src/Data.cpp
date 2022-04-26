@@ -156,7 +156,7 @@ fs::path Data::getDataDir(const Args& args) {
     if (args[i] == DataArg) {
       if (i + 1 == args.size())
         usage("'-data' must be followed by a directory name");
-      const auto data{Path(args[i + 1])};
+      auto data{Path(args[i + 1])};
       if (!fs::is_directory(data))
         usage("'" + data.string() + "' is not a valid directory");
       if (!isValidDataDir(data))

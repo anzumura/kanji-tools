@@ -204,13 +204,16 @@ std::string toUtf8(const std::wstring& s) {
 
 MBUtf8Result validateMBUtf8(
     const char* s, Utf8Result& error, bool sizeOne) noexcept {
+  if (!s) return MBUtf8Result::NotMultiByte;
+  auto u{reinterpret_cast<const unsigned char*>(s)};
+  if (!(*u & Bit1)) return MBUtf8Result::NotMultiByte;
+
   const auto err{[&error](auto e) {
     error = e;
     return MBUtf8Result::NotValid;
   }};
-  if (!s || !(*s & Bit1)) return MBUtf8Result::NotMultiByte;
-  if ((*s & TwoBits) == Bit1) return err(Utf8Result::ContinuationByte);
-  auto u{reinterpret_cast<const unsigned char*>(s)};
+
+  if ((*u & TwoBits) == Bit1) return err(Utf8Result::ContinuationByte);
   uInt b1{*u};
   if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
   if (b1 & Bit3) {

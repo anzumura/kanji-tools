@@ -296,7 +296,8 @@ TEST_F(ListQuizTest, SkipQuestions) {
     EXPECT_TRUE(_os.eof() && _os.fail());
     EXPECT_FALSE(_os.good() || _os.bad());
     const auto skipped(std::to_string(i));
-    EXPECT_EQ(lastLine, "Final score: 0/" + skipped + ", skipped: " + skipped);
+    EXPECT_EQ(
+        lastLine, "Final score: 0/" + skipped += (", skipped: " + skipped));
   }
 }
 

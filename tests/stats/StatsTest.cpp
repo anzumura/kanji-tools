@@ -18,16 +18,7 @@ protected:
     _data = std::make_shared<KanjiData>(Args{}, _os);
   }
 
-  void SetUp() override {
-    _os.str({});
-    _os.clear();
-    if (fs::exists(TestDir)) TearDown();
-    EXPECT_TRUE(fs::create_directory(TestDir));
-  }
-
-  void TearDown() override { fs::remove_all(TestDir); }
-
-  void write(const std::string& s) {
+  static void write(const std::string& s) {
     std::ofstream of(TestFile);
     of << s;
     of.close();
@@ -50,6 +41,15 @@ protected:
     else if (expected.eof() && _os.str().size() > expectedIn.size())
       EXPECT_EQ(_os.str().substr(expectedIn.size()), "");
   }
+
+  void SetUp() override {
+    _os.str({});
+    _os.clear();
+    if (fs::exists(TestDir)) TearDown();
+    EXPECT_TRUE(fs::create_directory(TestDir));
+  }
+
+  void TearDown() override { fs::remove_all(TestDir); }
 
   inline static std::stringstream _os;
   inline static DataPtr _data;

@@ -22,7 +22,7 @@ const std::wregex MBCount::RemoveFurigana{std::wstring{L"(["} + KanjiRange() +
 const std::wstring MBCount::DefaultReplace{L"$1"};
 
 MBCount::MBCount(
-    OptRegex find, const std::wstring& replace, std::ostream* debug)
+    const OptRegex& find, const std::wstring& replace, std::ostream* debug)
     : _find{find}, _replace{replace}, _debug{debug} {}
 
 size_t MBCount::add(const std::string& s, const OptString& tag) {
@@ -85,7 +85,7 @@ size_t MBCount::doAddFile(
     added += processFile(file, tag);
   } else if (fs::is_directory(file)) {
     ++_directories;
-    for (fs::directory_entry i : fs::directory_iterator(file))
+    for (const auto& i : fs::directory_iterator(file))
       // skip symlinks for now when potentially recursing
       added += i.is_symlink() ? 0
                : recurse      ? doAddFile(i.path(), addTag, fileNames)
@@ -126,7 +126,8 @@ size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
         // don't process in case next line stars with open bracket
         prevLine = line;
         continue;
-      } else if (prevUnclosed) {
+      }
+      if (prevUnclosed) {
         // case for previous line having unclosed brackets
         if (const auto close{line.find(CloseWideBracket)};
             close != std::string::npos)

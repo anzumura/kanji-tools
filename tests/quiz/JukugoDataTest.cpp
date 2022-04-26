@@ -17,6 +17,12 @@ protected:
 
   static void SetUpTestSuite() { _data = std::make_shared<KanjiData>(); }
 
+  static void write(const std::string& f, const std::string& s) {
+    std::ofstream of{TestDir / f, std::ios_base::app};
+    of << s;
+    of.close();
+  }
+
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
@@ -28,12 +34,6 @@ protected:
   }
 
   void TearDown() override { fs::remove_all(TestDir); }
-
-  void write(const std::string& f, const std::string& s) {
-    std::ofstream of{TestDir / f, std::ios_base::app};
-    of << s;
-    of.close();
-  }
 
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;

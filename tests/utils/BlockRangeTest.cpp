@@ -12,9 +12,9 @@ TEST(BlockRangeTest, KanjiRange) {
   size_t pos{};
   auto checkKanjiRange{[&pos](auto& blocks) {
     for (auto& i : blocks) {
-      EXPECT_EQ(KanjiRange[pos++], i.start) << pos;
+      EXPECT_EQ(KanjiRange[pos++], i.start()) << pos;
       EXPECT_EQ(KanjiRange[pos++], U'-') << pos;
-      EXPECT_EQ(KanjiRange[pos++], i.end) << pos;
+      EXPECT_EQ(KanjiRange[pos++], i.end()) << pos;
     }
   }};
   checkKanjiRange(CommonKanjiBlocks);
@@ -27,22 +27,22 @@ TEST(BlockRangeTest, CheckOtherBlocks) {
   ASSERT_EQ(std::size(WideLetterRange), 3);
   ASSERT_EQ(std::size(HiraganaRange), 3);
   ASSERT_EQ(HiraganaBlocks.size(), 1);
-  EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start);
-  EXPECT_EQ(HiraganaRange[2], HiraganaBlocks[0].end);
+  EXPECT_EQ(HiraganaRange[0], HiraganaBlocks[0].start());
+  EXPECT_EQ(HiraganaRange[2], HiraganaBlocks[0].end());
   ASSERT_EQ(std::size(KatakanaRange), 6);
   ASSERT_EQ(KatakanaBlocks.size(), 2);
-  EXPECT_EQ(KatakanaRange[0], KatakanaBlocks[0].start);
-  EXPECT_EQ(KatakanaRange[2], KatakanaBlocks[0].end);
-  EXPECT_EQ(KatakanaRange[3], KatakanaBlocks[1].start);
-  EXPECT_EQ(KatakanaRange[5], KatakanaBlocks[1].end);
+  EXPECT_EQ(KatakanaRange[0], KatakanaBlocks[0].start());
+  EXPECT_EQ(KatakanaRange[2], KatakanaBlocks[0].end());
+  EXPECT_EQ(KatakanaRange[3], KatakanaBlocks[1].start());
+  EXPECT_EQ(KatakanaRange[5], KatakanaBlocks[1].end());
   ASSERT_EQ(std::size(KanaRange), 6);
-  EXPECT_EQ(KanaRange[0], HiraganaBlocks[0].start);
+  EXPECT_EQ(KanaRange[0], HiraganaBlocks[0].start());
   // first katakana block immediately follows hiragana block so can use a bigger
   // range but check the assumption by comparing 'end + 1' to 'start'
-  EXPECT_EQ(HiraganaBlocks[0].end + 1, KatakanaBlocks[0].start);
-  EXPECT_EQ(KanaRange[2], KatakanaBlocks[0].end);
-  EXPECT_EQ(KanaRange[3], KatakanaBlocks[1].start);
-  EXPECT_EQ(KanaRange[5], KatakanaBlocks[1].end);
+  EXPECT_EQ(HiraganaBlocks[0].end() + 1, KatakanaBlocks[0].start());
+  EXPECT_EQ(KanaRange[2], KatakanaBlocks[0].end());
+  EXPECT_EQ(KanaRange[3], KatakanaBlocks[1].start());
+  EXPECT_EQ(KanaRange[5], KatakanaBlocks[1].end());
 }
 
 TEST(BlockRangeTest, BlockRangeError) {

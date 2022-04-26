@@ -168,7 +168,8 @@ TEST_F(DataFileTest, MaxEntries) {
   // over all 'CommonKanjiBlocks' (eventhough some aren't real characters)
   std::ofstream f{BigFile};
   for (DataFile::Index c{}; auto& i : CommonKanjiBlocks)
-    for (auto j = i.start; j < i.end && c <= DataFile::MaxEntries + 1; ++j, ++c)
+    for (auto j = i.start(); j < i.end() && c <= DataFile::MaxEntries + 1;
+         ++j, ++c)
       f << toUtf8(j) << '\n';
   f.close();
   EXPECT_THROW(call([] { DataFile{BigFile}; },

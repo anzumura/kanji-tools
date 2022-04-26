@@ -363,7 +363,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
   for (auto& i : _) {
     f.nextRow();
     EXPECT_THROW(
-        call([&] { f.getChar32(Col); }, ConvertError + "char32_t, " + i),
+        call([&] { f.getChar32(Col); }, ConvertError + "char32_t, " += i),
         std::domain_error);
   }
 }
