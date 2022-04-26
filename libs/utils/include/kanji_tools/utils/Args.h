@@ -20,7 +20,8 @@ public:
   // 'const char*[]' ctor is helpful for test code since it figures out 'size'
   // from the array, it's also not marked 'explicit' to help shorten code.
   template<size_t N>
-  constexpr Args(const char* (&args)[N]) noexcept : _size{N}, _args{args} {
+  constexpr Args(const char* (&args)[N]) noexcept // NOLINT
+      : _size{N}, _args{args} {
     static_assert(N <= std::numeric_limits<Size>::max());
   }
 

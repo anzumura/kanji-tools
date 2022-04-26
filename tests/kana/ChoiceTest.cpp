@@ -297,8 +297,8 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
   const Choices choices{{'a', "12"}, {'c', "34"}};
   const std::string start{"range option '"}, end{"' already in choices"};
   for (char rangeStart : {'a', 'b'}) {
-    const auto f{[&, this] {
-      return choice().get("", {rangeStart, 'c'}, choices);
+    const auto f{[rangeStart, &choices, this] {
+      return choice().get("", {rangeStart, 'c'}, choices); // NOLINT
     }};
     EXPECT_THROW(call(f, start + (rangeStart == 'a' ? 'a' : 'c') += end),
         std::domain_error);

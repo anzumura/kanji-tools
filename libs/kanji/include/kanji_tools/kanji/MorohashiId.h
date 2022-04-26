@@ -34,7 +34,7 @@ public:
     return _id;
   }
   [[nodiscard]] constexpr auto operator<=>(
-      const MorohashiId&) const noexcept = default;
+      const MorohashiId&) const noexcept = default; // NOLINT: nullptr
 
   [[nodiscard]] std::string toString() const;
 private:

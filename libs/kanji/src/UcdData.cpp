@@ -14,6 +14,10 @@ namespace {
 // cases for completeness.
 class PrintCount {
 public:
+  PrintCount() noexcept = default;
+  PrintCount(const PrintCount&) = delete;
+  PrintCount& operator=(const PrintCount&) = delete;
+
   void add(const Ucd& k) {
     ++_count;
     if (k.hasLinks()) ++_link;
@@ -155,6 +159,7 @@ void UcdData::load(const Data::Path& file) {
 void UcdData::print(DataRef data) const {
   PrintCount joyo, jinmei, other;
   const auto print{[&](const char* s, auto f) {
+    // NOLINTNEXTLINE: CallAndMessage
     const auto x{(joyo.*f)()}, y{(jinmei.*f)()}, z{(other.*f)()};
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x
                << ", Jinmei " << y << ", Other " << z << ")\n";

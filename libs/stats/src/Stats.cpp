@@ -289,6 +289,7 @@ void Stats::countKanji(
     const fs::path& top, bool showBreakdown, bool verbose) const {
   const auto f{[=, this, &top](const auto& pred, const std::string& name,
                    bool firstCount = false) {
+    // NOLINTNEXTLINE
     auto p{std::make_shared<StatsPred>(_data, top, name, showBreakdown)};
     return std::pair(std::async(std::launch::async,
                          [=] { return p->run(pred, verbose, firstCount); }),

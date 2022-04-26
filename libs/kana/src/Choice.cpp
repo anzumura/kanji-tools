@@ -133,7 +133,7 @@ void Choice::add(std::string& prompt, const Choices& choices) {
   OptChar rangeStart;
   char prevChar{};
   const auto completeRange{[&prompt, &rangeStart, &prevChar]() {
-    if (rangeStart != prevChar) prompt += Dash + prevChar;
+    if (rangeStart != prevChar) prompt += Dash + prevChar; // NOLINT
   }};
   for (auto& i : choices) {
     checkPrintableAscii(i.first, "option");

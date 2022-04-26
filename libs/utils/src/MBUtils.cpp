@@ -97,8 +97,8 @@ template<typename T>
     return v[Err]; // 1st byte was '10...' or more than four '1's
   }                // GCOV_EXCL_STOP
   if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
-    return v[Err]; // 2nd byte not '10...'
-  else if (uInt b2 = *u ^ Bit1; b1 & Bit3)
+    return v[Err];                           // 2nd byte not '10...'
+  else if (uInt b2 = *u ^ Bit1; b1 & Bit3)   // NOLINT: else-after-return
     return (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
            : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
                                     : threeByte(b1, b2);
@@ -172,7 +172,7 @@ std::string toUtf8(Code c) {
 
 std::string toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
 
-std::string toUtf8(long x) { return toUtf8(static_cast<Code>(x)); }
+std::string toUtf8(u_int32_t x) { return toUtf8(static_cast<Code>(x)); }
 
 std::string toUtf8(const std::u32string& s) {
   std::string result;

@@ -9,11 +9,14 @@ Checks: 'bugprone-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,
          -bugprone-easily-swappable-parameters,
          -clang-diagnostic-pragma-once-outside-header,
          -cppcoreguidelines-avoid-non-const-global-variables,
-         -cppcoreguidelines-pro-bounds-constant-array-index,
          -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+         -cppcoreguidelines-pro-bounds-constant-array-index,
+         -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+         -cppcoreguidelines-pro-type-reinterpret-cast,
          -cppcoreguidelines-pro-type-static-cast-downcast,
          -hicpp-no-array-decay,-llvm-header-guard,-misc-no-recursion,
          -modernize-pass-by-value,-modernize-use-trailing-return-type,
+         -readability-static-accessed-through-instance,
          -readability-implicit-bool-conversion,-readability-isolate-declaration'
 
 # Note on 'pragma' related:

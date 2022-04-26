@@ -224,9 +224,9 @@ private:
 
 // out of class member definitions for 'TypedEnumArray<T>'
 
-template<typename T, isEnumArray<T> _>
+template<typename T, isEnumArray<T> U>
 template<typename... Names>
-[[nodiscard]] auto TypedEnumArray<T, _>::create(
+[[nodiscard]] auto TypedEnumArray<T, U>::create(
     const std::string& name, Names... args) {
   static_assert(is_enumarray<T> != is_enumarray_with_none<T>,
       "both 'is_enumarray' and 'is_enumarray_with_none' are true");
@@ -242,15 +242,15 @@ template<typename... Names>
   }
 }
 
-template<typename T, isEnumArray<T> _>
-T TypedEnumArray<T, _>::fromString(const std::string& name) const {
+template<typename T, isEnumArray<T> U>
+T TypedEnumArray<T, U>::fromString(const std::string& name) const {
   const auto i{_nameMap.find(name)};
   if (i == _nameMap.end()) domainError("name '" + name + "' not found");
   return i->second;
 }
 
-template<typename T, isEnumArray<T> _>
-void TypedEnumArray<T, _>::insert(
+template<typename T, isEnumArray<T> U>
+void TypedEnumArray<T, U>::insert(
     const std::string& name, BaseEnum::Size index) {
   if (!_nameMap.emplace(name, to_enum<T>(index)).second)
     domainError("duplicate name '" + name + "'");

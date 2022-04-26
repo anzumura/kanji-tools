@@ -25,7 +25,7 @@ using Code = char32_t;
 
 [[nodiscard]] std::string toUtf8(Code);
 [[nodiscard]] std::string toUtf8(int);
-[[nodiscard]] std::string toUtf8(long x);
+[[nodiscard]] std::string toUtf8(u_int32_t x);
 [[nodiscard]] std::string toUtf8(const std::u32string&);
 
 // safe conversions of Code to wchar_t

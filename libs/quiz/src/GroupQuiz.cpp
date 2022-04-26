@@ -95,6 +95,7 @@ void GroupQuiz::addPinyin(const Kanji& kanji, std::string& s) {
 void GroupQuiz::addOtherGroupName(
     const std::string& name, std::string& s) const {
   const auto add{[this, &name, &s](const auto& map) {
+    // NOLINTNEXTLINE: NonNullParamChecker
     if (const auto j{map.find(name)}; j != map.end()) {
       s += _groupType == GroupType::Meaning ? 'p' : 'm';
       s += ':';

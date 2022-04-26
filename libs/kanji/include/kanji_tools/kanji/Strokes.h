@@ -25,7 +25,7 @@ public:
   [[nodiscard]] constexpr bool hasVariant() const noexcept { return _variant; }
 
   [[nodiscard]] constexpr auto operator<=>(
-      const Strokes&) const noexcept = default;
+      const Strokes&) const noexcept = default; // NOLINT:: nullptr
 
   // by default return a string containing '_value', but if 'includeVariant' is
   // set to true and '_variant' is non-zero then return '_value/_variant'

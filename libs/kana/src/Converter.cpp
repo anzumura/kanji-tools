@@ -148,6 +148,7 @@ std::string Converter::fromKana(
   // starts a new group containing 'kana' (the current symbol being processed).
   const auto done{[this, source, &state, &result, &kanaGroup, &kana, &prevKana](
                       DoneType dt = DoneType::NewGroup, State ns = State::New) {
+    // NOLINTNEXTLINE: NonNullParamChecker
     result += processKana(kanaGroup, source, prevKana, dt == DoneType::Prolong);
     if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
         afterN(source).contains(kana))

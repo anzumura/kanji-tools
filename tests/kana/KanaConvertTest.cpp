@@ -125,7 +125,7 @@ TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
 
 TEST_F(KanaConvertTest, PrintKanaChart) {
   const char* args[]{"", "-p"};
-  KanaConvert(args, os());
+  KanaConvert(args, os()); // NOLINT: unused-raii
   std::string lastLine;
   size_t count{}, found{};
   // just check for a few examples
@@ -147,7 +147,7 @@ TEST_F(KanaConvertTest, PrintKanaChart) {
 
 TEST_F(KanaConvertTest, PrintMarkdownKanaChart) {
   const char* args[]{"", "-m"};
-  KanaConvert(args, os());
+  KanaConvert(args, os()); // NOLINT: unused-raii
   std::string lastLine;
   size_t count{}, found{};
   // just check for a few examples

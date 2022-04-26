@@ -180,11 +180,11 @@ TEST(MBUtilsTest, GetCode) {
   EXPECT_EQ(getCode(std::string{"朧"}), U'\u6727');
 }
 
-TEST(MBUtilsTest, ToUTF8IntAndLong) {
-  const int intDog{0x72ac};
+TEST(MBUtilsTest, ToUTF8IntAndUInt) {
+  constexpr int intDog{0x72ac};
   EXPECT_EQ(toUtf8(intDog), Dog);
-  const long longDog{0x72ac};
-  EXPECT_EQ(toUtf8(longDog), Dog);
+  constexpr u_int32_t uIntDog{0x72ac};
+  EXPECT_EQ(toUtf8(uIntDog), Dog);
 }
 
 TEST(MBUtilsTest, BeyondMaxUnicode) {

@@ -72,9 +72,9 @@ enum class HexCase { Upper, Lower };
 template<typename T>
 [[nodiscard]] inline auto toHex(
     T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
-  static_assert(std::is_integral_v<T>);
+  static_assert(std::is_unsigned_v<T>);
   std::string result;
-  for (; x > 0; x >>= 4) {
+  for (; x > 0; x >>= 4U) {
     const char i = x % HexDigits;
     result.insert(result.begin(),
         (i < DecimalDigits

@@ -120,7 +120,7 @@ ColumnFile::OptULong ColumnFile::getOptULong(const Column& c, ULong max) const {
 
 ColumnFile::ULong ColumnFile::processULong(
     const std::string& s, const Column& column, ULong max) const {
-  unsigned long i{};
+  ULong i{};
   try {
     i = std::stoul(s);
   } catch (...) {
@@ -147,10 +147,11 @@ char32_t ColumnFile::getChar32(
     const Column& column, const std::string& s) const {
   if (s.size() < UnicodeStringMinSize || s.size() > UnicodeStringMaxSize)
     error("failed to convert to char32_t, size must be 4 or 5", column, s);
-  for (const char c : s)
-    if (c < '0' || c > 'F' || (c < 'A' && c > '9'))
-      error("failed to convert to char32_t, invalid hex", column, s);
-  return static_cast<char32_t>(std::strtol(s.c_str(), nullptr, HexDigits));
+  // want hex with capitals so can't use 'std::ishexnumber'
+  if (std::any_of(s.begin(), s.end(),
+          [](auto i) { return i < '0' || i > 'F' || (i < 'A' && i > '9'); }))
+    error("failed to convert to char32_t, invalid hex", column, s);
+  return static_cast<char32_t>(std::stoi(s, nullptr, HexDigits));
 }
 
 char32_t ColumnFile::getChar32(const Column& c) const {

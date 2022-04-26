@@ -48,7 +48,7 @@ protected:
   void correctMessage(); // increments '_correctAnswers'
   std::ostream& incorrectMessage(const std::string& name);
   std::ostream& beginQuizMessage(size_t totalQuestions);
-  std::ostream& beginQuestionMessage(size_t totalQuestions) const;
+  std::ostream& beginQuestionMessage(size_t totalQuestions) const; // NOLINT
   [[nodiscard]] bool showMeanings() const;
 
   // 'getDefaultChoices' returns a Choices structure populated with just the

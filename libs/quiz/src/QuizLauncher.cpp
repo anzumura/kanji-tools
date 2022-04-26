@@ -361,7 +361,7 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
         (id.size() == UnicodeStringMaxSize && id[0] != '1' && id[0] != '2') ||
         !std::all_of(id.begin(), id.end(), ::ishexnumber))
       Data::usage("Unicode value '" + id + "' is invalid");
-    printDetails(toUtf8(std::strtol(id.c_str(), nullptr, HexDigits)));
+    printDetails(toUtf8(std::stoi(id, nullptr, HexDigits)));
   } else if (isKanji(arg))
     printDetails(arg);
   else

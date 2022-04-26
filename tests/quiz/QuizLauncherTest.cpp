@@ -38,7 +38,7 @@ private:
 
 TEST_F(QuizLauncherTest, HelpMessage) {
   const char* args[]{"", "-h"};
-  QuizLauncher{args, _data, _groupData, _jukugoData};
+  QuizLauncher{args, _data, _groupData, _jukugoData}; // NOLINT: unused-raii
   // look for a few strings instead of comparing the whole output
   const auto expected = {"-r   review mode", "-t   test mode",
       "-s   show English meanings by default (can be toggled on/off later)"};
@@ -60,7 +60,7 @@ TEST_F(QuizLauncherTest, ValidOptions) {
       const char* args[]{"", i, j};
       if (i[1] == 'p') is() << "1\n"; // select pattern group bucket
       is() << "/\n";                  // send 'quit' option
-      QuizLauncher{args, _data, _groupData, _jukugoData, &is()};
+      QuizLauncher{args, _data, _groupData, _jukugoData, &is()}; // NOLINT
       EXPECT_TRUE(
           _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
       EXPECT_EQ(_es.str(), "");
@@ -71,7 +71,7 @@ TEST_F(QuizLauncherTest, ValidOptions) {
 TEST_F(QuizLauncherTest, QuestionOrderQuit) {
   const char* args[]{"", "-p1", "-r"};
   is() << "/\n"; // quit instead of choosing a question order
-  QuizLauncher{args, _data, _groupData, _jukugoData, &is()};
+  QuizLauncher{args, _data, _groupData, _jukugoData, &is()}; // NOLINT
   EXPECT_TRUE(_os.str().ends_with(
       "List order (/=quit, b=from beginning, e=from end, r=random) def 'r': "));
 }
