@@ -16,7 +16,7 @@ namespace kanji_tools {
 // 'KanjiInfo' members can be used to select which fields are printed by
 // 'Kanji::info' method. For example 'Grade | Level | Freq' will print 'grade',
 // 'level' and 'frequency' fields and 'All ^ Strokes' prints all except strokes.
-enum class KanjiInfo {
+enum class KanjiInfo : u_int16_t {
   Radical = 1,
   Strokes,
   Pinyin = 4,

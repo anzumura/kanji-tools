@@ -19,7 +19,7 @@ inline const auto CharTypes{
 
 // 'ConvertFlags' is also used by 'Converter' class to control some aspects of
 // conversion (see comments at the bottom of this file for more details)
-enum class ConvertFlags {
+enum class ConvertFlags : BaseEnum::Size {
   None,
   Hepburn,
   Kunrei,
