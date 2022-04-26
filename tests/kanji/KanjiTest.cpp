@@ -21,7 +21,7 @@ namespace {
 
 class MockData : public Data {
 public:
-  MockData(const Path& p) : Data{p, Data::DebugMode::None} {}
+  explicit MockData(const Path& p) : Data{p, Data::DebugMode::None} {}
   MOCK_METHOD(
       Kanji::Frequency, frequency, (const std::string&), (const, override));
   MOCK_METHOD(JlptLevels, level, (const std::string&), (const, override));
@@ -61,13 +61,13 @@ protected:
     return CustomFileKanji::fromFile<T>(_data, TestFile);
   }
 
-  void write(const std::string& s) {
+  static void write(const std::string& s) {
     std::ofstream of{TestFile};
     of << s;
     of.close();
   }
 
-  void checkExtraKanji(const Kanji& k) const {
+  static void checkExtraKanji(const Kanji& k) {
     EXPECT_FALSE(k.hasGrade());
     EXPECT_FALSE(k.hasLevel());
     EXPECT_FALSE(k.frequency());
@@ -89,7 +89,7 @@ protected:
     EXPECT_FALSE(k.year());
   }
 
-  void checkJinmeiKanji(const Kanji& k) const {
+  static void checkJinmeiKanji(const Kanji& k) {
     EXPECT_FALSE(k.hasGrade());
     EXPECT_EQ(k.level(), JlptLevels::N1);
     EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);

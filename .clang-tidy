@@ -1,5 +1,6 @@
 # enable a broad set of checks using 'blah-*', then disable the most noisy (or
 # unwanted) ones for now - some of the checks are of couse 'style related' ...
+# docs: https://clang.llvm.org/extra/clang-tidy/checks/list.html
 
 Checks: 'bugprone-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,
          google-*,hicpp-*,llvm-*,misc-*,modernize-*,performance-*,readability-*,

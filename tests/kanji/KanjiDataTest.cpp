@@ -10,8 +10,6 @@
 
 namespace kanji_tools {
 
-namespace fs = std::filesystem;
-
 namespace {
 
 class KanjiDataTest : public ::testing::Test {
@@ -21,7 +19,7 @@ protected:
     _data = std::make_shared<KanjiData>();
   }
 
-  [[nodiscard]] auto checkKanji(const Data::KanjiList& l) const {
+  [[nodiscard]] static auto checkKanji(const Data::KanjiList& l) {
     size_t variants{};
     for (auto& i : l) {
       if (i->variant()) {

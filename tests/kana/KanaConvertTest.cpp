@@ -7,8 +7,6 @@
 
 namespace kanji_tools {
 
-namespace fs = std::filesystem;
-
 namespace {
 
 const std::string OptionsMsg{">>> current options: source="},
@@ -23,7 +21,7 @@ protected:
   void run(
       const Args& args, const std::string& expectedIn, size_t skipLines = 0) {
     _is << "q\n"; // send 'quit' option to make sure the program exits
-    KanaConvert(args, _os, &_is);
+    KanaConvert{args, _os, &_is};
     std::stringstream expected{expectedIn};
     if (skipLines) {
       size_t skipped{0};

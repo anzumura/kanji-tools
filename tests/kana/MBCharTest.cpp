@@ -132,7 +132,7 @@ TEST(MBCharTest, ErrorCount) {
   ASSERT_EQ(original.size(), 12);
   // introduce some errors
   original[1] = 'x'; // change middle of 甲 makes 2 errors (first and last byte)
-  original[3 * 2] =
+  original[3U * 2U] =
       'z'; // change first byte of 丙 makes 2 errors (2nd + 3rd bytes)
   MBChar s{original};
   std::string x;

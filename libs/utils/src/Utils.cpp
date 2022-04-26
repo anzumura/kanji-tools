@@ -109,11 +109,11 @@ unsigned char toUChar(char x) { return cast<unsigned char>(x); }
 // 'is' functions for testing single bytes
 
 bool isSingleByte(const std::string& s, bool sizeOne) noexcept {
-  return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);
+  return (sizeOne ? s.size() == 1 : !s.empty()) && isSingleByteChar(s[0]);
 }
 
 bool isSingleByte(const std::u32string& s, bool sizeOne) noexcept {
-  return (sizeOne ? s.size() == 1 : s.size() >= 1) && isSingleByteChar(s[0]);
+  return (sizeOne ? s.size() == 1 : !s.empty()) && isSingleByteChar(s[0]);
 }
 
 bool isAllSingleByte(const std::string& s) noexcept {

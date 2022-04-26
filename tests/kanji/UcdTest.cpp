@@ -9,7 +9,7 @@ namespace {
 // 'ptrCast' is used in Layout test
 template<typename T>
 [[nodiscard]] constexpr size_t ptrCast(const T& x) noexcept {
-  static_assert(sizeof(size_t) == sizeof(&x));
+  static_assert(sizeof(size_t) == sizeof(T*));
   return reinterpret_cast<size_t>(&x);
 }
 

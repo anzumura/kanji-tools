@@ -14,9 +14,9 @@ public:
 
   UnicodeVersion(const UnicodeVersion&) = delete;
 
-  constexpr auto version() const { return _version; }
-  constexpr auto month() const { return _month; }
-  constexpr auto year() const { return _year; }
+  [[nodiscard]] constexpr auto version() const { return _version; }
+  [[nodiscard]] constexpr auto month() const { return _month; }
+  [[nodiscard]] constexpr auto year() const { return _year; }
 private:
   const char* const _version;
   const uint8_t _month;
