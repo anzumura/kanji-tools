@@ -220,14 +220,25 @@ template<size_t N, typename... Ts>
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(
     const std::string& s, bool sizeOne, T&... t) {
-  if (s.size() > 1 && (!sizeOne || s.size() <= MaxMBSize * 2U))
-    if (const auto w{fromUtf8(s, sizeOne ? 3 : 1)};
-        !sizeOne || (w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])))
-      return inRange(w[0], t...);
+  // a string with only one byte can't hold an MB char so don't need to check it
+  if (s.size() > 1) {
+    if (!sizeOne) {
+      // only check the first 'wide' character when 'sizeOne' is false
+      const auto w{fromUtf8(s, 1)};
+      return w.size() == 1 && inRange(w[0], t...);
+    }
+    if (s.size() <= MaxMBSize * 2U) {
+      // when 'sizeOne' is true then need to convert (up to) three characters so
+      // that the second position can be tested for 'non-spacing'
+      const auto w{fromUtf8(s, 3)};
+      return (w.size() == 1 || w.size() == 2 && isNonSpacing(w[1])) &&
+             inRange(w[0], t...);
+    }
+  }
   return false;
 }
 
-// true if all characers are in the given blocks, empty is also considered true
+// true if all characers are in given blocks, empty is also considered true
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const std::string& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
@@ -243,9 +254,9 @@ template<typename... T>
 
 // functions for classifying 'recognized' utf-8 encoded characters. The string
 // parameter should contain one MB character (so 2-4 bytes) by default, but
-// 'sizeOne' can be set to 'false' to check just the first 'MB characer' in the
-// string. There are alls 'isAll' functions that return 'true' only if all the
-// characers in the string are the desired type.
+// 'sizeOne' can be set to 'false' to check just the first 'MB characer' in
+// the string. There are alls 'isAll' functions that return 'true' only if all
+// the characers in the string are the desired type.
 
 // Kana
 
