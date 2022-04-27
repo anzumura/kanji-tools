@@ -7,8 +7,7 @@ namespace kanji_tools {
 
 namespace {
 
-std::random_device RandomDevice;
-std::mt19937 RandomGen(RandomDevice());
+std::mt19937 RandomGen(std::random_device{}());
 
 const std::string Prompt{"  Select"};
 
