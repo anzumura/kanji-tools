@@ -19,7 +19,18 @@ Checks: 'bugprone-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,
          -readability-static-accessed-through-instance,
          -readability-implicit-bool-conversion,-readability-isolate-declaration'
 
-# Note on 'pragma' related:
+# Notes:
+# - '*-avoid-non-const-global-variables': catches some places where 'const'
+#   should be added, but also warns about private static vars in classes ...
 # - 'clang-diagnostic-pragma-once-outside-header': shouldn't need to turn this
 #   off but is seems like there's a bug somewhere in VS Code or clang-tidy ...
 # - 'llvm-header-guard': guards were used at first, but changed to #pragma once
+# - '*-static-accessed-through-instance': this warning helps here and there, but
+#   there are also lots of cases in template code where it is just noisy ...
+# - 'misc-no-recursion': recursion is used in a few places
+# - these 'modernize' and 'readability' ones seem to be style related:
+#   - '*-braces-around-statements' 
+#   - '*-isolate-declaration'
+#   - '*-named-parameter'
+#   - '*-pass-by-value'
+#   - '*-trailing-return-type'
