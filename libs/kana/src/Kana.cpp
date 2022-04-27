@@ -70,7 +70,7 @@ const std::array KanaList{// --- あ 行 ---
 
 using D = DakutenKana;
 // 'DakutenKanaList' holds Kana that have a 'dakuten' version (but not 'h' row)
-std::array DakutenKanaList{// --- あ 行 ---
+const std::array DakutenKanaList{// --- あ 行 ---
     D{K{"ga", "が", "ガ"}, "ka", "か", "カ"},
     D{K{"za", "ざ", "ザ"}, "sa", "さ", "サ"},
     D{K{"da", "だ", "ダ"}, "ta", "た", "タ"},
@@ -138,7 +138,7 @@ std::array DakutenKanaList{// --- あ 行 ---
 using H = HanDakutenKana;
 // 'HanDakutenKanaList' has Kana that have both a 'dakuten' and a 'han-dakuten'
 // version (so just the 'h' row)
-std::array HanDakutenKanaList{
+const std::array HanDakutenKanaList{
     H{K{"pa", "ぱ", "パ"}, K{"ba", "ば", "バ"}, "ha", "は", "ハ"},
     H{K{"pi", "ぴ", "ピ"}, K{"bi", "び", "ビ"}, "hi", "ひ", "ヒ"},
     H{K{"pu", "ぷ", "プ"}, K{"bu", "ぶ", "ブ"}, "fu", "ふ", "フ",
