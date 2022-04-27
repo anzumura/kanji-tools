@@ -263,7 +263,7 @@ void QuizLauncher::startGroupQuiz(Question question, bool showMeanings,
                                DefaultGroupKanji)};
       !isQuit(c))
     GroupQuiz(*this, question, showMeanings, list,
-        static_cast<GroupQuiz::MemberType>(c - '1'));
+        to_enum<GroupQuiz::MemberType>(c - '1'));
 }
 
 QuizLauncher::OptChar QuizLauncher::processArg(

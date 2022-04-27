@@ -14,71 +14,37 @@ std::mt19937 RandomGen(std::random_device{}());
 const Choice::Choices PatternGroupChoices{{'1', "ア"}, {'2', "カ"}, {'3', "サ"},
     {'4', "タ、ナ"}, {'5', "ハ、マ"}, {'6', "ヤ、ラ、ワ"}};
 
-constexpr auto DefaultPatternGroup{'1'}; // LCOV_EXCL_LINE: covered
-
 // Since there are over 1000 pattern groups, split them into 6 buckets based on
 // reading. The first bucket starts at 'ア', the second bucket starts at 'カ'
 // and so on (see 'PatternBucketChoices' above).
 constexpr std::array PatternGroups{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
 
-constexpr auto RefreshOption{'\''}, EditOption{'*'};
+constexpr auto RefreshOption{'\''}, EditOption{'*'}; // LCOV_EXCL_LINE: covered
 
-constexpr auto TotalLetters{'z' - 'a'}; // LCOV_EXCL_LINE: covered
+constexpr auto TotalLetters{'z' - 'a' + 1};
 
 } // namespace
 
 GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
-    // LCOV_EXCL_START: covered
     bool showMeanings, const GroupData::List& list, MemberType memberType)
-    // LCOV_EXCL_STOP
-    : Quiz{launcher, question, showMeanings}, _groupType{getGroupType(list)} {
-  std::optional<size_t> bucket;
-  // for 'pattern' groups, allow choosing a smaller subset (based on 'reading')
+    : Quiz{launcher, question, showMeanings}, _groupType{getGroupType(list)},
+      _memberType{memberType} {
   if (_groupType == GroupType::Pattern) {
-    const auto c{get("Pattern name", PatternGroupChoices, DefaultPatternGroup)};
+    // for 'pattern' groups, a subset (based on 'reading') needs to be choosen
+    const auto c{get("Pattern name", PatternGroupChoices, '1')};
     if (isQuit(c)) return;
-    bucket = c - '1';
-  }
-  if (launcher.questionOrder() == QuestionOrder::FromBeginning &&
-      memberType == All && !bucket)
-    start(list, memberType);
-  else {
-    GroupData::List newList;
-    const auto bucketHasEnd{bucket && *bucket < PatternGroups.size()};
-    for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {
-      if (startIncluding) {
-        if (bucketHasEnd &&
-            i->name().find(PatternGroups[*bucket]) != std::string::npos)
-          break;
-      } else if (i->name().find(PatternGroups[*bucket - 1]) !=
-                 std::string::npos)
-        startIncluding = true;
-      if (size_t memberCount{}; startIncluding) {
-        for (auto& j : i->members())
-          if (includeMember(*j, memberType)) ++memberCount;
-        // only include groups that have 2 or more members after applying the
-        // 'include member' filter
-        if (memberCount > 1) newList.push_back(i);
-      }
-    }
-    if (launcher.questionOrder() == QuestionOrder::FromEnd)
-      std::reverse(newList.begin(), newList.end());
-    else if (launcher.questionOrder() == QuestionOrder::Random)
-      std::shuffle(newList.begin(), newList.end(), RandomGen);
-    start(newList, memberType);
-  }
+    start(prepareList(list, c - '1'));
+  } else if (launcher.questionOrder() == QuestionOrder::FromBeginning &&
+             _memberType == MemberType::All)
+    start(list); // can use the original list in this case
+  else
+    start(prepareList(list));
 }
 
 GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
   const auto i{list.begin()};
   return i != list.end() ? (**i).type()
                          : throw std::domain_error{"empty group list"};
-}
-
-bool GroupQuiz::includeMember(const Kanji& k, MemberType memberType) {
-  return k.hasReading() &&
-         (k.is(KanjiTypes::Jouyou) || memberType && k.hasLevel() ||
-             memberType > 1 && k.frequency() || memberType > 2);
 }
 
 void GroupQuiz::addPinyin(const Kanji& kanji, std::string& s) {
@@ -89,6 +55,40 @@ void GroupQuiz::addPinyin(const Kanji& kanji, std::string& s) {
     s += p + std::string(PinyinWidth - displaySize(p), ' ');
   } else
     s += NoPinyin;
+}
+
+GroupData::List GroupQuiz::prepareList(
+    const GroupData::List& list, Bucket bucket) const {
+  GroupData::List result;
+  const auto bucketHasEnd{bucket && *bucket < PatternGroups.size()};
+  for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {
+    if (startIncluding) {
+      if (bucketHasEnd &&
+          i->name().find(PatternGroups[*bucket]) != std::string::npos)
+        break;
+    } else if (i->name().find(PatternGroups[*bucket - 1]) != std::string::npos)
+      startIncluding = true;
+    if (size_t memberCount{}; startIncluding) {
+      for (auto& j : i->members())
+        if (includeMember(*j)) ++memberCount;
+      // only include groups that have 2 or more members after applying the
+      // 'include member' filter
+      if (memberCount > 1) result.emplace_back(i);
+    }
+  }
+  if (launcher().questionOrder() == QuestionOrder::FromEnd)
+    std::reverse(result.begin(), result.end());
+  else if (launcher().questionOrder() == QuestionOrder::Random)
+    std::shuffle(result.begin(), result.end(), RandomGen);
+  return result;
+}
+
+bool GroupQuiz::includeMember(const Kanji& k) const {
+  using enum MemberType;
+  return k.hasReading() && (k.is(KanjiTypes::Jouyou) ||
+                               (_memberType > Jouyou && k.hasLevel() ||
+                                   (_memberType > JLPT && k.frequency() ||
+                                       _memberType > Frequency)));
 }
 
 void GroupQuiz::addOtherGroupName(
@@ -107,16 +107,16 @@ void GroupQuiz::addOtherGroupName(
     add(launcher().groupData()->meaningMap());
 }
 
-void GroupQuiz::start(const GroupData::List& list, MemberType memberType) {
+void GroupQuiz::start(const GroupData::List& list) {
   beginQuizMessage(list.size()) << _groupType << " groups\n";
-  if (memberType) log() << "  " << Kanji::Legend << '\n';
+  if (_memberType > MemberType::Jouyou) log() << "  " << Kanji::Legend << '\n';
 
   auto stopQuiz{false};
   for (; currentQuestion() < list.size() && !stopQuiz; ++currentQuestion()) {
     auto& i{list[currentQuestion()]};
     KanjiList questions, readings;
     for (auto& j : i->members())
-      if (includeMember(*j, memberType)) {
+      if (includeMember(*j)) {
         questions.emplace_back(j);
         readings.emplace_back(j);
       }
@@ -196,13 +196,11 @@ bool GroupQuiz::getAnswers(
 
 bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
   const static std::string ReviewMsg{"  Select"}, QuizMsg{"  Reading for: "};
+  const auto msg{
+      isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg};
   do {
     printAssignedAnswers();
-    switch (const auto answer{
-        get(isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1)
-                         : ReviewMsg,
-            choices)};
-            answer) {
+    switch (const auto answer{get(msg, choices)}; answer) {
     case RefreshOption: refresh = true; break;
     case MeaningsOption:
       refresh = true;
@@ -224,7 +222,7 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
       }
       return true;
     }
-  } while (!skipGroup && !refresh);
+  } while (!skipGroup && !refresh); // only 'edit' case needs to loop again
   return false;
 }
 

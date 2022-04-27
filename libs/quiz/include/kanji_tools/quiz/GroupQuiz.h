@@ -14,11 +14,13 @@ public:
   // - Frequency: include if member is Jōyō or JLPT or in the Top 2501 Frequency
   //   list (adds another 294 kanji)
   // - All: include all members (as long as they have readings)
-  enum MemberType { Jouyou, JLPT, Frequency, All };
+  enum class MemberType { Jouyou, JLPT, Frequency, All };
 
   GroupQuiz(const QuizLauncher&, Question, bool showMeanings,
       const GroupData::List&, MemberType);
 private:
+  using Bucket = std::optional<size_t>;
+
   // 'GroupEntryWidth' is the width required for 'qualified name', 'pinyin' and
   // 'other group name'
   enum Values { PinyinWidth = 12, GroupEntryWidth = 22 };
@@ -27,13 +29,16 @@ private:
   // should all have the same type)
   [[nodiscard]] static GroupType getGroupType(const GroupData::List&);
 
+  // 'addPinyin' adds optional pinyin for 'kanji' to 's' padded to 'PinyinWidth'
+  static void addPinyin(const Kanji&, std::string& s);
+
   // 'includeMember' returns true if a member can be included in group quiz
   // question. The member must have a reading as well as meet the criteria of
   // the given MemberType.
-  [[nodiscard]] static bool includeMember(const Kanji&, MemberType);
+  [[nodiscard]] bool includeMember(const Kanji&) const;
 
-  // 'addPinyin' adds optional pinyin for 'kanji' to 's' padded to 'PinyinWidth'
-  static void addPinyin(const Kanji&, std::string& s);
+  [[nodiscard]] GroupData::List prepareList(
+      const GroupData::List&, Bucket = {}) const;
 
   // 'addOtherGroupName' is used in review mode to show other groups that 'name'
   // may belong to. 'z:y' is optionally added to 's' where 'x' is either 'm' or
@@ -43,7 +48,7 @@ private:
   // group' number 123.
   void addOtherGroupName(const std::string& name, std::string& s) const;
 
-  void start(const GroupData::List&, MemberType);
+  void start(const GroupData::List&);
 
   // 'printAssignedAnswers' prints all currently assigned choices on one line in
   // the form: 1->a, 2->c, ...
@@ -71,6 +76,7 @@ private:
   std::vector<char> _answers;
 
   const GroupType _groupType;
+  const MemberType _memberType;
 };
 
 } // namespace kanji_tools
