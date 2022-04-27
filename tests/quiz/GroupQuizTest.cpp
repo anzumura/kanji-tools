@@ -87,7 +87,7 @@ TEST_F(GroupQuizTest, ListOrders) {
 TEST_F(GroupQuizTest, GroupKanjiTypes) {
   const auto f{[](int x = 0) {
     std::string msg{"37 members"};
-    if (x) msg = "showing " + std::to_string(x) + " out of " + msg;
+    if (x) msg = ("showing " + std::to_string(x) += " out of ") += msg;
     return msg;
   }};
   for (auto i : {std::pair{'1', f(28)}, std::pair{'2', f(31)},
