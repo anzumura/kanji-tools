@@ -106,20 +106,23 @@ bool Kanji::orderByQualifiedName(const Kanji& x) const {
 
 bool Kanji::operator==(const Kanji& x) const { return name() == x.name(); }
 
-u_int16_t Kanji::qualifiedNameRank() const {
-  // use an enum to avoid magic numbers, note 'Ucd' is the least common type
-  enum Values { Jou, Jlpt, Freq, Jinmei, LJinmei, LOld, Extra, NonK1, K1, Ucd };
+u_int16_t Kanji::qualifiedNameRank() const { // NOLINT
+  // use an enum to avoid magic numbers, note 'vUcd' is the least common type
+  enum Vals { vJou, vJlpt, vFreq, vJin, vLnkJ, vLnkO, vExt, vNoK1, vK1, vUcd };
   const auto t{type()};
-  return t == KanjiTypes::Jouyou         ? Jou
-         : hasLevel()                    ? Jlpt
-         : frequency()                   ? Freq
-         : t == KanjiTypes::Jinmei       ? Jinmei
-         : t == KanjiTypes::LinkedJinmei ? LJinmei
-         : t == KanjiTypes::LinkedOld    ? LOld
-         : t == KanjiTypes::Extra        ? Extra
-         : t == KanjiTypes::Ucd          ? Ucd
-         : kyu() != KenteiKyus::K1       ? NonK1
-                                         : K1;
+  // chained ':?' causes clang-tidy 'cognitive complexity' warning, but this
+  // style seems nicer than multiple returns (in 'if' and 'switch' blocks)
+  using enum KanjiTypes;
+  return t == Jouyou               ? vJou
+         : hasLevel()              ? vJlpt
+         : frequency()             ? vFreq
+         : t == Jinmei             ? vJin
+         : t == LinkedJinmei       ? vLnkJ
+         : t == LinkedOld          ? vLnkO
+         : t == Extra              ? vExt
+         : t == Ucd                ? vUcd
+         : kyu() != KenteiKyus::K1 ? vNoK1
+                                   : vK1;
 }
 
 } // namespace kanji_tools
