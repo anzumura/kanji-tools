@@ -96,8 +96,8 @@ template<typename T>
   }
   ++u; // GCOV_EXCL_START: covered
   return (byte1 ^ TwoBits) > 1 ? cast<T>(left6(byte1 ^ TwoBits, byte2))
-                               : v[Err]; // GCOV_EXCL_STOP
-}
+                               : v[Err];
+} // GCOV_EXCL_STOP
 
 // 'R' is a sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
 template<typename R, typename T = typename R::value_type>
