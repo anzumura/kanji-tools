@@ -73,39 +73,30 @@ template<typename T> using Consts = std::array<T, Char32Vals.size()>;
 
 template<typename T>
 [[nodiscard]] T convertOneUtf8(const unsigned char*& u, const Consts<T>& v) {
-  // return a 'T' that represents a 3-byte UTF-8 character (U+0800 to U+FFFF)
-  const auto threeByte{[&u, &v](uInt b1, uInt b2) {
-    const auto t{threeByteUtf8<T>(u, b1, b2)};
-    ++u;
-    // return Error if 't' is 'overlong' or in the Surrogate range
-    return t > v[MaxTwo] && (t < v[MinSur] || t > v[MaxSur]) ? t : v[Err];
-  }};
-
-  // return a 'T' that represents a 4-byte UTF-8 character (U+10080 to U+10FFFF)
-  const auto fourByte{[&u, &v](uInt b1, uInt b2, uInt b3) {
-    if ((*++u & TwoBits) != Bit1) return v[Err]; // 4th byte not '10...'
-    const auto t{fourByteUtf8<T>(u, b1, b2, b3)};
-    ++u;
-    // return Error if 't' is 'overlong' or beyond max Unicode range
-    return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
-  }};
-
-  if (*u <= MaxAscii)
-    return {*u++}; // single byte UTF-8 case (so regular Ascii)
+  if (*u <= MaxAscii) return {*u++}; // single byte UTF-8 case (Ascii)
   if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
     ++u;           // GCOV_EXCL_START: covered
     return v[Err]; // 1st byte was '10...' or more than four '1's
   }                // GCOV_EXCL_STOP
-  if (uInt b1{*u}; (*++u & TwoBits) != Bit1)
-    return v[Err];                           // 2nd byte not '10...'
-  else if (uInt b2 = *u ^ Bit1; b1 & Bit3)   // NOLINT: else-after-return
-    return (*++u & TwoBits) != Bit1 ? v[Err] // 3rd not '10...'
-           : (b1 & Bit4)            ? fourByte(b1, b2, *u ^ Bit1)
-                                    : threeByte(b1, b2);
-  else { // GCOV_EXCL_START: covered
-    ++u;
-    return (b1 ^ TwoBits) > 1 ? cast<T>(left6(b1 ^ TwoBits, b2)) : v[Err];
-  } // GCOV_EXCL_STOP
+  uInt byte1{*u};
+  if ((*++u & TwoBits) != Bit1) return v[Err]; // 2nd byte not '10...'
+  uInt byte2 = *u ^ Bit1;
+  if (byte1 & Bit3) {
+    if ((*++u & TwoBits) != Bit1) return v[Err]; // 3rd not '10...'
+    if (byte1 & Bit4) {
+      uInt byte3 = *u ^ Bit1;
+      if ((*++u & TwoBits) != Bit1) return v[Err]; // 4th byte not '10...'
+      const auto t{fourByteUtf8<T>(u++, byte1, byte2, byte3)};
+      // return Error if 't' is 'overlong' or beyond max Unicode range
+      return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
+    }
+    const auto t{threeByteUtf8<T>(u++, byte1, byte2)};
+    // return Error if 't' is 'overlong' or in the Surrogate range
+    return t > v[MaxTwo] && (t < v[MinSur] || t > v[MaxSur]) ? t : v[Err];
+  }
+  ++u; // GCOV_EXCL_START: covered
+  return (byte1 ^ TwoBits) > 1 ? cast<T>(left6(byte1 ^ TwoBits, byte2))
+                               : v[Err]; // GCOV_EXCL_STOP
 }
 
 // 'R' is a sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
@@ -144,6 +135,33 @@ void convertToUtf8(Code c, std::string& s) {
     s += toChar((Six & c) + Bit1);
   } else
     s += ReplacementCharacter; // GCOV_EXCL_LINE: covered
+}
+
+// 'validateMB' is a helper function called by 'validateMBUtf8'
+template<typename T>
+[[nodiscard]] auto validateMB(
+    const T& err, const unsigned char* u, bool sizeOne) {
+  uInt byte1{*u};
+  if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+  if (byte1 & Bit3) {
+    uInt byte2 = *u ^ Bit1; // last 6 bits of the second byte
+    if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+    if (byte1 & Bit4) {
+      if (byte1 & Bit5) return err(Utf8Result::CharTooLong);
+      uInt byte3 = *u ^ Bit1; // last 6 bits of the third byte
+      if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+      const auto code4{fourByteUtf8<Code>(u, byte1, byte2, byte3)};
+      if (code4 <= Max3Uni) return err(Utf8Result::Overlong); // overlong 4 byte
+      if (code4 > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
+    } else if (const auto code3{threeByteUtf8<Code>(u, byte1, byte2)};
+               code3 <= Max2Uni)
+      return err(Utf8Result::Overlong); // GCOV_EXCL_LINE: covered
+    else if (code3 >= MinSurrogate && code3 <= MaxSurrogate)
+      return err(Utf8Result::InvalidCodePoint);
+  } else if ((byte1 ^ TwoBits) < 2)   // GCOV_EXCL_LINE: covered
+    return err(Utf8Result::Overlong); // overlong 2 byte
+  return !sizeOne || !*++u ? MBUtf8Result::Valid
+                           : err(Utf8Result::StringTooLong);
 }
 
 } // namespace
@@ -207,33 +225,12 @@ MBUtf8Result validateMBUtf8(
   if (!s) return MBUtf8Result::NotMultiByte;
   auto u{reinterpret_cast<const unsigned char*>(s)};
   if (!(*u & Bit1)) return MBUtf8Result::NotMultiByte;
-
   const auto err{[&error](auto e) {
     error = e;
     return MBUtf8Result::NotValid;
   }};
-
   if ((*u & TwoBits) == Bit1) return err(Utf8Result::ContinuationByte);
-  uInt b1{*u};
-  if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
-  if (b1 & Bit3) {
-    uInt b2 = *u ^ Bit1; // last 6 bits of the second byte
-    if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
-    if (b1 & Bit4) {
-      if (b1 & Bit5) return err(Utf8Result::CharTooLong);
-      uInt b3 = *u ^ Bit1; // last 6 bits of the third byte
-      if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
-      uInt c{fourByteUtf8<Code>(u, b1, b2, b3)};
-      if (c <= Max3Uni) return err(Utf8Result::Overlong); // overlong 4 byte
-      if (c > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
-    } else if (uInt c{threeByteUtf8<Code>(u, b1, b2)}; c <= Max2Uni)
-      return err(Utf8Result::Overlong); // GCOV_EXCL_LINE: covered
-    else if (c >= MinSurrogate && c <= MaxSurrogate)
-      return err(Utf8Result::InvalidCodePoint);
-  } else if ((b1 ^ TwoBits) < 2)      // GCOV_EXCL_LINE: covered
-    return err(Utf8Result::Overlong); // overlong 2 byte
-  return !sizeOne || !*++u ? MBUtf8Result::Valid
-                           : err(Utf8Result::StringTooLong);
+  return validateMB(err, u, sizeOne);
 }
 
 MBUtf8Result validateMBUtf8(
