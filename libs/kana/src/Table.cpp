@@ -28,10 +28,10 @@ void Table::print(std::ostream& os) const {
     }
   if (!widths.empty()) {
     border(os, widths);
-    if (!_title.empty()) print(os, widths, _title);
+    if (!_title.empty()) printRow(os, widths, _title);
     for (size_t i{}; i < _rows.size(); ++i) {
       if (_sections.contains(i)) border(os, widths);
-      print(os, widths, _rows[i]);
+      printRow(os, widths, _rows[i]);
     }
     border(os, widths);
   }
@@ -40,39 +40,19 @@ void Table::print(std::ostream& os) const {
 void Table::printMarkdown(std::ostream& os) const {
   size_t maxColumns{_title.size()};
   for (auto& i : _rows) maxColumns = std::max(maxColumns, i.size());
-  const auto pRow{[&](const Row& r, bool header = false, bool section = false) {
-    for (size_t i{}; i < maxColumns; ++i) {
-      os << "| ";
-      if (header && r.empty()) os << "---";
-      if (i < r.size()) {
-        std::string out;
-        out.reserve(r[i].size());
-        for (const auto c : r[i])
-          if (c == '|')
-            out += "\\|";
-          else
-            out += c;
-        if (out.empty() || !section)
-          os << out;
-        else
-          os << "**" << out << "**";
-      }
-      os << ' ';
-    }
-    os << "|\n";
-  }};
   if (maxColumns) {
     // Markdown needs a header row followed by a row for formatting (---, :-:,
     // etc.) so print _title even if it's empty (which will just make and empty
     // set of headers).
-    pRow(_title);
-    pRow({}, true);
+    printMarkdownRow(os, maxColumns, _title);
+    printMarkdownRow(os, maxColumns, {}, RowType::Header);
     for (size_t i{}; i < _rows.size(); ++i)
-      pRow(_rows[i], false, _sections.contains(i));
+      printMarkdownRow(os, maxColumns, _rows[i],
+          _sections.contains(i) ? RowType::Section : RowType::Normal);
   }
 }
 
-void Table::print(std::ostream& os, const Widths& widths, const Row& row,
+void Table::printRow(std::ostream& os, const Widths& widths, const Row& row,
     char fill, char delim) {
   const auto cell{[&os, delim, fill](size_t w, const auto& s) {
     os << delim << fill << std::setw(static_cast<int>(w) + 1) << s;
@@ -89,7 +69,30 @@ void Table::print(std::ostream& os, const Widths& widths, const Row& row,
 }
 
 void Table::border(std::ostream& os, const Widths& w) {
-  print(os, w, {}, '-', '+');
+  printRow(os, w, {}, '-', '+');
+}
+
+void Table::printMarkdownRow(
+    std::ostream& os, size_t maxColumns, const Row& row, RowType rowType) {
+  for (size_t i{}; i < maxColumns; ++i) {
+    os << "| ";
+    if (rowType == RowType::Header && row.empty()) os << "---";
+    if (i < row.size()) {
+      std::string out;
+      out.reserve(row[i].size());
+      for (const auto c : row[i])
+        if (c == '|')
+          out += "\\|";
+        else
+          out += c;
+      if (out.empty() || rowType != RowType::Section)
+        os << out;
+      else
+        os << "**" << out << "**";
+    }
+    os << ' ';
+  }
+  os << "|\n";
 }
 
 } // namespace kanji_tools

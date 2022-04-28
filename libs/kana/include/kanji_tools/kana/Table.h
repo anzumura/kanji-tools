@@ -49,11 +49,18 @@ public:
 private:
   using Widths = std::vector<size_t>;
 
-  static void print(std::ostream&, const Widths&, const Row&, char fill = ' ',
-      char delim = '|');
+  static void printRow(std::ostream&, const Widths&, const Row&,
+      char fill = ' ', char delim = '|');
 
   // 'border' prints a horizontal border row
   static void border(std::ostream&, const Widths&);
+
+  // 'RowType' is used by 'printMarkdown...' functions
+  enum class RowType { Normal, Header, Section };
+
+  // 'printMarkdownRow' is called from 'printMarkdown' to print a row
+  static void printMarkdownRow(
+      std::ostream&, size_t maxColumns, const Row&, RowType = RowType::Normal);
 
   const Row _title;
   const bool _countInFirstColumn;
