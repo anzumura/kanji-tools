@@ -91,8 +91,21 @@ private:
   // true if 'result' is a 'variation selector'.
   [[nodiscard]] static bool peekVariant(std::string& result, const char* loc);
 
+  // 'processOne' returns a single Kana character if 'next' is a combining mark
+  // otherwise returns 'cur' (it calls the below 'combiningMark' functions)
+  template<typename T>
+  [[nodiscard]] static std::string processOne(
+      T&, const std::string& cur, const std::string& next);
+
+  // return 'accented' Kana if it's defined, otherwise return 'base' (non-const
+  // overload updates '_curLocation' as well as '_combiningMarks' or '_errors')
+  [[nodiscard]] std::string combiningMark(
+      const std::string& base, const OptString& accented) const;
+  [[nodiscard]] std::string combiningMark(
+      const std::string& base, const OptString& accented);
+
   const std::string _data;
-  const char* _loc{_data.c_str()};
+  const char* _curLocation{_data.c_str()};
   // counts of errors, variants and combiningMarks found
   size_t _errors{}, _variants{}, _combiningMarks{};
 };

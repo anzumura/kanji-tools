@@ -89,47 +89,35 @@ std::string MBChar::getFirst(const std::string& s) {
 }
 
 void MBChar::reset() {
-  _loc = _data.c_str();
+  _curLocation = _data.c_str();
   _errors = _variants = _combiningMarks = 0;
 }
 
 bool MBChar::next(std::string& result, bool onlyMB) {
-  const auto combiningMark{[this](const auto& r, const auto& i) {
-    _loc += VarSelectorSize;
-    if (i) {
-      ++_combiningMarks;
-      return *i;
-    }
-    ++_errors;
-    return r;
-  }};
-  while (*_loc) {
-    switch (validateMBUtf8(_loc)) {
+  while (*_curLocation) {
+    switch (validateMBUtf8(_curLocation)) {
     case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE: covered
       if (!onlyMB) {
-        result = *_loc++;
+        result = *_curLocation++;
         return true;
       }
-      ++_loc; // skip regular ascii when onlyMB is true
+      ++_curLocation; // skip regular ascii when onlyMB is true
       break;
     case MBUtf8Result::Valid:
-      if (std::string r; validResult(r, _loc)) {
-        if (std::string s; peekVariant(s, _loc)) {
-          _loc += VarSelectorSize;
+      if (std::string curChar; validResult(curChar, _curLocation)) {
+        if (std::string nexChar; peekVariant(nexChar, _curLocation)) {
+          _curLocation += VarSelectorSize;
           ++_variants;
-          result = r + s;
+          result = curChar + nexChar;
         } else
-          result = s == CombiningVoiced ? combiningMark(r, Kana::findDakuten(r))
-                   : s == CombiningSemiVoiced
-                       ? combiningMark(r, Kana::findHanDakuten(r))
-                       : r;
+          result = processOne(*this, curChar, nexChar);
         return true;
       }
       ++_errors; // can't start with a variation selector or a combining mark
       break;
     case MBUtf8Result::NotValid:
       // _loc doesn't start a valid utf8 sequence so try next byte
-      ++_loc;
+      ++_curLocation;
       ++_errors;
     }
   }
@@ -137,9 +125,7 @@ bool MBChar::next(std::string& result, bool onlyMB) {
 }
 
 bool MBChar::peek(std::string& result, bool onlyMB) const {
-  const auto combiningMark{
-      [](const auto& r, const auto& i) { return i ? *i : r; }};
-  for (auto location{_loc}; *location;) {
+  for (auto location{_curLocation}; *location;) {
     switch (validateMBUtf8(location)) {
     case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE: covered
       if (!onlyMB) {
@@ -149,14 +135,11 @@ bool MBChar::peek(std::string& result, bool onlyMB) const {
       ++location;
       break;
     case MBUtf8Result::Valid:
-      if (std::string r; validResult(r, location)) {
-        if (std::string s; peekVariant(s, location))
-          result = r + s;
+      if (std::string curChar; validResult(curChar, location)) {
+        if (std::string nextChar; peekVariant(nextChar, location))
+          result = curChar + nextChar;
         else
-          result = s == CombiningVoiced ? combiningMark(r, Kana::findDakuten(r))
-                   : s == CombiningSemiVoiced
-                       ? combiningMark(r, Kana::findHanDakuten(r))
-                       : r;
+          result = processOne(*this, curChar, nextChar);
         return true;
       }
       break;
@@ -190,6 +173,32 @@ bool MBChar::validResult(std::string& result, const char*& loc) {
 
 bool MBChar::peekVariant(std::string& result, const char* loc) {
   return isValidMBUtf8(loc) && isVariationSelector(result = getMBUtf8(loc));
+}
+
+template<typename T>
+std::string MBChar::processOne(
+    T& t, const std::string& cur, const std::string& next) {
+  return next == CombiningVoiced ? t.combiningMark(cur, Kana::findDakuten(cur))
+         : next == CombiningSemiVoiced
+             ? t.combiningMark(cur, Kana::findHanDakuten(cur))
+             : cur;
+}
+
+// NOLINTNEXTLINE: keep this non-static (for now) to allow overloading by const
+std::string MBChar::combiningMark(
+    const std::string& base, const OptString& accented) const {
+  return accented.value_or(base);
+}
+
+std::string MBChar::combiningMark(
+    const std::string& base, const OptString& accented) {
+  _curLocation += VarSelectorSize;
+  if (accented) {
+    ++_combiningMarks;
+    return *accented;
+  }
+  ++_errors;
+  return base;
 }
 
 } // namespace kanji_tools
