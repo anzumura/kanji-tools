@@ -91,6 +91,8 @@ private:
   // and can potentially span across lines of a text file.
   [[nodiscard]] size_t processFile(
       const std::filesystem::path& file, const OptString& tag);
+  [[nodiscard]] size_t processFileWithRegex(
+      const std::filesystem::path& file, const OptString& tag);
 
   [[nodiscard]] virtual bool allowAdd(const std::string&) const { return true; }
   [[nodiscard]] size_t doAddFile(const std::filesystem::path& file, bool addTag,

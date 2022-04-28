@@ -116,27 +116,30 @@ size_t MBCount::processJoinedLine(std::string& prevLine,
 }
 
 size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
+  if (_find) return processFileWithRegex(file, tag);
   size_t added{};
   std::string line;
-  if (std::fstream f{file}; _find) {
-    std::string prevLine;
-    for (auto prevUnclosed{false}; std::getline(f, line);
-         prevUnclosed = hasUnclosedBrackets(prevLine)) {
-      if (prevLine.empty()) {
-        // don't process in case next line stars with open bracket
-        prevLine = line;
-        continue;
-      }
+  for (std::fstream f{file}; (std::getline(f, line));) added += add(line, tag);
+  return added;
+}
+
+size_t MBCount::processFileWithRegex(
+    const fs::path& file, const OptString& tag) {
+  size_t added{};
+  std::fstream f{file};
+  std::string line, prevLine;
+  for (auto prevUnclosed{false}; std::getline(f, line);
+       prevUnclosed = hasUnclosedBrackets(prevLine)) {
+    if (!prevLine.empty()) {
       if (prevUnclosed) {
-        // case for previous line having unclosed brackets
+        // if prevLine is unclosed and 'close' comes before 'open' or 'open' is
+        // npos ('max size_t') on the current line then process joined lines
         if (const auto close{line.find(CloseWideBracket)};
-            close != std::string::npos)
-          if (const auto open{line.find(OpenWideBracket)}; close < open) {
-            added += processJoinedLine(prevLine, line, close, tag);
-            continue;
-          }
-      } else if (const auto open{line.find(OpenWideBracket)}; !open)
-        // case for line starting with open bracket
+            close != std::string::npos && close < line.find(OpenWideBracket)) {
+          added += processJoinedLine(prevLine, line, close, tag);
+          continue;
+        }
+      } else if (!line.find(OpenWideBracket)) // line starts with open bracket
         if (const auto close{line.find(CloseWideBracket)};
             close != std::string::npos) {
           added += processJoinedLine(prevLine, line, close, tag);
@@ -145,11 +148,10 @@ size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
       // A new open bracket came before 'close' or no 'close' at all on line so
       // give up on trying to balance and just process prevLine.
       added += add(prevLine, tag);
-      prevLine = line;
     }
-    if (!prevLine.empty()) added += add(prevLine, tag);
-  } else
-    while (std::getline(f, line)) added += add(line, tag);
+    prevLine = line;
+  }
+  if (!prevLine.empty()) added += add(prevLine, tag);
   return added;
 }
 
