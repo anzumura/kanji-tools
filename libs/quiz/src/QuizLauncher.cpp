@@ -216,28 +216,7 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
     }
     out() << '\n';
   }
-  // Jukugo Lists
-  static const std::string Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
-      OtherGrade{"Other Grade Jukugo"};
-  if (auto& list{_jukugoData->find(kanji.name())}; !list.empty()) {
-    // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
-    // lists, one for the same grade of the given kanji and one for other
-    // grades. For example, 一生（いっしょう） is a grade 1 Jukugo for '一', but
-    // 一縷（いちる） is a secondary school Jukugo (which also contains '一').
-    if (JukugoData::List same, other;
-        kanji.hasGrade() && list.size() > JukugoPerLine) {
-      for (auto& i : list)
-        (kanji.grade() == i->grade() ? same : other).push_back(i);
-      if (other.empty())
-        printJukugoList(Jukugo, list);
-      else {
-        printJukugoList(SameGrade, same);
-        printJukugoList(OtherGrade, other);
-      }
-    } else
-      printJukugoList(Jukugo, list);
-  }
-  out() << '\n';
+  printJukugo(kanji);
 }
 
 void QuizLauncher::startListQuiz(Question question, bool showMeanings,
@@ -415,6 +394,30 @@ bool QuizLauncher::getQuestionOrder() {
     default: return false;
     }
   return true;
+}
+
+void QuizLauncher::printJukugo(const Kanji& kanji) const {
+  static const std::string Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
+      OtherGrade{"Other Grade Jukugo"};
+  if (auto& list{_jukugoData->find(kanji.name())}; !list.empty()) {
+    // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
+    // lists, one for the same grade of the given kanji and one for other
+    // grades. For example, 一生（いっしょう） is a grade 1 Jukugo for '一', but
+    // 一縷（いちる） is a secondary school Jukugo (which also contains '一').
+    if (JukugoData::List same, other;
+        kanji.hasGrade() && list.size() > JukugoPerLine) {
+      for (auto& i : list)
+        (kanji.grade() == i->grade() ? same : other).push_back(i);
+      if (other.empty())
+        printJukugoList(Jukugo, list);
+      else {
+        printJukugoList(SameGrade, same);
+        printJukugoList(OtherGrade, other);
+      }
+    } else
+      printJukugoList(Jukugo, list);
+  }
+  out() << '\n';
 }
 
 void QuizLauncher::printJukugoList(

@@ -89,6 +89,7 @@ private:
 
   [[nodiscard]] bool getQuestionOrder();
 
+  void printJukugo(const Kanji&) const;
   void printJukugoList(const std::string& name, const JukugoData::List&) const;
 
   [[nodiscard]] char chooseQuizType(OptChar) const;
