@@ -40,7 +40,7 @@ void DataFile::clearUniqueCheckData() {
 }
 
 DataFile::DataFile(const Path& p, FileType fileType)
-    : DataFile{p, fileType, nullptr} {}
+    : DataFile{p, fileType, {}} {}
 
 DataFile::DataFile(const Path& fileIn, FileType fileType,
     StringSet* uniqueTypeNames, const std::string& name)
@@ -51,38 +51,27 @@ DataFile::DataFile(const Path& fileIn, FileType fileType,
     file += TextFileExtension;
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
   if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
+  load(file, fileType, uniqueTypeNames);
+}
+
+void DataFile::load(
+    const Path& file, FileType fileType, StringSet* uniqueTypeNames) {
   auto lineNum{1};
   const auto error{[&lineNum, &file](const auto& s, bool pLine = true) {
     usage(s + (pLine ? " - line: " + std::to_string(lineNum) : EmptyString) +
           ", file: " + file.string());
   }};
-  Index index{0};
   std::ifstream f{file};
   DataFile::StringList dups;
   for (std::string line; std::getline(f, line); ++lineNum) {
     std::stringstream ss{line};
-    for (std::string token; std::getline(ss, token, ' ');) {
+    for (std::string token; std::getline(ss, token, ' ');)
       if (fileType == FileType::OnePerLine && token != line)
         error("got multiple tokens");
-      if (!isValidMBUtf8(token, true))
-        error("invalid multi-byte token '" + token + "'");
-      // check uniqueness within file
-      if (_map.find(token) != _map.end())
-        error("got duplicate token '" + token);
-      // check uniqueness across files
-      if (uniqueTypeNames) {
-        if (const auto i{uniqueTypeNames->insert(token)}; !i.second) {
-          dups.emplace_back(*i.first);
-          continue;
-        }
-      } else if (!UniqueNames.insert(token).second)
-        error("found globally non-unique entry '" + token + "'");
-      if (index == MaxEntries)
+      else if (!validate(error, uniqueTypeNames, token))
+        dups.emplace_back(token);
+      else if (!addEntry(token))
         error("exceeded '" + std::to_string(MaxEntries) + "' entries", false);
-      _list.emplace_back(token);
-      // 'index' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
-      _map.emplace(token, ++index);
-    }
   }
   if (!dups.empty()) {
     std::string msg{"found " + std::to_string(dups.size()) + " duplicates in " +
@@ -90,6 +79,28 @@ DataFile::DataFile(const Path& fileIn, FileType fileType,
     for (const auto& i : dups) msg += ' ' + i;
     error(msg, false);
   }
+}
+
+template<typename T>
+bool DataFile::validate(
+    const T& error, StringSet* uniqueTypeNames, const std::string& token) {
+  if (!isValidMBUtf8(token, true))
+    error("invalid multi-byte token '" + token + "'");
+  // check uniqueness within file
+  if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
+  // check uniqueness across files
+  if (uniqueTypeNames) return uniqueTypeNames->insert(token).second;
+  if (!UniqueNames.insert(token).second)
+    error("found globally non-unique entry '" + token + "'");
+  return true;
+}
+
+bool DataFile::addEntry(const std::string& token) {
+  if (_list.size() == MaxEntries) return false;
+  _list.emplace_back(token);
+  // 'index' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
+  _map.emplace(token, _list.size());
+  return true;
 }
 
 bool DataFile::exists(const std::string& s) const {

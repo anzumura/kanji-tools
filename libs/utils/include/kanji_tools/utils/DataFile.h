@@ -68,6 +68,18 @@ private:
   inline static StringSet UniqueNames;
   inline static std::set<StringSet*> OtherUniqueNames;
 
+  // 'load' is called by ctor to load contents of 'file'
+  void load(const Path& file, FileType, StringSet*);
+
+  // 'validate' is called by 'load' for each token. The lambda function (in 'T')
+  // is called for errors (which results in an exception being thrown) and false
+  // is returned if the token already exists in optional 'StringSet'.
+  template<typename T> bool validate(const T&, StringSet*, const std::string&);
+
+  // 'addEntry' returns false if adding another entry would exceed 'MaxEntries'
+  // otherwise, it adds the given token to _list and _map and returns true.
+  [[nodiscard]] bool addEntry(const std::string& token);
+
   const std::string _name;
   StringList _list;
   Map _map;
