@@ -37,7 +37,7 @@ protected:
   }
 
   // pass in 'romaji' when round trip is lossy (like repeat symbols)
-  void kanaConvertCheck(const std::string& hiragana,
+  void kanaConvertCheck(const std::string& hiragana, // NOLINT
       const std::string& katakana, const std::string& romaji = {}) {
     if (romaji.empty()) {
       auto r{hiraganaToRomaji(hiragana)};
@@ -52,7 +52,7 @@ protected:
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
 
-  void check(const std::string& hiragana, const std::string& katakana,
+  void check(const std::string& hiragana, const std::string& katakana, // NOLINT
       const std::string& romaji, const char* hepburn = {},
       const char* kunrei = {}, const char* both = {}) {
     EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);

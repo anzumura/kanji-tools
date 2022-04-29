@@ -19,7 +19,7 @@ protected:
     _data = std::make_shared<KanjiData>();
   }
 
-  [[nodiscard]] static auto checkKanji(const Data::KanjiList& l) {
+  [[nodiscard]] static auto checkKanji(const Data::KanjiList& l) { // NOLINT
     size_t variants{};
     for (auto& i : l) {
       if (i->variant()) {

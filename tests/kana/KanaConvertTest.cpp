@@ -18,7 +18,7 @@ constexpr size_t SkipFirstTwoLines{2}, SkipFirstFourLines{4};
 
 class KanaConvertTest : public ::testing::Test {
 protected:
-  void run(
+  void run( // NOLINT
       const Args& args, const std::string& expectedIn, size_t skipLines = 0) {
     _is << "q\n"; // send 'quit' option to make sure the program exits
     if (KanaConvert{args, _os, &_is}; skipLines) {

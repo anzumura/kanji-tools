@@ -67,45 +67,41 @@ protected:
     of.close();
   }
 
-  static void checkExtraKanji(const Kanji& k) {
+  static void checkExtraKanji(const Kanji& k) { // NOLINT
+    EXPECT_EQ(k.type(), KanjiTypes::Extra);
+    EXPECT_EQ(k.name(), "霙");
+    EXPECT_EQ(k.radical().name(), "雨");
+    EXPECT_EQ(k.strokes(), Strokes16);
+    EXPECT_EQ(k.meaning(), "sleet");
+    EXPECT_EQ(k.reading(), "エイ、ヨウ、みぞれ");
     EXPECT_FALSE(k.hasGrade());
     EXPECT_FALSE(k.hasLevel());
     EXPECT_FALSE(k.frequency());
     EXPECT_EQ(k.frequencyOrMax(), std::numeric_limits<Kanji::Frequency>::max());
     EXPECT_EQ(k.kyu(), KenteiKyus::K1);
-    EXPECT_EQ(k.name(), "霙");
-    EXPECT_EQ(k.strokes(), Strokes16);
-    EXPECT_EQ(k.meaning(), "sleet");
-    EXPECT_EQ(k.reading(), "エイ、ヨウ、みぞれ");
-    EXPECT_EQ(k.info(), "Rad 雨(1), Strokes 16, K1");
-    EXPECT_EQ(k.extraTypeInfo(), "#1");
-    EXPECT_FALSE(k.hasGrade());
-    EXPECT_FALSE(k.hasLevel());
-    EXPECT_TRUE(k.hasMeaning());
-    EXPECT_TRUE(k.hasReading());
-    EXPECT_EQ(k.type(), KanjiTypes::Extra);
-    EXPECT_EQ(k.radical().name(), "雨");
     EXPECT_EQ(k.reason(), JinmeiReasons::None);
     EXPECT_FALSE(k.year());
+    EXPECT_EQ(k.info(), "Rad 雨(1), Strokes 16, K1");
+    EXPECT_EQ(k.extraTypeInfo(), "#1");
   }
 
-  static void checkJinmeiKanji(const Kanji& k) {
-    EXPECT_FALSE(k.hasGrade());
-    EXPECT_EQ(k.level(), JlptLevels::N1);
-    EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
-    EXPECT_EQ(k.frequency(), Freq1728);
-    EXPECT_EQ(k.frequencyOrMax(), Freq1728);
+  static void checkJinmeiKanji(const Kanji& k) { // NOLINT
+    ASSERT_EQ(k.type(), KanjiTypes::Jinmei);
     EXPECT_EQ(k.name(), "亘");
+    EXPECT_EQ(k.radical().name(), "二");
+    EXPECT_EQ(k.strokes(), Strokes6);
     EXPECT_EQ(k.reading(), "コウ、カン、わた-る、もと-める");
     EXPECT_FALSE(k.hasMeaning());
-    EXPECT_EQ(k.strokes(), Strokes6);
-    ASSERT_EQ(k.type(), KanjiTypes::Jinmei);
-    EXPECT_EQ(k.extraTypeInfo(), "#8 1951 [Names]");
-    EXPECT_EQ(k.info(), "Rad 二(1), Strokes 6, N1, Frq 1728, Old 亙, KJ1");
-    EXPECT_EQ(k.radical().name(), "二");
+    EXPECT_FALSE(k.hasGrade());
+    EXPECT_EQ(k.level(), JlptLevels::N1);
+    EXPECT_EQ(k.frequency(), Freq1728);
+    EXPECT_EQ(k.frequencyOrMax(), Freq1728);
+    EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
     EXPECT_EQ(k.oldNames(), Kanji::LinkNames{"亙"});
-    EXPECT_EQ(k.year(), Year1951);
     EXPECT_EQ(k.reason(), JinmeiReasons::Names);
+    EXPECT_EQ(k.year(), Year1951);
+    EXPECT_EQ(k.info(), "Rad 二(1), Strokes 6, N1, Frq 1728, Old 亙, KJ1");
+    EXPECT_EQ(k.extraTypeInfo(), "#8 1951 [Names]");
   }
 
   [[nodiscard]] const MockData& data() { return _data; }
