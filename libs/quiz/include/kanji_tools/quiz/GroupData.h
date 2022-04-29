@@ -40,6 +40,9 @@ private:
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
+  static DataFile::StringList getKanjiNames(const std::string& name,
+      const std::string& members, GroupType, Group::PatternType&);
+
   [[nodiscard]] static GroupPtr createGroup(size_t number,
       const std::string& name, const Data::KanjiList&, Group::PatternType);
 
@@ -57,11 +60,13 @@ private:
 
   [[nodiscard]] auto fullDebug() const { return _data->fullDebug(); }
 
-  // '_meaningMap' and '_meaningGroups' are populated from 'meaning-groups.txt'
+  // '_meaningMap' and '_meaningGroups' are populated from
+  // 'meaning-groups.txt'
   MultiMap _meaningMap;
   List _meaningGroups;
 
-  // '_patternMap' and '_patternGroups' are populated from 'pattern-groups.txt.
+  // '_patternMap' and '_patternGroups' are populated from
+  // 'pattern-groups.txt.
   Map _patternMap;
   List _patternGroups;
 
@@ -71,11 +76,12 @@ private:
 using GroupDataPtr = std::shared_ptr<const GroupData>;
 
 // Not allowing a Kanji to be in multiple Pattern Groups can be ambiguous for
-// some more complex Kanji so in these cases, the pattern that best fits related
-// pronunciation was chosen (as well as preferring grouping by 'non-radical')
-// when creating the 'pattern-groups.txt' file. This restriction doesn't apply
-// to Meaning groups since choosing only one meaning for some (even very common)
-// Kanji would make other groups seem incomplete, e.g., if '金' was only in the
-// '色' group then the '時間：曜日' group would be missing a day.
+// some more complex Kanji so in these cases, the pattern that best fits
+// related pronunciation was chosen (as well as preferring grouping by
+// 'non-radical') when creating the 'pattern-groups.txt' file. This
+// restriction doesn't apply to Meaning groups since choosing only one meaning
+// for some (even very common) Kanji would make other groups seem incomplete,
+// e.g., if '金' was only in the '色' group then the '時間：曜日' group would
+// be missing a day.
 
 } // namespace kanji_tools

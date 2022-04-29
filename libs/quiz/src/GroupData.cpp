@@ -51,26 +51,17 @@ void GroupData::loadGroup(
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
       membersCol{"Members"};
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
+    // get name
     auto& name{f.get(nameCol)};
-    auto& members{f.get(membersCol)};
     if (name.empty()) f.error("group must have a name");
     if (isAnySingleByte(name)) f.error("group name must be all MB characters");
+    // get members
+    auto& members{f.get(membersCol)};
     if (members.ends_with(",")) f.error("members ends with ,");
-
-    DataFile::StringList kanjiNames;
+    // get patternType and kanjiNames
     auto patternType{Group::PatternType::None};
-    if (groupType == GroupType::Pattern) {
-      patternType = name.starts_with(WideColon) ? Group::PatternType::Peer
-                    : name.find(WideColon) != std::string::npos
-                        ? Group::PatternType::Family
-                        : Group::PatternType::Reading;
-      // 'name' before the colon is the first member of a 'family'
-      if (patternType == Group::PatternType::Family)
-        kanjiNames.emplace_back(MBChar::getFirst(name));
-    }
-    std::string member;
-    for (std::stringstream ss{members}; std::getline(ss, member, ',');)
-      kanjiNames.emplace_back(member);
+    const auto kanjiNames{getKanjiNames(name, members, groupType, patternType)};
+    // get memberKanji (by looking up each name in kanjiNames)
     Data::KanjiList memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findKanjiByName(i)}; k)
@@ -90,6 +81,25 @@ void GroupData::loadGroup(
       f.error(e.what());
     }
   }
+}
+
+DataFile::StringList GroupData::getKanjiNames(const std::string& name,
+    const std::string& members, GroupType groupType,
+    Group::PatternType& patternType) {
+  DataFile::StringList kanjiNames;
+  if (groupType == GroupType::Pattern) {
+    patternType = name.starts_with(WideColon) ? Group::PatternType::Peer
+                  : name.find(WideColon) != std::string::npos
+                      ? Group::PatternType::Family
+                      : Group::PatternType::Reading;
+    // 'name' before the colon is the first member of a 'family'
+    if (patternType == Group::PatternType::Family)
+      kanjiNames.emplace_back(MBChar::getFirst(name));
+  }
+  std::string member;
+  for (std::stringstream ss{members}; std::getline(ss, member, ',');)
+    kanjiNames.emplace_back(member);
+  return kanjiNames;
 }
 
 GroupPtr GroupData::createGroup(size_t number, const std::string& name,
