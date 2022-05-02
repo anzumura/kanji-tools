@@ -9,6 +9,14 @@ namespace kanji_tools {
 
 namespace {
 
+const ColumnFile::Column CodeCol{"Code"}, NameCol{"Name"}, BlockCol{"Block"},
+    VersionCol{"Version"}, RadicalCol{"Radical"}, StrokesCol{"Strokes"},
+    VStrokesCol{"VStrokes"}, PinyinCol{"Pinyin"}, MorohashiIdCol{"MorohashiId"},
+    NelsonIdsCol{"NelsonIds"}, SourcesCol{"Sources"}, JSourceCol{"JSource"},
+    JoyoCol{"Joyo"}, JinmeiCol{"Jinmei"}, LinkCodesCol{"LinkCodes"},
+    LinkNamesCol{"LinkNames"}, LinkTypeCol{"LinkType"}, MeaningCol{"Meaning"},
+    OnCol{"On"}, KunCol{"Kun"};
+
 // 'PrintCount' is used for debug printing. Some combinations are prevented by
 // 'load' function (like Joyo with a link or missing meaning), but count all
 // cases for completeness.
@@ -81,78 +89,46 @@ std::string UcdData::getReadingsAsKana(UcdPtr u) const {
 }
 
 void UcdData::load(const Data::Path& file) {
-  const ColumnFile::Column codeCol{"Code"}, nameCol{"Name"}, blockCol{"Block"},
-      versionCol{"Version"}, radicalCol{"Radical"}, strokesCol{"Strokes"},
-      vStrokesCol{"VStrokes"}, pinyinCol{"Pinyin"}, morohashiCol{"MorohashiId"},
-      nelsonIdsCol{"NelsonIds"}, sourcesCol{"Sources"}, jSourceCol{"JSource"},
-      joyoCol{"Joyo"}, jinmeiCol{"Jinmei"}, linkCodesCol{"LinkCodes"},
-      linkNamesCol{"LinkNames"}, linkTypeCol{"LinkType"}, meaningCol{"Meaning"},
-      onCol{"On"}, kunCol{"Kun"};
   for (ColumnFile f{file,
-           {codeCol, nameCol, blockCol, versionCol, radicalCol, strokesCol,
-               vStrokesCol, pinyinCol, morohashiCol, nelsonIdsCol, sourcesCol,
-               jSourceCol, joyoCol, jinmeiCol, linkCodesCol, linkNamesCol,
-               linkTypeCol, meaningCol, onCol, kunCol}};
+           {CodeCol, NameCol, BlockCol, VersionCol, RadicalCol, StrokesCol,
+               VStrokesCol, PinyinCol, MorohashiIdCol, NelsonIdsCol, SourcesCol,
+               JSourceCol, JoyoCol, JinmeiCol, LinkCodesCol, LinkNamesCol,
+               LinkTypeCol, MeaningCol, OnCol, KunCol}};
        f.nextRow();) {
-    if (f.isEmpty(onCol) && f.isEmpty(kunCol) && f.isEmpty(morohashiCol) &&
-        f.isEmpty(jSourceCol))
+    if (f.isEmpty(OnCol) && f.isEmpty(KunCol) && f.isEmpty(MorohashiIdCol) &&
+        f.isEmpty(JSourceCol))
       f.error("one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated");
-    auto& name{f.get(nameCol)};
+    auto& name{f.get(NameCol)};
     if (name.size() > 4) f.error("name more than 4 bytes");
-    const auto radical{f.getULong(radicalCol)};
+    const auto radical{f.getULong(RadicalCol)};
     if (radical < 1 || radical > Radical::MaxRadicals)
       f.error("radical '" + std::to_string(radical) + "' out of range");
-    const auto joyo{f.getBool(joyoCol)}, jinmei{f.getBool(jinmeiCol)};
+    const auto joyo{f.getBool(JoyoCol)}, jinmei{f.getBool(JinmeiCol)};
     if (joyo) {
       if (jinmei) f.error("can't be both joyo and jinmei");
       // meaning is empty for some entries like 乁, 乣, 乴, etc., but it
       // shouldn't be empty for Joyo
-      if (f.isEmpty(meaningCol)) f.error("meaning is empty for Jōyō Kanji");
+      if (f.isEmpty(MeaningCol)) f.error("meaning is empty for Jōyō Kanji");
     }
-
-    Ucd::Links links;
-    if (!f.isEmpty(linkNamesCol)) {
-      std::stringstream names{f.get(linkNamesCol)}, codes{f.get(linkCodesCol)};
-      for (std::string linkName; std::getline(names, linkName, ',');)
-        if (std::string linkCode; std::getline(codes, linkCode, ','))
-          links.emplace_back(f.getChar32(linkCodesCol, linkCode), linkName);
-        else
-          f.error("LinkNames has more values than LinkCodes");
-      // Joyo are standard Kanji so they shouldn't have a link back to a
-      // standard form. However, Some Jinmei do have links since they are
-      // 'officially allowed variants/old forms'. There are links in raw XML
-      // data for joyo, but the parse script ignores them.
-      if (joyo) f.error("joyo shouldn't have links");
-      if (f.isEmpty(linkTypeCol))
-        f.error("LinkNames has a value, but LinkType is empty");
-    } else if (!f.isEmpty(linkTypeCol))
-      f.error("LinkType has a value, but LinkNames is empty");
-    else if (!f.isEmpty(linkCodesCol))
-      f.error("LinkCodes has a value, but LinkNames is empty");
+    auto links{loadLinks(f, joyo)};
     try {
-      const auto strokes{f.isEmpty(vStrokesCol) ? Strokes{f.getU8(strokesCol)}
-                                                : Strokes{f.getU8(strokesCol),
-                                                      f.getU8(vStrokesCol)}};
+      const auto strokes{f.isEmpty(VStrokesCol) ? Strokes{f.getU8(StrokesCol)}
+                                                : Strokes{f.getU8(StrokesCol),
+                                                      f.getU8(VStrokesCol)}};
       if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
-                   std::make_tuple(UcdEntry{f.getChar32(codeCol), name},
-                       f.get(blockCol), f.get(versionCol), radical, strokes,
-                       f.get(pinyinCol), f.get(morohashiCol),
-                       f.get(nelsonIdsCol), f.get(sourcesCol),
-                       f.get(jSourceCol), joyo, jinmei, links,
-                       AllUcdLinkTypes.fromStringAllowEmpty(f.get(linkTypeCol)),
-                       f.get(meaningCol), f.get(onCol), f.get(kunCol)))
+                   std::make_tuple(UcdEntry{f.getChar32(CodeCol), name},
+                       f.get(BlockCol), f.get(VersionCol), radical, strokes,
+                       f.get(PinyinCol), f.get(MorohashiIdCol),
+                       f.get(NelsonIdsCol), f.get(SourcesCol),
+                       f.get(JSourceCol), joyo, jinmei, links,
+                       AllUcdLinkTypes.fromStringAllowEmpty(f.get(LinkTypeCol)),
+                       f.get(MeaningCol), f.get(OnCol), f.get(KunCol)))
                .second)
         throw std::domain_error{"duplicate entry '" + name + "'"};
     } catch (const std::exception& e) {
       f.error(e.what());
     }
-    for (const auto& link : links)
-      if (!jinmei)
-        _linkedOther[link.name()].emplace_back(name);
-      else if (const auto i{_linkedJinmei.emplace(link.name(), name)};
-               !i.second)
-        f.error("jinmei entry '" + name + "' with link '" + link.name() +
-                "' failed - link already points to '" + i.first->second + "'");
+    processLinks(f, links, name, jinmei);
   }
 }
 
@@ -199,6 +175,39 @@ void UcdData::print(DataRef data) const {
   pLinks("Frequency", data.types(KanjiTypes::Frequency));
   pLinks("Extra", data.types(KanjiTypes::Extra));
   printVariationSelectorKanji(data);
+}
+
+Ucd::Links UcdData::loadLinks(const class ColumnFile& f, bool joyo) {
+  Ucd::Links links;
+  if (!f.isEmpty(LinkNamesCol)) {
+    std::stringstream names{f.get(LinkNamesCol)}, codes{f.get(LinkCodesCol)};
+    for (std::string linkName; std::getline(names, linkName, ',');)
+      if (std::string linkCode; std::getline(codes, linkCode, ','))
+        links.emplace_back(f.getChar32(LinkCodesCol, linkCode), linkName);
+      else
+        f.error("LinkNames has more values than LinkCodes");
+    // Joyo are standard Kanji so they shouldn't have a link back to a
+    // standard form. However, Some Jinmei do have links since they are
+    // 'officially allowed variants/old forms'. There are links in raw XML
+    // data for joyo, but the parse script ignores them.
+    if (joyo) f.error("joyo shouldn't have links");
+    if (f.isEmpty(LinkTypeCol))
+      f.error("LinkNames has a value, but LinkType is empty");
+  } else if (!f.isEmpty(LinkTypeCol))
+    f.error("LinkType has a value, but LinkNames is empty");
+  else if (!f.isEmpty(LinkCodesCol))
+    f.error("LinkCodes has a value, but LinkNames is empty");
+  return links;
+}
+
+void UcdData::processLinks(const ColumnFile& f, const Ucd::Links& links,
+    const std::string& name, bool jinmei) {
+  for (const auto& link : links)
+    if (!jinmei)
+      _linkedOther[link.name()].emplace_back(name);
+    else if (const auto i{_linkedJinmei.emplace(link.name(), name)}; !i.second)
+      f.error("jinmei entry '" + name + "' with link '" + link.name() +
+              "' failed - link already points to '" + i.first->second + "'");
 }
 
 void UcdData::printVariationSelectorKanji(DataRef data) const {

@@ -38,6 +38,10 @@ public:
   void load(const std::filesystem::path&);
   void print(const class Data&) const;
 private:
+  [[nodiscard]] static Ucd::Links loadLinks(const class ColumnFile&, bool joyo);
+  void processLinks(const ColumnFile&, const Ucd::Links&,
+      const std::string& name, bool jinmei);
+
   void printVariationSelectorKanji(const Data&) const;
 
   Map _map;
