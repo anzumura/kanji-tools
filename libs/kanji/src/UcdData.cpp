@@ -23,8 +23,8 @@ const ColumnFile::Column CodeCol{"Code"}, NameCol{"Name"}, BlockCol{"Block"},
 class PrintCount {
 public:
   PrintCount() noexcept = default;
-  PrintCount(const PrintCount&) = delete; // LCOV_EXCL_LINE: covered
-  PrintCount& operator=(const PrintCount&) = delete;
+  PrintCount(const PrintCount&) = delete;
+  PrintCount& operator=(const PrintCount&) = delete; // LCOV_EXCL_LINE: covered
 
   void add(const Ucd& k) {
     ++_count;
