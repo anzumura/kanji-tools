@@ -180,6 +180,13 @@ void Kana::RepeatMark::validate() const {
   assert(isAllKatakana(_katakana));
 }
 
+const Kana::RepeatMark* Kana::findRepeatMark(
+    CharType source, const std::string& kana) {
+  if (RepeatPlain.matches(source, kana)) return &RepeatPlain;
+  if (RepeatAccented.matches(source, kana)) return &RepeatAccented;
+  return {};
+}
+
 const Kana::Map& Kana::getMap(CharType t) {
   switch (t) {
   case CharType::Romaji: return RomajiMap;

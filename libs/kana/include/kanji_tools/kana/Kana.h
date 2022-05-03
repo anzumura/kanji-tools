@@ -138,6 +138,9 @@ public:
   inline static const RepeatMark RepeatPlain{"ゝ", "ヽ", false},
       RepeatAccented{"ゞ", "ヾ", true};
 
+  // return repeat mark or nullptr if 'kana' isn't a repeat mark.
+  [[nodiscard]] static const RepeatMark* findRepeatMark(CharType, const std::string& kana);
+
   // provide static const refs for some special-case Kana
   static const Kana& SmallTsu;
   static const Kana& N;
