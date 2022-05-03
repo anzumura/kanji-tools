@@ -20,6 +20,9 @@ private:
   // 'error' throws an exception (used during processing of command line args)
   static void error(const std::string&);
 
+  [[nodiscard]] bool processArg(
+      const std::string& arg, bool& printKana, bool& printMarkdown);
+
   [[nodiscard]] bool charTypeArgs(const std::string&);
   bool flagArgs(char);
 

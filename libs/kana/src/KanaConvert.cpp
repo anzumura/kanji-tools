@@ -13,61 +13,59 @@ void KanaConvert::error(const std::string& msg) {
 
 KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
     : _out(out), _in(in), _choice{out, in} {
-  auto finishedOptions{false}, printKana{false}, printMarkdown{false};
-  const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
-    if (_interactive || _suppressNewLine || printKana || printMarkdown)
-      error("can only specify one of -i, -m, -n, or -p");
-    b = true;
-  }};
+  auto printKana{false}, printMarkdown{false};
   List strings;
-  for (Args::Size i{1}; i < args.size(); ++i) {
-    std::string arg{args[i]};
-    if (finishedOptions)
-      strings.emplace_back(arg);
-    else if (arg == "--")
-      finishedOptions = true; // any more args will be added to 'files'
-    else if (arg == "-i")
-      setBool(_interactive);
-    else if (arg == "-m")
-      setBool(printMarkdown);
-    else if (arg == "-n")
-      setBool(_suppressNewLine);
-    else if (arg == "-p")
-      setBool(printKana);
+  for (Args::Size i{1}; i < args.size(); ++i)
+    if (std::string arg{args[i]}; arg == "--")
+      while (++i < args.size()) strings.emplace_back(args[i]);
     else if (arg == "-?") {
       usage();
       return;
     } else if (arg == "-f") {
-      if (i + 1 < args.size()) {
-        ++i;
-        arg = args[i];
-        if (arg.size() != 1 || !flagArgs(arg[0]))
-          error("illegal option for -f: " + arg);
-      } else
-        error("-f must be followed by a flag value");
-    } else if (arg.starts_with("-")) {
-      if (!charTypeArgs(arg)) error("illegal option: " + arg);
-    } else
+      if (++i >= args.size()) error("-f must be followed by a flag value");
+      if (arg = args[i]; arg.size() != 1 || !flagArgs(arg[0]))
+        error("illegal option for -f: " + arg);
+    } else if (processArg(arg, printKana, printMarkdown))
       strings.emplace_back(arg);
-  }
-  if (strings.empty()) {
-    if (printKana)
-      printKanaChart();
-    else if (printMarkdown)
-      printKanaChart(true);
-    else {
-      // when testing ('_in' is defined) or reading from a tty then require '-i'
-      // if no string args are provided. If stdin is not a tty (like a pipe)
-      // then '-i' isn't required, e.g.: 'echo hi | kanaConvert'
-      if ((_in || isatty(fileno(stdin))) && !_interactive)
-        error("provide one or more 'strings' to convert or specify '-i' for "
-              "interactive mode");
-      start();
-    }
-  } else if (_interactive || printKana || printMarkdown)
-    error("'string' args can't be combined with '-i', '-m' or '-p'");
-  else
+
+  if (!strings.empty()) {
+    if (_interactive || printKana || printMarkdown)
+      error("'string' args can't be combined with '-i', '-m' or '-p'");
     start(strings);
+  } else if (printKana || printMarkdown)
+    printKanaChart(printMarkdown);
+  else {
+    // when testing ('_in' is defined) or reading from a tty then require
+    // '-i' if no string args are provided. If stdin is not a tty (like a
+    // pipe) then '-i' isn't required, e.g.: 'echo hi | kanaConvert'
+    if ((_in || isatty(fileno(stdin))) && !_interactive)
+      error("provide one or more 'strings' to convert or specify '-i' for "
+            "interactive mode");
+    start();
+  }
+}
+
+bool KanaConvert::processArg(
+    const std::string& arg, bool& printKana, bool& printMarkdown) {
+  const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
+    // NOLINTNEXTLINE: NonNullParamChecker
+    if (_interactive || _suppressNewLine || printKana || printMarkdown)
+      error("can only specify one of -i, -m, -n, or -p");
+    b = true;
+  }};
+  if (arg == "-i")
+    setBool(_interactive);
+  else if (arg == "-m")
+    setBool(printMarkdown);
+  else if (arg == "-n")
+    setBool(_suppressNewLine);
+  else if (arg == "-p")
+    setBool(printKana);
+  else if (arg.starts_with("-")) {
+    if (!charTypeArgs(arg)) error("illegal option: " + arg);
+  } else
+    return true;
+  return false;
 }
 
 bool KanaConvert::charTypeArgs(const std::string& arg) {
