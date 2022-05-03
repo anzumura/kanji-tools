@@ -8,8 +8,8 @@ namespace {
 
 // 'ptrCast' is used in Layout test
 template<typename T>
-[[nodiscard]] constexpr size_t ptrCast(const T& x) noexcept {
-  static_assert(sizeof(size_t) == sizeof(T*));
+[[nodiscard]] constexpr uintptr_t ptrCast(const T& x) noexcept {
+  static_assert(sizeof(uintptr_t) == sizeof(T*));
   return reinterpret_cast<size_t>(&x);
 }
 
@@ -35,12 +35,12 @@ TEST(UcdTest, Size) {
 
 TEST(UcdTest, Layout) {
 #ifdef __clang__
-  const size_t stringDiff{};
+  const uintptr_t stringDiff{};
 #else
-  const size_t stringDiff{8}; // gcc string is 8 bytes bigger than clang
+  const uintptr_t stringDiff{8}; // gcc string is 8 bytes bigger than clang
 #endif
   const Ucd u{TestUcd{}};
-  const size_t start{ptrCast(u)};
+  const uintptr_t start{ptrCast(u)};
   EXPECT_EQ(ptrCast(u.entry()), start);
   EXPECT_EQ(ptrCast(u.block()) - start, 24 + stringDiff);
   EXPECT_EQ(ptrCast(u.version()) - start, 26 + stringDiff);
@@ -49,7 +49,7 @@ TEST(UcdTest, Layout) {
   EXPECT_EQ(ptrCast(u.morohashiId()) - start, 36 + stringDiff);
   EXPECT_EQ(ptrCast(u.links()) - start, 40 + stringDiff);
   EXPECT_EQ(ptrCast(u.nelsonIds()) - start, 64 + stringDiff);
-  size_t i{2};
+  uintptr_t i{2};
   EXPECT_EQ(ptrCast(u.jSource()) - start, 88 + stringDiff * i);
   EXPECT_EQ(ptrCast(u.meaning()) - start, 112 + stringDiff * ++i);
   EXPECT_EQ(ptrCast(u.onReading()) - start, 136 + stringDiff * ++i);
