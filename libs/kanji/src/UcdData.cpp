@@ -111,6 +111,7 @@ void UcdData::load(const Data::Path& file) {
       if (f.isEmpty(MeaningCol)) f.error("meaning is empty for Jōyō Kanji");
     }
     auto links{loadLinks(f, joyo)};
+    processLinks(f, links, name, jinmei);
     try {
       const auto strokes{f.isEmpty(VStrokesCol) ? Strokes{f.getU8(StrokesCol)}
                                                 : Strokes{f.getU8(StrokesCol),
@@ -120,7 +121,7 @@ void UcdData::load(const Data::Path& file) {
                        f.get(BlockCol), f.get(VersionCol), radical, strokes,
                        f.get(PinyinCol), f.get(MorohashiIdCol),
                        f.get(NelsonIdsCol), f.get(SourcesCol),
-                       f.get(JSourceCol), joyo, jinmei, links,
+                       f.get(JSourceCol), joyo, jinmei, std::move(links),
                        AllUcdLinkTypes.fromStringAllowEmpty(f.get(LinkTypeCol)),
                        f.get(MeaningCol), f.get(OnCol), f.get(KunCol)))
                .second)
@@ -128,7 +129,6 @@ void UcdData::load(const Data::Path& file) {
     } catch (const std::exception& e) {
       f.error(e.what());
     }
-    processLinks(f, links, name, jinmei);
   }
 }
 

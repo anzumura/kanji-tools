@@ -60,7 +60,7 @@ public:
       Radical::Number, Strokes, const std::string& pinyin,
       const std::string& morohashiId, const std::string& nelsonIds,
       const std::string& sources, const std::string& jSource, bool joyo,
-      bool jinmei, const Links&, UcdLinkTypes, Meaning, Reading onReading,
+      bool jinmei, Links, UcdLinkTypes, Meaning, Reading onReading,
       Reading kunReading);
 
   Ucd(const Ucd&) = delete;

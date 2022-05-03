@@ -50,13 +50,13 @@ Ucd::Ucd(const UcdEntry& entry, const std::string& block,
     const std::string& version, Radical::Number radical, Strokes strokes,
     const std::string& pinyin, const std::string& morohashiId,
     const std::string& nelsonIds, const std::string& sources,
-    const std::string& jSource, bool joyo, bool jinmei, const Links& links,
+    const std::string& jSource, bool joyo, bool jinmei, Links links,
     UcdLinkTypes linkType, Meaning meaning, Reading onReading,
     Reading kunReading)
     : _entry{entry}, _block{block}, _version{version}, _pinyin{pinyin},
       _sources{getSources(sources, joyo, jinmei)}, _linkType{linkType},
       _radical{radical}, _strokes{strokes}, _morohashiId{morohashiId},
-      _links{links}, _nelsonIds{nelsonIds}, _jSource{jSource},
+      _links{std::move(links)}, _nelsonIds{nelsonIds}, _jSource{jSource},
       _meaning{meaning}, _onReading{onReading}, _kunReading{kunReading} {}
 
 bool Ucd::linkedReadings() const {
