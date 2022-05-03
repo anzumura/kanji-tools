@@ -138,12 +138,10 @@ std::string Converter::convert(
 
 std::string Converter::fromKana(
     const std::string& kanaInput, CharType source) const { // LCOV_EXCL_LINE
-  enum class State { New, SmallTsu, Done };
   State state{State::New};
   std::string result, kanaGroup, kana;
   const Kana* prevKana{};
 
-  enum class DoneType { NewGroup, NewEmptyGroup, Prolong };
   // 'done' is called to process the Kana built up in 'kanaGroup'. By default it
   // starts a new group containing 'kana' (the current symbol being processed).
   const auto done{[this, source, &state, &result, &kanaGroup, &kana, &prevKana](
@@ -162,38 +160,14 @@ std::string Converter::fromKana(
     if (kana == Kana::ProlongMark)
       // prolong is 'katakana', but it can appear in (non-standard) Hiragana.
       done(DoneType::Prolong);
-    else if (Kana::RepeatPlain.matches(source, kana)) {
+    else if (const auto repeat{Kana::findRepeatMark(source, kana)}; repeat) {
       done(DoneType::NewEmptyGroup);
-      result += Kana::RepeatPlain.get(_target, _flags, prevKana);
-    } else if (Kana::RepeatAccented.matches(source, kana)) {
-      done(DoneType::NewEmptyGroup);
-      result += Kana::RepeatAccented.get(_target, _flags, prevKana);
+      result += repeat->get(_target, _flags, prevKana);
     } else if (Kana::getMap(source).contains(kana)) {
-      if (Kana::SmallTsu.containsKana(kana))
-        // getting a small tsu causes any stored kana to be processed
-        done(DoneType::NewGroup, State::SmallTsu);
-      else if (Kana::N.containsKana(kana))
-        // getting an 'n' causes any stored kana to be processed
-        done(DoneType::NewGroup, State::Done); // new group marked as 'Done'
-      else if (state == State::Done)
-        done();
-      else if (smallKana(source).contains(kana)) {
-        // a small letter should cause letters to be processed including the
-        // small letter so mark group as done, but continue the loop in case
-        // there's a 'prolong' mark.
-        kanaGroup += kana;
-        state = State::Done;
-      } else if (kanaGroup.size() >
-                 (state == State::SmallTsu ? Kana::OneKanaSize : 0))
-        // a normal (non-n, non-small) letter can't form the second part of a
-        // digraph so process any stored previous letter and hold processing of
-        // the new letter in case it forms the first part of a new digraph.
-        done();
-      else
+      if (!processOneKana(done, source, kana, kanaGroup, state))
         kanaGroup += kana;
     } else {
-      // got non-hiragana letter so flush any letters and preserve the new
-      // letter unconverted
+      // got non-kana so flush any letters and preserve new letter unconverted
       done(DoneType::NewEmptyGroup);
       if (romajiTarget())
         if (const auto i{wideDelims().find(kana)}; i != wideDelims().end()) {
@@ -204,6 +178,36 @@ std::string Converter::fromKana(
     }
   }
   return result + processKana(kanaGroup, source, prevKana);
+}
+
+template<typename T>
+bool Converter::processOneKana(const T& done, CharType source,
+    const std::string& kana, const std::string& kanaGroup, State& state) const {
+  if (Kana::SmallTsu.containsKana(kana)) {
+    // getting a small tsu causes any stored kana to be processed
+    done(DoneType::NewGroup, State::SmallTsu);
+    return true;
+  }
+  if (Kana::N.containsKana(kana)) {
+    // getting an 'n' causes any stored kana to be processed
+    done(DoneType::NewGroup, State::Done); // new group marked as 'Done'
+    return true;
+  }
+  if (state != State::Done) {
+    if (smallKana(source).contains(kana)) {
+      // a small letter (other than small tsu covered above) should cause
+      // letters to be processed including the small letter so mark group as
+      // done, but continue processing in case there's a 'prolong' mark.
+      state = State::Done;
+      return false;
+    }
+    if (kanaGroup.size() <= (state == State::SmallTsu ? Kana::OneKanaSize : 0))
+      // keep processing for a normal (non-n non-small) letter if it's the first
+      // part of a group (or the group starts with a small tsu)
+      return false;
+  }
+  done();
+  return true;
 }
 
 std::string Converter::processKana(const std::string& kanaGroup,

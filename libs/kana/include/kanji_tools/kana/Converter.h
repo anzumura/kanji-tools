@@ -143,9 +143,15 @@ private:
   // and vice versa).
   [[nodiscard]] std::string fromKana(const std::string&, CharType source) const;
 
+  enum class State { New, SmallTsu, Done };
+  enum class DoneType { NewGroup, NewEmptyGroup, Prolong };
+
   // helper functions used by 'fromKana'
   [[nodiscard]] std::string processKana(const std::string& kanaGroup,
       CharType source, const Kana*& prevKana, bool prolong = false) const;
+  template<typename T>
+  [[nodiscard]] bool processOneKana(const T&, CharType source,
+      const std::string& kana, const std::string& kanaGroup, State&) const;
   [[nodiscard]] std::string processKanaMacron(bool prolong,
       const Kana*& prevKana, const Kana* kana, bool sokuon = false) const;
 
