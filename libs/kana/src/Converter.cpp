@@ -183,30 +183,29 @@ std::string Converter::fromKana(
 template<typename T>
 bool Converter::processOneKana(const T& done, CharType source,
     const std::string& kana, const std::string& kanaGroup, State& state) const {
-  if (Kana::SmallTsu.containsKana(kana)) {
+  if (Kana::SmallTsu.containsKana(kana))
     // getting a small tsu causes any stored kana to be processed
     done(DoneType::NewGroup, State::SmallTsu);
-    return true;
-  }
-  if (Kana::N.containsKana(kana)) {
+  else if (Kana::N.containsKana(kana))
     // getting an 'n' causes any stored kana to be processed
     done(DoneType::NewGroup, State::Done); // new group marked as 'Done'
-    return true;
-  }
-  if (state != State::Done) {
-    if (smallKana(source).contains(kana)) {
-      // a small letter (other than small tsu covered above) should cause
-      // letters to be processed including the small letter so mark group as
-      // done, but continue processing in case there's a 'prolong' mark.
-      state = State::Done;
-      return false;
+  else {
+    if (state != State::Done) {
+      if (smallKana(source).contains(kana)) {
+        // a small letter (other than small tsu covered above) should cause
+        // letters to be processed including the small letter so mark group as
+        // done, but continue processing in case there's a 'prolong' mark.
+        state = State::Done;
+        return false;
+      }
+      if (kanaGroup.size() <=
+          (state == State::SmallTsu ? Kana::OneKanaSize : 0))
+        // keep processing for a normal (non-n non-small) letter if it's the
+        // first part of a group (or the group starts with a small tsu)
+        return false;
     }
-    if (kanaGroup.size() <= (state == State::SmallTsu ? Kana::OneKanaSize : 0))
-      // keep processing for a normal (non-n non-small) letter if it's the first
-      // part of a group (or the group starts with a small tsu)
-      return false;
+    done();
   }
-  done();
   return true;
 }
 
