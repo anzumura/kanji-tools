@@ -29,8 +29,6 @@ private:
   size_t _dakuten{}, _hanDakuten{}, _plain{};
 };
 
-constexpr size_t NoneTypeKana{4}, FooterWidth{10};
-
 void printChartHeader(std::ostream& out, bool markdown) {
   out << (markdown ? "## **Kana Conversion Chart**\n### **Notes:**"
                    : ">>> Notes:");
@@ -57,6 +55,7 @@ void printChartHeader(std::ostream& out, bool markdown) {
 void printChartFooter(std::ostream& out, bool markdown, size_t small,
     size_t romajiVariants, const KanaCount& monographs,
     const KanaCount& digraphs) {
+  static constexpr size_t NoneTypeKana{4}, FooterWidth{10};
   out << '\n'
       << (markdown ? "### **Totals:**" : ">>> Totals:") << std::setfill(' ')
       << std::right << '\n';
@@ -237,55 +236,50 @@ void KanaConvert::start(const List& strings) {
       else
         space = _converter.target() != CharType::Romaji &&
                 !(_converter.flags() & ConvertFlags::RemoveSpaces);
-      processOneLine(i);
+      convert(i);
     }
     _out << '\n';
   }
 }
 
 void KanaConvert::getInput() {
-  static const Choice::Choices FlagChoices{{'h', "Hepburn"}, // LCOV_EXCL_LINE
-      {'k', "Kunrei"}, {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
-  auto outputCurrentOptions{true};
-  do {
-    if (_interactive && outputCurrentOptions) {
-      _out << ">>> current options: source="
-           << (_source ? toString(*_source) : "any")
-           << ", target=" << toString(_converter.target())
-           << ", flags=" << _converter.flagString()
-           << "\n>>> enter string (c=clear flags, f=set flag, q=quit, h=help, "
-              "-k|-h|-r|-K|-H|-R):\n";
-      outputCurrentOptions = false;
-    }
-    if (std::string line;
-        std::getline(_in ? *_in : std::cin, line) && line != "q") {
-      if (_interactive) {
-        if (line.empty()) continue;
-        if (line == "c" || line == "f" || line == "h" ||
-            line.starts_with("-")) {
-          if (line == "c")
-            _converter.flags(ConvertFlags::None);
-          else if (line == "f")
-            flagArgs(_choice.get(">>> enter flag option", FlagChoices));
-          else if (line == "h") {
-            usage(false);
-            line = "q";
-          } else if (line.starts_with("-")) {
-            if (!charTypeArgs(line))
-              _out << "  illegal option: " << line << '\n';
-          }
-          outputCurrentOptions = true;
-          continue;
-        }
-      }
-      processOneLine(line);
-      if (!_suppressNewLine) _out << '\n';
-    } else
-      break;
-  } while (true);
+  if (_interactive) printOptions();
+  for (std::string line;
+       std::getline(_in ? *_in : std::cin, line) && line != "q";) {
+    if (_interactive && !processLine(line)) continue;
+    convert(line);
+    if (!_suppressNewLine) _out << '\n';
+  }
 }
 
-void KanaConvert::processOneLine(const std::string& s) {
+void KanaConvert::printOptions() const {
+  _out << ">>> current options: source="
+       << (_source ? toString(*_source) : "any")
+       << ", target=" << toString(_converter.target())
+       << ", flags=" << _converter.flagString()
+       << "\n>>> enter string (c=clear flags, f=set flag, q=quit, h=help, "
+          "-k|-h|-r|-K|-H|-R):\n";
+}
+
+bool KanaConvert::processLine(const std::string& line) {
+  static const Choice::Choices FlagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
+      {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
+  if (line.empty()) return false;
+  if (line == "c")
+    _converter.flags(ConvertFlags::None);
+  else if (line == "f")
+    flagArgs(_choice.get(">>> enter flag option", FlagChoices));
+  else if (line == "h")
+    usage(false);
+  else if (line.starts_with("-")) {
+    if (!charTypeArgs(line)) _out << "  illegal option: " << line << '\n';
+  } else
+    return true;
+  printOptions();
+  return false;
+}
+
+void KanaConvert::convert(const std::string& s) {
   _out << (_source ? _converter.convert(*_source, s) : _converter.convert(s));
 }
 

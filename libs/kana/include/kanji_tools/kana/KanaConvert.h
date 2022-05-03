@@ -31,9 +31,13 @@ private:
   void usage(bool showAllOptions = true) const;
 
   void start(const List& = {});
+
   void getInput();
-  void processOneLine(const std::string&);
+  void printOptions() const;
+  [[nodiscard]] bool processLine(const std::string&);
+  void convert(const std::string&);
   void setFlag(ConvertFlags);
+
   void printKanaChart(bool markdown = false) const;
 
   std::ostream& _out;
