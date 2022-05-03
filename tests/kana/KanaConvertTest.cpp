@@ -118,8 +118,8 @@ TEST_F(KanaConvertTest, InteractiveOrPrintOptionsAndStrings) {
 TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
   const char* args[]{""};
   const auto f{[&args, this] { KanaConvert{args, os(), &is()}; }};
-  EXPECT_THROW(call(f, "provide one or more 'strings' to convert or specify "
-                       "'-i' for interactive mode"),
+  EXPECT_THROW(
+      call(f, "provide one or more 'strings' or '-i' for interactive mode"),
       std::domain_error);
 }
 

@@ -7,6 +7,102 @@
 
 namespace kanji_tools {
 
+namespace {
+
+class KanaCount {
+public:
+  void add(const Kana& i) {
+    if (i.isDakuten())
+      ++_dakuten;
+    else if (i.isHanDakuten())
+      ++_hanDakuten;
+    else
+      ++_plain;
+  }
+
+  [[nodiscard]] auto dakuten() const { return _dakuten; }
+  [[nodiscard]] auto hanDakuten() const { return _hanDakuten; }
+  [[nodiscard]] auto plain() const { return _plain; }
+
+  [[nodiscard]] auto total() const { return _dakuten + _hanDakuten + _plain; }
+private:
+  size_t _dakuten{}, _hanDakuten{}, _plain{};
+};
+
+constexpr size_t NoneTypeKana{4}, FooterWidth{10};
+
+void printChartHeader(std::ostream& out, bool markdown) {
+  out << (markdown ? "## **Kana Conversion Chart**\n### **Notes:**"
+                   : ">>> Notes:");
+  out << R"(
+- Abbreviations used below: Roma=Rōmaji, Hira=Hiragana, Kata=Katakana,
+                            Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
+- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro'
+- Hepb and Kunr are only populated when they would produce different output
+  - Values in () means 'output-only' since inputting leads to a different kana
+- 'Roma Variants' are alternative key combinations that lead to the same kana
+- When populated, Roma, Hira and Kata columns are unique (no duplicates)
+- Unicode values are only shown for 'monograph' entries
+- Some 'digraphs' may not be in any real words, but include for completeness
+- Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no conversion exist)
+- Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
+- Type 'N' includes:
+  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
+  - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
+  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
+)";
+}
+
+void printChartFooter(std::ostream& out, bool markdown, size_t small,
+    size_t romajiVariants, const KanaCount& monographs,
+    const KanaCount& digraphs) {
+  out << '\n'
+      << (markdown ? "### **Totals:**" : ">>> Totals:") << std::setfill(' ')
+      << std::right << '\n';
+  const auto print{[&out, markdown](const std::string& s) -> std::ostream& {
+    if (markdown)
+      out << "- **";
+    else
+      out << std::setw(FooterWidth);
+    return out << s << (markdown ? ":** " : ": ") << std::setw(3);
+  }};
+  const auto plain{small + monographs.plain() + digraphs.plain()},
+      dakuten{monographs.dakuten() + digraphs.dakuten()},
+      hanDakuten{monographs.hanDakuten() + digraphs.hanDakuten()};
+  const auto types{plain + dakuten + hanDakuten + NoneTypeKana};
+  print("Monograph") << monographs.total() + small
+                     << " (Plain=" << monographs.plain()
+                     << ", Dakuten=" << monographs.dakuten()
+                     << ", HanDakuten=" << monographs.hanDakuten()
+                     << ", Small=" << small << ")\n";
+  print("Digraphs") << digraphs.total() << " (Plain=" << digraphs.plain()
+                    << ", Dakuten=" << digraphs.dakuten()
+                    << ", HanDakuten=" << digraphs.hanDakuten() << ")\n";
+  print("All Kana") << monographs.total() + digraphs.total()
+                    << " (Monographs=" << monographs.total()
+                    << ", Digraphs=" << digraphs.total()
+                    << "), Rōmaji Variants=" << romajiVariants << ")\n";
+  print("Types") << types << " (P=" << plain << ", D=" << dakuten
+                 << ", H=" << hanDakuten << ", N=" << NoneTypeKana
+                 << "), N types are not included in 'All Kana'\n";
+}
+
+[[nodiscard]] std::string getHepburn(const Kana& i, const std::string& romaji) {
+  auto& hepburn{i.getRomaji(ConvertFlags::Hepburn)};
+  return romaji == hepburn ? EmptyString
+                           : addBrackets(hepburn, BracketType::Round);
+}
+
+[[nodiscard]] std::string getKunrei(const Kana& i, const std::string& romaji) {
+  auto& kunrei{i.getRomaji(ConvertFlags::Kunrei)};
+  return romaji == kunrei    ? EmptyString
+         : i.kunreiVariant() ? kunrei
+                             : addBrackets(kunrei, BracketType::Round);
+}
+
+} // namespace
+
 void KanaConvert::error(const std::string& msg) {
   throw std::domain_error(msg);
 }
@@ -39,8 +135,7 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
     // '-i' if no string args are provided. If stdin is not a tty (like a
     // pipe) then '-i' isn't required, e.g.: 'echo hi | kanaConvert'
     if ((_in || isatty(fileno(stdin))) && !_interactive)
-      error("provide one or more 'strings' to convert or specify '-i' for "
-            "interactive mode");
+      error("provide one or more 'strings' or '-i' for interactive mode");
     start();
   }
 }
@@ -199,30 +294,9 @@ void KanaConvert::setFlag(ConvertFlags value) {
 }
 
 void KanaConvert::printKanaChart(bool markdown) const {
-  _out << (markdown ? "## **Kana Conversion Chart**\n### **Notes:**"
-                    : ">>> Notes:");
-  _out << R"(
-- Abbreviations used below: Roma=Rōmaji, Hira=Hiragana, Kata=Katakana,
-                            Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
-- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro'
-- Hepb and Kunr are only populated when they would produce different output
-  - Values in () means 'output-only' since inputting leads to a different kana
-- 'Roma Variants' are alternative key combinations that lead to the same kana
-- When populated, Roma, Hira and Kata columns are unique (no duplicates)
-- Unicode values are only shown for 'monograph' entries
-- Some 'digraphs' may not be in any real words, but include for completeness
-- Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no conversion exist)
-- Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
-- Type 'N' includes:
-  - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
-  - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
-  - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
-)";
-  size_t hanDakutenMonographs{}, small{}, plainMonographs{},
-      dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
-      dakutenDigraphs{}, romajiVariants{};
-  constexpr size_t noneTypeKana{4};
+  printChartHeader(_out, markdown);
+  size_t small{}, romajiVariants{};
+  KanaCount monographs, digraphs;
   Table table{{"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
                   "Kunr", "Roma Variants"},
       true};
@@ -236,40 +310,24 @@ void KanaConvert::printKanaChart(bool markdown) const {
     romajiVariants += i.romajiVariants().size();
     if (i.isSmall())
       ++small;
-    else if (i.isMonograph()) {
-      if (i.isDakuten())
-        ++dakutenMonographs;
-      else if (i.isHanDakuten())
-        ++hanDakutenMonographs;
-      else
-        ++plainMonographs;
-    } else {
-      if (i.isDakuten())
-        ++dakutenDigraphs;
-      else if (i.isHanDakuten())
-        ++hanDakutenDigraphs;
-      else
-        ++plainDigraphs;
-    }
+    else if (i.isMonograph())
+      monographs.add(i);
+    else
+      digraphs.add(i);
     const std::string type{i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P"};
     auto& romaji{i.romaji()};
     auto& h{i.hiragana()};
     auto& k{i.katakana()};
-    auto hepb{i.getRomaji(ConvertFlags::Hepburn)},
-        kunr{i.getRomaji(ConvertFlags::Kunrei)};
-    hepb = romaji == hepb ? EmptyString : addBrackets(hepb, BracketType::Round);
-    kunr = romaji == kunr      ? EmptyString
-           : i.kunreiVariant() ? kunr
-                               : addBrackets(kunr, BracketType::Round);
+    const auto hepburn{getHepburn(i, romaji)}, kunrei{getKunrei(i, romaji)};
     std::string vars;
     for (auto& j : i.romajiVariants()) {
       if (!vars.empty()) vars += ", ";
       vars += j;
     }
     // only show unicode for monographs
-    const auto uni{
+    const auto getUni{
         [&i](auto& s) { return i.isMonograph() ? toUnicode(s) : EmptyString; }};
-    table.add({type, romaji, h, k, uni(h), uni(k), hepb, kunr, vars},
+    table.add({type, romaji, h, k, getUni(h), getUni(k), hepburn, kunrei, vars},
         groups.contains(romaji));
   }
   // special handling for middle dot, prolong symbol and repeat symbols
@@ -282,37 +340,7 @@ void KanaConvert::printKanaChart(bool markdown) const {
     table.add({"N", {}, h, k, toUnicode(h), toUnicode(k)});
   }
   markdown ? table.printMarkdown(_out) : table.print(_out);
-  const auto monographs{
-      small + plainMonographs + dakutenMonographs + hanDakutenMonographs},
-      digraphs{plainDigraphs + dakutenDigraphs + hanDakutenDigraphs},
-      plain{small + plainMonographs + plainDigraphs},
-      dakuten{dakutenMonographs + dakutenDigraphs},
-      hanDakuten{hanDakutenMonographs + hanDakutenDigraphs};
-  const auto types{plain + dakuten + hanDakuten + noneTypeKana};
-  const auto out{[this, markdown](const std::string& s) -> std::ostream& {
-    static constexpr auto CellWidth{10};
-    if (markdown)
-      _out << "- **";
-    else
-      _out << std::setw(CellWidth);
-    return _out << s << (markdown ? ":** " : ": ") << std::setw(3);
-  }};
-  _out << '\n'
-       << (markdown ? "### **Totals:**" : ">>> Totals:") << std::setfill(' ')
-       << std::right << '\n';
-  out("Monograph") << monographs << " (Plain=" << plainMonographs
-                   << ", Dakuten=" << dakutenMonographs
-                   << ", HanDakuten=" << hanDakutenMonographs
-                   << ", Small=" << small << ")\n";
-  out("Digraphs") << digraphs << " (Plain=" << plainDigraphs
-                  << ", Dakuten=" << dakutenDigraphs
-                  << ", HanDakuten=" << hanDakutenDigraphs << ")\n";
-  out("All Kana") << monographs + digraphs << " (Monographs=" << monographs
-                  << ", Digraphs=" << digraphs
-                  << "), Rōmaji Variants=" << romajiVariants << ")\n";
-  out("Types") << types << " (P=" << plain << ", D=" << dakuten
-               << ", H=" << hanDakuten << ", N=" << noneTypeKana
-               << "), N types are not included in 'All Kana'\n";
+  printChartFooter(_out, markdown, small, romajiVariants, monographs, digraphs);
 }
 
 } // namespace kanji_tools
