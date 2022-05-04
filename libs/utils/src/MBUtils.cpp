@@ -45,13 +45,26 @@ cast(uInt x) noexcept {
   return static_cast<T>(x);
 }
 
+// 'threeByteUtf8' returns a value of type 'T' (char32_t or wchar_t) that
+// represents a 3 byte UTF-8 character. The values passed in are:
+//   'b1': first byte (strip leading '1's to get 'aaaa' part of '1110aaaa')
+//   'b2': second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
+//   'u':  pointer to third byte (get the 'cccccc' part of '10cccccc')
+// The result is made from the 16 bits: 'aaaa bbbbbb cccccc'
 template<typename T>
-constexpr auto threeByteUtf8(const unsigned char* u, uInt b1, uInt b2) {
+constexpr auto threeByteUtf8(uInt b1, uInt b2, const unsigned char* u) {
   return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
 }
 
+// 'fourByteUtf8' returns a value of type 'T' (char32_t or wchar_t) that
+// represents a 4 byte UTF-8 character. The values passed in are:
+//   'b1': first byte (strip leading '1's to get 'aaa' part of '11110aaa')
+//   'b2': second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
+//   'b3': third byte without leading '1' (the 'cccccc' part of '10cccccc')
+//   'u':  pointer to fourth byte (get the 'dddddd' part of '10dddddd')
+// The result is made from the 21 bits: 'aaa bbbbbb cccccc dddddd'
 template<typename T>
-constexpr auto fourByteUtf8(const unsigned char* u, uInt b1, uInt b2, uInt b3) {
+constexpr auto fourByteUtf8(uInt b1, uInt b2, uInt b3, const unsigned char* u) {
   return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
 }
 
@@ -86,11 +99,11 @@ template<typename T>
     if (byte1 & Bit4) {
       uInt byte3 = *u ^ Bit1;
       if ((*++u & TwoBits) != Bit1) return v[Err]; // 4th byte not '10...'
-      const auto t{fourByteUtf8<T>(u++, byte1, byte2, byte3)};
+      const auto t{fourByteUtf8<T>(byte1, byte2, byte3, u++)};
       // return Error if 't' is 'overlong' or beyond max Unicode range
       return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
     }
-    const auto t{threeByteUtf8<T>(u++, byte1, byte2)};
+    const auto t{threeByteUtf8<T>(byte1, byte2, u++)};
     // return Error if 't' is 'overlong' or in the Surrogate range
     return t > v[MaxTwo] && (t < v[MinSur] || t > v[MaxSur]) ? t : v[Err];
   }
@@ -150,10 +163,10 @@ template<typename T>
       if (byte1 & Bit5) return err(Utf8Result::CharTooLong);
       uInt byte3 = *u ^ Bit1; // last 6 bits of the third byte
       if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
-      const auto code4{fourByteUtf8<Code>(u, byte1, byte2, byte3)};
+      const auto code4{fourByteUtf8<Code>(byte1, byte2, byte3, u)};
       if (code4 <= Max3Uni) return err(Utf8Result::Overlong); // overlong 4 byte
       if (code4 > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
-    } else if (const auto code3{threeByteUtf8<Code>(u, byte1, byte2)};
+    } else if (const auto code3{threeByteUtf8<Code>(byte1, byte2, u)};
                code3 <= Max2Uni)
       return err(Utf8Result::Overlong); // GCOV_EXCL_LINE: covered
     else if (code3 >= MinSurrogate && code3 <= MaxSurrogate)
