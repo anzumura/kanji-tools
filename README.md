@@ -136,7 +136,15 @@ The program also supports various flags for controlling conversion (like Hepburn
 
 ### Kana Class Diagram
 
+The following diagram includes **Kana** class and its derived classes as well as some of the public methods.
+
 [Class Diagram: Kana](docs/diagrams/out/Class_Kana/Class_Kana.png)
+
+See *kana/Kana.h* for details, but in summary, the derived classes are:
+
+- **DakutenKana**: holds an **AccentedKana** accessible via overridden 'dakuten()' method
+- **HanDakutenKana**: holds an **AccentedKana** accessible via overridden 'hanDakuten()' method
+- **AccentedKana**: has a pointer back to its *plain* holder
 
 ### Kana Conversion Chart
 
@@ -392,6 +400,8 @@ To support **kanjiStats** and **kanjiQuiz** programs, *KanjiData* class loads an
 - **None**: kanji that haven't been loaded from any files
 
 ### Kanji Class Diagram
+
+The following diagram includes the abstract **Kanji** class and 14 derived classes (8 are concrete). Most of the public methods are also included, but the types are simplified for the diagram, i.e., 'std::optional<std::string>' is shown as 'Optional<String>', 'std::vector<std::string>' is 'List<String>', etc.. 
 
 [Class Diagram: Kanji](docs/diagrams/out/Class_Kanji/Class_Kanji.png)
 

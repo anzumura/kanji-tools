@@ -2,18 +2,18 @@
 title Class Diagram: <b>Kanji</b>\n
 
 abstract Kanji {
-  some public methods:
+  <b>some public methods</b>
   +name() : String
   +compatibilityName() : String
   +nonVariantName() : String
   +qualifiedName() : String
   +radical() : Radical
   +strokes() : Strokes
-  +morohashiId() : Optional<String>
-  +nelsonIds() : List<String>
+  +morohashiId() : MorohashiId
+  +nelsonIds() : List<NelsonId>
   +pinyin() : Symbol
   --
-  some public virtual methods:
+  <b>some public virtual methods</b>
   {abstract} +frequency() : Frequency
   {abstract} +grade() : KanjiGrades
   {abstract} +level() : JlptLevels
