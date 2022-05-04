@@ -81,7 +81,7 @@ protected:
     }
 
     auto operator++(int) {
-      Derived x{derived()};
+      const auto x{derived()};
       ++*this;
       return x;
     }
@@ -95,7 +95,7 @@ protected:
     }
 
     auto operator--(int) {
-      Derived x{derived()};
+      const auto x{derived()};
       --*this;
       return x;
     }
