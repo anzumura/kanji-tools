@@ -1,35 +1,40 @@
 # enable a broad set of checks using 'blah-*', then disable the most noisy (or
-# unwanted) ones for now - some of the checks are of couse 'style related' ...
+# unwanted) ones for now - some of the checks are of course 'style related' ...
 # docs: https://clang.llvm.org/extra/clang-tidy/checks/list.html
 
-Checks: 'bugprone-*,clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,
-         google-*,hicpp-*,llvm-*,misc-*,modernize-*,performance-*,readability-*,
-         -*-avoid-c-arrays,-*-braces-around-statements,-*-named-parameter,
-         -*-qualified-auto,-*-special-member-functions,
-         -bugprone-easily-swappable-parameters,
-         -clang-diagnostic-pragma-once-outside-header,
-         -cppcoreguidelines-avoid-non-const-global-variables,
-         -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
-         -cppcoreguidelines-pro-bounds-constant-array-index,
-         -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-         -cppcoreguidelines-pro-type-reinterpret-cast,
-         -hicpp-no-array-decay,-llvm-header-guard,-misc-no-recursion,
-         -modernize-pass-by-value,-modernize-use-trailing-return-type,
-         -readability-static-accessed-through-instance,
-         -readability-implicit-bool-conversion,-readability-isolate-declaration'
+Checks: '
+  bugprone-*,cert-*,clang-*,concurrency-*,cppcoreguidelines-*,google-*,hicpp-*,
+  llvm-*,misc-*,modernize-*,performance-*,portability-*,readability-*,
+  -*-avoid-c-arrays,-*-braces-around-statements,-*-named-parameter,
+  -*-qualified-auto,-*-special-member-functions,
+  -bugprone-easily-swappable-parameters,-cert-dcl21-cpp,-cert-err58-cpp,
+  -clang-diagnostic-pragma-once-outside-header,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-reinterpret-cast,-hicpp-no-array-decay,
+  -llvm-header-guard,-misc-no-recursion,-modernize-pass-by-value,
+  -modernize-use-trailing-return-type,-readability-implicit-bool-conversion,
+  -readability-isolate-declaration,-readability-static-accessed-through-instance
+'
 
-# Notes:
+# Notes about skipped checks:
+# - skip lib speicific like: abseil-*, altera-*, android-*, boost-*, darwin-*,
+#   fuchsia-*, linuxkernel-*, llvmlibc-*, mpi-*, objc-*, openmp-*, and zircon-*
 # - '*-avoid-non-const-global-variables': catches some places where 'const'
 #   should be added, but also warns about private static vars in classes ...
+# - 'cert-dcl21-cpp': warns about postfix operators, but seems to be incorrect
+# - 'cert-err58-cpp': warns about static objects that can throw when constructed
 # - 'clang-diagnostic-pragma-once-outside-header': shouldn't need to turn this
 #   off but is seems like there's a bug somewhere in VS Code or clang-tidy ...
 # - 'llvm-header-guard': guards were used at first, but changed to #pragma once
 # - '*-static-accessed-through-instance': this warning helps here and there, but
 #   there are also lots of cases in template code where it is just noisy ...
 # - 'misc-no-recursion': recursion is used in a few places
-# - these 'modernize' and 'readability' ones seem to be style related:
+# - skip these 'modernize' and 'readability' ones that are more style related:
 #   - '*-braces-around-statements' 
 #   - '*-isolate-declaration'
 #   - '*-named-parameter'
-#   - '*-pass-by-value'
+#   - '*-pass-by-value': this can be a good suggestion sometimes (but noisy)
 #   - '*-trailing-return-type'
