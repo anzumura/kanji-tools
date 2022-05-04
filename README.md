@@ -136,7 +136,7 @@ The program also supports various flags for controlling conversion (like Hepburn
 
 ### Kana Class Diagram
 
-The following diagram includes **Kana** class and its derived classes as well as some of the public methods.
+The following diagram shows the **Kana** class hierarchy as well as some of the public methods.
 
 [Class Diagram: Kana](docs/diagrams/out/Class_Kana/Class_Kana.png)
 
@@ -401,7 +401,7 @@ To support **kanjiStats** and **kanjiQuiz** programs, *KanjiData* class loads an
 
 ### Kanji Class Diagram
 
-The following diagram includes the abstract **Kanji** class and 14 derived classes (8 are concrete). Most of the public methods are also included, but the types are simplified for the diagram, i.e., 'std::optional<std::string>' is shown as 'Optional<String>', 'std::vector<std::string>' is 'List<String>', etc.. 
+The following diagram shows the **Kanji** class hierarchy (8 classes are concrete). Most of the public methods are included, but the types are simplified for the diagram, i.e., `std::optional<std::string>` is shown as `Optional<String>`, `std::vector<std::string>` is shown as `List<String>`, etc..
 
 [Class Diagram: Kanji](docs/diagrams/out/Class_Kanji/Class_Kanji.png)
 
