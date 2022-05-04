@@ -1,0 +1,28 @@
+@startuml
+title Class Diagram: <b>Kana</b>\n
+
+class Kana {
+  +hiragana() : String
+  +katakana() : String
+  +romaji() : String
+  {abstract} +dakuten() : AccentedKana*
+  {abstract} +hanDakuten() : AccentedKana*
+  {abstract} +plain() : Kana*
+}
+class DakutenKana {
+  +dakuten() : AccentedKana*
+}
+class HanDakutenKana {
+  +hanDakuten() : AccentedKana*
+}
+class AccentedKana {
+  +plain() : Kana*
+}
+Kana <|-- AccentedKana
+Kana <|-- DakutenKana
+DakutenKana <|-- HanDakutenKana
+DakutenKana *- AccentedKana
+HanDakutenKana *- AccentedKana
+
+hide empty members
+@enduml

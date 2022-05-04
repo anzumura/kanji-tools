@@ -1,0 +1,89 @@
+@startuml
+title Class Diagram: <b>Kanji</b>\n
+
+abstract Kanji {
+  some public methods:
+  +name() : String
+  +compatibilityName() : String
+  +nonVariantName() : String
+  +qualifiedName() : String
+  +radical() : Radical
+  +strokes() : Strokes
+  +morohashiId() : Optional<String>
+  +nelsonIds() : List<String>
+  +pinyin() : Symbol
+  --
+  some public virtual methods:
+  {abstract} +frequency() : Frequency
+  {abstract} +grade() : KanjiGrades
+  {abstract} +level() : JlptLevels
+  {abstract} +link() : Optional<Kanji>
+  {abstract} +linkedReadings() : Bool
+  {abstract} +kyu() : KenteiKyus
+  {abstract} +meaning() : String
+  {abstract} +newName() : Optional<String>
+  {abstract} +oldNames() : List<String>
+  {abstract} +reading() : String
+  {abstract} +reason() : JinmeiReasons
+  {abstract} +year() : Year
+}
+abstract NonLinkedKanji {
+  +meaning() : String
+  +reading() : String
+}
+abstract CustomFileKanji {
+  +kyu() : KenteiKyus
+  +oldNames() : List<String>
+}
+abstract OfficialKanji {
+  +frequency() : Frequency
+  +level() : JlptLevels
+  +year() : Year
+}
+abstract UcdFileKanji {
+  +linkedReadings() : Bool
+  +newName() : Optional<String>
+  +oldNames() : List<String>
+}
+abstract StandardKanji {
+  +kyu() : KenteiKyus
+}
+abstract LinkedKanji {
+  +frequency() : Frequency
+  +kyu() : KenteiKyus
+  +link(): Optional<Kanji>
+  +linkedReadings(): Bool
+  +meaning() : String
+  +newName() : Optional<String>
+  +reading() : String
+}
+class JouyouKanji {
+  +grade() : KanjiGrades
+}
+class JinmeiKanji {
+  +reason() : JinmeiReasons
+}
+class ExtraKanji {
+  +newName() : Optional<String>
+}
+class FrequencyKanji {
+  +frequency() : Frequency
+}
+
+Kanji <|-- NonLinkedKanji
+NonLinkedKanji <|-- CustomFileKanji
+CustomFileKanji <|-- OfficialKanji
+OfficialKanji <|-- JouyouKanji
+OfficialKanji <|-- JinmeiKanji
+CustomFileKanji <|-- ExtraKanji
+NonLinkedKanji <|-- UcdFileKanji
+UcdFileKanji <|-- StandardKanji
+StandardKanji <|-- FrequencyKanji
+StandardKanji <|-- KenteiKanji
+UcdFileKanji <|-- UcdKanji
+Kanji <|-- LinkedKanji
+LinkedKanji <|-- LinkedJinmeiKanji
+LinkedKanji <|-- LinkedOldKanji
+
+hide empty members
+@enduml

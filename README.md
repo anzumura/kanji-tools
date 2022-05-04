@@ -7,9 +7,10 @@
 **[- VS Code Setup](#VS-Code-Setup)**\
 **[- Compiler Diagnostic Flags](#Compiler-Diagnostic-Flags)**\
 **[Kana Convert](#Kana-Convert)**\
+**[- Kana Class Diagram](#Kana-Class-Diagram)**\
 **[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
 **[Kanji Data](#Kanji-Data)**\
-**[- Kanji Class Hierarchy](#Kanji-Class-Hierarchy)**\
+**[- Kanji Class Diagram](#Kanji-Class-Diagram)**\
 **[- JLPT Kanji](#JLPT-Kanji)**\
 **[- Jōyō Kanji](#Jōyō-Kanji)**\
 **[- Data Directory](#Data-Directory)**\
@@ -38,6 +39,7 @@ The project is build using *cmake* (installed via Homebrew) so there is a *CMake
 - **apps**: *CMakeLists.txt* and a *.cpp* file for each main programs
 - **build**: generated directory for build targets and *cmake* dependencies
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
+- **docs**: contains **[PlantUML](https://plantuml.com/)** diagrams
 - **scripts**: *.sh* bash scripts for working with *Unicode* data files
 - **libs**: has a directory per lib, each containing:
   - **include**: *.h* files for the lib
@@ -70,6 +72,7 @@ I am using the following VS Code extensions:
 - **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)**
 - **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**
 - **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**
+- **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
 - **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
 
 **Notes**:
@@ -130,6 +133,10 @@ $ kanaConvert -k kwarutetto
 The program also supports various flags for controlling conversion (like Hepburn or Kunrei) and it has an interactive mode as well. Passing '-p' to *kanaConvert* causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see Table.h for more details). However, the output isn't aligned properly in a Markdown code block (wide to narrow character ratio isn't exactly 2:1) so there's also a '-m' option to print using markdown formatting.
 
 - Note: the terminal output (-p) puts a border line between sections (sections for the kana chart table are groups of related kana symbols, i.e., 'a', 'ka', 'sa', etc.), but for markdown (-m) the rows are in bold instead:
+
+### Kana Class Diagram
+
+[Class Diagram: Kana](docs/diagrams/out/Class_Kana/Class_Kana.png)
 
 ### Kana Conversion Chart
 
@@ -384,42 +391,9 @@ To support **kanjiStats** and **kanjiQuiz** programs, *KanjiData* class loads an
 - **Ucd**: kanji that are in 'ucd.txt', but not already one of the above types
 - **None**: kanji that haven't been loaded from any files
 
-### Kanji Class Hierarchy
+### Kanji Class Diagram
 
-The following diagram shows the class hierarchy for the **Kanji** class (* = abstract class). There are currently 8 concrete types:
-
-```;
-     Kanji*
-       |
-       +----------------------------------------+
-       |                                        |
- NonLinkedKanji*                           LinkedKanji*
-       |                                        |
-       +------------------------+               +---------------+
-       |                        |               |               |
-CustomFileKanji*          UcdFileKanji* LinkedJinmeiKanji LinkedOldKanji
-       |                        |
-       +------------+           +------------+
-       |            |           |            |
- OfficialKanji* ExtraKanji StandardKanji* UcdKanji
-       |                        |
-       +-----------+            +------------+
-       |           |            |            |
-  JouyouKanji JinmeiKanji FrequencyKanji KenteiKanji
-```
-
-The classes derived from **Kanji** add the following fields (* = optional):
-
-- **NonLinkedKanji**: *meaning*, *reading*
-- **LinkedKanji**: *frequency*\*, *kyu*, *link* (points to new/standard kanji)
-- **CustomFileKanji**: *kyu*, *number*, *oldNames*
-- **UcdFileKanji**: *hasOldLinks*, *linkNames*, *linkedReadings*
-- **OfficialKanji**: *frequency*\*, *level*, *year*\*
-- **ExtraKanji**: *newName*\*
-- **StandardKanji**: *kyu*
-- **JouyouKanji**: *grade* (school grade when the kanji is introduced)
-- **JinmeiKanji**: *reason* (official reason for inclusion in Jinmeiyoō list)
-- **FrequencyKanji**: *frequency*
+[Class Diagram: Kanji](docs/diagrams/out/Class_Kanji/Class_Kanji.png)
 
 ### JLPT Kanji
 
