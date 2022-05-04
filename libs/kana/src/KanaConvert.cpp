@@ -120,7 +120,7 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
       if (++i >= args.size()) error("-f must be followed by a flag value");
       if (arg = args[i]; arg.size() != 1 || !flagArgs(arg[0]))
         error("illegal option for -f: " + arg);
-    } else if (processArg(arg, printKana, printMarkdown))
+    } else if (!processArg(arg, printKana, printMarkdown))
       strings.emplace_back(arg);
 
   if (!strings.empty()) {
@@ -158,39 +158,34 @@ bool KanaConvert::processArg(
   else if (arg.starts_with("-")) {
     if (!charTypeArgs(arg)) error("illegal option: " + arg);
   } else
-    return true;
-  return false;
+    return false; // arg is not an 'option' so treat as a string to convert
+  return true; // arg was processed successfully
 }
 
 bool KanaConvert::charTypeArgs(const std::string& arg) {
-  if (arg == "-h")
-    _converter.target(CharType::Hiragana);
-  else if (arg == "-k")
-    _converter.target(CharType::Katakana);
-  else if (arg == "-r")
-    _converter.target(CharType::Romaji);
-  else if (arg == "-H")
-    _source = CharType::Hiragana;
-  else if (arg == "-K")
-    _source = CharType::Katakana;
-  else if (arg == "-R")
-    _source = CharType::Romaji;
-  else
-    return false;
+  // this function is only called when 'arg' starts with '-' so don't need to
+  // check that again (only need to check the length)
+  if (arg.size() != 2) return false;
+  switch (arg[1]) {
+  case 'h': _converter.target(CharType::Hiragana); break;
+  case 'k': _converter.target(CharType::Katakana); break;
+  case 'r': _converter.target(CharType::Romaji); break;
+  case 'H': _source = CharType::Hiragana; break;
+  case 'K': _source = CharType::Katakana; break;
+  case 'R': _source = CharType::Romaji; break;
+  default: return false;
+  }
   return true;
 }
 
 bool KanaConvert::flagArgs(char arg) {
-  if (arg == 'h')
-    setFlag(ConvertFlags::Hepburn);
-  else if (arg == 'k')
-    setFlag(ConvertFlags::Kunrei);
-  else if (arg == 'n')
-    setFlag(ConvertFlags::NoProlongMark);
-  else if (arg == 'r')
-    setFlag(ConvertFlags::RemoveSpaces);
-  else
-    return false;
+  switch (arg) {
+  case 'h': setFlag(ConvertFlags::Hepburn); break;
+  case 'k': setFlag(ConvertFlags::Kunrei); break;
+  case 'n': setFlag(ConvertFlags::NoProlongMark); break;
+  case 'r': setFlag(ConvertFlags::RemoveSpaces); break;
+  default: return false;
+  }
   return true;
 }
 

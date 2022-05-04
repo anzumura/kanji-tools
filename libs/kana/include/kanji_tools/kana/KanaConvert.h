@@ -20,6 +20,8 @@ private:
   // 'error' throws an exception (used during processing of command line args)
   static void error(const std::string&);
 
+  // 'processArg' returns true if 'arg' is recognized and processed, otherwise
+  // it returns false meaning 'arg' should be treated as a string to convert
   [[nodiscard]] bool processArg(
       const std::string& arg, bool& printKana, bool& printMarkdown);
 
