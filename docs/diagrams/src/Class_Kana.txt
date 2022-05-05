@@ -2,9 +2,16 @@
 title Class Diagram: <b>Kana</b>\n
 
 class Kana {
+  <b>some public methods</b>
   +hiragana() : String
   +katakana() : String
   +romaji() : String
+  +romajiVariants(): RomajiVariants
+  +isSmall() : Bool
+  +isMonograph() : Bool
+  +isDigraph() : Bool
+  --
+  <b>some public virtual methods</b>
   {abstract} +dakuten() : AccentedKana*
   {abstract} +hanDakuten() : AccentedKana*
   {abstract} +plain() : Kana*
