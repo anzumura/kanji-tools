@@ -148,7 +148,7 @@ See *kana/Kana.h* for details, but in summary, the derived classes are:
 - **AccentedKana**: has a pointer back to its *plain* holder
 ### Kana Conversion Chart
 
-![Kana Conversion Chart](docs/KanaConversionChart.md)
+[Kana Conversion Chart](docs/KanaConversionChart.md)
 
 ## Kanji Data
 
