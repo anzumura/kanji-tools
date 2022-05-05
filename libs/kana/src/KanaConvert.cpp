@@ -30,7 +30,7 @@ private:
 };
 
 void printChartHeader(std::ostream& out, bool markdown) {
-  out << (markdown ? "## **Kana Conversion Chart**\n### **Notes:**"
+  out << (markdown ? "**Notes:**\n"
                    : ">>> Notes:");
   out << R"(
 - Abbreviations used below: Roma=Rōmaji, Hira=Hiragana, Kata=Katakana,
@@ -50,6 +50,7 @@ void printChartHeader(std::ostream& out, bool markdown) {
   - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
 )";
+  if (markdown) out << '\n';
 }
 
 void printChartFooter(std::ostream& out, bool markdown, size_t small,
@@ -57,7 +58,7 @@ void printChartFooter(std::ostream& out, bool markdown, size_t small,
     const KanaCount& digraphs) {
   static constexpr size_t NoneTypeKana{4}, FooterWidth{10};
   out << '\n'
-      << (markdown ? "### **Totals:**" : ">>> Totals:") << std::setfill(' ')
+      << (markdown ? "**Totals:**\n" : ">>> Totals:") << std::setfill(' ')
       << std::right << '\n';
   const auto print{[&out, markdown](const std::string& s) -> std::ostream& {
     if (markdown)
@@ -84,7 +85,7 @@ void printChartFooter(std::ostream& out, bool markdown, size_t small,
                     << "), Rōmaji Variants=" << romajiVariants << ")\n";
   print("Types") << types << " (P=" << plain << ", D=" << dakuten
                  << ", H=" << hanDakuten << ", N=" << NoneTypeKana
-                 << "), N types are not included in 'All Kana'\n";
+                 << "), N types aren't included in 'All Kana'\n";
 }
 
 [[nodiscard]] std::string getHepburn(const Kana& i, const std::string& romaji) {

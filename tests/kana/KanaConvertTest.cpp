@@ -153,7 +153,7 @@ TEST_F(KanaConvertTest, PrintMarkdownKanaChart) {
   // just check for a few examples
   for (std::string line; std::getline(os(), line); ++count, lastLine = line) {
     if (!count)
-      EXPECT_EQ(line, "## **Kana Conversion Chart**");
+      EXPECT_EQ(line, "**Notes:**");
     else {
       if (line.starts_with("| **14** | **P** | **ka** | **か** | **カ** |"))
         ++found;
@@ -166,7 +166,7 @@ TEST_F(KanaConvertTest, PrintMarkdownKanaChart) {
   EXPECT_EQ(found, 3);
   // there are less lines when printing the chart with -m option (compared to -p
   // option) since the Markdown table doesn't have '+---+---+' type border lines
-  EXPECT_EQ(count, 234);
+  EXPECT_EQ(count, 236);
 }
 
 TEST_F(KanaConvertTest, InteractiveMode) {
