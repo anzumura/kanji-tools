@@ -64,22 +64,19 @@ Here are some links that might help with setup:
 - **[VS Code - Clang on macOS](https://code.visualstudio.com/docs/cpp/config-clang-mac)**
 - **[VS Code - Build with CMake](https://code.visualstudio.com/docs/cpp/cmake-linux)**
 
-I am using the following VS Code extensions:
+Here's a list of relevant VS Code extensions being used:
 
-- **[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)**
-- **[C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)**
-- **[Clock](https://marketplace.visualstudio.com/items?itemName=angelo-breuer.clock)**
-- **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)**
-- **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**
-- **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**
-- **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
-- **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
+- Code/Build: **[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)**, **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)**, **[CMake](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)**
+- Format: **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**, **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
+- Test: **[C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)**, **[Test Adapter Converter](https://marketplace.visualstudio.com/items?itemName=ms-vscode.test-adapter-converter)**, **[Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer)**
+- Debug: **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**, **[Hex Editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)**
+- Docs: **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
+- Aesthetic: **[Clock](https://marketplace.visualstudio.com/items?itemName=angelo-breuer.clock)**
 
 **Notes**:
 
-- **Clock** and **shell-format** are of course not required for building code
-- **Code Spell Checker** is also optional, but there are lots of entries for it in *.vscode/settings.json* (partly caused by all the Japanese words in test code)
-- **CodeLLDB** is only used for debugging (see comments in *.vscode/launch.json* for more details)
+- **Code Spell Checker**: there are lots of *word* entries for this extension in *.vscode/settings.json* (mainly caused by all the Japanese words in test code)
+- **CodeLLDB**: current setup has some limitations (see comments in *.vscode/launch.json* for more details)
 - **PlantUML** is used to generate diagrams from the *.txt* files in *docs/diagrams/src*. In order to generate them locally **graphviz** must be installed. On Mac this can be done via `brew install --cask temurin; brew install graphviz`
 
 ### Compiler Diagnostic Flags
