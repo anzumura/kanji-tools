@@ -57,7 +57,7 @@ The five libraries are:
 
 ### VS Code Setup
 
-The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*. 
+The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
 
 Here are some links that might help with setup:
 
@@ -80,6 +80,7 @@ I am using the following VS Code extensions:
 - **Clock** and **shell-format** are of course not required for building code
 - **Code Spell Checker** is also optional, but there are lots of entries for it in *.vscode/settings.json* (partly caused by all the Japanese words in test code)
 - **CodeLLDB** is only used for debugging (see comments in *.vscode/launch.json* for more details)
+- **PlantUML** is used to generate diagrams from the *.txt* files in *docs/diagrams/src*. In order to generate them locally **graphviz** must be installed. On Mac this can be done via `brew install --cask temurin; brew install graphviz`
 
 ### Compiler Diagnostic Flags
 
