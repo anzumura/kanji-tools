@@ -1,17 +1,17 @@
 **Notes:**
 
-- Abbreviations used below: Roma=Rōmaji, Hira=Hiragana, Kata=Katakana,
-                            Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
-- Roma is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro'
-- Hepb and Kunr are only populated when they would produce different output
-  - Values in () means 'output-only' since inputting leads to a different kana
-- 'Roma Variants' are alternative key combinations that lead to the same kana
-- When populated, Roma, Hira and Kata columns are unique (no duplicates)
-- Unicode values are only shown for 'monograph' entries
-- Some 'digraphs' may not be in any real words, but include for completeness
+- Column names use some abbreviations: 'Roma' = Rōmaji, 'Hira' = Hiragana,
+  'Kata' = Katakana, 'Uni' = Unicode, 'Hepb' = Hepburn, 'Kunr' = Kunrei
+- 'Roma' is mainly 'Modern Hepburn', but can be 'Nihon Shiki' or 'Wāpuro'
+- 'Hepb' and 'Kunr' are only populated when they would produce different output
+  - Values in () means 'output-only' since inputting leads to a different Kana
+- 'Roma Variants' are alternative key combinations that lead to the same Kana
+- When populated, 'Roma', 'Hira' and 'Kata' columns are unique (no duplicates)
+- Unicode values are only shown for 'monograph' (single-symbol) entries
+- Some 'digraphs' may not be in any 'official words', but are supported by IMEs
 - Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no conversion exist)
-- Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no conversions exist)
+- Type values: P=Plain Kana, D=Dakuten (濁点), H=HanDakuten (半濁点), N=None
 - Type 'N' includes:
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
   - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
