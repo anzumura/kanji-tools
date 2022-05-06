@@ -30,8 +30,7 @@ private:
 };
 
 void printChartHeader(std::ostream& out, bool markdown) {
-  out << (markdown ? "**Notes:**\n"
-                   : ">>> Notes:");
+  out << (markdown ? "**Notes:**\n" : ">>> Notes:");
   out << R"(
 - Abbreviations used below: Roma=Rōmaji, Hira=Hiragana, Kata=Katakana,
                             Uni=Unicode, Hepb=Hepburn, Kunr=Kunrei
@@ -43,7 +42,7 @@ void printChartHeader(std::ostream& out, bool markdown) {
 - Unicode values are only shown for 'monograph' entries
 - Some 'digraphs' may not be in any real words, but include for completeness
 - Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no conversion exist)
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no conversions exist)
 - Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
 - Type 'N' includes:
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
@@ -61,26 +60,25 @@ void printChartFooter(std::ostream& out, bool markdown, size_t small,
       << (markdown ? "**Totals:**\n" : ">>> Totals:") << std::setfill(' ')
       << std::right << '\n';
   const auto print{[&out, markdown](const std::string& s) -> std::ostream& {
-    if (markdown)
-      out << "- **";
-    else
-      out << std::setw(FooterWidth);
-    return out << s << (markdown ? ":** " : ": ") << std::setw(3);
+    if (markdown) return out << "- **" << s << ":** ";
+    return out << std::setw(FooterWidth) << s << ": " << std::setw(3);
   }};
-  const auto plain{small + monographs.plain() + digraphs.plain()},
+  // 'small' kana are plain monographs, but are counted separately (digraphs
+  // always consist of a full size Kana followed by small Kana)
+  const auto totalMonographs{monographs.total() + small},
+      plain{small + monographs.plain() + digraphs.plain()},
       dakuten{monographs.dakuten() + digraphs.dakuten()},
       hanDakuten{monographs.hanDakuten() + digraphs.hanDakuten()};
   const auto types{plain + dakuten + hanDakuten + NoneTypeKana};
-  print("Monograph") << monographs.total() + small
-                     << " (Plain=" << monographs.plain()
-                     << ", Dakuten=" << monographs.dakuten()
-                     << ", HanDakuten=" << monographs.hanDakuten()
-                     << ", Small=" << small << ")\n";
+  print("Monographs") << totalMonographs << " (Plain=" << monographs.plain()
+                      << ", Dakuten=" << monographs.dakuten()
+                      << ", HanDakuten=" << monographs.hanDakuten()
+                      << ", Small=" << small << ")\n";
   print("Digraphs") << digraphs.total() << " (Plain=" << digraphs.plain()
                     << ", Dakuten=" << digraphs.dakuten()
                     << ", HanDakuten=" << digraphs.hanDakuten() << ")\n";
-  print("All Kana") << monographs.total() + digraphs.total()
-                    << " (Monographs=" << monographs.total()
+  print("All Kana") << totalMonographs + digraphs.total()
+                    << " (Monographs=" << totalMonographs
                     << ", Digraphs=" << digraphs.total()
                     << "), Rōmaji Variants=" << romajiVariants << ")\n";
   print("Types") << types << " (P=" << plain << ", D=" << dakuten
@@ -160,7 +158,7 @@ bool KanaConvert::processArg(
     if (!charTypeArgs(arg)) error("illegal option: " + arg);
   } else
     return false; // arg is not an 'option' so treat as a string to convert
-  return true; // arg was processed successfully
+  return true;    // arg was processed successfully
 }
 
 bool KanaConvert::charTypeArgs(const std::string& arg) {

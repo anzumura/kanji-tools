@@ -137,7 +137,7 @@ TEST_F(KanaConvertTest, PrintKanaChart) {
         ++found;
       if (line.starts_with("| 205 | N    | /    |      | ・   |      | 30FB |"))
         ++found;
-      if (line.starts_with(" Monograph:  86")) ++found;
+      if (line.starts_with("Monographs:  86")) ++found;
     }
   }
   EXPECT_TRUE(lastLine.starts_with("     Types: 208 (P=131, D=63, H=10, N=4)"));
@@ -158,7 +158,7 @@ TEST_F(KanaConvertTest, PrintMarkdownKanaChart) {
       if (line.starts_with("| **14** | **P** | **ka** | **か** | **カ** |"))
         ++found;
       if (line.starts_with("| **205** | **N** | **/** |  | **・** |")) ++found;
-      if (line.starts_with("- **Monograph:**  86")) ++found;
+      if (line.starts_with("- **Monographs:** 86")) ++found;
     }
   }
   EXPECT_TRUE(

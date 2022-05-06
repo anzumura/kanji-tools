@@ -10,7 +10,7 @@
 - Unicode values are only shown for 'monograph' entries
 - Some 'digraphs' may not be in any real words, but include for completeness
 - Chart output is sorted by Hiragana, so 'a, ka, sa, ta, na, ...' ordering
-- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't suppoted (no conversion exist)
+- Katakana 'dakuten w' (ヷ, ヸ, ヹ, ヺ) aren't supported (no conversion exist)
 - Type values: P=Plain Kana, D=Dakuten, H=HanDakuten, N=None
 - Type 'N' includes:
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
@@ -230,8 +230,7 @@
 
 **Totals:**
 
-- **Monograph:**  86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
+- **Monographs:** 86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
 - **Digraphs:** 118 (Plain=71, Dakuten=42, HanDakuten=5)
-- **All Kana:** 192 (Monographs=74, Digraphs=118), Rōmaji Variants=55)
+- **All Kana:** 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55)
 - **Types:** 208 (P=131, D=63, H=10, N=4), N types aren't included in 'All Kana'
-
