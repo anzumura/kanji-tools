@@ -12,22 +12,30 @@ namespace {
 class KanaCount {
 public:
   void add(const Kana& i) {
-    if (i.isDakuten())
-      ++_dakuten;
-    else if (i.isHanDakuten())
-      ++_hanDakuten;
-    else
-      ++_plain;
+    ++(i.isSmall()         ? _small
+        : i.isDakuten()    ? _dakuten
+        : i.isHanDakuten() ? _hanDakuten
+                           : _plain);
   }
 
   [[nodiscard]] auto dakuten() const { return _dakuten; }
   [[nodiscard]] auto hanDakuten() const { return _hanDakuten; }
   [[nodiscard]] auto plain() const { return _plain; }
+  [[nodiscard]] auto small() const { return _small; }
 
-  [[nodiscard]] auto total() const { return _dakuten + _hanDakuten + _plain; }
+  [[nodiscard]] auto total() const {
+    return _dakuten + _hanDakuten + _plain + _small;
+  }
 private:
-  size_t _dakuten{}, _hanDakuten{}, _plain{};
+  size_t _dakuten{}, _hanDakuten{}, _plain{}, _small{};
 };
+
+auto& operator<<(std::ostream& os, const KanaCount& k) {
+  os << k.total() << " (Plain=" << k.plain() << ", Dakuten=" << k.dakuten()
+     << ", HanDakuten=" << k.hanDakuten();
+  if (k.small()) os << ", Small=" << k.small();
+  return os << ')';
+}
 
 void printChartHeader(std::ostream& out, bool markdown) {
   // LCOV_EXCL_START: covered
@@ -52,9 +60,8 @@ void printChartHeader(std::ostream& out, bool markdown) {
   if (markdown) out << '\n';
 }
 
-void printChartFooter(std::ostream& out, bool markdown, size_t small,
-    size_t romajiVariants, const KanaCount& monographs,
-    const KanaCount& digraphs) {
+void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
+    const KanaCount& monographs, const KanaCount& digraphs) {
   static constexpr size_t NoneTypeKana{4}, FooterWidth{10};
   out << '\n'
       << (markdown ? "**Totals:**\n" : ">>> Totals:") << std::setfill(' ')
@@ -63,24 +70,18 @@ void printChartFooter(std::ostream& out, bool markdown, size_t small,
     if (markdown) return out << "- **" << s << ":** ";
     return out << std::setw(FooterWidth) << s << ": " << std::setw(3);
   }};
-  // 'small' kana are plain monographs, but are counted separately (digraphs
-  // always consist of a full size Kana followed by small Kana)
-  const auto totalMonographs{monographs.total() + small},
-      plain{small + monographs.plain() + digraphs.plain()},
+  print("Monographs") << monographs << '\n';
+  print("Digraphs") << digraphs << '\n';
+  print("All Kana") << monographs.total() + digraphs.total()
+                    << " (Monographs=" << monographs.total()
+                    << ", Digraphs=" << digraphs.total()
+                    << "), Rōmaji Variants=" << romajiVariants << "\n";
+  // 'small' Kana are plain monographs, but are counted separately (digraphs
+  // always consist of a full size Kana followed by a small Kana)
+  const auto plain{monographs.small() + monographs.plain() + digraphs.plain()},
       dakuten{monographs.dakuten() + digraphs.dakuten()},
       hanDakuten{monographs.hanDakuten() + digraphs.hanDakuten()};
   const auto types{plain + dakuten + hanDakuten + NoneTypeKana};
-  print("Monographs") << totalMonographs << " (Plain=" << monographs.plain()
-                      << ", Dakuten=" << monographs.dakuten()
-                      << ", HanDakuten=" << monographs.hanDakuten()
-                      << ", Small=" << small << ")\n";
-  print("Digraphs") << digraphs.total() << " (Plain=" << digraphs.plain()
-                    << ", Dakuten=" << digraphs.dakuten()
-                    << ", HanDakuten=" << digraphs.hanDakuten() << ")\n";
-  print("All Kana") << totalMonographs + digraphs.total()
-                    << " (Monographs=" << totalMonographs
-                    << ", Digraphs=" << digraphs.total()
-                    << "), Rōmaji Variants=" << romajiVariants << ")\n";
   print("Types") << types << " (P=" << plain << ", D=" << dakuten
                  << ", H=" << hanDakuten << ", N=" << NoneTypeKana
                  << "), N types aren't included in 'All Kana'\n";
@@ -283,7 +284,7 @@ void KanaConvert::setFlag(ConvertFlags value) {
 
 void KanaConvert::printKanaChart(bool markdown) const {
   printChartHeader(_out, markdown);
-  size_t small{}, romajiVariants{};
+  size_t romajiVariants{};
   KanaCount monographs, digraphs;
   Table table{{"No.", "Type", "Roma", "Hira", "Kata", "HUni", "KUni", "Hepb",
                   "Kunr", "Roma Variants"},
@@ -296,12 +297,7 @@ void KanaConvert::printKanaChart(bool markdown) const {
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i{*entry.second};
     romajiVariants += i.romajiVariants().size();
-    if (i.isSmall())
-      ++small;
-    else if (i.isMonograph())
-      monographs.add(i);
-    else
-      digraphs.add(i);
+    (i.isMonograph() ? monographs : digraphs).add(i);
     const std::string type{i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P"};
     auto& romaji{i.romaji()};
     auto& h{i.hiragana()};
@@ -328,7 +324,7 @@ void KanaConvert::printKanaChart(bool markdown) const {
     table.add({"N", {}, h, k, toUnicode(h), toUnicode(k)});
   }
   markdown ? table.printMarkdown(_out) : table.print(_out);
-  printChartFooter(_out, markdown, small, romajiVariants, monographs, digraphs);
+  printChartFooter(_out, markdown, romajiVariants, monographs, digraphs);
 }
 
 } // namespace kanji_tools

@@ -232,5 +232,5 @@
 
 - **Monographs:** 86 (Plain=48, Dakuten=21, HanDakuten=5, Small=12)
 - **Digraphs:** 118 (Plain=71, Dakuten=42, HanDakuten=5)
-- **All Kana:** 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55)
+- **All Kana:** 204 (Monographs=86, Digraphs=118), Rōmaji Variants=55
 - **Types:** 208 (P=131, D=63, H=10, N=4), N types aren't included in 'All Kana'
