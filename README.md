@@ -30,7 +30,7 @@ This repository contains code for four 'main' programs:
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
 - **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 
-The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify Japanese **kanji** (漢字) characters into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code created for the *stats* program.
+The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify Japanese **Kanji** (漢字) characters into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code created for the *stats* program.
 
 ### Project Structure
 
@@ -57,7 +57,7 @@ The five libraries are:
 
 ### VS Code Setup
 
-The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to *wchar_t* and multi-byte handling that won't currently compile on *Windows 10*.
+The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to `wchar_t` and multi-byte handling that won't currently compile on *Windows 10*.
 
 Here are some links that might help with setup:
 
@@ -145,8 +145,8 @@ The following diagram shows the **Kana** class hierarchy as well as some of the 
 
 See **[Kana.h](libs/kana/include/kanji_tools/kana/Kana.h)** for details, but in summary, the derived classes are:
 
-- **DakutenKana**: represents a Kana that has a *dakuten* version. It holds an **AccentedKana** accessible via overridden `dakuten()` method to return the accented form, i.e., *[ka, か, カ]* is an instance of **DakutenKana** and calling `dakuten()` on it returns *[ga, が, ガ]*
-- **HanDakutenKana**: derives from **DakutenKana** and holds an **AccentedKana** accessible via overridden `hanDakuten()` method - this class is used for ha-gyō (は-行) Kana which have both *dakuten* and *hanDakuten* versions.
+- **DakutenKana**: represents a Kana that has a *dakuten* version. It holds an **AccentedKana** accessible via the overridden `dakuten()` method to return the accented form, i.e., *[ka, か, カ]* is an instance of **DakutenKana** and calling `dakuten()` on it returns *[ga, が, ガ]*
+- **HanDakutenKana**: derives from **DakutenKana** and holds an **AccentedKana** accessible via the overridden `hanDakuten()` method - this class is used for ha-gyō (は-行) Kana which have both *dakuten* and *hanDakuten* versions.
 - **AccentedKana**: has a pointer back to its *plain* holder
 
 ## Kanji Data
@@ -283,21 +283,21 @@ Rad 龍(212), Strokes 16, lóng, Frq 1734, New 竜*
      Jukugo: 龍頭蛇尾（りゅうとうだび） 烏龍茶（うーろんちゃ） 画龍点睛（がりょうてんせい）
 ```
 
-Here are some runtime memory and (statically linked) file size stats for **kanjiQuiz**. These stats are more relevant for this program compared to the others since it loads more Kanji related data including all *groups* and *jukugo*. *Sanitize* stats are only available for *Clang* - they cause a lot more runtime memory to be used, but slightly smaller debug binary file size (presumably because of less inlining).
+Here are some runtime memory and (statically linked) file sizes for **kanjiQuiz**. Stats are more relevant for the *quiz* program compared to the others since it loads more Kanji related data including *groups* and *jukugo*. *Sanitize* stats are only available for *Clang* (this is the default debug setup when building the project) - they cause a lot more runtime memory to be used.
 
 ### Kanji Quiz Runtime Memory
 
 | Compiler | Debug Sanitize | Debug | Release |
 | --- | --- | --- | --- |
-| Clang | 126.8 MB | 30.0 MB | 30.7 MB |
-| GCC | | 41.9 MB | 41.8 MB |
+| Clang | 124.4 MB | 24.4 MB | 24.7 MB |
+| GCC | | 34.3 MB | 33.8 MB |
 
 ### Kanji Quiz Binary File Size
 
 | Compiler | Debug Sanitize | Debug | Release |
 | --- | --- | --- | --- |
-| Clang | 8.0 MB | 8.3 MB | 744 KB |
-| GCC | | 4.3 MB | 983 KB |
+| Clang | 14 MB | 10 MB | 883 KB |
+| GCC | | 4.6 MB | 1.2 KB |
 
 ## Kanji Stats
 
