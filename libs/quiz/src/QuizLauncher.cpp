@@ -25,15 +25,15 @@ constexpr auto HelpMessage{
     -g   'grade' (optional grade '1-6', 's' = Secondary School)
     -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)
     -l   'level' (optional JLPT level number '1-5')
-    -m   'meaning' (optional kanji type '1-4')
-    -p   'pattern' (optional kanji type '1-4')
+    -m   'meaning' (optional Kanji type '1-4')
+    -p   'pattern' (optional Kanji type '1-4')
 
   The following options can be followed by a 'num' to specify where to start in
   the question list (use negative to start from the end or 0 for random order).
     -r   review mode
     -t   test mode
 
-  kanji  show details for a kanji instead of starting a review or test
+  kanji  show details for a Kanji instead of starting a review or test
 
 Examples:
   kanjiQuiz -f        # start 'frequency' quiz (prompts for 'bucket' number)
