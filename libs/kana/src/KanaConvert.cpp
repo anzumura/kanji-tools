@@ -27,7 +27,7 @@ public:
     return _dakuten + _hanDakuten + _plain + _small;
   }
 private:
-  size_t _dakuten{}, _hanDakuten{}, _plain{}, _small{};
+  uint16_t _dakuten{}, _hanDakuten{}, _plain{}, _small{};
 };
 
 auto& operator<<(std::ostream& os, const KanaCount& k) {
@@ -62,7 +62,7 @@ void printChartHeader(std::ostream& out, bool markdown) {
 
 void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
     const KanaCount& monographs, const KanaCount& digraphs) {
-  static constexpr size_t NoneTypeKana{4}, FooterWidth{10};
+  static constexpr uint16_t NoneTypeKana{4}, FooterWidth{10};
   out << '\n'
       << (markdown ? "**Totals:**\n" : ">>> Totals:") << std::setfill(' ')
       << std::right << '\n';
@@ -75,7 +75,7 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
   print("All Kana") << monographs.total() + digraphs.total()
                     << " (Monographs=" << monographs.total()
                     << ", Digraphs=" << digraphs.total()
-                    << "), Rōmaji Variants=" << romajiVariants << "\n";
+                    << "), Rōmaji Variants=" << romajiVariants << '\n';
   // 'small' Kana are plain monographs, but are counted separately (digraphs
   // always consist of a full size Kana followed by a small Kana)
   const auto plain{monographs.small() + monographs.plain() + digraphs.plain()},
@@ -314,7 +314,7 @@ void KanaConvert::printKanaChart(bool markdown) const {
     table.add({type, romaji, h, k, getUni(h), getUni(k), hepburn, kunrei, vars},
         groups.contains(romaji));
   }
-  // special handling for middle dot, prolong symbol and repeat symbols
+  // special handling for middle dot, prolong mark and repeat marks
   const std::string slash{"/"}, middleDot{"・"};
   table.add({"N", slash, {}, middleDot, {}, toUnicode(middleDot)}, true);
   table.add({"N", {}, {}, Kana::ProlongMark, {}, toUnicode(Kana::ProlongMark)});
