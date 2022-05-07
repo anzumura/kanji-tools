@@ -30,7 +30,7 @@ This repository contains code for four 'main' programs:
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
 - **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 
-The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify Japanese **Kanji** (漢字) characters into *official* categories in order to determine how many kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code created for the *stats* program.
+The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify **Japanese Kanji (漢字)** characters into *official* categories in order to determine how many Kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code created for the *stats* program.
 
 ### Project Structure
 
@@ -195,7 +195,7 @@ Grade | Total | **N5** | **N4** | **N3** | **N2** | **N1** | **None**
 **S** | 1130  |     |     |     | 161 | 804 | 165
 Total | 2136  | 103 | 181 | 361 | 415 | 911 | 165
 
-Total for all grades is the same as the total Jōyō (2136) and all are in the Top 2501 frequency list except for 99 **S** (Secondary School) kanjis.
+Total for all grades is the same as the total Jōyō (2136) and all are in the Top 2501 frequency list except for 99 **S** (Secondary School) Kanjis.
 
 The program also loads the 214 official Kanji radicals (部首).
 
@@ -332,11 +332,11 @@ The books pulled from Aozora were in Shift JIS format so the following steps wer
 - Load the HTML version of the book in **Safari**
 - Select All, then Copy-Paste to **Notes** - this keeps the *furigana*, but puts it on a separate line
 - Open *file1* in **Terminal** using *vi* and paste in the text from **Notes**, then save and exit.
-  - Copying straight from the browser to *vi* puts the *furigana* immediately after the kanji (with no space, brackets, newline, etc.) which makes it pretty much impossible to 'regex' it out when producing stats (and difficult to read as well).
+  - Copying straight from the browser to *vi* puts the *furigana* immediately after the Kanji (with no space, brackets, newline, etc.) which makes it pretty much impossible to 'regex' it out when producing stats (and difficult to read as well).
   - Extremely rare Kanji that are just embedded images in the HTML (instead of real Shift JIS values) do show up in **Notes**, but of course they don't end up getting pasted into the plain text file in *vi*. These need to be entered by hand (by choosing the closest Unicode equivalent).
-  - **MS Word** also captures the *furigana* from the HTML, but it ends up being above unrelated text. When pasting to *vi* the *furigana* is put in standard brackets, but in incorrect locations which makes it useless (but at least it can be easily removed which is better than the straight to *vi* option). However, a more serious problem is that **MS Word** (macOS version 2019) also seemed to randomly drop parts of the text (maybe an encoding conversion issue?) which was a showstopper.
+  - **MS Word** also captures the *furigana* from the HTML, but it ends up being above unrelated text. When pasting to *vi* the *furigana* is put in standard brackets, but in incorrect locations which makes it useless (but at least it can be easily removed which is better than the straight to *vi* option). However, a more serious problem is that **MS Word** (*macOS* version 2019) also seemed to randomly drop parts of the text (maybe an encoding conversion issue?) which was a showstopper.
 - Run the **kanjiFormat** program (from *build/apps*) on *file1* and redirect the output to *file2*
-- *file2* should now have properly formatted *furigana* in wide brackets following the *kanji sequence* on the same line.
+- *file2* should now have properly formatted *furigana* in wide brackets following the *Kanji Sequence* on the same line.
 - run 'fold *file2*>*file1*' to split up the really long lines to 80 columns.
 
 ### Helpful Commands
