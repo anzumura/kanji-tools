@@ -13,7 +13,7 @@ namespace kanji_tools {
 class CustomFileKanji : public NonLinkedKanji {
 public:
   using File = const ColumnFile&;
-  using Number = u_int16_t;
+  using Number = uint16_t;
 
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
   [[nodiscard]] OptString extraTypeInfo() const override;

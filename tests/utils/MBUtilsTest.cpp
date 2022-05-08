@@ -123,7 +123,7 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   EXPECT_EQ(o.size(), 2);
   EXPECT_EQ(validateUtf8(o), Utf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
-  constexpr u_int32_t macronO{0x014d};
+  constexpr uint32_t macronO{0x014d};
   EXPECT_EQ(toBinary(macronO, 16), "0000000101001101");
   const std::string overlongO{
       toChar(ThreeBits), toChar(Bit1 | 0b101U), toChar(Bit1 | 0b1101U)};
@@ -183,7 +183,7 @@ TEST(MBUtilsTest, GetCode) {
 TEST(MBUtilsTest, ToUTF8IntAndUInt) {
   constexpr int intDog{0x72ac};
   EXPECT_EQ(toUtf8(intDog), Dog);
-  constexpr u_int32_t uIntDog{0x72ac};
+  constexpr uint32_t uIntDog{0x72ac};
   EXPECT_EQ(toUtf8(uIntDog), Dog);
 }
 

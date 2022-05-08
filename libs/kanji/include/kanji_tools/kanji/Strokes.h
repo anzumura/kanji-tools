@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 class Strokes {
 public:
-  using Size = u_int8_t;
+  using Size = uint8_t;
 
   // max number of strokes and variant strokes found in current 'ucd.txt' data
   // for example, 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes

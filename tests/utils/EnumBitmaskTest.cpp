@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 namespace {
 
-enum class TestEnum : u_int8_t { One = 1, Two, Four = 4, Eight = 8, All = 15 };
+enum class TestEnum : uint8_t { One = 1, Two, Four = 4, Eight = 8, All = 15 };
 
 } // namespace
 
@@ -29,9 +29,9 @@ TEST(EnumBitmaskTest, BitwiseXOrOperator) {
 }
 
 TEST(EnumBitmaskTest, BitwiseComplementOperator) {
-  constexpr u_int8_t four{4};
+  constexpr uint8_t four{4};
   EXPECT_EQ(~TestEnum::Four,
-      to_enum<TestEnum>(four ^ std::numeric_limits<u_int8_t>::max()));
+      to_enum<TestEnum>(four ^ std::numeric_limits<uint8_t>::max()));
   auto x{TestEnum::Two | TestEnum::Four};
   EXPECT_EQ(x &= ~TestEnum::Two, TestEnum::Four);
 }

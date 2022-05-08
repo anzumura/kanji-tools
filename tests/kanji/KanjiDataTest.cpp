@@ -213,7 +213,7 @@ TEST_F(KanjiDataTest, FindKanjisByNelsonId) {
   constexpr Kanji::NelsonId totalNelsonIds{5447};
   ASSERT_TRUE(_data->findByNelsonId(0).empty());
   ASSERT_TRUE(_data->findByNelsonId(totalNelsonIds).empty());
-  std::vector<u_int> missingNelsonIds;
+  std::vector<uint> missingNelsonIds;
   for (Kanji::NelsonId i{1}; i < totalNelsonIds; ++i)
     if (_data->findByNelsonId(i).empty()) missingNelsonIds.push_back(i);
   // There are a few Nelson IDs that are missing from UCD data
@@ -281,9 +281,9 @@ TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
 TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
   // Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
-  u_int32_t rareUcd{};
-  std::map<std::string, u_int> rareMissingJSource;
-  std::map<KanjiTypes, u_int> missingJSource;
+  uint32_t rareUcd{};
+  std::map<std::string, uint> rareMissingJSource;
+  std::map<KanjiTypes, uint> missingJSource;
   for (auto& i : _data->ucd().map()) {
     auto& u{i.second};
     // at least one of 'on', 'kun', 'jSource' or 'morohashiId' must have a value
@@ -316,9 +316,9 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
 TEST_F(KanjiDataTest, UcdLinks) {
   auto& ucd{_data->ucd().map()};
   EXPECT_EQ(ucd.size(), _data->kanjiNameMap().size());
-  u_int32_t jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
+  uint32_t jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
       jinmeiLinksToJinmei{};
-  std::map<KanjiTypes, u_int> otherLinks;
+  std::map<KanjiTypes, uint> otherLinks;
   // every 'linkName' should be different than 'name' and also exist in the map
   for (auto& i : ucd) {
     auto& u{i.second};
@@ -366,7 +366,7 @@ TEST_F(KanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[KanjiTypes::Ucd], 2838);
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedJinmei], 0); // part of 'jinmeiLinks'
   EXPECT_EQ(otherLinks[KanjiTypes::LinkedOld], 90);
-  u_int32_t officialLinksToJinmei{}, officialLinksToJouyou{};
+  uint32_t officialLinksToJinmei{}, officialLinksToJouyou{};
   for (auto& i : _data->types(KanjiTypes::LinkedJinmei)) {
     auto& link{*i->link()};
     if (link.type() == KanjiTypes::Jouyou)

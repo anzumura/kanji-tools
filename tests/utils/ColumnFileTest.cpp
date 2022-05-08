@@ -274,10 +274,10 @@ TEST_F(ColumnFileTest, GetULongMaxValueError) {
 }
 
 TEST_F(ColumnFileTest, GetUInt) {
-  constexpr u_int8_t expected{123};
+  constexpr uint8_t expected{123};
   auto f{write({Col}, "Col\n123")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getUInt<u_int8_t>(Col), expected);
+  EXPECT_EQ(f.getUInt<uint8_t>(Col), expected);
   EXPECT_EQ(f.getU8(Col), expected); // convenience function
 }
 
@@ -310,7 +310,7 @@ TEST_F(ColumnFileTest, GetOptULongError) {
 TEST_F(ColumnFileTest, GetOptUInt) {
   auto f{write({Col}, "Col\n123\n")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getOptUInt<u_int16_t>(Col), 123);
+  EXPECT_EQ(f.getOptUInt<uint16_t>(Col), 123);
   EXPECT_TRUE(f.nextRow());
   EXPECT_FALSE(f.getOptU16(Col));
 }

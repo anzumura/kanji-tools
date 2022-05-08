@@ -16,7 +16,7 @@ namespace kanji_tools {
 // 'KanjiInfo' members can be used to select which fields are printed by
 // 'Kanji::info' method. For example 'Grade | Level | Freq' will print 'grade',
 // 'level' and 'frequency' fields and 'All ^ Strokes' prints all except strokes.
-enum class KanjiInfo : u_int16_t {
+enum class KanjiInfo : uint16_t {
   Radical = 1,
   Strokes,
   Pinyin = 4,
@@ -36,12 +36,12 @@ using KanjiPtr = std::shared_ptr<class Kanji>;
 
 class Kanji {
 public:
-  using Frequency = u_int16_t;
+  using Frequency = uint16_t;
   using LinkNames = std::vector<std::string>;
-  using NelsonId = u_int16_t;
+  using NelsonId = uint16_t;
   using NelsonIds = std::vector<NelsonId>;
   using OptString = std::optional<std::string>;
-  using Year = u_int16_t;
+  using Year = uint16_t;
   // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
   using Name = UcdEntry::Name;
@@ -189,7 +189,7 @@ private:
   static constexpr std::array QualifiedNames{
       '.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
 
-  [[nodiscard]] u_int16_t qualifiedNameRank() const;
+  [[nodiscard]] uint16_t qualifiedNameRank() const;
 
   // name related fields
   const KanjiName _name;

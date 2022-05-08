@@ -33,7 +33,7 @@ enum class BracketType { Curly, Round, Square, None };
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
 // 'toChar' overloads for common unsigned types (don't need 'allowNegative')
-[[nodiscard]] char toChar(u_int16_t);
+[[nodiscard]] char toChar(uint16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);
 [[nodiscard]] char toChar(char32_t);

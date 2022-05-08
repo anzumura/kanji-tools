@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 class ListQuiz : public Quiz {
 public:
-  using ChoiceCount = u_int16_t;
+  using ChoiceCount = uint16_t;
 
   enum class QuizStyle { KanjiToReading, ReadingToKanji };
   static QuizStyle toQuizStyle(char);

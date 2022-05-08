@@ -21,7 +21,7 @@ public:
   // of entries that the group quiz currently supports for entering answers,
   // i.e., a-z, then A-Z, then 6 more ascii characters following Z (before
   // reaching 'a' again).
-  static constexpr u_int16_t MaxGroupSize{58};
+  static constexpr uint16_t MaxGroupSize{58};
 
   // 'PatternType' is 'None' for Meaning groups, but for a Pattern Group it can
   // be one of three values:

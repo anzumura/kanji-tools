@@ -16,7 +16,7 @@ namespace kanji_tools {
 // entries are for a 'JLPT Level' or a 'Kentei Kyu'.
 class DataFile {
 public:
-  using Index = u_int16_t; // support up to 65K entries
+  using Index = uint16_t; // support up to 65K entries
   using Path = std::filesystem::path;
   using StringList = std::vector<std::string>;
   using StringSet = std::set<std::string>;

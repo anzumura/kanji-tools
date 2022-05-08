@@ -14,9 +14,9 @@ namespace kanji_tools {
 // encapsulates this by internally storing an unsigned 'id' and an 'IdType'.
 class MorohashiId {
 public:
-  using Id = u_int16_t;
+  using Id = uint16_t;
 
-  enum class IdType : u_int8_t { Regular, Prime, DoublePrime, Supplemental };
+  enum class IdType : uint8_t { Regular, Prime, DoublePrime, Supplemental };
 
   static constexpr Id MaxId{std::numeric_limits<Id>::max()};
 
@@ -43,7 +43,7 @@ private:
   [[nodiscard]] static IdType getIdType(const std::string&);
   [[nodiscard]] static Id validate(const std::string&, size_t = 0, size_t = 0);
 
-  const u_int16_t _id{};
+  const uint16_t _id{};
   const IdType _idType{IdType::Regular};
 };
 

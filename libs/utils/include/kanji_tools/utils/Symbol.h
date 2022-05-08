@@ -15,7 +15,7 @@ namespace kanji_tools {
 // and the data member doesn't have many different values. Some examples would
 // be Unicode block names or Unicode version names (see Ucd.h for examples).
 //
-// The current implementation uses u_int16_t so it can support up to ~65K unique
+// The current implementation uses uint16_t so it can support up to ~65K unique
 // symbols per type (an exception is thrown if this limit is exceeded). If there
 // are more than 65K values then 'Symbol' was probably not a good design choice
 // in the first place.
@@ -29,7 +29,7 @@ namespace kanji_tools {
 
 class BaseSymbol {
 public:
-  using Id = u_int16_t;
+  using Id = uint16_t;
 
   // '0' is used as the 'id' for 'empty' symbols (non-empty start at '1')
   static constexpr auto Max{std::numeric_limits<Id>::max() - 1};

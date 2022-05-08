@@ -9,7 +9,7 @@ namespace kanji_tools {
 class Radical {
 public:
   using AltForms = std::vector<std::string>;
-  using Number = u_int16_t;
+  using Number = uint16_t;
   // some type aliases to help make parameter lists shorter and clearer
   using Name = const std::string&;
   using Reading = const std::string&;

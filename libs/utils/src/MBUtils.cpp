@@ -203,7 +203,7 @@ std::string toUtf8(Code c) {
 
 std::string toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
 
-std::string toUtf8(u_int32_t x) { return toUtf8(static_cast<Code>(x)); }
+std::string toUtf8(uint32_t x) { return toUtf8(static_cast<Code>(x)); }
 
 std::string toUtf8(const std::u32string& s) {
   std::string result;

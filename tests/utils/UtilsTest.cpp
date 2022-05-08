@@ -168,11 +168,11 @@ TEST(UtilsTest, IntToCharOnlyPositive) {
 }
 
 TEST(UtilsTest, UInt16ToChar) {
-  u_int16_t x{0};
+  uint16_t x{0};
   EXPECT_EQ(toChar(x), '\0');
   EXPECT_EQ(toChar(x = 255), '\xff');
   EXPECT_THROW(call([&x] { return toChar(x = 256); },
-                   "toChar (u_int16_t): '256' out of range"),
+                   "toChar (uint16_t): '256' out of range"),
       std::out_of_range);
 }
 

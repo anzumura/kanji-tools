@@ -13,7 +13,7 @@ public:
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
   using KanjiList = Data::KanjiList;
-  using Question = u_int16_t;
+  using Question = uint16_t;
 
   static constexpr char QuitOption{'/'};
 
@@ -50,7 +50,7 @@ public:
       const Kanji&, bool useNewLine = false, bool showMeaning = true) const;
   void printReviewDetails(const Kanji&) const;
 private:
-  static constexpr u_int16_t JukugoPerLine{3}, MaxJukugoSize{30};
+  static constexpr uint16_t JukugoPerLine{3}, MaxJukugoSize{30};
 
   [[nodiscard]] DataRef data() const { return _groupData->data(); }
 

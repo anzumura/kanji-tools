@@ -13,7 +13,7 @@ public:
   // enforce using a small unsigned type to help make sure scoped enums being
   // used in derived classes (EnumMap, EnumArray, etc.) don't have negative
   // values (they are supposed to be contiguous values starting at zero).
-  using Size = u_int8_t;
+  using Size = uint8_t;
 
   BaseEnum(const BaseEnum&) = delete;
   BaseEnum& operator=(const BaseEnum&) = delete;

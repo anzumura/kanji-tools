@@ -18,7 +18,7 @@ template<> void rangeError<char32_t>(const std::string& msg, char32_t x) {
 template<typename T, typename U> auto cast(U u) { return static_cast<T>(u); }
 
 template<typename T> char toCharUnsigned(T x, const std::string& type) {
-  if (x > std::numeric_limits<u_int8_t>::max())
+  if (x > std::numeric_limits<uint8_t>::max())
     rangeError("toChar (" + type + ")", x);
   return cast<char>(x);
 }
@@ -87,8 +87,8 @@ char toChar(unsigned int x) {
   return toCharUnsigned(x, Type);
 }
 
-char toChar(u_int16_t x) {
-  static const std::string Type{"u_int16_t"};
+char toChar(uint16_t x) {
+  static const std::string Type{"uint16_t"};
   return toCharUnsigned(x, Type);
 }
 

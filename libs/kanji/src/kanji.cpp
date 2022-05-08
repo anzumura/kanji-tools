@@ -106,7 +106,7 @@ bool Kanji::orderByQualifiedName(const Kanji& x) const {
 
 bool Kanji::operator==(const Kanji& x) const { return name() == x.name(); }
 
-u_int16_t Kanji::qualifiedNameRank() const { // NOLINT
+uint16_t Kanji::qualifiedNameRank() const { // NOLINT
   // use an enum to avoid magic numbers, note 'vUcd' is the least common type
   enum Vals { vJou, vJlpt, vFreq, vJin, vLnkJ, vLnkO, vExt, vNoK1, vK1, vUcd };
   const auto t{type()};

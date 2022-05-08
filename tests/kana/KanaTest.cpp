@@ -145,7 +145,7 @@ TEST(KanaTest, CheckHiragana) {
   auto& sourceMap{Kana::getMap(CharType::Hiragana)};
   EXPECT_EQ(sourceMap.size(), TotalKana);
   // count various types including smallDigraphs (which should be 0)
-  u_int16_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
+  uint16_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
       dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
       dakutenDigraphs{}, smallDigraphs{};
   for (auto& i : sourceMap) {
@@ -252,7 +252,7 @@ TEST(KanaTest, CheckKatakana) {
 TEST(KanaTest, CheckRomaji) {
   auto& sourceMap{Kana::getMap(CharType::Romaji)};
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
-  u_int16_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
+  uint16_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
       oNum{}, voNum{}, nNum{};
   std::set<std::string> romajiVariants;
   for (auto& i : sourceMap) {

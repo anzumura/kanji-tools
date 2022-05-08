@@ -270,7 +270,7 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(
     if (arg.size() == 3 && arg[2] == '0')
       _questionOrder = QuestionOrder::Random;
     else {
-      u_int16_t offset{2};
+      uint16_t offset{2};
       if (arg[2] == '-') {
         _questionOrder = QuestionOrder::FromEnd;
         offset = 3;
