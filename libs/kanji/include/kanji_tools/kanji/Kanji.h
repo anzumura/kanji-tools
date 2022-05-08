@@ -160,10 +160,10 @@ protected:
   // ctor used by above ctor as well as 'TestKanji' class
   Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
       Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
-      const NelsonIds& nelsonIds)
+      NelsonIds nelsonIds)
       : _name{name}, _compatibilityName{compatibilityName}, _radical{radical},
         _strokes{strokes}, _pinyin{pinyin}, _morohashiId{morohashiId},
-        _nelsonIds{nelsonIds} {}
+        _nelsonIds{std::move(nelsonIds)} {}
 
   inline static const LinkNames EmptyLinkNames;
 private:
