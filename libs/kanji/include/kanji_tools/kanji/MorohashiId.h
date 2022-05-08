@@ -43,7 +43,7 @@ private:
   [[nodiscard]] static IdType getIdType(const std::string&);
   [[nodiscard]] static Id validate(const std::string&, size_t = 0, size_t = 0);
 
-  const uint16_t _id{};
+  const Id _id{};
   const IdType _idType{IdType::Regular};
 };
 
