@@ -341,10 +341,15 @@ The books pulled from Aozora were in Shift JIS format so the following steps wer
 
 ### Helpful Commands
 
-Helpful commands for re-ordering columns, re-numbering (assuming header and first column should be numbered starting at 1) and converting double byte to single byte:
+Below are some bash commands that were used while creating this project:
 
 ```bash
+# re-order columns
 awk -F'[\t]' -v OFS="\t" '{print $1,$2,$4,$5,$3,$6,$7,$8,$9}' file
+# re-number file assuming first column should be a number column starting at 1
 awk -F'[\t]' -v OFS="\t" 'NR==1{print}NR>1{for(i=1;i<=NF;i++) printf "%s",(i>1 ? OFS $i : NR-1);print ""}' file
+# convert wide numbers to normal single byte numbers (and delete a character)
 cat file|tr '１２３４５６７８９０' '1234567890'|tr -d '画'
+# add newline to end of a file if missing (skip build, out and .git dirs)
+find . -not \( -name build -prune \) -not \( -name .git -prune \) -not \( -name out -prune \) -type f | while read f; do tail -n1 $f | read -r _ || echo >> $f; done
 ```
