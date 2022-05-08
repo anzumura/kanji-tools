@@ -18,6 +18,26 @@ void checkRange(const T& blocks, BlockSet* allBlocks = {}) {
 
 } // namespace
 
+TEST(UnicodeBlockTest, UnicodeVersionStreamOperator) {
+  std::stringstream s;
+  s << UVer1_1;
+  EXPECT_EQ(s.str(), "v1.1: 6, 1993");
+  s.str("");
+  s << UVer13_0;
+  EXPECT_EQ(s.str(), "v13.0: 3, 2020");
+}
+
+TEST(UnicodeBlockTest, UnicodeBlockStreamOperator) {
+  std::stringstream s;
+  s << CommonKanjiBlocks[0];
+  EXPECT_EQ(s.str(), "CJK Extension A (v3.0: 9, 1999)");
+  s.str("");
+  const auto noName{makeBlock<0x26A1>()};
+  s << noName;
+  EXPECT_EQ(s.str(), "start=26A1, end=26A1");
+  // a block can't be created with a name, but no version
+}
+
 TEST(UnicodeBlockTest, CheckNoOverlappingBlocks) {
   BlockSet allBlocks;
   checkRange(HiraganaBlocks, &allBlocks);

@@ -3,25 +3,27 @@
 #include <kanji_tools/utils/MBUtils.h>
 
 #include <array>
+#include <chrono>
+#include <iostream>
 
 namespace kanji_tools {
 
 // Unicode version and release date
 class UnicodeVersion {
 public:
-  consteval UnicodeVersion(const char* v, uint8_t m, uint16_t y)
-      : _version{v}, _month{m}, _year{y} {}
+  consteval UnicodeVersion(std::string_view v, uint8_t m, uint16_t y)
+      : _version{v}, _date{std::chrono::year{y}, std::chrono::month{m}} {}
 
   UnicodeVersion(const UnicodeVersion&) = delete;
 
   [[nodiscard]] constexpr auto version() const { return _version; }
-  [[nodiscard]] constexpr auto month() const { return _month; }
-  [[nodiscard]] constexpr auto year() const { return _year; }
+  [[nodiscard]] constexpr auto date() const { return _date; }
 private:
-  const char* const _version;
-  const uint8_t _month;
-  const uint16_t _year;
+  const std::string_view _version;
+  const std::chrono::year_month _date;
 };
+
+std::ostream& operator<<(std::ostream&, const UnicodeVersion&);
 
 // 'UnicodeBlock' holds a range which is used in the 'is' functions ('isKanji',
 // 'isHiragana', etc.). Official blocks have a 'version' and a 'name' (just for
@@ -67,20 +69,22 @@ private:
   }
 
   consteval UnicodeBlock(
-      Code s, Code e, const UnicodeVersion* v = {}, const char* n = {})
+      Code s, Code e, const UnicodeVersion* v = {}, std::string_view n = {})
       : _start{s}, _end{e}, _version{v}, _name{n} {}
 
   // grant access to 'makeBlock' functions
   template<Code Start> friend consteval auto makeBlock();
   template<Code Start, Code End> friend consteval auto makeBlock();
   template<Code Start, Code End, typename T>
-  friend consteval auto makeBlock(T&, const char*);
+  friend consteval auto makeBlock(T&, std::string_view);
 
   const Code _start;
   const Code _end;
   const UnicodeVersion* const _version;
-  const char* const _name;
+  const std::string_view _name;
 };
+
+std::ostream& operator<<(std::ostream&, const UnicodeBlock&);
 
 // UnicodeBlocks defined in DisplaySize.h (WideBlocks) are used for determining
 // if a character is narrow or wide display can be a single entry and also not
@@ -103,7 +107,7 @@ template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 
 template<Code Start, Code End, typename T>
-[[nodiscard]] consteval auto makeBlock(T& v, const char* n) {
+[[nodiscard]] consteval auto makeBlock(T& v, std::string_view n) {
   UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % UnicodeBlock::Mod == UnicodeBlock::OfficialStartMod);
   static_assert(End % UnicodeBlock::Mod == UnicodeBlock::OfficialEndMod);

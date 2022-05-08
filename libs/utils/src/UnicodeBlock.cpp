@@ -1,6 +1,24 @@
 #include <kanji_tools/utils/UnicodeBlock.h>
+#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
+
+std::ostream& operator<<(std::ostream& os, const UnicodeVersion& v) {
+  // simplify the following once 'std::format' is available (in Clang and GCC)
+  const unsigned m{v.date().month()};
+  const int y{v.date().year()};
+  return os << 'v' << v.version() << ": " << std::to_string(m) << ", "
+            << std::to_string(y);
+}
+
+std::ostream& operator<<(std::ostream& os, const UnicodeBlock& b) {
+  if (b.name().empty())
+    os << "start=" << toUnicode(b.start()) << ", end=" << toUnicode(b.end());
+  else
+    os << b.name();
+  if (b.version()) os << " (" << *b.version() << ')';
+  return os;
+}
 
 // Kana
 

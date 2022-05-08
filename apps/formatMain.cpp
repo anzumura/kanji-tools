@@ -3,7 +3,6 @@
 
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <regex>
 
 using kanji_tools::Args, kanji_tools::KanjiRange, kanji_tools::KanaRange,

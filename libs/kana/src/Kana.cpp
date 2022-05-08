@@ -3,7 +3,6 @@
 #include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
-#include <iostream>
 
 namespace kanji_tools {
 

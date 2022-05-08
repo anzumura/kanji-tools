@@ -3,7 +3,6 @@
 #include <kanji_tools/utils/BlockRange.h>
 
 #include <fstream>
-#include <iostream>
 
 namespace kanji_tools {
 
