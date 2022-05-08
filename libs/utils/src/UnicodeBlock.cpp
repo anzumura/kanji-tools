@@ -7,8 +7,7 @@ std::ostream& operator<<(std::ostream& os, const UnicodeVersion& v) {
   // simplify the following once 'std::format' is available (in Clang and GCC)
   const unsigned m{v.date().month()};
   const int y{v.date().year()};
-  return os << 'v' << v.version() << ": " << std::to_string(m) << ", "
-            << std::to_string(y);
+  return os << 'v' << v.version() << ": " << m << ", " << y;
 }
 
 std::ostream& operator<<(std::ostream& os, const UnicodeBlock& b) {
