@@ -2,6 +2,7 @@
 #include <kanji_tools/utils/Utils.h>
 
 #include <array>
+#include <bit>
 
 namespace kanji_tools {
 
@@ -25,21 +26,39 @@ constexpr Code MinSurrogate{0xd800}, MaxSurrogate{0xdfff}, Max2Uni{0x7ff},
 constexpr uInt Shift6{6};
 constexpr uInt Shift12{Shift6 * 2}, Shift18{Shift6 * 3};
 
-constexpr auto left6(uInt x) noexcept { return x << Shift6; }
-constexpr auto left12(uInt x) noexcept { return x << Shift12; }
-constexpr auto left18(uInt x) noexcept { return x << Shift18; }
+[[nodiscard]] constexpr auto left6(uInt x) noexcept { return x << Shift6; }
+[[nodiscard]] constexpr auto left12(uInt x) noexcept { return x << Shift12; }
+[[nodiscard]] constexpr auto left18(uInt x) noexcept { return x << Shift18; }
 
-constexpr auto left6(uInt x, uInt y) noexcept { return left6(x) + y; }
-constexpr auto left12(uInt x, uInt y) noexcept { return left12(x) + y; }
-constexpr auto left18(uInt x, uInt y) noexcept { return left18(x) + y; }
+[[nodiscard]] constexpr auto left6(uInt x, uInt y) noexcept {
+  return left6(x) + y;
+}
+[[nodiscard]] constexpr auto left12(uInt x, uInt y) noexcept {
+  return left12(x) + y;
+}
+[[nodiscard]] constexpr auto left18(uInt x, uInt y) noexcept {
+  return left18(x) + y;
+}
 
-constexpr auto right6(uInt x, uInt y) noexcept { return (x >> Shift6) + y; }
-constexpr auto right12(uInt x, uInt y) noexcept { return (x >> Shift12) + y; }
-constexpr auto right18(uInt x, uInt y) noexcept { return (x >> Shift18) + y; }
+[[nodiscard]] constexpr auto right6(uInt x, uInt y) noexcept {
+  return (x >> Shift6) + y;
+}
+[[nodiscard]] constexpr auto right12(uInt x, uInt y) noexcept {
+  return (x >> Shift12) + y;
+}
+[[nodiscard]] constexpr auto right18(uInt x, uInt y) noexcept {
+  return (x >> Shift18) + y;
+}
+
+// 'getNextByte' advances 'u' to the next byte and returns true it it starts
+// with '10', i.e., a continuation byte
+[[nodiscard]] constexpr auto getNextByte(const unsigned char*& u) noexcept {
+  return std::countl_one(*++u) == 1;
+}
 
 // allow casting 'uInt' to 'char32_t' or 'wchar_t' (used by 'convertFromUtf8')
 template<typename T>
-constexpr std::enable_if_t<
+[[nodiscard]] constexpr std::enable_if_t<
     std::is_same_v<T, Code> || std::is_same_v<T, wchar_t>, T>
 cast(uInt x) noexcept {
   return static_cast<T>(x);
@@ -52,7 +71,8 @@ cast(uInt x) noexcept {
 //   'u':  pointer to third byte (get the 'cccccc' part of '10cccccc')
 // The result is made from the 16 bits: 'aaaa bbbbbb cccccc'
 template<typename T>
-constexpr auto threeByteUtf8(uInt b1, uInt b2, const unsigned char* u) {
+[[nodiscard]] constexpr auto threeByteUtf8(
+    uInt b1, uInt b2, const unsigned char* u) noexcept {
   return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
 }
 
@@ -64,7 +84,8 @@ constexpr auto threeByteUtf8(uInt b1, uInt b2, const unsigned char* u) {
 //   'u':  pointer to fourth byte (get the 'dddddd' part of '10dddddd')
 // The result is made from the 21 bits: 'aaa bbbbbb cccccc dddddd'
 template<typename T>
-constexpr auto fourByteUtf8(uInt b1, uInt b2, uInt b3, const unsigned char* u) {
+[[nodiscard]] constexpr auto fourByteUtf8(
+    uInt b1, uInt b2, uInt b3, const unsigned char* u) noexcept {
   return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
 }
 
@@ -85,20 +106,22 @@ constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
 template<typename T> using Consts = std::array<T, Char32Vals.size()>;
 
 template<typename T>
-[[nodiscard]] T convertOneUtf8(const unsigned char*& u, const Consts<T>& v) {
-  if (*u <= MaxAscii) return {*u++}; // single byte UTF-8 case (Ascii)
-  if ((*u & TwoBits) == Bit1 || (*u & FiveBits) == FiveBits) {
+[[nodiscard]] T convertOneUtf8(
+    const unsigned char*& u, const Consts<T>& v) noexcept {
+  const auto utfLen{std::countl_one(*u)};
+  if (!utfLen) return {*u++}; // single byte UTF-8 case (Ascii)
+  if (utfLen == 1 || utfLen > 4) {
     ++u;           // GCOV_EXCL_START: covered
     return v[Err]; // 1st byte was '10...' or more than four '1's
   }                // GCOV_EXCL_STOP
   uInt byte1{*u};
-  if ((*++u & TwoBits) != Bit1) return v[Err]; // 2nd byte not '10...'
+  if (!getNextByte(u)) return v[Err]; // 2nd byte not '10...'
   uInt byte2 = *u ^ Bit1;
-  if (byte1 & Bit3) {
-    if ((*++u & TwoBits) != Bit1) return v[Err]; // 3rd not '10...'
-    if (byte1 & Bit4) {
+  if (utfLen > 2) {
+    if (!getNextByte(u)) return v[Err]; // 3rd not '10...'
+    if (utfLen == 4) {
       uInt byte3 = *u ^ Bit1;
-      if ((*++u & TwoBits) != Bit1) return v[Err]; // 4th byte not '10...'
+      if (!getNextByte(u)) return v[Err]; // 4th byte not '10...'
       const auto t{fourByteUtf8<T>(byte1, byte2, byte3, u++)};
       // return Error if 't' is 'overlong' or beyond max Unicode range
       return t > v[MaxThree] && t <= v[MaxUni] ? t : v[Err];
@@ -150,19 +173,20 @@ void convertToUtf8(Code c, std::string& s) {
     s += ReplacementCharacter; // GCOV_EXCL_LINE: covered
 }
 
-// 'validateMB' is a helper function called by 'validateMBUtf8'
+// 'validateMB' is called by 'validateMBUtf8' ('u' has already been verified to
+// point to the first byte of a UTF-8 sequence by the calling function)
 template<typename T>
 [[nodiscard]] auto validateMB(
     const T& err, const unsigned char* u, bool sizeOne) {
   uInt byte1{*u};
-  if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+  if (!getNextByte(u)) return err(Utf8Result::MissingBytes);
   if (byte1 & Bit3) {
     uInt byte2 = *u ^ Bit1; // last 6 bits of the second byte
-    if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+    if (!getNextByte(u)) return err(Utf8Result::MissingBytes);
     if (byte1 & Bit4) {
       if (byte1 & Bit5) return err(Utf8Result::CharTooLong);
       uInt byte3 = *u ^ Bit1; // last 6 bits of the third byte
-      if ((*++u & TwoBits) != Bit1) return err(Utf8Result::MissingBytes);
+      if (!getNextByte(u)) return err(Utf8Result::MissingBytes);
       const auto code4{fourByteUtf8<Code>(byte1, byte2, byte3, u)};
       if (code4 <= Max3Uni) return err(Utf8Result::Overlong); // overlong 4 byte
       if (code4 > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
@@ -187,13 +211,13 @@ std::u32string fromUtf8(const std::string& s, size_t maxSize) {
   return fromUtf8(s.c_str(), maxSize);
 }
 
-Code getCode(const char* s) {
+Code getCode(const char* s) noexcept {
   if (!s || !*s) return {};
   auto u{reinterpret_cast<const unsigned char*>(s)};
   return convertOneUtf8(u, Char32Vals);
 }
 
-Code getCode(const std::string& s) { return getCode(s.c_str()); }
+Code getCode(const std::string& s) noexcept { return getCode(s.c_str()); }
 
 std::string toUtf8(Code c) {
   std::string result;

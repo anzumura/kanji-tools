@@ -20,8 +20,8 @@ using Code = char32_t;
 [[nodiscard]] std::u32string fromUtf8(const std::string&, size_t maxSize = 0);
 
 // functions that return a single UTF-8 'Code' (or 0 if input is empty)
-[[nodiscard]] Code getCode(const char*);
-[[nodiscard]] Code getCode(const std::string&);
+[[nodiscard]] Code getCode(const char*) noexcept;
+[[nodiscard]] Code getCode(const std::string&) noexcept;
 
 [[nodiscard]] std::string toUtf8(Code);
 [[nodiscard]] std::string toUtf8(int);
