@@ -31,15 +31,12 @@ GroupData::GroupData(const DataPtr& data, const Data::Path* dir) : _data{data} {
   }
 }
 
-void GroupData::add(
-    const String& kanji, MultiMap& groups, const GroupPtr& group) {
-  groups.emplace(kanji, group);
+void GroupData::add(const String& kanji, MultiMap& m, const GroupPtr& group) {
+  m.emplace(kanji, group);
 }
 
-void GroupData::add(
-    const String& kanji, Map& groups, const GroupPtr& group) const {
-  const auto i{groups.emplace(kanji, group)};
-  if (!i.second)
+void GroupData::add(const String& kanji, Map& m, const GroupPtr& group) const {
+  if (const auto i{m.emplace(kanji, group)}; !i.second)
     _data->printError(kanji + " from " + group->toString() + " already in " +
                       i.first->second->toString());
 }
