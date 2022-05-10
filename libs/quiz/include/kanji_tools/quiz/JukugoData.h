@@ -16,21 +16,21 @@ public:
   JukugoData(const JukugoData&) = delete;
   JukugoData& operator=(const JukugoData&) = delete;
 
-  [[nodiscard]] const List& find(const std::string& kanji) const;
+  [[nodiscard]] const List& find(const String& kanji) const;
 private:
   inline static const List EmptyList;
 
-  static size_t findOpenBracket(const std::string&, bool onePerLine);
-  static size_t findCloseBracket(const std::string&, bool onePerLine);
-  static void error(const std::string&);
+  static size_t findOpenBracket(const String&, bool onePerLine);
+  static size_t findCloseBracket(const String&, bool onePerLine);
+  static void error(const String&);
 
-  void createJukugo(const std::string& line, KanjiGrades, bool onePerLine);
+  void createJukugo(const String& line, KanjiGrades, bool onePerLine);
 
-  using JukugoKey = std::pair<std::string, std::string>;
+  using JukugoKey = std::pair<String, String>;
   [[nodiscard]] size_t loadFile(const Data::Path&, KanjiGrades);
 
   std::map<JukugoKey, JukugoPtr> _uniqueJukugo;
-  std::map<std::string, List> _kanjiToJukugo;
+  std::map<String, List> _kanjiToJukugo;
 };
 
 using JukugoDataPtr = std::shared_ptr<const JukugoData>;

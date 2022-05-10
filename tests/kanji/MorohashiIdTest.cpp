@@ -8,7 +8,7 @@ namespace kanji_tools {
 
 namespace {
 
-[[nodiscard]] std::string error(const std::string& id, const std::string& msg) {
+[[nodiscard]] String error(const String& id, const String& msg) {
   return "Morohashi ID '" + id + "' " + msg;
 }
 
@@ -94,7 +94,7 @@ TEST(MorohashiIdTest, NonDigit) {
 }
 
 TEST(MorohashiIdTest, MaxIds) {
-  const std::string max{std::to_string(MorohashiId::MaxId)};
+  const String max{std::to_string(MorohashiId::MaxId)};
   const MorohashiId id{max}, idPrime{max + "P"}, idDPrime{max + "PP"},
       idSupplemental{"H" + max};
   EXPECT_EQ(id.id(), MorohashiId::MaxId);
@@ -110,7 +110,7 @@ TEST(MorohashiIdTest, MaxIds) {
 TEST(MorohashiIdTest, TooBig) {
   const size_t big{MorohashiId::MaxId + 1};
   for (auto i : {big, big + 10, big + 100, big * 2}) {
-    const std::string id{std::to_string(i)};
+    const String id{std::to_string(i)};
     for (const auto& j : {"H" + id, id + "P", id + "PP", id + "'", id + "''"})
       EXPECT_THROW(call([j] { MorohashiId{j}; }, error(j, "exceeds max")),
           std::domain_error);

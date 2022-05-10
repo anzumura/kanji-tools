@@ -1,5 +1,4 @@
 #include <kanji_tools/quiz/ListQuiz.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <random>
 
@@ -9,7 +8,7 @@ namespace {
 
 std::mt19937 RandomGen(std::random_device{}());
 
-const std::string Prompt{"  Select"};
+const String Prompt{"  Select"};
 
 constexpr auto ChoiceStart{'1'}; // LCOV_EXCL_LINE: covered
 
@@ -62,8 +61,8 @@ void ListQuiz::start(const KanjiList& questions) {
   if (stopQuiz) --currentQuestion();
 }
 
-const std::string& ListQuiz::getPrompt() const {
-  static const std::string Reading{Prompt + " correct reading"},
+const String& ListQuiz::getPrompt() const {
+  static const String Reading{Prompt + " correct reading"},
       Kanji(Prompt + " correct kanji");
   return isTestMode() ? isKanjiToReading() ? Reading : Kanji : Prompt;
 }
@@ -117,7 +116,7 @@ void ListQuiz::printChoices(
 }
 
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
-    const std::string& kanjiName) {
+    const String& kanjiName) {
   const auto answer{
       isTestMode() ? choice().get(_prompt, {ChoiceStart, _choiceEnd}, choices)
                    : get(_prompt, choices)};

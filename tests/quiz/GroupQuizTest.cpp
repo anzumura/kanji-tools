@@ -50,7 +50,7 @@ protected:
     _quiz.start(quizType, questionList, {}, meanings, randomizeAnswers);
   }
 
-  void getFirstQuestion(std::string& line, QuizLauncher::OptChar quizType = {},
+  void getFirstQuestion(String& line, QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}) {
     startQuiz(quizType, questionList);
     while (std::getline(_os, line))
@@ -73,10 +73,10 @@ private:
 } // namespace
 
 TEST_F(GroupQuizTest, ListOrders) {
-  for (std::string lastLine; const auto i : {'b', 'e', 'r'}) {
+  for (String lastLine; const auto i : {'b', 'e', 'r'}) {
     meaningQuiz(i);
     startQuiz();
-    for (std::string line; std::getline(_os, line);) lastLine = line;
+    for (String line; std::getline(_os, line);) lastLine = line;
     // test the line sent to _os
     EXPECT_EQ(lastLine, "Final score: 0/0");
     // should be nothing sent to _es (for errors)
@@ -86,7 +86,7 @@ TEST_F(GroupQuizTest, ListOrders) {
 
 TEST_F(GroupQuizTest, GroupKanjiTypes) {
   const auto f{[](int x = 0) {
-    std::string msg{"37 members"};
+    String msg{"37 members"};
     if (x) msg = ("showing " + std::to_string(x) += " out of ") += msg;
     return msg;
   }};
@@ -96,7 +96,7 @@ TEST_F(GroupQuizTest, GroupKanjiTypes) {
     // in this test are for question 2 since it contains Kanji of all 4 types)
     is() << "t\nb\n.\n";
     startQuiz('m', i.first);
-    EXPECT_NE(_os.str().find(", " + i.second), std::string::npos) << i.second;
+    EXPECT_NE(_os.str().find(", " + i.second), String::npos) << i.second;
   }
 }
 
@@ -105,8 +105,8 @@ TEST_F(GroupQuizTest, CorrectResponse) {
     is() << "t\nb\n1\na\nb\n";
     startQuiz('p', '1', meanings, false);
     auto found{false};
-    std::string lastLine;
-    for (std::string line; std::getline(_os, line); lastLine = line)
+    String lastLine;
+    for (String line; std::getline(_os, line); lastLine = line)
       if (line.ends_with("Correct! (1/1)")) found = true;
     EXPECT_TRUE(found);
     EXPECT_EQ(lastLine, "Final score: 1/1 - Perfect!");
@@ -118,8 +118,8 @@ TEST_F(GroupQuizTest, IncorrectResponse) {
     is() << "t\nb\n1\nb\na\n";
     startQuiz('p', '1', meanings, false);
     auto found{false};
-    std::string lastLine;
-    for (std::string line; std::getline(_os, line); lastLine = line)
+    String lastLine;
+    for (String line; std::getline(_os, line); lastLine = line)
       if (line.ends_with("Incorrect (got 0 right out of 2)")) found = true;
     EXPECT_TRUE(found);
     EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 亜：ア、アク");
@@ -139,7 +139,7 @@ TEST_F(GroupQuizTest, SkipQuestions) {
     meaningQuiz();
     for (size_t j{}; j < i; ++j) skip();
     startQuiz();
-    std::string line, lastLine;
+    String line, lastLine;
     while (std::getline(_os, line)) lastLine = line;
     const auto skipped{std::to_string(i)};
     EXPECT_EQ(lastLine, "Final score: 0/" + skipped += ", skipped: " + skipped);
@@ -153,9 +153,9 @@ TEST_F(GroupQuizTest, ToggleMeanings) {
   startQuiz();
   auto meaningsOn{false};
   size_t found{};
-  const std::string expected{"みなみ"};
+  const String expected{"みなみ"};
   const auto expectedWithMeaning{expected + " : south"};
-  for (std::string line; std::getline(_os, line);) {
+  for (String line; std::getline(_os, line);) {
     if (line.erase(0, 4).starts_with(":  ") &&
         line.ends_with(meaningsOn ? expectedWithMeaning : expected)) {
       ++found;
@@ -175,7 +175,7 @@ TEST_F(GroupQuizTest, EditAfterOneAnswer) {
   is() << "b\n"; // change the answer from 'a' to 'b'
   startQuiz();
   size_t found{};
-  for (std::string line; std::getline(_os, line);) {
+  for (String line; std::getline(_os, line);) {
     if (!found) {
       if (line.ends_with("1->a")) ++found;
     } else if (line.ends_with("1->b"))
@@ -192,7 +192,7 @@ TEST_F(GroupQuizTest, EditAfterMultipleAnswers) {
   is() << "c\n"; // set new value (should now be 1->c and 2 still maps to 'b')
   startQuiz();
   size_t found{};
-  for (std::string line; std::getline(_os, line);) {
+  for (String line; std::getline(_os, line);) {
     if (!found) {
       if (line.ends_with("1->a 2->b")) ++found; // before edit
     } else if (line.ends_with("1->c 2->b"))     // after edit
@@ -207,9 +207,9 @@ TEST_F(GroupQuizTest, RefreshAfterAnswer) {
   is() << "'\n"; // refresh - will update the screen with '1->a:'
   startQuiz();
   size_t found{};
-  for (std::string line; std::getline(_os, line);)
+  for (String line; std::getline(_os, line);)
     if (line.starts_with("   1:  ") &&
-        (!found || line.find("1->a:") != std::string::npos))
+        (!found || line.find("1->a:") != String::npos))
       ++found;
   EXPECT_EQ(found, 2);
 }
@@ -218,7 +218,7 @@ TEST_F(GroupQuizTest, PatternGroupBuckets) {
   constexpr auto RemoveQuestionText{9};
   const auto f{[this](char x) {
     is() << "t\nb\np\n4\n" << x << "\n";
-    std::string line;
+    String line;
     getFirstQuestion(line);
     return line.substr(RemoveQuestionText);
   }};
@@ -237,14 +237,14 @@ TEST_F(GroupQuizTest, LoopOverAllPatternsInABucket) {
   is() << "r\nb\n1\n";
   for (auto _{FirstBucketGroups}; _--;) is() << ".\n";
   startQuiz('p', '4');
-  std::string leftOverInput;
+  String leftOverInput;
   std::getline(is(), leftOverInput);
   EXPECT_EQ(leftOverInput, "/");
 }
 
 TEST_F(GroupQuizTest, QuizDefaults) {
   is() << "t\nb\np\n2\n1\n";
-  std::string line, lineWithDefaults;
+  String line, lineWithDefaults;
   getFirstQuestion(line);
   EXPECT_EQ(
       line.substr(9), "1/37:  [亜：ア、アク], showing 2 out of 3 members");
@@ -261,7 +261,7 @@ TEST_F(GroupQuizTest, QuizReview) {
     is() << "r\nb\n";
     if (i.first == 'p') is() << "2\n"; // choose 'カ' pattern group bucket
     startQuiz(i.first, '4');
-    for (std::string line; std::getline(_os, line);)
+    for (String line; std::getline(_os, line);)
       if (line.ends_with(i.second)) break;
     EXPECT_FALSE(_os.eof()) << "line not found: " << i.second;
   }
@@ -272,7 +272,7 @@ TEST_F(GroupQuizTest, ReviewNextPrev) {
   is() << "r\nb\n.\n.\n,\n,\n";
   startQuiz('m', '4');
   size_t found{};
-  std::string line;
+  String line;
   const auto f{[&line, &found](auto question) {
     if (line.starts_with(std::to_string(question) + "/")) ++found;
   }};

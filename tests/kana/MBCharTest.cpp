@@ -21,7 +21,7 @@ TEST(MBCharTest, Size) {
   // char is unchanged if it doesn't have a variation selector
   EXPECT_EQ(MBChar::noVariationSelector(s), s);
   // combining marks are not included in 'size'
-  const std::string noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
+  const String noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
   EXPECT_EQ(noMarks.size(), 27);
   EXPECT_EQ(marks.size(), 30);
   EXPECT_EQ(MBChar::size(noMarks), 9);
@@ -41,7 +41,7 @@ TEST(MBCharTest, GetFirst) {
 
 TEST(MBCharTest, Next) {
   MBChar s{"todayトロントの天気is nice。"};
-  std::string x;
+  String x;
   for (const auto _ = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
        auto& i : _) {
     EXPECT_TRUE(s.peek(x));
@@ -55,7 +55,7 @@ TEST(MBCharTest, Next) {
 
 TEST(MBCharTest, NextWithVariationSelectors) {
   MBChar s{"憎︀憎む朗︀"};
-  std::string x;
+  String x;
   for (const auto _ = {"憎︀", "憎", "む", "朗︀"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
@@ -70,14 +70,14 @@ TEST(MBCharTest, NextWithVariationSelectors) {
 }
 
 TEST(MBCharTest, NextWithCombiningMarks) {
-  const std::string ga{"ガ"}, gi{"ギ"}, combinedGi{"ギ"}, gu{"グ"}, po{"ポ"},
+  const String ga{"ガ"}, gi{"ギ"}, combinedGi{"ギ"}, gu{"グ"}, po{"ポ"},
       combinedPo{"ポ"};
   EXPECT_EQ(combinedGi.size(), 6);
   EXPECT_EQ(combinedPo.size(), 6);
   const auto c{ga + combinedGi + gu + combinedPo};
   EXPECT_EQ(c.size(), 18);
   MBChar s{c};
-  std::string x;
+  String x;
   // combining marks should get replaced by normal versions
   for (const auto _ = {ga, gi, gu, po}; auto& i : _) {
     EXPECT_EQ(i.size(), 3);
@@ -95,7 +95,7 @@ TEST(MBCharTest, NextWithCombiningMarks) {
 
 TEST(MBCharTest, GetNextIncludingSingleByte) {
   MBChar s{"a天気b"};
-  std::string x;
+  String x;
   for (const auto _ = {"a", "天", "気", "b"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x, false));
     EXPECT_EQ(x, i);
@@ -108,7 +108,7 @@ TEST(MBCharTest, GetNextIncludingSingleByte) {
 
 TEST(MBCharTest, Reset) {
   MBChar s{"a天気b"};
-  std::string x;
+  String x;
   const auto expected = {"天", "気"};
   for (auto& i : expected) {
     EXPECT_TRUE(s.peek(x));
@@ -127,7 +127,7 @@ TEST(MBCharTest, Reset) {
 }
 
 TEST(MBCharTest, ErrorCount) {
-  std::string original{"甲乙丙丁"};
+  String original{"甲乙丙丁"};
   // there should be 4 '3-byte' characters
   ASSERT_EQ(original.size(), 12);
   // introduce some errors
@@ -135,7 +135,7 @@ TEST(MBCharTest, ErrorCount) {
   original[original.size() / 2] =
       'z'; // change first byte of 丙 makes 2 errors (2nd + 3rd bytes)
   MBChar s{original};
-  std::string x;
+  String x;
   for (const auto _ = {"乙", "丁"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x));
     EXPECT_EQ(x, i);
@@ -161,7 +161,7 @@ TEST(MBCharTest, ErrorWithVariationSelectors) {
   const auto variantSelector{toUtf8(U"\ufe01")};
   // put a variation selector after a single byte char which is invalid
   MBChar s{"a" + variantSelector + "ご"};
-  std::string x;
+  String x;
   EXPECT_TRUE(s.next(x, false));
   EXPECT_EQ(x, "a");
   EXPECT_TRUE(s.peek(x));
@@ -177,7 +177,7 @@ TEST(MBCharTest, ErrorWithVariationSelectors) {
 TEST(MBCharTest, ErrorWithCombiningMarks) {
   // put combining marks at the start which isn't valid
   MBChar s{CombiningVoiced + CombiningSemiVoiced + "じ"};
-  std::string x;
+  String x;
   EXPECT_TRUE(s.peek(x));
   EXPECT_EQ(x, "じ");
   EXPECT_EQ(s.errors(), 0);
@@ -191,7 +191,7 @@ TEST(MBCharTest, ErrorWithCombiningMarks) {
 TEST(MBCharTest, Valid) {
   EXPECT_EQ(MBChar{""}.valid(), MBUtf8Result::NotMultiByte);
   EXPECT_EQ(MBChar{"a"}.valid(), MBUtf8Result::NotMultiByte);
-  std::string x{"雪"};
+  String x{"雪"};
   EXPECT_EQ(x.size(), 3);
   EXPECT_EQ(MBChar(x).valid(), MBUtf8Result::Valid);
   EXPECT_TRUE(MBChar(x).isValid());

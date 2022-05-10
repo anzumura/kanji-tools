@@ -65,9 +65,9 @@ inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
 
 // return size in terms of how many columns would be required for display on a
 // terminal, i.e, 1 for a normal character and 2 for a wide character
-[[nodiscard]] size_t displaySize(const std::u32string&);
+[[nodiscard]] size_t displaySize(const CodeString&);
 [[nodiscard]] size_t displaySize(const char*);
-[[nodiscard]] size_t displaySize(const std::string&);
+[[nodiscard]] size_t displaySize(const String&);
 
 // 'wideSetw' returns a value that works for 'std::setw' when 's' contains wide
 // chars. For example, if 's' contains 1 wide char that is 3 bytes then calling
@@ -76,6 +76,6 @@ inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
 // at bytes and s already has 3 bytes. However, using this function, i.e., 'os
 // << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by returning
 // '5' (5 is 2 more than the 3 byte size of 's').
-[[nodiscard]] int wideSetw(const std::string& s, size_t setwLen);
+[[nodiscard]] int wideSetw(const String& s, size_t setwLen);
 
 } // namespace kanji_tools

@@ -9,36 +9,36 @@ namespace {
 class ConverterTest : public ::testing::Test {
 protected:
   [[nodiscard]] auto romajiToHiragana(
-      const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+      const String& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Romaji, s, CharType::Hiragana, flags);
   }
 
   [[nodiscard]] auto romajiToKatakana(
-      const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+      const String& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Romaji, s, CharType::Katakana, flags);
   }
 
   [[nodiscard]] auto hiraganaToRomaji(
-      const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+      const String& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Hiragana, s, CharType::Romaji, flags);
   }
 
-  [[nodiscard]] auto hiraganaToKatakana(const std::string& s) {
+  [[nodiscard]] auto hiraganaToKatakana(const String& s) {
     return _converter.convert(CharType::Hiragana, s, CharType::Katakana);
   }
 
   [[nodiscard]] auto katakanaToRomaji(
-      const std::string& s, ConvertFlags flags = ConvertFlags::None) {
+      const String& s, ConvertFlags flags = ConvertFlags::None) {
     return _converter.convert(CharType::Katakana, s, CharType::Romaji, flags);
   }
 
-  [[nodiscard]] auto katakanaToHiragana(const std::string& s) {
+  [[nodiscard]] auto katakanaToHiragana(const String& s) {
     return _converter.convert(CharType::Katakana, s, CharType::Hiragana);
   }
 
   // pass in 'romaji' when round trip is lossy (like repeat symbols)
-  void kanaConvertCheck(const std::string& hiragana, // NOLINT
-      const std::string& katakana, const std::string& romaji = {}) {
+  void kanaConvertCheck(const String& hiragana, // NOLINT
+      const String& katakana, const String& romaji = {}) {
     if (romaji.empty()) {
       auto r{hiraganaToRomaji(hiragana)};
       EXPECT_EQ(katakanaToRomaji(katakana), r);
@@ -52,9 +52,9 @@ protected:
     EXPECT_EQ(katakanaToHiragana(katakana), hiragana);
   }
 
-  void check(const std::string& hiragana, const std::string& katakana, // NOLINT
-      const std::string& romaji, const char* hepburn = {},
-      const char* kunrei = {}, const char* both = {}) {
+  void check(const String& hiragana, const String& katakana, // NOLINT
+      const String& romaji, const char* hepburn = {}, const char* kunrei = {},
+      const char* both = {}) {
     EXPECT_EQ(hiraganaToRomaji(hiragana), romaji);
     EXPECT_EQ(katakanaToRomaji(katakana), romaji);
     EXPECT_EQ(hiraganaToRomaji(hiragana, ConvertFlags::Hepburn),
@@ -74,15 +74,15 @@ protected:
         result);
   }
 
-  void checkKunrei(const std::string& hiragana, const std::string& katakana,
-      const std::string& romaji, const char* kunrei) {
+  void checkKunrei(const String& hiragana, const String& katakana,
+      const String& romaji, const char* kunrei) {
     check(hiragana, katakana, romaji, nullptr, kunrei);
   }
 
-  void checkSmallKana(CharType source, const std::string& s) {
+  void checkSmallKana(CharType source, const String& s) {
     // small letters that don't form part of a digraph are output in 'wāpuro'
     // style favoring 'l' instead of 'x' as first letter (so small tsu is 'ltu')
-    std::string romaji{"lalilulelolkalkelyalyulyoltulwa"};
+    String romaji{"lalilulelolkalkelyalyulyoltulwa"};
     EXPECT_EQ(_converter.convert(source, s, CharType::Romaji), romaji);
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
     // also test small letters starting with 'x'
@@ -126,7 +126,7 @@ TEST_F(ConverterTest, CheckConvertFlags) {
 }
 
 TEST_F(ConverterTest, NoConversionIfSourceAndTargetAreTheSame) {
-  std::string s{"atatakaiあたたかいアタタカイ"};
+  String s{"atatakaiあたたかいアタタカイ"};
   EXPECT_EQ(converter().convert(CharType::Romaji, s, CharType::Romaji), s);
   EXPECT_EQ(converter().convert(CharType::Hiragana, s, CharType::Hiragana), s);
   EXPECT_EQ(converter().convert(CharType::Katakana, s, CharType::Katakana), s);
@@ -509,7 +509,7 @@ TEST_F(ConverterTest, CheckDelims) {
            P{'%', "％"}, P{'^', "＾"}, P{'&', "＆"}, P{'{', "『"}, P{'}', "』"},
            P{'|', "｜"}, P{'"', "”"}, P{'`', "｀"}, P{'<', "＜"}, P{'>', "＞"},
            P{'_', "＿"}, P{'\\', "￥"}}) {
-    const std::string romaji{i.first}, kana{i.second};
+    const String romaji{i.first}, kana{i.second};
     check(kana, kana, romaji);
   }
 }

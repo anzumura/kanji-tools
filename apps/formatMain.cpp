@@ -6,7 +6,7 @@
 #include <regex>
 
 using kanji_tools::Args, kanji_tools::KanjiRange, kanji_tools::KanaRange,
-    kanji_tools::fromUtf8ToWstring;
+    kanji_tools::fromUtf8ToWstring, kanji_tools::String;
 
 void format(Args args) {
   if (args.size() < 2) throw std::domain_error{"specify a file to format"};
@@ -14,7 +14,7 @@ void format(Args args) {
   const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange() + L"]{1}$"},
       allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
   std::fstream f{file};
-  std::string line, prevLine;
+  String line, prevLine;
   auto prevLineEndedWithKanji{false};
   while (std::getline(f, line)) {
     if (auto wline{fromUtf8ToWstring(line)}; prevLineEndedWithKanji) {

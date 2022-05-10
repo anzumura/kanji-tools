@@ -8,9 +8,9 @@ namespace kanji_tools {
 
 namespace {
 
-[[nodiscard]] std::string error(Strokes::Size s, bool variant = false) {
-  return (variant ? "variant " : "") + std::string{"strokes '"} +
-         std::to_string(s) + "' out of range";
+[[nodiscard]] String error(Strokes::Size s, bool variant = false) {
+  return (variant ? "variant " : "") + String{"strokes '"} + std::to_string(s) +
+         "' out of range";
 }
 
 } // namespace
@@ -59,7 +59,7 @@ TEST(StrokesTest, InvalidVariantStrokes) {
 }
 
 TEST(StrokesTest, SameStrokesAndVariant) {
-  const std::string msg{"strokes and variant strokes are the same '3'"};
+  const String msg{"strokes and variant strokes are the same '3'"};
   EXPECT_THROW(call([] { Strokes{3, 3}; }, msg), std::domain_error);
 }
 

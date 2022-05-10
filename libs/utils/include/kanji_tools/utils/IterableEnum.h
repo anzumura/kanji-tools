@@ -1,10 +1,10 @@
 #pragma once
 
 #include <kanji_tools/utils/EnumTraits.h>
+#include <kanji_tools/utils/String.h>
 
 #include <compare>
 #include <concepts>
-#include <string>
 
 namespace kanji_tools {
 
@@ -18,7 +18,7 @@ public:
   BaseEnum(const BaseEnum&) = delete;
   BaseEnum& operator=(const BaseEnum&) = delete;
 protected:
-  inline static const std::string IndexMsg{"index '"}, EnumMsg{"enum '"},
+  inline static const String IndexMsg{"index '"}, EnumMsg{"enum '"},
       RangeMsg{"' is out of range"};
 
   class BaseIterator {
@@ -31,14 +31,14 @@ protected:
     [[nodiscard]] auto operator<=>(
         const BaseIterator&) const noexcept = default; // NOLINT: nullptr
   protected:
-    inline static const std::string BadBegin{"can't decrement past zero"},
+    inline static const String BadBegin{"can't decrement past zero"},
         BadEnd{"can't increment past end"};
 
     // helper functions for throwing errors if the value passed in is 'false'
     static void comparable(bool);
     static void initialized(bool);
 
-    static void rangeError(const std::string&);
+    static void rangeError(const String&);
 
     explicit BaseIterator(Size index) noexcept;
 
@@ -48,7 +48,7 @@ protected:
     Size _index;
   };
 
-  static void rangeError(const std::string&);
+  static void rangeError(const String&);
 
   BaseEnum() noexcept = default;
 };
@@ -141,10 +141,10 @@ protected:
 
   template<typename I>
   requires std::integral<I> || std::same_as<T, I>
-  [[nodiscard]] static auto checkIndex(I i, const std::string& name) {
+  [[nodiscard]] static auto checkIndex(I i, const String& name) {
     const auto x{static_cast<Size>(i)};
     if (x >= N) {
-      std::string msg{name};
+      String msg{name};
       if constexpr (std::is_same_v<I, T>)
         msg += "enum value " + std::to_string(x);
       else // use original value in error message (so int '-1' is preserved)

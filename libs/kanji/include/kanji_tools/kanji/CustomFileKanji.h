@@ -102,7 +102,7 @@ public:
   inline static const std::array RequiredColumns{
       OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
 private:
-  [[nodiscard]] static KanjiGrades getGrade(const std::string&);
+  [[nodiscard]] static KanjiGrades getGrade(const String&);
   const KanjiGrades _grade;
 };
 

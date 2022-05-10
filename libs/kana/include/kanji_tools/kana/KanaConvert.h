@@ -15,17 +15,17 @@ public:
 
   KanaConvert(const KanaConvert&) = delete;
 private:
-  using List = std::vector<std::string>;
+  using List = std::vector<String>;
 
   // 'error' throws an exception (used during processing of command line args)
-  static void error(const std::string&);
+  static void error(const String&);
 
   // 'processArg' returns true if 'arg' is recognized and processed, otherwise
   // it returns false meaning 'arg' should be treated as a string to convert
   [[nodiscard]] bool processArg(
-      const std::string& arg, bool& printKana, bool& printMarkdown);
+      const String& arg, bool& printKana, bool& printMarkdown);
 
-  [[nodiscard]] bool charTypeArgs(const std::string&);
+  [[nodiscard]] bool charTypeArgs(const String&);
   bool flagArgs(char);
 
   // 'usage' prints details about all command line args by default, but setting
@@ -36,8 +36,8 @@ private:
 
   void getInput();
   void printOptions() const;
-  [[nodiscard]] bool processLine(const std::string&);
-  void convert(const std::string&);
+  [[nodiscard]] bool processLine(const String&);
+  void convert(const String&);
   void setFlag(ConvertFlags);
 
   void printKanaChart(bool markdown = false) const;

@@ -18,10 +18,10 @@ class DataFile {
 public:
   using Index = uint16_t; // support up to 65K entries
   using Path = std::filesystem::path;
-  using StringList = std::vector<std::string>;
-  using StringSet = std::set<std::string>;
+  using StringList = std::vector<String>;
+  using StringSet = std::set<String>;
 
-  inline static const std::string TextFileExtension{".txt"};
+  inline static const String TextFileExtension{".txt"};
 
   static constexpr Index MaxEntries{std::numeric_limits<Index>::max() - 1};
 
@@ -30,10 +30,10 @@ public:
   // 'file' isn't found and doesn't already have an extension.
   [[nodiscard]] static Path getFile(const Path& dir, const Path& file);
 
-  static void print(std::ostream&, const StringList&, const std::string& type,
-      const std::string& group);
+  static void print(std::ostream&, const StringList&, const String& type,
+      const String& group);
 
-  static void usage(const std::string& msg) { throw std::domain_error(msg); }
+  static void usage(const String& msg) { throw std::domain_error(msg); }
 
   // should be called after loading all lists to clean up unneeded static data
   static void clearUniqueCheckData();
@@ -47,9 +47,9 @@ public:
   virtual ~DataFile() = default;
 
   // return index for 'name' starting at '1' or return '0' for not found.
-  [[nodiscard]] Index getIndex(const std::string& name) const;
+  [[nodiscard]] Index getIndex(const String& name) const;
 
-  [[nodiscard]] bool exists(const std::string&) const;
+  [[nodiscard]] bool exists(const String&) const;
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] virtual JlptLevels level() const { return JlptLevels::None; }
   [[nodiscard]] virtual KenteiKyus kyu() const { return KenteiKyus::None; }
@@ -57,11 +57,11 @@ public:
   [[nodiscard]] auto size() const { return _list.size(); }
 
   // return the full contents of this list in a string (with no separates)
-  [[nodiscard]] std::string toString() const;
+  [[nodiscard]] String toString() const;
 protected:
-  DataFile(const Path&, FileType, StringSet*, const std::string& name = {});
+  DataFile(const Path&, FileType, StringSet*, const String& name = {});
 private:
-  using Map = std::map<std::string, Index>;
+  using Map = std::map<String, Index>;
 
   // 'UniqueNames': ensures uniqueness across non-typed DataFiles (currently
   // only frequency.txt)
@@ -74,13 +74,13 @@ private:
   // 'validate' is called by 'load' for each token. The lambda function (in 'T')
   // is called for errors (which results in an exception being thrown) and false
   // is returned if the token already exists in optional 'StringSet'.
-  template<typename T> bool validate(const T&, StringSet*, const std::string&);
+  template<typename T> bool validate(const T&, StringSet*, const String&);
 
   // 'addEntry' returns false if adding another entry would exceed 'MaxEntries'
   // otherwise, it adds the given token to _list and _map and returns true.
-  [[nodiscard]] bool addEntry(const std::string& token);
+  [[nodiscard]] bool addEntry(const String& token);
 
-  const std::string _name;
+  const String _name;
   StringList _list;
   Map _map;
 };

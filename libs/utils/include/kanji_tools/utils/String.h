@@ -4,27 +4,35 @@
 
 namespace kanji_tools {
 
+// use 'String' and 'StringView' type aliases to help potentially switch to
+// 'std::u8' versions later when they get wider support (streams, regex, etx.)
+using String = std::string;
+using StringView = std::string_view;
+
+// type aliases for Unicode code points - use 'char32_t' instead of 'wchar_t'
+// since it's more explicit, i.e., it's 32 bits instead of platform dependent
+using Code = char32_t;
+using CodeString = std::u32string;
+
 // helper functions for adding brackets and adding leading zeroes
 
 enum class BracketType { Curly, Round, Square, None };
 
-[[nodiscard]] std::string addBrackets(const std::string&, BracketType);
+[[nodiscard]] String addBrackets(const String&, BracketType);
 
-[[nodiscard]] std::string addLeadingZeroes(const std::string&, size_t minSize);
+[[nodiscard]] String addLeadingZeroes(const String&, size_t minSize);
 
-[[nodiscard]] std::u32string addLeadingZeroes(
-    const std::u32string&, size_t minSize);
+[[nodiscard]] CodeString addLeadingZeroes(const CodeString&, size_t minSize);
 
-// convert a 'char32_t' into a Unicode code point (caps hex with minSize of 4)
-[[nodiscard]] std::string toUnicode(char32_t, BracketType = BracketType::None);
+// convert a 'Code' into a Unicode code point (caps hex with minSize of 4)
+[[nodiscard]] String toUnicode(Code, BracketType = BracketType::None);
 
 // convert a UTF-8 string into space-separated Unicode code points. Note: non-
 // None 'brackets' puts brackets around the whole string (not each entry).
-[[nodiscard]] std::string toUnicode(
-    const std::string&, BracketType = BracketType::None);
+[[nodiscard]] String toUnicode(const String&, BracketType = BracketType::None);
 
-[[nodiscard]] std::string toUnicode(
-    const std::u32string&, BracketType = BracketType::None);
+[[nodiscard]] String toUnicode(
+    const CodeString&, BracketType = BracketType::None);
 
 // 'toChar' safely converts 'x' to a char. If 'x' is out of range then an
 // exception is thrown. If 'allowNegative' is true (the default) then 'x' can't
@@ -36,7 +44,7 @@ enum class BracketType { Curly, Round, Square, None };
 [[nodiscard]] char toChar(uint16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);
-[[nodiscard]] char toChar(char32_t);
+[[nodiscard]] char toChar(Code);
 
 // conversion functions that don't throw since size is the same
 [[nodiscard]] char toChar(unsigned char);
@@ -55,7 +63,7 @@ template<typename T>
 [[nodiscard]] inline auto toBinary(
     T x, BracketType brackets, size_t minSize = 0) {
   static_assert(std::is_unsigned_v<T>);
-  std::string result;
+  String result;
   for (; x > 0; x >>= 1U)
     result.insert(result.begin(), '0' + toChar(x % BinaryDigits));
   return addBrackets(
@@ -73,7 +81,7 @@ template<typename T>
 [[nodiscard]] inline auto toHex(
     T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
   static_assert(std::is_unsigned_v<T>);
-  std::string result;
+  String result;
   for (; x > 0; x >>= 4U) {
     const char i = x % HexDigits;
     result.insert(result.begin(),
@@ -119,25 +127,24 @@ template<>
 [[nodiscard]] constexpr auto isSingleByteChar(char x) noexcept {
   return x >= 0;
 }
-[[nodiscard]] constexpr auto isSingleByteChar(char32_t x) noexcept {
+[[nodiscard]] constexpr auto isSingleByteChar(Code x) noexcept {
   return x < SevenBitMax;
 }
 
+[[nodiscard]] bool isSingleByte(const String&, bool sizeOne = true) noexcept;
 [[nodiscard]] bool isSingleByte(
-    const std::string&, bool sizeOne = true) noexcept;
-[[nodiscard]] bool isSingleByte(
-    const std::u32string&, bool sizeOne = true) noexcept;
+    const CodeString&, bool sizeOne = true) noexcept;
 
-[[nodiscard]] bool isAllSingleByte(const std::string&) noexcept;
-[[nodiscard]] bool isAllSingleByte(const std::u32string&) noexcept;
+[[nodiscard]] bool isAllSingleByte(const String&) noexcept;
+[[nodiscard]] bool isAllSingleByte(const CodeString&) noexcept;
 
-[[nodiscard]] bool isAnySingleByte(const std::string&) noexcept;
-[[nodiscard]] bool isAnySingleByte(const std::u32string&) noexcept;
+[[nodiscard]] bool isAnySingleByte(const String&) noexcept;
+[[nodiscard]] bool isAnySingleByte(const CodeString&) noexcept;
 
 template<typename T>
-[[nodiscard]] inline auto firstConvert(T pred, T conv, const std::string& s) {
+[[nodiscard]] inline auto firstConvert(T pred, T conv, const String& s) {
   if (!s.empty() && pred(s[0])) {
-    std::string result{s};
+    String result{s};
     result[0] = toChar(conv(result[0]));
     return result;
   }
@@ -146,33 +153,33 @@ template<typename T>
 
 // if first letter of (ascii string) 's' is upper case then return a copy with
 // the first character converted to lower case, otherwise return 's'
-[[nodiscard]] inline auto firstLower(const std::string& s) {
+[[nodiscard]] inline auto firstLower(const String& s) {
   return firstConvert(::isupper, ::tolower, s);
 }
 
 // if first letter of (ascii string) 's' is lower case then return a copy with
 // the first character converted to upper case, otherwise return 's'
-[[nodiscard]] inline auto firstUpper(const std::string& s) {
+[[nodiscard]] inline auto firstUpper(const String& s) {
   return firstConvert(::islower, ::toupper, s);
 }
 
 // return a copy of (ascii string) 's' converted to lower case
-[[nodiscard]] inline auto toLower(const std::string& s) {
-  std::string result{s};
+[[nodiscard]] inline auto toLower(const String& s) {
+  String result{s};
   std::transform(
       s.begin(), s.end(), result.begin(), [](auto c) { return ::tolower(c); });
   return result;
 }
 
 // return a copy of (ascii string) 's' converted to upper case
-[[nodiscard]] inline auto toUpper(const std::string& s) {
-  std::string result{s};
+[[nodiscard]] inline auto toUpper(const String& s) {
+  String result{s};
   std::transform(
       s.begin(), s.end(), result.begin(), [](auto c) { return ::toupper(c); });
   return result;
 }
 
-inline const std::string EmptyString;
-inline const std::u32string EmptyU32String;
+inline const String EmptyString;
+inline const CodeString EmptyU32String;
 
 } // namespace kanji_tools

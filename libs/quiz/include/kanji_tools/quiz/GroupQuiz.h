@@ -30,7 +30,7 @@ private:
   [[nodiscard]] static GroupType getGroupType(const GroupData::List&);
 
   // 'addPinyin' adds optional pinyin for 'kanji' to 's' padded to 'PinyinWidth'
-  static void addPinyin(const Kanji&, std::string& s);
+  static void addPinyin(const Kanji&, String& s);
 
   // 'includeMember' returns true if a member can be included in group quiz
   // question. The member must have a reading as well as meet the criteria of
@@ -46,7 +46,7 @@ private:
   // group that contains 'name'. For example, while reviewing 'meaning groups'
   // values like 'p:123' will be displayed if 'name' is a member of 'pattern
   // group' number 123.
-  void addOtherGroupName(const std::string& name, std::string& s) const;
+  void addOtherGroupName(const String& name, String& s) const;
 
   void start(const GroupData::List&);
 
@@ -69,7 +69,7 @@ private:
   [[nodiscard]] size_t getAnswerToEdit() const;
 
   void checkAnswers(const KanjiList& questions, const KanjiList& readings,
-      const std::string& kanjiName);
+      const String& kanjiName);
 
   // '_answers' holds answers for the current question, i.e., the reading
   // selected for each group member

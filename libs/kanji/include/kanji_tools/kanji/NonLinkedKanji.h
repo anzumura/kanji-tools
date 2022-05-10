@@ -28,8 +28,8 @@ protected:
       : NonLinkedKanji{data, name, radical, data.ucdStrokes(name, u),
             UcdData::getMeaning(u), reading, u} {}
 private:
-  const std::string _meaning;
-  const std::string _reading;
+  const String _meaning;
+  const String _reading;
 };
 
 } // namespace kanji_tools

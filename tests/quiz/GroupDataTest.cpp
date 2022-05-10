@@ -22,7 +22,7 @@ protected:
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
-    static const std::string HeaderRow{"Number\tName\tMembers"};
+    static const String HeaderRow{"Number\tName\tMembers"};
     write(MeaningFile, HeaderRow);
     write(PatternFile, HeaderRow);
     _es.str({});
@@ -31,7 +31,7 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  static void write(const fs::path& f, const std::string& s) {
+  static void write(const fs::path& f, const String& s) {
     std::ofstream of{f, std::ios_base::app};
     of << s;
     of.close();
@@ -40,7 +40,7 @@ protected:
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;
 
-  inline static const std::string MeaningErr{" - file: meaning-groups, row: 1"};
+  inline static const String MeaningErr{" - file: meaning-groups, row: 1"};
   inline static const fs::path TestDir{"testDir"};
   inline static const fs::path MeaningFile{TestDir / "meaning-groups"},
       PatternFile{TestDir / "pattern-groups"};
@@ -80,7 +80,7 @@ TEST_F(GroupDataTest, MeaningGroup) {
   EXPECT_EQ(g.patternType(), Group::PatternType::None);
   EXPECT_EQ(g.number(), 1);
   EXPECT_EQ(g.name(), "時間：曜日");
-  std::string days;
+  String days;
   for (auto& i : g.members()) days += i->name();
   EXPECT_EQ(days, "日月火水木金土");
 }

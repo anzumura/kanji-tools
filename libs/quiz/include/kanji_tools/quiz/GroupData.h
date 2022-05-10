@@ -9,8 +9,8 @@ namespace kanji_tools {
 // multiple Pattern Groups (see comments at the bottom of this file for details)
 class GroupData {
 public:
-  using MultiMap = std::multimap<std::string, GroupPtr>;
-  using Map = std::map<std::string, GroupPtr>;
+  using MultiMap = std::multimap<String, GroupPtr>;
+  using Map = std::map<String, GroupPtr>;
   using List = std::vector<GroupPtr>;
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()' when
@@ -33,24 +33,24 @@ private:
   const Data::Path& dataDir(const Data::Path*) const;
 
   // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
-  static void add(const std::string& kanji, MultiMap&, const GroupPtr& group);
+  static void add(const String& kanji, MultiMap&, const GroupPtr& group);
 
   // add 'kanji'->'group' mapping or log an error if it's already been added
-  void add(const std::string& kanji, Map&, const GroupPtr& group) const;
+  void add(const String& kanji, Map&, const GroupPtr& group) const;
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
-  static DataFile::StringList getKanjiNames(const std::string& name,
-      const std::string& members, GroupType, Group::PatternType&);
+  static DataFile::StringList getKanjiNames(const String& name,
+      const String& members, GroupType, Group::PatternType&);
 
-  [[nodiscard]] static GroupPtr createGroup(size_t number,
-      const std::string& name, const Data::KanjiList&, Group::PatternType);
+  [[nodiscard]] static GroupPtr createGroup(size_t number, const String& name,
+      const Data::KanjiList&, Group::PatternType);
 
   template<typename T> void printGroups(const T&, const List&) const;
 
-  using StringList = std::vector<std::string>;
+  using StringList = std::vector<String>;
   using TypeMap = std::map<KanjiTypes, StringList>;
-  using StringSet = std::set<std::string>;
+  using StringSet = std::set<String>;
 
   void printMeaningGroup(const Group&, TypeMap&, StringSet&) const;
   void printPatternGroup(const Group&, TypeMap&) const;

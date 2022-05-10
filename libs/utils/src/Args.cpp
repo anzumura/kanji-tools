@@ -1,7 +1,7 @@
 #include <kanji_tools/utils/Args.h>
+#include <kanji_tools/utils/String.h>
 
 #include <stdexcept>
-#include <string>
 
 namespace kanji_tools {
 

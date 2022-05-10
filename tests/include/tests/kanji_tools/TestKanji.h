@@ -7,7 +7,7 @@ namespace kanji_tools {
 class TestKanji : public Kanji {
 public:
   inline static const Radical TestRadical{1, {}, {}, {}, {}};
-  inline static const std::string TestMeaning{"test"}, TestReading{"テスト"};
+  inline static const String TestMeaning{"test"}, TestReading{"テスト"};
 
   explicit TestKanji(Name name, const OptString& compatibilityName = {})
       : Kanji{name, compatibilityName, TestRadical, Strokes{1}, {}, {}, {}} {}

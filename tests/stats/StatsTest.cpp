@@ -18,22 +18,22 @@ protected:
     _data = std::make_shared<KanjiData>(Args{}, _os);
   }
 
-  static void write(const std::string& s) {
+  static void write(const String& s) {
     std::ofstream of(TestFile);
     of << s;
     of.close();
   }
 
-  static void run(const std::string& file, const std::string& expected) {
+  static void run(const String& file, const String& expected) {
     const auto f{_data->dataDir() / "../tests/stats" / file};
     const char* args[]{"", f.c_str()};
     run(args, expected);
   }
 
-  static void run(const Args& args, const std::string& expectedIn) {
+  static void run(const Args& args, const String& expectedIn) {
     Stats stats(args, _data);
     std::stringstream expected{expectedIn};
-    for (std::string i, j; std::getline(_os, i) && std::getline(expected, j);)
+    for (String i, j; std::getline(_os, i) && std::getline(expected, j);)
       ASSERT_EQ(i, j);
     // if loop completed due to 'eof' then check remaining part of other stream
     if (_os.eof() && expectedIn.size() > _os.str().size())
@@ -138,7 +138,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   const char* args[]{"", file.c_str()};
   Stats stats(args, _data);
   auto found{false};
-  for (std::string line; !found && std::getline(_os, line);)
+  for (String line; !found && std::getline(_os, line);)
     found = line.starts_with(">>> Stats for: 'wiki-articles' (3 files)");
   EXPECT_TRUE(found);
 }

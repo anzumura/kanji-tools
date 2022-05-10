@@ -10,7 +10,7 @@ namespace kanji_tools {
 // 'UcdData': holds data loaded from Unicode UCD XML
 class UcdData {
 public:
-  using Map = std::map<std::string, Ucd>;
+  using Map = std::map<String, Ucd>;
 
   // 'getMeaning' is a helper function that returns 'meaning' from the given
   // pointer if it's non-null or an empty string
@@ -24,13 +24,13 @@ public:
   // 'getReadingsAsKana' returns a (wide) comma separated string starting with
   // 'onReading' converted to Katakana followed by 'kunReading' converted to
   // Hiragana (spaces within the readings are also converted to wide commas)
-  [[nodiscard]] std::string getReadingsAsKana(UcdPtr) const;
+  [[nodiscard]] String getReadingsAsKana(UcdPtr) const;
 
   // 'find' returns a pointer to a Ucd instance if 'kanjiName' is in _ucdMap. If
   // 'kanjiName' has a 'variation selector' then _linkedJinmei then _linkedOther
   // maps are used to get a Ucd variant (variant returned is the same displayed
   // character for Jinmei ones)
-  [[nodiscard]] UcdPtr find(const std::string& kanjiName) const;
+  [[nodiscard]] UcdPtr find(const String& kanjiName) const;
 
   [[nodiscard]] auto& map() const { return _map; }
 
@@ -39,8 +39,8 @@ public:
   void print(const class Data&) const;
 private:
   [[nodiscard]] static Ucd::Links loadLinks(const class ColumnFile&, bool joyo);
-  void processLinks(const ColumnFile&, const Ucd::Links&,
-      const std::string& name, bool jinmei);
+  void processLinks(
+      const ColumnFile&, const Ucd::Links&, const String& name, bool jinmei);
 
   void printVariationSelectorKanji(const Data&) const;
 
@@ -52,8 +52,8 @@ private:
   // Note:
   // - if a variant is marked as 'Jinmei' it will be put in '_linkedJinmei'
   // - otherwise it will be put in '_linkedOther'
-  std::map<std::string, std::string> _linkedJinmei;
-  std::map<std::string, std::vector<std::string>> _linkedOther;
+  std::map<String, String> _linkedJinmei;
+  std::map<String, std::vector<String>> _linkedOther;
 
   // '_converter' is used by 'getReadingsAsKana' to convert the Romaji readings
   // loaded from UCD (Katakana for 'onReading' and Hiragana for 'kunReading').

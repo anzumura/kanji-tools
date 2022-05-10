@@ -14,7 +14,7 @@ TEST(QuizTest, Info) {
       ">>> Loaded 5700 kanji into 1038 groups",
       ">>> Total Kanji with Jukugo: 2910, unique jukugo: 18490"};
   size_t found{};
-  for (std::string line; std::getline(os, line);)
+  for (String line; std::getline(os, line);)
     for (const auto& i : expected)
       if (line == i) {
         ++found;
@@ -32,7 +32,7 @@ TEST(QuizTest, Debug) {
       "時間：十干 (10)   : 甲. 乙. 丙. 丁. 戊^ 己. 庚^ 辛. 壬\" 癸+",
       "畏：ワイ、イ( 3)   畏.: 隈\" 猥#"};
   size_t found{};
-  for (std::string line; std::getline(os, line);)
+  for (String line; std::getline(os, line);)
     for (const auto& i : expected)
       if (line.ends_with(i)) {
         ++found;

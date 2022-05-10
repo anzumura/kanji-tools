@@ -33,7 +33,7 @@ FrequencyKanji::FrequencyKanji(DataRef data, Name name, Frequency frequency)
     : StandardKanji{data, name}, _frequency{frequency} {}
 
 FrequencyKanji::FrequencyKanji(
-    DataRef data, const std::string& name, Reading reading, Frequency frequency)
+    DataRef data, const String& name, Reading reading, Frequency frequency)
     : StandardKanji{data, name, reading}, _frequency{frequency} {}
 
 KenteiKanji::KenteiKanji(DataRef data, Name name, KenteiKyus kyu)

@@ -33,7 +33,7 @@ JukugoData::JukugoData(const DataPtr& data, const Data::Path* dir) {
   if (data->debug()) {
     data->log() << "Total Kanji with Jukugo: " << _kanjiToJukugo.size()
                 << ", unique jukugo: " << _uniqueJukugo.size() << '\n';
-    std::map<KanjiTypes, std::vector<std::string>> types;
+    std::map<KanjiTypes, std::vector<String>> types;
     for (auto& i : _kanjiToJukugo)
       types[data->getType(i.first)].emplace_back(i.first);
     for (auto& i : types) {
@@ -46,7 +46,7 @@ JukugoData::JukugoData(const DataPtr& data, const Data::Path* dir) {
   }
 }
 
-const JukugoData::List& JukugoData::find(const std::string& kanji) const {
+const JukugoData::List& JukugoData::find(const String& kanji) const {
   const auto i{_kanjiToJukugo.find(kanji)};
   return i != _kanjiToJukugo.end() ? i->second : EmptyList;
 }
@@ -59,49 +59,49 @@ size_t JukugoData::loadFile(const fs::path& file, KanjiGrades grade) {
     if (const bool onePerLine{grade != KanjiGrades::S}; onePerLine)
       // line has one entry with a space between the Jukugo and its bracketed
       // reading (so g*.txt files)
-      for (std::string line; std::getline(f, line); ++lineNum)
+      for (String line; std::getline(f, line); ++lineNum)
         createJukugo(line, grade, onePerLine);
     else
       // line has multiple space separated Jukugo entries for a given kanji
       // (so other.txt file), i.e.: X ... XA(reading) XB(reading) XC(reading)
-      for (std::string line; std::getline(f, line); ++lineNum) {
-        static const std::string Dots{"..."};
+      for (String line; std::getline(f, line); ++lineNum) {
+        static const String Dots{"..."};
         const auto i{line.find(Dots)};
-        if (i == std::string::npos) error("line is missing '" + Dots + "'");
+        if (i == String::npos) error("line is missing '" + Dots + "'");
         for (std::stringstream ss{line.substr(i + Dots.size() + 1)};
              std::getline(ss, line, ' ');)
           createJukugo(line, grade, onePerLine);
       }
   } catch (const std::exception& e) {
-    error(std::string{e.what()} + " - line: " + std::to_string(lineNum) +
+    error(String{e.what()} + " - line: " + std::to_string(lineNum) +
           ", file: " + file.filename().string());
   }
   return _uniqueJukugo.size() - previouslyCreated;
 }
 
-size_t JukugoData::findOpenBracket(const std::string& line, bool onePerLine) {
+size_t JukugoData::findOpenBracket(const String& line, bool onePerLine) {
   const auto i{line.find('(')};
-  if (i == std::string::npos) error("failed to find open bracket");
+  if (i == String::npos) error("failed to find open bracket");
   if (onePerLine && (i < 2 || line[i - 1] != ' '))
     error("open bracket should follow a space");
   return i;
 }
 
-size_t JukugoData::findCloseBracket(const std::string& line, bool onePerLine) {
+size_t JukugoData::findCloseBracket(const String& line, bool onePerLine) {
   const auto i{line.find(')')};
-  if (i == std::string::npos) error("failed to find close bracket");
+  if (i == String::npos) error("failed to find close bracket");
   if (onePerLine && i != line.size() - 1)
     error("close bracket should be the last character");
   return i;
 }
 
-void JukugoData::error(const std::string& msg) { throw std::domain_error(msg); }
+void JukugoData::error(const String& msg) { throw std::domain_error(msg); }
 
 void JukugoData::createJukugo(
-    const std::string& line, KanjiGrades grade, bool onePerLine) {
+    const String& line, KanjiGrades grade, bool onePerLine) {
   const auto open{findOpenBracket(line, onePerLine)};
   const auto close{findCloseBracket(line, onePerLine)};
-  const std::string name{line.substr(0, onePerLine ? open - 1 : open)},
+  const String name{line.substr(0, onePerLine ? open - 1 : open)},
       reading{line.substr(open + 1, close - open - 1)};
   // There are some duplicates in data files which makes sense for
   // 'jukugo/other.txt' since it has a line per kanji followed by jukugo, but
@@ -114,7 +114,7 @@ void JukugoData::createJukugo(
   if (const auto i{_uniqueJukugo.find(key)}; i == _uniqueJukugo.end()) {
     const auto jukugo{std::make_shared<Jukugo>(name, reading, grade)};
     MBChar nameChars{name};
-    for (std::string c; nameChars.next(c);)
+    for (String c; nameChars.next(c);)
       if (isKanji(c)) _kanjiToJukugo[c].emplace_back(jukugo);
     _uniqueJukugo.emplace(key, jukugo);
   } else if (i->second->grade() != grade)

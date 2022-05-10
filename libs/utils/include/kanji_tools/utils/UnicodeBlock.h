@@ -11,7 +11,7 @@ namespace kanji_tools {
 // Unicode version and release date
 class UnicodeVersion {
 public:
-  consteval UnicodeVersion(std::string_view v, uint8_t m, uint16_t y)
+  consteval UnicodeVersion(StringView v, uint8_t m, uint16_t y)
       : _version{v}, _date{std::chrono::year{y}, std::chrono::month{m}} {}
 
   UnicodeVersion(const UnicodeVersion&) = delete;
@@ -19,7 +19,7 @@ public:
   [[nodiscard]] constexpr auto version() const { return _version; }
   [[nodiscard]] constexpr auto date() const { return _date; }
 private:
-  const std::string_view _version;
+  const StringView _version;
   const std::chrono::year_month _date;
 };
 
@@ -69,19 +69,19 @@ private:
   }
 
   consteval UnicodeBlock(
-      Code s, Code e, const UnicodeVersion* v = {}, std::string_view n = {})
+      Code s, Code e, const UnicodeVersion* v = {}, StringView n = {})
       : _start{s}, _end{e}, _version{v}, _name{n} {}
 
   // grant access to 'makeBlock' functions
   template<Code Start> friend consteval auto makeBlock();
   template<Code Start, Code End> friend consteval auto makeBlock();
   template<Code Start, Code End, typename T>
-  friend consteval auto makeBlock(T&, std::string_view);
+  friend consteval auto makeBlock(T&, StringView);
 
   const Code _start;
   const Code _end;
   const UnicodeVersion* const _version;
-  const std::string_view _name;
+  const StringView _name;
 };
 
 std::ostream& operator<<(std::ostream&, const UnicodeBlock&);
@@ -107,7 +107,7 @@ template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 
 template<Code Start, Code End, typename T>
-[[nodiscard]] consteval auto makeBlock(T& v, std::string_view n) {
+[[nodiscard]] consteval auto makeBlock(T& v, StringView n) {
   UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % UnicodeBlock::Mod == UnicodeBlock::OfficialStartMod);
   static_assert(End % UnicodeBlock::Mod == UnicodeBlock::OfficialEndMod);
@@ -228,8 +228,7 @@ template<size_t N, typename... Ts>
 // will return false and a string longer than one 'MB characer' will also return
 // false unless 'sizeOne' is false.
 template<typename... T>
-[[nodiscard]] inline auto inWCharRange(
-    const std::string& s, bool sizeOne, T&... t) {
+[[nodiscard]] inline auto inWCharRange(const String& s, bool sizeOne, T&... t) {
   // a string with only one byte can't hold an MB char so don't need to check it
   if (s.size() > 1) {
     if (!sizeOne) {
@@ -250,7 +249,7 @@ template<typename... T>
 
 // true if all characers are in given blocks, empty is also considered true
 template<typename... T>
-[[nodiscard]] inline auto inWCharRange(const std::string& s, T&... t) {
+[[nodiscard]] inline auto inWCharRange(const String& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
   for (auto allowNonSpacing{false}; const auto i : fromUtf8(s))
     if (allowNonSpacing && isNonSpacing(i))
@@ -270,35 +269,35 @@ template<typename... T>
 
 // Kana
 
-[[nodiscard]] bool isHiragana(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllHiragana(const std::string&);
-[[nodiscard]] bool isKatakana(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllKatakana(const std::string&);
-[[nodiscard]] bool isKana(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllKana(const std::string&);
+[[nodiscard]] bool isHiragana(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllHiragana(const String&);
+[[nodiscard]] bool isKatakana(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllKatakana(const String&);
+[[nodiscard]] bool isKana(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllKana(const String&);
 
 // Kanji
 
-[[nodiscard]] bool isCommonKanji(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllCommonKanji(const std::string&);
-[[nodiscard]] bool isRareKanji(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllRareKanji(const std::string&);
-[[nodiscard]] bool isKanji(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllKanji(const std::string&);
+[[nodiscard]] bool isCommonKanji(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllCommonKanji(const String&);
+[[nodiscard]] bool isRareKanji(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllRareKanji(const String&);
+[[nodiscard]] bool isKanji(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllKanji(const String&);
 
 // other multi-byte characters
 
 [[nodiscard]] bool isMBPunctuation(
-    const std::string&, bool includeSpace = false, bool sizeOne = true);
-[[nodiscard]] bool isAllMBPunctuation(const std::string&);
-[[nodiscard]] bool isMBSymbol(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllMBSymbol(const std::string&);
-[[nodiscard]] bool isMBLetter(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllMBLetter(const std::string&);
+    const String&, bool includeSpace = false, bool sizeOne = true);
+[[nodiscard]] bool isAllMBPunctuation(const String&);
+[[nodiscard]] bool isMBSymbol(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllMBSymbol(const String&);
+[[nodiscard]] bool isMBLetter(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllMBLetter(const String&);
 
 // 'isRecognizedMBChar' returns true if the string is in any UnicodeBlock
 // defined in this header file (including wide space)
-[[nodiscard]] bool isRecognizedMBChar(const std::string&, bool sizeOne = true);
-[[nodiscard]] bool isAllRecognizedCharacters(const std::string&);
+[[nodiscard]] bool isRecognizedMBChar(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllRecognizedCharacters(const String&);
 
 } // namespace kanji_tools

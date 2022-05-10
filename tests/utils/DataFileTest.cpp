@@ -44,19 +44,19 @@ protected:
 } // namespace
 
 TEST_F(DataFileTest, Usage) {
-  const std::string msg{"error msg"};
+  const String msg{"error msg"};
   EXPECT_THROW(call([&msg] { DataFile::usage(msg); }, msg), std::domain_error);
 }
 
 TEST_F(DataFileTest, MissingFileWithExtension) {
-  const std::string msg{"testDir must contain 'missing.txt'"};
+  const String msg{"testDir must contain 'missing.txt'"};
   EXPECT_THROW(
       call([] { return DataFile::getFile(TestDir, "missing.txt"); }, msg),
       std::domain_error);
 }
 
 TEST_F(DataFileTest, MissingFileWithoutExtension) {
-  const std::string msg{
+  const String msg{
       "testDir must contain 'missing' (also tried '.txt' extension)"};
   EXPECT_THROW(call([] { return DataFile::getFile(TestDir, "missing"); }, msg),
       std::domain_error);

@@ -37,8 +37,8 @@ protected:
   // the following methods are shotcuts for calling '_launcher' methods
   [[nodiscard]] auto& launcher() const { return _launcher; }
   [[nodiscard]] auto& choice() const { return _launcher.choice(); }
-  [[nodiscard]] char get(const std::string& msg, const Choices&,
-      OptChar def = {}, bool useQuit = true) const;
+  [[nodiscard]] char get(const String& msg, const Choices&, OptChar def = {},
+      bool useQuit = true) const;
   [[nodiscard]] auto isQuit(char c) const { return _launcher.isQuit(c); }
   [[nodiscard]] auto isTestMode() const { return _launcher.isTestMode(); }
   [[nodiscard]] std::ostream& log(bool heading = false) const;
@@ -46,7 +46,7 @@ protected:
   void printMeaning(const Kanji&, bool useNewLine = false) const;
 
   void correctMessage(); // increments '_correctAnswers'
-  std::ostream& incorrectMessage(const std::string& name);
+  std::ostream& incorrectMessage(const String& name);
   std::ostream& beginQuizMessage(size_t totalQuestions);
   std::ostream& beginQuestionMessage(size_t totalQuestions) const; // NOLINT
   [[nodiscard]] bool showMeanings() const;

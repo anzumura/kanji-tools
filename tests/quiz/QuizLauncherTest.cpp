@@ -24,7 +24,7 @@ protected:
 
   QuizLauncherTest() { reset(); }
 
-  inline static const std::string Help{", use -h for help"};
+  inline static const String Help{", use -h for help"};
 
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;
@@ -43,7 +43,7 @@ TEST_F(QuizLauncherTest, HelpMessage) {
   const auto expected = {"-r   review mode", "-t   test mode",
       "-s   show English meanings by default (can be toggled on/off later)"};
   size_t found{};
-  for (std::string line; std::getline(_os, line);)
+  for (String line; std::getline(_os, line);)
     for (const auto& i : expected)
       if (line.ends_with(i)) {
         ++found;
@@ -103,8 +103,7 @@ TEST_F(QuizLauncherTest, InvalidFormat) {
     const auto f{[&args] {
       QuizLauncher{args, _data, _groupData, _jukugoData};
     }};
-    EXPECT_THROW(
-        call(f, "invalid format for '-" + std::string{i[1], '\''} + Help),
+    EXPECT_THROW(call(f, "invalid format for '-" + String{i[1], '\''} + Help),
         std::domain_error);
   }
 }
@@ -122,7 +121,7 @@ TEST_F(QuizLauncherTest, QuestionExceedsLimit) {
     const auto f{[&args] {
       QuizLauncher{args, _data, _groupData, _jukugoData};
     }};
-    EXPECT_THROW(call(f, "value for '" + std::string(i, 2) + "' exceeds limit"),
+    EXPECT_THROW(call(f, "value for '" + String(i, 2) + "' exceeds limit"),
         std::domain_error);
   }
 }

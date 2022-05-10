@@ -30,7 +30,7 @@ TEST_F(RadicalDataTest, LoadOneRadical) {
 }
 
 TEST_F(RadicalDataTest, FindBeforeLoad) {
-  const std::string msg{"must call 'load' before calling 'find'"};
+  const String msg{"must call 'load' before calling 'find'"};
   EXPECT_THROW(
       call([this] { return radicals().find(1); }, msg), std::domain_error);
   EXPECT_THROW(

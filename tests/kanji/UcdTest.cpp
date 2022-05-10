@@ -20,16 +20,16 @@ TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(UcdLinkTypes), 1);
   EXPECT_EQ(sizeof(MorohashiId), 4);
   EXPECT_EQ(sizeof(size_t), 8);
-  EXPECT_EQ(sizeof(std::string*), 8);
+  EXPECT_EQ(sizeof(String*), 8);
   EXPECT_EQ(sizeof(Ucd::Links), 24);
 #ifdef __clang__
   EXPECT_EQ(sizeof(Ucd), 184);
   EXPECT_EQ(sizeof(UcdEntry), 24);
-  EXPECT_EQ(sizeof(std::string), 24);
+  EXPECT_EQ(sizeof(String), 24);
 #else
   EXPECT_EQ(sizeof(Ucd), 232);
   EXPECT_EQ(sizeof(UcdEntry), 32);
-  EXPECT_EQ(sizeof(std::string), 32);
+  EXPECT_EQ(sizeof(String), 32);
 #endif
 }
 
@@ -63,7 +63,7 @@ TEST(UcdEntry, GoodCodeAndName) {
 }
 
 TEST(UcdEntry, BadName) {
-  const auto msg{[](const std::string& i) {
+  const auto msg{[](const String& i) {
     return "name '" + i + "' isn't a recognized Kanji";
   }};
   for (auto i : {"", "a", "こ", "。", "雷鳴", "轟く"})
@@ -77,21 +77,21 @@ TEST(UcdEntry, BadCode) {
 }
 
 TEST(UcdTest, SourcesTooLong) {
-  const std::string s{"GHJKHJK"};
+  const String s{"GHJKHJK"};
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' exceeds max size"),
       std::domain_error);
 }
 
 TEST(UcdTest, SourcesHasDuplicate) {
-  const std::string s{"GHH"};
+  const String s{"GHH"};
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' has duplicate value: H"),
       std::domain_error);
 }
 
 TEST(UcdTest, SourcesUnrecognized) {
-  const std::string s{"JKL"};
+  const String s{"JKL"};
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' has unrecognized value: L"),
       std::domain_error);

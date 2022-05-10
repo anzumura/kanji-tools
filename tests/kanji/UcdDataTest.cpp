@@ -8,7 +8,7 @@ namespace kanji_tools {
 
 namespace {
 
-const std::string FileMsg{" - file: testFile.txt, row: 1"};
+const String FileMsg{" - file: testFile.txt, row: 1"};
 
 class UcdDataTest : public TestData {
 protected:
@@ -61,8 +61,8 @@ protected:
   [[nodiscard]] auto& getStrokes() { return _testStrokes; }
   [[nodiscard]] auto& getVStrokes() { return _testVStrokes; }
 private:
-  std::string _testName{"一"}, _testRadical{"1"}, _testStrokes{"1"},
-      _testVStrokes{}, _testJouyou{"Y"}, _testJinmei{}, _testMorohashi{"1"},
+  String _testName{"一"}, _testRadical{"1"}, _testStrokes{"1"}, _testVStrokes{},
+      _testJouyou{"Y"}, _testJinmei{}, _testMorohashi{"1"},
       _testJSource{"J0-306C"}, _testMeaning{"one; a, an; alone"},
       _testLinkCodes{}, _testLinkNames{}, _testLinkType{};
 };
@@ -160,7 +160,7 @@ TEST_F(UcdDataTest, NotFound) {
 
 TEST_F(UcdDataTest, FindIncludingVariations) {
   loadLinkedJinmei();
-  const std::string jouyou{"僧"}, jinmei{"僧"}, jinmeiVariant{"僧︀"},
+  const String jouyou{"僧"}, jinmei{"僧"}, jinmeiVariant{"僧︀"},
       otherVariant{"侮︀"};
   EXPECT_EQ(jouyou.size(), 3);
   EXPECT_EQ(jinmei.size(), 3);
@@ -282,7 +282,7 @@ TEST_F(UcdDataTest, PrintWithMissingEntry) {
   types()[KanjiTypes::Frequency].emplace_back(testKanji);
   ucd().print(*this);
   auto found{false};
-  for (std::string line; std::getline(_os, line);)
+  for (String line; std::getline(_os, line);)
     if (line == "  ERROR: 四 not found in UCD") found = true;
   EXPECT_TRUE(found);
 }

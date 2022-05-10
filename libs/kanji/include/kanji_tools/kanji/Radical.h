@@ -1,22 +1,23 @@
 #pragma once
 
+#include <kanji_tools/utils/String.h>
+
 #include <iostream>
-#include <string>
 #include <vector>
 
 namespace kanji_tools {
 
 class Radical {
 public:
-  using AltForms = std::vector<std::string>;
+  using AltForms = std::vector<String>;
   using Number = uint16_t;
   // some type aliases to help make parameter lists shorter and clearer
-  using Name = const std::string&;
-  using Reading = const std::string&;
+  using Name = const String&;
+  using Reading = const String&;
 
   inline static constexpr Number MaxRadicals{214};
 
-  Radical(Number, Name, const AltForms&, const std::string& longName, Reading);
+  Radical(Number, Name, const AltForms&, const String& longName, Reading);
 
   Radical(const Radical&) = default;
 
@@ -30,10 +31,10 @@ public:
   [[nodiscard]] auto& reading() const { return _reading; }
 private:
   const Number _number;
-  const std::string _name;
+  const String _name;
   const AltForms _altForms;
-  const std::string _longName;
-  const std::string _reading;
+  const String _longName;
+  const String _reading;
 };
 
 using RadicalRef = const Radical&;

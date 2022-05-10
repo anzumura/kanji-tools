@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <kanji_tools/utils/String.h>
 
 namespace kanji_tools {
 
@@ -8,7 +8,7 @@ namespace kanji_tools {
 // below when an exception has a 'what' that doesn't match the expected value.
 class WhatMismatch : public std::runtime_error {
 public:
-  WhatMismatch(const std::string& expectedWhat, const std::exception& e)
+  WhatMismatch(const String& expectedWhat, const std::exception& e)
       : std::runtime_error{
             "expected: '" + expectedWhat + "', actual: '" + e.what() + '\''} {}
 };
@@ -19,7 +19,7 @@ public:
 // the original exception is re-thrown to be handled by the test macro
 // (EXPECT_THROW, ASSERT_THROW, etc.) which is only able to test the type of
 // exception (not the 'what' string).
-template<typename F> auto call(const F& f, const std::string& expectedWhat) {
+template<typename F> auto call(const F& f, const String& expectedWhat) {
   try {
     return f();
   } catch (const std::exception& e) {

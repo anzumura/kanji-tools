@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kanji_tools/utils/String.h>
+
 #include <compare>
 #include <iostream>
 #include <numeric>
@@ -26,7 +28,7 @@ public:
   // followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
   // for DoublePrime or prefixed with a 'H' for Supplemental (補巻). Note, only
   // plain and Prime values are in the current version of Unicode.
-  explicit MorohashiId(const std::string&);
+  explicit MorohashiId(const String&);
 
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
   [[nodiscard]] constexpr auto idType() const noexcept { return _idType; }
@@ -36,12 +38,12 @@ public:
   [[nodiscard]] constexpr auto operator<=>(
       const MorohashiId&) const noexcept = default; // NOLINT: nullptr
 
-  [[nodiscard]] std::string toString() const;
+  [[nodiscard]] String toString() const;
 private:
   // helper functions used by ctor to validate and populate '_id' and '_idType'
-  [[nodiscard]] static Id getId(const std::string&);
-  [[nodiscard]] static IdType getIdType(const std::string&);
-  [[nodiscard]] static Id validate(const std::string&, size_t = 0, size_t = 0);
+  [[nodiscard]] static Id getId(const String&);
+  [[nodiscard]] static IdType getIdType(const String&);
+  [[nodiscard]] static Id validate(const String&, size_t = 0, size_t = 0);
 
   const Id _id{};
   const IdType _idType{IdType::Regular};

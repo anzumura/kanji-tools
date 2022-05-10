@@ -3,7 +3,6 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/utils/Utils.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <type_traits>
@@ -146,7 +145,7 @@ TEST_F(KanjiDataTest, TotalsChecks) {
 }
 
 TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
-  std::vector<std::string> list{"弓", "弖", "窮", "弼", "穹", "躬"};
+  std::vector<String> list{"弓", "弖", "窮", "弼", "穹", "躬"};
   Data::KanjiList kanjis;
   for (auto& i : list) {
     const auto k{_data->findKanjiByName(i)};
@@ -154,7 +153,7 @@ TEST_F(KanjiDataTest, SortingAndPrintingQualifiedName) {
     kanjis.emplace_back(k);
   }
   std::sort(kanjis.begin(), kanjis.end(), Data::OrderByQualifiedName);
-  std::string sorted;
+  String sorted;
   for (auto& i : kanjis) {
     if (!sorted.empty()) sorted += ' ';
     sorted += i->qualifiedName();
@@ -264,7 +263,7 @@ TEST_F(KanjiDataTest, KanjiWithMultipleNelsonIds) {
 }
 
 TEST_F(KanjiDataTest, UcdLinksMapToNewName) {
-  const std::string north{"北"}, variantNorth{"北"};
+  const String north{"北"}, variantNorth{"北"};
   EXPECT_EQ(toUnicode(north), "5317");
   EXPECT_EQ(toUnicode(variantNorth), "F963");
   EXPECT_NE(north, variantNorth);
@@ -282,7 +281,7 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
   // Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
   uint32_t rareUcd{};
-  std::map<std::string, uint32_t> rareMissingJSource;
+  std::map<String, uint32_t> rareMissingJSource;
   std::map<KanjiTypes, uint32_t> missingJSource;
   for (auto& i : _data->ucd().map()) {
     auto& u{i.second};
@@ -304,7 +303,7 @@ TEST_F(KanjiDataTest, UnicodeBlocksAndSources) {
         ++missingJSource[t]; // other with empty jSource should be Kentei or Ucd
     } else
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
-      EXPECT_NE(u.sources().find('J'), std::string::npos);
+      EXPECT_NE(u.sources().find('J'), String::npos);
   }
   EXPECT_EQ(rareUcd, 2534);
   // missing JSource for common Kanji are either 'Kentei' or 'Ucd' type
@@ -381,8 +380,8 @@ TEST_F(KanjiDataTest, UcdLinks) {
 }
 
 TEST_F(KanjiDataTest, SortByQualifiedName) {
-  const auto find{[](const std::string& name, auto t, auto s,
-                      Kanji::Frequency f, const std::string& u = EmptyString) {
+  const auto find{[](const String& name, auto t, auto s, Kanji::Frequency f,
+                      const String& u = EmptyString) {
     auto k{_data->findKanjiByName(name)};
     // can't use 'ASSERT' in a function returning non-void so throw an exception
     // if not found (which never happens by design of the rest of this test)
@@ -437,7 +436,7 @@ TEST(KanjiDataPrintTest, Info) {
       ">>>   Total for grade S: 1130 (nf 99) (N2 161, N1 804, None 165)",
       ">>>   Total for all grades: 2136"};
   int count{0}, maxLines{std::size(expected)};
-  for (std::string line; std::getline(os, line); ++count) {
+  for (String line; std::getline(os, line); ++count) {
     if (count == maxLines) FAIL() << "got more than " << maxLines;
     EXPECT_EQ(line, expected[count]);
   }
@@ -448,14 +447,14 @@ TEST(KanjiDataPrintTest, Debug) {
   const char* args[]{"", Data::DebugArg.c_str()};
   std::stringstream os;
   KanjiData data(args, os);
-  std::string lastLine;
+  String lastLine;
   size_t count{}, found{};
   // output is really big so just check for a few examples
-  for (std::string line; std::getline(os, line); ++count, lastLine = line) {
+  for (String line; std::getline(os, line); ++count, lastLine = line) {
     if (count == 1)
       EXPECT_EQ(line, ">>> Begin Loading Data");
     else if (line.starts_with(">>> Found ")) {
-      const std::string s{line.substr(10)};
+      const String s{line.substr(10)};
       // check each line against all strings (to detect possible duplicates)
       if (s.starts_with("251 Jinmei in N1")) ++found;
       if (s.starts_with("2 Linked Old in Frequency")) ++found;

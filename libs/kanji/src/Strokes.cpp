@@ -4,7 +4,7 @@ namespace kanji_tools {
 
 namespace {
 
-void rangeError(Strokes::Size value, const std::string& msg = {}) {
+void rangeError(Strokes::Size value, const String& msg = {}) {
   throw std::range_error{
       msg + "strokes '" + std::to_string(value) + "' out of range"};
 }
@@ -23,8 +23,8 @@ Strokes::Strokes(Size value, Size variant) : _value{value}, _variant{variant} {
                             std::to_string(value) + "'"};
 }
 
-std::string Strokes::toString(bool includeVariant) const {
-  std::string result{std::to_string(_value)};
+String Strokes::toString(bool includeVariant) const {
+  String result{std::to_string(_value)};
   if (includeVariant && _variant) {
     result += '/';
     result += std::to_string(_variant);

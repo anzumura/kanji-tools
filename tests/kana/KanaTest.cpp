@@ -150,13 +150,12 @@ TEST(KanaTest, CheckHiragana) {
       dakutenDigraphs{}, smallDigraphs{};
   for (auto& i : sourceMap) {
     MBChar s{i.first};
-    std::string c;
-    const auto checkDigraph{
-        [&i, &c](const std::string& a, const std::string& b = {}) {
-          EXPECT_TRUE(c == a || (!b.empty() && c == b))
-              << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-              << i.second->romaji() << "', hiragana " << i.first;
-        }};
+    String c;
+    const auto checkDigraph{[&i, &c](const String& a, const String& b = {}) {
+      EXPECT_TRUE(c == a || (!b.empty() && c == b))
+          << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
+          << i.second->romaji() << "', hiragana " << i.first;
+    }};
     EXPECT_TRUE(s.next(c));
     if (s.next(c)) {
       EXPECT_FALSE(i.second->isMonograph());
@@ -219,13 +218,12 @@ TEST(KanaTest, CheckKatakana) {
     // the maps are the same size) then there's no need to checkDigraph the
     // various counts again.
     EXPECT_TRUE(hiraganaMap.contains(i.second->hiragana()));
-    std::string c;
-    const auto checkDigraph{
-        [&i, &c](const std::string& a, const std::string& b = {}) {
-          EXPECT_TRUE(c == a || (!b.empty() && c == b))
-              << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
-              << i.second->romaji() << "', katakana " << i.first;
-        }};
+    String c;
+    const auto checkDigraph{[&i, &c](const String& a, const String& b = {}) {
+      EXPECT_TRUE(c == a || (!b.empty() && c == b))
+          << c << " != " << a << (b.empty() ? "" : " or ") << b << " for '"
+          << i.second->romaji() << "', katakana " << i.first;
+    }};
     EXPECT_TRUE(s.next(c));
     if (s.next(c)) {
       // if there's a second character it must be a small symbol matching the
@@ -254,7 +252,7 @@ TEST(KanaTest, CheckRomaji) {
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
   uint16_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
       oNum{}, voNum{}, nNum{};
-  std::set<std::string> romajiVariants;
+  std::set<String> romajiVariants;
   for (auto& i : sourceMap) {
     const auto count{[&i](auto& normal, auto& variant) {
       i.second->romaji() == i.first ? ++normal : ++variant;

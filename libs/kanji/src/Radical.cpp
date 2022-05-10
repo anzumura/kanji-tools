@@ -5,7 +5,7 @@
 namespace kanji_tools {
 
 Radical::Radical(Number number, Name name, const AltForms& altForms,
-    const std::string& longName, Reading reading)
+    const String& longName, Reading reading)
     : _number{number}, _name{name}, _altForms{altForms}, _longName{longName},
       _reading{reading} {}
 

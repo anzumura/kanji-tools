@@ -17,24 +17,24 @@ protected:
 
   // helper functions to call _choice.get with '\n' as input
   template<typename... Args>
-  auto getMsgDef(const std::string& msg, const Choices& c, Args... args) {
+  auto getMsgDef(const String& msg, const Choices& c, Args... args) {
     _is << '\n';
     return _choice.get(msg, c, args...);
   }
   template<typename... Args>
-  auto rangeMsgDef(const std::string& msg, const Range& r, Args... args) {
+  auto rangeMsgDef(const String& msg, const Range& r, Args... args) {
     _is << '\n';
     return _choice.get(msg, r, args...);
   }
 
   // write 'x' as input (followed by '\n') before calling 'get'
   template<typename... Args>
-  auto getMsg(char x, const std::string& msg, const Choices& c, Args... args) {
+  auto getMsg(char x, const String& msg, const Choices& c, Args... args) {
     _is << x;
     return getMsgDef(msg, c, args...);
   }
   template<typename... Args>
-  auto rangeMsg(char x, const std::string& msg, const Range& r, Args... args) {
+  auto rangeMsg(char x, const String& msg, const Range& r, Args... args) {
     _is << x;
     return rangeMsgDef(msg, r, args...);
   }
@@ -54,7 +54,7 @@ protected:
   }
 
   [[nodiscard]] auto getOutput() {
-    std::string result;
+    String result;
     std::getline(_os, result);
     return result;
   }
@@ -295,7 +295,7 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
 
 TEST_F(ChoiceTest, DuplicateRangeOption) {
   const Choices choices{{'a', "12"}, {'c', "34"}};
-  const std::string start{"range option '"}, end{"' already in choices"};
+  const String start{"range option '"}, end{"' already in choices"};
   for (char rangeStart : {'a', 'b'}) {
     const auto f{[rangeStart, &choices, this] {
       return choice().get("", {rangeStart, 'c'}, choices); // NOLINT

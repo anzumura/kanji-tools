@@ -31,9 +31,9 @@ protected:
     _is << "t\n" << listOrder << "\ng\n1\n4\nk\n";
   }
 
-  [[nodiscard]] std::string firstQuestion(
+  [[nodiscard]] String firstQuestion(
       char quizType, char questionList, bool checkDefault = false) {
-    std::string line, otherLine;
+    String line, otherLine;
     // run with quizType and questionList coming from stdin
     _is << "t\nb\n" << quizType << '\n' << questionList << "\n4\nk\n";
     getFirstQuestion(line);
@@ -70,7 +70,7 @@ protected:
     _quiz.start(quizType, questionList, {}, false, randomizeAnswers);
   }
 
-  void getFirstQuestion(std::string& line, QuizLauncher::OptChar quizType = {},
+  void getFirstQuestion(String& line, QuizLauncher::OptChar quizType = {},
       QuizLauncher::OptChar questionList = {}) {
     startQuiz(quizType, questionList);
     while (std::getline(_os, line))
@@ -93,10 +93,10 @@ private:
 } // namespace
 
 TEST_F(ListQuizTest, ListOrders) {
-  for (std::string lastLine; const auto i : {'b', 'e', 'r'}) {
+  for (String lastLine; const auto i : {'b', 'e', 'r'}) {
     gradeQuiz(i);
     startQuiz();
-    for (std::string line; std::getline(_os, line);) lastLine = line;
+    for (String line; std::getline(_os, line);) lastLine = line;
     // test the last (non-eof) line sent to _os
     EXPECT_EQ(lastLine, "Final score: 0/0");
     // should be nothing sent to _es (for errors)
@@ -108,7 +108,7 @@ TEST_F(ListQuizTest, MissingReading) {
   // Make a list containing a Kanji without a Japanese reading for this test.
   // This should never happen for any of the current quiz types since they only
   // include standard Kanji with readings.
-  const std::string noReading("㐄");
+  const String noReading("㐄");
   const auto i{_data->findKanjiByName(noReading)};
   ASSERT_TRUE(i);
   ASSERT_FALSE(i->hasReading());
@@ -122,9 +122,9 @@ TEST_F(ListQuizTest, MissingReading) {
 
 TEST_F(ListQuizTest, QuizDefaults) {
   constexpr auto First8Chars{8};
-  const auto run{[this](std::string& out) {
+  const auto run{[this](String& out) {
     startQuiz();
-    std::string line;
+    String line;
     // collect all lines after ">>>" (the start of the quiz), but don't add
     // the readings for the choices since they are randomly selected (instead
     // just get the first 8 chars, i.e., the "    #.  " part)
@@ -132,7 +132,7 @@ TEST_F(ListQuizTest, QuizDefaults) {
       if (!out.empty() || line.starts_with(">>>"))
         out += line.starts_with("    ") ? line.substr(0, First8Chars) : line;
   }};
-  std::string all, allWithDefaults;
+  String all, allWithDefaults;
   gradeQuiz();
   run(all);
   ASSERT_FALSE(all.empty());
@@ -152,7 +152,7 @@ TEST_F(ListQuizTest, QuizReview) {
   is() << "r\nb\ng\n1\n";
   toggleMeanings();
   startQuiz();
-  std::string line, lastLine;
+  String line, lastLine;
   auto kanjiCount{0}, meaningCount{0};
   while (std::getline(_os, line)) {
     if (line ==
@@ -177,7 +177,7 @@ TEST_F(ListQuizTest, ReviewNextPrev) {
   is() << "r\nb\n.\n.\n,\n,\n";
   startQuiz('g', '2');
   size_t found{};
-  std::string line;
+  String line;
   const auto f{[&line, &found](auto question) {
     if (line.starts_with(std::to_string(question) + "/")) ++found;
   }};
@@ -195,7 +195,7 @@ TEST_F(ListQuizTest, ReviewNextPrev) {
 
 TEST_F(ListQuizTest, ReadingQuiz) {
   is() << "t\nb\ng\n1\n4\nr\n";
-  std::string line;
+  String line;
   getFirstQuestion(line);
   EXPECT_EQ(line, "Question 1/80:  Reading:  イチ、イツ、ひと、ひと-つ");
 }
@@ -204,8 +204,8 @@ TEST_F(ListQuizTest, CorrectResponse) {
   is() << "t\nb\n4\nr\n1\n";
   startQuiz('g', '1', false);
   auto found{false};
-  std::string lastLine;
-  for (std::string line; std::getline(_os, line); lastLine = line)
+  String lastLine;
+  for (String line; std::getline(_os, line); lastLine = line)
     if (line.ends_with("Correct! (1/1)")) found = true;
   EXPECT_TRUE(found);
   EXPECT_EQ(lastLine, "Final score: 1/1 - Perfect!");
@@ -215,8 +215,8 @@ TEST_F(ListQuizTest, IncorrectResponse) {
   is() << "t\nb\n4\nr\n2\n";
   startQuiz('g', '1', false);
   auto found{false};
-  std::string lastLine;
-  for (std::string line; std::getline(_os, line); lastLine = line)
+  String lastLine;
+  for (String line; std::getline(_os, line); lastLine = line)
     if (line.ends_with("Incorrect (correct answer is 1)")) found = true;
   EXPECT_TRUE(found);
   EXPECT_EQ(lastLine, "Final score: 0/1 - mistakes: 一");
@@ -290,7 +290,7 @@ TEST_F(ListQuizTest, SkipQuestions) {
     // make sure _os is in expected 'good' state
     EXPECT_TRUE(_os.good());
     EXPECT_FALSE(_os.eof() || _os.fail() || _os.bad());
-    std::string line, lastLine;
+    String line, lastLine;
     while (std::getline(_os, line)) lastLine = line;
     // make sure _os is in expected 'eof' state
     EXPECT_TRUE(_os.eof() && _os.fail());
@@ -306,10 +306,10 @@ TEST_F(ListQuizTest, ToggleMeanings) {
   toggleMeanings(); // turn meanings on
   toggleMeanings(); // turn meanings off
   startQuiz();
-  std::string line;
+  String line;
   auto meaningsOn{false};
   size_t found{};
-  const std::string expected{
+  const String expected{
       "Question 1/80:  一  Rad 一(1), Strokes 1, yī, N5, Frq 2, K10"};
   while (std::getline(_os, line)) {
     if (line.starts_with("Question")) {

@@ -1,7 +1,6 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 
@@ -56,7 +55,7 @@ Ucd::Meaning UcdData::getMeaning(UcdPtr u) {
   return u ? u->meaning() : EmptyString;
 }
 
-UcdPtr UcdData::find(const std::string& kanjiName) const {
+UcdPtr UcdData::find(const String& kanjiName) const {
   auto r{kanjiName};
   if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
     const auto nonVariant{MBChar::noVariationSelector(kanjiName)};
@@ -71,7 +70,7 @@ UcdPtr UcdData::find(const std::string& kanjiName) const {
   return i == _map.end() ? nullptr : &i->second;
 }
 
-std::string UcdData::getReadingsAsKana(UcdPtr u) const {
+String UcdData::getReadingsAsKana(UcdPtr u) const {
   if (u) {
     auto s{u->onReading()};
     std::replace(s.begin(), s.end(), ' ', ',');
@@ -156,7 +155,7 @@ void UcdData::print(DataRef data) const {
   print("Kun Readings", &PrintCount::kunReading);
   print("Morohashi Ids", &PrintCount::morohashi);
   print("Nelson Ids", &PrintCount::nelson);
-  const auto pLinks{[this, &data](const std::string& name, const auto& list) {
+  const auto pLinks{[this, &data](const String& name, const auto& list) {
     const auto count{
         std::count_if(list.begin(), list.end(), [this](const auto& i) {
           const auto j{_map.find(i->name())};
@@ -181,8 +180,8 @@ Ucd::Links UcdData::loadLinks(const class ColumnFile& f, bool joyo) {
   Ucd::Links links;
   if (!f.isEmpty(LinkNamesCol)) {
     std::stringstream names{f.get(LinkNamesCol)}, codes{f.get(LinkCodesCol)};
-    for (std::string linkName; std::getline(names, linkName, ',');)
-      if (std::string linkCode; std::getline(codes, linkCode, ','))
+    for (String linkName; std::getline(names, linkName, ',');)
+      if (String linkCode; std::getline(codes, linkCode, ','))
         links.emplace_back(f.getChar32(LinkCodesCol, linkCode), linkName);
       else
         f.error("LinkNames has more values than LinkCodes");
@@ -201,7 +200,7 @@ Ucd::Links UcdData::loadLinks(const class ColumnFile& f, bool joyo) {
 }
 
 void UcdData::processLinks(const ColumnFile& f, const Ucd::Links& links,
-    const std::string& name, bool jinmei) {
+    const String& name, bool jinmei) {
   for (const auto& link : links)
     if (!jinmei)
       _linkedOther[link.name()].emplace_back(name);

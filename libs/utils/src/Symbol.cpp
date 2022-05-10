@@ -4,12 +4,11 @@
 
 namespace kanji_tools {
 
-BaseSymbol::BaseSymbol(
-    const std::string& type, const std::string& name, Map& m, List& l)
+BaseSymbol::BaseSymbol(const String& type, const String& name, Map& m, List& l)
     : _id{name.empty() ? Id{} : getId(type, name, m, l)} {}
 
 BaseSymbol::Id BaseSymbol::getId(
-    const std::string& type, const std::string& name, Map& m, List& l) {
+    const String& type, const String& name, Map& m, List& l) {
   if (l.size() < Max) {
     // id '0' is used for 'empty' case so non-empty symbols should start at '1'
     const auto i{m.emplace(name, l.size() + 1)};

@@ -1,18 +1,15 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 
 namespace {
 
-void fromUtf8Error(
-    const std::string& s, const std::u32string& result = U"\ufffd") {
+void fromUtf8Error(const String& s, const CodeString& result = U"\ufffd") {
   EXPECT_EQ(fromUtf8(s), result);
 }
 
-void toUtf8Error(
-    const std::u32string& s, const std::string& result = "\xEF\xBF\xBD") {
+void toUtf8Error(const CodeString& s, const String& result = "\xEF\xBF\xBD") {
   EXPECT_EQ(toUtf8(s), result);
 }
 
@@ -22,17 +19,17 @@ const auto GoodFirst{toChar(0b11'11'01'00)}, GoodSecond{toChar(0b10'00'11'11)},
     GoodNext{toChar(0b10'11'11'11)};
 const auto BadSecond{toChar(GoodSecond + 1)}, BadNext{toChar(Bit1)};
 
-const std::string MaxUnicodeUtf8{GoodFirst, GoodSecond, GoodNext, GoodNext},
+const String MaxUnicodeUtf8{GoodFirst, GoodSecond, GoodNext, GoodNext},
     BeyondMaxUnicodeUtf8{GoodFirst, BadSecond, BadNext, BadNext};
 
 } // namespace bytes
 
 using bytes::MaxUnicodeUtf8, bytes::BeyondMaxUnicodeUtf8;
 
-const std::string BeforeSurrogateRange{'\xED', '\x9F', '\xBF'}, // U+D7FF
-    SurrogateRangeStart{'\xED', '\xA0', '\x80'},                // U+D800
-    SurrogateRangeEnd{'\xED', '\xBF', '\xBF'},                  // U+DFFF
-    AfterSurrogateRange{'\xEE', '\x80', '\x80'},                // U+E000
+const String BeforeSurrogateRange{'\xED', '\x9F', '\xBF'}, // U+D7FF
+    SurrogateRangeStart{'\xED', '\xA0', '\x80'},           // U+D800
+    SurrogateRangeEnd{'\xED', '\xBF', '\xBF'},             // U+DFFF
+    AfterSurrogateRange{'\xEE', '\x80', '\x80'},           // U+E000
     Dog{"犬"};
 
 const Code MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
@@ -41,7 +38,7 @@ const Code MaxUnicodePoint{0x10ffff}, BeyondMaxUnicodePoint{0x110000};
 
 TEST(MBUtilsTest, ValidMBUtf8) {
   EXPECT_EQ(validateMBUtf8(nullptr), MBUtf8Result::NotMultiByte);
-  const std::string x{"雪"};
+  const String x{"雪"};
   EXPECT_EQ(x.size(), 3);
   EXPECT_EQ(validateUtf8(x), Utf8Result::Valid);
   EXPECT_EQ(validateMBUtf8(x), MBUtf8Result::Valid);
@@ -53,7 +50,7 @@ TEST(MBUtilsTest, ValidMBUtf8) {
 }
 
 TEST(MBUtilsTest, ValidWithTwoByte) {
-  const std::string x{"©"};
+  const String x{"©"};
   EXPECT_EQ(x.size(), 2);
   EXPECT_TRUE(isValidUtf8(x));
   EXPECT_TRUE(isValidMBUtf8(x));
@@ -63,7 +60,7 @@ TEST(MBUtilsTest, ValidWithTwoByte) {
 }
 
 TEST(MBUtilsTest, ValidWithFourByte) {
-  const std::string x{"𒀄"}; // a four byte Sumerian cuneiform symbol
+  const String x{"𒀄"}; // a four byte Sumerian cuneiform symbol
   EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidUtf8(x));
   EXPECT_TRUE(isValidMBUtf8(x));
@@ -80,7 +77,7 @@ TEST(MBUtilsTest, ValidWithFourByte) {
 }
 
 TEST(MBUtilsTest, NotValidWithFiveByte) {
-  std::string x{"𒀄"};
+  String x{"𒀄"};
   EXPECT_EQ(x.size(), 4);
   EXPECT_TRUE(isValidMBUtf8(x));
   // try to make a 'fake valid' string with 5 bytes (which is not valid)
@@ -114,22 +111,21 @@ TEST(MBUtilsTest, NotValidForOverlong) {
   // overlong single byte ascii
   const unsigned char bang{33};
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
-  EXPECT_EQ(
-      validateMBUtf8(std::string{toChar(bang)}), MBUtf8Result::NotMultiByte);
-  EXPECT_EQ(validateUtf8(std::string{toChar(TwoBits), toChar(Bit1 | bang)}),
+  EXPECT_EQ(validateMBUtf8(String{toChar(bang)}), MBUtf8Result::NotMultiByte);
+  EXPECT_EQ(validateUtf8(String{toChar(TwoBits), toChar(Bit1 | bang)}),
       Utf8Result::Overlong);
   // overlong ō with 3 bytes
-  const std::string o{"ō"};
+  const String o{"ō"};
   EXPECT_EQ(o.size(), 2);
   EXPECT_EQ(validateUtf8(o), Utf8Result::Valid);
   EXPECT_EQ(toUnicode(o), "014D");
   constexpr uint32_t macronO{0x014d};
   EXPECT_EQ(toBinary(macronO, 16), "0000000101001101");
-  const std::string overlongO{
+  const String overlongO{
       toChar(ThreeBits), toChar(Bit1 | 0b101U), toChar(Bit1 | 0b1101U)};
   EXPECT_EQ(validateUtf8(overlongO), Utf8Result::Overlong);
   // overlong Euro symbol with 4 bytes
-  const std::string x{"\xF0\x82\x82\xAC"};
+  const String x{"\xF0\x82\x82\xAC"};
   EXPECT_EQ(validateUtf8(x), Utf8Result::Overlong);
 }
 
@@ -144,15 +140,15 @@ TEST(MBUtilsTest, FromUTF8String) {
   const auto wideSingle{fromUtf8("single .")};
   ASSERT_EQ(wideSingle, U"single .");
   // first byte error cases
-  fromUtf8Error(std::string{toChar(Bit1)});
-  fromUtf8Error(std::string{toChar(FiveBits)});
+  fromUtf8Error(String{toChar(Bit1)});
+  fromUtf8Error(String{toChar(FiveBits)});
   // second byte not continuation
-  fromUtf8Error(std::string{toChar(TwoBits), 'a'}, U"\ufffda");
+  fromUtf8Error(String{toChar(TwoBits), 'a'}, U"\ufffda");
   const auto cont{toChar(Bit1)};
   // third byte not continuation
-  fromUtf8Error(std::string{toChar(ThreeBits), cont, 'a'}, U"\ufffda");
+  fromUtf8Error(String{toChar(ThreeBits), cont, 'a'}, U"\ufffda");
   // fourth byte not continuation
-  fromUtf8Error(std::string{toChar(FourBits), cont, cont, 'a'}, U"\ufffda");
+  fromUtf8Error(String{toChar(FourBits), cont, cont, 'a'}, U"\ufffda");
   ASSERT_EQ(Dog.size(), 3);
   EXPECT_EQ(Dog[0], '\xe7');
   EXPECT_EQ(Dog[1], '\x8a');
@@ -165,7 +161,7 @@ TEST(MBUtilsTest, FromUTF8String) {
 }
 
 TEST(MBUtilsTest, fromUtf8WithMaxSize) {
-  const std::string utf8{"生命尊重"};
+  const String utf8{"生命尊重"};
   // default is '0' which means no max size
   EXPECT_EQ(fromUtf8(utf8), U"生命尊重");
   EXPECT_EQ(fromUtf8(utf8, 1), U"生");
@@ -177,7 +173,7 @@ TEST(MBUtilsTest, fromUtf8WithMaxSize) {
 
 TEST(MBUtilsTest, GetCode) {
   EXPECT_EQ(getCode("朧"), U'\u6727');
-  EXPECT_EQ(getCode(std::string{"朧"}), U'\u6727');
+  EXPECT_EQ(getCode(String{"朧"}), U'\u6727');
 }
 
 TEST(MBUtilsTest, ToUTF8IntAndUInt) {
@@ -213,13 +209,13 @@ TEST(MBUtilsTest, ErrorForOverlong) {
   // overlong single byte ascii
   const unsigned char bang{33};
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
-  fromUtf8Error(std::string{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
+  fromUtf8Error(String{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
   // overlong ō with 3 bytes
   constexpr auto Byte2{Bit1 | 0b101U}, Byte3{Bit1 | 0b1101U};
-  std::string overlongO{toChar(ThreeBits), toChar(Byte2), toChar(Byte3)};
+  String overlongO{toChar(ThreeBits), toChar(Byte2), toChar(Byte3)};
   fromUtf8Error(overlongO, U"\ufffd");
   // overlong Euro symbol with 4 bytes
-  std::string x{"\xF0\x82\x82\xAC"};
+  String x{"\xF0\x82\x82\xAC"};
   fromUtf8Error(x, U"\ufffd");
 }
 
@@ -235,8 +231,7 @@ TEST(MBUtilsTest, FromUTF8CharArray) {
 }
 
 TEST(MBUtilsTest, SortKatakana) {
-  const std::set<std::string> s{
-      "ケン、トウ", "カ", "カ、サ", "ガ", "ゲン、カン"};
+  const std::set<String> s{"ケン、トウ", "カ", "カ、サ", "ガ", "ゲン、カン"};
   ASSERT_EQ(s.size(), 5);
   auto i{s.begin()};
   EXPECT_EQ(*i++, "カ");
@@ -257,8 +252,8 @@ TEST(MBUtilsTest, SortKanaAndRomaji) {
   // - Katakana: should mix with Hiragana instead of always coming after
   // - Full-width Rōmaji: should probably come before Kana
   // - Half-width Katakana: should mix with other Kana instead
-  const std::set<std::string> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ", "バラ",
-      "ばら", "ぱら", "para", "じょ", "しょ", "ｐａｒａ"};
+  const std::set<String> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ", "バラ", "ばら",
+      "ぱら", "para", "じょ", "しょ", "ｐａｒａ"};
   ASSERT_EQ(s.size(), 11);
   auto i{s.begin()};
   EXPECT_EQ(*i++, "para");
@@ -279,7 +274,7 @@ TEST(MBUtilsTest, SortKanji) {
   // Kanji sort order seems to follow Unicode code points instead of
   // 'radical/stroke' ordering. Calling std::setlocale with values like ja_JP or
   // ja_JP.UTF-8 doesn't make any difference.
-  const std::set<std::string> s{
+  const std::set<String> s{
       "些", "丑", "云", "丞", "乃", "𠮟", "廿", "⺠", "輸", "鳩"};
   ASSERT_EQ(s.size(), 10);
   auto i{s.begin()};

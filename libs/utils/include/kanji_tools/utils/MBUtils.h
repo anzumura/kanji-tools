@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <kanji_tools/utils/String.h>
 
 namespace kanji_tools {
 
@@ -11,22 +11,18 @@ namespace kanji_tools {
 // throwing a 'range_error'. Also, 'wstring_convert' was deprecated as of C++17
 // (see http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
 
-// type alias for a Unicode code point - use instead of wchar_t since it's more
-// explicit than 'wchar_t', i.e., it's 32 bits instead of platform dependent.
-using Code = char32_t;
-
 // 'maxSize' can be specified to control the number of characters converted
-[[nodiscard]] std::u32string fromUtf8(const char*, size_t maxSize = 0);
-[[nodiscard]] std::u32string fromUtf8(const std::string&, size_t maxSize = 0);
+[[nodiscard]] CodeString fromUtf8(const char*, size_t maxSize = 0);
+[[nodiscard]] CodeString fromUtf8(const String&, size_t maxSize = 0);
 
 // functions that return a single UTF-8 'Code' (or 0 if input is empty)
 [[nodiscard]] Code getCode(const char*) noexcept;
-[[nodiscard]] Code getCode(const std::string&) noexcept;
+[[nodiscard]] Code getCode(const String&) noexcept;
 
-[[nodiscard]] std::string toUtf8(Code);
-[[nodiscard]] std::string toUtf8(int);
-[[nodiscard]] std::string toUtf8(uint32_t x);
-[[nodiscard]] std::string toUtf8(const std::u32string&);
+[[nodiscard]] String toUtf8(Code);
+[[nodiscard]] String toUtf8(int);
+[[nodiscard]] String toUtf8(uint32_t x);
+[[nodiscard]] String toUtf8(const CodeString&);
 
 // safe conversions of Code to wchar_t
 inline constexpr wchar_t toWChar(Code x) noexcept {
@@ -37,8 +33,8 @@ inline constexpr wchar_t toWChar(Code x) noexcept {
 // keep wstring versions of conversion functions for now to work with wregex
 
 [[nodiscard]] std::wstring fromUtf8ToWstring(const char*);
-[[nodiscard]] std::wstring fromUtf8ToWstring(const std::string&);
-[[nodiscard]] std::string toUtf8(const std::wstring&);
+[[nodiscard]] std::wstring fromUtf8ToWstring(const String&);
+[[nodiscard]] String toUtf8(const std::wstring&);
 
 // 'MBUtf8Result' is the return value of 'validateMBUtf8' - see comments below
 // for more details.
@@ -79,7 +75,7 @@ MBUtf8Result validateMBUtf8(
     const char*, Utf8Result&, bool sizeOne = false) noexcept;
 
 MBUtf8Result validateMBUtf8(
-    const std::string&, Utf8Result& e, bool sizeOne = false) noexcept;
+    const String&, Utf8Result& e, bool sizeOne = false) noexcept;
 
 template<typename T>
 [[nodiscard]] inline auto validateMBUtf8(
@@ -97,11 +93,9 @@ template<typename T>
   return e;
 }
 
-[[nodiscard]] bool isValidMBUtf8(
-    const std::string&, bool sizeOne = false) noexcept;
+[[nodiscard]] bool isValidMBUtf8(const String&, bool sizeOne = false) noexcept;
 
-[[nodiscard]] bool isValidUtf8(
-    const std::string&, bool sizeOne = false) noexcept;
+[[nodiscard]] bool isValidUtf8(const String&, bool sizeOne = false) noexcept;
 
 // bit patterns used for processing UTF-8
 enum BitPatterns : unsigned char {
@@ -123,7 +117,7 @@ inline constexpr size_t VarSelectorSize{3}, MinMBSize{2}, MaxMBSize{4};
 
 inline constexpr auto MaxAscii{U'\x7f'}, MaxUnicode{U'\x10ffff'},
     CombiningVoicedChar{U'\x3099'}, CombiningSemiVoicedChar{U'\x309a'};
-inline static const std::string CombiningVoiced{"\xe3\x82\x99"}, // U+3099
-    CombiningSemiVoiced{"\xe3\x82\x9a"};                         // U+309A
+inline static const String CombiningVoiced{"\xe3\x82\x99"}, // U+3099
+    CombiningSemiVoiced{"\xe3\x82\x9a"};                    // U+309A
 
 } // namespace kanji_tools

@@ -1,6 +1,5 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/Data.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 
@@ -22,7 +21,7 @@ Kanji::Year Kanji::year() const { return 0; }
 
 bool Kanji::linkedReadings() const { return false; }
 
-Kanji::KanjiName::KanjiName(const std::string& name) : _name{name} {
+Kanji::KanjiName::KanjiName(const String& name) : _name{name} {
   assert(MBChar::size(_name) == 1);
 }
 
@@ -30,7 +29,7 @@ bool Kanji::KanjiName::isVariant() const {
   return MBChar::isMBCharWithVariationSelector(_name);
 }
 
-std::string Kanji::KanjiName::nonVariant() const {
+String Kanji::KanjiName::nonVariant() const {
   return MBChar::noVariationSelector(_name);
 }
 
@@ -38,7 +37,7 @@ Kanji::Kanji(DataRef d, Name n, RadicalRef radical, Strokes strokes, UcdPtr u)
     : Kanji{n, d.getCompatibilityName(n), radical, strokes, Data::getPinyin(u),
           Data::getMorohashiId(u), Data::getNelsonIds(u)} {}
 
-std::string Kanji::compatibilityName() const {
+String Kanji::compatibilityName() const {
   return _compatibilityName.value_or(_name.name());
 }
 
@@ -51,11 +50,11 @@ Kanji::Frequency Kanji::frequencyOrMax() const {
   return frequencyOrDefault(std::numeric_limits<Frequency>::max());
 }
 
-std::string Kanji::info(KanjiInfo fields) const {
-  static const std::string RadMsg{"Rad "}, StrokesMsg{"Strokes "},
-      FreqMsg{"Frq "}, NewMsg{"New "}, OldMsg{"Old "};
+String Kanji::info(KanjiInfo fields) const {
+  static const String RadMsg{"Rad "}, StrokesMsg{"Strokes "}, FreqMsg{"Frq "},
+      NewMsg{"New "}, OldMsg{"Old "};
 
-  std::string result;
+  String result;
   const auto add{[&result](const auto& x) {
     if (!result.empty()) result += ", ";
     result += x;
@@ -76,7 +75,7 @@ std::string Kanji::info(KanjiInfo fields) const {
     if (hasValue(fields & KanjiInfo::New))
       add(NewMsg + *newName() + (linkedReadings() ? "*" : ""));
   } else if (hasValue(fields & KanjiInfo::Old) && !oldNames().empty()) {
-    std::string s;
+    String s;
     for (auto& i : oldNames()) {
       if (s.empty())
         s = i + (linkedReadings() ? "*" : "");
@@ -89,7 +88,7 @@ std::string Kanji::info(KanjiInfo fields) const {
   return result;
 }
 
-std::string Kanji::qualifiedName() const {
+String Kanji::qualifiedName() const {
   return name() + QualifiedNames[qualifiedNameRank()];
 }
 

@@ -78,7 +78,7 @@ void Table::printMarkdownRow(
     os << "| ";
     if (rowType == RowType::Header && row.empty()) os << "---";
     if (i < row.size()) {
-      std::string out;
+      String out;
       out.reserve(row[i].size());
       for (const auto c : row[i])
         if (c == '|')

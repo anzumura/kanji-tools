@@ -1,5 +1,4 @@
 #include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 
@@ -21,7 +20,7 @@ Kanji::Name LinkedKanji::linkType(Name name, const Kanji& link, bool isJouyou) {
         "LinkedKanji " + name + " wanted type '" +
         toString(KanjiTypes::Jouyou) +
         (isJouyou ? EmptyString
-                  : std::string{"' or '"} + toString(KanjiTypes::Jinmei)) +
+                  : String{"' or '"} + toString(KanjiTypes::Jinmei)) +
         "' for link " + link.name() + ", but got '" + toString(t) + "'"};
   return name;
 }

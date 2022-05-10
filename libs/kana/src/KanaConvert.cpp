@@ -1,6 +1,5 @@
 #include <kanji_tools/kana/KanaConvert.h>
 #include <kanji_tools/kana/Table.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <cstdio>
 #include <unistd.h>
@@ -66,7 +65,7 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
   out << '\n'
       << (markdown ? "**Totals:**\n" : ">>> Totals:") << std::setfill(' ')
       << std::right << '\n';
-  const auto print{[&out, markdown](const std::string& s) -> std::ostream& {
+  const auto print{[&out, markdown](const String& s) -> std::ostream& {
     if (markdown) return out << "- **" << s << ":** ";
     return out << std::setw(FooterWidth) << s << ": " << std::setw(3);
   }};
@@ -87,13 +86,13 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
                  << "), N types aren't included in 'All Kana'\n";
 }
 
-[[nodiscard]] std::string getHepburn(const Kana& i, const std::string& romaji) {
+[[nodiscard]] String getHepburn(const Kana& i, const String& romaji) {
   auto& hepburn{i.getRomaji(ConvertFlags::Hepburn)};
   return romaji == hepburn ? EmptyString
                            : addBrackets(hepburn, BracketType::Round);
 }
 
-[[nodiscard]] std::string getKunrei(const Kana& i, const std::string& romaji) {
+[[nodiscard]] String getKunrei(const Kana& i, const String& romaji) {
   auto& kunrei{i.getRomaji(ConvertFlags::Kunrei)};
   return romaji == kunrei    ? EmptyString
          : i.kunreiVariant() ? kunrei
@@ -102,16 +101,14 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
 
 } // namespace
 
-void KanaConvert::error(const std::string& msg) {
-  throw std::domain_error(msg);
-}
+void KanaConvert::error(const String& msg) { throw std::domain_error(msg); }
 
 KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
     : _out(out), _in(in), _choice{out, in} {
   auto printKana{false}, printMarkdown{false};
   List strings;
   for (Args::Size i{1}; i < args.size(); ++i)
-    if (std::string arg{args[i]}; arg == "--")
+    if (String arg{args[i]}; arg == "--")
       while (++i < args.size()) strings.emplace_back(args[i]);
     else if (arg == "-?") {
       usage();
@@ -140,7 +137,7 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
 }
 
 bool KanaConvert::processArg(
-    const std::string& arg, bool& printKana, bool& printMarkdown) {
+    const String& arg, bool& printKana, bool& printMarkdown) {
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     // NOLINTNEXTLINE: NonNullParamChecker
     if (_interactive || _suppressNewLine || printKana || printMarkdown)
@@ -162,7 +159,7 @@ bool KanaConvert::processArg(
   return true;    // arg was processed successfully
 }
 
-bool KanaConvert::charTypeArgs(const std::string& arg) {
+bool KanaConvert::charTypeArgs(const String& arg) {
   // this function is only called when 'arg' starts with '-' so don't need to
   // check that again (only need to check the length)
   if (arg.size() != 2) return false;
@@ -239,8 +236,7 @@ void KanaConvert::start(const List& strings) {
 
 void KanaConvert::getInput() {
   if (_interactive) printOptions();
-  for (std::string line;
-       std::getline(_in ? *_in : std::cin, line) && line != "q";) {
+  for (String line; std::getline(_in ? *_in : std::cin, line) && line != "q";) {
     if (_interactive && !processLine(line)) continue;
     convert(line);
     if (!_suppressNewLine) _out << '\n';
@@ -256,7 +252,7 @@ void KanaConvert::printOptions() const {
           "-k|-h|-r|-K|-H|-R):\n";
 }
 
-bool KanaConvert::processLine(const std::string& line) {
+bool KanaConvert::processLine(const String& line) {
   if (line.empty()) return false;
   if (line == "c")
     _converter.flags(ConvertFlags::None);
@@ -274,7 +270,7 @@ bool KanaConvert::processLine(const std::string& line) {
   return false;
 }
 
-void KanaConvert::convert(const std::string& s) {
+void KanaConvert::convert(const String& s) {
   _out << (_source ? _converter.convert(*_source, s) : _converter.convert(s));
 }
 
@@ -292,18 +288,18 @@ void KanaConvert::printKanaChart(bool markdown) const {
   // Put a border before each 'group' of kana - use 'la', 'lya' and 'lwa' when
   // there are small letters that should be included, i.e., 'la' (ぁ) comes
   // right before 'a' (あ).
-  const std::set<std::string> groups{
+  const std::set<String> groups{
       "la", "ka", "sa", "ta", "na", "ha", "ma", "lya", "ra", "lwa"};
   for (auto& entry : Kana::getMap(CharType::Hiragana)) {
     auto& i{*entry.second};
     romajiVariants += i.romajiVariants().size();
     (i.isMonograph() ? monographs : digraphs).add(i);
-    const std::string type{i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P"};
+    const String type{i.isDakuten() ? "D" : i.isHanDakuten() ? "H" : "P"};
     auto& romaji{i.romaji()};
     auto& h{i.hiragana()};
     auto& k{i.katakana()};
     const auto hepburn{getHepburn(i, romaji)}, kunrei{getKunrei(i, romaji)};
-    std::string vars;
+    String vars;
     for (auto& j : i.romajiVariants()) {
       if (!vars.empty()) vars += ", ";
       vars += j;
@@ -315,7 +311,7 @@ void KanaConvert::printKanaChart(bool markdown) const {
         groups.contains(romaji));
   }
   // special handling for middle dot, prolong mark and repeat marks
-  const std::string slash{"/"}, middleDot{"・"};
+  const String slash{"/"}, middleDot{"・"};
   table.add({"N", slash, {}, middleDot, {}, toUnicode(middleDot)}, true);
   table.add({"N", {}, {}, Kana::ProlongMark, {}, toUnicode(Kana::ProlongMark)});
   for (auto& i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {

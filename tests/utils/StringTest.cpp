@@ -1,17 +1,16 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Utils.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
 
 namespace {
 
-const std::string LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪sNow"};
+const String LowerString{"aBcD"}, UpperString{"EfGh"}, MBString{"雪sNow"};
 
 } // namespace
 
-TEST(UtilsTest, AddLeadingZeroes) {
+TEST(StringTest, AddLeadingZeroes) {
   // addLeadingZeroes returns '0' when given an empty string, otherwise it pads
   // the string with zeroes if size is less than 'minSize' (the second param)
   EXPECT_EQ(addLeadingZeroes("", 0), "0");
@@ -22,7 +21,7 @@ TEST(UtilsTest, AddLeadingZeroes) {
   EXPECT_EQ(addLeadingZeroes("abc", 2), "abc");
 }
 
-TEST(UtilsTest, U32AddLeadingZeroes) {
+TEST(StringTest, U32AddLeadingZeroes) {
   // addLeadingZeroes returns '0' when given an empty string, otherwise it pads
   // the string with zeroes if size is less than 'minSize' (the second param)
   EXPECT_EQ(addLeadingZeroes(U"", 0), U"0");
@@ -33,7 +32,7 @@ TEST(UtilsTest, U32AddLeadingZeroes) {
   EXPECT_EQ(addLeadingZeroes(U"abc", 2), U"abc");
 }
 
-TEST(UtilsTest, ToUnicode) {
+TEST(StringTest, ToUnicode) {
   EXPECT_EQ(toUnicode('a'), "0061");
   EXPECT_EQ(toUnicode("ぁ"), "3041");
   EXPECT_EQ(toUnicode("ぁ", BracketType::Square), "[3041]");
@@ -42,7 +41,7 @@ TEST(UtilsTest, ToUnicode) {
       "[3059 305A 3081 002D 96C0]");
 }
 
-TEST(UtilsTest, U32ToUnicode) {
+TEST(StringTest, U32ToUnicode) {
   EXPECT_EQ(toUnicode(U'a'), "0061");
   EXPECT_EQ(toUnicode(U"ぁ"), "3041");
   EXPECT_EQ(toUnicode(U"ぁ", BracketType::Square), "[3041]");
@@ -51,7 +50,7 @@ TEST(UtilsTest, U32ToUnicode) {
       "[3059 305A 3081 002D 96C0]");
 }
 
-TEST(UtilsTest, ToHex) {
+TEST(StringTest, ToHex) {
   EXPECT_EQ(toHex(U'\ufffc'), "0000fffc");
   const auto s{toUtf8(U"\ufffc")};
   ASSERT_EQ(s.size(), 3);
@@ -72,7 +71,7 @@ TEST(UtilsTest, ToHex) {
   EXPECT_EQ(toHex(newline, 1), "a");
 }
 
-TEST(UtilsTest, ToBinary) {
+TEST(StringTest, ToBinary) {
   EXPECT_EQ(toBinary(U'\ufffc'), "00000000000000001111111111111100");
   EXPECT_EQ(toBinary(U'\ufffc', 1), "1111111111111100");
   EXPECT_EQ(toBinary(U'\ufffc', BracketType::Square, 1), "[1111111111111100]");
@@ -88,7 +87,7 @@ TEST(UtilsTest, ToBinary) {
   EXPECT_EQ(toBinary(nullChar, 2), "00");
 }
 
-TEST(UtilsTest, CheckSingleByte) {
+TEST(StringTest, CheckSingleByte) {
   // normal char
   EXPECT_TRUE(isSingleByteChar('a'));
   EXPECT_FALSE(isSingleByteChar('\x80'));
@@ -116,35 +115,35 @@ TEST(UtilsTest, CheckSingleByte) {
   EXPECT_FALSE(isAnySingleByte(U"こ"));
 }
 
-TEST(UtilsTest, FirstLower) {
+TEST(StringTest, FirstLower) {
   EXPECT_EQ(firstLower(EmptyString), EmptyString);
   EXPECT_EQ(firstLower(LowerString), LowerString);
   EXPECT_EQ(firstLower(UpperString), "efGh");
   EXPECT_EQ(firstLower(MBString), MBString);
 }
 
-TEST(UtilsTest, FirstUpper) {
+TEST(StringTest, FirstUpper) {
   EXPECT_EQ(firstUpper(EmptyString), EmptyString);
   EXPECT_EQ(firstUpper(LowerString), "ABcD");
   EXPECT_EQ(firstUpper(UpperString), UpperString);
   EXPECT_EQ(firstUpper(MBString), MBString);
 }
 
-TEST(UtilsTest, ToLower) {
+TEST(StringTest, ToLower) {
   EXPECT_EQ(toLower(EmptyString), EmptyString);
   EXPECT_EQ(toLower(LowerString), "abcd");
   EXPECT_EQ(toLower(UpperString), "efgh");
   EXPECT_EQ(toLower(MBString), "雪snow");
 }
 
-TEST(UtilsTest, ToUpper) {
+TEST(StringTest, ToUpper) {
   EXPECT_EQ(toUpper(EmptyString), EmptyString);
   EXPECT_EQ(toUpper(LowerString), "ABCD");
   EXPECT_EQ(toUpper(UpperString), "EFGH");
   EXPECT_EQ(toUpper(MBString), "雪SNOW");
 }
 
-TEST(UtilsTest, IntToChar) {
+TEST(StringTest, IntToChar) {
   EXPECT_EQ(toChar(-128), '\x80');
   EXPECT_EQ(toChar(0), '\0');
   EXPECT_EQ(toChar(255), '\xff');
@@ -156,7 +155,7 @@ TEST(UtilsTest, IntToChar) {
       std::out_of_range);
 }
 
-TEST(UtilsTest, IntToCharOnlyPositive) {
+TEST(StringTest, IntToCharOnlyPositive) {
   EXPECT_EQ(toChar(0, false), '\0');
   EXPECT_EQ(toChar(255, false), '\xff');
   EXPECT_THROW(call([] { return toChar(-1, false); },
@@ -167,7 +166,7 @@ TEST(UtilsTest, IntToCharOnlyPositive) {
       std::out_of_range);
 }
 
-TEST(UtilsTest, UInt16ToChar) {
+TEST(StringTest, UInt16ToChar) {
   uint16_t x{0};
   EXPECT_EQ(toChar(x), '\0');
   EXPECT_EQ(toChar(x = 255), '\xff');
@@ -176,7 +175,7 @@ TEST(UtilsTest, UInt16ToChar) {
       std::out_of_range);
 }
 
-TEST(UtilsTest, UIntToChar) {
+TEST(StringTest, UIntToChar) {
   EXPECT_EQ(toChar(0U), '\0');
   EXPECT_EQ(toChar(255U), '\xff');
   EXPECT_THROW(call([] { return toChar(256U); },
@@ -184,7 +183,7 @@ TEST(UtilsTest, UIntToChar) {
       std::out_of_range);
 }
 
-TEST(UtilsTest, ULongToChar) {
+TEST(StringTest, ULongToChar) {
   EXPECT_EQ(toChar(0UL), '\0');
   EXPECT_EQ(toChar(255UL), '\xff');
   EXPECT_THROW(
@@ -192,22 +191,22 @@ TEST(UtilsTest, ULongToChar) {
       std::out_of_range);
 }
 
-TEST(UtilsTest, Char32ToChar) {
+TEST(StringTest, Char32ToChar) {
   EXPECT_EQ(toChar(U'\x0'), '\0');
   EXPECT_EQ(toChar(U'\xff'), '\xff');
   EXPECT_THROW(call([] { return toChar(U'\xa00'); },
-                   "toChar (char32_t): '0a00' out of range"),
+                   "toChar (Code): '0a00' out of range"),
       std::out_of_range);
 }
 
-TEST(UtilsTest, UCharToChar) {
+TEST(StringTest, UCharToChar) {
   unsigned char x{0};
   EXPECT_EQ(toChar(x), '\0');
   EXPECT_EQ(toChar(x = 0xff), '\xff');
   // no chance for an exception
 }
 
-TEST(UtilsTest, CharToUChar) {
+TEST(StringTest, CharToUChar) {
   EXPECT_EQ(toUChar(0), '\0');
   EXPECT_EQ(toChar(0xff), '\xff');
   // no chance for an exception

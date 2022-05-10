@@ -49,8 +49,7 @@ OfficialKanji::OfficialKanji(
 Kanji::LinkNames OfficialKanji::getOldNames(File f) {
   LinkNames result;
   std::stringstream ss{f.get(OldNamesCol)};
-  for (std::string token; std::getline(ss, token, ',');)
-    result.emplace_back(token);
+  for (String token; std::getline(ss, token, ',');) result.emplace_back(token);
   return result;
 }
 
@@ -71,7 +70,7 @@ JouyouKanji::JouyouKanji(DataRef data, File f)
           f.get(MeaningCol)},
       _grade{getGrade(f.get(GradeCol))} {}
 
-KanjiGrades JouyouKanji::getGrade(const std::string& s) {
+KanjiGrades JouyouKanji::getGrade(const String& s) {
   return AllKanjiGrades.fromString(s.starts_with("S") ? s : "G" + s);
 }
 

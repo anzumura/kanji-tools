@@ -66,7 +66,7 @@ TEST(UnicodeBlockTest, CheckKanjiBlocks) {
 }
 
 TEST(UnicodeBlockTest, IsNonSpacing) {
-  std::u32string s{U"\x3078\x3099"}; // へ and dakuten combining mark
+  CodeString s{U"\x3078\x3099"}; // へ and dakuten combining mark
   EXPECT_EQ(s.size(), 2);
   EXPECT_FALSE(isNonSpacing(s[0]));
   EXPECT_TRUE(isNonSpacing(s[1]));

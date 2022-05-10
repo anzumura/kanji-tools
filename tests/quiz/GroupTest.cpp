@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/quiz/Group.h>
-#include <kanji_tools/utils/Utils.h>
 #include <tests/kanji_tools/TestKanji.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -31,7 +30,7 @@ TEST(GroupTest, CreateMeaningGroup) {
 TEST(GroupTest, CreatePatternGroup) {
   using enum Group::PatternType;
   for (const auto i : {Family, Peer, Reading}) {
-    const std::string name{i == Peer ? ":z" : "x:y"};
+    const String name{i == Peer ? ":z" : "x:y"};
     const PatternGroup g{2, name, TestMembers, i};
     EXPECT_EQ(g.type(), GroupType::Pattern);
     EXPECT_EQ(g.patternType(), i);

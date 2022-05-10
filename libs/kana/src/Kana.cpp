@@ -1,6 +1,5 @@
 #include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 
@@ -158,7 +157,7 @@ const std::array HanDakutenKanaList{
 
 } // namespace
 
-const std::string& Kana::RepeatMark::get(
+const String& Kana::RepeatMark::get(
     CharType target, ConvertFlags flags, const Kana* prevKana) const {
   switch (target) {
   case CharType::Hiragana: return _hiragana;
@@ -180,7 +179,7 @@ void Kana::RepeatMark::validate() const {
 }
 
 const Kana::RepeatMark* Kana::findRepeatMark(
-    CharType source, const std::string& kana) {
+    CharType source, const String& kana) {
   if (RepeatPlain.matches(source, kana)) return &RepeatPlain;
   if (RepeatAccented.matches(source, kana)) return &RepeatAccented;
   return {};
@@ -195,7 +194,7 @@ const Kana::Map& Kana::getMap(CharType t) {
   __builtin_unreachable(); // stop gcc 'reaches end' warning LCOV_EXCL_LINE
 }
 
-Kana::OptString Kana::findDakuten(const std::string& s) {
+Kana::OptString Kana::findDakuten(const String& s) {
   auto i{HiraganaMap.find(s)};
   if (i != HiraganaMap.end()) return i->second->dakuten(CharType::Hiragana);
   i = KatakanaMap.find(s);
@@ -203,7 +202,7 @@ Kana::OptString Kana::findDakuten(const std::string& s) {
                                 : EmptyOptString;
 }
 
-Kana::OptString Kana::findHanDakuten(const std::string& s) {
+Kana::OptString Kana::findHanDakuten(const String& s) {
   auto i{HiraganaMap.find(s)};
   if (i != HiraganaMap.end()) return i->second->hanDakuten(CharType::Hiragana);
   i = KatakanaMap.find(s);
@@ -211,7 +210,7 @@ Kana::OptString Kana::findHanDakuten(const std::string& s) {
                                 : EmptyOptString;
 }
 
-const std::string& Kana::getRomaji(ConvertFlags flags) const {
+const String& Kana::getRomaji(ConvertFlags flags) const {
   return hasValue(flags & ConvertFlags::Hepburn) && _hepburn ? *_hepburn
          : hasValue(flags & ConvertFlags::Kunrei) && kunreiVariant()
              ? romajiVariants()[0]
@@ -219,7 +218,7 @@ const std::string& Kana::getRomaji(ConvertFlags flags) const {
                                                              : _romaji;
 }
 
-const std::string& Kana::get(CharType t, ConvertFlags flags) const {
+const String& Kana::get(CharType t, ConvertFlags flags) const {
   switch (t) {
   case CharType::Romaji: return getRomaji(flags);
   case CharType::Hiragana: return _hiragana;

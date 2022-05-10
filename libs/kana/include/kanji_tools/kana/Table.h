@@ -1,8 +1,9 @@
 #pragma once
 
+#include <kanji_tools/utils/String.h>
+
 #include <iostream>
 #include <set>
-#include <string>
 #include <vector>
 
 namespace kanji_tools {
@@ -21,7 +22,7 @@ namespace kanji_tools {
 // - SimHei, Osaka-Mono, MS Mincho, MS Gothic, MingLiU, PCMyungjo, SimSun-ExtB
 class Table {
 public:
-  using Row = std::vector<std::string>;
+  using Row = std::vector<String>;
   using Rows = std::vector<Row>;
 
   explicit Table(const Row& title = {}, bool countInFirstColumn = false)

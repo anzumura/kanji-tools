@@ -1,5 +1,4 @@
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <array>
 #include <bit>
@@ -56,7 +55,7 @@ constexpr uInt Shift12{Shift6 * 2}, Shift18{Shift6 * 3};
   return std::countl_one(*++u) == 1;
 }
 
-// allow casting 'uInt' to 'char32_t' or 'wchar_t' (used by 'convertFromUtf8')
+// allow casting 'uInt' to 'Code' or 'wchar_t' (used by 'convertFromUtf8')
 template<typename T>
 [[nodiscard]] constexpr std::enable_if_t<
     std::is_same_v<T, Code> || std::is_same_v<T, wchar_t>, T>
@@ -64,7 +63,7 @@ cast(uInt x) noexcept {
   return static_cast<T>(x);
 }
 
-// 'threeByteUtf8' returns a value of type 'T' (char32_t or wchar_t) that
+// 'threeByteUtf8' returns a value of type 'T' (Code or wchar_t) that
 // represents a 3 byte UTF-8 character. The values passed in are:
 //   'b1': first byte (strip leading '1's to get 'aaaa' part of '1110aaaa')
 //   'b2': second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
@@ -76,7 +75,7 @@ template<typename T>
   return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
 }
 
-// 'fourByteUtf8' returns a value of type 'T' (char32_t or wchar_t) that
+// 'fourByteUtf8' returns a value of type 'T' (Code or wchar_t) that
 // represents a 4 byte UTF-8 character. The values passed in are:
 //   'b1': first byte (strip leading '1's to get 'aaa' part of '11110aaa')
 //   'b2': second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
@@ -135,7 +134,7 @@ template<typename T>
                                : v[Err];
 } // GCOV_EXCL_STOP
 
-// 'R' is a sequence (so u32string or wstring) and 'T' is char32_t or wchar_t
+// 'R' is a sequence (so u32string or wstring) and 'T' is Code or wchar_t
 template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(
     const char* s, size_t maxSize, const Consts<T>& v) {
@@ -148,7 +147,7 @@ template<typename R, typename T = typename R::value_type>
   return result;
 }
 
-void convertToUtf8(Code c, std::string& s) {
+void convertToUtf8(Code c, String& s) {
   static constexpr Code FirstThree{left18(0b111)}, FirstFour{left12(0b11'11)},
       FirstFive{left6(0b1'11'11)}, Six{0b11'11'11};
   static constexpr Code SecondSix{left6(Six)}, ThirdSix{left12(Six)};
@@ -203,11 +202,11 @@ template<typename T>
 
 } // namespace
 
-std::u32string fromUtf8(const char* s, size_t maxSize) {
-  return convertFromUtf8<std::u32string>(s, maxSize, Char32Vals);
+CodeString fromUtf8(const char* s, size_t maxSize) {
+  return convertFromUtf8<CodeString>(s, maxSize, Char32Vals);
 }
 
-std::u32string fromUtf8(const std::string& s, size_t maxSize) {
+CodeString fromUtf8(const String& s, size_t maxSize) {
   return fromUtf8(s.c_str(), maxSize);
 }
 
@@ -217,20 +216,20 @@ Code getCode(const char* s) noexcept {
   return convertOneUtf8(u, Char32Vals);
 }
 
-Code getCode(const std::string& s) noexcept { return getCode(s.c_str()); }
+Code getCode(const String& s) noexcept { return getCode(s.c_str()); }
 
-std::string toUtf8(Code c) {
-  std::string result;
+String toUtf8(Code c) {
+  String result;
   convertToUtf8(c, result);
   return result;
 }
 
-std::string toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
+String toUtf8(int x) { return toUtf8(static_cast<Code>(x)); }
 
-std::string toUtf8(uint32_t x) { return toUtf8(static_cast<Code>(x)); }
+String toUtf8(uint32_t x) { return toUtf8(static_cast<Code>(x)); }
 
-std::string toUtf8(const std::u32string& s) {
-  std::string result;
+String toUtf8(const CodeString& s) {
+  String result;
   // result will be bigger than 's' if there are any multibyte chars
   result.reserve(s.size());
   for (auto c : s) convertToUtf8(c, result);
@@ -243,12 +242,12 @@ std::wstring fromUtf8ToWstring(const char* s) {
   return convertFromUtf8<std::wstring>(s, 0, WCharVals);
 }
 
-std::wstring fromUtf8ToWstring(const std::string& s) {
+std::wstring fromUtf8ToWstring(const String& s) {
   return fromUtf8ToWstring(s.c_str());
 }
 
-std::string toUtf8(const std::wstring& s) {
-  std::string result;
+String toUtf8(const std::wstring& s) {
+  String result;
   // result will be bigger than 's' if there are any multibyte chars
   result.reserve(s.size());
   for (auto c : s) convertToUtf8(static_cast<Code>(c), result);
@@ -271,15 +270,15 @@ MBUtf8Result validateMBUtf8(
 }
 
 MBUtf8Result validateMBUtf8(
-    const std::string& s, Utf8Result& e, bool sizeOne) noexcept {
+    const String& s, Utf8Result& e, bool sizeOne) noexcept {
   return validateMBUtf8(s.c_str(), e, sizeOne);
 }
 
-bool isValidMBUtf8(const std::string& s, bool sizeOne) noexcept {
+bool isValidMBUtf8(const String& s, bool sizeOne) noexcept {
   return validateMBUtf8(s, sizeOne) == MBUtf8Result::Valid;
 }
 
-bool isValidUtf8(const std::string& s, bool sizeOne) noexcept {
+bool isValidUtf8(const String& s, bool sizeOne) noexcept {
   return validateUtf8(s, sizeOne) == Utf8Result::Valid;
 }
 

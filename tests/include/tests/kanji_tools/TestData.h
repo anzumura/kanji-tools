@@ -13,13 +13,13 @@ inline const std::filesystem::path TestFile{TestDir / "testFile.txt"};
 
 class TestData : public ::testing::Test, public Data {
 public:
-  [[nodiscard]] Kanji::Frequency frequency(const std::string&) const override {
+  [[nodiscard]] Kanji::Frequency frequency(const String&) const override {
     return Kanji::Frequency{};
   }
-  [[nodiscard]] JlptLevels level(const std::string&) const override {
+  [[nodiscard]] JlptLevels level(const String&) const override {
     return JlptLevels::None;
   }
-  [[nodiscard]] KenteiKyus kyu(const std::string&) const override {
+  [[nodiscard]] KenteiKyus kyu(const String&) const override {
     return KenteiKyus::None;
   }
 protected:
@@ -35,7 +35,7 @@ protected:
     std::filesystem::remove_all(TestDir);
   }
 
-  static void write(const std::string& s) {
+  static void write(const String& s) {
     if (!std::filesystem::exists(TestDir))
       std::filesystem::create_directory(TestDir);
     std::ofstream of{TestFile, std::ios_base::app};

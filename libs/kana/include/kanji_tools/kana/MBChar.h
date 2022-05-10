@@ -20,37 +20,37 @@ namespace kanji_tools {
 //   means 3, etc.
 class MBChar {
 public:
-  using OptString = std::optional<std::string>;
+  using OptString = std::optional<String>;
 
   // 'isVariationSelector' returns true if s points to a UTF-8 variation
   // selector, this method is used by 'size', 'next' and 'doPeek'.
   [[nodiscard]] static bool isVariationSelector(const unsigned char* s);
   [[nodiscard]] static bool isVariationSelector(const char* s);
-  [[nodiscard]] static bool isVariationSelector(const std::string& s);
+  [[nodiscard]] static bool isVariationSelector(const String& s);
 
   [[nodiscard]] static bool isCombiningMark(const unsigned char* s);
   [[nodiscard]] static bool isCombiningMark(const char* s);
-  [[nodiscard]] static bool isCombiningMark(const std::string& s);
+  [[nodiscard]] static bool isCombiningMark(const String& s);
 
   // 'size' with onlyMB=true only counts multi-byte 'sequence start' bytes,
   // otherwise it includes both multi-byte sequence starts as well as regular
   // single byte values.
   [[nodiscard]] static size_t size(const char* s, bool onlyMB = true);
-  [[nodiscard]] static size_t size(const std::string& s, bool onlyMB = true);
+  [[nodiscard]] static size_t size(const String& s, bool onlyMB = true);
 
   // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so
   // 2-4 bytes) followed by a variation selector (which are always 3 bytes).
-  [[nodiscard]] static bool isMBCharWithVariationSelector(const std::string&);
+  [[nodiscard]] static bool isMBCharWithVariationSelector(const String&);
 
   // return copy of given string with variation selector removed (if it has one)
-  [[nodiscard]] static std::string noVariationSelector(const std::string&);
+  [[nodiscard]] static String noVariationSelector(const String&);
 
   // 'getFirst' returns the first MBChar from 's' (including any variation
   // selector that might follow). If 's' doesn't start with a multi-byte
   // sequence then empty string is returned.
-  [[nodiscard]] static std::string getFirst(const std::string&);
+  [[nodiscard]] static String getFirst(const String&);
 
-  explicit MBChar(const std::string& data) : _data{data} {}
+  explicit MBChar(const String& data) : _data{data} {}
 
   MBChar(const MBChar&) = delete;
 
@@ -64,10 +64,10 @@ public:
   // variation selector it will be added as well. Plain Kana followed by
   // 'Combining Marks' (U+3099, U+309A) are converted to single values, i.e.,
   // U+306F (は) + U+3099 maps to U+3070 (ば).
-  bool next(std::string& result, bool onlyMB = true);
+  bool next(String& result, bool onlyMB = true);
 
   // 'peek' works like 'next', but doesn't update state.
-  [[nodiscard]] bool peek(std::string& result, bool onlyMB = true) const;
+  [[nodiscard]] bool peek(String& result, bool onlyMB = true) const;
 
   [[nodiscard]] auto errors() const { return _errors; }
   [[nodiscard]] auto variants() const { return _variants; }
@@ -78,33 +78,33 @@ public:
 private:
   // 'getMBUtf8' returns a string containing one multi-byte UTF-8 sequence
   // starting at 'loc'
-  [[nodiscard]] static std::string getMBUtf8(const char*& loc);
+  [[nodiscard]] static String getMBUtf8(const char*& loc);
 
   // 'validResult' is called from 'next' and 'peek' after determining 'location'
   // points to a valid multi-byte utf8 sequence. It sets 'result', increments
   // 'loc' and returns true if the result is valid, i.e., not a 'variation
   // selector' or a 'combining mark'.
-  [[nodiscard]] static bool validResult(std::string& result, const char*& loc);
+  [[nodiscard]] static bool validResult(String& result, const char*& loc);
 
   // 'peekVariant' is called from 'next' and 'peek' methods. It populates
   // 'result' if 'location' starts a valid multi-byte utf8 sequence and returns
   // true if 'result' is a 'variation selector'.
-  [[nodiscard]] static bool peekVariant(std::string& result, const char* loc);
+  [[nodiscard]] static bool peekVariant(String& result, const char* loc);
 
   // 'processOne' returns a single Kana character if 'next' is a combining mark
   // otherwise returns 'cur' (it calls the below 'combiningMark' functions)
   template<typename T>
-  [[nodiscard]] static std::string processOne(
-      T&, const std::string& cur, const std::string& next);
+  [[nodiscard]] static String processOne(
+      T&, const String& cur, const String& next);
 
   // return 'accented' Kana if it's defined, otherwise return 'base' (non-const
   // overload updates '_curLocation' as well as '_combiningMarks' or '_errors')
-  [[nodiscard]] std::string combiningMark(
-      const std::string& base, const OptString& accented) const;
-  [[nodiscard]] std::string combiningMark(
-      const std::string& base, const OptString& accented);
+  [[nodiscard]] String combiningMark(
+      const String& base, const OptString& accented) const;
+  [[nodiscard]] String combiningMark(
+      const String& base, const OptString& accented);
 
-  const std::string _data;
+  const String _data;
   const char* _curLocation{_data.c_str()};
   // counts of errors, variants and combiningMarks found
   size_t _errors{}, _variants{}, _combiningMarks{};

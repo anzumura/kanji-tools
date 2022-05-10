@@ -24,7 +24,7 @@ public:
   void target(CharType target) { _target = target; }
 
   [[nodiscard]] auto flags() const { return _flags; }
-  [[nodiscard]] std::string flagString() const; // return a | separated string
+  [[nodiscard]] String flagString() const; // return a | separated string
   void flags(ConvertFlags flags) { _flags = flags; }
 
   // 'convert' has 4 overloads. The first and second are 'const' and use current
@@ -32,12 +32,11 @@ public:
   // before processing). If 'source' is specified then only input characters of
   // that type are converted. If 'source' == 'target' then the original string
   // is returned. See 'ConvertFlags' in Kana.h for more info about 'flags'.
-  [[nodiscard]] std::string convert(const std::string& input) const;
-  [[nodiscard]] std::string convert(
-      CharType source, const std::string& input) const;
-  [[nodiscard]] std::string convert(const std::string& input, CharType target,
-      ConvertFlags = ConvertFlags::None);
-  [[nodiscard]] std::string convert(CharType source, const std::string& input,
+  [[nodiscard]] String convert(const String& input) const;
+  [[nodiscard]] String convert(CharType source, const String& input) const;
+  [[nodiscard]] String convert(
+      const String& input, CharType target, ConvertFlags = ConvertFlags::None);
+  [[nodiscard]] String convert(CharType source, const String& input,
       CharType target, ConvertFlags = ConvertFlags::None);
 private:
   // For input, either 'Apostrophe' or 'Dash' can be used to separate 'n' in
@@ -63,7 +62,7 @@ private:
     [[nodiscard]] auto& narrowDelims() const { return _narrowDelims; }
     [[nodiscard]] auto& wideDelims() const { return _wideDelims; }
   private:
-    using Set = std::set<std::string>;
+    using Set = std::set<String>;
 
     // Support converting most non-alphanumeric ascii from narrow to wide
     // values. These values are also used as delimiters for splitting up input
@@ -72,14 +71,14 @@ private:
     // For now, don't include '-' (minus) or apostrophe since these could get
     // mixed up with prolong mark 'ー' and special separation handling after 'n'
     // in Rōmaji output. Backslash maps to ￥ as per usual keyboard input.
-    using NarrowDelims = std::map<char, std::string>;
-    using WideDelims = std::map<std::string, char>;
+    using NarrowDelims = std::map<char, String>;
+    using WideDelims = std::map<String, char>;
 
     // 'insertUnique' performs an insert and ensures value was added by using
     // 'assert' (can't do on one line like 'assert(s.insert(x).second)' since
     // that would result in the code not getting executed when compiling with
     // asserts disabled, i.e., a 'Release' build.
-    static void insertUnique(Set& s, const std::string& x) {
+    static void insertUnique(Set& s, const String& x) {
       [[maybe_unused]] const auto i{s.insert(x)};
       assert(i.second);
     }
@@ -100,7 +99,7 @@ private:
     Set _smallHiragana, _smallKatakana;
 
     // Punctuation and word delimiter handling
-    std::string _narrowDelimList;
+    String _narrowDelimList;
     NarrowDelims _narrowDelims;
     WideDelims _wideDelims;
   };
@@ -133,7 +132,7 @@ private:
   [[nodiscard]] auto& getN() const { return get(Kana::N); }
   [[nodiscard]] auto& getSmallTsu() const { return get(Kana::SmallTsu); }
 
-  [[nodiscard]] static auto isN(const std::string& x) {
+  [[nodiscard]] static auto isN(const String& x) {
     return x == "n" || x == "N";
   }
 
@@ -141,28 +140,28 @@ private:
   // retuns converted result based on '_target' and '_flags' (result can be
   // either Rōmaji or Kana, i.e., this function can convert Hiragana to Katakana
   // and vice versa).
-  [[nodiscard]] std::string fromKana(const std::string&, CharType source) const;
+  [[nodiscard]] String fromKana(const String&, CharType source) const;
 
   enum class State { New, SmallTsu, Done };
   enum class DoneType { NewGroup, NewEmptyGroup, Prolong };
 
   // helper functions used by 'fromKana'
-  [[nodiscard]] std::string processKana(const std::string& kanaGroup,
-      CharType source, const Kana*& prevKana, bool prolong = false) const;
+  [[nodiscard]] String processKana(const String& kanaGroup, CharType source,
+      const Kana*& prevKana, bool prolong = false) const;
   template<typename T>
   [[nodiscard]] bool processOneKana(const T&, CharType source,
-      const std::string& kana, const std::string& kanaGroup, State&) const;
-  [[nodiscard]] std::string processKanaMacron(bool prolong,
-      const Kana*& prevKana, const Kana* kana, bool sokuon = false) const;
+      const String& kana, const String& kanaGroup, State&) const;
+  [[nodiscard]] String processKanaMacron(bool prolong, const Kana*& prevKana,
+      const Kana* kana, bool sokuon = false) const;
 
   // 'toKana' takes a string of Rōmaji and returns either Hiragana or Katakana
   // based on '_target' and '_flags'.
-  [[nodiscard]] std::string toKana(const std::string&) const;
+  [[nodiscard]] String toKana(const String&) const;
 
   // helper functions used by 'toKana'
-  void processRomaji(std::string& romajiLetters, std::string& result) const;
-  [[nodiscard]] bool processRomajiMacron(const std::string& letter,
-      std::string& letters, std::string& result) const;
+  void processRomaji(String& romajiLetters, String& result) const;
+  [[nodiscard]] bool processRomajiMacron(
+      const String& letter, String& letters, String& result) const;
 
   // Members for the current conversion
   CharType _target;

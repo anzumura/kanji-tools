@@ -14,19 +14,19 @@ public:
       std::ostream& err = std::cerr);
 
   // Implement the base class functions used during Kanji construction
-  [[nodiscard]] Kanji::Frequency frequency(const std::string& s) const override;
-  [[nodiscard]] JlptLevels level(const std::string&) const override;
-  [[nodiscard]] KenteiKyus kyu(const std::string&) const override;
+  [[nodiscard]] Kanji::Frequency frequency(const String& s) const override;
+  [[nodiscard]] JlptLevels level(const String&) const override;
+  [[nodiscard]] KenteiKyus kyu(const String&) const override;
 private:
   // functions to print loaded data if _debug is true
   void noFreq(std::ptrdiff_t f, bool brackets = false) const;
   template<typename T>
-  void printCount(const std::string& name, T pred, size_t = 0) const;
+  void printCount(const String& name, T pred, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
   template<typename T, BaseEnum::Size S>
   void printListStats(const IterableEnumArray<T, S>&, T (Kanji::*)() const,
-      const std::string&, bool showNoFrequency) const;
+      const String&, bool showNoFrequency) const;
 
   LevelDataFile dataFile(JlptLevels) const;
   KyuDataFile dataFile(KenteiKyus) const;

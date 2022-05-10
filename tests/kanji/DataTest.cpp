@@ -16,7 +16,7 @@ constexpr auto Arg0{"test"};
 const auto TestOne{std::make_shared<TestKanji>("一")},
     TestVariant{std::make_shared<TestKanji>("侮︀")};
 
-const std::string InUcd{" in _ucd\n"};
+const String InUcd{" in _ucd\n"};
 
 class DataTest : public TestData {
 protected:
@@ -34,7 +34,7 @@ private:
 } // namespace
 
 TEST_F(DataTest, Usage) {
-  const std::string msg{"error msg"};
+  const String msg{"error msg"};
   EXPECT_THROW(call([&msg] { Data::usage(msg); }, msg), std::domain_error);
 }
 
@@ -130,7 +130,7 @@ TEST_F(DataTest, DataDirArgToInvalidData) {
   // have the expected .txt files
   const auto dir{currentDir().root_directory()};
   const char* args[]{Arg0, DataArg.c_str(), dir.c_str()};
-  const std::string msg{
+  const String msg{
       "'" + dir.string() + "' does not contain 10 expected '.txt' files"};
   EXPECT_THROW(
       call([&args] { return getDataDir(args); }, msg), std::domain_error);
@@ -151,7 +151,7 @@ TEST_F(DataTest, SearchBasedOnArg0ForDataDir) {
 
 TEST_F(DataTest, FailToFindDataDirNoArg0) {
   fs::current_path(currentDir().root_directory());
-  const std::string msg{
+  const String msg{
       "couldn't find 'data' directory with 10 expected '.txt' files:\n- "
       "searched up from current: " +
       fs::current_path().string() +
@@ -161,8 +161,8 @@ TEST_F(DataTest, FailToFindDataDirNoArg0) {
 
 TEST_F(DataTest, FailToFindDataDirWithArg0) {
   fs::current_path(currentDir().root_directory());
-  const std::string arg0{fs::current_path() / "testProgramName"};
-  const std::string msg{
+  const String arg0{fs::current_path() / "testProgramName"};
+  const String msg{
       "couldn't find 'data' directory with 10 expected '.txt' files:\n- "
       "searched up from current: " +
       fs::current_path().string() + "\n- searched up from arg0: " + arg0 +

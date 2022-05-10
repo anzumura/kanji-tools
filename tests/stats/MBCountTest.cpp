@@ -86,7 +86,7 @@ TEST_F(MBCountTest, Add) {
 }
 
 TEST_F(MBCountTest, AddWithErrors) {
-  std::string s1{"hello空は青い"}, s2{"箱は空です"};
+  String s1{"hello空は青い"}, s2{"箱は空です"};
   s1[s1.size() - 2] = 'x'; // mess up い introducing 2 errors
   s2[0] = 'y';             // mess up 箱 introducing 2 errors
   EXPECT_EQ(mbCount().add(s1), 3);
@@ -109,7 +109,7 @@ TEST_F(MBCountTest, AddWithErrors) {
 }
 
 TEST_F(MBCountTest, AddWithVariants) {
-  const std::string s1{"normal中variant逸︁"}, s2{"あア謁︀"};
+  const String s1{"normal中variant逸︁"}, s2{"あア謁︀"};
   EXPECT_EQ(mbCount().add(s1), 2);
   EXPECT_EQ(mbCount().add(s2), 3);
   EXPECT_EQ(mbCount().count("中"), 1);
@@ -122,16 +122,16 @@ TEST_F(MBCountTest, AddWithVariants) {
 }
 
 TEST_F(MBCountTest, AddWithCombiningMarks) {
-  const std::string s1{"て\xe3\x82\x99"}, // with dakuten
-      s2{"フ\xe3\x82\x9a"},               // with han-dakuten
-      bad{"や\xe3\x82\x9aく"};            // error, but still add や and く
+  const String s1{"て\xe3\x82\x99"}, // with dakuten
+      s2{"フ\xe3\x82\x9a"},          // with han-dakuten
+      bad{"や\xe3\x82\x9aく"};       // error, but still add や and く
   EXPECT_EQ(mbCount().add(s1), 1);
   EXPECT_EQ(mbCount().add(s2), 1);
   EXPECT_EQ(mbCount().combiningMarks(), 2);
   EXPECT_EQ(mbCount().add(bad), 2);
   EXPECT_EQ(mbCount().combiningMarks(), 2);
   EXPECT_EQ(mbCount().errors(), 1);
-  const std::string noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
+  const String noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
   EXPECT_EQ(noMarks.size(), 27);
   EXPECT_EQ(marks.size(), 30);
   EXPECT_EQ(mbCount().add(noMarks), 9);

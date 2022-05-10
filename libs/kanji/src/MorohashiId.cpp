@@ -6,33 +6,33 @@ namespace {
 
 constexpr auto PrimeSuffix{'P'}, AltPrimeSuffix{'\''}, SupplementalPrefix{'H'};
 
-const std::string DoublePrimeSuffix{"PP"}, AltDoublePrimeSuffix{"''"};
+const String DoublePrimeSuffix{"PP"}, AltDoublePrimeSuffix{"''"};
 
-[[nodiscard]] auto isDoublePrime(const std::string& s) {
+[[nodiscard]] auto isDoublePrime(const String& s) {
   return s.ends_with(DoublePrimeSuffix) || s.ends_with(AltDoublePrimeSuffix);
 }
 
-[[nodiscard]] auto isPrime(const std::string& s) {
+[[nodiscard]] auto isPrime(const String& s) {
   return s.ends_with(PrimeSuffix) || s.ends_with(AltPrimeSuffix);
 }
 
-[[nodiscard]] auto isSupplemental(const std::string& s) {
+[[nodiscard]] auto isSupplemental(const String& s) {
   return s.starts_with(SupplementalPrefix);
 }
 
 } // namespace
 
-MorohashiId::MorohashiId(const std::string& s)
+MorohashiId::MorohashiId(const String& s)
     : _id{getId(s)}, _idType{getIdType(s)} {}
 
-MorohashiId::Id MorohashiId::getId(const std::string& s) {
+MorohashiId::Id MorohashiId::getId(const String& s) {
   if (isDoublePrime(s)) return validate(s, 0, 2);
   if (isPrime(s)) return validate(s, 0, 1);
   if (isSupplemental(s)) return validate(s, 1);
   return validate(s);
 }
 
-MorohashiId::IdType MorohashiId::getIdType(const std::string& s) {
+MorohashiId::IdType MorohashiId::getIdType(const String& s) {
   if (isDoublePrime(s)) return IdType::DoublePrime;
   if (isPrime(s)) return IdType::Prime;
   if (isSupplemental(s)) return IdType::Supplemental;
@@ -40,11 +40,11 @@ MorohashiId::IdType MorohashiId::getIdType(const std::string& s) {
 }
 
 MorohashiId::Id MorohashiId::validate(
-    const std::string& s, size_t start, size_t end) {
+    const String& s, size_t start, size_t end) {
   static constexpr auto CharZero{'0'}, CharNine{'9'};
   static constexpr MorohashiId::Id Ten{10};
 
-  const auto error{[&s](const std::string& msg) {
+  const auto error{[&s](const String& msg) {
     throw std::domain_error{"Morohashi ID '" + s + "' " + msg};
   }};
 
@@ -66,8 +66,8 @@ MorohashiId::Id MorohashiId::validate(
   return result;
 }
 
-std::string MorohashiId::toString() const {
-  std::string result;
+String MorohashiId::toString() const {
+  String result;
   if (_id) {
     if (_idType == IdType::Supplemental) result = SupplementalPrefix;
     result += std::to_string(_id);

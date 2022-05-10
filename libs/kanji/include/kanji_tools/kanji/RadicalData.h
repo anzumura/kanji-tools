@@ -11,7 +11,7 @@ namespace kanji_tools {
 // 'RadicalData': holds data loaded from 'radicals.txt' (214 official Radicals).
 class RadicalData {
 public:
-  using Map = std::map<std::string, Radical::Number>;
+  using Map = std::map<String, Radical::Number>;
   using List = std::vector<Radical>;
 
   RadicalData() = default;
@@ -22,7 +22,7 @@ public:
   // 'find' by the ideograph code in utf8 (not the unicode radical code). For
   // example, Radical number 30 (口) is Unicode 53E3, but has another 'Unicode
   // Radical' value of 2F1D
-  [[nodiscard]] RadicalRef find(const std::string&) const;
+  [[nodiscard]] RadicalRef find(const String&) const;
 
   // 'find' by the official Radical Number (one greater than index in _radicals)
   [[nodiscard]] RadicalRef find(Radical::Number) const;

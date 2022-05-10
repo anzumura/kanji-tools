@@ -15,7 +15,6 @@ private:
     return *this;
   }
 public:
-  using Code = UcdEntry::Code;
   using Links = Ucd::Links;
   using Meaning = Ucd::Meaning;
   using Name = UcdEntry::Name;
@@ -36,9 +35,9 @@ public:
 
   auto& code(Code x) { return set(_code, x); }
   auto& name(Name x) { return set(_name, x); }
-  auto& block(const std::string& x) { return set(_block, x); }
-  auto& version(const std::string& x) { return set(_version, x); }
-  auto& pinyin(const std::string& x) { return set(_pinyin, x); }
+  auto& block(const String& x) { return set(_block, x); }
+  auto& version(const String& x) { return set(_version, x); }
+  auto& pinyin(const String& x) { return set(_pinyin, x); }
   auto& linkType(UcdLinkTypes x) { return set(_linkType, x); }
   auto& links(const Links& x) {
     _links.clear();
@@ -48,20 +47,20 @@ public:
   auto& radical(Radical::Number x) { return set(_radical, x); }
   auto& strokes(Strokes::Size x) { return set(_strokes, x); }
   auto& variantStrokes(Strokes::Size x) { return set(_variantStrokes, x); }
-  auto& morohashiId(const std::string& x) { return set(_morohashiId, x); }
-  auto& nelsonIds(const std::string& x) { return set(_nelsonIds, x); }
-  auto& jSource(const std::string& x) { return set(_jSource, x); }
-  auto& meaning(const std::string& x) { return set(_meaning, x); }
-  auto& onReading(const std::string& x) { return set(_onReading, x); }
-  auto& kunReading(const std::string& x) { return set(_kunReading, x); }
-  auto& sources(const std::string& x) { return set(_sources, x); }
+  auto& morohashiId(const String& x) { return set(_morohashiId, x); }
+  auto& nelsonIds(const String& x) { return set(_nelsonIds, x); }
+  auto& jSource(const String& x) { return set(_jSource, x); }
+  auto& meaning(const String& x) { return set(_meaning, x); }
+  auto& onReading(const String& x) { return set(_onReading, x); }
+  auto& kunReading(const String& x) { return set(_kunReading, x); }
+  auto& sources(const String& x) { return set(_sources, x); }
   auto& joyo(bool x) { return set(_joyo, x); }
   auto& jinmei(bool x) { return set(_jinmei, x); }
   // compound setters
-  auto& ids(const std::string& m, const std::string& n) {
+  auto& ids(const String& m, const String& n) {
     return morohashiId(m).nelsonIds(n);
   }
-  auto& sources(const std::string& s, const std::string& j) {
+  auto& sources(const String& s, const String& j) {
     return sources(s).jSource(j);
   }
   auto& links(const Links& x, UcdLinkTypes t) { return links(x).linkType(t); }
@@ -73,13 +72,13 @@ public:
   }
 private:
   Code _code{};
-  std::string _name, _block, _version, _pinyin;
+  String _name, _block, _version, _pinyin;
   UcdLinkTypes _linkType{UcdLinkTypes::None};
   Links _links;
   Radical::Number _radical{};
   Strokes::Size _strokes{1}, _variantStrokes{};
-  std::string _morohashiId, _nelsonIds, _sources, _jSource;
-  std::string _meaning, _onReading, _kunReading;
+  String _morohashiId, _nelsonIds, _sources, _jSource;
+  String _meaning, _onReading, _kunReading;
   bool _joyo{}, _jinmei{};
 };
 

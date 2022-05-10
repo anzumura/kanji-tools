@@ -12,10 +12,10 @@ namespace kanji_tools {
 // 'MBCount' counts multi-byte characters in strings passed to 'add' functions
 class MBCount {
 public:
-  using Map = std::map<std::string, size_t>;
-  using TagMap = std::map<std::string, Map>;
+  using Map = std::map<String, size_t>;
+  using TagMap = std::map<String, Map>;
   using OptRegex = std::optional<std::wregex>;
-  using OptString = std::optional<std::string>;
+  using OptString = std::optional<String>;
 
   // 'RemoveFurigana' is a regex for removing Furigana from text files. It can
   // be passed to MBCount ctor. Furigana is usually a Kanji followed by one or
@@ -41,7 +41,7 @@ public:
   // 'add' adds all the 'MBChars' from the given string 's' and returns the
   // number added. If 'tag' is provided then '_tags' will be updated (which
   // contains a count per tag per unique token).
-  size_t add(const std::string& s, const OptString& tag = {});
+  size_t add(const String& s, const OptString& tag = {});
 
   // 'addFile' adds strings from given 'file' or from all files in directory (if
   // file is 'directory'). 'fileNames' controls whether the name of the file (or
@@ -52,10 +52,10 @@ public:
       bool fileNames = true, bool recurse = true);
 
   // return count for given string or 0 if not found
-  [[nodiscard]] size_t count(const std::string& s) const;
+  [[nodiscard]] size_t count(const String& s) const;
 
   // return an optional Map of 'tag to count' for the given MBChar 's'
-  [[nodiscard]] const Map* tags(const std::string& s) const;
+  [[nodiscard]] const Map* tags(const String& s) const;
 
   [[nodiscard]] auto uniqueEntries() const { return _map.size(); }
   [[nodiscard]] auto files() const { return _files; }
@@ -75,13 +75,13 @@ public:
 private:
   // 'hasUnclosedBrackets' returns true if 'line' has an open bracket without a
   // closing bracket (searching back from the end), otherwise it returns false.
-  [[nodiscard]] static bool hasUnclosedBrackets(const std::string& line);
+  [[nodiscard]] static bool hasUnclosedBrackets(const String& line);
 
   // 'processJoinedLine' returns count from processing 'prevline' plus 'line' up
   // until 'pos' (plus size of close bracket) and sets 'prevLine' to the
   // unprocessed remainder of 'line'.
-  [[nodiscard]] size_t processJoinedLine(std::string& prevLine,
-      const std::string& line, size_t pos, const OptString& tag);
+  [[nodiscard]] size_t processJoinedLine(
+      String& prevLine, const String& line, size_t pos, const OptString& tag);
 
   // 'processFile' returns the MBChar count from 'file'. If '_find' is not set
   // then each line is processed independently, otherwise 'hasUnclosedBrackets'
@@ -94,13 +94,13 @@ private:
   [[nodiscard]] size_t processFileWithRegex(
       const std::filesystem::path& file, const OptString& tag);
 
-  [[nodiscard]] virtual bool allowAdd(const std::string&) const { return true; }
+  [[nodiscard]] virtual bool allowAdd(const String&) const { return true; }
   [[nodiscard]] size_t doAddFile(const std::filesystem::path& file, bool addTag,
       bool fileNames, bool recurse = true);
 
   Map _map;
   TagMap _tags;
-  std::string _lastReplaceTag;
+  String _lastReplaceTag;
 
   // count files and directories processed
   size_t _files{}, _directories{};
@@ -119,7 +119,7 @@ public:
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : MBCount{find, replace, debug}, _pred{pred} {}
 private:
-  [[nodiscard]] bool allowAdd(const std::string& token) const override {
+  [[nodiscard]] bool allowAdd(const String& token) const override {
     return _pred(token);
   }
   const Pred _pred;

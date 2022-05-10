@@ -12,7 +12,7 @@ void BaseEnum::BaseIterator::initialized(bool value) {
   if (!value) throw std::domain_error("not initialized");
 }
 
-void BaseEnum::BaseIterator::rangeError(const std::string& msg) {
+void BaseEnum::BaseIterator::rangeError(const String& msg) {
   BaseEnum::rangeError(msg);
 }
 
@@ -22,8 +22,6 @@ BaseEnum::Size& BaseEnum::BaseIterator::index() { return _index; }
 
 BaseEnum::Size BaseEnum::BaseIterator::index() const { return _index; }
 
-void BaseEnum::rangeError(const std::string& msg) {
-  throw std::out_of_range{msg};
-}
+void BaseEnum::rangeError(const String& msg) { throw std::out_of_range{msg}; }
 
 } // namespace kanji_tools

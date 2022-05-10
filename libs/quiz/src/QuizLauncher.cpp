@@ -2,7 +2,6 @@
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <kanji_tools/quiz/ListQuiz.h>
 #include <kanji_tools/quiz/QuizLauncher.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 
@@ -86,7 +85,7 @@ QuizLauncher::QuizLauncher(const Args& args, const DataPtr& data,
   Question question{};
   auto endOptions{false}, showMeanings{false};
   for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
-    if (std::string arg{args[i]};
+    if (String arg{args[i]};
         endOptions || !arg.starts_with("-") || arg.size() < 2) {
       processKanjiArg(arg);
       return; // exit after showing info for a Kanji, i.e., don't start a quiz
@@ -164,7 +163,7 @@ void QuizLauncher::printExtraTypeInfo(const Kanji& k) const {
 }
 
 void QuizLauncher::printLegend(KanjiInfo fields) const {
-  std::string s;
+  String s;
   if (hasValue(fields & KanjiInfo::Level)) s += " N[1-5]=JLPT Level";
   if (hasValue(fields & KanjiInfo::Kyu)) {
     if (!s.empty()) s += ',';
@@ -246,7 +245,7 @@ void QuizLauncher::startGroupQuiz(Question question, bool showMeanings,
 }
 
 QuizLauncher::OptChar QuizLauncher::processArg(
-    Question& question, OptChar& quizType, const std::string& arg) {
+    Question& question, OptChar& quizType, const String& arg) {
   switch (arg[1]) {
   case 'r': // intentional fallthrough
   case 't': question = processProgramModeArg(arg); break;
@@ -261,8 +260,7 @@ QuizLauncher::OptChar QuizLauncher::processArg(
   return {};
 }
 
-QuizLauncher::Question QuizLauncher::processProgramModeArg(
-    const std::string& arg) {
+QuizLauncher::Question QuizLauncher::processProgramModeArg(const String& arg) {
   if (_programMode != ProgramMode::NotAssigned)
     Data::usage("only one mode (-r or -t) can be specified, use -h for help");
   _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
@@ -291,8 +289,7 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(
   return 0;
 }
 
-Kanji::NelsonId QuizLauncher::getId(
-    const std::string& msg, const std::string& arg) {
+Kanji::NelsonId QuizLauncher::getId(const String& msg, const String& arg) {
   std::stringstream ss{arg};
   Kanji::NelsonId id{};
   if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
@@ -300,7 +297,7 @@ Kanji::NelsonId QuizLauncher::getId(
 }
 
 QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
-    const std::string& arg, const Choices& choices,
+    const String& arg, const Choices& choices,
     const std::optional<Choice::Range>& r) {
   if (quizType)
     Data::usage("only one quiz type can be specified, use -h for help");
@@ -316,7 +313,7 @@ QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
   return {};
 }
 
-void QuizLauncher::processKanjiArg(const std::string& arg) const {
+void QuizLauncher::processKanjiArg(const String& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
     const auto kanji{
         _groupData->data().findKanjiByFrequency(getId("frequency", arg))};
@@ -347,8 +344,8 @@ void QuizLauncher::processKanjiArg(const std::string& arg) const {
     Data::usage("unrecognized 'kanji' value '" + arg + "', use -h for help");
 }
 
-void QuizLauncher::printDetails(const Data::KanjiList& list,
-    const std::string& name, const std::string& arg) const {
+void QuizLauncher::printDetails(
+    const Data::KanjiList& list, const String& name, const String& arg) const {
   if (list.size() != 1) {
     if (list.size() > 1) {
       printLegend();
@@ -360,7 +357,7 @@ void QuizLauncher::printDetails(const Data::KanjiList& list,
   for (auto& kanji : list) printDetails(kanji->name(), list.size() == 1);
 }
 
-void QuizLauncher::printDetails(const std::string& arg, bool showLegend) const {
+void QuizLauncher::printDetails(const String& arg, bool showLegend) const {
   if (showLegend) {
     printLegend();
     out() << "Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, "
@@ -397,7 +394,7 @@ bool QuizLauncher::getQuestionOrder() {
 }
 
 void QuizLauncher::printJukugo(const Kanji& kanji) const {
-  static const std::string Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
+  static const String Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
       OtherGrade{"Other Grade Jukugo"};
   if (auto& list{_jukugoData->find(kanji.name())}; !list.empty()) {
     // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
@@ -421,7 +418,7 @@ void QuizLauncher::printJukugo(const Kanji& kanji) const {
 }
 
 void QuizLauncher::printJukugoList(
-    const std::string& name, const JukugoData::List& list) const {
+    const String& name, const JukugoData::List& list) const {
   out() << "    " << name << ':';
   if (list.size() <= JukugoPerLine)
     for (auto& i : list) out() << ' ' << i->nameAndReading();

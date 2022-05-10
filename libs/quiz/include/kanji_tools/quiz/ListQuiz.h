@@ -19,7 +19,7 @@ public:
 private:
   void start(const KanjiList&);
 
-  [[nodiscard]] const std::string& getPrompt() const;
+  [[nodiscard]] const String& getPrompt() const;
   [[nodiscard]] bool isKanjiToReading() const;
 
   // populates '_answers' and returns the position corresponding to the current
@@ -34,7 +34,7 @@ private:
   // only returns 'false' if the question should be repeated (for toggling
   // meanings), otherwise it returns 'true'.
   [[nodiscard]] bool getAnswer(Choices& choices, bool& stopQuiz,
-      ChoiceCount correct, const std::string& name);
+      ChoiceCount correct, const String& name);
 
   // '_answers' contains '_choiceCount' entries and is repopulated for each
   // question (one index has the correct answer and others are randomly chosen
@@ -44,7 +44,7 @@ private:
   const KanjiInfo _infoFields;
   const ChoiceCount _choiceCount;
   const QuizStyle _quizStyle;
-  const std::string _prompt;
+  const String _prompt;
   const char _choiceEnd; // '0' + _choiceCount
 };
 

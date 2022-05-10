@@ -34,8 +34,8 @@ template<> inline constexpr auto is_bitmask<ConvertFlags>{true};
 // this file for more details)
 class Kana {
 public:
-  using Map = std::map<std::string, const class Kana*>;
-  using OptString = std::optional<std::string>;
+  using Map = std::map<String, const class Kana*>;
+  using OptString = std::optional<String>;
   template<size_t N> using CharArray = const char (&)[N];
 
   inline static const OptString EmptyOptString;
@@ -54,11 +54,11 @@ public:
 
   // find corresponding 'Dakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
-  [[nodiscard]] static OptString findDakuten(const std::string& s);
+  [[nodiscard]] static OptString findDakuten(const String& s);
 
   // find corresponding 'HanDakuten' Kana, 's' should be a non-accented single
   // Hiragana or Katakana letter
-  [[nodiscard]] static OptString findHanDakuten(const std::string& s);
+  [[nodiscard]] static OptString findHanDakuten(const String& s);
 
   // 'RomajiVariants' holds any further variant Rōmaji values that are unique
   // for this 'Kana' class. These include extra key combinations that also map
@@ -67,7 +67,7 @@ public:
   // a 'Kunrei Shiki' value (and then 'Kana::_kunrei' should be nullopt).
   class RomajiVariants {
   public:
-    using List = std::vector<std::string>;
+    using List = std::vector<String>;
     using RMax = CharArray<RomajiArrayMaxSize>;
 
     RomajiVariants() = default;
@@ -113,11 +113,11 @@ public:
   public:
     RepeatMark(const RepeatMark&) = delete;
 
-    [[nodiscard]] auto matches(CharType t, const std::string& s) const {
+    [[nodiscard]] auto matches(CharType t, const String& s) const {
       return t == CharType::Hiragana && _hiragana == s ||
              t == CharType::Katakana && _katakana == s;
     }
-    [[nodiscard]] const std::string& get(
+    [[nodiscard]] const String& get(
         CharType target, ConvertFlags flags, const Kana* prevKana) const;
     [[nodiscard]] auto& hiragana() const { return _hiragana; }
     [[nodiscard]] auto& katakana() const { return _katakana; }
@@ -131,7 +131,7 @@ public:
 
     void validate() const;
 
-    const std::string _hiragana, _katakana;
+    const String _hiragana, _katakana;
     const bool _dakuten; // true if this instance is 'dakuten' (濁点) version
   };
 
@@ -140,7 +140,7 @@ public:
 
   // return repeat mark or nullptr if 'kana' isn't a repeat mark.
   [[nodiscard]] static const RepeatMark* findRepeatMark(
-      CharType, const std::string& kana);
+      CharType, const String& kana);
 
   // provide static const refs for some special-case Kana
   static const Kana& SmallTsu;
@@ -148,7 +148,7 @@ public:
 
   // 'ProlongMark' (ー) is officially in the Katakana Unicode block, but it can
   // also rarely appear in some (non-standard) Hiragana words like らーめん.
-  inline static const std::string ProlongMark{"ー"};
+  inline static const String ProlongMark{"ー"};
 
   template<size_t R, size_t N>
   Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana)
@@ -225,18 +225,18 @@ public:
   }
 
   // 'getRomaji' returns 'Rōmaji' value based on flags
-  [[nodiscard]] const std::string& getRomaji(ConvertFlags flags) const;
+  [[nodiscard]] const String& getRomaji(ConvertFlags flags) const;
 
   // repeat the first letter of _romaji for sokuon (促音) output (special
   // handling for 't' as described in comments above).
-  [[nodiscard]] std::string getSokuonRomaji(ConvertFlags flags) const {
+  [[nodiscard]] String getSokuonRomaji(ConvertFlags flags) const {
     auto& r{getRomaji(flags)};
     return (r[0] == 'c' ? 't' : r[0]) + r;
   }
 
-  [[nodiscard]] const std::string& get(CharType t, ConvertFlags flags) const;
+  [[nodiscard]] const String& get(CharType t, ConvertFlags flags) const;
 
-  [[nodiscard]] auto containsKana(const std::string& s) const {
+  [[nodiscard]] auto containsKana(const String& s) const {
     return s == _hiragana || s == _katakana;
   }
 
@@ -280,7 +280,7 @@ private:
   // '_hiragana' is actually valid Hiragana, etc..
   void validate() const;
 
-  const std::string _romaji, _hiragana, _katakana;
+  const String _romaji, _hiragana, _katakana;
   const OptString _hepburn, _kunrei;
 
   RomajiVariants _variants; // non-const to allow moving

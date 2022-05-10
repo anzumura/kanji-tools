@@ -22,16 +22,13 @@ namespace {
 class MockData : public Data {
 public:
   explicit MockData(const Path& p) : Data{p, Data::DebugMode::None} {}
+  MOCK_METHOD(Kanji::Frequency, frequency, (const String&), (const, override));
+  MOCK_METHOD(JlptLevels, level, (const String&), (const, override));
+  MOCK_METHOD(KenteiKyus, kyu, (const String&), (const, override));
   MOCK_METHOD(
-      Kanji::Frequency, frequency, (const std::string&), (const, override));
-  MOCK_METHOD(JlptLevels, level, (const std::string&), (const, override));
-  MOCK_METHOD(KenteiKyus, kyu, (const std::string&), (const, override));
-  MOCK_METHOD(
-      RadicalRef, ucdRadical, (const std::string&, UcdPtr), (const, override));
-  MOCK_METHOD(
-      Strokes, ucdStrokes, (const std::string&, UcdPtr), (const, override));
-  MOCK_METHOD(
-      RadicalRef, getRadicalByName, (const std::string&), (const, override));
+      RadicalRef, ucdRadical, (const String&, UcdPtr), (const, override));
+  MOCK_METHOD(Strokes, ucdStrokes, (const String&, UcdPtr), (const, override));
+  MOCK_METHOD(RadicalRef, getRadicalByName, (const String&), (const, override));
 };
 
 class KanjiTest : public ::testing::Test {
@@ -61,7 +58,7 @@ protected:
     return CustomFileKanji::fromFile<T>(_data, TestFile);
   }
 
-  static void write(const std::string& s) {
+  static void write(const String& s) {
     std::ofstream of{TestFile};
     of << s;
     of.close();
@@ -195,7 +192,7 @@ TEST_F(KanjiTest, KenteiKanji) {
 TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_CALL(data(), ucdRadical(_, _)).WillOnce(ReturnRef(Rad1));
   EXPECT_CALL(data(), ucdStrokes(_, _)).WillOnce(Return(Strokes8));
-  const std::string sampleLink{"犬"};
+  const String sampleLink{"犬"};
   const Ucd ucd{TestUcd{"侭"}
                     .ids("123P", "456 789")
                     .links({{0x72ac, sampleLink}}, UcdLinkTypes::Simplified)
@@ -474,7 +471,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 }
 
 TEST_F(KanjiTest, BadLinkedOld) {
-  const std::string name{"呑"};
+  const String name{"呑"};
   EXPECT_CALL(data(), ucdRadical(name, _)).WillOnce(ReturnRef(Rad1));
   EXPECT_CALL(data(), ucdStrokes(name, _)).WillOnce(Return(Strokes7));
   EXPECT_CALL(data(), kyu("呑")).WillOnce(Return(KenteiKyus::KJ1));

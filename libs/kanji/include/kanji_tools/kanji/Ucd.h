@@ -14,7 +14,6 @@ namespace kanji_tools {
 // stored in this class.
 class UcdEntry {
 public:
-  using Code = char32_t;
   using Name = Radical::Name;
 
   // throws an exception if 'name' is not a recognized Kanji or if 'code' is not
@@ -25,26 +24,26 @@ public:
   [[nodiscard]] auto& name() const { return _name; }
 
   // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
-  [[nodiscard]] std::string codeAndName() const;
+  [[nodiscard]] String codeAndName() const;
 private:
-  const std::string _name;
+  const String _name;
 };
 
 class UcdBlock : public Symbol<UcdBlock> {
 public:
-  inline static const std::string Type{"UcdBlock"};
+  inline static const String Type{"UcdBlock"};
   using Symbol::Symbol;
 };
 
 class UcdVersion : public Symbol<UcdVersion> {
 public:
-  inline static const std::string Type{"UcdVersion"};
+  inline static const String Type{"UcdVersion"};
   using Symbol::Symbol;
 };
 
 class Pinyin : public Symbol<Pinyin> {
 public:
-  inline static const std::string Type{"Pinyin"};
+  inline static const String Type{"Pinyin"};
   using Symbol::Symbol;
 };
 
@@ -53,14 +52,13 @@ public:
 class Ucd {
 public:
   using Links = std::vector<UcdEntry>;
-  using Meaning = const std::string&;
+  using Meaning = const String&;
   using Reading = Radical::Reading;
 
-  Ucd(const UcdEntry&, const std::string& block, const std::string& version,
-      Radical::Number, Strokes, const std::string& pinyin,
-      const std::string& morohashiId, const std::string& nelsonIds,
-      const std::string& sources, const std::string& jSource, bool joyo,
-      bool jinmei, Links, UcdLinkTypes, Meaning, Reading onReading,
+  Ucd(const UcdEntry&, const String& block, const String& version,
+      Radical::Number, Strokes, const String& pinyin, const String& morohashiId,
+      const String& nelsonIds, const String& sources, const String& jSource,
+      bool joyo, bool jinmei, Links, UcdLinkTypes, Meaning, Reading onReading,
       Reading kunReading);
 
   Ucd(const Ucd&) = delete;
@@ -81,7 +79,7 @@ public:
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
 
   // values for these fields are stored in bits of '_sources';
-  [[nodiscard]] std::string sources() const;
+  [[nodiscard]] String sources() const;
   [[nodiscard]] bool joyo() const;
   [[nodiscard]] bool jinmei() const;
 
@@ -93,11 +91,11 @@ public:
   [[nodiscard]] auto code() const { return _entry.code(); }
   [[nodiscard]] auto& name() const { return _entry.name(); }
   [[nodiscard]] bool linkedReadings() const;
-  [[nodiscard]] std::string codeAndName() const;
-  [[nodiscard]] std::string linkCodeAndNames() const;
+  [[nodiscard]] String codeAndName() const;
+  [[nodiscard]] String linkCodeAndNames() const;
 private:
   [[nodiscard]] static unsigned char getSources(
-      const std::string& sources, bool joyo, bool jinmei);
+      const String& sources, bool joyo, bool jinmei);
 
   const UcdEntry _entry;
   const UcdBlock _block;
@@ -109,7 +107,7 @@ private:
   const Strokes _strokes;
   const MorohashiId _morohashiId;
   const Links _links;
-  const std::string _nelsonIds, _jSource, _meaning, _onReading, _kunReading;
+  const String _nelsonIds, _jSource, _meaning, _onReading, _kunReading;
 };
 
 using UcdPtr = const Ucd*;

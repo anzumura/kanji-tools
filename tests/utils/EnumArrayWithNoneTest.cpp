@@ -177,8 +177,8 @@ TEST(EnumArrayWithNoneTest, FromString) {
 
 TEST(EnumArrayWithNoneTest, BadFromString) {
   for (auto i : {"", "None", "Blah"}) {
-    const std::string s{i};
-    const std::string msg{"name '" + s + "' not found"};
+    const String s{i};
+    const String msg{"name '" + s + "' not found"};
     EXPECT_THROW(
         call([&s] { return AllColors.fromString(s); }, msg), std::domain_error);
     if (s != "None")

@@ -1,5 +1,4 @@
 #include <kanji_tools/kana/Choice.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -8,13 +7,13 @@ namespace kanji_tools {
 
 namespace {
 
-const std::string AlreadyInChoices{"' already in choices"};
+const String AlreadyInChoices{"' already in choices"};
 
 } // namespace
 
-char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
+char Choice::get(const String& msg, bool useQuit, const Choices& choicesIn,
     OptChar def) const {
-  static const std::string QuitError{"quit option '"},
+  static const String QuitError{"quit option '"},
       DefaultError{"default option '"}, DefaultPrompt{") def '"};
 
   auto choices{choicesIn};
@@ -24,7 +23,7 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
   if (choices.empty()) error("must specify at least one choice");
 
   // if 'msg' is empty then don't leave space before listing choices in brackets
-  std::string line, prompt{msg + (msg.empty() ? "(" : " (")};
+  String line, prompt{msg + (msg.empty() ? "(" : " (")};
 
   add(prompt, choices);
   if (def) {
@@ -53,23 +52,22 @@ char Choice::get(const std::string& msg, bool useQuit, const Choices& choicesIn,
 }
 
 char Choice::get(
-    const std::string& msg, bool useQuit, const Choices& choices) const {
+    const String& msg, bool useQuit, const Choices& choices) const {
   return get(msg, useQuit, choices, {});
 }
 
-char Choice::get(
-    const std::string& msg, const Choices& choices, OptChar def) const {
+char Choice::get(const String& msg, const Choices& choices, OptChar def) const {
   return get(msg, true, choices, def);
 }
 
-char Choice::get(const std::string& msg, const Choices& choices) const {
+char Choice::get(const String& msg, const Choices& choices) const {
   return get(msg, choices, {});
 }
 
-char Choice::get(const std::string& msg, bool useQuit, const Range& range,
+char Choice::get(const String& msg, bool useQuit, const Range& range,
     const Choices& choicesIn, OptChar def) const {
-  static const std::string RangeError{"range option"};
-  static const std::string FirstError{"first " + RangeError},
+  static const String RangeError{"range option"};
+  static const String FirstError{"first " + RangeError},
       LastError{"last " + RangeError};
 
   checkPrintableAscii(range.first, FirstError);
@@ -84,22 +82,21 @@ char Choice::get(const std::string& msg, bool useQuit, const Range& range,
   return get(msg, useQuit, choices, def);
 }
 
-char Choice::get(const std::string& msg, const Range& range,
-    const Choices& choices, OptChar def) const {
+char Choice::get(const String& msg, const Range& range, const Choices& choices,
+    OptChar def) const {
   return get(msg, true, range, choices, def);
 }
 
 char Choice::get(
-    const std::string& msg, const Range& range, const Choices& choices) const {
+    const String& msg, const Range& range, const Choices& choices) const {
   return get(msg, range, choices, {});
 }
 
-char Choice::get(const std::string& msg, const Range& range) const {
+char Choice::get(const String& msg, const Range& range) const {
   return get(msg, range, {}, {});
 }
 
-char Choice::get(
-    const std::string& msg, const Range& range, OptChar def) const {
+char Choice::get(const String& msg, const Range& range, OptChar def) const {
   return get(msg, range, {}, def);
 }
 
@@ -127,8 +124,8 @@ char Choice::getOneChar() {
 }
 // LCOV_EXCL_STOP
 
-void Choice::add(std::string& prompt, const Choices& choices) {
-  static const std::string CommaSpace{", "}, Equals{"="}, Dash{"-"};
+void Choice::add(String& prompt, const Choices& choices) {
+  static const String CommaSpace{", "}, Equals{"="}, Dash{"-"};
 
   OptChar rangeStart;
   char prevChar{};
@@ -162,10 +159,10 @@ void Choice::add(std::string& prompt, const Choices& choices) {
   if (rangeStart) completeRange();
 }
 
-void Choice::checkPrintableAscii(char x, const std::string& msg) {
+void Choice::checkPrintableAscii(char x, const String& msg) {
   if (x < ' ' || x > '~') error(msg + " is non-printable: 0x" + toHex(x));
 }
 
-void Choice::error(const std::string& msg) { throw std::domain_error(msg); }
+void Choice::error(const String& msg) { throw std::domain_error(msg); }
 
 } // namespace kanji_tools

@@ -3,7 +3,6 @@
 #include <kanji_tools/kanji/UcdFileKanji.h>
 #include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 
@@ -28,7 +27,7 @@ Args::Size Data::nextArg(const Args& args, Args::Size current) {
                             std::to_string(args.size()) + "'");
   Args::Size result{current};
   if (args && ++result < args.size()) {
-    std::string arg{args[result]};
+    String arg{args[result]};
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
     // followed by a path then an earlier call to 'getDataDir' would have failed
     // with a call to 'usage' which ends the program.
@@ -73,27 +72,27 @@ Data::Data(const Path& dataDir, DebugMode debugMode, std::ostream& out,
   if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
 }
 
-UcdPtr Data::findUcd(const std::string& kanjiName) const {
+UcdPtr Data::findUcd(const String& kanjiName) const {
   return _ucd.find(kanjiName);
 }
 
-RadicalRef Data::ucdRadical(const std::string& kanji, UcdPtr u) const {
+RadicalRef Data::ucdRadical(const String& kanji, UcdPtr u) const {
   if (u) return _radicals.find(u->radical());
   // 'throw' should never happen - every 'Kanji' class instance should have
   // also exist in the data loaded from Unicode.
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
-Strokes Data::ucdStrokes(const std::string& kanji, UcdPtr u) const {
+Strokes Data::ucdStrokes(const String& kanji, UcdPtr u) const {
   if (u) return u->strokes();
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
-RadicalRef Data::getRadicalByName(const std::string& radicalName) const {
+RadicalRef Data::getRadicalByName(const String& radicalName) const {
   return _radicals.find(radicalName);
 }
 
-Kanji::OptString Data::getCompatibilityName(const std::string& kanji) const {
+Kanji::OptString Data::getCompatibilityName(const String& kanji) const {
   const auto u{_ucd.find(kanji)};
   return u && u->name() != kanji ? Kanji::OptString{u->name()} : std::nullopt;
 }
@@ -104,12 +103,12 @@ const Data::KanjiList& Data::frequencies(size_t f) const {
 
 size_t Data::frequencySize(size_t f) const { return frequencies(f).size(); }
 
-KanjiTypes Data::getType(const std::string& name) const {
+KanjiTypes Data::getType(const String& name) const {
   const auto i{findKanjiByName(name)};
   return i ? i->type() : KanjiTypes::None;
 }
 
-KanjiPtr Data::findKanjiByName(const std::string& s) const {
+KanjiPtr Data::findKanjiByName(const String& s) const {
   const auto i{_compatibilityMap.find(s)};
   if (const auto j{
           _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
@@ -135,7 +134,7 @@ const Data::KanjiList& Data::findByMorohashiId(const MorohashiId& id) const {
   return BaseEnumMap<KanjiList>::Empty;
 }
 
-const Data::KanjiList& Data::findByMorohashiId(const std::string& id) const {
+const Data::KanjiList& Data::findByMorohashiId(const String& id) const {
   return findByMorohashiId(MorohashiId{id});
 }
 
@@ -149,7 +148,7 @@ std::ostream& Data::log(bool heading) const {
 }
 
 fs::path Data::getDataDir(const Args& args) {
-  static const std::string ExpectedTextFiles{
+  static const String ExpectedTextFiles{
       std::to_string(TextFilesInDataDir) + " expected '" +
       DataFile::TextFileExtension + "' files"};
   for (Args::Size i{1}; i < args.size(); ++i)
@@ -165,9 +164,9 @@ fs::path Data::getDataDir(const Args& args) {
     }
   // If '-data' wasn't provided then search up directories for 'data' and make
   // sure it contains at least one of the required files (jouyou.txt).
-  static const std::string NotFound{"couldn't find 'data' directory with " +
-                                    ExpectedTextFiles +
-                                    ":\n- searched up from current: "},
+  static const String NotFound{"couldn't find 'data' directory with " +
+                               ExpectedTextFiles +
+                               ":\n- searched up from current: "},
       NotFoundEnd{"\nrun in a directory where 'data' can be found or use "
                   "'-data <dir>'"};
   // search up from current directory
@@ -176,7 +175,7 @@ fs::path Data::getDataDir(const Args& args) {
   if (found = searchUpForDataDir(cur); !found && args) {
     Path p{args[0]}; // search up from 'args[0]'
     if (p = p.parent_path(); fs::is_directory(p)) {
-      static const std::string Arg0Msg{"\n- searched up from arg0: "};
+      static const String Arg0Msg{"\n- searched up from arg0: "};
       if (found = searchUpForDataDir(p.parent_path()); !found)
         usage(NotFound + cur.string() + Arg0Msg + args[0] + NotFoundEnd);
     }
@@ -253,8 +252,8 @@ bool Data::checkInsert(KanjiList& s, const KanjiPtr& kanji) {
 }
 
 void Data::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
-  const auto error{[this, &kanji](const std::string& s) {
-    std::string v;
+  const auto error{[this, &kanji](const String& s) {
+    String v;
     if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";
     printError(kanji.name() + ' ' +
                toUnicode(kanji.name(), BracketType::Square) + v + " " + s +
@@ -275,7 +274,7 @@ void Data::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
   // skipping radical and strokes checks for now
 }
 
-void Data::printError(const std::string& msg) const {
+void Data::printError(const String& msg) const {
   static size_t count;
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- "
        << msg << std::setfill(' ') << '\n';
@@ -304,9 +303,9 @@ void Data::populateLinkedKanji(const Path& file) {
   // each line in 'file' should be a Jouyou Kanji followed by the officially
   // recognized 'Jinmei Variant' (so populateJouyou must be called first)
   auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
-  for (std::string line; std::getline(f, line);) {
+  for (String line; std::getline(f, line);) {
     std::stringstream ss{line};
-    if (std::string jouyou, linked;
+    if (String jouyou, linked;
         std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
       if (const auto i{_kanjiNameMap.find(jouyou)}; i == _kanjiNameMap.end())
         usage("'" + jouyou + "' not found - file: " + file.filename().string());
@@ -395,8 +394,7 @@ void Data::processList(const DataFile& list) {
     DataFile::print(
         _out, found[KanjiTypes::LinkedOld], "Linked Old", list.name());
     DataFile::print(_out, created,
-        std::string{"non-Jouyou/Jinmei"} +
-            (hasValue(list.level()) ? "" : "/JLPT"),
+        String{"non-Jouyou/Jinmei"} + (hasValue(list.level()) ? "" : "/JLPT"),
         list.name());
     // list.level is None when processing 'frequency.txt' file (so not JLPT)
     if (!kenteiList && !(list.level())) {
@@ -406,10 +404,10 @@ void Data::processList(const DataFile& list) {
         DataFile::StringList jlptJinmei, otherJinmei;
         for (auto& j : *i.first)
           (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
-        DataFile::print(_out, jlptJinmei,
-            std::string{"JLPT "} + i.second + "Jinmei", list.name());
+        DataFile::print(_out, jlptJinmei, String{"JLPT "} + i.second + "Jinmei",
+            list.name());
         DataFile::print(_out, otherJinmei,
-            std::string{"non-JLPT "} + i.second + "Jinmei", list.name());
+            String{"non-JLPT "} + i.second + "Jinmei", list.name());
       }
     } else {
       DataFile::print(_out, found[KanjiTypes::Jinmei], "Jinmei", list.name());

@@ -2,7 +2,6 @@
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <sstream>
 
@@ -10,7 +9,7 @@ namespace kanji_tools {
 
 namespace {
 
-const std::string WideColon{"："};
+const String WideColon{"："};
 // LCOV_EXCL_START: covered
 constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
 // LCOV_EXCL_STOP
@@ -33,12 +32,12 @@ GroupData::GroupData(const DataPtr& data, const Data::Path* dir) : _data{data} {
 }
 
 void GroupData::add(
-    const std::string& kanji, MultiMap& groups, const GroupPtr& group) {
+    const String& kanji, MultiMap& groups, const GroupPtr& group) {
   groups.emplace(kanji, group);
 }
 
 void GroupData::add(
-    const std::string& kanji, Map& groups, const GroupPtr& group) const {
+    const String& kanji, Map& groups, const GroupPtr& group) const {
   const auto i{groups.emplace(kanji, group)};
   if (!i.second)
     _data->printError(kanji + " from " + group->toString() + " already in " +
@@ -83,26 +82,26 @@ void GroupData::loadGroup(
   }
 }
 
-DataFile::StringList GroupData::getKanjiNames(const std::string& name,
-    const std::string& members, GroupType groupType,
+DataFile::StringList GroupData::getKanjiNames(const String& name,
+    const String& members, GroupType groupType,
     Group::PatternType& patternType) {
   DataFile::StringList kanjiNames;
   if (groupType == GroupType::Pattern) {
     patternType = name.starts_with(WideColon) ? Group::PatternType::Peer
-                  : name.find(WideColon) != std::string::npos
+                  : name.find(WideColon) != String::npos
                       ? Group::PatternType::Family
                       : Group::PatternType::Reading;
     // 'name' before the colon is the first member of a 'family'
     if (patternType == Group::PatternType::Family)
       kanjiNames.emplace_back(MBChar::getFirst(name));
   }
-  std::string member;
+  String member;
   for (std::stringstream ss{members}; std::getline(ss, member, ',');)
     kanjiNames.emplace_back(member);
   return kanjiNames;
 }
 
-GroupPtr GroupData::createGroup(size_t number, const std::string& name,
+GroupPtr GroupData::createGroup(size_t number, const String& name,
     const Data::KanjiList& members, Group::PatternType patternType) {
   if (patternType == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
@@ -180,8 +179,8 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
 template<typename T>
 void GroupData::printUniqueNames(
     const T& groups, const StringSet& uniqueNames) const {
-  std::map<std::string, size_t> multipleGroups;
-  std::string prevKey;
+  std::map<String, size_t> multipleGroups;
+  String prevKey;
   size_t maxBelongsTo{}; // the maximum number of groups a kanji belongs to
   for (auto i{groups.begin()}; i != groups.end(); ++i)
     if (i->first == prevKey) {

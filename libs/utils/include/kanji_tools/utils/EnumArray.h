@@ -62,18 +62,18 @@ class BaseEnumArray {
 public:
   virtual ~BaseEnumArray() = 0;
 protected:
-  static void domainError(const std::string&);
+  static void domainError(const String&);
 };
 
 // 'TypedEnumArray' has a pure virtual 'toString' function holds a map from
-// 'std::string' to 'Ts' used by 'fromString' methods. It also has static
+// 'String' to 'Ts' used by 'fromString' methods. It also has static
 // 'create', 'isCreated' and 'instance' public functions.
 template<typename T, isEnumArray<T> = 0>
 class TypedEnumArray : public BaseEnumArray {
 public:
   // 'create' requires at least one 'name' (see comments above)
   template<typename... Names>
-  [[nodiscard]] static auto create(const std::string& name, Names...);
+  [[nodiscard]] static auto create(const String& name, Names...);
 
   [[nodiscard]] static bool isCreated() noexcept { return _instance; }
 
@@ -84,19 +84,19 @@ public:
 
   ~TypedEnumArray() override { _instance = nullptr; }
 
-  [[nodiscard]] virtual const std::string& toString(T) const = 0;
+  [[nodiscard]] virtual const String& toString(T) const = 0;
 
   // returns 'T' instance for the given string (does not support T::None). See
   // EnumArrayWithNone form more 'fromString...' methods that support T::None.
-  [[nodiscard]] T fromString(const std::string& name) const;
+  [[nodiscard]] T fromString(const String& name) const;
 protected:
   TypedEnumArray() noexcept { _instance = this; }
 
-  void insert(const std::string& name, BaseEnum::Size index);
+  void insert(const String& name, BaseEnum::Size index);
 private:
   inline static constinit const TypedEnumArray<T>* _instance;
 
-  std::map<std::string, T> _nameMap;
+  std::map<String, T> _nameMap;
 };
 
 // 'IterableEnumArray' adds functionality to the iterator from 'IterableEnum'
@@ -156,25 +156,24 @@ class EnumArray : public IterableEnumArray<T, N> {
 public:
   using base = IterableEnumArray<T, N>;
 
-  [[nodiscard]] const std::string& toString(T x) const override {
+  [[nodiscard]] const String& toString(T x) const override {
     return _names[base::getIndex(x)];
   }
 private:
   friend TypedEnumArray<T>; // 'create' calls private ctor
 
-  explicit EnumArray(const std::string& name) { setName(name, N - 1); }
+  explicit EnumArray(const String& name) { setName(name, N - 1); }
 
   template<typename... Names>
-  explicit EnumArray(const std::string& name, Names... args)
-      : EnumArray{args...} {
+  explicit EnumArray(const String& name, Names... args) : EnumArray{args...} {
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const std::string& name, BaseEnum::Size index) {
+  void setName(const String& name, BaseEnum::Size index) {
     base::insert(_names[index] = name, index);
   }
 
-  std::array<std::string, N> _names;
+  std::array<String, N> _names;
 };
 
 // Base 'IterableEnumArray' has size 'N + 1' to account for the final 'None'
@@ -186,40 +185,40 @@ class EnumArrayWithNone : public IterableEnumArray<T, N + 1> {
 public:
   using base = IterableEnumArray<T, N + 1>;
 
-  [[nodiscard]] const std::string& toString(T x) const override {
+  [[nodiscard]] const String& toString(T x) const override {
     const auto i{base::getIndex(x)};
     return i < N ? _names[i] : None;
   }
 
-  [[nodiscard]] auto fromStringAllowEmpty(const std::string& s) const {
+  [[nodiscard]] auto fromStringAllowEmpty(const String& s) const {
     return s.empty() ? T::None : base::fromString(s);
   }
 
-  [[nodiscard]] auto fromStringAllowNone(const std::string& s) const {
+  [[nodiscard]] auto fromStringAllowNone(const String& s) const {
     return s == None ? T::None : base::fromString(s);
   }
 
-  [[nodiscard]] auto fromStringAllowEmptyAndNone(const std::string& s) const {
+  [[nodiscard]] auto fromStringAllowEmptyAndNone(const String& s) const {
     return s.empty() || s == None ? T::None : base::fromString(s);
   }
 private:
-  inline const static std::string None{"None"};
+  inline const static String None{"None"};
   friend TypedEnumArray<T>; // 'create' calls private ctor
 
-  explicit EnumArrayWithNone(const std::string& name) { setName(name, N - 1); }
+  explicit EnumArrayWithNone(const String& name) { setName(name, N - 1); }
 
   template<typename... Names>
-  explicit EnumArrayWithNone(const std::string& name, Names... args)
+  explicit EnumArrayWithNone(const String& name, Names... args)
       : EnumArrayWithNone{args...} {
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const std::string& name, BaseEnum::Size index) {
+  void setName(const String& name, BaseEnum::Size index) {
     if (name == None) base::domainError("'None' should not be specified");
     base::insert(_names[index] = name, index);
   }
 
-  std::array<std::string, N> _names;
+  std::array<String, N> _names;
 };
 
 // out of class member definitions for 'TypedEnumArray<T>'
@@ -227,7 +226,7 @@ private:
 template<typename T, isEnumArray<T> U>
 template<typename... Names>
 [[nodiscard]] auto TypedEnumArray<T, U>::create(
-    const std::string& name, Names... args) {
+    const String& name, Names... args) {
   static_assert(is_enumarray<T> != is_enumarray_with_none<T>,
       "both 'is_enumarray' and 'is_enumarray_with_none' are true");
   if (_instance) domainError("'create' should only be called once");
@@ -243,15 +242,14 @@ template<typename... Names>
 }
 
 template<typename T, isEnumArray<T> U>
-T TypedEnumArray<T, U>::fromString(const std::string& name) const {
+T TypedEnumArray<T, U>::fromString(const String& name) const {
   const auto i{_nameMap.find(name)};
   if (i == _nameMap.end()) domainError("name '" + name + "' not found");
   return i->second;
 }
 
 template<typename T, isEnumArray<T> U>
-void TypedEnumArray<T, U>::insert(
-    const std::string& name, BaseEnum::Size index) {
+void TypedEnumArray<T, U>::insert(const String& name, BaseEnum::Size index) {
   if (!_nameMap.emplace(name, to_enum<T>(index)).second)
     domainError("duplicate name '" + name + "'");
 }
@@ -259,8 +257,7 @@ void TypedEnumArray<T, U>::insert(
 // below are some global functions that are enabled for enums types that have
 // instances of 'EnumArray' or 'EnumArrayWithNone'
 
-template<typename T>
-[[nodiscard]] isEnumArray<T, const std::string&> toString(T x) {
+template<typename T> [[nodiscard]] isEnumArray<T, const String&> toString(T x) {
   return TypedEnumArray<T>::instance().toString(x);
 }
 

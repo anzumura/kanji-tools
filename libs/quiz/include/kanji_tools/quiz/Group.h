@@ -39,7 +39,7 @@ public:
 
   // ctor throws if 'members' contains duplicates, has less than two entries or
   // has more than 'MaxGroupSize' entries
-  Group(size_t number, const std::string& name, const Data::KanjiList& members);
+  Group(size_t number, const String& name, const Data::KanjiList& members);
 
   Group(const Group&) = delete;
   virtual ~Group() = default;
@@ -52,12 +52,12 @@ public:
   [[nodiscard]] auto number() const { return _number; }
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& members() const { return _members; }
-  [[nodiscard]] std::string toString() const;
+  [[nodiscard]] String toString() const;
 protected:
-  void error(const std::string&) const;
+  void error(const String&) const;
 private:
   const size_t _number;
-  const std::string _name;
+  const String _name;
   const Data::KanjiList _members;
 };
 
@@ -66,7 +66,7 @@ using GroupPtr = std::shared_ptr<Group>;
 class MeaningGroup : public Group {
 public:
   MeaningGroup(
-      size_t number, const std::string& name, const Data::KanjiList& members)
+      size_t number, const String& name, const Data::KanjiList& members)
       : Group{number, name, members} {}
 
   [[nodiscard]] GroupType type() const override { return GroupType::Meaning; }
@@ -74,7 +74,7 @@ public:
 
 class PatternGroup : public Group {
 public:
-  PatternGroup(size_t number, const std::string& name,
+  PatternGroup(size_t number, const String& name,
       const Data::KanjiList& members, PatternType patternType);
 
   [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }

@@ -1,7 +1,6 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Utils.h>
 
 namespace kanji_tools {
 
@@ -60,17 +59,17 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
   }
 }
 
-Kanji::Frequency KanjiData::frequency(const std::string& s) const {
+Kanji::Frequency KanjiData::frequency(const String& s) const {
   return _frequency.getIndex(s);
 }
 
-JlptLevels KanjiData::level(const std::string& k) const {
+JlptLevels KanjiData::level(const String& k) const {
   for (auto& i : _levels)
     if (i.exists(k)) return i.level();
   return JlptLevels::None;
 }
 
-KenteiKyus KanjiData::kyu(const std::string& k) const {
+KenteiKyus KanjiData::kyu(const String& k) const {
   for (auto& i : _kyus)
     if (i.exists(k)) return i.kyu();
   return KenteiKyus::None;
@@ -89,9 +88,9 @@ void KanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
 
 template<typename T>
 void KanjiData::printCount(
-    const std::string& name, T pred, size_t printExamples) const {
+    const String& name, T pred, size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, size_t>> counts;
-  std::map<KanjiTypes, std::vector<std::string>> examples;
+  std::map<KanjiTypes, std::vector<String>> examples;
   size_t total{};
   for (auto i{AllKanjiTypes.begin()}; auto& l : types()) {
     size_t count{};
@@ -180,8 +179,7 @@ void KanjiData::printGrades() const {
 
 template<typename T, BaseEnum::Size S>
 void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
-    T (Kanji::*p)() const, const std::string& name,
-    bool showNoFrequency) const {
+    T (Kanji::*p)() const, const String& name, bool showNoFrequency) const {
   log() << name << " breakdown:\n";
   size_t total{};
   for (const auto i : all) {

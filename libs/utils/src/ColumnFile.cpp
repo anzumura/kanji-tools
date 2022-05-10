@@ -1,5 +1,4 @@
 #include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <cassert>
 #include <set>
@@ -15,14 +14,14 @@ constexpr auto ColNotFound{std::numeric_limits<size_t>::max()};
 
 namespace fs = std::filesystem;
 
-ColumnFile::Column::Column(const std::string& name)
+ColumnFile::Column::Column(const String& name)
     : _name{name}, _number{ColumnFile::getColumnNumber(name)} {}
 
 bool ColumnFile::Column::operator==(const Column& rhs) const {
   return _number == rhs._number;
 }
 
-size_t ColumnFile::getColumnNumber(const std::string& name) {
+size_t ColumnFile::getColumnNumber(const String& name) {
   const auto i{_allColumns.find(name)};
   if (i == _allColumns.end()) return _allColumns[name] = _allColumns.size();
   return i->second;
@@ -37,7 +36,7 @@ ColumnFile::ColumnFile(
   if (columns.empty()) error("must specify at least one column");
   if (!fs::exists(p)) error("doesn't exist");
   if (!fs::is_regular_file(p)) error("not regular file");
-  if (std::string headerRow; std::getline(_file, headerRow)) {
+  if (String headerRow; std::getline(_file, headerRow)) {
     ColNames colNames;
     for (auto& c : columns)
       if (!colNames.emplace(c.name(), c).second)
@@ -48,10 +47,10 @@ ColumnFile::ColumnFile(
     error("missing header row");
 }
 
-void ColumnFile::processHeaderRow(const std::string& row, ColNames& colNames) {
+void ColumnFile::processHeaderRow(const String& row, ColNames& colNames) {
   size_t pos{};
-  std::set<std::string> foundCols;
-  std::string header;
+  std::set<String> foundCols;
+  String header;
   for (std::stringstream ss{row}; std::getline(ss, header, _delimiter); ++pos) {
     if (foundCols.contains(header)) error("duplicate header '" + header + "'");
     const auto i{colNames.find(header)};
@@ -66,7 +65,7 @@ void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
   if (colNames.size() == 1)
     error("column '" + (*colNames.begin()).first + "' not found");
   if (colNames.size() > 1) {
-    std::string msg;
+    String msg;
     for (auto& i : colNames) {
       if (!msg.empty()) msg += ',';
       msg += " '" + i.first + "'";
@@ -76,10 +75,10 @@ void ColumnFile::verifyHeaderColumns(const ColNames& colNames) const {
 }
 
 bool ColumnFile::nextRow() {
-  if (std::string line; std::getline(_file, line)) {
+  if (String line; std::getline(_file, line)) {
     ++_currentRow;
     size_t i{};
-    std::string field;
+    String field;
     for (std::stringstream ss{line}; std::getline(ss, field, _delimiter); ++i) {
       if (i == _rowValues.size()) error("too many columns");
       _rowValues[i] = field;
@@ -97,7 +96,7 @@ bool ColumnFile::nextRow() {
   return false;
 }
 
-const std::string& ColumnFile::get(const Column& column) const {
+const String& ColumnFile::get(const Column& column) const {
   if (!_currentRow) error("'nextRow' must be called before calling 'get'");
   if (column.number() >= _columnToPosition.size())
     error("unrecognized column '" + column.name() + "'");
@@ -119,7 +118,7 @@ ColumnFile::OptULong ColumnFile::getOptULong(const Column& c, ULong max) const {
 }
 
 ColumnFile::ULong ColumnFile::processULong(
-    const std::string& s, const Column& column, ULong max) const {
+    const String& s, const Column& column, ULong max) const {
   ULong i{};
   try {
     i = std::stoul(s);
@@ -143,32 +142,31 @@ bool ColumnFile::getBool(const Column& column) const {
   return false;
 }
 
-char32_t ColumnFile::getChar32(
-    const Column& column, const std::string& s) const {
+Code ColumnFile::getChar32(const Column& column, const String& s) const {
   if (s.size() < UnicodeStringMinSize || s.size() > UnicodeStringMaxSize)
-    error("failed to convert to char32_t, size must be 4 or 5", column, s);
+    error("failed to convert to Code, size must be 4 or 5", column, s);
   // want hex with capitals so can't use 'std::ishexnumber'
   if (std::any_of(s.begin(), s.end(),
           [](auto i) { return i < '0' || i > 'F' || (i < 'A' && i > '9'); }))
-    error("failed to convert to char32_t, invalid hex", column, s);
-  return static_cast<char32_t>(std::stoi(s, nullptr, HexDigits));
+    error("failed to convert to Code, invalid hex", column, s);
+  return static_cast<Code>(std::stoi(s, nullptr, HexDigits));
 }
 
-char32_t ColumnFile::getChar32(const Column& c) const {
+Code ColumnFile::getChar32(const Column& c) const {
   return getChar32(c, get(c));
 }
 
-void ColumnFile::error(const std::string& msg) const {
+void ColumnFile::error(const String& msg) const {
   throw std::domain_error(errorMsg(msg));
 }
 
 void ColumnFile::error(
-    const std::string& msg, const Column& c, const std::string& s) const {
+    const String& msg, const Column& c, const String& s) const {
   throw std::domain_error{
       errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'"};
 }
 
-std::string ColumnFile::errorMsg(const std::string& msg) const {
+String ColumnFile::errorMsg(const String& msg) const {
   auto result{msg + " - file: " + _fileName};
   if (_currentRow) result += ", row: " + std::to_string(_currentRow);
   return result;

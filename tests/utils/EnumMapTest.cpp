@@ -38,8 +38,8 @@ TEST_F(EnumMapTest, SquareOperator) {
 TEST_F(EnumMapTest, NoneReturnsEmptyForConstOperator) {
   const auto& cMap{map()};
   EXPECT_EQ(cMap[Colors::None], 0);
-  const EnumMap<Colors, std::string> stringMap;
-  EXPECT_EQ(stringMap[Colors::None], std::string{});
+  const EnumMap<Colors, String> stringMap;
+  EXPECT_EQ(stringMap[Colors::None], String{});
 }
 
 TEST_F(EnumMapTest, NoneThrowsErrorForNonConstOperator) {

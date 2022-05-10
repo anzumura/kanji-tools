@@ -1,7 +1,6 @@
 #include <kanji_tools/stats/MBCount.h>
 #include <kanji_tools/stats/Stats.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <future>
 #include <numeric>
@@ -28,7 +27,7 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 // helper class for ordering and printing out kanji found in files
 class Count { // LCOV_EXCL_LINE: covered
 public:
-  Count(size_t f, const std::string& n, const KanjiPtr& e)
+  Count(size_t f, const String& n, const KanjiPtr& e)
       : _count{f}, _name{n}, _entry{e} {}
 
   [[nodiscard]] auto frequency() const {
@@ -57,7 +56,7 @@ public:
   [[nodiscard]] auto& entry() const { return _entry; }
 private:
   size_t _count;
-  std::string _name;
+  String _name;
   KanjiPtr _entry;
 };
 
@@ -67,8 +66,7 @@ std::ostream& operator<<(std::ostream& os, const Count& c) {
      << ']';
   if (c.entry())
     os << std::setw(FreqWidth) << c.entry()->frequencyOrDefault(0) << ", "
-       << (c.entry()->hasLevel() ? toString(c.entry()->level())
-                                 : std::string{"--"})
+       << (c.entry()->hasLevel() ? toString(c.entry()->level()) : String{"--"})
        << ", " << c.entry()->type();
   else
     os << ", " << std::setw(UnicodeStringMaxSize + 2)
@@ -86,13 +84,13 @@ constexpr size_t IncludeInTotals{5}, MaxExamples{5};
 // results can be retrieved via the 'total' and 'str' methods.
 class StatsPred {
 public:
-  StatsPred(const DataPtr& data, const fs::path& top, const std::string& name,
+  StatsPred(const DataPtr& data, const fs::path& top, const String& name,
       bool showBreakdown)
       : _data{data}, _top{top}, _name{name},
         _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
 
   template<typename Pred>
-  [[nodiscard]] std::string run(const Pred&, bool verbose, bool firstCount);
+  [[nodiscard]] String run(const Pred&, bool verbose, bool firstCount);
 
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto total() const { return _total; }
@@ -109,15 +107,14 @@ private:
   using CountSet = std::set<Count>;
 
   void printHeaderInfo(const MBCount&);
-  void printTotalAndUnique(
-      const std::string& name, size_t total, size_t unique);
+  void printTotalAndUnique(const String& name, size_t total, size_t unique);
   void printKanjiTypeCounts(const std::set<Count>&);
   void printRareExamples(const CountSet&);
   void printBreakdown(const CountSet&, const MBCount&);
 
   const DataPtr _data;
   const fs::path& _top;
-  const std::string _name;
+  const String _name;
   const bool _showBreakdown;
   const bool _isKanji;
   size_t _total{};
@@ -125,7 +122,7 @@ private:
 };
 
 template<typename Pred>
-std::string StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
+String StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   const auto isHiragana{_name == "Hiragana"},
       isUnrecognized{_name == "Unrecognized"},
       isCommonKanji{_isKanji && _name.starts_with("Common")};
@@ -186,7 +183,7 @@ void StatsPred::printHeaderInfo(const MBCount& count) {
 }
 
 void StatsPred::printTotalAndUnique(
-    const std::string& name, size_t total, size_t unique) {
+    const String& name, size_t total, size_t unique) {
   _os << ">>> " << std::right << std::setw(TypeNameWidth) << name << ": "
       << std::setw(TotalCountWidth) << total
       << ", unique: " << std::setw(UniqueCountWidth) << unique;
@@ -206,7 +203,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
         i != uniqueKanjiPerType.end()) {
       auto totalForType{totalKanjiPerType[t]};
       printTotalAndUnique(
-          std::string{"["} + toString(t) + "] ", totalForType, i->second);
+          String{"["} + toString(t) + "] ", totalForType, i->second);
       _os << ", " << std::setw(PercentWidth) << std::fixed
           << std::setprecision(PercentPrecision)
           << asPercent(totalForType, _total) << "%  (";
@@ -246,7 +243,7 @@ void StatsPred::printBreakdown(
     _os << i;
     if (!i.entry()) {
       if (const auto tags{count.tags(i.name())}; tags) {
-        std::string file;
+        String file;
         for (size_t maxCount{}; auto& j : *tags)
           if (j.second > maxCount) {
             maxCount = j.second;
@@ -263,9 +260,9 @@ void StatsPred::printBreakdown(
 
 Stats::Stats(const Args& args, const DataPtr& data) : _data(data) {
   auto breakdown{false}, endOptions{false}, verbose{false};
-  std::vector<std::string> files;
+  std::vector<String> files;
   for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
-    if (std::string arg{args[i]}; !endOptions && arg.starts_with("-")) {
+    if (String arg{args[i]}; !endOptions && arg.starts_with("-")) {
       if (arg == "-h") {
         out() << HelpMessage;
         return;
@@ -287,7 +284,7 @@ Stats::Stats(const Args& args, const DataPtr& data) : _data(data) {
 
 void Stats::countKanji(
     const fs::path& top, bool showBreakdown, bool verbose) const {
-  const auto f{[=, this, &top](const auto& pred, const std::string& name,
+  const auto f{[=, this, &top](const auto& pred, const String& name,
                    bool firstCount = false) {
     // NOLINTNEXTLINE
     auto p{std::make_shared<StatsPred>(_data, top, name, showBreakdown)};

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <kanji_tools/utils/String.h>
+
 #include <compare>
 #include <iostream>
 
@@ -29,7 +31,7 @@ public:
 
   // by default return a string containing '_value', but if 'includeVariant' is
   // set to true and '_variant' is non-zero then return '_value/_variant'
-  [[nodiscard]] std::string toString(bool includeVariant = false) const;
+  [[nodiscard]] String toString(bool includeVariant = false) const;
 private:
   const Size _value, _variant;
 };

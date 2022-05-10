@@ -1,6 +1,5 @@
 #include <kanji_tools/kana/DisplaySize.h>
 #include <kanji_tools/quiz/GroupQuiz.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <optional>
 #include <random>
@@ -47,12 +46,12 @@ GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
                          : throw std::domain_error{"empty group list"};
 }
 
-void GroupQuiz::addPinyin(const Kanji& kanji, std::string& s) {
-  static const std::string NoPinyin(PinyinWidth, ' ');
+void GroupQuiz::addPinyin(const Kanji& kanji, String& s) {
+  static const String NoPinyin(PinyinWidth, ' ');
   if (kanji.pinyin()) {
     const auto p{"  (" + kanji.pinyin().name() + ')'};
     // use 'displaySize' since Pinyin can contain multi-byte chars (for tones)
-    s += p + std::string(PinyinWidth - displaySize(p), ' ');
+    s += p + String(PinyinWidth - displaySize(p), ' ');
   } else
     s += NoPinyin;
 }
@@ -64,9 +63,9 @@ GroupData::List GroupQuiz::prepareList(
   for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {
     if (startIncluding) {
       if (bucketHasEnd &&
-          i->name().find(PatternGroups[*bucket]) != std::string::npos)
+          i->name().find(PatternGroups[*bucket]) != String::npos)
         break;
-    } else if (i->name().find(PatternGroups[*bucket - 1]) != std::string::npos)
+    } else if (i->name().find(PatternGroups[*bucket - 1]) != String::npos)
       startIncluding = true;
     if (size_t memberCount{}; startIncluding) {
       for (auto& j : i->members())
@@ -91,8 +90,7 @@ bool GroupQuiz::includeMember(const Kanji& k) const {
                                        _memberType > Frequency)));
 }
 
-void GroupQuiz::addOtherGroupName(
-    const std::string& name, std::string& s) const {
+void GroupQuiz::addOtherGroupName(const String& name, String& s) const {
   const auto add{[this, &name, &s](const auto& map) {
     // NOLINTNEXTLINE: NonNullParamChecker
     if (const auto j{map.find(name)}; j != map.end()) {
@@ -195,7 +193,7 @@ bool GroupQuiz::getAnswers(
 }
 
 bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
-  const static std::string ReviewMsg{"  Select"}, QuizMsg{"  Reading for: "};
+  const static String ReviewMsg{"  Select"}, QuizMsg{"  Reading for: "};
   const auto msg{
       isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg};
   do {
@@ -227,7 +225,7 @@ bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
 }
 
 void GroupQuiz::editAnswer(Choices& choices) {
-  static const std::string NewReadingForEntry("    New reading for Entry: ");
+  static const String NewReadingForEntry("    New reading for Entry: ");
 
   const auto entry{getAnswerToEdit()};
   choices[_answers[entry]] = {}; // put the answer back as a choice
@@ -243,10 +241,10 @@ void GroupQuiz::editAnswer(Choices& choices) {
 }
 
 size_t GroupQuiz::getAnswerToEdit() const {
-  static const std::string AnswerToEdit{"    Answer to edit: "};
+  static const String AnswerToEdit{"    Answer to edit: "};
 
   if (_answers.size() == 1) return 0;
-  std::map<char, std::string> answersToEdit;
+  std::map<char, String> answersToEdit;
   for (auto k : _answers) answersToEdit[k] = {};
   const auto index{std::find(_answers.begin(), _answers.end(),
       get(AnswerToEdit, answersToEdit, {}, false))};
@@ -255,7 +253,7 @@ size_t GroupQuiz::getAnswerToEdit() const {
 }
 
 void GroupQuiz::checkAnswers(const KanjiList& questions,
-    const KanjiList& readings, const std::string& kanjiName) {
+    const KanjiList& readings, const String& kanjiName) {
   size_t correctCount{};
   for (size_t count{}; auto i : _answers) {
     const auto answer{

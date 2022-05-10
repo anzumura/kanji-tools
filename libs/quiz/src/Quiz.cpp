@@ -40,7 +40,7 @@ Quiz::~Quiz() {
   }
 }
 
-char Quiz::get(const std::string& msg, const Choices& choices, OptChar def,
+char Quiz::get(const String& msg, const Choices& choices, OptChar def,
     bool useQuit) const {
   return choice().get(msg, useQuit, choices, def);
 }
@@ -78,7 +78,7 @@ void Quiz::correctMessage() {
         << ")\n";
 }
 
-std::ostream& Quiz::incorrectMessage(const std::string& name) {
+std::ostream& Quiz::incorrectMessage(const String& name) {
   _mistakes.emplace_back(name);
   return out() << "  Incorrect";
 }

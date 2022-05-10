@@ -1,6 +1,5 @@
 #include <kanji_tools/utils/DataFile.h>
 #include <kanji_tools/utils/MBUtils.h>
-#include <kanji_tools/utils/Utils.h>
 
 #include <fstream>
 #include <sstream>
@@ -23,8 +22,8 @@ fs::path DataFile::getFile(const Path& dir, const Path& file) {
   return p;
 }
 
-void DataFile::print(std::ostream& out, const StringList& l,
-    const std::string& type, const std::string& group) { // LCOV_EXCL_LINE
+void DataFile::print(std::ostream& out, const StringList& l, const String& type,
+    const String& group) { // LCOV_EXCL_LINE
   if (!l.empty()) {
     out << ">>> Found " << l.size() << ' ' << type;
     if (!group.empty()) out << " in " << group;
@@ -43,7 +42,7 @@ DataFile::DataFile(const Path& p, FileType fileType)
     : DataFile{p, fileType, {}} {}
 
 DataFile::DataFile(const Path& fileIn, FileType fileType,
-    StringSet* uniqueTypeNames, const std::string& name)
+    StringSet* uniqueTypeNames, const String& name)
     : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
   auto file{fileIn};
   // try adding .txt if file isn't found
@@ -63,9 +62,9 @@ void DataFile::load(
   }};
   std::ifstream f{file};
   DataFile::StringList dups;
-  for (std::string line; std::getline(f, line); ++lineNum) {
+  for (String line; std::getline(f, line); ++lineNum) {
     std::stringstream ss{line};
-    for (std::string token; std::getline(ss, token, ' ');)
+    for (String token; std::getline(ss, token, ' ');)
       if (fileType == FileType::OnePerLine && token != line)
         error("got multiple tokens");
       else if (!validate(error, uniqueTypeNames, token))
@@ -74,8 +73,8 @@ void DataFile::load(
         error("exceeded '" + std::to_string(MaxEntries) + "' entries", false);
   }
   if (!dups.empty()) {
-    std::string msg{"found " + std::to_string(dups.size()) + " duplicates in " +
-                    _name + ":"};
+    String msg{"found " + std::to_string(dups.size()) + " duplicates in " +
+               _name + ":"};
     for (const auto& i : dups) msg += ' ' + i;
     error(msg, false);
   }
@@ -83,7 +82,7 @@ void DataFile::load(
 
 template<typename T>
 bool DataFile::validate(
-    const T& error, StringSet* uniqueTypeNames, const std::string& token) {
+    const T& error, StringSet* uniqueTypeNames, const String& token) {
   if (!isValidMBUtf8(token, true))
     error("invalid multi-byte token '" + token + "'");
   // check uniqueness within file
@@ -95,7 +94,7 @@ bool DataFile::validate(
   return true;
 }
 
-bool DataFile::addEntry(const std::string& token) {
+bool DataFile::addEntry(const String& token) {
   if (_list.size() == MaxEntries) return false;
   _list.emplace_back(token);
   // 'index' starts at 1, i.e., the first kanji has 'frequency 1' (not 0)
@@ -103,17 +102,17 @@ bool DataFile::addEntry(const std::string& token) {
   return true;
 }
 
-bool DataFile::exists(const std::string& s) const {
+bool DataFile::exists(const String& s) const {
   return _map.find(s) != _map.end();
 }
 
-DataFile::Index DataFile::getIndex(const std::string& name) const {
+DataFile::Index DataFile::getIndex(const String& name) const {
   const auto i{_map.find(name)};
   return i != _map.end() ? i->second : Index{};
 }
 
-std::string DataFile::toString() const {
-  std::string result;
+String DataFile::toString() const {
+  String result;
   // reserve for efficiency - make a guess that each entry in the list is a 3
   // byte utf8 character
   result.reserve(_list.size() * 3);

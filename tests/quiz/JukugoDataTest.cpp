@@ -17,7 +17,7 @@ protected:
 
   static void SetUpTestSuite() { _data = std::make_shared<KanjiData>(); }
 
-  static void write(const std::string& f, const std::string& s) {
+  static void write(const String& f, const String& s) {
     std::ofstream of{TestDir / f, std::ios_base::app};
     of << s;
     of.close();
@@ -26,7 +26,7 @@ protected:
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
-    static const std::string HeaderRow{"Number\tName\tMembers"};
+    static const String HeaderRow{"Number\tName\tMembers"};
     // make files for each grade ('g1' to 'g6')
     for (auto i{1}; i < AllKanjiGrades.size() - 1; ++i)
       write("g" + std::to_string(i) + ".txt", {});
@@ -38,7 +38,7 @@ protected:
   inline static std::stringstream _os, _es;
   inline static DataPtr _data;
 
-  inline static const std::string Grade1File{"g1.txt"}, OtherFile{"other.txt"},
+  inline static const String Grade1File{"g1.txt"}, OtherFile{"other.txt"},
       Err{" - line: 1, file: "};
   inline static const fs::path TestDir{"testDir"};
 };

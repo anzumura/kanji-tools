@@ -29,7 +29,7 @@ void printCounts(DataRef data, const Count& c, bool summary = false) {
 
 } // namespace
 
-RadicalRef RadicalData::find(const std::string& name) const {
+RadicalRef RadicalData::find(const String& name) const {
   checkLoaded();
   const auto i{_map.find(name)};
   if (i == _map.end()) throw std::domain_error{"name not found: " + name};
@@ -54,7 +54,7 @@ void RadicalData::load(const Data::Path& file) {
       f.error("radicals must be ordered by 'number'");
     std::stringstream radicals{f.get(nameCol)};
     Radical::AltForms altForms;
-    std::string name, token;
+    String name, token;
     while (std::getline(radicals, token, ' '))
       if (name.empty())
         name = token;

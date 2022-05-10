@@ -27,7 +27,7 @@ class ColumnFileTest : public ::testing::Test {
 protected:
   inline static const ColumnFile::Column Col{"Col"}, Col1{"Col1"}, Col2{"Col2"},
       Col3{"Col3"}, Col4{"Col4"};
-  inline static const std::string FileMsg{" - file: testFile.txt"},
+  inline static const String FileMsg{" - file: testFile.txt"},
       ConvertError{"failed to convert to "};
   inline static const fs::path TestDir{"testDir"};
   inline static const fs::path TestFile{TestDir / "testFile.txt"};
@@ -43,7 +43,7 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  static void write(const std::string& s, bool newLine = true) {
+  static void write(const String& s, bool newLine = true) {
     std::ofstream of{TestFile};
     of << s;
     if (newLine) of << '\n';
@@ -51,7 +51,7 @@ protected:
   }
 
   static ColumnFile write(
-      const ColumnFile::Columns& c, const std::string& s, bool newLine = true) {
+      const ColumnFile::Columns& c, const String& s, bool newLine = true) {
     write(s, newLine);
     return create(c);
   }
@@ -265,7 +265,7 @@ TEST_F(ColumnFileTest, GetULongMaxValueError) {
   EXPECT_TRUE(f.nextRow());
   EXPECT_EQ(f.getULong(Col, 0), maxValue); // 0 implies no max value
   EXPECT_TRUE(f.nextRow());
-  std::string msg{"exceeded max value of "};
+  String msg{"exceeded max value of "};
   EXPECT_THROW(call([&] { f.getULong(Col, maxValue); },
                    msg + std::to_string(maxValue) + FileMsg +
                        ", row: 3, column: 'Col', value: '" +
@@ -362,8 +362,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
       "invalid hex" + FileMsg + ", row: 4, column: 'Col', value: 'DEFG'"};
   for (auto& i : _) {
     f.nextRow();
-    EXPECT_THROW(
-        call([&] { f.getChar32(Col); }, ConvertError + "char32_t, " += i),
+    EXPECT_THROW(call([&] { f.getChar32(Col); }, ConvertError + "Code, " += i),
         std::domain_error);
   }
 }

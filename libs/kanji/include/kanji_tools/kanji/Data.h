@@ -14,13 +14,13 @@ namespace kanji_tools {
 class Data {
 public:
   using KanjiList = std::vector<KanjiPtr>;
-  using KanjiMap = std::map<std::string, KanjiPtr>;
+  using KanjiMap = std::map<String, KanjiPtr>;
   template<typename T> using EnumList = EnumMap<T, KanjiList>;
   using Path = DataFile::Path;
 
   // DataArg (to specify location of 'data' dir), DebugArg and InfoArg are
   // command line options that can be passed to apps using this 'Data' class
-  inline static const std::string DataArg{"-data"}, DebugArg{"-debug"},
+  inline static const String DataArg{"-data"}, DebugArg{"-debug"},
       InfoArg{"-info"};
 
   // 'nextArg' is meant to be used by other classes that process command line
@@ -37,7 +37,7 @@ public:
   //   InfoArg:  sets '_debugMode' to 'Info' to print some summary debug output
   enum class DebugMode { Full, Info, None };
 
-  static void usage(const std::string& msg) { DataFile::usage(msg); }
+  static void usage(const String& msg) { DataFile::usage(msg); }
   static constexpr auto OrderByQualifiedName{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
 
@@ -61,25 +61,24 @@ public:
   virtual ~Data() = default;
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
-  [[nodiscard]] UcdPtr findUcd(const std::string& kanjiName) const;
+  [[nodiscard]] UcdPtr findUcd(const String& kanjiName) const;
 
   // functions used by 'Kanji' class ctors, each takes a Kanji name string
-  [[nodiscard]] virtual Kanji::Frequency frequency(
-      const std::string&) const = 0;
-  [[nodiscard]] virtual JlptLevels level(const std::string&) const = 0;
-  [[nodiscard]] virtual KenteiKyus kyu(const std::string&) const = 0;
-  [[nodiscard]] virtual RadicalRef ucdRadical(const std::string&, UcdPtr) const;
-  [[nodiscard]] virtual Strokes ucdStrokes(const std::string&, UcdPtr) const;
+  [[nodiscard]] virtual Kanji::Frequency frequency(const String&) const = 0;
+  [[nodiscard]] virtual JlptLevels level(const String&) const = 0;
+  [[nodiscard]] virtual KenteiKyus kyu(const String&) const = 0;
+  [[nodiscard]] virtual RadicalRef ucdRadical(const String&, UcdPtr) const;
+  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const;
 
   // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
   // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).
   [[nodiscard]] virtual RadicalRef getRadicalByName(
-      const std::string& radicalName) const;
+      const String& radicalName) const;
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given
   // 'kanji' if it exists (_ucd.find method takes care of checking whether
   // 'kanji' has a variation selector).
-  [[nodiscard]] Kanji::OptString getCompatibilityName(const std::string&) const;
+  [[nodiscard]] Kanji::OptString getCompatibilityName(const String&) const;
 
   // get list by KanjiType
   [[nodiscard]] auto& types(KanjiTypes t) const { return _types[t]; }
@@ -102,12 +101,12 @@ public:
   [[nodiscard]] const KanjiList& frequencies(size_t) const;
   [[nodiscard]] size_t frequencySize(size_t) const;
 
-  [[nodiscard]] KanjiTypes getType(const std::string& name) const;
+  [[nodiscard]] KanjiTypes getType(const String& name) const;
 
   // 'findKanjiByName' supports finding a Kanji by UTF-8 string including
   // 'variation selectors', i.e., the same result is returned for '侮︀ [4FAE
   // FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
-  [[nodiscard]] KanjiPtr findKanjiByName(const std::string&) const;
+  [[nodiscard]] KanjiPtr findKanjiByName(const String&) const;
 
   // 'findKanjiByFrequency' returns the Kanji with the given 'freq' (should be a
   // value from 1 to 2501)
@@ -117,13 +116,13 @@ public:
   // numeric, but they can also be a number followed by a 'P'. For example,
   // '4138' maps to 嗩 and '4138P' maps to 嘆.
   [[nodiscard]] const KanjiList& findByMorohashiId(const MorohashiId&) const;
-  [[nodiscard]] const KanjiList& findByMorohashiId(const std::string&) const;
+  [[nodiscard]] const KanjiList& findByMorohashiId(const String&) const;
 
   // 'findKanjisByNelsonId' can return more than one Kanji. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
   [[nodiscard]] const KanjiList& findByNelsonId(Kanji::NelsonId) const;
 
-  void printError(const std::string&) const;
+  void printError(const String&) const;
 
   [[nodiscard]] auto debug() const { return _debugMode != DebugMode::None; }
   [[nodiscard]] auto fullDebug() const { return _debugMode == DebugMode::Full; }
@@ -206,12 +205,12 @@ private:
   // '_compatibilityMap' maps from a UCD 'compatibility' name to a 'variation
   // selector' style name. This map only has entries for recognized Kanji that
   // were loaded with a selector.
-  std::map<std::string, std::string> _compatibilityMap;
+  std::map<String, String> _compatibilityMap;
 
   // '_frequencyReadings' holds readings loaded from frequency-readings.txt -
   // these are for Top Frequency kanji that aren't part of any other group (so
   // not Jouyou or Jinmei).
-  std::map<std::string, std::string> _frequencyReadings;
+  std::map<String, String> _frequencyReadings;
 
   // lists of kanji per Level, Grade and Kyu (excluding the 'None' enum values)
   EnumList<JlptLevels> _levels;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/utils/Utils.h>
+#include <kanji_tools/utils/String.h>
 
 #include <iostream>
 #include <map>
@@ -9,7 +9,7 @@
 
 namespace kanji_tools {
 
-// 'Symbol' can be used instead of 'std::string' to save memory at the cost of
+// 'Symbol' can be used instead of 'String' to save memory at the cost of
 // a small performance hit when creating or looking up a value. A potentially
 // good use case would be for a data member of a class that has many instances
 // and the data member doesn't have many different values. Some examples would
@@ -23,7 +23,7 @@ namespace kanji_tools {
 // Classes should derive from 'Symbol' and define 'Type', for example:
 //   class TestSymbol : public Symbol<TestSymbol> {
 //   public:
-//     inline static const std::string Type{"TestSymbol"};
+//     inline static const String Type{"TestSymbol"};
 //     using Symbol::Symbol;
 //   };
 
@@ -38,33 +38,32 @@ public:
 
   [[nodiscard]] explicit constexpr operator bool() const { return _id; }
 protected:
-  using Map = std::map<std::string, Id>;
-  using List = std::vector<const std::string*>;
+  using Map = std::map<String, Id>;
+  using List = std::vector<const String*>;
 
   constexpr explicit BaseSymbol(Id id) noexcept : _id{id} {}
-  BaseSymbol(const std::string& type, const std::string& name, Map&, List&);
+  BaseSymbol(const String& type, const String& name, Map&, List&);
 private:
   [[nodiscard]] static Id getId(
-      const std::string& type, const std::string& name, Map&, List&);
+      const String& type, const String& name, Map&, List&);
 
   const Id _id;
 };
 
 template<typename T> class Symbol : public BaseSymbol {
 public:
-  [[nodiscard]] static const std::string& type() { return T::Type; }
+  [[nodiscard]] static const String& type() { return T::Type; }
 
   // 'size' returns total unique symbols created (not including 'empty')
   [[nodiscard]] static auto size() { return _list.size(); }
 
   // 'exists' returns true if a symbol exists for the given (non-empty) name
-  [[nodiscard]] static auto exists(const std::string& name) {
+  [[nodiscard]] static auto exists(const String& name) {
     return !name.empty() && _map.contains(name);
   }
 
   constexpr Symbol() noexcept : BaseSymbol{0} {}
-  explicit Symbol(const std::string& name)
-      : BaseSymbol{type(), name, _map, _list} {}
+  explicit Symbol(const String& name) : BaseSymbol{type(), name, _map, _list} {}
 
   [[nodiscard]] auto& name() const {
     return id() ? *_list.at(id() - 1) : EmptyString;

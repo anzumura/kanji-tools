@@ -8,7 +8,7 @@ namespace {
 
 class TestSymbol : public Symbol<TestSymbol> {
 public:
-  inline static const std::string Type{"TestSymbol"};
+  inline static const String Type{"TestSymbol"};
   using Symbol::Symbol;
 };
 

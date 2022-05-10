@@ -9,26 +9,25 @@ namespace kanji_tools {
 
 namespace {
 
-const std::string OptionsMsg{">>> current options: source="},
+const String OptionsMsg{">>> current options: source="},
     EnterMsg{"\n>>> enter string (c=clear flags, f=set flag, q=quit, h=help, "
              "-k|-h|-r|-K|-H|-R):\n"};
-const std::string DefOptionsMsg{OptionsMsg + "any, target=Hiragana, flags="};
+const String DefOptionsMsg{OptionsMsg + "any, target=Hiragana, flags="};
 
 constexpr size_t SkipFirstTwoLines{2}, SkipFirstFourLines{4};
 
 class KanaConvertTest : public ::testing::Test {
 protected:
   void run( // NOLINT
-      const Args& args, const std::string& expectedIn, size_t skipLines = 0) {
+      const Args& args, const String& expectedIn, size_t skipLines = 0) {
     _is << "q\n"; // send 'quit' option to make sure the program exits
     if (KanaConvert{args, _os, &_is}; skipLines) {
       size_t skipped{0};
-      for (std::string i; skipped < skipLines && std::getline(_os, i);)
-        ++skipped;
+      for (String i; skipped < skipLines && std::getline(_os, i);) ++skipped;
       ASSERT_EQ(skipped, skipLines);
     }
     std::stringstream expected{expectedIn};
-    for (std::string i, j; std::getline(_os, i) && std::getline(expected, j);)
+    for (String i, j; std::getline(_os, i) && std::getline(expected, j);)
       ASSERT_EQ(i, j);
     // if loop ended due to 'eof' then check remaining part of other stream
     if (_os.eof() && expectedIn.size() > _os.str().size())
@@ -89,7 +88,7 @@ TEST_F(KanaConvertTest, MissingFlagOption) {
 }
 
 TEST_F(KanaConvertTest, IllegalFlagOption) {
-  for (const std::string i : {"a", "aa"}) {
+  for (const String i : {"a", "aa"}) {
     const char* args[]{"", "-f", i.c_str()};
     const auto f{[&args] { KanaConvert{args}; }};
     EXPECT_THROW(call(f, "illegal option for -f: " + i), std::domain_error);
@@ -126,10 +125,10 @@ TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
 TEST_F(KanaConvertTest, PrintKanaChart) {
   const char* args[]{"", "-p"};
   KanaConvert(args, os()); // NOLINT: unused-raii
-  std::string lastLine;
+  String lastLine;
   size_t count{}, found{};
   // just check for a few examples
-  for (std::string line; std::getline(os(), line); ++count, lastLine = line) {
+  for (String line; std::getline(os(), line); ++count, lastLine = line) {
     if (!count)
       EXPECT_EQ(line, ">>> Notes:");
     else {
@@ -148,10 +147,10 @@ TEST_F(KanaConvertTest, PrintKanaChart) {
 TEST_F(KanaConvertTest, PrintMarkdownKanaChart) {
   const char* args[]{"", "-m"};
   KanaConvert(args, os()); // NOLINT: unused-raii
-  std::string lastLine;
+  String lastLine;
   size_t count{}, found{};
   // just check for a few examples
-  for (std::string line; std::getline(os(), line); ++count, lastLine = line) {
+  for (String line; std::getline(os(), line); ++count, lastLine = line) {
     if (!count)
       EXPECT_EQ(line, "**Notes:**");
     else {

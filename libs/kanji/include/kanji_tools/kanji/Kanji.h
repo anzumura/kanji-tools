@@ -37,10 +37,10 @@ using KanjiPtr = std::shared_ptr<class Kanji>;
 class Kanji {
 public:
   using Frequency = uint16_t;
-  using LinkNames = std::vector<std::string>;
+  using LinkNames = std::vector<String>;
   using NelsonId = uint16_t;
   using NelsonIds = std::vector<NelsonId>;
-  using OptString = std::optional<std::string>;
+  using OptString = std::optional<String>;
   using Year = uint16_t;
   // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
@@ -102,7 +102,7 @@ public:
   // 'compatibilityName' returns 'compatibilityName' if it exists, otherwise it
   // returns the string value of '_name'.
   // (which is should be a single MB char without a variation selector)
-  [[nodiscard]] std::string compatibilityName() const;
+  [[nodiscard]] String compatibilityName() const;
 
   [[nodiscard]] Frequency frequencyOrDefault(Frequency x) const;
   [[nodiscard]] Frequency frequencyOrMax() const;
@@ -125,7 +125,7 @@ public:
   // 'fields' can be used to control inclusion of fields (include all by
   // default). Note: multiple 'Old' links are separated by '／' (wide slash) and
   // a link is followed by '*' if it was used to pull in readings.
-  [[nodiscard]] std::string info(KanjiInfo fields = KanjiInfo::All) const;
+  [[nodiscard]] String info(KanjiInfo fields = KanjiInfo::All) const;
 
   // Return 'name' plus an extra 'suffix' to show more info. Suffixes are:
   //   . = Jouyou        : 2136 Jouyou
@@ -138,7 +138,7 @@ public:
   //   @ = <K1 Kentei    : 268 non-K1 Kentei Kanji that aren't included above
   //   # = K1 Kentei     : 2554 K1 Kentei Kanji that aren't included above
   //   * = Ucd           : kanji loaded from 'ucd.txt' not included above
-  [[nodiscard]] std::string qualifiedName() const;
+  [[nodiscard]] String qualifiedName() const;
 
   // Used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
   // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the
@@ -178,9 +178,9 @@ private:
     // 'isVariant' is true if _name includes a Unicode 'variation selector'. In
     // this case 'nonVariant' returns _name without the selector.
     [[nodiscard]] bool isVariant() const;
-    [[nodiscard]] std::string nonVariant() const;
+    [[nodiscard]] String nonVariant() const;
   private:
-    const std::string _name;
+    const String _name;
   };
 
   // 'QualifiedNames' stores the suffixes for qualified names in order of most
