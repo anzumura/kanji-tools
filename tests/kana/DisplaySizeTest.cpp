@@ -38,7 +38,7 @@ TEST(DisplaySizeTest, DisplaySize) {
 TEST(DisplaySizeTest, U32DisplaySize) {
   EXPECT_EQ(displaySize(U""), 0);
   EXPECT_EQ(displaySize(U"abc ."), 5);
-  EXPECT_EQ(displaySize(EmptyU32String), 0);
+  EXPECT_EQ(displaySize(EmptyCodeString), 0);
   EXPECT_EQ(displaySize(CodeString{U"abc ."}), 5);
   EXPECT_EQ(displaySize(U"abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize(U"。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter

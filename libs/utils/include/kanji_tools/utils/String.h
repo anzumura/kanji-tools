@@ -180,6 +180,6 @@ template<typename T>
 }
 
 inline const String EmptyString;
-inline const CodeString EmptyU32String;
+inline const CodeString EmptyCodeString;
 
 } // namespace kanji_tools

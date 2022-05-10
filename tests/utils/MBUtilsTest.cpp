@@ -130,9 +130,9 @@ TEST(MBUtilsTest, NotValidForOverlong) {
 }
 
 TEST(MBUtilsTest, ConvertEmptyStrings) {
-  EXPECT_EQ(fromUtf8(EmptyString), EmptyU32String);
-  EXPECT_EQ(fromUtf8(""), EmptyU32String);
-  EXPECT_EQ(toUtf8(EmptyU32String), EmptyString);
+  EXPECT_EQ(fromUtf8(EmptyString), EmptyCodeString);
+  EXPECT_EQ(fromUtf8(""), EmptyCodeString);
+  EXPECT_EQ(toUtf8(EmptyCodeString), EmptyString);
   EXPECT_EQ(toUtf8(U""), EmptyString);
 }
 
