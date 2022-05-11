@@ -4,7 +4,7 @@
 
 namespace kanji_tools {
 
-// To enable operators to meet the requirements of 'BitmaskType', specialize
+// To enable operators to meet the requirements of C++ 'BitmaskType', specialize
 // 'is_bitmask' for a scoped enum like the following:
 //
 //   template<> inline constexpr auto is_bitmask<MyEnum>{true};
@@ -13,9 +13,9 @@ namespace kanji_tools {
 //
 // 'MyEnum' must be a scoped enum with 'unsigned' underlying type and values set
 // to powers of 2. 'is_bitmask' enables 7 bitwise operators plus 'hasValue' and
-// 'operator!' global functions (see EnumBitmaskTest.cpp for examples).
+// 'operator!' global functions (see BitmaskTest.cpp for examples).
 
-// 'is_bitmask' bool that should be specialized:
+// 'is_bitmask' bool which should be specialized:
 template<typename T,
     std::enable_if_t<is_scoped_enum_v<T> &&
                          std::is_unsigned_v<std::underlying_type_t<T>>,
@@ -25,7 +25,7 @@ inline constexpr auto is_bitmask{false};
 template<typename T, typename _ = T>
 using isBitmask = std::enable_if_t<is_bitmask<T>, _>;
 
-// the 7 required bitwise operators are: &, |, ^, ~, &=, |= and ^=
+// the 7 bitwise operators enabled for 'bitmask' are: &, |, ^, ~, &=, |= and ^=
 
 template<typename T>
 [[nodiscard]] constexpr isBitmask<T> operator&(T x, T y) noexcept {

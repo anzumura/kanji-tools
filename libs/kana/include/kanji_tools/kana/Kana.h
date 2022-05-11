@@ -1,7 +1,7 @@
 #pragma once
 
+#include <kanji_tools/utils/Bitmask.h>
 #include <kanji_tools/utils/EnumArray.h>
-#include <kanji_tools/utils/EnumBitmask.h>
 
 #include <optional>
 #include <vector>

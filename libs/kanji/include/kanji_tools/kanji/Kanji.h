@@ -4,7 +4,7 @@
 #include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Ucd.h>
-#include <kanji_tools/utils/EnumBitmask.h>
+#include <kanji_tools/utils/Bitmask.h>
 #include <kanji_tools/utils/JlptLevels.h>
 #include <kanji_tools/utils/KenteiKyus.h>
 
