@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kanji_tools/utils/Bitmask.h>
-#include <kanji_tools/utils/EnumArray.h>
+#include <kanji_tools/utils/EnumList.h>
 
 #include <optional>
 #include <vector>
@@ -10,16 +10,16 @@ namespace kanji_tools {
 
 // 'CharType' is used by 'Converter' class to specify 'source' and 'target'
 // types when converting
-enum class CharType : BaseEnum::Size { Hiragana, Katakana, Romaji };
+enum class CharType : EnumContainer::Size { Hiragana, Katakana, Romaji };
 
-template<> inline constexpr auto is_enumarray<CharType>{true};
+template<> inline constexpr auto is_enumlist<CharType>{true};
 
 inline const auto CharTypes{
-    TypedEnumArray<CharType>::create("Hiragana", "Katakana", "Romaji")};
+    BaseEnumList<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
 // 'ConvertFlags' is also used by 'Converter' class to control some aspects of
 // conversion (see comments at the bottom of this file for more details)
-enum class ConvertFlags : BaseEnum::Size {
+enum class ConvertFlags : EnumContainer::Size {
   None,
   Hepburn,
   Kunrei,

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/utils/EnumArray.h>
+#include <kanji_tools/utils/EnumList.h>
 
 namespace kanji_tools {
 
@@ -13,7 +13,7 @@ namespace kanji_tools {
 // - Other: reason listed as その他
 // - None: all JinmeiKanji have one of the above reasons, None is used for base
 //   class virtual function return value (similar to other Kanji related enums)
-enum class JinmeiReasons : BaseEnum::Size {
+enum class JinmeiReasons : EnumContainer::Size {
   Names,
   Print,
   Variant,
@@ -23,9 +23,9 @@ enum class JinmeiReasons : BaseEnum::Size {
   None
 };
 
-template<> inline constexpr auto is_enumarray_with_none<JinmeiReasons>{true};
+template<> inline constexpr auto is_enumlist_with_none<JinmeiReasons>{true};
 
-inline const auto AllJinmeiReasons{TypedEnumArray<JinmeiReasons>::create(
+inline const auto AllJinmeiReasons{BaseEnumList<JinmeiReasons>::create(
     "Names", "Print", "Variant", "Moved", "Simple", "Other")};
 
 } // namespace kanji_tools

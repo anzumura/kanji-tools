@@ -24,8 +24,8 @@ private:
   void printCount(const String& name, T pred, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
-  template<typename T, BaseEnum::Size S>
-  void printListStats(const IterableEnumArray<T, S>&, T (Kanji::*)() const,
+  template<typename T, EnumContainer::Size S>
+  void printListStats(const EnumListWithNone<T, S>&, T (Kanji::*)() const,
       const String&, bool showNoFrequency) const;
 
   LevelDataFile dataFile(JlptLevels) const;

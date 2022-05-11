@@ -1,22 +1,22 @@
 #pragma once
 
-#include <kanji_tools/utils/TypeTraits.h>
 #include <kanji_tools/utils/String.h>
+#include <kanji_tools/utils/TypeTraits.h>
 
 #include <compare>
 #include <concepts>
 
 namespace kanji_tools {
 
-class BaseEnum {
+class EnumContainer {
 public:
   // enforce using a small unsigned type to help make sure scoped enums being
-  // used in derived classes (EnumMap, EnumArray, etc.) don't have negative
+  // used in derived classes (EnumMap, EnumList, etc.) don't have negative
   // values (they are supposed to be contiguous values starting at zero).
   using Size = uint8_t;
 
-  BaseEnum(const BaseEnum&) = delete;
-  BaseEnum& operator=(const BaseEnum&) = delete;
+  EnumContainer(const EnumContainer&) = delete;
+  EnumContainer& operator=(const EnumContainer&) = delete;
 protected:
   inline static const String IndexMsg{"index '"}, EnumMsg{"enum '"},
       RangeMsg{"' is out of range"};
@@ -50,12 +50,13 @@ protected:
 
   static void rangeError(const String&);
 
-  BaseEnum() noexcept = default;
+  EnumContainer() noexcept = default;
 };
 
-// IterableEnum is a base class for EnumArray and EnumMap classes. It provides
+// TypedEnumContainer is a base for EnumList and EnumMap classes. It provides
 // 'size' and 'getIndex' methods and an 'Iterator' (used by derived classes)
-template<typename T, BaseEnum::Size N> class IterableEnum : public BaseEnum {
+template<typename T, EnumContainer::Size N>
+class TypedEnumContainer : public EnumContainer {
 public:
   [[nodiscard]] static constexpr Size size() noexcept { return N; }
 protected:
@@ -63,9 +64,9 @@ protected:
     return checkIndex(to_underlying(x), EnumMsg);
   }
 
-  IterableEnum() noexcept {
+  TypedEnumContainer() noexcept {
     // make sure enum 'T' has the same underlying type as 'Size' since derived
-    // classes (like EnumArray) are designed to only support up to 'Size' items
+    // classes (like EnumList) are designed to only support up to 'Size' items
     static_assert(std::is_same_v<std::underlying_type_t<T>, Size>);
   }
 

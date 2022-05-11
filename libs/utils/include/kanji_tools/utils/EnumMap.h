@@ -1,12 +1,12 @@
 #pragma once
 
-#include <kanji_tools/utils/IterableEnum.h>
+#include <kanji_tools/utils/EnumContainer.h>
 
 #include <array>
 
 namespace kanji_tools {
 
-// EnumMap is a collection class for mapping scoped enum 'keys' to 'values'. The
+// EnumMap is a container class for mapping scoped enum 'keys' to 'values'. The
 // enum should have contiguous values starting at zero and a final 'None' which
 // allows this class to use 'std::array' internally instead of 'std::map'. It
 // provides 'size', 'operator[]', 'begin' and 'end' methods.
@@ -32,11 +32,11 @@ protected:
   BaseEnumMap() noexcept = default;
 };
 
-template<typename T, typename V, BaseEnum::Size N = to_underlying(T::None),
+template<typename T, typename V, EnumContainer::Size N = to_underlying(T::None),
     std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-class EnumMap : public IterableEnum<T, N>, public BaseEnumMap<V> {
+class EnumMap : public TypedEnumContainer<T, N>, public BaseEnumMap<V> {
 public:
-  using base = IterableEnum<T, N>;
+  using base = TypedEnumContainer<T, N>;
 
   EnumMap() noexcept = default;
 
@@ -112,7 +112,7 @@ public:
   private:
     friend EnumMap<T, V>; // calls private ctor
 
-    ConstIterator(BaseEnum::Size i, const EnumMap<T, V>& m) noexcept
+    ConstIterator(EnumContainer::Size i, const EnumMap<T, V>& m) noexcept
         : iBase{i}, _map{&m} {}
 
     const EnumMap<T, V>* _map{};

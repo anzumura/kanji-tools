@@ -177,8 +177,8 @@ void KanjiData::printGrades() const {
   log() << "  Total for all grades: " << all << '\n';
 }
 
-template<typename T, BaseEnum::Size S>
-void KanjiData::printListStats(const IterableEnumArray<T, S>& all,
+template<typename T, EnumContainer::Size S>
+void KanjiData::printListStats(const EnumListWithNone<T, S>& all,
     T (Kanji::*p)() const, const String& name, bool showNoFrequency) const {
   log() << name << " breakdown:\n";
   size_t total{};

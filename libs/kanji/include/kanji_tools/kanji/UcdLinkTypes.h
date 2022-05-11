@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/utils/EnumArray.h>
+#include <kanji_tools/utils/EnumList.h>
 
 namespace kanji_tools {
 
@@ -9,7 +9,7 @@ namespace kanji_tools {
 // readings. The script uses '*' for reading links so '*' has also been used in
 // 'AllUcdLinkTypes' array). Put _R first to allow a '<' comparision to find all
 // reading links. Note, there is no non-Reading 'Semantic' link type by design.
-enum class UcdLinkTypes : BaseEnum::Size {
+enum class UcdLinkTypes : EnumContainer::Size {
   Compatibility_R,
   Definition_R,
   Jinmei_R,
@@ -24,10 +24,10 @@ enum class UcdLinkTypes : BaseEnum::Size {
   None
 };
 
-template<> inline constexpr auto is_enumarray_with_none<UcdLinkTypes>{true};
+template<> inline constexpr auto is_enumlist_with_none<UcdLinkTypes>{true};
 
 inline const auto AllUcdLinkTypes{
-    TypedEnumArray<UcdLinkTypes>::create("Compatibility*", "Definition*",
+    BaseEnumList<UcdLinkTypes>::create("Compatibility*", "Definition*",
         "Jinmei*", "Semantic*", "Simplified*", "Traditional*", "Compatibility",
         "Definition", "Jinmei", "Simplified", "Traditional")};
 

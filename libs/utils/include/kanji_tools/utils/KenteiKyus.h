@@ -1,11 +1,11 @@
 #pragma once
 
-#include <kanji_tools/utils/EnumArray.h>
+#include <kanji_tools/utils/EnumList.h>
 
 namespace kanji_tools {
 
 // Kanji Kentei (漢字検定) Kyū (級), K = Kanken (漢検), J=Jun (準)
-enum class KenteiKyus : BaseEnum::Size {
+enum class KenteiKyus : EnumContainer::Size {
   K10,
   K9,
   K8,
@@ -21,9 +21,9 @@ enum class KenteiKyus : BaseEnum::Size {
   None
 };
 
-template<> inline constexpr auto is_enumarray_with_none<KenteiKyus>{true};
+template<> inline constexpr auto is_enumlist_with_none<KenteiKyus>{true};
 
-inline const auto AllKenteiKyus{TypedEnumArray<KenteiKyus>::create(
+inline const auto AllKenteiKyus{BaseEnumList<KenteiKyus>::create(
     "K10", "K9", "K8", "K7", "K6", "K5", "K4", "K3", "KJ2", "K2", "KJ1", "K1")};
 
 } // namespace kanji_tools

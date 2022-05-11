@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/utils/EnumArray.h>
+#include <kanji_tools/utils/EnumList.h>
 
 namespace kanji_tools {
 
@@ -17,7 +17,7 @@ namespace kanji_tools {
 // - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't included above
 // - Ucd: kanji loaded from 'ucd.txt' file that aren't included above
 // - None: used as a type for a kanji that haven't been loaded
-enum class KanjiTypes : BaseEnum::Size {
+enum class KanjiTypes : EnumContainer::Size {
   Jouyou,
   Jinmei,
   LinkedJinmei,
@@ -29,10 +29,10 @@ enum class KanjiTypes : BaseEnum::Size {
   None
 };
 
-template<> inline constexpr auto is_enumarray_with_none<KanjiTypes>{true};
+template<> inline constexpr auto is_enumlist_with_none<KanjiTypes>{true};
 
 inline const auto AllKanjiTypes{
-    TypedEnumArray<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
+    BaseEnumList<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
         "LinkedOld", "Frequency", "Extra", "Kentei", "Ucd")};
 
 } // namespace kanji_tools
