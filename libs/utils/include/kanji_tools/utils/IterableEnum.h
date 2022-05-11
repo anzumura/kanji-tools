@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/utils/EnumTraits.h>
+#include <kanji_tools/utils/TypeTraits.h>
 #include <kanji_tools/utils/String.h>
 
 #include <compare>
