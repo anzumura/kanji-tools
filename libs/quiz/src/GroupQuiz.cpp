@@ -18,9 +18,9 @@ const Choice::Choices PatternGroupChoices{{'1', "ア"}, {'2', "カ"}, {'3', "サ
 // and so on (see 'PatternBucketChoices' above).
 constexpr std::array PatternGroups{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
 
-constexpr auto RefreshOption{'\''}, EditOption{'*'}; // LCOV_EXCL_LINE: covered
+constexpr auto RefreshOption{'\''}, EditOption{'*'};
 
-constexpr auto TotalLetters{'z' - 'a' + 1};
+constexpr auto TotalLetters{'z' - 'a' + 1}; // LCOV_EXCL_LINE: covered
 
 } // namespace
 

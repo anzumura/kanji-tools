@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kanji_tools/kanji/Kanji.h>
+#include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
 #include <kanji_tools/utils/Args.h>

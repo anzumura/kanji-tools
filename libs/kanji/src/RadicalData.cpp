@@ -1,5 +1,4 @@
 #include <kanji_tools/kanji/Data.h>
-#include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 

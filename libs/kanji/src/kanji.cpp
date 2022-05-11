@@ -1,24 +1,19 @@
 #include <kanji_tools/kana/MBChar.h>
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/CustomFileKanji.h>
 
 #include <cassert>
 
 namespace kanji_tools {
 
+// base implementations of virtual functions return default values
+
 Kanji::Frequency Kanji::frequency() const { return 0; }
-
 KanjiGrades Kanji::grade() const { return KanjiGrades::None; }
-
 KenteiKyus Kanji::kyu() const { return KenteiKyus::None; }
-
 JlptLevels Kanji::level() const { return JlptLevels::None; }
-
 KanjiPtr Kanji::link() const { return {}; }
-
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
-
 Kanji::Year Kanji::year() const { return 0; }
-
 bool Kanji::linkedReadings() const { return false; }
 
 Kanji::KanjiName::KanjiName(const String& name) : _name{name} {
@@ -49,6 +44,14 @@ Kanji::Frequency Kanji::frequencyOrDefault(Frequency x) const {
 Kanji::Frequency Kanji::frequencyOrMax() const {
   return frequencyOrDefault(std::numeric_limits<Frequency>::max());
 }
+
+bool Kanji::is(KanjiTypes t) const { return type() == t; }
+bool Kanji::hasGrade() const { return hasValue(grade()); }
+bool Kanji::hasKyu() const { return hasValue(kyu()); }
+bool Kanji::hasLevel() const { return hasValue(level()); }
+bool Kanji::hasMeaning() const { return !meaning().empty(); }
+bool Kanji::hasNelsonIds() const { return !_nelsonIds.empty(); }
+bool Kanji::hasReading() const { return !reading().empty(); }
 
 String Kanji::info(KanjiInfo fields) const {
   static const String RadMsg{"Rad "}, StrokesMsg{"Strokes "}, FreqMsg{"Frq "},

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <kanji_tools/kanji/JinmeiReasons.h>
-#include <kanji_tools/kanji/KanjiGrades.h>
-#include <kanji_tools/kanji/KanjiTypes.h>
 #include <kanji_tools/kanji/Ucd.h>
 #include <kanji_tools/utils/Bitmask.h>
 #include <kanji_tools/utils/JlptLevels.h>
@@ -12,6 +9,40 @@
 #include <optional>
 
 namespace kanji_tools {
+
+// 'KanjiTypes' is used to identify which official group (Jouyou or Jinmei) a
+// kanji belongs to (or has a link to) as well as a few more groups for less
+// common kanji:
+// - Jouyou: 2136 official Jouyou kanji
+// - Jinmei: 633 official Jinmei kanji
+// - LinkedJinmei: 230 more Jinmei kanji that are old/variant forms of Jouyou
+//   (212) or Jinmei (18)
+// - LinkedOld: old/variant Jouyou kanji that aren't in 'LinkedJinmei'
+// - Frequency: kanji in top 2501 frequency list and in the above types
+// - Extra: kanji loaded from 'extra.txt' - shouldn't be any of the above types
+// - Kentei: kanji loaded from 'kentei/k*.txt' files that aren't included above
+// - Ucd: kanji loaded from 'ucd.txt' file that aren't included above
+// - None: used as a type for a kanji that haven't been loaded
+enum class KanjiTypes : EnumContainer::Size {
+  Jouyou,
+  Jinmei,
+  LinkedJinmei,
+  LinkedOld,
+  Frequency,
+  Extra,
+  Kentei,
+  Ucd,
+  None
+};
+
+template<> inline constexpr auto is_enumlist_with_none<KanjiTypes>{true};
+
+inline const auto AllKanjiTypes{
+    BaseEnumList<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
+        "LinkedOld", "Frequency", "Extra", "Kentei", "Ucd")};
+
+enum class KanjiGrades : EnumContainer::Size;
+enum class JinmeiReasons : EnumContainer::Size;
 
 // 'KanjiInfo' members can be used to select which fields are printed by
 // 'Kanji::info' method. For example 'Grade | Level | Freq' will print 'grade',
@@ -112,13 +143,13 @@ public:
   [[nodiscard]] auto& radical() const { return _radical; }
   [[nodiscard]] auto strokes() const { return _strokes; }
 
-  [[nodiscard]] auto is(KanjiTypes t) const { return type() == t; }
-  [[nodiscard]] auto hasGrade() const { return hasValue(grade()); }
-  [[nodiscard]] auto hasKyu() const { return hasValue(kyu()); }
-  [[nodiscard]] auto hasLevel() const { return hasValue(level()); }
-  [[nodiscard]] auto hasMeaning() const { return !meaning().empty(); }
-  [[nodiscard]] auto hasNelsonIds() const { return !_nelsonIds.empty(); }
-  [[nodiscard]] auto hasReading() const { return !reading().empty(); }
+  [[nodiscard]] bool is(KanjiTypes t) const;
+  [[nodiscard]] bool hasGrade() const;
+  [[nodiscard]] bool hasKyu() const;
+  [[nodiscard]] bool hasLevel() const;
+  [[nodiscard]] bool hasMeaning() const;
+  [[nodiscard]] bool hasNelsonIds() const;
+  [[nodiscard]] bool hasReading() const;
 
   // 'info' returns a comma separated string with extra info (if present)
   // including: Radical, Strokes, Pinyin, Grade, Level, Freq, New, Old and Kyu.
