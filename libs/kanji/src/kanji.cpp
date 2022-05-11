@@ -124,7 +124,7 @@ uint16_t Kanji::qualifiedNameRank() const { // NOLINT
          : t == Extra              ? vExt
          : t == Ucd                ? vUcd
          : kyu() != KenteiKyus::K1 ? vNoK1
-                                   : vK1;
+                                   : vK1; // LCOV_EXCL_LINE: covered
 }
 
 } // namespace kanji_tools
