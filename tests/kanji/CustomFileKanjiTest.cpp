@@ -54,6 +54,7 @@ protected:
   static void checkExtraKanji(const Kanji& k) { // NOLINT
     EXPECT_EQ(k.type(), KanjiTypes::Extra);
     EXPECT_EQ(k.name(), "霙");
+    EXPECT_EQ(k.qualifiedName(), "霙+");
     EXPECT_EQ(k.radical().name(), "雨");
     EXPECT_EQ(k.strokes(), Strokes16);
     EXPECT_EQ(k.meaning(), "sleet");
@@ -208,6 +209,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.frequency());
   EXPECT_EQ(k.name(), "云");
+  EXPECT_EQ(k.qualifiedName(), "云^");
   EXPECT_EQ(k.strokes(), Strokes4);
   EXPECT_EQ(k.kyu(), KenteiKyus::KJ1);
   ASSERT_EQ(k.type(), KanjiTypes::Jinmei);
@@ -237,6 +239,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   const LinkedJinmeiKanji k{data(), "亙", results[0]};
   EXPECT_EQ(k.type(), KanjiTypes::LinkedJinmei);
   EXPECT_EQ(k.name(), "亙");
+  EXPECT_EQ(k.qualifiedName(), "亙~");
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.hasGrade());
   EXPECT_FALSE(k.frequency());
@@ -289,6 +292,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
       EXPECT_EQ(k.kyu(), KenteiKyus::K7);
       EXPECT_EQ(k.frequency(), Freq640);
       EXPECT_EQ(k.name(), "愛");
+      EXPECT_EQ(k.qualifiedName(), "愛.");
       EXPECT_EQ(k.strokes().value(), 13);
       EXPECT_EQ(k.meaning(), "love");
       EXPECT_EQ(k.reading(), "アイ");
@@ -342,6 +346,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   const LinkedOldKanji k{data(), "艷", results[0]};
   EXPECT_EQ(k.type(), KanjiTypes::LinkedOld);
   EXPECT_EQ(k.name(), "艷");
+  EXPECT_EQ(k.qualifiedName(), "艷%");
   EXPECT_FALSE(k.hasLevel());
   EXPECT_FALSE(k.hasKyu());
   EXPECT_FALSE(k.hasGrade());

@@ -109,6 +109,7 @@ TEST_F(KanjiTest, FrequencyKanjiWithReading) {
   EXPECT_EQ(k.type(), KanjiTypes::Frequency);
   EXPECT_TRUE(k.is(KanjiTypes::Frequency));
   EXPECT_EQ(k.name(), "呑");
+  EXPECT_EQ(k.qualifiedName(), "呑\"");
   EXPECT_EQ(k.radical(), Rad1);
   EXPECT_EQ(k.frequency(), Freq2362);
   EXPECT_FALSE(k.hasLevel());
@@ -127,6 +128,7 @@ TEST_F(KanjiTest, KenteiKanji) {
   const KenteiKanji k{data(), "蘋", kyu};
   EXPECT_EQ(k.type(), KanjiTypes::Kentei);
   EXPECT_EQ(k.name(), "蘋");
+  EXPECT_EQ(k.qualifiedName(), "蘋#");
   EXPECT_EQ(k.strokes(), Strokes19);
   EXPECT_EQ(k.radical(), Rad1);
   EXPECT_FALSE(k.frequency());
@@ -150,6 +152,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   const UcdKanji k{data(), ucd};
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
   EXPECT_EQ(k.name(), "侭");
+  EXPECT_EQ(k.qualifiedName(), "侭*");
   EXPECT_EQ(k.radical(), Rad1);
   EXPECT_FALSE(k.frequency());
   EXPECT_FALSE(k.hasLevel());
