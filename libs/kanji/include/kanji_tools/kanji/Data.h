@@ -2,10 +2,10 @@
 
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/KanjiGrades.h>
+#include <kanji_tools/kanji/KanjiListFile.h>
 #include <kanji_tools/kanji/RadicalData.h>
 #include <kanji_tools/kanji/UcdData.h>
 #include <kanji_tools/utils/Args.h>
-#include <kanji_tools/utils/DataFile.h>
 #include <kanji_tools/utils/EnumMap.h>
 
 namespace kanji_tools {
@@ -17,7 +17,7 @@ public:
   using KanjiList = std::vector<KanjiPtr>;
   using KanjiMap = std::map<String, KanjiPtr>;
   template<typename T> using EnumList = EnumMap<T, KanjiList>;
-  using Path = DataFile::Path;
+  using Path = KanjiListFile::Path;
 
   // DataArg (to specify location of 'data' dir), DebugArg and InfoArg are
   // command line options that can be passed to apps using this 'Data' class
@@ -38,7 +38,7 @@ public:
   //   InfoArg:  sets '_debugMode' to 'Info' to print some summary debug output
   enum class DebugMode { Full, Info, None };
 
-  static void usage(const String& msg) { DataFile::usage(msg); }
+  static void usage(const String& msg) { KanjiListFile::usage(msg); }
   static constexpr auto OrderByQualifiedName{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
 
@@ -162,7 +162,7 @@ protected:
   void populateLinkedKanji(const Path&);
   void populateJinmei();
   void populateExtra();
-  void processList(const DataFile&);
+  void processList(const KanjiListFile&);
   void processUcd(); // should be called after processing all other types
 
   // 'checkStrokes' should be called after all lists are populated. It compares

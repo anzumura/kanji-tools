@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/KenteiKyus.h>
+#include <kanji_tools/kanji/KenteiKyus.h>
 
 namespace kanji_tools {
 

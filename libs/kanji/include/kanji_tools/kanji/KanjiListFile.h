@@ -1,7 +1,7 @@
 #pragma once
 
-#include <kanji_tools/utils/JlptLevels.h>
-#include <kanji_tools/utils/KenteiKyus.h>
+#include <kanji_tools/kanji/JlptLevels.h>
+#include <kanji_tools/kanji/KenteiKyus.h>
 
 #include <filesystem>
 #include <set>
@@ -9,12 +9,12 @@
 
 namespace kanji_tools {
 
-// 'DataFile' holds data loaded from text files that contain unique 'string'
-// entries (either one per line or multiple per line separated by space).
+// 'KanjiListFile' holds data loaded from text files that contain unique 'kanji'
+// string entries (either one per line or multiple per line separated by space).
 // Uniqueness is verified when data is loaded and entries are stored in order in
 // a list. There are derived classes for specific data types, i.e., where all
 // entries are for a 'JLPT Level' or a 'Kentei Kyu'.
-class DataFile {
+class KanjiListFile {
 public:
   using Index = uint16_t; // support up to 65K entries
   using Path = std::filesystem::path;
@@ -40,11 +40,11 @@ public:
 
   enum class FileType { MultiplePerLine, OnePerLine };
 
-  explicit DataFile(const Path&, FileType = FileType::OnePerLine);
+  explicit KanjiListFile(const Path&, FileType = FileType::OnePerLine);
 
-  DataFile(const DataFile&) = delete;
+  KanjiListFile(const KanjiListFile&) = delete;
 
-  virtual ~DataFile() = default;
+  virtual ~KanjiListFile() = default;
 
   // return index for 'name' starting at '1' or return '0' for not found.
   [[nodiscard]] Index getIndex(const String& name) const;
@@ -59,12 +59,12 @@ public:
   // return the full contents of this list in a string (with no separates)
   [[nodiscard]] String toString() const;
 protected:
-  DataFile(const Path&, FileType, StringSet*, const String& name = {});
+  KanjiListFile(const Path&, FileType, StringSet*, const String& name = {});
 private:
   using Map = std::map<String, Index>;
 
-  // 'UniqueNames': ensures uniqueness across non-typed DataFiles (currently
-  // only frequency.txt)
+  // 'UniqueNames': ensures uniqueness across non-typed KanjiListFiles
+  // (currently only frequency.txt)
   inline static StringSet UniqueNames;
   inline static std::set<StringSet*> OtherUniqueNames;
 
@@ -85,11 +85,11 @@ private:
   Map _map;
 };
 
-// there are TypedDataFile classes for 'JlptLevels' and 'KenteiKyus'
-template<typename T> class TypedDataFile : public DataFile {
+// there are TypedListFile classes for 'JlptLevels' and 'KenteiKyus'
+template<typename T> class TypedListFile : public KanjiListFile {
 protected:
-  TypedDataFile(const Path& p, T type)
-      : DataFile{p, FileType::MultiplePerLine, &UniqueTypeNames,
+  TypedListFile(const Path& p, T type)
+      : KanjiListFile{p, FileType::MultiplePerLine, &UniqueTypeNames,
             kanji_tools::toString(type)},
         _type{type} {}
 
@@ -100,16 +100,16 @@ private:
   inline static StringSet UniqueTypeNames;
 };
 
-class LevelDataFile : public TypedDataFile<JlptLevels> {
+class LevelListFile : public TypedListFile<JlptLevels> {
 public:
-  LevelDataFile(const Path& p, JlptLevels level) : TypedDataFile{p, level} {}
+  LevelListFile(const Path& p, JlptLevels level) : TypedListFile{p, level} {}
 
   [[nodiscard]] JlptLevels level() const override { return type(); }
 };
 
-class KyuDataFile : public TypedDataFile<KenteiKyus> {
+class KyuListFile : public TypedListFile<KenteiKyus> {
 public:
-  KyuDataFile(const Path& p, KenteiKyus kyu) : TypedDataFile{p, kyu} {}
+  KyuListFile(const Path& p, KenteiKyus kyu) : TypedListFile{p, kyu} {}
 
   [[nodiscard]] KenteiKyus kyu() const override { return type(); }
 };

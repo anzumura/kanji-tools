@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/JlptLevels.h>
+#include <kanji_tools/kanji/JlptLevels.h>
 
 namespace kanji_tools {
 

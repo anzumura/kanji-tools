@@ -40,7 +40,7 @@ private:
 
   template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
 
-  static DataFile::StringList getKanjiNames(const String& name,
+  static KanjiListFile::StringList getKanjiNames(const String& name,
       const String& members, GroupType, Group::PatternType&);
 
   [[nodiscard]] static GroupPtr createGroup(size_t number, const String& name,

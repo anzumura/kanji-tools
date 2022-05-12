@@ -28,19 +28,19 @@ private:
   void printListStats(const EnumListWithNone<T, S>&, T (Kanji::*)() const,
       const String&, bool showNoFrequency) const;
 
-  LevelDataFile dataFile(JlptLevels) const;
-  KyuDataFile dataFile(KenteiKyus) const;
+  LevelListFile dataFile(JlptLevels) const;
+  KyuListFile dataFile(KenteiKyus) const;
 
   template<typename V, size_t N> using List = const std::array<const V, N - 1>;
 
   // '_levels' (for JLPT) loaded from files under 'data/jlpt'
-  List<LevelDataFile, AllJlptLevels.size()> _levels;
+  List<LevelListFile, AllJlptLevels.size()> _levels;
 
   // '_kyus' (for Kanji Kentei) loaded from files under 'data/kentei'
-  List<KyuDataFile, AllKenteiKyus.size()> _kyus;
+  List<KyuListFile, AllKenteiKyus.size()> _kyus;
 
   // top 2501 frequency kanji loaded from 'data/frequency.txt'
-  const DataFile _frequency;
+  const KanjiListFile _frequency;
 };
 
 } // namespace kanji_tools

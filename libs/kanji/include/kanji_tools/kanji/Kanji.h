@@ -2,8 +2,6 @@
 
 #include <kanji_tools/kanji/Ucd.h>
 #include <kanji_tools/utils/Bitmask.h>
-#include <kanji_tools/utils/JlptLevels.h>
-#include <kanji_tools/utils/KenteiKyus.h>
 
 #include <memory>
 #include <optional>
@@ -41,7 +39,9 @@ inline const auto AllKanjiTypes{
     BaseEnumList<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
         "LinkedOld", "Frequency", "Extra", "Kentei", "Ucd")};
 
+enum class JlptLevels : EnumContainer::Size;
 enum class KanjiGrades : EnumContainer::Size;
+enum class KenteiKyus : EnumContainer::Size;
 enum class JinmeiReasons : EnumContainer::Size;
 
 // 'KanjiInfo' members can be used to select which fields are printed by

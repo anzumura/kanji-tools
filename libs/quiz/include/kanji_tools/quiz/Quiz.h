@@ -63,7 +63,7 @@ protected:
 private:
   const QuizLauncher& _launcher;
   Question _currentQuestion, _correctAnswers;
-  DataFile::StringList _mistakes;
+  KanjiListFile::StringList _mistakes;
   bool _showMeanings;
 };
 

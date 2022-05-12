@@ -21,9 +21,9 @@ const Data::Path& GroupData::dataDir(const Data::Path* dir) const {
 }
 
 GroupData::GroupData(const DataPtr& data, const Data::Path* dir) : _data{data} {
-  loadGroup(DataFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
+  loadGroup(KanjiListFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
       _meaningGroups, GroupType::Meaning);
-  loadGroup(DataFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
+  loadGroup(KanjiListFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
       _patternGroups, GroupType::Pattern);
   if (_data->debug()) {
     printGroups(_meaningMap, _meaningGroups);
@@ -79,10 +79,10 @@ void GroupData::loadGroup(
   }
 }
 
-DataFile::StringList GroupData::getKanjiNames(const String& name,
+KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
     const String& members, GroupType groupType,
     Group::PatternType& patternType) {
-  DataFile::StringList kanjiNames;
+  KanjiListFile::StringList kanjiNames;
   if (groupType == GroupType::Pattern) {
     patternType = name.starts_with(WideColon) ? Group::PatternType::Peer
                   : name.find(WideColon) != String::npos

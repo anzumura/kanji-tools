@@ -28,12 +28,13 @@ KanjiData::KanjiData(const Args& args, std::ostream& out, std::ostream& err)
           dataFile(KenteiKyus::KJ2), dataFile(KenteiKyus::K2),
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
       _frequency{dataDir() / "frequency"} {
-  DataFile::clearUniqueCheckData(); // cleanup data used for unique checks
-  ucd().load(DataFile::getFile(dataDir(), UcdFile));
-  radicals().load(DataFile::getFile(dataDir(), RadicalsFile));
-  loadFrequencyReadings(DataFile::getFile(dataDir(), FrequencyReadingsFile));
+  KanjiListFile::clearUniqueCheckData(); // cleanup data used for unique checks
+  ucd().load(KanjiListFile::getFile(dataDir(), UcdFile));
+  radicals().load(KanjiListFile::getFile(dataDir(), RadicalsFile));
+  loadFrequencyReadings(
+      KanjiListFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
-  populateLinkedKanji(DataFile::getFile(dataDir(), LinkedJinmeiFile));
+  populateLinkedKanji(KanjiListFile::getFile(dataDir(), LinkedJinmeiFile));
   populateJinmei();
   populateExtra();
   for (auto& i : _levels) processList(i);
@@ -213,11 +214,11 @@ void KanjiData::printListStats(const EnumListWithNone<T, S>& all,
   log() << "  Total for all " << name << "s: " << total << '\n';
 }
 
-LevelDataFile KanjiData::dataFile(JlptLevels x) const {
+LevelListFile KanjiData::dataFile(JlptLevels x) const {
   return {dataDir() / Jlpt / firstLower(toString(x)), x};
 }
 
-KyuDataFile KanjiData::dataFile(KenteiKyus x) const {
+KyuListFile KanjiData::dataFile(KenteiKyus x) const {
   return {dataDir() / Kentei / firstLower(toString(x)), x};
 }
 
