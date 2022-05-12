@@ -191,7 +191,7 @@ template<typename T>
       if (code4 > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
     } else if (const auto code3{threeByteUtf8<Code>(byte1, byte2, u)};
                code3 <= Max2Uni)
-      return err(Utf8Result::Overlong);
+      return err(Utf8Result::Overlong); // GCOV_EXCL_LINE
     else if (code3 >= MinSurrogate && code3 <= MaxSurrogate)
       return err(Utf8Result::InvalidCodePoint);
   } else if ((byte1 ^ TwoBits) < 2)
