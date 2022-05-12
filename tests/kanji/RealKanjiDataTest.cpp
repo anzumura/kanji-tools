@@ -17,8 +17,7 @@ protected:
     _data = std::make_shared<RealKanjiData>();
   }
 
-  [[nodiscard]] static auto checkKanji(
-      const KanjiData::KanjiList& l) { // NOLINT
+  [[nodiscard]] static auto check(const KanjiData::KanjiList& l) { // NOLINT
     size_t variants{};
     for (auto& i : l) {
       if (i->variant()) {
@@ -160,13 +159,13 @@ TEST_F(RealKanjiDataTest, SortingAndPrintingQualifiedName) {
   }
   EXPECT_EQ(sorted, "弓. 窮. 穹^ 弼@ 弖# 躬#");
   // Make sure all Kanji are in Kanji related Unicode blocks
-  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Jouyou)), 0);
-  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Jinmei)), 0);
+  EXPECT_EQ(check(_data->types(KanjiTypes::Jouyou)), 0);
+  EXPECT_EQ(check(_data->types(KanjiTypes::Jinmei)), 0);
   // 52 LinkedJinmei type Kanji use the Unicode 'Variation Selector'
-  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::LinkedJinmei)), 52);
-  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::LinkedOld)), 0);
-  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Extra)), 0);
-  EXPECT_EQ(checkKanji(_data->types(KanjiTypes::Frequency)), 0);
+  EXPECT_EQ(check(_data->types(KanjiTypes::LinkedJinmei)), 52);
+  EXPECT_EQ(check(_data->types(KanjiTypes::LinkedOld)), 0);
+  EXPECT_EQ(check(_data->types(KanjiTypes::Extra)), 0);
+  EXPECT_EQ(check(_data->types(KanjiTypes::Frequency)), 0);
 }
 
 TEST_F(RealKanjiDataTest, FindByName) {
