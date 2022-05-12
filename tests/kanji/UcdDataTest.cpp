@@ -1,6 +1,6 @@
 #include <kanji_tools/kanji/UcdData.h>
-#include <tests/kanji_tools/TestData.h>
 #include <tests/kanji_tools/TestKanji.h>
+#include <tests/kanji_tools/TestKanjiData.h>
 #include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -10,7 +10,7 @@ namespace {
 
 const String FileMsg{" - file: testFile.txt, row: 1"};
 
-class UcdDataTest : public TestData {
+class UcdDataTest : public TestKanjiData {
 protected:
   void SetUp() override {
     write("Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t"
@@ -276,8 +276,8 @@ TEST_F(UcdDataTest, DuplicateEntry) {
 }
 
 TEST_F(UcdDataTest, PrintWithMissingEntry) {
-  // add an entry to 'Data' that doesn't exist in 'ucd()' (should never happen
-  // when loading from actual data files)
+  // add an entry to 'KanjiData' that doesn't exist in 'ucd()' (should never
+  // happen when loading from actual data files)
   auto testKanji{std::make_shared<TestKanji>("四")};
   types()[KanjiTypes::Frequency].emplace_back(testKanji);
   ucd().print(*this);
@@ -288,8 +288,8 @@ TEST_F(UcdDataTest, PrintWithMissingEntry) {
 }
 
 TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
-  // add an entry with a variation selector to 'Data' that doesn't exist in
-  // 'ucd()' (should never happen when loading from actual data files)
+  // add an entry with a variation selector to 'KanjiData' that doesn't
+  // exist in 'ucd()' (should never happen when loading from actual data files)
   auto testKanji{std::make_shared<TestKanji>("僧︀")};
   const Ucd u{TestUcd{testKanji->name()}};
   checkInsert(testKanji, &u);

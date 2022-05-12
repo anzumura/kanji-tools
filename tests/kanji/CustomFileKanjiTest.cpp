@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kanji/CustomFileKanji.h>
-#include <tests/kanji_tools/MockData.h>
+#include <tests/kanji_tools/MockKanjiData.h>
 #include <tests/kanji_tools/TestKanji.h>
 #include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
@@ -40,7 +40,7 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  template<typename T> [[nodiscard]] Data::KanjiList fromFile() {
+  template<typename T> [[nodiscard]] KanjiData::KanjiList fromFile() {
     return CustomFileKanji::fromFile<T>(_data, TestFile);
   }
 
@@ -88,9 +88,9 @@ protected:
     EXPECT_EQ(k.extraTypeInfo(), "#8 1951 [Names]");
   }
 
-  [[nodiscard]] const MockData& data() { return _data; }
+  [[nodiscard]] const MockKanjiData& data() { return _data; }
 private:
-  const MockData _data;
+  const MockKanjiData _data;
 };
 
 } // namespace

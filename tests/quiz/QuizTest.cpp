@@ -6,7 +6,7 @@
 namespace kanji_tools {
 
 TEST(QuizTest, Info) {
-  const char* args[]{"", Data::InfoArg.c_str()};
+  const char* args[]{"", KanjiData::InfoArg.c_str()};
   std::stringstream os;
   Quiz::run(args, os);
   // look for a few strings instead of comparing the whole output
@@ -24,7 +24,7 @@ TEST(QuizTest, Info) {
 }
 
 TEST(QuizTest, Debug) {
-  const char* args[]{"", Data::DebugArg.c_str()};
+  const char* args[]{"", KanjiData::DebugArg.c_str()};
   std::stringstream os;
   Quiz::run(args, os);
   // look for a few strings instead of comparing the whole output

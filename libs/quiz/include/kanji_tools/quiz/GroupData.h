@@ -15,7 +15,7 @@ public:
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()' when
   // looking for group files (to help with testing)
-  explicit GroupData(const DataPtr&, const Data::Path* dir = {});
+  explicit GroupData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
 
   GroupData(const GroupData&) = delete;
   GroupData& operator=(const GroupData&) = delete;
@@ -30,7 +30,7 @@ public:
     return _data->log(heading);
   }
 private:
-  const Data::Path& dataDir(const Data::Path*) const;
+  const KanjiData::Path& dataDir(const KanjiData::Path*) const;
 
   // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
   static void add(const String& kanji, MultiMap&, const GroupPtr& group);
@@ -38,13 +38,14 @@ private:
   // add 'kanji'->'group' mapping or log an error if it's already been added
   void add(const String& kanji, Map&, const GroupPtr& group) const;
 
-  template<typename T> void loadGroup(const Data::Path&, T&, List&, GroupType);
+  template<typename T>
+  void loadGroup(const KanjiData::Path&, T&, List&, GroupType);
 
   static KanjiListFile::StringList getKanjiNames(const String& name,
       const String& members, GroupType, Group::PatternType&);
 
   [[nodiscard]] static GroupPtr createGroup(size_t number, const String& name,
-      const Data::KanjiList&, Group::PatternType);
+      const KanjiData::KanjiList&, Group::PatternType);
 
   template<typename T> void printGroups(const T&, const List&) const;
 
@@ -56,7 +57,7 @@ private:
   void printPatternGroup(const Group&, TypeMap&) const;
   template<typename T> void printUniqueNames(const T&, const StringSet&) const;
   void printTypeBreakdown(TypeMap&) const;
-  void printMissingFromType(const Data::KanjiList&, StringList&) const;
+  void printMissingFromType(const KanjiData::KanjiList&, StringList&) const;
 
   [[nodiscard]] auto fullDebug() const { return _data->fullDebug(); }
 
@@ -70,7 +71,7 @@ private:
   Map _patternMap;
   List _patternGroups;
 
-  const DataPtr _data;
+  const KanjiDataPtr _data;
 };
 
 using GroupDataPtr = std::shared_ptr<const GroupData>;

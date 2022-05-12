@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/kanji/RealKanjiData.h>
 #include <kanji_tools/quiz/Quiz.h>
 
 namespace kanji_tools {
@@ -10,7 +10,7 @@ constexpr auto ShowMeanings{"show meanings"}, HideMeanings{"hide meanings"};
 } // namespace
 
 void Quiz::run(const Args& args, std::ostream& out) {
-  const auto data{std::make_shared<KanjiData>(args, out)};
+  const auto data{std::make_shared<RealKanjiData>(args, out)};
   QuizLauncher(args, data, std::make_shared<GroupData>(data),
       std::make_shared<JukugoData>(data));
 }
@@ -52,9 +52,9 @@ std::ostream& Quiz::beginQuizMessage(size_t totalQuestions) {
   // 'question' list index starts at zero.
   if (_currentQuestion) {
     if (_currentQuestion > totalQuestions)
-      Data::usage("entry num '" + std::to_string(_currentQuestion) +
-                  "' is larger than total questions: " +
-                  std::to_string(totalQuestions));
+      KanjiData::usage("entry num '" + std::to_string(_currentQuestion) +
+                       "' is larger than total questions: " +
+                       std::to_string(totalQuestions));
     --_currentQuestion;
   }
   return log(true) << "Starting " << (isTestMode() ? "quiz" : "review")

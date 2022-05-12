@@ -1,13 +1,13 @@
 #pragma once
 
 #include <gmock/gmock.h>
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 
 namespace kanji_tools {
 
-class MockData : public Data {
+class MockKanjiData : public KanjiData {
 public:
-  explicit MockData() : Data{{}, Data::DebugMode::None} {}
+  explicit MockKanjiData() : KanjiData{{}, KanjiData::DebugMode::None} {}
   MOCK_METHOD(Kanji::Frequency, frequency, (const String&), (const, override));
   MOCK_METHOD(JlptLevels, level, (const String&), (const, override));
   MOCK_METHOD(KenteiKyus, kyu, (const String&), (const, override));

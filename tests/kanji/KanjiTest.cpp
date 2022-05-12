@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <tests/kanji_tools/MockData.h>
+#include <tests/kanji_tools/MockKanjiData.h>
 #include <tests/kanji_tools/TestKanji.h>
 #include <tests/kanji_tools/TestUcd.h>
 #include <tests/kanji_tools/WhatMismatch.h>
@@ -25,9 +25,9 @@ protected:
 
   KanjiTest() = default;
 
-  [[nodiscard]] const MockData& data() { return _data; }
+  [[nodiscard]] const MockKanjiData& data() { return _data; }
 private:
-  const MockData _data;
+  const MockKanjiData _data;
 };
 
 } // namespace
@@ -60,7 +60,7 @@ TEST(KanjiTypesTest, CheckValues) {
 TEST_F(KanjiTest, Equals) {
   const TestKanji first{"甲", "三"}, sameName{"甲", "山"}, diffName{"乙", "三"};
   // equality only depends on 'name' field - Kanji with same 'name' (even if any
-  // other fields are different) can't be added to 'Data' class
+  // other fields are different) can't be added to 'KanjiData' class
   EXPECT_EQ(first, sameName);
   EXPECT_NE(first, diffName);
 }

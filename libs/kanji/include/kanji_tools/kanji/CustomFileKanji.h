@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
@@ -29,12 +29,12 @@ public:
   //   for the given Kanji type 'T' (and the first line must have header names
   //   that match the static 'Column' instances below)
   template<typename T>
-  [[nodiscard]] static Data::KanjiList fromFile(
-      DataRef data, const Data::Path& f) {
+  [[nodiscard]] static KanjiData::KanjiList fromFile(
+      KanjiDataRef data, const KanjiData::Path& f) {
     // all 'CustomFileKanji' files must have at least the following columns
     ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
     for (auto& i : T::RequiredColumns) columns.emplace_back(i);
-    Data::KanjiList results;
+    KanjiData::KanjiList results;
     for (ColumnFile file{f, columns}; file.nextRow();)
       results.emplace_back(std::make_shared<T>(data, file));
     return results;
@@ -48,10 +48,10 @@ protected:
       ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
   // ctor used by 'CustomFileKanji' and 'ExtraKanji': has a 'meaning' field
-  CustomFileKanji(DataRef, File, Name, Strokes, Meaning, OldNames, UcdPtr);
+  CustomFileKanji(KanjiDataRef, File, Name, Strokes, Meaning, OldNames, UcdPtr);
 
   // ctor used by 'OfficialKanji': 'strokes' and 'meaning' loaded from 'ucd.txt'
-  CustomFileKanji(DataRef, File, Name, OldNames, UcdPtr);
+  CustomFileKanji(KanjiDataRef, File, Name, OldNames, UcdPtr);
 private:
   const KenteiKyus _kyu;
   const Number _number;
@@ -68,10 +68,10 @@ public:
   [[nodiscard]] Year year() const override { return _year; }
 protected:
   // ctor used by 'JinmeiKanji'
-  OfficialKanji(DataRef, File, Name, UcdPtr);
+  OfficialKanji(KanjiDataRef, File, Name, UcdPtr);
 
   // ctor used by 'JouyouKanji' calls base with 'strokes' and 'meaning' fields
-  OfficialKanji(DataRef, File, Name, Strokes, Meaning);
+  OfficialKanji(KanjiDataRef, File, Name, Strokes, Meaning);
 private:
   [[nodiscard]] static LinkNames getOldNames(File);
 
@@ -106,7 +106,7 @@ inline const auto AllJinmeiReasons{BaseEnumList<JinmeiReasons>::create(
 
 class JinmeiKanji : public OfficialKanji {
 public:
-  JinmeiKanji(DataRef, File);
+  JinmeiKanji(KanjiDataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   [[nodiscard]] JinmeiReasons reason() const override { return _reason; }
@@ -120,7 +120,7 @@ private:
 
 class JouyouKanji : public OfficialKanji {
 public:
-  JouyouKanji(DataRef, File);
+  JouyouKanji(KanjiDataRef, File);
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
 
@@ -136,15 +136,15 @@ private:
 // links). They should also not be in 'frequency.txt' or have a JLPT level.
 class ExtraKanji : public CustomFileKanji {
 public:
-  ExtraKanji(DataRef, File);
+  ExtraKanji(KanjiDataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
   [[nodiscard]] OptString newName() const override { return _newName; }
 
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 private:
-  ExtraKanji(DataRef, File, Name);
-  ExtraKanji(DataRef, File, Name, UcdPtr);
+  ExtraKanji(KanjiDataRef, File, Name);
+  ExtraKanji(KanjiDataRef, File, Name, UcdPtr);
 
   const OptString _newName;
 };
@@ -165,7 +165,7 @@ public:
   [[nodiscard]] bool linkedReadings() const override { return true; }
   [[nodiscard]] OptString newName() const override;
 protected:
-  LinkedKanji(DataRef, Name, const KanjiPtr&, UcdPtr);
+  LinkedKanji(KanjiDataRef, Name, const KanjiPtr&, UcdPtr);
 
   // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to
   // either Jouyou or Jinmei
@@ -180,7 +180,7 @@ private:
 // 18 have a 'link' pointing to a or JouyouKanji.
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
-  LinkedJinmeiKanji(DataRef, Name, const KanjiPtr&);
+  LinkedJinmeiKanji(KanjiDataRef, Name, const KanjiPtr&);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::LinkedJinmei;
@@ -191,7 +191,7 @@ public:
 // published Jōyō variants that aren't already included as Jinmeiyō variants.
 class LinkedOldKanji : public LinkedKanji {
 public:
-  LinkedOldKanji(DataRef, Name, const KanjiPtr&);
+  LinkedOldKanji(KanjiDataRef, Name, const KanjiPtr&);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::LinkedOld;

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/kanji/RealKanjiData.h>
 #include <kanji_tools/stats/Stats.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -15,7 +15,7 @@ namespace {
 class StatsTest : public ::testing::Test {
 protected:
   static void SetUpTestSuite() {
-    _data = std::make_shared<KanjiData>(Args{}, _os);
+    _data = std::make_shared<RealKanjiData>(Args{}, _os);
   }
 
   static void write(const String& s) {
@@ -52,7 +52,7 @@ protected:
   void TearDown() override { fs::remove_all(TestDir); }
 
   inline static std::stringstream _os;
-  inline static DataPtr _data;
+  inline static KanjiDataPtr _data;
   inline static const fs::path TestDir{"testDir"};
   inline static const fs::path TestFile{TestDir / "test.txt"};
 };

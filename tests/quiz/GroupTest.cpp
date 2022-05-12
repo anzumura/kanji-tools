@@ -9,7 +9,7 @@ namespace kanji_tools {
 
 namespace {
 
-const Data::KanjiList TestMembers{
+const KanjiData::KanjiList TestMembers{
     std::make_shared<TestKanji>("甲"), std::make_shared<TestKanji>("乙")};
 
 } // namespace
@@ -55,7 +55,7 @@ TEST(GroupTest, GroupWithOneMember) {
 }
 
 TEST(GroupTest, GroupWithTooManyMembers) {
-  Data::KanjiList l;
+  KanjiData::KanjiList l;
   for (size_t i{}; i <= Group::MaxGroupSize; ++i) l.push_back(TestMembers[0]);
   const auto f{[&l] { MeaningGroup{{}, "big", l}; }};
   EXPECT_THROW(
@@ -69,7 +69,7 @@ TEST(GroupTest, GroupWithOneDuplicateMember) {
 }
 
 TEST(GroupTest, GroupWithMultipleDuplicateMembers) {
-  Data::KanjiList l{TestMembers};
+  KanjiData::KanjiList l{TestMembers};
   l.insert(l.end(), TestMembers.begin(), TestMembers.end());
   const auto f{[&l] { MeaningGroup{{}, "m", l}; }};
   EXPECT_THROW(

@@ -15,7 +15,7 @@ constexpr auto JukugoSetW{14}, JukugoMaxExamples{12};
 
 namespace fs = std::filesystem;
 
-JukugoData::JukugoData(const DataPtr& data, const Data::Path* dir) {
+JukugoData::JukugoData(const KanjiDataPtr& data, const KanjiData::Path* dir) {
   const auto jukugoDir{dir ? *dir : data->dataDir() / "jukugo"};
   const auto f{[this, &jukugoDir, data](const char* file, KanjiGrades grade) {
     const auto loaded{loadFile(KanjiListFile::getFile(jukugoDir, file), grade)};

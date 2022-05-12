@@ -1,12 +1,12 @@
 #include <kanji_tools/kanji/RadicalData.h>
-#include <tests/kanji_tools/TestData.h>
+#include <tests/kanji_tools/TestKanjiData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
 
 namespace {
 
-class RadicalDataTest : public TestData {
+class RadicalDataTest : public TestKanjiData {
 protected:
   void SetUp() override { write("Number\tName\tLongName\tReading"); }
 

@@ -1,5 +1,5 @@
 #include <kanji_tools/kana/MBChar.h>
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
 #include <sstream>
@@ -87,7 +87,7 @@ String UcdData::getReadingsAsKana(UcdPtr u) const {
   return EmptyString;
 }
 
-void UcdData::load(const Data::Path& file) {
+void UcdData::load(const KanjiData::Path& file) {
   for (ColumnFile f{file,
            {CodeCol, NameCol, BlockCol, VersionCol, RadicalCol, StrokesCol,
                VStrokesCol, PinyinCol, MorohashiIdCol, NelsonIdsCol, SourcesCol,
@@ -131,7 +131,7 @@ void UcdData::load(const Data::Path& file) {
   }
 }
 
-void UcdData::print(DataRef data) const {
+void UcdData::print(KanjiDataRef data) const {
   PrintCount joyo, jinmei, other;
   const auto print{[&](const char* s, auto f) {
     // NOLINTNEXTLINE: CallAndMessage
@@ -209,7 +209,7 @@ void UcdData::processLinks(const ColumnFile& f, const Ucd::Links& links,
               "' failed - link already points to '" + i.first->second + "'");
 }
 
-void UcdData::printVariationSelectorKanji(DataRef data) const {
+void UcdData::printVariationSelectorKanji(KanjiDataRef data) const {
   data.log()
       << "  Standard Kanji with 'Variation Selectors' vs UCD Variants:\n";
   data.log()
@@ -224,7 +224,7 @@ void UcdData::printVariationSelectorKanji(DataRef data) const {
                  << " variant of " << k.nonVariantName() << "    ";
       const auto u{find(k.name())};
       // ucd entry should always exist
-      if (!u) Data::usage("UCD not found for '" + k.name() + "'");
+      if (!u) KanjiData::usage("UCD not found for '" + k.name() + "'");
       data.out() << u->codeAndName();
       if (u->hasLinks()) data.out() << " variant of " << u->linkCodeAndNames();
       data.out() << '\n';

@@ -27,9 +27,9 @@ public:
   // 'find' by the official Radical Number (one greater than index in _radicals)
   [[nodiscard]] RadicalRef find(Radical::Number) const;
 
-  // 'load' and 'print' are called by 'KanjiData'
+  // 'load' and 'print' are called by 'RealKanjiData'
   void load(const std::filesystem::path&);
-  void print(const class Data&) const;
+  void print(const class KanjiData&) const;
 private:
   // 'MaxExamples' controls how many examples are printed for each radical by
   // the above 'print' function (examples are sorted by assending stroke count).
@@ -38,11 +38,11 @@ private:
   using KanjiList = std::vector<std::shared_ptr<class Kanji>>;
   using RadicalLists = std::map<Radical, KanjiList>;
 
-  static void printRadicalLists(const Data&, RadicalLists&);
+  static void printRadicalLists(const KanjiData&, RadicalLists&);
 
   void checkLoaded() const;
 
-  void printMissingRadicals(const Data&, const RadicalLists&) const;
+  void printMissingRadicals(const KanjiData&, const RadicalLists&) const;
 
   // '_radicals' is populated from radicals.txt and the index in the vector is
   // one less than the actual Radical.number().

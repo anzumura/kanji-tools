@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 
 namespace kanji_tools {
 
@@ -13,7 +13,7 @@ public:
   // Command line options must specify one or more files and 'data' class is
   // used to lookup kanji found in files - see HelpMessage in Stats.cpp for more
   // details on command line options.
-  Stats(const Args&, const DataPtr&);
+  Stats(const Args&, const KanjiDataPtr&);
 
   Stats(const Stats&) = delete;
 private:
@@ -23,9 +23,9 @@ private:
   [[nodiscard]] auto& out() const { return _data->out(); }
 
   void countKanji(
-      const Data::Path& top, bool showBreakdown, bool verbose) const;
+      const KanjiData::Path& top, bool showBreakdown, bool verbose) const;
 
-  const DataPtr _data;
+  const KanjiDataPtr _data;
 };
 
 } // namespace kanji_tools

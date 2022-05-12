@@ -12,14 +12,14 @@ Kanji::OptString CustomFileKanji::extraTypeInfo() const {
 
 Kanji::Name CustomFileKanji::name(File f) { return f.get(NameCol); }
 
-CustomFileKanji::CustomFileKanji(DataRef data, File f, Name name,
+CustomFileKanji::CustomFileKanji(KanjiDataRef data, File f, Name name,
     Strokes strokes, Meaning meaning, OldNames oldNames, UcdPtr u)
     : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
           strokes, meaning, f.get(ReadingCol), u},
       _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 CustomFileKanji::CustomFileKanji(
-    DataRef data, File f, Name name, OldNames oldNames, UcdPtr u)
+    KanjiDataRef data, File f, Name name, OldNames oldNames, UcdPtr u)
     : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
           f.get(ReadingCol), u},
       _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
@@ -32,12 +32,13 @@ Kanji::OptString OfficialKanji::extraTypeInfo() const {
                : CustomFileKanji::extraTypeInfo();
 }
 
-OfficialKanji::OfficialKanji(DataRef data, File f, Name name, UcdPtr u)
+OfficialKanji::OfficialKanji(KanjiDataRef data, File f, Name name, UcdPtr u)
     : CustomFileKanji{data, f, name, getOldNames(f), u},
       _frequency{data.frequency(name)}, _level{data.level(name)},
       _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
 
-OfficialKanji::OfficialKanji(DataRef data, File f, Name name, Strokes strokes,
+OfficialKanji::OfficialKanji(KanjiDataRef data, File f, Name name,
+    Strokes strokes,
     Meaning meaning) // LCOV_EXCL_LINE
     : CustomFileKanji{data, f, name, strokes, meaning, getOldNames(f),
           data.findUcd(name)},
@@ -53,7 +54,7 @@ Kanji::LinkNames OfficialKanji::getOldNames(File f) {
 
 // JinmeiKanji
 
-JinmeiKanji::JinmeiKanji(DataRef data, File f)
+JinmeiKanji::JinmeiKanji(KanjiDataRef data, File f)
     : OfficialKanji{data, f, name(f), data.findUcd(f.get(NameCol))},
       _reason{AllJinmeiReasons.fromString(f.get(ReasonCol))} {}
 
@@ -63,7 +64,7 @@ Kanji::OptString JinmeiKanji::extraTypeInfo() const {
 
 // JouyouKanji
 
-JouyouKanji::JouyouKanji(DataRef data, File f)
+JouyouKanji::JouyouKanji(KanjiDataRef data, File f)
     : OfficialKanji{data, f, name(f), Strokes{f.getU8(StrokesCol)},
           f.get(MeaningCol)},
       _grade{getGrade(f.get(GradeCol))} {}
@@ -74,12 +75,13 @@ KanjiGrades JouyouKanji::getGrade(const String& s) {
 
 // ExtraKanji
 
-ExtraKanji::ExtraKanji(DataRef data, File f) : ExtraKanji{data, f, name(f)} {}
+ExtraKanji::ExtraKanji(KanjiDataRef data, File f)
+    : ExtraKanji{data, f, name(f)} {}
 
-ExtraKanji::ExtraKanji(DataRef data, File f, Name name)
+ExtraKanji::ExtraKanji(KanjiDataRef data, File f, Name name)
     : ExtraKanji{data, f, name, data.findUcd(name)} {}
 
-ExtraKanji::ExtraKanji(DataRef data, File f, Name name, UcdPtr u)
+ExtraKanji::ExtraKanji(KanjiDataRef data, File f, Name name, UcdPtr u)
     : CustomFileKanji{data, f, name, Strokes{f.getU8(StrokesCol)},
           f.get(MeaningCol),
           u && u->hasTraditionalLinks() ? linkNames(u) : EmptyLinkNames, u},
@@ -96,7 +98,7 @@ Kanji::Reading LinkedKanji::reading() const { return _link->reading(); }
 Kanji::OptString LinkedKanji::newName() const { return _link->name(); }
 
 LinkedKanji::LinkedKanji(
-    DataRef data, Name name, const KanjiPtr& link, UcdPtr u)
+    KanjiDataRef data, Name name, const KanjiPtr& link, UcdPtr u)
     : Kanji{data, name, data.ucdRadical(name, u), data.ucdStrokes(name, u), u},
       _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
 
@@ -113,11 +115,12 @@ Kanji::Name LinkedKanji::linkType(Name name, const Kanji& link, bool isJouyou) {
 }
 
 LinkedJinmeiKanji::LinkedJinmeiKanji(
-    DataRef data, Name name, const KanjiPtr& link)
+    KanjiDataRef data, Name name, const KanjiPtr& link)
     : LinkedKanji{
           data, linkType(name, *link, false), link, data.findUcd(name)} {}
 
-LinkedOldKanji::LinkedOldKanji(DataRef data, Name name, const KanjiPtr& link)
+LinkedOldKanji::LinkedOldKanji(
+    KanjiDataRef data, Name name, const KanjiPtr& link)
     : LinkedKanji{data, linkType(name, *link), link, data.findUcd(name)} {}
 
 } // namespace kanji_tools

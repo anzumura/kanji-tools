@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/kanji/RealKanjiData.h>
 #include <kanji_tools/quiz/ListQuiz.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -12,7 +12,7 @@ namespace {
 class ListQuizTest : public ::testing::Test {
 protected:
   static void SetUpTestSuite() {
-    _data = std::make_shared<KanjiData>(Args{}, _os, _es);
+    _data = std::make_shared<RealKanjiData>(Args{}, _os, _es);
     _groupData = std::make_shared<GroupData>(_data);
     _jukugoData = std::make_shared<JukugoData>(_data);
   }
@@ -79,7 +79,7 @@ protected:
   }
 
   inline static std::stringstream _os, _es;
-  inline static DataPtr _data;
+  inline static KanjiDataPtr _data;
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
 
@@ -112,7 +112,7 @@ TEST_F(ListQuizTest, MissingReading) {
   const auto i{_data->findKanjiByName(noReading)};
   ASSERT_TRUE(i);
   ASSERT_FALSE(i->hasReading());
-  Data::KanjiList questionList{i};
+  KanjiData::KanjiList questionList{i};
   const auto f{[&questionList, this] {
     ListQuiz{quiz(), {}, {}, questionList, KanjiInfo::All, 1,
         ListQuiz::QuizStyle::KanjiToReading};

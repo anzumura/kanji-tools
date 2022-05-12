@@ -29,8 +29,8 @@ public: // LCOV_EXCL_LINE
       : _count{f}, _name{n}, _entry{e} {}
 
   [[nodiscard]] auto frequency() const {
-    return _entry ? _entry->frequencyOrDefault(Data::maxFrequency())
-                  : Data::maxFrequency() + 1;
+    return _entry ? _entry->frequencyOrDefault(KanjiData::maxFrequency())
+                  : KanjiData::maxFrequency() + 1;
   }
   [[nodiscard]] auto type() const {
     return _entry ? _entry->type() : KanjiTypes::None;
@@ -82,7 +82,7 @@ constexpr size_t IncludeInTotals{5}, MaxExamples{5};
 // results can be retrieved via the 'total' and 'str' methods.
 class StatsPred {
 public:
-  StatsPred(const DataPtr& data, const fs::path& top, const String& name,
+  StatsPred(const KanjiDataPtr& data, const fs::path& top, const String& name,
       bool showBreakdown)
       : _data{data}, _top{top}, _name{name},
         _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
@@ -110,7 +110,7 @@ private:
   void printRareExamples(const CountSet&);
   void printBreakdown(const CountSet&, const MBCount&);
 
-  const DataPtr _data;
+  const KanjiDataPtr _data;
   const fs::path& _top;
   const String _name;
   const bool _showBreakdown;
@@ -256,10 +256,11 @@ void StatsPred::printBreakdown(
 
 } // namespace
 
-Stats::Stats(const Args& args, const DataPtr& data) : _data(data) {
+Stats::Stats(const Args& args, const KanjiDataPtr& data) : _data(data) {
   auto breakdown{false}, endOptions{false}, verbose{false};
   std::vector<String> files;
-  for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
+  for (auto i{KanjiData::nextArg(args)}; i < args.size();
+       i = KanjiData::nextArg(args, i))
     if (String arg{args[i]}; !endOptions && arg.starts_with("-")) {
       if (arg == "-h") {
         out() << HelpMessage;
@@ -272,11 +273,11 @@ Stats::Stats(const Args& args, const DataPtr& data) : _data(data) {
       else if (arg == "--")
         endOptions = true;
       else
-        Data::usage("illegal option '" + arg + "' use -h for help");
+        KanjiData::usage("illegal option '" + arg + "' use -h for help");
     } else
       files.emplace_back(arg);
   if (!data->debug() && files.empty())
-    Data::usage("please specify at least one option or '-h' for help");
+    KanjiData::usage("please specify at least one option or '-h' for help");
   for (auto& i : files) countKanji(i, breakdown, verbose);
 }
 

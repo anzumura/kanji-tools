@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/KanjiData.h>
+#include <kanji_tools/kanji/RealKanjiData.h>
 #include <kanji_tools/quiz/JukugoData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -15,7 +15,7 @@ class JukugoDataTest : public ::testing::Test {
 protected:
   static JukugoData create() { return JukugoData{_data, &TestDir}; }
 
-  static void SetUpTestSuite() { _data = std::make_shared<KanjiData>(); }
+  static void SetUpTestSuite() { _data = std::make_shared<RealKanjiData>(); }
 
   static void write(const String& f, const String& s) {
     std::ofstream of{TestDir / f, std::ios_base::app};
@@ -36,7 +36,7 @@ protected:
   void TearDown() override { fs::remove_all(TestDir); }
 
   inline static std::stringstream _os, _es;
-  inline static DataPtr _data;
+  inline static KanjiDataPtr _data;
 
   inline static const String Grade1File{"g1.txt"}, OtherFile{"other.txt"},
       Err{" - line: 1, file: "};

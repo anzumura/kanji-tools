@@ -64,7 +64,7 @@ enum class KanjiInfo : uint16_t {
 template<> inline constexpr auto is_bitmask<KanjiInfo>{true};
 
 using KanjiPtr = std::shared_ptr<class Kanji>;
-using DataRef = const class Data&;
+using KanjiDataRef = const class KanjiData&;
 
 class Kanji {
 public:
@@ -187,7 +187,7 @@ public:
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
   // ctor used by 'LinkedKanji' and 'NonLinkedKanji' classes
-  Kanji(DataRef, Name, RadicalRef, Strokes, UcdPtr);
+  Kanji(KanjiDataRef, Name, RadicalRef, Strokes, UcdPtr);
 
   // ctor used by above ctor as well as 'TestKanji' class
   Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
@@ -249,11 +249,12 @@ protected:
   [[nodiscard]] static LinkNames linkNames(UcdPtr);
 
   // ctor used by 'CustomFileKanji'
-  NonLinkedKanji(DataRef, Name, RadicalRef, Strokes, Meaning, Reading, UcdPtr);
+  NonLinkedKanji(
+      KanjiDataRef, Name, RadicalRef, Strokes, Meaning, Reading, UcdPtr);
 
   // ctor used by 'CustomFileKanji' and 'UcdFileKanji': looks up 'meaning' and
   // 'strokes' from 'ucd.txt'
-  NonLinkedKanji(DataRef, Name, RadicalRef, Reading, UcdPtr);
+  NonLinkedKanji(KanjiDataRef, Name, RadicalRef, Reading, UcdPtr);
 private:
   const String _meaning;
   const String _reading;
@@ -271,9 +272,9 @@ public:
   [[nodiscard]] bool linkedReadings() const override { return _linkedReadings; }
 protected:
   // ctor used by 'StandardKanji': has 'reading'
-  UcdFileKanji(DataRef, Name, Reading, UcdPtr);
+  UcdFileKanji(KanjiDataRef, Name, Reading, UcdPtr);
   // ctor used by 'StandardKanji' and 'UcdKanji': looks up 'reading'
-  UcdFileKanji(DataRef, Name, UcdPtr);
+  UcdFileKanji(KanjiDataRef, Name, UcdPtr);
 private:
   const bool _hasOldLinks;
 
@@ -295,13 +296,13 @@ public:
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
 protected:
   // ctor used by 'FrequencyKanji': has 'reading' and looks up 'kyu'
-  StandardKanji(DataRef, Name, Reading);
+  StandardKanji(KanjiDataRef, Name, Reading);
 
   // ctor used by 'FrequencyKanji': looks up 'kyu'
-  StandardKanji(DataRef, Name);
+  StandardKanji(KanjiDataRef, Name);
 
   // ctor used by 'KenteiKanji': has 'kyu'
-  StandardKanji(DataRef, Name, KenteiKyus);
+  StandardKanji(KanjiDataRef, Name, KenteiKyus);
 private:
   const KenteiKyus _kyu;
 };
@@ -311,10 +312,10 @@ private:
 class FrequencyKanji : public StandardKanji {
 public:
   // ctor used for 'FrequencyKanji' without a reading
-  FrequencyKanji(DataRef, Name, Frequency);
+  FrequencyKanji(KanjiDataRef, Name, Frequency);
 
   // ctor used for 'FrequencyKanji' with readings from 'frequency-readings.txt'
-  FrequencyKanji(DataRef, Name, Reading, Frequency);
+  FrequencyKanji(KanjiDataRef, Name, Reading, Frequency);
 
   [[nodiscard]] KanjiTypes type() const override {
     return KanjiTypes::Frequency;
@@ -328,7 +329,7 @@ private:
 // pulled in from other files
 class KenteiKanji : public StandardKanji {
 public:
-  KenteiKanji(DataRef, Name, KenteiKyus);
+  KenteiKanji(KanjiDataRef, Name, KenteiKyus);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
@@ -339,7 +340,7 @@ public:
 // Japanese reading.
 class UcdKanji : public UcdFileKanji {
 public:
-  UcdKanji(DataRef, const Ucd&);
+  UcdKanji(KanjiDataRef, const Ucd&);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };

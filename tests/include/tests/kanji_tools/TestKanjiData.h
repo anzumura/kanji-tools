@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 
 #include <fstream>
 
@@ -11,7 +11,7 @@ inline constexpr auto TestDirArg{"testDir"};
 inline const std::filesystem::path TestDir{TestDirArg};
 inline const std::filesystem::path TestFile{TestDir / "testFile.txt"};
 
-class TestData : public ::testing::Test, public Data {
+class TestKanjiData : public ::testing::Test, public KanjiData {
 public:
   [[nodiscard]] Kanji::Frequency frequency(const String&) const override {
     return Kanji::Frequency{};
@@ -23,9 +23,9 @@ public:
     return KenteiKyus::None;
   }
 protected:
-  TestData() : Data{TestDir, DebugMode::None, _os, _es} {}
+  TestKanjiData() : KanjiData{TestDir, DebugMode::None, _os, _es} {}
 
-  ~TestData() override { clear(); }
+  ~TestKanjiData() override { clear(); }
 
   static void clear() {
     _os.str({});

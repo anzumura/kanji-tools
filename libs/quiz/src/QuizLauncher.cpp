@@ -72,7 +72,7 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 
 } // namespace
 
-QuizLauncher::QuizLauncher(const Args& args, const DataPtr& data,
+QuizLauncher::QuizLauncher(const Args& args, const KanjiDataPtr& data,
     const GroupDataPtr& groupData, const JukugoDataPtr& jukugoData,
     std::istream* in)
     : _programMode{ProgramMode::NotAssigned},
@@ -82,7 +82,8 @@ QuizLauncher::QuizLauncher(const Args& args, const DataPtr& data,
   OptChar quizType, qList;
   Question question{};
   auto endOptions{false}, showMeanings{false};
-  for (auto i{Data::nextArg(args)}; i < args.size(); i = Data::nextArg(args, i))
+  for (auto i{KanjiData::nextArg(args)}; i < args.size();
+       i = KanjiData::nextArg(args, i))
     if (String arg{args[i]};
         endOptions || !arg.starts_with("-") || arg.size() < 2) {
       processKanjiArg(arg);
@@ -135,7 +136,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
     if (const auto c{chooseKyu(qList)}; !isQuit(c))
       listQuiz(KanjiInfo::Kyu, getKyuList(c));
     break;
-  case 'l':
+  case 'l': // LCOV_EXCL_LINE
     if (const char c{chooseLevel(qList)}; !isQuit(c))
       listQuiz(KanjiInfo::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
     break;
@@ -188,8 +189,8 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
       i != _groupData->patternMap().end() &&
       i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
-    Data::KanjiList sorted(i->second->members());
-    std::sort(sorted.begin(), sorted.end(), Data::OrderByQualifiedName);
+    KanjiData::KanjiList sorted(i->second->members());
+    std::sort(sorted.begin(), sorted.end(), KanjiData::OrderByQualifiedName);
     for (auto& j : sorted)
       if (*j != kanji) out() << ' ' << j->qualifiedName();
     out() << '\n';
@@ -253,14 +254,15 @@ QuizLauncher::OptChar QuizLauncher::processArg(
   case 'l': return setQuizType(quizType, arg, LevelChoices);
   case 'm': // intentional fallthrough
   case 'p': return setQuizType(quizType, arg, GroupKanjiChoices);
-  default: Data::usage("illegal option '" + arg + "', use -h for help");
+  default: KanjiData::usage("illegal option '" + arg + "', use -h for help");
   }
   return {};
 }
 
 QuizLauncher::Question QuizLauncher::processProgramModeArg(const String& arg) {
   if (_programMode != ProgramMode::NotAssigned)
-    Data::usage("only one mode (-r or -t) can be specified, use -h for help");
+    KanjiData::usage(
+        "only one mode (-r or -t) can be specified, use -h for help");
   _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
   if (arg.size() > 2) {
     if (arg.size() == 3 && arg[2] == '0')
@@ -276,12 +278,12 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(const String& arg) {
       }
       const auto s{arg.substr(offset)};
       if (!std::all_of(s.begin(), s.end(), ::isdigit))
-        Data::usage(
+        KanjiData::usage(
             "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
       if (const auto i{std::stoul(s)};
           i <= std::numeric_limits<Question>::max())
         return static_cast<Question>(i);
-      Data::usage("value for '" + arg.substr(0, 2) + "' exceeds limit");
+      KanjiData::usage("value for '" + arg.substr(0, 2) + "' exceeds limit");
     }
   }
   return 0;
@@ -290,7 +292,7 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(const String& arg) {
 Kanji::NelsonId QuizLauncher::getId(const String& msg, const String& arg) {
   std::stringstream ss{arg};
   Kanji::NelsonId id{};
-  if (!(ss >> id)) Data::usage("invalid " + msg + " '" + arg + "'");
+  if (!(ss >> id)) KanjiData::usage("invalid " + msg + " '" + arg + "'");
   return id;
 }
 
@@ -298,14 +300,14 @@ QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
     const String& arg, const Choices& choices,
     const std::optional<Choice::Range>& r) {
   if (quizType)
-    Data::usage("only one quiz type can be specified, use -h for help");
+    KanjiData::usage("only one quiz type can be specified, use -h for help");
   quizType = arg[1];
   if (arg.size() > 2) {
     if (const auto c{arg[2]};
         arg.size() == 3 &&
         (choices.contains(c) || r && r->first <= c && r->second >= c))
       return c;
-    Data::usage(
+    KanjiData::usage(
         "invalid format for '" + arg.substr(0, 2) + "', use -h for help");
   }
   return {};
@@ -315,7 +317,7 @@ void QuizLauncher::processKanjiArg(const String& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
     const auto kanji{
         _groupData->data().findKanjiByFrequency(getId("frequency", arg))};
-    if (!kanji) Data::usage("Kanji not found for frequency '" + arg + "'");
+    if (!kanji) KanjiData::usage("Kanji not found for frequency '" + arg + "'");
     printDetails(kanji->name());
   } else if (arg.starts_with("m")) {
     const MorohashiId id{arg.substr(1)};
@@ -324,7 +326,7 @@ void QuizLauncher::processKanjiArg(const String& arg) const {
   } else if (arg.starts_with("n")) {
     const auto id{arg.substr(1)};
     if (id.empty() || !std::all_of(id.begin(), id.end(), ::isdigit))
-      Data::usage("Nelson ID '" + id + "' is non-numeric");
+      KanjiData::usage("Nelson ID '" + id + "' is non-numeric");
     printDetails(_groupData->data().findByNelsonId(getId("Nelson ID", id)),
         "Nelson", id);
   } else if (arg.starts_with("u")) {
@@ -334,16 +336,17 @@ void QuizLauncher::processKanjiArg(const String& arg) const {
     if (id.size() < UnicodeStringMinSize || id.size() > UnicodeStringMaxSize ||
         (id.size() == UnicodeStringMaxSize && id[0] != '1' && id[0] != '2') ||
         !std::all_of(id.begin(), id.end(), ::ishexnumber))
-      Data::usage("Unicode value '" + id + "' is invalid");
+      KanjiData::usage("Unicode value '" + id + "' is invalid");
     printDetails(toUtf8(std::stoi(id, nullptr, HexDigits)));
   } else if (isKanji(arg))
     printDetails(arg);
   else
-    Data::usage("unrecognized 'kanji' value '" + arg + "', use -h for help");
+    KanjiData::usage(
+        "unrecognized 'kanji' value '" + arg + "', use -h for help");
 }
 
-void QuizLauncher::printDetails(
-    const Data::KanjiList& list, const String& name, const String& arg) const {
+void QuizLauncher::printDetails(const KanjiData::KanjiList& list,
+    const String& name, const String& arg) const {
   if (list.size() != 1) {
     if (list.size() > 1) {
       printLegend();
@@ -462,7 +465,7 @@ char QuizLauncher::chooseLevel(OptChar qList) const {
   return qList ? *qList : _choice.get("Choose level", LevelChoices);
 }
 
-const Data::KanjiList& QuizLauncher::getKyuList(char c) const {
+const KanjiData::KanjiList& QuizLauncher::getKyuList(char c) const {
   using enum KenteiKyus;
   return data().kyus(c == 'a'   ? K10
                      : c == 'c' ? KJ2

@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -11,7 +11,7 @@ namespace {
 
 using Count = std::map<KanjiTypes, int>;
 
-void printCounts(DataRef data, const Count& c, bool summary = false) {
+void printCounts(KanjiDataRef data, const Count& c, bool summary = false) {
   const auto t{std::accumulate(c.begin(), c.end(), 0,
       [](const auto& x, const auto& y) { return x + y.second; })};
   data.out() << std::setfill(' ') << std::right << std::setw(4) << t << " (";
@@ -43,7 +43,7 @@ RadicalRef RadicalData::find(Radical::Number number) const {
   return _radicals.at(number - 1);
 }
 
-void RadicalData::load(const Data::Path& file) {
+void RadicalData::load(const KanjiData::Path& file) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
       longNameCol{"LongName"}, readingCol{"Reading"};
   for (ColumnFile f{file, {numberCol, nameCol, longNameCol, readingCol}};
@@ -65,7 +65,7 @@ void RadicalData::load(const Data::Path& file) {
   }
 }
 
-void RadicalData::print(DataRef data) const {
+void RadicalData::print(KanjiDataRef data) const {
   data.log() << "Common Kanji Radicals (";
   for (auto i : AllKanjiTypes) {
     data.out() << i;
@@ -83,7 +83,7 @@ void RadicalData::print(DataRef data) const {
   printMissingRadicals(data, radicals);
 }
 
-void RadicalData::printRadicalLists(DataRef data, RadicalLists& radicals) {
+void RadicalData::printRadicalLists(KanjiDataRef data, RadicalLists& radicals) {
   Count total;
   for (auto& i : radicals) {
     auto& l{i.second};
@@ -113,7 +113,7 @@ void RadicalData::checkLoaded() const {
 }
 
 void RadicalData::printMissingRadicals(
-    DataRef data, const RadicalLists& radicals) const {
+    KanjiDataRef data, const RadicalLists& radicals) const {
   std::vector<Radical> missingRadicals;
   for (auto& i : _radicals)
     if (radicals.find(i) == radicals.end()) missingRadicals.emplace_back(i);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/kanji/Data.h>
+#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/Jukugo.h>
 
 namespace kanji_tools {
@@ -11,7 +11,7 @@ public:
 
   // if 'dir' is provided it will be used intead of 'data->dataDir()/jukugo'
   // when looking for jukugo files (to help with testing)
-  explicit JukugoData(const DataPtr&, const Data::Path* dir = {});
+  explicit JukugoData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
 
   JukugoData(const JukugoData&) = delete;
   JukugoData& operator=(const JukugoData&) = delete;
@@ -27,7 +27,7 @@ private:
   void createJukugo(const String& line, KanjiGrades, bool onePerLine);
 
   using JukugoKey = std::pair<String, String>;
-  [[nodiscard]] size_t loadFile(const Data::Path&, KanjiGrades);
+  [[nodiscard]] size_t loadFile(const KanjiData::Path&, KanjiGrades);
 
   std::map<JukugoKey, JukugoPtr> _uniqueJukugo;
   std::map<String, List> _kanjiToJukugo;

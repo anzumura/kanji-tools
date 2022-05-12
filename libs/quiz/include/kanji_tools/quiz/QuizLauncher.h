@@ -12,14 +12,14 @@ class QuizLauncher {
 public:
   using Choices = Choice::Choices;
   using OptChar = Choice::OptChar;
-  using KanjiList = Data::KanjiList;
+  using KanjiList = KanjiData::KanjiList;
   using Question = uint16_t;
 
   static constexpr char QuitOption{'/'};
 
   // An istream 'in' can be provided for testing purposes (instead of reading
   // std::cin) and if given, 'start' must be explicitly called to start a quiz.
-  QuizLauncher(const Args&, const DataPtr&, const GroupDataPtr&,
+  QuizLauncher(const Args&, const KanjiDataPtr&, const GroupDataPtr&,
       const JukugoDataPtr&, std::istream* in = {});
 
   QuizLauncher(const QuizLauncher&) = delete;
@@ -52,7 +52,7 @@ public:
 private:
   static constexpr uint16_t JukugoPerLine{3}, MaxJukugoSize{30};
 
-  [[nodiscard]] DataRef data() const { return _groupData->data(); }
+  [[nodiscard]] KanjiDataRef data() const { return _groupData->data(); }
 
   void startListQuiz(Question question, bool showMeanings,
       KanjiInfo excludeField, const KanjiList&) const;
@@ -83,7 +83,7 @@ private:
   // 'printDetails' prints info about a kanji provided on the command line
   // (instead of running a quiz)
   void printDetails(
-      const Data::KanjiList&, const String& name, const String& arg) const;
+      const KanjiData::KanjiList&, const String& name, const String& arg) const;
   void printDetails(const String&, bool showLegend = true) const;
 
   [[nodiscard]] bool getQuestionOrder();
@@ -98,7 +98,7 @@ private:
   [[nodiscard]] char chooseKyu(OptChar) const;
   [[nodiscard]] char chooseLevel(OptChar) const;
 
-  [[nodiscard]] const Data::KanjiList& getKyuList(char) const;
+  [[nodiscard]] const KanjiData::KanjiList& getKyuList(char) const;
 
   // '_programMode' and '_questionOrder' can be set via the command line,
   // otherwise they are obtained interactively

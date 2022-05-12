@@ -16,11 +16,12 @@ constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
 
 } // namespace
 
-const Data::Path& GroupData::dataDir(const Data::Path* dir) const {
+const KanjiData::Path& GroupData::dataDir(const KanjiData::Path* dir) const {
   return dir ? *dir : _data->dataDir();
 }
 
-GroupData::GroupData(const DataPtr& data, const Data::Path* dir) : _data{data} {
+GroupData::GroupData(const KanjiDataPtr& data, const KanjiData::Path* dir)
+    : _data{data} {
   loadGroup(KanjiListFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
       _meaningGroups, GroupType::Meaning);
   loadGroup(KanjiListFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
@@ -43,7 +44,7 @@ void GroupData::add(const String& kanji, Map& m, const GroupPtr& group) const {
 
 template<typename T>
 void GroupData::loadGroup(
-    const Data::Path& file, T& groups, List& list, GroupType groupType) {
+    const KanjiData::Path& file, T& groups, List& list, GroupType groupType) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
       membersCol{"Members"};
   for (ColumnFile f(file, {numberCol, nameCol, membersCol}); f.nextRow();) {
@@ -58,7 +59,7 @@ void GroupData::loadGroup(
     auto patternType{Group::PatternType::None};
     const auto kanjiNames{getKanjiNames(name, members, groupType, patternType)};
     // get memberKanji (by looking up each name in kanjiNames)
-    Data::KanjiList memberKanji;
+    KanjiData::KanjiList memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findKanjiByName(i)}; k)
         memberKanji.emplace_back(k);
@@ -99,7 +100,7 @@ KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
 }
 
 GroupPtr GroupData::createGroup(size_t number, const String& name,
-    const Data::KanjiList& members, Group::PatternType patternType) {
+    const KanjiData::KanjiList& members, Group::PatternType patternType) {
   if (patternType == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, patternType);
@@ -211,7 +212,7 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
 }
 
 void GroupData::printMissingFromType(
-    const Data::KanjiList& all, StringList& found) const {
+    const KanjiData::KanjiList& all, StringList& found) const {
   if (const auto missing{all.size() - found.size()}; missing) {
     std::sort(found.begin(), found.end());
     out() << " (";

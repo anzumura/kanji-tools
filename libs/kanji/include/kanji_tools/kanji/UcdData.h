@@ -34,15 +34,15 @@ public:
 
   [[nodiscard]] auto& map() const { return _map; }
 
-  // 'load' and 'print' are called by 'KanjiData'
+  // 'load' and 'print' are called by 'RealKanjiData'
   void load(const std::filesystem::path&);
-  void print(const class Data&) const;
+  void print(const class KanjiData&) const;
 private:
   [[nodiscard]] static Ucd::Links loadLinks(const class ColumnFile&, bool joyo);
   void processLinks(
       const ColumnFile&, const Ucd::Links&, const String& name, bool jinmei);
 
-  void printVariationSelectorKanji(const Data&) const;
+  void printVariationSelectorKanji(const KanjiData&) const;
 
   Map _map;
 
