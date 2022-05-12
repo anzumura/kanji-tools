@@ -37,7 +37,6 @@ auto& operator<<(std::ostream& os, const KanaCount& k) {
 }
 
 void printChartHeader(std::ostream& out, bool markdown) {
-  // LCOV_EXCL_START: covered
   out << (markdown ? "**Notes:**\n" : ">>> Notes:") << R"(
 - Column names use some abbreviations: 'Roma' = Rōmaji, 'Hira' = Hiragana,
   'Kata' = Katakana, 'Uni' = Unicode, 'Hepb' = Hepburn, 'Kunr' = Kunrei
@@ -55,7 +54,7 @@ void printChartHeader(std::ostream& out, bool markdown) {
   - Middle Dot/Interpunct (・): maps to Rōmaji '/' to match IME keyboard entry
   - Prolong Mark (ー): convert to/from macrons (ā, ī, ū, ē, ō)
   - Repeat symbols (ゝ, ゞ, ヽ, ヾ): only supported when 'target' is Rōmaji
-)"; // LCOV_EXCL_STOP
+)";
   if (markdown) out << '\n';
 }
 
@@ -137,7 +136,7 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
 }
 
 bool KanaConvert::processArg(
-    const String& arg, bool& printKana, bool& printMarkdown) {
+    const String& arg, bool& printKana, bool& printMarkdown) { // LCOV_EXCL_LINE
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     // NOLINTNEXTLINE: NonNullParamChecker
     if (_interactive || _suppressNewLine || printKana || printMarkdown)

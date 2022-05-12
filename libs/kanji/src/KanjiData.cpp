@@ -135,7 +135,7 @@ void KanjiData::printStats() const {
     printCount("  Jinmei with no frequency and not JLPT", [](auto& x) {
       return x->type() == KanjiTypes::Jinmei && !x->frequency() &&
              !x->hasLevel();
-    }); // LCOV_EXCL_LINE: covered
+    });
     printCount("  NF (no-frequency)", [](auto& x) { return !x->frequency(); });
     printCount("  Has Variant Strokes",
         [](auto& x) { return x->strokes().hasVariant(); });

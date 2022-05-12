@@ -110,7 +110,7 @@ template<typename T>
   const auto utfLen{std::countl_one(*u)};
   if (!utfLen) return {*u++}; // single byte UTF-8 case (Ascii)
   if (utfLen == 1 || utfLen > 4) {
-    ++u;           // GCOV_EXCL_START: covered
+    ++u;           // GCOV_EXCL_START
     return v[Err]; // 1st byte was '10...' or more than four '1's
   }                // GCOV_EXCL_STOP
   uInt byte1{*u};
@@ -129,10 +129,10 @@ template<typename T>
     // return Error if 't' is 'overlong' or in the Surrogate range
     return t > v[MaxTwo] && (t < v[MinSur] || t > v[MaxSur]) ? t : v[Err];
   }
-  ++u; // GCOV_EXCL_START: covered
+  ++u;
   return (byte1 ^ TwoBits) > 1 ? cast<T>(left6(byte1 ^ TwoBits, byte2))
                                : v[Err];
-} // GCOV_EXCL_STOP
+}
 
 // 'R' is a sequence (so u32string or wstring) and 'T' is Code or wchar_t
 template<typename R, typename T = typename R::value_type>
@@ -163,13 +163,13 @@ void convertToUtf8(Code c, String& s) {
       s += toChar((Six & c) + Bit1);
     } else
       s += ReplacementCharacter;
-  } else if (c <= MaxUnicode) { // GCOV_EXCL_LINE: covered
+  } else if (c <= MaxUnicode) {
     s += toChar(right18(FirstThree & c, FourBits));
     s += toChar(right12(ThirdSix & c, Bit1));
     s += toChar(right6(SecondSix & c, Bit1));
     s += toChar((Six & c) + Bit1);
   } else
-    s += ReplacementCharacter; // GCOV_EXCL_LINE: covered
+    s += ReplacementCharacter; // GCOV_EXCL_LINE
 }
 
 // 'validateMB' is called by 'validateMBUtf8' ('u' has already been verified to
@@ -191,10 +191,10 @@ template<typename T>
       if (code4 > MaxUnicode) return err(Utf8Result::InvalidCodePoint);
     } else if (const auto code3{threeByteUtf8<Code>(byte1, byte2, u)};
                code3 <= Max2Uni)
-      return err(Utf8Result::Overlong); // GCOV_EXCL_LINE: covered
+      return err(Utf8Result::Overlong);
     else if (code3 >= MinSurrogate && code3 <= MaxSurrogate)
       return err(Utf8Result::InvalidCodePoint);
-  } else if ((byte1 ^ TwoBits) < 2)   // GCOV_EXCL_LINE: covered
+  } else if ((byte1 ^ TwoBits) < 2)
     return err(Utf8Result::Overlong); // overlong 2 byte
   return !sizeOne || !*++u ? MBUtf8Result::Valid
                            : err(Utf8Result::StringTooLong);

@@ -22,21 +22,16 @@ Quiz::Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
 Quiz::~Quiz() {
   if (isTestMode()) {
     out() << "\nFinal score: " << _correctAnswers << '/' << _currentQuestion;
-    if (!_currentQuestion)
-      out() << '\n';
-    else if (_correctAnswers == _currentQuestion)
-      out() << " - Perfect!\n";
-    else { // LCOV_EXCL_LINE: covered
-      if (const auto skipped{
-              _currentQuestion - _correctAnswers - _mistakes.size()};
-          skipped)
-        out() << ", skipped: " << skipped;
+    if (_currentQuestion) {
+      const auto skipped{_currentQuestion - _correctAnswers - _mistakes.size()};
+      if (skipped) out() << ", skipped: " << skipped;
       if (!_mistakes.empty()) {
         out() << " - mistakes:";
         for (auto& i : _mistakes) out() << ' ' << i;
-      }
-      out() << '\n';
+      } else if (!skipped)
+        out() << " - Perfect!";
     }
+    out() << '\n';
   }
 }
 

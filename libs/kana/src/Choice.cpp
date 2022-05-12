@@ -38,13 +38,13 @@ char Choice::get(const String& msg, bool useQuit, const Choices& choicesIn,
     if (_in)
       std::getline(*_in, line);
     else {
-      // LCOV_EXCL_START - code only used in interactive mode
+      // XCOV_EXCL_START - code only used in interactive mode
       if (const auto choice{getOneChar()}; choice == '\n')
         line.clear();
       else
         line = choice;
       _out << '\n';
-      // LCOV_EXCL_STOP
+      // XCOV_EXCL_STOP
     }
     if (line.empty() && def) return *def;
   } while (line.size() != 1 || choices.find(line[0]) == choices.end());
@@ -100,7 +100,7 @@ char Choice::get(const String& msg, const Range& range, OptChar def) const {
   return get(msg, range, {}, def);
 }
 
-// LCOV_EXCL_START - this code requires user input (so not covered by tests)
+// XCOV_EXCL_START - this code requires user input (so not covered by tests)
 char Choice::getOneChar() {
   static constexpr tcflag_t Icanon{ICANON}, Echo{ECHO};
   struct termios settings {};
@@ -122,7 +122,7 @@ char Choice::getOneChar() {
     perror("tcsetattr() - turning off raw mode");
   return result;
 }
-// LCOV_EXCL_STOP
+// XCOV_EXCL_STOP
 
 void Choice::add(String& prompt, const Choices& choices) {
   static const String CommaSpace{", "}, Equals{"="}, Dash{"-"};

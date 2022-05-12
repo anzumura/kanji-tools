@@ -68,12 +68,24 @@ if [[ -n $(find . -name $gcno | head -1) ]]; then
   find .. \( -name '*.gcda' -o -name '*.gcov' \) -exec rm {} \;
   log "- remove .gcno files that don't have a corresponding .o file"
   find .. -name $gcno -exec bash -c '[[ -f ${1/.gcno/.o} ]] || rm "$1"' _ {} \;
+  # Clang and gcc occasionally miss covering lines that are covered by tests and
+  # Clang has more problems than gcc including having zero counts for a few
+  # constexpr lines (and parts of raw strings) wherease gcc doesn't count these
+  # lines at all - this leads to Clang having ~15% more total line than gcc. The
+  # following 'exclude comment convention' is used to deal with these problems:
+  # - LCOV_EXCL_*: comment for lines Clang incorrectly marks as not covered
+  # - GCOV_EXCL_*: comment for lines gcc incorrectly marks as not covered
+  # - XCOV_EXCL_*: comment for lines truly not covered and skipped on purpose
+  # There are only a few usages of XCOV_* including some assert related code and
+  # code related to terminal manipulation and direct user input.
   if otool -L $(ls ./*/*Test | head -1) | grep -q /lib/gcc/; then
-    cov=gcov-11
+    covTool=gcov-11
+    covPrefix=G
   else
-    cov=gcov
+    covTool=gcov
+    covPrefix=L
   fi
-  log "- will use gcov executable: $(which $cov)"
+  log "- will use gcov executable: $(which $covTool)"
 fi
 
 for i in *; do
@@ -81,7 +93,7 @@ for i in *; do
   ./${i}Test --gtest_output=xml
 done
 
-if [[ -n $cov ]]; then
+if [[ -n $covTool ]]; then
   changeDir "$topDir"
   if [[ $reportDir != build ]]; then
     if [[ -d $reportDir ]]; then
@@ -91,13 +103,14 @@ if [[ -n $cov ]]; then
       mkdir $reportDir
     fi
   fi
-  log "running: $(which gcovr)"
+  log "running: $(which gcovr), prefix=$covPrefix"
   # 'gcovr' 5.0 worked fine for both Clang and GCC, but version 5.1 gets a few
   # parse errors for GCC which don't seem to affect the overall coverage so for
   # now use '--gcov-ignore-parse-errors' to allow the report to get generated
-  gcovr --gcov-executable=$cov $report $reportDir/$reportFile -d -flibs \
+  gcovr --gcov-executable=$covTool $report $reportDir/$reportFile -d -flibs \
     --gcov-ignore-parse-errors --exclude-unreachable-branches \
-    --exclude-throw-branches build/libs build/tests
+    --exclude-throw-branches --exclude-pattern-prefix "[X$covPrefix]COV_*" \
+    build/libs build/tests
 fi
 
 # set the following values for the actions:

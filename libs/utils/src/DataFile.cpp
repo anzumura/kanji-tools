@@ -23,7 +23,7 @@ fs::path DataFile::getFile(const Path& dir, const Path& file) {
 }
 
 void DataFile::print(std::ostream& out, const StringList& l, const String& type,
-    const String& group) { // LCOV_EXCL_LINE
+    const String& group) {
   if (!l.empty()) {
     out << ">>> Found " << l.size() << ' ' << type;
     if (!group.empty()) out << " in " << group;

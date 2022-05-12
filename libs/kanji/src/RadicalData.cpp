@@ -9,7 +9,7 @@ namespace kanji_tools {
 
 namespace {
 
-using Count = std::map<KanjiTypes, int>; // LCOV_EXCL_LINE: covered
+using Count = std::map<KanjiTypes, int>;
 
 void printCounts(DataRef data, const Count& c, bool summary = false) {
   const auto t{std::accumulate(c.begin(), c.end(), 0,

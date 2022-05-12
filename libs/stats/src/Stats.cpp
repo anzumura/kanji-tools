@@ -10,23 +10,21 @@ namespace kanji_tools {
 
 namespace fs = std::filesystem;
 
-// LCOV_EXCL_START: covered
-namespace {
+namespace { // LCOV_EXCL_START
 
 constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
   -b: show full Kanji breakdown for 'file' (instead of just a summary)
   -h: show help message for command-line options
   -v: show 'before' and 'after' versions of lines changed by Furigana removal
-)"};
-// LCOV_EXCL_STOP
+)"}; // LCOV_EXCL_STOP
 
 [[nodiscard]] constexpr double asPercent(size_t amount, size_t total) {
   return static_cast<double>(amount) * 100. / static_cast<double>(total);
 }
 
 // helper class for ordering and printing out kanji found in files
-class Count { // LCOV_EXCL_LINE: covered
-public:
+class Count {
+public: // LCOV_EXCL_LINE
   Count(size_t f, const String& n, const KanjiPtr& e)
       : _count{f}, _name{n}, _entry{e} {}
 

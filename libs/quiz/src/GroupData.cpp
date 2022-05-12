@@ -10,7 +10,7 @@ namespace kanji_tools {
 namespace {
 
 const String WideColon{"："};
-// LCOV_EXCL_START: covered
+// LCOV_EXCL_START
 constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
 // LCOV_EXCL_STOP
 

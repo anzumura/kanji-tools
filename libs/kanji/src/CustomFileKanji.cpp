@@ -19,9 +19,7 @@ CustomFileKanji::CustomFileKanji(DataRef data, File f, Name name,
       _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 CustomFileKanji::CustomFileKanji(
-    // LCOV_EXCL_START: covered
     DataRef data, File f, Name name, OldNames oldNames, UcdPtr u)
-    // LCOV_EXCL_STOP
     : NonLinkedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
           f.get(ReadingCol), u},
       _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
@@ -39,8 +37,8 @@ OfficialKanji::OfficialKanji(DataRef data, File f, Name name, UcdPtr u)
       _frequency{data.frequency(name)}, _level{data.level(name)},
       _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
 
-OfficialKanji::OfficialKanji(
-    DataRef data, File f, Name name, Strokes strokes, Meaning meaning)
+OfficialKanji::OfficialKanji(DataRef data, File f, Name name, Strokes strokes,
+    Meaning meaning) // LCOV_EXCL_LINE
     : CustomFileKanji{data, f, name, strokes, meaning, getOldNames(f),
           data.findUcd(name)},
       _frequency{data.frequency(name)}, _level{data.level(name)},

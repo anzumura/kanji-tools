@@ -95,7 +95,7 @@ void MBChar::reset() {
 bool MBChar::next(String& result, bool onlyMB) {
   while (*_curLocation) {
     switch (validateMBUtf8(_curLocation)) {
-    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE: covered
+    case MBUtf8Result::NotMultiByte:
       if (!onlyMB) {
         result = *_curLocation++;
         return true;
@@ -126,7 +126,7 @@ bool MBChar::next(String& result, bool onlyMB) {
 bool MBChar::peek(String& result, bool onlyMB) const {
   for (auto location{_curLocation}; *location;) {
     switch (validateMBUtf8(location)) {
-    case MBUtf8Result::NotMultiByte: // LCOV_EXCL_LINE: covered
+    case MBUtf8Result::NotMultiByte:
       if (!onlyMB) {
         result = *location;
         return true;

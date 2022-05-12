@@ -11,8 +11,7 @@ namespace {
 
 // Clang marks some lines in 'HelpMessage' as '0' coverage whereas GCC doesn't
 // count them at all (which seems like the correct way to go for 'constexpr')
-// LCOV_EXCL_START: covered
-constexpr auto HelpMessage{
+constexpr auto HelpMessage{// LCOV_EXCL_START
     R"(kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]
     -h   show this help message for command-line options
@@ -46,8 +45,7 @@ or 'u' followed by Unicode. For example, theses all produce the same output:
   kanjiQuiz m5894
   kanjiQuiz n212
   kanjiQuiz u5949
-)"};
-// LCOV_EXCL_STOP
+)"};                       // LCOV_EXCL_STOP
 
 const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
     ListOrderChoices{
@@ -103,7 +101,7 @@ QuizLauncher::QuizLauncher(const Args& args, const DataPtr& data,
 }
 
 void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
-    bool meanings, bool randomizeAnswers) { // LCOV_EXCL_LINE: covered
+    bool meanings, bool randomizeAnswers) {
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
@@ -376,7 +374,7 @@ void QuizLauncher::printDetails(const String& arg, bool showLegend) const {
       printMeaning(*k, true);
       printReviewDetails(*k);
     } else // should never happen since all kanji in ucd.txt should be loaded
-      out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE: covered
+      out() << " --- Kanji not loaded'\n"; // LCOV_EXCL_LINE
   } else
     // can happen for non=supported rare kanji (see parseUcdAllFlat.sh)
     out() << " --- Not found in 'ucd.txt'\n";

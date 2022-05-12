@@ -26,17 +26,15 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
   };
   // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
   for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
-           // LCOV_EXCL_START: covered
            D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
            D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
            // Ascii 0-9
            D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"}, D{'>', "＞"},
            D{'?', "？"}, D{'@', "＠"},
-           // Ascii A-Z
+           // Ascii A-Z - LCOV_EXCL_START
            D{'[', "「"}, D{'\\', "￥"}, D{']', "」"}, D{'^', "＾"},
            D{'_', "＿"}, D{'`', "｀"},
-           // LCOV_EXCL_STOP
-           // Ascii a-z
+           // Ascii a-z - LCOV_EXCL_STOP
            D{'{', "『"}, D{'|', "｜"}, D{'}', "』"}, D{'~', "〜"}}) {
     _narrowDelimList += i.narrow;
     _narrowDelims[i.narrow] = i.wide;
@@ -134,8 +132,7 @@ String Converter::convert(CharType source, const String& input) const {
   return result;
 }
 
-String Converter::fromKana(
-    const String& kanaInput, CharType source) const { // LCOV_EXCL_LINE
+String Converter::fromKana(const String& kanaInput, CharType source) const {
   State state{State::New};
   String result, kanaGroup, kana;
   const Kana* prevKana{};
@@ -226,10 +223,10 @@ String Converter::processKana(const String& kanaGroup, CharType source,
                          processKanaMacron(prolong, prevKana, i->second);
       // return second part unconverted - this should be impossible by design
       // since only Kana that exists in sourceMap are added to 'kanaGroup'
-      // LCOV_EXCL_START
+      // XCOV_EXCL_START
       return processKana(firstKana, source, prevKana) +
              kanaGroup.substr(Kana::OneKanaSize);
-      // LCOV_EXCL_STOP
+      // XCOV_EXCL_STOP
     }
   } else if (prolong)
     // a 'prolong mark' at the start of a group isn't valid so in this case just
@@ -315,7 +312,7 @@ void Converter::processRomaji(String& letters, String& result) const {
 bool Converter::processRomajiMacron(
     const String& letter, String& letters, String& result) const {
   static const std::map<String, std::pair<char, String>> Macrons{
-      {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, // GCOV_EXCL_LINE: covered
+      {"ā", {'a', "あ"}}, {"ī", {'i', "い"}}, // GCOV_EXCL_LINE
       {"ū", {'u', "う"}}, {"ē", {'e', "え"}}, {"ō", {'o', "お"}}};
 
   if (const auto i{Macrons.find(letter)}; i != Macrons.end()) {

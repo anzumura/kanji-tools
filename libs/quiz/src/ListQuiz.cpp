@@ -20,7 +20,7 @@ ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
     bool showMeanings, const KanjiList& list, KanjiInfo fields,
-    ChoiceCount choiceCount, QuizStyle quizStyle) // LCOV_EXCL_LINE: covered
+    ChoiceCount choiceCount, QuizStyle quizStyle) // LCOV_EXCL_LINE
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
       _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{toChar(
