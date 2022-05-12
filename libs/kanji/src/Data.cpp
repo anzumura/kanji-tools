@@ -1,7 +1,4 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
-#include <kanji_tools/kanji/LinkedKanji.h>
-#include <kanji_tools/kanji/UcdFileKanji.h>
-#include <kanji_tools/utils/ColumnFile.h>
 #include <kanji_tools/utils/MBUtils.h>
 
 #include <sstream>

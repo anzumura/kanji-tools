@@ -2,7 +2,6 @@
 #include <kanji_tools/kana/DisplaySize.h>
 #include <kanji_tools/kana/MBChar.h>
 #include <kanji_tools/kanji/KanjiData.h>
-#include <kanji_tools/kanji/LinkedKanji.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <type_traits>

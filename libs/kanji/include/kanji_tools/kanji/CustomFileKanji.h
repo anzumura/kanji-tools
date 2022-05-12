@@ -1,7 +1,7 @@
 #pragma once
 
+#include <kanji_tools/kanji/Data.h>
 #include <kanji_tools/kanji/KanjiGrades.h>
-#include <kanji_tools/kanji/NonLinkedKanji.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
 namespace kanji_tools {
@@ -147,6 +147,55 @@ private:
   ExtraKanji(DataRef, File, Name, UcdPtr);
 
   const OptString _newName;
+};
+
+// 'LinkedKanji' are official variants of Jouyou or Jinmei Kanji. Some are in
+// the top 2501 frequency list and they are generally in Kentei KJ1 or K1 kyus.
+// However, none of them are in a JLPT level and 'meaning' and 'reading' methods
+// return the values from the 'link' (ie original Jouyou or Jinmei) Kanji.
+class LinkedKanji : public Kanji {
+public:
+  [[nodiscard]] Meaning meaning() const override;
+  [[nodiscard]] Reading reading() const override;
+
+  [[nodiscard]] Frequency frequency() const override { return _frequency; }
+  [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
+  [[nodiscard]] KanjiPtr link() const override { return _link; }
+
+  [[nodiscard]] bool linkedReadings() const override { return true; }
+  [[nodiscard]] OptString newName() const override;
+protected:
+  LinkedKanji(DataRef, Name, const KanjiPtr&, UcdPtr);
+
+  // linkedOldKanji must link back to Jouyou and LinkedJinmeiKanji can link to
+  // either Jouyou or Jinmei
+  [[nodiscard]] static Name linkType(Name, const Kanji&, bool isJouyou = true);
+private:
+  const Frequency _frequency;
+  const KenteiKyus _kyu;
+  const KanjiPtr _link;
+};
+
+// There are 230 of these Kanji. 212 have a 'link' pointing to a JinmeiKanji and
+// 18 have a 'link' pointing to a or JouyouKanji.
+class LinkedJinmeiKanji : public LinkedKanji {
+public:
+  LinkedJinmeiKanji(DataRef, Name, const KanjiPtr&);
+
+  [[nodiscard]] KanjiTypes type() const override {
+    return KanjiTypes::LinkedJinmei;
+  }
+};
+
+// There are 163 of these Kanji. 'link' points to a JouyouKanji - these are the
+// published Jōyō variants that aren't already included as Jinmeiyō variants.
+class LinkedOldKanji : public LinkedKanji {
+public:
+  LinkedOldKanji(DataRef, Name, const KanjiPtr&);
+
+  [[nodiscard]] KanjiTypes type() const override {
+    return KanjiTypes::LinkedOld;
+  }
 };
 
 } // namespace kanji_tools

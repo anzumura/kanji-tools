@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kanji/CustomFileKanji.h>
-#include <kanji_tools/kanji/LinkedKanji.h>
 #include <tests/kanji_tools/MockData.h>
 #include <tests/kanji_tools/TestKanji.h>
 #include <tests/kanji_tools/TestUcd.h>

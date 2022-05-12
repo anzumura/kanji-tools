@@ -237,6 +237,5 @@ private:
 };
 
 using DataPtr = std::shared_ptr<const Data>;
-using DataRef = const Data&;
 
 } // namespace kanji_tools
