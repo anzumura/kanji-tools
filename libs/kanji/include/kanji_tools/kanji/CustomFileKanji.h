@@ -1,7 +1,6 @@
 #pragma once
 
 #include <kanji_tools/kanji/KanjiData.h>
-#include <kanji_tools/kanji/KanjiGrades.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
 namespace kanji_tools {
@@ -79,30 +78,6 @@ private:
   const JlptLevels _level;
   const Year _year;
 };
-
-// JinmeiReasons represents reason kanji was added to Jinmei list:
-// - Names: for use in names
-// - Print: for use in publications
-// - Variant: allowed variant form (異体字)
-// - Moved: moved out of Jouyou into Jinmei
-// - Simple: simplified form (表外漢字字体表の簡易慣用字体)
-// - Other: reason listed as その他
-// - None: all JinmeiKanji have one of the above reasons, None is used for base
-//   class virtual function return value (similar to other Kanji related enums)
-enum class JinmeiReasons : EnumContainer::Size {
-  Names,
-  Print,
-  Variant,
-  Moved,
-  Simple,
-  Other,
-  None
-};
-
-template<> inline constexpr auto is_enumlist_with_none<JinmeiReasons>{true};
-
-inline const auto AllJinmeiReasons{BaseEnumList<JinmeiReasons>::create(
-    "Names", "Print", "Variant", "Moved", "Simple", "Other")};
 
 class JinmeiKanji : public OfficialKanji {
 public:

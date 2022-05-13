@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/kanji/KanjiGrades.h>
+#include <kanji_tools/kanji/KanjiEnums.h>
 
 #include <memory>
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include <kanji_tools/kanji/JlptLevels.h>
-#include <kanji_tools/kanji/KenteiKyus.h>
+#include <kanji_tools/kanji/KanjiEnums.h>
 
 #include <filesystem>
 #include <set>
@@ -63,9 +62,12 @@ protected:
 private:
   using Map = std::map<String, Index>;
 
-  // 'UniqueNames': ensures uniqueness across non-typed KanjiListFiles
+  // 'UniqueNames' ensures uniqueness across non-typed KanjiListFiles
   // (currently only frequency.txt)
   inline static StringSet UniqueNames;
+
+  // 'OtherUniqueNames' hold pointers to 'UniqueTypeNames' sets (from derived
+  // classes) and is used to facilitate clearing data once everything is loaded
   inline static std::set<StringSet*> OtherUniqueNames;
 
   // 'load' is called by ctor to load contents of 'file'
