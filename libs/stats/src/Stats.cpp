@@ -24,7 +24,7 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
 
 // helper class for ordering and printing out kanji found in files
 class Count {
-public: // LCOV_EXCL_LINE
+public:
   Count(size_t f, const String& n, const KanjiPtr& e)
       : _count{f}, _name{n}, _entry{e} {}
 
@@ -53,7 +53,7 @@ public: // LCOV_EXCL_LINE
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& entry() const { return _entry; }
 private:
-  size_t _count;
+  size_t _count; // LCOV_EXCL_LINE
   String _name;
   KanjiPtr _entry;
 };
@@ -95,7 +95,7 @@ public:
   [[nodiscard]] auto isKanji() const { return _isKanji; }
 private:
   // 'DisplayValues' are for ostream 'set' functions
-  enum IntDisplayValues {
+  enum IntDisplayValues { // LCOV_EXCL_LINE
     UniqueCountWidth = 4,
     TotalCountWidth = 6,
     TypeNameWidth = 16
