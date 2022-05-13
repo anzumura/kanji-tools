@@ -11,9 +11,7 @@ namespace kanji_tools {
 // 'CharType' is used by 'Converter' class to specify 'source' and 'target'
 // types when converting
 enum class CharType : EnumContainer::Size { Hiragana, Katakana, Romaji };
-
 template<> inline constexpr auto is_enumlist<CharType>{true};
-
 inline const auto CharTypes{
     BaseEnumList<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
@@ -26,7 +24,6 @@ enum class ConvertFlags : EnumContainer::Size {
   NoProlongMark = 4,
   RemoveSpaces = 8
 };
-
 template<> inline constexpr auto is_bitmask<ConvertFlags>{true};
 
 // 'Kana' represents a Kana 'Monograph' or 'Digraph'. It stores Rōmaji, Hiragana
@@ -113,21 +110,15 @@ public:
   public:
     RepeatMark(const RepeatMark&) = delete;
 
-    [[nodiscard]] auto matches(CharType t, const String& s) const {
-      return t == CharType::Hiragana && _hiragana == s ||
-             t == CharType::Katakana && _katakana == s;
-    }
+    [[nodiscard]] bool matches(CharType, const String&) const;
     [[nodiscard]] const String& get(
-        CharType target, ConvertFlags flags, const Kana* prevKana) const;
+        CharType target, ConvertFlags, const Kana* prevKana) const;
     [[nodiscard]] auto& hiragana() const { return _hiragana; }
     [[nodiscard]] auto& katakana() const { return _katakana; }
   private:
     friend Kana; // only Kana class can constuct
     RepeatMark(CharArray<OneKanaArraySize> hiragana,
-        CharArray<OneKanaArraySize> katakana, bool dakuten)
-        : _hiragana{hiragana}, _katakana{katakana}, _dakuten{dakuten} {
-      validate();
-    }
+        CharArray<OneKanaArraySize> katakana, bool dakuten);
 
     void validate() const;
 
@@ -178,73 +169,46 @@ public:
 
   // 'dakuten' and 'hanDakuten' are overridden by derived classes to
   // return the accented versions
-  [[nodiscard]] virtual const Kana* dakuten() const { return nullptr; }
-  [[nodiscard]] virtual const Kana* hanDakuten() const { return nullptr; }
+  [[nodiscard]] virtual const Kana* dakuten() const;
+  [[nodiscard]] virtual const Kana* hanDakuten() const;
 
   // 'plain' returns the unaccented version of this Kana or 'nullptr' if this
   // Kana is unaccented or is a combination that doesn't have an equivalent
   // unaccented 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc..
   // Note: ウォ can be typed with 'u' then 'lo', but is treated as two separate
   // Kana instances ('u' and 'lo') instead of a plain version of 'vo'.
-  [[nodiscard]] virtual const Kana* plain() const { return nullptr; }
+  [[nodiscard]] virtual const Kana* plain() const;
 
-  [[nodiscard]] OptString dakuten(CharType t) const {
-    if (const auto i{dakuten()}; i) return i->get(t, ConvertFlags::None);
-    return EmptyOptString;
-  }
+  [[nodiscard]] OptString dakuten(CharType) const;
 
-  [[nodiscard]] OptString hanDakuten(CharType t) const {
-    if (const auto i{hanDakuten()}; i) return i->get(t, ConvertFlags::None);
-    return EmptyOptString;
-  }
+  [[nodiscard]] OptString hanDakuten(CharType) const;
 
   // All small Kana have _romaji starting with 'l' (and they are all monographs)
-  [[nodiscard]] auto isSmall() const { return _romaji.starts_with("l"); }
+  [[nodiscard]] bool isSmall() const;
 
   // A 'Kana' instance can either be a single symbol or two symbols. This is
   // enforced by assertions in the constructor as well as unit tests.
-  [[nodiscard]] auto isMonograph() const {
-    return _hiragana.size() == OneKanaSize;
-  }
-  [[nodiscard]] auto isDigraph() const {
-    return _hiragana.size() == TwoKanaSize;
-  }
+  [[nodiscard]] bool isMonograph() const;
+  [[nodiscard]] bool isDigraph() const;
 
   // Test if the current instance (this) is a 'dakuten' or 'han-dakuten' Kana,
   // i.e., the class of 'this' is 'Kana', but we are a member of a 'DakutenKana'
   // or 'HanDakutenKana' class.
-  [[nodiscard]] auto isDakuten() const {
-    if (auto* p{plain()}; p) return p->dakuten() == this;
-    // special case for a few digraphs that start with 'v', but don't have an
-    // unaccented version (see 'plain' method comments for more details)
-    return _romaji.starts_with("v");
-  }
-  [[nodiscard]] auto isHanDakuten() const {
-    if (auto* p{plain()}; p) return p->hanDakuten() == this;
-    return false;
-  }
+  [[nodiscard]] bool isDakuten() const;
+  [[nodiscard]] bool isHanDakuten() const;
 
   // 'getRomaji' returns 'Rōmaji' value based on flags
   [[nodiscard]] const String& getRomaji(ConvertFlags flags) const;
 
   // repeat the first letter of _romaji for sokuon (促音) output (special
   // handling for 't' as described in comments above).
-  [[nodiscard]] String getSokuonRomaji(ConvertFlags flags) const {
-    auto& r{getRomaji(flags)};
-    return (r[0] == 'c' ? 't' : r[0]) + r;
-  }
+  [[nodiscard]] String getSokuonRomaji(ConvertFlags) const;
 
-  [[nodiscard]] const String& get(CharType t, ConvertFlags flags) const;
+  [[nodiscard]] const String& get(CharType, ConvertFlags) const;
 
-  [[nodiscard]] auto containsKana(const String& s) const {
-    return s == _hiragana || s == _katakana;
-  }
+  [[nodiscard]] bool containsKana(const String& s) const;
 
-  // comparing _romaji is good enough since uniqueness is enforced by the rest
-  // of the program
-  [[nodiscard]] auto operator==(const Kana& rhs) const {
-    return _romaji == rhs._romaji;
-  }
+  [[nodiscard]] bool operator==(const Kana&) const;
 
   [[nodiscard]] auto& romaji() const { return _romaji; }
   [[nodiscard]] auto& hiragana() const { return _hiragana; }
@@ -262,8 +226,8 @@ private:
   Kana(CharArray<R> romaji, CharArray<N> hiragana, CharArray<N> katakana,
       const char* hepburn, const char* kunrei, RomajiVariants&& variants)
       : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
-        _hepburn{hepburn ? OptString(hepburn) : std::nullopt},
-        _kunrei{kunrei ? OptString(kunrei) : std::nullopt}, _variants{std::move(
+        _hepburn{hepburn ? OptString{hepburn} : std::nullopt},
+        _kunrei{kunrei ? OptString{kunrei} : std::nullopt}, _variants{std::move(
                                                                 variants)} {
     static_assert(R <= RomajiArrayMaxSize);
     // Hiragana and Katakana must be the same size (3 or 6) and also check that

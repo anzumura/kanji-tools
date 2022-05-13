@@ -157,6 +157,11 @@ const std::array HanDakutenKanaList{
 
 } // namespace
 
+bool Kana::RepeatMark::matches(CharType t, const String& s) const {
+  return t == CharType::Hiragana && _hiragana == s ||
+         t == CharType::Katakana && _katakana == s;
+}
+
 const String& Kana::RepeatMark::get(
     CharType target, ConvertFlags flags, const Kana* prevKana) const {
   switch (target) {
@@ -171,6 +176,12 @@ const String& Kana::RepeatMark::get(
   } else if (const auto unaccented{prevKana->plain()}; unaccented)
     k = unaccented;
   return k->getRomaji(flags);
+}
+
+Kana::RepeatMark::RepeatMark(CharArray<OneKanaArraySize> hiragana,
+    CharArray<OneKanaArraySize> katakana, bool dakuten)
+    : _hiragana{hiragana}, _katakana{katakana}, _dakuten{dakuten} {
+  validate();
 }
 
 void Kana::RepeatMark::validate() const {
@@ -210,12 +221,47 @@ Kana::OptString Kana::findHanDakuten(const String& s) {
                                 : EmptyOptString;
 }
 
+const Kana* Kana::dakuten() const { return nullptr; }
+const Kana* Kana::hanDakuten() const { return nullptr; }
+const Kana* Kana::plain() const { return nullptr; }
+
+Kana::OptString Kana::dakuten(CharType t) const {
+  if (const auto i{dakuten()}; i) return i->get(t, ConvertFlags::None);
+  return EmptyOptString;
+}
+
+Kana::OptString Kana::hanDakuten(CharType t) const {
+  if (const auto i{hanDakuten()}; i) return i->get(t, ConvertFlags::None);
+  return EmptyOptString;
+}
+
+bool Kana::isSmall() const { return _romaji.starts_with("l"); }
+bool Kana::isMonograph() const { return _hiragana.size() == OneKanaSize; }
+bool Kana::isDigraph() const { return _hiragana.size() == TwoKanaSize; }
+
+bool Kana::isDakuten() const {
+  if (auto* p{plain()}; p) return p->dakuten() == this;
+  // special case for a few digraphs that start with 'v', but don't have an
+  // unaccented version (see 'plain' method comments for more details)
+  return _romaji.starts_with("v");
+}
+
+bool Kana::isHanDakuten() const {
+  if (auto* p{plain()}; p) return p->hanDakuten() == this;
+  return false;
+}
+
 const String& Kana::getRomaji(ConvertFlags flags) const {
   return hasValue(flags & ConvertFlags::Hepburn) && _hepburn ? *_hepburn
          : hasValue(flags & ConvertFlags::Kunrei) && kunreiVariant()
              ? romajiVariants()[0]
          : hasValue(flags & ConvertFlags::Kunrei) && _kunrei ? *_kunrei
                                                              : _romaji;
+}
+
+String Kana::getSokuonRomaji(ConvertFlags flags) const {
+  auto& r{getRomaji(flags)};
+  return (r[0] == 'c' ? 't' : r[0]) + r;
 }
 
 const String& Kana::get(CharType t, ConvertFlags flags) const {
@@ -225,6 +271,16 @@ const String& Kana::get(CharType t, ConvertFlags flags) const {
   case CharType::Katakana: return _katakana;
   }
   __builtin_unreachable(); // stop gcc 'reaches end' warning XCOV_EXCL_LINE
+}
+
+bool Kana::containsKana(const String& s) const {
+  return s == _hiragana || s == _katakana;
+}
+
+bool Kana::operator==(const Kana& rhs) const {
+  // comparing _romaji is good enough since uniqueness is enforced by the rest
+  // of the program
+  return _romaji == rhs._romaji;
 }
 
 void Kana::validate() const {
