@@ -16,39 +16,39 @@ template<typename T>
 } // namespace
 
 TEST(UcdLinkTypesTest, CheckStrings) {
-  EXPECT_EQ(toString(UcdLinkTypes::Compatibility_R), "Compatibility*");
-  EXPECT_EQ(toString(UcdLinkTypes::Definition_R), "Definition*");
-  EXPECT_EQ(toString(UcdLinkTypes::Jinmei_R), "Jinmei*");
-  EXPECT_EQ(toString(UcdLinkTypes::Semantic_R), "Semantic*");
-  EXPECT_EQ(toString(UcdLinkTypes::Simplified_R), "Simplified*");
-  EXPECT_EQ(toString(UcdLinkTypes::Traditional_R), "Traditional*");
-  EXPECT_EQ(toString(UcdLinkTypes::Compatibility), "Compatibility");
-  EXPECT_EQ(toString(UcdLinkTypes::Definition), "Definition");
-  EXPECT_EQ(toString(UcdLinkTypes::Jinmei), "Jinmei");
-  EXPECT_EQ(toString(UcdLinkTypes::Simplified), "Simplified");
-  EXPECT_EQ(toString(UcdLinkTypes::Traditional), "Traditional");
-  EXPECT_EQ(toString(UcdLinkTypes::None), "None");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Compatibility_R), "Compatibility*");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Definition_R), "Definition*");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Jinmei_R), "Jinmei*");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Semantic_R), "Semantic*");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Simplified_R), "Simplified*");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Traditional_R), "Traditional*");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Compatibility), "Compatibility");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Definition), "Definition");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Jinmei), "Jinmei");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Simplified), "Simplified");
+  EXPECT_EQ(toString(Ucd::LinkTypes::Traditional), "Traditional");
+  EXPECT_EQ(toString(Ucd::LinkTypes::None), "None");
 }
 
 TEST(UcdLinkTypesTest, CheckValues) {
   size_t i{};
-  EXPECT_EQ(AllUcdLinkTypes[i], UcdLinkTypes::Compatibility_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Definition_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Jinmei_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Semantic_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Simplified_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Traditional_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Compatibility);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Definition);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Jinmei);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Simplified);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::Traditional);
-  EXPECT_EQ(AllUcdLinkTypes[++i], UcdLinkTypes::None);
+  EXPECT_EQ(AllUcdLinkTypes[i], Ucd::LinkTypes::Compatibility_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Definition_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Jinmei_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Semantic_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Simplified_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Traditional_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Compatibility);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Definition);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Jinmei);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Simplified);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Traditional);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::None);
 }
 
 TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(bool), 1);
-  EXPECT_EQ(sizeof(UcdLinkTypes), 1);
+  EXPECT_EQ(sizeof(Ucd::LinkTypes), 1);
   EXPECT_EQ(sizeof(MorohashiId), 4);
   EXPECT_EQ(sizeof(size_t), 8);
   EXPECT_EQ(sizeof(String*), 8);
@@ -147,21 +147,21 @@ TEST(UcdTest, CodeAndName) {
   EXPECT_EQ(ucd.code(), u'\x5b66');
   EXPECT_EQ(ucd.block().name(), "CJK");
   EXPECT_EQ(ucd.version().name(), "1.1");
-  EXPECT_EQ(ucd.linkType(), UcdLinkTypes::None);
+  EXPECT_EQ(ucd.linkType(), Ucd::LinkTypes::None);
   EXPECT_EQ(ucd.codeAndName(), "[5B66] 学");
 }
 
 TEST(UcdTest, LinkCodeAndNames) {
   const Ucd ucd{
-      TestUcd{"學"}.links({{u'\x5b66', "学"}}, UcdLinkTypes::Simplified)};
-  EXPECT_EQ(ucd.linkType(), UcdLinkTypes::Simplified);
+      TestUcd{"學"}.links({{u'\x5b66', "学"}}, Ucd::LinkTypes::Simplified)};
+  EXPECT_EQ(ucd.linkType(), Ucd::LinkTypes::Simplified);
   EXPECT_EQ(ucd.linkCodeAndNames(), "[5B66] 学");
 }
 
 TEST(UcdTest, MultipleLinkCodeAndNames) {
   const Ucd ucd{TestUcd("并").links(
-      {{u'\x4e26', "並"}, {u'\x4f75', "併"}}, UcdLinkTypes::Traditional)};
-  EXPECT_EQ(ucd.linkType(), UcdLinkTypes::Traditional);
+      {{u'\x4e26', "並"}, {u'\x4f75', "併"}}, Ucd::LinkTypes::Traditional)};
+  EXPECT_EQ(ucd.linkType(), Ucd::LinkTypes::Traditional);
   EXPECT_EQ(ucd.linkCodeAndNames(), "[4E26] 並, [4F75] 併");
 }
 

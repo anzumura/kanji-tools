@@ -38,7 +38,7 @@ public:
   auto& block(const String& x) { return set(_block, x); }
   auto& version(const String& x) { return set(_version, x); }
   auto& pinyin(const String& x) { return set(_pinyin, x); }
-  auto& linkType(UcdLinkTypes x) { return set(_linkType, x); }
+  auto& linkType(Ucd::LinkTypes x) { return set(_linkType, x); }
   auto& links(const Links& x) {
     _links.clear();
     std::copy(x.begin(), x.end(), std::back_inserter(_links));
@@ -63,7 +63,7 @@ public:
   auto& sources(const String& s, const String& j) {
     return sources(s).jSource(j);
   }
-  auto& links(const Links& x, UcdLinkTypes t) { return links(x).linkType(t); }
+  auto& links(const Links& x, Ucd::LinkTypes t) { return links(x).linkType(t); }
   auto& readings(Reading on, Reading kun) {
     return onReading(on).kunReading(kun);
   }
@@ -73,7 +73,7 @@ public:
 private:
   Code _code{};
   String _name, _block, _version, _pinyin;
-  UcdLinkTypes _linkType{UcdLinkTypes::None};
+  Ucd::LinkTypes _linkType{Ucd::LinkTypes::None};
   Links _links;
   Radical::Number _radical{};
   Strokes::Size _strokes{1}, _variantStrokes{};

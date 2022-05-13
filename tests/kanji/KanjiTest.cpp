@@ -121,7 +121,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   const String sampleLink{"犬"};
   const Ucd ucd{TestUcd{"侭"}
                     .ids("123P", "456 789")
-                    .links({{0x72ac, sampleLink}}, UcdLinkTypes::Simplified)
+                    .links({{0x72ac, sampleLink}}, Ucd::LinkTypes::Simplified)
                     .meaningAndReadings("utmost", "JIN", "MAMA")};
   const UcdKanji k{data(), ucd};
   EXPECT_EQ(k.type(), KanjiTypes::Ucd);
@@ -145,11 +145,11 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
 TEST_F(KanjiTest, UcdKanjiWithLinkedReadingOldNames) {
   EXPECT_CALL(data(), ucdStrokes(_, _)).WillOnce(Return(Strokes8));
   EXPECT_CALL(data(), ucdRadical(_, _)).WillOnce(ReturnRef(Rad1));
-  const Ucd ucd{
-      TestUcd{"侭"}
-          .sources("GJ", "J0-4B79")
-          .links({{0x72ac, "犬"}, {0x732b, "猫"}}, UcdLinkTypes::Traditional_R)
-          .meaningAndReadings("utmost", "JIN", "MAMA")};
+  const Ucd ucd{TestUcd{"侭"}
+                    .sources("GJ", "J0-4B79")
+                    .links({{0x72ac, "犬"}, {0x732b, "猫"}},
+                        Ucd::LinkTypes::Traditional_R)
+                    .meaningAndReadings("utmost", "JIN", "MAMA")};
   EXPECT_EQ(ucd.sources(), "GJ");
   EXPECT_EQ(ucd.jSource(), "J0-4B79");
   const UcdKanji k{data(), ucd};

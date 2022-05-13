@@ -84,7 +84,7 @@ TEST_F(UcdDataTest, LoadOneEntry) {
   EXPECT_TRUE(u.joyo());
   EXPECT_FALSE(u.jinmei());
   EXPECT_TRUE(u.links().empty());
-  EXPECT_EQ(u.linkType(), UcdLinkTypes::None);
+  EXPECT_EQ(u.linkType(), Ucd::LinkTypes::None);
   EXPECT_FALSE(u.linkedReadings());
   EXPECT_EQ(u.meaning(), "one; a, an; alone");
   // readings get converted to Kana during Kanji creation (when required) by
@@ -111,7 +111,7 @@ TEST_F(UcdDataTest, LoadLinkedJinmeiEntries) {
   EXPECT_EQ(u.jSource(), "J3-2E49");
   EXPECT_FALSE(u.joyo());
   EXPECT_TRUE(u.jinmei());
-  EXPECT_EQ(u.linkType(), UcdLinkTypes::Jinmei_R);
+  EXPECT_EQ(u.linkType(), Ucd::LinkTypes::Jinmei_R);
   EXPECT_TRUE(u.linkedReadings());
   ASSERT_EQ(u.links().size(), 1);
   EXPECT_EQ(u.links()[0].code(), U'\x50E7');

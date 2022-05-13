@@ -49,8 +49,7 @@ Ucd::Ucd(const UcdEntry& entry, const String& block, const String& version,
     Radical::Number radical, Strokes strokes, const String& pinyin,
     const String& morohashiId, const String& nelsonIds, const String& sources,
     const String& jSource, bool joyo, bool jinmei, Links links,
-    UcdLinkTypes linkType, Meaning meaning, Reading onReading,
-    Reading kunReading)
+    LinkTypes linkType, Meaning meaning, Reading onReading, Reading kunReading)
     : _entry{entry}, _block{block}, _version{version}, _pinyin{pinyin},
       _sources{getSources(sources, joyo, jinmei)}, _linkType{linkType},
       _radical{radical}, _strokes{strokes}, _morohashiId{morohashiId},
@@ -58,7 +57,7 @@ Ucd::Ucd(const UcdEntry& entry, const String& block, const String& version,
       _meaning{meaning}, _onReading{onReading}, _kunReading{kunReading} {}
 
 bool Ucd::linkedReadings() const {
-  return _linkType < UcdLinkTypes::Compatibility;
+  return _linkType < LinkTypes::Compatibility;
 }
 
 String Ucd::sources() const {
@@ -75,13 +74,13 @@ bool Ucd::jinmei() const { return _sources & Jinmei; }
 bool Ucd::hasLinks() const { return !_links.empty(); }
 
 bool Ucd::hasTraditionalLinks() const {
-  return _linkType == UcdLinkTypes::Traditional ||
-         _linkType == UcdLinkTypes::Traditional_R;
+  return _linkType == LinkTypes::Traditional ||
+         _linkType == LinkTypes::Traditional_R;
 }
 
 bool Ucd::hasNonTraditionalLinks() const {
-  return hasLinks() && _linkType != UcdLinkTypes::Traditional &&
-         _linkType != UcdLinkTypes::Traditional_R;
+  return hasLinks() && _linkType != LinkTypes::Traditional &&
+         _linkType != LinkTypes::Traditional_R;
 }
 
 String Ucd::codeAndName() const { return _entry.codeAndName(); }
