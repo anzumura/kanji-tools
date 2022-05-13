@@ -15,7 +15,7 @@ public:
   // Kanji.h for more details on 'KanjiInfo') and 'choiceCount' specifies the
   // number of choices per question (2 to 9).
   ListQuiz(const QuizLauncher&, Question, bool showMeanings, const KanjiList&,
-      KanjiInfo, ChoiceCount, QuizStyle);
+      Kanji::Info, ChoiceCount, QuizStyle);
 private:
   void start(const KanjiList&);
 
@@ -41,7 +41,7 @@ private:
   // from the full question list).
   std::vector<Question> _answers;
 
-  const KanjiInfo _infoFields;
+  const Kanji::Info _infoFields;
   const ChoiceCount _choiceCount;
   const QuizStyle _quizStyle;
   const String _prompt;

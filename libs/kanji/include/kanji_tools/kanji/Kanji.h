@@ -9,25 +9,6 @@
 
 namespace kanji_tools {
 
-// 'KanjiInfo' members can be used to select which fields are printed by
-// 'Kanji::info' method. For example 'Grade | Level | Freq' will print 'grade',
-// 'level' and 'frequency' fields and 'All ^ Strokes' prints all except strokes.
-enum class KanjiInfo : uint16_t {
-  Radical = 1,
-  Strokes,
-  Pinyin = 4,
-  Grade = 8,
-  Level = 16,
-  Freq = 32,
-  New = 64,
-  Old = 128,
-  Kyu = 256,
-  All = 511
-};
-
-// enable bitwise operators for 'KanjiInfo'
-template<> inline constexpr auto is_bitmask<KanjiInfo>{true};
-
 using KanjiPtr = std::shared_ptr<class Kanji>;
 using KanjiDataRef = const class KanjiData&;
 
@@ -44,6 +25,23 @@ public:
   using Name = UcdEntry::Name;
   using OldNames = const LinkNames&;
   using Reading = Ucd::Reading;
+
+  // 'Info' members can be used to select which fields are printed by
+  // 'Kanji::info' method. For example 'Grade | Level | Freq' will print
+  // 'grade', 'level' and 'frequency' fields and 'All ^ Strokes' prints all
+  // except strokes.
+  enum class Info : uint16_t {
+    Radical = 1,
+    Strokes,
+    Pinyin = 4,
+    Grade = 8,
+    Level = 16,
+    Freq = 32,
+    New = 64,
+    Old = 128,
+    Kyu = 256,
+    All = 511
+  };
 
   virtual ~Kanji() = default;
   Kanji(const Kanji&) = delete;
@@ -122,7 +120,7 @@ public:
   // 'fields' can be used to control inclusion of fields (include all by
   // default). Note: multiple 'Old' links are separated by '／' (wide slash) and
   // a link is followed by '*' if it was used to pull in readings.
-  [[nodiscard]] String info(KanjiInfo fields = KanjiInfo::All) const;
+  [[nodiscard]] String info(Info fields = Info::All) const;
 
   // Return 'name' plus an extra 'suffix' to show more info. Suffixes are:
   //   . = Jouyou        : 2136 Jouyou
@@ -309,5 +307,8 @@ public:
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };
+
+// enable bitwise operators for 'Kanji::Info'
+template<> inline constexpr auto is_bitmask<Kanji::Info>{true};
 
 } // namespace kanji_tools

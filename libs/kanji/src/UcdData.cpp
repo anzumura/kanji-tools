@@ -19,10 +19,10 @@ const ColumnFile::Column CodeCol{"Code"}, NameCol{"Name"}, BlockCol{"Block"},
 // 'PrintCount' is used for debug printing. Some combinations are prevented by
 // 'load' function (like Joyo with a link or missing meaning), but count all
 // cases for completeness.
-class PrintCount {
-public: // LCOV_EXCL_LINE
+class PrintCount { // LCOV_EXCL_LINE
+public:
   PrintCount() noexcept = default;
-  PrintCount(const PrintCount&) = delete; // LCOV_EXCL_LINE
+  PrintCount(const PrintCount&) = delete;
   PrintCount& operator=(const PrintCount&) = delete;
 
   void add(const Ucd& k) {
@@ -47,7 +47,7 @@ public: // LCOV_EXCL_LINE
 private:
   size_t _count{}, _link{}, _variantStrokes{}, _meaning{}, _onReading{},
       _kunReading{}, _morohashi{}, _nelson{};
-};
+}; // LCOV_EXCL_LINE
 
 } // namespace
 

@@ -55,7 +55,7 @@ bool Kanji::hasMeaning() const { return !meaning().empty(); }
 bool Kanji::hasNelsonIds() const { return !_nelsonIds.empty(); }
 bool Kanji::hasReading() const { return !reading().empty(); }
 
-String Kanji::info(KanjiInfo fields) const {
+String Kanji::info(Info fields) const {
   static const String RadMsg{"Rad "}, StrokesMsg{"Strokes "}, FreqMsg{"Frq "},
       NewMsg{"New "}, OldMsg{"Old "};
 
@@ -64,22 +64,21 @@ String Kanji::info(KanjiInfo fields) const {
     if (!result.empty()) result += ", ";
     result += x;
   }};
-  if (hasValue(fields & KanjiInfo::Radical))
+  if (hasValue(fields & Info::Radical))
     add(RadMsg + radical().name() + '(' + std::to_string(radical().number()) +
         ')');
-  if (hasValue(fields & KanjiInfo::Strokes))
-    add(StrokesMsg + strokes().toString());
-  if (hasValue(fields & KanjiInfo::Pinyin) && _pinyin) add(_pinyin.name());
-  if (hasValue(fields & KanjiInfo::Grade) && hasGrade()) add(toString(grade()));
-  if (hasValue(fields & KanjiInfo::Level) && hasLevel()) add(toString(level()));
-  if (hasValue(fields & KanjiInfo::Freq) && frequency())
+  if (hasValue(fields & Info::Strokes)) add(StrokesMsg + strokes().toString());
+  if (hasValue(fields & Info::Pinyin) && _pinyin) add(_pinyin.name());
+  if (hasValue(fields & Info::Grade) && hasGrade()) add(toString(grade()));
+  if (hasValue(fields & Info::Level) && hasLevel()) add(toString(level()));
+  if (hasValue(fields & Info::Freq) && frequency())
     add(FreqMsg + std::to_string(frequency()));
   // kanji can have a 'New' value (from a link) or an 'Old' value,but not both.
   if (newName()) {
     assert(oldNames().empty());
-    if (hasValue(fields & KanjiInfo::New))
+    if (hasValue(fields & Info::New))
       add(NewMsg + *newName() + (linkedReadings() ? "*" : ""));
-  } else if (hasValue(fields & KanjiInfo::Old) && !oldNames().empty()) {
+  } else if (hasValue(fields & Info::Old) && !oldNames().empty()) {
     String s;
     for (auto& i : oldNames()) {
       if (s.empty())
@@ -89,7 +88,7 @@ String Kanji::info(KanjiInfo fields) const {
     }
     add(OldMsg + s);
   }
-  if (hasValue(fields & KanjiInfo::Kyu) && hasKyu()) add(toString(kyu()));
+  if (hasValue(fields & Info::Kyu) && hasKyu()) add(toString(kyu()));
   return result;
 }
 

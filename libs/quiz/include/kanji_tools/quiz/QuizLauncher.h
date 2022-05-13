@@ -45,7 +45,7 @@ public:
   [[nodiscard]] auto randomizeAnswers() const { return _randomizeAnswers; }
 
   void printExtraTypeInfo(const Kanji&) const;
-  void printLegend(KanjiInfo fields = KanjiInfo::All) const;
+  void printLegend(Kanji::Info fields = Kanji::Info::All) const;
   void printMeaning(
       const Kanji&, bool useNewLine = false, bool showMeaning = true) const;
   void printReviewDetails(const Kanji&) const;
@@ -55,7 +55,7 @@ private:
   [[nodiscard]] KanjiDataRef data() const { return _groupData->data(); }
 
   void startListQuiz(Question question, bool showMeanings,
-      KanjiInfo excludeField, const KanjiList&) const;
+      Kanji::Info excludeField, const KanjiList&) const;
   void startGroupQuiz(Question question, bool showMeanings, OptChar qList,
       const GroupData::List& list) const;
 

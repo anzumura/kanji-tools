@@ -225,7 +225,7 @@ TEST_F(RealKanjiDataTest, KanjiWithMultipleOldNames) {
   auto result3{_data->findKanjiByName("弁")};
   ASSERT_TRUE(result3);
   EXPECT_EQ(result3->oldNames(), (Kanji::LinkNames{"辨", "瓣", "辯"}));
-  EXPECT_EQ(result3->info(KanjiInfo::Old), "Old 辨／瓣／辯");
+  EXPECT_EQ(result3->info(Kanji::Info::Old), "Old 辨／瓣／辯");
   for (auto& i : result3->oldNames()) {
     const auto old{_data->findKanjiByName(i)};
     ASSERT_TRUE(old);
