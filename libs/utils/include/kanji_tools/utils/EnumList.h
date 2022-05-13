@@ -221,8 +221,7 @@ private:
 
 template<typename T, isEnumList<T> U>
 template<typename... Names>
-[[nodiscard]] auto BaseEnumList<T, U>::create(
-    const String& name, Names... args) {
+auto BaseEnumList<T, U>::create(const String& name, Names... args) {
   static_assert(is_enumlist<T> != is_enumlist_with_none<T>,
       "both 'is_enumlist' and 'is_enumlist_with_none' are true");
   if (_instance) domainError("'create' should only be called once");
