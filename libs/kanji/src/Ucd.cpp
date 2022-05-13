@@ -5,7 +5,7 @@ namespace kanji_tools {
 
 namespace {
 
-enum SourcesBits : unsigned char {
+enum SourcesBits : uint8_t {
   GSource = 1,
   HSource = 2,
   JSource = 4,
@@ -85,12 +85,12 @@ bool Ucd::hasNonTraditionalLinks() const {
 
 String Ucd::codeAndName() const { return _entry.codeAndName(); }
 
-unsigned char Ucd::getSources(const String& sources, bool joyo, bool jinmei) {
+uint8_t Ucd::getSources(const String& sources, bool joyo, bool jinmei) {
   const auto error{[&sources](const auto& msg) {
     throw std::domain_error{"sources '" + sources + "' " + msg};
   }};
   if (sources.size() > SourceLetterMap.size()) error("exceeds max size");
-  unsigned char result{};
+  uint8_t result{};
   for (auto i : sources) {
     if (const auto j{SourceLetterMap.find(i)}; j != SourceLetterMap.end()) {
       if (result & j->second) error(String{"has duplicate value: "} + i);

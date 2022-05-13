@@ -118,14 +118,14 @@ public:
   [[nodiscard]] String codeAndName() const;
   [[nodiscard]] String linkCodeAndNames() const;
 private:
-  [[nodiscard]] static unsigned char getSources(
+  [[nodiscard]] static uint8_t getSources(
       const String& sources, bool joyo, bool jinmei);
 
   const Entry _entry;
   const Block _block;
   const Version _version;
   const Pinyin _pinyin;
-  const unsigned char _sources;
+  const uint8_t _sources;
   const LinkTypes _linkType;
   const Radical::Number _radical;
   const Strokes _strokes;
