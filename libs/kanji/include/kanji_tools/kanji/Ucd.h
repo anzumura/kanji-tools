@@ -8,39 +8,9 @@
 
 namespace kanji_tools {
 
-// 'UcdEntry' is used to hold the name of an entry from 'ucd.txt' file. The file
-// contains both Unicode 'Code' and the UTF-8 string value (having both values
-// makes searching and cross-referencing easier), but only the string value is
-// stored in this class.
-class UcdEntry {
-public:
-  using Name = Radical::Name;
-
-  // throws an exception if 'name' is not a recognized Kanji or if 'code' is not
-  // the correct Unicode value for 'name'
-  UcdEntry(Code code, Name name);
-
-  [[nodiscard]] Code code() const; // returns 'Code' calculated from '_name'
-  [[nodiscard]] auto& name() const { return _name; }
-
-  // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
-  [[nodiscard]] String codeAndName() const;
-private:
-  const String _name;
-};
-
-class UcdBlock : public Symbol<UcdBlock> {
-public:
-  inline static const String Type{"UcdBlock"};
-  using Symbol::Symbol;
-};
-
-class UcdVersion : public Symbol<UcdVersion> {
-public:
-  inline static const String Type{"UcdVersion"};
-  using Symbol::Symbol;
-};
-
+// 'Pinyin' holds a 'hànyǔ pīnyīn' (漢語拼音) from the Unicode 'kMandarin' XML
+// property (there are currently 1,337 unique values). This class is used as a
+// member data field in both 'Ucd' and 'Kanji' classes.
 class Pinyin : public Symbol<Pinyin> {
 public:
   inline static const String Type{"Pinyin"};
@@ -51,10 +21,6 @@ public:
 // 'ucd.all.flat.xml' file - see scripts/parseUcdAllFlat.sh for more details
 class Ucd {
 public:
-  using Links = std::vector<UcdEntry>;
-  using Meaning = const String&;
-  using Reading = Radical::Reading;
-
   // 'LinkTypes' represent the XML property from which the link was loaded -
   // see parseUcdAllFlat.sh for details. '_R' means the link was also used to
   // pull in readings. The script uses '*' for reading links so '*' has also
@@ -76,8 +42,45 @@ public:
     None
   };
 
-  Ucd(const UcdEntry&, const String& block, const String& version,
-      Radical::Number, Strokes, const String& pinyin, const String& morohashiId,
+  // 'Entry' is used to hold the name of an entry from 'ucd.txt' file. The file
+  // contains both Unicode 'Code' and the UTF-8 string value (having both values
+  // makes searching and cross-referencing easier), but only the string value is
+  // stored in this class.
+  class Entry {
+  public:
+    using Name = Radical::Name;
+
+    // throws an exception if 'name' is not a recognized Kanji or if 'code' is
+    // not the correct Unicode value for 'name'
+    Entry(Code code, Name name);
+
+    [[nodiscard]] Code code() const; // returns 'Code' calculated from '_name'
+    [[nodiscard]] auto& name() const { return _name; }
+
+    // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
+    [[nodiscard]] String codeAndName() const;
+  private:
+    const String _name;
+  };
+
+  class Block : public Symbol<Block> {
+  public:
+    inline static const String Type{"Ucd::Block"};
+    using Symbol::Symbol;
+  };
+
+  class Version : public Symbol<Version> {
+  public:
+    inline static const String Type{"Ucd::Version"};
+    using Symbol::Symbol;
+  };
+
+  using Links = std::vector<Entry>;
+  using Meaning = const String&;
+  using Reading = Radical::Reading;
+
+  Ucd(const Entry&, const String& block, const String& version, Radical::Number,
+      Strokes, const String& pinyin, const String& morohashiId,
       const String& nelsonIds, const String& sources, const String& jSource,
       bool joyo, bool jinmei, Links, LinkTypes, Meaning, Reading onReading,
       Reading kunReading);
@@ -118,9 +121,9 @@ private:
   [[nodiscard]] static unsigned char getSources(
       const String& sources, bool joyo, bool jinmei);
 
-  const UcdEntry _entry;
-  const UcdBlock _block;
-  const UcdVersion _version;
+  const Entry _entry;
+  const Block _block;
+  const Version _version;
   const Pinyin _pinyin;
   const unsigned char _sources;
   const LinkTypes _linkType;

@@ -51,8 +51,8 @@ TEST_F(RealKanjiDataTest, BasicChecks) {
   // Ucd data related
   EXPECT_EQ(_data->ucd().map().size(), _data->kanjiNameMap().size());
   EXPECT_EQ(Pinyin::size(), 1337);
-  EXPECT_EQ(UcdBlock::size(), 8);
-  EXPECT_EQ(UcdVersion::size(), 10);
+  EXPECT_EQ(Ucd::Block::size(), 8);
+  EXPECT_EQ(Ucd::Version::size(), 10);
 }
 
 TEST_F(RealKanjiDataTest, FrequencyKanjiChecks) {

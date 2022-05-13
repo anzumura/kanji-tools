@@ -55,11 +55,11 @@ TEST(UcdTest, Size) {
   EXPECT_EQ(sizeof(Ucd::Links), 24);
 #ifdef __clang__
   EXPECT_EQ(sizeof(Ucd), 184);
-  EXPECT_EQ(sizeof(UcdEntry), 24);
+  EXPECT_EQ(sizeof(Ucd::Entry), 24);
   EXPECT_EQ(sizeof(String), 24);
 #else
   EXPECT_EQ(sizeof(Ucd), 232);
-  EXPECT_EQ(sizeof(UcdEntry), 32);
+  EXPECT_EQ(sizeof(Ucd::Entry), 32);
   EXPECT_EQ(sizeof(String), 32);
 #endif
 }
@@ -87,23 +87,23 @@ TEST(UcdTest, Layout) {
   EXPECT_EQ(ptrCast(u.kunReading()) - start, 160 + stringDiff * ++i);
 }
 
-TEST(UcdEntry, GoodCodeAndName) {
-  const UcdEntry e{0x96f7, "雷"};
+TEST(UcdTest, GoodCodeAndName) {
+  const Ucd::Entry e{0x96f7, "雷"};
   EXPECT_EQ(e.code(), 0x96f7);
   EXPECT_EQ(e.name(), "雷");
 }
 
-TEST(UcdEntry, BadName) {
+TEST(UcdTest, BadName) {
   const auto msg{[](const String& i) {
     return "name '" + i + "' isn't a recognized Kanji";
   }};
   for (auto i : {"", "a", "こ", "。", "雷鳴", "轟く"})
-    EXPECT_THROW(call([i] { UcdEntry{{}, i}; }, msg(i)), std::domain_error);
+    EXPECT_THROW(call([i] { Ucd::Entry{{}, i}; }, msg(i)), std::domain_error);
 }
 
-TEST(UcdEntry, BadCode) {
+TEST(UcdTest, BadCode) {
   constexpr Code ThunderCompat{0xf949}; // normal 'thunder' is 96F7
-  const auto f{[] { UcdEntry{ThunderCompat, "雷"}; }};
+  const auto f{[] { Ucd::Entry{ThunderCompat, "雷"}; }};
   EXPECT_THROW(call(f, "code 'F949' doesn't match '96F7'"), std::domain_error);
 }
 

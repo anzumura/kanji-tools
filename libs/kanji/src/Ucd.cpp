@@ -22,7 +22,7 @@ const std::map SourceLetterMap{std::pair{'G', GSource}, std::pair{'H', HSource},
 
 } // namespace
 
-UcdEntry::UcdEntry(Code code, const String& name) : _name{name} {
+Ucd::Entry::Entry(Code code, const String& name) : _name{name} {
   if (!isKanji(name))
     throw std::domain_error{"name '" + name + "' isn't a recognized Kanji"};
   if (const auto c{getCode(name)}; code != c)
@@ -30,9 +30,9 @@ UcdEntry::UcdEntry(Code code, const String& name) : _name{name} {
         "code '" + toUnicode(code) + "' doesn't match '" + toUnicode(c) + "'"};
 }
 
-Code UcdEntry::code() const { return getCode(_name); }
+Code Ucd::Entry::code() const { return getCode(_name); }
 
-String UcdEntry::codeAndName() const {
+String Ucd::Entry::codeAndName() const {
   return toUnicode(code(), BracketType::Square) + ' ' + _name;
 }
 
@@ -45,7 +45,7 @@ String Ucd::linkCodeAndNames() const {
   return result;
 }
 
-Ucd::Ucd(const UcdEntry& entry, const String& block, const String& version,
+Ucd::Ucd(const Entry& entry, const String& block, const String& version,
     Radical::Number radical, Strokes strokes, const String& pinyin,
     const String& morohashiId, const String& nelsonIds, const String& sources,
     const String& jSource, bool joyo, bool jinmei, Links links,

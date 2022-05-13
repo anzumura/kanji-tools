@@ -22,7 +22,7 @@ public:
   using Year = uint16_t;
   // some type aliases to help make parameter lists shorter and clearer
   using Meaning = Ucd::Meaning;
-  using Name = UcdEntry::Name;
+  using Name = Radical::Name;
   using OldNames = const LinkNames&;
   using Reading = Ucd::Reading;
 

@@ -17,7 +17,7 @@ private:
 public:
   using Links = Ucd::Links;
   using Meaning = Ucd::Meaning;
-  using Name = UcdEntry::Name;
+  using Name = Radical::Name;
   using Reading = Ucd::Reading;
 
   // allow setting 'name' via the ctor since it's the more commonly used field

@@ -116,7 +116,7 @@ void UcdData::load(const KanjiData::Path& file) {
                                                 : Strokes{f.getU8(StrokesCol),
                                                       f.getU8(VStrokesCol)}};
       if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
-                   std::make_tuple(UcdEntry{f.getChar32(CodeCol), name},
+                   std::make_tuple(Ucd::Entry{f.getChar32(CodeCol), name},
                        f.get(BlockCol), f.get(VersionCol), radical, strokes,
                        f.get(PinyinCol), f.get(MorohashiIdCol),
                        f.get(NelsonIdsCol), f.get(SourcesCol),
