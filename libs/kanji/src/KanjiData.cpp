@@ -1,5 +1,5 @@
 #include <kanji_tools/kanji/CustomFileKanji.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utf8.h>
 
 #include <sstream>
 

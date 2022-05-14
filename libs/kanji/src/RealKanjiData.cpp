@@ -1,6 +1,6 @@
 #include <kanji_tools/kanji/Kanji.h>
 #include <kanji_tools/kanji/RealKanjiData.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utf8.h>
 
 namespace kanji_tools {
 

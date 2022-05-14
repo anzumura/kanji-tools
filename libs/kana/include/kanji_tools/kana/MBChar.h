@@ -1,6 +1,6 @@
 #pragma once
 
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utf8.h>
 
 #include <optional>
 

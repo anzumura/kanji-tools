@@ -322,7 +322,7 @@ TEST_F(RealKanjiDataTest, UcdLinks) {
     auto& u{i.second};
     // every Ucd entry should be a wide character, i.e., have 'display size' 2
     EXPECT_EQ(displaySize(u.name()), 2);
-    // make sure MBUtils UCD characters are part of MBUtils unicode blocks
+    // make sure Ucd entries are part of expected Unicode blocks
     if (u.joyo() || u.jinmei())
       EXPECT_TRUE(isCommonKanji(u.name())) << u.codeAndName();
     else

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kanji_tools/kanji/Ucd.h>
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utf8.h>
 
 namespace kanji_tools {
 

@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/MBUtils.h>
+#include <kanji_tools/utils/Utf8.h>
 
 #include <array>
 #include <bit>
@@ -10,7 +10,7 @@ using uInt = const unsigned int;
 namespace {
 
 // Values for determining invalid Unicde code points when doing UTF-8
-// conversion (in addition to 'MaxUnicode' in MBUtils.h). Here's a quote from
+// conversion (in addition to 'MaxUnicode' in Utf8.h). Here's a quote from
 // https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
 //   Since RFC 3629 (November 2003), the high and low surrogate halves used by
 //   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
