@@ -179,7 +179,7 @@ void RealKanjiData::printGrades() const {
   log() << "  Total for all grades: " << all << '\n';
 }
 
-template<typename T, EnumContainer::Size S>
+template<typename T, Enum::Size S>
 void RealKanjiData::printListStats(const EnumListWithNone<T, S>& all,
     T (Kanji::*p)() const, const String& name, bool showNoFrequency) const {
   log() << name << " breakdown:\n";

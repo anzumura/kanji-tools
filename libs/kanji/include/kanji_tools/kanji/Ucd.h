@@ -27,7 +27,7 @@ public:
   // been used in 'AllUcdLinkTypes' EnumList). Put _R first to allow a '<'
   // comparision to find all reading links. Note, there is no non '_R' type for
   // 'Semantic' by design.
-  enum class LinkTypes : EnumContainer::Size {
+  enum class LinkTypes : Enum::Size {
     Compatibility_R,
     Definition_R,
     Jinmei_R,

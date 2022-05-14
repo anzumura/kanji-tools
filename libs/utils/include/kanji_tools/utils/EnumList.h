@@ -87,7 +87,7 @@ protected:
 
   BaseEnumList() noexcept { _instance = this; }
 
-  void insert(const String& name, EnumContainer::Size index);
+  void insert(const String& name, Enum::Size index);
 private:
   inline static constinit const BaseEnumList<T>* _instance;
 
@@ -100,11 +100,10 @@ private:
 // - N:     number of enum values (used for interating and index checking)
 // - Names: number of strings in '_names' array (same as N by default, but set
 //          to 'N - 1' for EnumListWithNone since 'None' isn't stored)
-template<typename T, EnumContainer::Size N, EnumContainer::Size Names = N>
-class EnumListContainer : public TypedEnumContainer<T, N>,
-                          public BaseEnumList<T> {
+template<typename T, Enum::Size N, Enum::Size Names = N>
+class EnumListContainer : public EnumContainer<T, N>, public BaseEnumList<T> {
 public:
-  using base = TypedEnumContainer<T, N>;
+  using base = EnumContainer<T, N>;
 
   [[nodiscard]] static auto begin() noexcept { return ConstIterator{0}; }
   [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
@@ -147,12 +146,12 @@ public:
   private:
     friend EnumListContainer<T, N, Names>; // calls private ctor
 
-    explicit ConstIterator(EnumContainer::Size index) noexcept : iBase{index} {}
+    explicit ConstIterator(Enum::Size index) noexcept : iBase{index} {}
   };
 protected:
   EnumListContainer() noexcept = default;
 
-  void setName(const String& name, EnumContainer::Size index) {
+  void setName(const String& name, Enum::Size index) {
     BaseEnumList<T>::insert(_names[index] = name, index);
   }
 private:
@@ -160,7 +159,7 @@ private:
 };
 
 // see comments at the top of this file (EnumList.h) for more details
-template<typename T, EnumContainer::Size N>
+template<typename T, Enum::Size N>
 class EnumList : public EnumListContainer<T, N> {
 public:
   using base = EnumListContainer<T, N, N>;
@@ -179,7 +178,7 @@ private:
 // iterating. A string value for 'None' is not stored in '_names' or base class
 // '_nameMap' for safety (see private 'setName') and to support the special
 // handling in 'fromString' with 'allowEmptyAsNone'.
-template<typename T, EnumContainer::Size N>
+template<typename T, Enum::Size N>
 class EnumListWithNone : public EnumListContainer<T, N + 1, N> {
 public:
   using base = EnumListContainer<T, N + 1, N>;
@@ -211,7 +210,7 @@ private:
     setName(name, N - 1 - sizeof...(args));
   }
 
-  void setName(const String& name, EnumContainer::Size index) {
+  void setName(const String& name, Enum::Size index) {
     if (name == None) base::domainError("'None' should not be specified");
     base::setName(name, index);
   }
@@ -244,7 +243,7 @@ T BaseEnumList<T, U>::fromString(const String& name) const {
 }
 
 template<typename T, isEnumList<T> U>
-void BaseEnumList<T, U>::insert(const String& name, EnumContainer::Size index) {
+void BaseEnumList<T, U>::insert(const String& name, Enum::Size index) {
   if (!_nameMap.emplace(name, to_enum<T>(index)).second)
     domainError("duplicate name '" + name + "'");
 }

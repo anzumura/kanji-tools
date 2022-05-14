@@ -10,14 +10,14 @@ namespace kanji_tools {
 
 // 'CharType' is used by 'Converter' class to specify 'source' and 'target'
 // types when converting
-enum class CharType : EnumContainer::Size { Hiragana, Katakana, Romaji };
+enum class CharType : Enum::Size { Hiragana, Katakana, Romaji };
 template<> inline constexpr auto is_enumlist<CharType>{true};
 inline const auto CharTypes{
     BaseEnumList<CharType>::create("Hiragana", "Katakana", "Romaji")};
 
 // 'ConvertFlags' is also used by 'Converter' class to control some aspects of
 // conversion (see comments at the bottom of this file for more details)
-enum class ConvertFlags : EnumContainer::Size {
+enum class ConvertFlags : Enum::Size {
   None,
   Hepburn,
   Kunrei,

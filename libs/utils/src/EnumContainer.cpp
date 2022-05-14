@@ -4,29 +4,24 @@
 
 namespace kanji_tools {
 
-void EnumContainer::BaseIterator::comparable(bool value) {
+void Enum::BaseIterator::comparable(bool value) {
   if (!value) throw std::domain_error("not comparable");
 }
 
-void EnumContainer::BaseIterator::initialized(bool value) {
+void Enum::BaseIterator::initialized(bool value) {
   if (!value) throw std::domain_error("not initialized");
 }
 
-void EnumContainer::BaseIterator::rangeError(const String& msg) {
-  EnumContainer::rangeError(msg);
+void Enum::BaseIterator::rangeError(const String& msg) {
+  Enum::rangeError(msg);
 }
 
-EnumContainer::BaseIterator::BaseIterator(Size index) noexcept
-    : _index{index} {}
+Enum::BaseIterator::BaseIterator(Size index) noexcept : _index{index} {}
 
-EnumContainer::Size& EnumContainer::BaseIterator::index() { return _index; }
+Enum::Size& Enum::BaseIterator::index() { return _index; }
 
-EnumContainer::Size EnumContainer::BaseIterator::index() const {
-  return _index;
-}
+Enum::Size Enum::BaseIterator::index() const { return _index; }
 
-void EnumContainer::rangeError(const String& msg) {
-  throw std::out_of_range{msg};
-}
+void Enum::rangeError(const String& msg) { throw std::out_of_range{msg}; }
 
 } // namespace kanji_tools

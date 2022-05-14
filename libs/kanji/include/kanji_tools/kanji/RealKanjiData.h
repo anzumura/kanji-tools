@@ -22,7 +22,7 @@ private:
   void printCount(const String& name, T pred, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
-  template<typename T, EnumContainer::Size S>
+  template<typename T, Enum::Size S>
   void printListStats(const EnumListWithNone<T, S>&, T (Kanji::*)() const,
       const String&, bool showNoFrequency) const;
 

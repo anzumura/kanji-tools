@@ -9,9 +9,9 @@ namespace kanji_tools {
 
 namespace {
 
-enum class Colors : EnumContainer::Size { Red, Green, Blue };
+enum class Colors : Enum::Size { Red, Green, Blue };
 
-enum class TestEnum : EnumContainer::Size { A, B, C };
+enum class TestEnum : Enum::Size { A, B, C };
 
 } // namespace
 

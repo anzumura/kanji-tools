@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 namespace {
 
-enum class Colors : EnumContainer::Size { Red, Green, Blue, None };
+enum class Colors : Enum::Size { Red, Green, Blue, None };
 
 class EnumMapTest : public ::testing::Test {
 protected:

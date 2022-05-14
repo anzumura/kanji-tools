@@ -32,11 +32,11 @@ protected:
   BaseEnumMap() noexcept = default;
 };
 
-template<typename T, typename V, EnumContainer::Size N = to_underlying(T::None),
+template<typename T, typename V, Enum::Size N = to_underlying(T::None),
     std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-class EnumMap : public TypedEnumContainer<T, N>, public BaseEnumMap<V> {
+class EnumMap : public EnumContainer<T, N>, public BaseEnumMap<V> {
 public:
-  using base = TypedEnumContainer<T, N>;
+  using base = EnumContainer<T, N>;
 
   EnumMap() noexcept = default;
 
@@ -112,7 +112,7 @@ public:
   private:
     friend EnumMap<T, V>; // calls private ctor
 
-    ConstIterator(EnumContainer::Size i, const EnumMap<T, V>& m) noexcept
+    ConstIterator(Enum::Size i, const EnumMap<T, V>& m) noexcept
         : iBase{i}, _map{&m} {}
 
     const EnumMap<T, V>* _map{};
