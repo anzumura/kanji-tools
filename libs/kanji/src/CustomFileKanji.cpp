@@ -37,8 +37,8 @@ OfficialKanji::OfficialKanji(KanjiDataRef data, File f, Name name, UcdPtr u)
       _frequency{data.frequency(name)}, _level{data.level(name)},
       _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
 
-OfficialKanji::OfficialKanji(
-    KanjiDataRef data, File f, Name name, Strokes strokes, Meaning meaning)
+OfficialKanji::OfficialKanji(KanjiDataRef data, File f, Name name,
+    Strokes strokes, Meaning meaning) // LCOV_EXCL_LINE
     : CustomFileKanji{data, f, name, strokes, meaning, getOldNames(f),
           data.findUcd(name)},
       _frequency{data.frequency(name)}, _level{data.level(name)},
