@@ -135,8 +135,9 @@ void GroupData::printMeaningGroup(
     const Group& group, TypeMap& types, StringSet& uniqueNames) const {
   if (fullDebug()) {
     const auto len{Utf8Char::size(group.name())};
-    static constexpr std::array Pad{2, 6, 4};
-    out() << group.name() << std::setw(Pad[len < 3 ? len : 0]) << " ("
+    // pad short names with wide spaces (since names are also wide characters)
+    static constexpr std::array Pad{"", "　　", "　"};
+    out() << group.name() << Pad[len < Pad.size() ? len : 0] << " ("
           << std::setw(2) << std::setfill(' ') << group.members().size()
           << ")   :";
   }

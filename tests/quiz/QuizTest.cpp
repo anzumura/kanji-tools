@@ -28,9 +28,11 @@ TEST(QuizTest, Debug) {
   std::stringstream os;
   Quiz::run(args, os);
   // look for a few strings instead of comparing the whole output
-  const auto expected = {"阿：ア( 3)   阿': 婀# 痾#",
-      "時間：十干 (10)   : 甲. 乙. 丙. 丁. 戊^ 己. 庚^ 辛. 壬\" 癸+",
-      "畏：ワイ、イ( 3)   畏.: 隈\" 猥#"};
+  const auto expected = {"阿：ア( 3)   阿': 婀# 痾#", // 'pattern' with parent
+      "団体　 (5 )   : 団. 社. 派. 組. 群.",          // short name 'meaning'
+      "時間：十干 (10)   : 甲. 乙. 丙. 丁. 戊^ 己. 庚^ 辛. 壬\" 癸+", // 'meaning'
+      "畏：ワイ、イ( 3)   畏.: 隈\" 猥#",   // 'pattern' with multiple readings
+      "  ：ジュン( 3)   　 : 準. 准. 隼'"}; // 'pattern' with no parent
   size_t found{};
   for (String line; std::getline(os, line);)
     for (const auto& i : expected)
