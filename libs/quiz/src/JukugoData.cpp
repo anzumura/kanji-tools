@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/quiz/JukugoData.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -113,7 +113,7 @@ void JukugoData::createJukugo(
   JukugoKey key{name, reading};
   if (const auto i{_uniqueJukugo.find(key)}; i == _uniqueJukugo.end()) {
     const auto jukugo{std::make_shared<Jukugo>(name, reading, grade)};
-    MBChar nameChars{name};
+    Utf8Char nameChars{name};
     for (String c; nameChars.next(c);)
       if (isKanji(c)) _kanjiToJukugo[c].emplace_back(jukugo);
     _uniqueJukugo.emplace(key, jukugo);

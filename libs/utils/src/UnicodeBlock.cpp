@@ -89,13 +89,13 @@ bool isMBLetter(const String& s, bool sizeOne) {
 
 bool isAllMBLetter(const String& s) { return inWCharRange(s, LetterBlocks); }
 
-bool isRecognizedMBChar(const String& s, bool sizeOne) {
+bool isRecognizedUtf8(const String& s, bool sizeOne) {
   return inWCharRange(s, sizeOne, HiraganaBlocks, CommonKanjiBlocks,
       RareKanjiBlocks, KatakanaBlocks, PunctuationBlocks, SymbolBlocks,
       LetterBlocks);
 }
 
-bool isAllRecognizedCharacters(const String& s) {
+bool isAllRecognizedUtf8(const String& s) {
   return inWCharRange(s, HiraganaBlocks, CommonKanjiBlocks, RareKanjiBlocks,
       KatakanaBlocks, PunctuationBlocks, SymbolBlocks, LetterBlocks);
 }

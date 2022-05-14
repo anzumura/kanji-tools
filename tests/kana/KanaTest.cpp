@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kana/Kana.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 
 namespace kanji_tools {
 
@@ -149,7 +149,7 @@ TEST(KanaTest, CheckHiragana) {
       dakutenMonographs{}, plainDigraphs{}, hanDakutenDigraphs{},
       dakutenDigraphs{}, smallDigraphs{};
   for (auto& i : sourceMap) {
-    MBChar s{i.first};
+    Utf8Char s{i.first};
     String c;
     const auto checkDigraph{[&i, &c](const String& a, const String& b = {}) {
       EXPECT_TRUE(c == a || (!b.empty() && c == b))
@@ -213,7 +213,7 @@ TEST(KanaTest, CheckKatakana) {
   auto& hiraganaMap{Kana::getMap(CharType::Hiragana)};
   EXPECT_EQ(sourceMap.size(), TotalKana);
   for (auto& i : sourceMap) {
-    MBChar s{i.first};
+    Utf8Char s{i.first};
     // As long as all entries in katakana map are also be in hiragana map (and
     // the maps are the same size) then there's no need to checkDigraph the
     // various counts again.

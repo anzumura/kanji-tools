@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/kanji/RealKanjiData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -31,7 +31,7 @@ protected:
         }
         ++variants;
       }
-      EXPECT_EQ(MBChar::size(i->name()), 1)
+      EXPECT_EQ(Utf8Char::size(i->name()), 1)
           << i->type() << ", " << i->name() << ", " << toUnicode(i->name());
       EXPECT_TRUE(isKanji(i->name()))
           << i->type() << ", " << i->name() << ", " << toUnicode(i->name());

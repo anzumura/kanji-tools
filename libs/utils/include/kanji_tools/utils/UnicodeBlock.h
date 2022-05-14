@@ -261,10 +261,10 @@ template<typename... T>
   return true;
 }
 
-// functions for classifying 'recognized' utf-8 encoded characters. The string
+// functions for classifying 'recognized' UTF-8 encoded characters. The string
 // parameter should contain one MB character (so 2-4 bytes) by default, but
 // 'sizeOne' can be set to 'false' to check just the first 'MB characer' in
-// the string. There are alls 'isAll' functions that return 'true' only if all
+// the string. There are also 'isAll' functions that return 'true' only if all
 // the characers in the string are the desired type.
 
 // Kana
@@ -285,7 +285,7 @@ template<typename... T>
 [[nodiscard]] bool isKanji(const String&, bool sizeOne = true);
 [[nodiscard]] bool isAllKanji(const String&);
 
-// other multi-byte characters
+// other 'MB' (multi-byte) characters
 
 [[nodiscard]] bool isMBPunctuation(
     const String&, bool includeSpace = false, bool sizeOne = true);
@@ -295,9 +295,9 @@ template<typename... T>
 [[nodiscard]] bool isMBLetter(const String&, bool sizeOne = true);
 [[nodiscard]] bool isAllMBLetter(const String&);
 
-// 'isRecognizedMBChar' returns true if the string is in any UnicodeBlock
+// 'isRecognizedUtf8' returns true if the string is in any UnicodeBlock arrays
 // defined in this header file (including wide space)
-[[nodiscard]] bool isRecognizedMBChar(const String&, bool sizeOne = true);
-[[nodiscard]] bool isAllRecognizedCharacters(const String&);
+[[nodiscard]] bool isRecognizedUtf8(const String&, bool sizeOne = true);
+[[nodiscard]] bool isAllRecognizedUtf8(const String&);
 
 } // namespace kanji_tools

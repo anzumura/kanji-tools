@@ -88,8 +88,8 @@ TEST(UnicodeBlockTest, IsKana) {
   EXPECT_FALSE(isKatakana("ゑ"));
   EXPECT_TRUE(isKatakana("ヰ"));
   EXPECT_FALSE(isHiragana("ヰ"));
-  EXPECT_TRUE(isRecognizedMBChar("ー"));
-  EXPECT_TRUE(isRecognizedMBChar("さ"));
+  EXPECT_TRUE(isRecognizedUtf8("ー"));
+  EXPECT_TRUE(isRecognizedUtf8("さ"));
   EXPECT_TRUE(isKana("は"));
   EXPECT_TRUE(isKana("ハ"));
   EXPECT_FALSE(isKana("犬"));
@@ -114,7 +114,7 @@ TEST(UnicodeBlockTest, IsMBLetter) {
   EXPECT_TRUE(isMBLetter("ｄ"));
   EXPECT_TRUE(isMBLetter("Ｚ"));
   EXPECT_TRUE(isMBLetter("１"));
-  EXPECT_TRUE(isRecognizedMBChar("。"));
+  EXPECT_TRUE(isRecognizedUtf8("。"));
 }
 
 TEST(UnicodeBlockTest, IsMBPunctuation) {
@@ -130,8 +130,8 @@ TEST(UnicodeBlockTest, IsMBPunctuation) {
   EXPECT_FALSE(isAllMBPunctuation("　x"));
   EXPECT_TRUE(isAllMBPunctuation("　。　、"));
   EXPECT_TRUE(isMBPunctuation(toUtf8(U"\ufffc"))); // from Specials block
-  EXPECT_TRUE(isRecognizedMBChar("—"));
-  EXPECT_TRUE(isRecognizedMBChar("　"));
+  EXPECT_TRUE(isRecognizedUtf8("—"));
+  EXPECT_TRUE(isRecognizedUtf8("　"));
 }
 
 TEST(UnicodeBlockTest, IsMBSymbol) {
@@ -146,7 +146,7 @@ TEST(UnicodeBlockTest, IsMBSymbol) {
   EXPECT_FALSE(isAllMBSymbol("㇁ぶ"));
   EXPECT_TRUE(isAllMBSymbol("㇁☆"));
   EXPECT_FALSE(isMBSymbol("ｺ"));
-  EXPECT_TRUE(isRecognizedMBChar("☆"));
+  EXPECT_TRUE(isRecognizedUtf8("☆"));
 }
 
 TEST(UnicodeBlockTest, IsKanji) {
@@ -174,13 +174,13 @@ TEST(UnicodeBlockTest, IsKanji) {
   EXPECT_TRUE(isKanji("𫠜"));
   EXPECT_TRUE(isAllKanji("𫠜𠮟"));
   EXPECT_FALSE(isAllKanji("𫠜か𠮟"));
-  EXPECT_TRUE(isRecognizedMBChar("厭"));
-  EXPECT_TRUE(isRecognizedMBChar("⺠"));
-  EXPECT_TRUE(isRecognizedMBChar("𫠜"));
-  EXPECT_FALSE(isRecognizedMBChar("𫠜馬イヌねこ"));
-  EXPECT_TRUE(isRecognizedMBChar("𫠜馬イヌねこ", false));
-  EXPECT_TRUE(isAllRecognizedCharacters("𫠜馬イヌねこ"));
-  EXPECT_FALSE(isAllRecognizedCharacters("𫠜馬イxヌねこ"));
+  EXPECT_TRUE(isRecognizedUtf8("厭"));
+  EXPECT_TRUE(isRecognizedUtf8("⺠"));
+  EXPECT_TRUE(isRecognizedUtf8("𫠜"));
+  EXPECT_FALSE(isRecognizedUtf8("𫠜馬イヌねこ"));
+  EXPECT_TRUE(isRecognizedUtf8("𫠜馬イヌねこ", false));
+  EXPECT_TRUE(isAllRecognizedUtf8("𫠜馬イヌねこ"));
+  EXPECT_FALSE(isAllRecognizedUtf8("𫠜馬イxヌねこ"));
 }
 
 } // namespace kanji_tools

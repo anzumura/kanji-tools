@@ -1,5 +1,5 @@
 #include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
@@ -91,7 +91,7 @@ KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
                       : Group::PatternType::Reading;
     // 'name' before the colon is the first member of a 'family'
     if (patternType == Group::PatternType::Family)
-      kanjiNames.emplace_back(MBChar::getFirst(name));
+      kanjiNames.emplace_back(Utf8Char::getFirst(name));
   }
   String member;
   for (std::stringstream ss{members}; std::getline(ss, member, ',');)
@@ -136,7 +136,7 @@ void GroupData::printGroups(const T& groups, const List& groupList) const {
 void GroupData::printMeaningGroup(
     const Group& group, TypeMap& types, StringSet& uniqueNames) const {
   if (fullDebug()) {
-    const auto len{MBChar::size(group.name())};
+    const auto len{Utf8Char::size(group.name())};
     out() << group.name()
           << (len == 1      ? "　　"
                  : len == 2 ? "　"

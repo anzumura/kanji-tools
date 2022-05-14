@@ -1,5 +1,5 @@
-#include <kanji_tools/stats/MBCount.h>
 #include <kanji_tools/stats/Stats.h>
+#include <kanji_tools/stats/Utf8Count.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 #include <future>
@@ -104,11 +104,11 @@ private:
 
   using CountSet = std::set<Count>;
 
-  void printHeaderInfo(const MBCount&);
+  void printHeaderInfo(const Utf8Count&);
   void printTotalAndUnique(const String& name, size_t total, size_t unique);
   void printKanjiTypeCounts(const std::set<Count>&);
   void printRareExamples(const CountSet&);
-  void printBreakdown(const CountSet&, const MBCount&);
+  void printBreakdown(const CountSet&, const Utf8Count&);
 
   const KanjiDataPtr _data;
   const fs::path& _top;
@@ -133,9 +133,9 @@ String StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
 
   if (isHiragana && verbose) _os << ">>> Showing all Furigana replacements:\n";
 
-  MBCountIf count{pred,
-      removeFurigana ? std::optional(MBCount::RemoveFurigana) : std::nullopt,
-      MBCount::DefaultReplace, isHiragana && verbose ? &_os : nullptr};
+  Utf8CountIf count{pred,
+      removeFurigana ? std::optional(Utf8Count::RemoveFurigana) : std::nullopt,
+      Utf8Count::DefaultReplace, isHiragana && verbose ? &_os : nullptr};
   count.addFile(_top, _isKanji || isUnrecognized || isHiragana && verbose);
   if (firstCount) printHeaderInfo(count);
   CountSet frequency;
@@ -160,7 +160,7 @@ String StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   return _os.str();
 }
 
-void StatsPred::printHeaderInfo(const MBCount& count) {
+void StatsPred::printHeaderInfo(const Utf8Count& count) {
   const auto file{_top.filename()};
   _os << ">>> Stats for: '"
       << (file.has_filename() ? file : _top.parent_path().filename()).string()
@@ -227,7 +227,7 @@ void StatsPred::printRareExamples(const CountSet& frequency) {
 }
 
 void StatsPred::printBreakdown(
-    const CountSet& frequency, const MBCount& count) {
+    const CountSet& frequency, const Utf8Count& count) {
   _os << ">>> Showing Breakdown for '" << _name << "':\n  Rank  [Val Num]"
       << (_isKanji && !_name.starts_with("Non-UCD")
                  ? " Freq, LV, Type"
@@ -307,7 +307,7 @@ void Stats::countKanji(
       f([](const auto& x) { return isMBPunctuation(x); }, "MB-Punctuation"),
       f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
       f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-      f([](const auto& x) { return !isRecognizedMBChar(x); }, "Unrecognized")};
+      f([](const auto& x) { return !isRecognizedUtf8(x); }, "Unrecognized")};
   for (auto& i : totals) out() << i.first.get();
   size_t total{};
   for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();

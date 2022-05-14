@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
@@ -57,8 +57,8 @@ Ucd::Meaning UcdData::getMeaning(UcdPtr u) {
 
 UcdPtr UcdData::find(const String& kanjiName) const {
   auto r{kanjiName};
-  if (MBChar::isMBCharWithVariationSelector(kanjiName)) {
-    const auto nonVariant{MBChar::noVariationSelector(kanjiName)};
+  if (Utf8Char::isCharWithVariationSelector(kanjiName)) {
+    const auto nonVariant{Utf8Char::noVariationSelector(kanjiName)};
     if (const auto i{_linkedJinmei.find(nonVariant)}; i != _linkedJinmei.end())
       r = i->second; // return jinmei variant
     else

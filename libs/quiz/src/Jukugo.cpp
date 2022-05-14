@@ -1,5 +1,5 @@
 #include <kanji_tools/kana/Kana.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/quiz/Jukugo.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
@@ -7,7 +7,7 @@ namespace kanji_tools {
 
 Jukugo::Jukugo(const String& name, const String& reading, KanjiGrades grade)
     : _name{name}, _reading{reading}, _grade{grade} {
-  MBChar nameChars{name}, readingChars{reading};
+  Utf8Char nameChars{name}, readingChars{reading};
   size_t count{};
   for (String c; nameChars.next(c);)
     if (isKanji(c)) ++count;

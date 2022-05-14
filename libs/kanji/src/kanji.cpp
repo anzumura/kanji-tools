@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/kanji/CustomFileKanji.h>
 
 #include <cassert>
@@ -17,15 +17,15 @@ Kanji::Year Kanji::year() const { return 0; }
 bool Kanji::linkedReadings() const { return false; }
 
 Kanji::KanjiName::KanjiName(const String& name) : _name{name} {
-  assert(MBChar::size(_name) == 1);
+  assert(Utf8Char::size(_name) == 1);
 }
 
 bool Kanji::KanjiName::isVariant() const {
-  return MBChar::isMBCharWithVariationSelector(_name);
+  return Utf8Char::isCharWithVariationSelector(_name);
 }
 
 String Kanji::KanjiName::nonVariant() const {
-  return MBChar::noVariationSelector(_name);
+  return Utf8Char::noVariationSelector(_name);
 }
 
 Kanji::Kanji(

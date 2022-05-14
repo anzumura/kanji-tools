@@ -1,46 +1,46 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 
 namespace kanji_tools {
 
-TEST(MBCharTest, Size) {
-  EXPECT_EQ(MBChar{""}.size(), 0);
-  EXPECT_EQ(MBChar::size(nullptr), 0);
-  EXPECT_EQ(MBChar{"abc"}.size(), 0);
-  EXPECT_EQ(MBChar{"abc"}.size(false), 3);
-  EXPECT_EQ(MBChar{"大blue空"}.size(), 2);
-  EXPECT_EQ(MBChar{"大blue空"}.size(false), 6);
+TEST(Utf8CharTest, Size) {
+  EXPECT_EQ(Utf8Char{""}.size(), 0);
+  EXPECT_EQ(Utf8Char::size(nullptr), 0);
+  EXPECT_EQ(Utf8Char{"abc"}.size(), 0);
+  EXPECT_EQ(Utf8Char{"abc"}.size(false), 3);
+  EXPECT_EQ(Utf8Char{"大blue空"}.size(), 2);
+  EXPECT_EQ(Utf8Char{"大blue空"}.size(false), 6);
   // variation selectors are considered part of the previous character so don't
   // affect 'size'
-  auto mbCharWithVariant{U"\u9038\ufe01"};
-  auto s{toUtf8(mbCharWithVariant)};
+  auto Utf8CharWithVariant{U"\u9038\ufe01"};
+  auto s{toUtf8(Utf8CharWithVariant)};
   EXPECT_EQ(s.size(), 6);
-  EXPECT_EQ(MBChar::size(s), 1);
-  s = MBChar::noVariationSelector(s); // strip off the variation selector
+  EXPECT_EQ(Utf8Char::size(s), 1);
+  s = Utf8Char::noVariationSelector(s); // strip off the variation selector
   EXPECT_EQ(s.size(), 3);
   // char is unchanged if it doesn't have a variation selector
-  EXPECT_EQ(MBChar::noVariationSelector(s), s);
+  EXPECT_EQ(Utf8Char::noVariationSelector(s), s);
   // combining marks are not included in 'size'
   const String noMarks{"愛詞（あいことば）"}, marks{"愛詞（あいことば）"};
   EXPECT_EQ(noMarks.size(), 27);
   EXPECT_EQ(marks.size(), 30);
-  EXPECT_EQ(MBChar::size(noMarks), 9);
-  EXPECT_EQ(MBChar::size(marks), 9);
+  EXPECT_EQ(Utf8Char::size(noMarks), 9);
+  EXPECT_EQ(Utf8Char::size(marks), 9);
 }
 
-TEST(MBCharTest, GetFirst) {
-  EXPECT_EQ(MBChar::getFirst(""), "");
-  EXPECT_EQ(MBChar::getFirst("abc"), "");
-  EXPECT_EQ(MBChar::getFirst("大blue空"), "大");
+TEST(Utf8CharTest, GetFirst) {
+  EXPECT_EQ(Utf8Char::getFirst(""), "");
+  EXPECT_EQ(Utf8Char::getFirst("abc"), "");
+  EXPECT_EQ(Utf8Char::getFirst("大blue空"), "大");
   // variation selectors are considered part of a character
-  auto mbCharWithVariant{U"\u9038\ufe01"};
-  auto s{toUtf8(mbCharWithVariant)};
-  auto r{MBChar::getFirst(s)};
+  auto Utf8CharWithVariant{U"\u9038\ufe01"};
+  auto s{toUtf8(Utf8CharWithVariant)};
+  auto r{Utf8Char::getFirst(s)};
   EXPECT_EQ(r, s);
 }
 
-TEST(MBCharTest, Next) {
-  MBChar s{"todayトロントの天気is nice。"};
+TEST(Utf8CharTest, Next) {
+  Utf8Char s{"todayトロントの天気is nice。"};
   String x;
   for (const auto _ = {"ト", "ロ", "ン", "ト", "の", "天", "気", "。"};
        auto& i : _) {
@@ -53,8 +53,8 @@ TEST(MBCharTest, Next) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBCharTest, NextWithVariationSelectors) {
-  MBChar s{"憎︀憎む朗︀"};
+TEST(Utf8CharTest, NextWithVariationSelectors) {
+  Utf8Char s{"憎︀憎む朗︀"};
   String x;
   for (const auto _ = {"憎︀", "憎", "む", "朗︀"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x));
@@ -69,14 +69,14 @@ TEST(MBCharTest, NextWithVariationSelectors) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBCharTest, NextWithCombiningMarks) {
+TEST(Utf8CharTest, NextWithCombiningMarks) {
   const String ga{"ガ"}, gi{"ギ"}, combinedGi{"ギ"}, gu{"グ"}, po{"ポ"},
       combinedPo{"ポ"};
   EXPECT_EQ(combinedGi.size(), 6);
   EXPECT_EQ(combinedPo.size(), 6);
   const auto c{ga + combinedGi + gu + combinedPo};
   EXPECT_EQ(c.size(), 18);
-  MBChar s{c};
+  Utf8Char s{c};
   String x;
   // combining marks should get replaced by normal versions
   for (const auto _ = {ga, gi, gu, po}; auto& i : _) {
@@ -93,8 +93,8 @@ TEST(MBCharTest, NextWithCombiningMarks) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBCharTest, GetNextIncludingSingleByte) {
-  MBChar s{"a天気b"};
+TEST(Utf8CharTest, GetNextIncludingSingleByte) {
+  Utf8Char s{"a天気b"};
   String x;
   for (const auto _ = {"a", "天", "気", "b"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x, false));
@@ -106,8 +106,8 @@ TEST(MBCharTest, GetNextIncludingSingleByte) {
   EXPECT_FALSE(s.next(x, false));
 }
 
-TEST(MBCharTest, Reset) {
-  MBChar s{"a天気b"};
+TEST(Utf8CharTest, Reset) {
+  Utf8Char s{"a天気b"};
   String x;
   const auto expected = {"天", "気"};
   for (auto& i : expected) {
@@ -126,7 +126,7 @@ TEST(MBCharTest, Reset) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBCharTest, ErrorCount) {
+TEST(Utf8CharTest, ErrorCount) {
   String original{"甲乙丙丁"};
   // there should be 4 '3-byte' characters
   ASSERT_EQ(original.size(), 12);
@@ -134,7 +134,7 @@ TEST(MBCharTest, ErrorCount) {
   original[1] = 'x'; // change middle of 甲 makes 2 errors (first and last byte)
   original[original.size() / 2] =
       'z'; // change first byte of 丙 makes 2 errors (2nd + 3rd bytes)
-  MBChar s{original};
+  Utf8Char s{original};
   String x;
   for (const auto _ = {"乙", "丁"}; auto& i : _) {
     EXPECT_TRUE(s.peek(x));
@@ -157,10 +157,10 @@ TEST(MBCharTest, ErrorCount) {
   EXPECT_EQ(s.errors(), 4);
 }
 
-TEST(MBCharTest, ErrorWithVariationSelectors) {
+TEST(Utf8CharTest, ErrorWithVariationSelectors) {
   const auto variantSelector{toUtf8(U"\ufe01")};
   // put a variation selector after a single byte char which is invalid
-  MBChar s{"a" + variantSelector + "ご"};
+  Utf8Char s{"a" + variantSelector + "ご"};
   String x;
   EXPECT_TRUE(s.next(x, false));
   EXPECT_EQ(x, "a");
@@ -174,9 +174,9 @@ TEST(MBCharTest, ErrorWithVariationSelectors) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBCharTest, ErrorWithCombiningMarks) {
+TEST(Utf8CharTest, ErrorWithCombiningMarks) {
   // put combining marks at the start which isn't valid
-  MBChar s{CombiningVoiced + CombiningSemiVoiced + "じ"};
+  Utf8Char s{CombiningVoiced + CombiningSemiVoiced + "じ"};
   String x;
   EXPECT_TRUE(s.peek(x));
   EXPECT_EQ(x, "じ");
@@ -188,24 +188,24 @@ TEST(MBCharTest, ErrorWithCombiningMarks) {
   EXPECT_FALSE(s.next(x));
 }
 
-TEST(MBCharTest, Valid) {
-  EXPECT_EQ(MBChar{""}.valid(), MBUtf8Result::NotMultiByte);
-  EXPECT_EQ(MBChar{"a"}.valid(), MBUtf8Result::NotMultiByte);
+TEST(Utf8CharTest, Valid) {
+  EXPECT_EQ(Utf8Char{""}.valid(), MBUtf8Result::NotMultiByte);
+  EXPECT_EQ(Utf8Char{"a"}.valid(), MBUtf8Result::NotMultiByte);
   String x{"雪"};
   EXPECT_EQ(x.size(), 3);
-  EXPECT_EQ(MBChar(x).valid(), MBUtf8Result::Valid);
-  EXPECT_TRUE(MBChar(x).isValid());
+  EXPECT_EQ(Utf8Char(x).valid(), MBUtf8Result::Valid);
+  EXPECT_TRUE(Utf8Char(x).isValid());
 
   // longer strings are not considered valid by default
-  EXPECT_EQ(MBChar{"吹雪"}.valid(), MBUtf8Result::NotValid);
-  EXPECT_EQ(MBChar{"猫s"}.valid(), MBUtf8Result::NotValid);
-  EXPECT_EQ(MBChar{"a猫"}.valid(), MBUtf8Result::NotMultiByte);
+  EXPECT_EQ(Utf8Char{"吹雪"}.valid(), MBUtf8Result::NotValid);
+  EXPECT_EQ(Utf8Char{"猫s"}.valid(), MBUtf8Result::NotValid);
+  EXPECT_EQ(Utf8Char{"a猫"}.valid(), MBUtf8Result::NotMultiByte);
 
   // however, longer strings can be valid if 'sizeOne' is false
-  EXPECT_TRUE(MBChar{"吹雪"}.isValid(false));
-  EXPECT_TRUE(MBChar{"猫s"}.isValid(false));
+  EXPECT_TRUE(Utf8Char{"吹雪"}.isValid(false));
+  EXPECT_TRUE(Utf8Char{"猫s"}.isValid(false));
   // but the first char must be a multi-byte
-  EXPECT_FALSE(MBChar{"a猫"}.isValid(false));
+  EXPECT_FALSE(Utf8Char{"a猫"}.isValid(false));
 }
 
 } // namespace kanji_tools

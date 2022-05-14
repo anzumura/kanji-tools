@@ -9,8 +9,8 @@
 
 namespace kanji_tools {
 
-// 'MBCount' counts multi-byte characters in strings passed to 'add' functions
-class MBCount {
+// 'Utf8Count' counts multi-byte characters in strings passed to 'add' functions
+class Utf8Count {
 public:
   using Map = std::map<String, size_t>;
   using TagMap = std::map<String, Map>;
@@ -18,10 +18,10 @@ public:
   using OptString = std::optional<String>;
 
   // 'RemoveFurigana' is a regex for removing Furigana from text files. It can
-  // be passed to MBCount ctor. Furigana is usually a Kanji followed by one or
+  // be passed to Utf8Count ctor. Furigana is usually a Kanji followed by one or
   // more Kana characters inside wide brackets. This regex matches a Kanji (or
   // wide letter) followed by bracketed Kana (and 'DefaultReplace' replaces it
-  // with just just the Kanji match part). See MBCharTest.cpp for examples of
+  // with just just the Kanji match part). See Utf8CharTest.cpp for examples of
   // how the regex works. Note, almost all Furigana is Hiragana, but sometimes
   // Katakana can also be used like: 護謨製（ゴムせい）.
   static const std::wregex RemoveFurigana;
@@ -32,13 +32,13 @@ public:
   static const std::wstring DefaultReplace;
 
   // if 'find' regex is provided it's applied before processing for counting
-  explicit MBCount(const OptRegex& find = {},
+  explicit Utf8Count(const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {});
 
-  MBCount(const MBCount&) = delete;
-  virtual ~MBCount() = default;
+  Utf8Count(const Utf8Count&) = delete;
+  virtual ~Utf8Count() = default;
 
-  // 'add' adds all the 'MBChars' from the given string 's' and returns the
+  // 'add' adds all the 'Utf8Chars' from the given string 's' and returns the
   // number added. If 'tag' is provided then '_tags' will be updated (which
   // contains a count per tag per unique token).
   size_t add(const String& s, const OptString& tag = {});
@@ -54,7 +54,7 @@ public:
   // return count for given string or 0 if not found
   [[nodiscard]] size_t count(const String& s) const;
 
-  // return an optional Map of 'tag to count' for the given MBChar 's'
+  // return an optional Map of 'tag to count' for the given Utf8Char 's'
   [[nodiscard]] const Map* tags(const String& s) const;
 
   [[nodiscard]] auto uniqueEntries() const { return _map.size(); }
@@ -83,7 +83,7 @@ private:
   [[nodiscard]] size_t processJoinedLine(
       String& prevLine, const String& line, size_t pos, const OptString& tag);
 
-  // 'processFile' returns the MBChar count from 'file'. If '_find' is not set
+  // 'processFile' returns the Utf8Char count from 'file'. If '_find' is not set
   // then each line is processed independently, otherwise 'hasUnclosedBrackets'
   // and 'processJoinedLine' are used to join up to two lines together before
   // calling 'add' to help '_find' match against larger sets of data. The focus
@@ -113,11 +113,11 @@ private:
   std::ostream* const _debug;
 };
 
-template<typename Pred> class MBCountIf : public MBCount {
+template<typename Pred> class Utf8CountIf : public Utf8Count {
 public:
-  explicit MBCountIf(Pred pred, const OptRegex& find = {},
+  explicit Utf8CountIf(Pred pred, const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
-      : MBCount{find, replace, debug}, _pred{pred} {}
+      : Utf8Count{find, replace, debug}, _pred{pred} {}
 private:
   [[nodiscard]] bool allowAdd(const String& token) const override {
     return _pred(token);

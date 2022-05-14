@@ -1,9 +1,9 @@
 #include <kanji_tools/kana/Kana.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 
 namespace kanji_tools {
 
-bool MBChar::isVariationSelector(const unsigned char* s) {
+bool Utf8Char::isVariationSelector(const unsigned char* s) {
   // Checking for variation selectors would be easier if 'i' was a wide char
   // type (like 'Code'), but that would involve calling expensive conversion
   // functions (like fromUtf8). Note, variation selectors are range 'fe00' to
@@ -12,28 +12,28 @@ bool MBChar::isVariationSelector(const unsigned char* s) {
   return s && *s++ == B1 && *s++ == B2 && *s >= B3Start && *s <= B3End;
 }
 
-bool MBChar::isVariationSelector(const char* s) {
+bool Utf8Char::isVariationSelector(const char* s) {
   return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
 }
 
-bool MBChar::isVariationSelector(const String& s) {
+bool Utf8Char::isVariationSelector(const String& s) {
   return isVariationSelector(s.c_str());
 }
 
-bool MBChar::isCombiningMark(const unsigned char* s) {
+bool Utf8Char::isCombiningMark(const unsigned char* s) {
   static constexpr auto B1{0xe3}, B2{0x82}, B3_1{0x99}, B3_2{0x9a};
   return s && *s++ == B1 && *s++ == B2 && (*s == B3_1 || *s == B3_2);
 }
 
-bool MBChar::isCombiningMark(const char* s) {
+bool Utf8Char::isCombiningMark(const char* s) {
   return isCombiningMark(reinterpret_cast<const unsigned char*>(s));
 }
 
-bool MBChar::isCombiningMark(const String& s) {
+bool Utf8Char::isCombiningMark(const String& s) {
   return isCombiningMark(s.c_str());
 }
 
-size_t MBChar::size(const char* s, bool onlyMB) {
+size_t Utf8Char::size(const char* s, bool onlyMB) {
   // use '11 00 00 00' to grab the first two bits and only adding if the result
   // is not binary '10 00 00 00'). Examples:
   // - size("abc") = 0
@@ -59,11 +59,11 @@ size_t MBChar::size(const char* s, bool onlyMB) {
   return result;
 }
 
-size_t MBChar::size(const String& s, bool onlyMB) {
+size_t Utf8Char::size(const String& s, bool onlyMB) {
   return size(s.c_str(), onlyMB);
 }
 
-bool MBChar::isMBCharWithVariationSelector(const String& s) {
+bool Utf8Char::isCharWithVariationSelector(const String& s) {
   // Variation selectors are 3 bytes and min UTF-8 multi-byte char is 2 bytes so
   // a character must be at least 5 long to include a variation selector. Also,
   // max UTF-8 char len is 4 so a single character with a selector can't be more
@@ -74,25 +74,25 @@ bool MBChar::isMBCharWithVariationSelector(const String& s) {
          isVariationSelector(s.substr(s.size() - VarSelectorSize));
 }
 
-String MBChar::noVariationSelector(const String& s) {
-  return isMBCharWithVariationSelector(s)
+String Utf8Char::noVariationSelector(const String& s) {
+  return isCharWithVariationSelector(s)
              ? s.substr(0, s.size() - VarSelectorSize)
              : s;
 }
 
-String MBChar::getFirst(const String& s) {
+String Utf8Char::getFirst(const String& s) {
   String result;
-  MBChar c{s};
+  Utf8Char c{s};
   c.next(result);
   return result;
 }
 
-void MBChar::reset() {
+void Utf8Char::reset() {
   _curLocation = _data.c_str();
   _errors = _variants = _combiningMarks = 0;
 }
 
-bool MBChar::next(String& result, bool onlyMB) {
+bool Utf8Char::next(String& result, bool onlyMB) {
   while (*_curLocation) {
     switch (validateMBUtf8(_curLocation)) {
     case MBUtf8Result::NotMultiByte:
@@ -123,7 +123,7 @@ bool MBChar::next(String& result, bool onlyMB) {
   return false;
 }
 
-bool MBChar::peek(String& result, bool onlyMB) const {
+bool Utf8Char::peek(String& result, bool onlyMB) const {
   for (auto location{_curLocation}; *location;) {
     switch (validateMBUtf8(location)) {
     case MBUtf8Result::NotMultiByte:
@@ -148,34 +148,34 @@ bool MBChar::peek(String& result, bool onlyMB) const {
   return false;
 }
 
-size_t MBChar::size(bool onlyMB) const { return size(_data, onlyMB); }
+size_t Utf8Char::size(bool onlyMB) const { return size(_data, onlyMB); }
 
-MBUtf8Result MBChar::valid(bool sizeOne) const {
+MBUtf8Result Utf8Char::valid(bool sizeOne) const {
   return validateMBUtf8(_data, sizeOne);
 }
 
-bool MBChar::isValid(bool sizeOne) const {
+bool Utf8Char::isValid(bool sizeOne) const {
   return valid(sizeOne) == MBUtf8Result::Valid;
 }
 
-String MBChar::getMBUtf8(const char*& loc) {
+String Utf8Char::getMBUtf8(const char*& loc) {
   const auto firstOfGroup{toUChar(*loc)};
   String result{*loc++};
   for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1U) result += *loc++;
   return result;
 }
 
-bool MBChar::validResult(String& result, const char*& loc) {
+bool Utf8Char::validResult(String& result, const char*& loc) {
   return !isVariationSelector(result = getMBUtf8(loc)) &&
          !isCombiningMark(result);
 }
 
-bool MBChar::peekVariant(String& result, const char* loc) {
+bool Utf8Char::peekVariant(String& result, const char* loc) {
   return isValidMBUtf8(loc) && isVariationSelector(result = getMBUtf8(loc));
 }
 
 template<typename T>
-String MBChar::processOne(T& t, const String& cur, const String& next) {
+String Utf8Char::processOne(T& t, const String& cur, const String& next) {
   return next == CombiningVoiced ? t.combiningMark(cur, Kana::findDakuten(cur))
          : next == CombiningSemiVoiced
              ? t.combiningMark(cur, Kana::findHanDakuten(cur))
@@ -183,12 +183,12 @@ String MBChar::processOne(T& t, const String& cur, const String& next) {
 }
 
 // NOLINTNEXTLINE: keep this non-static (for now) to allow overloading by const
-String MBChar::combiningMark(
+String Utf8Char::combiningMark(
     const String& base, const OptString& accented) const {
   return accented.value_or(base);
 }
 
-String MBChar::combiningMark(const String& base, const OptString& accented) {
+String Utf8Char::combiningMark(const String& base, const OptString& accented) {
   _curLocation += VarSelectorSize;
   if (accented) {
     ++_combiningMarks;

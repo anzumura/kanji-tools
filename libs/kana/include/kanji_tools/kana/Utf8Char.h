@@ -6,10 +6,10 @@
 
 namespace kanji_tools {
 
-// MBChar is a helper class for working with UTF-8 strings. Create MBChar from a
-// string and then call 'next' to get one 'character' at a time. 'next' will
-// return false once the end of the original string is reached. Use 'reset' to
-// iterate again.
+// 'Utf8Char' is a helper class for working with UTF-8 strings. Create Utf8Char
+// from a string and then call 'next' to get one 'character' at a time (with
+// support for variation selectors and combining marks). 'next' returns false
+// once the end of the original string is reached. Use 'reset' to iterate again.
 //
 // Note on UTF-8 structure:
 // - UTF-8 uses 1 to 4 bytes per character, depending on the Unicode symbol
@@ -18,7 +18,7 @@ namespace kanji_tools {
 // - Otherwise it's the first byte of a multi-byte sequence. The number of
 //   leading '1's indicates how many bytes follow, i.e.: 110 means 2 bytes, 1110
 //   means 3, etc.
-class MBChar {
+class Utf8Char {
 public:
   using OptString = std::optional<String>;
 
@@ -38,21 +38,21 @@ public:
   [[nodiscard]] static size_t size(const char* s, bool onlyMB = true);
   [[nodiscard]] static size_t size(const String& s, bool onlyMB = true);
 
-  // 'isMBCharWithVariationSelector' returns true if 's' is a single MBChar (so
-  // 2-4 bytes) followed by a variation selector (which are always 3 bytes).
-  [[nodiscard]] static bool isMBCharWithVariationSelector(const String&);
+  // 'isCharWithVariationSelector' returns true if 's' is a single Utf8Char
+  // (so 2-4 bytes) followed by a variation selector (which are always 3 bytes).
+  [[nodiscard]] static bool isCharWithVariationSelector(const String&);
 
   // return copy of given string with variation selector removed (if it has one)
   [[nodiscard]] static String noVariationSelector(const String&);
 
-  // 'getFirst' returns the first MBChar from 's' (including any variation
+  // 'getFirst' returns the first Utf8Char from 's' (including any variation
   // selector that might follow). If 's' doesn't start with a multi-byte
   // sequence then empty string is returned.
   [[nodiscard]] static String getFirst(const String&);
 
-  explicit MBChar(const String& data) : _data{data} {}
+  explicit Utf8Char(const String& data) : _data{data} {}
 
-  MBChar(const MBChar&) = delete;
+  Utf8Char(const Utf8Char&) = delete;
 
   // call reset in order to loop over the string again
   void reset();

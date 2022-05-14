@@ -1,5 +1,5 @@
 #include <kanji_tools/kana/Converter.h>
-#include <kanji_tools/kana/MBChar.h>
+#include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 #include <sstream>
@@ -150,7 +150,7 @@ String Converter::fromKana(const String& kanaInput, CharType source) const {
     state = ns;
   }};
 
-  for (MBChar s{kanaInput}; s.next(kana, false);) {
+  for (Utf8Char s{kanaInput}; s.next(kana, false);) {
     // check prolong and repeating marks first since they aren't in 'sourceMap'
     if (kana == Kana::ProlongMark)
       // prolong is 'katakana', but it can appear in (non-standard) Hiragana.
@@ -256,7 +256,7 @@ String Converter::processKanaMacron(
 
 String Converter::toKana(const String& romajiInput) const {
   String result, letters, letter;
-  for (MBChar s{romajiInput}; s.next(letter, false);)
+  for (Utf8Char s{romajiInput}; s.next(letter, false);)
     if (isSingleByte(letter)) {
       if (!isN(letter)) {
         letters += letter;

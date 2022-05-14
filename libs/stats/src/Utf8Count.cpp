@@ -1,5 +1,5 @@
-#include <kanji_tools/kana/MBChar.h>
-#include <kanji_tools/stats/MBCount.h>
+#include <kanji_tools/kana/Utf8Char.h>
+#include <kanji_tools/stats/Utf8Count.h>
 #include <kanji_tools/utils/BlockRange.h>
 
 #include <fstream>
@@ -15,16 +15,16 @@ const auto CloseWideBracketSize{CloseWideBracket.size()};
 
 namespace fs = std::filesystem;
 
-const std::wregex MBCount::RemoveFurigana{std::wstring{L"(["} + KanjiRange() +
-                                          WideLetterRange() + L"]{1})（[" +
-                                          KanaRange() + L"]+）"};
-const std::wstring MBCount::DefaultReplace{L"$1"};
+const std::wregex Utf8Count::RemoveFurigana{std::wstring{L"(["} + KanjiRange() +
+                                            WideLetterRange() + L"]{1})（[" +
+                                            KanaRange() + L"]+）"};
+const std::wstring Utf8Count::DefaultReplace{L"$1"};
 
-MBCount::MBCount(
+Utf8Count::Utf8Count(
     const OptRegex& find, const std::wstring& replace, std::ostream* debug)
     : _find{find}, _replace{replace}, _debug{debug} {}
 
-size_t MBCount::add(const String& s, const OptString& tag) {
+size_t Utf8Count::add(const String& s, const OptString& tag) {
   auto n{s};
   if (_find) {
     n = toUtf8(std::regex_replace(fromUtf8ToWstring(s), *_find, _replace));
@@ -43,7 +43,7 @@ size_t MBCount::add(const String& s, const OptString& tag) {
       }
     }
   }
-  MBChar c{n};
+  Utf8Char c{n};
   size_t added{};
   for (String token; c.next(token);)
     if (allowAdd(token)) {
@@ -57,24 +57,24 @@ size_t MBCount::add(const String& s, const OptString& tag) {
   return added;
 }
 
-size_t MBCount::addFile(const std::filesystem::path& file, bool addTag,
+size_t Utf8Count::addFile(const std::filesystem::path& file, bool addTag,
     bool fileNames, bool recurse) {
   if (!std::filesystem::exists(file))
     throw std::domain_error{"file not found: " + file.string()};
   return doAddFile(file, addTag, fileNames, recurse);
 }
 
-size_t MBCount::count(const String& s) const {
+size_t Utf8Count::count(const String& s) const {
   const auto i{_map.find(s)};
   return i != _map.end() ? i->second : 0;
 }
 
-const MBCount::Map* MBCount::tags(const String& s) const {
+const Utf8Count::Map* Utf8Count::tags(const String& s) const {
   const auto i{_tags.find(s)};
   return i != _tags.end() ? &i->second : nullptr;
 }
 
-size_t MBCount::doAddFile(
+size_t Utf8Count::doAddFile(
     const fs::path& file, bool addTag, bool fileNames, bool recurse) {
   size_t added{};
   const auto fileName{file.filename().string()}; // use final component of path
@@ -97,7 +97,7 @@ size_t MBCount::doAddFile(
   return added;
 }
 
-bool MBCount::hasUnclosedBrackets(const String& line) {
+bool Utf8Count::hasUnclosedBrackets(const String& line) {
   if (const auto open{line.rfind(OpenWideBracket)}; open != String::npos) {
     const auto close{line.rfind(CloseWideBracket)};
     return close == String::npos || close < open;
@@ -105,7 +105,7 @@ bool MBCount::hasUnclosedBrackets(const String& line) {
   return false;
 }
 
-size_t MBCount::processJoinedLine(
+size_t Utf8Count::processJoinedLine(
     String& prevLine, const String& line, size_t pos, const OptString& tag) {
   const auto end{pos + CloseWideBracketSize};
   const auto joinedLine{prevLine + line.substr(0, end)};
@@ -114,7 +114,7 @@ size_t MBCount::processJoinedLine(
   return add(joinedLine, tag);
 }
 
-size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
+size_t Utf8Count::processFile(const fs::path& file, const OptString& tag) {
   if (_find) return processFileWithRegex(file, tag);
   size_t added{};
   String line;
@@ -122,7 +122,7 @@ size_t MBCount::processFile(const fs::path& file, const OptString& tag) {
   return added;
 }
 
-size_t MBCount::processFileWithRegex(
+size_t Utf8Count::processFileWithRegex(
     const fs::path& file, const OptString& tag) {
   size_t added{};
   std::fstream f{file};
