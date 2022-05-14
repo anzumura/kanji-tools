@@ -15,14 +15,14 @@ namespace kanji_tools {
 // not valid for non-const 'operator[]' (it will throw an exception). Iteration
 // loops over only 'non-None' values. For example:
 //
-// enum class Colors : BaseEnum::Size { Red, Green, Blue, None };
-// EnumMap<Colors, int> m;
-// m[Colors::Red] = 2;
-// m[Colors::Green] = 4;
-// m[Colors::Blue] = 7;
-// for (auto i : m) std::cout << i << '\n'; // prints the 3 values
-// const auto& cm{m};
-// std::cout << cm[Colors::None]; // prints 0 (the default value for 'int')
+//   enum class Colors : Enum::Size { Red, Green, Blue, None };
+//   EnumMap<Colors, int> m;
+//   m[Colors::Red] = 2;
+//   m[Colors::Green] = 4;
+//   m[Colors::Blue] = 7;
+//   for (auto i : m) std::cout << i << '\n'; // prints the 3 'int' values
+//   const auto& cm{m};
+//   std::cout << cm[Colors::None]; // prints 0 (the default value for 'int')
 
 // BaseEnumMap has a static 'Empty' value to share amongst different EnumMaps
 template<typename V> class BaseEnumMap {
@@ -79,10 +79,10 @@ public:
 
     [[nodiscard]] auto& operator*() const {
       iBase::initialized(_map);
-      if (iBase::index() >= N)
-        iBase::rangeError(
-            base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
-      return (*_map)[to_enum<T>(iBase::index())];
+      const auto i{iBase::index()};
+      if (i >= N)
+        iBase::rangeError(base::IndexMsg + std::to_string(i) + base::RangeMsg);
+      return (*_map)[to_enum<T>(i)];
     }
 
     // random-access iterator requirements (compare, subtracting iterators)

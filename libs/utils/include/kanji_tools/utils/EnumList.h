@@ -12,8 +12,8 @@ namespace kanji_tools {
 // EnumList is a helper class for scoped enums that have contiguous values
 // starting at zero. It provides 'size', 'operator[]' and 'fromString' methods
 // as well as 'begin' and 'end' methods for range based iteration over the enum
-// values. There is also a 'toString' method that is used by out-of-class
-// 'toString' and ostream 'operator<<' functions.
+// values. There's also a 'toString' method used by out-of-class 'toString' and
+// ostream 'operator<<' functions.
 //
 // In order to enable this functionality 'is_enumlist' must be set to 'true'
 // and an EnumList instance must be created with string values in the same order
@@ -21,28 +21,28 @@ namespace kanji_tools {
 //
 // Here's an example of how to create (and use) an EnumList:
 //
-//   enum class Colors : BaseEnum::Size { Red, Green, Blue };
+//   enum class Colors : Enum::Size { Red, Green, Blue };
 //   template<> inline constexpr auto is_enumlist<Colors>{true};
 //   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
 //     "Blue")};
 //
 //   for (auto c : AllColors) { std::cout << c << '\n'; }
 //
-// If the enum has a final value of 'None' then extra functionality (and
-// compile checks) can be enabled by setting 'is_enumlist_with_none' instead.
+// If the enum has a final 'None' value then extra functionality (and compile
+// checks) can be enabled by specializing 'is_enumlist_with_none' instead.
 // Setting this bool enables 'hasValue', 'operator!' and 'isNextNone' global
-// functions based on T::None. 'None' should not be passed to 'create', instead
-// there's a static_assert to check that T::None is the next value after the
-// list of strings (helps keep the enum and the strings in sync).
+// functions based on T::None. "None" string shouldn't be passed to 'create',
+// instead there's a static_assert to check that T::None is the next value after
+// the list of strings (this helps keep the enum and the strings in sync).
 //
 // Here's an example of how to create (and use) an EnumList with 'None':
 //
-//   enum class Colors : BaseEnum::Size { Red, Green, Blue, None };
+//   enum class Colors : Enum::Size { Red, Green, Blue, None };
 //   template<> inline constexpr auto is_enumlist_with_none<Colors>{true};
 //   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
 //     "Blue")};
 //
-//   // prints all Colors including 'None'
+//   // prints all Colors including "None"
 //   for (auto c : AllColors) { std::cout << c << '\n'; }
 //
 // A scoped enum can't be both an 'EnumList' and an 'EnumListWithNone'.
