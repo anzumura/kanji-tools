@@ -20,6 +20,11 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
       } else
         _repeatingConsonents.insert(r[0]);
     }
+  populateDelimLists();
+  verifyData();
+}
+
+void Converter::Tokens::populateDelimLists() {
   struct D {
     const char narrow;
     const char (&wide)[Kana::OneKanaArraySize]; // wide delims are 3 byte UTF-8
@@ -40,7 +45,6 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
     _narrowDelims[i.narrow] = i.wide;
     _wideDelims[i.wide] = i.narrow;
   }
-  verifyData();
 }
 
 void Converter::Tokens::verifyData() const {

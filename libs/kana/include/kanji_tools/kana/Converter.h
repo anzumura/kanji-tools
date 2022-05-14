@@ -83,6 +83,8 @@ private:
       assert(i.second);
     }
 
+    void populateDelimLists();
+
     // 'verifyData' is called by the constructor and performs various 'asserts'
     // on member data.
     void verifyData() const;
