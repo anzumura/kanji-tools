@@ -9,7 +9,6 @@ namespace kanji_tools {
 
 namespace {
 
-const String WideColon{"："};
 constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
 
 } // namespace
@@ -53,9 +52,9 @@ void GroupData::loadGroup(
     // get members
     auto& members{f.get(membersCol)};
     if (members.ends_with(",")) f.error("members ends with ,");
-    // get patternType and kanjiNames
-    auto patternType{Group::PatternType::None};
-    const auto kanjiNames{getKanjiNames(name, members, groupType, patternType)};
+    // get pattern and kanjiNames
+    auto pattern{Group::PatternType::None};
+    const auto kanjiNames{getKanjiNames(name, members, groupType, pattern)};
     // get memberKanji (by looking up each name in kanjiNames)
     KanjiData::KanjiList memberKanji;
     for (auto& i : kanjiNames)
@@ -69,7 +68,7 @@ void GroupData::loadGroup(
       f.error("group failed to load all members");
     try {
       auto group{
-          createGroup(f.getULong(numberCol), name, memberKanji, patternType)};
+          createGroup(f.getULong(numberCol), name, memberKanji, pattern)};
       for (auto& i : memberKanji) add(i->name(), groups, group);
       list.emplace_back(group);
     } catch (const std::exception& e) {
@@ -79,17 +78,15 @@ void GroupData::loadGroup(
 }
 
 KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
-    const String& members, GroupType groupType,
-    Group::PatternType& patternType) {
+    const String& members, GroupType groupType, Group::PatternType& pattern) {
   KanjiListFile::StringList kanjiNames;
-  if (groupType == GroupType::Pattern) {
-    patternType = name.starts_with(WideColon) ? Group::PatternType::Peer
-                  : name.find(WideColon) != String::npos
-                      ? Group::PatternType::Family
-                      : Group::PatternType::Reading;
+  if (static const String Colon{"："}; groupType == GroupType::Pattern) {
+    using enum Group::PatternType;
+    pattern = name.starts_with(Colon)            ? Peer
+              : name.find(Colon) != String::npos ? Family
+                                                 : Reading;
     // 'name' before the colon is the first member of a 'family'
-    if (patternType == Group::PatternType::Family)
-      kanjiNames.emplace_back(Utf8Char::getFirst(name));
+    if (pattern == Family) kanjiNames.emplace_back(Utf8Char::getFirst(name));
   }
   String member;
   for (std::stringstream ss{members}; std::getline(ss, member, ',');)
@@ -98,10 +95,10 @@ KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
 }
 
 GroupPtr GroupData::createGroup(size_t number, const String& name,
-    const KanjiData::KanjiList& members, Group::PatternType patternType) {
-  if (patternType == Group::PatternType::None)
+    const KanjiData::KanjiList& members, Group::PatternType pattern) {
+  if (pattern == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
-  return std::make_shared<PatternGroup>(number, name, members, patternType);
+  return std::make_shared<PatternGroup>(number, name, members, pattern);
 }
 
 template<typename T>
