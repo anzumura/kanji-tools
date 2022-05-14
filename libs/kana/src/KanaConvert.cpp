@@ -136,7 +136,7 @@ KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
 }
 
 bool KanaConvert::processArg(
-    const String& arg, bool& printKana, bool& printMarkdown) { // LCOV_EXCL_LINE
+    const String& arg, bool& printKana, bool& printMarkdown) {
   const auto setBool{[this, &printKana, &printMarkdown](bool& b) {
     // NOLINTNEXTLINE: NonNullParamChecker
     if (_interactive || _suppressNewLine || printKana || printMarkdown)

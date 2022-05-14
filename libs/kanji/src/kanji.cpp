@@ -165,8 +165,7 @@ UcdFileKanji::UcdFileKanji(
       _hasOldLinks{u && u->hasTraditionalLinks()}, _linkNames{linkNames(u)},
       _linkedReadings{u && u->linkedReadings()} {}
 
-UcdFileKanji::UcdFileKanji(
-    KanjiDataRef data, Name name, UcdPtr u) // LCOV_EXCL_LINE
+UcdFileKanji::UcdFileKanji(KanjiDataRef data, Name name, UcdPtr u)
     : UcdFileKanji{data, name, data.ucd().getReadingsAsKana(u), u} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, Reading reading)

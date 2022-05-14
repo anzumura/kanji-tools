@@ -10,9 +10,7 @@ namespace kanji_tools {
 namespace {
 
 const String WideColon{"："};
-// LCOV_EXCL_START
 constexpr auto MissingTypeExamples{12}, PatternGroupSetW{25}, BreakdownSetW{14};
-// LCOV_EXCL_STOP
 
 } // namespace
 
@@ -137,11 +135,9 @@ void GroupData::printMeaningGroup(
     const Group& group, TypeMap& types, StringSet& uniqueNames) const {
   if (fullDebug()) {
     const auto len{Utf8Char::size(group.name())};
-    out() << group.name()
-          << (len == 1      ? "　　"
-                 : len == 2 ? "　"
-                            : "")
-          << " (" << std::setw(2) << std::setfill(' ') << group.members().size()
+    static constexpr std::array Pad{2, 6, 4};
+    out() << group.name() << std::setw(Pad[len < 3 ? len : 0]) << " ("
+          << std::setw(2) << std::setfill(' ') << group.members().size()
           << ")   :";
   }
   for (auto& i : group.members()) {

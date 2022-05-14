@@ -10,7 +10,7 @@ std::mt19937 RandomGen(std::random_device{}());
 
 const String Prompt{"  Select"};
 
-constexpr auto ChoiceStart{'1'}; // LCOV_EXCL_LINE: covered
+constexpr auto ChoiceStart{'1'};
 
 } // namespace
 

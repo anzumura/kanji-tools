@@ -136,7 +136,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
     if (const auto c{chooseKyu(qList)}; !isQuit(c))
       listQuiz(Kanji::Info::Kyu, getKyuList(c));
     break;
-  case 'l': // LCOV_EXCL_LINE
+  case 'l':
     if (const char c{chooseLevel(qList)}; !isQuit(c))
       listQuiz(Kanji::Info::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
     break;

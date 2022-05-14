@@ -20,7 +20,7 @@ constexpr std::array PatternGroups{"：カ", "：サ", "：タ", "：ハ", "：�
 
 constexpr auto RefreshOption{'\''}, EditOption{'*'};
 
-constexpr auto TotalLetters{'z' - 'a' + 1}; // LCOV_EXCL_LINE
+constexpr auto TotalLetters{'z' - 'a' + 1};
 
 } // namespace
 
