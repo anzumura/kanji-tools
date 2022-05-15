@@ -8,6 +8,11 @@
     "TARGET_OS_OSX=1"
   ],
   "workbench.editor.enablePreview": false,
+  // see https://code.visualstudio.com/api/references/theme-color#editor-colors
+  "workbench.colorCustomizations": {
+    "editor.selectionBackground": "#e7fa92",
+    "editor.selectionHighlightBackground": "#e7fa92",
+  },
   "editor.tokenColorCustomizations": {
     "comments": "#525252",
     "textMateRules": [
