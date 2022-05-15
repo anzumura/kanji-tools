@@ -7,6 +7,9 @@ namespace kanji_tools {
 
 namespace {
 
+namespace kana_lists {
+
+// define some short type aliases to help create arrays of Kana below
 using K = Kana;
 using V = Kana::RomajiVariants;
 
@@ -155,14 +158,29 @@ const std::array HanDakutenKanaList{
     H{K{"pyo", "ぴょ", "ピョ"}, K{"byo", "びょ", "ビョ"}, "hyo", "ひょ",
         "ヒョ"}};
 
+} // namespace kana_lists
+
+using kana_lists::KanaList, kana_lists::DakutenKanaList,
+    kana_lists::HanDakutenKanaList;
+
 } // namespace
 
-bool Kana::RepeatMark::matches(CharType t, const String& s) const {
+const Kana::Map Kana::RomajiMap{Kana::populate(CharType::Romaji)},
+    Kana::HiraganaMap{Kana::populate(CharType::Hiragana)},
+    Kana::KatakanaMap{Kana::populate(CharType::Katakana)};
+
+const Kana::IterationMark Kana::RepeatPlain{"ゝ", "ヽ", false},
+    Kana::RepeatAccented{"ゞ", "ヾ", true};
+
+const Kana& Kana::SmallTsu{KanaList[KanaList.size() - 2]};
+const Kana& Kana::N{KanaList[KanaList.size() - 1]};
+
+bool Kana::IterationMark::matches(CharType t, const String& s) const {
   return t == CharType::Hiragana && _hiragana == s ||
          t == CharType::Katakana && _katakana == s;
 }
 
-const String& Kana::RepeatMark::get(
+const String& Kana::IterationMark::get(
     CharType target, ConvertFlags flags, const Kana* prevKana) const {
   switch (target) {
   case CharType::Hiragana: return _hiragana;
@@ -178,18 +196,18 @@ const String& Kana::RepeatMark::get(
   return k->getRomaji(flags);
 }
 
-Kana::RepeatMark::RepeatMark(CharArray<OneKanaArraySize> hiragana,
+Kana::IterationMark::IterationMark(CharArray<OneKanaArraySize> hiragana,
     CharArray<OneKanaArraySize> katakana, bool dakuten)
     : _hiragana{hiragana}, _katakana{katakana}, _dakuten{dakuten} {
   validate();
 }
 
-void Kana::RepeatMark::validate() const {
+void Kana::IterationMark::validate() const {
   assert(isAllHiragana(_hiragana));
   assert(isAllKatakana(_katakana));
 }
 
-const Kana::RepeatMark* Kana::findRepeatMark(
+const Kana::IterationMark* Kana::findIterationMark(
     CharType source, const String& kana) {
   if (RepeatPlain.matches(source, kana)) return &RepeatPlain;
   if (RepeatAccented.matches(source, kana)) return &RepeatAccented;
@@ -327,11 +345,82 @@ Kana::Map Kana::populate(CharType t) {
   return result;
 }
 
-const Kana::Map Kana::RomajiMap{Kana::populate(CharType::Romaji)},
-    Kana::HiraganaMap{Kana::populate(CharType::Hiragana)},
-    Kana::KatakanaMap{Kana::populate(CharType::Katakana)};
+const Kana* DakutenKana::dakuten() const { return &_dakuten; }
 
-const Kana& Kana::SmallTsu{KanaList[KanaList.size() - 2]};
-const Kana& Kana::N{KanaList[KanaList.size() - 1]};
+DakutenKana::AccentedKana::AccentedKana(Kana&& k, const Kana& p)
+    : Kana{std::move(k)}, _plain{p} {}
+
+const Kana* DakutenKana::AccentedKana::plain() const { return &_plain; }
+
+const Kana* HanDakutenKana::hanDakuten() const { return &_hanDakuten; }
+
+// Kana and related class ctor template definitions can be in the .cpp file
+// since Kana instance are only created in this TU (Translation Unit)
+
+template<size_t R>
+Kana::RomajiVariants::RomajiVariants(CharArray<R> r, bool kunrei)
+    : _list{r}, _kunrei{kunrei} {
+  check<R>();
+}
+
+template<size_t R>
+Kana::RomajiVariants::RomajiVariants(
+    CharArray<R> r1, CharArray<R> r2, bool kunrei)
+    : _list{r1, r2}, _kunrei{kunrei} {
+  check<R>();
+}
+
+template<size_t R>
+Kana::RomajiVariants::RomajiVariants(CharArray<R> r1, RMax r2, RMax r3)
+    : _list{r1, r2, r3} {
+  check<R>();
+}
+
+template<size_t R, size_t A>
+Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana)
+    : Kana{romaji, hiragana, katakana, {}, {}, {}} {}
+
+template<size_t R, size_t A, size_t H, size_t K>
+Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
+    CharArray<H> hepburn, CharArray<K> kunrei)
+    : Kana{romaji, hiragana, katakana, hepburn, kunrei, {}} {
+  static_assert(H <= RomajiArrayMaxSize && K <= RomajiArrayMaxSize);
+  if constexpr (A == OneKanaArraySize)
+    static_assert(H >= RomajiArrayMinSize && K >= RomajiArrayMinSize);
+  else {
+    // all digraphs have Rōmaji of at least 2 characters
+    static_assert(A == TwoKanaArraySize);
+    static_assert(H > RomajiArrayMinSize && K > RomajiArrayMinSize);
+  }
+}
+
+template<size_t R, size_t A>
+Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
+    RomajiVariants&& variants)
+    : Kana{romaji, hiragana, katakana, {}, {}, std::move(variants)} {}
+
+template<size_t R, size_t A>
+Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
+    const char* hepburn, const char* kunrei, RomajiVariants&& variants)
+    : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
+      _hepburn{hepburn ? OptString{hepburn} : std::nullopt},
+      _kunrei{kunrei ? OptString{kunrei} : std::nullopt}, _variants{std::move(
+                                                              variants)} {
+  static_assert(R <= RomajiArrayMaxSize);
+  // Hiragana and Katakana must be the same size (3 or 6) and also check that
+  // Rōmaji is at least 1 character for a monograph or 2 for a digraph
+  static_assert(A == OneKanaArraySize && R >= RomajiArrayMinSize ||
+                A == TwoKanaArraySize && R > RomajiArrayMinSize);
+  validate();
+}
+
+template<typename... T>
+DakutenKana::DakutenKana(Kana&& dakuten, T&&... t)
+    : Kana{std::forward<T>(t)...}, _dakuten{std::move(dakuten), *this} {}
+
+template<typename... T>
+HanDakutenKana::HanDakutenKana(Kana&& hanDakuten, T&&... t)
+    : DakutenKana{std::forward<T>(t)...}, _hanDakuten{
+                                              std::move(hanDakuten), *this} {}
 
 } // namespace kanji_tools

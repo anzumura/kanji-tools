@@ -113,15 +113,17 @@ TEST(KanaTest, RepeatMarkGetRomaji) {
 }
 
 TEST(KanaTest, FindRepeatMark) {
-  EXPECT_EQ(Kana::findRepeatMark(CharType::Hiragana, "ゝ"), &Kana::RepeatPlain);
-  EXPECT_EQ(Kana::findRepeatMark(CharType::Katakana, "ヽ"), &Kana::RepeatPlain);
   EXPECT_EQ(
-      Kana::findRepeatMark(CharType::Hiragana, "ゞ"), &Kana::RepeatAccented);
+      Kana::findIterationMark(CharType::Hiragana, "ゝ"), &Kana::RepeatPlain);
   EXPECT_EQ(
-      Kana::findRepeatMark(CharType::Katakana, "ヾ"), &Kana::RepeatAccented);
+      Kana::findIterationMark(CharType::Katakana, "ヽ"), &Kana::RepeatPlain);
+  EXPECT_EQ(
+      Kana::findIterationMark(CharType::Hiragana, "ゞ"), &Kana::RepeatAccented);
+  EXPECT_EQ(
+      Kana::findIterationMark(CharType::Katakana, "ヾ"), &Kana::RepeatAccented);
   // negative tests where source doesn't match kana type
-  EXPECT_EQ(Kana::findRepeatMark(CharType::Hiragana, "ヾ"), nullptr);
-  EXPECT_EQ(Kana::findRepeatMark(CharType::Katakana, "ゝ"), nullptr);
+  EXPECT_EQ(Kana::findIterationMark(CharType::Hiragana, "ヾ"), nullptr);
+  EXPECT_EQ(Kana::findIterationMark(CharType::Katakana, "ゝ"), nullptr);
 }
 
 TEST(KanaTest, FindDakuten) {

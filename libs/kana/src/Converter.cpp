@@ -159,7 +159,7 @@ String Converter::fromKana(const String& kanaInput, CharType source) const {
     if (kana == Kana::ProlongMark)
       // prolong is 'katakana', but it can appear in (non-standard) Hiragana.
       done(DoneType::Prolong);
-    else if (const auto repeat{Kana::findRepeatMark(source, kana)}; repeat) {
+    else if (const auto repeat{Kana::findIterationMark(source, kana)}; repeat) {
       done(DoneType::NewEmptyGroup);
       result += repeat->get(_target, _flags, prevKana);
     } else if (Kana::getMap(source).contains(kana)) {
