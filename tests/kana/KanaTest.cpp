@@ -6,6 +6,8 @@ namespace kanji_tools {
 
 namespace {
 
+using enum CharType;
+
 enum Values {
   HanDakuten = 5,       // both mono- and di-graphs have the same number
   SmallMonographs = 12, // digraphs end (but don't start) with small kana
@@ -24,16 +26,16 @@ constexpr auto TotalMonographs{
 } // namespace
 
 TEST(CharTypeTest, CheckStrings) {
-  EXPECT_EQ(toString(CharType::Hiragana), "Hiragana");
-  EXPECT_EQ(toString(CharType::Katakana), "Katakana");
-  EXPECT_EQ(toString(CharType::Romaji), "Romaji");
+  EXPECT_EQ(toString(Hiragana), "Hiragana");
+  EXPECT_EQ(toString(Katakana), "Katakana");
+  EXPECT_EQ(toString(Romaji), "Romaji");
 }
 
 TEST(CharTypeTest, CheckValues) {
   size_t i{};
-  EXPECT_EQ(CharTypes[i], CharType::Hiragana);
-  EXPECT_EQ(CharTypes[++i], CharType::Katakana);
-  EXPECT_EQ(CharTypes[++i], CharType::Romaji);
+  EXPECT_EQ(CharTypes[i], Hiragana);
+  EXPECT_EQ(CharTypes[++i], Katakana);
+  EXPECT_EQ(CharTypes[++i], Romaji);
 }
 
 TEST(KanaTest, CheckN) {
@@ -72,11 +74,11 @@ TEST(KanaTest, RepeatAccented) {
 
 TEST(KanaTest, RepeatMarkMatches) {
   for (auto i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
-    EXPECT_TRUE(i->matches(CharType::Hiragana, i->hiragana()));
-    EXPECT_TRUE(i->matches(CharType::Katakana, i->katakana()));
-    EXPECT_FALSE(i->matches(CharType::Hiragana, i->katakana()));
-    EXPECT_FALSE(i->matches(CharType::Katakana, i->hiragana()));
-    EXPECT_FALSE(i->matches(CharType::Romaji, {}));
+    EXPECT_TRUE(i->matches(Hiragana, i->hiragana()));
+    EXPECT_TRUE(i->matches(Katakana, i->katakana()));
+    EXPECT_FALSE(i->matches(Hiragana, i->katakana()));
+    EXPECT_FALSE(i->matches(Katakana, i->hiragana()));
+    EXPECT_FALSE(i->matches(Romaji, {}));
   }
 }
 
@@ -85,45 +87,41 @@ TEST(KanaTest, RepeatMarkGet) {
     for (auto i : std::array{&Kana::RepeatPlain, &Kana::RepeatAccented}) {
       // get with CharType 'Hiragana' or 'Katakana' always return underlying
       // 'hiragana' or 'katakana' respectively regardless of 'flags' or prevKana
-      EXPECT_EQ(i->get(CharType::Hiragana, flags, {}), i->hiragana());
-      EXPECT_EQ(i->get(CharType::Katakana, flags, {}), i->katakana());
+      EXPECT_EQ(i->get(Hiragana, flags, {}), i->hiragana());
+      EXPECT_EQ(i->get(Katakana, flags, {}), i->katakana());
       // get CharType 'Romaji' always returns EmptyString if prevKana is nullptr
       // see other tests below for getting with non-empty prevKana
-      EXPECT_EQ(i->get(CharType::Romaji, flags, {}), "");
+      EXPECT_EQ(i->get(Romaji, flags, {}), "");
     }
 }
 
 TEST(KanaTest, RepeatMarkGetRomaji) {
-  auto& m{Kana::getMap(CharType::Romaji)};
+  auto& m{Kana::getMap(Romaji)};
   const auto i{m.find("tsu")};
   ASSERT_TRUE(i != m.end());
   auto* prev{i->second};
   auto flags{ConvertFlags::None};
-  EXPECT_EQ(Kana::RepeatPlain.get(CharType::Romaji, flags, prev), "tsu");
-  EXPECT_EQ(Kana::RepeatAccented.get(CharType::Romaji, flags, prev), "du");
+  EXPECT_EQ(Kana::RepeatPlain.get(Romaji, flags, prev), "tsu");
+  EXPECT_EQ(Kana::RepeatAccented.get(Romaji, flags, prev), "du");
   // 'tsu' has 'Kunrei' of 'tu' and accented value of 'du' by default (the
   // Wāpuro value), but the accented value is 'zu' if either 'Hepburn' or
   // 'Kunrei' standard is requested
   flags = ConvertFlags::Hepburn;
-  EXPECT_EQ(Kana::RepeatPlain.get(CharType::Romaji, flags, prev), "tsu");
-  EXPECT_EQ(Kana::RepeatAccented.get(CharType::Romaji, flags, prev), "zu");
+  EXPECT_EQ(Kana::RepeatPlain.get(Romaji, flags, prev), "tsu");
+  EXPECT_EQ(Kana::RepeatAccented.get(Romaji, flags, prev), "zu");
   flags = ConvertFlags::Kunrei;
-  EXPECT_EQ(Kana::RepeatPlain.get(CharType::Romaji, flags, prev), "tu");
-  EXPECT_EQ(Kana::RepeatAccented.get(CharType::Romaji, flags, prev), "zu");
+  EXPECT_EQ(Kana::RepeatPlain.get(Romaji, flags, prev), "tu");
+  EXPECT_EQ(Kana::RepeatAccented.get(Romaji, flags, prev), "zu");
 }
 
 TEST(KanaTest, FindRepeatMark) {
-  EXPECT_EQ(
-      Kana::findIterationMark(CharType::Hiragana, "ゝ"), &Kana::RepeatPlain);
-  EXPECT_EQ(
-      Kana::findIterationMark(CharType::Katakana, "ヽ"), &Kana::RepeatPlain);
-  EXPECT_EQ(
-      Kana::findIterationMark(CharType::Hiragana, "ゞ"), &Kana::RepeatAccented);
-  EXPECT_EQ(
-      Kana::findIterationMark(CharType::Katakana, "ヾ"), &Kana::RepeatAccented);
+  EXPECT_EQ(Kana::findIterationMark(Hiragana, "ゝ"), &Kana::RepeatPlain);
+  EXPECT_EQ(Kana::findIterationMark(Katakana, "ヽ"), &Kana::RepeatPlain);
+  EXPECT_EQ(Kana::findIterationMark(Hiragana, "ゞ"), &Kana::RepeatAccented);
+  EXPECT_EQ(Kana::findIterationMark(Katakana, "ヾ"), &Kana::RepeatAccented);
   // negative tests where source doesn't match kana type
-  EXPECT_EQ(Kana::findIterationMark(CharType::Hiragana, "ヾ"), nullptr);
-  EXPECT_EQ(Kana::findIterationMark(CharType::Katakana, "ゝ"), nullptr);
+  EXPECT_EQ(Kana::findIterationMark(Hiragana, "ヾ"), nullptr);
+  EXPECT_EQ(Kana::findIterationMark(Katakana, "ゝ"), nullptr);
 }
 
 TEST(KanaTest, FindDakuten) {
@@ -144,7 +142,7 @@ TEST(KanaTest, FindHanDakuten) {
 }
 
 TEST(KanaTest, CheckHiragana) {
-  auto& sourceMap{Kana::getMap(CharType::Hiragana)};
+  auto& sourceMap{Kana::getMap(Hiragana)};
   EXPECT_EQ(sourceMap.size(), TotalKana);
   // count various types including smallDigraphs (which should be 0)
   uint16_t hanDakutenMonographs{}, smallMonographs{}, plainMonographs{},
@@ -211,8 +209,8 @@ TEST(KanaTest, CheckHiragana) {
 }
 
 TEST(KanaTest, CheckKatakana) {
-  auto& sourceMap{Kana::getMap(CharType::Katakana)};
-  auto& hiraganaMap{Kana::getMap(CharType::Hiragana)};
+  auto& sourceMap{Kana::getMap(Katakana)};
+  auto& hiraganaMap{Kana::getMap(Hiragana)};
   EXPECT_EQ(sourceMap.size(), TotalKana);
   for (auto& i : sourceMap) {
     Utf8Char s{i.first};
@@ -250,7 +248,7 @@ TEST(KanaTest, CheckKatakana) {
 }
 
 TEST(KanaTest, CheckRomaji) {
-  auto& sourceMap{Kana::getMap(CharType::Romaji)};
+  auto& sourceMap{Kana::getMap(Romaji)};
   EXPECT_EQ(sourceMap.size(), TotalRomaji);
   uint16_t aNum{}, vaNum{}, iNum{}, viNum{}, uNum{}, vuNum{}, eNum{}, veNum{},
       oNum{}, voNum{}, nNum{};

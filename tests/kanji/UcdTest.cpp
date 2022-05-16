@@ -16,34 +16,36 @@ template<typename T>
 } // namespace
 
 TEST(UcdLinkTypesTest, CheckStrings) {
-  EXPECT_EQ(toString(Ucd::LinkTypes::Compatibility_R), "Compatibility*");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Definition_R), "Definition*");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Jinmei_R), "Jinmei*");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Semantic_R), "Semantic*");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Simplified_R), "Simplified*");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Traditional_R), "Traditional*");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Compatibility), "Compatibility");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Definition), "Definition");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Jinmei), "Jinmei");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Simplified), "Simplified");
-  EXPECT_EQ(toString(Ucd::LinkTypes::Traditional), "Traditional");
-  EXPECT_EQ(toString(Ucd::LinkTypes::None), "None");
+  using enum Ucd::LinkTypes;
+  EXPECT_EQ(toString(Compatibility_R), "Compatibility*");
+  EXPECT_EQ(toString(Definition_R), "Definition*");
+  EXPECT_EQ(toString(Jinmei_R), "Jinmei*");
+  EXPECT_EQ(toString(Semantic_R), "Semantic*");
+  EXPECT_EQ(toString(Simplified_R), "Simplified*");
+  EXPECT_EQ(toString(Traditional_R), "Traditional*");
+  EXPECT_EQ(toString(Compatibility), "Compatibility");
+  EXPECT_EQ(toString(Definition), "Definition");
+  EXPECT_EQ(toString(Jinmei), "Jinmei");
+  EXPECT_EQ(toString(Simplified), "Simplified");
+  EXPECT_EQ(toString(Traditional), "Traditional");
+  EXPECT_EQ(toString(None), "None");
 }
 
 TEST(UcdLinkTypesTest, CheckValues) {
+  using enum Ucd::LinkTypes;
   size_t i{};
-  EXPECT_EQ(AllUcdLinkTypes[i], Ucd::LinkTypes::Compatibility_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Definition_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Jinmei_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Semantic_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Simplified_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Traditional_R);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Compatibility);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Definition);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Jinmei);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Simplified);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::Traditional);
-  EXPECT_EQ(AllUcdLinkTypes[++i], Ucd::LinkTypes::None);
+  EXPECT_EQ(AllUcdLinkTypes[i], Compatibility_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Definition_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Jinmei_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Semantic_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Simplified_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Traditional_R);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Compatibility);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Definition);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Jinmei);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Simplified);
+  EXPECT_EQ(AllUcdLinkTypes[++i], Traditional);
+  EXPECT_EQ(AllUcdLinkTypes[++i], None);
 }
 
 TEST(UcdTest, Size) {
