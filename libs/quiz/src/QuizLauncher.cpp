@@ -331,8 +331,7 @@ void QuizLauncher::processKanjiArg(const String& arg) const {
         "Nelson", id);
   } else if (arg.starts_with("u")) {
     const auto id{arg.substr(1)};
-    // must be a 4 or 5 digit hex value (and if 5 digits, then the first digit
-    // must be a 1 or 2)
+    // must be 4 or 5 digit hex (and if 5, then first digit must be 1 or 2)
     if (id.size() < UnicodeStringMinSize || id.size() > UnicodeStringMaxSize ||
         (id.size() == UnicodeStringMaxSize && id[0] != '1' && id[0] != '2') ||
         !std::all_of(id.begin(), id.end(), ::ishexnumber))
