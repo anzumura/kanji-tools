@@ -24,17 +24,13 @@ public:
 
   using Range = std::pair<char, char>;
 
-  // There is no 'quit' option by default, but it can be specified in the
-  // constructor or changed later via 'setQuit' and 'clearQuit' methods. An
-  // 'istream' of '0' (the default) means read from stdin.
-  explicit Choice(std::ostream& out, OptChar quit = {},
-      const String& d = DefaultQuitDescription)
-      : Choice{out, nullptr, quit, d} {}
-  Choice(std::ostream& out, std::istream* in, OptChar quit = {},
-      const String& d = DefaultQuitDescription)
-      : _out{out}, _in{in} {
-    if (quit) setQuit(*quit, d);
-  }
+  // There is no 'quit' option by default, but it can be specified in the ctor
+  // or changed later via 'setQuit' and 'clearQuit' methods. An 'istream' of '0'
+  // (default if first ctor is used) means read from stdin.
+  explicit Choice(
+      std::ostream&, OptChar quit = {}, const String& = DefaultQuitDescription);
+  Choice(std::ostream&, std::istream*, OptChar quit = {},
+      const String& = DefaultQuitDescription);
 
   Choice(const Choice&) = delete;
   Choice& operator=(const Choice&) = delete;
@@ -42,12 +38,8 @@ public:
   // Provide support for a '_quitOption' choice instead of needing to specify it
   // every time when. If it has a value then it will be added to the 'choices'
   // provided to the below 'get' methods.
-  void setQuit(char c, const String& d = DefaultQuitDescription) {
-    checkPrintableAscii(c, "quit option");
-    _quit = c;
-    _quitDescription = d;
-  }
-  void clearQuit() { _quit = {}; }
+  void setQuit(char, const String& = DefaultQuitDescription);
+  void clearQuit();
 
   [[nodiscard]] auto isQuit(char c) const { return _quit == c; }
   [[nodiscard]] auto quit() const { return _quit; }

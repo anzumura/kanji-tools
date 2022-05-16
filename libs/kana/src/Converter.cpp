@@ -136,6 +136,40 @@ String Converter::convert(CharType source, const String& input) const {
   return result;
 }
 
+const Converter::Set& Converter::afterN(CharType source) {
+  return tokens().afterN(source);
+}
+
+const Converter::Set& Converter::smallKana(CharType source) {
+  return tokens().smallKana(source);
+}
+
+const std::set<char>& Converter::repeatingConsonents() {
+  return tokens().repeatingConsonents();
+}
+
+const Converter::NarrowDelims& Converter::narrowDelims() {
+  return tokens().narrowDelims();
+}
+
+const Converter::WideDelims& Converter::wideDelims() {
+  return tokens().wideDelims();
+}
+
+bool Converter::romajiTarget() const { return _target == CharType::Romaji; }
+
+bool Converter::hiraganaTarget() const { return _target == CharType::Hiragana; }
+
+const String& Converter::get(const Kana& k) const {
+  return k.get(_target, _flags);
+}
+
+const String& Converter::getN() const { return get(Kana::N); }
+
+const String& Converter::getSmallTsu() const { return get(Kana::SmallTsu); }
+
+bool Converter::isN(const String& x) { return x == "n" || x == "N"; }
+
 String Converter::fromKana(const String& kanaInput, CharType source) const {
   State state{State::New};
   String result, kanaGroup, kana;

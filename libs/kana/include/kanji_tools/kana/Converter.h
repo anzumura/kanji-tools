@@ -39,6 +39,10 @@ public:
   [[nodiscard]] String convert(CharType source, const String& input,
       CharType target, ConvertFlags = ConvertFlags::None);
 private:
+  using Set = std::set<String>;
+  using NarrowDelims = std::map<char, String>;
+  using WideDelims = std::map<String, char>;
+
   // For input, either 'Apostrophe' or 'Dash' can be used to separate 'n' in
   // the middle of Rōmaji words like gin'iro, kan'atsu, kan-i, etc.. For Rōmaji
   // output, 'Apostrophe' is used. Note, 'Dash' is used in 'Traditional Hepburn'
@@ -62,18 +66,6 @@ private:
     [[nodiscard]] auto& narrowDelims() const { return _narrowDelims; }
     [[nodiscard]] auto& wideDelims() const { return _wideDelims; }
   private:
-    using Set = std::set<String>;
-
-    // Support converting most non-alphanumeric ascii from narrow to wide
-    // values. These values are also used as delimiters for splitting up input
-    // strings when converting from Rōmaji to Kana. Use a '*' for Katakana
-    // middle dot '・' to keep round-trip translations as non-lossy as possible.
-    // For now, don't include '-' (minus) or apostrophe since these could get
-    // mixed up with prolong mark 'ー' and special separation handling after 'n'
-    // in Rōmaji output. Backslash maps to ￥ as per usual keyboard input.
-    using NarrowDelims = std::map<char, String>;
-    using WideDelims = std::map<String, char>;
-
     // 'insertUnique' performs an insert and ensures value was added by using
     // 'assert' (can't do on one line like 'assert(s.insert(x).second)' since
     // that would result in the code not getting executed when compiling with
@@ -100,7 +92,12 @@ private:
     // 'wa') that form the second parts of digraphs.
     Set _smallHiragana, _smallKatakana;
 
-    // Punctuation and word delimiter handling
+    // Support converting most non-alpha ascii from narrow to wide values. These
+    // values are also used as delimiters when converting from Rōmaji to Kana.
+    // Use a '*' for Katakana middle dot '・' to keep round-trip translations as
+    // non-lossy as possible and '-' (dash) and apostrophe aren't included since
+    // these could get mixed up with prolong mark 'ー' and handling after 'n' in
+    // Rōmaji output. Backslash maps to ￥ as per usual keyboard input.
     String _narrowDelimList;
     NarrowDelims _narrowDelims;
     WideDelims _wideDelims;
@@ -110,33 +107,19 @@ private:
   // function to avoid order of static initialization problems
   static const Tokens& tokens();
 
-  [[nodiscard]] static auto& afterN(CharType source) {
-    return tokens().afterN(source);
-  }
-  [[nodiscard]] static auto& smallKana(CharType source) {
-    return tokens().smallKana(source);
-  }
-  [[nodiscard]] static auto& repeatingConsonents() {
-    return tokens().repeatingConsonents();
-  }
-  [[nodiscard]] static auto& narrowDelims() { return tokens().narrowDelims(); }
-  [[nodiscard]] static auto& wideDelims() { return tokens().wideDelims(); }
+  [[nodiscard]] static const Set& afterN(CharType);
+  [[nodiscard]] static const Set& smallKana(CharType);
+  [[nodiscard]] static const std::set<char>& repeatingConsonents();
+  [[nodiscard]] static const NarrowDelims& narrowDelims();
+  [[nodiscard]] static const WideDelims& wideDelims();
 
-  [[nodiscard]] auto romajiTarget() const {
-    return _target == CharType::Romaji;
-  }
-  [[nodiscard]] auto hiraganaTarget() const {
-    return _target == CharType::Hiragana;
-  }
-  [[nodiscard]] auto& get(const Kana& k) const {
-    return k.get(_target, _flags);
-  }
-  [[nodiscard]] auto& getN() const { return get(Kana::N); }
-  [[nodiscard]] auto& getSmallTsu() const { return get(Kana::SmallTsu); }
+  [[nodiscard]] bool romajiTarget() const;
+  [[nodiscard]] bool hiraganaTarget() const;
+  [[nodiscard]] const String& get(const Kana&) const;
+  [[nodiscard]] const String& getN() const;
+  [[nodiscard]] const String& getSmallTsu() const;
 
-  [[nodiscard]] static auto isN(const String& x) {
-    return x == "n" || x == "N";
-  }
+  [[nodiscard]] static bool isN(const String&);
 
   // 'fromKana' takes a string of Kana (so 'source' is Hiragana or Katakana) and
   // retuns converted result based on '_target' and '_flags' (result can be

@@ -11,6 +11,23 @@ const String AlreadyInChoices{"' already in choices"};
 
 } // namespace
 
+Choice::Choice(std::ostream& out, OptChar quit, const String& d)
+    : Choice{out, nullptr, quit, d} {}
+
+Choice::Choice(
+    std::ostream& out, std::istream* in, OptChar quit, const String& d)
+    : _out{out}, _in{in} {
+  if (quit) setQuit(*quit, d);
+}
+
+void Choice::setQuit(char c, const String& d) {
+  checkPrintableAscii(c, "quit option");
+  _quit = c;
+  _quitDescription = d;
+}
+
+void Choice::clearQuit() { _quit = {}; }
+
 char Choice::get(const String& msg, bool useQuit, const Choices& choicesIn,
     OptChar def) const {
   static const String QuitError{"quit option '"},
