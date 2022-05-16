@@ -11,8 +11,8 @@ constexpr auto ShowMeanings{"show meanings"}, HideMeanings{"hide meanings"};
 
 void Quiz::run(const Args& args, std::ostream& out) {
   const auto data{std::make_shared<RealKanjiData>(args, out)};
-  QuizLauncher(args, data, std::make_shared<GroupData>(data),
-      std::make_shared<JukugoData>(data));
+  QuizLauncher{args, data, std::make_shared<GroupData>(data),
+      std::make_shared<JukugoData>(data)};
 }
 
 Quiz::Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
