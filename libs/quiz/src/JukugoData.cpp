@@ -99,9 +99,9 @@ void JukugoData::error(const String& msg) { throw std::domain_error(msg); }
 
 void JukugoData::createJukugo(
     const String& line, KanjiGrades grade, bool onePerLine) {
-  const auto open{findOpenBracket(line, onePerLine)};
-  const auto close{findCloseBracket(line, onePerLine)};
-  const String name{line.substr(0, onePerLine ? open - 1 : open)},
+  const auto open{findOpenBracket(line, onePerLine)},
+      close{findCloseBracket(line, onePerLine)};
+  const auto name{line.substr(0, onePerLine ? open - 1 : open)},
       reading{line.substr(open + 1, close - open - 1)};
   // There are some duplicates in data files which makes sense for
   // 'jukugo/other.txt' since it has a line per kanji followed by jukugo, but
