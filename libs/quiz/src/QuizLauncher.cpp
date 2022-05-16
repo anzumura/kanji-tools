@@ -123,14 +123,14 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
     if (const auto c{chooseFreq(qList)}; !isQuit(c))
       // suppress printing 'Freq' (by passing 'Kanji::Info::Freq') since this
       // would work against showing the list in a random order
-      listQuiz(
-          Kanji::Info::Freq, data().frequencies(static_cast<size_t>(c - '1')));
+      listQuiz(Kanji::Info::Freq,
+          data().frequencyList(static_cast<size_t>(c - '1')));
     break;
   case 'g':
     if (const auto c{chooseGrade(qList)}; !isQuit(c))
       // suppress printing 'Grade' (it's the same for every kanji in the list)
       listQuiz(Kanji::Info::Grade,
-          data().grades(c == 's' ? KanjiGrades::S : AllKanjiGrades[c - '1']));
+          data().grades()[c == 's' ? KanjiGrades::S : AllKanjiGrades[c - '1']]);
     break;
   case 'k':
     if (const auto c{chooseKyu(qList)}; !isQuit(c))
@@ -138,7 +138,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
     break;
   case 'l':
     if (const char c{chooseLevel(qList)}; !isQuit(c))
-      listQuiz(Kanji::Info::Level, data().levels(AllJlptLevels[4 - (c - '1')]));
+      listQuiz(
+          Kanji::Info::Level, data().levels()[AllJlptLevels[4 - (c - '1')]]);
     break;
   case 'm': groupQuiz(_groupData->meaningGroups()); break;
   case 'p': groupQuiz(_groupData->patternGroups()); break;
@@ -397,10 +398,10 @@ void QuizLauncher::printJukugo(const Kanji& kanji) const {
   static const String Jukugo{" Jukugo"}, SameGrade{"Same Grade Jukugo"},
       OtherGrade{"Other Grade Jukugo"};
   if (auto& list{_jukugoData->find(kanji.name())}; !list.empty()) {
-    // For kanji with a 'Grade' (so all Jouyou kanji) split Jukugo into two
-    // lists, one for the same grade of the given kanji and one for other
-    // grades. For example, 一生（いっしょう） is a grade 1 Jukugo for '一', but
-    // 一縷（いちる） is a secondary school Jukugo (which also contains '一').
+    // For Kanji with a 'Grade' split Jukugo into two lists, one for the same
+    // grade of the given Kanji and one for the other grades. For example,
+    // 一生（いっしょう） is a grade 1 Jukugo for '一', but 一縷（いちる） is a
+    // secondary school Jukugo (which also contains '一').
     if (JukugoData::List same, other;
         kanji.hasGrade() && list.size() > JukugoPerLine) {
       for (auto& i : list)
@@ -466,12 +467,13 @@ char QuizLauncher::chooseLevel(OptChar qList) const {
 
 const KanjiData::KanjiList& QuizLauncher::getKyuList(char c) const {
   using enum KenteiKyus;
-  return data().kyus(c == 'a'   ? K10
-                     : c == 'c' ? KJ2
-                     : c == '2' ? K2
-                     : c == 'b' ? KJ1
-                     : c == '1' ? K1
-                                : AllKenteiKyus[to_underlying(K3) - (c - '3')]);
+  return data()
+      .kyus()[c == 'a'   ? K10
+              : c == 'c' ? KJ2
+              : c == '2' ? K2
+              : c == 'b' ? KJ1
+              : c == '1' ? K1
+                         : AllKenteiKyus[to_underlying(K3) - (c - '3')]];
 }
 
 } // namespace kanji_tools

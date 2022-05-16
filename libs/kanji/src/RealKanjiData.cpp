@@ -151,7 +151,7 @@ void RealKanjiData::printStats() const {
 void RealKanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   size_t all{};
-  for (auto& jouyou{types(KanjiTypes::Jouyou)}; auto i : AllKanjiGrades) {
+  for (auto& jouyou{types()[KanjiTypes::Jouyou]}; auto i : AllKanjiGrades) {
     const auto grade{[i](auto& x) { return x->grade() == i; }};
     if (auto gradeCount{static_cast<size_t>(
             std::count_if(jouyou.begin(), jouyou.end(), grade))};
@@ -201,7 +201,7 @@ void RealKanjiData::printListStats(const EnumListWithNone<T, S>& all,
       log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
       for (const auto& j : counts) {
         out() << j.first << ' ' << j.second;
-        auto& l{types(j.first)};
+        auto& l{types()[j.first]};
         if (showNoFrequency)
           noFreq(std::count_if(l.begin(), l.end(), [i, &p](auto& x) {
             return ((*x).*p)() == i && !x->frequency();

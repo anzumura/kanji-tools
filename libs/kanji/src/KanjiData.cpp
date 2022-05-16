@@ -94,12 +94,8 @@ Kanji::OptString KanjiData::getCompatibilityName(const String& kanji) const {
   return u && u->name() != kanji ? Kanji::OptString{u->name()} : std::nullopt;
 }
 
-const KanjiData::KanjiList& KanjiData::frequencies(size_t f) const {
+const KanjiData::KanjiList& KanjiData::frequencyList(size_t f) const {
   return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<KanjiList>::Empty;
-}
-
-size_t KanjiData::frequencySize(size_t f) const {
-  return frequencies(f).size();
 }
 
 KanjiTypes KanjiData::getType(const String& name) const {

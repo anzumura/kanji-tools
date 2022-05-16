@@ -54,8 +54,8 @@ public:
   // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
   [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr);
 
-  KanjiData(const Path& dataDir, DebugMode, std::ostream& out = std::cout,
-      std::ostream& err = std::cerr);
+  KanjiData(const Path& dataDir, DebugMode, std::ostream& = std::cout,
+      std::ostream& = std::cerr);
 
   KanjiData(const KanjiData&) = delete;
   virtual ~KanjiData() = default;
@@ -71,35 +71,22 @@ public:
   [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const;
 
   // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
-  // official Radical for the given 'radicalName' (like 二, 木, 言, etc.).
-  [[nodiscard]] virtual RadicalRef getRadicalByName(
-      const String& radicalName) const;
+  // official Radical for the given string (like 二, 木, 言, etc.).
+  [[nodiscard]] virtual RadicalRef getRadicalByName(const String&) const;
 
   // 'getCompatibilityName' returns the UCD compatibility code for the given
   // 'kanji' if it exists (_ucd.find method takes care of checking whether
   // 'kanji' has a variation selector).
   [[nodiscard]] Kanji::OptString getCompatibilityName(const String&) const;
 
-  // get list by KanjiType
-  [[nodiscard]] auto& types(KanjiTypes t) const { return _types[t]; }
-  [[nodiscard]] auto typeSize(KanjiTypes t) const { return types(t).size(); }
-
-  // get list by KanjiGrade
-  [[nodiscard]] auto& grades(KanjiGrades g) const { return _grades[g]; }
-  [[nodiscard]] auto gradeSize(KanjiGrades g) const { return grades(g).size(); }
-
-  // get list by JLPT Level
-  [[nodiscard]] auto& levels(JlptLevels l) const { return _levels[l]; }
-  [[nodiscard]] auto levelSize(JlptLevels l) const { return levels(l).size(); }
-
-  // get list by Kentei Kyu
-  [[nodiscard]] auto& kyus(KenteiKyus k) const { return _kyus[k]; }
-  [[nodiscard]] auto kyuSize(KenteiKyus k) const { return kyus(k).size(); }
+  [[nodiscard]] auto& types() const { return _types; }
+  [[nodiscard]] auto& grades() const { return _grades; }
+  [[nodiscard]] auto& levels() const { return _levels; }
+  [[nodiscard]] auto& kyus() const { return _kyus; }
 
   // See comment for '_frequencies' private data member for more details
   static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
-  [[nodiscard]] const KanjiList& frequencies(size_t) const;
-  [[nodiscard]] size_t frequencySize(size_t) const;
+  [[nodiscard]] const KanjiList& frequencyList(size_t) const;
 
   [[nodiscard]] KanjiTypes getType(const String& name) const;
 
@@ -170,10 +157,9 @@ protected:
   void checkStrokes() const;
 
   // used by derived classes
-  auto& radicals() { return _radicals; }
-  auto& ucd() { return _ucd; }
-  auto& types() { return _types; }
-  auto& types() const { return _types; }
+  [[nodiscard]] auto& radicals() { return _radicals; }
+  [[nodiscard]] auto& ucd() { return _ucd; }
+  [[nodiscard]] auto& types() { return _types; }
 
   // checkInsert is non-private to help support testing
   bool checkInsert(const KanjiPtr&, UcdPtr = {});

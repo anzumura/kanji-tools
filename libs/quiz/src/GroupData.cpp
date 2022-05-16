@@ -196,7 +196,7 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
         << " missing examples per type)\n";
   for (auto i : AllKanjiTypes)
     if (auto j{types.find(i)}; j != types.end()) {
-      auto& all{_data->types(i)};
+      auto& all{_data->types()[i]};
       out() << std::right << std::setw(BreakdownSetW) << i << ": "
             << j->second.size() << " / " << all.size();
       printMissingFromType(all, j->second);
