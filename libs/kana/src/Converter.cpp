@@ -25,22 +25,23 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
 }
 
 void Converter::Tokens::populateDelimLists() {
+  using Wide = Kana::CharArray<Kana::OneKanaArraySize>; // all are 3 byte UTF-8
   struct D {
     const char narrow;
-    const char (&wide)[Kana::OneKanaArraySize]; // wide delims are 3 byte UTF-8
+    Wide wide;
   };
-  // add delims in Ascii order (skipping alphanum, Apostrophe and Dash)
-  for (auto& i : {D{' ', "　"}, D{'!', "！"}, D{'"', "”"}, D{'#', "＃"},
-           D{'$', "＄"}, D{'%', "％"}, D{'&', "＆"}, D{'(', "（"}, D{')', "）"},
-           D{'*', "＊"}, D{'+', "＋"}, D{',', "、"}, D{'.', "。"}, D{'/', "・"},
-           // Ascii 0-9
-           D{':', "："}, D{';', "；"}, D{'<', "＜"}, D{'=', "＝"}, D{'>', "＞"},
-           D{'?', "？"}, D{'@', "＠"},
-           // Ascii A-Z - LCOV_EXCL_START
-           D{'[', "「"}, D{'\\', "￥"}, D{']', "」"}, D{'^', "＾"},
-           D{'_', "＿"}, D{'`', "｀"},
-           // Ascii a-z - LCOV_EXCL_STOP
-           D{'{', "『"}, D{'|', "｜"}, D{'}', "』"}, D{'~', "〜"}}) {
+  char prevChar{};
+  const auto f{[&prevChar](Wide wide, char narrow = {}) {
+    return D{narrow ? prevChar = narrow : ++prevChar, wide};
+  }}; // LCOV_EXCL_LINE
+  // add delims in Ascii order (skipping Apostrophe, Dash and Alpha)
+  for (auto& i : {f("　", ' '), f("！"), f("”"), f("＃"), f("＄"), f("％"),
+           f("＆"), /* ' */ f("（", '('), f("）"), f("＊"), f("＋"), f("、"),
+           /* - */ f("。", '.'), f("・"), f("０"), f("１"), f("２"), f("３"),
+           f("４"), f("５"), f("６"), f("７"), f("８"), f("９"), f("："),
+           f("；"), f("＜"), f("＝"), f("＞"), f("？"), f("＠"), /* A-Z */
+           f("「", '['), f("￥"), f("」"), f("＾"), f("＿"), f("｀"),
+           /* a-z */ f("『", '{'), f("｜"), f("』"), f("〜")}) {
     _narrowDelimList += i.narrow;
     _narrowDelims[i.narrow] = i.wide;
     _wideDelims[i.wide] = i.narrow;

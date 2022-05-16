@@ -191,7 +191,7 @@ TEST_F(ConverterTest, ConvertRomajiToKatakana) {
 TEST_F(ConverterTest, ConvertHiraganaToRomaji) {
   EXPECT_EQ(hiraganaToRomaji("う"), "u");
   EXPECT_EQ(hiraganaToRomaji("かつ　さんど！"), "katsu sando!");
-  EXPECT_EQ(hiraganaToRomaji("うぃき"), "wiki");
+  EXPECT_EQ(hiraganaToRomaji("４うぃき"), "4wiki");
   EXPECT_EQ(hiraganaToRomaji("おんな"), "onna");
   checkSmallKana(CharType::Hiragana, "ぁぃぅぇぉゕゖゃゅょっゎ");
   EXPECT_EQ(hiraganaToRomaji("きょうと"), "kyouto");
@@ -285,7 +285,7 @@ TEST_F(ConverterTest, ConvertBetweenKana) {
     EXPECT_EQ(converter().convert(CharType::Hiragana, r, CharType::Katakana),
         i.second->katakana());
   }
-  kanaConvertCheck("きょうはいいてんきです。", "キョウハイイテンキデス。");
+  kanaConvertCheck("きょうはいいてんきです。１２", "キョウハイイテンキデス。１２");
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
   kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？",
@@ -508,7 +508,9 @@ TEST_F(ConverterTest, CheckDelims) {
            P{'=', "＝"}, P{'+', "＋"}, P{'@', "＠"}, P{'#', "＃"}, P{'$', "＄"},
            P{'%', "％"}, P{'^', "＾"}, P{'&', "＆"}, P{'{', "『"}, P{'}', "』"},
            P{'|', "｜"}, P{'"', "”"}, P{'`', "｀"}, P{'<', "＜"}, P{'>', "＞"},
-           P{'_', "＿"}, P{'\\', "￥"}}) {
+           P{'_', "＿"}, P{'\\', "￥"}, P{'0', "０"}, P{'1', "１"},
+           P{'2', "２"}, P{'3', "３"}, P{'4', "４"}, P{'5', "５"}, P{'6', "６"},
+           P{'7', "７"}, P{'8', "８"}, P{'9', "９"}}) {
     const String romaji{i.first}, kana{i.second};
     check(kana, kana, romaji);
   }
