@@ -23,7 +23,8 @@ Group::Group(
 }
 
 String Group::toString() const {
-  return "[" + std::to_string(_number) + ' ' + name() + ']';
+  return addBrackets(
+      std::to_string(_number) + ' ' + name(), BracketType::Square);
 }
 
 void Group::error(const String& msg) const {
