@@ -285,7 +285,7 @@ TEST_F(ConverterTest, ConvertBetweenKana) {
     EXPECT_EQ(converter().convert(CharType::Hiragana, r, CharType::Katakana),
         i.second->katakana());
   }
-  kanaConvertCheck("きょうはいいてんきです。１２", "キョウハイイテンキデス。１２");
+  kanaConvertCheck("きょうはいいてんきです。２", "キョウハイイテンキデス。２");
   // try mixing sokuon and long vowels
   kanaConvertCheck("らーめん！", "ラーメン！");
   kanaConvertCheck("びっぐ　ばあど、すまーる　はっまー？",
