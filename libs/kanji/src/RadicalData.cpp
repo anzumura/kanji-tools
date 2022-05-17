@@ -74,7 +74,7 @@ void RadicalData::print(KanjiDataRef data) const {
   }
   data.out() << "):\n";
   RadicalLists radicals;
-  for (auto& i : data.kanjiNameMap())
+  for (auto& i : data.nameMap())
     // only include 'Common Kanji' for now since a lot of the rare kanji don't
     // display properly - they just show up as '?' (𮧮)
     if (isCommonKanji(i.second->name()))

@@ -22,8 +22,8 @@ const ColumnFile::Column CodeCol{"Code"}, NameCol{"Name"}, BlockCol{"Block"},
 class PrintCount {
 public:
   PrintCount() noexcept = default;
-  PrintCount(const PrintCount&) = delete;
-  PrintCount& operator=(const PrintCount&) = delete; // LCOV_EXCL_LINE
+  PrintCount(const PrintCount&) = delete; // LCOV_EXCL_LINE
+  PrintCount& operator=(const PrintCount&) = delete;
 
   void add(const Ucd& k) {
     ++_count;
@@ -216,7 +216,7 @@ void UcdData::printVariationSelectorKanji(KanjiDataRef data) const {
       << "    #      Standard Kanji with Selector    UCD Compatibility Kanji\n";
   data.log()
       << "    -      ----------------------------    -----------------------\n";
-  for (size_t count{}; auto& i : data.kanjiNameMap())
+  for (size_t count{}; auto& i : data.nameMap())
     if (auto& k{*i.second}; k.variant()) {
       data.log() << "    " << std::left << std::setfill(' ') << std::setw(3)
                  << ++count << "    "

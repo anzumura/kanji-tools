@@ -17,7 +17,6 @@ class KanjiData {
 public:
   using List = std::vector<KanjiPtr>;
   using Map = std::map<String, KanjiPtr>;
-  template<typename T> using KanjiEnumMap = EnumMap<T, List>;
   using Path = KanjiListFile::Path;
 
   // DataArg (specify location of 'data' dir), DebugArg and InfoArg are command
@@ -91,14 +90,14 @@ public:
 
   [[nodiscard]] KanjiTypes getType(const String& name) const;
 
-  // 'findKanjiByName' supports finding a Kanji by UTF-8 string including
-  // 'variation selectors', i.e., the same result is returned for '侮︀ [4FAE
-  // FE00]' and '侮 [FA30]' (a single UTF-8 compatibility kanji).
-  [[nodiscard]] KanjiPtr findKanjiByName(const String&) const;
+  // 'findByName' supports finding a Kanji by UTF-8 string including 'variation
+  // selectors', i.e., the same result is returned for '侮︀ [4FAE FE00]' and
+  // '侮 [FA30]' (a compatibility Kanji).
+  [[nodiscard]] KanjiPtr findByName(const String&) const;
 
-  // 'findKanjiByFrequency' returns the Kanji with the given 'freq' (should be a
+  // 'findByFrequency' returns the Kanji with the given 'freq' (should be a
   // value from 1 to 2501)
-  [[nodiscard]] KanjiPtr findKanjiByFrequency(Kanji::Frequency freq) const;
+  [[nodiscard]] KanjiPtr findByFrequency(Kanji::Frequency freq) const;
 
   // 'findByMorohashiId' can return more than one Kanji. Ids are usually just
   // numeric, but they can also be a number followed by a 'P'. For example,
@@ -119,7 +118,7 @@ public:
   [[nodiscard]] auto& out() const { return _out; }
   [[nodiscard]] auto& err() const { return _err; }
   [[nodiscard]] auto& dataDir() const { return _dataDir; }
-  [[nodiscard]] auto& kanjiNameMap() const { return _nameMap; }
+  [[nodiscard]] auto& nameMap() const { return _nameMap; }
 
   // 'log' can be used for putting a standard prefix to output messages (used
   // for some debug messages)
@@ -165,6 +164,7 @@ protected:
   // checkInsert is non-private to help support testing
   bool checkInsert(const KanjiPtr&, UcdPtr = {});
 private:
+  template<typename T> using KanjiEnumMap = EnumMap<T, List>;
   using OptPath = std::optional<Path>;
 
   [[nodiscard]] static OptPath searchUpForDataDir(Path);

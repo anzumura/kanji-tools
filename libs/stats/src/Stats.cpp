@@ -141,8 +141,8 @@ String StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   CountSet frequency;
   for (const auto& i : count.map()) {
     _total += i.second;
-    frequency.emplace(i.second, i.first,
-        _isKanji ? _data->findKanjiByName(i.first) : KanjiPtr{});
+    frequency.emplace(
+        i.second, i.first, _isKanji ? _data->findByName(i.first) : KanjiPtr{});
   }
   if (_total) {
     printTotalAndUnique(_name, _total, frequency.size());

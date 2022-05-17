@@ -98,11 +98,11 @@ const KanjiData::List& KanjiData::frequencyList(size_t f) const {
 }
 
 KanjiTypes KanjiData::getType(const String& name) const {
-  const auto i{findKanjiByName(name)};
+  const auto i{findByName(name)};
   return i ? i->type() : KanjiTypes::None;
 }
 
-KanjiPtr KanjiData::findKanjiByName(const String& s) const {
+KanjiPtr KanjiData::findByName(const String& s) const {
   const auto i{_compatibilityMap.find(s)};
   if (const auto j{_nameMap.find(i != _compatibilityMap.end() ? i->second : s)};
       j != _nameMap.end())
@@ -110,7 +110,7 @@ KanjiPtr KanjiData::findKanjiByName(const String& s) const {
   return {};
 }
 
-KanjiPtr KanjiData::findKanjiByFrequency(Kanji::Frequency freq) const {
+KanjiPtr KanjiData::findByFrequency(Kanji::Frequency freq) const {
   if (!freq || freq >= _maxFrequency) return {};
   auto bucket{--freq};
   bucket /= FrequencyEntries;
@@ -314,7 +314,7 @@ void KanjiData::populateLinkedKanji(const Path& file) {
   // LinkedJinmei created above)
   for (auto& linkedOld{_types[KanjiTypes::LinkedOld]}; const auto& i : _nameMap)
     for (auto& j : i.second->oldNames())
-      if (!findKanjiByName(j))
+      if (!findByName(j))
         checkInsert(
             linkedOld, std::make_shared<LinkedOldKanji>(*this, j, i.second));
 }
@@ -348,7 +348,7 @@ void KanjiData::processList(const KanjiListFile& list) {
   for (size_t i{}; i < list.list().size(); ++i) {
     auto& name{list.list()[i]};
     KanjiPtr kanji;
-    if (const auto j{findKanjiByName(name)}; j) {
+    if (const auto j{findByName(name)}; j) {
       kanji = j;
       if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou)
         found[kanji->type()].push_back(name);
@@ -416,7 +416,7 @@ void KanjiData::processUcd() {
   // 'name' so use it instead of checking for a match in _nameMap directly
   // (this avoids creating 52 redundant kanji when processing 'ucd.txt').
   for (auto& newKanji{_types[KanjiTypes::Ucd]}; const auto& i : _ucd.map())
-    if (!findKanjiByName(i.second.name()))
+    if (!findByName(i.second.name()))
       checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
 }
 

@@ -109,7 +109,7 @@ TEST_F(ListQuizTest, MissingReading) {
   // This should never happen for any of the current quiz types since they only
   // include standard Kanji with readings.
   const String noReading("㐄");
-  const auto i{_data->findKanjiByName(noReading)};
+  const auto i{_data->findByName(noReading)};
   ASSERT_TRUE(i);
   ASSERT_FALSE(i->hasReading());
   KanjiData::List questionList{i};

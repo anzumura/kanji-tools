@@ -122,7 +122,7 @@ void RealKanjiData::printCount(
 }
 
 void RealKanjiData::printStats() const {
-  log() << "Loaded " << kanjiNameMap().size() << " Kanji (";
+  log() << "Loaded " << nameMap().size() << " Kanji (";
   for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
     if (i != AllKanjiTypes.begin()) out() << ' ';
     out() << *i++ << ' ' << j.size();

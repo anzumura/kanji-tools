@@ -317,7 +317,7 @@ QuizLauncher::OptChar QuizLauncher::setQuizType(OptChar& quizType,
 void QuizLauncher::processKanjiArg(const String& arg) const {
   if (std::all_of(arg.begin(), arg.end(), ::isdigit)) {
     const auto kanji{
-        _groupData->data().findKanjiByFrequency(getId("frequency", arg))};
+        _groupData->data().findByFrequency(getId("frequency", arg))};
     if (!kanji) KanjiData::usage("Kanji not found for frequency '" + arg + "'");
     printDetails(kanji->name());
   } else if (arg.starts_with("m")) {
@@ -371,7 +371,7 @@ void QuizLauncher::printDetails(const String& arg, bool showLegend) const {
       out() << ", Sources " << ucd->sources();
       if (!ucd->jSource().empty()) out() << " (" << ucd->jSource() << ')';
     }
-    if (const auto k{data().findKanjiByName(arg)}; k) {
+    if (const auto k{data().findByName(arg)}; k) {
       printExtraTypeInfo(*k);
       out() << '\n' << k->info();
       printMeaning(*k, true);
