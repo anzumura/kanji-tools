@@ -8,7 +8,7 @@
 
 namespace kanji_tools {
 
-// 'RadicalData': holds data loaded from 'radicals.txt' (214 official Radicals).
+// 'RadicalData' holds data loaded from 'radicals.txt' (214 official Radicals).
 class RadicalData {
 public:
   using Map = std::map<String, Radical::Number>;

@@ -22,11 +22,10 @@ public:
 class Ucd {
 public:
   // 'LinkTypes' represent the XML property from which the link was loaded -
-  // see parseUcdAllFlat.sh for details. '_R' means the link was also used to
-  // pull in readings. The script uses '*' for reading links so '*' has also
-  // been used in 'AllUcdLinkTypes' EnumList). Put _R first to allow a '<'
-  // comparision to find all reading links. Note, there is no non '_R' type for
-  // 'Semantic' by design.
+  // '_R' means the link was also used to pull in readings. The script uses '*'
+  // for reading links so '*' has also been used in 'AllUcdLinkTypes' EnumList).
+  // Put _R first to allow a '<' comparision to find all reading links. Note,
+  // there is no non '_R' type for 'Semantic' by design.
   enum class LinkTypes : Enum::Size {
     Compatibility_R,
     Definition_R,
@@ -102,7 +101,7 @@ public:
   [[nodiscard]] auto& onReading() const { return _onReading; }
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
 
-  // values for these fields are stored in bits of '_sources';
+  // values for these fields are stored as bits in '_sources' data member
   [[nodiscard]] String sources() const;
   [[nodiscard]] bool joyo() const;
   [[nodiscard]] bool jinmei() const;

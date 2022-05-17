@@ -7,7 +7,7 @@
 
 namespace kanji_tools {
 
-// 'UcdData': holds data loaded from Unicode UCD XML
+// 'UcdData' holds data loaded from Unicode UCD XML
 class UcdData {
 public:
   using Map = std::map<String, Ucd>;
