@@ -22,8 +22,8 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
   return static_cast<double>(amount) * 100. / static_cast<double>(total);
 }
 
-// helper class for ordering and printing out kanji found in files
-class Count {
+// helper class for ordering and printing out Kanji found in files
+class Count { // LCOV_EXCL_LINE
 public:
   Count(size_t f, const String& n, const KanjiPtr& e)
       : _count{f}, _name{n}, _entry{e} {}
@@ -53,7 +53,7 @@ public:
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& entry() const { return _entry; }
 private:
-  size_t _count; // LCOV_EXCL_LINE
+  size_t _count;
   String _name;
   KanjiPtr _entry;
 };
