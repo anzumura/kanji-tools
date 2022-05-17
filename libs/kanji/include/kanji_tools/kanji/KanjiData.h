@@ -9,27 +9,29 @@
 
 namespace kanji_tools {
 
-// 'KanjiData' provides data used during 'Kanji' loading and is the base class
-// of 'RealKanjiData' (as well as 'MockKanjiData' and 'TestKanjiData')
+// 'KanjiData' provides helper functions used during 'Kanji' loading and holds
+// data such as Kanji radicals, 'UCD' data and maps of enum values to lists of
+// Kanji. This is the base class of 'RealKanjiData' (as well as 'MockKanjiData'
+// and 'TestKanjiData').
 class KanjiData {
 public:
-  using KanjiList = std::vector<KanjiPtr>;
-  using KanjiMap = std::map<String, KanjiPtr>;
-  template<typename T> using EnumList = EnumMap<T, KanjiList>;
+  using List = std::vector<KanjiPtr>;
+  using Map = std::map<String, KanjiPtr>;
+  template<typename T> using KanjiEnumMap = EnumMap<T, List>;
   using Path = KanjiListFile::Path;
 
-  // DataArg (to specify location of 'data' dir), DebugArg and InfoArg are
-  // command line options that can be passed to apps using this 'Data' class
+  // DataArg (specify location of 'data' dir), DebugArg and InfoArg are command
+  // line options that can be passed to apps using this 'KanjiData' class
   inline static const String DataArg{"-data"}, DebugArg{"-debug"},
       InfoArg{"-info"};
 
   // 'nextArg' is meant to be used by other classes that process command line
-  // options, but also have a 'Data' class (like Quiz and Stats programs) - it
-  // returns 'current + 1' if args[currentArg + 1] is not used used by this
-  // 'Data' class (ie getDataDir or getDebug). If 'current + 1' is used then a
-  // larger increment is returned to 'skip over' the args, for example:
-  //   for (auto i{Data::nextArg(args)}; i < args.size();
-  //       i = Data::nextArg(args)) { /* do something with args[i] */ }
+  // options, but also have a 'KanjiData' class (like Quiz and Stats programs) -
+  // it returns 'current + 1' if args[currentArg + 1] is not used used by this
+  // class. If 'current + 1' would be used by this class (like '-data', '-info',
+  // etc.) then a larger value is returned to 'skip over' the args, for example:
+  //   for (auto i{KanjiData::nextArg(args)}; i < args.size();
+  //       i = KanjiData::nextArg(args)) { /* do something with args[i] */ }
   [[nodiscard]] static Args::Size nextArg(const Args&, Args::Size current = 0);
 
   // 'DebugMode' is controlled by debug/info command-line options (see above):
@@ -85,8 +87,7 @@ public:
   [[nodiscard]] auto& kyus() const { return _kyus; }
 
   // See comment for '_frequencies' private data member for more details
-  static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
-  [[nodiscard]] const KanjiList& frequencyList(size_t) const;
+  [[nodiscard]] const List& frequencyList(size_t) const;
 
   [[nodiscard]] KanjiTypes getType(const String& name) const;
 
@@ -102,12 +103,12 @@ public:
   // 'findByMorohashiId' can return more than one Kanji. Ids are usually just
   // numeric, but they can also be a number followed by a 'P'. For example,
   // '4138' maps to 嗩 and '4138P' maps to 嘆.
-  [[nodiscard]] const KanjiList& findByMorohashiId(const MorohashiId&) const;
-  [[nodiscard]] const KanjiList& findByMorohashiId(const String&) const;
+  [[nodiscard]] const List& findByMorohashiId(const MorohashiId&) const;
+  [[nodiscard]] const List& findByMorohashiId(const String&) const;
 
   // 'findKanjisByNelsonId' can return more than one Kanji. For example, 1491
   // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] const KanjiList& findByNelsonId(Kanji::NelsonId) const;
+  [[nodiscard]] const List& findByNelsonId(Kanji::NelsonId) const;
 
   void printError(const String&) const;
 
@@ -118,7 +119,7 @@ public:
   [[nodiscard]] auto& out() const { return _out; }
   [[nodiscard]] auto& err() const { return _err; }
   [[nodiscard]] auto& dataDir() const { return _dataDir; }
-  [[nodiscard]] auto& kanjiNameMap() const { return _kanjiNameMap; }
+  [[nodiscard]] auto& kanjiNameMap() const { return _nameMap; }
 
   // 'log' can be used for putting a standard prefix to output messages (used
   // for some debug messages)
@@ -177,10 +178,8 @@ private:
   // and 'reading' when needed (mostly by non-CustomFileKanji classes).
   UcdData _ucd;
 
-  EnumList<KanjiTypes> _types;
-
-  // helper functions for checking and inserting into '_kanjiNameMap'
-  bool checkInsert(KanjiList&, const KanjiPtr&);
+  // helper functions for checking and inserting into '_nameMap'
+  bool checkInsert(List&, const KanjiPtr&);
   void insertSanityChecks(const Kanji&, UcdPtr) const;
 
   const Path _dataDir;
@@ -198,27 +197,24 @@ private:
   // not Jouyou or Jinmei).
   std::map<String, String> _frequencyReadings;
 
-  // lists of kanji per Level, Grade and Kyu (excluding the 'None' enum values)
-  EnumList<JlptLevels> _levels;
-  EnumList<KanjiGrades> _grades;
-  EnumList<KenteiKyus> _kyus;
+  // each 'EnumMap' has a Kanji list per enum value (excluding 'None' values)
+  KanjiEnumMap<KanjiTypes> _types;
+  KanjiEnumMap<KanjiGrades> _grades;
+  KanjiEnumMap<JlptLevels> _levels;
+  KanjiEnumMap<KenteiKyus> _kyus;
 
-  // Lists of kanji grouped into 5 frequency ranges: 1-500, 501-1000, 1001-1500,
-  // 1501-2000, 2001-2501. The last list is one longer in order to hold the full
-  // frequency list (of 2501 kanji).
-  std::array<KanjiList, FrequencyBuckets> _frequencies;
+  // '_frequencies' holds lists of Kanji grouped into 5 frequency ranges: each
+  // list has 500 entries except the last which has 501 (for a total of 2501)
+  static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
+  std::array<List, FrequencyBuckets> _frequencies;
 
-  KanjiMap _kanjiNameMap;                          // UTF-8 name to Kanji
-  std::map<MorohashiId, KanjiList> _morohashiMap;  // Dai Kan-Wa Jiten ID lookup
-  std::map<Kanji::NelsonId, KanjiList> _nelsonMap; // Nelson ID lookup
+  Map _nameMap;                               // UTF-8 name map to one Kanji
+  std::map<MorohashiId, List> _morohashiMap;  // Dai Kan-Wa Jiten ID lookup
+  std::map<Kanji::NelsonId, List> _nelsonMap; // Nelson ID lookup
 
-  // 'maxFrequency' is set to 1 larger than the highest frequency of any Kanji
-  // put into '_kanjiNameMap'
+  // 'maxFrequency' is set to 1 larger than the 'frequency' of any Kanji added
+  // to '_nameMap' (should end being '2502' after all Kanji have been loaded)
   inline static constinit Kanji::Frequency _maxFrequency;
-
-  inline static const Kanji::NelsonIds EmptyNelsonIds;
-
-  inline static const Path DataDir{"data"};
 };
 
 using KanjiDataPtr = std::shared_ptr<const KanjiData>;

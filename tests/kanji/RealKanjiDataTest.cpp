@@ -17,7 +17,7 @@ protected:
     _data = std::make_shared<RealKanjiData>();
   }
 
-  [[nodiscard]] static auto check(const KanjiData::KanjiList& l) { // NOLINT
+  [[nodiscard]] static auto check(const KanjiData::List& l) { // NOLINT
     size_t variants{};
     for (auto& i : l) {
       if (i->variant()) {
@@ -154,7 +154,7 @@ TEST_F(RealKanjiDataTest, FrequencyTotals) {
 
 TEST_F(RealKanjiDataTest, SortingAndPrintingQualifiedName) {
   std::vector<String> list{"弓", "弖", "窮", "弼", "穹", "躬"};
-  KanjiData::KanjiList kanjis;
+  KanjiData::List kanjis;
   for (auto& i : list) {
     const auto k{_data->findKanjiByName(i)};
     ASSERT_TRUE(k);

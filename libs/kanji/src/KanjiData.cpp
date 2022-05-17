@@ -47,16 +47,15 @@ const MorohashiId& KanjiData::getMorohashiId(UcdPtr u) {
 }
 
 Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) {
+  Kanji::NelsonIds ids;
   if (u && !u->nelsonIds().empty()) {
-    Kanji::NelsonIds ids;
     auto s{u->nelsonIds()};
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss{s};
     Kanji::NelsonId id{};
     while (ss >> id) ids.emplace_back(id);
-    return ids;
   }
-  return EmptyNelsonIds;
+  return ids;
 }
 
 KanjiData::KanjiData(const Path& dataDir, DebugMode debugMode,
@@ -75,8 +74,8 @@ UcdPtr KanjiData::findUcd(const String& kanjiName) const {
 
 RadicalRef KanjiData::ucdRadical(const String& kanji, UcdPtr u) const {
   if (u) return _radicals.find(u->radical());
-  // 'throw' should never happen - every 'Kanji' class instance should have
-  // also exist in the data loaded from Unicode.
+  // 'throw' should never happen - every 'Kanji' class instance should exist in
+  // the data loaded from Unicode (in 'data/ucd.txt').
   throw std::domain_error{"UCD entry not found: " + kanji};
 }
 
@@ -94,8 +93,8 @@ Kanji::OptString KanjiData::getCompatibilityName(const String& kanji) const {
   return u && u->name() != kanji ? Kanji::OptString{u->name()} : std::nullopt;
 }
 
-const KanjiData::KanjiList& KanjiData::frequencyList(size_t f) const {
-  return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<KanjiList>::Empty;
+const KanjiData::List& KanjiData::frequencyList(size_t f) const {
+  return f < FrequencyBuckets ? _frequencies[f] : BaseEnumMap<List>::Empty;
 }
 
 KanjiTypes KanjiData::getType(const String& name) const {
@@ -105,9 +104,8 @@ KanjiTypes KanjiData::getType(const String& name) const {
 
 KanjiPtr KanjiData::findKanjiByName(const String& s) const {
   const auto i{_compatibilityMap.find(s)};
-  if (const auto j{
-          _kanjiNameMap.find(i != _compatibilityMap.end() ? i->second : s)};
-      j != _kanjiNameMap.end())
+  if (const auto j{_nameMap.find(i != _compatibilityMap.end() ? i->second : s)};
+      j != _nameMap.end())
     return j->second;
   return {};
 }
@@ -121,24 +119,22 @@ KanjiPtr KanjiData::findKanjiByFrequency(Kanji::Frequency freq) const {
   return _frequencies[bucket][freq - bucket * FrequencyEntries];
 }
 
-const KanjiData::KanjiList& KanjiData::findByMorohashiId(
+const KanjiData::List& KanjiData::findByMorohashiId(
     const MorohashiId& id) const {
   if (id) {
     if (const auto i{_morohashiMap.find(id)}; i != _morohashiMap.end())
       return i->second;
   }
-  return BaseEnumMap<KanjiList>::Empty;
+  return BaseEnumMap<List>::Empty;
 }
 
-const KanjiData::KanjiList& KanjiData::findByMorohashiId(
-    const String& id) const {
+const KanjiData::List& KanjiData::findByMorohashiId(const String& id) const {
   return findByMorohashiId(MorohashiId{id});
 }
 
-const KanjiData::KanjiList& KanjiData::findByNelsonId(
-    Kanji::NelsonId id) const {
+const KanjiData::List& KanjiData::findByNelsonId(Kanji::NelsonId id) const {
   const auto i{_nelsonMap.find(id)};
-  return i != _nelsonMap.end() ? i->second : BaseEnumMap<KanjiList>::Empty;
+  return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
 }
 
 std::ostream& KanjiData::log(bool heading) const {
@@ -199,6 +195,7 @@ KanjiData::DebugMode KanjiData::getDebugMode(const Args& args) {
 }
 
 KanjiData::OptPath KanjiData::searchUpForDataDir(Path parent) {
+  static const Path DataDir{"data"};
   OptPath oldParent;
   do {
     // check if 'data' exists and contains the expected number of '.txt' files
@@ -222,7 +219,7 @@ bool KanjiData::isValidDataDir(const Path& p) {
 
 bool KanjiData::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   auto& k{*kanji};
-  if (!_kanjiNameMap.emplace(k.name(), kanji).second) {
+  if (!_nameMap.emplace(k.name(), kanji).second) {
     printError("failed to insert '" + k.name() + "' into map");
     return false;
   }
@@ -243,7 +240,7 @@ bool KanjiData::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   return true;
 }
 
-bool KanjiData::checkInsert(KanjiList& s, const KanjiPtr& kanji) {
+bool KanjiData::checkInsert(List& s, const KanjiPtr& kanji) {
   if (!checkInsert(kanji)) return false;
   s.emplace_back(kanji);
   return true;
@@ -305,7 +302,7 @@ void KanjiData::populateLinkedKanji(const Path& file) {
     std::stringstream ss{line};
     if (String jouyou, linked;
         std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
-      if (const auto i{_kanjiNameMap.find(jouyou)}; i == _kanjiNameMap.end())
+      if (const auto i{_nameMap.find(jouyou)}; i == _nameMap.end())
         usage("'" + jouyou + "' not found - file: " + file.filename().string());
       else
         checkInsert(linkedJinmei,
@@ -315,8 +312,7 @@ void KanjiData::populateLinkedKanji(const Path& file) {
   }
   // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not
   // LinkedJinmei created above)
-  for (auto& linkedOld{_types[KanjiTypes::LinkedOld]};
-       const auto& i : _kanjiNameMap)
+  for (auto& linkedOld{_types[KanjiTypes::LinkedOld]}; const auto& i : _nameMap)
     for (auto& j : i.second->oldNames())
       if (!findKanjiByName(j))
         checkInsert(
@@ -360,10 +356,9 @@ void KanjiData::processList(const KanjiListFile& list) {
       if (kenteiList)
         kanji = std::make_shared<KenteiKanji>(*this, name, list.kyu());
       else {
-        // kanji wasn't already in _kanjiNameMap so it only exists in the
-        // 'frequency.txt' file - these kanjis are considered 'Frequency' type
-        // and by definition are not part of Jouyou or Jinmei (so also not part
-        // of JLPT levels)
+        // Kanji wasn't already in _nameMap so it only exists in 'frequency.txt'
+        // file - these are considered 'Frequency' type and by definition are
+        // not part of Jouyou or Jinmei (so also not part of JLPT levels)
         const auto reading{_frequencyReadings.find(name)};
         kanji = reading == _frequencyReadings.end()
                     ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
@@ -418,7 +413,7 @@ void KanjiData::processList(const KanjiListFile& list) {
 
 void KanjiData::processUcd() {
   // Calling 'findKanjiByName' checks for a 'variation selector' version of
-  // 'name' so use it instead of checking for a match in _kanjiNameMap directly
+  // 'name' so use it instead of checking for a match in _nameMap directly
   // (this avoids creating 52 redundant kanji when processing 'ucd.txt').
   for (auto& newKanji{_types[KanjiTypes::Ucd]}; const auto& i : _ucd.map())
     if (!findKanjiByName(i.second.name()))

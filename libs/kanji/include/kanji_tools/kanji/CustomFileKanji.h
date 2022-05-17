@@ -22,22 +22,13 @@ public:
   [[nodiscard]] auto number() const { return _number; }
 
   // 'fromFile' is a factory method that creates a list of Kanji of type 'T':
-  // - 'T' must have a public 'RequiredColumns' and be constructable from 'data'
+  // - 'T' must have a public 'RequiredColumns' and a ctor taking 'KanjiDataRef'
   //   and a custom file (currently JouyouKanji, JinmeiKanji and ExtraKanji)
   // - 'f' must have tab separated lines that have the right number of columns
   //   for the given Kanji type 'T' (and the first line must have header names
   //   that match the static 'Column' instances below)
   template<typename T>
-  [[nodiscard]] static KanjiData::KanjiList fromFile(
-      KanjiDataRef data, const KanjiData::Path& f) {
-    // all 'CustomFileKanji' files must have at least the following columns
-    ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
-    for (auto& i : T::RequiredColumns) columns.emplace_back(i);
-    KanjiData::KanjiList results;
-    for (ColumnFile file{f, columns}; file.nextRow();)
-      results.emplace_back(std::make_shared<T>(data, file));
-    return results;
-  }
+  [[nodiscard]] static auto fromFile(KanjiDataRef, const KanjiData::Path& f);
 protected:
   static Name name(File);
 
@@ -172,5 +163,16 @@ public:
     return KanjiTypes::LinkedOld;
   }
 };
+
+template<typename T>
+auto CustomFileKanji::fromFile(KanjiDataRef data, const KanjiData::Path& f) {
+  // all 'CustomFileKanji' files must have at least the following columns
+  ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
+  for (auto& i : T::RequiredColumns) columns.emplace_back(i);
+  KanjiData::List results;
+  for (ColumnFile file{f, columns}; file.nextRow();)
+    results.emplace_back(std::make_shared<T>(data, file));
+  return results;
+}
 
 } // namespace kanji_tools

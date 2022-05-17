@@ -2,8 +2,7 @@
 
 namespace kanji_tools {
 
-Group::Group(
-    size_t number, const String& name, const KanjiData::KanjiList& members)
+Group::Group(size_t number, const String& name, const KanjiData::List& members)
     : _number{number}, _name{name}, _members{members} {
   if (members.empty()) error("no members");
   if (members.size() == 1) error("only one member");
@@ -32,7 +31,7 @@ void Group::error(const String& msg) const {
 }
 
 PatternGroup::PatternGroup(size_t number, const String& name,
-    const KanjiData::KanjiList& members, PatternType patternType)
+    const KanjiData::List& members, PatternType patternType)
     : Group{number, name, members}, _patternType{patternType} {
   if (patternType == PatternType::None) error("invalid pattern type");
 }

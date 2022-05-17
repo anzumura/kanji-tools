@@ -40,7 +40,7 @@ protected:
 
   void TearDown() override { fs::remove_all(TestDir); }
 
-  template<typename T> [[nodiscard]] KanjiData::KanjiList fromFile() {
+  template<typename T> [[nodiscard]] KanjiData::List fromFile() {
     return CustomFileKanji::fromFile<T>(_data, TestFile);
   }
 

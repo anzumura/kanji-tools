@@ -56,7 +56,7 @@ void GroupData::loadGroup(
     auto pattern{Group::PatternType::None};
     const auto kanjiNames{getKanjiNames(name, members, groupType, pattern)};
     // get memberKanji (by looking up each name in kanjiNames)
-    KanjiData::KanjiList memberKanji;
+    KanjiData::List memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findKanjiByName(i)}; k)
         memberKanji.emplace_back(k);
@@ -95,7 +95,7 @@ KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
 }
 
 GroupPtr GroupData::createGroup(size_t number, const String& name,
-    const KanjiData::KanjiList& members, Group::PatternType pattern) {
+    const KanjiData::List& members, Group::PatternType pattern) {
   if (pattern == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, pattern);
@@ -205,7 +205,7 @@ void GroupData::printTypeBreakdown(TypeMap& types) const {
 }
 
 void GroupData::printMissingFromType(
-    const KanjiData::KanjiList& all, StringList& found) const {
+    const KanjiData::List& all, StringList& found) const {
   if (const auto missing{all.size() - found.size()}; missing) {
     std::sort(found.begin(), found.end());
     out() << " (";

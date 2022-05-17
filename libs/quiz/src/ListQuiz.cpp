@@ -19,14 +19,14 @@ ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
 }
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
-    bool showMeanings, const KanjiList& list, // LCOV_EXCL_LINE
+    bool showMeanings, const List& list, // LCOV_EXCL_LINE
     Kanji::Info fields, ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
       _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{toChar(
                                                        '0' + _choiceCount)} {
   assert(_answers.size() == _choiceCount); // need () ctor
-  KanjiList questions;
+  List questions;
   for (auto& i : list) {
     if (!i->hasReading())
       // should never happen for any of the existing list quiz types
@@ -44,7 +44,7 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
   start(questions);
 }
 
-void ListQuiz::start(const KanjiList& questions) {
+void ListQuiz::start(const List& questions) {
   auto stopQuiz{false};
   for (; !stopQuiz && currentQuestion() < questions.size();
        ++currentQuestion()) {
@@ -72,7 +72,7 @@ bool ListQuiz::isKanjiToReading() const {
 }
 
 ListQuiz::ChoiceCount ListQuiz::populateAnswers(
-    const Kanji& kanji, const KanjiList& questions) {
+    const Kanji& kanji, const List& questions) {
   std::uniform_int_distribution<Question> randomReading(
       0, static_cast<Question>(questions.size()) - 1);
   std::uniform_int_distribution<ChoiceCount> randomCorrect(0, _choiceCount - 1);
@@ -103,8 +103,7 @@ void ListQuiz::printQuestion(const Kanji& kanji) const {
   printMeaning(kanji, !isTestMode());
 }
 
-void ListQuiz::printChoices(
-    const Kanji& kanji, const KanjiList& questions) const {
+void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
   if (isTestMode())
     for (ChoiceCount i{}; i < _choiceCount; ++i)
       out() << "    " << i + 1 << ".  "

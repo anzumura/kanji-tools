@@ -11,8 +11,8 @@ namespace kanji_tools {
 class QuizLauncher {
 public:
   using Choices = Choice::Choices;
+  using List = KanjiData::List;
   using OptChar = Choice::OptChar;
-  using KanjiList = KanjiData::KanjiList;
   using Question = uint16_t;
 
   static constexpr char QuitOption{'/'};
@@ -55,7 +55,7 @@ private:
   [[nodiscard]] KanjiDataRef data() const { return _groupData->data(); }
 
   void startListQuiz(Question question, bool showMeanings,
-      Kanji::Info excludeField, const KanjiList&) const;
+      Kanji::Info excludeField, const List&) const;
   void startGroupQuiz(Question question, bool showMeanings, OptChar qList,
       const GroupData::List& list) const;
 
@@ -83,7 +83,7 @@ private:
   // 'printDetails' prints info about a kanji provided on the command line
   // (instead of running a quiz)
   void printDetails(
-      const KanjiData::KanjiList&, const String& name, const String& arg) const;
+      const KanjiData::List&, const String& name, const String& arg) const;
   void printDetails(const String&, bool showLegend = true) const;
 
   [[nodiscard]] bool getQuestionOrder();
@@ -98,7 +98,7 @@ private:
   [[nodiscard]] char chooseKyu(OptChar) const;
   [[nodiscard]] char chooseLevel(OptChar) const;
 
-  [[nodiscard]] const KanjiData::KanjiList& getKyuList(char) const;
+  [[nodiscard]] const KanjiData::List& getKyuList(char) const;
 
   // '_programMode' and '_questionOrder' can be set via the command line,
   // otherwise they are obtained interactively

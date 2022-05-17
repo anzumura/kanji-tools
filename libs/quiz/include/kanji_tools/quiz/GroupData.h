@@ -45,7 +45,7 @@ private:
       const String& members, GroupType, Group::PatternType&);
 
   [[nodiscard]] static GroupPtr createGroup(size_t number, const String& name,
-      const KanjiData::KanjiList&, Group::PatternType);
+      const KanjiData::List&, Group::PatternType);
 
   template<typename T> void printGroups(const T&, const List&) const;
 
@@ -57,7 +57,7 @@ private:
   void printPatternGroup(const Group&, TypeMap&) const;
   template<typename T> void printUniqueNames(const T&, const StringSet&) const;
   void printTypeBreakdown(TypeMap&) const;
-  void printMissingFromType(const KanjiData::KanjiList&, StringList&) const;
+  void printMissingFromType(const KanjiData::List&, StringList&) const;
 
   [[nodiscard]] auto fullDebug() const { return _data->fullDebug(); }
 

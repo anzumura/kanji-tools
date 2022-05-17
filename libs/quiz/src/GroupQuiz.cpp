@@ -112,7 +112,7 @@ void GroupQuiz::start(const GroupData::List& list) {
   auto stopQuiz{false};
   for (; currentQuestion() < list.size() && !stopQuiz; ++currentQuestion()) {
     auto& i{list[currentQuestion()]};
-    KanjiList questions, readings;
+    List questions, readings;
     for (auto& j : i->members())
       if (includeMember(*j)) {
         questions.emplace_back(j);
@@ -160,7 +160,7 @@ std::ostream& GroupQuiz::printAssignedAnswer(char choice) const {
   return out() << "    ";
 }
 
-void GroupQuiz::showGroup(const KanjiList& questions, const KanjiList& readings,
+void GroupQuiz::showGroup(const List& questions, const List& readings,
     Choices& choices, bool repeatQuestion) const {
   for (size_t count{}; auto& i : questions) {
     const char choice{
@@ -252,8 +252,8 @@ size_t GroupQuiz::getAnswerToEdit() const {
   return static_cast<size_t>(std::distance(_answers.begin(), index));
 }
 
-void GroupQuiz::checkAnswers(const KanjiList& questions,
-    const KanjiList& readings, const String& kanjiName) {
+void GroupQuiz::checkAnswers(
+    const List& questions, const List& readings, const String& kanjiName) {
   size_t correctCount{};
   for (size_t count{}; auto i : _answers) {
     const auto answer{

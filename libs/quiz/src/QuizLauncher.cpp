@@ -190,7 +190,7 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
       i != _groupData->patternMap().end() &&
       i->second->patternType() != Group::PatternType::Reading) {
     out() << "    Similar:";
-    KanjiData::KanjiList sorted(i->second->members());
+    KanjiData::List sorted(i->second->members());
     std::sort(sorted.begin(), sorted.end(), KanjiData::OrderByQualifiedName);
     for (auto& j : sorted)
       if (*j != kanji) out() << ' ' << j->qualifiedName();
@@ -219,7 +219,7 @@ void QuizLauncher::printReviewDetails(const Kanji& kanji) const {
 }
 
 void QuizLauncher::startListQuiz(Question question, bool showMeanings,
-    Kanji::Info excludeField, const KanjiList& list) const {
+    Kanji::Info excludeField, const List& list) const {
   ListQuiz::ChoiceCount choiceCount{1};
   auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
@@ -345,8 +345,8 @@ void QuizLauncher::processKanjiArg(const String& arg) const {
         "unrecognized 'kanji' value '" + arg + "', use -h for help");
 }
 
-void QuizLauncher::printDetails(const KanjiData::KanjiList& list,
-    const String& name, const String& arg) const {
+void QuizLauncher::printDetails(
+    const KanjiData::List& list, const String& name, const String& arg) const {
   if (list.size() != 1) {
     if (list.size() > 1) {
       printLegend();
@@ -465,7 +465,7 @@ char QuizLauncher::chooseLevel(OptChar qList) const {
   return qList ? *qList : _choice.get("Choose level", LevelChoices);
 }
 
-const KanjiData::KanjiList& QuizLauncher::getKyuList(char c) const {
+const KanjiData::List& QuizLauncher::getKyuList(char c) const {
   using enum KenteiKyus;
   return data()
       .kyus()[c == 'a'   ? K10
