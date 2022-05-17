@@ -131,12 +131,10 @@ void RealKanjiData::printStats() const {
   if (fullDebug()) {
     printCount("  Has JLPT level", [](auto& x) { return x->hasLevel(); });
     printCount("  Has frequency and not in Jouyou or JLPT", [](auto& x) {
-      return x->frequency() && x->type() != KanjiTypes::Jouyou &&
-             !x->hasLevel();
+      return x->frequency() && !x->is(KanjiTypes::Jouyou) && !x->hasLevel();
     });
     printCount("  Jinmei with no frequency and not JLPT", [](auto& x) {
-      return x->type() == KanjiTypes::Jinmei && !x->frequency() &&
-             !x->hasLevel();
+      return x->is(KanjiTypes::Jinmei) && !x->frequency() && !x->hasLevel();
     });
     printCount("  NF (no-frequency)", [](auto& x) { return !x->frequency(); });
     printCount("  Has Variant Strokes",

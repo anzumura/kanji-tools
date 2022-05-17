@@ -378,9 +378,9 @@ TEST_F(RealKanjiDataTest, UcdLinks) {
   uint32_t officialLinksToJinmei{}, officialLinksToJouyou{};
   for (auto& i : _data->types()[LinkedJinmei]) {
     auto& link{*i->link()};
-    if (link.type() == Jouyou)
+    if (link.is(Jouyou))
       ++officialLinksToJouyou;
-    else if (link.type() == KanjiTypes::Jinmei)
+    else if (link.is(Jinmei))
       ++officialLinksToJinmei;
     else
       FAIL() << "link from " << link.name() << " is type " << link.type();
