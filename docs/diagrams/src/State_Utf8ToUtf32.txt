@@ -8,68 +8,66 @@ title Convert UTF-8 String to one UTF-32 <color:blue>Code</color>
 !pragma useVerticalIf on
 
 :<u><b>Constants
-<color:blue>Error</color>: � (0xFFFD)
-<color:blue>MaxOneByte</color>: 0x7F
-<color:blue>MaxTwoByte</color>: 0x7FF
-<color:blue>SurrogateRange</color>: 0xD800 to 0xDFFF
-<color:blue>MaxThreeByte</color>: 0xFFFF
-<color:blue>MaxUnicode</color>: 0x10FFFF
-<u><b>Input
-<color:blue>S</color>: UTF-8 String
-<color:blue>B1</color>, <color:blue>B2</color>, <color:blue>B3</color> <color:blue>B4</color>: first four bytes in <color:blue>S</color>
-<color:blue>Ones</color>: '1's at the start of <color:blue>B1</color>;
+set <color:blue>Error</color> = � (0xFFFD)
+set <color:blue>SurrogateRange</color> = 0xD800 to 0xDFFF
+set <color:blue>MaxOneByte</color> = 0x7F
+set <color:blue>MaxTwoByte</color> = 0x7FF
+set <color:blue>MaxThreeByte</color> = 0xFFFF
+set <color:blue>MaxUnicode</color> = 0x10FFFF;
 
 start
 
-if (<color:blue>S</color> is Empty?) then (Yes)
+if (set <color:blue>S</color> = UTF-8 Input
+is <color:blue>S</color> Empty?) then (Yes)
   #PaleGreen:Return 0;
-(No) elseif (<color:blue>Ones</color> = 0?) then (Yes: <b>1 Byte UTF-8 (Ascii))
-  #PaleGreen:Return <color:blue>B1</color>;
+(No) elseif (set <color:blue>Ones</color> = '1's at the start of <color:blue>S[0]</color>
+<color:blue>Ones</color> equal 0?) then (Yes: <b>1 Byte UTF-8 (Ascii))
+  #PaleGreen:Return <color:blue>S[0]</color>;
   kill
-(No) elseif (<color:blue>Ones</color> = 1 or
-<color:blue>Ones</color> > 4?) then (Yes: <b>Invalid First Byte)
-  #Pink:Return Error;
+(No) elseif (<color:blue>Ones</color> equal 1 or
+<color:blue>Ones</color> greater than 4?) then (Yes: <b>Invalid First Byte)
+  #Pink:Return <color:blue>Error</color>;
   kill
-(No) elseif (<color:blue>B2</color> starts with '10'?) then (No: <b>Invalid Second Byte)
-  #Pink:Return Error;
+(No) elseif (<color:blue>S[1]</color> starts with '10'?) then (No: <b>Invalid Second Byte)
+  #Pink:Return <color:blue>Error</color>;
   kill
-(Yes) elseif (<color:blue>Ones</color> > 2?) then (Yes)
-  if (<color:blue>B3</color> starts with '10'?) then (No: <b>Invalid Third Byte)
-    #Pink:Return Error;
-  (Yes) elseif (<color:blue>Ones</color> = 4?) then (Yes)
+(Yes) elseif (<color:blue>Ones</color> greater than 2?) then (Yes)
+  if (<color:blue>S[2]</color> starts with '10'?) then (No: <b>Invalid Third Byte)
+    #Pink:Return <color:blue>Error</color>;
+  (Yes) elseif (<color:blue>Ones</color> equal 4?) then (Yes)
     group <b>4 Byte UTF-8
-    if (<color:blue>B4</color> starts with '10'?) then (No)
-      #Pink:Return Error;
+    if (<color:blue>S[3]</color> starts with '10'?) then (No)
+      #Pink:Return <color:blue>Error</color>;
     else (Yes)
-      :<color:blue>Code</color>: utf32[<color:blue>B1</color>, <color:blue>B2</color>, <color:blue>B3</color>, <color:blue>B4</color>];
-      if (<color:blue>Code</color> > <color:blue>MaxThreeByte</color> and
-<color:blue>Code</color> <= <color:blue>MaxUnicode</color>?) then (Yes)
+      if (set <color:blue>Code</color> = utf32{<color:blue>S[0]</color>, <color:blue>S[1]</color>, <color:blue>S[2]</color>, <color:blue>S[3]</color>}
+<color:blue>Code</color> greater than <color:blue>MaxThreeByte</color> and
+<color:blue>Code</color> less than or equal <color:blue>MaxUnicode</color>?) then (Yes)
         #PaleGreen:Return <color:blue>Code</color>;
       else (No)
-        #Pink:Return Error;
+        #Pink:Return <color:blue>Error</color>;
       endif
     endif
     kill
     end group
   else (No)
     group <b>3 Byte UTF-8
-    :<color:blue>Code</color>: utf32[<color:blue>B1</color>, <color:blue>B2</color>, <color:blue>B3</color>];
-    if (<color:blue>Code</color> > <color:blue>MaxTwoByte</color> and
+    if (set <color:blue>Code</color> = utf32{<color:blue>S[0]</color>, <color:blue>S[1]</color>, <color:blue>S[2]</color>}
+<color:blue>Code</color> greater than <color:blue>MaxTwoByte</color> and
 <color:blue>Code</color> not in <color:blue>SurrogateRange</color>?) then (Yes)
       #PaleGreen:Return <color:blue>Code</color>;
     else (No)
-      #Pink:Return Error;
+      #Pink:Return <color:blue>Error</color>;
     endif
     end group
   endif
   kill
 else (No)
   group <b>2 Byte UTF-8
-  :<color:blue>Code</color> = utf32[<color:blue>B1</color>, <color:blue>B2</color>];
-  if (<color:blue>Code</color> > <color:blue>MaxOneByte</color>?) then (Yes)
+  if (set <color:blue>Code</color> = utf32(<color:blue>S[0]</color>, <color:blue>S[1]</color>}
+<color:blue>Code</color> greater than <color:blue>MaxOneByte</color>?) then (Yes)
     #PaleGreen:Return <color:blue>Code</color>;
   else (No)
-    #Pink:Return Error;
+    #Pink:Return <color:blue>Error</color>;
   endif
   end group
 endif
