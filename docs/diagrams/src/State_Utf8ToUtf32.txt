@@ -1,0 +1,78 @@
+@startuml
+
+' Docs for making activity diagrams
+' https://plantuml.com/activity-diagram-beta
+
+title Convert UTF-8 String to one UTF-32 <color:blue>Code</color>
+
+!pragma useVerticalIf on
+
+:<u><b>Constants
+<color:blue>Error</color>: � (0xFFFD)
+<color:blue>MaxOneByte</color>: 0x7F
+<color:blue>MaxTwoByte</color>: 0x7FF
+<color:blue>SurrogateRange</color>: 0xD800 to 0xDFFF
+<color:blue>MaxThreeByte</color>: 0xFFFF
+<color:blue>MaxUnicode</color>: 0x10FFFF
+<u><b>Input
+<color:blue>S</color>: UTF-8 String
+<color:blue>B1</color>, <color:blue>B2</color>, <color:blue>B3</color> <color:blue>B4</color>: first four bytes in <color:blue>S</color>
+<color:blue>Ones</color>: '1's at the start of <color:blue>B1</color>;
+
+start
+
+if (<color:blue>S</color> is Empty?) then (Yes)
+  #PaleGreen:Return 0;
+(No) elseif (<color:blue>Ones</color> = 0?) then (Yes: <b>1 Byte UTF-8 (Ascii))
+  #PaleGreen:Return <color:blue>B1</color>;
+  kill
+(No) elseif (<color:blue>Ones</color> = 1 or
+<color:blue>Ones</color> > 4?) then (Yes: <b>Invalid First Byte)
+  #Pink:Return Error;
+  kill
+(No) elseif (<color:blue>B2</color> starts with '10'?) then (No: <b>Invalid Second Byte)
+  #Pink:Return Error;
+  kill
+(Yes) elseif (<color:blue>Ones</color> > 2?) then (Yes)
+  if (<color:blue>B3</color> starts with '10'?) then (No: <b>Invalid Third Byte)
+    #Pink:Return Error;
+  (Yes) elseif (<color:blue>Ones</color> = 4?) then (Yes)
+    group <b>4 Byte UTF-8
+    if (<color:blue>B4</color> starts with '10'?) then (No)
+      #Pink:Return Error;
+    else (Yes)
+      :<color:blue>Code</color>: utf32[<color:blue>B1</color>, <color:blue>B2</color>, <color:blue>B3</color>, <color:blue>B4</color>];
+      if (<color:blue>Code</color> > <color:blue>MaxThreeByte</color> and
+<color:blue>Code</color> <= <color:blue>MaxUnicode</color>?) then (Yes)
+        #PaleGreen:Return <color:blue>Code</color>;
+      else (No)
+        #Pink:Return Error;
+      endif
+    endif
+    kill
+    end group
+  else (No)
+    group <b>3 Byte UTF-8
+    :<color:blue>Code</color>: utf32[<color:blue>B1</color>, <color:blue>B2</color>, <color:blue>B3</color>];
+    if (<color:blue>Code</color> > <color:blue>MaxTwoByte</color> and
+<color:blue>Code</color> not in <color:blue>SurrogateRange</color>?) then (Yes)
+      #PaleGreen:Return <color:blue>Code</color>;
+    else (No)
+      #Pink:Return Error;
+    endif
+    end group
+  endif
+  kill
+else (No)
+  group <b>2 Byte UTF-8
+  :<color:blue>Code</color> = utf32[<color:blue>B1</color>, <color:blue>B2</color>];
+  if (<color:blue>Code</color> > <color:blue>MaxOneByte</color>?) then (Yes)
+    #PaleGreen:Return <color:blue>Code</color>;
+  else (No)
+    #Pink:Return Error;
+  endif
+  end group
+endif
+kill
+
+@enduml
