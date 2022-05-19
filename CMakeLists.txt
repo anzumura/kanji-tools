@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14..3.23)
 project(kanji_tools VERSION 1.0
-                    DESCRIPTION "Tools for Japanesse Kana and Kanji"
+                    DESCRIPTION "Tools for Japanese Kana and Kanji"
                     LANGUAGES CXX)
 
 ### Require out-of-source builds
@@ -21,10 +21,10 @@ endif()
 # Clang: https://clang.llvm.org/docs/DiagnosticsReference.html
 # GCC: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 add_compile_options(-Wall -Wconversion -Werror -Wextra -Wextra-semi
-  -Wignored-qualifiers -Wold-style-cast -Wpedantic -Wsuggest-override)
+  -Wignored-qualifiers -Wnonnull -Wold-style-cast -Wpedantic -Wsuggest-override)
 
-  # to turn off a warning for a section of code use the following ('GCC' works
-# for both Clang and GCC):
+# to turn off a warning for a section of code use the following ('GCC' works for
+# both Clang and GCC):
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 # ... code with warning ...
@@ -46,8 +46,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # string(APPEND SANITIZER_FLAGS "-fsanitize-address-use-after-scope")
   string(APPEND CMAKE_CXX_FLAGS_DEBUG " ${SANITIZER_FLAGS}")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  # Clang -Wall sets -Wmost which sets -Woverloaded-virtual, -Wunused, etc.,
-  # and -Wshadow-all sets -Wshadow (and more). GCC -Wall also sets things like
+  # Clang -Wall sets -Wmost which sets -Woverloaded-virtual, -Wunused, etc., and
+  # -Wshadow-all sets -Wshadow (and more). GCC -Wall also sets things like
   # -Wunused (see links above), but the following don't seem to be included:
   add_compile_options(-Wnon-virtual-dtor -Woverloaded-virtual -Wshadow)
 
@@ -106,7 +106,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 
 set(LIB_PREFIX kanjiTools_) # prefix for libs created by this project
-set(LIBS kana kanji quiz stats utils) # libs created by this project
+set(LIBS kana kanji quiz stats utils) # list of libs created by this project
 
 # add options for test coverage (only affects debug builds)
 if(CODE_COVERAGE)

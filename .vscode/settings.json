@@ -3,7 +3,8 @@
   "C_Cpp.default.cppStandard": "c++20",
   "C_Cpp.default.defines": [
     "GTEST_ENABLE_CATCH_EXCEPTIONS_=1",
-    "TARGET_OS_OSX=1"
+    "TARGET_OS_OSX=1",
+    "__float128=long double" // only needed when using 'Mac-GCC' Configuration
   ],
   "cSpell.ignorePaths": [
     ".clang-tidy",
@@ -16,9 +17,11 @@
     "akai",
     "Andale",
     "Aozora",
+    "ASAN",
     "atatakai",
     "beppin",
     "bìng",
+    "Bitmask",
     "burikko",
     "cdev",
     "chǎo",
@@ -37,10 +40,13 @@
     "dīng",
     "efgh",
     "encodable",
+    "endforeach",
     "enduml",
     "enumlist",
     "fāzā",
     "fèng",
+    "fprofile",
+    "fsanitize",
     "Furigana",
     "gaka",
     "gaku",
@@ -49,7 +55,9 @@
     "GHJKTV",
     "gin'iro",
     "gmock",
+    "googletest",
     "graphviz",
+    "gtest",
     "guro",
     "hajime",
     "halfwidth",
@@ -144,6 +152,7 @@
     "stoi",
     "stoul",
     "STREQ",
+    "STREQUAL",
     "sumisu",
     "suzume",
     "tan'i",
@@ -173,7 +182,9 @@
     "Wheader",
     "Wignored",
     "Wloop",
+    "Wmost",
     "Wnon",
+    "Wnonnull",
     "Woverloaded",
     "Wpedantic",
     "wregex",
@@ -182,6 +193,7 @@
     "Wsuggest",
     "Wswitch",
     "Wunreachable",
+    "Wunused",
     "Wuseless",
     "Wzero",
     "XCOV",
@@ -311,5 +323,8 @@
   "plantuml.exportFormat": "png",
   "plantuml.render": "Local",
   "testMate.cpp.test.parallelExecutionLimit": 8,
-  "testMate.cpp.log.logpanel": true
+  "testMate.cpp.log.logpanel": true,
+  "cSpell.enableFiletypes": [
+    "cmake"
+  ]
 }

@@ -2,7 +2,7 @@
 {
   "env": {
     "clangVer": "clang/13.1.6",
-    "gccVer": "gcc/11.2.0_3",
+    "gccVer": "gcc/11.3.0_1",
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
       "${workspaceFolder}/libs/kana/include",
