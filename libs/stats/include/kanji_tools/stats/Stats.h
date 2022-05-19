@@ -5,7 +5,7 @@
 namespace kanji_tools {
 
 // 'Stats' counts all multi-byte characters in 'top' file and if 'top' is a
-// directroy than all the regulars under top will be processed (recursively).
+// directory than all the regulars under top will be processed (recursively).
 // The 'count' for each unique kanji (frequency) will be displayed (non-kanji
 // are not included).
 class Stats {

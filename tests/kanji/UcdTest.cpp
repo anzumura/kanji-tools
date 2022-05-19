@@ -110,7 +110,7 @@ TEST(UcdTest, BadCode) {
 }
 
 TEST(UcdTest, SourcesTooLong) {
-  const String s{"GHJKHJK"};
+  const String s{"GHJKHJK"}; // cSpell:disable-line
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' exceeds max size"),
       std::domain_error);

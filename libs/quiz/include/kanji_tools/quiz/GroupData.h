@@ -13,7 +13,7 @@ public:
   using Map = std::map<String, GroupPtr>;
   using List = std::vector<GroupPtr>;
 
-  // if 'dir' is provided it will be used intead of 'data->dataDir()' when
+  // if 'dir' is provided it will be used instead of 'data->dataDir()' when
   // looking for group files (to help with testing)
   explicit GroupData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
 

@@ -114,7 +114,7 @@ public:
     [[nodiscard]] auto& hiragana() const { return _hiragana; }
     [[nodiscard]] auto& katakana() const { return _katakana; }
   private:
-    friend Kana; // only Kana class can constuct
+    friend Kana; // only Kana class can construct
     IterationMark(CharArray<OneKanaArraySize> hiragana,
         CharArray<OneKanaArraySize> katakana, bool dakuten);
 
@@ -263,7 +263,7 @@ private:
 };
 
 // A 'Monograph' is a single Kana character (large or small) and a 'Digraph' is
-// a valid (at least typable with standard IME) two Kana combination. Diagraphs
+// a valid (at least typeable with standard IME) two Kana combination. Diagraphs
 // are always a full sized Kana followed by a small Kana (one of the 5 vowels, 3
 // y's or 'wa').
 
@@ -284,7 +284,7 @@ private:
 // Prolonged sound marks in Hiragana are non-standard, but output them by
 // default in order to support round-trip type conversions, otherwise the above
 // example would map "らあめん" back to "raamen" which doesn't match the initial
-// value. ConvertFlags suppots bitwise operators so they can be combined using
+// value. ConvertFlags supports bitwise operators so they can be combined using
 // '|', for example:
 //  convert("rāmen desu.", CharType::Hiragana, ConvertFlags::RemoveSpaces |
 //      ConvertFlags::NoProlongMark) -> らあめんです。

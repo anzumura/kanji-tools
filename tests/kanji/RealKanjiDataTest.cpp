@@ -473,8 +473,8 @@ TEST(KanjiDataPrintTest, Debug) {
       if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
       if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
       if (s.starts_with("12 non-JLPT Linked Jinmei in Frequency")) ++found;
-      if (s.starts_with("12 Jouyou Kanji with differrent strokes")) ++found;
-      if (s.starts_with("1 Extra Kanji with differrent strokes")) ++found;
+      if (s.starts_with("12 Jouyou Kanji with different strokes")) ++found;
+      if (s.starts_with("1 Extra Kanji with different strokes")) ++found;
     } else {
       if (line == ">>> Frequency Kanji with links 15:") ++found;
       if (line == ">>> Extra Kanji with links 10:") ++found;

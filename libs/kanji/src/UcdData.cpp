@@ -151,7 +151,7 @@ void UcdData::print(KanjiDataRef data) const {
   print("Links", &PrintCount::link);
   print("VStrokes", &PrintCount::variantStrokes);
   print("Meanings", &PrintCount::meaning);
-  print("On Readdings", &PrintCount::onReading);
+  print("On Readings", &PrintCount::onReading);
   print("Kun Readings", &PrintCount::kunReading);
   print("Morohashi Ids", &PrintCount::morohashi);
   print("Nelson Ids", &PrintCount::nelson);

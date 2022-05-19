@@ -53,8 +53,8 @@ private:
   public:
     Tokens();
 
-    [[nodiscard]] auto& repeatingConsonents() const {
-      return _repeatingConsonents;
+    [[nodiscard]] auto& repeatingConsonants() const {
+      return _repeatingConsonants;
     }
     [[nodiscard]] auto& afterN(CharType t) const {
       return t == CharType::Hiragana ? _afterNHiragana : _afterNKatakana;
@@ -81,11 +81,11 @@ private:
     // on member data.
     void verifyData() const;
 
-    // '_repeatingConsonents' is for processing small 'tsu' for sokuon output
-    std::set<char> _repeatingConsonents;
+    // '_repeatingConsonants' is for processing small 'tsu' for sokuon output
+    std::set<char> _repeatingConsonants;
 
     // '_afterN...' contain the 8 Kana (5 vowels and 3 y's) that should be
-    // proceedeed with 'Apostrophe' when producing Rōmaji if they follow 'n'.
+    // proceeded with 'Apostrophe' when producing Rōmaji if they follow 'n'.
     Set _afterNHiragana, _afterNKatakana;
 
     // '_small...' sets contain the 9 small Kana symbols (5 vowels, 3 y's, and
@@ -109,7 +109,7 @@ private:
 
   [[nodiscard]] static const Set& afterN(CharType);
   [[nodiscard]] static const Set& smallKana(CharType);
-  [[nodiscard]] static const std::set<char>& repeatingConsonents();
+  [[nodiscard]] static const std::set<char>& repeatingConsonants();
   [[nodiscard]] static const NarrowDelims& narrowDelims();
   [[nodiscard]] static const WideDelims& wideDelims();
 

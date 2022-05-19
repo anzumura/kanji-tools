@@ -169,7 +169,7 @@ TEST_F(KanjiListFileTest, DuplicateSymbol) {
 
 TEST_F(KanjiListFileTest, MaxEntries) {
   // need to write more than 65K unique multi-byte characters to a file so loop
-  // over all 'CommonKanjiBlocks' (eventhough some aren't real characters)
+  // over all 'CommonKanjiBlocks' (even though some aren't real characters)
   std::ofstream f{BigFile};
   for (KanjiListFile::Index c{}; auto& i : CommonKanjiBlocks)
     for (auto j = i.start(); j < i.end() && c <= KanjiListFile::MaxEntries + 1;

@@ -237,7 +237,7 @@ TEST_F(Utf8CountTest, AddDirectoryRecurseIncludingFileNamesButNoTags) {
   EXPECT_EQ(count().count("下"), 1);
 }
 
-TEST_F(Utf8CountTest, SkipSimlinksWhenRecursing) {
+TEST_F(Utf8CountTest, SkipSymlinksWhenRecursing) {
   const auto link{TestDir / "link"};
   fs::create_symlink(TestSubDir.filename(), link);
   EXPECT_TRUE(fs::is_symlink(link));

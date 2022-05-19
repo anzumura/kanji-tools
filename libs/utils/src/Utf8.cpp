@@ -9,7 +9,7 @@ using uInt = const unsigned int;
 
 namespace {
 
-// Values for determining invalid Unicde code points when doing UTF-8
+// Values for determining invalid Unicode code points when doing UTF-8
 // conversion (in addition to 'MaxUnicode' in Utf8.h). Here's a quote from
 // https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
 //   Since RFC 3629 (November 2003), the high and low surrogate halves used by

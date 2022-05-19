@@ -18,7 +18,7 @@ Converter::Tokens::Tokens() : _narrowDelimList{Apostrophe, Dash} {
           insertUnique(_smallKatakana, i.second->katakana());
         }
       } else
-        _repeatingConsonents.insert(r[0]);
+        _repeatingConsonants.insert(r[0]);
     }
   populateDelimLists();
   verifyData();
@@ -51,9 +51,9 @@ void Converter::Tokens::populateDelimLists() {
 void Converter::Tokens::verifyData() const {
   assert(Kana::N.romaji() == "n");
   assert(Kana::SmallTsu.romaji() == "ltu");
-  assert(_repeatingConsonents.size() == 18);
+  assert(_repeatingConsonants.size() == 18);
   for ([[maybe_unused]] const auto i : {'a', 'i', 'u', 'e', 'o', 'l', 'n', 'x'})
-    assert(_repeatingConsonents.contains(i) == false);
+    assert(_repeatingConsonants.contains(i) == false);
   assert(_afterNHiragana.size() == 8); // 5 vowels plus 3 y's
   assert(_afterNHiragana.size() == _afterNKatakana.size());
   // 5 small vowels plus 3 small y's plus small 'wa'
@@ -145,8 +145,8 @@ const Converter::Set& Converter::smallKana(CharType source) {
   return tokens().smallKana(source);
 }
 
-const std::set<char>& Converter::repeatingConsonents() {
-  return tokens().repeatingConsonents();
+const std::set<char>& Converter::repeatingConsonants() {
+  return tokens().repeatingConsonants();
 }
 
 const Converter::NarrowDelims& Converter::narrowDelims() {
@@ -256,7 +256,7 @@ String Converter::processKana(const String& kanaGroup, CharType source,
       if (const auto i{sourceMap.find(kanaGroup.substr(Kana::OneKanaSize))};
           i != sourceMap.end())
         return romajiTarget() && Kana::SmallTsu.containsKana(firstKana) &&
-                       repeatingConsonents().contains(i->second->romaji()[0])
+                       repeatingConsonants().contains(i->second->romaji()[0])
                    ? processKanaMacron(prolong, prevKana, i->second, true)
                    : processKana(firstKana, source, prevKana) +
                          processKanaMacron(prolong, prevKana, i->second);
@@ -306,7 +306,7 @@ String Converter::toKana(const String& romajiInput) const {
         // got two 'n's in a row so output one, but don't clear letters
         result += getN();
       else {
-        // error: partial romaji followed by n - output uncoverted partial group
+        // error: partial romaji followed by n, output unconverted partial group
         result += letters;
         letters = letter; // 'n' starts a new group
       }
@@ -338,7 +338,7 @@ void Converter::processRomaji(String& letters, String& result) const {
     // unconverted since no valid romaji can be longer than 3 letters
     result += lower[0] == 'n' ? getN()
               : lower[0] == lower[1] || lower[0] == 't' && lower[1] == 'c'
-                  ? repeatingConsonents().contains(letters[0])
+                  ? repeatingConsonants().contains(letters[0])
                         ? getSmallTsu()
                         : letters.substr(0, 1) // error: first letter not valid
                   : letters.substr(0, 1);      // error: first letter not valid

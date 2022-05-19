@@ -118,6 +118,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 }
 
 TEST_F(CustomFileKanjiTest, ExtraFileWithUnrecognizedColumn) {
+  // cSpell:ignore Rdical
   write("\
 Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");

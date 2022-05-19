@@ -82,7 +82,7 @@ protected:
   void checkSmallKana(CharType source, const String& s) {
     // small letters that don't form part of a digraph are output in 'wāpuro'
     // style favoring 'l' instead of 'x' as first letter (so small tsu is 'ltu')
-    String romaji{"lalilulelolkalkelyalyulyoltulwa"};
+    String romaji{"lalilulelolkalkelyalyulyoltulwa"}; // cSpell:disable-line
     EXPECT_EQ(_converter.convert(source, s, CharType::Romaji), romaji);
     EXPECT_EQ(_converter.convert(CharType::Romaji, romaji, source), s);
     // also test small letters starting with 'x'
@@ -159,12 +159,12 @@ TEST_F(ConverterTest, ConvertRomajiToHiragana) {
   EXPECT_EQ(romajiToHiragana("kani"), "かに");
   EXPECT_EQ(romajiToHiragana("kan-i"), "かんい");
   EXPECT_EQ(romajiToHiragana("ninja samurai"), "にんじゃ　さむらい");
-  // case insensitive
+  // case insensitive - cSpell:disable
   EXPECT_EQ(
       romajiToHiragana("Dare desu ka? ngya!"), "だれ　です　か？　んぎゃ！");
   EXPECT_EQ(
       romajiToHiragana("Dare dESu ka? kyaa!!", ConvertFlags::RemoveSpaces),
-      "だれですか？きゃあ！！");
+      "だれですか？きゃあ！！"); // cSpell:enable
   // don't convert non-romaji
   EXPECT_EQ(romajiToHiragana("店じまいdesu."), "店じまいです。");
   EXPECT_EQ(romajiToHiragana("[サメはkowai!]"), "「サメはこわい！」");
@@ -176,12 +176,12 @@ TEST_F(ConverterTest, ConvertRomajiToKatakana) {
   // support both standard way (t+chi) as well as the wāpuro way (c+chi)
   EXPECT_EQ(romajiToKatakana("matchi"), "マッチ");
   EXPECT_EQ(romajiToKatakana("macchi"), "マッチ");
-  // use macrons to get a katakana 'ー'
+  // use macrons to get a katakana 'ー' - cSpell:disable
   EXPECT_EQ(romajiToKatakana("sērā"), "セーラー");
   EXPECT_EQ(romajiToKatakana("pāthī"), "パーティー");
   EXPECT_EQ(romajiToKatakana("chīzu"), "チーズ");
   EXPECT_EQ(romajiToKatakana("chiizu"), "チイズ");
-  // don't convert non-romaji
+  // don't convert non-romaji - cSpell:enable
   EXPECT_EQ(romajiToKatakana("店じまいdesu."), "店じまいデス。");
   EXPECT_EQ(romajiToKatakana("[サメはkowai!]"), "「サメはコワイ！」");
   // don't convert invalid romaji
@@ -211,8 +211,8 @@ TEST_F(ConverterTest, ConvertHiraganaToRomaji) {
   // not sure what to do with a final or repeated small tsu ... for now it falls
   // back to 'wāpuro', i.e., exactly what you would need to type on a keyboard
   // to reproduce the Hiragana.
-  EXPECT_EQ(hiraganaToRomaji("いてっ"), "iteltu");
-  EXPECT_EQ(hiraganaToRomaji("いっって"), "iltutte");
+  EXPECT_EQ(hiraganaToRomaji("いてっ"), "iteltu");    // cSpell:disable-line
+  EXPECT_EQ(hiraganaToRomaji("いっって"), "iltutte"); // cSpell:disable-line
 }
 
 TEST_F(ConverterTest, ConvertKatakanaToRomaji) {
@@ -236,8 +236,8 @@ TEST_F(ConverterTest, ConvertKatakanaToRomaji) {
   // not sure what to do with a final or repeated small tsu ... for now it falls
   // back to 'wāpuro', i.e., exactly what you would need to type on a keyboard
   // to reproduce the Hiragana.
-  EXPECT_EQ(katakanaToRomaji("イテッ"), "iteltu");
-  EXPECT_EQ(katakanaToRomaji("イッッテ"), "iltutte");
+  EXPECT_EQ(katakanaToRomaji("イテッ"), "iteltu");    // cSpell:disable-line
+  EXPECT_EQ(katakanaToRomaji("イッッテ"), "iltutte"); // cSpell:disable-line
 }
 
 TEST_F(ConverterTest, ProlongMark) {
@@ -293,7 +293,7 @@ TEST_F(ConverterTest, ConvertBetweenKana) {
   kanaConvertCheck("じょん・どー", "ジョン・ドー");
 }
 
-TEST_F(ConverterTest, RepeatSymbol) {
+TEST_F(ConverterTest, RepeatSymbol) { // cSpell:disable
   kanaConvertCheck("かゝ", "カヽ", "kaka");
   kanaConvertCheck("かゞ", "カヾ", "kaga");
   kanaConvertCheck("がゝ", "ガヽ", "gaka");
@@ -322,10 +322,10 @@ TEST_F(ConverterTest, RepeatSymbol) {
   // repeating symbol is ignored after 'prolong' mark when target is Romaji
   kanaConvertCheck("はーゝろー", "ハーヽロー", "hārō");
   kanaConvertCheck("ばーゞろー", "バーヾロー", "bārō");
-  // repeating symbol at the begining is an error so drop for romaji, but can
+  // repeating symbol at the beginning is an error so drop for romaji, but can
   // still convert for kana
   kanaConvertCheck("ゝろ", "ヽロ", "ro");
-}
+} // cSpell:enable
 
 TEST_F(ConverterTest, ConvertAllToOneType) {
   EXPECT_EQ(converter().convert("ima クリスマス　です。", CharType::Romaji),
@@ -335,7 +335,7 @@ TEST_F(ConverterTest, ConvertAllToOneType) {
   EXPECT_EQ(converter().convert("ima クリスマス　です。", CharType::Katakana),
       "イマ　クリスマス　デス。");
   EXPECT_EQ(converter().convert("rāmenらーめんラーメン!!", CharType::Romaji),
-      "rāmenrāmenrāmen!!");
+      "rāmenrāmenrāmen!!"); // cSpell:disable-line
   EXPECT_EQ(converter().convert("rāmenらーめんラーメン!!", CharType::Hiragana),
       "らーめんらーめんらーめん！！");
   EXPECT_EQ(converter().convert("rāmenらーめんラーメン!!", CharType::Katakana),

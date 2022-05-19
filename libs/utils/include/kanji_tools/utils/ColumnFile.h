@@ -79,7 +79,7 @@ public:
     return {};
   }
 
-  // convenience functions for some numberic types
+  // convenience functions for some numeric types
   auto getU8(const Column& c) const { return getUInt<uint8_t>(c); }
   auto getOptU8(const Column& c) const { return getOptUInt<uint8_t>(c); }
   auto getU16(const Column& c) const { return getUInt<uint16_t>(c); }

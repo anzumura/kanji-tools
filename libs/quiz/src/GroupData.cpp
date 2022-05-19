@@ -141,7 +141,7 @@ void GroupData::printMeaningGroup(
   for (auto& i : group.members()) {
     if (fullDebug()) out() << ' ' << i->qualifiedName();
     // the same kanji can be in more than one meaning group so check uniqueness
-    // to avoid overcounting
+    // to avoid over-counting
     if (uniqueNames.insert(i->name()).second)
       types[i->type()].emplace_back(i->name());
   }

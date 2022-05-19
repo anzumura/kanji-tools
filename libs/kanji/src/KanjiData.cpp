@@ -431,7 +431,7 @@ void KanjiData::checkStrokes() const {
             u && i->strokes().value() != u->strokes().value())
           l.emplace_back(i->name());
       KanjiListFile::print(
-          _out, l, toString(t) + " Kanji with differrent strokes", "_ucd");
+          _out, l, toString(t) + " Kanji with different strokes", "_ucd");
     }
   }
 }

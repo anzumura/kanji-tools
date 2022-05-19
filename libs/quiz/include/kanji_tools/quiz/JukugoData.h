@@ -9,7 +9,7 @@ class JukugoData {
 public:
   using List = std::vector<JukugoPtr>;
 
-  // if 'dir' is provided it will be used intead of 'data->dataDir()/jukugo'
+  // if 'dir' is provided it will be used instead of 'data->dataDir()/jukugo'
   // when looking for jukugo files (to help with testing)
   explicit JukugoData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
 

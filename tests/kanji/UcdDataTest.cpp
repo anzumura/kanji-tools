@@ -39,7 +39,7 @@ protected:
     // write the Jōyō Kanji
     write("50E7\t僧\tCJK\t1.1\t9\t13\t\tsēng\t1076\t536,538\tGHJKTV\tJ0-414E\t"
           "Y\t\t\t\t\tBuddhist priest, monk; san of Sanskrit sangha\tSOU\t"
-          "BOUZU");
+          "BOUZU"); // cSpell:ignore BOUZU
     // write the 'linked' Jinmeiyō Kanji
     write("FA31\t僧\tCJK_Compat_Ideographs\t3.2\t9\t14\t\t\t\t\tJ\tJ3-2E49\t\t"
           "Y\t50E7\t僧\tJinmei*\tBuddhist priest, monk; san of Sanskrit sangha"

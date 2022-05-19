@@ -42,7 +42,7 @@ public:
     return _end - _start + 1;
   }
 
-  // 'opterator()' returns true if 'x' is in this block
+  // 'operator()' returns true if 'x' is in this block
   [[nodiscard]] constexpr auto operator()(Code x) const noexcept {
     return x >= _start && x <= _end;
   }
@@ -224,8 +224,8 @@ template<size_t N, typename... Ts>
          c == CombiningSemiVoicedChar;
 }
 
-// Return true if the first 'MB character' is in the given blocks, empty string
-// will return false and a string longer than one 'MB characer' will also return
+// Return true if the first 'MB character' is in the given blocks. Empty string
+// will return false and a string longer than one 'MB character' also returns
 // false unless 'sizeOne' is false.
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const String& s, bool sizeOne, T&... t) {
@@ -247,7 +247,7 @@ template<typename... T>
   return false;
 }
 
-// true if all characers are in given blocks, empty is also considered true
+// true if all characters are in given blocks, empty is also considered true
 template<typename... T>
 [[nodiscard]] inline auto inWCharRange(const String& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
@@ -263,9 +263,9 @@ template<typename... T>
 
 // functions for classifying 'recognized' UTF-8 encoded characters. The string
 // parameter should contain one MB character (so 2-4 bytes) by default, but
-// 'sizeOne' can be set to 'false' to check just the first 'MB characer' in
+// 'sizeOne' can be set to 'false' to check just the first 'MB character' in
 // the string. There are also 'isAll' functions that return 'true' only if all
-// the characers in the string are the desired type.
+// the characters in the string are the desired type.
 
 // Kana
 

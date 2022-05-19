@@ -97,7 +97,7 @@ private:
 // 'EnumListContainer' provides common functionality for derived classes
 // including 'begin', 'end', 'operator[]' and 'toString'. Template args are:
 // - T:     scoped enum type
-// - N:     number of enum values (used for interating and index checking)
+// - N:     number of enum values (used for iterating and index checking)
 // - Names: number of strings in '_names' array (same as N by default, but set
 //          to 'N - 1' for EnumListWithNone since 'None' isn't stored)
 template<typename T, Enum::Size N, Enum::Size Names = N>

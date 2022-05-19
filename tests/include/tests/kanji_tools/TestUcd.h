@@ -23,7 +23,7 @@ public:
   // allow setting 'name' via the ctor since it's the more commonly used field
   explicit TestUcd(Name name = "一") : _name(name) {}
 
-  // conversion opterator to create a Ucd instance
+  // conversion operator to create a Ucd instance
   [[nodiscard]] explicit operator Ucd() const {
     return Ucd{{_code ? _code : getCode(_name), _name}, _block, _version,
         _radical,

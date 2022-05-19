@@ -142,7 +142,7 @@ TEST(Utf8Test, FromUTF8String) {
   // first byte error cases
   fromUtf8Error(String{toChar(Bit1)});
   fromUtf8Error(String{toChar(FiveBits)});
-  // second byte not continuation
+  // second byte not continuation - cSpell:ignore ufffda
   fromUtf8Error(String{toChar(TwoBits), 'a'}, U"\ufffda");
   const auto cont{toChar(Bit1)};
   // third byte not continuation
@@ -225,7 +225,7 @@ TEST(Utf8Test, FromUTF8CharArray) {
   ASSERT_EQ(wideChar.size(), 1);
   EXPECT_EQ(wideChar[0], U'\ufffc');
   const auto utf8String{toUtf8(wideChar)};
-  // make sure round-trip convertion gets back to the original char array
+  // make sure round-trip conversion gets back to the original char array
   ASSERT_EQ(utf8String.size(), std::size(s) - 1);
   for (size_t i{}; i < std::size(s) - 1; ++i) EXPECT_EQ(utf8String[i], s[i]);
 }
@@ -252,6 +252,7 @@ TEST(Utf8Test, SortKanaAndRomaji) {
   // - Katakana: should mix with Hiragana instead of always coming after
   // - Full-width Rōmaji: should probably come before Kana
   // - Half-width Katakana: should mix with other Kana instead
+  // cSpell:ignore Ｐａｒａ
   const std::set<String> s{"しょう", "Ｐａｒａ", "はら", "ﾊﾗ", "バラ", "ばら",
       "ぱら", "para", "じょ", "しょ", "ｐａｒａ"};
   ASSERT_EQ(s.size(), 11);

@@ -186,8 +186,8 @@ TEST_F(ChoiceTest, NewLineWithoutDefault) {
   EXPECT_EQ(get('2', {{'1', ""}, {'2', ""}}), '2');
   // Note: new line is not sent to console when prompting for an option since
   // the user should be entering their choice on the same line as the 'prompt'
-  // message. If they choose an invalid option and presss enter then the
-  // 'prompt' message is sent again to output.
+  // message. If they choose an invalid option and press enter then the 'prompt'
+  // message is sent again to output.
   EXPECT_EQ(getOutput(), "(1-2): (1-2): ");
   EXPECT_TRUE(os().eof());
 }

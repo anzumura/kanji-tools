@@ -34,7 +34,7 @@ protected:
   // destructor prints the final score when in test mode
   virtual ~Quiz();
 
-  // the following methods are shotcuts for calling '_launcher' methods
+  // the following methods are shortcuts for calling '_launcher' methods
   [[nodiscard]] auto& launcher() const { return _launcher; }
   [[nodiscard]] auto& choice() const { return _launcher.choice(); }
   [[nodiscard]] char get(const String& msg, const Choices&, OptChar def = {},

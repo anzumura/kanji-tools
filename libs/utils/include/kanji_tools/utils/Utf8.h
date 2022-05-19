@@ -54,7 +54,7 @@ enum class Utf8Result {
   InvalidCodePoint, // the bytes decode to an invalid Unicode code point
   MissingBytes,     // not enough continuation bytes
   // 'Overlong' is when a character is 'UTF-8' encoded with more bytes than the
-  // minimum required, i.e., if a characer can be encoded in two bytes, but
+  // minimum required, i.e., if a character can be encoded in two bytes, but
   // instead is encoded using three or four bytes (with extra leading zero bits
   // - see https://en.wikipedia.org/wiki/UTF-8#Overlong_encodings).
   Overlong,

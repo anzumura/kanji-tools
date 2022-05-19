@@ -32,7 +32,7 @@ public:
   void print(const class KanjiData&) const;
 private:
   // 'MaxExamples' controls how many examples are printed for each radical by
-  // the above 'print' function (examples are sorted by assending stroke count).
+  // the above 'print' function (examples are sorted by ascending stroke count).
   enum Values { MaxExamples = 12 };
 
   using KanjiList = std::vector<std::shared_ptr<class Kanji>>;
