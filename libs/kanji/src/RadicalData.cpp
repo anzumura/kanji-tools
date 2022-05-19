@@ -88,7 +88,10 @@ void RadicalData::printRadicalLists(KanjiDataRef data, RadicalLists& radicals) {
   for (auto& i : radicals) {
     auto& l{i.second};
     std::sort(l.begin(), l.end(), [](const auto& x, const auto& y) {
-      return x->strokes() < y->strokes();
+      return x->strokes() < y->strokes() ||
+             x->strokes() == y->strokes() &&
+                 toUnicode(x->compatibilityName()) <
+                     toUnicode(y->compatibilityName());
     });
     Count count;
     for (const auto& j : l) {

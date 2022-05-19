@@ -477,12 +477,14 @@ TEST(KanjiDataPrintTest, Debug) {
       if (s.starts_with("1 Extra Kanji with different strokes")) ++found;
     } else {
       if (line == ">>> Frequency Kanji with links 15:") ++found;
+      if (line == "  [63B4] 掴 -> [6451] 摑 Traditional") ++found;
       if (line == ">>> Extra Kanji with links 10:") ++found;
+      if (line.ends_with(": 生 甠 甡 產 産 㽒 甤 甥 甦 𤯳 甧")) ++found;
       if (line.starts_with(">>>   Total for 214 radicals: 21181")) ++found;
     }
   }
   EXPECT_TRUE(lastLine.starts_with(">>>     52     [985E FE00] 類︀"));
-  EXPECT_EQ(found, 12);
+  EXPECT_EQ(found, 14);
   EXPECT_EQ(count, 361);
 }
 
