@@ -56,7 +56,7 @@ void GroupData::loadGroup(
     auto pattern{Group::PatternType::None};
     const auto kanjiNames{getKanjiNames(name, members, groupType, pattern)};
     // get memberKanji (by looking up each name in kanjiNames)
-    KanjiData::List memberKanji;
+    Group::Members memberKanji;
     for (auto& i : kanjiNames)
       if (const auto k{_data->findByName(i)}; k)
         memberKanji.emplace_back(k);
@@ -67,8 +67,7 @@ void GroupData::loadGroup(
     if (memberKanji.size() < kanjiNames.size())
       f.error("group failed to load all members");
     try {
-      auto group{
-          createGroup(f.getULong(numberCol), name, memberKanji, pattern)};
+      auto group{createGroup(f.getU16(numberCol), name, memberKanji, pattern)};
       for (auto& i : memberKanji) add(i->name(), groups, group);
       list.emplace_back(group);
     } catch (const std::exception& e) {

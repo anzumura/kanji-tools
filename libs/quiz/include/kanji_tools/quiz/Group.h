@@ -6,9 +6,7 @@ namespace kanji_tools {
 
 enum class GroupType { Meaning, Pattern };
 
-inline auto& operator<<(std::ostream& os, const GroupType& x) {
-  return os << (x == GroupType::Meaning ? "Meaning" : "Pattern");
-}
+std::ostream& operator<<(std::ostream&, const GroupType&);
 
 // 'Group' holds kanji groups from 'meaning-groups.txt' and 'pattern-groups.txt'
 // files. Meaning groups are intended to be used for meaning categories like
@@ -17,6 +15,9 @@ inline auto& operator<<(std::ostream& os, const GroupType& x) {
 // same pronunciation.
 class Group {
 public:
+  using Number = uint16_t;
+  using Members = KanjiData::List;
+
   // For now, set max size for a group to '58' since this is the maximum number
   // of entries that the group quiz currently supports for entering answers,
   // i.e., a-z, then A-Z, then 6 more ascii characters following Z (before
@@ -39,15 +40,13 @@ public:
 
   // ctor throws if 'members' contains duplicates, has less than two entries or
   // has more than 'MaxGroupSize' entries
-  Group(size_t number, const String& name, const KanjiData::List& members);
+  Group(Number, const String& name, const Members&);
 
   Group(const Group&) = delete;
   virtual ~Group() = default;
 
   [[nodiscard]] virtual GroupType type() const = 0;
-  [[nodiscard]] virtual PatternType patternType() const {
-    return PatternType::None;
-  }
+  [[nodiscard]] virtual PatternType patternType() const;
 
   [[nodiscard]] auto number() const { return _number; }
   [[nodiscard]] auto& name() const { return _name; }
@@ -56,31 +55,26 @@ public:
 protected:
   void error(const String&) const;
 private:
-  const size_t _number;
+  const Number _number;
   const String _name;
-  const KanjiData::List _members;
+  const Members _members;
 };
 
 using GroupPtr = std::shared_ptr<Group>;
 
 class MeaningGroup : public Group {
 public:
-  MeaningGroup(
-      size_t number, const String& name, const KanjiData::List& members)
-      : Group{number, name, members} {}
+  MeaningGroup(Number, const String& name, const Members&);
 
-  [[nodiscard]] GroupType type() const override { return GroupType::Meaning; }
+  [[nodiscard]] GroupType type() const override;
 };
 
 class PatternGroup : public Group {
 public:
-  PatternGroup(size_t number, const String& name,
-      const KanjiData::List& members, PatternType patternType);
+  PatternGroup(Number, const String& name, const Members&, PatternType);
 
-  [[nodiscard]] GroupType type() const override { return GroupType::Pattern; }
-  [[nodiscard]] PatternType patternType() const override {
-    return _patternType;
-  }
+  [[nodiscard]] GroupType type() const override;
+  [[nodiscard]] PatternType patternType() const override;
 private:
   const PatternType _patternType;
 };

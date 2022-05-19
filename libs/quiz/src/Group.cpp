@@ -2,7 +2,11 @@
 
 namespace kanji_tools {
 
-Group::Group(size_t number, const String& name, const KanjiData::List& members)
+std::ostream& operator<<(std::ostream& os, const GroupType& x) {
+  return os << (x == GroupType::Meaning ? "Meaning" : "Pattern");
+}
+
+Group::Group(Number number, const String& name, const Members& members)
     : _number{number}, _name{name}, _members{members} {
   if (members.empty()) error("no members");
   if (members.size() == 1) error("only one member");
@@ -21,6 +25,8 @@ Group::Group(size_t number, const String& name, const KanjiData::List& members)
   }
 }
 
+Group::PatternType Group::patternType() const { return PatternType::None; }
+
 String Group::toString() const {
   return addBrackets(
       std::to_string(_number) + ' ' + name(), BracketType::Square);
@@ -30,11 +36,21 @@ void Group::error(const String& msg) const {
   throw std::domain_error{"group " + toString() + " has " + msg};
 }
 
-PatternGroup::PatternGroup(size_t number, const String& name,
-    const KanjiData::List& members, PatternType patternType)
+MeaningGroup::MeaningGroup(
+    Number number, const String& name, const Members& members)
+    : Group{number, name, members} {}
+
+GroupType MeaningGroup::type() const { return GroupType::Meaning; }
+
+PatternGroup::PatternGroup(Number number, const String& name,
+    const Members& members, PatternType patternType)
     : Group{number, name, members}, _patternType{patternType} {
   if (patternType == PatternType::None) error("invalid pattern type");
 }
+
+GroupType PatternGroup::type() const { return GroupType::Pattern; }
+
+Group::PatternType PatternGroup::patternType() const { return _patternType; }
 
 std::ostream& operator<<(std::ostream& os, const Group& x) {
   os << '[';
