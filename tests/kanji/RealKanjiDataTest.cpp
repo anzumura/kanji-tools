@@ -413,13 +413,17 @@ TEST_F(RealKanjiDataTest, SortByQualifiedName) {
   auto jinmei4stroke1{find("云", KanjiTypes::Jinmei, SmallS, {}, "4E91")};
   auto jinmei4stroke2{find("勿", KanjiTypes::Jinmei, SmallS, {}, "52FF")};
 
-  const auto check{[](auto& x, auto& y) {
+  const auto check{[](auto& x, auto& y, bool strokes = true) {
     EXPECT_TRUE(KanjiData::OrderByQualifiedName(x, y));
     EXPECT_FALSE(KanjiData::OrderByQualifiedName(y, x));
+    // OrderByStrokes is the same as OrderByQualifiedName if both Kanji are the
+    // same 'qualified name rank'
+    EXPECT_EQ(KanjiData::OrderByStrokes(x, y), strokes);
+    EXPECT_EQ(KanjiData::OrderByStrokes(y, x), !strokes);
   }};
   // sort by qualified type first (so Jouyou is less then Jinmei)
-  check(jouyou10stroke, jinmei4stroke1);
-  check(jouyou10stroke, jinmei4stroke2);
+  check(jouyou10stroke, jinmei4stroke1, false);
+  check(jouyou10stroke, jinmei4stroke2, false);
   // if qualified type is the same then sort by stokes
   check(jouyou7stroke1, jouyou10stroke);
   check(jouyou7stroke2, jouyou10stroke);
