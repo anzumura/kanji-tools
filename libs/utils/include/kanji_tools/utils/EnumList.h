@@ -145,7 +145,7 @@ public:
   private:
     friend EnumListContainer<T, N, Names>; // calls private ctor
 
-    explicit ConstIterator(Enum::Size index) noexcept : iBase{index} {}
+    explicit ConstIterator(Enum::Size i) noexcept : iBase{i} {}
   };
 protected:
   EnumListContainer() noexcept = default;
