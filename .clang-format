@@ -1,4 +1,5 @@
-# style options for clang-format version 13.0.1 (installed via Homebrew)
+# Style options for clang-format version 14.0.3 (installed via Homebrew). See
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html for details.
 Language: Cpp
 
 # run 'clang-format -style=llvm -dump-config > .clang-format' to see defaults
