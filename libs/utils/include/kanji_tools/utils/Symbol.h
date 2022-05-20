@@ -9,24 +9,6 @@
 
 namespace kanji_tools {
 
-// 'Symbol' can be used instead of 'String' to save memory at the cost of a
-// small performance hit when creating or looking up a value. A potentially good
-// use case would be for a data member of a class that has many instances and
-// the data member doesn't have many different values. Some examples would be
-// Unicode block names or Unicode version names (see Ucd.h for examples).
-//
-// The current implementation uses uint16_t so it can support up to ~65K unique
-// symbols per type (an exception is thrown if this limit is exceeded). If there
-// are more than 65K values then 'Symbol' was probably not a good design choice
-// in the first place.
-//
-// Classes should derive from 'Symbol' and define 'Type', for example:
-//   class TestSymbol : public Symbol<TestSymbol> {
-//   public:
-//     inline static const String Type{"TestSymbol"};
-//     using Symbol::Symbol;
-//   };
-
 class BaseSymbol {
 public:
   using Id = uint16_t;
@@ -49,6 +31,29 @@ private:
   const Id _id;
 };
 
+/// \brief Class that can be used instead of 'String' to save memory
+///
+/// This class incurs a small performance hit when creating/looking up a value,
+/// but can save significant memory when used as member of a class that has many
+/// instances and the member doesn't have many different values. Some examples
+/// would be Unicode block names or Unicode version names (see Ucd.h for
+/// examples).
+///
+/// The current implementation uses uint16_t so it can support up to ~65K unique
+/// symbols per type (an exception is thrown if this limit is exceeded). If
+/// there are more than 65K values then Symbol was probably not a good design
+/// choice in the first place.
+///
+/// Classes should derive from **Symbol<T>** and define **Type**, for example:
+/// \code
+/// class TestSymbol : public Symbol<TestSymbol> {
+/// public:
+///   inline static const String Type{"TestSymbol"};
+///   using Symbol::Symbol;
+/// };
+/// \endcode
+///
+/// \tparam T derived class (see sample code above)
 template<typename T> class Symbol : public BaseSymbol {
 public:
   [[nodiscard]] static const String& type() noexcept { return T::Type; }

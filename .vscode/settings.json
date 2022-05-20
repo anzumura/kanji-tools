@@ -11,7 +11,8 @@
     ".git",
     ".vscode",
     "build",
-    "data/ucd.txt"
+    "data/ucd.txt",
+    "docs/html"
   ],
   "cSpell.words": [
     "akai",
