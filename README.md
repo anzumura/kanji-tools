@@ -71,7 +71,7 @@ Here's a list of VS Code extensions being used:
 - Format: **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**, **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
 - Test: **[C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)**, **[Test Adapter Converter](https://marketplace.visualstudio.com/items?itemName=ms-vscode.test-adapter-converter)**, **[Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer)**
 - Debug: **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**, **[Hex Editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)**
-- Docs: **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
+- Docs:  **[Doxygen Document Generator](https://marketplace.visualstudio.com/items?itemName=cschlosser.doxdocgen)**, **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
 - Aesthetic: **[Clock](https://marketplace.visualstudio.com/items?itemName=angelo-breuer.clock)**
 
 **Notes**:
