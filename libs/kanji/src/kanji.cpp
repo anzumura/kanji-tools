@@ -98,13 +98,16 @@ String Kanji::qualifiedName() const {
 
 bool Kanji::orderByQualifiedName(const Kanji& x) const {
   return qualifiedNameRank() < x.qualifiedNameRank() ||
-         qualifiedNameRank() == x.qualifiedNameRank() &&
-             (strokes() < x.strokes() ||
-                 strokes() == x.strokes() &&
-                     (frequencyOrMax() < x.frequencyOrMax() ||
-                         frequencyOrMax() == x.frequencyOrMax() &&
-                             toUnicode(compatibilityName()) <
-                                 toUnicode(x.compatibilityName())));
+         qualifiedNameRank() == x.qualifiedNameRank() && orderByStrokes(x);
+}
+
+bool Kanji::orderByStrokes(const Kanji& x) const {
+  return strokes() < x.strokes() ||
+         strokes() == x.strokes() &&
+             (frequencyOrMax() < x.frequencyOrMax() ||
+                 frequencyOrMax() == x.frequencyOrMax() &&
+                     toUnicode(compatibilityName()) <
+                         toUnicode(x.compatibilityName()));
 }
 
 bool Kanji::operator==(const Kanji& x) const { return name() == x.name(); }

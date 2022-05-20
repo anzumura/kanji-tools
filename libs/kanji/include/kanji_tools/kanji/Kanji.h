@@ -135,11 +135,14 @@ public:
   //   * = Ucd           : kanji loaded from 'ucd.txt' not included above
   [[nodiscard]] String qualifiedName() const;
 
-  // Used to sort 'Kanji' in a way that corresponds to 'qualifiedName' output,
-  // i.e., Jouyou followed by JLPT followed by Frequency, etc.. If within the
-  // same 'qualifiedNameRank' then sort by strokes, frequency (if exists) and
-  // finally compatibilityName (in unicode).
+  // Sort in a way that corresponds to 'qualifiedName' output, i.e., 'Jouyou'
+  // followed by 'JLPT' followed by 'Frequency', etc.. If both Kanji have the
+  // same 'qualifiedNameRank' then return 'orderByStrokes'.
   [[nodiscard]] bool orderByQualifiedName(const Kanji&) const;
+
+  // Sort by stokes (smallest first) and if strokes are the same then sort by
+  // 'frequency' and finally 'compatibilityName' (in unicode).
+  [[nodiscard]] bool orderByStrokes(const Kanji&) const;
 
   [[nodiscard]] bool operator==(const Kanji&) const;
 

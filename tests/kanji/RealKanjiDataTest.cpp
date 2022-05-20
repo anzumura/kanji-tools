@@ -458,34 +458,41 @@ TEST(KanjiDataPrintTest, Debug) {
   std::stringstream os;
   RealKanjiData data(args, os);
   String lastLine;
-  size_t count{}, found{};
+  size_t count{}, top{}, totalChecks{};
+  std::set<size_t> found;
   // output is really big so just check for a few examples
   for (String line; std::getline(os, line); ++count, lastLine = line) {
+    size_t i{};
+    // fail if line (for test number 'i') already found or not found in order
+    const auto dup{[&i, &found] {
+      ASSERT_TRUE(found.emplace(i).second);
+      ASSERT_EQ(found.size(), i);
+    }};
     if (count == 1)
       EXPECT_EQ(line, ">>> Begin Loading Data");
     else if (line.starts_with(">>> Found ")) {
       const String s{line.substr(10)};
       // check each line against all strings (to detect possible duplicates)
-      if (s.starts_with("251 Jinmei in N1")) ++found;
-      if (s.starts_with("2 Linked Old in Frequency")) ++found;
-      if (s.starts_with("124 non-Jouyou/Jinmei/JLPT in Frequency")) ++found;
-      if (s.starts_with("168 JLPT Jinmei in Frequency")) ++found;
-      if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
-      if (s.starts_with("158 non-JLPT Jinmei in Frequency")) ++found;
-      if (s.starts_with("12 non-JLPT Linked Jinmei in Frequency")) ++found;
-      if (s.starts_with("12 Jouyou Kanji with different strokes")) ++found;
-      if (s.starts_with("1 Extra Kanji with different strokes")) ++found;
+      if (++i; s.starts_with("251 Jinmei in N1")) dup();
+      if (++i; s.starts_with("2 Linked Old in Frequency")) dup();
+      if (++i; s.starts_with("124 non-Jouyou/Jinmei/JLPT in Frequency")) dup();
+      if (++i; s.starts_with("168 JLPT Jinmei in Frequency")) dup();
+      if (++i; s.starts_with("158 non-JLPT Jinmei in Frequency")) dup();
+      if (++i; s.starts_with("12 non-JLPT Linked Jinmei in Frequency")) dup();
+      if (++i; s.starts_with("12 Jouyou Kanji with different strokes")) dup();
+      if (++i; s.starts_with("1 Extra Kanji with different strokes")) dup();
+      top = ++i; // use a variable to avoid hard-coding the number of tests
     } else {
-      if (line == ">>> Frequency Kanji with links 15:") ++found;
-      if (line == "  [63B4] 掴 -> [6451] 摑 Traditional") ++found;
-      if (line == ">>> Extra Kanji with links 10:") ++found;
-      if (line.ends_with(": 生 甠 甡 產 産 㽒 甤 甥 甦 𤯳 甧")) ++found;
-      if (line.starts_with(">>>   Total for 214 radicals: 21181")) ++found;
+      if (i = top; line.ends_with(": 生 甠 甡 産 產 甦 㽒 甤 甥 𤯳 甧")) dup();
+      if (++i; line.starts_with(">>>   Total for 214 radicals: 21181")) dup();
+      if (++i; line == ">>> Frequency Kanji with links 15:") dup();
+      if (++i; line == ">>> Extra Kanji with links 10:") dup();
+      totalChecks = i;
     }
   }
   EXPECT_TRUE(lastLine.starts_with(">>>     52     [985E FE00] 類︀"));
-  EXPECT_EQ(found, 14);
   EXPECT_EQ(count, 361);
+  EXPECT_EQ(found.size(), totalChecks);
 }
 
 } // namespace kanji_tools

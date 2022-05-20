@@ -41,6 +41,8 @@ public:
   static void usage(const String& msg) { KanjiListFile::usage(msg); }
   static constexpr auto OrderByQualifiedName{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
+  static constexpr auto OrderByStrokes{
+      [](KanjiPtr& a, KanjiPtr& b) { return a->orderByStrokes(*b); }};
 
   [[nodiscard]] static Kanji::Frequency maxFrequency();
 
