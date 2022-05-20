@@ -17,7 +17,7 @@ namespace {
 TEST(MorohashiIdTest, EmptyId) {
   const MorohashiId id{};
   EXPECT_EQ(id.id(), 0);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Plain);
   EXPECT_FALSE(id);
   EXPECT_EQ(id.toString(), "");
 }
@@ -25,7 +25,7 @@ TEST(MorohashiIdTest, EmptyId) {
 TEST(MorohashiIdTest, IdFromEmptyString) {
   const MorohashiId id{""};
   EXPECT_EQ(id.id(), 0);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Plain);
   EXPECT_FALSE(id);
   EXPECT_EQ(id.toString(), "");
 }
@@ -33,12 +33,12 @@ TEST(MorohashiIdTest, IdFromEmptyString) {
 TEST(MorohashiIdTest, StripLeadingZeroes) {
   const MorohashiId id{"00000"};
   EXPECT_EQ(id.id(), 0);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Plain);
   EXPECT_FALSE(id);
   EXPECT_EQ(id.toString(), "");
   const MorohashiId id1{"0001"};
   EXPECT_EQ(id1.id(), 1);
-  EXPECT_EQ(id1.idType(), MorohashiId::IdType::Regular);
+  EXPECT_EQ(id1.idType(), MorohashiId::IdType::Plain);
   EXPECT_TRUE(id1);
   EXPECT_EQ(id1.toString(), "1");
 }
@@ -101,7 +101,7 @@ TEST(MorohashiIdTest, MaxIds) {
   EXPECT_EQ(idPrime.id(), MorohashiId::MaxId);
   EXPECT_EQ(idDPrime.id(), MorohashiId::MaxId);
   EXPECT_EQ(idSupplemental.id(), MorohashiId::MaxId);
-  EXPECT_EQ(id.idType(), MorohashiId::IdType::Regular);
+  EXPECT_EQ(id.idType(), MorohashiId::IdType::Plain);
   EXPECT_EQ(idPrime.idType(), MorohashiId::IdType::Prime);
   EXPECT_EQ(idDPrime.idType(), MorohashiId::IdType::DoublePrime);
   EXPECT_EQ(idSupplemental.idType(), MorohashiId::IdType::Supplemental);

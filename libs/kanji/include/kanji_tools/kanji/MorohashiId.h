@@ -8,17 +8,17 @@
 
 namespace kanji_tools {
 
-// Unicode 14.0 has ~18K distinct values in 'kMorohashi' property with most
-// entries being plain numbers (max is 49,867). 379 are numbers followed by a
-// single quote (referred to as 'Prime'). There is a proposal to add several
-// hundred 'DoublePrime' and 'Supplemental' types as well as add most of the
-// missing plain entries (Dai Kan-Wa Jiten has 51,284 total entries). This class
-// encapsulates this by internally storing an unsigned 'id' and an 'IdType'.
+// Unicode 14.0 has ~18K distinct values in 'kMorohashi' property. Most entries
+// are plain numbers and 379 are numbers followed by a single quote (these are
+// called 'Prime') - the max number is 49,867. There's a proposal to add most of
+// the missing entries (Dai Kan-Wa Jiten has 51,284) which also includes several
+// hundred 'DoublePrime' and 'Supplemental' entries. This class supports the new
+// proposal by internally storing an unsigned 'id' and an 'IdType'.
 class MorohashiId {
 public:
   using Id = uint16_t;
 
-  enum class IdType : uint8_t { Regular, Prime, DoublePrime, Supplemental };
+  enum class IdType : uint8_t { Plain, Prime, DoublePrime, Supplemental };
 
   static constexpr Id MaxId{std::numeric_limits<Id>::max()};
 
@@ -27,7 +27,7 @@ public:
   // ctor expects a string that's a positive number (up to MaxId) optionally
   // followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
   // for DoublePrime or prefixed with a 'H' for Supplemental (補巻). Note, only
-  // plain and Prime values are in the current version of Unicode.
+  // Plain and Prime values are in the current version of Unicode.
   explicit MorohashiId(const String&);
 
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
@@ -46,7 +46,7 @@ private:
   [[nodiscard]] static Id validate(const String&, size_t = 0, size_t = 0);
 
   const Id _id{};
-  const IdType _idType{IdType::Regular};
+  const IdType _idType{IdType::Plain};
 };
 
 std::ostream& operator<<(std::ostream&, const MorohashiId&);

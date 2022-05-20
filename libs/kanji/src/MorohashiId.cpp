@@ -36,25 +36,26 @@ MorohashiId::IdType MorohashiId::getIdType(const String& s) {
   if (isDoublePrime(s)) return IdType::DoublePrime;
   if (isPrime(s)) return IdType::Prime;
   if (isSupplemental(s)) return IdType::Supplemental;
-  return IdType::Regular;
+  return IdType::Plain;
 }
 
 MorohashiId::Id MorohashiId::validate(
-    const String& s, size_t start, size_t end) {
+    const String& s, size_t prefixSize, size_t suffixSize) {
   static constexpr auto CharZero{'0'}, CharNine{'9'};
-  static constexpr MorohashiId::Id Ten{10};
+  static constexpr Id Ten{10};
 
   const auto error{[&s](const String& msg) {
     throw std::domain_error{"Morohashi ID '" + s + "' " + msg};
   }};
 
-  if (s.empty() && !start && !end) return Id{};
-  if (s.size() - start - end == 0) error("is invalid");
   Id result{};
-  const auto typedId{start || end};
-  for (auto i = start; i < s.size() - end; ++i)
-    if (i == start && s[i] == CharZero)
-      ++start;
+  if (s.empty() && !prefixSize && !suffixSize) return result;
+  if (s.size() - prefixSize - suffixSize == 0) error("is invalid");
+  const auto nonPlain{prefixSize || suffixSize};
+  // Id (ignoring any prefix or suffix) must be numeric and not exceed MaxId
+  for (auto i = prefixSize; i < s.size() - suffixSize; ++i)
+    if (i == prefixSize && s[i] == CharZero)
+      ++prefixSize; // skip leading zeroes
     else if (s[i] < CharZero || s[i] > CharNine)
       error("is non-numeric");
     else if (const Id x{static_cast<Id>(s[i] - CharZero)};
@@ -62,19 +63,19 @@ MorohashiId::Id MorohashiId::validate(
       error("exceeds max");
     else
       result += x;
-  if (typedId && !result) error("can't be zero");
+  // Unicode currently has a few (bad) entries that consist of all zeroes so
+  // allow them for now, but don't allow a non-plain Id to be zero.
+  if (nonPlain && !result) error("can't be zero");
   return result;
 }
 
 String MorohashiId::toString() const {
-  String result;
-  if (_id) {
-    if (_idType == IdType::Supplemental) result = SupplementalPrefix;
-    result += std::to_string(_id);
-    if (_idType == IdType::Prime)
-      result += PrimeSuffix;
-    else if (_idType == IdType::DoublePrime)
-      result += DoublePrimeSuffix;
+  String result{_id ? std::to_string(_id) : EmptyString};
+  switch (_idType) {
+  case IdType::Prime: result += PrimeSuffix; break;
+  case IdType::DoublePrime: result += DoublePrimeSuffix; break;
+  case IdType::Supplemental: result = SupplementalPrefix + result; break;
+  case IdType::Plain: break;
   }
   return result;
 }
