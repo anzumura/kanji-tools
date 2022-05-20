@@ -9,11 +9,11 @@
 
 namespace kanji_tools {
 
-// 'Symbol' can be used instead of 'String' to save memory at the cost of
-// a small performance hit when creating or looking up a value. A potentially
-// good use case would be for a data member of a class that has many instances
-// and the data member doesn't have many different values. Some examples would
-// be Unicode block names or Unicode version names (see Ucd.h for examples).
+// 'Symbol' can be used instead of 'String' to save memory at the cost of a
+// small performance hit when creating or looking up a value. A potentially good
+// use case would be for a data member of a class that has many instances and
+// the data member doesn't have many different values. Some examples would be
+// Unicode block names or Unicode version names (see Ucd.h for examples).
 //
 // The current implementation uses uint16_t so it can support up to ~65K unique
 // symbols per type (an exception is thrown if this limit is exceeded). If there
@@ -34,8 +34,7 @@ public:
   // '0' is used as the 'id' for 'empty' symbols (non-empty start at '1')
   static constexpr auto Max{std::numeric_limits<Id>::max() - 1};
 
-  [[nodiscard]] constexpr auto id() const { return _id; }
-
+  [[nodiscard]] constexpr auto id() const noexcept { return _id; }
   [[nodiscard]] explicit constexpr operator bool() const { return _id; }
 protected:
   using Map = std::map<String, Id>;
@@ -52,10 +51,10 @@ private:
 
 template<typename T> class Symbol : public BaseSymbol {
 public:
-  [[nodiscard]] static const String& type() { return T::Type; }
+  [[nodiscard]] static const String& type() noexcept { return T::Type; }
 
   // 'size' returns total unique symbols created (not including 'empty')
-  [[nodiscard]] static auto size() { return _list.size(); }
+  [[nodiscard]] static auto size() noexcept { return _list.size(); }
 
   // 'exists' returns true if a symbol exists for the given (non-empty) name
   [[nodiscard]] static auto exists(const String& name) {
