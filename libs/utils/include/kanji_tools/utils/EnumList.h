@@ -9,7 +9,7 @@
 
 namespace kanji_tools {
 
-// EnumList is a helper class for scoped enums that have contiguous values
+// 'EnumList' is a helper class for scoped enums that have contiguous values
 // starting at zero. It provides 'size', 'operator[]' and 'fromString' methods
 // as well as 'begin' and 'end' methods for range based iteration over the enum
 // values. There's also a 'toString' method used by out-of-class 'toString' and
@@ -121,6 +121,7 @@ public:
     // base iterator implements some operations such as prefix and postfix
     // increment and decrement, operator[], +=, -=, + and -.
     using iBase = typename base::template Iterator<ConstIterator>;
+    using iBase::operator-, iBase::index, iBase::rangeError;
 
     // forward iterator requirements (default ctor)
 
@@ -131,17 +132,15 @@ public:
     [[nodiscard]] auto operator*() const {
       // exception should only happen when dereferencing 'end' since other
       // methods prevent moving out of range
-      if (iBase::index() >= N)
-        iBase::rangeError(
-            base::IndexMsg + std::to_string(iBase::index()) + base::RangeMsg);
-      return to_enum<T>(iBase::index());
+      if (index() >= N)
+        rangeError(base::IndexMsg + std::to_string(index()) + base::RangeMsg);
+      return to_enum<T>(index());
     }
 
     // random-access iterator requirements
 
-    using iBase::operator-;
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
-      return iBase::index() - x.index();
+      return index() - x.index();
     }
   private:
     friend EnumListContainer<T, N, Names>; // calls private ctor

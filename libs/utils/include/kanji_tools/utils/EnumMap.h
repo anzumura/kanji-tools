@@ -6,8 +6,8 @@
 
 namespace kanji_tools {
 
-// EnumMap is a container class for mapping scoped enum 'keys' to 'values'. The
-// enum should have contiguous values starting at zero and a final 'None' which
+// 'EnumMap' is a container class for mapping enum 'keys' to 'values'. The enum
+// should have contiguous values starting at zero and a final 'None' value which
 // allows this class to use 'std::array' internally instead of 'std::map'. It
 // provides 'size', 'operator[]', 'begin' and 'end' methods.
 //
@@ -24,7 +24,7 @@ namespace kanji_tools {
 //   const auto& cm{m};
 //   std::cout << cm[Colors::None]; // prints 0 (the default value for 'int')
 
-// BaseEnumMap has a static 'Empty' value to share amongst different EnumMaps
+// 'BaseEnumMap' has a static 'Empty' value to share amongst different EnumMaps
 template<typename V> class BaseEnumMap {
 public:
   inline static const V Empty{};
@@ -61,13 +61,14 @@ public:
     // base iterator implements some operations such as prefix and postfix
     // increment and decrement, operator[], +=, -=, + and -.
     using iBase = typename base::template Iterator<ConstIterator>;
+    using iBase::operator-, iBase::comparable, iBase::index, iBase::initialized;
 
-    // forward iterator requirements (default ctor, equal)
+    // forward iterator requirements (default ctor, ==, !=)
 
     ConstIterator() noexcept : iBase{0} {}
 
     [[nodiscard]] bool operator==(const ConstIterator& x) const {
-      iBase::comparable(_map == x._map);
+      comparable(_map == x._map);
       return iBase::operator==(x);
     }
 
@@ -78,8 +79,8 @@ public:
     // input iterator requirements (except operator->)
 
     [[nodiscard]] auto& operator*() const {
-      iBase::initialized(_map);
-      const auto i{iBase::index()};
+      initialized(_map);
+      const auto i{index()};
       if (i >= N)
         iBase::rangeError(base::IndexMsg + std::to_string(i) + base::RangeMsg);
       return (*_map)[to_enum<T>(i)];
@@ -88,8 +89,8 @@ public:
     // random-access iterator requirements (compare, subtracting iterators)
 
     [[nodiscard]] bool operator<(const ConstIterator& x) const {
-      iBase::comparable(_map == x._map);
-      return iBase::index() < x.index();
+      comparable(_map == x._map);
+      return index() < x.index();
     }
 
     [[nodiscard]] bool operator<=(const ConstIterator& x) const {
@@ -104,10 +105,9 @@ public:
       return !(*this <= x);
     }
 
-    using iBase::operator-;
     [[nodiscard]] auto operator-(const ConstIterator& x) const {
-      iBase::comparable(_map == x._map);
-      return iBase::index() - x.index();
+      comparable(_map == x._map);
+      return index() - x.index();
     }
   private:
     friend EnumMap<T, V>; // calls private ctor

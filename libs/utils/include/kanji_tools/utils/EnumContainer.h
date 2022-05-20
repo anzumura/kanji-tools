@@ -9,7 +9,7 @@
 namespace kanji_tools {
 
 // 'Enum' is a non-templated base class for 'EnumContainer'. It prevents copying
-// and has a 'Size' type the needs to be used by scoped enums participating in
+// and has a 'Size' type that needs to be used by scoped enums participating in
 // the containers. A small unsigned type is used to make sure enums don't have
 // negative values (they are supposed to be contiguous values starting at zero).
 class Enum {
