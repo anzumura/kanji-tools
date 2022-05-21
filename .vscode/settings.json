@@ -12,7 +12,8 @@
     ".vscode",
     "build",
     "data/ucd.txt",
-    "docs/html"
+    "docs/html",
+    "Doxyfile"
   ],
   "cSpell.words": [
     "akai",
