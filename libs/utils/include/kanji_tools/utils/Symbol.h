@@ -9,14 +9,17 @@
 
 namespace kanji_tools {
 
+/// non-templated base class for Symbol
 class BaseSymbol {
 public:
   using Id = uint16_t;
 
-  // '0' is used as the 'id' for 'empty' symbols (non-empty start at '1')
+  /// maximum number of unique symbols that can be created per 'type'
   static constexpr auto Max{std::numeric_limits<Id>::max() - 1};
 
+  /// '0' is used as the 'id' for 'empty' symbols (non-empty start at '1')
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
+
   [[nodiscard]] explicit constexpr operator bool() const { return _id; }
 protected:
   using Map = std::map<String, Id>;
@@ -31,18 +34,16 @@ private:
   const Id _id;
 };
 
-/// \brief Class that can be used instead of 'String' to save memory
+/// \brief class that can be used instead of **String** to save memory
 ///
-/// This class incurs a small performance hit when creating/looking up a value,
-/// but can save significant memory when used as member of a class that has many
-/// instances and the member doesn't have many different values. Some examples
-/// would be Unicode block names or Unicode version names (see Ucd.h for
-/// examples).
+/// Symbol incurs a small performance hit when creating/looking up a value, but
+/// can save significant memory when used as a member of a class that has many
+/// instances and the member doesn't have many different values. Some good
+/// examples would be Unicode block or version names (see Ucd.h for examples).
 ///
-/// The current implementation uses uint16_t so it can support up to ~65K unique
-/// symbols per type (an exception is thrown if this limit is exceeded). If
-/// there are more than 65K values then Symbol was probably not a good design
-/// choice in the first place.
+/// Currently up to ~65K unique symbols per type can be added (an exception is
+/// thrown if the limit is exceeded). If more than 65K values are needed then
+/// Symbol was probably not the right design choice in the first place.
 ///
 /// Classes should derive from **Symbol<T>** and define **Type**, for example:
 /// \code
@@ -58,10 +59,10 @@ template<typename T> class Symbol : public BaseSymbol {
 public:
   [[nodiscard]] static const String& type() noexcept { return T::Type; }
 
-  // 'size' returns total unique symbols created (not including 'empty')
+  /// returns total unique symbols created (not including 'empty' symbol)
   [[nodiscard]] static auto size() noexcept { return _list.size(); }
 
-  // 'exists' returns true if a symbol exists for the given (non-empty) name
+  /// returns true if a symbol exists for the given (non-empty) name
   [[nodiscard]] static auto exists(const String& name) {
     return !name.empty() && _map.contains(name);
   }
