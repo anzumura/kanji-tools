@@ -147,9 +147,9 @@ find_package(Doxygen)
 if(DOXYGEN_FOUND)
   add_custom_target(doxygen ALL ${DOXYGEN_EXECUTABLE}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Generating API documentation with Doxygen under build/docs/html")
+    COMMENT "Generating API documentation under build/docs/html")
   # depend on the 'last app' in order to generate docs near the end of the build
   add_dependencies(doxygen kanjiStats)
 else()
-  message("Doxygen needs to be installed (on Mac use 'brew install doxygen'")
+  message(WARNING "Doxygen not found, on Mac use 'brew install doxygen'")
 endif()
