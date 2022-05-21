@@ -145,11 +145,11 @@ add_subdirectory(apps)
 # check if Doxygen is installed
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-  add_custom_target(doc_doxygen ALL
+  add_custom_target(doxygen ALL ${DOXYGEN_EXECUTABLE}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMAND ${DOXYGEN_EXECUTABLE} DoxyFile
-    COMMENT "Generating API documentation with Doxygen"
-    VERBATIM)
-else(DOXYGEN_FOUND)
+    COMMENT "Generating API documentation with Doxygen under build/docs/html")
+  # depend on the 'last app' in order to generate docs near the end of the build
+  add_dependencies(doxygen kanjiStats)
+else()
   message("Doxygen needs to be installed (on Mac use 'brew install doxygen'")
-endif(DOXYGEN_FOUND)
+endif()
