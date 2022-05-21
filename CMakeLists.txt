@@ -146,10 +146,10 @@ add_subdirectory(apps)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   add_custom_target(doc_doxygen ALL
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/libs
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMAND ${DOXYGEN_EXECUTABLE} DoxyFile
     COMMENT "Generating API documentation with Doxygen"
     VERBATIM)
 else(DOXYGEN_FOUND)
-  message("Doxygen need to be installed to generate the doxygen documentation")
+  message("Doxygen needs to be installed (on Mac use 'brew install doxygen'")
 endif(DOXYGEN_FOUND)

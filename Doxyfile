@@ -1,11 +1,12 @@
 # Doxyfile 1.9.4
 
-# cmake runs 'doxygen DoxyFile' from the 'libs' directory so that paths in the
-# docs don't all start with 'libs/'. The output generated under build/docs.
+# cmake runs 'doxygen DoxyFile' from the top directory so set INPUT to 'libs'
+# to get all relevant C++ code. The output is generated under build/docs/html.
 
 DOXYFILE_ENCODING      = UTF-8
 GENERATE_LATEX         = NO
-OUTPUT_DIRECTORY       = ../build/docs
+INPUT                  = libs
+OUTPUT_DIRECTORY       = build/docs
 OUTPUT_LANGUAGE        = English
 PROJECT_BRIEF          = "Tools for working with Japanese Kana and Kanji"
 PROJECT_NAME           = "Kanji Tools"
