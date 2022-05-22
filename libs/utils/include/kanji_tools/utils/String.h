@@ -31,27 +31,30 @@ enum class BracketType { Curly, Round, Square, None };
 
 [[nodiscard]] CodeString addLeadingZeroes(const CodeString&, size_t minSize);
 
-// convert a 'Code' into a Unicode code point (caps hex with minSize of 4)
+/// convert a #Code into a Unicode code point (caps hex with minSize of 4)
 [[nodiscard]] String toUnicode(Code, BracketType = BracketType::None);
 
-// convert a UTF-8 string into space-separated Unicode code points. Note: non-
-// None 'brackets' puts brackets around the whole string (not each entry).
+///@{
+/// convert a UTF-8 string into space-separated Unicode code points. \details
+/// Brackets are put around the whole string (not each Unicode value).
 [[nodiscard]] String toUnicode(const String&, BracketType = BracketType::None);
-
 [[nodiscard]] String toUnicode(
     const CodeString&, BracketType = BracketType::None);
+///@}
 
-// 'toChar' safely converts 'x' to a char. If 'x' is out of range then an
-// exception is thrown. If 'allowNegative' is true (the default) then 'x' can't
-// be less than -128, otherwise 'x' must be positive. 'x' must be less then 256
-// regardless of the value of 'allowNegative'.
+/// safely converts \p x to a char or throws if \p x is out of range. \details
+/// If \p allowNegative is true (the default) then \p x can't be less than -128,
+/// otherwise \p x must be positive. \p x must be less then 256 regardless of
+/// the value of \p allowNegative.
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
-// 'toChar' overloads for common unsigned types (don't need 'allowNegative')
+///@{
+/// overloads for common unsigned types (don't need *allowNegative*)
 [[nodiscard]] char toChar(uint16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);
 [[nodiscard]] char toChar(Code);
+///@}
 
 // conversion functions that don't throw since size is the same
 [[nodiscard]] char toChar(unsigned char);
