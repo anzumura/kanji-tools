@@ -186,7 +186,7 @@ FrequencyKanji::FrequencyKanji(
     : StandardKanji{data, name}, _frequency{frequency} {}
 
 FrequencyKanji::FrequencyKanji(
-    KanjiDataRef data, const String& name, Reading reading, Frequency frequency)
+    KanjiDataRef data, Name name, Reading reading, Frequency frequency)
     : StandardKanji{data, name, reading}, _frequency{frequency} {}
 
 KenteiKanji::KenteiKanji(KanjiDataRef data, Name name, KenteiKyus kyu)
