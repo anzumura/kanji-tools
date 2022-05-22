@@ -7,8 +7,10 @@ DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
 DOXYFILE_ENCODING      = UTF-8
 EXTRACT_ALL            = YES
 GENERATE_LATEX         = NO
-INPUT                  = libs
+IMAGE_PATH             = docs
+INPUT                  = README.md docs libs
 JAVADOC_AUTOBRIEF      = YES
+LAYOUT_FILE            = DoxygenLayout.xml
 OUTPUT_DIRECTORY       = build/docs
 OUTPUT_LANGUAGE        = English
 PROJECT_BRIEF          = "Tools for working with Japanese Kana and Kanji"
@@ -17,6 +19,7 @@ PROJECT_NUMBER         = 1.0
 QUIET                  = YES
 RECURSIVE              = YES
 TAB_SIZE               = 2
+USE_MDFILE_AS_MAINPAGE = README.md
 WARN_IF_INCOMPLETE_DOC = NO
 
 # override default values to produce shorter output

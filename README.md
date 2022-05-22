@@ -2,25 +2,26 @@
 
 ## Table of Contents
 
-**[Introduction](#Introduction)**\
-**[- Project Structure](#Project-Structure)**\
-**[- VS Code Setup](#VS-Code-Setup)**\
-**[- Compiler Diagnostic Flags](#Compiler-Diagnostic-Flags)**\
-**[Kana Convert](#Kana-Convert)**\
-**[- Kana Conversion Chart](#Kana-Conversion-Chart)**\
-**[- Kana Class Diagram](#Kana-Class-Diagram)**\
-**[Kanji Data](#Kanji-Data)**\
-**[- Kanji Class Diagram](#Kanji-Class-Diagram)**\
-**[- JLPT Kanji](#JLPT-Kanji)**\
-**[- Jōyō Kanji](#Jōyō-Kanji)**\
-**[- Data Directory](#Data-Directory)**\
-**[Kanji Quiz](#Kanji-Quiz)**\
-**[- Kanji Quiz Runtime Memory](#Kanji-Quiz-Runtime-Memory)**\
-**[- Kanji Quiz Binary File Size](#Kanji-Quiz-Binary-File-Size)**\
-**[Kanji Stats](#Kanji-Stats)**\
-**[- Aozora](#Aozora)**\
-**[- Helpful Commands](#Helpful-Commands)**
+**[Introduction](#Introduction)**<br>
+**[- Project Structure](#Project-Structure)**<br>
+**[- VS Code Setup](#VS-Code-Setup)**<br>
+**[- Compiler Diagnostic Flags](#Compiler-Diagnostic-Flags)**<br>
+**[Kana Convert](#Kana-Convert)**<br>
+**[- Kana Conversion Chart](#Kana-Conversion-Chart)**<br>
+**[- Kana Class Diagram](#Kana-Class-Diagram)**<br>
+**[Kanji Data](#Kanji-Data)**<br>
+**[- Kanji Class Diagram](#Kanji-Class-Diagram)**<br>
+**[- JLPT Kanji](#JLPT-Kanji)**<br>
+**[- Jōyō Kanji](#Jōyō-Kanji)**<br>
+**[- Data Directory](#Data-Directory)**<br>
+**[Kanji Quiz](#Kanji-Quiz)**<br>
+**[- Kanji Quiz Runtime Memory](#Kanji-Quiz-Runtime-Memory)**<br>
+**[- Kanji Quiz Binary File Size](#Kanji-Quiz-Binary-File-Size)**<br>
+**[Kanji Stats](#Kanji-Stats)**<br>
+**[- Aozora](#Aozora)**<br>
+**[- Helpful Commands](#Helpful-Commands)**<br>
 
+<a name="Introduction"></a>
 ## Introduction
 
 This repository contains code for four 'main' programs:
@@ -32,6 +33,7 @@ This repository contains code for four 'main' programs:
 
 The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify **Japanese Kanji (漢字)** characters into *official* categories in order to determine how many Kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code created for the *stats* program.
 
+<a name="Project-Structure"></a>
 ### Project Structure
 
 The project is build using *cmake* (installed via Homebrew) so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The project has the following directories:
@@ -55,6 +57,7 @@ The five libraries are:
 - **stats**: code used by *kanjiStats* program (depends on **kanji** lib)
 - **quiz**: code used by *kanjiQuiz* program (depends on **kanji** lib)
 
+<a name="VS-Code-Setup"></a>
 ### VS Code Setup
 
 The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-11** (version 11.3.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake`, `doxygen` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to `wchar_t` and multi-byte handling that won't currently compile on *Windows 10*.
@@ -80,6 +83,7 @@ Here's a list of VS Code extensions being used:
 - **CodeLLDB**: current setup has some limitations (see comments in **[.vscode/launch.json](.vscode/launch.json)** for more details)
 - **PlantUML** is used to generate diagrams from the *.txt* files in **[docs/diagrams/src](docs/diagrams/src)**. In order to generate them locally **graphviz** must be installed. On Mac this can be done via `brew install --cask temurin; brew install graphviz`
 
+<a name="Compiler-Diagnostic-Flags"></a>
 ### Compiler Diagnostic Flags
 
 The code builds without warnings using a large set of diagnostic flags such as **-Wall**, **-Wextra** (equivalent to **-W**), **-Wconversion**, etc.. **-Werror** is also included to ensure the code remains warning-free. Finally, only one type of warning has been disabled (requiring parentheses for some expressions that seemed excessive). **clang-tidy** (which is nicely integrated with **VS Code**) is also being used for diagnostics (see **[.clang-tidy](.clang-tidy)** for details on what's being checked).
@@ -100,11 +104,12 @@ The following table shows flags used per compiler (**Common** shows flags used f
   - **Clang**: https://clang.llvm.org/docs/DiagnosticsReference.html
   - **GCC**: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
 
+<a name="Kana-Convert"></a>
 ## Kana Convert
 
 The **kanaConvert** program was created to parse the *UniHan XML* files (from Unicode Consortium) which have 'On' (音) and 'Kun' (訓) readings, but only in Rōmaji. The program can read stdin and supports various flags for controlling conversion (like *Hepburn* or *Kunrei*) and it has an interactive mode. Here are some examples:
 
-```;
+```
 $ kanaConvert atatakai
 あたたかい
 $ kanaConvert kippu
@@ -129,6 +134,7 @@ $ kanaConvert -k kwarutetto
 クァルテット
 ```
 
+<a name="Kana-Conversion-Chart"></a>
 ### Kana Conversion Chart
 
 Passing '-p' to **kanaConvert** causes it to print out a Kana Chart that shows the Rōmaji letter combinations that are supported along with some notes and totals. The output is aligned properly in a terminal using a fixed font (or an IDE depending on the font - see **[Table.h](libs/kana/include/kanji_tools/kana/Table.h)** for more details). However, the output doesn't align properly in a Markdown code block (wide to narrow character ratio isn't exactly 2:1) so there's also a '-m' option to print using markdown formatting.
@@ -137,6 +143,7 @@ Passing '-p' to **kanaConvert** causes it to print out a Kana Chart that shows t
 
 [Kana Conversion Chart](docs/KanaConversionChart.md)
 
+<a name="Kana-Class-Diagram"></a>
 ### Kana Class Diagram
 
 The following diagram shows the **Kana** class hierarchy as well as some of the public methods.
@@ -149,6 +156,7 @@ See **[Kana.h](libs/kana/include/kanji_tools/kana/Kana.h)** for details, but in 
 - **HanDakutenKana**: derives from **DakutenKana** and holds an **AccentedKana** accessible via the overridden `hanDakuten()` method - this class is used for ha-gyō (は-行) Kana which have both *dakuten* and *hanDakuten* versions.
 - **AccentedKana**: has a pointer back to its *plain* holder
 
+<a name="Kanji-Data"></a>
 ## Kanji Data
 
 To support **kanjiStats** and **kanjiQuiz** programs, *KanjiData* class loads and breaks down Kanji into the following categories:
@@ -163,12 +171,14 @@ To support **kanjiStats** and **kanjiQuiz** programs, *KanjiData* class loads an
 - **Ucd**: Kanji that are in 'ucd.txt', but not already one of the above types
 - **None**: Kanji that haven't been loaded from any files
 
+<a name="Kanji-Class-Diagram"></a>
 ### Kanji Class Diagram
 
 The following diagram shows the **Kanji** class hierarchy (8 classes are concrete). Most of the public methods are included, but the types are simplified for the diagram, i.e., `std::optional<std::string>` is shown as `Optional<String>`, `std::vector<std::string>` is shown as `List<String>`, etc..
 
 ![Kanji Class Diagram](docs/diagrams/out/Class_Kanji/Class_Kanji.png)
 
+<a name="JLPT-Kanji"></a>
 ### JLPT Kanji
 
 Note that JLPT level lists are no longer *official* since 2010. Also, each level file only contains uniquely new Kanji for the level (as opposed to some **N2** and **N1** lists on the web that repeat some Kanji from earlier levels). The levels have the following number of Kanji:
@@ -181,6 +191,7 @@ Note that JLPT level lists are no longer *official* since 2010. Also, each level
 
 All Kanji in levels **N5** to **N2** are in the Top 2501 frequency list, but **N1** contains 25 Jōyō and 83 Jinmeiyō Kanji that are not in the Top 2501 frequency list.
 
+<a name="Jōyō-Kanji"></a>
 ### Jōyō Kanji
 
 Kyōiku (教育) Kanji grades are included in the Jōyō list. Here is a breakdown of the count per grade as well as how many per JLPT level per grade (**None** means not included in any of the JLPT levels)
@@ -199,6 +210,7 @@ Total for all grades is the same as the total Jōyō (2136) and all are in the T
 
 The program also loads the 214 official Kanji radicals (部首).
 
+<a name="Data-Directory"></a>
 ### Data Directory
 
 The **data** directory contains the following files:
@@ -224,11 +236,12 @@ The following 'strokes' related files used to be in the **data** directory, but 
 - **strokes.txt**: loaded from [here](https://kanji.jitenon.jp/cat/jimmei.html) - covers Jinmeiyō Kanji and some old forms.
 - **wiki-strokes.txt**: loaded from [here](https://en.wikipedia.org/wiki/List_of_kanji_by_stroke_count) - mainly Jōyō, but also includes a few 'Frequency' type Kanji.
 
+<a name="Kanji-Quiz"></a>
 ## Kanji Quiz
 
 The **kanjiQuiz** program supports running various types of quizzes (in review or test mode) as well as looking up details of a Kanji from the command-line. If no options are provided then the user is prompted for mode, quiz type, etc. or command-line options can be used to jump directly to the desired type of quiz or Kanji lookup. The following is the output from the `-h` (help) option:
 
-```;
+```
 kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
           [-r[num] | -t[num]] [kanji]
     -h   show this help message for command-line options
@@ -266,7 +279,7 @@ or 'u' followed by Unicode. For example, theses all produce the same output:
 
 When using the quiz program to lookup a Kanji, the output includes a brief legend followed by some details such as **Radical**, **Strokes**, **Pinyin**, **Frequency**, **Old** or **New** variants, **Meaning**, **Reading**, etc.. The **Similar** list comes from the *pattern-groups.txt* file and (the very ad-hoc) **Category** comes from the *meaning-groups.txt* file. **Morohashi** and **Nelson** IDs are shown if they exist as well as any **Jukugo** examples loaded from *data/jukugo* files (there are only about 18K *Jukugo* entries so these lists are pretty limited).
 
-```;
+```
 ~/cdev/kanji-tools $ ./build/apps/kanjiQuiz 龍
 >>> Legend:
 Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
@@ -285,6 +298,7 @@ Rad 龍(212), Strokes 16, lóng, Frq 1734, New 竜*
 
 Here are some runtime memory and (statically linked) file sizes for **kanjiQuiz**. Stats are more relevant for the *quiz* program compared to the others since it loads more Kanji related data including *groups* and *jukugo*. *Sanitize* stats are only available for *Clang* (this is the default debug setup when building the project) - they cause a lot more runtime memory to be used.
 
+<a name="Kanji-Quiz-Runtime-Memory"></a>
 ### Kanji Quiz Runtime Memory
 
 | Compiler | Debug Sanitize | Debug | Release |
@@ -292,6 +306,7 @@ Here are some runtime memory and (statically linked) file sizes for **kanjiQuiz*
 | Clang | 124.4 MB | 24.4 MB | 24.7 MB |
 | GCC | | 34.3 MB | 33.8 MB |
 
+<a name="Kanji-Quiz-Binary-File-Size"></a>
 ### Kanji Quiz Binary File Size
 
 | Compiler | Debug Sanitize | Debug | Release |
@@ -299,13 +314,14 @@ Here are some runtime memory and (statically linked) file sizes for **kanjiQuiz*
 | Clang | 14 MB | 10 MB | 883 KB |
 | GCC | | 4.6 MB | 1.2 KB |
 
+<a name="Kanji-Stats"></a>
 ## Kanji Stats
 
 The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command line options. In order to get more accurate stats about percentages of *Kanji*, *Hiragana* and *Katakana*, the program attempts to strip away all *Furigana* before counting.
 
 Here is the output from processing a set of files containing lyrics for *中島みゆき (Miyuki Nakajima)* songs:
 
-```;
+```
 ~/cdev/kanji-tools $ ./build/apps/kanjiStats ~/songs
 >>> Stats for: 'songs' (634 files from 62 directories) - showing top 5 Kanji per type
 >>> Furigana Removed: 436, Combining Marks Replaced: 253, Variation Selectors: 0
@@ -323,6 +339,7 @@ Here is the output from processing a set of files containing lyrics for *中島�
 >>> Total Kana+Kanji: 208100 (Hiragana: 70.3%, Katakana: 4.5%, Kanji: 25.2%)
 ```
 
+<a name="Aozora"></a>
 ### Aozora
 
 There is also a **[tests/stats/sample-data](tests/stats/sample-data)** directory that contains files used for testing. The **wiki-articles** directory contains text from several wiki pages and **books** contains text from books found on [青空文庫 (Aozora Bunko)](https://www.aozora.gr.jp/) (with *furigana* preserved in wide brackets).
@@ -339,6 +356,7 @@ The books pulled from Aozora were in Shift JIS format so the following steps wer
 - *file2* should now have properly formatted *furigana* in wide brackets following the *Kanji Sequence* on the same line.
 - run 'fold *file2*>*file1*' to split up the really long lines to 80 columns.
 
+<a name="Helpful-Commands"></a>
 ### Helpful Commands
 
 Below are some bash commands that were used while creating this project:
