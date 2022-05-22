@@ -6,14 +6,16 @@
 
 namespace kanji_tools {
 
-/// helper class for working with command line args
+/// class for working with command line args
 class Args {
 public:
   using Size = uint16_t;
   using List = const char* const*;
 
   Args() noexcept = default;
+  Args(const Args&) = delete;
   Args(Size size, List args);
+
   /// provide an 'int' overload that will throw if \p size is out of range
   Args(int size, List args) : Args{checkInt(size), args} {}
 

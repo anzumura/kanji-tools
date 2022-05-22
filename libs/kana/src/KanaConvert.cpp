@@ -102,7 +102,7 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
 
 void KanaConvert::error(const String& msg) { throw std::domain_error(msg); }
 
-KanaConvert::KanaConvert(Args args, std::ostream& out, std::istream* in)
+KanaConvert::KanaConvert(const Args& args, std::ostream& out, std::istream* in)
     : _out(out), _in(in), _choice{out, in} {
   auto printKana{false}, printMarkdown{false};
   List strings;
