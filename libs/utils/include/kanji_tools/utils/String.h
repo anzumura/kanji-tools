@@ -2,17 +2,24 @@
 
 #include <string>
 
+/// \file
+/// type aliases and global functions for working with strings
+
 namespace kanji_tools {
 
-// use 'String' and 'StringView' type aliases to help potentially switch to
-// 'std::u8' versions later when they get wider support (streams, regex, etx.)
+///@{
+/// \brief String and StringView type aliases may be changed to **std::u8**
+/// versions later once they get wider support (streams, regex, etc.)
 using String = std::string;
 using StringView = std::string_view;
+///@}
 
-// type aliases for Unicode code points - use 'char32_t' instead of 'wchar_t'
-// since it's more explicit, i.e., it's 32 bits instead of platform dependent
+///@{
+/// \brief type alias for Unicode code points (use **char32_t** instead of
+/// **wchar_t** since it's always 32 bits instead of platform dependent)
 using Code = char32_t;
 using CodeString = std::u32string;
+///@}
 
 // helper functions for adding brackets and adding leading zeroes
 

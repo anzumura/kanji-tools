@@ -3,9 +3,12 @@
 # cmake runs 'doxygen DoxyFile' from the top directory so set INPUT to 'libs'
 # to get all relevant C++ code. The output is generated under build/docs/html.
 
+DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
 DOXYFILE_ENCODING      = UTF-8
+EXTRACT_ALL            = YES
 GENERATE_LATEX         = NO
 INPUT                  = libs
+JAVADOC_AUTOBRIEF      = YES
 OUTPUT_DIRECTORY       = build/docs
 OUTPUT_LANGUAGE        = English
 PROJECT_BRIEF          = "Tools for working with Japanese Kana and Kanji"
@@ -15,31 +18,31 @@ QUIET                  = YES
 RECURSIVE              = YES
 TAB_SIZE               = 2
 WARN_IF_INCOMPLETE_DOC = NO
-WARN_IF_UNDOCUMENTED   = NO
-WARNINGS               = NO
 
 # override default values to produce shorter output
 SHOW_HEADERFILE        = NO # include statement at the top of class doc
 HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 
+# INLINE_GROUPED_CLASSES = YES
+
 # uncomment these to override defaults and produce shorter output
+# BRIEF_MEMBER_DESC      = NO
 # CLASS_GRAPH            = NO
 # COLLABORATION_GRAPH    = NO
-# HIDE_IN_BODY_DOCS      = YES # in-body docs are added to details by default
-# HIDE_FRIEND_COMPOUNDS  = YES
-# HIDE_UNDOC_CLASSES     = YES
-# HIDE_UNDOC_MEMBERS     = YES
-# BRIEF_MEMBER_DESC      = NO
 # EXTRACT_LOCAL_CLASSES  = NO # 'NO' means only show classes defined in headers
-# REPEAT_BRIEF           = NO # prepend brief member description to details
-# INHERIT_DOCS           = NO
-# INLINE_INFO            = NO # adds 'inline' on the right for inline functions
-# SHOW_USED_FILES        = NO # section at the bottom showing original file name
-# SHOW_FILES             = NO # the 'files' section in quick view
 # GENERATE_BUGLIST       = NO # show docs after \bug
 # GENERATE_DEPRECATEDLIST= NO # show docs after \deprecated
 # GENERATE_TESTLIST      = NO # show docs after \test
 # GENERATE_TODOLIST      = NO # show docs after \todo
+# HIDE_IN_BODY_DOCS      = YES # in-body docs are added to details by default
+# HIDE_FRIEND_COMPOUNDS  = YES
+# HIDE_UNDOC_CLASSES     = YES
+# HIDE_UNDOC_MEMBERS     = YES
+# INHERIT_DOCS           = NO
+# INLINE_INFO            = NO # adds 'inline' on the right for inline functions
+# REPEAT_BRIEF           = NO # prepend brief member description to details
+# SHOW_USED_FILES        = NO # section at the bottom showing original file name
+# SHOW_FILES             = NO # the 'files' section in quick view
 
 # uncomment these to produce longer output (values below override the defaults)
 # CALL_GRAPH             = YES
@@ -48,8 +51,11 @@ HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 # EXTRACT_PRIVATE        = YES
 # EXTRACT_PRIV_VIRTUAL   = YES
 # EXTRACT_STATIC         = YES
-# INTERNAL_DOCS          = YES # show docs after \internal
 # INLINE_INHERITED_MEMB  = YES
+# INTERNAL_DOCS          = YES # show docs after \internal
 # REFERENCED_BY_RELATION = YES
 # REFERENCES_RELATION    = YES
 # STRIP_CODE_COMMENTS    = NO # strip doxygen type comments from source code
+
+# this flag only applies if EXTRACT_ALL is NO
+# WARN_IF_UNDOCUMENTED   = NO

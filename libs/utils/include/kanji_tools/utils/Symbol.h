@@ -34,7 +34,7 @@ private:
   const Id _id;
 };
 
-/// \brief class that can be used instead of **String** to save memory
+/// class that can be used instead of #String to save memory
 ///
 /// Symbol incurs a small performance hit when creating/looking up a value, but
 /// can save significant memory when used as a member of a class that has many
