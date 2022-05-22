@@ -14,6 +14,7 @@ namespace kanji_tools {
 // tab) separated text file with a header row (containing the column names).
 class ColumnFile {
 public:
+  using Path = std::filesystem::path;
   using ULong = uint64_t;
 
   // 'Column' has a name that must match a column header in the file being
@@ -40,7 +41,7 @@ public:
   // regular file) or if the list of columns doesn't match the first row of the
   // file. Note, columns in the file can be in a different order than the list
   // provided to this ctor, but the names must all be found.
-  ColumnFile(const std::filesystem::path& p, const Columns&, char delim = '\t');
+  ColumnFile(const Path& p, const Columns&, char delim = '\t');
 
   ColumnFile(const ColumnFile&) = delete;
 

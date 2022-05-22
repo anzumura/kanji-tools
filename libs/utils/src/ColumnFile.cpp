@@ -12,8 +12,6 @@ constexpr auto ColNotFound{std::numeric_limits<size_t>::max()};
 
 } // namespace
 
-namespace fs = std::filesystem;
-
 ColumnFile::Column::Column(const String& name)
     : _name{name}, _number{ColumnFile::getColumnNumber(name)} {}
 
@@ -27,15 +25,14 @@ size_t ColumnFile::getColumnNumber(const String& name) {
   return i->second;
 }
 
-ColumnFile::ColumnFile(
-    const fs::path& p, const Columns& columns, char delimiter)
-    : _file{std::fstream(p)}, _delimiter{delimiter},
+ColumnFile::ColumnFile(const Path& p, const Columns& columns, char delim)
+    : _file{std::fstream(p)}, _delimiter{delim},
       _fileName{p.filename().string()}, _rowValues{columns.size()},
       _columnToPosition(_allColumns.size(), ColNotFound) {
   assert(_columnToPosition.size() == _allColumns.size()); // need () ctor
   if (columns.empty()) error("must specify at least one column");
-  if (!fs::exists(p)) error("doesn't exist");
-  if (!fs::is_regular_file(p)) error("not regular file");
+  if (!std::filesystem::exists(p)) error("doesn't exist");
+  if (!std::filesystem::is_regular_file(p)) error("not regular file");
   if (String headerRow; std::getline(_file, headerRow)) {
     ColNames colNames;
     for (auto& c : columns)
