@@ -12,10 +12,7 @@
       "request": "launch",
       "program": "${command:cmake.launchTargetPath}",
       "args": [],
-      "stopAtEntry": true,
       "cwd": "${command:cmake.launchTargetDirectory}",
-      "externalConsole": false,
-      "MIMode": "lldb"
     }
   ]
 }
