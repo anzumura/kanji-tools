@@ -5,10 +5,12 @@
 
 DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
 DOXYFILE_ENCODING      = UTF-8
+EXTENSION_MAPPING      = json=md
 EXTRACT_ALL            = YES
+FILE_PATTERNS          = *.cpp *.h *.md *.json
 GENERATE_LATEX         = NO
 IMAGE_PATH             = docs
-INPUT                  = README.md docs libs
+INPUT                  = README.md .vscode docs libs
 JAVADOC_AUTOBRIEF      = YES
 LAYOUT_FILE            = DoxygenLayout.xml
 OUTPUT_DIRECTORY       = build/docs
