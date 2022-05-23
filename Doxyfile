@@ -4,15 +4,14 @@
 # to get all relevant C++ code. The output is generated under build/docs/html.
 
 DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
-DOXYFILE_ENCODING      = UTF-8
 EXTENSION_MAPPING      = json=md
 EXTRACT_ALL            = YES
 FILE_PATTERNS          = *.cpp *.h *.md *.json
 GENERATE_LATEX         = NO
 IMAGE_PATH             = docs
 INPUT                  = README.md .vscode docs libs
-JAVADOC_AUTOBRIEF      = YES
 LAYOUT_FILE            = DoxygenLayout.xml
+MULTILINE_CPP_IS_BRIEF = YES
 OUTPUT_DIRECTORY       = build/docs
 OUTPUT_LANGUAGE        = English
 PROJECT_BRIEF          = "Tools for working with Japanese Kana and Kanji"
