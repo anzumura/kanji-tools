@@ -1,4 +1,4 @@
-// %settings.json <pre><code>
+// %settings.json <pre>
 {
   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.default.cppStandard": "c++20",
@@ -332,4 +332,4 @@
     "cmake"
   ]
 }
-// </code></pre>
+// </pre>

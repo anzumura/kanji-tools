@@ -1,4 +1,4 @@
-// %launch.json <pre><code>
+// %launch.json <pre>
 {
   "version": "0.2.0",
   // To debug on an 'M1 Mac' install 'CoreLLDB' extension (as per this link:
@@ -17,4 +17,4 @@
     }
   ]
 }
-// </code></pre>
+// </pre>
