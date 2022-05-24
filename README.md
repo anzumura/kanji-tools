@@ -1,27 +1,27 @@
 # C++ kanji Tools
 
 [TOC] <!--[TOC] adds a Table of Contents for Doxygen-->
-GitHub automatically generates a Table of Contents in the header since [this change](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) in April 2021.
+[GitHub](http://github.com) automatically generates a Table of Contents in the header since [this change](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) in April 2021. Note, relative links to directories and some file types don't work from the [Doxygen](https://doxygen.nl) generated main page.
 
 ## Introduction
 
-This repository contains code for four 'main' programs:
+This repository contains code for four *main* programs:
 
 - **kanaConvert**: program that converts between Hiragana, Katakana and Rōmaji
 - **kanjiFormat**: program used to format **[sample-data](tests/stats/sample-data/books)** files (from 青空文庫 - see below)
 - **kanjiQuiz**: interactive program that allows a user to choose from various types of quizzes
 - **kanjiStats**: classifies and counts multi-byte characters in a file or directory tree
 
-The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify **Japanese Kanji (漢字)** characters into *official* categories in order to determine how many Kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from Aozora - it's a small program that relies on some of the generic code created for the *stats* program.
+The initial goal for this project was to create a program that could parse multi-byte (UTF-8) input and classify **Japanese Kanji (漢字)** characters into *official* categories in order to determine how many Kanji fall into each category in real-world examples. The *quiz* program was added later once the initial work was done for loading and classifying Kanji. The *format* program was created to help with a specific use-case that came up while gathering sample text from [Aozora](https://www.aozora.gr.jp) - it's a small program that relies on some of the generic code created for the *stats* program.
 
 ### Project Structure
 
-The project is build using *cmake* (installed via Homebrew) so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The project has the following directories:
+The project is build using [cmake](https://cmake.org/) (installed via Homebrew) so there is a *CMakeLists.txt* file in the top directory that builds five *libs* (C++ static libraries for now), the four main programs (mentioned in the Introduction) plus all the test code. The tests are written using **[GoogleTest](https://github.com/google/googletest.git)** test framework. The project has the following directories:
 
 - **apps**: *CMakeLists.txt* and a *.cpp* file for each main program
 - **build**: generated for build targets and *cmake* dependencies
 - **data**: data files described in **[Kanji Data](#Kanji-Data)** section
-- **docs**: docs and **[PlantUML](https://plantuml.com/)** diagrams
+- **docs**: docs and **[PlantUML](https://plantuml.com)** diagrams
 - **scripts**: *.sh* bash scripts for working with *Unicode* data files
 - **libs**: has a directory per lib, each containing:
   - **include**: *.h* files for the lib
