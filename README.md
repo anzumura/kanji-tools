@@ -53,11 +53,12 @@ Here's a list of VS Code extensions being used:
 - Format: **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**, **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
 - Test: **[C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)**, **[Test Adapter Converter](https://marketplace.visualstudio.com/items?itemName=ms-vscode.test-adapter-converter)**, **[Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer)**
 - Debug: **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**, **[Hex Editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)**
-- Docs:  **[Doxygen Document Generator](https://marketplace.visualstudio.com/items?itemName=cschlosser.doxdocgen)**, **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
-- Aesthetic: **[Clock](https://marketplace.visualstudio.com/items?itemName=angelo-breuer.clock)**
+- Docs: **[Doxygen Document Generator](https://marketplace.visualstudio.com/items?itemName=cschlosser.doxdocgen)**, **[PlantUML](https://marketplace.visualstudio.com/items?itemName=jebbs.plantuml)**
+- Aesthetic: **[Better Comments](https://marketplace.visualstudio.com/items?itemName=aaron-bond.better-comments)**, **[Clock](https://marketplace.visualstudio.com/items?itemName=angelo-breuer.clock)**
 
 **Notes**:
 
+- **Better Comments**: can help distinguish Doxygen comments by using a different color for tag "!" in "better-comments.tags" (in User Settings)
 - **Code Spell Checker**: there are lots of *word* entries for this extension in **[.vscode/settings.json](.vscode/settings.json)** (mainly caused by all the Japanese words in test code)
 - **CodeLLDB**: current setup has some limitations (see comments in **[.vscode/launch.json](.vscode/launch.json)** for more details)
 - **PlantUML** is used to generate diagrams from the *.txt* files in **[docs/diagrams/src](docs/diagrams/src)**. In order to generate them locally **graphviz** must be installed. On Mac this can be done via `brew install --cask temurin; brew install graphviz`
