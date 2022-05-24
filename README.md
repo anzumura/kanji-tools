@@ -1,6 +1,7 @@
 # C++ kanji Tools
 
-[TOC]
+[TOC] <!--[TOC] adds a Table of Contents for Doxygen-->
+GitHub automatically generates a Table of Contents in the header since [this change](https://github.blog/changelog/2021-04-13-table-of-contents-support-in-markdown-files/) in April 2021.
 
 ## Introduction
 
