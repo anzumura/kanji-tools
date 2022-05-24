@@ -1,8 +1,20 @@
 # Doxyfile 1.9.4
 
-# cmake runs 'doxygen DoxyFile' from the top directory so set INPUT to 'libs'
-# to get all relevant C++ code. The output is generated under build/docs/html.
+# INPUT and OUTPUT_DIRECTORY are defined below assuming 'doxygen' is executed in
+# the top level repo directory - output is generated under build/docs/html.
 
+# alias to display the 'lib' a class belongs to as well as adjust '#include' to
+# show the expected value (ie kanji_tools/'lib' as a prefix)
+ALIASES += lib{2}="\headerfile \2.h kanji_tools/\1/\2.h [\1] "
+
+# aliases for each of the 5 libraries in the project
+ALIASES += lib_utils{1}="\lib{utils,\1}"
+ALIASES += lib_kana{1}="\lib{kana,\1}"
+ALIASES += lib_kanji{1}="\lib{kanji,\1}"
+ALIASES += lib_quiz{1}="\lib{quiz,\1}"
+ALIASES += lib_stats{1}="\lib{stats,\1}"
+
+# override default settings for the following config values
 DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
 EXTENSION_MAPPING      = json=md
 EXTRACT_ALL            = YES
@@ -28,7 +40,7 @@ WARN_IF_INCOMPLETE_DOC = NO
 
 # INLINE_GROUPED_CLASSES = YES
 
-# uncomment these to override defaults and produce shorter output
+# uncomment these to override default values and produce shorter output
 # BRIEF_MEMBER_DESC      = NO
 # CLASS_GRAPH            = NO
 # COLLABORATION_GRAPH    = NO

@@ -9,8 +9,7 @@
 
 namespace kanji_tools {
 
-//! non-templated base class for Symbol
-//! \headerfile Symbol.h kanji_tools/utils/Symbol.h
+//! \lib_utils{Symbol} non-templated base class for Symbol
 class BaseSymbol {
 public:
   using Id = uint16_t;
@@ -35,8 +34,7 @@ private:
   const Id _id;
 };
 
-//! class that can be used instead of #String to save memory
-//! \headerfile Symbol.h kanji_tools/utils/Symbol.h
+//! \lib_utils{Symbol} class that can be used instead of #String to save memory
 //!
 //! Symbol incurs a small performance hit when creating/looking up a value, but
 //! can save significant memory when used as a member of a class that has many

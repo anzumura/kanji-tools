@@ -6,8 +6,7 @@
 
 namespace kanji_tools {
 
-//! class for working with command line args
-//! \headerfile Args.h kanji_tools/utils/Args.h
+//! \lib_utils{Args} class for working with command line args
 class Args {
 public:
   using Size = uint16_t;
