@@ -8,6 +8,7 @@ EXTENSION_MAPPING      = json=md
 EXTRACT_ALL            = YES
 FILE_PATTERNS          = *.cpp *.h *.md *.json
 GENERATE_LATEX         = NO
+HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 IMAGE_PATH             = docs
 INPUT                  = README.md .vscode docs libs
 LAYOUT_FILE            = DoxygenLayout.xml
@@ -19,13 +20,11 @@ PROJECT_NAME           = "Kanji Tools"
 PROJECT_NUMBER         = 1.0
 QUIET                  = YES
 RECURSIVE              = YES
+REPEAT_BRIEF           = NO # prepend brief member description to details
+SHOW_INCLUDE_FILES     = NO # show list of files included by a file
 TAB_SIZE               = 2
 USE_MDFILE_AS_MAINPAGE = README.md
 WARN_IF_INCOMPLETE_DOC = NO
-
-# override default values to produce shorter output
-SHOW_HEADERFILE        = NO # include statement at the top of class doc
-HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 
 # INLINE_GROUPED_CLASSES = YES
 
@@ -44,9 +43,9 @@ HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 # HIDE_UNDOC_MEMBERS     = YES
 # INHERIT_DOCS           = NO
 # INLINE_INFO            = NO # adds 'inline' on the right for inline functions
-# REPEAT_BRIEF           = NO # prepend brief member description to details
 # SHOW_USED_FILES        = NO # section at the bottom showing original file name
 # SHOW_FILES             = NO # the 'files' section in quick view
+# SHOW_HEADERFILE        = NO # include statement at the top of class doc
 
 # uncomment these to produce longer output (values below override the defaults)
 # CALL_GRAPH             = YES

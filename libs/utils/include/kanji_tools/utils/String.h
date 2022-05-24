@@ -2,24 +2,24 @@
 
 #include <string>
 
-/// \file
-/// type aliases and global functions for working with strings
+//! \file
+//! type aliases and global functions for working with strings
 
 namespace kanji_tools {
 
-///@{
-/// \brief String and StringView type aliases may be changed to **std::u8**
-/// versions later once they get wider support (streams, regex, etc.)
+//!@{
+//! String and StringView type aliases may be changed to **std::u8** versions
+//! later once they get wider support (streams, regex, etc.)
 using String = std::string;
 using StringView = std::string_view;
-///@}
+//!@}
 
-///@{
-/// \brief type alias for Unicode code points (use **char32_t** instead of
-/// **wchar_t** since it's always 32 bits instead of platform dependent)
+//!@{
+//! type alias for Unicode code points (use **char32_t** instead of **wchar_t**
+//! since it's always 32 bits instead of platform dependent)
 using Code = char32_t;
 using CodeString = std::u32string;
-///@}
+//!@}
 
 // helper functions for adding brackets and adding leading zeroes
 
@@ -31,30 +31,30 @@ enum class BracketType { Curly, Round, Square, None };
 
 [[nodiscard]] CodeString addLeadingZeroes(const CodeString&, size_t minSize);
 
-/// convert a #Code into a Unicode code point (caps hex with minSize of 4)
+//! convert a #Code into a Unicode code point (caps hex with minSize of 4)
 [[nodiscard]] String toUnicode(Code, BracketType = BracketType::None);
 
-///@{
-/// convert a UTF-8 string into space-separated Unicode code points. \details
-/// Brackets are put around the whole string (not each Unicode value).
+//!@{
+//! convert a UTF-8 string into space-separated Unicode code points, brackets
+//! are put around the whole string (not each Unicode value).
 [[nodiscard]] String toUnicode(const String&, BracketType = BracketType::None);
 [[nodiscard]] String toUnicode(
     const CodeString&, BracketType = BracketType::None);
-///@}
+//!@}
 
-/// safely converts \p x to a char or throws if \p x is out of range. \details
-/// If \p allowNegative is true (the default) then \p x can't be less than -128,
-/// otherwise \p x must be positive. \p x must be less then 256 regardless of
-/// the value of \p allowNegative.
+//! safely converts \p x to a char or throws if \p x is out of range \details
+//! If \p allowNegative is true (the default) then \p x can't be less than -128,
+//! otherwise \p x must be positive. \p x must be less then 256 regardless of
+//! the value of \p allowNegative.
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
-///@{
-/// overloads for common unsigned types (don't need *allowNegative*)
+//!@{
+//! overloads for common unsigned types (don't need *allowNegative*)
 [[nodiscard]] char toChar(uint16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);
 [[nodiscard]] char toChar(Code);
-///@}
+//!@}
 
 // conversion functions that don't throw since size is the same
 [[nodiscard]] char toChar(unsigned char);

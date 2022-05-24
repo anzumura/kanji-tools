@@ -6,7 +6,8 @@
 
 namespace kanji_tools {
 
-/// class for working with command line args
+//! class for working with command line args
+//! \headerfile Args.h kanji_tools/utils/Args.h
 class Args {
 public:
   using Size = uint16_t;
@@ -16,11 +17,11 @@ public:
   Args(const Args&) = delete;
   Args(Size size, List args);
 
-  /// provide an 'int' overload that will throw if \p size is out of range
+  //! provide an 'int' overload that will throw if \p size is out of range
   Args(int size, List args) : Args{checkInt(size), args} {}
 
-  /// 'const char*[]' ctor is helpful for test code since it figures out 'size'
-  /// from the array (it's also not marked 'explicit' to help shorten code)
+  //! 'const char*[]' ctor is helpful for test code since it figures out 'size'
+  //! from the array (it's also not marked 'explicit' to help shorten code)
   template<size_t N>
   constexpr Args(const char* (&args)[N]) noexcept // NOLINT
       : _size{N}, _args{args} {
