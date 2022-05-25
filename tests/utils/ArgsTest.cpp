@@ -6,13 +6,13 @@ namespace kanji_tools {
 
 TEST(ArgsTest, SizeWithNoArgs) {
   const auto f{[] { Args{1, {}}; }};
-  EXPECT_THROW(call(f, "size is 1, but args is null"), std::domain_error);
+  EXPECT_THROW(call(f, "argc is 1, but argv is null"), std::domain_error);
 }
 
 TEST(ArgsTest, NoSizeWithArgs) {
   const char* args{"test"};
   const auto f{[&args] { Args{0, &args}; }};
-  EXPECT_THROW(call(f, "size is 0, but args is not null"), std::domain_error);
+  EXPECT_THROW(call(f, "argc is 0, but argv is not null"), std::domain_error);
 }
 
 TEST(ArgsTest, IntArgs) {
@@ -25,12 +25,12 @@ TEST(ArgsTest, IntArgs) {
 TEST(ArgsTest, IntArgsOutOfRange) {
   const char* argv[]{"a", "bb", "ccc"};
   const auto small{[&] { Args{-1, argv}; }};
-  EXPECT_THROW(call(small, "size -1 is less than 0"), std::domain_error);
+  EXPECT_THROW(call(small, "argc -1 is less than 0"), std::range_error);
   const auto big{[&argv] {
     Args{std::numeric_limits<Args::Size>::max() + 1, argv};
   }};
   EXPECT_THROW(
-      call(big, "size 65536 is greater than 65535"), std::domain_error);
+      call(big, "argc 65536 is greater than 65535"), std::range_error);
 }
 
 TEST(ArgsTest, Index) {
@@ -46,8 +46,8 @@ TEST(ArgsTest, IndexOutOfRange) {
   const char* argv[]{"a", "bb", "ccc"};
   const Args args{argv};
   EXPECT_THROW(
-      call([&args] { return args[3]; }, "index 3 must be less than size 3"),
-      std::domain_error);
+      call([&args] { return args[3]; }, "index 3 must be less than argc 3"),
+      std::range_error);
 }
 
 TEST(ArgsTest, OperatorBool) {
