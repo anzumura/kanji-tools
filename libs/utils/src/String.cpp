@@ -1,17 +1,17 @@
+#include <kanji_tools/utils/Exception.h>
 #include <kanji_tools/utils/Utf8.h>
 
 #include <numeric>
-#include <stdexcept>
 
 namespace kanji_tools {
 
 namespace {
 
 template<typename T> void rangeError(const String& msg, T x) {
-  throw std::out_of_range(msg + ": '" + std::to_string(x) + "' out of range");
+  throw RangeError(msg + ": '" + std::to_string(x) + "' out of range");
 }
 template<> void rangeError<Code>(const String& msg, Code x) {
-  throw std::out_of_range(msg + ": '" + toHex(x, 4) + "' out of range");
+  throw RangeError(msg + ": '" + toHex(x, 4) + "' out of range");
 }
 
 template<typename T, typename U> auto cast(U u) { return static_cast<T>(u); }

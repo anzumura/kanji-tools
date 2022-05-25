@@ -1,0 +1,13 @@
+#include <kanji_tools/utils/Exception.h>
+
+namespace kanji_tools {
+
+DomainError::DomainError(const String& s) : std::domain_error{s} {}
+
+DomainError::DomainError(const char* s) : std::domain_error{s} {}
+
+RangeError::RangeError(const String& s) : std::range_error{s} {}
+
+RangeError::RangeError(const char* s) : std::range_error{s} {}
+
+} // namespace kanji_tools

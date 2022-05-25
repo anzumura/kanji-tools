@@ -32,7 +32,7 @@ public:
   static void print(std::ostream&, const StringList&, const String& type,
       const String& group);
 
-  static void usage(const String& msg) { throw std::domain_error(msg); }
+  static void usage(const String& msg) { throw DomainError(msg); }
 
   // should be called after loading all lists to clean up unneeded static data
   static void clearUniqueCheckData();

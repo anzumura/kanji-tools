@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <kanji_tools/utils/Exception.h>
 #include <kanji_tools/utils/Utf8.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -149,10 +150,10 @@ TEST(StringTest, IntToChar) {
   EXPECT_EQ(toChar(255), '\xff');
   EXPECT_THROW(
       call([] { return toChar(256); }, "toChar (int): '256' out of range"),
-      std::out_of_range);
+      RangeError);
   EXPECT_THROW(
       call([] { return toChar(-129); }, "toChar (int): '-129' out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(StringTest, IntToCharOnlyPositive) {
@@ -160,10 +161,10 @@ TEST(StringTest, IntToCharOnlyPositive) {
   EXPECT_EQ(toChar(255, false), '\xff');
   EXPECT_THROW(call([] { return toChar(-1, false); },
                    "toChar (positive int): '-1' out of range"),
-      std::out_of_range);
+      RangeError);
   EXPECT_THROW(call([] { return toChar(256, false); },
                    "toChar (int): '256' out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(StringTest, UInt16ToChar) {
@@ -172,7 +173,7 @@ TEST(StringTest, UInt16ToChar) {
   EXPECT_EQ(toChar(x = 255), '\xff');
   EXPECT_THROW(call([&x] { return toChar(x = 256); },
                    "toChar (uint16_t): '256' out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(StringTest, UIntToChar) {
@@ -180,7 +181,7 @@ TEST(StringTest, UIntToChar) {
   EXPECT_EQ(toChar(255U), '\xff');
   EXPECT_THROW(call([] { return toChar(256U); },
                    "toChar (unsigned int): '256' out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(StringTest, ULongToChar) {
@@ -188,7 +189,7 @@ TEST(StringTest, ULongToChar) {
   EXPECT_EQ(toChar(255UL), '\xff');
   EXPECT_THROW(
       call([] { return toChar(256UL); }, "toChar (size_t): '256' out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(StringTest, Char32ToChar) {
@@ -196,7 +197,7 @@ TEST(StringTest, Char32ToChar) {
   EXPECT_EQ(toChar(U'\xff'), '\xff');
   EXPECT_THROW(call([] { return toChar(U'\xa00'); },
                    "toChar (Code): '0a00' out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(StringTest, UCharToChar) {

@@ -95,7 +95,7 @@ size_t JukugoData::findCloseBracket(const String& line, bool onePerLine) {
   return i;
 }
 
-void JukugoData::error(const String& msg) { throw std::domain_error(msg); }
+void JukugoData::error(const String& msg) { throw DomainError(msg); }
 
 void JukugoData::createJukugo(
     const String& line, KanjiGrades grade, bool onePerLine) {
@@ -118,8 +118,7 @@ void JukugoData::createJukugo(
       if (isKanji(c)) _kanjiToJukugo[c].emplace_back(jukugo);
     _uniqueJukugo.emplace(key, jukugo);
   } else if (i->second->grade() != grade)
-    throw std::domain_error(
-        "jukugo '" + name + "' found in more than one file");
+    throw DomainError("jukugo '" + name + "' found in more than one file");
 }
 
 } // namespace kanji_tools

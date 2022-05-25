@@ -45,15 +45,14 @@ protected:
 
 TEST_F(KanjiListFileTest, Usage) {
   const String msg{"error msg"};
-  EXPECT_THROW(
-      call([&msg] { KanjiListFile::usage(msg); }, msg), std::domain_error);
+  EXPECT_THROW(call([&msg] { KanjiListFile::usage(msg); }, msg), DomainError);
 }
 
 TEST_F(KanjiListFileTest, MissingFileWithExtension) {
   const String msg{"testDir must contain 'missing.txt'"};
   EXPECT_THROW(
       call([] { return KanjiListFile::getFile(TestDir, "missing.txt"); }, msg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, MissingFileWithoutExtension) {
@@ -61,7 +60,7 @@ TEST_F(KanjiListFileTest, MissingFileWithoutExtension) {
       "testDir must contain 'missing' (also tried '.txt' extension)"};
   EXPECT_THROW(
       call([] { return KanjiListFile::getFile(TestDir, "missing"); }, msg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, PrintEmptyList) {
@@ -114,7 +113,7 @@ TEST_F(KanjiListFileTest, BadOnePerLine) {
   EXPECT_THROW(
       call([] { KanjiListFile{BadOnePerLine}; },
           "got multiple tokens - line: 1, file: testDir/badOnePerLine"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, MultiplePerLine) {
@@ -139,7 +138,7 @@ TEST_F(KanjiListFileTest, GlobalDuplicate) {
   }};
   EXPECT_THROW(call(f, "found globally non-unique entry '東' - line: 1, file: "
                        "testDir/multiplePerLine"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, GlobalDuplicateLevel) {
@@ -150,21 +149,21 @@ TEST_F(KanjiListFileTest, GlobalDuplicateLevel) {
   }};
   EXPECT_THROW(call(f, "found 3 duplicates in N3: 犬 猫 虎, file: "
                        "testDir/goodOnePerLineLevel"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, BadSymbol) {
   EXPECT_THROW(
       call([] { KanjiListFile{BadSymbol}; },
           "invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, DuplicateSymbol) {
   EXPECT_THROW(
       call([] { KanjiListFile{DuplicateSymbol}; },
           "got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiListFileTest, MaxEntries) {
@@ -178,7 +177,7 @@ TEST_F(KanjiListFileTest, MaxEntries) {
   f.close();
   EXPECT_THROW(call([] { KanjiListFile{BigFile}; },
                    "exceeded '65534' entries, file: testDir/bigFile"),
-      std::domain_error);
+      DomainError);
 }
 
 } // namespace kanji_tools

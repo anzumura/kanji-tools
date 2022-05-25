@@ -24,9 +24,9 @@ const std::map SourceLetterMap{std::pair{'G', GSource}, std::pair{'H', HSource},
 
 Ucd::Entry::Entry(Code code, const String& name) : _name{name} {
   if (!isKanji(name))
-    throw std::domain_error{"name '" + name + "' isn't a recognized Kanji"};
+    throw DomainError{"name '" + name + "' isn't a recognized Kanji"};
   if (const auto c{getCode(name)}; code != c)
-    throw std::domain_error{
+    throw DomainError{
         "code '" + toUnicode(code) + "' doesn't match '" + toUnicode(c) + "'"};
 }
 
@@ -87,7 +87,7 @@ String Ucd::codeAndName() const { return _entry.codeAndName(); }
 
 uint8_t Ucd::getSources(const String& sources, bool joyo, bool jinmei) {
   const auto error{[&sources](const auto& msg) {
-    throw std::domain_error{"sources '" + sources + "' " + msg};
+    throw DomainError{"sources '" + sources + "' " + msg};
   }};
   if (sources.size() > SourceLetterMap.size()) error("exceeds max size");
   uint8_t result{};

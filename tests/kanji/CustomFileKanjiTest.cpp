@@ -124,7 +124,7 @@ Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   EXPECT_THROW(call([this] { return fromFile<ExtraKanji>(); },
                    "unrecognized header 'Rdical' - file: test.txt"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, ExtraFileWithDuplicateColumn) {
@@ -133,7 +133,7 @@ Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   EXPECT_THROW(call([this] { return fromFile<ExtraKanji>(); },
                    "duplicate header 'Name' - file: test.txt"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, ExtraFileWithToManyColumns) {
@@ -142,7 +142,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16\t16");
   EXPECT_THROW(call([this] { return fromFile<ExtraKanji>(); },
                    "too many columns - file: test.txt, row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, ExtraFileWithNotEnoughColumns) {
@@ -151,7 +151,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ");
   EXPECT_THROW(call([this] { return fromFile<ExtraKanji>(); },
                    "not enough columns - file: test.txt, row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, ExtraFileWithInvalidData) {
@@ -163,7 +163,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   EXPECT_THROW(call([this] { return fromFile<ExtraKanji>(); },
                    "failed to convert to unsigned long - file: test.txt, row: "
                    "1, column: 'Number', value: 'a'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, JinmeiFile) {
@@ -234,7 +234,7 @@ TEST_F(CustomFileKanjiTest, BadLinkedJinmei) {
       call([&fKanji, this] { LinkedJinmeiKanji k(data(), "亙", fKanji); },
           "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but "
           "got 'None'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, JinmeiFileWithMissingReason) {
@@ -243,7 +243,7 @@ Number\tName\tRadical\tOldNames\tYear\tReading\n\
 1\t亘\t二\t亙\t1951\tコウ、カン、わた-る、もと-める");
   EXPECT_THROW(call([this] { return fromFile<JinmeiKanji>(); },
                    "column 'Reason' not found - file: test.txt"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(CustomFileKanjiTest, JouyouFile) {
@@ -341,7 +341,7 @@ TEST_F(CustomFileKanjiTest, BadLinkedOld) {
   EXPECT_THROW(call([&, this] { LinkedOldKanji k(data(), "艷", freqKanji); },
                    "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got "
                    "'None'"),
-      std::domain_error);
+      DomainError);
 }
 
 } // namespace kanji_tools

@@ -1,4 +1,5 @@
 #include <kanji_tools/utils/ColumnFile.h>
+#include <kanji_tools/utils/Exception.h>
 
 #include <cassert>
 #include <set>
@@ -154,12 +155,12 @@ Code ColumnFile::getChar32(const Column& c) const {
 }
 
 void ColumnFile::error(const String& msg) const {
-  throw std::domain_error(errorMsg(msg));
+  throw DomainError(errorMsg(msg));
 }
 
 void ColumnFile::error(
     const String& msg, const Column& c, const String& s) const {
-  throw std::domain_error{
+  throw DomainError{
       errorMsg(msg) + ", column: '" + c.name() + "', value: '" + s + "'"};
 }
 

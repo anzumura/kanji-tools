@@ -1,4 +1,5 @@
 #include <kanji_tools/kana/Choice.h>
+#include <kanji_tools/utils/Exception.h>
 
 #include <termios.h>
 #include <unistd.h>
@@ -180,6 +181,6 @@ void Choice::checkPrintableAscii(char x, const String& msg) {
   if (x < ' ' || x > '~') error(msg + " is non-printable: 0x" + toHex(x));
 }
 
-void Choice::error(const String& msg) { throw std::domain_error(msg); }
+void Choice::error(const String& msg) { throw DomainError(msg); }
 
 } // namespace kanji_tools

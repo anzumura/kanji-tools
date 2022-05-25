@@ -82,21 +82,21 @@ TEST_F(JukugoDataTest, GradeFileMissingOpenBracket) {
   write(Grade1File, "青空 あおぞら)");
   EXPECT_THROW(
       call([] { create(); }, "failed to find open bracket" + Err + Grade1File),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, GradeFileMissingSpace) {
   write(Grade1File, "青空(あおぞら)");
   EXPECT_THROW(call([] { create(); },
                    "open bracket should follow a space" + Err + Grade1File),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, GradeFileMissingCloseBracket) {
   write(Grade1File, "青空 (あおぞら");
   EXPECT_THROW(
       call([] { create(); }, "failed to find close bracket" + Err + Grade1File),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, GradeFileCloseBracketNotLastCharacter) {
@@ -104,28 +104,28 @@ TEST_F(JukugoDataTest, GradeFileCloseBracketNotLastCharacter) {
   EXPECT_THROW(
       call([] { create(); },
           "close bracket should be the last character" + Err + Grade1File),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, OtherFileMissingOpenBracket) {
   write(OtherFile, "鶴 ... 千羽鶴(せんばづる) 丹頂鶴 たんちょうづる)");
   EXPECT_THROW(
       call([] { create(); }, "failed to find open bracket" + Err + OtherFile),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, OtherFileMissingCloseBracket) {
   write(OtherFile, "鶴 ... 千羽鶴(せんばづる) 丹頂鶴(たんちょうづる");
   EXPECT_THROW(
       call([] { create(); }, "failed to find close bracket" + Err + OtherFile),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, OtherFileMissingDots) {
   write(OtherFile, "鶴 .. 千羽鶴(せんばづる) 丹頂鶴(たんちょうづる");
   EXPECT_THROW(
       call([] { create(); }, "line is missing '...'" + Err + OtherFile),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(JukugoDataTest, IgnoreDuplicateInSameFile) {
@@ -143,7 +143,7 @@ TEST_F(JukugoDataTest, FailForDuplicateInDifferentFile) {
   EXPECT_THROW(
       call([] { create(); },
           "jukugo '青白' found in more than one file" + Err + "g2.txt"),
-      std::domain_error);
+      DomainError);
 }
 
 } // namespace kanji_tools

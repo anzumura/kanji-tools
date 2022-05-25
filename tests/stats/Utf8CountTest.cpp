@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/stats/Utf8Count.h>
+#include <kanji_tools/utils/Exception.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
@@ -180,7 +181,7 @@ TEST_F(Utf8CountTest, AddFileIncludingFile) {
 TEST_F(Utf8CountTest, AddMissingFile) {
   EXPECT_THROW(call([this] { count().addFile(TestDir / "missing"); },
                    "file not found: testDir/missing"),
-      std::domain_error);
+      DomainError);
   EXPECT_EQ(count().files(), 0);
   EXPECT_EQ(count().directories(), 0);
 }

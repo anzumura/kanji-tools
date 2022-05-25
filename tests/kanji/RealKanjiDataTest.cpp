@@ -395,7 +395,7 @@ TEST_F(RealKanjiDataTest, SortByQualifiedName) {
     auto k{_data->findByName(name)};
     // can't use 'ASSERT' in a function returning non-void so throw an exception
     // if not found (which never happens by design of the rest of this test)
-    if (!k) throw std::domain_error(name + " not found");
+    if (!k) throw DomainError(name + " not found");
     // verify attributes of the Kanji found match expected values
     EXPECT_EQ(k->type(), t);
     EXPECT_EQ(k->strokes().value(), s);

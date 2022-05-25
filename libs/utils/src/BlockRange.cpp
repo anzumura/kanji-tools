@@ -1,6 +1,5 @@
 #include <kanji_tools/utils/BlockRange.h>
-
-#include <stdexcept>
+#include <kanji_tools/utils/Exception.h>
 
 namespace kanji_tools {
 
@@ -12,9 +11,9 @@ void BaseBlockRange::fill(wchar_t* i, const UnicodeBlock& block) noexcept {
 
 size_t BaseBlockRange::checkIndex(size_t i, size_t size) {
   if (i > size)
-    throw std::out_of_range("index '" + std::to_string(i) +
-                            "' is out of range for BlockRange with size '" +
-                            std::to_string(size) + "'");
+    throw RangeError("index '" + std::to_string(i) +
+                     "' is out of range for BlockRange with size '" +
+                     std::to_string(size) + "'");
   return i;
 }
 

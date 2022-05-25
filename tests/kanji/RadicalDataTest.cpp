@@ -31,23 +31,22 @@ TEST_F(RadicalDataTest, LoadOneRadical) {
 
 TEST_F(RadicalDataTest, FindBeforeLoad) {
   const String msg{"must call 'load' before calling 'find'"};
+  EXPECT_THROW(call([this] { return radicals().find(1); }, msg), DomainError);
   EXPECT_THROW(
-      call([this] { return radicals().find(1); }, msg), std::domain_error);
-  EXPECT_THROW(
-      call([this] { return radicals().find("一"); }, msg), std::domain_error);
+      call([this] { return radicals().find("一"); }, msg), DomainError);
 }
 
 TEST_F(RadicalDataTest, NotFound) {
   loadOne();
   EXPECT_THROW(
       call([this] { return radicals().find("二"); }, "name not found: 二"),
-      std::domain_error);
+      DomainError);
   EXPECT_THROW(call([this] { return radicals().find(0); },
                    "'0' is not a valid radical number"),
-      std::domain_error);
+      DomainError);
   EXPECT_THROW(call([this] { return radicals().find(2); },
                    "'2' is not a valid radical number"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(RadicalDataTest, InvalidNumbering) {
@@ -55,7 +54,7 @@ TEST_F(RadicalDataTest, InvalidNumbering) {
   EXPECT_THROW(
       call([this] { radicals().load(TestFile); },
           "radicals must be ordered by 'number' - file: testFile.txt, row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(RadicalDataTest, AltForms) {

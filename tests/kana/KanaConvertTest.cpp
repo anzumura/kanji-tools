@@ -77,21 +77,20 @@ related flags can also be specified:
 TEST_F(KanaConvertTest, IllegalOption) {
   const char* args[]{"", "-a"};
   const auto f{[&args] { KanaConvert{args}; }};
-  EXPECT_THROW(call(f, "illegal option: -a"), std::domain_error);
+  EXPECT_THROW(call(f, "illegal option: -a"), DomainError);
 }
 
 TEST_F(KanaConvertTest, MissingFlagOption) {
   const char* args[]{"", "-f"};
   const auto f{[&args] { KanaConvert{args}; }};
-  EXPECT_THROW(
-      call(f, "-f must be followed by a flag value"), std::domain_error);
+  EXPECT_THROW(call(f, "-f must be followed by a flag value"), DomainError);
 }
 
 TEST_F(KanaConvertTest, IllegalFlagOption) {
   for (const String i : {"a", "aa"}) {
     const char* args[]{"", "-f", i.c_str()};
     const auto f{[&args] { KanaConvert{args}; }};
-    EXPECT_THROW(call(f, "illegal option for -f: " + i), std::domain_error);
+    EXPECT_THROW(call(f, "illegal option for -f: " + i), DomainError);
   }
 }
 
@@ -99,8 +98,8 @@ TEST_F(KanaConvertTest, MultipleProgramModes) {
   for (const auto i : {"-i", "-m", "-n", "-p"}) {
     const char* args[]{"", "-i", i};
     const auto f{[&args] { KanaConvert{args}; }};
-    EXPECT_THROW(call(f, "can only specify one of -i, -m, -n, or -p"),
-        std::domain_error);
+    EXPECT_THROW(
+        call(f, "can only specify one of -i, -m, -n, or -p"), DomainError);
   }
 }
 
@@ -110,7 +109,7 @@ TEST_F(KanaConvertTest, InteractiveOrPrintOptionsAndStrings) {
     const auto f{[&args] { KanaConvert{args}; }};
     EXPECT_THROW(
         call(f, "'string' args can't be combined with '-i', '-m' or '-p'"),
-        std::domain_error);
+        DomainError);
   }
 }
 
@@ -119,7 +118,7 @@ TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
   const auto f{[&args, this] { KanaConvert{args, os(), &is()}; }};
   EXPECT_THROW(
       call(f, "provide one or more 'strings' or '-i' for interactive mode"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanaConvertTest, PrintKanaChart) {

@@ -28,21 +28,21 @@ TEST(EnumListWithNoneTest, FailForDuplicateName) {
   EXPECT_THROW(
       call([] { return BaseEnumList<TestEnum>::create("A", "B", "B"); },
           "duplicate name 'B'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListWithNoneTest, FailForNoneName) {
   EXPECT_THROW(
       call([] { return BaseEnumList<TestEnum>::create("A", "B", "None"); },
           "'None' should not be specified"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListWithNoneTest, CallInstanceBeforeCreate) {
   // 'toString' calls 'instance'
   EXPECT_THROW(call([] { return toString(TestEnum::A); },
                    "must call 'create' before calling 'instance'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListWithNoneTest, DestructorClearsInstance) {
@@ -71,7 +71,7 @@ TEST(EnumListWithNoneTest, CallCreateTwice) {
   EXPECT_THROW(
       call([] { return BaseEnumList<TestEnum>::create("A", "B", "C"); },
           "'create' should only be called once"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListWithNoneTest, Iteration) {
@@ -83,7 +83,7 @@ TEST(EnumListWithNoneTest, Iteration) {
 
 TEST(EnumListWithNoneTest, BadAccess) {
   EXPECT_THROW(call([] { return AllColors[4]; }, "index '4' is out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(EnumListWithNoneTest, RangeBasedForLoop) {
@@ -101,23 +101,19 @@ TEST(EnumListWithNoneTest, BadIncrement) {
   EXPECT_EQ(*i, Colors::None);
   EXPECT_EQ(++i, AllColors.end());
   EXPECT_THROW(
-      call([&] { return *i; }, "index '4' is out of range"), std::out_of_range);
+      call([&] { return *i; }, "index '4' is out of range"), RangeError);
+  EXPECT_THROW(call([&] { i++; }, "can't increment past end"), RangeError);
+  EXPECT_THROW(call([&] { i += 1; }, "can't increment past end"), RangeError);
   EXPECT_THROW(
-      call([&] { i++; }, "can't increment past end"), std::out_of_range);
-  EXPECT_THROW(
-      call([&] { i += 1; }, "can't increment past end"), std::out_of_range);
-  EXPECT_THROW(call([&] { return i[1]; }, "can't increment past end"),
-      std::out_of_range);
+      call([&] { return i[1]; }, "can't increment past end"), RangeError);
 }
 
 TEST(EnumListWithNoneTest, BadDecrement) {
   auto i{AllColors.end()};
-  EXPECT_THROW(
-      call([&] { i -= 5; }, "can't decrement past zero"), std::out_of_range);
+  EXPECT_THROW(call([&] { i -= 5; }, "can't decrement past zero"), RangeError);
   i -= 4;
   EXPECT_EQ(*i, Colors::Red);
-  EXPECT_THROW(
-      call([&] { --i; }, "can't decrement past zero"), std::out_of_range);
+  EXPECT_THROW(call([&] { --i; }, "can't decrement past zero"), RangeError);
 }
 
 TEST(EnumListWithNoneTest, IteratorCompare) {
@@ -155,7 +151,7 @@ TEST(EnumListWithNoneTest, ToString) {
 TEST(EnumListWithNoneTest, BadToString) {
   EXPECT_THROW(
       call([] { return toString(BadColor); }, "enum '29' is out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(EnumListWithNoneTest, Stream) {
@@ -179,18 +175,18 @@ TEST(EnumListWithNoneTest, BadFromString) {
     const String s{i};
     const String msg{"name '" + s + "' not found"};
     EXPECT_THROW(
-        call([&s] { return AllColors.fromString(s); }, msg), std::domain_error);
+        call([&s] { return AllColors.fromString(s); }, msg), DomainError);
     if (s != "None")
       EXPECT_THROW(call([&s] { return AllColors.fromStringAllowNone(s); }, msg),
-          std::domain_error);
+          DomainError);
     if (!s.empty())
       EXPECT_THROW(
           call([&s] { return AllColors.fromStringAllowEmpty(s); }, msg),
-          std::domain_error);
+          DomainError);
     if (!s.empty() && s != "None")
       EXPECT_THROW(
           call([&s] { return AllColors.fromStringAllowEmptyAndNone(s); }, msg),
-          std::domain_error);
+          DomainError);
   }
 }
 

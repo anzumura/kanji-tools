@@ -117,7 +117,7 @@ TEST_F(ListQuizTest, MissingReading) {
     ListQuiz{quiz(), {}, {}, questionList, Kanji::Info::All, 1,
         ListQuiz::QuizStyle::KanjiToReading};
   }};
-  EXPECT_THROW(call(f, noReading + " has no reading"), std::domain_error);
+  EXPECT_THROW(call(f, noReading + " has no reading"), DomainError);
 }
 
 TEST_F(ListQuizTest, QuizDefaults) {

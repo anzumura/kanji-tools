@@ -100,7 +100,7 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
 
 } // namespace
 
-void KanaConvert::error(const String& msg) { throw std::domain_error(msg); }
+void KanaConvert::error(const String& msg) { throw DomainError(msg); }
 
 KanaConvert::KanaConvert(const Args& args, std::ostream& out, std::istream* in)
     : _out(out), _in(in), _choice{out, in} {

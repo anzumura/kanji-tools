@@ -1,6 +1,5 @@
+#include <kanji_tools/utils/Exception.h>
 #include <kanji_tools/utils/Symbol.h>
-
-#include <stdexcept>
 
 namespace kanji_tools {
 
@@ -17,7 +16,7 @@ BaseSymbol::Id BaseSymbol::getId(
   }
   // allow finding existing symbols even if at max capacity
   if (const auto i{m.find(name)}; i != m.end()) return i->second;
-  throw std::domain_error{type + ": can't add '" + name + "' - max capacity"};
+  throw DomainError{type + ": can't add '" + name + "' - max capacity"};
 }
 
 } // namespace kanji_tools

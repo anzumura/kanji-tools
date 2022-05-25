@@ -124,7 +124,7 @@ void UcdData::load(const KanjiData::Path& file) {
                        AllUcdLinkTypes.fromStringAllowEmpty(f.get(LinkTypeCol)),
                        f.get(MeaningCol), f.get(OnCol), f.get(KunCol)))
                .second)
-        throw std::domain_error{"duplicate entry '" + name + "'"};
+        throw DomainError{"duplicate entry '" + name + "'"};
     } catch (const std::exception& e) {
       f.error(e.what());
     }

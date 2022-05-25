@@ -21,7 +21,7 @@ Jukugo::Jukugo(const String& name, const String& reading, KanjiGrades grade)
 String Jukugo::nameAndReading() const { return _name + "（" + _reading + "）"; }
 
 void Jukugo::error(const String& msg) const {
-  throw std::domain_error{"jukugo '" + _name + "' " + msg};
+  throw DomainError{"jukugo '" + _name + "' " + msg};
 }
 
 } // namespace kanji_tools

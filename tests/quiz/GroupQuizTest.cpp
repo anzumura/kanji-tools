@@ -131,7 +131,7 @@ TEST_F(GroupQuizTest, QuizWithEmptyList) {
   const auto f{[this] {
     GroupQuiz{quiz(), {}, {}, {}, GroupQuiz::MemberType::All};
   }};
-  EXPECT_THROW(call(f, "empty group list"), std::domain_error);
+  EXPECT_THROW(call(f, "empty group list"), DomainError);
 }
 
 TEST_F(GroupQuizTest, SkipQuestions) {

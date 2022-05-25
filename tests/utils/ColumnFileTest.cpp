@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/ColumnFile.h>
+#include <kanji_tools/utils/Exception.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <fstream>
@@ -83,7 +84,7 @@ TEST_F(ColumnFileTest, SingleColumnFile) {
 TEST_F(ColumnFileTest, NoColumnsError) {
   EXPECT_THROW(
       call([] { create({}); }, "must specify at least one column" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetValueFromOneColumn) {
@@ -155,69 +156,69 @@ TEST_F(ColumnFileTest, NotEnoughColumns) {
   auto f{write({Col1, Col2, Col3}, "Col1\tCol2\tCol3\nVal1\tVal2")};
   EXPECT_THROW(
       call([&f] { f.nextRow(); }, "not enough columns" + FileMsg + ", row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, TooManyColumns) {
   auto f{write({Col1, Col2, Col3}, "Col1\tCol2\tCol3\nVal1\tVal2\tVal3\tVal4")};
   EXPECT_THROW(
       call([&f] { f.nextRow(); }, "too many columns" + FileMsg + ", row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, UnrecognizedHeaderError) {
   const ColumnFile::Columns c{ColumnFile::Column{"B"}};
   EXPECT_THROW(
       call([&c] { write(c, "A"); }, "unrecognized header 'A'" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, DuplicateHeaderError) {
   write("Col\tCol");
   EXPECT_THROW(call([] { create({Col}); }, "duplicate header 'Col'" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, DuplicateColumnError) {
   write("");
   const auto f{[] { create({Col1, Col2, Col1}); }};
-  EXPECT_THROW(call(f, "duplicate column 'Col1'" + FileMsg), std::domain_error);
+  EXPECT_THROW(call(f, "duplicate column 'Col1'" + FileMsg), DomainError);
 }
 
 TEST_F(ColumnFileTest, OneMissingColumnError) {
   write("Col1");
   const auto f{[] { create({Col1, Col2}); }};
-  EXPECT_THROW(call(f, "column 'Col2' not found" + FileMsg), std::domain_error);
+  EXPECT_THROW(call(f, "column 'Col2' not found" + FileMsg), DomainError);
 }
 
 TEST_F(ColumnFileTest, MultipleMissingColumnsError) {
   write("Col1\tCol3");
   const auto f{[] { create({Col1, Col2, Col3, Col4}); }};
-  EXPECT_THROW(call(f, "2 columns not found: 'Col2', 'Col4'" + FileMsg),
-      std::domain_error);
+  EXPECT_THROW(
+      call(f, "2 columns not found: 'Col2', 'Col4'" + FileMsg), DomainError);
 }
 
 TEST_F(ColumnFileTest, MissingFileError) {
-  EXPECT_THROW(call([] { create({Col}); }, "doesn't exist" + FileMsg),
-      std::domain_error);
+  EXPECT_THROW(
+      call([] { create({Col}); }, "doesn't exist" + FileMsg), DomainError);
 }
 
 TEST_F(ColumnFileTest, NotRegularFileError) {
   const auto f{[] { ColumnFile{TestDir, {Col}}; }};
-  EXPECT_THROW(call(f, "not regular file - file: testDir"), std::domain_error);
+  EXPECT_THROW(call(f, "not regular file - file: testDir"), DomainError);
 }
 
 TEST_F(ColumnFileTest, MissingHeaderRowError) {
   EXPECT_THROW(
       call([] { write({Col}, "", false); }, "missing header row" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetBeforeNextRowError) {
   const auto f{write({Col}, "Col")};
   EXPECT_THROW(call([&f] { f.get(Col); },
                    "'nextRow' must be called before calling 'get'" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
@@ -227,7 +228,7 @@ TEST_F(ColumnFileTest, GetUnrecognizedColumError) {
   EXPECT_THROW(
       call([&] { f.get(columnCreatedAfterConstruction); },
           "unrecognized column 'Created After'" + FileMsg + ", row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetInvalidColumError) {
@@ -236,7 +237,7 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
   EXPECT_TRUE(f.nextRow());
   EXPECT_THROW(call([&] { f.get(columnNotIncludedInFile); },
                    "invalid column 'Not Included'" + FileMsg + ", row: 1"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetULong) {
@@ -251,7 +252,7 @@ TEST_F(ColumnFileTest, GetULongError) {
   EXPECT_THROW(call([&] { f.getULong(Col); },
                    ConvertError + "unsigned long" + FileMsg +
                        ", row: 1, column: 'Col', value: 'blah'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetULongMaxValueError) {
@@ -270,7 +271,7 @@ TEST_F(ColumnFileTest, GetULongMaxValueError) {
                    msg + std::to_string(maxValue) + FileMsg +
                        ", row: 3, column: 'Col', value: '" +
                        std::to_string(maxValue + 1) + "'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetUInt) {
@@ -287,7 +288,7 @@ TEST_F(ColumnFileTest, GetUIntError) {
   EXPECT_THROW(
       call([&] { f.getU8(Col); }, "exceeded max value of 255" + FileMsg +
                                       ", row: 1, column: 'Col', value: '1234'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetOptULong) {
@@ -304,7 +305,7 @@ TEST_F(ColumnFileTest, GetOptULongError) {
   EXPECT_THROW(call([&] { f.getOptULong(Col); },
                    ConvertError + "unsigned long" + FileMsg +
                        ", row: 1, column: 'Col', value: 'blah'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetOptUInt) {
@@ -321,7 +322,7 @@ TEST_F(ColumnFileTest, GetOptUIntError) {
   EXPECT_THROW(call([&] { f.getOptU8(Col); },
                    "exceeded max value of 255" + FileMsg +
                        ", row: 1, column: 'Col', value: '256'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetBool) {
@@ -341,7 +342,7 @@ TEST_F(ColumnFileTest, GetBoolError) {
   EXPECT_THROW(
       call([&] { f.getBool(Col); }, ConvertError + "bool" + FileMsg +
                                         ", row: 1, column: 'Col', value: 'x'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(ColumnFileTest, GetWChar) {
@@ -363,7 +364,7 @@ TEST_F(ColumnFileTest, GetWCharError) {
   for (auto& i : _) {
     f.nextRow();
     EXPECT_THROW(call([&] { f.getChar32(Col); }, ConvertError + "Code, " += i),
-        std::domain_error);
+        DomainError);
   }
 }
 

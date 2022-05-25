@@ -72,20 +72,19 @@ TEST_F(StatsTest, NoOptions) {
   const char* args[]{""};
   const auto f{[&args] { Stats{args, _data}; }};
   EXPECT_THROW(call(f, "please specify at least one option or '-h' for help"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(StatsTest, IllegalOption) {
   const char* args[]{"", "-a"};
   const auto f{[&args] { Stats{args, _data}; }};
-  EXPECT_THROW(
-      call(f, "illegal option '-a' use -h for help"), std::domain_error);
+  EXPECT_THROW(call(f, "illegal option '-a' use -h for help"), DomainError);
 }
 
 TEST_F(StatsTest, EndOfOptions) {
   const char* args[]{"", "--", "-h"};
   const auto f{[&args] { Stats{args, _data}; }};
-  EXPECT_THROW(call(f, "file not found: -h"), std::domain_error);
+  EXPECT_THROW(call(f, "file not found: -h"), DomainError);
 }
 
 TEST_F(StatsTest, PrintStatsForOneFile) {

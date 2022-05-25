@@ -12,14 +12,15 @@ namespace kanji_tools {
 //! \lib_utils{Symbol} non-templated base class for Symbol
 class BaseSymbol {
 public:
-  using Id = uint16_t;
+  using Id = uint16_t; //!< type for id
 
-  //! maximum number of unique symbols that can be created per 'type'
+  //! maximum number of unique symbols that can be created per symbol 'type'
   static constexpr auto Max{std::numeric_limits<Id>::max() - 1};
 
-  //! '0' is used as the 'id' for 'empty' symbols (non-empty start at '1')
+  //! return the id, an empty Symbol has an id of `0`
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
 
+  //! return true if this Symbol is non-empty
   [[nodiscard]] explicit constexpr operator bool() const { return _id; }
 protected:
   using Map = std::map<String, Id>;
@@ -57,19 +58,26 @@ private:
 //! \tparam T derived class (see sample code above)
 template<typename T> class Symbol : public BaseSymbol {
 public:
+  //! return the type name
   [[nodiscard]] static const String& type() noexcept { return T::Type; }
 
-  //! returns total unique symbols created (not including 'empty' symbol)
+  //! return total unique (non-empty) Symbols created
   [[nodiscard]] static auto size() noexcept { return _list.size(); }
 
-  //! returns true if a symbol exists for the given (non-empty) name
+  //! return true if a Symbol exists for the given (non-empty) `name`
   [[nodiscard]] static auto exists(const String& name) {
     return !name.empty() && _map.contains(name);
   }
 
+  //! default ctor, creates an *empty* Symbol
   constexpr Symbol() noexcept : BaseSymbol{0} {}
+
+  //! create a Symbol for the given String
+  //! \param name the name of the Symbol
+  //! \throw DomainError if `name` would result in more than #Max Symbols
   explicit Symbol(const String& name) : BaseSymbol{type(), name, _map, _list} {}
 
+  //! return the name or empty String if id is `0`
   [[nodiscard]] auto& name() const {
     return id() ? *_list.at(id() - 1) : EmptyString;
   }

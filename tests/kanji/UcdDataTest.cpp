@@ -193,27 +193,27 @@ TEST_F(UcdDataTest, LoadFailsWithNoReadingsOrMorohashiIdOrJSource) {
       call([this] { loadOne(false, false); },
           "one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated" +
               FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, NameTooLong) {
   getName() = "一二";
   EXPECT_THROW(call([this] { loadOne(); }, "name more than 4 bytes" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, ZeroStrokes) {
   getStrokes() = "0";
   EXPECT_THROW(
       call([this] { loadOne(); }, "strokes '0' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, BigStrokes) {
   getStrokes() = "55";
   EXPECT_THROW(
       call([this] { loadOne(); }, "strokes '55' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, ZeroVStrokes) {
@@ -221,7 +221,7 @@ TEST_F(UcdDataTest, ZeroVStrokes) {
   getVStrokes() = "0";
   EXPECT_THROW(
       call([this] { loadOne(); }, "variant strokes '0' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, OneVStrokes) {
@@ -229,7 +229,7 @@ TEST_F(UcdDataTest, OneVStrokes) {
   getVStrokes() = "1";
   EXPECT_THROW(
       call([this] { loadOne(); }, "variant strokes '1' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, BigVStrokes) {
@@ -237,42 +237,42 @@ TEST_F(UcdDataTest, BigVStrokes) {
   getVStrokes() = "34";
   EXPECT_THROW(call([this] { loadOne(); },
                    "variant strokes '34' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, RadicalZeroOutOfRange) {
   getRadical() = "0";
   EXPECT_THROW(
       call([this] { loadOne(); }, "radical '0' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, RadicalOutOfRange) {
   getRadical() = "215";
   EXPECT_THROW(
       call([this] { loadOne(); }, "radical '215' out of range" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, BothJouyouAndJinmei) {
   getJinmei() = "Y";
   EXPECT_THROW(
       call([this] { loadOne(); }, "can't be both joyo and jinmei" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, MissingMeaningForJouyou) {
   getMeaning().clear();
   EXPECT_THROW(
       call([this] { loadOne(); }, "meaning is empty for Jōyō Kanji" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, DuplicateEntry) {
   writeOne();
   EXPECT_THROW(call([this] { loadOne(); },
                    "duplicate entry '一' - file: testFile.txt, row: 2"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, PrintWithMissingEntry) {
@@ -295,7 +295,7 @@ TEST_F(UcdDataTest, PrintVariantWithMissingEntry) {
   checkInsert(testKanji, &u);
   EXPECT_THROW(
       call([this] { ucd().print(*this); }, "UCD not found for '僧︀'"),
-      std::domain_error);
+      DomainError);
 }
 
 // link validation tests
@@ -305,7 +305,7 @@ TEST_F(UcdDataTest, MoreLinkNamesThanLinkCodes) {
   getLinkNames() = "二,三";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkNames has more values than LinkCodes" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, BadJouyouLink) {
@@ -313,7 +313,7 @@ TEST_F(UcdDataTest, BadJouyouLink) {
   getLinkNames() = "二";
   EXPECT_THROW(
       call([this] { loadOne(); }, "joyo shouldn't have links" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, LinkNamesButNoLinkType) {
@@ -322,21 +322,21 @@ TEST_F(UcdDataTest, LinkNamesButNoLinkType) {
   getLinkNames() = "二";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkNames has a value, but LinkType is empty" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, LinkTypeButNoLinkNames) {
   getLinkType() = "Jinmei";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkType has a value, but LinkNames is empty" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, LinkCodesButNoLinkNames) {
   getLinkCodes() = "ABCD";
   EXPECT_THROW(call([this] { loadOne(); },
                    "LinkCodes has a value, but LinkNames is empty" + FileMsg),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(UcdDataTest, BadJinmeiLink) {
@@ -349,7 +349,7 @@ TEST_F(UcdDataTest, BadJinmeiLink) {
   const auto msg{"jinmei entry '僧' with link '" + getLinkNames() +
                  "' failed - link already points to '" + getName() +
                  "' - file: testFile.txt, row: 3"};
-  EXPECT_THROW(call([this] { loadLinkedJinmei(); }, msg), std::domain_error);
+  EXPECT_THROW(call([this] { loadLinkedJinmei(); }, msg), DomainError);
 }
 
 } // namespace kanji_tools

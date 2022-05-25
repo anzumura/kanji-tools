@@ -1,6 +1,7 @@
 #include <kanji_tools/kana/Utf8Char.h>
 #include <kanji_tools/stats/Utf8Count.h>
 #include <kanji_tools/utils/BlockRange.h>
+#include <kanji_tools/utils/Exception.h>
 
 #include <fstream>
 
@@ -60,7 +61,7 @@ size_t Utf8Count::add(const String& s, const OptString& tag) {
 size_t Utf8Count::addFile(const std::filesystem::path& file, bool addTag,
     bool fileNames, bool recurse) {
   if (!std::filesystem::exists(file))
-    throw std::domain_error{"file not found: " + file.string()};
+    throw DomainError{"file not found: " + file.string()};
   return doAddFile(file, addTag, fileNames, recurse);
 }
 

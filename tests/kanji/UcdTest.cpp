@@ -100,34 +100,34 @@ TEST(UcdTest, BadName) {
     return "name '" + i + "' isn't a recognized Kanji";
   }};
   for (auto i : {"", "a", "こ", "。", "雷鳴", "轟く"})
-    EXPECT_THROW(call([i] { Ucd::Entry{{}, i}; }, msg(i)), std::domain_error);
+    EXPECT_THROW(call([i] { Ucd::Entry{{}, i}; }, msg(i)), DomainError);
 }
 
 TEST(UcdTest, BadCode) {
   constexpr Code ThunderCompat{0xf949}; // normal 'thunder' is 96F7
   const auto f{[] { Ucd::Entry{ThunderCompat, "雷"}; }};
-  EXPECT_THROW(call(f, "code 'F949' doesn't match '96F7'"), std::domain_error);
+  EXPECT_THROW(call(f, "code 'F949' doesn't match '96F7'"), DomainError);
 }
 
 TEST(UcdTest, SourcesTooLong) {
   const String s{"GHJKHJK"}; // cSpell:disable-line
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' exceeds max size"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(UcdTest, SourcesHasDuplicate) {
   const String s{"GHH"};
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' has duplicate value: H"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(UcdTest, SourcesUnrecognized) {
   const String s{"JKL"};
   EXPECT_THROW(call([&s] { return Ucd{TestUcd{}.sources(s)}; },
                    "sources '" + s + "' has unrecognized value: L"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(UcdTest, SetSources) {

@@ -30,7 +30,7 @@ ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
   for (auto& i : list) {
     if (!i->hasReading())
       // should never happen for any of the existing list quiz types
-      throw std::domain_error{i->name() + " has no reading"};
+      throw DomainError{i->name() + " has no reading"};
     questions.emplace_back(i);
   }
   if (launcher.questionOrder() == QuestionOrder::FromEnd)

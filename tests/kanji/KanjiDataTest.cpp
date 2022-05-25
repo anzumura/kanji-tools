@@ -35,19 +35,19 @@ private:
 
 TEST_F(KanjiDataTest, Usage) {
   const String msg{"error msg"};
-  EXPECT_THROW(call([&msg] { KanjiData::usage(msg); }, msg), std::domain_error);
+  EXPECT_THROW(call([&msg] { KanjiData::usage(msg); }, msg), DomainError);
 }
 
 TEST_F(KanjiDataTest, MissingRadical) {
   EXPECT_THROW(
       call([this] { return ucdRadical("鼠", {}); }, "UCD entry not found: 鼠"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiDataTest, MissingStrokes) {
   EXPECT_THROW(
       call([this] { return ucdStrokes("蛇", {}); }, "UCD entry not found: 蛇"),
-      std::domain_error);
+      DomainError);
 }
 
 // command line args tests
@@ -59,8 +59,8 @@ TEST_F(KanjiDataTest, NextArgWithNoArgs) {
 
 TEST_F(KanjiDataTest, NextArgWithBadCurrentArg) {
   const auto f{[] { return nextArg({1, &Arg0}, 2); }};
-  EXPECT_THROW(call(f, "current arg '2' is greater than args size '1'"),
-      std::domain_error);
+  EXPECT_THROW(
+      call(f, "current arg '2' is greater than args size '1'"), DomainError);
 }
 
 TEST_F(KanjiDataTest, NextArgWithJustArg0) {
@@ -108,14 +108,14 @@ TEST_F(KanjiDataTest, MissingDataDirArg) {
   const char* args[]{Arg0, DataArg.c_str()};
   EXPECT_THROW(call([&args] { return getDataDir(args); },
                    "'-data' must be followed by a directory name"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiDataTest, BadDataDirArg) {
   const char* args[]{Arg0, DataArg.c_str(), TestDirArg};
   EXPECT_THROW(call([&args] { return getDataDir(args); },
                    "'testDir' is not a valid directory"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiDataTest, GoodDataDirArg) {
@@ -132,8 +132,7 @@ TEST_F(KanjiDataTest, DataDirArgToInvalidData) {
   const char* args[]{Arg0, DataArg.c_str(), dir.c_str()};
   const String msg{
       "'" + dir.string() + "' does not contain 10 expected '.txt' files"};
-  EXPECT_THROW(
-      call([&args] { return getDataDir(args); }, msg), std::domain_error);
+  EXPECT_THROW(call([&args] { return getDataDir(args); }, msg), DomainError);
 }
 
 TEST_F(KanjiDataTest, SearchBasedOnArg0ForDataDir) {
@@ -156,7 +155,7 @@ TEST_F(KanjiDataTest, FailToFindDataDirNoArg0) {
       "searched up from current: " +
       fs::current_path().string() +
       "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
-  EXPECT_THROW(call([] { return getDataDir({}); }, msg), std::domain_error);
+  EXPECT_THROW(call([] { return getDataDir({}); }, msg), DomainError);
 }
 
 TEST_F(KanjiDataTest, FailToFindDataDirWithArg0) {
@@ -168,8 +167,7 @@ TEST_F(KanjiDataTest, FailToFindDataDirWithArg0) {
       fs::current_path().string() + "\n- searched up from arg0: " + arg0 +
       "\nrun in a directory where 'data' can be found or use '-data <dir>'"};
   const char* args[]{arg0.c_str()};
-  EXPECT_THROW(
-      call([&args] { return getDataDir(args); }, msg), std::domain_error);
+  EXPECT_THROW(call([&args] { return getDataDir(args); }, msg), DomainError);
 }
 
 TEST_F(KanjiDataTest, NoDebugArgs) {
@@ -192,7 +190,7 @@ TEST_F(KanjiDataTest, BothDebugAndInfoArgs) {
   const char* args[]{Arg0, DebugArg.c_str(), InfoArg.c_str()};
   EXPECT_THROW(call([&args] { return getDebugMode(args); },
                    "can only specify one '-debug' or '-info' option"),
-      std::domain_error);
+      DomainError);
 }
 
 // creation sanity checks
@@ -266,7 +264,7 @@ TEST_F(KanjiDataTest, FrequencyReadingDuplicate) {
   write("Name\tReading\n呑\tトン、ドン、の-む\n呑\tトン、ドン、の-む");
   EXPECT_THROW(call([this] { loadFrequencyReadings(TestFile); },
                    "duplicate name - file: testFile.txt, row: 2"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiDataTest, LinkedJinmeiEntryNotFound) {
@@ -274,14 +272,14 @@ TEST_F(KanjiDataTest, LinkedJinmeiEntryNotFound) {
   // no Jouyou Kanji are loaded at this point so any entry will cause an error
   EXPECT_THROW(call([this] { populateLinkedKanji(TestFile); },
                    "'亜' not found - file: testFile.txt"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(KanjiDataTest, LinkedJinmeiBadLine) {
   write("亜亞");
   EXPECT_THROW(call([this] { populateLinkedKanji(TestFile); },
                    "bad line '亜亞' - file: testFile.txt"),
-      std::domain_error);
+      DomainError);
 }
 
 } // namespace kanji_tools

@@ -19,9 +19,9 @@ constexpr size_t TextFilesInDataDir{10};
 
 Args::Size KanjiData::nextArg(const Args& args, Args::Size current) {
   if (current > args.size())
-    throw std::domain_error("current arg '" + std::to_string(current) +
-                            "' is greater than args size '" +
-                            std::to_string(args.size()) + "'");
+    throw DomainError("current arg '" + std::to_string(current) +
+                      "' is greater than args size '" +
+                      std::to_string(args.size()) + "'");
   Args::Size result{current};
   if (args && ++result < args.size()) {
     String arg{args[result]};
@@ -76,12 +76,12 @@ RadicalRef KanjiData::ucdRadical(const String& kanji, UcdPtr u) const {
   if (u) return _radicals.find(u->radical());
   // 'throw' should never happen - every 'Kanji' class instance should exist in
   // the data loaded from Unicode (in 'data/ucd.txt').
-  throw std::domain_error{"UCD entry not found: " + kanji};
+  throw DomainError{"UCD entry not found: " + kanji};
 }
 
 Strokes KanjiData::ucdStrokes(const String& kanji, UcdPtr u) const {
   if (u) return u->strokes();
-  throw std::domain_error{"UCD entry not found: " + kanji};
+  throw DomainError{"UCD entry not found: " + kanji};
 }
 
 RadicalRef KanjiData::getRadicalByName(const String& radicalName) const {

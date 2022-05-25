@@ -42,8 +42,7 @@ GroupQuiz::GroupQuiz(const QuizLauncher& launcher, Question question,
 
 GroupType GroupQuiz::getGroupType(const GroupData::List& list) {
   const auto i{list.begin()};
-  return i != list.end() ? (**i).type()
-                         : throw std::domain_error{"empty group list"};
+  return i != list.end() ? (**i).type() : throw DomainError{"empty group list"};
 }
 
 void GroupQuiz::addPinyin(const Kanji& kanji, String& s) {

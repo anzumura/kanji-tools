@@ -1,4 +1,5 @@
 #include <kanji_tools/kanji/MorohashiId.h>
+#include <kanji_tools/utils/Exception.h>
 
 namespace kanji_tools {
 
@@ -45,7 +46,7 @@ MorohashiId::Id MorohashiId::validate(
   static constexpr Id Ten{10};
 
   const auto error{[&s](const String& msg) {
-    throw std::domain_error{"Morohashi ID '" + s + "' " + msg};
+    throw DomainError{"Morohashi ID '" + s + "' " + msg};
   }};
 
   Id result{};

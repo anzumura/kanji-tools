@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/BlockRange.h>
+#include <kanji_tools/utils/Exception.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
@@ -48,10 +49,10 @@ TEST(BlockRangeTest, CheckOtherBlocks) {
 TEST(BlockRangeTest, BlockRangeError) {
   EXPECT_THROW(call([] { return KanaRange[7]; },
                    "index '7' is out of range for BlockRange with size '6'"),
-      std::out_of_range);
+      RangeError);
   EXPECT_THROW(call([] { return HiraganaRange[6]; },
                    "index '6' is out of range for BlockRange with size '3'"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(BlockRangeTest, CreateBlockRange) {

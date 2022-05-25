@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kanji/MorohashiId.h>
+#include <kanji_tools/utils/Exception.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <sstream>
@@ -72,14 +73,14 @@ TEST(MorohashiIdTest, SupplementalId) {
 
 TEST(MorohashiIdTest, BadEmptyTypedIds) {
   for (auto i : {"PP", "''", "P", "'", "H"})
-    EXPECT_THROW(call([i] { MorohashiId{i}; }, error(i, "is invalid")),
-        std::domain_error);
+    EXPECT_THROW(
+        call([i] { MorohashiId{i}; }, error(i, "is invalid")), DomainError);
 }
 
 TEST(MorohashiIdTest, BadTypedZeroIds) {
   for (auto i : {"0PP", "00''", "00P", "0'", "H0"})
-    EXPECT_THROW(call([i] { MorohashiId{i}; }, error(i, "can't be zero")),
-        std::domain_error);
+    EXPECT_THROW(
+        call([i] { MorohashiId{i}; }, error(i, "can't be zero")), DomainError);
 }
 
 TEST(MorohashiIdTest, NumericString) {
@@ -89,8 +90,8 @@ TEST(MorohashiIdTest, NumericString) {
 
 TEST(MorohashiIdTest, NonDigit) {
   for (auto i : {"x", "a7", "22D4", "123f"})
-    EXPECT_THROW(call([i] { MorohashiId{i}; }, error(i, "is non-numeric")),
-        std::domain_error);
+    EXPECT_THROW(
+        call([i] { MorohashiId{i}; }, error(i, "is non-numeric")), DomainError);
 }
 
 TEST(MorohashiIdTest, MaxIds) {
@@ -112,8 +113,8 @@ TEST(MorohashiIdTest, TooBig) {
   for (auto i : {big, big + 10, big + 100, big * 2}) {
     const String id{std::to_string(i)};
     for (const auto& j : {"H" + id, id + "P", id + "PP", id + "'", id + "''"})
-      EXPECT_THROW(call([j] { MorohashiId{j}; }, error(j, "exceeds max")),
-          std::domain_error);
+      EXPECT_THROW(
+          call([j] { MorohashiId{j}; }, error(j, "exceeds max")), DomainError);
   }
 }
 

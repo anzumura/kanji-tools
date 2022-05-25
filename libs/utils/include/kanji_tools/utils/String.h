@@ -42,14 +42,16 @@ enum class BracketType { Curly, Round, Square, None };
     const CodeString&, BracketType = BracketType::None);
 //!@}
 
-//! safely converts \p x to a char or throws if \p x is out of range \details
-//! If \p allowNegative is true (the default) then \p x can't be less than -128,
-//! otherwise \p x must be positive. \p x must be less then 256 regardless of
-//! the value of \p allowNegative.
+//! safely converts `x` to a char
+//! \param allowNegative if true (the default) then `x` can't be less than -128
+//!                      otherwise `x` must be positive.
+//! \param x the value to convert (must be < 256 regardless of `allowNegative`)
+//! \return the char value
+//! \throw RangeError if `x` is out of range for char type
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
 //!@{
-//! overloads for common unsigned types (don't need *allowNegative*)
+//! overloads or toChar(int,bool) for common `unsigned` types
 [[nodiscard]] char toChar(uint16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);

@@ -1,15 +1,16 @@
 #include <kanji_tools/utils/Args.h>
 #include <kanji_tools/utils/BlockRange.h>
+#include <kanji_tools/utils/Exception.h>
 
 #include <filesystem>
 #include <fstream>
 #include <regex>
 
-using kanji_tools::Args, kanji_tools::KanjiRange, kanji_tools::KanaRange,
-    kanji_tools::fromUtf8ToWstring, kanji_tools::String;
+using kanji_tools::Args, kanji_tools::DomainError, kanji_tools::KanjiRange,
+    kanji_tools::KanaRange, kanji_tools::fromUtf8ToWstring, kanji_tools::String;
 
 void format(Args args) {
-  if (args.size() < 2) throw std::domain_error{"specify a file to format"};
+  if (args.size() < 2) throw DomainError{"specify a file to format"};
   const auto* const file{args[1]};
   const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange() + L"]{1}$"},
       allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};

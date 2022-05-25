@@ -31,14 +31,14 @@ void printCounts(KanjiDataRef data, const Count& c, bool summary = false) {
 RadicalRef RadicalData::find(const String& name) const {
   checkLoaded();
   const auto i{_map.find(name)};
-  if (i == _map.end()) throw std::domain_error{"name not found: " + name};
+  if (i == _map.end()) throw DomainError{"name not found: " + name};
   return _radicals.at(i->second);
 }
 
 RadicalRef RadicalData::find(Radical::Number number) const {
   checkLoaded();
   if (!number || number > _radicals.size())
-    throw std::domain_error(
+    throw DomainError(
         "'" + std::to_string(number) + "' is not a valid radical number");
   return _radicals.at(number - 1);
 }
@@ -107,7 +107,7 @@ void RadicalData::printRadicalLists(KanjiDataRef data, RadicalLists& radicals) {
 
 void RadicalData::checkLoaded() const {
   if (_radicals.empty())
-    throw std::domain_error("must call 'load' before calling 'find'");
+    throw DomainError("must call 'load' before calling 'find'");
 }
 
 void RadicalData::printMissingRadicals(

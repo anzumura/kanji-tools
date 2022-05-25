@@ -26,14 +26,14 @@ TEST(EnumListTest, FailForDuplicateName) {
   EXPECT_THROW(
       call([] { return BaseEnumList<TestEnum>::create("A", "B", "B"); },
           "duplicate name 'B'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListTest, CallInstanceBeforeCreate) {
   // 'toString' calls 'instance'
   EXPECT_THROW(call([] { return toString(TestEnum::A); },
                    "must call 'create' before calling 'instance'"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListTest, DestructorClearsInstance) {
@@ -61,7 +61,7 @@ TEST(EnumListTest, CallCreateTwice) {
   EXPECT_THROW(
       call([] { return BaseEnumList<TestEnum>::create("A", "B", "C"); },
           "'create' should only be called once"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST(EnumListTest, Iteration) {
@@ -79,11 +79,11 @@ TEST(EnumListTest, IterationInt) {
 
 TEST(EnumListTest, BadAccess) {
   EXPECT_THROW(call([] { return AllColors[-1]; }, "index '-1' is out of range"),
-      std::out_of_range);
+      RangeError);
   EXPECT_THROW(call([] { return AllColors[4]; }, "index '4' is out of range"),
-      std::out_of_range);
+      RangeError);
   EXPECT_THROW(call([] { return AllColors[4U]; }, "index '4' is out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(EnumListTest, IteratorIncrementAndDecrement) {
@@ -120,23 +120,19 @@ TEST(EnumListTest, BadIncrement) {
   EXPECT_EQ(*i, Colors::Blue);
   EXPECT_EQ(++i, AllColors.end());
   EXPECT_THROW(
-      call([&] { return *i; }, "index '3' is out of range"), std::out_of_range);
+      call([&] { return *i; }, "index '3' is out of range"), RangeError);
+  EXPECT_THROW(call([&] { i++; }, "can't increment past end"), RangeError);
+  EXPECT_THROW(call([&] { i += 1; }, "can't increment past end"), RangeError);
   EXPECT_THROW(
-      call([&] { i++; }, "can't increment past end"), std::out_of_range);
-  EXPECT_THROW(
-      call([&] { i += 1; }, "can't increment past end"), std::out_of_range);
-  EXPECT_THROW(call([&] { return i[1]; }, "can't increment past end"),
-      std::out_of_range);
+      call([&] { return i[1]; }, "can't increment past end"), RangeError);
 }
 
 TEST(EnumListTest, BadDecrement) {
   auto i{AllColors.end()};
-  EXPECT_THROW(
-      call([&] { i -= 4; }, "can't decrement past zero"), std::out_of_range);
+  EXPECT_THROW(call([&] { i -= 4; }, "can't decrement past zero"), RangeError);
   i -= 3;
   EXPECT_EQ(*i, Colors::Red);
-  EXPECT_THROW(
-      call([&] { --i; }, "can't decrement past zero"), std::out_of_range);
+  EXPECT_THROW(call([&] { --i; }, "can't decrement past zero"), RangeError);
 }
 
 TEST(EnumListTest, IteratorCompare) {
@@ -173,7 +169,7 @@ TEST(EnumListTest, ToString) {
 TEST(EnumListTest, BadToString) {
   EXPECT_THROW(call([] { return toString(to_enum<Colors>(7)); },
                    "enum '7' is out of range"),
-      std::out_of_range);
+      RangeError);
 }
 
 TEST(EnumListTest, Stream) {
@@ -191,10 +187,10 @@ TEST(EnumListTest, FromString) {
 TEST(EnumListTest, BadFromString) {
   EXPECT_THROW(
       call([] { return AllColors.fromString(""); }, "name '' not found"),
-      std::domain_error);
+      DomainError);
   EXPECT_THROW(call([] { return AllColors.fromString("Blah"); },
                    "name 'Blah' not found"),
-      std::domain_error);
+      DomainError);
 }
 
 } // namespace kanji_tools

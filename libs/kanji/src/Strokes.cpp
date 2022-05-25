@@ -1,11 +1,12 @@
 #include <kanji_tools/kanji/Strokes.h>
+#include <kanji_tools/utils/Exception.h>
 
 namespace kanji_tools {
 
 namespace {
 
 void rangeError(Strokes::Size value, const String& msg = {}) {
-  throw std::range_error{
+  throw RangeError{
       msg + "strokes '" + std::to_string(value) + "' out of range"};
 }
 
@@ -19,8 +20,8 @@ Strokes::Strokes(Size value, Size variant) : _value{value}, _variant{variant} {
   if (value < 2 || value > Max) rangeError(value);
   if (variant < 3 || variant > MaxVariant) rangeError(variant, "variant ");
   if (value == variant)
-    throw std::domain_error{"strokes and variant strokes are the same '" +
-                            std::to_string(value) + "'"};
+    throw DomainError{"strokes and variant strokes are the same '" +
+                      std::to_string(value) + "'"};
 }
 
 String Strokes::toString(bool includeVariant) const {

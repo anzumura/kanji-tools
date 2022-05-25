@@ -18,19 +18,19 @@ TEST(JukugoTest, AllowProlongMarkInReading) {
 
 TEST(JukugoTest, NoKanji) {
   const auto f{[] { Jukugo{"ゆき", "ゆき", KanjiGrades::G2}; }};
-  EXPECT_THROW(call(f, "jukugo 'ゆき' contains no Kanji"), std::domain_error);
+  EXPECT_THROW(call(f, "jukugo 'ゆき' contains no Kanji"), DomainError);
 }
 
 TEST(JukugoTest, SingleKanji) {
   const auto f{[] { Jukugo{"ね雪", "ゆき", KanjiGrades::G2}; }};
-  EXPECT_THROW(call(f, "jukugo 'ね雪' must contain two or more Kanji"),
-      std::domain_error);
+  EXPECT_THROW(
+      call(f, "jukugo 'ね雪' must contain two or more Kanji"), DomainError);
 }
 
 TEST(JukugoTest, BadReading) {
   const auto f{[] { Jukugo{"根雪", "ネユキ", KanjiGrades::G2}; }};
   EXPECT_THROW(
-      call(f, "jukugo '根雪' reading must be all Hiragana"), std::domain_error);
+      call(f, "jukugo '根雪' reading must be all Hiragana"), DomainError);
 }
 
 } // namespace kanji_tools

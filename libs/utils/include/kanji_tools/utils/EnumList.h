@@ -1,11 +1,11 @@
 #pragma once
 
 #include <kanji_tools/utils/EnumContainer.h>
+#include <kanji_tools/utils/Exception.h>
 
 #include <array>
 #include <iostream>
 #include <map>
-#include <stdexcept>
 
 namespace kanji_tools {
 
@@ -83,7 +83,7 @@ public:
   // EnumListWithNone form more 'fromString...' methods that support T::None.
   [[nodiscard]] T fromString(const String& name) const;
 protected:
-  static void domainError(const String& msg) { throw std::domain_error{msg}; }
+  static void domainError(const String& msg) { throw DomainError{msg}; }
 
   BaseEnumList() noexcept { _instance = this; }
 

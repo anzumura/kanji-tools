@@ -33,7 +33,7 @@ String Group::toString() const {
 }
 
 void Group::error(const String& msg) const {
-  throw std::domain_error{"group " + toString() + " has " + msg};
+  throw DomainError{"group " + toString() + " has " + msg};
 }
 
 MeaningGroup::MeaningGroup(

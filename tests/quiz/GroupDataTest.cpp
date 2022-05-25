@@ -180,7 +180,7 @@ TEST_F(GroupDataTest, UnknownKanji) {
   // 'data/ucd.txt') causes both an exception as well as output to stderr
   EXPECT_THROW(
       call([] { create(); }, "group failed to load all members" + MeaningErr),
-      std::domain_error);
+      DomainError);
   EXPECT_TRUE(_es.str().ends_with(
       "failed to find member 㐁 in group: '方向', number: 1\n"));
 }
@@ -189,7 +189,7 @@ TEST_F(GroupDataTest, CreateGroupError) {
   write(MeaningFile, "\n1\t方向\t北,艮,北");
   EXPECT_THROW(call([] { create(); },
                    "group [1 方向] has 1 duplicate member: 北" + MeaningErr),
-      std::domain_error);
+      DomainError);
   EXPECT_EQ(_es.str(), "");
 }
 

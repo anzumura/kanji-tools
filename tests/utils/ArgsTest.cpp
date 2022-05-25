@@ -1,18 +1,19 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/utils/Args.h>
+#include <kanji_tools/utils/Exception.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 namespace kanji_tools {
 
 TEST(ArgsTest, SizeWithNoArgs) {
   const auto f{[] { Args{1, {}}; }};
-  EXPECT_THROW(call(f, "argc is 1, but argv is null"), std::domain_error);
+  EXPECT_THROW(call(f, "argc is 1, but argv is null"), DomainError);
 }
 
 TEST(ArgsTest, NoSizeWithArgs) {
   const char* args{"test"};
   const auto f{[&args] { Args{0, &args}; }};
-  EXPECT_THROW(call(f, "argc is 0, but argv is not null"), std::domain_error);
+  EXPECT_THROW(call(f, "argc is 0, but argv is not null"), DomainError);
 }
 
 TEST(ArgsTest, IntArgs) {
@@ -25,12 +26,11 @@ TEST(ArgsTest, IntArgs) {
 TEST(ArgsTest, IntArgsOutOfRange) {
   const char* argv[]{"a", "bb", "ccc"};
   const auto small{[&] { Args{-1, argv}; }};
-  EXPECT_THROW(call(small, "argc -1 is less than 0"), std::range_error);
+  EXPECT_THROW(call(small, "argc -1 is less than 0"), RangeError);
   const auto big{[&argv] {
     Args{std::numeric_limits<Args::Size>::max() + 1, argv};
   }};
-  EXPECT_THROW(
-      call(big, "argc 65536 is greater than 65535"), std::range_error);
+  EXPECT_THROW(call(big, "argc 65536 is greater than 65535"), RangeError);
 }
 
 TEST(ArgsTest, Index) {
@@ -47,7 +47,7 @@ TEST(ArgsTest, IndexOutOfRange) {
   const Args args{argv};
   EXPECT_THROW(
       call([&args] { return args[3]; }, "index 3 must be less than argc 3"),
-      std::range_error);
+      RangeError);
 }
 
 TEST(ArgsTest, OperatorBool) {

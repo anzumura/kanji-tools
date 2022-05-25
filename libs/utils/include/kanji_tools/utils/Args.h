@@ -9,8 +9,8 @@ namespace kanji_tools {
 //! \lib_utils{Args} class for working with command line args
 class Args {
 public:
-  using Size = uint16_t;           //!< command line arg count
-  using List = const char* const*; //!< command line arg list
+  using Size = uint16_t;           //!< type for arg count
+  using List = const char* const*; //!< type for arg list
 
   Args() noexcept = default;  //!< default ctor, sets arg count to 0
   Args(const Args&) = delete; //!< deleted copy ctor
@@ -18,14 +18,13 @@ public:
   //! ctor taking an `unsigned` arg count
   //! \param argc number of args
   //! \param argv list of args (pointer to pointer)
-  //! \throw std::domain_error if \p argc is 0 and \p argv is non-null or if
-  //!                          \p argc is non-0 and \p argv is null
+  //! \throw DomainError if `argc` is 0 and `argv` is non-null or vice versa
   Args(Size argc, List argv);
 
   //! ctor taking an `int` arg count, helpful in `main` functions
   //! \param argc number of args
   //! \param argv list of args (pointer to pointer)
-  //! \throw std::range_error if \p argc is negative or greater than max size
+  //! \throw RangeError if `argc` is negative or greater than max size
   Args(int argc, List argv) : Args{checkInt(argc), argv} {}
 
   //! ctor taking `const char*[]`, helpful in tests since it figures out size
@@ -37,8 +36,8 @@ public:
     static_assert(N <= std::numeric_limits<Size>::max());
   }
 
-  //! return the arg at position \p i
-  //! \throw std::range_error if \p i is beyond the end of the arg list
+  //! return the arg at position `i`
+  //! \throw RangeError if `i` is beyond the end of the arg list
   [[nodiscard]] const char* operator[](Size i) const;
 
   //! return total number of command line args

@@ -79,21 +79,21 @@ TEST_F(QuizLauncherTest, QuestionOrderQuit) {
 TEST_F(QuizLauncherTest, IllegalOption) {
   const char* args[]{"", "-s", "-j"};
   const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
-  EXPECT_THROW(call(f, "illegal option '-j'" + Help), std::domain_error);
+  EXPECT_THROW(call(f, "illegal option '-j'" + Help), DomainError);
 }
 
 TEST_F(QuizLauncherTest, MultipleModes) {
   const char* args[]{"", "-r", "-t"};
   const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
-  EXPECT_THROW(call(f, "only one mode (-r or -t) can be specified" + Help),
-      std::domain_error);
+  EXPECT_THROW(
+      call(f, "only one mode (-r or -t) can be specified" + Help), DomainError);
 }
 
 TEST_F(QuizLauncherTest, MultipleQuizTypes) {
   const char* args[]{"", "-g", "-l"};
   const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
   EXPECT_THROW(
-      call(f, "only one quiz type can be specified" + Help), std::domain_error);
+      call(f, "only one quiz type can be specified" + Help), DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidFormat) {
@@ -104,7 +104,7 @@ TEST_F(QuizLauncherTest, InvalidFormat) {
       QuizLauncher{args, _data, _groupData, _jukugoData};
     }};
     EXPECT_THROW(call(f, "invalid format for '-" + String{i[1], '\''} + Help),
-        std::domain_error);
+        DomainError);
   }
 }
 
@@ -112,7 +112,7 @@ TEST_F(QuizLauncherTest, InvalidQuestionNumber) {
   const char* args[]{"", "-r81", "-g1"};
   const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
   EXPECT_THROW(call(f, "entry num '81' is larger than total questions: 80"),
-      std::domain_error);
+      DomainError);
 }
 
 TEST_F(QuizLauncherTest, QuestionExceedsLimit) {
@@ -121,8 +121,8 @@ TEST_F(QuizLauncherTest, QuestionExceedsLimit) {
     const auto f{[&args] {
       QuizLauncher{args, _data, _groupData, _jukugoData};
     }};
-    EXPECT_THROW(call(f, "value for '" + String(i, 2) + "' exceeds limit"),
-        std::domain_error);
+    EXPECT_THROW(
+        call(f, "value for '" + String(i, 2) + "' exceeds limit"), DomainError);
   }
 }
 
@@ -250,8 +250,7 @@ TEST_F(QuizLauncherTest, ShowByFrequencyNotFound) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(
-      call(f, "Kanji not found for frequency '2502'"), std::domain_error);
+  EXPECT_THROW(call(f, "Kanji not found for frequency '2502'"), DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidMorohashiId) {
@@ -259,8 +258,7 @@ TEST_F(QuizLauncherTest, InvalidMorohashiId) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(
-      call(f, "Morohashi ID '123Q' is non-numeric"), std::domain_error);
+  EXPECT_THROW(call(f, "Morohashi ID '123Q' is non-numeric"), DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidNelsonId) {
@@ -268,7 +266,7 @@ TEST_F(QuizLauncherTest, InvalidNelsonId) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(call(f, "Nelson ID '123B' is non-numeric"), std::domain_error);
+  EXPECT_THROW(call(f, "Nelson ID '123B' is non-numeric"), DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidUnicode) {
@@ -276,7 +274,7 @@ TEST_F(QuizLauncherTest, InvalidUnicode) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(call(f, "Unicode value 'ABC' is invalid"), std::domain_error);
+  EXPECT_THROW(call(f, "Unicode value 'ABC' is invalid"), DomainError);
 }
 
 TEST_F(QuizLauncherTest, UnrecognizedKanji) {
@@ -284,8 +282,7 @@ TEST_F(QuizLauncherTest, UnrecognizedKanji) {
   const auto f{[&args] {
     QuizLauncher quiz{args, _data, _groupData, _jukugoData};
   }};
-  EXPECT_THROW(
-      call(f, "unrecognized 'kanji' value 'a'" + Help), std::domain_error);
+  EXPECT_THROW(call(f, "unrecognized 'kanji' value 'a'" + Help), DomainError);
 }
 
 } // namespace kanji_tools

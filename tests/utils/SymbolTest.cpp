@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <kanji_tools/utils/Exception.h>
 #include <kanji_tools/utils/Symbol.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -74,7 +75,7 @@ TEST(SymbolTest, TooManySymbols) {
   const auto before{TestSymbol::size()};
   EXPECT_THROW(call([] { TestSymbol{"foo"}; },
                    "TestSymbol: can't add 'foo' - max capacity"),
-      std::domain_error);
+      DomainError);
   // make sure nothing new was added
   EXPECT_EQ(TestSymbol::size(), before);
   EXPECT_FALSE(TestSymbol::exists("foo"));

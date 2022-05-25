@@ -1,15 +1,14 @@
 #include <kanji_tools/utils/EnumContainer.h>
-
-#include <stdexcept>
+#include <kanji_tools/utils/Exception.h>
 
 namespace kanji_tools {
 
 void Enum::BaseIterator::comparable(bool value) {
-  if (!value) throw std::domain_error("not comparable");
+  if (!value) throw DomainError("not comparable");
 }
 
 void Enum::BaseIterator::initialized(bool value) {
-  if (!value) throw std::domain_error("not initialized");
+  if (!value) throw DomainError("not initialized");
 }
 
 void Enum::BaseIterator::rangeError(const String& msg) {
@@ -22,6 +21,6 @@ Enum::Size& Enum::BaseIterator::index() { return _index; }
 
 Enum::Size Enum::BaseIterator::index() const { return _index; }
 
-void Enum::rangeError(const String& msg) { throw std::out_of_range{msg}; }
+void Enum::rangeError(const String& msg) { throw RangeError{msg}; }
 
 } // namespace kanji_tools

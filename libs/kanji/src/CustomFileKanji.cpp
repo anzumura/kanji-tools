@@ -104,7 +104,7 @@ LinkedKanji::LinkedKanji(
 Kanji::Name LinkedKanji::linkType(Name name, const Kanji& link, bool isJouyou) {
   if (const auto t{link.type()};
       t != KanjiTypes::Jouyou && (isJouyou || t != KanjiTypes::Jinmei))
-    throw std::domain_error{
+    throw DomainError{
         "LinkedKanji " + name + " wanted type '" +
         toString(KanjiTypes::Jouyou) +
         (isJouyou ? EmptyString
