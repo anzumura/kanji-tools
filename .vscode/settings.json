@@ -1,11 +1,13 @@
 // %settings.json <pre>
 {
-  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.default.cppStandard": "c++20",
   "C_Cpp.default.defines": [
     "GTEST_ENABLE_CATCH_EXCEPTIONS_=1",
     "TARGET_OS_OSX=1",
     "__float128=long double" // only needed when using 'Mac-GCC' Configuration
+  ],
+  "cSpell.enableFiletypes": [
+    "cmake"
   ],
   "cSpell.ignorePaths": [
     ".clang-tidy",
@@ -209,6 +211,23 @@
     "Zìdiǎn"
   ],
   "debug.onTaskErrors": "debugAnyway",
+  "doxdocgen.c.commentPrefix": "//!",
+  "doxdocgen.c.firstLine": "",
+  "doxdocgen.c.lastLine": "",
+  "doxdocgen.c.triggerSequence": "//!",
+  "doxdocgen.cpp.tparamTemplate": " \\tparam {param} ",
+  "doxdocgen.generic.returnTemplate": " \\return ",
+  "doxdocgen.generic.boolReturnsTrueFalse": false,
+  "doxdocgen.generic.generateSmartText": false,
+  "doxdocgen.generic.paramTemplate": " \\param {param} ",
+  "doxdocgen.generic.linesToGet": 100,
+  "doxdocgen.generic.order": [
+    "empty",
+    "empty",
+    "tparam",
+    "param",
+    "return"
+  ],
   "editor.rulers": [
     80
   ],
@@ -328,26 +347,6 @@
   "plantuml.exportFormat": "png",
   "plantuml.render": "Local",
   "testMate.cpp.test.parallelExecutionLimit": 8,
-  "testMate.cpp.log.logpanel": true,
-  "cSpell.enableFiletypes": [
-    "cmake"
-  ],
-  "doxdocgen.c.commentPrefix": "//!",
-  "doxdocgen.c.firstLine": "",
-  "doxdocgen.c.lastLine": "",
-  "doxdocgen.c.triggerSequence": "//!",
-  "doxdocgen.cpp.tparamTemplate": " \\tparam {param} ",
-  "doxdocgen.generic.returnTemplate": " \\return ",
-  "doxdocgen.generic.boolReturnsTrueFalse": false,
-  "doxdocgen.generic.generateSmartText": false,
-  "doxdocgen.generic.paramTemplate": " \\param {param} ",
-  "doxdocgen.generic.linesToGet": 100,
-  "doxdocgen.generic.order": [
-    "empty",
-    "empty",
-    "tparam",
-    "param",
-    "return"
-  ]
+  "testMate.cpp.log.logpanel": true 
 }
 // </pre>
