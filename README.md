@@ -49,7 +49,7 @@ Here are some links that might help with setup:
 
 Here's a list of VS Code extensions being used:
 
-- Code/Build: **[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)**, **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)**, **[CMake](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)**
+- Code/Build: **[C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)**, **[CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)**, **[CMake](https://marketplace.visualstudio.com/items?itemName=twxs.cmake)**, **[Makefile Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.makefile-tools)**
 - Format: **[Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)**, **[shell-format](https://marketplace.visualstudio.com/items?itemName=foxundermoon.shell-format)**
 - Test: **[C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)**, **[Test Adapter Converter](https://marketplace.visualstudio.com/items?itemName=ms-vscode.test-adapter-converter)**, **[Test Explorer UI](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer)**
 - Debug: **[CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)**, **[Hex Editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)**
