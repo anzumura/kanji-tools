@@ -333,9 +333,21 @@
     "cmake"
   ],
   "doxdocgen.c.commentPrefix": "//!",
-  "doxdocgen.c.firstLine": "//!",
-  "doxdocgen.c.lastLine": "//!",
+  "doxdocgen.c.firstLine": "",
+  "doxdocgen.c.lastLine": "",
   "doxdocgen.c.triggerSequence": "//!",
-  "doxdocgen.generic.linesToGet": 100
+  "doxdocgen.cpp.tparamTemplate": " \\tparam {param} ",
+  "doxdocgen.generic.returnTemplate": " \\return ",
+  "doxdocgen.generic.boolReturnsTrueFalse": false,
+  "doxdocgen.generic.generateSmartText": false,
+  "doxdocgen.generic.paramTemplate": " \\param {param} ",
+  "doxdocgen.generic.linesToGet": 100,
+  "doxdocgen.generic.order": [
+    "empty",
+    "empty",
+    "tparam",
+    "param",
+    "return"
+  ]
 }
 // </pre>
