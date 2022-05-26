@@ -4,9 +4,9 @@
 #include <cstdint>
 #include <limits>
 
-namespace kanji_tools {
+namespace kanji_tools { //! \utils_group{Args}
 
-//! \lib_utils{Args} class for working with command line args
+//! \utils_class{Args} class for working with command line args
 class Args {
 public:
   using Size = uint16_t;           //!< type for arg count
@@ -54,4 +54,5 @@ private:
   List _argv{};
 };
 
+//! \end_group
 } // namespace kanji_tools

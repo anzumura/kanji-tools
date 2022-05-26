@@ -2,10 +2,7 @@
 
 #include <string>
 
-//! \file
-//! type aliases and global functions for working with strings
-
-namespace kanji_tools {
+namespace kanji_tools { //! \utils_group{String}
 
 //!@{
 //! String and StringView type aliases may be changed to **std::u8** versions
@@ -194,4 +191,5 @@ template<typename T>
 inline const String EmptyString;
 inline const CodeString EmptyCodeString;
 
+//! \end_group
 } // namespace kanji_tools

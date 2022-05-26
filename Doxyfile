@@ -3,16 +3,23 @@
 # INPUT and OUTPUT_DIRECTORY are defined below assuming 'doxygen' is executed in
 # the top level repo directory - output is generated under build/docs/html.
 
+# create a Doxygen group (module) in a header (used by below 'XX_group' aliases)
+ALIASES += grp{2}="\file \2.h header file in [\1]^^\addtogroup \1_\2^^@{"
+
+# one '\XX_group' '\end_group' pair should be put inside the top level namespace 
+# in each header in order to include all classes, global functions and variables
+ALIASES += end_group="@}"
+
 # alias to display the 'lib' a class belongs to as well as adjust '#include' to
 # show the expected value (ie kanji_tools/'lib' as a prefix)
-ALIASES += lib{2}="\headerfile \2.h kanji_tools/\1/\2.h [\1] "
+ALIASES += cls{2}="\headerfile \2.h kanji_tools/\1/\2.h [\1] "
 
-# aliases for each of the 5 libraries in the project
-ALIASES += lib_utils{1}="\lib{utils,\1}"
-ALIASES += lib_kana{1}="\lib{kana,\1}"
-ALIASES += lib_kanji{1}="\lib{kanji,\1}"
-ALIASES += lib_quiz{1}="\lib{quiz,\1}"
-ALIASES += lib_stats{1}="\lib{stats,\1}"
+# single arg 'XX_group' and 'XX_class' aliases for each lib in the project
+ALIASES += utils_group{1}="\grp{utils,\1}" utils_class{1}="\cls{utils,\1}"
+ALIASES += kana_group{1}="\grp{kana,\1}" kana_class{1}="\cls{kana,\1}"
+ALIASES += kanji_group{1}="\grp{kanji,\1}" kanji_class{1}="\cls{kanji,\1}"
+ALIASES += quiz_group{1}="\grp{quiz,\1}" quiz_class{1}="\cls{quiz,\1}"
+ALIASES += stats_group{1}="\grp{stats,\1}" stats_class{1}="\cls{stats,\1}"
 
 # override default settings for the following config values
 DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
@@ -20,6 +27,7 @@ EXTENSION_MAPPING      = json=md
 EXTRACT_ALL            = YES
 FILE_PATTERNS          = *.cpp *.h *.md *.json
 GENERATE_LATEX         = NO
+GROUP_NESTED_COMPOUNDS = YES
 HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 IMAGE_PATH             = docs
 INPUT                  = README.md .vscode docs libs
@@ -32,7 +40,6 @@ PROJECT_NAME           = "Kanji Tools"
 PROJECT_NUMBER         = 1.0
 QUIET                  = YES
 RECURSIVE              = YES
-REPEAT_BRIEF           = NO # prepend brief member description to details
 SHOW_INCLUDE_FILES     = NO # show list of files included by a file
 TAB_SIZE               = 2
 USE_MDFILE_AS_MAINPAGE = README.md
@@ -55,6 +62,7 @@ WARN_IF_INCOMPLETE_DOC = NO
 # HIDE_UNDOC_MEMBERS     = YES
 # INHERIT_DOCS           = NO
 # INLINE_INFO            = NO # adds 'inline' on the right for inline functions
+# REPEAT_BRIEF           = NO # prepend brief member description to details
 # SHOW_USED_FILES        = NO # section at the bottom showing original file name
 # SHOW_FILES             = NO # the 'files' section in quick view
 # SHOW_HEADERFILE        = NO # include statement at the top of class doc

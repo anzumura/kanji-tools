@@ -7,9 +7,9 @@
 #include <numeric>
 #include <vector>
 
-namespace kanji_tools {
+namespace kanji_tools { //! \utils_group{Symbol}
 
-//! \lib_utils{Symbol} non-templated base class for Symbol
+//! \utils_class{Symbol} non-templated base class for Symbol
 class BaseSymbol {
 public:
   using Id = uint16_t; //!< type for id
@@ -35,7 +35,7 @@ private:
   const Id _id;
 };
 
-//! \lib_utils{Symbol} class that can be used instead of #String to save memory
+//! \utils_class{Symbol} class can be used instead of #String to save memory
 //!
 //! Symbol incurs a small performance hit when creating/looking up a value, but
 //! can save significant memory when used as a member of a class that has many
@@ -82,10 +82,12 @@ public:
     return id() ? *_list.at(id() - 1) : EmptyString;
   }
 
+  //! equal-to operator
   [[nodiscard]] constexpr auto operator==(const Symbol& x) const noexcept {
     return id() == x.id();
   }
 
+  //! not-equal-to operator
   [[nodiscard]] constexpr auto operator!=(const Symbol& x) const noexcept {
     return !operator==(x);
   }
@@ -94,9 +96,11 @@ private:
   inline static List _list;
 };
 
+//! write Symbol::name() to `os`
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const Symbol<T>& s) {
   return os << s.name();
 }
 
+//! \end_group
 } // namespace kanji_tools
