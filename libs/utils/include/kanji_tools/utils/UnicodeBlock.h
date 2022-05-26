@@ -8,23 +8,6 @@
 
 namespace kanji_tools {
 
-// Unicode version and release date
-class UnicodeVersion {
-public:
-  consteval UnicodeVersion(StringView v, uint8_t m, uint16_t y)
-      : _version{v}, _date{std::chrono::year{y}, std::chrono::month{m}} {}
-
-  UnicodeVersion(const UnicodeVersion&) = delete;
-
-  [[nodiscard]] constexpr auto version() const { return _version; }
-  [[nodiscard]] constexpr auto date() const { return _date; }
-private:
-  const StringView _version;
-  const std::chrono::year_month _date;
-};
-
-std::ostream& operator<<(std::ostream&, const UnicodeVersion&);
-
 // 'UnicodeBlock' holds a range which is used in the 'is' functions ('isKanji',
 // 'isHiragana', etc.). Official blocks have a 'version' and a 'name' (just for
 // reference). To keep it simple, 'version' represents the first version the
@@ -34,6 +17,21 @@ std::ostream& operator<<(std::ostream&, const UnicodeVersion&);
 class UnicodeBlock {
 public:
   static constexpr auto Mod{16}, OfficialStartMod{0}, OfficialEndMod{15};
+
+  // Unicode version and release date
+  class Version {
+  public:
+    consteval Version(StringView v, uint8_t m, uint16_t y)
+        : _version{v}, _date{std::chrono::year{y}, std::chrono::month{m}} {}
+
+    Version(const Version&) = delete;
+
+    [[nodiscard]] constexpr auto version() const { return _version; }
+    [[nodiscard]] constexpr auto date() const { return _date; }
+  private:
+    const StringView _version;
+    const std::chrono::year_month _date;
+  };
 
   UnicodeBlock(const UnicodeBlock&) = delete;
 
@@ -69,21 +67,22 @@ private:
   }
 
   consteval UnicodeBlock(
-      Code s, Code e, const UnicodeVersion* v = {}, StringView n = {})
+      Code s, Code e, const Version* v = {}, StringView n = {})
       : _start{s}, _end{e}, _version{v}, _name{n} {}
 
   // grant access to 'makeBlock' functions
   template<Code Start> friend consteval auto makeBlock();
   template<Code Start, Code End> friend consteval auto makeBlock();
-  template<Code Start, Code End, typename T>
-  friend consteval auto makeBlock(T&, StringView);
+  template<Code Start, Code End>
+  friend consteval auto makeBlock(const Version&, StringView);
 
   const Code _start;
   const Code _end;
-  const UnicodeVersion* const _version;
+  const Version* const _version;
   const StringView _name;
 };
 
+std::ostream& operator<<(std::ostream&, const UnicodeBlock::Version&);
 std::ostream& operator<<(std::ostream&, const UnicodeBlock&);
 
 // UnicodeBlocks defined in DisplaySize.h (WideBlocks) are used for determining
@@ -106,8 +105,9 @@ template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
 // Official Unicode blocks start on a value having mod 16 = 0 (so ending in hex
 // '0') and end on a value having mod 16 = 15 (so ending in hex 'f').
 
-template<Code Start, Code End, typename T>
-[[nodiscard]] consteval auto makeBlock(T& v, StringView n) {
+template<Code Start, Code End>
+[[nodiscard]] consteval auto makeBlock(
+    const UnicodeBlock::Version& v, StringView n) {
   UnicodeBlock::checkLess<Start, End>();
   static_assert(Start % UnicodeBlock::Mod == UnicodeBlock::OfficialStartMod);
   static_assert(End % UnicodeBlock::Mod == UnicodeBlock::OfficialEndMod);
@@ -116,7 +116,7 @@ template<Code Start, Code End, typename T>
 
 // below are the Unicode versions referenced in this program, for the full list
 // see: https://unicode.org/history/publicationdates.html
-inline constexpr UnicodeVersion UVer1_0{"1.0", 10, 1991},
+inline constexpr UnicodeBlock::Version UVer1_0{"1.0", 10, 1991},
     UVer1_1{"1.1", 6, 1993}, UVer2_0{"2.0", 7, 1996}, UVer3_0{"3.0", 9, 1999},
     UVer3_1{"3.1", 3, 2001}, UVer3_2{"3.2", 3, 2002}, UVer4_1{"4.1", 3, 2005},
     UVer5_0{"5.0", 7, 2006}, UVer5_2{"5.2", 10, 2009},

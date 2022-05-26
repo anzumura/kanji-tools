@@ -2,7 +2,7 @@
 
 namespace kanji_tools {
 
-std::ostream& operator<<(std::ostream& os, const UnicodeVersion& v) {
+std::ostream& operator<<(std::ostream& os, const UnicodeBlock::Version& v) {
   // simplify the following once 'std::format' is available (in Clang and GCC)
   const unsigned m{v.date().month()};
   const int y{v.date().year()};
