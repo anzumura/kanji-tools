@@ -2,62 +2,62 @@
 
 #include <string>
 
-namespace kanji_tools { //! \utils_group{String}
+namespace kanji_tools { /// \utils_group{String}
 
-//!@{
-//! String and StringView type aliases may be changed to **std::u8** versions
-//! later once they get wider support (streams, regex, etc.)
+/// String and StringView type aliases may be changed to `std::u8` versions
+/// later once they get wider standard library support (streams, regex, etc.)
 using String = std::string;
-using StringView = std::string_view;
-//!@}
+using StringView = std::string_view; ///< \copydoc String
 
-//!@{
-//! type alias for Unicode code points (use **char32_t** instead of **wchar_t**
-//! since it's always 32 bits instead of platform dependent)
+/// type alias for Unicode code points (use `char32_t` instead of `wchar_t`
+/// since it's always 32 bits instead of platform dependent)
 using Code = char32_t;
-using CodeString = std::u32string;
-//!@}
-
-// helper functions for adding brackets and adding leading zeroes
+using CodeString = std::u32string; ///< \copydoc Code
 
 enum class BracketType { Curly, Round, Square, None };
 
-[[nodiscard]] String addBrackets(const String&, BracketType);
+/// return a copy of `s` surrounded in brackets of the given type 
+[[nodiscard]] String addBrackets(const String& s, BracketType);
 
-[[nodiscard]] String addLeadingZeroes(const String&, size_t minSize);
+/// return a copy of `s` prepended with `minSize - s.size()` zeroes
+[[nodiscard]] String addLeadingZeroes(const String& s, size_t minSize);
 
-[[nodiscard]] CodeString addLeadingZeroes(const CodeString&, size_t minSize);
+/// \copydoc addLeadingZeroes()
+[[nodiscard]] CodeString addLeadingZeroes(const CodeString& s, size_t minSize);
 
-//! convert a #Code into a Unicode code point (caps hex with minSize of 4)
+/// convert #Code into a Unicode code point (caps hex with minSize of 4)
 [[nodiscard]] String toUnicode(Code, BracketType = BracketType::None);
 
-//!@{
-//! convert a UTF-8 string into space-separated Unicode code points, brackets
-//! are put around the whole string (not each Unicode value).
+/// convert a (UTF-8) #String into space-separated Unicode code points
+/// \details brackets are put around the whole string (not each Unicode value)
 [[nodiscard]] String toUnicode(const String&, BracketType = BracketType::None);
+
+/// convert a (UTF-32) #CodeString into space-separated Unicode code points
+/// \details brackets are put around the whole string (not each Unicode value)
 [[nodiscard]] String toUnicode(
     const CodeString&, BracketType = BracketType::None);
-//!@}
 
-//! safely converts `x` to a char
-//! \param allowNegative if true (the default) then `x` can't be less than -128
-//!                      otherwise `x` must be positive.
-//! \param x the value to convert (must be < 256 regardless of `allowNegative`)
-//! \return the char value
-//! \throw RangeError if `x` is out of range for char type
+/// safely converts `x` to a char
+/// \param allowNegative if true (the default) then `x` can't be less than -128
+///                      otherwise `x` must be positive.
+/// \param x the value to convert (must be < 256 regardless of `allowNegative`)
+/// \return the char value
+/// \throw RangeError if `x` is out of range for char type
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
-//!@{
-//! overloads or toChar(int,bool) for common `unsigned` types
+///@{
+/// overloads of toChar(int,bool) for common `unsigned` types
 [[nodiscard]] char toChar(uint16_t);
 [[nodiscard]] char toChar(unsigned int);
 [[nodiscard]] char toChar(size_t);
 [[nodiscard]] char toChar(Code);
-//!@}
+///@}
 
-// conversion functions that don't throw since size is the same
+///@{
+/// conversion functions that don't throw since size is the same
 [[nodiscard]] char toChar(unsigned char);
 [[nodiscard]] unsigned char toUChar(char);
+///@}
 
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
 // of 'x' ('x' must be integral). 'minSize' 0 (the default) causes leading
@@ -191,5 +191,5 @@ template<typename T>
 inline const String EmptyString;
 inline const CodeString EmptyCodeString;
 
-//! \end_group
+/// \end_group
 } // namespace kanji_tools

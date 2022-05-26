@@ -7,20 +7,20 @@
 #include <numeric>
 #include <vector>
 
-namespace kanji_tools { //! \utils_group{Symbol}
+namespace kanji_tools { /// \utils_group{Symbol}
 
-//! \utils_class{Symbol} non-templated base class for Symbol
+/// \utils_class{Symbol} non-templated base class for Symbol
 class BaseSymbol {
 public:
-  using Id = uint16_t; //!< type for id
+  using Id = uint16_t; ///< type for id
 
-  //! maximum number of unique symbols that can be created per symbol 'type'
+  /// maximum number of unique symbols that can be created per symbol 'type'
   static constexpr auto Max{std::numeric_limits<Id>::max() - 1};
 
-  //! return the id, an empty Symbol has an id of `0`
+  /// return the id, an empty Symbol has an id of `0`
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
 
-  //! return true if this Symbol is non-empty
+  /// return true if this Symbol is non-empty
   [[nodiscard]] explicit constexpr operator bool() const { return _id; }
 protected:
   using Map = std::map<String, Id>;
@@ -35,59 +35,58 @@ private:
   const Id _id;
 };
 
-//! \utils_class{Symbol} class can be used instead of #String to save memory
-//!
-//! Symbol incurs a small performance hit when creating/looking up a value, but
-//! can save significant memory when used as a member of a class that has many
-//! instances and the member doesn't have many different values. Some good
-//! examples would be Unicode block or version names (see Ucd.h for examples).
-//!
-//! Currently up to ~65K unique symbols per type can be added (an exception is
-//! thrown if the limit is exceeded). If more than 65K values are needed then
-//! Symbol was probably not the right design choice in the first place.
-//!
-//! Classes should derive from **Symbol<T>** and define **Type**, for example:
-//! \code
-//! class TestSymbol : public Symbol<TestSymbol> {
-//! public:
-//!   inline static const String Type{"TestSymbol"};
-//!   using Symbol::Symbol;
-//! };
-//! \endcode
-//!
-//! \tparam T derived class (see sample code above)
+/// \utils_class{Symbol} class can be used instead of #String to save memory
+///
+/// Symbol incurs a small performance hit when creating/looking up a value, but
+/// can save significant memory when used as a member of a class that has many
+/// instances and the member doesn't have many different values. Some good
+/// examples would be Unicode block or version names (see Ucd.h for examples).
+///
+/// Currently up to ~65K unique symbols per type can be added (an exception is
+/// thrown if the limit is exceeded). If more than 65K values are needed then
+/// Symbol was probably not the right design choice in the first place.
+///
+/// Classes should derive from **Symbol<T>** and define **Type**, for example:
+/// \code
+/// class TestSymbol : public Symbol<TestSymbol> {
+/// public:
+///   inline static const String Type{"TestSymbol"};
+///   using Symbol::Symbol;
+/// };
+/// \endcode
+/// \tparam T derived class (see sample code above)
 template<typename T> class Symbol : public BaseSymbol {
 public:
-  //! return the type name
+  /// return the type name
   [[nodiscard]] static const String& type() noexcept { return T::Type; }
 
-  //! return total unique (non-empty) Symbols created
+  /// return total unique (non-empty) Symbols created
   [[nodiscard]] static auto size() noexcept { return _list.size(); }
 
-  //! return true if a Symbol exists for the given (non-empty) `name`
+  /// return true if a Symbol exists for the given (non-empty) `name`
   [[nodiscard]] static auto exists(const String& name) {
     return !name.empty() && _map.contains(name);
   }
 
-  //! default ctor, creates an *empty* Symbol
+  /// default ctor, creates an *empty* Symbol
   constexpr Symbol() noexcept : BaseSymbol{0} {}
 
-  //! create a Symbol for the given String
-  //! \param name the name of the Symbol
-  //! \throw DomainError if `name` would result in more than #Max Symbols
+  /// create a Symbol for the given String
+  /// \param name the name of the Symbol
+  /// \throw DomainError if `name` would result in more than #Max Symbols
   explicit Symbol(const String& name) : BaseSymbol{type(), name, _map, _list} {}
 
-  //! return the name or empty String if id is `0`
+  /// return the name or empty String if id is `0`
   [[nodiscard]] auto& name() const {
     return id() ? *_list.at(id() - 1) : EmptyString;
   }
 
-  //! equal-to operator
+  /// equal-to operator
   [[nodiscard]] constexpr auto operator==(const Symbol& x) const noexcept {
     return id() == x.id();
   }
 
-  //! not-equal-to operator
+  /// not-equal-to operator
   [[nodiscard]] constexpr auto operator!=(const Symbol& x) const noexcept {
     return !operator==(x);
   }
@@ -96,11 +95,11 @@ private:
   inline static List _list;
 };
 
-//! write Symbol::name() to `os`
+/// write Symbol::name() to `os`
 template<typename T>
 std::ostream& operator<<(std::ostream& os, const Symbol<T>& s) {
   return os << s.name();
 }
 
-//! \end_group
+/// \end_group
 } // namespace kanji_tools
