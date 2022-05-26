@@ -39,6 +39,7 @@
     "Consolas",
     "consteval",
     "constinit",
+    "copydoc",
     "countl",
     "dakuten",
     "DEFG",
@@ -221,10 +222,10 @@
     "Zìdiǎn"
   ],
   "debug.onTaskErrors": "debugAnyway",
-  "doxdocgen.c.commentPrefix": "//!",
+  "doxdocgen.c.commentPrefix": "///",
   "doxdocgen.c.firstLine": "",
   "doxdocgen.c.lastLine": "",
-  "doxdocgen.c.triggerSequence": "//!",
+  "doxdocgen.c.triggerSequence": "///",
   "doxdocgen.cpp.tparamTemplate": " \\tparam {param} ",
   "doxdocgen.generic.returnTemplate": " \\return ",
   "doxdocgen.generic.boolReturnsTrueFalse": false,
@@ -256,6 +257,7 @@
     "__errc": "cpp",
     "__functional_03": "cpp",
     "__functional_base": "cpp",
+    "__functional_base_03": "cpp",
     "__hash_table": "cpp",
     "__locale": "cpp",
     "__memory": "cpp",
@@ -346,7 +348,10 @@
     "variant": "cpp",
     "vector": "cpp",
     "version": "cpp",
-    "*.tcc": "cpp"
+    "*.tcc": "cpp",
+    "Doxyfile": "makefile",
+    ".clang-format": "yaml",
+    ".clang-tidy": "yaml"
   },
   "files.exclude": {
     "build": true
