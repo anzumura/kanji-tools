@@ -58,7 +58,7 @@ Here's a list of VS Code extensions being used:
 
 **Notes**:
 
-- **Better Comments**: can help distinguish '///' Doxygen comments by using a different color for tag "/" in "better-comments.tags" (in User Settings)
+- **Better Comments**: can help distinguish `///` Doxygen comments by using a different color for tag "/" in "better-comments.tags" (in User Settings)
 - **Code Spell Checker**: there are lots of *word* entries for this extension in **[.vscode/settings.json](.vscode/settings.json)** (mainly caused by all the Japanese words in test code)
 - **CodeLLDB**: current setup has some limitations (see comments in **[.vscode/launch.json](.vscode/launch.json)** for more details)
 - **PlantUML** is used to generate diagrams from the *.txt* files in **[docs/diagrams/src](docs/diagrams/src)**. In order to generate them locally **graphviz** must be installed. On Mac this can be done via `brew install --cask temurin; brew install graphviz`

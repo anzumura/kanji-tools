@@ -1,4 +1,24 @@
 // %settings.json <pre>
+//
+// The settings in this file are 'Workspace Settings' needed for this project to
+// work properly such as C++ defines, file locations for PlantUML, cSpell words
+// used in this project, file associations, etc.. User specific preferences like
+// themes, fonts, colors, VS code features, etc. should be in a 'User Settings'
+// file ('~/Library/Application Support/Code/User/settings.json' on Mac).
+//
+// Here are a few 'user specific' settings that may be helpful:
+// {
+//   "better-comments.tags": [
+//     {
+//       "tag": "/", // tag for doxygen comments (staring with three slashes)
+//       "color": "#cc6699" // choose a different color than normal comments
+//     }
+//   ],
+//   "cmake.statusbar.visibility": "compact",
+//   "diffEditor.ignoreTrimWhitespace": false,
+//   "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+//   "testMate.cpp.test.parallelExecutionLimit": 8
+// }
 {
   "C_Cpp.default.cppStandard": "c++20",
   "C_Cpp.default.defines": [
@@ -14,8 +34,7 @@
     ".git",
     ".vscode",
     "build",
-    "data/ucd.txt",
-    "docs/html"
+    "data/ucd.txt"
   ],
   "cSpell.words": [
     "addtogroup",
@@ -249,6 +268,10 @@
     "）": true
   },
   "files.associations": {
+    "Doxyfile": "makefile",
+    ".clang-format": "yaml",
+    ".clang-tidy": "yaml",
+    // the rest are C++ headers that VS Code added automatically
     "__availability": "cpp",
     "__bit_reference": "cpp",
     "__bits": "cpp",
@@ -348,10 +371,7 @@
     "variant": "cpp",
     "vector": "cpp",
     "version": "cpp",
-    "*.tcc": "cpp",
-    "Doxyfile": "makefile",
-    ".clang-format": "yaml",
-    ".clang-tidy": "yaml"
+    "*.tcc": "cpp"
   },
   "files.exclude": {
     "build": true
@@ -359,8 +379,6 @@
   "plantuml.exportOutDir": "docs/diagrams/out",
   "plantuml.diagramsRoot": "docs/diagrams/src",
   "plantuml.exportFormat": "png",
-  "plantuml.render": "Local",
-  "testMate.cpp.test.parallelExecutionLimit": 8,
-  "testMate.cpp.log.logpanel": true 
+  "plantuml.render": "Local"
 }
 // </pre>
