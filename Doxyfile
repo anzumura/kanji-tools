@@ -4,7 +4,7 @@
 # the top level repo directory - output is generated under build/docs/html.
 
 # create a Doxygen group (module) in a header (used by below 'XX_group' aliases)
-ALIASES += grp{2}="\file \2.h header in lib: <b>\1</b>^^\addtogroup \1_\2^^@{"
+ALIASES += grp{2}="\file \2.h header file in lib: \b \1^^\addtogroup \1_\2^^@{"
 
 # one '\XX_group' '\end_group' pair should be put inside the top level namespace 
 # in each header in order to include all classes, global functions and variables
@@ -12,7 +12,7 @@ ALIASES += end_group="@}"
 
 # alias to display the 'lib' a class belongs to as well as adjust '#include' to
 # show the expected value (ie kanji_tools/'lib' as a prefix)
-ALIASES += cls{2}="\headerfile \2.h kanji_tools/\1/\2.h [lib: <b>\1</b>] "
+ALIASES += cls{2}="\headerfile \2.h kanji_tools/\1/\2.h [lib: \b \1] "
 
 # single arg 'XX_group' and 'XX_class' aliases for each lib in the project
 ALIASES += utils_group{1}="\grp{utils,\1}" utils_class{1}="\cls{utils,\1}"
@@ -31,6 +31,7 @@ GROUP_NESTED_COMPOUNDS = YES
 HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
 IMAGE_PATH             = docs
 INPUT                  = README.md .vscode docs libs
+INPUT_FILTER           = "sed 's/\[\[nodiscard]] //'"
 LAYOUT_FILE            = DoxygenLayout.xml
 MULTILINE_CPP_IS_BRIEF = YES
 OUTPUT_DIRECTORY       = build/docs
