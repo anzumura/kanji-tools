@@ -43,6 +43,7 @@ RECURSIVE              = YES
 SHOW_INCLUDE_FILES     = NO # show list of files included by a file
 TAB_SIZE               = 2
 USE_MDFILE_AS_MAINPAGE = README.md
+WARN_AS_ERROR          = FAIL_ON_WARNINGS # warnings cause a non-zero return
 WARN_IF_INCOMPLETE_DOC = NO
 
 # INLINE_GROUPED_CLASSES = YES
