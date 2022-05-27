@@ -3,7 +3,7 @@
 
 namespace kanji_tools {
 
-bool Utf8Char::isVariationSelector(const unsigned char* s) {
+bool Utf8Char::isVariationSelector(const uint8_t* s) {
   // Checking for variation selectors would be easier if 'i' was a wide char
   // type (like 'Code'), but that would involve calling expensive conversion
   // functions (like fromUtf8). Note, variation selectors are range 'fe00' to
@@ -13,20 +13,20 @@ bool Utf8Char::isVariationSelector(const unsigned char* s) {
 }
 
 bool Utf8Char::isVariationSelector(const char* s) {
-  return isVariationSelector(reinterpret_cast<const unsigned char*>(s));
+  return isVariationSelector(reinterpret_cast<const uint8_t*>(s));
 }
 
 bool Utf8Char::isVariationSelector(const String& s) {
   return isVariationSelector(s.c_str());
 }
 
-bool Utf8Char::isCombiningMark(const unsigned char* s) {
+bool Utf8Char::isCombiningMark(const uint8_t* s) {
   static constexpr auto B1{0xe3}, B2{0x82}, B3_1{0x99}, B3_2{0x9a};
   return s && *s++ == B1 && *s++ == B2 && (*s == B3_1 || *s == B3_2);
 }
 
 bool Utf8Char::isCombiningMark(const char* s) {
-  return isCombiningMark(reinterpret_cast<const unsigned char*>(s));
+  return isCombiningMark(reinterpret_cast<const uint8_t*>(s));
 }
 
 bool Utf8Char::isCombiningMark(const String& s) {
@@ -47,7 +47,7 @@ size_t Utf8Char::size(const char* s, bool onlyMB) {
   size_t result{};
   // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
   // checking if the next 3 bytes represent a 'variation selector'
-  if (auto i{reinterpret_cast<const unsigned char*>(s)}; i) {
+  if (auto i{reinterpret_cast<const uint8_t*>(s)}; i) {
     while (*i)
       if (isCombiningMark(i) || isVariationSelector(i))
         i += VarSelectorSize;
@@ -161,7 +161,7 @@ bool Utf8Char::isValid(bool sizeOne) const {
 String Utf8Char::getMBUtf8(const char*& loc) {
   const auto firstOfGroup{toUChar(*loc)};
   String result{*loc++};
-  for (unsigned char x{Bit2}; x && firstOfGroup & x; x >>= 1U) result += *loc++;
+  for (uint8_t x{Bit2}; x && firstOfGroup & x; x >>= 1U) result += *loc++;
   return result;
 }
 

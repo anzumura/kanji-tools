@@ -101,9 +101,9 @@ char toChar(Code x) {
   return toCharUnsigned(x, Type);
 }
 
-char toChar(unsigned char x) { return toCharUnsigned(x, {}); }
+char toChar(uint8_t x) { return toCharUnsigned(x, {}); }
 
-unsigned char toUChar(char x) { return cast<unsigned char>(x); }
+uint8_t toUChar(char x) { return cast<uint8_t>(x); }
 
 // 'is' functions for testing single bytes
 

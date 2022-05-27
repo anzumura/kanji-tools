@@ -24,11 +24,11 @@ public:
 
   // 'isVariationSelector' returns true if s points to a UTF-8 variation
   // selector, this method is used by 'size', 'next' and 'doPeek'.
-  [[nodiscard]] static bool isVariationSelector(const unsigned char* s);
+  [[nodiscard]] static bool isVariationSelector(const uint8_t* s);
   [[nodiscard]] static bool isVariationSelector(const char* s);
   [[nodiscard]] static bool isVariationSelector(const String& s);
 
-  [[nodiscard]] static bool isCombiningMark(const unsigned char* s);
+  [[nodiscard]] static bool isCombiningMark(const uint8_t* s);
   [[nodiscard]] static bool isCombiningMark(const char* s);
   [[nodiscard]] static bool isCombiningMark(const String& s);
 

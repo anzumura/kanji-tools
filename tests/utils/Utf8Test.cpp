@@ -109,7 +109,7 @@ TEST(Utf8Test, ValidateSurrogateRange) {
 
 TEST(Utf8Test, NotValidForOverlong) {
   // overlong single byte ascii
-  const unsigned char bang{33};
+  const uint8_t bang{33};
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
   EXPECT_EQ(validateMBUtf8(String{toChar(bang)}), MBUtf8Result::NotMultiByte);
   EXPECT_EQ(validateUtf8(String{toChar(TwoBits), toChar(Bit1 | bang)}),
@@ -207,7 +207,7 @@ TEST(Utf8Test, InvalidSurrogateRange) {
 
 TEST(Utf8Test, ErrorForOverlong) {
   // overlong single byte ascii
-  const unsigned char bang{33};
+  const uint8_t bang{33};
   EXPECT_EQ(toBinary(bang), "00100001"); // decimal 33 which is ascii '!'
   fromUtf8Error(String{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
   // overlong ō with 3 bytes

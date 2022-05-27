@@ -51,7 +51,7 @@ constexpr uInt Shift12{Shift6 * 2}, Shift18{Shift6 * 3};
 
 // 'getNextByte' advances 'u' to the next byte and returns true it it starts
 // with '10', i.e., a continuation byte
-[[nodiscard]] constexpr auto getNextByte(const unsigned char*& u) noexcept {
+[[nodiscard]] constexpr auto getNextByte(const uint8_t*& u) noexcept {
   return std::countl_one(*++u) == 1;
 }
 
@@ -71,7 +71,7 @@ cast(uInt x) noexcept {
 // The result is made from the 16 bits: 'aaaa bbbbbb cccccc'
 template<typename T>
 [[nodiscard]] constexpr auto threeByteUtf8(
-    uInt b1, uInt b2, const unsigned char* u) noexcept {
+    uInt b1, uInt b2, const uint8_t* u) noexcept {
   return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
 }
 
@@ -84,7 +84,7 @@ template<typename T>
 // The result is made from the 21 bits: 'aaa bbbbbb cccccc dddddd'
 template<typename T>
 [[nodiscard]] constexpr auto fourByteUtf8(
-    uInt b1, uInt b2, uInt b3, const unsigned char* u) noexcept {
+    uInt b1, uInt b2, uInt b3, const uint8_t* u) noexcept {
   return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
 }
 
@@ -105,8 +105,7 @@ constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
 template<typename T> using Consts = std::array<T, Char32Vals.size()>;
 
 template<typename T>
-[[nodiscard]] T convertOneUtf8(
-    const unsigned char*& u, const Consts<T>& v) noexcept {
+[[nodiscard]] T convertOneUtf8(const uint8_t*& u, const Consts<T>& v) noexcept {
   const auto utfLen{std::countl_one(*u)};
   if (!utfLen) return {*u++}; // single byte UTF-8 case (Ascii)
   if (utfLen == 1 || utfLen > 4) {
@@ -140,7 +139,7 @@ template<typename R, typename T = typename R::value_type>
     const char* s, size_t maxSize, const Consts<T>& v) {
   R result;
   if (!s || !*s) return result;
-  auto u{reinterpret_cast<const unsigned char*>(s)};
+  auto u{reinterpret_cast<const uint8_t*>(s)};
   do {
     result += convertOneUtf8(u, v);
   } while (*u && (!maxSize || result.size() < maxSize));
@@ -175,8 +174,7 @@ void convertToUtf8(Code c, String& s) {
 // 'validateMB' is called by 'validateMBUtf8' ('u' has already been verified to
 // point to the first byte of a UTF-8 sequence by the calling function)
 template<typename T>
-[[nodiscard]] auto validateMB(
-    const T& err, const unsigned char* u, bool sizeOne) {
+[[nodiscard]] auto validateMB(const T& err, const uint8_t* u, bool sizeOne) {
   uInt byte1{*u};
   if (!getNextByte(u)) return err(Utf8Result::MissingBytes);
   if (byte1 & Bit3) {
@@ -212,7 +210,7 @@ CodeString fromUtf8(const String& s, size_t maxSize) {
 
 Code getCode(const char* s) noexcept {
   if (!s || !*s) return {};
-  auto u{reinterpret_cast<const unsigned char*>(s)};
+  auto u{reinterpret_cast<const uint8_t*>(s)};
   return convertOneUtf8(u, Char32Vals);
 }
 
@@ -259,7 +257,7 @@ String toUtf8(const std::wstring& s) {
 MBUtf8Result validateMBUtf8(
     const char* s, Utf8Result& error, bool sizeOne) noexcept {
   if (!s) return MBUtf8Result::NotMultiByte;
-  auto u{reinterpret_cast<const unsigned char*>(s)};
+  auto u{reinterpret_cast<const uint8_t*>(s)};
   if (!(*u & Bit1)) return MBUtf8Result::NotMultiByte;
   const auto err{[&error](auto e) {
     error = e;

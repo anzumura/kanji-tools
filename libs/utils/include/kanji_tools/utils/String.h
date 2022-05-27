@@ -16,7 +16,7 @@ using CodeString = std::u32string; ///< \copydoc Code
 
 enum class BracketType { Curly, Round, Square, None };
 
-/// return a copy of `s` surrounded in brackets of the given type 
+/// return a copy of `s` surrounded in brackets of the given type
 [[nodiscard]] String addBrackets(const String& s, BracketType);
 
 /// return a copy of `s` prepended with `minSize - s.size()` zeroes
@@ -45,19 +45,25 @@ enum class BracketType { Curly, Round, Square, None };
 /// \throw RangeError if `x` is out of range for char type
 [[nodiscard]] char toChar(int x, bool allowNegative = true);
 
-///@{
-/// overloads of toChar(int,bool) for common `unsigned` types
+/// toChar(int,bool) overload for `uint16_t`
+/// \details type is `unsigned` so `allowNegative` param isn't needed
 [[nodiscard]] char toChar(uint16_t);
-[[nodiscard]] char toChar(unsigned int);
-[[nodiscard]] char toChar(size_t);
-[[nodiscard]] char toChar(Code);
-///@}
 
-///@{
-/// conversion functions that don't throw since size is the same
-[[nodiscard]] char toChar(unsigned char);
-[[nodiscard]] unsigned char toUChar(char);
-///@}
+/// toChar(int,bool) overload for `unsigned int`
+[[nodiscard]] char toChar(unsigned int); ///< \copydetails toChar(uint16_t)
+
+/// toChar(int,bool) overload for `size_t`
+[[nodiscard]] char toChar(size_t); ///< \copydetails toChar(uint16_t)
+
+/// toChar(int,bool) overload for #Code
+[[nodiscard]] char toChar(Code); ///< \copydetails toChar(uint16_t)
+
+/// convert `uint8_t` to `char`
+/// \details doesn't throw since sizes are the same
+[[nodiscard]] char toChar(uint8_t);
+
+/// convert `char` to `uint8_t`
+[[nodiscard]] uint8_t toUChar(char); ///< \copydetails toChar(uint8_t)
 
 // 'toBinary' and 'toHex' are helper functions to print binary or hex versions
 // of 'x' ('x' must be integral). 'minSize' 0 (the default) causes leading
@@ -116,7 +122,7 @@ template<typename T> [[nodiscard]] inline auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }
 
-// provide specializations for 'char' that cast to 'unsigned char' (which is
+// provide specializations for 'char' that cast to 'uint8_t' (which is
 // probably what is expected)
 
 template<>

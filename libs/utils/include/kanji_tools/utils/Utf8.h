@@ -98,7 +98,7 @@ template<typename T>
 [[nodiscard]] bool isValidUtf8(const String&, bool sizeOne = false) noexcept;
 
 // bit patterns used for processing UTF-8
-enum BitPatterns : unsigned char {
+enum BitPatterns : uint8_t {
   Bit5 = 0b00'00'10'00,
   Bit4 = 0b00'01'00'00,
   Bit3 = 0b00'10'00'00,

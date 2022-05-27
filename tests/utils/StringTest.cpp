@@ -201,7 +201,7 @@ TEST(StringTest, Char32ToChar) {
 }
 
 TEST(StringTest, UCharToChar) {
-  unsigned char x{0};
+  uint8_t x{0};
   EXPECT_EQ(toChar(x), '\0');
   EXPECT_EQ(toChar(x = 0xff), '\xff');
   // no chance for an exception
