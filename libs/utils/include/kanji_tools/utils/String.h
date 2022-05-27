@@ -14,7 +14,19 @@ using StringView = std::string_view; ///< \copydoc String
 using Code = char32_t;
 using CodeString = std::u32string; ///< \copydoc Code
 
-enum class BracketType { Curly, Round, Square, None };
+/// bracket type to use in functions like addBrackets(), toHex(), etc.
+enum class BracketType {
+  Curly,  ///< add {} for narrow output or『』for wide output
+  Round,  ///< add () for narrow output or（）for wide output
+  Square, ///< add [] for narrow output or「」for wide output
+  None    ///< don't add brackets
+};
+
+/// case for hex digits to use in string representations
+enum class HexCase {
+  Upper, ///< use upper-case (the standard for Unicode)
+  Lower  ///< use lower-case (typical default when printing numbers)
+};
 
 /// return a copy of `s` surrounded in brackets of the given type
 [[nodiscard]] String addBrackets(const String& s, BracketType);
@@ -65,15 +77,17 @@ enum class BracketType { Curly, Round, Square, None };
 /// convert `char` to `uint8_t`
 [[nodiscard]] uint8_t toUChar(char); ///< \copydetails toChar(uint8_t)
 
-// 'toBinary' and 'toHex' are helper functions to print binary or hex versions
-// of 'x' ('x' must be integral). 'minSize' 0 (the default) causes leading
-// zeroes to be added to make strings the same size for a given type, i.e., if
-// 'x' is char then toHex returns a string of size 2 and toBinary returns a
-// string of size 8. 'minSize' is ignored if it's less than 'result' size.
-
 constexpr auto BinaryDigits{2}, DecimalDigits{10}, HexDigits{16}, Bits{8},
     SevenBitMax{128}, UnicodeStringMinSize{4}, UnicodeStringMaxSize{5};
 
+/// return a #String containing the binary representation of `x`
+/// \tparam T must be an unsigned type
+/// \param x the value to convert
+/// \param brackets specify type of brackets (can be `None` for no brackets)
+/// \param minSize `0` (the default) causes enough leading zeroes to be added to
+///                make results the same size for a given type, i.e., if `T` is
+///                `char` then the result will have a size of 8
+/// \return #String with the binary representation of `x`
 template<typename T>
 [[nodiscard]] inline auto toBinary(
     T x, BracketType brackets, size_t minSize = 0) {
@@ -85,13 +99,21 @@ template<typename T>
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * Bits), brackets);
 }
 
+/// overload of toBinary() that sets `brackets` to #BracketType::None
 template<typename T>
 [[nodiscard]] inline auto toBinary(T x, size_t minSize = 0) {
   return toBinary(x, BracketType::None, minSize);
 }
 
-enum class HexCase { Upper, Lower };
-
+/// return a #String containing the hex representation of `x`
+/// \tparam T must be an unsigned type
+/// \param x the value to convert
+/// \param brackets specify type of brackets (can be `None` for no brackets)
+/// \param hexCase specify the case for hex digits
+/// \param minSize `0` (the default) causes enough leading zeroes to be added to
+///                make results the same size for a given type, i.e., if `T` is
+///                `char` then the result will have a size of 2 (00 - FF)
+/// \return #String with the binary representation of `x`
 template<typename T>
 [[nodiscard]] inline auto toHex(
     T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
@@ -108,16 +130,20 @@ template<typename T>
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 2), brackets);
 }
 
+/// overload of toHex() that sets `brackets` to #BracketType::None
 template<typename T>
 [[nodiscard]] inline auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
   return toHex(x, BracketType::None, hexCase, minSize);
 }
 
+/// overload of toHex() that sets `hexCase` to #HexCase::Lower
 template<typename T>
 [[nodiscard]] inline auto toHex(T x, BracketType brackets, size_t minSize = 0) {
   return toHex(x, brackets, HexCase::Lower, minSize);
 }
 
+/// overload of toHex() that sets `brackets` to #BracketType::None and `hexCase`
+/// to #HexCase::Lower
 template<typename T> [[nodiscard]] inline auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }
