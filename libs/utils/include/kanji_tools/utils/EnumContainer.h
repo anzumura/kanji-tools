@@ -17,7 +17,7 @@ public:
   using Size = uint8_t;
 
   Enum(const Enum&) = delete;
-  Enum& operator=(const Enum&) = delete;
+  auto operator=(const Enum&) = delete;
 protected:
   inline static const String IndexMsg{"index '"}, EnumMsg{"enum '"},
       RangeMsg{"' is out of range"};

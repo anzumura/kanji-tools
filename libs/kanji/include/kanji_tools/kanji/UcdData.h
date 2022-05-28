@@ -19,7 +19,7 @@ public:
   UcdData() = default;
 
   UcdData(const UcdData&) = delete;
-  UcdData& operator=(const UcdData&) = delete;
+  auto operator=(const UcdData&) = delete;
 
   // 'getReadingsAsKana' returns a (wide) comma separated string starting with
   // 'onReading' converted to Katakana followed by 'kunReading' converted to

@@ -18,7 +18,7 @@ public:
   explicit GroupData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
 
   GroupData(const GroupData&) = delete;
-  GroupData& operator=(const GroupData&) = delete;
+  auto operator=(const GroupData&) = delete;
 
   [[nodiscard]] auto& meaningGroups() const { return _meaningGroups; }
   [[nodiscard]] auto& patternGroups() const { return _patternGroups; }

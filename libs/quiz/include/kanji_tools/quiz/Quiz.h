@@ -11,7 +11,7 @@ public:
   using List = KanjiData::List;
 
   Quiz(const Quiz&) = delete;
-  Quiz& operator=(const Quiz&) = delete;
+  auto operator=(const Quiz&) = delete;
 
   // 'run' is called by 'quizMain.cpp'. it creates 'QuizLauncher' as well as its
   // dependencies. 'QuizLauncher' constructor creates and starts an instance of

@@ -17,7 +17,7 @@ public:
   RadicalData() = default;
 
   RadicalData(const RadicalData&) = delete;
-  RadicalData& operator=(const RadicalData&) = delete;
+  auto operator=(const RadicalData&) = delete;
 
   // 'find' by the ideograph code in utf8 (not the unicode radical code). For
   // example, Radical number 30 (口) is Unicode 53E3, but has another 'Unicode

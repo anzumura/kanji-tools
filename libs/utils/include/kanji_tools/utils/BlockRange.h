@@ -25,8 +25,16 @@ protected:
 ///
 /// For each block passed to the ctor, `block.wStart()`, `-`, `block.wEnd()` is
 /// added to the internal array.
+///
+/// The following code should print "all Kana" (see #KanaRange below)
+/// \code
+/// const std::wregex allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
+/// const auto s{L"ひらがな"};
+/// if (std::regex_search(s, allKana)) std::cout << "all Kana\n";
+/// \endcode
 template<typename... Ts> class BlockRange : public BaseBlockRange {
 public:
+  /// ctor takes one or more `UnicodeBlock`s and populated internal array
   explicit BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(_range, block, blocks...);
   }
@@ -47,7 +55,7 @@ private:
   wchar_t _range[size() + 1]{}; // add 1 for final null
 };
 
-/// KanjiRange is for 'wregex' and contains the following blocks (in order):
+/// KanjiRange is for `wregex()` and contains the following blocks (in order):
 /// - CJK Extension A
 /// - CJK Unified Ideographs Kanji
 /// - CJK Compatibility Ideographs
@@ -62,9 +70,16 @@ inline const BlockRange KanjiRange{CommonKanjiBlocks[0], CommonKanjiBlocks[1],
     RareKanjiBlocks[0], RareKanjiBlocks[1], RareKanjiBlocks[2],
     RareKanjiBlocks[3]};
 
+/// range for halfwidth Katakana and wide letters (U+FF00 - U+FFEF)
 inline const BlockRange WideLetterRange{LetterBlocks[6]};
+
+/// range for standard Hiragana
 inline const BlockRange HiraganaRange{HiraganaBlocks[0]};
+
+/// range for Katakana (both official blocks)
 inline const BlockRange KatakanaRange{KatakanaBlocks[0], KatakanaBlocks[1]};
+
+/// range that includes both Hiragana and Katakana
 inline const BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
 
 /// \end_group

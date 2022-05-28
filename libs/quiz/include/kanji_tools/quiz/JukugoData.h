@@ -14,7 +14,7 @@ public:
   explicit JukugoData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
 
   JukugoData(const JukugoData&) = delete;
-  JukugoData& operator=(const JukugoData&) = delete;
+  auto operator=(const JukugoData&) = delete;
 
   [[nodiscard]] const List& find(const String& kanji) const;
 private:
