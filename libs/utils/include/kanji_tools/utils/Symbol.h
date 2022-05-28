@@ -9,7 +9,7 @@
 
 namespace kanji_tools { /// \utils_group{Symbol}
 
-/// \utils_class{Symbol} non-templated base class for Symbol
+/// non-templated base class for Symbol \utils{Symbol}
 class BaseSymbol {
 public:
   using Id = uint16_t; ///< type for id
@@ -35,7 +35,7 @@ private:
   const Id _id;
 };
 
-/// \utils_class{Symbol} class can be used instead of #String to save memory
+/// class can be used instead of #String to save memory \utils{Symbol}
 ///
 /// Symbol incurs a small performance hit when creating/looking up a value, but
 /// can save significant memory when used as a member of a class that has many

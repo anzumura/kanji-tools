@@ -10,16 +10,17 @@ ALIASES += grp{2}="\file \2.h header file in lib: \b \1^^\addtogroup \1_\2^^@{"
 # in each header in order to include all classes, global functions and variables
 ALIASES += end_group="@}"
 
-# alias to display the 'lib' a class belongs to as well as adjust '#include' to
-# show the expected value (ie kanji_tools/'lib' as a prefix)
-ALIASES += cls{2}="\headerfile \2.h kanji_tools/\1/\2.h [lib: \b \1] "
+# 'hdr' is used by below 'single arg' aliases. It adds 'lib' as well as expected
+# prefix to '#include' section on the 'class' page. This 'command' should come
+# after 'brief' description so that IDEs work properly when showing doc hints.
+ALIASES += hdr{2}=" [lib: \b \1]\headerfile \2.h kanji_tools/\1/\2.h"
 
-# single arg 'XX_group' and 'XX_class' aliases for each lib in the project
-ALIASES += utils_group{1}="\grp{utils,\1}" utils_class{1}="\cls{utils,\1}"
-ALIASES += kana_group{1}="\grp{kana,\1}" kana_class{1}="\cls{kana,\1}"
-ALIASES += kanji_group{1}="\grp{kanji,\1}" kanji_class{1}="\cls{kanji,\1}"
-ALIASES += quiz_group{1}="\grp{quiz,\1}" quiz_class{1}="\cls{quiz,\1}"
-ALIASES += stats_group{1}="\grp{stats,\1}" stats_class{1}="\cls{stats,\1}"
+# single arg 'XX_group' and 'XX' aliases for each lib (XX) in the project
+ALIASES += utils_group{1}="\grp{utils,\1}" utils{1}="\hdr{utils,\1}"
+ALIASES += kana_group{1}="\grp{kana,\1}" kana{1}="\hdr{kana,\1}"
+ALIASES += kanji_group{1}="\grp{kanji,\1}" kanji{1}="\hdr{kanji,\1}"
+ALIASES += quiz_group{1}="\grp{quiz,\1}" quiz{1}="\hdr{quiz,\1}"
+ALIASES += stats_group{1}="\grp{stats,\1}" stats{1}="\hdr{stats,\1}"
 
 # override default settings for the following config values
 DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
