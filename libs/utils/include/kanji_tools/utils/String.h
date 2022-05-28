@@ -80,8 +80,8 @@ inline const CodeString EmptyCodeString; ///< \copydoc EmptyString
 /// \details type is `unsigned` so `allowNegative` param isn't needed
 [[nodiscard]] char toChar(uint16_t);
 
-/// `unsigned int` overload of toChar(int,bool)
-[[nodiscard]] char toChar(unsigned int); ///< \copydetails toChar(uint16_t)
+/// `uint32_t` overload of toChar(int,bool)
+[[nodiscard]] char toChar(uint32_t); ///< \copydetails toChar(uint16_t)
 
 /// `size_t` overload of toChar(int,bool)
 [[nodiscard]] char toChar(size_t); ///< \copydetails toChar(uint16_t)

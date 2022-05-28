@@ -81,8 +81,8 @@ char toChar(int x, bool allowNegative) {
   return toCharUnsigned(x, Type);
 }
 
-char toChar(unsigned int x) {
-  static const String Type{"unsigned int"};
+char toChar(uint32_t x) {
+  static const String Type{"uint32_t"};
   return toCharUnsigned(x, Type);
 }
 

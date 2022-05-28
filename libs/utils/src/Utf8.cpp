@@ -5,7 +5,7 @@
 
 namespace kanji_tools {
 
-using uInt = const unsigned int;
+using uInt = const uint32_t;
 
 namespace {
 

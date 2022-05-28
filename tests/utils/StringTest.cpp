@@ -180,7 +180,7 @@ TEST(StringTest, UIntToChar) {
   EXPECT_EQ(toChar(0U), '\0');
   EXPECT_EQ(toChar(255U), '\xff');
   EXPECT_THROW(call([] { return toChar(256U); },
-                   "toChar (unsigned int): '256' out of range"),
+                   "toChar (uint32_t): '256' out of range"),
       RangeError);
 }
 
