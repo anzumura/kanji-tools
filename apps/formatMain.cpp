@@ -11,7 +11,9 @@ using kanji_tools::Args, kanji_tools::DomainError, kanji_tools::KanjiRange,
 
 void format(Args args) {
   if (args.size() < 2) throw DomainError{"specify a file to format"};
-  const auto* const file{args[1]};
+  const std::filesystem::path file{args[1]};
+  if (!std::filesystem::is_regular_file(file))
+    throw DomainError("file not found: " + file.string());
   const std::wregex endsWithKanji{std::wstring{L"["} + KanjiRange() + L"]{1}$"},
       allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
   std::fstream f{file};
