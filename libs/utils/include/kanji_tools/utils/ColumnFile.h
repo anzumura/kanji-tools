@@ -8,59 +8,67 @@
 #include <optional>
 #include <vector>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \utils_group{ColumnFile}
 
-// 'ColumnFile' is a helper class for loading data from a delimiter (defaults to
-// tab) separated text file with a header row (containing the column names).
+/// class for loading data from a delimiter (defaults to tab) separated file
+/// with a header row containing the column names \utils{ColumnFile}
 class ColumnFile {
 public:
-  using Path = std::filesystem::path;
-
-  // 'Column' has a name that must match a column header in the file being
-  // processed. The set of columns for a 'ColumnFile' are passed into its ctor
-  // and the same column instances are used to get values rows. A 'Column' can
-  // be used across multiple 'ColumnFile' instances.
+  /// represents a column in a ColumnFile
+  ///
+  /// Column instances are used to get values from each row and a Column can be
+  /// be across multiple ColumnFile instances.
   class Column {
   public:
+    /// create a Column instance for the given `name` (looks up `number`)
     explicit Column(const String& name);
 
+    /// equal operator
     [[nodiscard]] bool operator==(const Column&) const;
 
+    /// return the column name
     [[nodiscard]] auto& name() const { return _name; }
+
+    /// return the column number (which is globally unique per column name)
     [[nodiscard]] auto number() const { return _number; }
   private:
     const String _name;
-    const size_t _number; // globally unique number per column based on '_name'
+    const size_t _number;
   };
 
   using Columns = std::vector<Column>;
   using OptU64 = std::optional<uint64_t>;
+  using Path = std::filesystem::path;
 
-  // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a
-  // regular file) or if the list of columns doesn't match the first row of the
-  // file. Note, columns in the file can be in a different order than the list
-  // provided to this ctor, but the names must all be found.
-  ColumnFile(const Path& p, const Columns&, char delim = '\t');
+  /// ctor creates a ColumnFile and processes the first 'header' row
+  /// \param p path to the text file to be read and processed
+  /// \param columns list of columns in the file (can be specified in any order)
+  /// \param delim column delimiter (defaults to tab)
+  /// \throw DomainError if 'p' cannot be opened (or is not a regular file) or
+  /// if a column name is duplicated or not found in the header row of the file
+  ColumnFile(const Path& p, const Columns& columns, char delim = '\t');
 
   ColumnFile(const ColumnFile&) = delete;
 
-  // 'nextRow' must be called before using 'get'. An exception is thrown if the
-  // next row has too few or too many columns. 'nextRow' returns 'false' when
-  // there are no more rows in the file.
+  /// read the next row, this method must be called before using `get` methods.
+  /// \return true if a row was successfully read
+  /// \throw DomainError if the next row has too few or too many columns
   bool nextRow();
 
-  // 'get' returns the value for the given column for the current row. An
-  // exception is thrown if 'nextRow' hasn't been called yet or if the given
-  // column was not passed in to the constructor.
+  /// get the value for the given Column for the current row
+  /// \throw if nextRow() hasn't been called yet or if the given Column is not
+  /// part of the ColumnFile, i.e., it wasn't passed into the ctor
   const String& get(const Column&) const;
 
+  /// return true if the value for the given Column is empty
   [[nodiscard]] bool isEmpty(const Column&) const;
 
-  // convert to 'uint64_t' or call 'error' (if maxValue is non-zero and value
-  // exceeds it then call 'error')
+  /// get the value for the given Column and convert to `uint64_t`
+  /// \throw DomainError if conversion to result type fails of if `maxValue` is
+  ///                    non-0 and less than the converted result
   uint64_t getU64(const Column&, uint64_t maxValue = 0) const;
 
-  // return std::nullopt if column is empty or call 'processU64'
+  /// return std::nullopt if column is empty, otherwise works like getU64()
   OptU64 getOptU64(const Column&, uint64_t maxValue = 0) const;
 
   // getUInt takes a numeric type T (like uint16_t) and then calls getLong with
@@ -144,4 +152,5 @@ private:
   inline static std::map<String, size_t> _allColumns;
 };
 
+/// \end_group
 } // namespace kanji_tools

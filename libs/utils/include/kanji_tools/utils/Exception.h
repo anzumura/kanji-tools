@@ -6,7 +6,7 @@
 
 namespace kanji_tools { /// \utils_group{Exception}
 
-/// class for domain error exceptions (prevents copying) \utils{Exception}
+/// non-copyable exception class for domain errors \utils{Exception}
 class DomainError : public std::domain_error {
 public:
   /// pull in base ctors
@@ -19,7 +19,7 @@ public:
   auto operator=(const DomainError&) = delete; ///< deleted operator=
 };
 
-/// class for range error exceptions (prevents copying) \utils{Exception}
+/// non-copyable exception class for range errors \utils{Exception}
 class RangeError : public std::range_error {
 public:
   /// pull in base ctors
