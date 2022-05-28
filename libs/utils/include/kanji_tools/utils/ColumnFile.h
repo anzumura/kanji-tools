@@ -15,7 +15,6 @@ namespace kanji_tools {
 class ColumnFile {
 public:
   using Path = std::filesystem::path;
-  using ULong = uint64_t;
 
   // 'Column' has a name that must match a column header in the file being
   // processed. The set of columns for a 'ColumnFile' are passed into its ctor
@@ -35,7 +34,7 @@ public:
   };
 
   using Columns = std::vector<Column>;
-  using OptULong = std::optional<ULong>;
+  using OptU64 = std::optional<uint64_t>;
 
   // 'ColumnFile' will throw an exception if 'p' cannot be opened (or is not a
   // regular file) or if the list of columns doesn't match the first row of the
@@ -57,17 +56,17 @@ public:
 
   [[nodiscard]] bool isEmpty(const Column&) const;
 
-  // convert to 'ULong' or call 'error' (if maxValue is non-zero and
-  // value exceeds it then call 'error')
-  ULong getULong(const Column&, ULong maxValue = 0) const;
+  // convert to 'uint64_t' or call 'error' (if maxValue is non-zero and value
+  // exceeds it then call 'error')
+  uint64_t getU64(const Column&, uint64_t maxValue = 0) const;
 
-  // return std::nullopt if column is empty or call 'processULong'
-  OptULong getOptULong(const Column&, ULong maxValue = 0) const;
+  // return std::nullopt if column is empty or call 'processU64'
+  OptU64 getOptU64(const Column&, uint64_t maxValue = 0) const;
 
   // getUInt takes a numeric type T (like uint16_t) and then calls getLong with
   // the appropriate max value
   template<std::unsigned_integral T> T getUInt(const Column& c) const {
-    const auto i{getULong(c, std::numeric_limits<T>::max())};
+    const auto i{getU64(c, std::numeric_limits<T>::max())};
     return static_cast<T>(i);
   }
 
@@ -75,7 +74,7 @@ public:
   // appropriate max value
   template<std::unsigned_integral T>
   std::optional<T> getOptUInt(const Column& column) const {
-    const auto i{getOptULong(column, std::numeric_limits<T>::max())};
+    const auto i{getOptU64(column, std::numeric_limits<T>::max())};
     if (i) return static_cast<T>(*i);
     return {};
   }
@@ -109,8 +108,8 @@ private:
   // 'getColumnNumber' is used by 'Column' class constructor
   [[nodiscard]] static size_t getColumnNumber(const String& name);
 
-  [[nodiscard]] ULong processULong(
-      const String&, const Column&, ULong maxValue) const;
+  [[nodiscard]] uint64_t processU64(
+      const String&, const Column&, uint64_t) const;
 
   using ColNames = std::map<String, Column>;
 

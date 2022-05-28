@@ -105,23 +105,23 @@ const String& ColumnFile::get(const Column& column) const {
 
 bool ColumnFile::isEmpty(const Column& c) const { return get(c).empty(); }
 
-ColumnFile::ULong ColumnFile::getULong(const Column& c, ULong max) const {
-  return processULong(get(c), c, max);
+uint64_t ColumnFile::getU64(const Column& c, uint64_t max) const {
+  return processU64(get(c), c, max);
 }
 
-ColumnFile::OptULong ColumnFile::getOptULong(const Column& c, ULong max) const {
+ColumnFile::OptU64 ColumnFile::getOptU64(const Column& c, uint64_t max) const {
   auto& s{get(c)};
   if (s.empty()) return {};
-  return processULong(s, c, max);
+  return processU64(s, c, max);
 }
 
-ColumnFile::ULong ColumnFile::processULong(
-    const String& s, const Column& column, ULong max) const {
-  ULong i{};
+uint64_t ColumnFile::processU64(
+    const String& s, const Column& column, uint64_t max) const {
+  uint64_t i{};
   try {
     i = std::stoul(s);
   } catch (...) {
-    error("failed to convert to unsigned long", column, s);
+    error("failed to convert to unsigned number", column, s);
   }
   if (max && max < i)
     error("exceeded max value of " + std::to_string(max), column, s);

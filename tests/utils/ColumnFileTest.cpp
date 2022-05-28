@@ -240,34 +240,34 @@ TEST_F(ColumnFileTest, GetInvalidColumError) {
       DomainError);
 }
 
-TEST_F(ColumnFileTest, GetULong) {
+TEST_F(ColumnFileTest, GetU64) {
   auto f{write({Col}, "Col\n123")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getULong(Col), 123);
+  EXPECT_EQ(f.getU64(Col), 123);
 }
 
-TEST_F(ColumnFileTest, GetULongError) {
+TEST_F(ColumnFileTest, GetU64Error) {
   auto f{write({Col}, "Col\nblah")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_THROW(call([&] { f.getULong(Col); },
-                   ConvertError + "unsigned long" + FileMsg +
+  EXPECT_THROW(call([&] { f.getU64(Col); },
+                   ConvertError + "unsigned number" + FileMsg +
                        ", row: 1, column: 'Col', value: 'blah'"),
       DomainError);
 }
 
-TEST_F(ColumnFileTest, GetULongMaxValueError) {
+TEST_F(ColumnFileTest, GetU64MaxValueError) {
   const auto maxValue{123U};
   std::ofstream of{TestFile};
   of << "Col\n" << maxValue << '\n' << maxValue << '\n' << maxValue + 1 << '\n';
   of.close();
   auto f{create({Col})};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getULong(Col, maxValue), maxValue);
+  EXPECT_EQ(f.getU64(Col, maxValue), maxValue);
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getULong(Col, 0), maxValue); // 0 implies no max value
+  EXPECT_EQ(f.getU64(Col, 0), maxValue); // 0 implies no max value
   EXPECT_TRUE(f.nextRow());
   String msg{"exceeded max value of "};
-  EXPECT_THROW(call([&] { f.getULong(Col, maxValue); },
+  EXPECT_THROW(call([&] { f.getU64(Col, maxValue); },
                    msg + std::to_string(maxValue) + FileMsg +
                        ", row: 3, column: 'Col', value: '" +
                        std::to_string(maxValue + 1) + "'"),
@@ -291,19 +291,19 @@ TEST_F(ColumnFileTest, GetUIntError) {
       DomainError);
 }
 
-TEST_F(ColumnFileTest, GetOptULong) {
+TEST_F(ColumnFileTest, GetOptU64) {
   auto f{write({Col}, "Col\n123\n")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_EQ(f.getOptULong(Col), 123);
+  EXPECT_EQ(f.getOptU64(Col), 123);
   EXPECT_TRUE(f.nextRow());
-  EXPECT_FALSE(f.getOptULong(Col));
+  EXPECT_FALSE(f.getOptU64(Col));
 }
 
-TEST_F(ColumnFileTest, GetOptULongError) {
+TEST_F(ColumnFileTest, GetOptU64Error) {
   auto f{write({Col}, "Col\nblah")};
   EXPECT_TRUE(f.nextRow());
-  EXPECT_THROW(call([&] { f.getOptULong(Col); },
-                   ConvertError + "unsigned long" + FileMsg +
+  EXPECT_THROW(call([&] { f.getOptU64(Col); },
+                   ConvertError + "unsigned number" + FileMsg +
                        ", row: 1, column: 'Col', value: 'blah'"),
       DomainError);
 }

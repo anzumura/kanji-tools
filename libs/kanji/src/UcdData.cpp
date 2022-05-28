@@ -99,7 +99,7 @@ void UcdData::load(const KanjiData::Path& file) {
       f.error("one of 'On', 'Kun', 'Morohashi' or 'JSource' must be populated");
     auto& name{f.get(NameCol)};
     if (name.size() > 4) f.error("name more than 4 bytes");
-    const auto radical{f.getULong(RadicalCol)};
+    const auto radical{f.getU64(RadicalCol)};
     if (radical < 1 || radical > Radical::MaxRadicals)
       f.error("radical '" + std::to_string(radical) + "' out of range");
     const auto joyo{f.getBool(JoyoCol)}, jinmei{f.getBool(JinmeiCol)};

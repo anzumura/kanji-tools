@@ -160,9 +160,10 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\ta\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
   EXPECT_CALL(data(), kyu(_)).WillOnce(Return(KenteiKyus::K1));
   EXPECT_CALL(data(), getRadicalByName("雨")).WillOnce(ReturnRef(RadRain));
-  EXPECT_THROW(call([this] { return fromFile<ExtraKanji>(); },
-                   "failed to convert to unsigned long - file: test.txt, row: "
-                   "1, column: 'Number', value: 'a'"),
+  EXPECT_THROW(
+      call([this] { return fromFile<ExtraKanji>(); },
+          "failed to convert to unsigned number - file: test.txt, row: "
+          "1, column: 'Number', value: 'a'"),
       DomainError);
 }
 

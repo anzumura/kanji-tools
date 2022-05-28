@@ -184,7 +184,7 @@ TEST(StringTest, UIntToChar) {
       RangeError);
 }
 
-TEST(StringTest, ULongToChar) {
+TEST(StringTest, U64ToChar) {
   EXPECT_EQ(toChar(0UL), '\0');
   EXPECT_EQ(toChar(255UL), '\xff');
   EXPECT_THROW(
