@@ -242,6 +242,7 @@
     "Zìdiǎn"
   ],
   "debug.onTaskErrors": "debugAnyway",
+  "doxdocgen.generic.commandSuggestion": true,
   "doxdocgen.c.commentPrefix": "///",
   "doxdocgen.c.firstLine": "",
   "doxdocgen.c.lastLine": "",
