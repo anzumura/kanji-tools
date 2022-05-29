@@ -5,7 +5,7 @@
 
 namespace kanji_tools {
 
-// 'TestUcd' creates an empty 'Ucd' instance via a conversion operator, but any
+// 'TestUcd' creates an empty 'Ucd' object via a conversion operator, but any
 // field can be overridden before creating, for example:
 //   const Ucd ucd{TestUcd{"龍"}.jinmei(true)};
 class TestUcd {
@@ -23,7 +23,7 @@ public:
   // allow setting 'name' via the ctor since it's the more commonly used field
   explicit TestUcd(Name name = "一") : _name(name) {}
 
-  // conversion operator to create a Ucd instance
+  // conversion operator to create a Ucd object
   [[nodiscard]] explicit operator Ucd() const {
     return Ucd{{_code ? _code : getCode(_name), _name}, _block, _version,
         _radical,

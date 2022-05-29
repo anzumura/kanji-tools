@@ -14,7 +14,7 @@ public:
   auto operator=(const Quiz&) = delete;
 
   // 'run' is called by 'quizMain.cpp'. it creates 'QuizLauncher' as well as its
-  // dependencies. 'QuizLauncher' constructor creates and starts an instance of
+  // dependencies. 'QuizLauncher' ctor creates and starts an instance of
   // either 'ListQuiz' or 'GroupQuiz' depending on command line args.
   static void run(const Args&, std::ostream& out = std::cout);
 protected:
