@@ -355,7 +355,7 @@ const Kana* DakutenKana::AccentedKana::plain() const { return &_plain; }
 const Kana* HanDakutenKana::hanDakuten() const { return &_hanDakuten; }
 
 // Kana and related class ctor template definitions can be in the .cpp file
-// since Kana instance are only created in this TU (Translation Unit)
+// since Kana objects are only created in this TU (Translation Unit)
 
 template<size_t R>
 Kana::RomajiVariants::RomajiVariants(CharArray<R> r, bool kunrei)
