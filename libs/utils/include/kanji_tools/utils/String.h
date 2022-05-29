@@ -9,12 +9,12 @@ namespace kanji_tools { /// \utils_group{String}
 /// String and StringView type aliases may be changed to `std::u8` versions
 /// later once they get wider standard library support (streams, regex, etc.)
 using String = std::string;
-using StringView = std::string_view; ///< \copydoc String
+using StringView = std::string_view; ///< \doc String
 
 /// type alias for Unicode code points (use `char32_t` instead of `wchar_t`
 /// since it's always 32 bits instead of platform dependent)
 using Code = char32_t;
-using CodeString = std::u32string; ///< \copydoc Code
+using CodeString = std::u32string; ///< \doc Code
 
 // Global Enums
 
@@ -44,7 +44,7 @@ constexpr auto BinaryDigits{2}, ///< number of binary digits (0 and 1)
 
 /// can be used by functions needing to return `const&` empty values
 inline const String EmptyString;
-inline const CodeString EmptyCodeString; ///< \copydoc EmptyString
+inline const CodeString EmptyCodeString; ///< \doc EmptyString
 
 // Global Functions
 
@@ -54,7 +54,7 @@ inline const CodeString EmptyCodeString; ///< \copydoc EmptyString
 /// return a copy of `s` prepended with `minSize - s.size()` zeroes
 [[nodiscard]] String addLeadingZeroes(const String& s, size_t minSize);
 [[nodiscard]] CodeString addLeadingZeroes(
-    const CodeString& s, size_t minSize); /// \copydoc addLeadingZeroes()
+    const CodeString& s, size_t minSize); /// \doc addLeadingZeroes()
 
 /// convert #Code into a Unicode code point (caps hex with minSize of 4)
 [[nodiscard]] String toUnicode(Code, BracketType = BracketType::None);
@@ -196,17 +196,17 @@ template<>
 ///     a single-byte character
 [[nodiscard]] bool isSingleByte(const String& s, bool sizeOne = true) noexcept;
 [[nodiscard]] bool isSingleByte(const CodeString& s,
-    bool sizeOne = true) noexcept; ///< \copydoc isSingleByte()
+    bool sizeOne = true) noexcept; ///< \doc isSingleByte()
 
 /// return true if all characters are single-byte
 [[nodiscard]] bool isAllSingleByte(const String&) noexcept;
 [[nodiscard]] bool isAllSingleByte(
-    const CodeString&) noexcept; ///< \copydoc isAllSingleByte()
+    const CodeString&) noexcept; ///< \doc isAllSingleByte()
 
 /// return true if any characters are single-byte
 [[nodiscard]] bool isAnySingleByte(const String&) noexcept;
 [[nodiscard]] bool isAnySingleByte(
-    const CodeString&) noexcept; ///< \copydoc isAnySingleByte()
+    const CodeString&) noexcept; ///< \doc isAnySingleByte()
 
 /// convert first char of `s` (used by firstLower() and firstUpper())
 /// \tparam T conversion function type

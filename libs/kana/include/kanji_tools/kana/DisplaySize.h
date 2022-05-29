@@ -2,8 +2,9 @@
 
 #include <kanji_tools/utils/UnicodeBlock.h>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kana_group{DisplaySize}
 
+/// used for determining if a character is narrow or wide display
 // --- begin generated code from 'parseEastAsiaWidth.sh' ---
 inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
     makeBlock<0x231A, 0x231B>(), makeBlock<0x2329, 0x232A>(),
@@ -63,19 +64,20 @@ inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
     makeBlock<0x20000, 0x2FFFD>(), makeBlock<0x30000, 0x3FFFD>()};
 // --- end generated code from 'parseEastAsiaWidth.sh' ---
 
-// return size in terms of how many columns would be required for display on a
-// terminal, i.e, 1 for a normal character and 2 for a wide character
+/// return size in terms of how many columns would be required for display on a
+/// terminal, i.e, 1 for a normal character and 2 for a wide character
 [[nodiscard]] size_t displaySize(const CodeString&);
-[[nodiscard]] size_t displaySize(const char*);
-[[nodiscard]] size_t displaySize(const String&);
+[[nodiscard]] size_t displaySize(const char*);   ///< \ displaySize
+[[nodiscard]] size_t displaySize(const String&); ///< \ displaySize
 
-// 'wideSetw' returns a value that works for 'std::setw' when 's' contains wide
-// chars. For example, if 's' contains 1 wide char that is 3 bytes then calling
-// 'os << std::setw(4) << s' will not result in expected padding of 2 (the wide
-// char plus 2 to get 4). Instead it will add 1 space since std::setw only looks
-// at bytes and s already has 3 bytes. However, using this function, i.e., 'os
-// << std::setw(wideSetw(s, 6)) << s' will correctly fill with 2 by returning
-// '5' (5 is 2 more than the 3 byte size of 's').
+/// return a value that works for `std::setw` when `s` contains wide char
+///
+/// \details If s contains 1 '3 byte char that has wide display' then `os <<
+/// std::setw(4) << s` will not result in expected padding of 2 (the wide char
+/// plus 2 spaces to get 4). Instead it will add 1 space since `std::setw` only
+/// looks at bytes. However, `os << std::setw(wideSetw(s, 6)) << s` correctly
+/// pads with 2 by returning '5' (5 is 2 more than the 3 byte size of `s`).
 [[nodiscard]] int wideSetw(const String& s, size_t setwLen);
 
+/// \end_group
 } // namespace kanji_tools

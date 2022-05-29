@@ -20,7 +20,7 @@ public:
   /// be across multiple ColumnFile instances.
   class Column {
   public:
-    /// create a Column instance for the given `name` (looks up `number`)
+    /// create a Column object for the given `name` (looks up `number`)
     explicit Column(const String& name);
 
     /// equal operator
@@ -68,7 +68,7 @@ public:
   ///     non-0 and less than the converted result
   uint64_t getU64(const Column&, uint64_t maxValue = 0) const;
 
-  /// return std::nullopt if column is empty, otherwise works like getU64()
+  /// return `std::nullopt` if column is empty, otherwise works like getU64()
   OptU64 getOptU64(const Column&, uint64_t maxValue = 0) const;
 
   /// calls getU64() with the appropriate max value for numeric type `T`
