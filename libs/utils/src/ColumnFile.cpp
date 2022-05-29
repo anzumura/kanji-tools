@@ -140,6 +140,10 @@ bool ColumnFile::getBool(const Column& column) const {
   return false;
 }
 
+Code ColumnFile::getChar32(const Column& c) const {
+  return getChar32(c, get(c));
+}
+
 Code ColumnFile::getChar32(const Column& column, const String& s) const {
   if (s.size() < UnicodeStringMinSize || s.size() > UnicodeStringMaxSize)
     error("failed to convert to Code, size must be 4 or 5", column, s);
@@ -148,10 +152,6 @@ Code ColumnFile::getChar32(const Column& column, const String& s) const {
           [](auto i) { return i < '0' || i > 'F' || (i < 'A' && i > '9'); }))
     error("failed to convert to Code, invalid hex", column, s);
   return static_cast<Code>(std::stoi(s, nullptr, HexDigits));
-}
-
-Code ColumnFile::getChar32(const Column& c) const {
-  return getChar32(c, get(c));
 }
 
 void ColumnFile::error(const String& msg) const {
