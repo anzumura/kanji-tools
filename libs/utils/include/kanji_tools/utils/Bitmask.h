@@ -11,11 +11,10 @@ namespace kanji_tools { /// \utils_group{Bitmask}
 ///
 /// Example code for enabling this functionality for 'MyEnum':
 /// \code
-/// template<> inline constexpr auto is_bitmask<MyEnum>{true};
+///   template<> inline constexpr auto is_bitmask<MyEnum>{true};
 /// \endcode
 ///
-/// \tparam T scoped enum with `unsigned` underlying type and values equal to
-///           powers of 2
+/// \tparam T scoped enum with `unsigned` underlying type and power of 2 values
 template<typename T,
     std::enable_if_t<is_scoped_enum_v<T> &&
                          std::is_unsigned_v<std::underlying_type_t<T>>,

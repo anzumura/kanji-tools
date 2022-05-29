@@ -70,7 +70,7 @@ inline const CodeString EmptyCodeString; ///< \copydoc EmptyString
 
 /// safely converts `x` to a char
 /// \param allowNegative if true (the default) then `x` can't be less than -128
-///                      otherwise `x` must be positive.
+///     otherwise `x` must be positive.
 /// \param x the value to convert (must be < 256 regardless of `allowNegative`)
 /// \return the char value
 /// \throw RangeError if `x` is out of range for char type
@@ -101,8 +101,8 @@ inline const CodeString EmptyCodeString; ///< \copydoc EmptyString
 /// \param x the value to convert
 /// \param brackets specify type of brackets (can be `None` for no brackets)
 /// \param minSize `0` (the default) causes enough leading zeroes to be added to
-///                make results the same size for a given type, i.e., if `T` is
-///                `char` then the result will have a size of 8
+///     make results the same size for a given type, i.e., if `T` is `char` then
+///     the result will have a size of 8
 /// \return #String with the binary representation of `x`
 template<typename T>
 [[nodiscard]] inline auto toBinary(
@@ -127,8 +127,8 @@ template<typename T>
 /// \param brackets specify type of brackets (can be `None` for no brackets)
 /// \param hexCase specify the case for hex digits
 /// \param minSize `0` (the default) causes enough leading zeroes to be added to
-///                make results the same size for a given type, i.e., if `T` is
-///                `char` then the result will have a size of 2 (00 - FF)
+///     make results the same size for a given type, i.e., if `T` is `char` then
+///     the result will have a size of 2 (00 - FF)
 /// \return #String with the binary representation of `x`
 template<typename T>
 [[nodiscard]] inline auto toHex(
@@ -191,9 +191,9 @@ template<>
 /// checks if the first character of `s` is a single-byte character
 /// \param s input string
 /// \param sizeOne if false (the default) then `s` can be any non-empty size,
-///                otherwise `s.size()` must have be exactly `1`
+///     otherwise `s.size()` must have be exactly `1`
 /// \return true if `sizeOne` criteria is met and the first character of `s` is
-///              a single-byte character
+///     a single-byte character
 [[nodiscard]] bool isSingleByte(const String& s, bool sizeOne = true) noexcept;
 [[nodiscard]] bool isSingleByte(const CodeString& s,
     bool sizeOne = true) noexcept; ///< \copydoc isSingleByte()

@@ -48,12 +48,13 @@ private:
 ///
 /// Classes should derive from **Symbol<T>** and define **Type**, for example:
 /// \code
-/// class TestSymbol : public Symbol<TestSymbol> {
-/// public:
-///   inline static const String Type{"TestSymbol"};
-///   using Symbol::Symbol;
-/// };
+///   class TestSymbol : public Symbol<TestSymbol> {
+///   public:
+///     inline static const String Type{"TestSymbol"};
+///     using Symbol::Symbol;
+///   };
 /// \endcode
+///
 /// \tparam T derived class (see sample code above)
 template<typename T> class Symbol : public BaseSymbol {
 public:

@@ -28,9 +28,9 @@ protected:
 ///
 /// The following code should print "all Kana" (see #KanaRange below)
 /// \code
-/// const std::wregex allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
-/// const auto s{L"ひらがな"};
-/// if (std::regex_search(s, allKana)) std::cout << "all Kana\n";
+///   const std::wregex allKana{std::wstring{L"^["} + KanaRange() + L"]+$"};
+///   const auto s{L"ひらがな"};
+///   if (std::regex_search(s, allKana)) std::cout << "all Kana\n";
 /// \endcode
 template<typename... Ts> class BlockRange : public BaseBlockRange {
 public:
