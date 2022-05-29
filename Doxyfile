@@ -1,7 +1,51 @@
 # Doxyfile 1.9.4
 
-# INPUT and OUTPUT_DIRECTORY are defined below assuming 'doxygen' is executed in
-# the top level repo directory - output is generated under build/docs/html.
+PROJECT_BRIEF          = "Tools for working with Japanese Kana and Kanji"
+PROJECT_NAME           = "Kanji Tools"
+PROJECT_NUMBER         = 1.0
+
+# below values assume 'doxygen' is executed in the top level repo directory
+INPUT                  = README.md .vscode docs libs
+IMAGE_PATH             = docs
+LAYOUT_FILE            = DoxygenLayout.xml
+OUTPUT_DIRECTORY       = build/docs
+USE_MDFILE_AS_MAINPAGE = README.md
+RECURSIVE              = YES
+
+# only generate HTML output (under build/docs/html) for now
+GENERATE_LATEX         = NO
+
+# for now extract everything (these are all NO by default)
+EXTRACT_ALL            = YES
+EXTRACT_ANON_NSPACES   = YES
+EXTRACT_PRIV_VIRTUAL   = YES
+EXTRACT_PACKAGE        = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+INLINE_SOURCES         = YES
+# EXTRACT_LOCAL_CLASSES is YES by default
+# EXTRACT_LOCAL_METHODS is only relevant for Objective-C
+
+# overriding any of these to YES has no effect if EXTRACT_ALL is YES
+# WARN_IF_UNDOCUMENTED   = YES # default is NO
+# HIDE_UNDOC_CLASSES     = YES # default is NO
+# HIDE_UNDOC_MEMBERS     = YES # default is NO
+
+### More overridden settings
+
+DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
+EXTENSION_MAPPING      = json=md
+FILE_PATTERNS          = *.cpp *.h *.md *.json
+GROUP_NESTED_COMPOUNDS = YES
+HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
+MULTILINE_CPP_IS_BRIEF = YES
+QUIET                  = YES
+SHOW_INCLUDE_FILES     = NO # show list of files included by a file
+TAB_SIZE               = 2
+WARN_AS_ERROR          = FAIL_ON_WARNINGS # warnings cause a non-zero return
+WARN_IF_INCOMPLETE_DOC = NO
+
+### ALIASES (custom commands)
 
 # create a Doxygen group (module) in a header (used by below 'XX_group' aliases)
 ALIASES += grp{2}="\file \2.h header file in lib: \b \1^^\addtogroup \1_\2^^@{"
@@ -22,31 +66,7 @@ ALIASES += kanji_group{1}="\grp{kanji,\1}" kanji{1}="\hdr{kanji,\1}"
 ALIASES += quiz_group{1}="\grp{quiz,\1}" quiz{1}="\hdr{quiz,\1}"
 ALIASES += stats_group{1}="\grp{stats,\1}" stats{1}="\hdr{stats,\1}"
 
-# override default settings for the following config values
-DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
-EXTENSION_MAPPING      = json=md
-EXTRACT_ALL            = YES
-FILE_PATTERNS          = *.cpp *.h *.md *.json
-GENERATE_LATEX         = NO
-GROUP_NESTED_COMPOUNDS = YES
-HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
-IMAGE_PATH             = docs
-INPUT                  = README.md .vscode docs libs
-INPUT_FILTER           = "sed 's/\[\[nodiscard]] //'"
-LAYOUT_FILE            = DoxygenLayout.xml
-MULTILINE_CPP_IS_BRIEF = YES
-OUTPUT_DIRECTORY       = build/docs
-OUTPUT_LANGUAGE        = English
-PROJECT_BRIEF          = "Tools for working with Japanese Kana and Kanji"
-PROJECT_NAME           = "Kanji Tools"
-PROJECT_NUMBER         = 1.0
-QUIET                  = YES
-RECURSIVE              = YES
-SHOW_INCLUDE_FILES     = NO # show list of files included by a file
-TAB_SIZE               = 2
-USE_MDFILE_AS_MAINPAGE = README.md
-WARN_AS_ERROR          = FAIL_ON_WARNINGS # warnings cause a non-zero return
-WARN_IF_INCOMPLETE_DOC = NO
+### Comments on other config values
 
 # INLINE_GROUPED_CLASSES = YES
 
@@ -61,8 +81,6 @@ WARN_IF_INCOMPLETE_DOC = NO
 # GENERATE_TODOLIST      = NO # show docs after \todo
 # HIDE_IN_BODY_DOCS      = YES # in-body docs are added to details by default
 # HIDE_FRIEND_COMPOUNDS  = YES
-# HIDE_UNDOC_CLASSES     = YES
-# HIDE_UNDOC_MEMBERS     = YES
 # INHERIT_DOCS           = NO
 # INLINE_INFO            = NO # adds 'inline' on the right for inline functions
 # REPEAT_BRIEF           = NO # prepend brief member description to details
@@ -82,6 +100,3 @@ WARN_IF_INCOMPLETE_DOC = NO
 # REFERENCED_BY_RELATION = YES
 # REFERENCES_RELATION    = YES
 # STRIP_CODE_COMMENTS    = NO # strip doxygen type comments from source code
-
-# this flag only applies if EXTRACT_ALL is NO
-# WARN_IF_UNDOCUMENTED   = NO
