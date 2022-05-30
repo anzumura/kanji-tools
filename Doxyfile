@@ -34,15 +34,16 @@ INLINE_SOURCES         = YES
 ### More overridden settings
 
 DISTRIBUTE_GROUP_DOC   = YES # one description can be used for each group member
-EXTENSION_MAPPING      = json=md
+EXTENSION_MAPPING      = json=md # README links to a couple local json files
 FILE_PATTERNS          = *.cpp *.h *.md *.json
 GROUP_NESTED_COMPOUNDS = YES
 HIDE_SCOPE_NAMES       = YES # hides the namespace:: part
+INPUT_FILTER           = "sed 's/::template /::/'" # ::template confuses doxygen
 MULTILINE_CPP_IS_BRIEF = YES
 QUIET                  = YES
 SHOW_INCLUDE_FILES     = NO # show list of files included by a file
 TAB_SIZE               = 2
-WARN_AS_ERROR          = FAIL_ON_WARNINGS # warnings cause a non-zero return
+WARN_AS_ERROR          = FAIL_ON_WARNINGS # warnings cause non-zero exit status
 WARN_IF_INCOMPLETE_DOC = NO
 
 ### ALIASES (custom commands)
