@@ -36,7 +36,7 @@ Quiz::~Quiz() {
 }
 
 char Quiz::get(const String& msg, const Choices& choices, OptChar def,
-    bool useQuit) const {
+    bool useQuit) const { // LCOV_EXCL_LINE
   return choice().get(msg, useQuit, choices, def);
 }
 
