@@ -7,80 +7,73 @@
 #include <iostream>
 #include <map>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \utils_group{EnumList}
 
-// 'EnumList' is a helper class for scoped enums that have contiguous values
-// starting at zero. It provides 'size', 'operator[]' and 'fromString' methods
-// as well as 'begin' and 'end' methods for range based iteration over the enum
-// values. There's also a 'toString' method used by out-of-class 'toString' and
-// ostream 'operator<<' functions.
-//
-// In order to enable this functionality 'is_enumlist' must be set to 'true'
-// and an EnumList instance must be created with string values in the same order
-// as the scoped enum values.
-//
-// Here's an example of how to create (and use) an EnumList:
-//
-//   enum class Colors : Enum::Size { Red, Green, Blue };
-//   template<> inline constexpr auto is_enumlist<Colors>{true};
-//   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
-//     "Blue")};
-//
-//   for (auto c : AllColors) { std::cout << c << '\n'; }
-//
-// If the enum has a final 'None' value then extra functionality (and compile
-// checks) can be enabled by specializing 'is_enumlist_with_none' instead.
-// Setting this bool enables 'hasValue', 'operator!' and 'isNextNone' global
-// functions based on T::None. "None" string shouldn't be passed to 'create',
-// instead there's a static_assert to check that T::None is the next value after
-// the list of strings (this helps keep the enum and the strings in sync).
-//
-// Here's an example of how to create (and use) an EnumList with 'None':
-//
-//   enum class Colors : Enum::Size { Red, Green, Blue, None };
-//   template<> inline constexpr auto is_enumlist_with_none<Colors>{true};
-//   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
-//     "Blue")};
-//
-//   // prints all Colors including "None"
-//   for (auto c : AllColors) { std::cout << c << '\n'; }
-//
-// A scoped enum can't be both an 'EnumList' and an 'EnumListWithNone'.
-
-// specialize 'is_enumlist' to enable 'EnumList'
+/// specialize to enable an enum to be used in EnumList class
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 inline constexpr auto is_enumlist{false};
 
-// specialize 'is_enumlist_with_none' to enable 'EnumListWithNone'
+/// specialize to enable an enum to be used in EnumListWithNone class
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
 inline constexpr auto is_enumlist_with_none{false};
 
+/// alias to check if an enum has been enabled for EnumList or EnumListWithNone
 template<typename T, typename _ = int>
 using isEnumList =
     std::enable_if_t<is_enumlist<T> || is_enumlist_with_none<T>, _>;
 
-// 'BaseEnumList' has a pure virtual 'toString' function holds a map from
-// 'String' to 'Ts' used by 'fromString' methods. It also has static 'create',
-// 'isCreated' and 'instance' public functions.
+/// alias that results in `bool` if enum has been enabled for EnumListWithNone
+template<typename T>
+using isEnumListWithNone = std::enable_if_t<is_enumlist_with_none<T>, bool>;
+
+/// base class with pure virtual toString() method as well as fromString() and
+/// static create() and instance() methods \utils{EnumList}
+///
+/// The concrete EnumList and EnumListWithNone classes provide more methods such
+/// as size(), operator[]() as well as begin() and end() for iterating over the
+/// enum values. Once an instance of one of the derived classes has been created
+/// via the create() method then global toString() and operator<<() functions
+/// can also be used for `T` (the enum).
+///
+/// If the enum has a final 'None' value then extra functionality (and compile
+/// checks) can be enabled by specializing #is_enumlist_with_none instead of
+/// #is_enumlist. Setting this bool also enables hasValue(), operator!() and
+/// isNextNone() global functions based on T::None. "None" string shouldn't be
+/// passed to create(), instead there's a static_assert to check that T::None is
+/// the next value after the list of strings (this helps keep the enum and the
+/// strings in sync).
+///
+/// A scoped enum can't be enabled for both EnumList and EnumListWithNone.
+///
+/// \tparam T scoped enum with contiguous values starting at zero
 template<typename T, isEnumList<T> = 0> class BaseEnumList {
 public:
-  // 'create' requires at least one 'name' (see comments above)
+  /// create an instance of EnumList or EnumListWithNone (depending on which
+  /// bool has been specialized for `T`) from one or more String names
+  /// \throw DomainError if an instance has already been created or if a name is
+  ///     used more than once or if "None" is specified for an EnumListWithNone
   template<typename... Names>
   [[nodiscard]] static auto create(const String& name, Names...);
 
+  /// return true if an instance of BaseEnumList<T> has been created
   [[nodiscard]] static bool isCreated() noexcept { return _instance; }
 
+  /// return static instance, create() must be called before using this method
+  /// \throw DomainError if instance hasn't been created
   [[nodiscard]] static auto& instance() {
     if (!_instance) domainError("must call 'create' before calling 'instance'");
     return *_instance;
   }
 
+  /// dtor sets instance back to nullptr
   virtual ~BaseEnumList() { _instance = nullptr; }
 
+  /// implemented by derived EnumListContainer class
   [[nodiscard]] virtual const String& toString(T) const = 0;
 
-  // returns 'T' instance for the given string (does not support T::None). See
-  // EnumListWithNone form more 'fromString...' methods that support T::None.
+  /// return `T` instance for `name` (see EnumListWithNone for more 'fromString'
+  /// methods that support T::None)
+  /// \throw DomainError if `name` doesn't map to an enum value of `T`
   [[nodiscard]] T fromString(const String& name) const;
 protected:
   static void domainError(const String& msg) { throw DomainError{msg}; }
@@ -94,51 +87,54 @@ private:
   std::map<String, T> _nameMap;
 };
 
-// 'EnumListContainer' provides common functionality for derived classes
-// including 'begin', 'end', 'operator[]' and 'toString'. Template args are:
-// - T:     scoped enum type
-// - N:     number of enum values (used for iterating and index checking)
-// - Names: number of strings in '_names' array (same as N by default, but set
-//          to 'N - 1' for EnumListWithNone since 'None' isn't stored)
+/// provide common functionality for derived classes including begin(), end(),
+/// operator[]() and toString() \utils{EnumList}
+/// \tparam T scoped enum with contiguous values starting at zero
+/// \tparam N number of enum values used for iterating and index checking
+/// \tparam Names number of string names (same as N by default)
 template<typename T, Enum::Size N, Enum::Size Names = N>
 class EnumListContainer : public EnumContainer<T, N>, public BaseEnumList<T> {
 public:
   using base = EnumContainer<T, N>;
 
+  /// return ConstIterator pointing at the first enum value
   [[nodiscard]] static auto begin() noexcept { return ConstIterator{0}; }
+
+  /// return ConstIterator pointing at 'one-past' the last enum value
   [[nodiscard]] static auto end() noexcept { return ConstIterator{N}; }
 
+  /// return enum value at position `i`
+  /// \tparam I must be in integral type
+  /// \throw RangeError if `i` is negative or beyond the final enum value
   template<std::integral I> [[nodiscard]] auto operator[](I i) const {
     return to_enum<T>(base::checkIndex(i, base::IndexMsg));
   }
 
+  /// return String name for enum value `x`
+  /// \throw RangeError if `x` is out of range (can only happen if a bad value
+  ///     is cast to the enum type)
   [[nodiscard]] const String& toString(T x) const override {
     return _names[base::getIndex(x)];
   }
 
+  /// iterator for looping over values of `T` (the enum) \utils{EnumList}
   class ConstIterator : public base::template Iterator<ConstIterator> {
   public:
-    // base iterator implements some operations such as prefix and postfix
-    // increment and decrement, operator[], +=, -=, + and -.
     using iBase = typename base::template Iterator<ConstIterator>;
     using iBase::operator-, iBase::index, iBase::rangeError;
 
-    // forward iterator requirements (default ctor)
-
+    /// default ctor sets location to first value (forward iterator requirement)
     ConstIterator() noexcept : iBase{0} {}
 
-    // input iterator requirements (except operator->)
-
+    /// return value at current location (input iterator requirement)
+    /// \throw RangeError if location is invalid, i.e., at 'end' location
     [[nodiscard]] auto operator*() const {
-      // exception should only happen when dereferencing 'end' since other
-      // methods prevent moving out of range
       if (index() >= N)
         rangeError(base::IndexMsg + std::to_string(index()) + base::RangeMsg);
       return to_enum<T>(index());
     }
 
-    // random-access iterator requirements
-
+    /// return difference between iterators (random-access iterator requirement)
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
       return index() - x.index();
     }
@@ -157,7 +153,26 @@ private:
   std::array<String, Names> _names;
 };
 
-// see comments at the top of this file (EnumList.h) for more details
+/// provide iteration and conversion to/from String for enums \utils{EnumList}
+///
+/// Here's an example of how to create and use EnumList:
+/// \code
+///   // must have underlying type Enum::Size and values starting at 0
+///   enum class Colors : Enum::Size { Red, Green, Blue };
+///
+///   // need to specialize is_enumlist before calling 'create'
+///   template<> inline constexpr auto is_enumlist<Colors>{true};
+///
+///   // call 'create' with strings in the same order as the enum values
+///   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
+///     "Blue")};
+///
+///   // print all Colors
+///   for (auto c : AllColors) { std::cout << c << '\n'; }
+/// \endcode
+///
+/// \tparam T scoped enum with contiguous values starting at zero
+/// \tparam N number of enum values
 template<typename T, Enum::Size N>
 class EnumList : public EnumListContainer<T, N> {
 public:
@@ -173,29 +188,60 @@ private:
   }
 };
 
-// Base 'EnumListContainer' has size 'N + 1' to account for final 'None' when
-// iterating. A string value for 'None' is not stored in '_names' or base class
-// '_nameMap' for safety (see private 'setName') and to support the special
-// handling in 'fromString' with 'allowEmptyAsNone'.
+/// provide iteration and conversion to/from String for enums that have a final
+/// 'None' value \utils{EnumList}
+///
+/// The base class is instantiated with size `N + 1` to account T::None when
+/// iterating, but is also passed `N` for the size of `_names` since a "None"
+/// String is not stored for safety, see setName(), as well as to support the
+/// special handling in fromString() with `allowEmptyAsNone`.
+///
+/// Here's an example of how to create and use EnumListWithNone:
+/// \code
+///   // must have underlying type Enum::Size, start at 0 and final value 'None'
+///   enum class Colors : Enum::Size { Red, Green, Blue, None };
+///
+///   // need to specialize is_enumlist_with_none before calling 'create'
+///   template<> inline constexpr auto is_enumlist_with_none<Colors>{true};
+///
+///   // call 'create' with strings in the same order as the enum values and
+///   // don't specify "None"
+///   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
+///     "Blue")};
+///
+///   // prints all Colors including final "None"
+///   for (auto c : AllColors) { std::cout << c << '\n'; }
+/// \endcode
+/// \tparam T scoped enum with contiguous values starting at zero
+/// \tparam N number of enum values (not including final 'None')
 template<typename T, Enum::Size N>
 class EnumListWithNone : public EnumListContainer<T, N + 1, N> {
 public:
   using base = EnumListContainer<T, N + 1, N>;
 
+  /// return String name for enum value `x` including support for T::None
+  /// \throw RangeError if `x` is out of range (can only happen if a bad value
+  ///     is cast to the enum type)
   [[nodiscard]] const String& toString(T x) const override {
     return x == T::None ? None : base::toString(x);
   }
 
-  [[nodiscard]] auto fromStringAllowEmpty(const String& s) const {
-    return s.empty() ? T::None : base::fromString(s);
+  /// return enum value for `name`, empty `name` returns T::None
+  /// \throw DomainError if `name` doesn't map to an enum value of `T`
+  [[nodiscard]] auto fromStringAllowEmpty(const String& name) const {
+    return name.empty() ? T::None : base::fromString(name);
   }
 
-  [[nodiscard]] auto fromStringAllowNone(const String& s) const {
-    return s == None ? T::None : base::fromString(s);
+  /// return enum value for `name`, allows "None" to return T::None
+  /// \throw DomainError if `name` doesn't map to an enum value of `T`
+  [[nodiscard]] auto fromStringAllowNone(const String& name) const {
+    return name == None ? T::None : base::fromString(name);
   }
 
-  [[nodiscard]] auto fromStringAllowEmptyAndNone(const String& s) const {
-    return s.empty() || s == None ? T::None : base::fromString(s);
+  /// return enum value for `name`, allows empty or "None" to return T::None
+  /// \throw DomainError if `name` doesn't map to an enum value of `T`
+  [[nodiscard]] auto fromStringAllowEmptyAndNone(const String& name) const {
+    return name.empty() || name == None ? T::None : base::fromString(name);
   }
 private:
   inline const static String None{"None"};
@@ -215,7 +261,7 @@ private:
   }
 };
 
-// out of class member definitions for 'BaseEnumList<T>'
+// out-of-class member definitions for BaseEnumList<T>
 
 template<typename T, isEnumList<T> U>
 template<typename... Names>
@@ -250,32 +296,34 @@ void BaseEnumList<T, U>::insert(const String& name, Enum::Size index) {
 // below are some global functions that are enabled for enums types that have
 // instances of 'EnumList' or 'EnumListWithNone'
 
+/// return String name for `x`
 template<typename T> [[nodiscard]] isEnumList<T, const String&> toString(T x) {
   return BaseEnumList<T>::instance().toString(x);
 }
 
+/// write String name of `x` to `os`
 template<typename T>
 isEnumList<T, std::ostream&> operator<<(std::ostream& os, T x) {
   return os << toString(x);
 }
 
-template<typename T>
-using isEnumListWithNone = std::enable_if_t<is_enumlist_with_none<T>, bool>;
-
+/// return true if `x` is not T::None
 template<typename T>
 [[nodiscard]] constexpr isEnumListWithNone<T> hasValue(T x) noexcept {
   return x != T::None;
 }
 
+/// return true if `x` is T::None
 template<typename T>
 [[nodiscard]] constexpr isEnumListWithNone<T> operator!(T x) noexcept {
   return !hasValue(x);
 }
 
-// 'isNextNone' returns true if the next value after 'x' is T::None
+/// return true if the next value after `x` is T::None
 template<typename T>
 [[nodiscard]] constexpr isEnumListWithNone<T> isNextNone(T x) noexcept {
   return to_enum<T>(to_underlying(x) + 1) == T::None;
 }
 
+/// \end_group
 } // namespace kanji_tools

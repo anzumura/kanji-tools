@@ -14,7 +14,7 @@ namespace kanji_tools { /// \utils_group{ColumnFile}
 /// with a header row containing the column names \utils{ColumnFile}
 class ColumnFile {
 public:
-  /// represents a column in a ColumnFile
+  /// represents a column in a ColumnFile \utils{ColumnFile}
   ///
   /// Column instances are used to get values from each row and a Column can be
   /// be across multiple ColumnFile instances.

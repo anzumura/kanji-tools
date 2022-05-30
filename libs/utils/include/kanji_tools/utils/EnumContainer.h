@@ -6,12 +6,14 @@
 #include <compare>
 #include <concepts>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \utils_group{EnumContainer}
 
-// 'Enum' is a non-templated base class for 'EnumContainer'. It prevents copying
-// and has a 'Size' type that needs to be used by scoped enums participating in
-// the containers. A small unsigned type is used to make sure enums don't have
-// negative values (they are supposed to be contiguous values starting at zero).
+/// non-templated base class for EnumContainer \utils{EnumContainer}
+///
+/// This class prevents copying and has a #Size type that needs to be used by
+/// scoped enums participating in the containers. A small unsigned type is used
+/// to make sure enums don't have negative values (they are supposed to have
+/// contiguous values starting at zero).
 class Enum {
 public:
   using Size = uint8_t;
@@ -22,22 +24,23 @@ protected:
   inline static const String IndexMsg{"index '"}, EnumMsg{"enum '"},
       RangeMsg{"' is out of range"};
 
+  /// non-templated base class for EnumContainer::Iterator \utils{EnumContainer}
   class BaseIterator {
   public:
     using iterator_category = std::random_access_iterator_tag;
     using difference_type = std::ptrdiff_t;
 
-    // operator<=> enables == and != needed for 'input interator' and <, >, <=
-    // and >= needed for 'random access iterator'
+    /// operator<=> enables == and != needed for 'input interator' and <, >, <=
+    /// and >= needed for 'random access iterator'
     [[nodiscard]] auto operator<=>(
         const BaseIterator&) const noexcept = default; // NOLINT: nullptr
   protected:
     inline static const String BadBegin{"can't decrement past zero"},
         BadEnd{"can't increment past end"};
 
-    // helper functions for throwing errors if the value passed in is 'false'
+    /// helper functions for throwing errors if value passed in is 'false' @{
     static void comparable(bool);
-    static void initialized(bool);
+    static void initialized(bool); ///@}
 
     static void rangeError(const String&);
 
@@ -54,9 +57,10 @@ protected:
   Enum() noexcept = default;
 };
 
-// 'EnumContainer' is a base for 'EnumList' and 'EnumMap' classes. It provides
-// 'size' and 'getIndex' methods and an 'Iterator' with common functionality
-// that is further enhanced by the derived class iterators.
+/// templated base class for EnumList and EnumMap \utils{EnumContainer}
+///
+/// This class provides size() and getIndex() methods and an Iterator with
+/// functionality that is further enhanced by the derived class iterators.
 template<typename T, Enum::Size N> class EnumContainer : public Enum {
 public:
   [[nodiscard]] static constexpr auto size() noexcept { return N; }
@@ -65,29 +69,29 @@ protected:
     return checkIndex(to_underlying(x), EnumMsg);
   }
 
+  /// ctor makes sure enum T has the same underlying type as Size since derived
+  /// classes (like EnumList) are designed to only support up to Size items
   EnumContainer() noexcept {
-    // make sure enum 'T' has the same underlying type as 'Size' since derived
-    // classes (like EnumList) are designed to only support up to 'Size' items
     static_assert(std::is_same_v<std::underlying_type_t<T>, Size>);
   }
 
-  // Random access iterator for looping over all values of T (the scoped enum).
+  /// Random access iterator for looping over values of T \utils{EnumContainer}
   template<typename Derived> class Iterator : public BaseIterator {
   public:
-    // common requirements for iterators
+    /// common requirements for iterators @{
     auto& operator++();
-    auto operator++(int);
+    auto operator++(int); ///@}
 
-    // bi-directional iterator requirements
+    /// bi-directional iterator requirements @{
     auto& operator--();
-    auto operator--(int);
+    auto operator--(int); ///@}
 
-    // random-access iterator requirements (except non-const operator[])
+    /// random-access iterator requirements (except non-const operator[]) @{
     [[nodiscard]] auto operator[](difference_type) const;
     auto& operator+=(difference_type);
     auto& operator-=(difference_type);
     [[nodiscard]] auto operator+(difference_type) const;
-    [[nodiscard]] auto operator-(difference_type) const;
+    [[nodiscard]] auto operator-(difference_type) const; ///@}
   protected:
     explicit Iterator(Size index) noexcept : BaseIterator{index} {}
   private:
@@ -104,6 +108,8 @@ protected:
   requires std::integral<I> || std::same_as<T, I>
   [[nodiscard]] static auto checkIndex(I i, const String& name);
 };
+
+// Out-of-class template definitions
 
 template<typename T, Enum::Size N> template<typename I>
 requires std::integral<I> || std::same_as<T, I>
@@ -193,4 +199,5 @@ auto EnumContainer<T, N>::Iterator<Derived>::operator-(
   return x -= i;
 }
 
+/// \end_group
 } // namespace kanji_tools
