@@ -208,6 +208,14 @@ CodeString fromUtf8(const String& s, size_t maxSize) {
   return fromUtf8(s.c_str(), maxSize);
 }
 
+std::wstring fromUtf8ToWstring(const char* s) {
+  return convertFromUtf8<std::wstring>(s, 0, WCharVals);
+}
+
+std::wstring fromUtf8ToWstring(const String& s) {
+  return fromUtf8ToWstring(s.c_str());
+}
+
 Code getCode(const char* s) noexcept {
   if (!s || !*s) return {};
   auto u{reinterpret_cast<const uint8_t*>(s)};
@@ -216,9 +224,9 @@ Code getCode(const char* s) noexcept {
 
 Code getCode(const String& s) noexcept { return getCode(s.c_str()); }
 
-String toUtf8(Code c) {
+String toUtf8(Code x) {
   String result;
-  convertToUtf8(c, result);
+  convertToUtf8(x, result);
   return result;
 }
 
@@ -232,16 +240,6 @@ String toUtf8(const CodeString& s) {
   result.reserve(s.size());
   for (auto c : s) convertToUtf8(c, result);
   return result;
-}
-
-// wstring versions of conversion functions
-
-std::wstring fromUtf8ToWstring(const char* s) {
-  return convertFromUtf8<std::wstring>(s, 0, WCharVals);
-}
-
-std::wstring fromUtf8ToWstring(const String& s) {
-  return fromUtf8ToWstring(s.c_str());
 }
 
 String toUtf8(const std::wstring& s) {
@@ -268,8 +266,8 @@ MBUtf8Result validateMBUtf8(
 }
 
 MBUtf8Result validateMBUtf8(
-    const String& s, Utf8Result& e, bool sizeOne) noexcept {
-  return validateMBUtf8(s.c_str(), e, sizeOne);
+    const String& s, Utf8Result& error, bool sizeOne) noexcept {
+  return validateMBUtf8(s.c_str(), error, sizeOne);
 }
 
 bool isValidMBUtf8(const String& s, bool sizeOne) noexcept {
