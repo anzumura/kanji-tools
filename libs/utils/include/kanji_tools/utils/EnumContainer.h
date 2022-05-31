@@ -78,20 +78,41 @@ protected:
   /// Random access iterator for looping over values of T \utils{EnumContainer}
   template<typename Derived> class Iterator : public BaseIterator {
   public:
-    /// common requirements for iterators @{
+    /// prefix increment operator (common for all iterators)
+    /// \throw RangeError if iterator is at the 'end' location
     auto& operator++();
-    auto operator++(int); ///@}
 
-    /// bi-directional iterator requirements @{
+    /// postfix increment operator (common for all iterators)
+    /// \throw RangeError if iterator is at 'end' location
+    auto operator++(int);
+
+    /// prefix decrement operator (bi-directional iterator)
+    /// \throw RangeError if iterator is at the beginning
     auto& operator--();
-    auto operator--(int); ///@}
 
-    /// random-access iterator requirements (except non-const operator[]) @{
-    [[nodiscard]] auto operator[](difference_type) const;
-    auto& operator+=(difference_type);
-    auto& operator-=(difference_type);
-    [[nodiscard]] auto operator+(difference_type) const;
-    [[nodiscard]] auto operator-(difference_type) const; ///@}
+    /// postfix decrement operator (bi-directional iterator)
+    /// \throw RangeError if iterator is at the beginning
+    auto operator--(int);
+
+    /// return value at location `i` (random-access iterator)
+    /// \throw RangeError if `i` is out of range
+    [[nodiscard]] auto operator[](difference_type i) const;
+
+    /// move iterator forward by `i` (random-access iterator)
+    /// \throw RangeError if new location would be beyond 'end' location
+    auto& operator+=(difference_type i);
+
+    /// move iterator backward by `i` (random-access iterator)
+    /// \throw RangeError if new location would be before the beginning location
+    auto& operator-=(difference_type i);
+
+    /// return a new iterator at current location + `i` (random-access iterator)
+    /// \throw RangeError if new location would be beyond 'end' location  
+    [[nodiscard]] auto operator+(difference_type i) const;
+
+    /// return a new iterator at current location - `i` (random-access iterator)
+    /// \throw RangeError if new location would be before the beginning location
+    [[nodiscard]] auto operator-(difference_type i) const;
   protected:
     explicit Iterator(Size index) noexcept : BaseIterator{index} {}
   private:

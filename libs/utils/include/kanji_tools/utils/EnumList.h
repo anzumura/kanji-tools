@@ -123,10 +123,10 @@ public:
     using iBase = typename base::template Iterator<ConstIterator>;
     using iBase::operator-, iBase::index, iBase::rangeError;
 
-    /// default ctor sets location to first value (forward iterator requirement)
+    /// default ctor sets location to first value (forward iterator)
     ConstIterator() noexcept : iBase{0} {}
 
-    /// return value at current location (input iterator requirement)
+    /// return value at current location (input iterator)
     /// \throw RangeError if location is invalid, i.e., at 'end' location
     [[nodiscard]] auto operator*() const {
       if (index() >= N)
@@ -134,7 +134,7 @@ public:
       return to_enum<T>(index());
     }
 
-    /// return difference between iterators (random-access iterator requirement)
+    /// return difference between iterators (random-access iterator)
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
       return index() - x.index();
     }

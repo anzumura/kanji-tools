@@ -83,20 +83,20 @@ public:
     /// associated with a collection yet
     ConstIterator() noexcept : iBase{0} {}
 
-    /// equal operator (forward iterator requirement)
+    /// equal operator (forward iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] bool operator==(const ConstIterator& x) const {
       comparable(_map == x._map);
       return iBase::operator==(x);
     }
 
-    /// not-equal operator (forward iterator requirement)
+    /// not-equal operator (forward iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] bool operator!=(const ConstIterator& x) const {
       return !(*this == x);
     }
 
-    /// return value at current location (input iterator requirement)
+    /// return value at current location (input iterator)
     /// \throw DomainError if iterator hasn't been initialized
     /// \throw RangeError if location is invalid, i.e., at 'end' location
     [[nodiscard]] auto& operator*() const {
@@ -107,32 +107,32 @@ public:
       return (*_map)[to_enum<T>(i)];
     }
 
-    /// less-than operator (random-access iterator requirement)
+    /// less-than operator (random-access iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] bool operator<(const ConstIterator& x) const {
       comparable(_map == x._map);
       return index() < x.index();
     }
 
-    /// less-than-or-equal operator (random-access iterator requirement)
+    /// less-than-or-equal operator (random-access iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] bool operator<=(const ConstIterator& x) const {
       return *this < x || *this == x;
     }
 
-    /// greater-than-or-equal operator (random-access iterator requirement)
+    /// greater-than-or-equal operator (random-access iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] bool operator>=(const ConstIterator& x) const {
       return !(*this < x);
     }
 
-    /// greater-than operator (random-access iterator requirement)
+    /// greater-than operator (random-access iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] bool operator>(const ConstIterator& x) const {
       return !(*this <= x);
     }
 
-    /// return difference between iterators (random-access iterator requirement)
+    /// return difference between iterators (random-access iterator)
     /// \throw DomainError if iterators are from different EnumMap collections
     [[nodiscard]] auto operator-(const ConstIterator& x) const {
       comparable(_map == x._map);
