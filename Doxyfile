@@ -49,7 +49,7 @@ WARN_IF_INCOMPLETE_DOC = NO
 ### ALIASES (custom commands)
 
 # create a Doxygen group (module) in a header (used by below 'XX_group' aliases)
-ALIASES += grp{2}="\file \2.h header file in lib: \b \1^^\addtogroup \1_\2^^@{"
+ALIASES += grp{2}="\file \2.h header in lib: \b \1^^\addtogroup \1_\2 \1_\2^^@{"
 
 # one '\XX_group' '\end_group' pair should be put inside the top level namespace 
 # in each header in order to include all classes, global functions and variables
