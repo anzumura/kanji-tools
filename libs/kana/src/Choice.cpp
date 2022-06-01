@@ -82,7 +82,7 @@ char Choice::get(const String& msg, const Choices& choices) const {
   return get(msg, choices, {});
 }
 
-char Choice::get(const String& msg, bool useQuit, Range range,
+char Choice::get(Range range, const String& msg, bool useQuit,
     const Choices& choices, OptChar def) const {
   static const String RangeError{"range option"};
   static const String FirstError{"first " + RangeError},
@@ -101,20 +101,20 @@ char Choice::get(const String& msg, bool useQuit, Range range,
 }
 
 char Choice::get(
-    const String& msg, Range range, const Choices& choices, OptChar def) const {
-  return get(msg, true, range, choices, def);
+    Range range, const String& msg, const Choices& choices, OptChar def) const {
+  return get(range, msg, true, choices, def);
 }
 
-char Choice::get(const String& msg, Range range, const Choices& choices) const {
-  return get(msg, range, choices, {});
+char Choice::get(Range range, const String& msg, const Choices& choices) const {
+  return get(range, msg, choices, {});
 }
 
-char Choice::get(const String& msg, Range range) const {
-  return get(msg, range, {}, {});
+char Choice::get(Range range, const String& msg) const {
+  return get(range, msg, {}, {});
 }
 
-char Choice::get(const String& msg, Range range, OptChar def) const {
-  return get(msg, range, {}, def);
+char Choice::get(Range range, const String& msg, OptChar def) const {
+  return get(range, msg, {}, def);
 }
 
 // XCOV_EXCL_START - this code requires user input (so not covered by tests)

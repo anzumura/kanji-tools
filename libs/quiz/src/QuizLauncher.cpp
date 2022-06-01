@@ -224,7 +224,7 @@ void QuizLauncher::startListQuiz(Question question, bool showMeanings,
   auto quizStyle{DefaultListStyle};
   if (isTestMode()) {
     const auto c{
-        _choice.get("Number of choices", ChoiceCountRange, DefaultChoiceCount)};
+        _choice.get(ChoiceCountRange, "Number of choices", DefaultChoiceCount)};
     if (isQuit(c)) return;
     choiceCount = static_cast<ListQuiz::ChoiceCount>(c - '0');
     quizStyle = _choice.get("Quiz style", ListStyleChoices, quizStyle);
@@ -454,11 +454,11 @@ char QuizLauncher::chooseFreq(OptChar qList) const {
 
 char QuizLauncher::chooseGrade(OptChar qList) const {
   return qList ? *qList
-               : _choice.get("Choose grade", GradeRange, GradeChoices, '6');
+               : _choice.get(GradeRange, "Choose grade", GradeChoices, '6');
 }
 
 char QuizLauncher::chooseKyu(OptChar qList) const {
-  return qList ? *qList : _choice.get("Choose kyu", KyuRange, KyuChoices, '2');
+  return qList ? *qList : _choice.get(KyuRange, "Choose kyu", KyuChoices, '2');
 }
 
 char QuizLauncher::chooseLevel(OptChar qList) const {

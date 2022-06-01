@@ -79,15 +79,19 @@ public:
   [[nodiscard]] char get(const String&, const Choices&, OptChar) const;
   [[nodiscard]] char get(const String&, const Choices&) const; ///@}
 
-  /// alternative get() functions that also take an (inclusive) range of value
-  [[nodiscard]] char get(const String&, bool useQuit, Range, const Choices&,
-      OptChar) const;
+  /// alternative get() function that also takes an (inclusive) range of values
+  /// \param range pair of choices to use as a range like '1-9' or 'a-f'
+  /// \details \copydetails get()
+  /// \throw DomainError if `range.first` > `range.second` or if any choice in
+  ///     `range` is not printable Ascii or is also included in `choices`
+  [[nodiscard]] char get(Range range, const String& msg, bool useQuit,
+      const Choices& choices, OptChar def) const;
 
   /// overloads that call the above get() function taking a range @{
-  [[nodiscard]] char get(const String&, Range, const Choices&, OptChar) const;
-  [[nodiscard]] char get(const String&, Range, const Choices&) const;
-  [[nodiscard]] char get(const String&, Range) const;
-  [[nodiscard]] char get(const String&, Range, OptChar) const; ///@}
+  [[nodiscard]] char get(Range, const String&, const Choices&, OptChar) const;
+  [[nodiscard]] char get(Range, const String&, const Choices&) const;
+  [[nodiscard]] char get(Range, const String&) const;
+  [[nodiscard]] char get(Range, const String&, OptChar) const; ///@}
 private:
   [[nodiscard]] static char getOneChar();
   static void add(String& prompt, const Choices&);

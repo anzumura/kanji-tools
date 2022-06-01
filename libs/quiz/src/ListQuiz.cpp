@@ -117,7 +117,7 @@ void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
     const String& kanjiName) {
   const auto answer{
-      isTestMode() ? choice().get(_prompt, {ChoiceStart, _choiceEnd}, choices)
+      isTestMode() ? choice().get({ChoiceStart, _choiceEnd}, _prompt, choices)
                    : get(_prompt, choices)};
   if (answer == MeaningsOption) {
     toggleMeanings(choices);
