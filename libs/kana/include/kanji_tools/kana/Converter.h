@@ -10,26 +10,27 @@ namespace kanji_tools { /// \kana_group{Converter}
 
 /// convert between Rōmaji, Hiragana and Katakana \kana{Converter}
 ///
-/// When Rōmaji (ローマジ) is the target, Revised Hepburn System (ヘボン式) is
-/// used, but for Rōmaji input many more letter combinations are supported such
-/// as: \li Kunrei-shiki (訓令式) Rōmaji:
+/// When the output target is Rōmaji, Revised Hepburn System (ヘボン式) is used,
+/// but for Rōmaji input many more letter combinations are supported such as:
+/// \li Kunrei-shiki (訓令式) Rōmaji:
 ///    si -> し, sya -> しゃ, syu -> しゅ, syo -> しょ, ti -> ち, tu -> つ,
 ///    hu -> ふ, tya -> ちゃ, tyu -> ちゅ, tyo -> ちょ, ...
 /// \li Nihon-shiki (日本式) Rōmaji: di -> ぢ,　du -> づ (plus Kunrei)
-/// \li Wāpuro (ワープロ) Rōmaji combinations: ou -> おう, ...
+/// \li Wāpuro (ワープロ) Rōmaji: ou -> おう, ...
 ///
 /// Letters with a macron (like ō, ā, ī) are supported for Rōmaji input, but
-/// when converting to Hiragana they are ambiguous, i.e., ō maps to either おお
-/// or おう so for simplicity the prolong mark (ー) is used (can be overridden
-/// by a flag to produce the double vowel like おお). Note, when typing Kana
-/// 'macchi' and 'kocchi' produce "マッチ" and "こっち" respectively, but this
-/// is not standard Hepburn. Instead the standard is 'matchi' and 'kotchi', but
-/// either way is accepted as input to the 'convert' function (when converting
+/// when converting to Hiragana they are ambiguous, i.e., ō maps to either
+/// おお or おう so for simplicity the prolong mark (ー) is used (can be
+/// overridden by a flag to produce a double vowel like おお). Note, when typing
+/// Kana 'macchi' and 'kocchi' produce "マッチ" and "こっち" respectively, but
+/// this is not standard Hepburn. Instead the standard is 'matchi' and 'kotchi',
+/// but either way is accepted as input to convert() functions (when converting
 /// from Kana to Rōmaji the standard form is used as output).
 ///
-/// \note numbers and delimiters are also converted from narrow to wide and vice
-/// versa (see Converter.cpp 'Delimiters'). Also, when converting from Rōmaji,
-/// case is ignored so both 'Dare' and 'dARe' convert to 'だれ'.
+/// \note most other non-alpha Ascii (including numbers) are also converted from
+/// narrow to wide and vice versa (see Converter.cpp 'Delimiters'). Also, when
+/// converting from Rōmaji, case is ignored so both 'Dare' and 'dARe' convert to
+/// 'だれ' and lower case is used when converting from Kana to Rōmaji.
 class Converter {
 public:
   /// set conversion `target` to Hiragana and `flags` to None by default (means
@@ -45,24 +46,29 @@ public:
   /// set conversion target
   void target(CharType target) { _target = target; }
 
-  /// return the current conversion flags
+  /// return current conversion flags
   [[nodiscard]] auto flags() const { return _flags; }
 
-  /// return the current conversion flags in a pipe delimited #String
+  /// return current conversion flags as a pipe delimited #String
   [[nodiscard]] String flagString() const;
 
   /// set conversion flags, can set multiple at once using bitwise | operator
   void flags(ConvertFlags flags) { _flags = flags; }
 
-  /// convert `input` to the current target type (using current flags) \details
-  /// If target is Hiragana then the following would return "あかちゃん":
-  /// <code>convert("akaチャン");</code>
+  /// convert `input` using current target and flags
+  /// \details the following code:
+  /// \code
+  ///   convert("akaチャン");
+  /// \endcode
+  /// would return "あかちゃん" if the target is Hiragana
   [[nodiscard]] String convert(const String& input) const;
 
-  /// convert only chars of `source` type in `input` to the current target type
-  /// (using current flags) \details
-  /// If target is Hiragana then the following would return "あかチャン":
-  /// <code>convert(CharType::Romaji, "akaチャン");</code>
+  /// convert only `source` type chars in `input` using current target and flags
+  /// \details the following code:
+  /// \code
+  ///   convert(CharType::Romaji, "akaチャン");
+  /// \endcode
+  /// would return "あかチャン" if the target is Hiragana
   [[nodiscard]] String convert(CharType source, const String& input) const;
 
   /// update current target and flags, then convert `input`
@@ -103,10 +109,9 @@ private:
     [[nodiscard]] auto& narrowDelims() const { return _narrowDelims; }
     [[nodiscard]] auto& wideDelims() const { return _wideDelims; }
   private:
-    /// performs an insert and ensure value was added by using 'assert' (can't
-    /// do on one line like `assert(s.insert(x).second)` since that would result
-    /// in the code not getting executed when compiling with asserts disabled,
-    /// i.e., a 'Release' build.
+    /// insert and then `assert` that the value was added (can't do on one line
+    /// like `assert(s.insert(x).second)` since the code wouldn't get executed
+    /// when compiling without asserts, i.e., a 'Release Build'
     static void insertUnique(Set& s, const String& x) {
       [[maybe_unused]] const auto i{s.insert(x)};
       assert(i.second);
@@ -114,14 +119,14 @@ private:
 
     void populateDelimLists();
 
-    /// called by the constructor and performs various 'asserts' on member data.
+    /// called by ctor to performs various asserts on member data
     void verifyData() const;
 
-    /// for processing small 'tsu' for sokuon output
+    /// list of letters that require a small 'tsu' for sokuon (促音) output
     std::set<char> _repeatingConsonants;
 
     /// '_afterN...' contain the 8 Kana (5 vowels and 3 y's) that should be
-    /// proceeded with 'Apostrophe' when producing Rōmaji if they follow 'n' @{
+    /// proceeded with #Apostrophe when producing Rōmaji if they follow 'n' @{
     Set _afterNHiragana, _afterNKatakana;
     ///@}
 
