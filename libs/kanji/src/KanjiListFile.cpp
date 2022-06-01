@@ -23,7 +23,7 @@ fs::path KanjiListFile::getFile(const Path& dir, const Path& file) {
 }
 
 void KanjiListFile::print(std::ostream& out, const StringList& l,
-    const String& type, const String& group) {
+    const String& type, const String& group) { // LCOV_EXCL_LINE
   if (!l.empty()) {
     out << ">>> Found " << l.size() << ' ' << type;
     if (!group.empty()) out << " in " << group;

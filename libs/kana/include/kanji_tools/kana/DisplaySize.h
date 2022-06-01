@@ -3,7 +3,7 @@
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 namespace kanji_tools { /// \kana_group{DisplaySize}
-/// functions for determining if a character is narrow or wide display 
+/// functions for determining if a character is narrow or wide display
 
 /// used for determining if a character is narrow or wide display
 // --- begin generated code from 'parseEastAsiaWidth.sh' ---

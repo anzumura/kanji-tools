@@ -6,7 +6,7 @@ namespace kanji_tools { /// \utils_group{Utf8}
 /// UTF-8 conversion and validation functions and global UTF-8 related variables
 /// \note conversion was originally implemented using `#include <codecvt>`, but
 /// was changed to a local implementation to remove the dependency and increase
-/// flexibility. For example, local implementations output 'U+FFFD' for errors 
+/// flexibility. For example, local implementations output 'U+FFFD' for errors
 /// instead of throwing. Also, 'wstring_convert' was deprecated as of C++17
 /// \sa http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0618r0.html).
 

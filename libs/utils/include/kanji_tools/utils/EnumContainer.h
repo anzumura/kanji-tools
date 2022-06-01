@@ -108,7 +108,7 @@ protected:
     auto& operator-=(difference_type i);
 
     /// return a new iterator at current location + `i` (random-access iterator)
-    /// \throw RangeError if new location would be beyond 'end' location  
+    /// \throw RangeError if new location would be beyond 'end' location
     [[nodiscard]] auto operator+(difference_type i) const;
 
     /// return a new iterator at current location - `i` (random-access iterator)
