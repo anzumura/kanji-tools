@@ -29,23 +29,23 @@ void Choice::setQuit(char c, const String& d) {
 
 void Choice::clearQuit() { _quit = {}; }
 
-char Choice::get(const String& msg, bool useQuit, const Choices& choicesIn,
+char Choice::get(const String& msg, bool useQuit, const Choices& choices,
     OptChar def) const {
   static const String QuitError{"quit option '"},
       DefaultError{"default option '"}, DefaultPrompt{") def '"};
 
-  auto choices{choicesIn};
-  if (_quit && (useQuit ? !choices.emplace(*_quit, _quitDescription).second
-                        : choices.contains(*_quit)))
+  auto choicesOut{choices};
+  if (_quit && (useQuit ? !choicesOut.emplace(*_quit, _quitDescription).second
+                        : choicesOut.contains(*_quit)))
     error(QuitError + *_quit + AlreadyInChoices);
-  if (choices.empty()) error("must specify at least one choice");
+  if (choicesOut.empty()) error("must specify at least one choice");
 
   // if 'msg' is empty then don't leave space before listing choices in brackets
   String line, prompt{msg + (msg.empty() ? "(" : " (")};
 
-  add(prompt, choices);
+  add(prompt, choicesOut);
   if (def) {
-    if (!choices.contains(*def))
+    if (!choicesOut.contains(*def))
       error(DefaultError + *def + "' not in choices");
     prompt += DefaultPrompt + *def + "': ";
   } else
@@ -65,7 +65,7 @@ char Choice::get(const String& msg, bool useQuit, const Choices& choicesIn,
       // XCOV_EXCL_STOP
     }
     if (line.empty() && def) return *def;
-  } while (line.size() != 1 || choices.find(line[0]) == choices.end());
+  } while (line.size() != 1 || choicesOut.find(line[0]) == choicesOut.end());
   return line[0];
 }
 
@@ -82,8 +82,8 @@ char Choice::get(const String& msg, const Choices& choices) const {
   return get(msg, choices, {});
 }
 
-char Choice::get(const String& msg, bool useQuit, const Range& range,
-    const Choices& choicesIn, OptChar def) const {
+char Choice::get(const String& msg, bool useQuit, Range range,
+    const Choices& choices, OptChar def) const {
   static const String RangeError{"range option"};
   static const String FirstError{"first " + RangeError},
       LastError{"last " + RangeError};
@@ -93,28 +93,27 @@ char Choice::get(const String& msg, bool useQuit, const Range& range,
   if (range.first > range.second)
     error(FirstError + " '" + range.first + "' is greater than last '" +
           range.second + "'");
-  auto choices{choicesIn};
+  auto choicesOut{choices};
   for (auto i{range.first}; i <= range.second; ++i)
-    if (!choices.emplace(i, EmptyString).second)
+    if (!choicesOut.emplace(i, EmptyString).second)
       error((RangeError + " '") += (i + AlreadyInChoices));
-  return get(msg, useQuit, choices, def);
-}
-
-char Choice::get(const String& msg, const Range& range, const Choices& choices,
-    OptChar def) const {
-  return get(msg, true, range, choices, def);
+  return get(msg, useQuit, choicesOut, def);
 }
 
 char Choice::get(
-    const String& msg, const Range& range, const Choices& choices) const {
+    const String& msg, Range range, const Choices& choices, OptChar def) const {
+  return get(msg, true, range, choices, def);
+}
+
+char Choice::get(const String& msg, Range range, const Choices& choices) const {
   return get(msg, range, choices, {});
 }
 
-char Choice::get(const String& msg, const Range& range) const {
+char Choice::get(const String& msg, Range range) const {
   return get(msg, range, {}, {});
 }
 
-char Choice::get(const String& msg, const Range& range, OptChar def) const {
+char Choice::get(const String& msg, Range range, OptChar def) const {
   return get(msg, range, {}, def);
 }
 

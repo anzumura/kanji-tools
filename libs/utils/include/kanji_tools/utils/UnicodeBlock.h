@@ -28,7 +28,7 @@ class UnicodeBlock {
 public:
   static constexpr auto Mod{16}, OfficialStartMod{0}, OfficialEndMod{15};
 
-  /// Unicode version and release date
+  /// Unicode version and release date \utils{UnicodeBlock}
   class Version {
   public:
     /// create a Version object
