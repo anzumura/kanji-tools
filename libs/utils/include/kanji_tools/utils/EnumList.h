@@ -8,6 +8,8 @@
 #include <map>
 
 namespace kanji_tools { /// \utils_group{EnumList}
+/// classes that provide conversion to/from string as well as iteration over the
+/// values of a scoped enum
 
 /// specialize to enable an enum to be used in EnumList class
 template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>

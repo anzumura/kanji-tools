@@ -3,6 +3,7 @@
 #include <kanji_tools/utils/TypeTraits.h>
 
 namespace kanji_tools { /// \utils_group{Bitmask}
+/// enable using bitwise operators with a scoped enum
 
 /// specialize to enable the 7 bitwise operators that satisfy C++ 'BitmaskType'
 /// requirements as well as hasValue() and operator!() global functions (see

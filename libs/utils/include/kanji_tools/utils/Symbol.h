@@ -8,6 +8,7 @@
 #include <vector>
 
 namespace kanji_tools { /// \utils_group{Symbol}
+/// Symbol class that can be used to save memory instead of using #String
 
 /// non-templated base class for Symbol \utils{Symbol}
 class BaseSymbol {

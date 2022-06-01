@@ -5,6 +5,7 @@
 #include <array>
 
 namespace kanji_tools { /// \utils_group{EnumMap}
+/// EnumMap class maps values of a scoped enum to a templated value type
 
 /// base class for EnumMap that has a static #Empty value to share amongst
 /// different EnumMaps \utils{EnumMap}

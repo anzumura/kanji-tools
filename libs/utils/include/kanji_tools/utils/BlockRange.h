@@ -3,6 +3,7 @@
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 namespace kanji_tools { /// \utils_group{BlockRange}
+/// BlockRange class and global constants for working with Unicode in `wregex`
 
 /// non-templated bass class for BlockRange \utils{BlockRange}
 class BaseBlockRange {

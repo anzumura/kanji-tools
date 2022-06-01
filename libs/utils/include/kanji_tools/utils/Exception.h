@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 namespace kanji_tools { /// \utils_group{Exception}
+/// Exception classes using in this project
 
 /// non-copyable exception class for domain errors \utils{Exception}
 class DomainError : public std::domain_error {

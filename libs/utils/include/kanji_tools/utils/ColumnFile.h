@@ -9,6 +9,7 @@
 #include <vector>
 
 namespace kanji_tools { /// \utils_group{ColumnFile}
+/// ColumnFile class for loading data from a column based text file
 
 /// class for loading data from a delimiter (defaults to tab) separated file
 /// with a header row containing the column names \utils{ColumnFile}

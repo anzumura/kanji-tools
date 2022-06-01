@@ -5,6 +5,7 @@
 #include <limits>
 
 namespace kanji_tools { /// \utils_group{Args}
+/// Args class for working with command line arguments
 
 /// class for working with command line args \utils{Args}
 class Args {

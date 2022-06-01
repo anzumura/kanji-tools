@@ -3,6 +3,8 @@
 #include <type_traits>
 
 namespace kanji_tools { /// \utils_group{TypeTraits}
+/// structs and functions for working with types (some of which are part of the
+/// upcoming 'C++23' standard)
 
 /// struct for testing if `T` is a scoped enum (will be included in 'C++23')
 template<typename T, bool B = std::is_enum_v<T>>

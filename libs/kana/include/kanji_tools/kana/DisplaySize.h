@@ -3,6 +3,7 @@
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 namespace kanji_tools { /// \kana_group{DisplaySize}
+/// functions for determining if a character is narrow or wide display 
 
 /// used for determining if a character is narrow or wide display
 // --- begin generated code from 'parseEastAsiaWidth.sh' ---
@@ -65,12 +66,12 @@ inline constexpr std::array WideBlocks{makeBlock<0x1100, 0x115F>(),
 // --- end generated code from 'parseEastAsiaWidth.sh' ---
 
 /// return size in terms of how many columns would be required for display on a
-/// terminal, i.e, 1 for a normal character and 2 for a wide character
+/// terminal (assuming 1 for a normal char and 2 for a wide char)
 [[nodiscard]] size_t displaySize(const CodeString&);
-[[nodiscard]] size_t displaySize(const char*);   ///< \ displaySize
-[[nodiscard]] size_t displaySize(const String&); ///< \ displaySize
+[[nodiscard]] size_t displaySize(const char*);   ///< \doc displaySize
+[[nodiscard]] size_t displaySize(const String&); ///< \doc displaySize
 
-/// return a value that works for `std::setw` when `s` contains wide char
+/// return a value that works for `std::setw` when `s` contains UTF-8
 ///
 /// \details If s contains 1 '3 byte char that has wide display' then `os <<
 /// std::setw(4) << s` will not result in expected padding of 2 (the wide char

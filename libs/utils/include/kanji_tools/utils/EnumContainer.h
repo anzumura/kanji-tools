@@ -7,6 +7,7 @@
 #include <concepts>
 
 namespace kanji_tools { /// \utils_group{EnumContainer}
+/// base classes used by EnumMap and EnumList
 
 /// non-templated base class for EnumContainer \utils{EnumContainer}
 ///

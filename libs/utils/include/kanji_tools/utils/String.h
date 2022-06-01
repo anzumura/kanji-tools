@@ -3,8 +3,8 @@
 #include <string>
 
 namespace kanji_tools { /// \utils_group{String}
-
-// Global Type Aliases
+/// Type Aliases and functions for working with strings (like addBrackets(),
+/// toHex(), isAllSingleByte(), etc.)
 
 /// String and StringView type aliases may be changed to `std::u8` versions
 /// later once they get wider standard library support (streams, regex, etc.)

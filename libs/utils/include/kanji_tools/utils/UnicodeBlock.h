@@ -7,6 +7,8 @@
 #include <iostream>
 
 namespace kanji_tools { /// \utils_group{UnicodeBlock}
+/// UnicodeBlock class as well as 'is' and 'isAll' functions for checking which
+/// block(s) a value belongs to
 
 /// class represents a block (range) of Unicode Code points \utils{UnicodeBlock}
 ///
