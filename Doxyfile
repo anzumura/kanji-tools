@@ -22,9 +22,11 @@ EXTRACT_PRIV_VIRTUAL   = YES
 EXTRACT_PACKAGE        = YES
 EXTRACT_PRIVATE        = YES
 EXTRACT_STATIC         = YES
-INLINE_SOURCES         = YES
 # EXTRACT_LOCAL_CLASSES is YES by default
 # EXTRACT_LOCAL_METHODS is only relevant for Objective-C
+
+# this pulls in all sorts of source code which can make the docs look cluttered
+# INLINE_SOURCES         = YES
 
 # overriding any of these to YES has no effect if EXTRACT_ALL is YES
 # WARN_IF_UNDOCUMENTED   = YES # default is NO
