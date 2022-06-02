@@ -11,20 +11,9 @@ namespace kanji_tools { /// \kana_group{Kana}
 /// class that represents a 'Monograph' or 'Digraph' Kana value \kana{Kana}
 ///
 /// A 'Monograph' is a single Kana character (large or small) and a 'Digraph' is
-/// a valid (at least typeable with standard IME) two Kana combo. Diagraphs are
-/// always a full sized Kana character followed by a small Kana (one of the 5
-/// vowels, 3 y's or 'wa').
-///
-/// Note on some attributes:
-/// \li `_romaji`: usually holds the 'Modern Hepburn' value, but will sometimes
-///   be a 'Nihon Shiki' value in order to ensure a unique value for Kana maps
-///   ('di' for ぢ, 'du' for づ, etc.).
-/// \li `_hepburn`: holds an optional 'Modern Hepburn' value for a few cases
-///   where it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be
-///   uniquely identified by 'du', but the correct Hepburn output for this Kana
-///   is 'zu' which is ambiguous with ず. If '_hepburn' is populated it will
-///   always be a duplicate of another Kana's '_romaji' value.
-/// \li `_kunrei`: holds an optional 'Kunrei Shiki' value like 'zya' for じゃ.
+/// a valid (at least typeable with standard IMEs) two Kana combo. Diagraphs are
+/// always a full sized Kana followed by a small Kana (5 vowels, 3 y's or 'wa').
+/// See #_romaji, #_hepburn and #_kunrei members for more details.
 class Kana {
 public:
   using Map = std::map<String, const class Kana*>;
@@ -53,26 +42,28 @@ public:
   /// return global Kana map for given #CharType
   [[nodiscard]] static const Map& getMap(CharType);
 
-  /// find corresponding DakutenKana, `s` should be a non-accented single
-  /// Hiragana or Katakana letter
+  /// find 'dakuten' version of `s` ("と" returns "ど", "セ" returns "ゼ", etc.)
+  /// \param s should be a non-accented Hiragana or Katakana UTF-8 String
+  /// \return 'dakuten' version of `s` or `std::nullopt` if not found
   [[nodiscard]] static OptString findDakuten(const String& s);
 
-  /// find corresponding HanDakutenKana, `s` should be a non-accented single
-  /// Hiragana or Katakana letter
+  /// find 'han-dakuten' version of `s` ("ひ" returns "ぴ", etc.)
+  /// \param s should be a non-accented Hiragana or Katakana UTF-8 String
+  /// \return 'han-dakuten' version of `s` or `std::nullopt` if not found
   [[nodiscard]] static OptString findHanDakuten(const String& s);
 
   /// holds any further variant Rōmaji values for a Kana object \kana{Kana}
   ///
-  /// This includes key combos that map to the same value like 'kwa' for  クァ
-  /// (instead of 'qa'), 'fyi' フィ (instead of 'fi'), etc.. `_kunrei` is true
-  /// if the first entry in the list is 'Kunrei Shiki' (then `Kana::_kunrei`
-  /// should be nullopt).
+  /// This includes IME key combos that map to the same value like 'kwa' for
+  /// クァ (instead of 'qa'), 'fyi' フィ (instead of 'fi'), etc.. #_kunrei is
+  /// true if the first entry in the list is 'Kunrei Shiki' (then Kana::_kunrei
+  /// should be `std::nullopt`).
   class RomajiVariants {
   public:
     using List = std::vector<String>;
     using RMax = CharArray<RomajiArrayMax>;
 
-    RomajiVariants() = default;                 ///< default ctor
+    RomajiVariants() = default; ///< default ctor (for an empty list)
     RomajiVariants(RomajiVariants&&) = default; ///< only allow moving
 
     /// ctor for one variant
@@ -215,21 +206,35 @@ public:
   [[nodiscard]] auto& romajiVariants() const { return _variants.list(); }
   [[nodiscard]] auto kunreiVariant() const { return _variants.kunrei(); }
 
-  /// all supported instances of Kana and its derived classes are created in
-  /// 'Kana.cpp' (the following ctors shouldn't be used anywhere else) @{
+  /// instances of Kana classes are created in Kana.cpp - this ctor shouldn't be
+  /// used anywhere else
+  ///
+  /// \tparam R size of `romaji` char array
+  /// \tparam A size of `hiragana` and `katakana` char arrays
+  /// \param romaji unique Rōmaji reading (see Kana class docs)
+  /// \param hiragana UTF-8 Hiragana value
+  /// \param katakana UTF-8 Katakana value
   template<size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana);
+
+  /// \doc Kana(CharArray<R>, CharArray<A>, CharArray<A>)
+  /// \tparam H size of `hepburn` char array
+  /// \tparam K size of `kunrei` char array
+  /// \param hepburn Hepburn reading
+  /// \param kunrei Kunrei reading
   template<size_t R, size_t A, size_t H, size_t K>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
       CharArray<H> hepburn, CharArray<K> kunrei);
+
+  /// \doc Kana(CharArray<R>, CharArray<A>, CharArray<A>)
+  /// \param variants list of one or more Rōmaji variants
   template<size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
-      RomajiVariants&&); ///@}
+      RomajiVariants&& variants);
 protected:
-  /// move ctor used by AccentedKana to move the non-const '_variants' field.
-  /// other fields will get copied because they are 'const' (copy is fine since
-  /// the other fields are all short strings that would not benefit from move
-  /// anyway because of SSO).
+  /// move ctor used by AccentedKana - moves #_variants and copies other fields
+  /// since they are 'const' (copy is fine since other fields are short strings
+  /// that wouldn't benefit from move anyway because of SSO).
   Kana(Kana&&) = default;
 private:
   template<size_t R, size_t A>
@@ -240,29 +245,44 @@ private:
   static const Map RomajiMap, HiraganaMap, KatakanaMap;
 
   /// called by ctors to make sure data is valid (via asserts) such as ensuring
-  /// '_hiragana' is actually valid Hiragana, etc..
+  /// #_hiragana is actually valid Hiragana, etc..
   void validate() const;
 
-  const String _romaji, _hiragana, _katakana;
-  const OptString _hepburn, _kunrei;
+  /// usually 'Modern Hepburn', but sometimes 'Nihon Shiki' ('di' for ぢ, 'du'
+  /// for づ, etc.) to ensure uniqueness (for keys and round-trip processing)
+  const String _romaji;
 
-  RomajiVariants _variants; ///< non-const to allow moving
+  const String _hiragana; ///< Hiragana value
+  const String _katakana; ///< Katakana value
+
+  /// 'Modern Hepburn' is only populated if it's not the same as #_romaji. For
+  /// example, づ can be uniquely identified by 'du', but the Hepburn value for
+  /// this Kana is 'zu' which is ambiguous with ず. If #_hepburn is populated it
+  /// will always be a duplicate of another Kana's #_romaji value.
+  const OptString _hepburn;
+
+  /// 'Kunrei Shiki' is only populated if it's not the same as #_romaji (like
+  /// 'zya' for じゃ) and this instance doesn't have any entries in #_variants
+  const OptString _kunrei;
+
+  /// list of Rōmaji variants (non-const to allow moving)
+  RomajiVariants _variants;
 };
 
 /// class for Kana that have voiced versions \kana{Kana}
 ///
 /// This class has instances for all Kana (Monograph and Digraph) in 'k', 's',
-/// 't', and 'h' rows as well as 'u'. For example 'ka' has `_dakuten` of 'ga',
+/// 't', and 'h' rows as well as 'u'. For example 'ka' has #_dakuten of 'ga',
 /// 'sha' has 'ja', 'u' has 'vu', etc.. romaji(), hiragana(), etc. members of
-/// this class have unaccented values (like 'ka') and the `_dakuten` member has
-/// the accented values (like 'ga').
+/// this class have unaccented values (like 'ka') and #_dakuten has the accented
+/// values (like 'ga').
 class DakutenKana : public Kana {
 public:
   /// `dakuten` should be a Kana object with accented values (like 'ga') and the
   /// base class ctor is called with the remaining parameters in `T`
   template<typename... T> explicit DakutenKana(Kana&& dakuten, T&&...);
 
-  /// return 'dakuten' Kana (which is an instance of AccentedKana)
+  /// return #_dakuten Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* dakuten() const override;
 protected:
   /// represents an accented Kana \kana{Kana}
@@ -271,15 +291,15 @@ protected:
   /// the related accented versions of Kana values.
   class AccentedKana : public Kana {
   public:
-    /// move ctor that moves `k` into base class fields and sets '_plain' to `p`
+    /// move ctor that moves `k` into base class fields and sets #_plain to `p`
     AccentedKana(Kana&& k, const Kana& p);
 
-    /// return plain Kana
+    /// return #_plain Kana
     [[nodiscard]] const Kana* plain() const override;
   private:
-    /// unaccented version by DakutenKana and HanDakutenKana ctors, for example,
-    /// the DakutenKana instance for け contains `_dakuten` Kana げ and in turn,
-    /// げ will have `_plain` set to the original け to allow lookup both ways
+    /// populated by unaccented version by DakutenKana and HanDakutenKana, for
+    /// example DakutenKana instance for け contains #_dakuten げ and in turn,
+    /// げ will have #_plain set to the original け to allow lookup both ways
     const Kana& _plain;
   };
 private:
@@ -296,7 +316,7 @@ public:
   /// the base class ctor is called with the remaining parameters in `T`
   template<typename... T> explicit HanDakutenKana(Kana&& hanDakuten, T&&...);
 
-  /// return 'han-dakuten' Kana (which is an instance of AccentedKana)
+  /// return #_hanDakuten Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* hanDakuten() const override;
 private:
   const AccentedKana _hanDakuten;
