@@ -44,6 +44,7 @@ INPUT_FILTER           = "sed 's/::template /::/'" # ::template confuses doxygen
 MULTILINE_CPP_IS_BRIEF = YES
 QUIET                  = YES
 SHOW_INCLUDE_FILES     = NO # show list of files included by a file
+SORT_MEMBER_DOCS       = NO # detailed docs are kept in declaration order
 TAB_SIZE               = 2
 WARN_AS_ERROR          = FAIL_ON_WARNINGS # warnings cause non-zero exit status
 WARN_IF_INCOMPLETE_DOC = NO
