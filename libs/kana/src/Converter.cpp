@@ -333,7 +333,7 @@ void Converter::processRomaji(String& letters, String& result) const {
   if (const auto i{sourceMap.find(lower)}; i != sourceMap.end()) {
     result += get(*i->second);
     letters.clear();
-  } else if (letters.size() == Kana::RomajiStringMaxSize) {
+  } else if (letters.size() == Kana::RomajiStringMax) {
     // convert first letter to small tsu if letter repeats and is a valid
     // consonant (also allow 'tc' combination) otherwise output the first letter
     // unconverted since no valid romaji can be longer than 3 letters

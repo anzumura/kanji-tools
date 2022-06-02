@@ -384,13 +384,13 @@ template<size_t R, size_t A, size_t H, size_t K>
 Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
     CharArray<H> hepburn, CharArray<K> kunrei)
     : Kana{romaji, hiragana, katakana, hepburn, kunrei, {}} {
-  static_assert(H <= RomajiArrayMaxSize && K <= RomajiArrayMaxSize);
+  static_assert(H <= RomajiArrayMax && K <= RomajiArrayMax);
   if constexpr (A == OneKanaArraySize)
-    static_assert(H >= RomajiArrayMinSize && K >= RomajiArrayMinSize);
+    static_assert(H >= RomajiArrayMin && K >= RomajiArrayMin);
   else {
     // all digraphs have Rōmaji of at least 2 characters
     static_assert(A == TwoKanaArraySize);
-    static_assert(H > RomajiArrayMinSize && K > RomajiArrayMinSize);
+    static_assert(H > RomajiArrayMin && K > RomajiArrayMin);
   }
 }
 
@@ -406,11 +406,11 @@ Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
       _hepburn{hepburn ? OptString{hepburn} : std::nullopt},
       _kunrei{kunrei ? OptString{kunrei} : std::nullopt}, _variants{std::move(
                                                               variants)} {
-  static_assert(R <= RomajiArrayMaxSize);
+  static_assert(R <= RomajiArrayMax);
   // Hiragana and Katakana must be the same size (3 or 6) and also check that
   // Rōmaji is at least 1 character for a monograph or 2 for a digraph
-  static_assert(A == OneKanaArraySize && R >= RomajiArrayMinSize ||
-                A == TwoKanaArraySize && R > RomajiArrayMinSize);
+  static_assert(A == OneKanaArraySize && R >= RomajiArrayMin ||
+                A == TwoKanaArraySize && R > RomajiArrayMin);
   validate();
 }
 

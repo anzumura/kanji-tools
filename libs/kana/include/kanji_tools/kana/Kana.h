@@ -31,15 +31,17 @@ public:
   using OptString = std::optional<String>;
   template<size_t N> using CharArray = const char (&)[N];
 
-  inline static const OptString EmptyOptString;
-  /// all Kana are 3 bytes UTF-8 values
-  static constexpr uint16_t OneKanaSize{3};
-  /// a char array is one larger to hold final null value @{
-  static constexpr uint16_t OneKanaArraySize{OneKanaSize + 1},
-      TwoKanaSize{OneKanaSize * 2}, TwoKanaArraySize{OneKanaSize * 2 + 1}; ///@}
-  /// Rōmaji string and array sizes @{
-  static constexpr uint16_t RomajiArrayMinSize{2}, RomajiArrayMaxSize{4};
-  static constexpr uint16_t RomajiStringMaxSize{RomajiArrayMaxSize - 1}; ///@}
+  inline static const OptString EmptyOptString; ///< empty OptString
+
+  static constexpr uint16_t OneKanaSize{3}, ///< all Kana are 3 bytes UTF-8
+      RomajiArrayMin{2}, ///< Rōmaji char array min size (including null)
+      RomajiArrayMax{4}; ///< Rōmaji char array max size (including null)
+
+  static constexpr uint16_t OneKanaArraySize{
+      OneKanaSize + 1},             ///< Kana char array (including null)
+      TwoKanaSize{OneKanaSize * 2}, ///< UTF-8 String containing two Kana
+      TwoKanaArraySize{OneKanaSize * 2 + 1}, ///< char array size for two Kana
+      RomajiStringMax{RomajiArrayMax - 1};   ///< max Rōmaji String size
 
   static const Kana& SmallTsu; ///< reference to 'small tsu' global instance
   static const Kana& N;        ///< reference to 'n' global instance
@@ -68,30 +70,34 @@ public:
   class RomajiVariants {
   public:
     using List = std::vector<String>;
-    using RMax = CharArray<RomajiArrayMaxSize>;
+    using RMax = CharArray<RomajiArrayMax>;
 
     RomajiVariants() = default;                 ///< default ctor
     RomajiVariants(RomajiVariants&&) = default; ///< only allow moving
 
+    /// ctor for one variant
     template<size_t R>
     explicit RomajiVariants(CharArray<R> r, bool kunrei = false);
 
-    /// all instances with two variants have variants with the same size (like
-    /// 'fa' (ファ) which has Rōmaji variants of 'fwa' and 'hwa')
+    /// ctor for two variants, variants are same size like 'fa' (ファ) which has
+    /// variants of 'fwa' and 'hwa'
     template<size_t R>
     RomajiVariants(CharArray<R> r1, CharArray<R> r2, bool kunrei = false);
 
-    /// no instance with three variants has `kunrei` true, but one has differing
-    /// sizes so need two template params, i.e, small 'ぇ' with Rōmaji of 'le'
-    /// has a variant list of 'xe', 'lye' and 'xye'
+    /// ctor for three variants, these instances never have `kunrei` true, but
+    /// one has differing sizes so need two template params, i.e, small 'ぇ'
+    /// with Rōmaji of 'le' has a variant list of 'xe', 'lye' and 'xye'
     template<size_t R> RomajiVariants(CharArray<R> r1, RMax r2, RMax r3);
 
+    /// return list of variants
     [[nodiscard]] auto& list() const { return _list; }
+
+    /// return true if the first variant is a 'kunrei' variant
     [[nodiscard]] auto kunrei() const { return _kunrei; }
   private:
     /// all Rōmaji variants are either 2 or 3 characters long
     template<size_t R> static consteval void check() {
-      static_assert(R > RomajiArrayMinSize && R <= RomajiArrayMaxSize);
+      static_assert(R > RomajiArrayMin && R <= RomajiArrayMax);
     }
 
     List _list;
@@ -101,12 +107,33 @@ public:
   /// holds Kana iteration marks (一の字点) \kana{Kana}
   class IterationMark {
   public:
-    IterationMark(const IterationMark&) = delete;
+    IterationMark(const IterationMark&) = delete; ///< deleted copy ctor
 
-    [[nodiscard]] bool matches(CharType, const String&) const;
+    /// return true if `s` is an iteration mark for type `t` \details
+    /// \li `matches(CharType::Hiragana, "ゞ")` returns true
+    /// \li `matches(CharType::Katakana, "ゞ")` returns false
+    /// \li `matches(CharType::Katakana, "か")` returns false
+    /// CharType::Romaji will always return false
+    [[nodiscard]] bool matches(CharType t, const String& s) const;
+
+    /// return the iteration mark for `target`, if `target` is Hiragana or
+    /// Katakana then the corresponding data member is returned, otherwise a
+    /// Rōmaji String is returned based on `flags` and `prevKana` \details
+    /// \code
+    ///   using enum CharType;
+    ///   auto* prev{Kana::getMap(Romaji).find("tsu")->second};
+    ///   auto flags{ConvertFlags::None};
+    ///   Kana::RepeatPlain.get(Hiragana, flags, prev);  // returns "ゝ"
+    ///   Kana::RepeatPlain.get(Romaji, flags, prev);    // returns "tsu"
+    ///   Kana::RepeatAccented.get(Romaji, flags, prev); // returns "du"
+    /// \endcode
     [[nodiscard]] const String& get(
-        CharType target, ConvertFlags, const Kana* prevKana) const;
+        CharType target, ConvertFlags flags, const Kana* prevKana) const;
+
+    /// return Hiragana iteration mark
     [[nodiscard]] auto& hiragana() const { return _hiragana; }
+
+    /// return Katakana iteration mark
     [[nodiscard]] auto& katakana() const { return _katakana; }
   private:
     friend Kana; // only Kana class can construct
@@ -116,10 +143,11 @@ public:
     void validate() const;
 
     const String _hiragana, _katakana;
-    const bool _dakuten; // true if this instance is 'dakuten' (濁点) version
+    const bool _dakuten; ///< true if this instance is 'dakuten' (濁点) version
   };
 
-  static const IterationMark RepeatPlain, RepeatAccented;
+  static const IterationMark RepeatPlain, ///< plain iteration marks: "ゝ", "ヽ"
+      RepeatAccented; ///< accented iteration marks: "ゞ", "ヾ"
 
   /// return iteration mark or nullptr if `kana` isn't an iteration mark
   [[nodiscard]] static const IterationMark* findIterationMark(
@@ -128,10 +156,10 @@ public:
   virtual ~Kana() = default;  ///< default dtor
   Kana(const Kana&) = delete; ///< deleted copy ctor
 
-  /// DakutenKana overrides to return accented Kana, base returns `nullptr`
+  /// DakutenKana return accented Kana, base class returns `nullptr`
   [[nodiscard]] virtual const Kana* dakuten() const;
 
-  /// HanDakutenKana overrides to return accented Kana, base returns `nullptr`
+  /// HanDakutenKana return accented Kana, base class returns `nullptr`
   [[nodiscard]] virtual const Kana* hanDakuten() const;
 
   /// return the unaccented version of this Kana or `nullptr` if this Kana is
@@ -164,7 +192,7 @@ public:
   [[nodiscard]] bool isDakuten() const;
 
   /// return true if this is a 'han-dakuten' (semi-voiced) Kana, i.e., 'this'
-  /// type is AccentedKana (and is contained in a DakutenKana object)
+  /// type is AccentedKana (and is contained in a HanDakutenKana object)
   [[nodiscard]] bool isHanDakuten() const;
 
   /// return Rōmaji value based on `flags`
@@ -179,7 +207,7 @@ public:
   /// return true if `s` is equal to #_hiragana or #_katakana
   [[nodiscard]] bool containsKana(const String& s) const;
 
-  [[nodiscard]] bool operator==(const Kana&) const;
+  [[nodiscard]] bool operator==(const Kana&) const; ///< equal operator
 
   [[nodiscard]] auto& romaji() const { return _romaji; }
   [[nodiscard]] auto& hiragana() const { return _hiragana; }
