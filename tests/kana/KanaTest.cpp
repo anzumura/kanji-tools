@@ -25,19 +25,6 @@ constexpr auto TotalMonographs{
 
 } // namespace
 
-TEST(CharTypeTest, CheckStrings) {
-  EXPECT_EQ(toString(Hiragana), "Hiragana");
-  EXPECT_EQ(toString(Katakana), "Katakana");
-  EXPECT_EQ(toString(Romaji), "Romaji");
-}
-
-TEST(CharTypeTest, CheckValues) {
-  size_t i{};
-  EXPECT_EQ(CharTypes[i], Hiragana);
-  EXPECT_EQ(CharTypes[++i], Katakana);
-  EXPECT_EQ(CharTypes[++i], Romaji);
-}
-
 TEST(KanaTest, CheckN) {
   EXPECT_EQ(Kana::N.hiragana(), "ん");
   EXPECT_EQ(Kana::N.katakana(), "ン");

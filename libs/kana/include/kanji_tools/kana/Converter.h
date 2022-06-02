@@ -1,12 +1,14 @@
 #pragma once
 
-#include <kanji_tools/kana/Kana.h>
+#include <kanji_tools/kana/KanaEnums.h>
 
 #include <cassert>
 #include <set>
 
 namespace kanji_tools { /// \kana_group{Converter}
 /// Converter class for converting between Rōmaji and %Kana
+
+class Kana;
 
 /// convert between Rōmaji, Hiragana and Katakana \kana{Converter}
 ///

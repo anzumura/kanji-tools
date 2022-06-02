@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kana/Converter.h>
+#include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/utils/UnicodeBlock.h>
 
 namespace kanji_tools {

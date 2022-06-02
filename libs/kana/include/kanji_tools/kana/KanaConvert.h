@@ -3,6 +3,7 @@
 #include <kanji_tools/utils/Args.h>
 
 #include <filesystem>
+#include <vector>
 
 namespace kanji_tools {
 

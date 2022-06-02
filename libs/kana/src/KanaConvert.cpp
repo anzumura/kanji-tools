@@ -1,3 +1,4 @@
+#include <kanji_tools/kana/Kana.h>
 #include <kanji_tools/kana/KanaConvert.h>
 #include <kanji_tools/kana/Table.h>
 
