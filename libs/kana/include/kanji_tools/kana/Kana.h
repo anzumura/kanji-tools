@@ -8,7 +8,7 @@
 namespace kanji_tools { /// \kana_group{Kana}
 /// Kana class hierarchy
 
-/// class that represents a ('Monograph' or 'Digraph') Kana value \kana{Kana}
+/// class that represents a 'Monograph' or 'Digraph' Kana value \kana{Kana}
 ///
 /// A 'Monograph' is a single Kana character (large or small) and a 'Digraph' is
 /// a valid (at least typeable with standard IME) two Kana combo. Diagraphs are
@@ -17,13 +17,13 @@ namespace kanji_tools { /// \kana_group{Kana}
 ///
 /// Note on some attributes:
 /// \li `_romaji`: usually holds the 'Modern Hepburn' value, but will sometimes
-/// be a 'Nihon Shiki' value in order to ensure a unique value for Kana maps
-/// ('di' for ぢ, 'du' for づ, etc.).
+///   be a 'Nihon Shiki' value in order to ensure a unique value for Kana maps
+///   ('di' for ぢ, 'du' for づ, etc.).
 /// \li `_hepburn`: holds an optional 'Modern Hepburn' value for a few cases
-/// where it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be
-/// uniquely identified by 'du', but the correct Hepburn output for this Kana is
-/// 'zu' which is ambiguous with ず. If '_hepburn' is populated it will always
-/// be a duplicate of another Kana's '_romaji' value.
+///   where it differs from the 'unique' Wāpuro Rōmaji. For example, づ can be
+///   uniquely identified by 'du', but the correct Hepburn output for this Kana
+///   is 'zu' which is ambiguous with ず. If '_hepburn' is populated it will
+///   always be a duplicate of another Kana's '_romaji' value.
 /// \li `_kunrei`: holds an optional 'Kunrei Shiki' value like 'zya' for じゃ.
 class Kana {
 public:
@@ -136,25 +136,33 @@ public:
 
   /// return the unaccented version of this Kana or `nullptr` if this Kana is
   /// unaccented or is a combination that doesn't have an equivalent unaccented
-  /// 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc.. \note ウォ
-  /// can be typed with 'u' then 'lo', but is treated as two separate Kana
-  /// instances ('u' and 'lo') instead of a plain version of 'vo'.
+  /// 'standard combination' such as 'va', 've', 'vo' (ヴォ), etc..
+  ///
+  /// \note ウォ can be typed with 'u' then 'lo', but is treated as two separate
+  /// Kana instances ('u' and 'lo') instead of a plain version of 'vo'.
   [[nodiscard]] virtual const Kana* plain() const;
 
+  /// return 'dakuten' string for the given #CharType or `std::nullopt` if this
+  /// instance doesn't have a 'dakuten' version (like 'ma')
   [[nodiscard]] OptString dakuten(CharType) const;
 
+  /// return 'han-dakuten' string for the given #CharType or `std::nullopt` if
+  /// this instance doesn't have a 'han-dakuten' version (like 'ka')
   [[nodiscard]] OptString hanDakuten(CharType) const;
 
   /// return true if this is a small Kana (small Kana are also all 'Monographs')
   [[nodiscard]] bool isSmall() const;
+
   /// return true if this is a Monograph (single UTF-8 character Kana object)
   [[nodiscard]] bool isMonograph() const;
+
   /// return true if this is a Digraph (two UTF-8 character Kana object)
   [[nodiscard]] bool isDigraph() const;
 
   /// return true if this is a 'dakuten' (voiced) Kana, i.e., 'this' type is
   /// AccentedKana (and is contained in a DakutenKana object)
   [[nodiscard]] bool isDakuten() const;
+
   /// return true if this is a 'han-dakuten' (semi-voiced) Kana, i.e., 'this'
   /// type is AccentedKana (and is contained in a DakutenKana object)
   [[nodiscard]] bool isHanDakuten() const;
@@ -213,19 +221,20 @@ private:
   RomajiVariants _variants; ///< non-const to allow moving
 };
 
-/// class for Kana with voiced versions \kana{Kana}
+/// class for Kana that have voiced versions \kana{Kana}
 ///
-/// This class has instances for all Monograph and Digraph versions of 'k', 's',
-/// 't', and 'h' row Kana, e.g., 'ka' (か) has 'ga' (が), plus 'u' (which has
-/// 'vu'). Members of this class hold the unaccented values (like 'ka') and the
-/// `_dakuten` member holds the accented value (like 'ga').
+/// This class has instances for all Kana (Monograph and Digraph) in 'k', 's',
+/// 't', and 'h' rows as well as 'u'. For example 'ka' has `_dakuten` of 'ga',
+/// 'sha' has 'ja', 'u' has 'vu', etc.. romaji(), hiragana(), etc. members of
+/// this class have unaccented values (like 'ka') and the `_dakuten` member has
+/// the accented values (like 'ga').
 class DakutenKana : public Kana {
 public:
-  /// `dakuten` should be Kana object with accented values (like 'ga') and the
+  /// `dakuten` should be a Kana object with accented values (like 'ga') and the
   /// base class ctor is called with the remaining parameters in `T`
   template<typename... T> explicit DakutenKana(Kana&& dakuten, T&&...);
 
-  /// return 'dakuten' Kana
+  /// return 'dakuten' Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* dakuten() const override;
 protected:
   /// represents an accented Kana \kana{Kana}
@@ -249,17 +258,17 @@ private:
   const AccentedKana _dakuten;
 };
 
-/// class for Kana with semi-voiced versions (so only 'h' row) \kana{Kana}
+/// class for Kana that have semi-voiced versions (so the 'h' row) \kana{Kana}
 ///
 /// This class derives from DakutenKana since 'h' row Kana have both voiced and
 /// semi-voiced, i.e., 'ha' (は) has semi-voiced 'pa' (ぱ) and voiced 'ba' (ば).
 class HanDakutenKana : public DakutenKana {
 public:
-  /// `hanDakuten` should be Kana object with accented values (like 'pa') and
+  /// `hanDakuten` should be a Kana object with accented values (like 'pa') and
   /// the base class ctor is called with the remaining parameters in `T`
   template<typename... T> explicit HanDakutenKana(Kana&& hanDakuten, T&&...);
 
-  /// return 'han-dakuten' Kana
+  /// return 'han-dakuten' Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* hanDakuten() const override;
 private:
   const AccentedKana _hanDakuten;

@@ -15,8 +15,8 @@ class Kana;
 /// When the output target is Rōmaji, Revised Hepburn System (ヘボン式) is used,
 /// but for Rōmaji input many more letter combinations are supported such as:
 /// \li Kunrei-shiki (訓令式) Rōmaji:
-///    si -> し, sya -> しゃ, syu -> しゅ, syo -> しょ, ti -> ち, tu -> つ,
-///    hu -> ふ, tya -> ちゃ, tyu -> ちゅ, tyo -> ちょ, ...
+///   si -> し, sya -> しゃ, syu -> しゅ, syo -> しょ, ti -> ち, tu -> つ,
+///   hu -> ふ, tya -> ちゃ, tyu -> ちゅ, tyo -> ちょ, ...
 /// \li Nihon-shiki (日本式) Rōmaji: di -> ぢ,　du -> づ (plus Kunrei)
 /// \li Wāpuro (ワープロ) Rōmaji: ou -> おう, ...
 ///
@@ -30,7 +30,7 @@ class Kana;
 /// from Kana to Rōmaji the standard form is used as output).
 ///
 /// \note most other non-alpha Ascii (including numbers) are also converted from
-/// narrow to wide and vice versa (see Converter.cpp 'Delimiters'). Also, when
+/// narrow to wide and vice versa (see Tokens::populateDelimLists()). Also, when
 /// converting from Rōmaji, case is ignored so both 'Dare' and 'dARe' convert to
 /// 'だれ' and lower case is used when converting from Kana to Rōmaji.
 class Converter {
@@ -58,19 +58,17 @@ public:
   void flags(ConvertFlags flags) { _flags = flags; }
 
   /// convert `input` using current target and flags
-  /// \details the following code:
+  /// \details the following returns "あかちゃん" if the target is Hiragana
   /// \code
   ///   convert("akaチャン");
   /// \endcode
-  /// would return "あかちゃん" if the target is Hiragana
   [[nodiscard]] String convert(const String& input) const;
 
   /// convert only `source` type chars in `input` using current target and flags
-  /// \details the following code:
+  /// \details the following returns "あかチャン" if the target is Hiragana
   /// \code
   ///   convert(CharType::Romaji, "akaチャン");
   /// \endcode
-  /// would return "あかチャン" if the target is Hiragana
   [[nodiscard]] String convert(CharType source, const String& input) const;
 
   /// update current target and flags, then convert `input`
