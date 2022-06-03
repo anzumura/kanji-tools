@@ -12,22 +12,14 @@ namespace kanji_tools { /// \utils_group{UnicodeBlock}
 
 /// class represents a block (range) of Unicode Code points \utils{UnicodeBlock}
 ///
-/// This class is used in `is` functions like isKanji(), isHiragana(), etc..
+/// This class is used in 'is' functions like isKanji(), isHiragana(), etc..
 /// Official blocks have a Version and a `name` (for reference). To keep it
 /// simple, `version` represents the first version the block was introduced
 /// whereas in reality some characters may have been added in later versions.
 /// For example, the 'Katakana' block was introduced in version 1.1, but U+30A0
 /// (゠) was added to the block in version 3.2.
-///
-/// UnicodeBlock instances defined in DisplaySize.h (WideBlocks) can be a single
-/// Code point and can also start or end on an 'unofficial' boundaries. GCC 11.2
-/// didn't like default template (Code End = Start) in combination with friend
-/// declarations so this was split into two makeBlock() functions. This also
-/// allows better `static_assert` (using '<' instead of '<=').
 class UnicodeBlock {
 public:
-  static constexpr auto Mod{16}, OfficialStartMod{0}, OfficialEndMod{15};
-
   /// Unicode version and release date \utils{UnicodeBlock}
   class Version {
   public:
@@ -117,13 +109,19 @@ std::ostream& operator<<(std::ostream&, const UnicodeBlock::Version&);
 /// write "name (version)" for official blocks, otherwise write "start=, end="
 std::ostream& operator<<(std::ostream&, const UnicodeBlock&);
 
-/// create a UnicodeBlock with a single Code point
+/// create an 'unofficial' UnicodeBlock with a single Code point
 template<Code Start> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkRange<Start>();
   return UnicodeBlock{Start, Start};
 }
 
 /// create an 'unofficial' UnicodeBlock: `Start` must be less than `End`
+///
+/// \details UnicodeBlock instances defined in DisplaySize.h (WideBlocks) can be
+/// a single Code point and can also start or end on 'unofficial' boundaries.
+/// GCC 11.2 didn't like default template (Code End = Start) in combination with
+/// friend declarations so this was split into two makeBlock() functions. This
+/// also allows better `static_assert` (using '<' instead of '<=').
 template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkLess<Start, End>();
   return UnicodeBlock{Start, End};
@@ -135,8 +133,9 @@ template<Code Start, Code End>
 [[nodiscard]] consteval auto makeBlock(
     const UnicodeBlock::Version& v, StringView n) {
   UnicodeBlock::checkLess<Start, End>();
-  static_assert(Start % UnicodeBlock::Mod == UnicodeBlock::OfficialStartMod);
-  static_assert(End % UnicodeBlock::Mod == UnicodeBlock::OfficialEndMod);
+  constexpr auto Mod{16}, OfficialStartMod{0}, OfficialEndMod{15};
+  static_assert(Start % Mod == OfficialStartMod);
+  static_assert(End % Mod == OfficialEndMod);
   return UnicodeBlock{Start, End, &v, n};
 }
 
@@ -163,21 +162,23 @@ inline constexpr auto CommonKanaBlock{
     makeBlock<HiraganaBlocks[0].start(), KatakanaBlocks[0].end()>(
         UVer1_1, "Kana")};
 
-/// Almost all 'common' Japanese Kanji are in the original CJK Unified block.
-/// Extension A has one 'Kentei' and about 1000 'Ucd' Kanji. Extension B has an
-/// updated Jouyou Kanji '𠮟' (U+20B9F) which used to be '叱' (U+53F1)). The
-/// Compatibility block contains many 'single grapheme' versions of old/variant
-/// Japanese Kanji that used to require two graphemes, i.e., a base character
-/// followed by a variation selector.
+/// blocks containing all common Japanese Kanji (plus many non-Japanese Kanji)
+/// \details Most Japanese Kanji are in the original 'CJK Unified Ideographs'
+/// block. 'Extension A' has one 'Kentei' and about 1000 'Ucd' Kanji and
+/// 'Extension B' has an updated Jouyou Kanji '𠮟' (U+20B9F) which used to be
+/// '叱' (U+53F1). The Compatibility block contains many 'single grapheme'
+/// versions of old/variant Kanji that used to require two graphemes, i.e., a
+/// base character followed by a variation selector.
 inline constexpr std::array CommonKanjiBlocks{
-    makeBlock<0x3400, 0x4dbf>(UVer3_0, "CJK Extension A"), // ~6K kanji: 㵎
+    makeBlock<0x3400, 0x4dbf>(UVer3_0, "CJK Extension A"),        // ~6K: 㵎
     makeBlock<0x4e00, 0x9fff>(UVer1_1, "CJK Unified Ideographs"), // ~20K
     makeBlock<0xf900, 0xfaff>(UVer1_1, "CJK Compat. Ideographs"), // 渚, 猪
     makeBlock<0x20000, 0x2a6df>(UVer3_1, "CJK Extension B")       // ~42K: 𠮟
 };
 
-/// Extensions C, D, E and F are contiguous so combine into one block (more
-/// efficient for 'isKanji' functions and wregex). Here are the actual ranges:
+/// blocks that contain rare Kanji \details Extensions C, D, E and F are
+/// contiguous so combine into one block (more efficient for 'isKanji' functions
+/// and `wregex`). Here are the actual ranges:
 /// - U+2A700 to U+2B73F : CJK Extension C, ver 5.2 Oct 2009, ~4K kanji
 /// - U+2B740 to U+2B81F : CJK Extension D, ver 6.0 Oct 2010, 222 kanji
 /// - U+2B820 to U+2CEAF : CJK Extension E, ver 8.0 Jun 2015, ~6K kanji
@@ -196,8 +197,8 @@ inline constexpr std::array PunctuationBlocks{
     makeBlock<0xfff0, 0xffff>(UVer1_1, "Specials") // Object Replacement, etc.
 };
 
-/// symbols commonly used in Japanese text (there are a lot more symbol blocks,
-/// but they haven't come up so far in sample data)
+/// symbols commonly used in Japanese text \details there are a lot more symbol
+/// blocks, but they haven't come up so far in sample data
 inline constexpr std::array SymbolBlocks{
     makeBlock<0x2100, 0x214f>(UVer1_1, "Letterlike Symbols"),          // ℃
     makeBlock<0x2190, 0x21ff>(UVer1_1, "Arrows"),                      // →
@@ -221,7 +222,7 @@ inline constexpr std::array LetterBlocks{
     makeBlock<0x2c60, 0x2c7f>(UVer5_0, "Latin Extended-C"),
     makeBlock<0xff00, 0xffef>(UVer1_1, "Halfwidth and Fullwidth Forms")};
 
-/// skip codes in this range when reading in Kanji - link for more info:
+/// skip codes in this range when reading in Kanji \sa
 /// http://unicode.org/reports/tr28/tr28-3.html#13_7_variation_selectors
 inline constexpr std::array NonSpacingBlocks{
     makeBlock<0xfe00, 0xfe0f>(UVer3_2, "Variation Selectors")};
@@ -305,8 +306,7 @@ template<typename... T>
 [[nodiscard]] bool isMBSymbol(const String& s, bool = true);    ///< \doc isKana
 [[nodiscard]] bool isMBLetter(const String& s, bool = true);    ///< \doc isKana
 [[nodiscard]] bool isMBPunctuation(const String& s, bool includeSpace = false,
-    bool sizeOne =
-        true); ///< \doc isKana (don't include wide spaces by default)
+    bool sizeOne = true); ///< \doc isKana (wide spaces excluded by default)
 [[nodiscard]] bool isRecognizedUtf8(const String& s,
     bool sizeOne = true); ///< \doc isKana (includes wide spaces)
 

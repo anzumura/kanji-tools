@@ -70,7 +70,7 @@ public:
     return !name.empty() && _map.contains(name);
   }
 
-  /// default ctor, creates an *empty* Symbol
+  /// default ctor, creates an empty Symbol with id `0`
   constexpr Symbol() noexcept : BaseSymbol{0} {}
 
   /// create a Symbol for the given String
@@ -83,12 +83,12 @@ public:
     return id() ? *_list.at(id() - 1) : EmptyString;
   }
 
-  /// equal-to operator
+  /// equal operator
   [[nodiscard]] constexpr auto operator==(const Symbol& x) const noexcept {
     return id() == x.id();
   }
 
-  /// not-equal-to operator
+  /// not-equal operator
   [[nodiscard]] constexpr auto operator!=(const Symbol& x) const noexcept {
     return !operator==(x);
   }
