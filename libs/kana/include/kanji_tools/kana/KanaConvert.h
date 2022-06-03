@@ -5,33 +5,36 @@
 #include <filesystem>
 #include <vector>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kana_group{KanaConvert}
+/// KanaConvert class used by 'kanaConvert' `main` function
 
-// 'KanaConvert' provides a command line interface as well as an interactive
-// mode for converting between Hiragana, Katakana and Rōmaji.
+/// provides a command line interface and interactive mode for converting
+/// between Hiragana, Katakana and Rōmaji \kana{KanaConvert}
 class KanaConvert {
 public:
-  // allow overriding in and out streams for testing
+  /// allow overriding in and out streams for testing
   explicit KanaConvert(
       const Args&, std::ostream& = std::cout, std::istream* = {});
 
-  KanaConvert(const KanaConvert&) = delete;
+  KanaConvert(const KanaConvert&) = delete; ///< deleted copy ctor
 private:
   using List = std::vector<String>;
 
-  // 'error' throws an exception (used during processing of command line args)
+  /// helper function for handling errors during processing of command line args
+  /// \throw DomainError
   static void error(const String&);
 
-  // 'processArg' returns true if 'arg' is recognized and processed, otherwise
-  // it returns false meaning 'arg' should be treated as a string to convert
+  /// return true if `arg` is recognized and processed, otherwise returns false
+  /// which means `arg` should be treated as a string to convert
   [[nodiscard]] bool processArg(
       const String& arg, bool& printKana, bool& printMarkdown);
 
   [[nodiscard]] bool charTypeArgs(const String&);
   bool flagArgs(char);
 
-  // 'usage' prints details about all command line args by default, but setting
-  // 'showAllOptions' to false causes it to print a shorted message
+  /// print details about command line args
+  /// \param showAllOptions set to false to print a shorter usage message which
+  ///     is used during interactive mode
   void usage(bool showAllOptions = true) const;
 
   void start(const List& = {});
@@ -52,4 +55,5 @@ private:
   const Choice _choice;
 };
 
+/// \end_group
 } // namespace kanji_tools

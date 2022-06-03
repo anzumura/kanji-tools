@@ -56,7 +56,7 @@ inline const auto CharTypes{
 /// Hepburn should map to 'wa' and 'e' if they are used as particles) - instead
 /// they always map to 'ha' and 'he'. If both Hepburn and Kunrei flags are set
 /// then Hepburn is preferred, but will then try Kunrei before falling back to
-/// the unique '_romaji' value in the Kana class.
+/// the unique Kana::_romaji value.
 enum class ConvertFlags : Enum::Size {
   None,              ///< no value (the default)
   Hepburn,           ///< use Hepburn style Rōmaji

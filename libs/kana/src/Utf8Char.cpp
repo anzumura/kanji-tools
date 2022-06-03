@@ -34,16 +34,6 @@ bool Utf8Char::isCombiningMark(const String& s) {
 }
 
 size_t Utf8Char::size(const char* s, bool onlyMB) {
-  // use '11 00 00 00' to grab the first two bits and only adding if the result
-  // is not binary '10 00 00 00'). Examples:
-  // - size("abc") = 0
-  // - size("abc", false) = 3
-  // - size("大blue空") = 2
-  // - size("大blue空", false) = 6
-  // Note: some Kanji can be followed by a 'variation selector' or 'combining
-  // mark' - these are not counted since they are considered part of the
-  // previous 'MB character' (as a modifier).
-
   size_t result{};
   // a 'reinterpret_cast' at the beginning saves a bunch of static_casts when
   // checking if the next 3 bytes represent a 'variation selector'
@@ -52,8 +42,13 @@ size_t Utf8Char::size(const char* s, bool onlyMB) {
       if (isCombiningMark(i) || isVariationSelector(i))
         i += VarSelectorSize;
       else if (onlyMB)
+        // use '11 00 00 00' to get first two bits and increment if equal to
+        // '11 00 00 00' - this only counts start bytes of 'multi-byte' UTF-8
         result += (*i++ & TwoBits) == TwoBits;
       else
+        // use '11 00 00 00' to get first two bits and increment if not equal to
+        // '10 00 00 00' - this will count both single byte UTF-8 as well as
+        // start bytes of 'multi-byte' UTF-8 (and skip continuation bytes)
         result += (*i++ & TwoBits) != Bit1;
   }
   return result;
@@ -86,6 +81,8 @@ String Utf8Char::getFirst(const String& s) {
   c.next(result);
   return result;
 }
+
+Utf8Char::Utf8Char(const String& data) : _data{data} {}
 
 void Utf8Char::reset() {
   _curLocation = _data.c_str();
