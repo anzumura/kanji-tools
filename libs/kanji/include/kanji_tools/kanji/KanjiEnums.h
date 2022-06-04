@@ -8,16 +8,15 @@ namespace kanji_tools { /// \kanji_group{KanjiEnums}
 /// used to identify which official group (Jouyou or Jinmei) a Kanji belongs to
 /// (or has a link to) as well as a few more groups for less common Kanji:
 enum class KanjiTypes : Enum::Size {
-  Jouyou,       ///< 2136 official Jōyō (常用) Kanji
+  Jouyou,       ///< 2,136 official Jōyō (常用) Kanji
   Jinmei,       ///< 633 official Jinmeiyō (人名用) Kanji
-  LinkedJinmei, ///< 230 more Jinmei Kanji (includes old/variant forms of 212
-                ///< Jouyou and and 18 Jinmei)
-  LinkedOld,    ///< old/variant Jouyou Kanji that aren't in 'LinkedJinmei'
-  Frequency,    ///< Kanji in top 2501 frequency list and in the above types
-  Extra,  ///< Kanji loaded from 'extra.txt' (and not any of the above types)
-  Kentei, ///< Kanji loaded from 'kentei/k*.txt' files (not included above)
-  Ucd,    ///< Kanji loaded from 'ucd.txt' file that aren't included above
-  None    ///< used for Kanji that haven't been loaded from 'data/*.txt' files
+  LinkedJinmei, ///< 230 old/variant forms of Jouyou (212) and Jinmei 18)
+  LinkedOld,    ///< 163 old/variant Jouyou Kanji that aren't in LinkedJinmei
+  Frequency,    ///< 124 from 'frequency.txt' that aren't one of the above types
+  Extra,        ///< loaded from 'extra.txt' (file doesn't contain above types)
+  Kentei,       ///< loaded from 'kentei/*.txt' and not one of the above types
+  Ucd,          ///< loaded from 'ucd.txt' and not one of the above types
+  None          ///< not loaded by this program
 };
 /// enable #KanjiTypes to be used in an EnumList
 template<> inline constexpr auto is_enumlist_with_none<KanjiTypes>{true};
@@ -62,20 +61,18 @@ inline const auto AllJlptLevels{
 /// Kanji Kentei (漢字検定) Kyū (級), K = Kanken (漢検), J=Jun (準)
 /// \sa https://en.wikipedia.org/wiki/Kanji_Kentei
 enum class KenteiKyus : Enum::Size {
-  K10, ///< Level 10 (１０級): 80 Kanji (Jouyou=80)
-  K9,  ///< Level 9 (９級): 160 Kanji (Jouyou=160)
-  K8,  ///< Level 8 (８級): 200 Kanji (Jouyou=200)
-  K7,  ///< Level 7 (７級): 202 Kanji (Jouyou=202)
-  K6,  ///< Level 6 (６級): 193 Kanji (Jouyou=193)
-  K5,  ///< Level 5 (５級): 191 Kanji (Jouyou=191)
-  K4,  ///< Level 4 (４級): 313 Kanji (Jouyou=313)
-  K3,  ///< Level 3 (３級): 284 Kanji (Jouyou=284)
-  KJ2, ///< Level Pre-2 (準２級): 328 Kanji (Jouyou=328)
-  K2,  ///< Level 2 (２級): 188 Kanji (Jouyou=184, Frequency=3, Kentei=1)
-  KJ1, ///< Level Pre-1 (隼１級): 940 Kanji (Jinmei=569, LinkedJinmei=11,
-       ///< Frequency=60, Extra=33, Kentei=267)
-  K1, ///< Level 1 (１級): 2,780 Kanji (Jinmei=63, LinkedJinmei=2, LinkedOld=2,
-      ///< Frequency=58, Extra=101, Kentei=2,554)
+  K10, ///< Level 10 (１０級): 80 Kanji
+  K9,  ///< Level 9 (９級): 160 Kanji
+  K8,  ///< Level 8 (８級): 200 Kanji
+  K7,  ///< Level 7 (７級): 202 Kanji
+  K6,  ///< Level 6 (６級): 193 Kanji
+  K5,  ///< Level 5 (５級): 191 Kanji
+  K4,  ///< Level 4 (４級): 313 Kanji
+  K3,  ///< Level 3 (３級): 284 Kanji
+  KJ2, ///< Level Pre-2 (準２級): 328 Kanji
+  K2,  ///< Level 2 (２級): 188 Kanji, has 3 non-Jouyou
+  KJ1, ///< Level Pre-1 (隼１級): 940 Kanji, all non-Jouyou
+  K1,  ///< Level 1 (１級): 2,780 Kanji, all non-Jouyou
   None ///< Not a Kentei Kanji
 };
 /// enable #KenteiKyus to be used in an EnumList
@@ -84,16 +81,15 @@ template<> inline constexpr auto is_enumlist_with_none<KenteiKyus>{true};
 inline const auto AllKenteiKyus{BaseEnumList<KenteiKyus>::create(
     "K10", "K9", "K8", "K7", "K6", "K5", "K4", "K3", "KJ2", "K2", "KJ1", "K1")};
 
-/// represents reason Kanji was added to Jinmeiyō list:
+/// reason Kanji was added to Jinmeiyō list:
 enum class JinmeiReasons : Enum::Size {
-  Names,   ///< for use in names
-  Print,   ///< for use in publications
-  Variant, ///< allowed variant form (異体字)
-  Moved,   ///< moved out of Jouyou into Jinmei
-  Simple,  ///< simplified form (表外漢字字体表の簡易慣用字体)
-  Other,   ///< reason listed as その他
-  None ///< all JinmeiKanji have one of the above reasons, None is used for base
-       ///< virtual function return value (similar to other Kanji enums)
+  Names,   ///< 246 Kanji: for use in names
+  Print,   ///< 352 Kanji: for use in publications
+  Variant, ///< 2 Kanji: allowed variant form (異体字)
+  Moved,   ///< 5 Kanji: moved out of Jouyou into Jinmei
+  Simple, ///< 2 Kanji: simplified form (表外漢字字体表の簡易慣用字体)
+  Other, ///< 26 Kanji: reason listed as その他
+  None   ///< Not a Jinmei type Kanji
 };
 /// enable #JinmeiReasons to be used in an EnumList
 template<> inline constexpr auto is_enumlist_with_none<JinmeiReasons>{true};
