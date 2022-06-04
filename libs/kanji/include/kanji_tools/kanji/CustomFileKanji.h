@@ -17,9 +17,13 @@ public:
   [[nodiscard]] OptString extraTypeInfo() const override;
   [[nodiscard]] OldNames oldNames() const override { return _oldNames; }
 
+  /// return a unique number starting at `1` for this Kanji (matches the row
+  /// number of the source '.txt' file)
   [[nodiscard]] auto number() const { return _number; }
 
-  /// factory method that creates a list of Kanji of type `T`:
+  /// factory method that creates a list of Kanji of type `T`
+  /// \details all files must have 'Number', 'Name', 'Radical' and 'Reading'
+  ///     columns plus the columns listed in T::RequiredColumns
   /// \tparam T must have public RequiredColumns and a ctor taking KanjiDataRef
   ///     and a custom file (currently JouyouKanji, JinmeiKanji and ExtraKanji)
   /// \param d KanjiData instance that is used for constructing Kanji
@@ -27,6 +31,7 @@ public:
   ///     number of columns for the given Kanji type `T` (and the first line
   ///     must have header names that match the static `Column` instance names)
   /// \return a list of Kanji instance of type `T`
+  /// \throw DomainError if `f` is missing or has malformed data
   template<typename T>
   [[nodiscard]] static auto fromFile(KanjiDataRef d, const KanjiData::Path& f);
 protected:
@@ -73,12 +78,14 @@ private:
 /// class representing the 633 official Jinmeiyō Kanji \kanji{CustomFileKanji}
 class JinmeiKanji : public OfficialKanji {
 public:
+  /// ctor called by fromFile() method
   JinmeiKanji(KanjiDataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
   [[nodiscard]] JinmeiReasons reason() const override { return _reason; }
   [[nodiscard]] OptString extraTypeInfo() const override;
 
+  /// additional columns required by JinmeiKanji, see fromFile()
   inline static const std::array RequiredColumns{
       OldNamesCol, YearCol, ReasonCol};
 private:
@@ -88,10 +95,13 @@ private:
 /// class representing the 2,136 official Jōyō Kanji \kanji{CustomFileKanji}
 class JouyouKanji : public OfficialKanji {
 public:
+  /// ctor called by fromFile() method
   JouyouKanji(KanjiDataRef, File);
+
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
   [[nodiscard]] KanjiGrades grade() const override { return _grade; }
 
+  /// additional columns required by JouyouKanji, see fromFile()
   inline static const std::array RequiredColumns{
       OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
 private:
@@ -106,11 +116,13 @@ private:
 /// These Kanji should also not be in 'frequency.txt'.
 class ExtraKanji : public CustomFileKanji {
 public:
+  /// ctor called by fromFile() method
   ExtraKanji(KanjiDataRef, File);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
   [[nodiscard]] OptString newName() const override { return _newName; }
 
+  /// additional columns required by ExtraKanji, see fromFile()
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 private:
   ExtraKanji(KanjiDataRef, File, Name);
@@ -135,12 +147,16 @@ public:
   [[nodiscard]] bool linkedReadings() const override { return true; }
   [[nodiscard]] OptString newName() const override;
 protected:
-  LinkedKanji(KanjiDataRef, Name, const KanjiPtr&, UcdPtr);
+  LinkedKanji(KanjiDataRef, Name, const KanjiPtr& link, UcdPtr);
 
-  /// return %Kanji name passed in
-  /// \throw DomainError if linkedOldKanji doesn't link to a JouyouKanji or
-  /// LinkedJinmeiKanji doesn't link to either a JouyouKanji or a JinmeiKanji
-  [[nodiscard]] static Name linkType(Name, const Kanji&, bool isJouyou = true);
+  /// used by ctor to ensure `link` has expected type
+  /// \param name String name of instance being constructed
+  /// \param link Kanji to use as the link
+  /// \param isOld true if called from LinkedOld ctor
+  /// \return `name` (the same value passed into the function)
+  /// \throw DomainError if `link` type is not Jouyou and (`isOld` is true or
+  ///     `link` type is not Jinmei)
+  [[nodiscard]] static Name check(Name name, const Kanji& link, bool isOld);
 private:
   const Frequency _frequency;
   const KenteiKyus _kyu;
@@ -156,6 +172,7 @@ private:
 /// \li 18 are alternate forms of standard JinmeiKanji
 class LinkedJinmeiKanji : public LinkedKanji {
 public:
+  /// ctor called by KanjiData
   LinkedJinmeiKanji(KanjiDataRef, Name, const KanjiPtr&);
 
   [[nodiscard]] KanjiTypes type() const override {
@@ -169,6 +186,7 @@ public:
 /// 230 Jinmeiyō 'official variants'.
 class LinkedOldKanji : public LinkedKanji {
 public:
+  /// ctor called by KanjiData (after creating all LinkedJinmeiKanji)
   LinkedOldKanji(KanjiDataRef, Name, const KanjiPtr&);
 
   [[nodiscard]] KanjiTypes type() const override {
@@ -177,13 +195,12 @@ public:
 };
 
 template<typename T>
-auto CustomFileKanji::fromFile(KanjiDataRef data, const KanjiData::Path& f) {
-  // all 'CustomFileKanji' files must have at least the following columns
+auto CustomFileKanji::fromFile(KanjiDataRef d, const KanjiData::Path& f) {
   ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
   for (auto& i : T::RequiredColumns) columns.emplace_back(i);
   KanjiData::List results;
   for (ColumnFile file{f, columns}; file.nextRow();)
-    results.emplace_back(std::make_shared<T>(data, file));
+    results.emplace_back(std::make_shared<T>(d, file));
   return results;
 }
 

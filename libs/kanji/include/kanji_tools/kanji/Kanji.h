@@ -87,7 +87,7 @@ public:
   /// return true if readings were loaded via a link
   [[nodiscard]] virtual bool linkedReadings() const;
 
-  /// return (usually empty) list of old names
+  /// return list of old names (usually empty)
   /// \details some JouyouKanji and JinmeiKanji have 'old' (旧字体) forms:
   /// \li 365 JouyouKanji: 364 have 'oldNames' with one entry and ono has
   ///   'oldNames' with three entries (弁 has 辨, 瓣 and 辯)
@@ -97,61 +97,96 @@ public:
   /// LinkedOldKanji end up getting created (367 - 204 linkedJinmeiKanji)
   [[nodiscard]] virtual OldNames oldNames() const { return EmptyLinkNames; }
 
-  // UcdFileKanji have an optional 'newName' field (based on Link field loaded
-  // from ucd.txt). LinkedKanji also have a 'newName', i.e., the linked kanji
-  // name which is the new (or more standard) version.
+  /// return the new name (usually not defined)
+  /// \details UcdFileKanji can populate this field based on 'Simplified Links'
+  /// loaded from 'ucd.txt'). LinkedKanji also set 'newName' to the name of the
+  /// `link` Kanji (which is the 'new/standard' version)
   [[nodiscard]] virtual OptString newName() const { return {}; }
 
-  // Only CustomFileKanji have 'extraTypeInfo'. They have a 'number' (from
-  // 'Number' column) plus:
-  // - Jouyou: optionally adds the year the kanji was added to the official list
-  // - Jinmei: adds the year the kanji was added as well as the 'reason' (see
-  // JinmeiKanji class)
+  /// return an optional String with extra information depending on type
+  /// \details currently this method is overridden by:
+  /// \li CustomFileKanji: returns `number`
+  /// \li OfficialKanji: optionally adds `year` if it's non-zero
+  /// \li JinmeiKanji: adds `reason`
   [[nodiscard]] virtual OptString extraTypeInfo() const { return {}; }
 
+  /// return the name (usually a single UTF-8 character, but can include a
+  /// variation selector)
   [[nodiscard]] Name name() const { return _name.name(); }
+
+  /// return true if name() has a variation selector
   [[nodiscard]] auto variant() const { return _name.isVariant(); }
+
+  /// return name() without any variation selector
   [[nodiscard]] auto nonVariantName() const { return _name.nonVariant(); }
 
-  // 'compatibilityName' returns 'compatibilityName' if it exists, otherwise it
-  // returns the string value of '_name'.
-  // (which is should be a single MB char without a variation selector)
+  /// return a 'compatibility name' if defined, otherwise return same as name()
+  /// \details a compatibility name is a single UTF-8 that can be used instead
+  /// of a base character plus variation selector
   [[nodiscard]] String compatibilityName() const;
 
+  /// return frequency() if it's non-zero, otherwise return `x`
   [[nodiscard]] Frequency frequencyOrDefault(Frequency x) const;
+
+  /// return frequency() if it's non-zero, otherwise return max Frequency value
   [[nodiscard]] Frequency frequencyOrMax() const;
+
+  /// return 'Morohashi ID' ('Dai Kan-Wa Jiten' index number)
   [[nodiscard]] auto& morohashiId() const { return _morohashiId; }
+
+  /// return list of 'Classic Nelson IDs' (usually a single value, but can be
+  /// empty or have more than one value in a few cases)
   [[nodiscard]] auto& nelsonIds() const { return _nelsonIds; }
+
+  /// return most common 'hànyǔ pīnyīn' (from UCD 'kMandarin' property)
   [[nodiscard]] auto& pinyin() const { return _pinyin; }
+
+  /// return reference to Radical object
   [[nodiscard]] auto& radical() const { return _radical; }
+
+  /// return copy of Strokes object
   [[nodiscard]] auto strokes() const { return _strokes; }
 
+  /// return true if type() is `t`
   [[nodiscard]] bool is(KanjiTypes t) const;
+
+  /// return true if grade() isn't `None` (so true for all JouyouKanji)
   [[nodiscard]] bool hasGrade() const;
+
+  /// return true if (Kentei) kyu() isn't `None`
   [[nodiscard]] bool hasKyu() const;
+
+  /// return true if (JLPT) level() isn't `None`
   [[nodiscard]] bool hasLevel() const;
+
+  /// return true if meaning() isn't empty
   [[nodiscard]] bool hasMeaning() const;
+
+  /// return true if nelsonIds() isn't empty
   [[nodiscard]] bool hasNelsonIds() const;
+
+  /// return true if reading() isn't empty
   [[nodiscard]] bool hasReading() const;
 
-  // 'info' returns a comma separated string with extra info (if present)
-  // including: Radical, Strokes, Pinyin, Grade, Level, Freq, New, Old and Kyu.
-  // 'fields' can be used to control inclusion of fields (include all by
-  // default). Note: multiple 'Old' links are separated by '／' (wide slash) and
-  // a link is followed by '*' if it was used to pull in readings.
+  /// return a comma separated string containing values for the given `fields`
+  /// \details if a field is requested, but it's empty or doesn't have any data
+  /// (like a `None` value for an enum) then it won't be included
+  /// \note multiple 'Old' links are separated by '／' (wide slash) and a link
+  /// is followed by '*' if it was used to pull in readings.
   [[nodiscard]] String info(Info fields = Info::All) const;
 
-  // Return 'name' plus an extra 'suffix' to show more info. Suffixes are:
-  //   . = Jouyou        : 2136 Jouyou
-  //   ' = JLPT          : 251 Jinmei in JLPT - the other 1971 JLPT are Jouyou
-  //   " = Top Frequency : 296 top frequency not in Jouyou or JLPT
-  //   ^ = Jinmei        : 224 Jinmei not already covered by the above types
-  //   ~ = Linked Jinmei : 218 Linked Jinmei (with no frequency)
-  //   % = Linked Old    : 211 Linked Old (with no frequency)
-  //   + = Extra         : all kanji loaded from 'extra.txt' file
-  //   @ = <K1 Kentei    : 268 non-K1 Kentei Kanji that aren't included above
-  //   # = K1 Kentei     : 2554 K1 Kentei Kanji that aren't included above
-  //   * = Ucd           : kanji loaded from 'ucd.txt' not included above
+  /// return name() plus an extra 'suffix' to show more info
+  /// \details Suffixes are:
+  /// \li . = Jouyou        : 2136 Jouyou
+  /// \li ' = JLPT          : 251 Jinmei in JLPT - other 1971 JLPT are Jouyou
+  /// \li " = Top Frequency : 296 top frequency not in Jouyou or JLPT
+  /// \li ^ = Jinmei        : 224 Jinmei not already covered by the above types
+  /// \li ~ = Linked Jinmei : 218 Linked Jinmei (with no frequency)
+  /// \li % = Linked Old    : 211 Linked Old (with no frequency)
+  /// \li + = Extra         : all kanji loaded from 'extra.txt' file
+  /// \li @ = <K1 Kentei    : 268 non-K1 Kentei Kanji that aren't included above
+  /// \li # = K1 Kentei     : 2554 K1 Kentei Kanji that aren't included above
+  /// \li * = Ucd           : kanji loaded from 'ucd.txt' not included above
   [[nodiscard]] String qualifiedName() const;
 
   // Sort in a way that corresponds to 'qualifiedName' output, i.e., 'Jouyou'
