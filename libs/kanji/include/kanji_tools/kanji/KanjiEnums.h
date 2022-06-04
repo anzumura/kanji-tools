@@ -87,9 +87,9 @@ enum class JinmeiReasons : Enum::Size {
   Print,   ///< 352 Kanji: for use in publications
   Variant, ///< 2 Kanji: allowed variant form (異体字)
   Moved,   ///< 5 Kanji: moved out of Jouyou into Jinmei
-  Simple, ///< 2 Kanji: simplified form (表外漢字字体表の簡易慣用字体)
-  Other, ///< 26 Kanji: reason listed as その他
-  None   ///< Not a Jinmei type Kanji
+  Simple,  ///< 2 Kanji: simplified (表外漢字字体表の簡易慣用字体)
+  Other,   ///< 26 Kanji: reason listed as その他
+  None     ///< Not a Jinmei type Kanji
 };
 /// enable #JinmeiReasons to be used in an EnumList
 template<> inline constexpr auto is_enumlist_with_none<JinmeiReasons>{true};

@@ -7,11 +7,13 @@
 #include <memory>
 #include <optional>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{Kanji}
+/// Kanji, NonLinkedKanji and UcdFileKanji class hierarchy
 
 using KanjiPtr = std::shared_ptr<class Kanji>;
 using KanjiDataRef = const class KanjiData&;
 
+/// abstract base class representing a Japanese %Kanji character \kanji{Kanji}
 class Kanji {
 public:
   using Frequency = uint16_t;
@@ -26,56 +28,73 @@ public:
   using OldNames = const LinkNames&;
   using Reading = Ucd::Reading;
 
-  // 'Info' members can be used to select which fields are printed by
-  // 'Kanji::info' method. For example 'Grade | Level | Freq' will print
-  // 'grade', 'level' and 'frequency' fields and 'All ^ Strokes' prints all
-  // except strokes.
+  /// members can be combined to select which fields are printed by info()
+  /// \details for example `Grade | Level | Freq` prints the three listed fields
+  /// and `All ^ Strokes` prints all fields except 'strokes'
   enum class Info : uint16_t {
-    Radical = 1,
-    Strokes,
-    Pinyin = 4,
-    Grade = 8,
-    Level = 16,
-    Freq = 32,
-    New = 64,
-    Old = 128,
-    Kyu = 256,
-    All = 511
+    Radical = 1, ///< print 'radical' (部首) name and number
+    Strokes,     ///< print 'strokes' (画数) count
+    Pinyin = 4,  ///< print most common 'hànyǔ pīnyīn' (漢語拼音)
+    Grade = 8,   ///< print 'grade' (学年)
+    Level = 16,  ///< print JLPT 'level'
+    Freq = 32,   ///< print 'frequency' number (from top 2,501 list)
+    New = 64,    ///< print 'new' variant (generally simplified forms)
+    Old = 128,   ///< print 'old' variant (generally traditional forms)
+    Kyu = 256,   ///< print Kentei 'kyu'
+    All = 511    ///< print all fields
   };
 
-  virtual ~Kanji() = default;
-  Kanji(const Kanji&) = delete;
+  virtual ~Kanji() = default;   ///< default dtor
+  Kanji(const Kanji&) = delete; ///< deleted copy ctor
 
+  /// return a unique KanjiTypes value for each leaf class type
   [[nodiscard]] virtual KanjiTypes type() const = 0;
+
+  /// return one or more English meanings (some UcdFileKanji have empty meaning)
   [[nodiscard]] virtual Meaning meaning() const = 0;
+
+  /// return a comma-separated list of Japanese readings in %Kana
+  /// \details On (音) readings are in Katakana followed by Kun (訓) readings in
+  /// Hiragana (LinkedKanji classes return the readings of their 'link' Kanji)
+  /// \note Jouyou and Extra Kanji include a dash (-) in Kun readings before any
+  /// Okurigana (送り仮名), but unfortunately this is not the case for readings
+  /// loaded from 'ucd.txt'
   [[nodiscard]] virtual Reading reading() const = 0;
 
-  // Base Kanji class provided default implementations for the following virtual
-  // functions. For enums like KenteiKyus and KanjiGrades, 'None' is returned
-  // and for 'frequency' and 'year' zero is returned (means no value).
-
+  /// return frequency number starting at `1` for most frequent up to `2,501`,
+  /// base class returns `0` which means 'not in the top 2,501 list'
   [[nodiscard]] virtual Frequency frequency() const;
+
+  /// return grade, base class returns `None` which means 'has no grade'
   [[nodiscard]] virtual KanjiGrades grade() const;
+
+  /// return Kentei kyu, base class returns `None` which means 'has no kyu'
   [[nodiscard]] virtual KenteiKyus kyu() const;
+
+  /// return JLPT level, base class returns `None` which means 'has no level'
   [[nodiscard]] virtual JlptLevels level() const;
+
+  /// return link to official Kanji, base class returns `nullptr`
   [[nodiscard]] virtual KanjiPtr link() const;
+
+  /// return Jinmei 'reason', base class returns `None`
   [[nodiscard]] virtual JinmeiReasons reason() const;
+
+  /// return the year Kanji was added to an official list, base class returns
+  /// `0` which means 'no year was specified'
   [[nodiscard]] virtual Year year() const;
 
-  // 'linkedReadings' returns true if readings were loaded from a linked kanji
+  /// return true if readings were loaded via a link
   [[nodiscard]] virtual bool linkedReadings() const;
 
-  // Some Jōyō and Jinmeiyō Kanji have 'old' (旧字体) forms:
-  // - 365 Jōyō have 'oldNames': 364 have 1 'oldName' and 1 has 3 'oldNames' (弁
-  //   has 辨, 瓣 and 辯)
-  // - 163 'LinkedOld' type kanji end up getting created (367 - 204 that are
-  //   linked jinmei)
-  // - 230 Jinmeiyō are 'alternate forms' (type is 'LinkedJinmei'):
-  //   - 204 are part of the 365 Jōyō oldName set
-  //   - 8 are different alternate forms of Jōyō kanji (薗 駈 嶋 盃 冨 峯 埜 凉)
-  //   - 18 are alternate forms of standard (633) Jinmeiyō kanji so only these
-  //     will have an 'oldName'
-  // - In summary, there are 383 kanji with non-empty 'oldNames' (365 + 18)
+  /// return (usually empty) list of old names
+  /// \details some JouyouKanji and JinmeiKanji have 'old' (旧字体) forms:
+  /// \li 365 JouyouKanji: 364 have 'oldNames' with one entry and ono has
+  ///   'oldNames' with three entries (弁 has 辨, 瓣 and 辯)
+  /// \li 18 JinmeiKanji: alternate forms of standard JinmeiKanji
+  /// \li several hundred Kanji of other types also have non-empty 'oldNames'
+  ///   populated from 'ucd.txt' 'Traditional Links'
+  /// LinkedOldKanji end up getting created (367 - 204 linkedJinmeiKanji)
   [[nodiscard]] virtual OldNames oldNames() const { return EmptyLinkNames; }
 
   // UcdFileKanji have an optional 'newName' field (based on Link field loaded
@@ -311,7 +330,8 @@ public:
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };
 
-// enable bitwise operators for 'Kanji::Info'
+/// enable bitwise operators for Kanji::Info
 template<> inline constexpr auto is_bitmask<Kanji::Info>{true};
 
+/// \end_group
 } // namespace kanji_tools
