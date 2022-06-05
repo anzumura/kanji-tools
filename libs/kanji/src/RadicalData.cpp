@@ -28,7 +28,7 @@ void printCounts(KanjiDataRef data, const Count& c, bool summary = false) {
 
 } // namespace
 
-RadicalRef RadicalData::find(const String& name) const {
+RadicalRef RadicalData::find(Radical::Name name) const {
   checkLoaded();
   const auto i{_map.find(name)};
   if (i == _map.end()) throw DomainError{"name not found: " + name};

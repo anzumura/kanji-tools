@@ -4,7 +4,7 @@
 #include <kanji_tools/utils/ColumnFile.h>
 
 namespace kanji_tools { /// \kanji_group{OfficialKanji}
-/// NumberedKanji and OfficialLinkedKanji class hierarchies
+/// NumberedKanji, OfficialKanji and OfficialLinkedKanji class hierarchies
 
 /// has 'kyu', 'number' and 'oldNames' fields and includes shared functionality
 /// for loading from customized local files \kanji{OfficialKanji}

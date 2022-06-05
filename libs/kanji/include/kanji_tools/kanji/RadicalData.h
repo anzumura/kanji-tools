@@ -6,34 +6,44 @@
 #include <map>
 #include <memory>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{RadicalData}
+/// RadicalData class for loading data from 'radicals.txt'
 
-// 'RadicalData' holds data loaded from 'radicals.txt' (214 official Radicals).
+/// load, store, find and print Radical objects \kanji{RadicalData}
 class RadicalData {
 public:
   using Map = std::map<String, Radical::Number>;
   using List = std::vector<Radical>;
 
-  RadicalData() = default;
+  RadicalData() = default; ///< default ctor
 
-  RadicalData(const RadicalData&) = delete;
-  auto operator=(const RadicalData&) = delete;
+  RadicalData(const RadicalData&) = delete;    ///< deleted copy ctor
+  auto operator=(const RadicalData&) = delete; ///< deleted operator=
 
-  // 'find' by the ideograph code in utf8 (not the unicode radical code). For
-  // example, Radical number 30 (口) is Unicode 53E3, but has another 'Unicode
-  // Radical' value of 2F1D
-  [[nodiscard]] RadicalRef find(const String&) const;
+  /// find Radical by `name`
+  /// \param name Japanese Kanji 'name' of the Radical
+  /// \details For example, Radical '30 (口)' is found using "口" (U+53E3) from
+  /// the usual "CJK Unified" Unicode block as opposed to using "⼝" (U+2F1D)
+  /// from the "Kangxi Radicals" block.
+  /// \return const reference to Radical
+  /// \throw DomainError if not found
+  [[nodiscard]] RadicalRef find(Radical::Name name) const;
 
-  // 'find' by the official Radical Number (one greater than index in _radicals)
-  [[nodiscard]] RadicalRef find(Radical::Number) const;
+  /// find Radical by `number`
+  /// \param number the official Radical number (1 - 214)
+  /// \return const reference to Radical
+  /// \throw DomainError if not found
+  [[nodiscard]] RadicalRef find(Radical::Number number) const;
 
-  // 'load' and 'print' are called by 'RealKanjiData'
-  void load(const std::filesystem::path&);
-  void print(const class KanjiData&) const;
+  /// load radicals from `file`
+  void load(const std::filesystem::path& file);
+
+  /// print example 'Common Kanji' from `data` for each Radical (sorted by
+  /// ascending stroke count)
+  void print(const class KanjiData& data) const;
 private:
-  // 'MaxExamples' controls how many examples are printed for each radical by
-  // the above 'print' function (examples are sorted by ascending stroke count).
-  enum Values { MaxExamples = 12 };
+  /// used by print() to control the max number of examples printed per Radical
+  static constexpr auto MaxExamples{12};
 
   using KanjiList = std::vector<std::shared_ptr<class Kanji>>;
   using RadicalLists = std::map<Radical, KanjiList>;
@@ -44,12 +54,13 @@ private:
 
   void printMissingRadicals(const KanjiData&, const RadicalLists&) const;
 
-  // '_radicals' is populated from radicals.txt and the index in the vector is
-  // one less than the actual Radical.number().
+  /// when populated from 'radicals.txt' the index in the vector is one less
+  /// than the actual Radical.number().
   List _radicals;
 
-  // '_map' maps from the Radical name (ideograph) to the index in _radicals.
+  /// maps from the Radical name (ideograph) to the index in #_radicals.
   Map _map;
 };
 
+/// \end_group
 } // namespace kanji_tools

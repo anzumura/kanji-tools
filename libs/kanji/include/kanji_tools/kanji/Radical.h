@@ -5,8 +5,16 @@
 #include <iostream>
 #include <vector>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{Radical}
+/// Radical class for Kanji radicals
 
+/// class that represents an official Kanji Radical (部首) \kanji{Radical}
+///
+/// Example code to create 'water' radical:
+/// \code
+///   Radical water{85, "水", {"氵", "氺"}, "水部（すいぶ）",
+///       "みず さんずい したみず"};
+/// \endcode
 class Radical {
 public:
   using AltForms = std::vector<String>;
@@ -17,12 +25,22 @@ public:
 
   inline static constexpr Number MaxRadicals{214};
 
-  Radical(Number, Name, const AltForms&, const String& longName, Reading);
+  /// ctor for creating a Radical
+  /// \param number official radical number (1 to 214)
+  /// \param name standard radical name
+  /// \param altForms list of alterative forms
+  /// \param longName long name in Japanese
+  /// \param reading space-separated Japanese readings
+  Radical(Number number, Name name, const AltForms& altForms,
+      const String& longName, Reading reading);
 
-  Radical(const Radical&) = default;
+  Radical(const Radical&) = default; ///< copy ctor
 
-  [[nodiscard]] bool operator==(const Radical&) const;
-  [[nodiscard]] bool operator<(const Radical&) const;
+  /// equal operator
+  [[nodiscard]] bool operator==(const Radical&) const noexcept;
+
+  /// less-than operator, compares 'number' field
+  [[nodiscard]] bool operator<(const Radical&) const noexcept;
 
   [[nodiscard]] auto number() const { return _number; }
   [[nodiscard]] auto& name() const { return _name; }
@@ -41,4 +59,5 @@ using RadicalRef = const Radical&;
 
 std::ostream& operator<<(std::ostream&, RadicalRef);
 
+/// \end_group
 } // namespace kanji_tools

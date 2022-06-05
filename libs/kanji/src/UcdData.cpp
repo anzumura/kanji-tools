@@ -55,10 +55,10 @@ Ucd::Meaning UcdData::getMeaning(UcdPtr u) {
   return u ? u->meaning() : EmptyString;
 }
 
-UcdPtr UcdData::find(const String& kanjiName) const {
-  auto r{kanjiName};
-  if (Utf8Char::isCharWithVariationSelector(kanjiName)) {
-    const auto nonVariant{Utf8Char::noVariationSelector(kanjiName)};
+UcdPtr UcdData::find(const String& name) const {
+  auto r{name};
+  if (Utf8Char::isCharWithVariationSelector(name)) {
+    const auto nonVariant{Utf8Char::noVariationSelector(name)};
     if (const auto i{_linkedJinmei.find(nonVariant)}; i != _linkedJinmei.end())
       r = i->second; // return jinmei variant
     else
