@@ -73,7 +73,7 @@ public:
   [[nodiscard]] virtual RadicalRef ucdRadical(const String&, UcdPtr) const;
   [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const;
 
-  // 'getRadicalByName' is used by 'CustomFileKanji' ctors. It returns the
+  // 'getRadicalByName' is used by 'NumberedKanji' ctors. It returns the
   // official Radical for the given string (like 二, 木, 言, etc.).
   [[nodiscard]] virtual RadicalRef getRadicalByName(const String&) const;
 
@@ -143,11 +143,12 @@ protected:
   void loadFrequencyReadings(const Path&);
 
   void populateJouyou();
-  // 'populateLinkedKanji' should be called immediately after 'populateJouyou'.
-  // This function creates a LinkedJinmei Kanji for each entry in the file (each
-  // line should start with a Jouyou Kanji). It then creates LinkedOld Kanji for
-  // all Jouyou Kanji 'oldNames' that aren't already LinkedJinmei.
-  void populateLinkedKanji(const Path&);
+  // 'populateOfficialLinkedKanji' should be called immediately after
+  // 'populateJouyou'. This function creates a LinkedJinmei Kanji for each entry
+  // in the file (each line should start with a Jouyou Kanji). It then creates
+  // LinkedOld Kanji for all Jouyou Kanji 'oldNames' that aren't already
+  // LinkedJinmei.
+  void populateOfficialLinkedKanji(const Path&);
   void populateJinmei();
   void populateExtra();
   void processList(const KanjiListFile&);
@@ -177,7 +178,7 @@ private:
 
   // '_ucd' is used by 'Kanji' class ctors to get 'pinyin', 'morohashiId' and
   // 'nelsonIds' attributes. It also provides 'radical', 'strokes', 'meaning'
-  // and 'reading' when needed (mostly by non-CustomFileKanji classes).
+  // and 'reading' when needed (mostly by non-NumberedKanji classes).
   UcdData _ucd;
 
   // helper functions for checking and inserting into '_nameMap'

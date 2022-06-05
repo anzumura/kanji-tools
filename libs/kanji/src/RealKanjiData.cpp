@@ -35,7 +35,8 @@ RealKanjiData::RealKanjiData(
   loadFrequencyReadings(
       KanjiListFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
-  populateLinkedKanji(KanjiListFile::getFile(dataDir(), LinkedJinmeiFile));
+  populateOfficialLinkedKanji(
+      KanjiListFile::getFile(dataDir(), LinkedJinmeiFile));
   populateJinmei();
   populateExtra();
   for (auto& i : _levels) processList(i);

@@ -27,12 +27,13 @@ abstract Kanji {
   {abstract} +reason() : JinmeiReasons
   {abstract} +year() : Year
 }
-abstract NonLinkedKanji {
+abstract LoadedKanji {
   +meaning() : String
   +reading() : String
 }
-abstract CustomFileKanji {
+abstract NumberedKanji {
   +kyu() : KenteiKyus
+  +number() : Number
   +oldNames() : List<String>
 }
 abstract OfficialKanji {
@@ -40,7 +41,7 @@ abstract OfficialKanji {
   +level() : JlptLevels
   +year() : Year
 }
-abstract UcdFileKanji {
+abstract OtherKanji {
   +linkedReadings() : Bool
   +newName() : Optional<String>
   +oldNames() : List<String>
@@ -48,7 +49,7 @@ abstract UcdFileKanji {
 abstract StandardKanji {
   +kyu() : KenteiKyus
 }
-abstract LinkedKanji {
+abstract OfficialLinkedKanji {
   +frequency() : Frequency
   +kyu() : KenteiKyus
   +link(): Optional<Kanji>
@@ -70,20 +71,20 @@ class FrequencyKanji {
   +frequency() : Frequency
 }
 
-Kanji <|-- NonLinkedKanji
-NonLinkedKanji <|-- CustomFileKanji
-CustomFileKanji <|-- OfficialKanji
+Kanji <|-- LoadedKanji
+LoadedKanji <|-- NumberedKanji
+NumberedKanji <|-- OfficialKanji
 OfficialKanji <|-- JouyouKanji
 OfficialKanji <|-- JinmeiKanji
-CustomFileKanji <|-- ExtraKanji
-NonLinkedKanji <|-- UcdFileKanji
-UcdFileKanji <|-- StandardKanji
+NumberedKanji <|-- ExtraKanji
+LoadedKanji <|-- OtherKanji
+OtherKanji <|-- StandardKanji
 StandardKanji <|-- FrequencyKanji
 StandardKanji <|-- KenteiKanji
-UcdFileKanji <|-- UcdKanji
-Kanji <|-- LinkedKanji
-LinkedKanji <|-- LinkedJinmeiKanji
-LinkedKanji <|-- LinkedOldKanji
+OtherKanji <|-- UcdKanji
+Kanji <|-- OfficialLinkedKanji
+OfficialLinkedKanji <|-- LinkedJinmeiKanji
+OfficialLinkedKanji <|-- LinkedOldKanji
 
 hide empty members
 @enduml

@@ -1,5 +1,5 @@
 #include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/kanji/CustomFileKanji.h>
+#include <kanji_tools/kanji/OfficialKanji.h>
 
 #include <cassert>
 
@@ -131,9 +131,9 @@ uint16_t Kanji::qualifiedNameRank() const { // NOLINT
                                    : vK1;
 }
 
-// NonLinkedKanji
+// LoadedKanji
 
-Kanji::LinkNames NonLinkedKanji::linkNames(UcdPtr u) {
+Kanji::LinkNames LoadedKanji::linkNames(UcdPtr u) {
   LinkNames result;
   if (u && u->hasLinks())
     std::transform(u->links().begin(), u->links().end(),
@@ -141,45 +141,44 @@ Kanji::LinkNames NonLinkedKanji::linkNames(UcdPtr u) {
   return result;
 }
 
-NonLinkedKanji::NonLinkedKanji(KanjiDataRef data, Name name, RadicalRef radical,
+LoadedKanji::LoadedKanji(KanjiDataRef data, Name name, RadicalRef radical,
     Strokes strokes, Meaning meaning, Reading reading, UcdPtr u)
     : Kanji{data, name, radical, strokes, u}, _meaning{meaning}, _reading{
                                                                      reading} {}
 
-NonLinkedKanji::NonLinkedKanji(
+LoadedKanji::LoadedKanji(
     KanjiDataRef data, Name name, RadicalRef radical, Reading reading, UcdPtr u)
-    : NonLinkedKanji{data, name, radical, data.ucdStrokes(name, u),
+    : LoadedKanji{data, name, radical, data.ucdStrokes(name, u),
           UcdData::getMeaning(u), reading, u} {}
 
-// UcdFileKanji
+// OtherKanji
 
-const Kanji::LinkNames& UcdFileKanji::oldNames() const {
+const Kanji::LinkNames& OtherKanji::oldNames() const {
   return _hasOldLinks ? _linkNames : EmptyLinkNames;
 }
 
-Kanji::OptString UcdFileKanji::newName() const {
+Kanji::OptString OtherKanji::newName() const {
   return _linkNames.empty() || _hasOldLinks ? std::nullopt
                                             : OptString{_linkNames[0]};
 }
 
-UcdFileKanji::UcdFileKanji(
-    KanjiDataRef data, Name name, Reading reading, UcdPtr u)
-    : NonLinkedKanji{data, name, data.ucdRadical(name, u), reading, u},
+OtherKanji::OtherKanji(KanjiDataRef data, Name name, Reading reading, UcdPtr u)
+    : LoadedKanji{data, name, data.ucdRadical(name, u), reading, u},
       _hasOldLinks{u && u->hasTraditionalLinks()}, _linkNames{linkNames(u)},
       _linkedReadings{u && u->linkedReadings()} {}
 
-UcdFileKanji::UcdFileKanji(KanjiDataRef data, Name name, UcdPtr u)
-    : UcdFileKanji{data, name, data.ucd().getReadingsAsKana(u), u} {}
+OtherKanji::OtherKanji(KanjiDataRef data, Name name, UcdPtr u)
+    : OtherKanji{data, name, data.ucd().getReadingsAsKana(u), u} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, Reading reading)
-    : UcdFileKanji{data, name, reading, data.findUcd(name)}, _kyu{data.kyu(
-                                                                 name)} {}
+    : OtherKanji{data, name, reading, data.findUcd(name)}, _kyu{data.kyu(
+                                                               name)} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name)
     : StandardKanji{data, name, data.kyu(name)} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, KenteiKyus kyu)
-    : UcdFileKanji{data, name, data.findUcd(name)}, _kyu{kyu} {}
+    : OtherKanji{data, name, data.findUcd(name)}, _kyu{kyu} {}
 
 FrequencyKanji::FrequencyKanji(
     KanjiDataRef data, Name name, Frequency frequency)
@@ -193,6 +192,6 @@ KenteiKanji::KenteiKanji(KanjiDataRef data, Name name, KenteiKyus kyu)
     : StandardKanji{data, name, kyu} {}
 
 UcdKanji::UcdKanji(KanjiDataRef data, const Ucd& u)
-    : UcdFileKanji{data, u.name(), &u} {}
+    : OtherKanji{data, u.name(), &u} {}
 
 } // namespace kanji_tools

@@ -3,12 +3,12 @@
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/ColumnFile.h>
 
-namespace kanji_tools { /// \kanji_group{CustomFileKanji}
-/// CustomFileKanji and LinkedKanji class hierarchies
+namespace kanji_tools { /// \kanji_group{OfficialKanji}
+/// NumberedKanji and OfficialLinkedKanji class hierarchies
 
-/// base class for ExtraKanji and OfficialKanji and supports loading data from
-/// column based customized local files \kanji{CustomFileKanji}
-class CustomFileKanji : public NonLinkedKanji {
+/// has 'kyu', 'number' and 'oldNames' fields and includes shared functionality
+/// for loading from customized local files \kanji{OfficialKanji}
+class NumberedKanji : public LoadedKanji {
 public:
   using File = const ColumnFile&;
   using Number = uint16_t;
@@ -42,20 +42,20 @@ protected:
       StrokesCol{"Strokes"}, GradeCol{"Grade"}, MeaningCol{"Meaning"},
       ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
-  /// ctor used by CustomFileKanji and ExtraKanji: has a 'meaning' param
-  CustomFileKanji(KanjiDataRef, File, Name, Strokes, Meaning, OldNames, UcdPtr);
+  /// ctor used by NumberedKanji and ExtraKanji: has a 'meaning' param
+  NumberedKanji(KanjiDataRef, File, Name, Strokes, Meaning, OldNames, UcdPtr);
 
   /// ctor used by OfficialKanji: 'strokes' and 'meaning' loaded from `UcdPtr`
-  CustomFileKanji(KanjiDataRef, File, Name, OldNames, UcdPtr);
+  NumberedKanji(KanjiDataRef, File, Name, OldNames, UcdPtr);
 private:
   const KenteiKyus _kyu;
   const Number _number;
   const LinkNames _oldNames;
 };
 
-/// has attributes shared by Jouyou and Jinmei kanji like 'level' (can be None)
-/// plus optional 'Frequency' and 'Year' values \kanji{CustomFileKanji}
-class OfficialKanji : public CustomFileKanji {
+/// has attributes shared by derived classes including 'level' (can be `None`)
+/// and optional 'frequency' and 'year' values \kanji{OfficialKanji}
+class OfficialKanji : public NumberedKanji {
 public:
   [[nodiscard]] OptString extraTypeInfo() const override;
   [[nodiscard]] Frequency frequency() const override { return _frequency; }
@@ -75,7 +75,7 @@ private:
   const Year _year;
 };
 
-/// class representing the 633 official Jinmeiyō Kanji \kanji{CustomFileKanji}
+/// class representing the 633 official Jinmeiyō Kanji \kanji{OfficialKanji}
 class JinmeiKanji : public OfficialKanji {
 public:
   /// ctor called by fromFile() method
@@ -92,7 +92,7 @@ private:
   const JinmeiReasons _reason;
 };
 
-/// class representing the 2,136 official Jōyō Kanji \kanji{CustomFileKanji}
+/// class representing the 2,136 official Jōyō Kanji \kanji{OfficialKanji}
 class JouyouKanji : public OfficialKanji {
 public:
   /// ctor called by fromFile() method
@@ -109,12 +109,12 @@ private:
   const KanjiGrades _grade;
 };
 
-/// class for Kanji loaded from 'extra.txt' \kanji{CustomFileKanji}
+/// class for Kanji loaded from 'extra.txt' \kanji{OfficialKanji}
 ///
 /// This group contains manually selected 'fairly common' Kanji that aren't in
 /// official Jōyō or Jinmeiyō lists (or their official old/alternative forms).
 /// These Kanji should also not be in 'frequency.txt'.
-class ExtraKanji : public CustomFileKanji {
+class ExtraKanji : public NumberedKanji {
 public:
   /// ctor called by fromFile() method
   ExtraKanji(KanjiDataRef, File);
@@ -131,11 +131,11 @@ private:
   const OptString _newName;
 };
 
-/// base class Jōyō and Jinmeiyō 'linked' Kanji \kanji{CustomFileKanji}
+/// base class Jōyō and Jinmeiyō 'linked' Kanji \kanji{OfficialKanji}
 ///
 /// Some of these Kanji are in the top 2,501 frequency list and almost all of
 /// them are in Kentei KJ1 or K1 kyus. However, none of them have a JLPT level.
-class LinkedKanji : public Kanji {
+class OfficialLinkedKanji : public Kanji {
 public:
   [[nodiscard]] Meaning meaning() const override;
   [[nodiscard]] Reading reading() const override;
@@ -147,7 +147,7 @@ public:
   [[nodiscard]] bool linkedReadings() const override { return true; }
   [[nodiscard]] OptString newName() const override;
 protected:
-  LinkedKanji(KanjiDataRef, Name, const KanjiPtr& link, UcdPtr);
+  OfficialLinkedKanji(KanjiDataRef, Name, const KanjiPtr& link, UcdPtr);
 
   /// used by ctor to ensure `link` has expected type
   /// \param name String name of instance being constructed
@@ -164,13 +164,13 @@ private:
 };
 
 /// official set of 230 Jinmeiyō Kanji that are old or alternative forms of
-/// JouyouKanji or JinmeiKanji \kanji{CustomFileKanji}
+/// JouyouKanji or JinmeiKanji \kanji{OfficialKanji}
 ///
 /// There are 230 of these Kanji:
 /// \li 204 are part of the 365 JouyouKanji 'old names' set
 /// \li 8 are different alternate forms of JouyouKanji (薗 駈 嶋 盃 冨 峯 埜 凉)
 /// \li 18 are alternate forms of standard JinmeiKanji
-class LinkedJinmeiKanji : public LinkedKanji {
+class LinkedJinmeiKanji : public OfficialLinkedKanji {
 public:
   /// ctor called by KanjiData
   LinkedJinmeiKanji(KanjiDataRef, Name, const KanjiPtr&);
@@ -180,11 +180,11 @@ public:
   }
 };
 
-/// official set of 163 Kanji that link to a JouyouKanji \kanji{CustomFileKanji}
+/// official set of 163 Kanji that link to a JouyouKanji \kanji{OfficialKanji}
 ///
 /// These are the published Jōyō variants that aren't already included in the
 /// 230 Jinmeiyō 'official variants'.
-class LinkedOldKanji : public LinkedKanji {
+class LinkedOldKanji : public OfficialLinkedKanji {
 public:
   /// ctor called by KanjiData (after creating all LinkedJinmeiKanji)
   LinkedOldKanji(KanjiDataRef, Name, const KanjiPtr&);
@@ -195,7 +195,7 @@ public:
 };
 
 template<typename T>
-auto CustomFileKanji::fromFile(KanjiDataRef d, const KanjiData::Path& f) {
+auto NumberedKanji::fromFile(KanjiDataRef d, const KanjiData::Path& f) {
   ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
   for (auto& i : T::RequiredColumns) columns.emplace_back(i);
   KanjiData::List results;

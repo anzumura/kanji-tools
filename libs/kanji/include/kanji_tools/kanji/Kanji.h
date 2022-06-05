@@ -8,7 +8,7 @@
 #include <optional>
 
 namespace kanji_tools { /// \kanji_group{Kanji}
-/// Kanji, NonLinkedKanji and UcdFileKanji class hierarchy
+/// Kanji, LoadedKanji and OtherKanji class hierarchy
 
 using KanjiPtr = std::shared_ptr<class Kanji>;
 using KanjiDataRef = const class KanjiData&;
@@ -50,15 +50,15 @@ public:
   /// return a unique KanjiTypes value for each leaf class type
   [[nodiscard]] virtual KanjiTypes type() const = 0;
 
-  /// return one or more English meanings (some UcdFileKanji have empty meaning)
+  /// return one or more English meanings (some OtherKanji have empty meaning)
   [[nodiscard]] virtual Meaning meaning() const = 0;
 
   /// return a comma-separated list of Japanese readings in %Kana
   /// \details On (音) readings are in Katakana followed by Kun (訓) readings in
-  /// Hiragana (LinkedKanji classes return the readings of their 'link' Kanji)
-  /// \note Jouyou and Extra Kanji include a dash (-) in Kun readings before any
-  /// Okurigana (送り仮名), but unfortunately this is not the case for readings
-  /// loaded from 'ucd.txt'
+  /// Hiragana (OfficialLinkedKanji classes return the readings of their 'link'
+  /// Kanji) \note Jouyou and Extra Kanji include a dash (-) in Kun readings
+  /// before any Okurigana (送り仮名), but unfortunately this is not the case
+  /// for readings loaded from 'ucd.txt'
   [[nodiscard]] virtual Reading reading() const = 0;
 
   /// return frequency number starting at `1` for most frequent up to `2,501`,
@@ -98,14 +98,14 @@ public:
   [[nodiscard]] virtual OldNames oldNames() const { return EmptyLinkNames; }
 
   /// return the new name (usually not defined)
-  /// \details UcdFileKanji can populate this field based on 'Simplified Links'
-  /// loaded from 'ucd.txt'). LinkedKanji also set 'newName' to the name of the
-  /// `link` Kanji (which is the 'new/standard' version)
+  /// \details OtherKanji can populate this field based on 'Simplified Links'
+  /// loaded from 'ucd.txt'). OfficialLinkedKanji also set 'newName' to the name
+  /// of the `link` Kanji (which is the 'new/standard' version)
   [[nodiscard]] virtual OptString newName() const { return {}; }
 
   /// return an optional String with extra information depending on type
   /// \details currently this method is overridden by:
-  /// \li CustomFileKanji: returns `number`
+  /// \li NumberedKanji: returns `number`
   /// \li OfficialKanji: optionally adds `year` if it's non-zero
   /// \li JinmeiKanji: adds `reason`
   [[nodiscard]] virtual OptString extraTypeInfo() const { return {}; }
@@ -189,27 +189,26 @@ public:
   /// \li * = Ucd           : kanji loaded from 'ucd.txt' not included above
   [[nodiscard]] String qualifiedName() const;
 
-  // Sort in a way that corresponds to 'qualifiedName' output, i.e., 'Jouyou'
-  // followed by 'JLPT' followed by 'Frequency', etc.. If both Kanji have the
-  // same 'qualifiedNameRank' then return 'orderByStrokes'.
+  /// Sort in a way that corresponds to qualifiedName() output, i.e., 'Jouyou'
+  /// followed by 'JLPT' followed by 'Frequency', etc.. If both Kanji have the
+  /// same qualifiedNameRank() then return orderByStrokes().
   [[nodiscard]] bool orderByQualifiedName(const Kanji&) const;
 
-  // Sort by stokes (smallest first) and if strokes are the same then sort by
-  // 'frequency' and finally 'compatibilityName' (in unicode).
+  /// Sort by stokes() (smallest first) and if they are the same then sort by
+  /// frequency() and finally compatibilityName() (in unicode).
   [[nodiscard]] bool orderByStrokes(const Kanji&) const;
 
   [[nodiscard]] bool operator==(const Kanji&) const;
 
-  // 'Legend' is meant to be used in output to briefly describe the suffix added
-  // to a kanji when using the 'qualifiedName' method. See comments for
-  // Kanji::qualifiedName for more details.
+  /// can be used in ouput to briefly describe the suffix added when using the
+  /// qualifiedName() method
   static constexpr auto Legend{".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO "
                                "+=Extra @=検定 #=1級 *=Ucd"};
 protected:
-  // ctor used by 'LinkedKanji' and 'NonLinkedKanji' classes
+  /// ctor used by OfficialLinkedKanji and LoadedKanji classes
   Kanji(KanjiDataRef, Name, RadicalRef, Strokes, UcdPtr);
 
-  // ctor used by above ctor as well as 'TestKanji' class
+  /// ctor used by above ctor as well as test code
   Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
       Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
       NelsonIds nelsonIds)
@@ -219,25 +218,24 @@ protected:
 
   inline static const LinkNames EmptyLinkNames;
 private:
-  // 'KanjiName' is a helper class that provides additional checks and methods
-  // related to the string 'name' of a Kanji (possibly extend this more later)
+  /// helper class that provides additional checks and methods related to String
+  /// 'name' of a Kanji (possibly extend this more later)
   class KanjiName {
   public:
     explicit KanjiName(Name name);
 
     [[nodiscard]] Name name() const { return _name; }
 
-    // 'isVariant' is true if _name includes a Unicode 'variation selector'. In
-    // this case 'nonVariant' returns _name without the selector.
+    /// true if #_name includes a Unicode 'variation selector'. In this case
+    /// nonVariant() returns #_name without the selector.
     [[nodiscard]] bool isVariant() const;
     [[nodiscard]] String nonVariant() const;
   private:
     const String _name;
   };
 
-  // 'QualifiedNames' stores the suffixes for qualified names in order of most
-  // common to least common (see comments for 'qualifiedName' method and
-  // 'Legend' string above for more details).
+  /// suffixes for qualified names in order of most common to least common, see
+  /// comments for qualifiedName()
   static constexpr std::array QualifiedNames{
       '.', '\'', '"', '^', '~', '%', '+', '@', '#', '*'};
 
@@ -257,84 +255,87 @@ private:
   const NelsonIds _nelsonIds;
 };
 
-// 'NonLinkedKanji' contains meaning and reading fields and is the base class
-// for CustomFileKanji (base class for JouyouKanji, JinmeiKanji and ExtraKanji),
-// and UcdFileKanji (base class for FrequencyKanji, KenteiKanji and UcdKanji).
-class NonLinkedKanji : public Kanji {
+/// enable bitwise operators for Kanji::Info
+template<> inline constexpr auto is_bitmask<Kanji::Info>{true};
+
+// Kanji derived classes
+
+/// contains 'meaning' and 'reading' fields \kanji{Kanji}
+class LoadedKanji : public Kanji {
 public:
   [[nodiscard]] Meaning meaning() const override { return _meaning; }
   [[nodiscard]] Reading reading() const override { return _reading; }
 protected:
-  // used by 'UcdFileKanji' and 'ExtraKanji' to populate links from Ucd data
+  /// ctor used by OtherKanji and ExtraKanji to populate links from Ucd data
   [[nodiscard]] static LinkNames linkNames(UcdPtr);
 
-  // ctor used by 'CustomFileKanji'
-  NonLinkedKanji(
+  /// ctor used by NumberedKanji
+  LoadedKanji(
       KanjiDataRef, Name, RadicalRef, Strokes, Meaning, Reading, UcdPtr);
 
-  // ctor used by 'CustomFileKanji' and 'UcdFileKanji': looks up 'meaning' and
-  // 'strokes' from 'ucd.txt'
-  NonLinkedKanji(KanjiDataRef, Name, RadicalRef, Reading, UcdPtr);
+  /// ctor used by NumberedKanji and OtherKanji: looks up 'meaning' and
+  /// 'strokes' from `UcdPtr`
+  LoadedKanji(KanjiDataRef, Name, RadicalRef, Reading, UcdPtr);
 private:
   const String _meaning;
   const String _reading;
 };
 
-// 'UcdFileKanji' is for kanji with attributes mainly loaded from 'data/ucd.txt'
-// as opposed to Kanji loaded from 'jouyou.txt', 'jinmei.txt', and 'extra.txt'.
-// There are '_hasOldLinks' and '_linkNames' fields for supporting 'ucd links'
-// as well as '_linkedReadings'. 'UcdFileKanji' are not in JLPT and are meant
-// for less common Kanji not loaded from a custom file (see CustomFileKanji.h).
-class UcdFileKanji : public NonLinkedKanji {
+/// base class for Kanji with fields mainly loaded from 'ucd.txt' as opposed to
+/// Kanji loaded from 'jouyou.txt', 'jinmei.txt', and 'extra.txt' \kanji{Kanji}
+///
+/// There are 'hasOldLinks' and 'linkNames' fields for supporting 'ucd links' as
+/// well as 'linkedReadings'. OtherKanji aren't part of JLPT.
+class OtherKanji : public LoadedKanji {
 public:
   [[nodiscard]] const LinkNames& oldNames() const override;
   [[nodiscard]] OptString newName() const override;
   [[nodiscard]] bool linkedReadings() const override { return _linkedReadings; }
 protected:
-  // ctor used by 'StandardKanji': has 'reading'
-  UcdFileKanji(KanjiDataRef, Name, Reading, UcdPtr);
-  // ctor used by 'StandardKanji' and 'UcdKanji': looks up 'reading'
-  UcdFileKanji(KanjiDataRef, Name, UcdPtr);
+  /// ctor used by 'StandardKanji': has 'reading'
+  OtherKanji(KanjiDataRef, Name, Reading, UcdPtr);
+  /// ctor used by 'StandardKanji' and 'UcdKanji': looks up 'reading'
+  OtherKanji(KanjiDataRef, Name, UcdPtr);
 private:
   const bool _hasOldLinks;
 
-  // Use 'LinkNames' instead of trying to hold pointers to other Kanji since
-  // 'ucd links' are more arbitrary than the standard 'official' Jinmei and
-  // Jouyou linked Kanji (ie official variants). Ucd links can potentially even
-  // be circular depending on how the source data is parsed and there are also
-  // cases of links to another ucd Kanji with a link.
+  /// Use 'LinkNames' instead of trying to hold pointers to other Kanji since
+  /// 'ucd links' are more arbitrary than the standard 'official' Jinmei and
+  /// Jouyou linked Kanji (ie official variants). Ucd links can potentially even
+  /// be circular depending on how the source data is parsed and there are also
+  /// cases of links to another ucd Kanji with a link.
   const LinkNames _linkNames;
 
   const bool _linkedReadings;
 };
 
-// 'StandardKanji' is the base class for 'FrequencyKanji' and 'KenteiKanji' and
-// has a '_kyu' field. In addition to 'OfficialKanji', these Kanji are included
-// in 'kanjiQuiz' and are generally recognized as standard Japanese characters.
-class StandardKanji : public UcdFileKanji {
+/// base class for FrequencyKanji and KenteiKanji \kanji{Kanji}
+///
+/// StandardKanji have a 'kyu' field
+class StandardKanji : public OtherKanji {
 public:
   [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
 protected:
-  // ctor used by 'FrequencyKanji': has 'reading' and looks up 'kyu'
+  /// ctor used by FrequencyKanji: has 'reading' and looks up 'kyu'
   StandardKanji(KanjiDataRef, Name, Reading);
 
-  // ctor used by 'FrequencyKanji': looks up 'kyu'
+  /// ctor used by FrequencyKanji: looks up 'kyu'
   StandardKanji(KanjiDataRef, Name);
 
-  // ctor used by 'KenteiKanji': has 'kyu'
+  /// ctor used by KenteiKanji: has 'kyu'
   StandardKanji(KanjiDataRef, Name, KenteiKyus);
 private:
   const KenteiKyus _kyu;
 };
 
-// 'FrequencyKanji' is for kanji from 'frequency.txt' that aren't already loaded
-// from jouyou or jinmei files
+/// class for Kanji in the top 2,501 frequency list ('frequency.txt') that
+/// haven't already been loaded from a 'jouyou' or 'jinmei' file \kanji{Kanji}
 class FrequencyKanji : public StandardKanji {
 public:
-  // ctor used for 'FrequencyKanji' without a reading
+  /// ctor used for FrequencyKanji without a reading
   FrequencyKanji(KanjiDataRef, Name, Frequency);
 
-  // ctor used for 'FrequencyKanji' with readings from 'frequency-readings.txt'
+  /// ctor used for FrequencyKanji with a reading from 'frequency-readings.txt'
   FrequencyKanji(KanjiDataRef, Name, Reading, Frequency);
 
   [[nodiscard]] KanjiTypes type() const override {
@@ -345,8 +346,8 @@ private:
   const Frequency _frequency;
 };
 
-// 'KenteiKanji' is for kanji in 'kentei/k*.txt' files that aren't already
-// pulled in from other files
+/// class for kanji in 'kentei/k*.txt' files that aren't already pulled in from
+/// other files \kanji{Kanji}
 class KenteiKanji : public StandardKanji {
 public:
   KenteiKanji(KanjiDataRef, Name, KenteiKyus);
@@ -354,19 +355,17 @@ public:
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Kentei; }
 };
 
-// 'UcdKanji' is for Kanji in 'ucd.txt' file that aren't already included in any
-// other 'types'. Many of these Kanji are in 'Dai Kan-Wa Jiten' (ie, they have a
-// Morohashi ID), but others are pulled in via links and may not even have a
-// Japanese reading.
-class UcdKanji : public UcdFileKanji {
+/// class for Kanji in 'ucd.txt' file that aren't already included in any other
+/// 'types' \kanji{Kanji}
+///
+/// Many of these Kanji have a Morohashi ID (ie they are in 'Dai Kan-Wa Jiten'),
+/// but others are pulled in via links and may not even have a Japanese reading.
+class UcdKanji : public OtherKanji {
 public:
   UcdKanji(KanjiDataRef, const Ucd&);
 
   [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
 };
-
-/// enable bitwise operators for Kanji::Info
-template<> inline constexpr auto is_bitmask<Kanji::Info>{true};
 
 /// \end_group
 } // namespace kanji_tools

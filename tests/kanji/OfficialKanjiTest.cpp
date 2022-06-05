@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/CustomFileKanji.h>
+#include <kanji_tools/kanji/OfficialKanji.h>
 #include <tests/kanji_tools/MockKanjiData.h>
 #include <tests/kanji_tools/TestKanji.h>
 #include <tests/kanji_tools/TestUcd.h>
@@ -17,7 +17,7 @@ using ::testing::ReturnRef;
 
 namespace fs = std::filesystem;
 
-class CustomFileKanjiTest : public ::testing::Test {
+class NumberedKanjiTest : public ::testing::Test {
 protected:
   static constexpr Kanji::Frequency Freq640{640}, Freq1728{1728},
       Freq2207{2207};
@@ -31,7 +31,7 @@ protected:
   inline static const fs::path TestDir{"testDir"};
   inline static const fs::path TestFile{TestDir / "test.txt"};
 
-  CustomFileKanjiTest() = default;
+  NumberedKanjiTest() = default;
 
   void SetUp() override {
     if (fs::exists(TestDir)) TearDown();
@@ -41,7 +41,7 @@ protected:
   void TearDown() override { fs::remove_all(TestDir); }
 
   template<typename T> [[nodiscard]] KanjiData::List fromFile() {
-    return CustomFileKanji::fromFile<T>(_data, TestFile);
+    return NumberedKanji::fromFile<T>(_data, TestFile);
   }
 
   static void write(const String& s) {
@@ -95,7 +95,7 @@ private:
 
 } // namespace
 
-TEST_F(CustomFileKanjiTest, ExtraFile) {
+TEST_F(NumberedKanjiTest, ExtraFile) {
   write("\
 Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
 1\t霙\t雨\t16\tsleet\tエイ、ヨウ、みぞれ");
@@ -106,7 +106,7 @@ Number\tName\tRadical\tStrokes\tMeaning\tReading\n\
   checkExtraKanji(*results[0]);
 }
 
-TEST_F(CustomFileKanjiTest, ExtraFileWithDifferentColumnOrder) {
+TEST_F(NumberedKanjiTest, ExtraFileWithDifferentColumnOrder) {
   write("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
@@ -117,7 +117,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
   checkExtraKanji(*results[0]);
 }
 
-TEST_F(CustomFileKanjiTest, ExtraFileWithUnrecognizedColumn) {
+TEST_F(NumberedKanjiTest, ExtraFileWithUnrecognizedColumn) {
   // cSpell:ignore Rdical
   write("\
 Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
@@ -127,7 +127,7 @@ Name\tNumber\tRdical\tMeaning\tReading\tStrokes\n\
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, ExtraFileWithDuplicateColumn) {
+TEST_F(NumberedKanjiTest, ExtraFileWithDuplicateColumn) {
   write("\
 Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
@@ -136,7 +136,7 @@ Name\tNumber\tRadical\tMeaning\tName\tReading\tStrokes\n\
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, ExtraFileWithToManyColumns) {
+TEST_F(NumberedKanjiTest, ExtraFileWithToManyColumns) {
   write("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ\t16\t16");
@@ -145,7 +145,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, ExtraFileWithNotEnoughColumns) {
+TEST_F(NumberedKanjiTest, ExtraFileWithNotEnoughColumns) {
   write("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\t1\t雨\tsleet\tエイ、ヨウ、みぞれ");
@@ -154,7 +154,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, ExtraFileWithInvalidData) {
+TEST_F(NumberedKanjiTest, ExtraFileWithInvalidData) {
   write("\
 Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
 霙\ta\t雨\tsleet\tエイ、ヨウ、みぞれ\t16");
@@ -167,7 +167,7 @@ Name\tNumber\tRadical\tMeaning\tReading\tStrokes\n\
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, JinmeiFile) {
+TEST_F(NumberedKanjiTest, JinmeiFile) {
   write("\
 Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 7\t云\t二\t\t2004\tPrint\tウン、い-う、ここに\n\
@@ -201,7 +201,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   checkJinmeiKanji(*results[1]);
 }
 
-TEST_F(CustomFileKanjiTest, LinkedJinmei) {
+TEST_F(NumberedKanjiTest, LinkedJinmei) {
   write("\
 Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 1\t亘\t二\t亙\t1951\tNames\tコウ、カン、わた-る、もと-める");
@@ -229,16 +229,17 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
   EXPECT_EQ(k.link(), results[0]);
 }
 
-TEST_F(CustomFileKanjiTest, BadLinkedJinmei) {
+TEST_F(NumberedKanjiTest, BadLinkedJinmei) {
   const auto fKanji{std::make_shared<TestKanji>("呑")};
   EXPECT_THROW(
       call([&fKanji, this] { LinkedJinmeiKanji k(data(), "亙", fKanji); },
-          "LinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link 呑, but "
+          "OfficialLinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link "
+          "呑, but "
           "got 'None'"),
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, JinmeiFileWithMissingReason) {
+TEST_F(NumberedKanjiTest, JinmeiFileWithMissingReason) {
   write("\
 Number\tName\tRadical\tOldNames\tYear\tReading\n\
 1\t亘\t二\t亙\t1951\tコウ、カン、わた-る、もと-める");
@@ -247,7 +248,7 @@ Number\tName\tRadical\tOldNames\tYear\tReading\n\
       DomainError);
 }
 
-TEST_F(CustomFileKanjiTest, JouyouFile) {
+TEST_F(NumberedKanjiTest, JouyouFile) {
   write("\
 Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 4\t愛\t心\t\t\t13\t4\tlove\tアイ\n\
@@ -309,7 +310,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   }
 }
 
-TEST_F(CustomFileKanjiTest, LinkedOld) {
+TEST_F(NumberedKanjiTest, LinkedOld) {
   write("\
 Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 103\t艶\t色\t艷\t2010\t19\tS\tglossy\tエン、つや");
@@ -337,11 +338,12 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
   EXPECT_EQ(k.info(), "Rad TestRadical(1), Strokes 24, New 艶*");
 }
 
-TEST_F(CustomFileKanjiTest, BadLinkedOld) {
+TEST_F(NumberedKanjiTest, BadLinkedOld) {
   const auto freqKanji{std::make_shared<TestKanji>("呑")};
-  EXPECT_THROW(call([&, this] { LinkedOldKanji k(data(), "艷", freqKanji); },
-                   "LinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got "
-                   "'None'"),
+  EXPECT_THROW(
+      call([&, this] { LinkedOldKanji k(data(), "艷", freqKanji); },
+          "OfficialLinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got "
+          "'None'"),
       DomainError);
 }
 

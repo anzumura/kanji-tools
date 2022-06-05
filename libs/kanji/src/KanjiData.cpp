@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/CustomFileKanji.h>
+#include <kanji_tools/kanji/OfficialKanji.h>
 #include <kanji_tools/utils/Utf8.h>
 
 #include <sstream>
@@ -283,7 +283,7 @@ void KanjiData::loadFrequencyReadings(const Path& file) {
 }
 
 void KanjiData::populateJouyou() {
-  auto results{CustomFileKanji::fromFile<JouyouKanji>(
+  auto results{NumberedKanji::fromFile<JouyouKanji>(
       *this, KanjiListFile::getFile(_dataDir, JouyouFile))};
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
@@ -293,7 +293,7 @@ void KanjiData::populateJouyou() {
   _types[KanjiTypes::Jouyou] = std::move(results);
 }
 
-void KanjiData::populateLinkedKanji(const Path& file) {
+void KanjiData::populateOfficialLinkedKanji(const Path& file) {
   std::ifstream f{file};
   // each line in 'file' should be a Jouyou Kanji followed by the officially
   // recognized 'Jinmei Variant' (so populateJouyou must be called first)
@@ -320,7 +320,7 @@ void KanjiData::populateLinkedKanji(const Path& file) {
 }
 
 void KanjiData::populateJinmei() {
-  auto results{CustomFileKanji::fromFile<JinmeiKanji>(
+  auto results{NumberedKanji::fromFile<JinmeiKanji>(
       *this, KanjiListFile::getFile(_dataDir, JinmeiFile))};
   for (auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
        const auto& i : results) {
@@ -333,7 +333,7 @@ void KanjiData::populateJinmei() {
 }
 
 void KanjiData::populateExtra() {
-  auto results{CustomFileKanji::fromFile<ExtraKanji>(
+  auto results{NumberedKanji::fromFile<ExtraKanji>(
       *this, KanjiListFile::getFile(_dataDir, ExtraFile))};
   for (const auto& i : results) checkInsert(i);
   _types[KanjiTypes::Extra] = std::move(results);
