@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/OfficialKanji.h>
+#include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/utils/Utf8.h>
 
 #include <sstream>
@@ -8,8 +8,6 @@ namespace kanji_tools {
 namespace fs = std::filesystem;
 
 namespace {
-
-const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"}, ExtraFile{"extra"};
 
 // This value is used for finding the location of 'data' directory. It will of
 // course need to be updated if the number of '.txt' files changes.
@@ -228,10 +226,7 @@ bool KanjiData::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   // since it can be helpful to see more than one error printed out if something
   // goes wrong. Any failures should be fixed right away.
   insertSanityChecks(k, ucd);
-  // update MaxFrequency, _compatibilityMap, _morohashiMap and _nelsonMap if
-  // applicable
-  if (k.frequency() && k.frequency() >= _maxFrequency)
-    _maxFrequency = k.frequency() + 1U;
+  if (k.hasGrade()) _grades[k.grade()].emplace_back(kanji);
   if (k.variant() &&
       !_compatibilityMap.emplace(k.compatibilityName(), k.name()).second)
     printError("failed to insert variant '" + k.name() + "' into map");
@@ -244,6 +239,25 @@ bool KanjiData::checkInsert(List& s, const KanjiPtr& kanji) {
   if (!checkInsert(kanji)) return false;
   s.emplace_back(kanji);
   return true;
+}
+
+void KanjiData::addToKyus(const KanjiPtr& kanji) {
+  assert(kanji->hasKyu());
+  _kyus[kanji->kyu()].emplace_back(kanji);
+}
+
+void KanjiData::addToLevels(const KanjiPtr& kanji) {
+  assert(kanji->hasLevel());
+  _levels[kanji->level()].emplace_back(kanji);
+}
+
+void KanjiData::addToFrequencies(const KanjiPtr& kanji) {
+  assert(kanji->frequency());
+  const auto bucket{(kanji->frequency() - 1U) / FrequencyEntries};
+  _frequencies[bucket < FrequencyBuckets ? bucket : FrequencyBuckets - 1]
+      .emplace_back(kanji);
+  if (kanji->frequency() >= _maxFrequency)
+    _maxFrequency = kanji->frequency() + 1U;
 }
 
 void KanjiData::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
@@ -273,142 +287,6 @@ void KanjiData::printError(const String& msg) const {
   static size_t count;
   _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- "
        << msg << std::setfill(' ') << '\n';
-}
-
-void KanjiData::loadFrequencyReadings(const Path& file) {
-  const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
-  for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
-    if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
-      f.error("duplicate name");
-}
-
-void KanjiData::populateJouyou() {
-  auto results{NumberedKanji::fromFile<JouyouKanji>(
-      *this, KanjiListFile::getFile(_dataDir, JouyouFile))};
-  for (const auto& i : results) {
-    // all Jouyou Kanji must have a grade
-    assert(hasValue(i->grade()));
-    if (checkInsert(i)) _grades[i->grade()].emplace_back(i);
-  }
-  _types[KanjiTypes::Jouyou] = std::move(results);
-}
-
-void KanjiData::populateOfficialLinkedKanji(const Path& file) {
-  std::ifstream f{file};
-  // each line in 'file' should be a Jouyou Kanji followed by the officially
-  // recognized 'Jinmei Variant' (so populateJouyou must be called first)
-  auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
-  for (String line; std::getline(f, line);) {
-    std::stringstream ss{line};
-    if (String jouyou, linked;
-        std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
-      if (const auto i{_nameMap.find(jouyou)}; i == _nameMap.end())
-        usage("'" + jouyou + "' not found - file: " + file.filename().string());
-      else
-        checkInsert(linkedJinmei,
-            std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second));
-    } else
-      usage("bad line '" + line + "' - file: " + file.filename().string());
-  }
-  // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not
-  // LinkedJinmei created above)
-  for (auto& linkedOld{_types[KanjiTypes::LinkedOld]}; const auto& i : _nameMap)
-    for (auto& j : i.second->oldNames())
-      if (!findByName(j))
-        checkInsert(
-            linkedOld, std::make_shared<LinkedOldKanji>(*this, j, i.second));
-}
-
-void KanjiData::populateJinmei() {
-  auto results{NumberedKanji::fromFile<JinmeiKanji>(
-      *this, KanjiListFile::getFile(_dataDir, JinmeiFile))};
-  for (auto& linkedJinmei{_types[KanjiTypes::LinkedJinmei]};
-       const auto& i : results) {
-    checkInsert(i);
-    for (auto& j : i->oldNames())
-      checkInsert(
-          linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
-  }
-  _types[KanjiTypes::Jinmei] = std::move(results);
-}
-
-void KanjiData::populateExtra() {
-  auto results{NumberedKanji::fromFile<ExtraKanji>(
-      *this, KanjiListFile::getFile(_dataDir, ExtraFile))};
-  for (const auto& i : results) checkInsert(i);
-  _types[KanjiTypes::Extra] = std::move(results);
-}
-
-void KanjiData::processList(const KanjiListFile& list) {
-  const auto kenteiList{hasValue(list.kyu())};
-  KanjiListFile::StringList created;
-  std::map<KanjiTypes, KanjiListFile::StringList> found;
-  auto& newKanji{
-      _types[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency]};
-  for (size_t i{}; i < list.list().size(); ++i) {
-    auto& name{list.list()[i]};
-    KanjiPtr kanji;
-    if (const auto j{findByName(name)}; j) {
-      kanji = j;
-      if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou)
-        found[kanji->type()].push_back(name);
-    } else {
-      if (kenteiList)
-        kanji = std::make_shared<KenteiKanji>(*this, name, list.kyu());
-      else {
-        // Kanji wasn't already in _nameMap so it only exists in 'frequency.txt'
-        // file - these are considered 'Frequency' type and by definition are
-        // not part of Jouyou or Jinmei (so also not part of JLPT levels)
-        const auto reading{_frequencyReadings.find(name)};
-        kanji = reading == _frequencyReadings.end()
-                    ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
-                    : std::make_shared<FrequencyKanji>(
-                          *this, name, reading->second, i + 1);
-      }
-      checkInsert(newKanji, kanji);
-      // don't print out kentei 'created' since there more than 2,000 outside of
-      // the other types
-      if (debug() && !kenteiList) created.emplace_back(name);
-    }
-    if (kenteiList) {
-      assert(kanji->kyu() == list.kyu());
-      _kyus[list.kyu()].emplace_back(kanji);
-    } else if (hasValue(list.level())) {
-      assert(kanji->level() == list.level());
-      _levels[list.level()].emplace_back(kanji);
-    } else {
-      assert(kanji->frequency());
-      const auto index{(kanji->frequency() - 1U) / FrequencyEntries};
-      _frequencies[index < FrequencyBuckets ? index : FrequencyBuckets - 1]
-          .emplace_back(kanji);
-    }
-  }
-  if (fullDebug()) {
-    KanjiListFile::print(
-        _out, found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-    KanjiListFile::print(_out, created,
-        String{"non-Jouyou/Jinmei"} + (hasValue(list.level()) ? "" : "/JLPT"),
-        list.name());
-    // list.level is None when processing 'frequency.txt' file (so not JLPT)
-    if (!kenteiList && !(list.level())) {
-      std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
-          std::pair{&found[KanjiTypes::LinkedJinmei], "Linked "}};
-      for (const auto& i : lists) {
-        KanjiListFile::StringList jlptJinmei, otherJinmei;
-        for (auto& j : *i.first)
-          (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
-        KanjiListFile::print(_out, jlptJinmei,
-            String{"JLPT "} + i.second + "Jinmei", list.name());
-        KanjiListFile::print(_out, otherJinmei,
-            String{"non-JLPT "} + i.second + "Jinmei", list.name());
-      }
-    } else {
-      KanjiListFile::print(
-          _out, found[KanjiTypes::Jinmei], "Jinmei", list.name());
-      KanjiListFile::print(
-          _out, found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
-    }
-  }
 }
 
 void KanjiData::processUcd() {

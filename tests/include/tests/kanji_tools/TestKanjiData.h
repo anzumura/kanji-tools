@@ -22,6 +22,15 @@ public:
   [[nodiscard]] KenteiKyus kyu(const String&) const override {
     return KenteiKyus::None;
   }
+
+  static void write(const String& s, bool append = true) {
+    if (!std::filesystem::exists(TestDir))
+      std::filesystem::create_directory(TestDir);
+    std::ofstream of{
+        TestFile, append ? std::ios_base::app : std::ios_base::ate};
+    of << s << '\n';
+    of.close();
+  }
 protected:
   TestKanjiData() : KanjiData{TestDir, DebugMode::None, _os, _es} {}
 
@@ -33,14 +42,6 @@ protected:
     _es.str({});
     _es.clear();
     std::filesystem::remove_all(TestDir);
-  }
-
-  static void write(const String& s) {
-    if (!std::filesystem::exists(TestDir))
-      std::filesystem::create_directory(TestDir);
-    std::ofstream of{TestFile, std::ios_base::app};
-    of << s << '\n';
-    of.close();
   }
 
   inline static std::stringstream _os, _es;

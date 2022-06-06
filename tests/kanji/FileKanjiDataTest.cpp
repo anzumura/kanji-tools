@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 #include <kanji_tools/kana/DisplaySize.h>
 #include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/kanji/RealKanjiData.h>
+#include <kanji_tools/kanji/FileKanjiData.h>
+#include <tests/kanji_tools/TestKanjiData.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
 #include <type_traits>
@@ -10,11 +11,17 @@ namespace kanji_tools {
 
 namespace {
 
-class RealKanjiDataTest : public ::testing::Test {
+class FileKanjiDataTest : public ::testing::Test {
 protected:
+  class TestFileKanjiData : public FileKanjiData {
+  public:
+    using FileKanjiData::FileKanjiData;
+    using FileKanjiData::loadFrequencyReadings;
+    using FileKanjiData::populateOfficialLinkedKanji;
+  };
   static void SetUpTestSuite() {
-    // Constructs RealKanjiData using the real data files
-    _data = std::make_shared<RealKanjiData>();
+    // Constructs FileKanjiData using the real data files
+    _data = std::make_shared<TestFileKanjiData>();
   }
 
   [[nodiscard]] static auto check(const KanjiData::List& l) { // NOLINT
@@ -39,12 +46,12 @@ protected:
     return variants;
   }
 
-  inline static KanjiDataPtr _data;
+  inline static std::shared_ptr<TestFileKanjiData> _data;
 };
 
 } // namespace
 
-TEST_F(RealKanjiDataTest, BasicChecks) {
+TEST_F(FileKanjiDataTest, BasicChecks) {
   EXPECT_EQ(_data->nameMap().size(), 23715);
   EXPECT_EQ(_data->level("院"), JlptLevels::N4);
   EXPECT_EQ(_data->frequency("蝦"), 2501);
@@ -55,7 +62,7 @@ TEST_F(RealKanjiDataTest, BasicChecks) {
   EXPECT_EQ(Ucd::Version::size(), 10);
 }
 
-TEST_F(RealKanjiDataTest, FrequencyKanjiChecks) {
+TEST_F(FileKanjiDataTest, FrequencyKanjiChecks) {
   const auto yeast{_data->findByName("麹")};
   ASSERT_TRUE(yeast);
   EXPECT_EQ(yeast->type(), KanjiTypes::Frequency);
@@ -69,7 +76,7 @@ TEST_F(RealKanjiDataTest, FrequencyKanjiChecks) {
   EXPECT_EQ(yeast->meaning(), "yeast, leaven; surname");
 }
 
-TEST_F(RealKanjiDataTest, ExtraKanjiChecks) {
+TEST_F(FileKanjiDataTest, ExtraKanjiChecks) {
   const auto grab{_data->findByName("掴")};
   ASSERT_TRUE(grab);
   EXPECT_EQ(grab->type(), KanjiTypes::Extra);
@@ -83,7 +90,7 @@ TEST_F(RealKanjiDataTest, ExtraKanjiChecks) {
   EXPECT_EQ(grab->meaning(), "catch");
 }
 
-TEST_F(RealKanjiDataTest, KenteiKanjiChecks) {
+TEST_F(FileKanjiDataTest, KenteiKanjiChecks) {
   const auto apple{_data->findByName("蘋")};
   ASSERT_TRUE(apple);
   EXPECT_EQ(apple->type(), KanjiTypes::Kentei);
@@ -96,7 +103,7 @@ TEST_F(RealKanjiDataTest, KenteiKanjiChecks) {
   EXPECT_FALSE(apple->linkedReadings());
 }
 
-TEST_F(RealKanjiDataTest, UcdKanjiChecks) {
+TEST_F(FileKanjiDataTest, UcdKanjiChecks) {
   const auto complete{_data->findByName("侭")};
   ASSERT_TRUE(complete);
   EXPECT_EQ(complete->type(), KanjiTypes::Ucd);
@@ -112,7 +119,7 @@ TEST_F(RealKanjiDataTest, UcdKanjiChecks) {
   EXPECT_TRUE(shape->linkedReadings());
 }
 
-TEST_F(RealKanjiDataTest, RadicalChecks) {
+TEST_F(FileKanjiDataTest, RadicalChecks) {
   const auto radical{_data->getRadicalByName("鹿")};
   EXPECT_EQ(radical.number(), 198);
   EXPECT_EQ(radical.name(), "鹿");
@@ -120,7 +127,7 @@ TEST_F(RealKanjiDataTest, RadicalChecks) {
   EXPECT_EQ(radical.reading(), "しか");
 }
 
-TEST_F(RealKanjiDataTest, GradeTotals) {
+TEST_F(FileKanjiDataTest, GradeTotals) {
   using enum KanjiGrades;
   EXPECT_EQ(_data->grades()[G1].size(), 80);
   EXPECT_EQ(_data->grades()[G2].size(), 160);
@@ -132,7 +139,7 @@ TEST_F(RealKanjiDataTest, GradeTotals) {
   EXPECT_EQ(_data->grades()[None].size(), 0);
 }
 
-TEST_F(RealKanjiDataTest, LevelTotals) {
+TEST_F(FileKanjiDataTest, LevelTotals) {
   using enum JlptLevels;
   EXPECT_EQ(_data->levels()[N5].size(), 103);
   EXPECT_EQ(_data->levels()[N4].size(), 181);
@@ -142,7 +149,7 @@ TEST_F(RealKanjiDataTest, LevelTotals) {
   EXPECT_EQ(_data->levels()[None].size(), 0);
 }
 
-TEST_F(RealKanjiDataTest, FrequencyTotals) {
+TEST_F(FileKanjiDataTest, FrequencyTotals) {
   size_t i{};
   EXPECT_EQ(_data->frequencyList(i).size(), 500);
   EXPECT_EQ(_data->frequencyList(++i).size(), 500);
@@ -152,7 +159,7 @@ TEST_F(RealKanjiDataTest, FrequencyTotals) {
   EXPECT_EQ(_data->frequencyList(++i).size(), 0);
 }
 
-TEST_F(RealKanjiDataTest, SortingAndPrintingQualifiedName) {
+TEST_F(FileKanjiDataTest, SortingAndPrintingQualifiedName) {
   std::vector<String> list{"弓", "弖", "窮", "弼", "穹", "躬"};
   KanjiData::List kanjis;
   for (auto& i : list) {
@@ -178,7 +185,7 @@ TEST_F(RealKanjiDataTest, SortingAndPrintingQualifiedName) {
   EXPECT_EQ(check(_data->types()[Frequency]), 0);
 }
 
-TEST_F(RealKanjiDataTest, FindByName) {
+TEST_F(FileKanjiDataTest, FindByName) {
   const auto result{_data->findByName("響︀")};
   ASSERT_TRUE(result);
   EXPECT_EQ(result->type(), KanjiTypes::LinkedJinmei);
@@ -194,7 +201,7 @@ TEST_F(RealKanjiDataTest, FindByName) {
   EXPECT_EQ(result2->nonVariantName(), "逸");
 }
 
-TEST_F(RealKanjiDataTest, FindKanjiByFrequency) {
+TEST_F(FileKanjiDataTest, FindKanjiByFrequency) {
   ASSERT_FALSE(_data->findByFrequency(0));
   ASSERT_FALSE(_data->findByFrequency(2502));
   for (Kanji::Frequency i{1}; i < KanjiData::maxFrequency(); ++i)
@@ -204,7 +211,7 @@ TEST_F(RealKanjiDataTest, FindKanjiByFrequency) {
   EXPECT_EQ(_data->findByFrequency(2501)->name(), "蝦");
 }
 
-TEST_F(RealKanjiDataTest, FindKanjisByMorohashiId) {
+TEST_F(FileKanjiDataTest, FindKanjisByMorohashiId) {
   auto& morohashi{_data->findByMorohashiId("4138")};
   ASSERT_EQ(morohashi.size(), 1);
   EXPECT_EQ(morohashi[0]->name(), "嗩");
@@ -217,7 +224,7 @@ TEST_F(RealKanjiDataTest, FindKanjisByMorohashiId) {
   EXPECT_EQ(multiMorohashi[1]->name(), "叄"); // Unicode 53C4
 }
 
-TEST_F(RealKanjiDataTest, FindKanjisByNelsonId) {
+TEST_F(FileKanjiDataTest, FindKanjisByNelsonId) {
   constexpr Kanji::NelsonId totalNelsonIds{5447};
   ASSERT_TRUE(_data->findByNelsonId(0).empty());
   ASSERT_TRUE(_data->findByNelsonId(totalNelsonIds).empty());
@@ -230,7 +237,7 @@ TEST_F(RealKanjiDataTest, FindKanjisByNelsonId) {
   EXPECT_EQ(_data->findByNelsonId(5446)[0]->name(), "龠");
 }
 
-TEST_F(RealKanjiDataTest, KanjiWithMultipleOldNames) {
+TEST_F(FileKanjiDataTest, KanjiWithMultipleOldNames) {
   // kanji with 3 old names
   auto result3{_data->findByName("弁")};
   ASSERT_TRUE(result3);
@@ -244,7 +251,7 @@ TEST_F(RealKanjiDataTest, KanjiWithMultipleOldNames) {
   }
 }
 
-TEST_F(RealKanjiDataTest, UcdChecks) {
+TEST_F(FileKanjiDataTest, UcdChecks) {
   // 'shrimp' is a Jinmei kanji, but 'jinmei.txt' doesn't include a Meaning
   // column so the value is pulled from UCD.
   auto& shrimp{*_data->findByName("蝦")};
@@ -260,7 +267,7 @@ TEST_F(RealKanjiDataTest, UcdChecks) {
   EXPECT_EQ(dull.reading(), "ボウ、ガイ、ホウ、おろか、あきれる");
 }
 
-TEST_F(RealKanjiDataTest, KanjiWithMultipleNelsonIds) {
+TEST_F(FileKanjiDataTest, KanjiWithMultipleNelsonIds) {
   constexpr Kanji::NelsonId id{1491};
   const auto ucdNelson{_data->ucd().find("㡡")};
   ASSERT_NE(ucdNelson, nullptr);
@@ -271,7 +278,7 @@ TEST_F(RealKanjiDataTest, KanjiWithMultipleNelsonIds) {
   ASSERT_EQ(ids.size(), 3);
 }
 
-TEST_F(RealKanjiDataTest, UcdLinksMapToNewName) {
+TEST_F(FileKanjiDataTest, UcdLinksMapToNewName) {
   const String north{"北"}, variantNorth{"北"};
   EXPECT_EQ(toUnicode(north), "5317");
   EXPECT_EQ(toUnicode(variantNorth), "F963");
@@ -286,7 +293,7 @@ TEST_F(RealKanjiDataTest, UcdLinksMapToNewName) {
   EXPECT_EQ(northKanji->type(), KanjiTypes::Jouyou);
 }
 
-TEST_F(RealKanjiDataTest, UnicodeBlocksAndSources) {
+TEST_F(FileKanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
   // Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
   uint32_t rareUcd{};
@@ -321,7 +328,7 @@ TEST_F(RealKanjiDataTest, UnicodeBlocksAndSources) {
   EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7472);
 }
 
-TEST_F(RealKanjiDataTest, UcdLinks) {
+TEST_F(FileKanjiDataTest, UcdLinks) {
   auto& ucd{_data->ucd().map()};
   EXPECT_EQ(ucd.size(), _data->nameMap().size());
   uint32_t jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
@@ -389,7 +396,7 @@ TEST_F(RealKanjiDataTest, UcdLinks) {
   EXPECT_EQ(jinmeiLinksToJinmei, officialLinksToJinmei);
 }
 
-TEST_F(RealKanjiDataTest, SortByQualifiedName) {
+TEST_F(FileKanjiDataTest, SortByQualifiedName) {
   const auto find{[](const String& name, auto t, auto s, Kanji::Frequency f,
                       const String& u = EmptyString) {
     auto k{_data->findByName(name)};
@@ -433,10 +440,36 @@ TEST_F(RealKanjiDataTest, SortByQualifiedName) {
   check(jinmei4stroke1, jinmei4stroke2);
 }
 
+// test file loading errors
+
+TEST_F(FileKanjiDataTest, FrequencyReadingDuplicate) {
+  TestKanjiData::write("Name\tReading\n呑\tトン、ドン、の-む", false);
+  EXPECT_THROW(call([] { _data->loadFrequencyReadings(TestFile); },
+                   "duplicate name - file: testFile.txt, row: 1"),
+      DomainError);
+}
+
+TEST_F(FileKanjiDataTest, LinkedJinmeiEntryNotFound) {
+  // use a Kanji that's not in 'ucd.txt'
+  TestKanjiData::write("㐁\t亞", false);
+  EXPECT_THROW(call([] { _data->populateOfficialLinkedKanji(TestFile); },
+                   "'㐁' not found - file: testFile.txt"),
+      DomainError);
+}
+
+TEST_F(FileKanjiDataTest, LinkedJinmeiBadLine) {
+  TestKanjiData::write("亜亞", false);
+  EXPECT_THROW(call([] { _data->populateOfficialLinkedKanji(TestFile); },
+                   "bad line '亜亞' - file: testFile.txt"),
+      DomainError);
+}
+
+// test Info and Debug printing
+
 TEST(KanjiDataPrintTest, Info) {
   const char* args[]{"", KanjiData::InfoArg.c_str()};
   std::stringstream os;
-  RealKanjiData data(args, os);
+  FileKanjiData data(args, os);
   const char* expected[]{
       (">>> Loaded 23715 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
        "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17471)"),
@@ -460,7 +493,7 @@ TEST(KanjiDataPrintTest, Info) {
 TEST(KanjiDataPrintTest, Debug) {
   const char* args[]{"", KanjiData::DebugArg.c_str()};
   std::stringstream os;
-  RealKanjiData data(args, os);
+  FileKanjiData data(args, os);
   String lastLine;
   size_t count{}, top{}, totalChecks{};
   std::set<size_t> found;

@@ -1,6 +1,9 @@
+#include <kanji_tools/kanji/FileKanjiData.h>
 #include <kanji_tools/kanji/Kanji.h>
-#include <kanji_tools/kanji/RealKanjiData.h>
+#include <kanji_tools/kanji/OfficialKanji.h>
 #include <kanji_tools/utils/Utf8.h>
+
+#include <sstream>
 
 namespace kanji_tools {
 
@@ -8,7 +11,8 @@ namespace fs = std::filesystem;
 
 namespace {
 
-const fs::path UcdFile{"ucd"}, RadicalsFile{"radicals"},
+const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"}, ExtraFile{"extra"},
+    UcdFile{"ucd"}, RadicalsFile{"radicals"},
     FrequencyReadingsFile{"frequency-readings"},
     LinkedJinmeiFile{"linked-jinmei"}, Jlpt{"jlpt"}, Kentei{"kentei"};
 
@@ -16,7 +20,7 @@ constexpr auto MaxVariantSelectorExamples{5};
 
 } // namespace
 
-RealKanjiData::RealKanjiData(
+FileKanjiData::FileKanjiData(
     const Args& args, std::ostream& out, std::ostream& err)
     : KanjiData{getDataDir(args), getDebugMode(args), out, err},
       _levels{dataFile(JlptLevels::N5), dataFile(JlptLevels::N4),
@@ -30,7 +34,7 @@ RealKanjiData::RealKanjiData(
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
       _frequency{dataDir() / "frequency"} {
   KanjiListFile::clearUniqueCheckData(); // cleanup data used for unique checks
-  ucd().load(KanjiListFile::getFile(dataDir(), UcdFile));
+  getUcd().load(KanjiListFile::getFile(dataDir(), UcdFile));
   radicals().load(KanjiListFile::getFile(dataDir(), RadicalsFile));
   loadFrequencyReadings(
       KanjiListFile::getFile(dataDir(), FrequencyReadingsFile));
@@ -62,23 +66,157 @@ RealKanjiData::RealKanjiData(
   }
 }
 
-Kanji::Frequency RealKanjiData::frequency(const String& s) const {
+Kanji::Frequency FileKanjiData::frequency(const String& s) const {
   return _frequency.getIndex(s);
 }
 
-JlptLevels RealKanjiData::level(const String& k) const {
+JlptLevels FileKanjiData::level(const String& k) const {
   for (auto& i : _levels)
     if (i.exists(k)) return i.level();
   return JlptLevels::None;
 }
 
-KenteiKyus RealKanjiData::kyu(const String& k) const {
+KenteiKyus FileKanjiData::kyu(const String& k) const {
   for (auto& i : _kyus)
     if (i.exists(k)) return i.kyu();
   return KenteiKyus::None;
 }
 
-void RealKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
+void FileKanjiData::populateJouyou() {
+  auto results{NumberedKanji::fromFile<JouyouKanji>(
+      *this, KanjiListFile::getFile(dataDir(), JouyouFile))};
+  for (const auto& i : results) {
+    // all Jouyou Kanji must have a grade
+    assert(hasValue(i->grade()));
+    checkInsert(i);
+  }
+  getTypes()[KanjiTypes::Jouyou] = std::move(results);
+}
+
+void FileKanjiData::populateJinmei() {
+  auto results{NumberedKanji::fromFile<JinmeiKanji>(
+      *this, KanjiListFile::getFile(dataDir(), JinmeiFile))};
+  for (auto& linkedJinmei{getTypes()[KanjiTypes::LinkedJinmei]};
+       const auto& i : results) {
+    checkInsert(i);
+    for (auto& j : i->oldNames())
+      checkInsert(
+          linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
+  }
+  getTypes()[KanjiTypes::Jinmei] = std::move(results);
+}
+
+void FileKanjiData::populateExtra() {
+  auto results{NumberedKanji::fromFile<ExtraKanji>(
+      *this, KanjiListFile::getFile(dataDir(), ExtraFile))};
+  for (const auto& i : results) checkInsert(i);
+  getTypes()[KanjiTypes::Extra] = std::move(results);
+}
+
+void FileKanjiData::populateOfficialLinkedKanji(const Path& file) {
+  std::ifstream f{file};
+  // each line in 'file' should be a Jouyou Kanji followed by the officially
+  // recognized 'Jinmei Variant' (so populateJouyou must be called first)
+  auto& linkedJinmei{getTypes()[KanjiTypes::LinkedJinmei]};
+  for (String line; std::getline(f, line);) {
+    std::stringstream ss{line};
+    if (String jouyou, linked;
+        std::getline(ss, jouyou, '\t') && std::getline(ss, linked, '\t')) {
+      if (const auto i{nameMap().find(jouyou)}; i == nameMap().end())
+        usage("'" + jouyou + "' not found - file: " + file.filename().string());
+      else
+        checkInsert(linkedJinmei,
+            std::make_shared<LinkedJinmeiKanji>(*this, linked, i->second));
+    } else
+      usage("bad line '" + line + "' - file: " + file.filename().string());
+  }
+  // create 'LinkedOld' type kanji (these are the 'old Jouyou' that are not
+  // LinkedJinmei created above)
+  for (auto& old{getTypes()[KanjiTypes::LinkedOld]}; const auto& i : nameMap())
+    for (auto& j : i.second->oldNames())
+      if (!findByName(j))
+        checkInsert(old, std::make_shared<LinkedOldKanji>(*this, j, i.second));
+}
+
+void FileKanjiData::loadFrequencyReadings(const Path& file) {
+  const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
+  for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
+    if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
+      f.error("duplicate name");
+}
+
+void FileKanjiData::processList(const KanjiListFile& list) {
+  const auto kenteiList{hasValue(list.kyu())};
+  StringList created;
+  TypeStringList found;
+  auto& newKanji{
+      getTypes()[kenteiList ? KanjiTypes::Kentei : KanjiTypes::Frequency]};
+  for (size_t i{}; i < list.list().size(); ++i) {
+    auto& name{list.list()[i]};
+    KanjiPtr kanji;
+    if (const auto j{findByName(name)}; j) {
+      kanji = j;
+      if (debug() && !kenteiList && kanji->type() != KanjiTypes::Jouyou)
+        found[kanji->type()].push_back(name);
+    } else {
+      if (kenteiList)
+        kanji = std::make_shared<KenteiKanji>(*this, name, list.kyu());
+      else {
+        // Kanji wasn't found in 'nameMap' so it only exists in 'frequency.txt'
+        // file - these are considered 'Frequency' type and by definition are
+        // not part of Jouyou or Jinmei (so also not part of JLPT levels)
+        const auto reading{_frequencyReadings.find(name)};
+        kanji = reading == _frequencyReadings.end()
+                    ? std::make_shared<FrequencyKanji>(*this, name, i + 1)
+                    : std::make_shared<FrequencyKanji>(
+                          *this, name, reading->second, i + 1);
+      }
+      checkInsert(newKanji, kanji);
+      // don't print out kentei 'created' since there more than 2,000 outside of
+      // the other types
+      if (debug() && !kenteiList) created.emplace_back(name);
+    }
+    if (kenteiList)
+      addToKyus(kanji);
+    else if (hasValue(list.level()))
+      addToLevels(kanji);
+    else
+      addToFrequencies(kanji);
+  }
+  printListData(list, created, found);
+}
+
+void FileKanjiData::printListData(const KanjiListFile& list,
+    const StringList& created, TypeStringList& found) const {
+  if (fullDebug()) {
+    KanjiListFile::print(
+        out(), found[KanjiTypes::LinkedOld], "Linked Old", list.name());
+    KanjiListFile::print(out(), created,
+        String{"non-Jouyou/Jinmei"} + (hasValue(list.level()) ? "" : "/JLPT"),
+        list.name());
+    // list.level is None when processing 'frequency.txt' file (so not JLPT)
+    if (!(list.kyu()) && !(list.level())) {
+      std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
+          std::pair{&found[KanjiTypes::LinkedJinmei], "Linked "}};
+      for (const auto& i : lists) {
+        KanjiListFile::StringList jlptJinmei, otherJinmei;
+        for (auto& j : *i.first)
+          (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
+        KanjiListFile::print(out(), jlptJinmei,
+            String{"JLPT "} + i.second + "Jinmei", list.name());
+        KanjiListFile::print(out(), otherJinmei,
+            String{"non-JLPT "} + i.second + "Jinmei", list.name());
+      }
+    } else {
+      KanjiListFile::print(
+          out(), found[KanjiTypes::Jinmei], "Jinmei", list.name());
+      KanjiListFile::print(
+          out(), found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
+    }
+  }
+}
+
+void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
   if (f) {
     if (brackets)
       out() << " (";
@@ -90,7 +228,7 @@ void RealKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
 }
 
 template<typename T>
-void RealKanjiData::printCount(
+void FileKanjiData::printCount(
     const String& name, T pred, size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<String>> examples;
@@ -122,7 +260,7 @@ void RealKanjiData::printCount(
   }
 }
 
-void RealKanjiData::printStats() const {
+void FileKanjiData::printStats() const {
   log() << "Loaded " << nameMap().size() << " Kanji (";
   for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
     if (i != AllKanjiTypes.begin()) out() << ' ';
@@ -147,7 +285,7 @@ void RealKanjiData::printStats() const {
   }
 }
 
-void RealKanjiData::printGrades() const {
+void FileKanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   size_t all{};
   for (auto& jouyou{types()[KanjiTypes::Jouyou]}; auto i : AllKanjiGrades) {
@@ -179,7 +317,7 @@ void RealKanjiData::printGrades() const {
 }
 
 template<typename T, Enum::Size S>
-void RealKanjiData::printListStats(const EnumListWithNone<T, S>& all,
+void FileKanjiData::printListStats(const EnumListWithNone<T, S>& all,
     T (Kanji::*p)() const, const String& name, bool showNoFrequency) const {
   log() << name << " breakdown:\n";
   size_t total{};
@@ -214,11 +352,11 @@ void RealKanjiData::printListStats(const EnumListWithNone<T, S>& all,
   log() << "  Total for all " << name << "s: " << total << '\n';
 }
 
-LevelListFile RealKanjiData::dataFile(JlptLevels x) const {
+LevelListFile FileKanjiData::dataFile(JlptLevels x) const {
   return {dataDir() / Jlpt / firstLower(toString(x)), x};
 }
 
-KyuListFile RealKanjiData::dataFile(KenteiKyus x) const {
+KyuListFile FileKanjiData::dataFile(KenteiKyus x) const {
   return {dataDir() / Kentei / firstLower(toString(x)), x};
 }
 

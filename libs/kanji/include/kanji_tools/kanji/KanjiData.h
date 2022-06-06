@@ -7,36 +7,38 @@
 #include <kanji_tools/utils/Args.h>
 #include <kanji_tools/utils/EnumMap.h>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{KanjiData}
+/// KanjiData class used for loading and finding Kanji
 
-// 'KanjiData' provides helper functions used during 'Kanji' loading and holds
-// data such as Kanji radicals, 'UCD' data and maps of enum values to lists of
-// Kanji. This is the base class of 'RealKanjiData' (as well as 'MockKanjiData'
-// and 'TestKanjiData').
+/// abstract class used for loading and finding Kanji \kanji{KanjiData}
 class KanjiData {
 public:
   using List = std::vector<KanjiPtr>;
   using Map = std::map<String, KanjiPtr>;
   using Path = KanjiListFile::Path;
 
-  // DataArg (specify location of 'data' dir), DebugArg and InfoArg are command
-  // line options that can be passed to apps using this 'KanjiData' class
-  inline static const String DataArg{"-data"}, DebugArg{"-debug"},
-      InfoArg{"-info"};
+  inline static const String DataArg{"-data"}, ///< arg to specify 'data' dir
+      DebugArg{"-debug"},                      ///< arg to #DebugMode to 'Full'
+      InfoArg{"-info"};                        ///< arg to #DebugMode to 'Info'
 
-  // 'nextArg' is meant to be used by other classes that process command line
-  // options, but also have a 'KanjiData' class (like Quiz and Stats programs) -
-  // it returns 'current + 1' if args[currentArg + 1] is not used used by this
-  // class. If 'current + 1' would be used by this class (like '-data', '-info',
-  // etc.) then a larger value is returned to 'skip over' the args, for example:
-  //   for (auto i{KanjiData::nextArg(args)}; i < args.size();
-  //       i = KanjiData::nextArg(args)) { /* do something with args[i] */ }
+  /// get the next arg that would not be used by KanjiData class
+  /// \details this function is meant to be used by other classes that process
+  /// command line options, but also have a KanjiData class (like Quiz and Stats
+  /// programs) - it returns `current + 1` if `args[currentArg + 1]` is not by
+  /// this class. If `current + 1` would be used (like '-data', '-info', etc.)
+  /// then a larger value is returned to 'skip over' the args. For example:
+  /// \code
+  ///   for (auto i{KanjiData::nextArg(args)}; i < args.size();
+  ///       i = KanjiData::nextArg(args)) { /* do something with args[i] */ }
+  /// \endcode
   [[nodiscard]] static Args::Size nextArg(const Args&, Args::Size current = 0);
 
-  // 'DebugMode' is controlled by debug/info command-line options (see above):
-  //   DebugArg: sets '_debugMode' to 'Full' to print all debug output
-  //   InfoArg:  sets '_debugMode' to 'Info' to print some summary debug output
-  enum class DebugMode { Full, Info, None };
+  // 'DebugMode' is controlled by #DebugArg and InfoArg command-line options:
+  enum class DebugMode {
+    Full, ///< print all debug info and then exit
+    Info, ///< print summary info and then exit
+    None  ///< run normally
+  };
 
   static void usage(const String& msg) { KanjiListFile::usage(msg); }
   static constexpr auto OrderByQualifiedName{
@@ -46,41 +48,42 @@ public:
 
   [[nodiscard]] static Kanji::Frequency maxFrequency();
 
-  // 'getPinyin' is a helper function to return pinyin value from the UcdPtr
-  // if the pointer is non-null, otherwise an empty value is returned.
-  [[nodiscard]] static const Pinyin& getPinyin(UcdPtr);
+  /// return `u->pinyin()` or an empty value if `u` is null
+  [[nodiscard]] static const Pinyin& getPinyin(UcdPtr u);
 
-  // 'getMorohashiId' returns a 'Dai Kan-Wa Jiten' index number (see comments in
-  // scripts/parseUcdAllFlat.sh)
+  /// return `u->morohashiId()' or an empty id if `u` is null
   [[nodiscard]] static const MorohashiId& getMorohashiId(UcdPtr);
 
-  // 'getNelsonIds' returns a vector of 0 or more 'Classic Nelson' ids
-  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr);
+  /// return list of 'Classic Nelson' ids from `u` or empty list if `u` is null
+  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr u);
 
-  KanjiData(const Path& dataDir, DebugMode, std::ostream& = std::cout,
-      std::ostream& = std::cerr);
+  /// ctor
+  /// \param dataDir directory containing '.txt' files with Kanji related data
+  /// \param debugMode if not None then print info after loading and then exit
+  /// \param out stream to write standard output
+  /// \param err stream to write error output
+  KanjiData(const Path& dataDir, DebugMode debugMode,
+      std::ostream& out = std::cout, std::ostream& err = std::cerr);
 
-  KanjiData(const KanjiData&) = delete;
-  virtual ~KanjiData() = default;
+  KanjiData(const KanjiData&) = delete; ///< deleted copy ctor
+  virtual ~KanjiData() = default;       ///< default dtor
 
   [[nodiscard]] auto& ucd() const { return _ucd; }
   [[nodiscard]] UcdPtr findUcd(const String& kanjiName) const;
 
-  // functions used by 'Kanji' class ctors, each takes a Kanji name string
+  /// used by Kanji class ctors, each takes a Kanji name String @{
   [[nodiscard]] virtual Kanji::Frequency frequency(const String&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const String&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const String&) const = 0;
   [[nodiscard]] virtual RadicalRef ucdRadical(const String&, UcdPtr) const;
-  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const;
+  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const; ///@}
 
-  // 'getRadicalByName' is used by 'NumberedKanji' ctors. It returns the
-  // official Radical for the given string (like 二, 木, 言, etc.).
+  /// used by NumberedKanji ctors to get a Radical for the given String
   [[nodiscard]] virtual RadicalRef getRadicalByName(const String&) const;
 
-  // 'getCompatibilityName' returns the UCD compatibility code for the given
-  // 'kanji' if it exists (_ucd.find method takes care of checking whether
-  // 'kanji' has a variation selector).
-  [[nodiscard]] Kanji::OptString getCompatibilityName(const String&) const;
+  /// return the UCD compatibility code for `kanji` if it exists
+  [[nodiscard]] Kanji::OptString getCompatibilityName(
+      const String& kanji) const;
 
   [[nodiscard]] auto& types() const { return _types; }
   [[nodiscard]] auto& grades() const { return _grades; }
@@ -92,24 +95,23 @@ public:
 
   [[nodiscard]] KanjiTypes getType(const String& name) const;
 
-  // 'findByName' supports finding a Kanji by UTF-8 string including 'variation
-  // selectors', i.e., the same result is returned for '侮︀ [4FAE FE00]' and
-  // '侮 [FA30]' (a compatibility Kanji).
+  /// find Kanji by name including 'variation selectors', i.e., same value is
+  /// returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a compatibility
+  /// Kanji).
   [[nodiscard]] KanjiPtr findByName(const String&) const;
 
-  // 'findByFrequency' returns the Kanji with the given 'freq' (should be a
-  // value from 1 to 2501)
+  /// find Kanji with the given `freq` (should be a value from 1 to 2501)
   [[nodiscard]] KanjiPtr findByFrequency(Kanji::Frequency freq) const;
 
-  // 'findByMorohashiId' can return more than one Kanji. Ids are usually just
-  // numeric, but they can also be a number followed by a 'P'. For example,
-  // '4138' maps to 嗩 and '4138P' maps to 嘆.
-  [[nodiscard]] const List& findByMorohashiId(const MorohashiId&) const;
-  [[nodiscard]] const List& findByMorohashiId(const String&) const;
+  /// return a list of Kanji for Morohashi ID `id`
+  /// \details Ids are usually just numeric, but can also be a number followed
+  /// by a 'P'. For example, '4138' maps to 嗩 and '4138P' maps to 嘆. @{
+  [[nodiscard]] const List& findByMorohashiId(const MorohashiId& id) const;
+  [[nodiscard]] const List& findByMorohashiId(const String& id) const; ///@}
 
-  // 'findKanjisByNelsonId' can return more than one Kanji. For example, 1491
-  // maps to 㡡, 幮 and 𢅥.
-  [[nodiscard]] const List& findByNelsonId(Kanji::NelsonId) const;
+  /// return a list of Kanji for Classic Nelson ID `id`
+  /// \details a few Ids map to multiple Kanji (ie '1491' maps to 㡡, 幮 and 𢅥)
+  [[nodiscard]] const List& findByNelsonId(Kanji::NelsonId id) const;
 
   void printError(const String&) const;
 
@@ -122,50 +124,40 @@ public:
   [[nodiscard]] auto& dataDir() const { return _dataDir; }
   [[nodiscard]] auto& nameMap() const { return _nameMap; }
 
-  // 'log' can be used for putting a standard prefix to output messages (used
-  // for some debug messages)
+  /// used for putting a standard prefix on output messages when needed
   [[nodiscard]] std::ostream& log(bool heading = false) const;
 protected:
-  // 'getDataDir' looks for a directory called 'data' containing expected number
-  // of .txt files based on checking directories starting at 'current dir' and
-  // working up parent directories (if this fails and 'args' is non-empty then
-  // search up based on args[0]). '-data' followed by a directory name can also
-  // be used as an override.
-  [[nodiscard]] static Path getDataDir(const Args&);
+  /// get path to a directory containing '.txt' files required by this program
+  /// \details This function first looks in `args` for #DataArg followed by a
+  /// directory name and returns that value if found, otherwise it searches up
+  /// the parent directories starting at 'current dir'. Finally if `args[0]` is
+  /// a valid path, its parent directories will be searched.
+  /// \param args command line args
+  /// \return a directory with the expected number of .txt files
+  /// \throw DomainError if an appropriate data directory isn't found
+  [[nodiscard]] static Path getDataDir(const Args& args);
 
-  // 'getDebugMode' looks for 'DebugArg' or 'InfoArg' flags in 'args' list (see
-  // 'DebugMode' above)
-  [[nodiscard]] static DebugMode getDebugMode(const Args&);
+  /// return #DebugMode by looking for #DebugArg or #InfoArg flags in `args`
+  [[nodiscard]] static DebugMode getDebugMode(const Args& args);
 
-  // 'loadStrokes' and 'loadFrequencyReadings' must be called before calling
-  // 'populate Lists' functions
-  void loadStrokes(const Path&, bool checkDuplicates = true);
-  void loadFrequencyReadings(const Path&);
+  /// create UcdKanji for any entries in '_ucd' that don't already have another
+  /// type created already (should be called after processing all other types)
+  void processUcd();
 
-  void populateJouyou();
-  // 'populateOfficialLinkedKanji' should be called immediately after
-  // 'populateJouyou'. This function creates a LinkedJinmei Kanji for each entry
-  // in the file (each line should start with a Jouyou Kanji). It then creates
-  // LinkedOld Kanji for all Jouyou Kanji 'oldNames' that aren't already
-  // LinkedJinmei.
-  void populateOfficialLinkedKanji(const Path&);
-  void populateJinmei();
-  void populateExtra();
-  void processList(const KanjiListFile&);
-  void processUcd(); // should be called after processing all other types
-
-  // 'checkStrokes' should be called after all lists are populated. It compares
-  // stroke values loaded from other files to strokes in 'ucd.txt' and prints
-  // the results (if -debug is specified)
+  /// should be called after all lists are populated. It compares stroke values
+  /// loaded from other files to strokes in 'ucd.txt' and prints the results (if
+  /// -debug is specified)
   void checkStrokes() const;
 
-  // used by derived classes
   [[nodiscard]] auto& radicals() { return _radicals; }
-  [[nodiscard]] auto& ucd() { return _ucd; }
-  [[nodiscard]] auto& types() { return _types; }
+  [[nodiscard]] auto& getUcd() { return _ucd; }
+  [[nodiscard]] auto& getTypes() { return _types; }
 
-  // checkInsert is non-private to help support testing
   bool checkInsert(const KanjiPtr&, UcdPtr = {});
+  bool checkInsert(List&, const KanjiPtr&);
+  void addToKyus(const KanjiPtr&);
+  void addToLevels(const KanjiPtr&);
+  void addToFrequencies(const KanjiPtr&);
 private:
   template<typename T> using KanjiEnumMap = EnumMap<T, List>;
   using OptPath = std::optional<Path>;
@@ -173,16 +165,14 @@ private:
   [[nodiscard]] static OptPath searchUpForDataDir(Path);
   [[nodiscard]] static bool isValidDataDir(const Path&);
 
-  // '_radicals' holds the 214 official Kanji Radicals
+  /// holds the 214 official Kanji Radicals
   RadicalData _radicals;
 
-  // '_ucd' is used by 'Kanji' class ctors to get 'pinyin', 'morohashiId' and
-  // 'nelsonIds' attributes. It also provides 'radical', 'strokes', 'meaning'
-  // and 'reading' when needed (mostly by non-NumberedKanji classes).
+  /// used by Kanji class ctors to get 'pinyin', 'morohashiId' and 'nelsonIds'
+  /// attributes. It also provides 'radical', 'strokes', 'meaning' and 'reading'
+  /// when needed (mostly by non-NumberedKanji classes).
   UcdData _ucd;
 
-  // helper functions for checking and inserting into '_nameMap'
-  bool checkInsert(List&, const KanjiPtr&);
   void insertSanityChecks(const Kanji&, UcdPtr) const;
 
   const Path _dataDir;
@@ -190,36 +180,32 @@ private:
   std::ostream& _out;
   std::ostream& _err;
 
-  // '_compatibilityMap' maps from a UCD 'compatibility' name to a 'variation
-  // selector' style name. This map only has entries for recognized Kanji that
-  // were loaded with a selector.
+  /// maps from a UCD 'compatibility' name to a 'variation selector' style name.
+  /// This map only has entries for Kanji that were loaded with a selector.
   std::map<String, String> _compatibilityMap;
 
-  // '_frequencyReadings' holds readings loaded from frequency-readings.txt -
-  // these are for Top Frequency kanji that aren't part of any other group (so
-  // not Jouyou or Jinmei).
-  std::map<String, String> _frequencyReadings;
-
-  // each 'EnumMap' has a Kanji list per enum value (excluding 'None' values)
+  /// each EnumMap has a Kanji list per enum value (excluding 'None' values)
   KanjiEnumMap<KanjiTypes> _types;
   KanjiEnumMap<KanjiGrades> _grades;
   KanjiEnumMap<JlptLevels> _levels;
   KanjiEnumMap<KenteiKyus> _kyus;
 
-  // '_frequencies' holds lists of Kanji grouped into 5 frequency ranges: each
-  // list has 500 entries except the last which has 501 (for a total of 2501)
   static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
+
+  /// holds lists of Kanji grouped into 5 frequency ranges: each list has 500
+  /// entries except the last which has 501 (for a total of 2501)
   std::array<List, FrequencyBuckets> _frequencies;
 
-  Map _nameMap;                               // UTF-8 name map to one Kanji
-  std::map<MorohashiId, List> _morohashiMap;  // Dai Kan-Wa Jiten ID lookup
-  std::map<Kanji::NelsonId, List> _nelsonMap; // Nelson ID lookup
+  Map _nameMap;                               ///< UTF-8 name map to one Kanji
+  std::map<MorohashiId, List> _morohashiMap;  ///< Dai Kan-Wa Jiten ID lookup
+  std::map<Kanji::NelsonId, List> _nelsonMap; ///< Nelson ID lookup
 
-  // 'maxFrequency' is set to 1 larger than the 'frequency' of any Kanji added
-  // to '_nameMap' (should end being '2502' after all Kanji have been loaded)
+  /// set to 1 larger than the 'frequency' of any Kanji added to '_nameMap'
+  /// (should end being '2502' after all Kanji have been loaded)
   inline static constinit Kanji::Frequency _maxFrequency;
 };
 
 using KanjiDataPtr = std::shared_ptr<const KanjiData>;
 
+/// \end_group
 } // namespace kanji_tools

@@ -258,28 +258,4 @@ TEST_F(KanjiDataTest, DuplicateCompatibilityName) {
       _es.str().ends_with("failed to insert variant '器︀' into map\n"));
 }
 
-// test loading from files
-
-TEST_F(KanjiDataTest, FrequencyReadingDuplicate) {
-  write("Name\tReading\n呑\tトン、ドン、の-む\n呑\tトン、ドン、の-む");
-  EXPECT_THROW(call([this] { loadFrequencyReadings(TestFile); },
-                   "duplicate name - file: testFile.txt, row: 2"),
-      DomainError);
-}
-
-TEST_F(KanjiDataTest, LinkedJinmeiEntryNotFound) {
-  write("亜\t亞");
-  // no Jouyou Kanji are loaded at this point so any entry will cause an error
-  EXPECT_THROW(call([this] { populateOfficialLinkedKanji(TestFile); },
-                   "'亜' not found - file: testFile.txt"),
-      DomainError);
-}
-
-TEST_F(KanjiDataTest, LinkedJinmeiBadLine) {
-  write("亜亞");
-  EXPECT_THROW(call([this] { populateOfficialLinkedKanji(TestFile); },
-                   "bad line '亜亞' - file: testFile.txt"),
-      DomainError);
-}
-
 } // namespace kanji_tools

@@ -15,7 +15,8 @@ protected:
   void SetUp() override {
     write("Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t"
           "MorohashiId\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\t"
-          "LinkNames\tLinkType\tMeaning\tOn\tKun");
+          "LinkNames\tLinkType\tMeaning\tOn\tKun",
+        false);
   }
 
   void writeOne(bool includeOn = true, bool includeKun = true) {
@@ -31,7 +32,7 @@ protected:
 
   const Ucd& loadOne(bool includeOn = true, bool includeKun = true) {
     writeOne(includeOn, includeKun);
-    ucd().load(TestFile);
+    getUcd().load(TestFile);
     return *ucd().find("一");
   }
 
@@ -44,7 +45,7 @@ protected:
     write("FA31\t僧\tCJK_Compat_Ideographs\t3.2\t9\t14\t\t\t\t\tJ\tJ3-2E49\t\t"
           "Y\t50E7\t僧\tJinmei*\tBuddhist priest, monk; san of Sanskrit sangha"
           "\tSOU\tBOUZU");
-    ucd().load(TestFile);
+    getUcd().load(TestFile);
     return *ucd().find("僧");
   }
 
@@ -279,7 +280,7 @@ TEST_F(UcdDataTest, PrintWithMissingEntry) {
   // add an entry to 'KanjiData' that doesn't exist in 'ucd()' (should never
   // happen when loading from actual data files)
   auto testKanji{std::make_shared<TestKanji>("四")};
-  types()[KanjiTypes::Frequency].emplace_back(testKanji);
+  getTypes()[KanjiTypes::Frequency].emplace_back(testKanji);
   ucd().print(*this);
   auto found{false};
   for (String line; std::getline(_os, line);)

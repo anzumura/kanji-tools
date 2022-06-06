@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/RealKanjiData.h>
+#include <kanji_tools/kanji/FileKanjiData.h>
 #include <kanji_tools/quiz/GroupQuiz.h>
 #include <tests/kanji_tools/WhatMismatch.h>
 
@@ -12,7 +12,7 @@ namespace {
 class GroupQuizTest : public ::testing::Test {
 protected:
   static void SetUpTestSuite() {
-    _data = std::make_shared<RealKanjiData>(Args{}, _os, _es);
+    _data = std::make_shared<FileKanjiData>(Args{}, _os, _es);
     _groupData = std::make_shared<GroupData>(_data);
     _jukugoData = std::make_shared<JukugoData>(_data);
   }
