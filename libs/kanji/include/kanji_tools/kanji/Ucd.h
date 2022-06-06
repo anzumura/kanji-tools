@@ -6,68 +6,77 @@
 #include <kanji_tools/utils/EnumList.h>
 #include <kanji_tools/utils/Symbol.h>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{Ucd}
+/// Pinyin and Ucd classes for data loaded from Unicode UCD data
 
-// 'Pinyin' holds a 'hànyǔ pīnyīn' (漢語拼音) from the Unicode 'kMandarin' XML
-// property (there are currently 1,337 unique values). This class is used as a
-// member data field in both 'Ucd' and 'Kanji' classes.
+/// holds a 'hànyǔ pīnyīn' (漢語拼音) from 'kMandarin' XML property \kanji{Ucd}
+///
+/// There are currently 1,337 unique Pinyin values so Symbol is a good fit. This
+/// class is used as a member data field in both Ucd and Kanji classes.
 class Pinyin : public Symbol<Pinyin> {
 public:
   inline static const String Type{"Pinyin"};
   using Symbol::Symbol;
 };
 
-// 'Ucd' holds data loaded from 'ucd.txt' which is an extract of the Unicode
-// 'ucd.all.flat.xml' file - see scripts/parseUcdAllFlat.sh for more details
+/// holds data loaded from 'ucd.txt' \kanji{Ucd}
+///
+/// 'ucd.txt' is an extract of some XML properties in Unicode 'ucd.all.flat.xml'
+/// file - see scripts/parseUcdAllFlat.sh for more details
 class Ucd {
 public:
-  // 'LinkTypes' represent the XML property from which the link was loaded -
-  // '_R' means the link was also used to pull in readings. The script uses '*'
-  // for reading links so '*' has also been used in 'AllUcdLinkTypes' EnumList).
-  // Put _R first to allow a '<' comparision to find all reading links. Note,
-  // there is no non '_R' type for 'Semantic' by design.
+  /// represent the XML property from which the link was loaded \details '_R'
+  /// means the link was also used to pull in readings. The script uses '*' for
+  /// reading links so '*' has also been used in the names in 'AllUcdLinkTypes'.
+  /// '_R' are first to allow a '<' comparision to find all reading links. Note,
+  /// there is no non '_R' type for 'Semantic' by design.
   enum class LinkTypes : Enum::Size {
-    Compatibility_R,
-    Definition_R,
-    Jinmei_R,
-    Semantic_R,
-    Simplified_R,
-    Traditional_R,
-    Compatibility,
-    Definition,
-    Jinmei,
-    Simplified,
-    Traditional,
-    None
+    Compatibility_R, ///< *kCompatibilityVariant* link also used for 'reading'
+    Definition_R,    ///< *kDefinition* based link and also used for 'reading'
+    Jinmei_R,        ///< *kJinmeiyoKanji* link also used for 'reading'
+    Semantic_R,      ///< *kSemanticVariant* link also used for 'reading'
+    Simplified_R,    ///< *kSimplifiedVariant* link also used for 'reading'
+    Traditional_R,   ///< *kTraditionalVariant* link also used for 'reading'
+    Compatibility,   ///< *kCompatibilityVariant* link
+    Definition,      ///< *kDefinition* based link
+    Jinmei,          ///< *KJinmeiyoKanji* link
+    Simplified,      ///< *kSimplifiedVariant* link
+    Traditional,     ///< *kTraditionalVariant* link
+    None             ///< no link
   };
 
-  // 'Entry' is used to hold the name of an entry from 'ucd.txt' file. The file
-  // contains both Unicode 'Code' and the UTF-8 string value (having both values
-  // makes searching and cross-referencing easier), but only the string value is
-  // stored in this class.
+  /// holds the String name of an entry from 'ucd.txt' file \kanji{Ucd}
   class Entry {
   public:
     using Name = Radical::Name;
 
-    // throws an exception if 'name' is not a recognized Kanji or if 'code' is
-    // not the correct Unicode value for 'name'
+    /// ctor for creating an Entry from 'ucd.txt' data
+    /// \param code UTF-32 code point
+    /// \param name UTF-8 string value
+    /// \throw DomainError if `name` is not in a recognized Kanji Unicode block
+    ///     or if `code` is not the correct Unicode value for `name`
     Entry(Code code, Name name);
 
-    [[nodiscard]] Code code() const; // returns 'Code' calculated from '_name'
+    /// return UTF-32 Code calculated from UTF-8 name()
+    [[nodiscard]] Code code() const;
+
+    /// return UTF-8 String
     [[nodiscard]] auto& name() const { return _name; }
 
-    // 'codeAndName' return Unicode in brackets plus the name, e.g.: [FA30] 侮
+    /// return Unicode in brackets plus the name, e.g.: [FA30] 侮
     [[nodiscard]] String codeAndName() const;
   private:
     const String _name;
   };
 
+  /// Unicode (short) block name from 'blk' XML property \kanji{Ucd}
   class Block : public Symbol<Block> {
   public:
     inline static const String Type{"Ucd::Block"};
     using Symbol::Symbol;
   };
 
+  /// Unicode version name from 'age' XML property \kanji{Ucd}
   class Version : public Symbol<Version> {
   public:
     inline static const String Type{"Ucd::Version"};
@@ -135,10 +144,13 @@ private:
 
 using UcdPtr = const Ucd*;
 
+/// enable Ucd::LinkTypes to be used in an EnumList
 template<> inline constexpr auto is_enumlist_with_none<Ucd::LinkTypes>{true};
+/// create an EnumList for Ucd::LinkTypes
 inline const auto AllUcdLinkTypes{
     BaseEnumList<Ucd::LinkTypes>::create("Compatibility*", "Definition*",
         "Jinmei*", "Semantic*", "Simplified*", "Traditional*", "Compatibility",
         "Definition", "Jinmei", "Simplified", "Traditional")};
 
+/// \end_group
 } // namespace kanji_tools

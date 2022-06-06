@@ -6,14 +6,17 @@
 #include <iostream>
 #include <numeric>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{MorohashiId}
+/// MorohashiId class
 
-// Unicode 14.0 has ~18K distinct values in 'kMorohashi' property. Most entries
-// are plain numbers and 379 are numbers followed by a single quote (these are
-// called 'Prime') - the max number is 49,867. There's a proposal to add most of
-// the missing entries (Dai Kan-Wa Jiten has 51,284) which also includes several
-// hundred 'DoublePrime' and 'Supplemental' entries. This class supports the new
-// proposal by internally storing an unsigned 'id' and an 'IdType'.
+/// class representing a Morohashi IDs ('Dai Kan-Wa Jiten') \kanji{MorohashiId}
+///
+/// Unicode 14.0 has ~18K distinct values in 'kMorohashi' property. Most entries
+/// are plain numbers and 379 are numbers followed by a single quote (these are
+/// called 'Prime') - the max is 49,867. There's a proposal to add most of the
+/// missing entries (Dai Kan-Wa Jiten has 51,284) which also includes several
+/// hundred 'DoublePrime' and 'Supplemental' entries. This class supports the
+/// new proposal by internally storing an unsigned #Id and an #IdType.
 class MorohashiId {
 public:
   using Id = uint16_t;
@@ -22,12 +25,13 @@ public:
 
   static constexpr Id MaxId{std::numeric_limits<Id>::max()};
 
+  /// default ctor creates an 'empty' MorohashiId (meaning 'doesn't have an id')
   constexpr MorohashiId() noexcept = default;
 
-  // ctor expects a string that's a positive number (up to MaxId) optionally
-  // followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
-  // for DoublePrime or prefixed with a 'H' for Supplemental (補巻). Note, only
-  // Plain and Prime values are in the current version of Unicode.
+  /// ctor expects a string that's a positive number (up to MaxId) optionally
+  /// followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
+  /// for DoublePrime or prefixed with a 'H' for Supplemental (補巻). Note, only
+  /// Plain and Prime values are in the current version of Unicode.
   explicit MorohashiId(const String&);
 
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
@@ -40,10 +44,10 @@ public:
 
   [[nodiscard]] String toString() const;
 private:
-  // helper functions used by ctor to validate and populate '_id' and '_idType'
+  /// functions used by ctor to validate and populate _id and _idType @{
   [[nodiscard]] static Id getId(const String&);
   [[nodiscard]] static IdType getIdType(const String&);
-  [[nodiscard]] static Id validate(const String&, size_t = 0, size_t = 0);
+  [[nodiscard]] static Id validate(const String&, size_t = 0, size_t = 0); ///@}
 
   const Id _id{};
   const IdType _idType{IdType::Plain};
@@ -51,4 +55,5 @@ private:
 
 std::ostream& operator<<(std::ostream&, const MorohashiId&);
 
+/// \end_group
 } // namespace kanji_tools
