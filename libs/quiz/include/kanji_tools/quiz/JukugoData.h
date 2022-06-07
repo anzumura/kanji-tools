@@ -3,19 +3,27 @@
 #include <kanji_tools/kanji/KanjiData.h>
 #include <kanji_tools/quiz/Jukugo.h>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \quiz_group{JukugoData}
+/// JukugoData class for loading data from 'jukugo/*.txt' files
 
+/// load, store and find Jukugo objects \quiz{JukugoData}
 class JukugoData {
 public:
   using List = std::vector<JukugoPtr>;
 
-  // if 'dir' is provided it will be used instead of 'data->dataDir()/jukugo'
-  // when looking for jukugo files (to help with testing)
-  explicit JukugoData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
+  /// ctor loads data from 'jukugo/*.txt' files and prints a summary or all data
+  /// loaded depending on the value of KanjiData::DebugMode
+  /// \param data used for validating Kanji and printing
+  /// \param dir can override using `data->dataDir()` (to help testing)
+  /// \throw DomainError if there are problems reading in data like formatting,
+  ///     Jukugo is repeated within a file or Jukugo ctor throws and error
+  explicit JukugoData(
+      const KanjiDataPtr& data, const KanjiData::Path* dir = {});
 
-  JukugoData(const JukugoData&) = delete;
-  auto operator=(const JukugoData&) = delete;
+  JukugoData(const JukugoData&) = delete;     ///< deleted copy ctor
+  auto operator=(const JukugoData&) = delete; ///< deleted operator=
 
+  /// return a list of Jukugo containing `kanji`
   [[nodiscard]] const List& find(const String& kanji) const;
 private:
   inline static const List EmptyList;
@@ -35,4 +43,5 @@ private:
 
 using JukugoDataPtr = std::shared_ptr<const JukugoData>;
 
+/// \end_group
 } // namespace kanji_tools

@@ -2,23 +2,26 @@
 
 #include <kanji_tools/quiz/Group.h>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \quiz_group{GroupData}
+/// GroupData class for loading data from '-groups.txt' files
 
-// 'GroupData' creates 'Group' instances from the '-groups.txt' files. 'Group'
-// class prevents duplicates, but this class also prevent a Kanji from being in
-// multiple Pattern Groups (see comments at the bottom of this file for details)
+/// load, store and print Group objects \quiz{GroupData}
 class GroupData {
 public:
   using MultiMap = std::multimap<String, GroupPtr>;
   using Map = std::map<String, GroupPtr>;
   using List = std::vector<GroupPtr>;
 
-  // if 'dir' is provided it will be used instead of 'data->dataDir()' when
-  // looking for group files (to help with testing)
-  explicit GroupData(const KanjiDataPtr&, const KanjiData::Path* dir = {});
+  /// ctor loads data from '-group.txt' files and prints a summary or all data
+  /// loaded depending on the value of KanjiData::DebugMode
+  /// \param data used for validating Kanji and printing
+  /// \param dir can override using `data->dataDir()` (to help testing)
+  /// \throw DomainError if group data is malformed, see Group.h for exceptions
+  ///     thrown by group ctors
+  explicit GroupData(const KanjiDataPtr& data, const KanjiData::Path* dir = {});
 
-  GroupData(const GroupData&) = delete;
-  auto operator=(const GroupData&) = delete;
+  GroupData(const GroupData&) = delete;      ///< deleted copy ctor
+  auto operator=(const GroupData&) = delete; ///< deleted operator=
 
   [[nodiscard]] auto& meaningGroups() const { return _meaningGroups; }
   [[nodiscard]] auto& patternGroups() const { return _patternGroups; }
@@ -32,10 +35,10 @@ public:
 private:
   const KanjiData::Path& dataDir(const KanjiData::Path*) const;
 
-  // add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
+  /// add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
   static void add(const String& kanji, MultiMap&, const GroupPtr& group);
 
-  // add 'kanji'->'group' mapping or log an error if it's already been added
+  /// add 'kanji'->'group' mapping or log an error if it's already been added
   void add(const String& kanji, Map&, const GroupPtr& group) const;
 
   template<typename T>
@@ -61,28 +64,18 @@ private:
 
   [[nodiscard]] auto fullDebug() const { return _data->fullDebug(); }
 
-  // '_meaningMap' and '_meaningGroups' are populated from
-  // 'meaning-groups.txt'
+  /// populated from 'meaning-groups.txt' @{
   MultiMap _meaningMap;
-  List _meaningGroups;
+  List _meaningGroups; ///@}
 
-  // '_patternMap' and '_patternGroups' are populated from
-  // 'pattern-groups.txt.
+  /// populated from 'pattern-groups.txt' @{
   Map _patternMap;
-  List _patternGroups;
+  List _patternGroups; ///@}
 
   const KanjiDataPtr _data;
 };
 
 using GroupDataPtr = std::shared_ptr<const GroupData>;
 
-// Not allowing a Kanji to be in multiple Pattern Groups can be ambiguous for
-// some more complex Kanji so in these cases, the pattern that best fits
-// related pronunciation was chosen (as well as preferring grouping by
-// 'non-radical') when creating the 'pattern-groups.txt' file. This
-// restriction doesn't apply to Meaning groups since choosing only one meaning
-// for some (even very common) Kanji would make other groups seem incomplete,
-// e.g., if '金' was only in the '色' group then the '時間：曜日' group would
-// be missing a day.
-
+/// \end_group
 } // namespace kanji_tools
