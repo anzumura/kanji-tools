@@ -4,7 +4,11 @@
 
 namespace kanji_tools { /// \kanji_group{FileKanjiData}
 
-/// concrete implementation of KanjiData for loading Kanji data from text files
+/// Implementation of KanjiData to load from text files \kanji{FileKanjiData}
+///
+/// The bulk of functionality for loading Kanji from '.txt' files is contained
+/// in this class, whereas the base class has functionality to support adding,
+/// validating, holding and looking up Kanji.
 class FileKanjiData : public KanjiData {
 public:
   explicit FileKanjiData(const Args& = {}, std::ostream& out = std::cout,

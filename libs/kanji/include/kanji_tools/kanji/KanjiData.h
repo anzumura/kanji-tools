@@ -11,6 +11,9 @@ namespace kanji_tools { /// \kanji_group{KanjiData}
 /// KanjiData class used for loading and finding Kanji
 
 /// abstract class used for loading and finding Kanji \kanji{KanjiData}
+///
+/// This class also provides some generic functionality finding 'data' directory
+/// processing some command line arguments related to debugging.
 class KanjiData {
 public:
   using List = std::vector<KanjiPtr>;
@@ -40,12 +43,21 @@ public:
     None  ///< run normally
   };
 
+  /// called for fatal problems with command line args or loading initial data
+  /// \param msg the error message
+  /// \throw DomainError containing `msg`
   static void usage(const String& msg) { KanjiListFile::usage(msg); }
+
+  /// lambda to sort shared pointers to Kanji by 'qualified name' (see Kanji.h)
   static constexpr auto OrderByQualifiedName{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
+
+  /// lambda to sort shared pointers to Kanji by 'strokes' (see Kanji.h)
   static constexpr auto OrderByStrokes{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByStrokes(*b); }};
 
+  /// return `highest frequency + 1` out of all the currently loaded Kanji
+  /// \details 'frequency' numbers start at `1` which means 'the most frequent'
   [[nodiscard]] static Kanji::Frequency maxFrequency();
 
   /// return `u->pinyin()` or an empty value if `u` is null
@@ -57,18 +69,13 @@ public:
   /// return list of 'Classic Nelson' ids from `u` or empty list if `u` is null
   [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr u);
 
-  /// ctor
-  /// \param dataDir directory containing '.txt' files with Kanji related data
-  /// \param debugMode if not None then print info after loading and then exit
-  /// \param out stream to write standard output
-  /// \param err stream to write error output
-  KanjiData(const Path& dataDir, DebugMode debugMode,
-      std::ostream& out = std::cout, std::ostream& err = std::cerr);
-
   KanjiData(const KanjiData&) = delete; ///< deleted copy ctor
   virtual ~KanjiData() = default;       ///< default dtor
 
+  /// return const ref to the UcdData object
   [[nodiscard]] auto& ucd() const { return _ucd; }
+
+  /// return a pointer to a Ucd object for `kanjiName` or nullptr if not found
   [[nodiscard]] UcdPtr findUcd(const String& kanjiName) const;
 
   /// used by Kanji class ctors, each takes a Kanji name String @{
@@ -76,7 +83,8 @@ public:
   [[nodiscard]] virtual JlptLevels level(const String&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const String&) const = 0;
   [[nodiscard]] virtual RadicalRef ucdRadical(const String&, UcdPtr) const;
-  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const; ///@}
+  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const;
+  ///@}
 
   /// used by NumberedKanji ctors to get a Radical for the given String
   [[nodiscard]] virtual RadicalRef getRadicalByName(const String&) const;
@@ -90,14 +98,13 @@ public:
   [[nodiscard]] auto& levels() const { return _levels; }
   [[nodiscard]] auto& kyus() const { return _kyus; }
 
-  // See comment for '_frequencies' private data member for more details
-  [[nodiscard]] const List& frequencyList(size_t) const;
+  /// get a list of Kanji for `bucket` see for #_frequencies for more details
+  [[nodiscard]] const List& frequencyList(size_t bucket) const;
 
   [[nodiscard]] KanjiTypes getType(const String& name) const;
 
   /// find Kanji by name including 'variation selectors', i.e., same value is
-  /// returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (a compatibility
-  /// Kanji).
+  /// returned for '侮︀ [4FAE FE00]' and '侮 [FA30]' (compatibility Kanji).
   [[nodiscard]] KanjiPtr findByName(const String&) const;
 
   /// find Kanji with the given `freq` (should be a value from 1 to 2501)
@@ -113,7 +120,8 @@ public:
   /// \details a few Ids map to multiple Kanji (ie '1491' maps to 㡡, 幮 and 𢅥)
   [[nodiscard]] const List& findByNelsonId(Kanji::NelsonId id) const;
 
-  void printError(const String&) const;
+  /// print "ERROR[#] --- " followed `msg` to err(), '#' is total error count
+  void printError(const String& msg) const;
 
   [[nodiscard]] auto debug() const { return _debugMode != DebugMode::None; }
   [[nodiscard]] auto fullDebug() const { return _debugMode == DebugMode::Full; }
@@ -140,13 +148,20 @@ protected:
   /// return #DebugMode by looking for #DebugArg or #InfoArg flags in `args`
   [[nodiscard]] static DebugMode getDebugMode(const Args& args);
 
-  /// create UcdKanji for any entries in '_ucd' that don't already have another
-  /// type created already (should be called after processing all other types)
+  /// ctor called by derived classes
+  /// \param dataDir directory containing '.txt' files with Kanji related data
+  /// \param debugMode if not None then print info after loading and then exit
+  /// \param out stream to write standard output
+  /// \param err stream to write error output
+  KanjiData(const Path& dataDir, DebugMode debugMode,
+      std::ostream& out = std::cout, std::ostream& err = std::cerr);
+
+  /// create UcdKanji for any entries in #_ucd that don't already have a Kanji
+  /// created already (should be called after creating all other types)
   void processUcd();
 
-  /// should be called after all lists are populated. It compares stroke values
-  /// loaded from other files to strokes in 'ucd.txt' and prints the results (if
-  /// -debug is specified)
+  /// compares stroke values loaded from other files to strokes in 'ucd.txt' and
+  /// prints results (if -debug was specified), call after calling processUcd()
   void checkStrokes() const;
 
   [[nodiscard]] auto& radicals() { return _radicals; }
@@ -200,8 +215,8 @@ private:
   std::map<MorohashiId, List> _morohashiMap;  ///< Dai Kan-Wa Jiten ID lookup
   std::map<Kanji::NelsonId, List> _nelsonMap; ///< Nelson ID lookup
 
-  /// set to 1 larger than the 'frequency' of any Kanji added to '_nameMap'
-  /// (should end being '2502' after all Kanji have been loaded)
+  /// set to 1 larger than the 'frequency' of any Kanji added to #_nameMap
+  /// \note should end up being '2502' after all Kanji have been loaded
   inline static constinit Kanji::Frequency _maxFrequency;
 };
 

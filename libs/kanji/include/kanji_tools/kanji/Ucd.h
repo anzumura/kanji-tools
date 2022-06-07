@@ -32,13 +32,13 @@ public:
   /// there is no non '_R' type for 'Semantic' by design.
   enum class LinkTypes : Enum::Size {
     Compatibility_R, ///< *kCompatibilityVariant* link also used for 'reading'
-    Definition_R,    ///< *kDefinition* based link and also used for 'reading'
+    Definition_R,    ///< *kDefinition based* link and also used for 'reading'
     Jinmei_R,        ///< *kJinmeiyoKanji* link also used for 'reading'
     Semantic_R,      ///< *kSemanticVariant* link also used for 'reading'
     Simplified_R,    ///< *kSimplifiedVariant* link also used for 'reading'
     Traditional_R,   ///< *kTraditionalVariant* link also used for 'reading'
     Compatibility,   ///< *kCompatibilityVariant* link
-    Definition,      ///< *kDefinition* based link
+    Definition,      ///< *kDefinition based* link
     Jinmei,          ///< *KJinmeiyoKanji* link
     Simplified,      ///< *kSimplifiedVariant* link
     Traditional,     ///< *kTraditionalVariant* link
@@ -52,8 +52,8 @@ public:
 
     /// ctor for creating an Entry from 'ucd.txt' data
     /// \param code UTF-32 code point
-    /// \param name UTF-8 string value
-    /// \throw DomainError if `name` is not in a recognized Kanji Unicode block
+    /// \param name UTF-8 String value
+    /// \throw DomainError if `name` is not in a recognized Unicode Kanji block
     ///     or if `code` is not the correct Unicode value for `name`
     Entry(Code code, Name name);
 
@@ -87,13 +87,14 @@ public:
   using Meaning = const String&;
   using Reading = Radical::Reading;
 
+  /// create a Ucd object, see scripts/parseUcdAllFlat.sh for details on fields
   Ucd(const Entry&, const String& block, const String& version, Radical::Number,
       Strokes, const String& pinyin, const String& morohashiId,
       const String& nelsonIds, const String& sources, const String& jSource,
       bool joyo, bool jinmei, Links, LinkTypes, Meaning, Reading onReading,
       Reading kunReading);
 
-  Ucd(const Ucd&) = delete;
+  Ucd(const Ucd&) = delete; ///< deleted copy ctor
 
   [[nodiscard]] auto& entry() const { return _entry; }
   [[nodiscard]] auto& block() const { return _block; }
@@ -119,6 +120,7 @@ public:
   [[nodiscard]] bool hasLinks() const;
   [[nodiscard]] bool hasTraditionalLinks() const;
   [[nodiscard]] bool hasNonTraditionalLinks() const;
+
   // helper methods
   [[nodiscard]] auto code() const { return _entry.code(); }
   [[nodiscard]] auto& name() const { return _entry.name(); }

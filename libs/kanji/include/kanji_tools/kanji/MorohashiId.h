@@ -28,11 +28,16 @@ public:
   /// default ctor creates an 'empty' MorohashiId (meaning 'doesn't have an id')
   constexpr MorohashiId() noexcept = default;
 
-  /// ctor expects a string that's a positive number (up to MaxId) optionally
-  /// followed by a single quote or a 'P' for Prime, two single quotes or 'PP'
-  /// for DoublePrime or prefixed with a 'H' for Supplemental (補巻). Note, only
-  /// Plain and Prime values are in the current version of Unicode.
-  explicit MorohashiId(const String&);
+  /// create a MorohashiId from a String
+  /// \param s positive number (up to #MaxId) optionally followed by a single
+  ///     quote or a 'P' for Prime, two single quotes or 'PP' for DoublePrime or
+  ///     prefixed with a 'H' for Supplemental (補巻)
+  /// \details `s` can have leading zeroes (which are removed), but can't be all
+  /// zeroes followed by a suffix. A 'zero' id is supported for now and treated
+  /// as an empty (missing) id since UCD data does this for a few entries.
+  /// \note Only Plain and Prime values are in the current version of Unicode.
+  /// \throw DomainError if `s` is malformed
+  explicit MorohashiId(const String& s);
 
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
   [[nodiscard]] constexpr auto idType() const noexcept { return _idType; }
