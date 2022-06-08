@@ -4,10 +4,10 @@
 #include <kanji_tools/quiz/GroupData.h>
 #include <kanji_tools/quiz/JukugoData.h>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \quiz_group{QuizLauncher}
+/// QuizLauncher class
 
-// 'QuizLauncher' is a class that will either start a quiz/review or print info
-// about a kanji based on command line args passed in to the constructor.
+/// starts a quiz (or review) or prints info about a Kanji \quiz{QuizLauncher}
 class QuizLauncher {
 public:
   using Choices = Choice::Choices;
@@ -17,27 +17,42 @@ public:
 
   static constexpr char QuitOption{'/'};
 
-  // An istream 'in' can be provided for testing purposes (instead of reading
-  // std::cin) and if given, 'start' must be explicitly called to start a quiz.
+  /// `in` can be provided for testing instead of using `std::cin` and if given,
+  /// the start() method must be explicitly called to start the quiz/review.
   QuizLauncher(const Args&, const KanjiDataPtr&, const GroupDataPtr&,
       const JukugoDataPtr&, std::istream* in = {});
 
-  QuizLauncher(const QuizLauncher&) = delete;
+  QuizLauncher(const QuizLauncher&) = delete; ///< deleted copy ctor
 
-  // 'start' is the top level method for starting a quiz or doing a review (List
-  // or Group based). 'quizType' can be 'f', 'g', 'k', 'l', 'm' or 'p' for the
-  // type of quiz/review and 'questionList' can also be provided (values depend
-  // on quiz type - see Quiz.cpp 'HelpMessage' for details).
+  /// starts a (list or group based) quiz/review
+  /// \param quizType if provided, value must be one of 'f', 'g', 'k', 'l', 'm'
+  ///     or 'p' (see QuizLauncher.cpp for details)
+  /// \param qList question list sub-type, valid values depend on `quizType`
+  /// \param question where to start from, `0` means prompt the user
+  /// \param showMeanings true indicates English meanings should be shown
+  /// \param randomizeAnswers should only be set to false in test code
   void start(OptChar quizType, OptChar qList, Question question = 0,
       bool showMeanings = false, bool randomizeAnswers = true);
 
   [[nodiscard]] std::ostream& log(bool heading = false) const;
   [[nodiscard]] auto& out() const { return data().out(); }
 
-  enum class ProgramMode { Review, Test, NotAssigned };
-  enum class QuestionOrder { FromBeginning, FromEnd, Random, NotAssigned };
+  /// main program mode
+  enum class ProgramMode {
+    Review,     ///< review lists or groups including showing more detailed info
+    Quiz,       ///< quiz mode (the default command-line option)
+    NotAssigned ///< prompt user to get the mode
+  };
 
-  [[nodiscard]] bool isTestMode() const;
+  /// question order
+  enum class QuestionOrder {
+    FromBeginning, ///< start at the first question and move forward
+    FromEnd,       ///< start at the last question and move backward
+    Random,        ///< proceed through the questions in random order
+    NotAssigned    ///< prompt user to get the order
+  };
+
+  [[nodiscard]] bool isQuizMode() const;
   [[nodiscard]] auto questionOrder() const { return _questionOrder; }
   [[nodiscard]] auto& choice() const { return _choice; }
   [[nodiscard]] auto isQuit(char c) const { return _choice.isQuit(c); }
@@ -62,29 +77,39 @@ private:
   [[nodiscard]] static Kanji::NelsonId getId(
       const String& msg, const String& arg);
 
-  // 'setQuizType' is called for -f, -g, -l, -k, -m and -p args (so ok to assume
-  // size is at least 2) and sets 'quizType'. It also returns optional 'question
-  // list' that may be part of the arg, i.e., '-g6' arg represents 'Grade' '6'.
+  /// called by ctor for 'quiz type' and 'program mode' args
+  /// \param[out] question set if `arg` is a 'program mode' ('-t' or '-r')
+  /// \param[out] quizType set if `arg` is a 'quiz type' (-f, -g, etc..)
+  /// \param arg command line arg to process
+  /// \return optional 'question list' depending on `arg` - see setQuizType()
+  /// \throw DomainError if `arg` isn't a valid option
+  [[nodiscard]] OptChar processArg(
+      Question& question, OptChar& quizType, const String& arg);
+
+  /// called by processArg() if `arg` starts with -f, -g, -l, -k, -m or -p
+  /// \param[out] quizType set to the second char of `arg` so 'f', 'g'. etc..
+  /// \param arg the command like arg to process
+  /// \return optional 'question list', for example if `arg` is "-g6" then '6'
+  ///     is returned, but if `arg` is "-g" then `std::nullopt` is returned
+  /// \throw DomainError if called multiple times or if `arg` format is invalid
   [[nodiscard]] static OptChar setQuizType(OptChar& quizType, const String& arg,
       const Choices&, const std::optional<Choice::Range>& = {});
 
-  // top level function for processing args (program mode and quiz types)
-  [[nodiscard]] OptChar processArg(Question&, OptChar&, const String& arg);
-
-  // 'processProgramModeArg' is called for '-r' and '-t' args and sets
-  // '_programMode'. It can also set '_questionOrder' depending on the value
-  // of 'arg' and returns the question to start from.
+  /// called for '-r' and '-t' args and sets #_programMode. It can also set
+  /// #_questionOrder if `arg` is followed by a number (like "-t30")
+  /// \return question to start from or `0` which means 'not specified'
+  /// \throw DomainError if `arg` format is invalid (like "-tABC")
   [[nodiscard]] Question processProgramModeArg(const String& arg);
 
-  // 'processKanjiArg' is called when a kanji arg is passed to the program
-  // (see 'HelpMessage' in QuizLauncher.cpp)
+  /// called when a Kanji `arg` is passed to the program (see QuizLauncher.cpp)
   void processKanjiArg(const String& arg) const;
 
-  // 'printDetails' prints info about a kanji provided on the command line
-  // (instead of running a quiz)
+  /// prints details about a list of Kanji (instead of running a quiz/review)
   void printDetails(
       const KanjiData::List&, const String& name, const String& arg) const;
-  void printDetails(const String&, bool showLegend = true) const;
+
+  /// print details about `arg` (should be a single Kanji name)
+  void printDetails(const String& arg, bool showLegend = true) const;
 
   [[nodiscard]] bool getQuestionOrder();
 
@@ -100,10 +125,12 @@ private:
 
   [[nodiscard]] const KanjiData::List& getKyuList(char) const;
 
-  // '_programMode' and '_questionOrder' can be set via the command line,
-  // otherwise they are obtained interactively
+  /// can be set via params to start(), otherwise obtained via reading input @{
   ProgramMode _programMode;
   QuestionOrder _questionOrder;
+  ///@}
+
+  /// set via a parameter to start()
   bool _randomizeAnswers;
 
   const Choice _choice;
@@ -111,4 +138,5 @@ private:
   const JukugoDataPtr _jukugoData;
 };
 
+/// \end_group
 } // namespace kanji_tools

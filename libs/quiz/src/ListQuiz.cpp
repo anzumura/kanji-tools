@@ -19,8 +19,8 @@ ListQuiz::QuizStyle ListQuiz::toQuizStyle(char c) {
 }
 
 ListQuiz::ListQuiz(const QuizLauncher& launcher, Question question,
-    bool showMeanings, const List& list, // LCOV_EXCL_LINE
-    Kanji::Info fields, ChoiceCount choiceCount, QuizStyle quizStyle)
+    bool showMeanings, const List& list, Kanji::Info fields,
+    ChoiceCount choiceCount, QuizStyle quizStyle)
     : Quiz{launcher, question, showMeanings},
       _answers(choiceCount), _infoFields{fields}, _choiceCount{choiceCount},
       _quizStyle{quizStyle}, _prompt{getPrompt()}, _choiceEnd{toChar(
@@ -64,7 +64,7 @@ void ListQuiz::start(const List& questions) {
 const String& ListQuiz::getPrompt() const {
   static const String Reading{Prompt + " correct reading"},
       Kanji(Prompt + " correct kanji");
-  return isTestMode() ? isKanjiToReading() ? Reading : Kanji : Prompt;
+  return isQuizMode() ? isKanjiToReading() ? Reading : Kanji : Prompt;
 }
 
 bool ListQuiz::isKanjiToReading() const {
@@ -97,14 +97,14 @@ void ListQuiz::printQuestion(const Kanji& kanji) const {
     out() << kanji.name();
     if (const auto info{kanji.info(_infoFields)}; !info.empty())
       out() << "  " << info;
-    if (!isTestMode()) launcher().printExtraTypeInfo(kanji);
+    if (!isQuizMode()) launcher().printExtraTypeInfo(kanji);
   } else
     out() << "Reading:  " << kanji.reading();
-  printMeaning(kanji, !isTestMode());
+  printMeaning(kanji, !isQuizMode());
 }
 
 void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
-  if (isTestMode())
+  if (isQuizMode())
     for (ChoiceCount i{}; i < _choiceCount; ++i)
       out() << "    " << i + 1 << ".  "
             << (isKanjiToReading() ? questions[_answers[i]]->reading()
@@ -117,7 +117,7 @@ void ListQuiz::printChoices(const Kanji& kanji, const List& questions) const {
 bool ListQuiz::getAnswer(Choices& choices, bool& stopQuiz, ChoiceCount correct,
     const String& kanjiName) {
   const auto answer{
-      isTestMode() ? choice().get({ChoiceStart, _choiceEnd}, _prompt, choices)
+      isQuizMode() ? choice().get({ChoiceStart, _choiceEnd}, _prompt, choices)
                    : get(_prompt, choices)};
   if (answer == MeaningsOption) {
     toggleMeanings(choices);

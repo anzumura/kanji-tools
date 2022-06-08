@@ -6,6 +6,18 @@ namespace kanji_tools { /// \quiz_group{GroupQuiz}
 /// GroupQuiz class
 
 /// class for creating and running a 'group quiz' \quiz{GroupQuiz}
+///
+/// Currently there are two types of group quizzes: 'meaning' and 'pattern'. The
+/// quiz consists of one question per group that has two or more members (after
+/// any filtering is done based on #MemberType). Each question shows the Kanji
+/// members of the group on the left and a list of numbered 'readings' on the
+/// right and the goal is to match the Kanji with their correct readings.
+///
+/// Since there are many 'pattern' groups, the user must choose a subset based
+/// on an 'On reading' range (like 'ア', 'カ', etc..). Later this should also be
+/// done for 'meaning' groups, but perhaps by categories instead (like '時間',
+/// '地理', etc..). A 'curses' interface would also be nice instead of requiring
+/// the user to choose a 'refresh' option to see the mappings chosen so far.
 class GroupQuiz : public Quiz {
 public:
   /// used to determine which members of a group should be included in a quiz

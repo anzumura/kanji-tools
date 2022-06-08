@@ -117,7 +117,7 @@ void GroupQuiz::start(const GroupData::List& list) {
         questions.emplace_back(j);
         readings.emplace_back(j);
       }
-    if (isTestMode() && launcher().randomizeAnswers()) {
+    if (isQuizMode() && launcher().randomizeAnswers()) {
       std::shuffle(questions.begin(), questions.end(), RandomGen);
       std::shuffle(readings.begin(), readings.end(), RandomGen);
     }
@@ -163,18 +163,18 @@ void GroupQuiz::showGroup(const List& questions, const List& readings,
     Choices& choices, bool repeatQuestion) const {
   for (size_t count{}; auto& i : questions) {
     const char choice{
-        isTestMode() ? toChar(count < TotalLetters ? 'a' + count
+        isQuizMode() ? toChar(count < TotalLetters ? 'a' + count
                                                    : 'A' + count - TotalLetters)
                      : ' '};
     out() << std::right << std::setw(4) << count + 1 << ":  ";
     auto s{i->qualifiedName()};
     addPinyin(*i, s);
-    if (!isTestMode()) addOtherGroupName(i->name(), s);
+    if (!isQuizMode()) addOtherGroupName(i->name(), s);
     out() << std::left << std::setw(wideSetw(s, GroupEntryWidth)) << s;
     printAssignedAnswer(choice)
         << choice << ":  " << readings[count]->reading();
     printMeaning(*readings[count++]);
-    if (!repeatQuestion && isTestMode()) choices[choice] = {};
+    if (!repeatQuestion && isQuizMode()) choices[choice] = {};
   }
   out() << '\n';
 }
@@ -194,7 +194,7 @@ bool GroupQuiz::getAnswers(
 bool GroupQuiz::getAnswer(Choices& choices, bool& skipGroup, bool& refresh) {
   const static String ReviewMsg{"  Select"}, QuizMsg{"  Reading for: "};
   const auto msg{
-      isTestMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg};
+      isQuizMode() ? QuizMsg + std::to_string(_answers.size() + 1) : ReviewMsg};
   do {
     printAssignedAnswers();
     switch (const auto answer{get(msg, choices)}; answer) {

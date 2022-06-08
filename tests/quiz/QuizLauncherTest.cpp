@@ -132,7 +132,7 @@ TEST_F(QuizLauncherTest, SetProgramMode) {
     const char* args[]{"", i.first};
     // specifying '&is()' causes launcher to not start automatically
     QuizLauncher quiz{args, _data, _groupData, _jukugoData, &is()};
-    EXPECT_EQ(quiz.isTestMode(), i.second);
+    EXPECT_EQ(quiz.isQuizMode(), i.second);
   }
 }
 

@@ -20,7 +20,7 @@ Quiz::Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
       _showMeanings{showMeanings} {}
 
 Quiz::~Quiz() {
-  if (isTestMode()) {
+  if (isQuizMode()) {
     out() << "\nFinal score: " << _correctAnswers << '/' << _currentQuestion;
     if (_currentQuestion) {
       const auto skipped{_currentQuestion - _correctAnswers - _mistakes.size()};
@@ -57,12 +57,12 @@ std::ostream& Quiz::beginQuizMessage(size_t totalQuestions) {
                        std::to_string(totalQuestions));
     --_currentQuestion;
   }
-  return log(true) << "Starting " << (isTestMode() ? "quiz" : "review")
+  return log(true) << "Starting " << (isQuizMode() ? "quiz" : "review")
                    << " for " << totalQuestions << ' ';
 }
 
 std::ostream& Quiz::beginQuestionMessage(size_t totalQuestions) const {
-  return out() << (isTestMode() ? "\nQuestion " : "\n") << _currentQuestion + 1
+  return out() << (isQuizMode() ? "\nQuestion " : "\n") << _currentQuestion + 1
                << '/' << totalQuestions << ":  ";
 }
 
@@ -82,9 +82,9 @@ Choice::Choices Quiz::getDefaultChoices(size_t totalQuestions) const {
   Choice::Choices c{
       {MeaningsOption, _showMeanings ? HideMeanings : ShowMeanings},
       {SkipOption, _currentQuestion + 1U == totalQuestions ? "finish"
-                   : !isTestMode()                         ? "next"
+                   : !isQuizMode()                         ? "next"
                                                            : "skip"}};
-  if (!isTestMode() && _currentQuestion) c[PrevOption] = "prev";
+  if (!isQuizMode() && _currentQuestion) c[PrevOption] = "prev";
   return c;
 }
 

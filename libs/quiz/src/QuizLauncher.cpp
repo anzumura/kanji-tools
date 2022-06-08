@@ -106,7 +106,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
   if (_programMode == ProgramMode::NotAssigned) {
     const auto c{_choice.get("Mode", ProgramModeChoices, DefaultProgramMode)};
     if (isQuit(c)) return;
-    _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Test;
+    _programMode = c == 'r' ? ProgramMode::Review : ProgramMode::Quiz;
   }
   if (!getQuestionOrder()) return;
   _randomizeAnswers = randomizeAnswers;
@@ -149,8 +149,8 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
   _questionOrder = QuestionOrder::NotAssigned;
 }
 
-bool QuizLauncher::isTestMode() const {
-  return _programMode == ProgramMode::Test;
+bool QuizLauncher::isQuizMode() const {
+  return _programMode == ProgramMode::Quiz;
 }
 
 std::ostream& QuizLauncher::log(bool heading) const {
@@ -222,7 +222,7 @@ void QuizLauncher::startListQuiz(Question question, bool showMeanings,
     Kanji::Info excludeField, const List& list) const {
   ListQuiz::ChoiceCount choiceCount{1};
   auto quizStyle{DefaultListStyle};
-  if (isTestMode()) {
+  if (isQuizMode()) {
     const auto c{
         _choice.get(ChoiceCountRange, "Number of choices", DefaultChoiceCount)};
     if (isQuit(c)) return;
@@ -264,7 +264,7 @@ QuizLauncher::Question QuizLauncher::processProgramModeArg(const String& arg) {
   if (_programMode != ProgramMode::NotAssigned)
     KanjiData::usage(
         "only one mode (-r or -t) can be specified, use -h for help");
-  _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Test;
+  _programMode = arg[1] == 'r' ? ProgramMode::Review : ProgramMode::Quiz;
   if (arg.size() > 2) {
     if (arg.size() == 3 && arg[2] == '0')
       _questionOrder = QuestionOrder::Random;
