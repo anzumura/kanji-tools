@@ -4,8 +4,8 @@
 
 namespace kanji_tools {
 
-// 'WhatMismatch' is an exception class that is thrown by the 'call' function
-// below when an exception has a 'what' that doesn't match the expected value.
+/// exception class thrown by the call() function below when an exception has a
+/// what() string that doesn't match the expected value
 class WhatMismatch : public std::runtime_error {
 public:
   WhatMismatch(const String& expectedWhat, const std::exception& e)
@@ -13,12 +13,17 @@ public:
             "expected: '" + expectedWhat + "', actual: '" + e.what() + '\''} {}
 };
 
-// 'call' is a helper function for tests that expect exceptions to be thrown. It
-// calls the given function 'f' and then checks if the exception raised matches
-// 'expectedWhat'. If it doesn't match then 'WhatMismatch' is thrown, otherwise
-// the original exception is re-thrown to be handled by the test macro
-// (EXPECT_THROW, ASSERT_THROW, etc.) which is only able to test the type of
-// exception (not the 'what' string).
+/// checks what() of exceptions thrown by `f` against `expectedWhat` and throws
+/// WhatMismatch if they don't match, otherwise re-throws the original exception
+/// \details This function is helpful when using test macros like EXPECT_THROW
+/// or ASSERT_THROW which can only check the type of exception thrown (not the
+/// the 'what' message)
+/// \tparam F type of `f` (can return any type, but can't take any arguments)
+/// \param f function to call
+/// \param expectedWhat expected value of what() of the exception thrown
+/// \return the return value of `f`
+/// \throw WhatMismatch if `f` throws an exception and `expectedWhat` doesn't
+///     match what() (otherwise the original exception is re-thrown)
 template<typename F> auto call(const F& f, const String& expectedWhat) {
   try {
     return f();

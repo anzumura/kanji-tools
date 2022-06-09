@@ -5,9 +5,11 @@
 
 namespace kanji_tools {
 
-// 'TestUcd' creates an empty 'Ucd' object via a conversion operator, but any
-// field can be overridden before creating, for example:
-//   const Ucd ucd{TestUcd{"龍"}.jinmei(true)};
+/// creates an empty 'Ucd' object via a conversion operator, but any
+/// field can be overridden before creating \details for example:
+/// \code
+///   const Ucd ucd{TestUcd{"龍"}.jinmei(true)};
+/// \endcode
 class TestUcd {
 private:
   template<typename T> auto& set(T& x, const T& y) {
