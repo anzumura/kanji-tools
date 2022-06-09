@@ -75,10 +75,8 @@ constexpr auto DefaultProgramMode{'t'}, DefaultQuestionOrder{'r'},
 QuizLauncher::QuizLauncher(const Args& args, const KanjiDataPtr& data,
     const GroupDataPtr& groupData, // LCOV_EXCL_LINE
     const JukugoDataPtr& jukugoData, std::istream* in)
-    : _programMode{ProgramMode::NotAssigned},
-      _questionOrder{QuestionOrder::NotAssigned},
-      _randomizeAnswers{true}, _choice{data->out(), in, QuitOption},
-      _groupData{groupData}, _jukugoData{jukugoData} {
+    : _choice{data->out(), in, QuitOption}, _groupData{groupData},
+      _jukugoData{jukugoData} {
   OptChar quizType, qList;
   Question question{};
   auto endOptions{false}, showMeanings{false};

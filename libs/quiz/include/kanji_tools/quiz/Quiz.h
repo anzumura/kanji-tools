@@ -14,6 +14,9 @@ public:
   Quiz(const Quiz&) = delete;           ///< deleted copy ctor
   auto operator=(const Quiz&) = delete; ///< deleted operator=
 
+  /// dtor prints the final score when in 'quiz' mode
+  virtual ~Quiz();
+
   /// creates QuizLauncher and it dependencies, this will start an instance of
   /// either ListQuiz or GroupQuiz depending on command line args.
   static void run(const Args&, std::ostream& = std::cout);
@@ -31,9 +34,6 @@ protected:
   ///@}
 
   Quiz(const QuizLauncher&, Question, bool showMeanings);
-
-  /// dtor prints the final score when in 'quiz' mode
-  virtual ~Quiz();
 
   /// the following methods are shortcuts for calling #_launcher methods @{
   [[nodiscard]] auto& launcher() const { return _launcher; }
@@ -66,9 +66,10 @@ protected:
   [[nodiscard]] auto& currentQuestion() { return _currentQuestion; }
 private:
   const QuizLauncher& _launcher;
-  Question _currentQuestion, _correctAnswers;
-  KanjiListFile::StringList _mistakes;
+  Question _currentQuestion;
   bool _showMeanings;
+  Question _correctAnswers{0};
+  KanjiListFile::StringList _mistakes;
 };
 
 /// \end_group

@@ -126,12 +126,12 @@ private:
   [[nodiscard]] const KanjiData::List& getKyuList(char) const;
 
   /// can be set via params to start(), otherwise obtained via reading input @{
-  ProgramMode _programMode;
-  QuestionOrder _questionOrder;
+  ProgramMode _programMode{ProgramMode::NotAssigned};
+  QuestionOrder _questionOrder{QuestionOrder::NotAssigned};
   ///@}
 
   /// set via a parameter to start()
-  bool _randomizeAnswers;
+  bool _randomizeAnswers{true};
 
   const Choice _choice;
   const GroupDataPtr _groupData;

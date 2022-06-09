@@ -15,9 +15,9 @@ Checks: '
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -cppcoreguidelines-pro-type-reinterpret-cast,-hicpp-no-array-decay,
   -llvm-header-guard,-misc-no-recursion,-modernize-pass-by-value,
-  -modernize-use-trailing-return-type,-readability-implicit-bool-conversion,
-  -readability-isolate-declaration,-readability-static-accessed-through-instance
-'
+  -modernize-use-trailing-return-type,-readability-identifier-length,
+  -readability-implicit-bool-conversion,-readability-isolate-declaration,
+  -readability-static-accessed-through-instance'
 
 # Notes about skipped checks:
 # - skip lib speicific like: abseil-*, altera-*, android-*, boost-*, darwin-*,
@@ -33,7 +33,8 @@ Checks: '
 #   there are also lots of cases in template code where it is just noisy ...
 # - 'misc-no-recursion': recursion is used in a few places
 # - skip these 'modernize' and 'readability' ones that are more style related:
-#   - '*-braces-around-statements' 
+#   - '*-braces-around-statements'
+#   - '*-identifier-length': reports way too many problems for 'i', 'x', etc..
 #   - '*-isolate-declaration'
 #   - '*-named-parameter'
 #   - '*-pass-by-value': this can be a good suggestion sometimes (but noisy)

@@ -16,8 +16,8 @@ void Quiz::run(const Args& args, std::ostream& out) {
 }
 
 Quiz::Quiz(const QuizLauncher& launcher, Question question, bool showMeanings)
-    : _launcher{launcher}, _currentQuestion{question}, _correctAnswers{0},
-      _showMeanings{showMeanings} {}
+    : _launcher{launcher}, _currentQuestion{question}, _showMeanings{
+                                                           showMeanings} {}
 
 Quiz::~Quiz() {
   if (isQuizMode()) {
