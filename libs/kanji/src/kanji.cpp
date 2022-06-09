@@ -11,7 +11,10 @@ Kanji::Frequency Kanji::frequency() const { return 0; }
 KanjiGrades Kanji::grade() const { return KanjiGrades::None; }
 KenteiKyus Kanji::kyu() const { return KenteiKyus::None; }
 JlptLevels Kanji::level() const { return JlptLevels::None; }
-KanjiPtr Kanji::link() const { return {}; }
+Kanji::Link Kanji::link() const {
+  static const KanjiPtr EmptyLink;
+  return EmptyLink;
+}
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
 Kanji::Year Kanji::year() const { return 0; }
 bool Kanji::linkedReadings() const { return false; }

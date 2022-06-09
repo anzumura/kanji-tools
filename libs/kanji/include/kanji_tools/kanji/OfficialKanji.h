@@ -142,12 +142,12 @@ public:
 
   [[nodiscard]] Frequency frequency() const final { return _frequency; }
   [[nodiscard]] KenteiKyus kyu() const final { return _kyu; }
-  [[nodiscard]] KanjiPtr link() const final { return _link; }
+  [[nodiscard]] Link link() const final { return _link; }
 
   [[nodiscard]] bool linkedReadings() const final { return true; }
   [[nodiscard]] OptString newName() const final;
 protected:
-  OfficialLinkedKanji(KanjiDataRef, Name, const KanjiPtr& link, UcdPtr);
+  OfficialLinkedKanji(KanjiDataRef, Name, Link, UcdPtr);
 
   /// used by ctor to ensure `link` has expected type
   /// \param name String name of instance being constructed
@@ -156,7 +156,7 @@ protected:
   /// \return `name` (the same value passed into the function)
   /// \throw DomainError if `link` type is not Jouyou and (`isOld` is true or
   ///     `link` type is not Jinmei)
-  [[nodiscard]] static Name check(Name name, const Kanji& link, bool isOld);
+  [[nodiscard]] static Name check(Name name, Link link, bool isOld);
 private:
   const Frequency _frequency;
   const KenteiKyus _kyu;
@@ -173,7 +173,7 @@ private:
 class LinkedJinmeiKanji : public OfficialLinkedKanji {
 public:
   /// ctor called by KanjiData
-  LinkedJinmeiKanji(KanjiDataRef, Name, const KanjiPtr&);
+  LinkedJinmeiKanji(KanjiDataRef, Name, Link);
 
   [[nodiscard]] KanjiTypes type() const final {
     return KanjiTypes::LinkedJinmei;
@@ -187,7 +187,7 @@ public:
 class LinkedOldKanji : public OfficialLinkedKanji {
 public:
   /// ctor called by KanjiData (after creating all LinkedJinmeiKanji)
-  LinkedOldKanji(KanjiDataRef, Name, const KanjiPtr&);
+  LinkedOldKanji(KanjiDataRef, Name, Link);
 
   [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::LinkedOld; }
 };

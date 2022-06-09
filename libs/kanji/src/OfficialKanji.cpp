@@ -97,31 +97,28 @@ Kanji::Reading OfficialLinkedKanji::reading() const { return _link->reading(); }
 Kanji::OptString OfficialLinkedKanji::newName() const { return _link->name(); }
 
 OfficialLinkedKanji::OfficialLinkedKanji(
-    KanjiDataRef data, Name name, const KanjiPtr& link, UcdPtr u)
+    KanjiDataRef data, Name name, Link link, UcdPtr u)
     : Kanji{data, name, data.ucdRadical(name, u), data.ucdStrokes(name, u), u},
       _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
 
-Kanji::Name OfficialLinkedKanji::check(
-    Name name, const Kanji& link, bool isOld) {
-  if (const auto t{link.type()};
+Kanji::Name OfficialLinkedKanji::check(Name name, Link link, bool isOld) {
+  if (const auto t{link->type()};
       t != KanjiTypes::Jouyou && (isOld || t != KanjiTypes::Jinmei))
     throw DomainError{
         "OfficialLinkedKanji " + name + " wanted type '" +
         toString(KanjiTypes::Jouyou) +
         (isOld ? EmptyString
                : String{"' or '"} + toString(KanjiTypes::Jinmei)) +
-        "' for link " + link.name() + ", but got '" + toString(t) + "'"};
+        "' for link " + link->name() + ", but got '" + toString(t) + "'"};
   return name;
 }
 
-LinkedJinmeiKanji::LinkedJinmeiKanji(
-    KanjiDataRef data, Name name, const KanjiPtr& link)
+LinkedJinmeiKanji::LinkedJinmeiKanji(KanjiDataRef data, Name name, Link link)
     : OfficialLinkedKanji{
-          data, check(name, *link, false), link, data.findUcd(name)} {}
+          data, check(name, link, false), link, data.findUcd(name)} {}
 
-LinkedOldKanji::LinkedOldKanji(
-    KanjiDataRef data, Name name, const KanjiPtr& link)
+LinkedOldKanji::LinkedOldKanji(KanjiDataRef data, Name name, Link link)
     : OfficialLinkedKanji{
-          data, check(name, *link, true), link, data.findUcd(name)} {}
+          data, check(name, link, true), link, data.findUcd(name)} {}
 
 } // namespace kanji_tools

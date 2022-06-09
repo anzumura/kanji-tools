@@ -17,6 +17,7 @@ using KanjiDataRef = const class KanjiData&;
 class Kanji {
 public:
   using Frequency = uint16_t;
+  using Link = const KanjiPtr&;
   using LinkNames = std::vector<String>;
   using NelsonId = uint16_t;
   using NelsonIds = std::vector<NelsonId>;
@@ -75,7 +76,7 @@ public:
   [[nodiscard]] virtual JlptLevels level() const;
 
   /// return link to official Kanji, base class returns `nullptr`
-  [[nodiscard]] virtual KanjiPtr link() const;
+  [[nodiscard]] virtual Link link() const;
 
   /// return Jinmei 'reason', base class returns `None`
   [[nodiscard]] virtual JinmeiReasons reason() const;
