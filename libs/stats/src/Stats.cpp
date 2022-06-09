@@ -50,13 +50,13 @@ Stats::Stats(const Args& args, const KanjiDataPtr& data) : _data(data) {
 
 void Stats::countKanji(
     const fs::path& top, bool showBreakdown, bool verbose) const {
+  // lambda to create a 'Stats::Pred, Future[String]' pair for each `pred`
   const auto f{[=, this, &top](const auto& pred, const String& name,
                    bool firstCount = false) {
     // NOLINTNEXTLINE
     auto p{std::make_shared<Pred>(_data, top, name, showBreakdown)};
-    return std::pair(std::async(std::launch::async,
-                         [=] { return p->run(pred, verbose, firstCount); }),
-        p);
+    return std::pair{p, std::async(std::launch::async,
+                            [=] { return p->run(pred, verbose, firstCount); })};
   }};
   // 2579 Kanji loaded by this program fall into 'Rare' blocks (and they are all
   // type 'Ucd'). All other types (like Jouyou, Jinmei, etc.) are in 'Common'
@@ -74,19 +74,19 @@ void Stats::countKanji(
       f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
       f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
       f([](const auto& x) { return !isRecognizedUtf8(x); }, "Unrecognized")};
-  for (auto& i : totals) out() << i.first.get();
+  for (auto& i : totals) out() << i.second.get();
   size_t total{};
-  for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();
+  for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].first->total();
   log() << "Total Kana+Kanji: " << total;
   if (total) {
     out() << " (" << std::fixed << std::setprecision(1);
     size_t totalKanji{};
     for (size_t i{}; i < IncludeInTotals; ++i)
-      if (totals[i].second->isKanji())
-        totalKanji += totals[i].second->total();
-      else if (totals[i].second->total())
-        out() << totals[i].second->name() << ": "
-              << asPercent(totals[i].second->total(), total) << "%, ";
+      if (totals[i].first->isKanji())
+        totalKanji += totals[i].first->total();
+      else if (totals[i].first->total())
+        out() << totals[i].first->name() << ": "
+              << asPercent(totals[i].first->total(), total) << "%, ";
     out() << "Kanji: " << asPercent(totalKanji, total) << "%)";
   }
   out() << '\n';
