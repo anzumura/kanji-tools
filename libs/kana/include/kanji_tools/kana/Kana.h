@@ -283,7 +283,7 @@ public:
   template<typename... T> explicit DakutenKana(Kana&& dakuten, T&&...);
 
   /// return #_dakuten Kana (which is an instance of AccentedKana)
-  [[nodiscard]] const Kana* dakuten() const override;
+  [[nodiscard]] const Kana* dakuten() const final;
 protected:
   /// represents an accented Kana \kana{Kana}
   ///
@@ -295,7 +295,7 @@ protected:
     AccentedKana(Kana&& k, const Kana& p);
 
     /// return #_plain Kana
-    [[nodiscard]] const Kana* plain() const override;
+    [[nodiscard]] const Kana* plain() const final;
   private:
     /// populated by unaccented version by DakutenKana and HanDakutenKana, for
     /// example DakutenKana instance for け contains #_dakuten げ and in turn,
@@ -317,7 +317,7 @@ public:
   template<typename... T> explicit HanDakutenKana(Kana&& hanDakuten, T&&...);
 
   /// return #_hanDakuten Kana (which is an instance of AccentedKana)
-  [[nodiscard]] const Kana* hanDakuten() const override;
+  [[nodiscard]] const Kana* hanDakuten() const final;
 private:
   const AccentedKana _hanDakuten;
 };

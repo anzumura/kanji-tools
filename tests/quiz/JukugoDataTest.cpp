@@ -23,7 +23,7 @@ protected:
     of.close();
   }
 
-  void SetUp() override {
+  void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
     static const String HeaderRow{"Number\tName\tMembers"};
@@ -33,7 +33,7 @@ protected:
     write(OtherFile, {});
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() final { fs::remove_all(TestDir); }
 
   inline static std::stringstream _os, _es;
   inline static KanjiDataPtr _data;

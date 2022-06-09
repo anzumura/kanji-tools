@@ -33,12 +33,12 @@ protected:
 
   NumberedKanjiTest() = default;
 
-  void SetUp() override {
+  void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() final { fs::remove_all(TestDir); }
 
   template<typename T> [[nodiscard]] KanjiData::List fromFile() {
     return NumberedKanji::fromFile<T>(_data, TestFile);

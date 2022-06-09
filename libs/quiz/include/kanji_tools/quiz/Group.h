@@ -83,7 +83,7 @@ class MeaningGroup : public Group {
 public:
   MeaningGroup(Number, const String& name, const Members&);
 
-  [[nodiscard]] GroupType type() const override;
+  [[nodiscard]] GroupType type() const final;
 };
 
 /// groups based on Kanji 'patterns' \quiz{Group}
@@ -108,8 +108,8 @@ class PatternGroup : public Group {
 public:
   PatternGroup(Number, const String& name, const Members&, PatternType);
 
-  [[nodiscard]] GroupType type() const override;
-  [[nodiscard]] PatternType patternType() const override;
+  [[nodiscard]] GroupType type() const final;
+  [[nodiscard]] PatternType patternType() const final;
 private:
   const PatternType _patternType;
 };

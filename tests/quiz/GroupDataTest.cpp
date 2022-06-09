@@ -19,7 +19,7 @@ protected:
     _data = std::make_shared<FileKanjiData>(Args{}, _os, _es);
   }
 
-  void SetUp() override {
+  void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
     static const String HeaderRow{"Number\tName\tMembers"};
@@ -29,7 +29,7 @@ protected:
     _es.clear();
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() final { fs::remove_all(TestDir); }
 
   static void write(const fs::path& f, const String& s) {
     std::ofstream of{f, std::ios_base::app};

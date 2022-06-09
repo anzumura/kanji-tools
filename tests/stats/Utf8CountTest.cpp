@@ -28,7 +28,7 @@ auto removeFurigana(const std::wstring& s) {
 
 class Utf8CountTest : public ::testing::Test {
 protected:
-  void SetUp() override {
+  void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directories(TestSubDir));
     const auto files = {std::pair{TestFile1, "北海道"},
@@ -41,7 +41,7 @@ protected:
     }
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() final { fs::remove_all(TestDir); }
 
   auto& count() { return _count; }
 private:

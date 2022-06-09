@@ -136,7 +136,7 @@ public:
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : Utf8Count{find, replace, debug}, _pred{pred} {}
 private:
-  [[nodiscard]] bool allowAdd(const String& token) const override {
+  [[nodiscard]] bool allowAdd(const String& token) const final {
     return _pred(token);
   }
   const T _pred;

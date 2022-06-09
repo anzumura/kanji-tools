@@ -20,7 +20,7 @@ const fs::path GoodOnePerLine{TestDir / "goodOnePerLine"},
 
 class KanjiListFileTest : public ::testing::Test {
 protected:
-  void SetUp() override {
+  void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
     const auto files = {std::pair{GoodOnePerLine, "北\n海\n道"},
@@ -35,7 +35,7 @@ protected:
     }
   }
 
-  void TearDown() override {
+  void TearDown() final {
     KanjiListFile::clearUniqueCheckData();
     fs::remove_all(TestDir);
   }

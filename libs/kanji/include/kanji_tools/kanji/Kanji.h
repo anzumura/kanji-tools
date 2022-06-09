@@ -263,8 +263,8 @@ template<> inline constexpr auto is_bitmask<Kanji::Info>{true};
 /// contains 'meaning' and 'reading' fields \kanji{Kanji}
 class LoadedKanji : public Kanji {
 public:
-  [[nodiscard]] Meaning meaning() const override { return _meaning; }
-  [[nodiscard]] Reading reading() const override { return _reading; }
+  [[nodiscard]] Meaning meaning() const final { return _meaning; }
+  [[nodiscard]] Reading reading() const final { return _reading; }
 protected:
   /// ctor used by OtherKanji and ExtraKanji to populate links from Ucd data
   [[nodiscard]] static LinkNames linkNames(UcdPtr);
@@ -288,9 +288,9 @@ private:
 /// well as 'linkedReadings'. OtherKanji aren't part of JLPT.
 class OtherKanji : public LoadedKanji {
 public:
-  [[nodiscard]] const LinkNames& oldNames() const override;
-  [[nodiscard]] OptString newName() const override;
-  [[nodiscard]] bool linkedReadings() const override { return _linkedReadings; }
+  [[nodiscard]] const LinkNames& oldNames() const final;
+  [[nodiscard]] OptString newName() const final;
+  [[nodiscard]] bool linkedReadings() const final { return _linkedReadings; }
 protected:
   /// ctor used by 'StandardKanji': has 'reading'
   OtherKanji(KanjiDataRef, Name, Reading, UcdPtr);
@@ -314,7 +314,7 @@ private:
 /// StandardKanji have a 'kyu' field
 class StandardKanji : public OtherKanji {
 public:
-  [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
+  [[nodiscard]] KenteiKyus kyu() const final { return _kyu; }
 protected:
   /// ctor used by FrequencyKanji: has 'reading' and looks up 'kyu'
   StandardKanji(KanjiDataRef, Name, Reading);
@@ -338,10 +338,8 @@ public:
   /// ctor used for FrequencyKanji with a reading from 'frequency-readings.txt'
   FrequencyKanji(KanjiDataRef, Name, Reading, Frequency);
 
-  [[nodiscard]] KanjiTypes type() const override {
-    return KanjiTypes::Frequency;
-  }
-  [[nodiscard]] Frequency frequency() const override { return _frequency; }
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Frequency; }
+  [[nodiscard]] Frequency frequency() const final { return _frequency; }
 private:
   const Frequency _frequency;
 };
@@ -352,7 +350,7 @@ class KenteiKanji : public StandardKanji {
 public:
   KenteiKanji(KanjiDataRef, Name, KenteiKyus);
 
-  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Kentei; }
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Kentei; }
 };
 
 /// class for Kanji in 'ucd.txt' file that aren't already included in any other
@@ -364,7 +362,7 @@ class UcdKanji : public OtherKanji {
 public:
   UcdKanji(KanjiDataRef, const Ucd&);
 
-  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Ucd; }
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Ucd; }
 };
 
 /// \end_group

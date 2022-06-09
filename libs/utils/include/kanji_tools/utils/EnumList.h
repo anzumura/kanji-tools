@@ -224,7 +224,7 @@ public:
   /// return String name for enum value `x` including support for T::None
   /// \throw RangeError if `x` is out of range (can only happen if a bad value
   ///     is cast to the enum type)
-  [[nodiscard]] const String& toString(T x) const override {
+  [[nodiscard]] const String& toString(T x) const final {
     return x == T::None ? None : base::toString(x);
   }
 

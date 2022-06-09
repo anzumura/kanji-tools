@@ -106,14 +106,14 @@ class LevelListFile : public TypedListFile<JlptLevels> {
 public:
   LevelListFile(const Path& p, JlptLevels level) : TypedListFile{p, level} {}
 
-  [[nodiscard]] JlptLevels level() const override { return type(); }
+  [[nodiscard]] JlptLevels level() const final { return type(); }
 };
 
 class KyuListFile : public TypedListFile<KenteiKyus> {
 public:
   KyuListFile(const Path& p, KenteiKyus kyu) : TypedListFile{p, kyu} {}
 
-  [[nodiscard]] KenteiKyus kyu() const override { return type(); }
+  [[nodiscard]] KenteiKyus kyu() const final { return type(); }
 };
 
 } // namespace kanji_tools

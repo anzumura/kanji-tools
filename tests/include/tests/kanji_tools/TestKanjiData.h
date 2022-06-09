@@ -13,13 +13,15 @@ inline const std::filesystem::path TestFile{TestDir / "testFile.txt"};
 
 class TestKanjiData : public ::testing::Test, public KanjiData {
 public:
-  [[nodiscard]] Kanji::Frequency frequency(const String&) const override {
+  ~TestKanjiData() override { clear(); }
+
+  [[nodiscard]] Kanji::Frequency frequency(const String&) const final {
     return Kanji::Frequency{};
   }
-  [[nodiscard]] JlptLevels level(const String&) const override {
+  [[nodiscard]] JlptLevels level(const String&) const final {
     return JlptLevels::None;
   }
-  [[nodiscard]] KenteiKyus kyu(const String&) const override {
+  [[nodiscard]] KenteiKyus kyu(const String&) const final {
     return KenteiKyus::None;
   }
 
@@ -33,8 +35,6 @@ public:
   }
 protected:
   TestKanjiData() : KanjiData{TestDir, DebugMode::None, _os, _es} {}
-
-  ~TestKanjiData() override { clear(); }
 
   static void clear() {
     _os.str({});

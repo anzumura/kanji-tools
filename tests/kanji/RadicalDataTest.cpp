@@ -8,7 +8,7 @@ namespace {
 
 class RadicalDataTest : public TestKanjiData {
 protected:
-  void SetUp() override { write("Number\tName\tLongName\tReading"); }
+  void SetUp() final { write("Number\tName\tLongName\tReading"); }
 
   void loadOne() {
     write("001\t一\t一部（いちぶ）\tイチ");

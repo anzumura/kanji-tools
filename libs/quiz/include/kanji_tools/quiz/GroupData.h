@@ -15,7 +15,7 @@ public:
   /// ctor loads data from '-group.txt' files and prints a summary or all data
   /// loaded depending on the value of KanjiData::DebugMode
   /// \param data used for validating Kanji and printing
-  /// \param dir can override using `data->dataDir()` (to help testing)
+  /// \param dir can final using `data->dataDir()` (to help testing)
   /// \throw DomainError if group data is malformed, see Group.h for exceptions
   ///     thrown by group ctors
   explicit GroupData(const KanjiDataPtr& data, const KanjiData::Path* dir = {});
@@ -35,7 +35,7 @@ public:
 private:
   const KanjiData::Path& dataDir(const KanjiData::Path*) const;
 
-  /// add 'kanji'->'group' mapping (no error is logged 'MultiMap' override)
+  /// add 'kanji'->'group' mapping (no error is logged 'MultiMap' final)
   static void add(const String& kanji, MultiMap&, const GroupPtr& group);
 
   /// add 'kanji'->'group' mapping or log an error if it's already been added

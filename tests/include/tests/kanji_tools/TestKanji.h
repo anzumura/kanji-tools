@@ -12,9 +12,9 @@ public:
   explicit TestKanji(Name name, const OptString& compatibilityName = {})
       : Kanji{name, compatibilityName, TestRadical, Strokes{1}, {}, {}, {}} {}
 
-  [[nodiscard]] KanjiTypes type() const override { return _type; }
-  [[nodiscard]] Meaning meaning() const override { return TestMeaning; }
-  [[nodiscard]] Reading reading() const override { return TestReading; }
+  [[nodiscard]] KanjiTypes type() const final { return _type; }
+  [[nodiscard]] Meaning meaning() const final { return TestMeaning; }
+  [[nodiscard]] Reading reading() const final { return TestReading; }
 
   void type(KanjiTypes t) { _type = t; }
 private:

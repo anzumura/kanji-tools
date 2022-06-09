@@ -24,7 +24,7 @@ protected:
     TestOne->type(KanjiTypes::None);
   }
 
-  void TearDown() override { fs::current_path(currentDir()); }
+  void TearDown() final { fs::current_path(currentDir()); }
 
   [[nodiscard]] const Path& currentDir() const { return _currentDir; }
 private:

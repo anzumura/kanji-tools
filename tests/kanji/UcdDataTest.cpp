@@ -12,7 +12,7 @@ const String FileMsg{" - file: testFile.txt, row: 1"};
 
 class UcdDataTest : public TestKanjiData {
 protected:
-  void SetUp() override {
+  void SetUp() final {
     write("Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t"
           "MorohashiId\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\t"
           "LinkNames\tLinkType\tMeaning\tOn\tKun",
@@ -30,13 +30,13 @@ protected:
     write(r += includeKun ? "HITOTSU HITOTABI HAJIME" : "");
   }
 
-  const Ucd& loadOne(bool includeOn = true, bool includeKun = true) {
+  auto& loadOne(bool includeOn = true, bool includeKun = true) {
     writeOne(includeOn, includeKun);
     getUcd().load(TestFile);
     return *ucd().find("一");
   }
 
-  const Ucd& loadLinkedJinmei() {
+  auto& loadLinkedJinmei() {
     // write the Jōyō Kanji
     write("50E7\t僧\tCJK\t1.1\t9\t13\t\tsēng\t1076\t536,538\tGHJKTV\tJ0-414E\t"
           "Y\t\t\t\t\tBuddhist priest, monk; san of Sanskrit sangha\tSOU\t"

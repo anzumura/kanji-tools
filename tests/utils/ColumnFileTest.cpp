@@ -37,12 +37,12 @@ protected:
     return ColumnFile{TestFile, c, delim};
   }
 
-  void SetUp() override {
+  void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() final { fs::remove_all(TestDir); }
 
   static void write(const String& s, bool newLine = true) {
     std::ofstream of{TestFile};

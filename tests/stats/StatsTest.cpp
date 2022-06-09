@@ -42,14 +42,14 @@ protected:
       EXPECT_EQ(_os.str().substr(expectedIn.size()), "");
   }
 
-  void SetUp() override {
+  void SetUp() final {
     _os.str({});
     _os.clear();
     if (fs::exists(TestDir)) TearDown();
     EXPECT_TRUE(fs::create_directory(TestDir));
   }
 
-  void TearDown() override { fs::remove_all(TestDir); }
+  void TearDown() final { fs::remove_all(TestDir); }
 
   inline static std::stringstream _os;
   inline static KanjiDataPtr _data;

@@ -13,9 +13,9 @@ public:
   using File = const ColumnFile&;
   using Number = uint16_t;
 
-  [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
+  [[nodiscard]] KenteiKyus kyu() const final { return _kyu; }
   [[nodiscard]] OptString extraTypeInfo() const override;
-  [[nodiscard]] OldNames oldNames() const override { return _oldNames; }
+  [[nodiscard]] OldNames oldNames() const final { return _oldNames; }
 
   /// return a unique number starting at `1` for this Kanji (matches the row
   /// number of the source '.txt' file)
@@ -58,9 +58,9 @@ private:
 class OfficialKanji : public NumberedKanji {
 public:
   [[nodiscard]] OptString extraTypeInfo() const override;
-  [[nodiscard]] Frequency frequency() const override { return _frequency; }
-  [[nodiscard]] JlptLevels level() const override { return _level; }
-  [[nodiscard]] Year year() const override { return _year; }
+  [[nodiscard]] Frequency frequency() const final { return _frequency; }
+  [[nodiscard]] JlptLevels level() const final { return _level; }
+  [[nodiscard]] Year year() const final { return _year; }
 protected:
   /// ctor used by JinmeiKanji
   OfficialKanji(KanjiDataRef, File, Name, UcdPtr);
@@ -81,9 +81,9 @@ public:
   /// ctor called by fromFile() method
   JinmeiKanji(KanjiDataRef, File);
 
-  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jinmei; }
-  [[nodiscard]] JinmeiReasons reason() const override { return _reason; }
-  [[nodiscard]] OptString extraTypeInfo() const override;
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Jinmei; }
+  [[nodiscard]] JinmeiReasons reason() const final { return _reason; }
+  [[nodiscard]] OptString extraTypeInfo() const final;
 
   /// additional columns required by JinmeiKanji, see fromFile()
   inline static const std::array RequiredColumns{
@@ -98,8 +98,8 @@ public:
   /// ctor called by fromFile() method
   JouyouKanji(KanjiDataRef, File);
 
-  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Jouyou; }
-  [[nodiscard]] KanjiGrades grade() const override { return _grade; }
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Jouyou; }
+  [[nodiscard]] KanjiGrades grade() const final { return _grade; }
 
   /// additional columns required by JouyouKanji, see fromFile()
   inline static const std::array RequiredColumns{
@@ -119,8 +119,8 @@ public:
   /// ctor called by fromFile() method
   ExtraKanji(KanjiDataRef, File);
 
-  [[nodiscard]] KanjiTypes type() const override { return KanjiTypes::Extra; }
-  [[nodiscard]] OptString newName() const override { return _newName; }
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Extra; }
+  [[nodiscard]] OptString newName() const final { return _newName; }
 
   /// additional columns required by ExtraKanji, see fromFile()
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
@@ -137,15 +137,15 @@ private:
 /// them are in Kentei KJ1 or K1 kyus. However, none of them have a JLPT level.
 class OfficialLinkedKanji : public Kanji {
 public:
-  [[nodiscard]] Meaning meaning() const override;
-  [[nodiscard]] Reading reading() const override;
+  [[nodiscard]] Meaning meaning() const final;
+  [[nodiscard]] Reading reading() const final;
 
-  [[nodiscard]] Frequency frequency() const override { return _frequency; }
-  [[nodiscard]] KenteiKyus kyu() const override { return _kyu; }
-  [[nodiscard]] KanjiPtr link() const override { return _link; }
+  [[nodiscard]] Frequency frequency() const final { return _frequency; }
+  [[nodiscard]] KenteiKyus kyu() const final { return _kyu; }
+  [[nodiscard]] KanjiPtr link() const final { return _link; }
 
-  [[nodiscard]] bool linkedReadings() const override { return true; }
-  [[nodiscard]] OptString newName() const override;
+  [[nodiscard]] bool linkedReadings() const final { return true; }
+  [[nodiscard]] OptString newName() const final;
 protected:
   OfficialLinkedKanji(KanjiDataRef, Name, const KanjiPtr& link, UcdPtr);
 
@@ -175,7 +175,7 @@ public:
   /// ctor called by KanjiData
   LinkedJinmeiKanji(KanjiDataRef, Name, const KanjiPtr&);
 
-  [[nodiscard]] KanjiTypes type() const override {
+  [[nodiscard]] KanjiTypes type() const final {
     return KanjiTypes::LinkedJinmei;
   }
 };
@@ -189,9 +189,7 @@ public:
   /// ctor called by KanjiData (after creating all LinkedJinmeiKanji)
   LinkedOldKanji(KanjiDataRef, Name, const KanjiPtr&);
 
-  [[nodiscard]] KanjiTypes type() const override {
-    return KanjiTypes::LinkedOld;
-  }
+  [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::LinkedOld; }
 };
 
 template<typename T>
