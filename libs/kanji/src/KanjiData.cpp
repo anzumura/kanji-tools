@@ -40,7 +40,7 @@ const Pinyin& KanjiData::getPinyin(UcdPtr u) {
 }
 
 const MorohashiId& KanjiData::getMorohashiId(UcdPtr u) {
-  static constexpr MorohashiId EmptyMorohashiId;
+  static constexpr MorohashiId EmptyMorohashiId; // LCOV_EXCL_LINE
   return u ? u->morohashiId() : EmptyMorohashiId;
 }
 

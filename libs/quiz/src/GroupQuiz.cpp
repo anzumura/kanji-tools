@@ -56,7 +56,7 @@ void GroupQuiz::addPinyin(const Kanji& kanji, String& s) {
 }
 
 GroupData::List GroupQuiz::prepareList(
-    const GroupData::List& list, Bucket bucket) const {
+    const GroupData::List& list, Bucket bucket) const { // LCOV_EXCL_LINE
   GroupData::List result;
   const auto bucketHasEnd{bucket && *bucket < PatternGroups.size()};
   for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {

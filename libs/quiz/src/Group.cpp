@@ -36,8 +36,8 @@ void Group::error(const String& msg) const {
   throw DomainError{"group " + toString() + " has " + msg};
 }
 
-MeaningGroup::MeaningGroup(
-    Number number, const String& name, const Members& members)
+MeaningGroup::MeaningGroup(Number number, const String& name,
+    const Members& members) // LCOV_EXCL_LINE
     : Group{number, name, members} {}
 
 GroupType MeaningGroup::type() const { return GroupType::Meaning; }
