@@ -220,7 +220,7 @@ kanjiQuiz [-hs] [-f[1-5] | -g[1-6s] | -k[1-9a-c] | -l[1-5] -m[1-4] | -p[1-4]]
 
   The following options allow choosing the quiz/review type optionally followed
   by question list type (grade, level, etc.) instead of being prompted:
-    -f   'frequency' (optional frequency group '1-5')
+    -f   'frequency' (optional frequency group '0-9')
     -g   'grade' (optional grade '1-6', 's' = Secondary School)
     -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)
     -l   'level' (optional JLPT level number '1-5')

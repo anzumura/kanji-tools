@@ -19,7 +19,7 @@ constexpr auto HelpMessage{// LCOV_EXCL_START
 
   The following options allow choosing the quiz/review type optionally followed
   by question list type (grade, level, etc.) instead of being prompted:
-    -f   'frequency' (optional frequency group '1-5')
+    -f   'frequency' (optional frequency group '0-9')
     -g   'grade' (optional grade '1-6', 's' = Secondary School)
     -k   'kyu' (optional Kentei Kyu '1-9', 'a' = 10, 'b' = 準１級, 'c' = 準２級)
     -l   'level' (optional JLPT level number '1-5')
@@ -52,8 +52,7 @@ const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
         {'b', "from beginning"}, {'e', "from end"}, {'r', "random"}},
     QuizTypeChoices{{'f', "freq"}, {'g', "grade"}, {'k', "kyu"}, {'l', "JLPT"},
         {'m', "meaning"}, {'p', "pattern"}},
-    FrequencyChoices{{'1', "1-500"}, {'2', "501-1000"}, {'3', "1001-1500"},
-        {'4', "1501-2000"}, {'5', "2001-2501"}},
+    FrequencyChoices{{'0', "top 250 Kanji"}},
     GradeChoices{{'s', "Secondary School"}},
     KyuChoices{{'a', "10"}, {'b', "準１級"}, {'c', "準２級"}},
     LevelChoices{
@@ -62,8 +61,8 @@ const Choice::Choices ProgramModeChoices{{'r', "review"}, {'t', "test"}},
     GroupKanjiChoices{
         {'1', "Jōyō"}, {'2', "1+JLPT"}, {'3', "2+Freq."}, {'4', "all"}};
 
-constexpr Choice::Range GradeRange{'1', '6'}, KyuRange{'1', '9'},
-    ChoiceCountRange{'2', '9'};
+constexpr Choice::Range FrequencyRange{'1', '9'}, GradeRange{'1', '6'},
+    KyuRange{'1', '9'}, ChoiceCountRange{'2', '9'};
 
 // Default options are offered for some of the above 'Choices' (when prompting
 // the user for input):
@@ -122,7 +121,7 @@ void QuizLauncher::start(OptChar quizType, OptChar qList, Question question,
       // suppress printing 'Freq' (by passing 'Kanji::Info::Freq') since this
       // would work against showing the list in a random order
       listQuiz(Kanji::Info::Freq,
-          data().frequencyList(static_cast<size_t>(c - '1')));
+          data().frequencyList(static_cast<size_t>(c - '0')));
     break;
   case 'g':
     if (const auto c{chooseGrade(qList)}; !isQuit(c))
@@ -247,7 +246,7 @@ QuizLauncher::OptChar QuizLauncher::processArg(
   switch (arg[1]) {
   case 'r': // intentional fallthrough
   case 't': question = processProgramModeArg(arg); break;
-  case 'f': return setQuizType(quizType, arg, FrequencyChoices);
+  case 'f': return setQuizType(quizType, arg, FrequencyChoices, FrequencyRange);
   case 'g': return setQuizType(quizType, arg, GradeChoices, GradeRange);
   case 'k': return setQuizType(quizType, arg, KyuChoices, KyuRange);
   case 'l': return setQuizType(quizType, arg, LevelChoices);
@@ -447,7 +446,9 @@ char QuizLauncher::chooseQuizType(OptChar quizType) const {
 }
 
 char QuizLauncher::chooseFreq(OptChar qList) const {
-  return qList ? *qList : _choice.get("Choose list", FrequencyChoices);
+  return qList ? *qList
+               : _choice.get(
+                     FrequencyRange, "Choose frequency list", FrequencyChoices);
 }
 
 char QuizLauncher::chooseGrade(OptChar qList) const {

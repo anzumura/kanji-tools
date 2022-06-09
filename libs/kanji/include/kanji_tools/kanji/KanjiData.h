@@ -24,6 +24,11 @@ public:
       DebugArg{"-debug"},                      ///< arg to #DebugMode to 'Full'
       InfoArg{"-info"};                        ///< arg to #DebugMode to 'Info'
 
+  /// top 2501 frequency (most commonly occurring) Kanji are grouped into 10
+  /// 'buckets': each having 250 entries except the last which has 251 @{
+  static constexpr Kanji::Frequency FrequencyBuckets{10}, FrequencyEntries{250};
+  ///@}
+
   /// get the next arg that would not be used by KanjiData class
   /// \details this function is meant to be used by other classes that process
   /// command line options, but also have a KanjiData class (like Quiz and Stats
@@ -98,7 +103,7 @@ public:
   [[nodiscard]] auto& levels() const { return _levels; }
   [[nodiscard]] auto& kyus() const { return _kyus; }
 
-  /// get a list of Kanji for `bucket` see for #_frequencies for more details
+  /// get list of Kanji for `bucket` see for #FrequencyBuckets for more details
   [[nodiscard]] const List& frequencyList(size_t bucket) const;
 
   [[nodiscard]] KanjiTypes getType(const String& name) const;
@@ -205,10 +210,6 @@ private:
   KanjiEnumMap<JlptLevels> _levels;
   KanjiEnumMap<KenteiKyus> _kyus;
 
-  static constexpr Kanji::Frequency FrequencyBuckets{5}, FrequencyEntries{500};
-
-  /// holds lists of Kanji grouped into 5 frequency ranges: each list has 500
-  /// entries except the last which has 501 (for a total of 2501)
   std::array<List, FrequencyBuckets> _frequencies;
 
   Map _nameMap;                               ///< UTF-8 name map to one Kanji

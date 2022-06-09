@@ -224,12 +224,18 @@ TEST_F(ListQuizTest, IncorrectResponse) {
 
 TEST_F(ListQuizTest, FrequencyLists) {
   const auto f{[this](char x) { return firstQuestion('f', x); }};
-  EXPECT_EQ(f('1'), "1/500:  日  Rad 日(72), Strokes 4, rì, G1, N5, K10");
-  EXPECT_EQ(f('2'), "1/500:  良  Rad 艮(138), Strokes 7, liáng, G4, N3, K7");
+  EXPECT_EQ(f('0'), "1/250:  日  Rad 日(72), Strokes 4, rì, G1, N5, K10");
+  EXPECT_EQ(f('1'), "1/250:  式  Rad 弋(56), Strokes 6, shì, G3, N3, K8");
+  EXPECT_EQ(f('2'), "1/250:  良  Rad 艮(138), Strokes 7, liáng, G4, N3, K7");
   EXPECT_EQ(
-      f('3'), "1/500:  贈  Rad 貝(154), Strokes 18, zèng, S, N2, Old 贈, K4");
-  EXPECT_EQ(f('4'), "1/500:  添  Rad 水(85), Strokes 11, tiān, S, N1, K4");
-  EXPECT_EQ(f('5'), "1/501:  炒  Rad 火(86), Strokes 8, chǎo, K1");
+      f('3'), "1/250:  闘  Rad 鬥(191), Strokes 18, dòu, S, N1, Old 鬭, K4");
+  EXPECT_EQ(
+      f('4'), "1/250:  贈  Rad 貝(154), Strokes 18, zèng, S, N2, Old 贈, K4");
+  EXPECT_EQ(f('5'), "1/250:  彩  Rad 彡(59), Strokes 11, cǎi, S, N1, K4");
+  EXPECT_EQ(f('6'), "1/250:  添  Rad 水(85), Strokes 11, tiān, S, N1, K4");
+  EXPECT_EQ(f('7'), "1/250:  釧  Rad 金(167), Strokes 11, chuàn, KJ1");
+  EXPECT_EQ(f('8'), "1/250:  炒  Rad 火(86), Strokes 8, chǎo, K1");
+  EXPECT_EQ(f('9'), "1/251:  蒋  Rad 艸(140), Strokes 13, jiǎng, Old 蔣, KJ1");
 }
 
 TEST_F(ListQuizTest, GradeLists) {

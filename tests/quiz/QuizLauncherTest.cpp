@@ -98,7 +98,7 @@ TEST_F(QuizLauncherTest, MultipleQuizTypes) {
 
 TEST_F(QuizLauncherTest, InvalidFormat) {
   for (const auto i :
-      {"-g7", "-f6", "-kd", "-l6", "-m0", "-p5", "-tx", "-ry"}) {
+      {"-g7", "-fa", "-kd", "-l6", "-m0", "-p5", "-tx", "-ry"}) {
     const char* args[]{"", i};
     const auto f{[&args] {
       QuizLauncher{args, _data, _groupData, _jukugoData};

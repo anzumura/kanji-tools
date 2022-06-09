@@ -151,12 +151,11 @@ TEST_F(FileKanjiDataTest, LevelTotals) {
 
 TEST_F(FileKanjiDataTest, FrequencyTotals) {
   size_t i{};
-  EXPECT_EQ(_data->frequencyList(i).size(), 500);
-  EXPECT_EQ(_data->frequencyList(++i).size(), 500);
-  EXPECT_EQ(_data->frequencyList(++i).size(), 500);
-  EXPECT_EQ(_data->frequencyList(++i).size(), 500);
-  EXPECT_EQ(_data->frequencyList(++i).size(), 501);
-  EXPECT_EQ(_data->frequencyList(++i).size(), 0);
+  // first 9 buckets have 250 entries and 10th has 251 (then 0 after that)
+  do EXPECT_EQ(_data->frequencyList(i++).size(), KanjiData::FrequencyEntries);
+  while (i < KanjiData::FrequencyBuckets - 1);
+  EXPECT_EQ(_data->frequencyList(i++).size(), KanjiData::FrequencyEntries + 1);
+  EXPECT_EQ(_data->frequencyList(i).size(), 0);
 }
 
 TEST_F(FileKanjiDataTest, SortingAndPrintingQualifiedName) {
@@ -256,8 +255,8 @@ TEST_F(FileKanjiDataTest, UcdChecks) {
   // column so the value is pulled from UCD.
   auto& shrimp{*_data->findByName("蝦")};
   EXPECT_EQ(shrimp.meaning(), "shrimp, prawn");
-  // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and reading
-  // are all pulled from UCD (and readings are converted to Kana).
+  // 'dull' is only in 'frequency.txt' so radical, strokes, meaning and
+  // reading are all pulled from UCD (and readings are converted to Kana).
   auto& dull{*_data->findByName("呆")};
   EXPECT_EQ(dull.radical(), _data->getRadicalByName("口"));
   EXPECT_EQ(dull.strokes().value(), 7);
@@ -294,14 +293,15 @@ TEST_F(FileKanjiDataTest, UcdLinksMapToNewName) {
 }
 
 TEST_F(FileKanjiDataTest, UnicodeBlocksAndSources) {
-  // Only some Ucd Kanji are in the 'rare' blocks. All other types (like Jouyou,
-  // Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
+  // Only some Ucd Kanji are in the 'rare' blocks. All other types (like
+  // Jouyou, Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
   uint32_t rareUcd{};
   std::map<String, uint32_t> rareMissingJSource;
   std::map<KanjiTypes, uint32_t> missingJSource;
   for (auto& i : _data->ucd().map()) {
     auto& u{i.second};
-    // at least one of 'on', 'kun', 'jSource' or 'morohashiId' must have a value
+    // at least one of 'on', 'kun', 'jSource' or 'morohashiId' must have a
+    // value
     EXPECT_FALSE(u.onReading().empty() && u.kunReading().empty() &&
                  u.jSource().empty() && !u.morohashiId());
     if (isRareKanji(i.first)) {
@@ -316,7 +316,8 @@ TEST_F(FileKanjiDataTest, UnicodeBlocksAndSources) {
       if (const auto t{_data->getType(i.first)}; t == KanjiTypes::LinkedOld)
         EXPECT_EQ(i.first, "絕"); // old form of 絶 doesn't have a jSource
       else
-        ++missingJSource[t]; // other with empty jSource should be Kentei or Ucd
+        ++missingJSource[t]; // other with empty jSource should be Kentei or
+                             // Ucd
     } else
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
       EXPECT_NE(u.sources().find('J'), String::npos);
@@ -334,7 +335,8 @@ TEST_F(FileKanjiDataTest, UcdLinks) {
   uint32_t jouyou{}, jinmei{}, jinmeiLinks{}, jinmeiLinksToJouyou{},
       jinmeiLinksToJinmei{};
   std::map<KanjiTypes, uint32_t> otherLinks;
-  // every 'linkName' should be different than 'name' and also exist in the map
+  // every 'linkName' should be different than 'name' and also exist in the
+  // map
   for (auto& i : ucd) {
     auto& u{i.second};
     // every Ucd entry should be a wide character, i.e., have 'display size' 2
@@ -400,8 +402,9 @@ TEST_F(FileKanjiDataTest, SortByQualifiedName) {
   const auto find{[](const String& name, auto t, auto s, Kanji::Frequency f,
                       const String& u = EmptyString) {
     auto k{_data->findByName(name)};
-    // can't use 'ASSERT' in a function returning non-void so throw an exception
-    // if not found (which never happens by design of the rest of this test)
+    // can't use 'ASSERT' in a function returning non-void so throw an
+    // exception if not found (which never happens by design of the rest of
+    // this test)
     if (!k) throw DomainError(name + " not found");
     // verify attributes of the Kanji found match expected values
     EXPECT_EQ(k->type(), t);
@@ -423,8 +426,8 @@ TEST_F(FileKanjiDataTest, SortByQualifiedName) {
   const auto check{[](auto& x, auto& y, bool strokes = true) {
     EXPECT_TRUE(KanjiData::OrderByQualifiedName(x, y));
     EXPECT_FALSE(KanjiData::OrderByQualifiedName(y, x));
-    // OrderByStrokes is the same as OrderByQualifiedName if both Kanji are the
-    // same 'qualified name rank'
+    // OrderByStrokes is the same as OrderByQualifiedName if both Kanji are
+    // the same 'qualified name rank'
     EXPECT_EQ(KanjiData::OrderByStrokes(x, y), strokes);
     EXPECT_EQ(KanjiData::OrderByStrokes(y, x), !strokes);
   }};
