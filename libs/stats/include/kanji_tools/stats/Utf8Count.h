@@ -7,9 +7,9 @@
 #include <optional>
 #include <regex>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \stats_group{Utf8Count}
 
-// 'Utf8Count' counts multi-byte characters in strings passed to 'add' functions
+/// counts multi-byte characters in strings passed to add() \stats{Utf8Count}
 class Utf8Count {
 public:
   using Map = std::map<String, size_t>;
@@ -17,54 +17,59 @@ public:
   using OptRegex = std::optional<std::wregex>;
   using OptString = std::optional<String>;
 
-  // 'RemoveFurigana' is a regex for removing Furigana from text files. It can
-  // be passed to Utf8Count ctor. Furigana is usually a Kanji followed by one or
-  // more Kana characters inside wide brackets. This regex matches a Kanji (or
-  // wide letter) followed by bracketed Kana (and 'DefaultReplace' replaces it
-  // with just just the Kanji match part). See Utf8CharTest.cpp for examples of
-  // how the regex works. Note, almost all Furigana is Hiragana, but sometimes
-  // Katakana can also be used like: 護謨製（ゴムせい）.
+  /// regex to remove Furigana from text files (can be passed to Utf8Count ctor)
+  /// \details Furigana is usually a Kanji followed by one or more Kana inside
+  /// wide brackets. This regex matches a Kanji (or wide letter) followed by
+  /// bracketed Kana (and #DefaultReplace replaces it with just just the Kanji
+  /// match part). See Utf8CharTest.cpp for examples of how the regex works.
+  /// \note almost all Furigana is Hiragana, but sometimes Katakana can also be
+  /// used like: 護謨製（ゴムせい）.
   static const std::wregex RemoveFurigana;
 
-  // 'DefaultReplace' is used as the default replacement string in below ctor to
-  // replace the contents in brackets with itself (and get rid of the rest of
-  // the string). It can be used in combination with 'RemoveFurigana' regex.
+  /// used as the default replacement string in Utf8Count ctor to replace the
+  /// contents in brackets with itself (and get rid of the rest of the string).
+  /// \details can be used in combination with #RemoveFurigana
   static const std::wstring DefaultReplace;
 
-  // if 'find' regex is provided it's applied before processing for counting
+  /// if `find` is provided it's applied before processing for counting
   explicit Utf8Count(const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {});
 
   Utf8Count(const Utf8Count&) = delete;
   virtual ~Utf8Count() = default;
 
-  // 'add' adds all the 'Utf8Chars' from the given string 's' and returns the
-  // number added. If 'tag' is provided then '_tags' will be updated (which
-  // contains a count per tag per unique token).
+  /// adds all UTF-8 characters from `s`
+  /// \param s UTF-8 string
+  /// \param tag if provided then #_tags is updated (with count per `tag`)
+  /// \return number of characters added
   size_t add(const String& s, const OptString& tag = {});
 
-  // 'addFile' adds strings from given 'file' or from all files in directory (if
-  // file is 'directory'). 'fileNames' controls whether the name of the file (or
-  // directory) should also be included in the count and 'recurse' determines if
-  // subdirectories are also searched. By default, file names are used as 'tag'
-  // values when calling 'add'.
+  /// add all UTF-8 characters from `file` if it's a regular file or all files
+  /// contained in `file` if it's a directory
+  /// \param file regular file or directory
+  /// \param addTag true means use file names as tags when calling add()
+  /// \param fileNames true means also count characters used in the file names
+  /// \param recurse true means add files from directories found in `file` (if
+  ///     `file` is a directory) and keep recursing. Otherwise don't process any
+  ///     deeper than one level, i.e., just add first level children of `file`.
+  /// \return number of characters added
   size_t addFile(const std::filesystem::path& file, bool addTag = true,
       bool fileNames = true, bool recurse = true);
 
-  // return count for given string or 0 if not found
+  /// return count (number of occurrences) for `s` or `0` if not found
   [[nodiscard]] size_t count(const String& s) const;
 
-  // return an optional Map of 'tag to count' for the given Utf8Char 's'
+  /// return an optional Map of 'tag to count' for tag `s`
   [[nodiscard]] const Map* tags(const String& s) const;
 
   [[nodiscard]] auto uniqueEntries() const { return _map.size(); }
   [[nodiscard]] auto files() const { return _files; }
   [[nodiscard]] auto directories() const { return _directories; }
 
-  // returns number of lines changed due to 'replace' regex
+  /// return number of lines changed by regex passed into the ctor
   [[nodiscard]] auto replacements() const { return _replacements; }
 
-  // returns last tag (file name) that had line replaced (if 'addTag' is used)
+  /// return last tag (file name) that had a line replaced (if 'addTag' is used)
   [[nodiscard]] auto& lastReplaceTag() const { return _lastReplaceTag; }
 
   [[nodiscard]] auto errors() const { return _errors; }
@@ -73,24 +78,36 @@ public:
   [[nodiscard]] auto& map() const { return _map; }
   [[nodiscard]] auto debug() const { return _debug; }
 private:
-  // 'hasUnclosedBrackets' returns true if 'line' has an open bracket without a
-  // closing bracket (searching back from the end), otherwise it returns false.
+  /// return true if `line` has an open bracket without a closing bracket when
+  /// searching back from the end
   [[nodiscard]] static bool hasUnclosedBrackets(const String& line);
 
-  // 'processJoinedLine' returns count from processing 'prevline' plus 'line' up
-  // until 'pos' (plus size of close bracket) and sets 'prevLine' to the
-  // unprocessed remainder of 'line'.
+  /// used to process parts of two lines together to help with cases of open and
+  /// close brackets spanning across lines (for Furigana replacement)
+  /// \param[in,out] prevLine pass in unprocessed part of previous line, this is
+  ///     then set to unprocessed part of `line` (ie from `pos` + close bracket)
+  /// \param line current line read from file
+  /// \param pos location of start of first close bracket in `line`
+  /// \param tag if provided then #_tags is updated (with count per `tag`)
+  /// \return count of multi-byte characters found in the joined lines
   [[nodiscard]] size_t processJoinedLine(
       String& prevLine, const String& line, size_t pos, const OptString& tag);
 
-  // 'processFile' returns the Utf8Char count from 'file'. If '_find' is not set
-  // then each line is processed independently, otherwise 'hasUnclosedBrackets'
-  // and 'processJoinedLine' are used to join up to two lines together before
-  // calling 'add' to help '_find' match against larger sets of data. The focus
-  // on brackets is to help removing furigana which is in brackets after a kanji
-  // and can potentially span across lines of a text file.
+  /// process one file (when no regex has been set) line by line
+  /// \param file regular file
+  /// \param tag if provided then #_tags is updated (with count per `tag`)
+  /// \return number of multi-byte characters found in `file`
   [[nodiscard]] size_t processFile(
       const std::filesystem::path& file, const OptString& tag);
+
+  /// process one file and apply the regex passed to the ctor before counting
+  /// \details hasUnclosedBrackets() and processJoinedLines() are used to help
+  /// the regex match larger sets of data. The focus on brackets is to help
+  /// removing Furigana which is in brackets after Kanji and can potentially
+  /// span across lines of a text file.
+  /// \param file regular file
+  /// \param tag if provided then #_tags is updated (with count per `tag`)
+  /// \return number of multi-byte characters found in `file`
   [[nodiscard]] size_t processFileWithRegex(
       const std::filesystem::path& file, const OptString& tag);
 
@@ -113,16 +130,17 @@ private:
   std::ostream* const _debug;
 };
 
-template<typename Pred> class Utf8CountIf : public Utf8Count {
+template<typename T> class Utf8CountIf : public Utf8Count {
 public:
-  explicit Utf8CountIf(Pred pred, const OptRegex& find = {},
+  explicit Utf8CountIf(T pred, const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : Utf8Count{find, replace, debug}, _pred{pred} {}
 private:
   [[nodiscard]] bool allowAdd(const String& token) const override {
     return _pred(token);
   }
-  const Pred _pred;
+  const T _pred;
 };
 
+/// \end_group
 } // namespace kanji_tools

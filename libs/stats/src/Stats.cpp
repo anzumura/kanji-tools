@@ -4,7 +4,6 @@
 
 #include <future>
 #include <numeric>
-#include <sstream>
 
 namespace kanji_tools {
 
@@ -22,43 +21,103 @@ constexpr auto HelpMessage{R"(kanjiStats [-bhv] file [file ...]:
   return static_cast<double>(amount) * 100. / static_cast<double>(total);
 }
 
-// helper class for ordering and printing out Kanji found in files
-class Count { // LCOV_EXCL_LINE
-public:
-  Count(size_t f, const String& n, const KanjiPtr& e)
-      : _count{f}, _name{n}, _entry{e} {}
+} // namespace
 
-  [[nodiscard]] auto frequency() const {
-    return _entry ? _entry->frequencyOrDefault(KanjiData::maxFrequency())
-                  : KanjiData::maxFrequency() + 1;
+Stats::Stats(const Args& args, const KanjiDataPtr& data) : _data(data) {
+  auto breakdown{false}, endOptions{false}, verbose{false};
+  std::vector<String> files;
+  for (auto i{KanjiData::nextArg(args)}; i < args.size();
+       i = KanjiData::nextArg(args, i))
+    if (String arg{args[i]}; !endOptions && arg.starts_with("-")) {
+      if (arg == "-h") {
+        out() << HelpMessage;
+        return;
+      }
+      if (arg == "-b")
+        breakdown = true;
+      else if (arg == "-v")
+        verbose = true;
+      else if (arg == "--")
+        endOptions = true;
+      else
+        KanjiData::usage("illegal option '" + arg + "' use -h for help");
+    } else
+      files.emplace_back(arg);
+  if (!data->debug() && files.empty())
+    KanjiData::usage("please specify at least one option or '-h' for help");
+  for (auto& i : files) countKanji(i, breakdown, verbose);
+}
+
+void Stats::countKanji(
+    const fs::path& top, bool showBreakdown, bool verbose) const {
+  const auto f{[=, this, &top](const auto& pred, const String& name,
+                   bool firstCount = false) {
+    // NOLINTNEXTLINE
+    auto p{std::make_shared<Pred>(_data, top, name, showBreakdown)};
+    return std::pair(std::async(std::launch::async,
+                         [=] { return p->run(pred, verbose, firstCount); }),
+        p);
+  }};
+  // 2579 Kanji loaded by this program fall into 'Rare' blocks (and they are all
+  // type 'Ucd'). All other types (like Jouyou, Jinmei, etc.) are in 'Common'
+  // blocks (see UnicodeBlock.h and KanjiDataTest.cpp 'CommonAndRareBlocks').
+  std::array totals{
+      f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
+      f([](const auto& x) { return isKatakana(x); }, "Katakana"),
+      f([this](const auto& x) { return isCommonKanji(x) && _data->findUcd(x); },
+          "Common Kanji"),
+      f([this](const auto& x) { return isRareKanji(x) && _data->findUcd(x); },
+          "Rare Kanji"),
+      f([this](const auto& x) { return isKanji(x) && !_data->findUcd(x); },
+          "Non-UCD Kanji"),
+      f([](const auto& x) { return isMBPunctuation(x); }, "MB-Punctuation"),
+      f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
+      f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
+      f([](const auto& x) { return !isRecognizedUtf8(x); }, "Unrecognized")};
+  for (auto& i : totals) out() << i.first.get();
+  size_t total{};
+  for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();
+  log() << "Total Kana+Kanji: " << total;
+  if (total) {
+    out() << " (" << std::fixed << std::setprecision(1);
+    size_t totalKanji{};
+    for (size_t i{}; i < IncludeInTotals; ++i)
+      if (totals[i].second->isKanji())
+        totalKanji += totals[i].second->total();
+      else if (totals[i].second->total())
+        out() << totals[i].second->name() << ": "
+              << asPercent(totals[i].second->total(), total) << "%, ";
+    out() << "Kanji: " << asPercent(totalKanji, total) << "%)";
   }
-  [[nodiscard]] auto type() const {
-    return _entry ? _entry->type() : KanjiTypes::None;
-  }
+  out() << '\n';
+}
 
-  // Sort to have largest 'count' first followed by lowest frequency number.
-  // Lower frequency means the kanji is more common, but a frequency of '0'
-  // means the kanji isn't in the top frequency list so use 'frequencyOrDefault'
-  // to return a large number for no-frequency kanji and consider 'not-found'
-  // kanji to have even higher (worse) frequency. If kanjis both have the same
-  // 'count' and 'frequency' then sort by type then name.
-  [[nodiscard]] auto operator<(const Count& x) const {
-    return _count > x._count ||
-           (_count == x._count && frequency() < x.frequency() ||
-               (frequency() == x.frequency() && type() < x.type() ||
-                   (type() == x.type() && _name < x._name)));
-  }
+std::ostream& Stats::log(bool heading) const { return _data->log(heading); }
 
-  [[nodiscard]] auto count() const { return _count; }
-  [[nodiscard]] auto& name() const { return _name; }
-  [[nodiscard]] auto& entry() const { return _entry; }
-private:
-  size_t _count;
-  String _name;
-  KanjiPtr _entry;
-};
+std::ostream& Stats::out() const { return _data->out(); }
 
-std::ostream& operator<<(std::ostream& os, const Count& c) {
+/// Stats::Count
+
+Stats::Count::Count(size_t count, const String& name, const KanjiPtr& entry)
+    : _count{count}, _name{name}, _entry{entry} {}
+
+Kanji::Frequency Stats::Count::frequency() const {
+  return _entry ? _entry->frequencyOrDefault(KanjiData::maxFrequency())
+                : KanjiData::maxFrequency() + 1;
+}
+
+KanjiTypes Stats::Count::type() const {
+  return _entry ? _entry->type() : KanjiTypes::None;
+}
+
+bool Stats::Count::operator<(const Count& x) const {
+  return _count > x._count ||
+         (_count == x._count && frequency() < x.frequency() ||
+             (frequency() == x.frequency() && type() < x.type() ||
+                 (type() == x.type() && _name < x._name)));
+}
+
+std::ostream& operator<<(std::ostream& os, const Stats::Count& c) {
   static constexpr auto FreqWidth{5};
   os << '[' << c.name() << ' ' << std::right << std::setw(4) << c.count()
      << ']';
@@ -72,55 +131,15 @@ std::ostream& operator<<(std::ostream& os, const Count& c) {
   return os;
 }
 
-// 'IncludeInTotals' of 4 indicates only Kanji and full-width kana should be
-// included in totals and percents 'MaxExamples' is the maximum number of
-// examples to show for each kanji type when printing stats
-constexpr size_t IncludeInTotals{5}, MaxExamples{5};
+// Stats::Pred
 
-// 'StatsPred' is a helper class for gathering stats matching a predicate (Pred)
-// function across a group of files. The 'run' method is thread-safe and the
-// results can be retrieved via the 'total' and 'str' methods.
-class StatsPred {
-public:
-  StatsPred(const KanjiDataPtr& data, const fs::path& top, const String& name,
-      bool showBreakdown)
-      : _data{data}, _top{top}, _name{name},
-        _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
+Stats::Pred::Pred(const KanjiDataPtr& data, const KanjiData::Path& top,
+    const String& name, bool showBreakdown)
+    : _data{data}, _top{top}, _name{name},
+      _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
 
-  template<typename Pred>
-  [[nodiscard]] String run(const Pred&, bool verbose, bool firstCount);
-
-  [[nodiscard]] auto& name() const { return _name; }
-  [[nodiscard]] auto total() const { return _total; }
-  [[nodiscard]] auto isKanji() const { return _isKanji; }
-private:
-  // 'DisplayValues' are for ostream 'set' functions
-  enum IntDisplayValues { // LCOV_EXCL_LINE
-    UniqueCountWidth = 4,
-    TotalCountWidth = 6,
-    TypeNameWidth = 16
-  };
-  enum PercentDisplayValues { PercentPrecision = 2, PercentWidth = 6 };
-
-  using CountSet = std::set<Count>;
-
-  void printHeaderInfo(const Utf8Count&);
-  void printTotalAndUnique(const String& name, size_t total, size_t unique);
-  void printKanjiTypeCounts(const std::set<Count>&);
-  void printRareExamples(const CountSet&);
-  void printBreakdown(const CountSet&, const Utf8Count&);
-
-  const KanjiDataPtr _data;
-  const fs::path& _top;
-  const String _name;
-  const bool _showBreakdown;
-  const bool _isKanji;
-  size_t _total{};
-  std::stringstream _os;
-};
-
-template<typename Pred>
-String StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
+template<typename T>
+String Stats::Pred::run(const T& pred, bool verbose, bool firstCount) {
   const auto isHiragana{_name == "Hiragana"},
       isUnrecognized{_name == "Unrecognized"},
       isCommonKanji{_isKanji && _name.starts_with("Common")};
@@ -160,7 +179,7 @@ String StatsPred::run(const Pred& pred, bool verbose, bool firstCount) {
   return _os.str();
 }
 
-void StatsPred::printHeaderInfo(const Utf8Count& count) {
+void Stats::Pred::printHeaderInfo(const Utf8Count& count) {
   const auto file{_top.filename()};
   _os << ">>> Stats for: '"
       << (file.has_filename() ? file : _top.parent_path().filename()).string()
@@ -180,14 +199,14 @@ void StatsPred::printHeaderInfo(const Utf8Count& count) {
   _os << '\n';
 }
 
-void StatsPred::printTotalAndUnique(
+void Stats::Pred::printTotalAndUnique(
     const String& name, size_t total, size_t unique) {
   _os << ">>> " << std::right << std::setw(TypeNameWidth) << name << ": "
       << std::setw(TotalCountWidth) << total
       << ", unique: " << std::setw(UniqueCountWidth) << unique;
 }
 
-void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
+void Stats::Pred::printKanjiTypeCounts(const std::set<Count>& frequency) {
   std::map<KanjiTypes, size_t> totalKanjiPerType, uniqueKanjiPerType;
   std::map<KanjiTypes, std::vector<Count>> found;
   for (const auto& i : frequency) {
@@ -214,7 +233,7 @@ void StatsPred::printKanjiTypeCounts(const std::set<Count>& frequency) {
     }
 }
 
-void StatsPred::printRareExamples(const CountSet& frequency) {
+void Stats::Pred::printRareExamples(const CountSet& frequency) {
   // percents aren't shown before rare examples so add spacing to align output
   static constexpr auto SkipPercentageWidth{12};
   _os << std::setw(SkipPercentageWidth) << '(';
@@ -226,7 +245,7 @@ void StatsPred::printRareExamples(const CountSet& frequency) {
   _os << ")\n";
 }
 
-void StatsPred::printBreakdown(
+void Stats::Pred::printBreakdown(
     const CountSet& frequency, const Utf8Count& count) {
   _os << ">>> Showing Breakdown for '" << _name << "':\n  Rank  [Val Num]"
       << (_isKanji && !_name.starts_with("Non-UCD")
@@ -252,78 +271,6 @@ void StatsPred::printBreakdown(
     }
     _os << '\n';
   }
-}
-
-} // namespace
-
-Stats::Stats(const Args& args, const KanjiDataPtr& data) : _data(data) {
-  auto breakdown{false}, endOptions{false}, verbose{false};
-  std::vector<String> files;
-  for (auto i{KanjiData::nextArg(args)}; i < args.size();
-       i = KanjiData::nextArg(args, i))
-    if (String arg{args[i]}; !endOptions && arg.starts_with("-")) {
-      if (arg == "-h") {
-        out() << HelpMessage;
-        return;
-      }
-      if (arg == "-b")
-        breakdown = true;
-      else if (arg == "-v")
-        verbose = true;
-      else if (arg == "--")
-        endOptions = true;
-      else
-        KanjiData::usage("illegal option '" + arg + "' use -h for help");
-    } else
-      files.emplace_back(arg);
-  if (!data->debug() && files.empty())
-    KanjiData::usage("please specify at least one option or '-h' for help");
-  for (auto& i : files) countKanji(i, breakdown, verbose);
-}
-
-void Stats::countKanji(
-    const fs::path& top, bool showBreakdown, bool verbose) const {
-  const auto f{[=, this, &top](const auto& pred, const String& name,
-                   bool firstCount = false) {
-    // NOLINTNEXTLINE
-    auto p{std::make_shared<StatsPred>(_data, top, name, showBreakdown)};
-    return std::pair(std::async(std::launch::async,
-                         [=] { return p->run(pred, verbose, firstCount); }),
-        p);
-  }};
-  // 2579 Kanji are loaded into this program fall into the 'Rare' blocks (and
-  // they are all type 'Ucd'). All other types (like Jouyou, Jinmei, etc.) are
-  // in the 'Common' blocks (see comments in UnicodeBlock.h and
-  // KanjiDataTest.cpp 'CommonAndRareBlocks').
-  std::array totals{
-      f([](const auto& x) { return isHiragana(x); }, "Hiragana", true),
-      f([](const auto& x) { return isKatakana(x); }, "Katakana"),
-      f([this](const auto& x) { return isCommonKanji(x) && _data->findUcd(x); },
-          "Common Kanji"),
-      f([this](const auto& x) { return isRareKanji(x) && _data->findUcd(x); },
-          "Rare Kanji"),
-      f([this](const auto& x) { return isKanji(x) && !_data->findUcd(x); },
-          "Non-UCD Kanji"),
-      f([](const auto& x) { return isMBPunctuation(x); }, "MB-Punctuation"),
-      f([](const auto& x) { return isMBSymbol(x); }, "MB-Symbol"),
-      f([](const auto& x) { return isMBLetter(x); }, "MB-Letter"),
-      f([](const auto& x) { return !isRecognizedUtf8(x); }, "Unrecognized")};
-  for (auto& i : totals) out() << i.first.get();
-  size_t total{};
-  for (size_t i{}; i < IncludeInTotals; ++i) total += totals[i].second->total();
-  log() << "Total Kana+Kanji: " << total;
-  if (total) {
-    out() << " (" << std::fixed << std::setprecision(1);
-    size_t totalKanji{};
-    for (size_t i{}; i < IncludeInTotals; ++i)
-      if (totals[i].second->isKanji())
-        totalKanji += totals[i].second->total();
-      else if (totals[i].second->total())
-        out() << totals[i].second->name() << ": "
-              << asPercent(totals[i].second->total(), total) << "%, ";
-    out() << "Kanji: " << asPercent(totalKanji, total) << "%)";
-  }
-  out() << '\n';
 }
 
 } // namespace kanji_tools
