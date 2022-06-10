@@ -72,7 +72,7 @@ public:
   [[nodiscard]] static const MorohashiId& getMorohashiId(UcdPtr) noexcept;
 
   /// return list of 'Classic Nelson' ids from `u` or empty list if `u` is null
-  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr u) noexcept;
+  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr u);
 
   KanjiData(const KanjiData&) = delete; ///< deleted copy ctor
   virtual ~KanjiData() = default;       ///< default dtor
@@ -204,11 +204,11 @@ private:
   /// This map only has entries for Kanji that were loaded with a selector.
   std::map<String, String> _compatibilityMap;
 
-  /// each EnumMap has a Kanji list per enum value (excluding 'None' values)
+  /// each EnumMap has a Kanji list per enum value (excluding 'None' values) @{
   KanjiEnumMap<KanjiTypes> _types;
   KanjiEnumMap<KanjiGrades> _grades;
   KanjiEnumMap<JlptLevels> _levels;
-  KanjiEnumMap<KenteiKyus> _kyus;
+  KanjiEnumMap<KenteiKyus> _kyus; ///@}
 
   std::array<List, FrequencyBuckets> _frequencies;
 

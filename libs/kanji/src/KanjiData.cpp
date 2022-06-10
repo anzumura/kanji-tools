@@ -44,14 +44,13 @@ const MorohashiId& KanjiData::getMorohashiId(UcdPtr u) noexcept {
   return u ? u->morohashiId() : EmptyMorohashiId;
 }
 
-Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) noexcept {
+Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) {
   Kanji::NelsonIds ids;
   if (u && !u->nelsonIds().empty()) {
     auto s{u->nelsonIds()};
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss{s};
     Kanji::NelsonId id{};
-    // could potentially throw if out of memory, but terminate in that case
     while (ss >> id) ids.emplace_back(id);
   }
   return ids;
