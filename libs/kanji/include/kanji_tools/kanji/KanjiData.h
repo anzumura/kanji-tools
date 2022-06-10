@@ -21,11 +21,11 @@ public:
   using Path = KanjiListFile::Path;
 
   inline static const String DataArg{"-data"}, ///< arg to specify 'data' dir
-      DebugArg{"-debug"},                      ///< arg to #DebugMode to 'Full'
-      InfoArg{"-info"};                        ///< arg to #DebugMode to 'Info'
+      DebugArg{"-debug"},                      ///< arg for 'Full' #DebugMode
+      InfoArg{"-info"};                        ///< arg for 'Info' #DebugMode
 
   /// top 2501 frequency (most commonly occurring) Kanji are grouped into 10
-  /// 'buckets': each having 250 entries except the last which has 251 @{
+  /// 'buckets', each having 250 entries except the last which has 251 @{
   static constexpr Kanji::Frequency FrequencyBuckets{10}, FrequencyEntries{250};
   ///@}
 
@@ -41,7 +41,7 @@ public:
   /// \endcode
   [[nodiscard]] static Args::Size nextArg(const Args&, Args::Size current = 0);
 
-  // 'DebugMode' is controlled by #DebugArg and InfoArg command-line options:
+  /// controlled by #DebugArg and InfoArg command-line options:
   enum class DebugMode {
     Full, ///< print all debug info and then exit
     Info, ///< print summary info and then exit
@@ -53,32 +53,32 @@ public:
   /// \throw DomainError containing `msg`
   static void usage(const String& msg) { KanjiListFile::usage(msg); }
 
-  /// lambda to sort shared pointers to Kanji by 'qualified name' (see Kanji.h)
+  /// lambda to sort shared Kanji pointers by 'qualified name' (see Kanji.h)
   static constexpr auto OrderByQualifiedName{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
 
-  /// lambda to sort shared pointers to Kanji by 'strokes' (see Kanji.h)
+  /// lambda to sort shared Kanji pointers by 'strokes' (see Kanji.h)
   static constexpr auto OrderByStrokes{
       [](KanjiPtr& a, KanjiPtr& b) { return a->orderByStrokes(*b); }};
 
   /// return `highest frequency + 1` out of all the currently loaded Kanji
   /// \details 'frequency' numbers start at `1` which means 'the most frequent'
-  [[nodiscard]] static Kanji::Frequency maxFrequency();
+  [[nodiscard]] static Kanji::Frequency maxFrequency() noexcept;
 
   /// return `u->pinyin()` or an empty value if `u` is null
-  [[nodiscard]] static const Pinyin& getPinyin(UcdPtr u);
+  [[nodiscard]] static const Pinyin& getPinyin(UcdPtr u) noexcept;
 
   /// return `u->morohashiId()' or an empty id if `u` is null
-  [[nodiscard]] static const MorohashiId& getMorohashiId(UcdPtr);
+  [[nodiscard]] static const MorohashiId& getMorohashiId(UcdPtr) noexcept;
 
   /// return list of 'Classic Nelson' ids from `u` or empty list if `u` is null
-  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr u);
+  [[nodiscard]] static Kanji::NelsonIds getNelsonIds(UcdPtr u) noexcept;
 
   KanjiData(const KanjiData&) = delete; ///< deleted copy ctor
   virtual ~KanjiData() = default;       ///< default dtor
 
   /// return const ref to the UcdData object
-  [[nodiscard]] auto& ucd() const { return _ucd; }
+  [[nodiscard]] auto& ucd() const noexcept { return _ucd; }
 
   /// return a pointer to a Ucd object for `kanjiName` or nullptr if not found
   [[nodiscard]] UcdPtr findUcd(const String& kanjiName) const;

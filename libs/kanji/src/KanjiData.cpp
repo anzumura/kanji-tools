@@ -32,25 +32,26 @@ Args::Size KanjiData::nextArg(const Args& args, Args::Size current) {
   return result;
 }
 
-Kanji::Frequency KanjiData::maxFrequency() { return _maxFrequency; }
+Kanji::Frequency KanjiData::maxFrequency() noexcept { return _maxFrequency; }
 
-const Pinyin& KanjiData::getPinyin(UcdPtr u) {
+const Pinyin& KanjiData::getPinyin(UcdPtr u) noexcept {
   static constexpr Pinyin EmptyPinyin;
   return u ? u->pinyin() : EmptyPinyin;
 }
 
-const MorohashiId& KanjiData::getMorohashiId(UcdPtr u) {
+const MorohashiId& KanjiData::getMorohashiId(UcdPtr u) noexcept {
   static constexpr MorohashiId EmptyMorohashiId; // LCOV_EXCL_LINE
   return u ? u->morohashiId() : EmptyMorohashiId;
 }
 
-Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) {
+Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) noexcept {
   Kanji::NelsonIds ids;
   if (u && !u->nelsonIds().empty()) {
     auto s{u->nelsonIds()};
     std::replace(s.begin(), s.end(), ',', ' ');
     std::stringstream ss{s};
     Kanji::NelsonId id{};
+    // could potentially throw if out of memory, but terminate in that case
     while (ss >> id) ids.emplace_back(id);
   }
   return ids;

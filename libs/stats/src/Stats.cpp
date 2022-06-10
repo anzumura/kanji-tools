@@ -50,7 +50,7 @@ Stats::Stats(const Args& args, const KanjiDataPtr& data) : _data(data) {
 
 void Stats::countKanji(
     const fs::path& top, bool showBreakdown, bool verbose) const {
-  // lambda to create a 'Stats::Pred, Future[String]' pair for each `pred`
+  // lambda to create a 'pair<shared_ptr<Stats::Pred>, Future<String>>'
   const auto f{[=, this, &top](const auto& pred, const String& name,
                    bool firstCount = false) {
     // NOLINTNEXTLINE
@@ -145,7 +145,7 @@ String Stats::Pred::run(const T& pred, bool verbose, bool firstCount) {
       isCommonKanji{_isKanji && _name.starts_with("Common")};
 
   // Remove Furigana when processing Hiragana or MB-Letter to remove the effect
-  // on counts, i.e., furigana in .txt files will artificially inflate Hiragana
+  // on counts, i.e., Furigana in .txt files will artificially inflate Hiragana
   // count (and MB-Letter because of the wide brackets)
   const auto removeFurigana{
       isHiragana || _name == "Katakana" || _name == "MB-Letter"};
