@@ -91,7 +91,6 @@ bool GroupQuiz::includeMember(const Kanji& k) const {
 
 void GroupQuiz::addOtherGroupName(const String& name, String& s) const {
   const auto add{[this, &name, &s](const auto& map) {
-    // NOLINTNEXTLINE: NonNullParamChecker
     if (const auto j{map.find(name)}; j != map.end()) {
       s += _groupType == GroupType::Meaning ? 'p' : 'm';
       s += ':';

@@ -134,8 +134,7 @@ void UcdData::load(const KanjiData::Path& file) {
 void UcdData::print(KanjiDataRef data) const {
   PrintCount joyo, jinmei, other;
   const auto print{[&](const char* s, auto f) {
-    // NOLINTNEXTLINE: CallAndMessage
-    const auto x{(joyo.*f)()}, y{(jinmei.*f)()}, z{(other.*f)()};
+    const auto x{(joyo.*f)()}, y{(jinmei.*f)()}, z{(other.*f)()}; // NOLINT
     data.log() << "  " << s << ": " << x + y + z << " (Jouyou " << x
                << ", Jinmei " << y << ", Other " << z << ")\n";
   }};

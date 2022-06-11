@@ -53,7 +53,6 @@ void Stats::countKanji(
   // lambda to create a 'pair<shared_ptr<Stats::Pred>, Future<String>>'
   const auto f{[=, this, &top](const auto& pred, const String& name,
                    bool firstCount = false) {
-    // NOLINTNEXTLINE
     auto p{std::make_shared<Pred>(_data, top, name, showBreakdown)};
     return std::pair{p, std::async(std::launch::async,
                             [=] { return p->run(pred, verbose, firstCount); })};

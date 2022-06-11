@@ -123,7 +123,7 @@ TEST_F(KanaConvertTest, NoStringsAndNoInteractiveMode) {
 
 TEST_F(KanaConvertTest, PrintKanaChart) {
   const char* args[]{"", "-p"};
-  KanaConvert(args, os()); // NOLINT: unused-raii
+  const KanaConvert kc{args, os()};
   String lastLine;
   size_t count{}, found{};
   // just check for a few examples
