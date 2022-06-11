@@ -35,10 +35,10 @@ public:
 private:
   const KanjiData::Path& dataDir(const KanjiData::Path*) const;
 
-  /// add 'kanji'->'group' mapping (no error is logged in this 'MultiMap' override)
+  /// add `kanji` -> `group` mapping, no error is logged in this add() override
   static void add(const String& kanji, MultiMap&, const GroupPtr& group);
 
-  /// add 'kanji'->'group' mapping or log an error if it's already been added
+  /// add `kanji`-> `group` mapping or log an error if it's already been added
   void add(const String& kanji, Map&, const GroupPtr& group) const;
 
   template<typename T>
