@@ -8,7 +8,7 @@
 namespace kanji_tools { /// \kana_group{KanaConvert}
 /// KanaConvert class used by 'kanaConvert' `main` function
 
-/// provides a command line interface and interactive mode for converting
+/// provides a command-line interface and interactive mode for converting
 /// between Hiragana, Katakana and Rōmaji \kana{KanaConvert}
 class KanaConvert final {
 public:
@@ -20,7 +20,7 @@ public:
 private:
   using List = std::vector<String>;
 
-  /// helper function for handling errors during processing of command line args
+  /// helper function for handling errors during processing of command-line args
   /// \throw DomainError
   static void error(const String&);
 
@@ -32,7 +32,7 @@ private:
   [[nodiscard]] bool charTypeArgs(const String&);
   bool flagArgs(char);
 
-  /// print details about command line args
+  /// print details about command-line args
   /// \param showAllOptions set to false to print a shorter usage message which
   ///     is used during interactive mode
   void usage(bool showAllOptions = true) const;

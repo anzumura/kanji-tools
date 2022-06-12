@@ -50,7 +50,7 @@ TEST_F(KanjiDataTest, MissingStrokes) {
       DomainError);
 }
 
-// command line args tests
+// command-line args tests
 
 TEST_F(KanjiDataTest, NextArgWithNoArgs) {
   // passing no args returns 0

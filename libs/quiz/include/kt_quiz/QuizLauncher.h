@@ -80,7 +80,7 @@ private:
   /// called by ctor for 'quiz type' and 'program mode' args
   /// \param[out] question set if `arg` is a 'program mode' ('-t' or '-r')
   /// \param[out] quizType set if `arg` is a 'quiz type' (-f, -g, etc..)
-  /// \param arg command line arg to process
+  /// \param arg command-line arg to process
   /// \return optional 'question list' depending on `arg` - see setQuizType()
   /// \throw DomainError if `arg` isn't a valid option
   [[nodiscard]] OptChar processArg(

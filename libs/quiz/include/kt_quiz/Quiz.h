@@ -18,7 +18,7 @@ public:
   virtual ~Quiz();
 
   /// creates QuizLauncher and it dependencies, this will start an instance of
-  /// either ListQuiz or GroupQuiz depending on command line args.
+  /// either ListQuiz or GroupQuiz depending on command-line args.
   static void run(const Args&, std::ostream& = std::cout);
 protected:
   using Choices = QuizLauncher::Choices;

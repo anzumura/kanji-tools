@@ -13,9 +13,16 @@ namespace kanji_tools { /// \kanji_group{KanjiData}
 /// abstract class used for loading and finding Kanji \kanji{KanjiData}
 ///
 /// This class also provides some generic functionality finding 'data' directory
-/// processing some command line arguments related to debugging.
+/// processing some command-line arguments related to debugging.
 class KanjiData {
 public:
+  /// type of debug output to print, can be set by command-line args
+  enum class DebugMode {
+    Full, ///< print all debug info and then exit
+    Info, ///< print summary info and then exit
+    None  ///< run normally
+  };
+
   using List = std::vector<KanjiPtr>;
   using Map = std::map<String, KanjiPtr>;
   using Path = KanjiListFile::Path;
@@ -31,7 +38,7 @@ public:
 
   /// get the next arg that would not be used by KanjiData class
   /// \details this function is meant to be used by other classes that process
-  /// command line options, but also have a KanjiData class (like Quiz and Stats
+  /// command-line options, but also have a KanjiData class (like Quiz and Stats
   /// programs) - it returns `current + 1` if `args[currentArg + 1]` is not by
   /// this class. If `current + 1` would be used (like '-data', '-info', etc.)
   /// then a larger value is returned to 'skip over' the args. For example:
@@ -41,14 +48,7 @@ public:
   /// \endcode
   [[nodiscard]] static Args::Size nextArg(const Args&, Args::Size current = 0);
 
-  /// controlled by #DebugArg and InfoArg command-line options:
-  enum class DebugMode {
-    Full, ///< print all debug info and then exit
-    Info, ///< print summary info and then exit
-    None  ///< run normally
-  };
-
-  /// called for fatal problems with command line args or loading initial data
+  /// called for fatal problems with command-line args or loading initial data
   /// \param msg the error message
   /// \throw DomainError containing `msg`
   static void usage(const String& msg) { KanjiListFile::usage(msg); }
@@ -145,7 +145,7 @@ protected:
   /// directory name and returns that value if found, otherwise it searches up
   /// the parent directories starting at 'current dir'. Finally if `args[0]` is
   /// a valid path, its parent directories will be searched.
-  /// \param args command line args
+  /// \param args command-line args
   /// \return a directory with the expected number of .txt files
   /// \throw DomainError if an appropriate data directory isn't found
   [[nodiscard]] static Path getDataDir(const Args& args);

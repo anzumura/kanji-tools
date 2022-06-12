@@ -5,9 +5,9 @@
 #include <memory>
 
 namespace kanji_tools { /// \quiz_group{Jukugo}
-/// Jukugo (熟語) class
+/// Jukugo (Japanese compound word) class
 
-/// class for holding a Japanese 'compound word' \quiz{Jukugo}
+/// class for holding a Japanese Jukugo (熟語) \quiz{Jukugo}
 class Jukugo final {
 public:
   /// create a Jukugo object

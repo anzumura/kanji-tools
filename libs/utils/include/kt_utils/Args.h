@@ -5,9 +5,9 @@
 #include <limits>
 
 namespace kanji_tools { /// \utils_group{Args}
-/// Args class for working with command line arguments
+/// Args class for working with command-line arguments
 
-/// class for working with command line args \utils{Args}
+/// class for working with command-line args \utils{Args}
 class Args final {
 public:
   using Size = uint16_t;           ///< type for arg count
@@ -41,10 +41,10 @@ public:
   /// \throw RangeError if `i` is beyond the end of the arg list
   [[nodiscard]] const char* operator[](Size i) const;
 
-  /// return total number of command line args
+  /// return total number of command-line args
   [[nodiscard]] constexpr auto size() const noexcept { return _argc; }
 
-  /// return true if there are command line args, i.e., #size is non-0
+  /// return true if there are command-line args, i.e., #size is non-0
   [[nodiscard]] constexpr explicit operator bool() const noexcept {
     return _argc;
   }

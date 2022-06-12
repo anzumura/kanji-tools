@@ -16,7 +16,7 @@ namespace kanji_tools { /// \stats_group{Stats}
 class Stats final {
 public:
   /// print stats for files provided in `args`
-  /// \param args command line args (see Stats.cpp HelpMessage for more details)
+  /// \param args command-line args (see Stats.cpp HelpMessage for more details)
   /// \param data used for validating Kanji and printing
   /// \throw DomainError for invalid `args`
   Stats(const Args& args, const KanjiDataPtr& data);
@@ -110,7 +110,7 @@ private:
   [[nodiscard]] std::ostream& log(bool heading = false) const;
   [[nodiscard]] std::ostream& out() const;
 
-  /// called by ctor for each file (or directory) in command line args
+  /// called by ctor for each file (or directory) in command-line args
   /// \param top regular file or directory to process
   /// \param showBreakdown true for detailed breakdown, see Pred()
   /// \param verbose true if before/after versions of lines should be printed

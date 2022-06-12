@@ -285,7 +285,7 @@ Here are some runtime memory and (statically linked) file sizes for **kanjiQuiz*
 
 ## Kanji Stats
 
-The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command line options. In order to get more accurate stats about percentages of *Kanji*, *Hiragana* and *Katakana*, the program attempts to strip away all *Furigana* before counting.
+The **kanjiStats** program takes a list of one or more files (or directories) and outputs a summary of counts of various types of multi-byte characters. More detailed information can also be shown depending on command-line options. In order to get more accurate stats about percentages of *Kanji*, *Hiragana* and *Katakana*, the program attempts to strip away all *Furigana* before counting.
 
 Here is the output from processing a set of files containing lyrics for *中島みゆき (Miyuki Nakajima)* songs:
 

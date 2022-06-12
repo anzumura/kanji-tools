@@ -8,6 +8,7 @@
 #include <regex>
 
 namespace kanji_tools { /// \stats_group{Utf8Count}
+/// Utf8Count class hierarchy
 
 /// counts multi-byte characters in strings passed to add() \stats{Utf8Count}
 class Utf8Count {
@@ -130,6 +131,7 @@ private:
   std::ostream* const _debug;
 };
 
+/// count based on a predicate `T` \stats{Utf8Count}
 template<typename T> class Utf8CountIf final : public Utf8Count {
 public:
   explicit Utf8CountIf(T pred, const OptRegex& find = {},
