@@ -6,16 +6,18 @@
 #include <set>
 #include <vector>
 
-namespace kanji_tools {
+namespace kanji_tools { /// \kanji_group{KanjiListFile}
+/// KanjiListFile class
 
-// 'KanjiListFile' holds data loaded from text files that contain unique 'kanji'
-// string entries (either one per line or multiple per line separated by space).
-// Uniqueness is verified when data is loaded and entries are stored in order in
-// a list. There are derived classes for specific data types, i.e., where all
-// entries are for a 'JLPT Level' or a 'Kentei Kyu'.
+/// holds data loaded from files with Kanji string entries \kanji{KanjiListFile}
+///
+/// Kanji can be specified either one per line or multiple per line separated by
+/// space. Uniqueness is verified when data is loaded and entries are stored in
+/// order in a list. There are derived classes for specific data types, i.e.,
+/// where all entries are for a 'JLPT Level' or a 'Kentei Kyu'.
 class KanjiListFile {
 public:
-  using Index = uint16_t; // support up to 65K entries
+  using Index = uint16_t; ///< support up to 65K entries
   using Path = std::filesystem::path;
   using StringList = std::vector<String>;
   using StringSet = std::set<String>;
@@ -24,9 +26,12 @@ public:
 
   static constexpr Index MaxEntries{std::numeric_limits<Index>::max() - 1};
 
-  // 'getFile' checks that 'file' exists in 'dir' and is a regular type file and
-  // then returns the full path. It will also try adding '.txt' extension if
-  // 'file' isn't found and doesn't already have an extension.
+  /// check that `file` exists in `dir` and is a regular type file
+  /// \details will also try adding '.txt' extension if `file` isn't found and
+  /// doesn't already have an extension
+  /// \return full path
+  /// \throw DomainError if `dir` is not a directory or if `file` is not found
+  ///     or is not a regular file
   [[nodiscard]] static Path getFile(const Path& dir, const Path& file);
 
   static void print(std::ostream&, const StringList&, const String& type,
@@ -34,7 +39,8 @@ public:
 
   static void usage(const String& msg) { throw DomainError(msg); }
 
-  // should be called after loading all lists to clean up unneeded static data
+  /// can be called after loading is complete to clear up static data used for
+  /// checking uniqueness
   static void clearUniqueCheckData();
 
   enum class FileType { MultiplePerLine, OnePerLine };
@@ -45,7 +51,7 @@ public:
 
   virtual ~KanjiListFile() = default;
 
-  // return index for 'name' starting at '1' or return '0' for not found.
+  /// return index for `name` starting at `1` or return `0` for not found
   [[nodiscard]] Index getIndex(const String& name) const;
 
   [[nodiscard]] bool exists(const String&) const;
@@ -55,31 +61,40 @@ public:
   [[nodiscard]] auto& list() const { return _list; }
   [[nodiscard]] auto size() const { return _list.size(); }
 
-  // return the full contents of this list in a string (with no separates)
+  /// return the full contents of this list in a string (with no separates)
   [[nodiscard]] String toString() const;
 protected:
   KanjiListFile(const Path&, FileType, StringSet*, const String& name = {});
 private:
   using Map = std::map<String, Index>;
 
-  // 'UniqueNames' ensures uniqueness across non-typed KanjiListFiles
-  // (currently only frequency.txt)
+  /// ensure uniqueness across non-typed KanjiListFile instances (currently only
+  /// applies to 'frequency.txt')
   inline static StringSet UniqueNames;
 
-  // 'OtherUniqueNames' hold pointers to 'UniqueTypeNames' sets (from derived
-  // classes) and is used to facilitate clearing data once everything is loaded
+  /// pointers to `UniqueTypeNames` sets (from derived classes) and is used to
+  /// facilitate clearing data once everything is loaded
   inline static std::set<StringSet*> OtherUniqueNames;
 
-  // 'load' is called by ctor to load contents of 'file'
+  /// called by ctor to load contents of `file`
   void load(const Path& file, FileType, StringSet*);
 
-  // 'validate' is called by 'load' for each token. The lambda function (in 'T')
-  // is called for errors (which results in an exception being thrown) and false
-  // is returned if the token already exists in optional 'StringSet'.
-  template<typename T> bool validate(const T&, StringSet*, const String&);
+  /// called by load() for each kanji string
+  /// \tparam T type of `error`
+  /// \param error function to call when an error is found
+  /// \param uniqueTypeNames `token` is inserted into this set if provided
+  /// \param token the kanji string to validate
+  /// \return result of insert into `uniqueTypeNames` or true set not provided
+  /// \throw DomainError if `token` isn't a valid multi-byte UTF-8 character or
+  ///     it already exists in the same file
+  /// \throw DomainError if `uniqueTypeNames` is not provided and `token` has
+  ///     already been loaded in another file
+  template<typename T>
+  bool validate(
+      const T& error, StringSet* uniqueTypeNames, const String& token);
 
-  // 'addEntry' returns false if adding another entry would exceed 'MaxEntries'
-  // otherwise, it adds the given token to _list and _map and returns true.
+  /// return false if adding another entry would exceed #MaxEntries, otherwise
+  /// add the given token to #_list and #_map and returns true
   [[nodiscard]] bool addEntry(const String& token);
 
   const String _name;
@@ -87,7 +102,7 @@ private:
   Map _map;
 };
 
-// there are TypedListFile classes for 'JlptLevels' and 'KenteiKyus'
+/// template for KanjiListFile that loads a type of Kanji \kanji{KAnjiListFile}
 template<typename T> class TypedListFile : public KanjiListFile {
 protected:
   TypedListFile(const Path& p, T type)
@@ -102,18 +117,21 @@ private:
   inline static StringSet UniqueTypeNames;
 };
 
-class LevelListFile : public TypedListFile<JlptLevels> {
+/// KanjiListFile for loading Kanji per JLPT Level \kanji{KanjiListFile}
+class LevelListFile final : public TypedListFile<JlptLevels> {
 public:
   LevelListFile(const Path& p, JlptLevels level) : TypedListFile{p, level} {}
 
   [[nodiscard]] JlptLevels level() const final { return type(); }
 };
 
-class KyuListFile : public TypedListFile<KenteiKyus> {
+/// KanjiListFile for loading Kanji per Kentei Kyu \kanji{KanjiListFile}
+class KyuListFile final : public TypedListFile<KenteiKyus> {
 public:
   KyuListFile(const Path& p, KenteiKyus kyu) : TypedListFile{p, kyu} {}
 
   [[nodiscard]] KenteiKyus kyu() const final { return type(); }
 };
 
+/// \end_group
 } // namespace kanji_tools
