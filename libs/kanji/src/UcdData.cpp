@@ -19,7 +19,7 @@ const ColumnFile::Column CodeCol{"Code"}, NameCol{"Name"}, BlockCol{"Block"},
 // 'PrintCount' is used for debug printing. Some combinations are prevented by
 // 'load' function (like Joyo with a link or missing meaning), but count all
 // cases for completeness.
-class PrintCount {
+class PrintCount final {
 public:
   PrintCount() noexcept = default;
   PrintCount(const PrintCount&) = delete;

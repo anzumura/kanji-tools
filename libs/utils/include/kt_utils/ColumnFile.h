@@ -19,7 +19,7 @@ public:
   ///
   /// Column instances are used to get values from each row and a Column can be
   /// be across multiple ColumnFile instances.
-  class Column {
+  class Column final {
   public:
     /// create a Column object for the given `name` (looks up `number`)
     explicit Column(const String& name);

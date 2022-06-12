@@ -12,7 +12,7 @@ struct is_scoped_enum final : std::false_type {};
 
 /// `value` is true if `T` is a scoped enum (part of 'C++23') \utils{TypeTraits}
 template<typename T>
-struct is_scoped_enum<T, true>
+struct is_scoped_enum<T, true> final
     : std::integral_constant<bool,
           !std::is_convertible_v<T, std::underlying_type_t<T>>> {};
 

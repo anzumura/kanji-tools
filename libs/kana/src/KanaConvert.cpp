@@ -9,7 +9,7 @@ namespace kanji_tools {
 
 namespace {
 
-class KanaCount {
+class KanaCount final {
 public:
   void add(const Kana& i) {
     ++(i.isSmall()         ? _small
