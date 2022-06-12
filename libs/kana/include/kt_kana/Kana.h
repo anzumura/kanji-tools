@@ -58,7 +58,7 @@ public:
   /// クァ (instead of 'qa'), 'fyi' フィ (instead of 'fi'), etc.. #_kunrei is
   /// true if the first entry in the list is 'Kunrei Shiki' (then Kana::_kunrei
   /// should be `std::nullopt`).
-  class RomajiVariants {
+  class RomajiVariants final {
   public:
     using List = std::vector<String>;
     using RMax = CharArray<RomajiArrayMax>;
@@ -96,7 +96,7 @@ public:
   };
 
   /// holds Kana iteration marks (一の字点) \kana{Kana}
-  class IterationMark {
+  class IterationMark final {
   public:
     IterationMark(const IterationMark&) = delete; ///< deleted copy ctor
 
@@ -289,7 +289,7 @@ protected:
   ///
   /// This class is used by both DakutenKana and HanDakutenKana classes to hold
   /// the related accented versions of Kana values.
-  class AccentedKana : public Kana {
+  class AccentedKana final : public Kana {
   public:
     /// move ctor that moves `k` into base class fields and sets #_plain to `p`
     AccentedKana(Kana&& k, const Kana& p);
@@ -310,7 +310,7 @@ private:
 ///
 /// This class derives from DakutenKana since 'h' row Kana have both voiced and
 /// semi-voiced, i.e., 'ha' (は) has semi-voiced 'pa' (ぱ) and voiced 'ba' (ば).
-class HanDakutenKana : public DakutenKana {
+class HanDakutenKana final : public DakutenKana {
 public:
   /// `hanDakuten` should be a Kana object with accented values (like 'pa') and
   /// the base class ctor is called with the remaining parameters in `T`

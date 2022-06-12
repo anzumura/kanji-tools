@@ -26,7 +26,7 @@ namespace kanji_tools { /// \kana_group{Table}
 /// normal, but are harder to read for normal width characters:
 /// \li SimHei, Osaka-Mono, MS Mincho, MS Gothic, MingLiU, PCMyungjo,
 /// SimSun-ExtB
-class Table {
+class Table final {
 public:
   using Row = std::vector<String>; ///< a row in the Table
 

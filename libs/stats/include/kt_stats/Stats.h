@@ -13,7 +13,7 @@ namespace kanji_tools { /// \stats_group{Stats}
 /// as further breakdowns for Kanji by type (including showing the most frequent
 /// examples). Totals and percentages are also calculated. See README.md or test
 /// code for sample output.
-class Stats {
+class Stats final {
 public:
   /// print stats for files provided in `args`
   /// \param args command line args (see Stats.cpp HelpMessage for more details)
@@ -24,7 +24,7 @@ public:
   Stats(const Stats&) = delete; ///< deleted copy ctor
 
   /// class for ordering and printing out Kanji found in files \stats{Stats}
-  class Count {
+  class Count final {
   public:
     /// create a Count object
     /// \param count number of occurrences of `entry`
@@ -55,7 +55,7 @@ public:
   };
 private:
   /// class for gathering stats matching a predicate function \stats{Stats}
-  class Pred {
+  class Pred final {
   public:
     /// one Pred object is created for each different stat being gathered like
     /// Hiragana, Katakana, Rare Kanji, etc..

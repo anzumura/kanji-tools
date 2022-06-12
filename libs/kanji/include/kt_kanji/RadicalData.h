@@ -10,7 +10,7 @@ namespace kanji_tools { /// \kanji_group{RadicalData}
 /// RadicalData class for loading data from 'radicals.txt'
 
 /// load, store, find and print Radical objects \kanji{RadicalData}
-class RadicalData {
+class RadicalData final {
 public:
   using Map = std::map<String, Radical::Number>;
   using List = std::vector<Radical>;

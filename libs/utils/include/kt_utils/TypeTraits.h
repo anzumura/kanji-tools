@@ -8,7 +8,7 @@ namespace kanji_tools { /// \utils_group{TypeTraits}
 
 /// test if `T` is a scoped enum (part of 'C++23') \utils{TypeTraits}
 template<typename T, bool B = std::is_enum_v<T>>
-struct is_scoped_enum : std::false_type {};
+struct is_scoped_enum final : std::false_type {};
 
 /// `value` is true if `T` is a scoped enum (part of 'C++23') \utils{TypeTraits}
 template<typename T>

@@ -79,7 +79,7 @@ using GroupPtr = std::shared_ptr<Group>;
 /// currently fairly ad-hoc (containing about 1,500 Kanji) - some groups could
 /// probably be split up more and many more Kanji should be added to existing or
 /// new groups.
-class MeaningGroup : public Group {
+class MeaningGroup final : public Group {
 public:
   MeaningGroup(Number, const String& name, const Members&);
 
@@ -104,7 +104,7 @@ public:
 ///   repeated in the member list, but does get added as a member by GroupData
 /// \li Peer: `"：R"` where `R` is the same as above
 /// \li Reading: `"R"` where `R` is the same as above
-class PatternGroup : public Group {
+class PatternGroup final : public Group {
 public:
   PatternGroup(Number, const String& name, const Members&, PatternType);
 

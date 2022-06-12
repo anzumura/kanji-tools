@@ -8,7 +8,7 @@ namespace kanji_tools { /// \utils_group{Args}
 /// Args class for working with command line arguments
 
 /// class for working with command line args \utils{Args}
-class Args {
+class Args final {
 public:
   using Size = uint16_t;           ///< type for arg count
   using List = const char* const*; ///< type for arg list

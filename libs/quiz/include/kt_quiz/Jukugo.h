@@ -8,7 +8,7 @@ namespace kanji_tools { /// \quiz_group{Jukugo}
 /// Jukugo (熟語) class
 
 /// class for holding a Japanese 'compound word' \quiz{Jukugo}
-class Jukugo {
+class Jukugo final {
 public:
   /// create a Jukugo object
   /// \param name Jukugo name in Kanji (can also include Kana)

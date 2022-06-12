@@ -7,7 +7,7 @@ namespace kanji_tools { /// \quiz_group{JukugoData}
 /// JukugoData class for loading data from 'jukugo/*.txt' files
 
 /// load, store and find Jukugo objects \quiz{JukugoData}
-class JukugoData {
+class JukugoData final {
 public:
   using List = std::vector<JukugoPtr>;
 

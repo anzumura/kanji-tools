@@ -13,7 +13,7 @@ namespace kanji_tools { /// \kanji_group{Ucd}
 ///
 /// There are currently 1,337 unique Pinyin values so Symbol is a good fit. This
 /// class is used as a member data field in both Ucd and Kanji classes.
-class Pinyin : public Symbol<Pinyin> {
+class Pinyin final : public Symbol<Pinyin> {
 public:
   inline static const String Type{"Pinyin"};
   using Symbol::Symbol;
@@ -23,7 +23,7 @@ public:
 ///
 /// 'ucd.txt' is an extract of some XML properties in Unicode 'ucd.all.flat.xml'
 /// file - see scripts/parseUcdAllFlat.sh for more details
-class Ucd {
+class Ucd final {
 public:
   /// represent the XML property from which the link was loaded \details '_R'
   /// means the link was also used to pull in readings. The script uses '*' for
@@ -46,7 +46,7 @@ public:
   };
 
   /// holds the String name of an entry from 'ucd.txt' file \kanji{Ucd}
-  class Entry {
+  class Entry final {
   public:
     using Name = Radical::Name;
 
@@ -70,14 +70,14 @@ public:
   };
 
   /// Unicode (short) block name from 'blk' XML property \kanji{Ucd}
-  class Block : public Symbol<Block> {
+  class Block final : public Symbol<Block> {
   public:
     inline static const String Type{"Ucd::Block"};
     using Symbol::Symbol;
   };
 
   /// Unicode version name from 'age' XML property \kanji{Ucd}
-  class Version : public Symbol<Version> {
+  class Version final : public Symbol<Version> {
   public:
     inline static const String Type{"Ucd::Version"};
     using Symbol::Symbol;
@@ -111,17 +111,15 @@ public:
   [[nodiscard]] auto& onReading() const { return _onReading; }
   [[nodiscard]] auto& kunReading() const { return _kunReading; }
 
-  // values for these fields are stored as bits in '_sources' data member
+  /// values for these fields are stored as bits in #_sources data member @{
   [[nodiscard]] String sources() const;
   [[nodiscard]] bool joyo() const;
-  [[nodiscard]] bool jinmei() const;
+  [[nodiscard]] bool jinmei() const; ///@}
 
-  // 'has' methods
   [[nodiscard]] bool hasLinks() const;
   [[nodiscard]] bool hasTraditionalLinks() const;
   [[nodiscard]] bool hasNonTraditionalLinks() const;
 
-  // helper methods
   [[nodiscard]] auto code() const { return _entry.code(); }
   [[nodiscard]] auto& name() const { return _entry.name(); }
   [[nodiscard]] bool linkedReadings() const;

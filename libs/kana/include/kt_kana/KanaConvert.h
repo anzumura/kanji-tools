@@ -10,7 +10,7 @@ namespace kanji_tools { /// \kana_group{KanaConvert}
 
 /// provides a command line interface and interactive mode for converting
 /// between Hiragana, Katakana and Rōmaji \kana{KanaConvert}
-class KanaConvert {
+class KanaConvert final {
 public:
   /// allow overriding in and out streams for testing
   explicit KanaConvert(

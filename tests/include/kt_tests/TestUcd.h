@@ -10,7 +10,7 @@ namespace kanji_tools {
 /// \code
 ///   const Ucd ucd{TestUcd{"龍"}.jinmei(true)};
 /// \endcode
-class TestUcd {
+class TestUcd final {
 private:
   template<typename T> auto& set(T& x, const T& y) {
     x = y;

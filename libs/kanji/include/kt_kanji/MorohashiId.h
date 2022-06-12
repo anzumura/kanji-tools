@@ -17,7 +17,7 @@ namespace kanji_tools { /// \kanji_group{MorohashiId}
 /// missing entries (Dai Kan-Wa Jiten has 51,284) which also includes several
 /// hundred 'DoublePrime' and 'Supplemental' entries. This class supports the
 /// new proposal by internally storing an unsigned #Id and an #IdType.
-class MorohashiId {
+class MorohashiId final {
 public:
   using Id = uint16_t;
 

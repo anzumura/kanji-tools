@@ -5,7 +5,7 @@
 
 namespace kanji_tools {
 
-class MockKanjiData : public KanjiData {
+class MockKanjiData final : public KanjiData {
 public:
   explicit MockKanjiData() : KanjiData{{}, KanjiData::DebugMode::None} {}
   MOCK_METHOD(Kanji::Frequency, frequency, (const String&), (const, final));

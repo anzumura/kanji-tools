@@ -49,7 +49,7 @@ private:
 ///
 /// Classes should derive from **Symbol<T>** and define **Type**, for example:
 /// \code
-///   class TestSymbol : public Symbol<TestSymbol> {
+///   class TestSymbol final : public Symbol<TestSymbol> {
 ///   public:
 ///     inline static const String Type{"TestSymbol"};
 ///     using Symbol::Symbol;

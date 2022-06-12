@@ -15,7 +15,7 @@ namespace kanji_tools { /// \kanji_group{Radical}
 ///   Radical water{85, "水", {"氵", "氺"}, "水部（すいぶ）",
 ///       "みず さんずい したみず"};
 /// \endcode
-class Radical {
+class Radical final {
 public:
   using AltForms = std::vector<String>;
   using Number = uint16_t;

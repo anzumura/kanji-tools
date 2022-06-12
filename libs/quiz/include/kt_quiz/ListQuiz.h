@@ -14,7 +14,7 @@ namespace kanji_tools { /// \quiz_group{ListQuiz}
 /// Kanji list). Random order can help (and stop in the middle) or use command
 /// line options to start at a specific question like '-gs -t200' (start 'gs' at
 /// question 200) - see README.md or QuizLauncher.cpp for more details.
-class ListQuiz : public Quiz {
+class ListQuiz final : public Quiz {
 public:
   using ChoiceCount = uint16_t;
 

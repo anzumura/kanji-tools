@@ -13,7 +13,7 @@ namespace kanji_tools { /// \utils_group{ColumnFile}
 
 /// class for loading data from a delimiter (defaults to tab) separated file
 /// with a header row containing the column names \utils{ColumnFile}
-class ColumnFile {
+class ColumnFile final {
 public:
   /// represents a column in a ColumnFile \utils{ColumnFile}
   ///

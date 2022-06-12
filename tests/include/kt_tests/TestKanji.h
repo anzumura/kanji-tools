@@ -4,7 +4,7 @@
 
 namespace kanji_tools {
 
-class TestKanji : public Kanji {
+class TestKanji final : public Kanji {
 public:
   inline static const Radical TestRadical{1, {}, {}, {}, {}};
   inline static const String TestMeaning{"test"}, TestReading{"テスト"};

@@ -33,7 +33,7 @@ class Kana;
 /// narrow to wide and vice versa (see Tokens::populateDelimLists()). Also, when
 /// converting from Rōmaji, case is ignored so both 'Dare' and 'dARe' convert to
 /// 'だれ' and lower case is used when converting from Kana to Rōmaji.
-class Converter {
+class Converter final {
 public:
   /// set conversion `target` to Hiragana and `flags` to None by default (means
   /// no extra conversion flags) - convert() functions can override these values
@@ -92,7 +92,7 @@ private:
   ///@}
 
   /// class to hold the tokens used by Converter \kana{Converter}
-  class Tokens {
+  class Tokens final {
   public:
     Tokens();
 

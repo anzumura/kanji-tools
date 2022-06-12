@@ -18,7 +18,7 @@ namespace kanji_tools { /// \quiz_group{GroupQuiz}
 /// done for 'meaning' groups, but perhaps by categories instead (like '時間',
 /// '地理', etc..). A 'curses' interface would also be nice instead of requiring
 /// the user to choose a 'refresh' option to see the mappings chosen so far.
-class GroupQuiz : public Quiz {
+class GroupQuiz final : public Quiz {
 public:
   /// used to determine which members of a group should be included in a quiz
   enum class MemberType {

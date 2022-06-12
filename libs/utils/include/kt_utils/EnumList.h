@@ -120,7 +120,7 @@ public:
   }
 
   /// iterator for looping over values of `T` (the enum) \utils{EnumList}
-  class ConstIterator : public base::template Iterator<ConstIterator> {
+  class ConstIterator final : public base::template Iterator<ConstIterator> {
   public:
     using iBase = typename base::template Iterator<ConstIterator>;
     using iBase::operator-, iBase::index, iBase::rangeError;
@@ -176,10 +176,10 @@ private:
 /// \tparam T scoped enum with contiguous values starting at zero
 /// \tparam N number of enum values
 template<typename T, Enum::Size N>
-class EnumList : public EnumListContainer<T, N> {
-public:
-  using base = EnumListContainer<T, N, N>;
+class EnumList final : public EnumListContainer<T, N> {
 private:
+  using base = EnumListContainer<T, N, N>;
+
   friend BaseEnumList<T>; // 'create' calls private ctor
 
   explicit EnumList(const String& name) { base::setName(name, N - 1); }
@@ -217,7 +217,7 @@ private:
 /// \tparam T scoped enum with contiguous values starting at zero
 /// \tparam N number of enum values (not including final 'None')
 template<typename T, Enum::Size N>
-class EnumListWithNone : public EnumListContainer<T, N + 1, N> {
+class EnumListWithNone final : public EnumListContainer<T, N + 1, N> {
 public:
   using base = EnumListContainer<T, N + 1, N>;
 

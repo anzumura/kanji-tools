@@ -221,7 +221,7 @@ protected:
 private:
   /// helper class that provides additional checks and methods related to String
   /// 'name' of a Kanji (possibly extend this more later)
-  class KanjiName {
+  class KanjiName final {
   public:
     explicit KanjiName(Name name);
 
@@ -331,7 +331,7 @@ private:
 
 /// class for Kanji in the top 2,501 frequency list ('frequency.txt') that
 /// haven't already been loaded from a 'jouyou' or 'jinmei' file \kanji{Kanji}
-class FrequencyKanji : public StandardKanji {
+class FrequencyKanji final : public StandardKanji {
 public:
   /// ctor used for FrequencyKanji without a reading
   FrequencyKanji(KanjiDataRef, Name, Frequency);
@@ -347,7 +347,7 @@ private:
 
 /// class for kanji in 'kentei/k*.txt' files that aren't already pulled in from
 /// other files \kanji{Kanji}
-class KenteiKanji : public StandardKanji {
+class KenteiKanji final : public StandardKanji {
 public:
   KenteiKanji(KanjiDataRef, Name, KenteiKyus);
 
@@ -359,7 +359,7 @@ public:
 ///
 /// Many of these Kanji have a Morohashi ID (ie they are in 'Dai Kan-Wa Jiten'),
 /// but others are pulled in via links and may not even have a Japanese reading.
-class UcdKanji : public OtherKanji {
+class UcdKanji final : public OtherKanji {
 public:
   UcdKanji(KanjiDataRef, const Ucd&);
 

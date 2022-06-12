@@ -6,7 +6,7 @@ namespace kanji_tools { /// \quiz_group{GroupData}
 /// GroupData class for loading data from '-groups.txt' files
 
 /// load, store and print Group objects \quiz{GroupData}
-class GroupData {
+class GroupData final {
 public:
   using MultiMap = std::multimap<String, GroupPtr>;
   using Map = std::map<String, GroupPtr>;

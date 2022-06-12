@@ -48,7 +48,7 @@ protected:
 /// \tparam N number of enum values (calculated via the position of T::None)
 template<typename T, typename V, Enum::Size N = to_underlying(T::None),
     std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-class EnumMap : public EnumContainer<T, N>, public BaseEnumMap<V> {
+class EnumMap final : public EnumContainer<T, N>, public BaseEnumMap<V> {
 public:
   using base = EnumContainer<T, N>;
 
@@ -75,7 +75,7 @@ public:
   [[nodiscard]] auto end() const noexcept { return ConstIterator{N, *this}; }
 
   /// iterator for looping over 'values' in the collection
-  class ConstIterator : public base::template Iterator<ConstIterator> {
+  class ConstIterator final : public base::template Iterator<ConstIterator> {
   public:
     using iBase = typename base::template Iterator<ConstIterator>;
     using iBase::operator-, iBase::comparable, iBase::index, iBase::initialized;

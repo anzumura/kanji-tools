@@ -16,7 +16,7 @@ namespace kanji_tools { /// \kana_group{Choice}
 /// 'default' choices (just pressing 'return') and choice 'ranges' (see 'get'
 /// functions below as well as 'ChoiceTest.cpp' for examples of how to use this
 /// class and expected output).
-class Choice {
+class Choice final {
 public:
   /// default description to be used if a 'quit option' has been specified
   inline static const String DefaultQuitDescription{"quit"};

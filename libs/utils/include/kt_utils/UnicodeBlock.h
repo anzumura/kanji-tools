@@ -18,10 +18,10 @@ namespace kanji_tools { /// \utils_group{UnicodeBlock}
 /// whereas in reality some characters may have been added in later versions.
 /// For example, the 'Katakana' block was introduced in version 1.1, but U+30A0
 /// (゠) was added to the block in version 3.2.
-class UnicodeBlock {
+class UnicodeBlock final {
 public:
   /// Unicode version and release date \utils{UnicodeBlock}
-  class Version {
+  class Version final {
   public:
     /// create a Version object
     /// \param v version name, like "1.1"

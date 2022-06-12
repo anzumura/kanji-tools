@@ -76,7 +76,7 @@ private:
 };
 
 /// class representing the 633 official Jinmeiyō Kanji \kanji{OfficialKanji}
-class JinmeiKanji : public OfficialKanji {
+class JinmeiKanji final : public OfficialKanji {
 public:
   /// ctor called by fromFile() method
   JinmeiKanji(KanjiDataRef, File);
@@ -93,7 +93,7 @@ private:
 };
 
 /// class representing the 2,136 official Jōyō Kanji \kanji{OfficialKanji}
-class JouyouKanji : public OfficialKanji {
+class JouyouKanji final : public OfficialKanji {
 public:
   /// ctor called by fromFile() method
   JouyouKanji(KanjiDataRef, File);
@@ -114,7 +114,7 @@ private:
 /// This group contains manually selected 'fairly common' Kanji that aren't in
 /// official Jōyō or Jinmeiyō lists (or their official old/alternative forms).
 /// These Kanji should also not be in 'frequency.txt'.
-class ExtraKanji : public NumberedKanji {
+class ExtraKanji final : public NumberedKanji {
 public:
   /// ctor called by fromFile() method
   ExtraKanji(KanjiDataRef, File);
@@ -170,7 +170,7 @@ private:
 /// \li 204 are part of the 365 JouyouKanji 'old names' set
 /// \li 8 are different alternate forms of JouyouKanji (薗 駈 嶋 盃 冨 峯 埜 凉)
 /// \li 18 are alternate forms of standard JinmeiKanji
-class LinkedJinmeiKanji : public OfficialLinkedKanji {
+class LinkedJinmeiKanji final : public OfficialLinkedKanji {
 public:
   /// ctor called by KanjiData
   LinkedJinmeiKanji(KanjiDataRef, Name, Link);
@@ -184,7 +184,7 @@ public:
 ///
 /// These are the published Jōyō variants that aren't already included in the
 /// 230 Jinmeiyō 'official variants'.
-class LinkedOldKanji : public OfficialLinkedKanji {
+class LinkedOldKanji final : public OfficialLinkedKanji {
 public:
   /// ctor called by KanjiData (after creating all LinkedJinmeiKanji)
   LinkedOldKanji(KanjiDataRef, Name, Link);

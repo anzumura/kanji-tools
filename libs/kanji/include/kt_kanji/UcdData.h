@@ -9,7 +9,7 @@ namespace kanji_tools { /// \kanji_group{UcdData}
 /// UcdData class for loading data from 'ucd.txt'
 
 /// load, store, find and print Ucd objects \kanji{UcdData}
-class UcdData {
+class UcdData final {
 public:
   using Map = std::map<String, Ucd>;
 

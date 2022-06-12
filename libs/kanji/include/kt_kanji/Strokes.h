@@ -9,7 +9,7 @@ namespace kanji_tools { /// \kanji_group{Strokes}
 /// Strokes class
 
 /// class for Kanji stroke counts (画数) \kanji{Strokes}
-class Strokes {
+class Strokes final {
 public:
   using Size = uint8_t;
 

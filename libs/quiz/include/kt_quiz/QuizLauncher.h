@@ -8,7 +8,7 @@ namespace kanji_tools { /// \quiz_group{QuizLauncher}
 /// QuizLauncher class
 
 /// starts a quiz (or review) or prints info about a Kanji \quiz{QuizLauncher}
-class QuizLauncher {
+class QuizLauncher final {
 public:
   using Choices = Choice::Choices;
   using List = KanjiData::List;

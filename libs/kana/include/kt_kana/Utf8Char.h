@@ -21,7 +21,7 @@ namespace kanji_tools { /// \kana_group{Utf8Char}
 /// \li otherwise it's the first byte of a multi-byte sequence. The number of
 ///   leading '1's indicates how many bytes follow, i.e.: 110 means 2 bytes,
 ///   1110 means 3, etc.
-class Utf8Char {
+class Utf8Char final {
 public:
   using OptString = std::optional<String>;
 

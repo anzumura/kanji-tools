@@ -33,7 +33,7 @@ protected:
 ///   const auto s{L"ひらがな"};
 ///   if (std::regex_search(s, allKana)) std::cout << "all Kana\n";
 /// \endcode
-template<typename... Ts> class BlockRange : public BaseBlockRange {
+template<typename... Ts> class BlockRange final : public BaseBlockRange {
 public:
   /// ctor takes one or more `UnicodeBlock`s and populated internal array
   explicit BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {

@@ -6,7 +6,7 @@ namespace kanji_tools {
 
 /// exception class thrown by the call() function below when an exception has a
 /// what() string that doesn't match the expected value
-class WhatMismatch : public std::runtime_error {
+class WhatMismatch final : public std::runtime_error {
 public:
   WhatMismatch(const String& expectedWhat, const std::exception& e)
       : std::runtime_error{
