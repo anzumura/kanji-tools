@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/ColumnFile.h>
-#include <kanji_tools/utils/Exception.h>
+#include <kt_utils/ColumnFile.h>
+#include <kt_utils/Exception.h>
 
 #include <cassert>
 #include <set>

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/FileKanjiData.h>
-#include <kanji_tools/quiz/ListQuiz.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_kanji/FileKanjiData.h>
+#include <kt_quiz/ListQuiz.h>
+#include <kt_tests/WhatMismatch.h>
 
 #include <sstream>
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <kanji_tools/utils/Bitmask.h>
+#include <kt_utils/Bitmask.h>
 
 namespace kanji_tools {
 

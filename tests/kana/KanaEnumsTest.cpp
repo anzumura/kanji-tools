@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/KanaEnums.h>
-#include <kanji_tools/kana/Utf8Char.h>
+#include <kt_kana/KanaEnums.h>
+#include <kt_kana/Utf8Char.h>
 
 namespace kanji_tools {
 

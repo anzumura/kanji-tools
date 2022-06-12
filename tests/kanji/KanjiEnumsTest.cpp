@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kanji/KanjiEnums.h>
+#include <kt_kanji/KanjiEnums.h>
 
 namespace kanji_tools {
 

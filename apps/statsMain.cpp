@@ -1,5 +1,5 @@
-#include <kanji_tools/kanji/FileKanjiData.h>
-#include <kanji_tools/stats/Stats.h>
+#include <kt_kanji/FileKanjiData.h>
+#include <kt_stats/Stats.h>
 
 int main(int argc, const char** argv) {
   using kanji_tools::Args, kanji_tools::Stats, kanji_tools::FileKanjiData;

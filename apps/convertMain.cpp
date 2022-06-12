@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/KanaConvert.h>
+#include <kt_kana/KanaConvert.h>
 
 int main(int argc, const char** argv) {
   try {

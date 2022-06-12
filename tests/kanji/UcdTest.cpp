@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <tests/kanji_tools/TestUcd.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_tests/TestUcd.h>
+#include <kt_tests/WhatMismatch.h>
 
 namespace kanji_tools {
 

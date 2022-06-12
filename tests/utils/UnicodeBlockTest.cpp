@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kt_utils/UnicodeBlock.h>
 
 namespace kanji_tools {
 

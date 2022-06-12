@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/Exception.h>
-#include <kanji_tools/utils/Utf8.h>
+#include <kt_utils/Exception.h>
+#include <kt_utils/Utf8.h>
 
 #include <numeric>
 

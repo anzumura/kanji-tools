@@ -1,5 +1,5 @@
-#include <kanji_tools/kana/Choice.h>
-#include <kanji_tools/utils/Exception.h>
+#include <kt_kana/Choice.h>
+#include <kt_utils/Exception.h>
 
 #include <termios.h>
 #include <unistd.h>

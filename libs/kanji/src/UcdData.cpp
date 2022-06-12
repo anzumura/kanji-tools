@@ -1,6 +1,6 @@
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/kanji/KanjiData.h>
-#include <kanji_tools/utils/ColumnFile.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_kanji/KanjiData.h>
+#include <kt_utils/ColumnFile.h>
 
 #include <sstream>
 

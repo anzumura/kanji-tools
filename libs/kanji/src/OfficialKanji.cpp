@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/OfficialKanji.h>
+#include <kt_kanji/OfficialKanji.h>
 
 #include <sstream>
 

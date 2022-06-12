@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/kanji/FileKanjiData.h>
-#include <tests/kanji_tools/TestKanjiData.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_kana/DisplaySize.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_kanji/FileKanjiData.h>
+#include <kt_tests/TestKanjiData.h>
+#include <kt_tests/WhatMismatch.h>
 
 #include <type_traits>
 

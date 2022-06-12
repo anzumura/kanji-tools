@@ -1,5 +1,5 @@
-#include <kanji_tools/kanji/Ucd.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kt_kanji/Ucd.h>
+#include <kt_utils/UnicodeBlock.h>
 
 namespace kanji_tools {
 

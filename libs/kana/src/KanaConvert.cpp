@@ -1,6 +1,6 @@
-#include <kanji_tools/kana/Kana.h>
-#include <kanji_tools/kana/KanaConvert.h>
-#include <kanji_tools/kana/Table.h>
+#include <kt_kana/Kana.h>
+#include <kt_kana/KanaConvert.h>
+#include <kt_kana/Table.h>
 
 #include <cstdio>
 #include <unistd.h>

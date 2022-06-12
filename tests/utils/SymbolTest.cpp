@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/Exception.h>
-#include <kanji_tools/utils/Symbol.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_tests/WhatMismatch.h>
+#include <kt_utils/Exception.h>
+#include <kt_utils/Symbol.h>
 
 namespace kanji_tools {
 

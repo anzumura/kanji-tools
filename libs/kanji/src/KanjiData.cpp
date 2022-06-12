@@ -1,5 +1,5 @@
-#include <kanji_tools/kanji/KanjiData.h>
-#include <kanji_tools/utils/Utf8.h>
+#include <kt_kanji/KanjiData.h>
+#include <kt_utils/Utf8.h>
 
 #include <sstream>
 

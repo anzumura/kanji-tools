@@ -1,7 +1,7 @@
-#include <kanji_tools/kanji/FileKanjiData.h>
-#include <kanji_tools/kanji/Kanji.h>
-#include <kanji_tools/kanji/OfficialKanji.h>
-#include <kanji_tools/utils/Utf8.h>
+#include <kt_kanji/FileKanjiData.h>
+#include <kt_kanji/Kanji.h>
+#include <kt_kanji/OfficialKanji.h>
+#include <kt_utils/Utf8.h>
 
 #include <sstream>
 

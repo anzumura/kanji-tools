@@ -1,4 +1,4 @@
-#include <kanji_tools/utils/Exception.h>
+#include <kt_utils/Exception.h>
 
 namespace kanji_tools {
 

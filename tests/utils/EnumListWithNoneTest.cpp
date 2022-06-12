@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <kanji_tools/utils/EnumList.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_tests/WhatMismatch.h>
+#include <kt_utils/EnumList.h>
 
 #include <sstream>
 

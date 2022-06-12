@@ -1,6 +1,6 @@
-#include <kanji_tools/stats/Stats.h>
-#include <kanji_tools/stats/Utf8Count.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kt_stats/Stats.h>
+#include <kt_stats/Utf8Count.h>
+#include <kt_utils/UnicodeBlock.h>
 
 #include <future>
 #include <numeric>

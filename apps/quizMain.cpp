@@ -1,4 +1,4 @@
-#include <kanji_tools/quiz/Quiz.h>
+#include <kt_quiz/Quiz.h>
 
 int main(int argc, const char** argv) {
   try {

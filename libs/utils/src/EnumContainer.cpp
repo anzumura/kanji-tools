@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/EnumContainer.h>
-#include <kanji_tools/utils/Exception.h>
+#include <kt_utils/EnumContainer.h>
+#include <kt_utils/Exception.h>
 
 namespace kanji_tools {
 

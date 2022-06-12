@@ -1,5 +1,5 @@
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/kanji/OfficialKanji.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_kanji/OfficialKanji.h>
 
 #include <cassert>
 

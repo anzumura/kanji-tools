@@ -1,5 +1,5 @@
-#include <kanji_tools/utils/Exception.h>
-#include <kanji_tools/utils/Symbol.h>
+#include <kt_utils/Exception.h>
+#include <kt_utils/Symbol.h>
 
 namespace kanji_tools {
 

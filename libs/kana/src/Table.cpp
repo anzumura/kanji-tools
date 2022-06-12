@@ -1,5 +1,5 @@
-#include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/kana/Table.h>
+#include <kt_kana/DisplaySize.h>
+#include <kt_kana/Table.h>
 
 #include <iomanip>
 

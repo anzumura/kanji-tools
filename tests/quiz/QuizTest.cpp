@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/quiz/Quiz.h>
+#include <kt_quiz/Quiz.h>
 
 #include <sstream>
 

@@ -1,6 +1,6 @@
-#include <kanji_tools/kanji/RadicalData.h>
-#include <tests/kanji_tools/TestKanjiData.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_kanji/RadicalData.h>
+#include <kt_tests/TestKanjiData.h>
+#include <kt_tests/WhatMismatch.h>
 
 namespace kanji_tools {
 

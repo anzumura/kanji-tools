@@ -1,7 +1,7 @@
-#include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/quiz/GroupData.h>
-#include <kanji_tools/utils/ColumnFile.h>
+#include <kt_kana/DisplaySize.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_quiz/GroupData.h>
+#include <kt_utils/ColumnFile.h>
 
 #include <sstream>
 

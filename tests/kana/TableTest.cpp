@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/Table.h>
+#include <kt_kana/Table.h>
 
 #include <sstream>
 

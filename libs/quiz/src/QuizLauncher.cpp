@@ -1,7 +1,7 @@
-#include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/quiz/GroupQuiz.h>
-#include <kanji_tools/quiz/ListQuiz.h>
-#include <kanji_tools/quiz/QuizLauncher.h>
+#include <kt_kana/DisplaySize.h>
+#include <kt_quiz/GroupQuiz.h>
+#include <kt_quiz/ListQuiz.h>
+#include <kt_quiz/QuizLauncher.h>
 
 #include <sstream>
 

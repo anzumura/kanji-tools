@@ -1,5 +1,5 @@
-#include <kanji_tools/kanji/Strokes.h>
-#include <kanji_tools/utils/Exception.h>
+#include <kt_kanji/Strokes.h>
+#include <kt_utils/Exception.h>
 
 namespace kanji_tools {
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/utils/BlockRange.h>
-#include <kanji_tools/utils/Exception.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_tests/WhatMismatch.h>
+#include <kt_utils/BlockRange.h>
+#include <kt_utils/Exception.h>
 
 namespace kanji_tools {
 

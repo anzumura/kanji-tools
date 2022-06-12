@@ -1,4 +1,4 @@
-#include <kanji_tools/kana/DisplaySize.h>
+#include <kt_kana/DisplaySize.h>
 
 namespace kanji_tools {
 

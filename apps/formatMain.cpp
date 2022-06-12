@@ -1,6 +1,6 @@
-#include <kanji_tools/utils/Args.h>
-#include <kanji_tools/utils/BlockRange.h>
-#include <kanji_tools/utils/Exception.h>
+#include <kt_utils/Args.h>
+#include <kt_utils/BlockRange.h>
+#include <kt_utils/Exception.h>
 
 #include <filesystem>
 #include <fstream>

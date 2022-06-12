@@ -1,4 +1,4 @@
-#include <kanji_tools/kanji/Radical.h>
+#include <kt_kanji/Radical.h>
 
 #include <iomanip>
 

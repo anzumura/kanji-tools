@@ -1,6 +1,6 @@
-#include <kanji_tools/utils/Args.h>
-#include <kanji_tools/utils/Exception.h>
-#include <kanji_tools/utils/String.h>
+#include <kt_utils/Args.h>
+#include <kt_utils/Exception.h>
+#include <kt_utils/String.h>
 
 namespace kanji_tools {
 

@@ -1,7 +1,7 @@
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/stats/Utf8Count.h>
-#include <kanji_tools/utils/BlockRange.h>
-#include <kanji_tools/utils/Exception.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_stats/Utf8Count.h>
+#include <kt_utils/BlockRange.h>
+#include <kt_utils/Exception.h>
 
 #include <fstream>
 

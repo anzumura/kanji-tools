@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/kana/KanaConvert.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_kana/KanaConvert.h>
+#include <kt_tests/WhatMismatch.h>
 
 #include <fstream>
 #include <sstream>

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <kanji_tools/quiz/Jukugo.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_quiz/Jukugo.h>
+#include <kt_tests/WhatMismatch.h>
 
 namespace kanji_tools {
 

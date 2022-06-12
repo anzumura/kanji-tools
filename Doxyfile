@@ -61,7 +61,7 @@ ALIASES += end_group="@}" doc="\copydoc"
 # 'hdr' is used by below 'single arg' aliases. It adds 'lib' as well as expected
 # prefix to '#include' section on the 'class' page. This 'command' should come
 # after 'brief' description so that IDEs work properly when showing doc hints.
-ALIASES += hdr{2}=" [lib: \b \1]\headerfile \2.h kanji_tools/\1/\2.h"
+ALIASES += hdr{2}=" [lib: \b \1]\headerfile \2.h kt_\1/\2.h"
 
 # single arg 'XX_group' and 'XX' aliases for each lib (XX) in the project
 ALIASES += utils_group{1}="\grp{utils,\1}" utils{1}="\hdr{utils,\1}"

@@ -1,4 +1,4 @@
-#include <kanji_tools/quiz/Group.h>
+#include <kt_quiz/Group.h>
 
 namespace kanji_tools {
 

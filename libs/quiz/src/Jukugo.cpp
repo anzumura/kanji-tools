@@ -1,7 +1,7 @@
-#include <kanji_tools/kana/Kana.h>
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/quiz/Jukugo.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kt_kana/Kana.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_quiz/Jukugo.h>
+#include <kt_utils/UnicodeBlock.h>
 
 namespace kanji_tools {
 

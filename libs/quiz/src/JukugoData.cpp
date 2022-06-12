@@ -1,6 +1,6 @@
-#include <kanji_tools/kana/Utf8Char.h>
-#include <kanji_tools/quiz/JukugoData.h>
-#include <kanji_tools/utils/UnicodeBlock.h>
+#include <kt_kana/Utf8Char.h>
+#include <kt_quiz/JukugoData.h>
+#include <kt_utils/UnicodeBlock.h>
 
 #include <fstream>
 #include <sstream>

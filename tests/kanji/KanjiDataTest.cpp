@@ -1,7 +1,7 @@
-#include <tests/kanji_tools/TestKanji.h>
-#include <tests/kanji_tools/TestKanjiData.h>
-#include <tests/kanji_tools/TestUcd.h>
-#include <tests/kanji_tools/WhatMismatch.h>
+#include <kt_tests/TestKanji.h>
+#include <kt_tests/TestKanjiData.h>
+#include <kt_tests/TestUcd.h>
+#include <kt_tests/WhatMismatch.h>
 
 #include <fstream>
 

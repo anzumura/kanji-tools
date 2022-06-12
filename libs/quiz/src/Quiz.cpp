@@ -1,5 +1,5 @@
-#include <kanji_tools/kanji/FileKanjiData.h>
-#include <kanji_tools/quiz/Quiz.h>
+#include <kt_kanji/FileKanjiData.h>
+#include <kt_quiz/Quiz.h>
 
 namespace kanji_tools {
 

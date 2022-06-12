@@ -1,5 +1,5 @@
-#include <kanji_tools/kana/DisplaySize.h>
-#include <kanji_tools/quiz/GroupQuiz.h>
+#include <kt_kana/DisplaySize.h>
+#include <kt_quiz/GroupQuiz.h>
 
 #include <optional>
 #include <random>
