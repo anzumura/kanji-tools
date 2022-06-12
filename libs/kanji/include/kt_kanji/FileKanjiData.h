@@ -3,6 +3,7 @@
 #include <kt_kanji/KanjiData.h>
 
 namespace kanji_tools { /// \kanji_group{FileKanjiData}
+/// FileKanjiData class for loading Kanji from '.txt' file
 
 /// Implementation of KanjiData to load from text files \kanji{FileKanjiData}
 ///
