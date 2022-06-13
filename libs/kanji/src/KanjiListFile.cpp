@@ -34,8 +34,8 @@ void KanjiListFile::print(std::ostream& out, const StringList& l,
 }
 
 void KanjiListFile::clearUniqueCheckData() {
-  UniqueNames.clear();
-  for (auto i : OtherUniqueNames) i->clear();
+  _uniqueNames.clear();
+  for (auto i : _otherUniqueNames) i->clear();
 }
 
 KanjiListFile::KanjiListFile(const Path& p, FileType fileType)
@@ -49,7 +49,7 @@ KanjiListFile::KanjiListFile(const Path& fileIn, FileType fileType,
   if (!fs::is_regular_file(file) && !fileIn.has_extension())
     file += TextFileExtension;
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
-  if (uniqueTypeNames) OtherUniqueNames.insert(uniqueTypeNames);
+  if (uniqueTypeNames) _otherUniqueNames.insert(uniqueTypeNames);
   load(file, fileType, uniqueTypeNames);
 }
 
@@ -89,7 +89,7 @@ bool KanjiListFile::validate(
   if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
   // check uniqueness across files
   if (uniqueTypeNames) return uniqueTypeNames->insert(token).second;
-  if (!UniqueNames.insert(token).second)
+  if (!_uniqueNames.insert(token).second)
     error("found globally non-unique entry '" + token + "'");
   return true;
 }

@@ -70,11 +70,11 @@ private:
 
   /// ensure uniqueness across non-typed KanjiListFile instances (currently only
   /// applies to 'frequency.txt')
-  inline static StringSet UniqueNames;
+  inline static StringSet _uniqueNames;
 
-  /// pointers to `UniqueTypeNames` sets (from derived classes) and is used to
+  /// pointers to `_uniqueTypeNames` sets (from derived classes) and is used to
   /// facilitate clearing data once everything is loaded
-  inline static std::set<StringSet*> OtherUniqueNames;
+  inline static std::set<StringSet*> _otherUniqueNames;
 
   /// called by ctor to load contents of `file`
   void load(const Path& file, FileType, StringSet*);
@@ -106,7 +106,7 @@ private:
 template<typename T> class TypedListFile : public KanjiListFile {
 protected:
   TypedListFile(const Path& p, T type)
-      : KanjiListFile{p, FileType::MultiplePerLine, &UniqueTypeNames,
+      : KanjiListFile{p, FileType::MultiplePerLine, &_uniqueTypeNames,
             kanji_tools::toString(type)},
         _type{type} {}
 
@@ -114,7 +114,7 @@ protected:
 private:
   const T _type;
 
-  inline static StringSet UniqueTypeNames;
+  inline static StringSet _uniqueTypeNames;
 };
 
 /// KanjiListFile for loading Kanji per JLPT Level \kanji{KanjiListFile}
