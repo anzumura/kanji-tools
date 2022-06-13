@@ -3,12 +3,6 @@
 
 namespace kanji_tools {
 
-void BaseBlockRange::fill(wchar_t* i, const UnicodeBlock& block) noexcept {
-  *i++ = block.wStart();
-  *i++ = L'-';
-  *i = block.wEnd();
-}
-
 size_t BaseBlockRange::checkIndex(size_t i, size_t size) {
   if (i > size)
     throw RangeError("index '" + std::to_string(i) +

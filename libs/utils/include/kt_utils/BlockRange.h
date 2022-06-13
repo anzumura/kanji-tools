@@ -10,10 +10,14 @@ class BaseBlockRange {
 protected:
   static constexpr size_t SizePerBlock{3};
 
-  static void fill(wchar_t*, const UnicodeBlock&) noexcept;
+  static constexpr void fill(wchar_t* i, const UnicodeBlock& block) noexcept {
+    *i++ = block.wStart();
+    *i++ = L'-';
+    *i = block.wEnd();
+  }
 
   template<typename... Ts>
-  static void fill(
+  static constexpr void fill(
       wchar_t* i, const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(i, block);
     fill(i + SizePerBlock, blocks...);
@@ -36,7 +40,8 @@ protected:
 template<typename... Ts> class BlockRange final : public BaseBlockRange {
 public:
   /// ctor takes one or more `UnicodeBlock`s and populated internal array
-  explicit BlockRange(const UnicodeBlock& block, const Ts&... blocks) noexcept {
+  explicit constexpr BlockRange(
+      const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(_range, block, blocks...);
   }
 
@@ -66,22 +71,22 @@ private:
 /// - CJK Extension C, D, E and F
 /// - CJK Compatibility Ideographs Supplement
 /// - CJK Extension G
-inline const BlockRange KanjiRange{CommonKanjiBlocks[0], CommonKanjiBlocks[1],
-    CommonKanjiBlocks[2], CommonKanjiBlocks[3], NonSpacingBlocks[0],
-    RareKanjiBlocks[0], RareKanjiBlocks[1], RareKanjiBlocks[2],
-    RareKanjiBlocks[3]};
+inline constexpr BlockRange KanjiRange{CommonKanjiBlocks[0],
+    CommonKanjiBlocks[1], CommonKanjiBlocks[2], CommonKanjiBlocks[3],
+    NonSpacingBlocks[0], RareKanjiBlocks[0], RareKanjiBlocks[1],
+    RareKanjiBlocks[2], RareKanjiBlocks[3]};
 
-/// range for halfwidth Katakana and wide letters (U+FF00 - U+FFEF)
-inline const BlockRange WideLetterRange{LetterBlocks[6]};
+/// range for wide letters including halfwidth Katakana (U+FF00 - U+FFEF)
+inline constexpr BlockRange WideLetterRange{LetterBlocks[6]};
 
 /// range for standard Hiragana
-inline const BlockRange HiraganaRange{HiraganaBlocks[0]};
+inline constexpr BlockRange HiraganaRange{HiraganaBlocks[0]};
 
 /// range for Katakana (both official blocks)
-inline const BlockRange KatakanaRange{KatakanaBlocks[0], KatakanaBlocks[1]};
+inline constexpr BlockRange KatakanaRange{KatakanaBlocks[0], KatakanaBlocks[1]};
 
 /// range that includes both Hiragana and Katakana
-inline const BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
+inline constexpr BlockRange KanaRange{CommonKanaBlock, KatakanaBlocks[1]};
 
 /// \end_group
 } // namespace kanji_tools
