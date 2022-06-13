@@ -83,8 +83,8 @@ TEST(UnicodeBlockTest, IsKana) {
   EXPECT_TRUE(isHiragana("ゑク", false)); // sizeOne=false
   EXPECT_TRUE(isAllHiragana("ゑあ"));
   EXPECT_FALSE(isAllHiragana("ゑク"));
-  EXPECT_TRUE(isAllHiragana("ゑは" + CombiningVoiced + "あ"));
-  EXPECT_TRUE(isAllKatakana("ヱハ" + CombiningSemiVoiced + "ア"));
+  EXPECT_TRUE(isAllHiragana((String{"ゑは"} += CombiningVoiced) += "あ"));
+  EXPECT_TRUE(isAllKatakana((String{"ヱハ"} += CombiningSemiVoiced) += "ア"));
   EXPECT_FALSE(isKatakana("ゑ"));
   EXPECT_TRUE(isKatakana("ヰ"));
   EXPECT_FALSE(isHiragana("ヰ"));

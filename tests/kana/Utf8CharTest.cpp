@@ -176,7 +176,7 @@ TEST(Utf8CharTest, ErrorWithVariationSelectors) {
 
 TEST(Utf8CharTest, ErrorWithCombiningMarks) {
   // put combining marks at the start which isn't valid
-  Utf8Char s{CombiningVoiced + CombiningSemiVoiced + "じ"};
+  Utf8Char s{(String{CombiningVoiced} += CombiningSemiVoiced) += "じ"};
   String x;
   EXPECT_TRUE(s.peek(x));
   EXPECT_EQ(x, "じ");

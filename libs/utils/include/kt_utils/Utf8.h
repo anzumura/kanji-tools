@@ -150,8 +150,8 @@ inline constexpr auto MaxAscii{U'\x7f'}, ///< maximum Ascii value
     MaxUnicode{U'\x10ffff'},             ///< maximum valid Unicode value
     CombiningVoicedChar{U'\x3099'},      ///< for dakuten (濁点) Kana
     CombiningSemiVoicedChar{U'\x309a'};  ///< for han-dakuten (半濁点) Kana
-inline static const String CombiningVoiced{"\xe3\x82\x99"}, ///< U+3099 in UTF-8
-    CombiningSemiVoiced{"\xe3\x82\x9a"};                    ///< U+309A in UTF-8
+inline constexpr StringView CombiningVoiced{"\xe3\x82\x99"}, ///< UTF-8 'U+3099'
+    CombiningSemiVoiced{"\xe3\x82\x9a"};                     ///< UTF-8 'U+309A'
 
 /// \end_group
 } // namespace kanji_tools
