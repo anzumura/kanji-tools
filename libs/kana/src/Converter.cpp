@@ -186,7 +186,7 @@ String Converter::fromKana(const String& kanaInput, CharType source) const {
     if (romajiTarget() && Kana::N.containsKana(kanaGroup) &&
         afterN(source).contains(kana))
       result += Apostrophe;
-    kanaGroup = dt == DoneType::NewGroup ? kana : EmptyString;
+    kanaGroup = dt == DoneType::NewGroup ? kana : emptyString();
     state = ns;
   }};
 

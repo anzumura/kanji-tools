@@ -17,7 +17,7 @@ TEST(DisplaySizeTest, WideBlocksRange) {
 TEST(DisplaySizeTest, DisplaySize) {
   EXPECT_EQ(displaySize(""), 0);
   EXPECT_EQ(displaySize("abc ."), 5);
-  EXPECT_EQ(displaySize(EmptyString), 0);
+  EXPECT_EQ(displaySize(emptyString()), 0);
   EXPECT_EQ(displaySize(String{"abc ."}), 5);
   EXPECT_EQ(displaySize("abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize("。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter
@@ -38,7 +38,7 @@ TEST(DisplaySizeTest, DisplaySize) {
 TEST(DisplaySizeTest, U32DisplaySize) {
   EXPECT_EQ(displaySize(U""), 0);
   EXPECT_EQ(displaySize(U"abc ."), 5);
-  EXPECT_EQ(displaySize(EmptyCodeString), 0);
+  EXPECT_EQ(displaySize(emptyCodeString()), 0);
   EXPECT_EQ(displaySize(CodeString{U"abc ."}), 5);
   EXPECT_EQ(displaySize(U"abクcカ"), 7); // 3 narrow + 2 wide
   EXPECT_EQ(displaySize(U"。、Ｈ"), 6);  // 2 wide punctuation + 1 wide letter

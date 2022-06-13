@@ -129,11 +129,11 @@ TEST(Utf8Test, NotValidForOverlong) {
   EXPECT_EQ(validateUtf8(x), Utf8Result::Overlong);
 }
 
-TEST(Utf8Test, ConvertEmptyStrings) {
-  EXPECT_EQ(fromUtf8(EmptyString), EmptyCodeString);
-  EXPECT_EQ(fromUtf8(""), EmptyCodeString);
-  EXPECT_EQ(toUtf8(EmptyCodeString), EmptyString);
-  EXPECT_EQ(toUtf8(U""), EmptyString);
+TEST(Utf8Test, ConvertEmptyString) {
+  EXPECT_EQ(fromUtf8(emptyString()), emptyCodeString());
+  EXPECT_EQ(fromUtf8(""), emptyCodeString());
+  EXPECT_EQ(toUtf8(emptyCodeString()), emptyString());
+  EXPECT_EQ(toUtf8(U""), emptyString());
 }
 
 TEST(Utf8Test, FromUTF8String) {

@@ -80,7 +80,7 @@ public:
 
   /// return the name or empty String if id is `0`
   [[nodiscard]] auto& name() const {
-    return id() ? *_list.at(id() - 1) : EmptyString;
+    return id() ? *_list.at(id() - 1) : emptyString();
   }
 
   /// equal operator

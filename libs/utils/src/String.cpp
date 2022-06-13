@@ -24,6 +24,16 @@ template<typename T> char toCharUnsigned(T x, const String& type) {
 
 } // namespace
 
+const String& emptyString() {
+  static const String empty;
+  return empty;
+}
+
+const CodeString& emptyCodeString() {
+  static const CodeString empty;
+  return empty;
+}
+
 String addBrackets(const String& s, BracketType t) {
   switch (t) {
   case BracketType::Curly: return '{' + s + '}';

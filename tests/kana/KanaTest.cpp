@@ -76,8 +76,8 @@ TEST(KanaTest, RepeatMarkGet) {
       // 'hiragana' or 'katakana' respectively regardless of 'flags' or prevKana
       EXPECT_EQ(i->get(Hiragana, flags, {}), i->hiragana());
       EXPECT_EQ(i->get(Katakana, flags, {}), i->katakana());
-      // get CharType 'Romaji' always returns EmptyString if prevKana is nullptr
-      // see other tests below for getting with non-empty prevKana
+      // get CharType 'Romaji' always returns emptyString() if prevKana is
+      // nullptr see other tests below for getting with non-empty prevKana
       EXPECT_EQ(i->get(Romaji, flags, {}), "");
     }
 }

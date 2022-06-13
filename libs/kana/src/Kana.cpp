@@ -187,7 +187,7 @@ const String& Kana::IterationMark::get(
   case CharType::Katakana: return _katakana;
   case CharType::Romaji: break;
   }
-  if (!prevKana) return EmptyString;
+  if (!prevKana) return emptyString();
   const Kana* k{prevKana};
   if (_dakuten) {
     if (const auto accented{prevKana->dakuten()}; accented) k = accented;

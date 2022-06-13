@@ -400,7 +400,7 @@ TEST_F(FileKanjiDataTest, UcdLinks) {
 
 TEST_F(FileKanjiDataTest, SortByQualifiedName) {
   const auto find{[](const String& name, auto t, auto s, Kanji::Frequency f,
-                      const String& u = EmptyString) {
+                      const String& u = emptyString()) {
     auto k{_data->findByName(name)};
     // can't use 'ASSERT' in a function returning non-void so throw an
     // exception if not found (which never happens by design of the rest of

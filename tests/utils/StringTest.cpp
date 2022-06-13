@@ -117,28 +117,28 @@ TEST(StringTest, CheckSingleByte) {
 }
 
 TEST(StringTest, FirstLower) {
-  EXPECT_EQ(firstLower(EmptyString), EmptyString);
+  EXPECT_EQ(firstLower(emptyString()), emptyString());
   EXPECT_EQ(firstLower(LowerString), LowerString);
   EXPECT_EQ(firstLower(UpperString), "efGh");
   EXPECT_EQ(firstLower(MBString), MBString);
 }
 
 TEST(StringTest, FirstUpper) {
-  EXPECT_EQ(firstUpper(EmptyString), EmptyString);
+  EXPECT_EQ(firstUpper(emptyString()), emptyString());
   EXPECT_EQ(firstUpper(LowerString), "ABcD");
   EXPECT_EQ(firstUpper(UpperString), UpperString);
   EXPECT_EQ(firstUpper(MBString), MBString);
 }
 
 TEST(StringTest, ToLower) {
-  EXPECT_EQ(toLower(EmptyString), EmptyString);
+  EXPECT_EQ(toLower(emptyString()), emptyString());
   EXPECT_EQ(toLower(LowerString), "abcd");
   EXPECT_EQ(toLower(UpperString), "efgh");
   EXPECT_EQ(toLower(MBString), "雪snow");
 }
 
 TEST(StringTest, ToUpper) {
-  EXPECT_EQ(toUpper(EmptyString), EmptyString);
+  EXPECT_EQ(toUpper(emptyString()), emptyString());
   EXPECT_EQ(toUpper(LowerString), "ABCD");
   EXPECT_EQ(toUpper(UpperString), "EFGH");
   EXPECT_EQ(toUpper(MBString), "雪SNOW");

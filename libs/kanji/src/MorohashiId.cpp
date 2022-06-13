@@ -71,7 +71,7 @@ MorohashiId::Id MorohashiId::validate(
 }
 
 String MorohashiId::toString() const {
-  String result{_id ? std::to_string(_id) : EmptyString};
+  String result{_id ? std::to_string(_id) : emptyString()};
   switch (_idType) {
   case IdType::Prime: result += PrimeSuffix; break;
   case IdType::DoublePrime: result += DoublePrimeSuffix; break;

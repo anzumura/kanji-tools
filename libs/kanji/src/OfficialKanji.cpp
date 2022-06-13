@@ -107,7 +107,7 @@ Kanji::Name OfficialLinkedKanji::check(Name name, Link link, bool isOld) {
     throw DomainError{
         "OfficialLinkedKanji " + name + " wanted type '" +
         toString(KanjiTypes::Jouyou) +
-        (isOld ? EmptyString
+        (isOld ? emptyString()
                : String{"' or '"} + toString(KanjiTypes::Jinmei)) +
         "' for link " + link->name() + ", but got '" + toString(t) + "'"};
   return name;

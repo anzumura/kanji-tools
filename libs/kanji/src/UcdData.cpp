@@ -52,7 +52,7 @@ private: // LCOV_EXCL_LINE
 } // namespace
 
 Ucd::Meaning UcdData::getMeaning(UcdPtr u) {
-  return u ? u->meaning() : EmptyString;
+  return u ? u->meaning() : emptyString();
 }
 
 UcdPtr UcdData::find(const String& name) const {
@@ -84,7 +84,7 @@ String UcdData::getReadingsAsKana(UcdPtr u) const {
     }
     return result;
   }
-  return EmptyString;
+  return emptyString();
 }
 
 void UcdData::load(const KanjiData::Path& file) {

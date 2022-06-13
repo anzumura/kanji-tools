@@ -57,7 +57,7 @@ void KanjiListFile::load(
     const Path& file, FileType fileType, StringSet* uniqueTypeNames) {
   auto lineNum{1};
   const auto error{[&lineNum, &file](const auto& s, bool pLine = true) {
-    usage(s + (pLine ? " - line: " + std::to_string(lineNum) : EmptyString) +
+    usage(s + (pLine ? " - line: " + std::to_string(lineNum) : emptyString()) +
           ", file: " + file.string());
   }};
   std::ifstream f{file};

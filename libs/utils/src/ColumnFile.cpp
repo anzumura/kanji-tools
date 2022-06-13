@@ -86,7 +86,7 @@ bool ColumnFile::nextRow() {
     // end of input so need a special case for an empty final column
     if (i == _rowValues.size() - 1 &&
         (i ? line.ends_with(_delimiter) : line.empty()))
-      _rowValues[_rowValues.size() - 1] = EmptyString;
+      _rowValues[_rowValues.size() - 1] = emptyString();
     else if (i < _rowValues.size())
       error("not enough columns");
     return true;

@@ -88,13 +88,13 @@ void printChartFooter(std::ostream& out, bool markdown, size_t romajiVariants,
 
 [[nodiscard]] String getHepburn(const Kana& i, const String& romaji) {
   auto& hepburn{i.getRomaji(ConvertFlags::Hepburn)};
-  return romaji == hepburn ? EmptyString
+  return romaji == hepburn ? emptyString()
                            : addBrackets(hepburn, BracketType::Round);
 }
 
 [[nodiscard]] String getKunrei(const Kana& i, const String& romaji) {
   auto& kunrei{i.getRomaji(ConvertFlags::Kunrei)};
-  return romaji == kunrei    ? EmptyString
+  return romaji == kunrei    ? emptyString()
          : i.kunreiVariant() ? kunrei
                              : addBrackets(kunrei, BracketType::Round);
 }
@@ -305,8 +305,9 @@ void KanaConvert::printKanaChart(bool markdown) const {
       vars += j;
     }
     // only show unicode for monographs
-    const auto getUni{
-        [&i](auto& s) { return i.isMonograph() ? toUnicode(s) : EmptyString; }};
+    const auto getUni{[&i](auto& s) {
+      return i.isMonograph() ? toUnicode(s) : emptyString();
+    }};
     table.add({type, romaji, h, k, getUni(h), getUni(k), hepburn, kunrei, vars},
         groups.contains(romaji));
   }

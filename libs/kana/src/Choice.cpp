@@ -95,7 +95,7 @@ char Choice::get(Range range, const String& msg, bool useQuit,
           range.second + "'");
   auto choicesOut{choices};
   for (auto i{range.first}; i <= range.second; ++i)
-    if (!choicesOut.emplace(i, EmptyString).second)
+    if (!choicesOut.emplace(i, emptyString()).second)
       error((RangeError + " '") += (i + AlreadyInChoices));
   return get(msg, useQuit, choicesOut, def);
 }

@@ -71,7 +71,7 @@ private:
 } // namespace
 
 TEST_F(ChoiceTest, SingleChoice) {
-  EXPECT_EQ(get('a', {{'a', EmptyString}}), 'a');
+  EXPECT_EQ(get('a', {{'a', emptyString()}}), 'a');
   EXPECT_EQ(getOutput(), "(a): ");
 }
 
@@ -82,17 +82,17 @@ TEST_F(ChoiceTest, NoChoicesError) {
 
 TEST_F(ChoiceTest, NonPrintableError) {
   const char esc{27};
-  const auto f{[esc, this] { getDef({{esc, EmptyString}}); }};
+  const auto f{[esc, this] { getDef({{esc, emptyString()}}); }};
   EXPECT_THROW(call(f, "option is non-printable: 0x1b"), DomainError);
 }
 
 TEST_F(ChoiceTest, TwoChoices) {
-  EXPECT_EQ(get('a', {{'a', EmptyString}, {'b', EmptyString}}), 'a');
+  EXPECT_EQ(get('a', {{'a', emptyString()}, {'b', emptyString()}}), 'a');
   EXPECT_EQ(getOutput(), "(a-b): ");
 }
 
 TEST_F(ChoiceTest, TwoNonConsecutiveChoices) {
-  EXPECT_EQ(get('a', {{'a', EmptyString}, {'c', EmptyString}}), 'a');
+  EXPECT_EQ(get('a', {{'a', emptyString()}, {'c', emptyString()}}), 'a');
   EXPECT_EQ(getOutput(), "(a, c): ");
 }
 
@@ -125,12 +125,12 @@ TEST_F(ChoiceTest, DescriptionsAndRanges) {
 
 TEST_F(ChoiceTest, ChoiceWithDefault) {
   // don't need to specify the choice when there's a default
-  EXPECT_EQ(getDef({{'1', EmptyString}, {'2', EmptyString}}, '1'), '1');
+  EXPECT_EQ(getDef({{'1', emptyString()}, {'2', emptyString()}}, '1'), '1');
   EXPECT_EQ(getOutput(), "(1-2) def '1': ");
 }
 
 TEST_F(ChoiceTest, ChooseNonDefault) {
-  EXPECT_EQ(get('2', {{'1', EmptyString}, {'2', EmptyString}}, '1'), '2');
+  EXPECT_EQ(get('2', {{'1', emptyString()}, {'2', emptyString()}}, '1'), '2');
   EXPECT_EQ(getOutput(), "(1-2) def '1': ");
   EXPECT_TRUE(os().eof());
 }
@@ -184,7 +184,7 @@ TEST_F(ChoiceTest, RangeChoicesAndDefault) {
 
 TEST_F(ChoiceTest, NewLineWithoutDefault) {
   is() << "\n";
-  EXPECT_EQ(get('2', {{'1', EmptyString}, {'2', EmptyString}}), '2');
+  EXPECT_EQ(get('2', {{'1', emptyString()}, {'2', emptyString()}}), '2');
   // Note: new line is not sent to console when prompting for an option since
   // the user should be entering their choice on the same line as the 'prompt'
   // message. If they choose an invalid option and press enter then the 'prompt'
@@ -195,14 +195,14 @@ TEST_F(ChoiceTest, NewLineWithoutDefault) {
 
 TEST_F(ChoiceTest, ChooseBadOption) {
   is() << "3\n";
-  EXPECT_EQ(get('2', {{'1', EmptyString}, {'2', EmptyString}}), '2');
+  EXPECT_EQ(get('2', {{'1', emptyString()}, {'2', emptyString()}}), '2');
   EXPECT_EQ(getOutput(), "(1-2): (1-2): ");
   EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, ChooseBadOptionWithDefault) {
   is() << "3\n";
-  EXPECT_EQ(get('2', {{'1', EmptyString}, {'2', EmptyString}}, '1'), '2');
+  EXPECT_EQ(get('2', {{'1', emptyString()}, {'2', emptyString()}}, '1'), '2');
   EXPECT_EQ(getOutput(), "(1-2) def '1': (1-2) def '1': ");
   EXPECT_TRUE(os().eof());
 }
@@ -214,7 +214,7 @@ TEST_F(ChoiceTest, QuitOption) {
   EXPECT_TRUE(choice().isQuit('q'));
   EXPECT_EQ(choice().quit(), 'q');
   EXPECT_EQ(choice().quitDescription(), "quit");
-  EXPECT_EQ(get('q', {{'1', EmptyString}, {'2', EmptyString}}), 'q');
+  EXPECT_EQ(get('q', {{'1', emptyString()}, {'2', emptyString()}}), 'q');
   EXPECT_EQ(getOutput(), "(1-2, q=quit): ");
   EXPECT_TRUE(os().eof());
 }
@@ -226,7 +226,7 @@ TEST_F(ChoiceTest, QuitDescription) {
   EXPECT_TRUE(choice().isQuit('s'));
   EXPECT_EQ(choice().quit(), 's');
   EXPECT_EQ(choice().quitDescription(), "終了");
-  EXPECT_EQ(get('s', {{'1', EmptyString}, {'2', EmptyString}}), 's');
+  EXPECT_EQ(get('s', {{'1', emptyString()}, {'2', emptyString()}}), 's');
   EXPECT_EQ(getOutput(), "(1-2, s=終了): ");
   EXPECT_TRUE(os().eof());
 }
@@ -254,14 +254,14 @@ TEST_F(ChoiceTest, NonPrintableQuitFromConstructorError) {
 TEST_F(ChoiceTest, UseQuitOption) {
   is() << "q\n";
   choice().setQuit('q');
-  EXPECT_EQ(choice().get(EmptyString, true, {{'1', ""}, {'2', ""}}), 'q');
+  EXPECT_EQ(choice().get(emptyString(), true, {{'1', ""}, {'2', ""}}), 'q');
   EXPECT_EQ(getOutput(), "(1-2, q=quit): ");
   EXPECT_TRUE(os().eof());
   os().clear(); // need to clear 'eof' state on _os before calling 'get' again
   ASSERT_FALSE(os().eof());
   is() << "2\n";
   // specify false for 'useSkip' parameter to skip using quit option
-  EXPECT_EQ(choice().get(EmptyString, false, {{'1', ""}, {'2', ""}}), '2');
+  EXPECT_EQ(choice().get(emptyString(), false, {{'1', ""}, {'2', ""}}), '2');
   EXPECT_EQ(getOutput(), "(1-2): ");
 }
 
@@ -270,14 +270,14 @@ TEST_F(ChoiceTest, ClearQuitOption) {
   choice().setQuit('q');
   choice().clearQuit();
   EXPECT_FALSE(choice().quit());
-  EXPECT_EQ(choice().get(EmptyString, {{'1', ""}, {'2', ""}}), '1');
+  EXPECT_EQ(choice().get(emptyString(), {{'1', ""}, {'2', ""}}), '1');
   EXPECT_EQ(getOutput(), "(1-2): (1-2): ");
   EXPECT_TRUE(os().eof());
 }
 
 TEST_F(ChoiceTest, MissingDefaultOption) {
   const auto f{[this] {
-    return choice().get(EmptyString, {{'a', "abc"}, {'b', "123"}}, 'e');
+    return choice().get(emptyString(), {{'a', "abc"}, {'b', "123"}}, 'e');
   }};
   EXPECT_THROW(call(f, "default option 'e' not in choices"), DomainError);
 }
@@ -286,7 +286,7 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
   choice().setQuit('q');
   for (bool useQuit : {false, true}) {
     const auto f{[useQuit, this] {
-      return choice().get(EmptyString, useQuit, {{'q', "abc"}});
+      return choice().get(emptyString(), useQuit, {{'q', "abc"}});
     }};
     EXPECT_THROW(call(f, "quit option 'q' already in choices"), DomainError);
   }
@@ -297,7 +297,7 @@ TEST_F(ChoiceTest, DuplicateRangeOption) {
   const String start{"range option '"}, end{"' already in choices"};
   for (char rangeStart : {'a', 'b'}) {
     const auto f{[rangeStart, &choices, this] {
-      return choice().get({rangeStart, 'c'}, EmptyString, choices); // NOLINT
+      return choice().get({rangeStart, 'c'}, emptyString(), choices); // NOLINT
     }};
     EXPECT_THROW(
         call(f, start + (rangeStart == 'a' ? 'a' : 'c') += end), DomainError);

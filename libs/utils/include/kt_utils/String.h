@@ -34,19 +34,19 @@ enum class HexCase {
 
 // Global Constants
 
-constexpr auto BinaryDigits{2}, ///< number of binary digits (0 and 1)
-    DecimalDigits{10},          ///< number of decimal digits (0-9)
-    HexDigits{16},              ///< number of hex digits (0-9 plus a-f)
-    Bits{8},                    ///< number of bits in a byte
-    SevenBitMax{128},           ///< max value for a seven bit number
-    UnicodeStringMinSize{4},    ///< min #String size for a Unicode code point
-    UnicodeStringMaxSize{5};    ///< max #String size for a Unicode code point
-
-/// can be used by functions needing to return `const&` empty values
-inline const String EmptyString;
-inline const CodeString EmptyCodeString; ///< \doc EmptyString
+inline constexpr auto BinaryDigits{2}, ///< number of binary digits (0 and 1)
+    DecimalDigits{10},                 ///< number of decimal digits (0-9)
+    HexDigits{16},                     ///< number of hex digits (0-9 plus a-f)
+    Bits{8},                           ///< number of bits in a byte
+    SevenBitMax{128},                  ///< max value for a seven bit number
+    UnicodeStringMinSize{4},           ///< min size for a Unicode hex string
+    UnicodeStringMaxSize{5};           ///< max size for a Unicode hex string
 
 // Global Functions
+
+/// can be used by functions needing to return `const&` empty values
+const String& emptyString();
+const CodeString& emptyCodeString(); ///< \doc emptyString()
 
 /// return a copy of `s` surrounded in brackets of the given type
 [[nodiscard]] String addBrackets(const String& s, BracketType);
