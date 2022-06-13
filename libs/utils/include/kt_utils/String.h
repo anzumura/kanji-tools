@@ -105,8 +105,7 @@ const CodeString& emptyCodeString(); ///< \doc emptyString()
 ///     the result will have a size of 8
 /// \return #String with the binary representation of `x`
 template<typename T>
-[[nodiscard]] inline auto toBinary(
-    T x, BracketType brackets, size_t minSize = 0) {
+[[nodiscard]] auto toBinary(T x, BracketType brackets, size_t minSize = 0) {
   static_assert(std::is_unsigned_v<T>);
   String result;
   for (; x > 0; x >>= 1U)
@@ -116,8 +115,7 @@ template<typename T>
 }
 
 /// overload of toBinary() that sets `brackets` to #BracketType::None
-template<typename T>
-[[nodiscard]] inline auto toBinary(T x, size_t minSize = 0) {
+template<typename T> [[nodiscard]] auto toBinary(T x, size_t minSize = 0) {
   return toBinary(x, BracketType::None, minSize);
 }
 
@@ -131,7 +129,7 @@ template<typename T>
 ///     the result will have a size of 2 (00 - FF)
 /// \return #String with the binary representation of `x`
 template<typename T>
-[[nodiscard]] inline auto toHex(
+[[nodiscard]] auto toHex(
     T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
   static_assert(std::is_unsigned_v<T>);
   String result;
@@ -148,19 +146,19 @@ template<typename T>
 
 /// overload of toHex() that sets `brackets` to #BracketType::None
 template<typename T>
-[[nodiscard]] inline auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
+[[nodiscard]] auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
   return toHex(x, BracketType::None, hexCase, minSize);
 }
 
 /// overload of toHex() that sets `hexCase` to #HexCase::Lower
 template<typename T>
-[[nodiscard]] inline auto toHex(T x, BracketType brackets, size_t minSize = 0) {
+[[nodiscard]] auto toHex(T x, BracketType brackets, size_t minSize = 0) {
   return toHex(x, brackets, HexCase::Lower, minSize);
 }
 
 /// overload of toHex() that sets `brackets` to #BracketType::None and `hexCase`
 /// to #HexCase::Lower
-template<typename T> [[nodiscard]] inline auto toHex(T x, size_t minSize = 0) {
+template<typename T> [[nodiscard]] auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }
 
@@ -215,7 +213,7 @@ template<>
 /// \param s String to convert
 /// \return `s` is no conversion was done or a copy of `s` converted first char
 template<typename T>
-[[nodiscard]] inline auto firstConvert(T pred, T conv, const String& s) {
+[[nodiscard]] auto firstConvert(T pred, T conv, const String& s) {
   if (!s.empty() && pred(s[0])) {
     String result{s};
     result[0] = toChar(conv(result[0]));
@@ -226,31 +224,17 @@ template<typename T>
 
 /// if first char in `s` is an Ascii upper case letter then return a copy with
 /// the first letter converted to lower case, otherwise return `s`
-[[nodiscard]] inline auto firstLower(const String& s) {
-  return firstConvert(::isupper, ::tolower, s);
-}
+[[nodiscard]] String firstLower(const String& s);
 
 /// if first char in `s` is an Ascii lower case letter then return a copy with
 /// the first letter converted to upper case, otherwise return `s`
-[[nodiscard]] inline auto firstUpper(const String& s) {
-  return firstConvert(::islower, ::toupper, s);
-}
+[[nodiscard]] String firstUpper(const String& s);
 
 /// return a copy of `s` with all Ascii letters converted to lower case
-[[nodiscard]] inline auto toLower(const String& s) {
-  String result{s};
-  std::transform(
-      s.begin(), s.end(), result.begin(), [](auto c) { return ::tolower(c); });
-  return result;
-}
+[[nodiscard]] String toLower(const String& s);
 
 /// return a copy of `s` with all Ascii letters converted to upper case
-[[nodiscard]] inline auto toUpper(const String& s) {
-  String result{s};
-  std::transform(
-      s.begin(), s.end(), result.begin(), [](auto c) { return ::toupper(c); });
-  return result;
-}
+[[nodiscard]] String toUpper(const String& s);
 
 /// \end_group
 } // namespace kanji_tools

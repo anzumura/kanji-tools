@@ -145,4 +145,26 @@ bool isAnySingleByte(const CodeString& s) noexcept {
       s.begin(), s.end(), [](auto i) { return isSingleByteChar(i); });
 }
 
+String firstLower(const String& s) {
+  return firstConvert(::isupper, ::tolower, s);
+}
+
+String firstUpper(const String& s) {
+  return firstConvert(::islower, ::toupper, s);
+}
+
+String toLower(const String& s) {
+  String result{s};
+  std::transform(
+      s.begin(), s.end(), result.begin(), [](auto c) { return ::tolower(c); });
+  return result;
+}
+
+String toUpper(const String& s) {
+  String result{s};
+  std::transform(
+      s.begin(), s.end(), result.begin(), [](auto c) { return ::toupper(c); });
+  return result;
+}
+
 } // namespace kanji_tools
