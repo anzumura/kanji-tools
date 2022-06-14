@@ -243,6 +243,7 @@
     "zèng",
     "Zìdiǎn"
   ],
+  "cmake.generator": "Unix Makefiles",
   "debug.onTaskErrors": "debugAnyway",
   "doxdocgen.generic.commandSuggestion": true,
   "doxdocgen.c.commentPrefix": "///",
