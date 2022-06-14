@@ -9,15 +9,15 @@ using uInt = const uint32_t;
 
 namespace {
 
-// Values for determining invalid Unicode code points when doing UTF-8
-// conversion (in addition to 'MaxUnicode' in Utf8.h). Here's a quote from
-// https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
-//   Since RFC 3629 (November 2003), the high and low surrogate halves used by
-//   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
-//   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
-//   encoding must be treated as an invalid byte sequence.
+/// Values for determining invalid code points during conversion from UTF-8 to
+/// UTF-32 (in addition to #MaxUnicode in Utf8.h). \details Here's a quote from
+/// https://en.wikipedia.org/wiki/UTF-8#Invalid_sequences_and_error_handling:
+///   Since RFC 3629 (November 2003), the high and low surrogate halves used by
+///   UTF-16 (U+D800 through U+DFFF) and code points not encodable by UTF-16
+///   (those after U+10FFFF) are not legal Unicode values, and their UTF-8
+///   encoding must be treated as an invalid byte sequence. @{
 constexpr Code MinSurrogate{0xd800}, MaxSurrogate{0xdfff}, Max2Uni{0x7ff},
-    Max3Uni{0xffff}, ErrorReplacement{0xfffd};
+    Max3Uni{0xffff}, ErrorReplacement{0xfffd}; ///@}
 
 // constants and functions for shifting to help simplify the code and get rid
 // of 'magic' numbers
@@ -49,13 +49,13 @@ constexpr uInt Shift12{Shift6 * 2}, Shift18{Shift6 * 3};
   return (x >> Shift18) + y;
 }
 
-// 'getNextByte' advances 'u' to the next byte and returns true it it starts
-// with '10', i.e., a continuation byte
+/// advances `u` to the next byte and returns true it it starts with '10', i.e.,
+/// a continuation byte
 [[nodiscard]] constexpr auto getNextByte(const uint8_t*& u) noexcept {
   return std::countl_one(*++u) == 1;
 }
 
-// allow casting 'uInt' to 'Code' or 'wchar_t' (used by 'convertFromUtf8')
+/// allow casting `uInt` to #Code or `wchar_t`, used by convertFromUtf8()
 template<typename T>
 [[nodiscard]] constexpr std::enable_if_t<
     std::is_same_v<T, Code> || std::is_same_v<T, wchar_t>, T>
@@ -63,44 +63,43 @@ cast(uInt x) noexcept {
   return static_cast<T>(x);
 }
 
-// 'threeByteUtf8' returns a value of type 'T' (Code or wchar_t) that
-// represents a 3 byte UTF-8 character. The values passed in are:
-//   'b1': first byte (strip leading '1's to get 'aaaa' part of '1110aaaa')
-//   'b2': second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
-//   'u':  pointer to third byte (get the 'cccccc' part of '10cccccc')
-// The result is made from the 16 bits: 'aaaa bbbbbb cccccc'
+/// returns a UTF-32 value created from a 3 byte UTF-8 character
+/// \tparam T destination type (either #Code or `wchar_t`)
+/// \param b1 first byte (strip leading '1's to get 'aaaa' part of '1110aaaa')
+/// \param b2 second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
+/// \param u pointer to third byte (get the 'cccccc' part of '10cccccc')
+/// \return result made from the 16 bits: 'aaaa bbbbbb cccccc'
 template<typename T>
 [[nodiscard]] constexpr auto threeByteUtf8(
     uInt b1, uInt b2, const uint8_t* u) noexcept {
   return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
 }
 
-// 'fourByteUtf8' returns a value of type 'T' (Code or wchar_t) that
-// represents a 4 byte UTF-8 character. The values passed in are:
-//   'b1': first byte (strip leading '1's to get 'aaa' part of '11110aaa')
-//   'b2': second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
-//   'b3': third byte without leading '1' (the 'cccccc' part of '10cccccc')
-//   'u':  pointer to fourth byte (get the 'dddddd' part of '10dddddd')
-// The result is made from the 21 bits: 'aaa bbbbbb cccccc dddddd'
+/// returns a UTF-32 value created from a 4 byte UTF-8 character
+/// \tparam T destination type (either #Code or `wchar_t`)
+/// \param b1 first byte (strip leading '1's to get 'aaa' part of '11110aaa')
+/// \param b2 second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
+/// \param b3 third byte without leading '1' (the 'cccccc' part of '10cccccc')
+/// \param u pointer to fourth byte (get the 'dddddd' part of '10dddddd')
+/// \return result made from the 21 bits: 'aaa bbbbbb cccccc dddddd'
 template<typename T>
 [[nodiscard]] constexpr auto fourByteUtf8(
     uInt b1, uInt b2, uInt b3, const uint8_t* u) noexcept {
   return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
 }
 
-// UTF-8 sequence for U+FFFD (�) - used by the local 'toUtf8' functions for
-// invalid code points
+/// UTF-8 sequence for U+FFFD (�) - used by local toUtf8() functions for invalid
+/// code points
 constexpr auto ReplacementCharacter{"\xEF\xBF\xBD"};
 
-// 'convertFromUtf8' is templated so use arrays of constants of the templated
-// type in order to avoid casting and type warnings
-
+/// convertFromUtf8() is templated so use arrays of constants of the templated
+/// type in order to avoid casting and type warnings @{
 constexpr auto Err{0}, MinSur{1}, MaxSur{2}, MaxTwo{3}, MaxThree{4}, MaxUni{5};
 constexpr std::array Char32Vals{
     ErrorReplacement, MinSurrogate, MaxSurrogate, Max2Uni, Max3Uni, MaxUnicode};
 constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
     toWChar(MaxSurrogate), toWChar(Max2Uni), toWChar(Max3Uni),
-    toWChar(MaxUnicode)};
+    toWChar(MaxUnicode)}; ///@}
 
 template<typename T> using Consts = std::array<T, Char32Vals.size()>;
 
@@ -133,7 +132,7 @@ template<typename T>
                                : v[Err];
 }
 
-// 'R' is a sequence (so u32string or wstring) and 'T' is Code or wchar_t
+/// `R` is a sequence (so u32string or wstring) and `T` is #Code or `wchar_t`
 template<typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(
     const char* s, size_t maxSize, const Consts<T>& v) {
@@ -171,8 +170,8 @@ void convertToUtf8(Code c, String& s) {
     s += ReplacementCharacter; // GCOV_EXCL_LINE
 }
 
-// 'validateMB' is called by 'validateMBUtf8' ('u' has already been verified to
-// point to the first byte of a UTF-8 sequence by the calling function)
+/// called by validateMBUtf8(), `u` has already been verified to point to the
+/// first byte of a UTF-8 sequence by the calling function
 template<typename T>
 [[nodiscard]] auto validateMB(const T& err, const uint8_t* u, bool sizeOne) {
   uInt byte1{*u};
