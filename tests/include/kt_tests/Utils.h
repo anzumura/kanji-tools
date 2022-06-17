@@ -13,7 +13,7 @@ namespace kanji_tools {
 /// \param expected list of values to look for in `is`
 /// \return total number of matching lines found
 template<auto P, typename T>
-[[nodiscard]] inline auto findMatches(std::istream& is, const T& expected) {
+[[nodiscard]] auto findMatches(std::istream& is, const T& expected) {
   size_t found{};
   for (String line; std::getline(is, line);)
     for (const auto& i : expected)
@@ -25,14 +25,14 @@ template<auto P, typename T>
 }
 
 template<typename T>
-[[nodiscard]] inline auto findEqualMatches(
+[[nodiscard]] auto findEqualMatches(
     std::istream& is, const T& expected) {
   return findMatches<[](const String& x, const auto& y) { return x == y; }>(
       is, expected);
 }
 
 template<typename T>
-[[nodiscard]] inline auto findEndMatches(std::istream& is, const T& expected) {
+[[nodiscard]] auto findEndMatches(std::istream& is, const T& expected) {
   return findMatches<[](const String& x, const auto& y) {
     return x.ends_with(y);
   }>(is, expected);

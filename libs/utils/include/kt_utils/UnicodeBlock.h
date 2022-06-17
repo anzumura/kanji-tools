@@ -260,7 +260,7 @@ template<size_t N, typename... Ts>
 /// will return false and a string longer than one 'MB character' also returns
 /// false unless `sizeOne` is false.
 template<typename... T>
-[[nodiscard]] inline auto inWCharRange(const String& s, bool sizeOne, T&... t) {
+[[nodiscard]] auto inWCharRange(const String& s, bool sizeOne, T&... t) {
   // a string with only one byte can't hold an MB char so don't need to check it
   if (s.size() > 1) {
     if (!sizeOne) {
@@ -281,7 +281,7 @@ template<typename... T>
 
 /// true if `s` is empty or every char in `s` is in the given blocks
 template<typename... T>
-[[nodiscard]] inline auto inWCharRange(const String& s, T&... t) {
+[[nodiscard]] auto inWCharRange(const String& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
   for (auto allowNonSpacing{false}; const auto i : fromUtf8(s))
     if (allowNonSpacing && isNonSpacing(i))
