@@ -24,13 +24,22 @@ template<auto P, typename T>
   return found;
 }
 
+/// count number of lines in `is` that equal an entry in `expected`
+/// \tparam T type of `expected`
+/// \param is input stream to search
+/// \param expected list of values to look for in `is`
+/// \return total number of matching lines found
 template<typename T>
-[[nodiscard]] auto findEqualMatches(
-    std::istream& is, const T& expected) {
+[[nodiscard]] auto findEqualMatches(std::istream& is, const T& expected) {
   return findMatches<[](const String& x, const auto& y) { return x == y; }>(
       is, expected);
 }
 
+/// count number of lines in `is` that end with an entry in `expected`
+/// \tparam T type of `expected`
+/// \param is input stream to search
+/// \param expected list of values to look for in `is`
+/// \return total number of matching lines found
 template<typename T>
 [[nodiscard]] auto findEndMatches(std::istream& is, const T& expected) {
   return findMatches<[](const String& x, const auto& y) {
