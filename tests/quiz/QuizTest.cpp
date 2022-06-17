@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kt_quiz/Quiz.h>
+#include <kt_tests/Utils.h>
 
 #include <sstream>
 
@@ -13,14 +14,7 @@ TEST(QuizTest, Info) {
   const auto expected = {">>> Loaded 1460 kanji into 88 groups",
       ">>> Loaded 5703 kanji into 1038 groups",
       ">>> Total Kanji with Jukugo: 2910, unique jukugo: 18490"};
-  size_t found{};
-  for (String line; std::getline(os, line);)
-    for (const auto& i : expected)
-      if (line == i) {
-        ++found;
-        break;
-      }
-  EXPECT_EQ(found, std::size(expected));
+  EXPECT_EQ(findEqualMatches(os, expected), std::size(expected));
 }
 
 TEST(QuizTest, Debug) {
@@ -33,14 +27,7 @@ TEST(QuizTest, Debug) {
       "時間：十干 (10)   : 甲. 乙. 丙. 丁. 戊^ 己. 庚^ 辛. 壬\" 癸+", // 'meaning'
       "畏：ワイ、イ( 3)   畏.: 隈\" 猥#",   // 'pattern' with multiple readings
       "  ：ジュン( 3)   　 : 準. 准. 隼'"}; // 'pattern' with no parent
-  size_t found{};
-  for (String line; std::getline(os, line);)
-    for (const auto& i : expected)
-      if (line.ends_with(i)) {
-        ++found;
-        break;
-      }
-  EXPECT_EQ(found, std::size(expected));
+  EXPECT_EQ(findEndMatches(os, expected), std::size(expected));
 }
 
 } // namespace kanji_tools

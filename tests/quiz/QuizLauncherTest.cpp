@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <kt_kanji/FileKanjiData.h>
 #include <kt_quiz/QuizLauncher.h>
+#include <kt_tests/Utils.h>
 #include <kt_tests/WhatMismatch.h>
 
 #include <sstream>
@@ -42,14 +43,7 @@ TEST_F(QuizLauncherTest, HelpMessage) {
   // look for a few strings instead of comparing the whole output
   const auto expected = {"-r   review mode", "-t   test mode",
       "-s   show English meanings by default (can be toggled on/off later)"};
-  size_t found{};
-  for (String line; std::getline(_os, line);)
-    for (const auto& i : expected)
-      if (line.ends_with(i)) {
-        ++found;
-        break;
-      }
-  EXPECT_EQ(found, std::size(expected));
+  EXPECT_EQ(findEndMatches(_os, expected), std::size(expected));
 }
 
 TEST_F(QuizLauncherTest, ValidOptions) {
