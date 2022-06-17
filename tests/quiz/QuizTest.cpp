@@ -11,7 +11,7 @@ TEST(QuizTest, Info) {
   Quiz::run(args, os);
   // look for a few strings instead of comparing the whole output
   const auto expected = {">>> Loaded 1460 kanji into 88 groups",
-      ">>> Loaded 5700 kanji into 1038 groups",
+      ">>> Loaded 5703 kanji into 1038 groups",
       ">>> Total Kanji with Jukugo: 2910, unique jukugo: 18490"};
   size_t found{};
   for (String line; std::getline(os, line);)
