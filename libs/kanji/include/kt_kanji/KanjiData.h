@@ -55,11 +55,15 @@ public:
 
   /// lambda to sort shared Kanji pointers by 'qualified name' (see Kanji.h)
   static constexpr auto OrderByQualifiedName{
-      [](KanjiPtr& a, KanjiPtr& b) { return a->orderByQualifiedName(*b); }};
+      [](const KanjiPtr& a, const KanjiPtr& b) {
+        return a->orderByQualifiedName(*b);
+      }};
 
   /// lambda to sort shared Kanji pointers by 'strokes' (see Kanji.h)
   static constexpr auto OrderByStrokes{
-      [](KanjiPtr& a, KanjiPtr& b) { return a->orderByStrokes(*b); }};
+      [](const KanjiPtr& a, const KanjiPtr& b) {
+        return a->orderByStrokes(*b);
+      }};
 
   /// return `highest frequency + 1` out of all the currently loaded Kanji
   /// \details 'frequency' numbers start at `1` which means 'the most frequent'
