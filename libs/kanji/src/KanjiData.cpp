@@ -32,6 +32,8 @@ Args::Size KanjiData::nextArg(const Args& args, Args::Size current) {
   return result;
 }
 
+void KanjiData::usage(const String& msg) { KanjiListFile::usage(msg); }
+
 Kanji::Frequency KanjiData::maxFrequency() noexcept { return _maxFrequency; }
 
 const Pinyin& KanjiData::getPinyin(UcdPtr u) noexcept {

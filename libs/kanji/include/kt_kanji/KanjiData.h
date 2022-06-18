@@ -51,7 +51,7 @@ public:
   /// called for fatal problems with command-line args or loading initial data
   /// \param msg the error message
   /// \throw DomainError containing `msg`
-  static void usage(const String& msg) { KanjiListFile::usage(msg); }
+  static void usage(const String& msg);
 
   /// lambda to sort shared Kanji pointers by 'qualified name' (see Kanji.h)
   static constexpr auto OrderByQualifiedName{
