@@ -80,11 +80,11 @@ protected:
   /// create a KanjiListFile object and call load()
   /// \param p path to text file to load
   /// \param fileType how data is stored in `p`
-  /// \param uniqueTypeNames optional set to use for making sure entries in `p`
+  /// \param uniqueNames optional set to use for making sure entries in `p`
   ///     are unique (instead of using a global set)
   /// \param name optional name, if empty then capitalized file name is used
   /// \throw DomainError if `p` is not found or is not a regular file
-  KanjiListFile(const Path& p, FileType fileType, StringSet* uniqueTypeNames,
+  KanjiListFile(const Path& p, FileType fileType, StringSet* uniqueNames,
       const String& name = {});
 private:
   using Map = std::map<String, Index>;
@@ -103,7 +103,7 @@ private:
   /// called by load() for each kanji string
   /// \tparam T type of `error`
   /// \param error function to call when an error is found
-  /// \param uniqueTypeNames `token` is inserted into this set if provided
+  /// \param uniqueNames `token` is inserted into this set if provided
   /// \param token the kanji string to validate
   /// \return result of insert into `uniqueTypeNames` or true set not provided
   /// \throw DomainError if `token` isn't a valid multi-byte UTF-8 character or
@@ -111,8 +111,7 @@ private:
   /// \throw DomainError if `uniqueTypeNames` is not provided and `token` has
   ///     already been loaded in another file
   template<typename T>
-  bool validate(
-      const T& error, StringSet* uniqueTypeNames, const String& token);
+  bool validate(const T& error, StringSet* uniqueNames, const String& token);
 
   /// return false if adding another entry would exceed #MaxEntries, otherwise
   /// add the given token to #_list and #_map and returns true

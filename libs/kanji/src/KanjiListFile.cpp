@@ -43,20 +43,20 @@ void KanjiListFile::clearUniqueCheckData() {
 KanjiListFile::KanjiListFile(const Path& p, FileType fileType)
     : KanjiListFile{p, fileType, {}} {}
 
-KanjiListFile::KanjiListFile(const Path& fileIn, FileType fileType,
-    StringSet* uniqueTypeNames, const String& name)
-    : _name{name.empty() ? firstUpper(fileIn.stem().string()) : name} {
-  auto file{fileIn};
+KanjiListFile::KanjiListFile(const Path& p, FileType fileType,
+    StringSet* uniqueNames, const String& name)
+    : _name{name.empty() ? firstUpper(p.stem().string()) : name} {
+  auto file{p};
   // try adding .txt if file isn't found
-  if (!fs::is_regular_file(file) && !fileIn.has_extension())
+  if (!fs::is_regular_file(file) && !p.has_extension())
     file += TextFileExtension;
   if (!fs::is_regular_file(file)) usage("can't open " + file.string());
-  if (uniqueTypeNames) _otherUniqueNames.insert(uniqueTypeNames);
-  load(file, fileType, uniqueTypeNames);
+  if (uniqueNames) _otherUniqueNames.insert(uniqueNames);
+  load(file, fileType, uniqueNames);
 }
 
 void KanjiListFile::load(
-    const Path& file, FileType fileType, StringSet* uniqueTypeNames) {
+    const Path& file, FileType fileType, StringSet* uniqueNames) {
   auto lineNum{1};
   const auto error{[&lineNum, &file](const auto& s, bool pLine = true) {
     usage(s + (pLine ? " - line: " + std::to_string(lineNum) : emptyString()) +
@@ -69,7 +69,7 @@ void KanjiListFile::load(
     for (String token; std::getline(ss, token, ' ');)
       if (fileType == FileType::OnePerLine && token != line)
         error("got multiple tokens");
-      else if (!validate(error, uniqueTypeNames, token))
+      else if (!validate(error, uniqueNames, token))
         dups.emplace_back(token);
       else if (!addEntry(token))
         error("exceeded '" + std::to_string(MaxEntries) + "' entries", false);
@@ -84,13 +84,13 @@ void KanjiListFile::load(
 
 template<typename T>
 bool KanjiListFile::validate(
-    const T& error, StringSet* uniqueTypeNames, const String& token) {
+    const T& error, StringSet* uniqueNames, const String& token) {
   if (!isValidMBUtf8(token, true))
     error("invalid multi-byte token '" + token + "'");
   // check uniqueness within file
   if (_map.find(token) != _map.end()) error("got duplicate token '" + token);
   // check uniqueness across files
-  if (uniqueTypeNames) return uniqueTypeNames->insert(token).second;
+  if (uniqueNames) return uniqueNames->insert(token).second;
   if (!_uniqueNames.insert(token).second)
     error("found globally non-unique entry '" + token + "'");
   return true;
