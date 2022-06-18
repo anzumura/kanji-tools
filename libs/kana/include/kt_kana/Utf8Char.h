@@ -126,6 +126,7 @@ private:
 
   /// returns a String containing a single %Kana character if `next` is a
   /// combining mark, otherwise return `cur` (calls combiningMark() functions)
+  /// \tparam T Utf8Char type (either const or non-const)
   template<typename T>
   [[nodiscard]] static String processOne(
       T&, const String& cur, const String& next);
