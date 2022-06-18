@@ -146,7 +146,7 @@ void Choice::add(String& prompt, const Choices& choices) {
 
   OptChar rangeStart;
   char prevChar{};
-  const auto completeRange{[&prompt, &rangeStart, &prevChar]() {
+  const auto completeRange{[&prompt, &rangeStart, &prevChar] {
     if (rangeStart != prevChar) prompt += Dash + prevChar; // NOLINT
   }};
   for (auto& i : choices) {
