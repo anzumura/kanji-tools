@@ -177,7 +177,7 @@ private:
   [[nodiscard]] String processKana(const String& kanaGroup, CharType source,
       const Kana*& prevKana, bool prolong = false) const;
   template<typename T>
-  [[nodiscard]] bool processOneKana(const T&, CharType source,
+  [[nodiscard]] bool processOneKana(const T& done, CharType source,
       const String& kana, const String& kanaGroup, State&) const;
   [[nodiscard]] String processKanaMacron(bool prolong, const Kana*& prevKana,
       const Kana* kana, bool sokuon = false) const; ///@}
