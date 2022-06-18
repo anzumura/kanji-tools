@@ -423,7 +423,7 @@ TEST_F(FileKanjiDataTest, SortByQualifiedName) {
   auto jinmei4stroke1{find("云", KanjiTypes::Jinmei, SmallS, {}, "4E91")};
   auto jinmei4stroke2{find("勿", KanjiTypes::Jinmei, SmallS, {}, "52FF")};
 
-  const auto check{[](auto& x, auto& y, bool strokes = true) {
+  const auto check{[]<typename T>(T& x, T& y, bool strokes = true) {
     EXPECT_TRUE(KanjiData::OrderByQualifiedName(x, y));
     EXPECT_FALSE(KanjiData::OrderByQualifiedName(y, x));
     // OrderByStrokes is the same as OrderByQualifiedName if both Kanji are

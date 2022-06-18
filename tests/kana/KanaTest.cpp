@@ -241,7 +241,7 @@ TEST(KanaTest, CheckRomaji) {
       oNum{}, voNum{}, nNum{};
   std::set<String> romajiVariants;
   for (auto& i : sourceMap) {
-    const auto count{[&i](auto& normal, auto& variant) {
+    const auto count{[&i]<typename T>(T& normal, T& variant) {
       i.second->romaji() == i.first ? ++normal : ++variant;
     }};
     ASSERT_FALSE(i.first.empty());
