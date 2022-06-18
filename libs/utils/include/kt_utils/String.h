@@ -211,8 +211,7 @@ template<>
 /// \tparam C function that returns converted value
 /// \param s String to convert
 /// \return converted copy of `s` or just `s` if `P` is false
-template<auto P, auto C>
-[[nodiscard]] auto firstConvert(const String& s) {
+template<auto P, auto C> [[nodiscard]] auto firstConvert(const String& s) {
   if (!s.empty() && P(s[0])) {
     String result{s};
     result[0] = toChar(C(result[0]));
