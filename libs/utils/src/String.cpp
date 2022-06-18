@@ -146,11 +146,11 @@ bool isAnySingleByte(const CodeString& s) noexcept {
 }
 
 String firstLower(const String& s) {
-  return firstConvert(::isupper, ::tolower, s);
+  return firstConvert<::isupper, ::tolower>(s);
 }
 
 String firstUpper(const String& s) {
-  return firstConvert(::islower, ::toupper, s);
+  return firstConvert<::islower, ::toupper>(s);
 }
 
 String toLower(const String& s) {

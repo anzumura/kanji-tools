@@ -207,16 +207,15 @@ template<>
     const CodeString&) noexcept; ///< \doc isAnySingleByte()
 
 /// convert first char of `s` (used by firstLower() and firstUpper())
-/// \tparam T conversion function type
-/// \param pred function that returns true if value should be converted
-/// \param conv function that returns converted value
+/// \tparam P function that returns true if value should be converted
+/// \tparam C function that returns converted value
 /// \param s String to convert
-/// \return `s` is no conversion was done or a copy of `s` converted first char
-template<typename T>
-[[nodiscard]] auto firstConvert(T pred, T conv, const String& s) {
-  if (!s.empty() && pred(s[0])) {
+/// \return converted copy of `s` or just `s` if `P` is false
+template<auto P, auto C>
+[[nodiscard]] auto firstConvert(const String& s) {
+  if (!s.empty() && P(s[0])) {
     String result{s};
-    result[0] = toChar(conv(result[0]));
+    result[0] = toChar(C(result[0]));
     return result;
   }
   return s;
