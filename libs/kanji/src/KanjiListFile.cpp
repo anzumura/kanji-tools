@@ -33,6 +33,8 @@ void KanjiListFile::print(std::ostream& out, const StringList& l,
   }
 }
 
+void KanjiListFile::usage(const String& msg) { throw DomainError{msg}; }
+
 void KanjiListFile::clearUniqueCheckData() {
   _uniqueNames.clear();
   for (auto i : _otherUniqueNames) i->clear();

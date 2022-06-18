@@ -37,19 +37,32 @@ public:
   static void print(std::ostream&, const StringList&, const String& type,
       const String& group);
 
-  static void usage(const String& msg) { throw DomainError(msg); }
+  /// report a fatal 'usage' error (like bad command-line args, missing files,
+  /// invalid static data, etc.)
+  /// \param msg usage error message
+  /// \throw DomainError is thrown with 'what' string set to `msg`
+  static void usage(const String& msg);
 
   /// can be called after loading is complete to clear up static data used for
   /// checking uniqueness
   static void clearUniqueCheckData();
 
-  enum class FileType { MultiplePerLine, OnePerLine };
+  /// indicates how data is stored in the text file
+  enum class FileType {
+    MultiplePerLine, ///< a line can have more than one (space separated) Kanji
+    OnePerLine       ///< each line can only have a single Kanji
+  };
 
-  explicit KanjiListFile(const Path&, FileType = FileType::OnePerLine);
+  /// public ctor used for a non-typed KanjiListFile (calls protected ctor)
+  /// \param p path to text file to load
+  /// \param fileType how data is stored in `p`
+  /// \throw DomainError if `p` is not found or is not a regular file
+  explicit KanjiListFile(
+      const Path& p, FileType fileType = FileType::OnePerLine);
 
-  KanjiListFile(const KanjiListFile&) = delete;
+  KanjiListFile(const KanjiListFile&) = delete; ///< deleted copy ctor
 
-  virtual ~KanjiListFile() = default;
+  virtual ~KanjiListFile() = default; ///< default dtor
 
   /// return index for `name` starting at `1` or return `0` for not found
   [[nodiscard]] Index getIndex(const String& name) const;
@@ -64,7 +77,15 @@ public:
   /// return the full contents of this list in a string (with no separates)
   [[nodiscard]] String toString() const;
 protected:
-  KanjiListFile(const Path&, FileType, StringSet*, const String& name = {});
+  /// create a KanjiListFile object and call load()
+  /// \param p path to text file to load
+  /// \param fileType how data is stored in `p`
+  /// \param uniqueTypeNames optional set to use for making sure entries in `p`
+  ///     are unique (instead of using a global set)
+  /// \param name optional name, if empty then capitalized file name is used
+  /// \throw DomainError if `p` is not found or is not a regular file 
+  KanjiListFile(const Path& p, FileType fileType, StringSet* uniqueTypeNames,
+      const String& name = {});
 private:
   using Map = std::map<String, Index>;
 
