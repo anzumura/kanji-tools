@@ -221,12 +221,14 @@ void UcdData::printVariationSelectorKanji(KanjiDataRef data) const {
                  << ++count << "    "
                  << toUnicode(k.name(), BracketType::Square) << ' ' << k.name()
                  << " variant of " << k.nonVariantName() << "    ";
-      const auto u{find(k.name())};
-      // ucd entry should always exist
-      if (!u) KanjiData::usage("UCD not found for '" + k.name() + "'");
-      data.out() << u->codeAndName();
-      if (u->hasLinks()) data.out() << " variant of " << u->linkCodeAndNames();
-      data.out() << '\n';
+      // ucd entry should always exist, but check to be safe
+      if (const auto u{find(k.name())}; u) {
+        data.out() << u->codeAndName();
+        if (u->hasLinks())
+          data.out() << " variant of " << u->linkCodeAndNames();
+        data.out() << '\n';
+      } else
+        KanjiData::usage("UCD not found for '" + k.name() + "'");
     }
 }
 
