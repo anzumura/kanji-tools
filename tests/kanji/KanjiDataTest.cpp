@@ -135,6 +135,14 @@ TEST_F(KanjiDataTest, DataDirArgToInvalidData) {
   EXPECT_THROW(call([&args] { return getDataDir(args); }, msg), DomainError);
 }
 
+TEST_F(KanjiDataTest, GetEmptyPinyin) {
+  EXPECT_EQ(getPinyin(nullptr), Pinyin{});
+}
+
+TEST_F(KanjiDataTest, GetEmptyMorohashiId) {
+  EXPECT_EQ(getMorohashiId(nullptr), MorohashiId{});
+}
+
 TEST_F(KanjiDataTest, SearchBasedOnArg0ForDataDir) {
   // get 'data' directory based on 'current directory' logic, i.e., look in
   // current directory for 'data' and if not found check all parent
