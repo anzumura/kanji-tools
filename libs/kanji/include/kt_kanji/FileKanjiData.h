@@ -42,8 +42,7 @@ private:
   void printListData(
       const KanjiListFile&, const StringList&, TypeStringList&) const;
   void noFreq(std::ptrdiff_t f, bool brackets = false) const;
-  template<typename T>
-  void printCount(const String& name, T pred, size_t = 0) const;
+  template<auto Pred> void printCount(const String& name, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
   template<typename T, Enum::Size S>

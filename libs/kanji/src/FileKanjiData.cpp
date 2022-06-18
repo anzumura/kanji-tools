@@ -227,9 +227,8 @@ void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
   }
 }
 
-template<typename T>
-void FileKanjiData::printCount(
-    const String& name, T pred, size_t printExamples) const {
+template<auto Pred>
+void FileKanjiData::printCount(const String& name, size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<String>> examples;
   size_t total{};
@@ -238,11 +237,11 @@ void FileKanjiData::printCount(
     const auto t{*i++};
     if (printExamples)
       for (auto& j : l) {
-        if (pred(j) && ++count <= printExamples)
+        if (Pred(j) && ++count <= printExamples)
           examples[t].emplace_back(j->name());
       }
     else
-      count = static_cast<size_t>(std::count_if(l.begin(), l.end(), pred));
+      count = static_cast<size_t>(std::count_if(l.begin(), l.end(), Pred));
     if (count) {
       counts.emplace_back(t, count);
       total += count;
@@ -268,20 +267,19 @@ void FileKanjiData::printStats() const {
   }
   out() << ")\n";
   if (fullDebug()) {
-    printCount("  Has JLPT level", [](auto& x) { return x->hasLevel(); });
-    printCount("  Has frequency and not in Jouyou or JLPT", [](auto& x) {
+    printCount<[](auto& x) { return x->hasLevel(); }>("  Has JLPT level");
+    printCount<[](auto& x) {
       return x->frequency() && !x->is(KanjiTypes::Jouyou) && !x->hasLevel();
-    });
-    printCount("  Jinmei with no frequency and not JLPT", [](auto& x) {
+    }>("  Has frequency and not in Jouyou or JLPT");
+    printCount<[](auto& x) {
       return x->is(KanjiTypes::Jinmei) && !x->frequency() && !x->hasLevel();
-    });
-    printCount("  NF (no-frequency)", [](auto& x) { return !x->frequency(); });
-    printCount("  Has Variant Strokes",
-        [](auto& x) { return x->strokes().hasVariant(); });
-    printCount(
-        "  Has Variation Selectors", [](auto& x) { return x->variant(); },
-        MaxVariantSelectorExamples);
-    printCount("Old Forms", [](auto& x) { return !x->oldNames().empty(); });
+    }>("  Jinmei with no frequency and not JLPT");
+    printCount<[](auto& x) { return !x->frequency(); }>("  NF (no-frequency)");
+    printCount<[](auto& x) { return x->strokes().hasVariant(); }>(
+        "  Has Variant Strokes");
+    printCount<[](auto& x) { return x->variant(); }>(
+        "  Has Variation Selectors", MaxVariantSelectorExamples);
+    printCount<[](auto& x) { return !x->oldNames().empty(); }>("Old Forms");
   }
 }
 
