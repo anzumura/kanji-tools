@@ -55,8 +55,8 @@ KanjiListFile::KanjiListFile(const Path& p, FileType fileType,
   load(file, fileType, uniqueNames);
 }
 
-void KanjiListFile::load(
-    const Path& file, FileType fileType, StringSet* uniqueNames) {
+void KanjiListFile::load(const Path& file, FileType fileType,
+    StringSet* uniqueNames) { // LCOV_EXCL_LINE
   auto lineNum{1};
   const auto error{[&lineNum, &file](const auto& s, bool pLine = true) {
     usage(s + (pLine ? " - line: " + std::to_string(lineNum) : emptyString()) +

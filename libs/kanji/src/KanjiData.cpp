@@ -37,12 +37,12 @@ void KanjiData::usage(const String& msg) { KanjiListFile::usage(msg); }
 Kanji::Frequency KanjiData::maxFrequency() noexcept { return _maxFrequency; }
 
 const Pinyin& KanjiData::getPinyin(UcdPtr u) noexcept {
-  static constexpr Pinyin EmptyPinyin;
+  static constexpr Pinyin EmptyPinyin; // LCOV_EXCL_LINE
   return u ? u->pinyin() : EmptyPinyin;
 }
 
 const MorohashiId& KanjiData::getMorohashiId(UcdPtr u) noexcept {
-  static constexpr MorohashiId EmptyMorohashiId; // LCOV_EXCL_LINE
+  static constexpr MorohashiId EmptyMorohashiId;
   return u ? u->morohashiId() : EmptyMorohashiId;
 }
 
