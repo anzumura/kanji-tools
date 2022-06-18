@@ -83,7 +83,7 @@ protected:
   /// \param uniqueTypeNames optional set to use for making sure entries in `p`
   ///     are unique (instead of using a global set)
   /// \param name optional name, if empty then capitalized file name is used
-  /// \throw DomainError if `p` is not found or is not a regular file 
+  /// \throw DomainError if `p` is not found or is not a regular file
   KanjiListFile(const Path& p, FileType fileType, StringSet* uniqueTypeNames,
       const String& name = {});
 private:
