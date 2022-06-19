@@ -3,6 +3,7 @@
 #include <kt_kana/Utf8Char.h>
 #include <kt_kanji/FileKanjiData.h>
 #include <kt_tests/TestKanjiData.h>
+#include <kt_tests/Utils.h>
 #include <kt_tests/WhatMismatch.h>
 
 #include <type_traits>
@@ -473,7 +474,7 @@ TEST(KanjiDataPrintTest, Info) {
   const char* args[]{"", KanjiData::InfoArg.c_str()};
   std::stringstream os;
   FileKanjiData data(args, os);
-  const char* expected[]{
+  const auto expected = {
       (">>> Loaded 23715 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
        "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17471)"),
       ">>> Grade breakdown:",
@@ -485,12 +486,8 @@ TEST(KanjiDataPrintTest, Info) {
       ">>>   Total for grade G6: 181 (N4 3, N2 105, N1 73)",
       ">>>   Total for grade S: 1130 (nf 99) (N2 161, N1 804, None 165)",
       ">>>   Total for all grades: 2136"};
-  int count{0}, maxLines{std::size(expected)};
-  for (String line; std::getline(os, line); ++count) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(os));
 }
 
 TEST(KanjiDataPrintTest, Debug) {

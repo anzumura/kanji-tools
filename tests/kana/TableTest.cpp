@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <kt_kana/Table.h>
+#include <kt_tests/Utils.h>
 
 #include <sstream>
 
@@ -49,18 +50,13 @@ TEST_F(TableTest, TableWithJustTitles) {
   Table t{{"hello", world}};
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+-------+-------+",
     "| hello | world |",
     "+-------+-------+"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithTitleAndEmptyRows) {
@@ -70,7 +66,7 @@ TEST_F(TableTest, TableWithTitleAndEmptyRows) {
   t.add();
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+-------+-------+",
     "| hello | world |",
     "|       |       |",
@@ -78,13 +74,8 @@ TEST_F(TableTest, TableWithTitleAndEmptyRows) {
     "|       |       |",
     "+-------+-------+"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithTitleAndSectionAndEmptyRows) {
@@ -94,7 +85,7 @@ TEST_F(TableTest, TableWithTitleAndSectionAndEmptyRows) {
   t.add();
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+-------+-------+",
     "| hello | world |",
     "+-------+-------+",
@@ -103,27 +94,17 @@ TEST_F(TableTest, TableWithTitleAndSectionAndEmptyRows) {
     "|       |       |",
     "+-------+-------+"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithOneCell) {
   Table t;
   t.add({"a"});
   t.print(_os);
-  const char* expected[]{"+---+", "| a |", "+---+"};
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  const auto expected = {"+---+", "| a |", "+---+"};
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithMultipleRowsAndColumns) {
@@ -132,33 +113,23 @@ TEST_F(TableTest, TableWithMultipleRowsAndColumns) {
   t.add({"1", "123"});
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+---+-----+---+",
     "| a | b   | c |",
     "| 1 | 123 |   |",
     "+---+-----+---+"};
-  const char* expectedMD[]{
+  const auto expectedMD = {
     "|  |  |  |",
     "| --- | --- | --- |",
     "| a | b | c |",
     "| 1 | 123 |  |"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
   _os.clear();
   t.printMarkdown(_os);
-  count = 0;
-  maxLines = std::size(expectedMD);
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expectedMD[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expectedMD), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithTitleSectionsAndRows) {
@@ -168,7 +139,7 @@ TEST_F(TableTest, TableWithTitleSectionsAndRows) {
   t.add({"x", "", "y", "z"}, true); // four columns
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+-----+-----+-------+---+",
     "| one | two | three |   |",
     "+-----+-----+-------+---+",
@@ -178,13 +149,8 @@ TEST_F(TableTest, TableWithTitleSectionsAndRows) {
     "| x   |     | y     | z |",
     "+-----+-----+-------+---+"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithCount) {
@@ -194,7 +160,7 @@ TEST_F(TableTest, TableWithCount) {
   t.add({"x"});
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+-------+-----+-----+",
     "| count | one | two |",
     "+-------+-----+-----+",
@@ -204,13 +170,8 @@ TEST_F(TableTest, TableWithCount) {
     "| 3     | x   |     |",
     "+-------+-----+-----+"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, TableWithWideCharacters) {
@@ -221,7 +182,7 @@ TEST_F(TableTest, TableWithWideCharacters) {
   t.print(_os);
   // clang-format off
   // This text aligns properly on a terminal (see comments in Table.h for more details)
-  const char* expected[]{
+  const auto expected = {
     "+------+-----+----------+",
     "| 数字 | one | two      |",
     "+------+-----+----------+",
@@ -230,29 +191,19 @@ TEST_F(TableTest, TableWithWideCharacters) {
     "| 3    | x   | y/はい   |",
     "+------+-----+----------+"};
   // Markdown output doesn't try to align columns (that's done by the browser or editor)
-  const char* expectedMD[]{
+  const auto expectedMD = {
     "| 数字 | one | two |",
     "| --- | --- | --- |",
     "| **1** | **a** | **カタカナ** |",
     "| 2 | 5 | 中 |",
     "| 3 | x | y/はい |"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
   _os.clear();
   t.printMarkdown(_os);
-  count = 0;
-  maxLines = std::size(expectedMD);
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expectedMD[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expectedMD), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 TEST_F(TableTest, EscapePipeForMarkdown) {
@@ -260,32 +211,22 @@ TEST_F(TableTest, EscapePipeForMarkdown) {
   t.add({"1", "1|2", "3"});
   t.print(_os);
   // clang-format off
-  const char* expected[]{
+  const auto expected = {
     "+---+-----+---+",
     "| a | b   | c |",
     "| 1 | 1|2 | 3 |",
     "+---+-----+---+"};
-  const char* expectedMD[]{
+  const auto expectedMD = {
     "| a | b | c |",
     "| --- | --- | --- |",
     "| 1 | 1\\|2 | 3 |"};
   // clang-format on
-  String line;
-  int count{0}, maxLines{std::size(expected)};
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expected[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expected), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
   _os.clear();
   t.printMarkdown(_os);
-  count = 0;
-  maxLines = std::size(expectedMD);
-  while (std::getline(_os, line)) {
-    if (count == maxLines) FAIL() << "got more than " << maxLines;
-    EXPECT_EQ(line, expectedMD[count++]);
-  }
-  EXPECT_EQ(count, maxLines);
+  EXPECT_EQ(findEqualMatches(_os, expectedMD), std::nullopt);
+  EXPECT_FALSE(hasMoreData(_os));
 }
 
 } // namespace kanji_tools

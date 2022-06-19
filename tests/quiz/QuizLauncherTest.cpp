@@ -41,9 +41,10 @@ TEST_F(QuizLauncherTest, HelpMessage) {
   const char* args[]{"", "-h"};
   const QuizLauncher ql{args, _data, _groupData, _jukugoData};
   // look for a few strings instead of comparing the whole output
-  const auto expected = {"-r   review mode", "-t   test mode",
-      "-s   show English meanings by default (can be toggled on/off later)"};
-  EXPECT_EQ(findEndMatches(_os, expected), std::size(expected));
+  const auto expected = {
+      "-s   show English meanings by default (can be toggled on/off later)",
+      "-r   review mode", "-t   test mode"};
+  EXPECT_EQ(findEndMatches(_os, expected), std::nullopt);
 }
 
 TEST_F(QuizLauncherTest, ValidOptions) {
