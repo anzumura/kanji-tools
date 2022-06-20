@@ -115,7 +115,9 @@ protected:
     /// \throw RangeError if new location would be before the beginning location
     [[nodiscard]] auto operator-(difference_type i) const;
   protected:
-    explicit Iterator(Size index) noexcept : BaseIterator{index} {}
+    explicit Iterator(Size index) noexcept : BaseIterator{index} {
+      static_assert(std::derived_from<Derived, Iterator>);
+    }
   private:
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);
