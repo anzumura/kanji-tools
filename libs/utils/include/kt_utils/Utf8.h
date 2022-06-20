@@ -97,7 +97,7 @@ MBUtf8Result validateMBUtf8(const String& s, Utf8Result& error,
 /// \param s UTF-8 input
 /// \param sizeOne if true then `s` must consist of only one UTF-8 value
 /// \return #MBUtf8Result (`Valid`, `NotMultiByte` or `NotValid`)
-template<typename T>
+template <typename T>
 [[nodiscard]] auto validateMBUtf8(const T& s, bool sizeOne = false) noexcept {
   auto e{Utf8Result::Valid};
   return validateMBUtf8(s, e, sizeOne);
@@ -107,7 +107,7 @@ template<typename T>
 /// \param s UTF-8 input
 /// \param sizeOne if true then `s` must consist of only one UTF-8 value
 /// \return #Utf8Result (`Valid` or 6 other values for invalid input)
-template<typename T>
+template <typename T>
 [[nodiscard]] auto validateUtf8(const T& s, bool sizeOne = false) noexcept {
   auto e{Utf8Result::Valid};
   validateMBUtf8(s, e, sizeOne);

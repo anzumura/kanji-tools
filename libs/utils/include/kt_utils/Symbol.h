@@ -57,7 +57,7 @@ private:
 /// \endcode
 ///
 /// \tparam T derived class (see sample code above)
-template<typename T> class Symbol : public BaseSymbol {
+template <typename T> class Symbol : public BaseSymbol {
 public:
   /// return the type name
   [[nodiscard]] static const String& type() noexcept { return T::Type; }
@@ -98,7 +98,7 @@ private:
 };
 
 /// write Symbol::name() to `os`
-template<typename T>
+template <typename T>
 std::ostream& operator<<(std::ostream& os, const Symbol<T>& s) {
   return os << s.name();
 }

@@ -7,7 +7,7 @@ namespace kanji_tools {
 namespace {
 
 // 'ptrCast' is used in Layout test
-template<typename T>
+template <typename T>
 [[nodiscard]] constexpr uintptr_t ptrCast(const T& x) noexcept {
   static_assert(sizeof(uintptr_t) == sizeof(T*));
   return reinterpret_cast<size_t>(&x);

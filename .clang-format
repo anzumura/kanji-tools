@@ -12,4 +12,3 @@ AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
 EmptyLineBeforeAccessModifier: Never
 PointerAlignment: Left
-SpaceAfterTemplateKeyword: false

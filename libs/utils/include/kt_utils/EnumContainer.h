@@ -62,7 +62,7 @@ protected:
 ///
 /// This class provides size() and getIndex() methods and an Iterator with
 /// functionality that is further enhanced by the derived class iterators.
-template<scoped_enum T, Enum::Size N> class EnumContainer : public Enum {
+template <scoped_enum T, Enum::Size N> class EnumContainer : public Enum {
 public:
   [[nodiscard]] static constexpr auto size() noexcept { return N; }
 protected:
@@ -77,7 +77,7 @@ protected:
   }
 
   /// Random access iterator for looping over values of T \utils{EnumContainer}
-  template<typename Derived> class Iterator : public BaseIterator {
+  template <typename Derived> class Iterator : public BaseIterator {
   public:
     /// prefix increment operator (common for all iterators)
     /// \throw RangeError if iterator is at the 'end' location
@@ -128,14 +128,14 @@ protected:
     }
   };
 
-  template<typename I>
+  template <typename I>
   requires std::integral<I> || std::same_as<T, I>
   [[nodiscard]] static auto checkIndex(I i, const String& name);
 };
 
 // Out-of-class template definitions
 
-template<scoped_enum T, Enum::Size N> template<typename I>
+template <scoped_enum T, Enum::Size N> template <typename I>
 requires std::integral<I> || std::same_as<T, I>
 auto EnumContainer<T, N>::checkIndex(I i, const String& name) {
   const auto x{static_cast<Size>(i)};
@@ -150,47 +150,47 @@ auto EnumContainer<T, N>::checkIndex(I i, const String& name) {
   return x;
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto& EnumContainer<T, N>::Iterator<Derived>::operator++() {
   if (index() >= N) rangeError(BadEnd);
   ++index();
   return derived();
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto EnumContainer<T, N>::Iterator<Derived>::operator++(int) {
   const auto x{derived()};
   ++*this;
   return x;
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto& EnumContainer<T, N>::Iterator<Derived>::operator--() {
   if (!index()) rangeError(BadBegin);
   --index();
   return derived();
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto EnumContainer<T, N>::Iterator<Derived>::operator--(int) {
   const auto x{derived()};
   --*this;
   return x;
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto EnumContainer<T, N>::Iterator<Derived>::operator[](
     difference_type i) const {
   return *(derived() + i);
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto& EnumContainer<T, N>::Iterator<Derived>::operator+=(difference_type i) {
   if (difference_type curIndex{index()}; (curIndex += i) < 0)
     rangeError(BadBegin);
@@ -201,22 +201,22 @@ auto& EnumContainer<T, N>::Iterator<Derived>::operator+=(difference_type i) {
   return derived();
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto& EnumContainer<T, N>::Iterator<Derived>::operator-=(difference_type i) {
   return *this += -i;
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto EnumContainer<T, N>::Iterator<Derived>::operator+(
     difference_type i) const {
   auto x{derived()};
   return x += i;
 }
 
-template<scoped_enum T, Enum::Size N>
-template<typename Derived>
+template <scoped_enum T, Enum::Size N>
+template <typename Derived>
 auto EnumContainer<T, N>::Iterator<Derived>::operator-(
     difference_type i) const {
   auto x{derived()};

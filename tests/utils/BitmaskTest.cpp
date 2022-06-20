@@ -10,7 +10,7 @@ enum class TestEnum : uint8_t { One = 1, Two, Four = 4, Eight = 8, All = 15 };
 
 } // namespace
 
-template<> inline constexpr auto is_bitmask<TestEnum>{true};
+template <> inline constexpr auto is_bitmask<TestEnum>{true};
 
 TEST(BitmaskTest, BitwiseAndOperator) {
   EXPECT_EQ(TestEnum::All & TestEnum::Two, TestEnum::Two);

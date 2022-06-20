@@ -15,12 +15,12 @@ enum class TestEnum : Enum::Size { A, B, C };
 
 } // namespace
 
-template<> inline constexpr auto is_enumlist<Colors>{true};
+template <> inline constexpr auto is_enumlist<Colors>{true};
 
 inline const auto AllColors{
     BaseEnumList<Colors>::create("Red", "Green", "Blue")};
 
-template<> inline constexpr auto is_enumlist<TestEnum>{true};
+template <> inline constexpr auto is_enumlist<TestEnum>{true};
 
 TEST(EnumListTest, FailForDuplicateName) {
   EXPECT_THROW(

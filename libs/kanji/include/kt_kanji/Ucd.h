@@ -145,7 +145,7 @@ private:
 using UcdPtr = const Ucd*;
 
 /// enable Ucd::LinkTypes to be used in an EnumList
-template<> inline constexpr auto is_enumlist_with_none<Ucd::LinkTypes>{true};
+template <> inline constexpr auto is_enumlist_with_none<Ucd::LinkTypes>{true};
 /// create an EnumList for Ucd::LinkTypes
 inline const auto AllUcdLinkTypes{
     BaseEnumList<Ucd::LinkTypes>::create("Compatibility*", "Definition*",

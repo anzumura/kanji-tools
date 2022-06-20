@@ -19,7 +19,7 @@ enum class KanjiTypes : Enum::Size {
   None          ///< not loaded by this program
 };
 /// enable #KanjiTypes to be used in an EnumList
-template<> inline constexpr auto is_enumlist_with_none<KanjiTypes>{true};
+template <> inline constexpr auto is_enumlist_with_none<KanjiTypes>{true};
 /// create an EnumList for #KanjiTypes
 inline const auto AllKanjiTypes{
     BaseEnumList<KanjiTypes>::create("Jouyou", "Jinmei", "LinkedJinmei",
@@ -37,7 +37,7 @@ enum class KanjiGrades : Enum::Size {
   None ///< Not a Jouyou Kanji
 };
 /// enable #KanjiGrades to be used in an EnumList
-template<> inline constexpr auto is_enumlist_with_none<KanjiGrades>{true};
+template <> inline constexpr auto is_enumlist_with_none<KanjiGrades>{true};
 /// create an EnumList for #KanjiGrades
 inline const auto AllKanjiGrades{
     BaseEnumList<KanjiGrades>::create("G1", "G2", "G3", "G4", "G5", "G6", "S")};
@@ -53,7 +53,7 @@ enum class JlptLevels : Enum::Size {
   None ///< Not a JLPT Kanji (S=165, most Jinmei and all other types)
 };
 /// enable #JlptLevels to be used in an EnumList
-template<> inline constexpr auto is_enumlist_with_none<JlptLevels>{true};
+template <> inline constexpr auto is_enumlist_with_none<JlptLevels>{true};
 /// create an EnumList for #JlptLevels
 inline const auto AllJlptLevels{
     BaseEnumList<JlptLevels>::create("N5", "N4", "N3", "N2", "N1")};
@@ -76,7 +76,7 @@ enum class KenteiKyus : Enum::Size {
   None ///< Not a Kentei Kanji
 };
 /// enable #KenteiKyus to be used in an EnumList
-template<> inline constexpr auto is_enumlist_with_none<KenteiKyus>{true};
+template <> inline constexpr auto is_enumlist_with_none<KenteiKyus>{true};
 /// create an EnumList for #KenteiKyus
 inline const auto AllKenteiKyus{BaseEnumList<KenteiKyus>::create(
     "K10", "K9", "K8", "K7", "K6", "K5", "K4", "K3", "KJ2", "K2", "KJ1", "K1")};
@@ -92,7 +92,7 @@ enum class JinmeiReasons : Enum::Size {
   None     ///< Not a Jinmei type Kanji
 };
 /// enable #JinmeiReasons to be used in an EnumList
-template<> inline constexpr auto is_enumlist_with_none<JinmeiReasons>{true};
+template <> inline constexpr auto is_enumlist_with_none<JinmeiReasons>{true};
 /// create an EnumList for #JinmeiReasons
 inline const auto AllJinmeiReasons{BaseEnumList<JinmeiReasons>::create(
     "Names", "Print", "Variant", "Moved", "Simple", "Other")};

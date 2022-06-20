@@ -77,12 +77,12 @@ public:
   /// return block name
   [[nodiscard]] constexpr auto name() const { return _name; }
 private:
-  template<Code Start, Code End = Start> static consteval void checkRange() {
+  template <Code Start, Code End = Start> static consteval void checkRange() {
     static_assert(Start > MaxAscii);
     static_assert(End <= MaxUnicode);
   }
 
-  template<Code Start, Code End> static consteval void checkLess() {
+  template <Code Start, Code End> static consteval void checkLess() {
     checkRange<Start, End>();
     static_assert(Start < End);
   }
@@ -92,9 +92,9 @@ private:
       : _start{s}, _end{e}, _version{v}, _name{n} {}
 
   // grant access to 'makeBlock' functions
-  template<Code Start> friend consteval auto makeBlock();
-  template<Code Start, Code End> friend consteval auto makeBlock();
-  template<Code Start, Code End>
+  template <Code Start> friend consteval auto makeBlock();
+  template <Code Start, Code End> friend consteval auto makeBlock();
+  template <Code Start, Code End>
   friend consteval auto makeBlock(const Version&, StringView);
 
   const Code _start;
@@ -110,7 +110,7 @@ std::ostream& operator<<(std::ostream&, const UnicodeBlock::Version&);
 std::ostream& operator<<(std::ostream&, const UnicodeBlock&);
 
 /// create an 'unofficial' UnicodeBlock with a single Code point
-template<Code Start> [[nodiscard]] consteval auto makeBlock() {
+template <Code Start> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkRange<Start>();
   return UnicodeBlock{Start, Start};
 }
@@ -122,14 +122,14 @@ template<Code Start> [[nodiscard]] consteval auto makeBlock() {
 /// GCC 11.2 didn't like default template (Code End = Start) in combination with
 /// friend declarations so this was split into two makeBlock() functions. This
 /// also allows better `static_assert` (using '<' instead of '<=').
-template<Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
+template <Code Start, Code End> [[nodiscard]] consteval auto makeBlock() {
   UnicodeBlock::checkLess<Start, End>();
   return UnicodeBlock{Start, End};
 }
 
 /// create an 'official' UnicodeBlock: `Start` must be less than `End` and they
 /// also must end with hex `0` and hex `f` respectively (verified using mod)
-template<Code Start, Code End>
+template <Code Start, Code End>
 [[nodiscard]] consteval auto makeBlock(
     const UnicodeBlock::Version& v, StringView n) {
   UnicodeBlock::checkLess<Start, End>();
@@ -231,7 +231,7 @@ inline constexpr std::array NonSpacingBlocks{
 /// `t` are assumed to be in order (based on 'start' values) and non-overlapping
 /// \details arrays defined in UnicodeBlock.h should all be in the correct order
 /// for usage in this function (this is also checked by automated tests)
-template<size_t N>
+template <size_t N>
 [[nodiscard]] constexpr auto inRange(
     Code c, const std::array<UnicodeBlock, N>& t) noexcept {
   for (auto& i : t) {
@@ -244,7 +244,7 @@ template<size_t N>
 /// check if `c` is contained in any of the block arrays. There's no requirement
 /// for the arrays to be specified in a particular order (which wouldn't work
 /// anyway because of overlapping ranges).
-template<size_t N, typename... Ts>
+template <size_t N, typename... Ts>
 [[nodiscard]] constexpr bool inRange(
     Code c, const std::array<UnicodeBlock, N>& t, Ts&... args) noexcept {
   return inRange(c, t) || inRange(c, args...);
@@ -259,7 +259,7 @@ template<size_t N, typename... Ts>
 /// return true if the first 'MB character' is in the given blocks. Empty string
 /// will return false and a string longer than one 'MB character' also returns
 /// false unless `sizeOne` is false.
-template<typename... T>
+template <typename... T>
 [[nodiscard]] auto inWCharRange(const String& s, bool sizeOne, T&... t) {
   // a string with only one byte can't hold an MB char so don't need to check it
   if (s.size() > 1) {
@@ -280,7 +280,7 @@ template<typename... T>
 }
 
 /// true if `s` is empty or every char in `s` is in the given blocks
-template<typename... T>
+template <typename... T>
 [[nodiscard]] auto inWCharRange(const String& s, T&... t) {
   // an 'inRange' character can be followed by a 'variation selector'
   for (auto allowNonSpacing{false}; const auto i : fromUtf8(s))

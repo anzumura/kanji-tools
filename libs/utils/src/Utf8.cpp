@@ -56,7 +56,7 @@ constexpr uInt Shift12{Shift6 * 2}, Shift18{Shift6 * 3};
 }
 
 /// allow casting `uInt` to #Code or `wchar_t`, used by convertFromUtf8()
-template<typename T>
+template <typename T>
 [[nodiscard]] constexpr std::enable_if_t<
     std::is_same_v<T, Code> || std::is_same_v<T, wchar_t>, T>
 cast(uInt x) noexcept {
@@ -69,7 +69,7 @@ cast(uInt x) noexcept {
 /// \param b2 second byte without leading '1' (the 'bbbbbb' part of '10bbbbbb')
 /// \param u pointer to third byte (get the 'cccccc' part of '10cccccc')
 /// \return result made from the 16 bits: 'aaaa bbbbbb cccccc'
-template<typename T>
+template <typename T>
 [[nodiscard]] constexpr auto threeByteUtf8(
     uInt b1, uInt b2, const uint8_t* u) noexcept {
   return cast<T>(left12(b1 ^ ThreeBits, left6(b2, *u ^ Bit1)));
@@ -82,7 +82,7 @@ template<typename T>
 /// \param b3 third byte without leading '1' (the 'cccccc' part of '10cccccc')
 /// \param u pointer to fourth byte (get the 'dddddd' part of '10dddddd')
 /// \return result made from the 21 bits: 'aaa bbbbbb cccccc dddddd'
-template<typename T>
+template <typename T>
 [[nodiscard]] constexpr auto fourByteUtf8(
     uInt b1, uInt b2, uInt b3, const uint8_t* u) noexcept {
   return cast<T>(left18(b1 ^ FourBits, left12(b2, left6(b3, *u ^ Bit1))));
@@ -101,9 +101,9 @@ constexpr std::array WCharVals{toWChar(ErrorReplacement), toWChar(MinSurrogate),
     toWChar(MaxSurrogate), toWChar(Max2Uni), toWChar(Max3Uni),
     toWChar(MaxUnicode)}; ///@}
 
-template<typename T> using Consts = std::array<T, Char32Vals.size()>;
+template <typename T> using Consts = std::array<T, Char32Vals.size()>;
 
-template<typename T>
+template <typename T>
 [[nodiscard]] T convertOneUtf8(const uint8_t*& u, const Consts<T>& v) noexcept {
   const auto utfLen{std::countl_one(*u)};
   if (!utfLen) return {*u++}; // single byte UTF-8 case (Ascii)
@@ -133,7 +133,7 @@ template<typename T>
 }
 
 /// `R` is a sequence (so u32string or wstring) and `T` is #Code or `wchar_t`
-template<typename R, typename T = typename R::value_type>
+template <typename R, typename T = typename R::value_type>
 [[nodiscard]] R convertFromUtf8(
     const char* s, size_t maxSize, const Consts<T>& v) {
   R result;
@@ -172,7 +172,7 @@ void convertToUtf8(Code c, String& s) {
 
 /// called by validateMBUtf8(), `u` has already been verified to point to the
 /// first byte of a UTF-8 sequence by the calling function
-template<typename T>
+template <typename T>
 [[nodiscard]] auto validateMB(const T& err, const uint8_t* u, bool sizeOne) {
   uInt byte1{*u};
   if (!getNextByte(u)) return err(Utf8Result::MissingBytes);

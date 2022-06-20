@@ -73,13 +73,13 @@ public:
   OptU64 getOptU64(const Column&, uint64_t maxValue = 0) const;
 
   /// calls getU64() with the appropriate max value for numeric type `T`
-  template<std::unsigned_integral T> T getUInt(const Column& c) const {
+  template <std::unsigned_integral T> T getUInt(const Column& c) const {
     const auto i{getU64(c, std::numeric_limits<T>::max())};
     return static_cast<T>(i);
   }
 
   /// calls getOptU64() with the appropriate max value for numeric type `T`
-  template<std::unsigned_integral T>
+  template <std::unsigned_integral T>
   std::optional<T> getOptUInt(const Column& c) const {
     const auto i{getOptU64(c, std::numeric_limits<T>::max())};
     if (i) return static_cast<T>(*i);

@@ -40,7 +40,7 @@ protected:
 
   void TearDown() final { fs::remove_all(TestDir); }
 
-  template<typename T> [[nodiscard]] KanjiData::List fromFile() {
+  template <typename T> [[nodiscard]] KanjiData::List fromFile() {
     return NumberedKanji::fromFile<T>(_data, TestFile);
   }
 

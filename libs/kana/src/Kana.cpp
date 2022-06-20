@@ -357,30 +357,30 @@ const Kana* HanDakutenKana::hanDakuten() const { return &_hanDakuten; }
 // Kana and related class ctor template definitions can be in the .cpp file
 // since Kana objects are only created in this TU (Translation Unit)
 
-template<size_t R>
+template <size_t R>
 Kana::RomajiVariants::RomajiVariants(CharArray<R> r, bool kunrei)
     : _list{r}, _kunrei{kunrei} {
   check<R>();
 }
 
-template<size_t R>
+template <size_t R>
 Kana::RomajiVariants::RomajiVariants(
     CharArray<R> r1, CharArray<R> r2, bool kunrei)
     : _list{r1, r2}, _kunrei{kunrei} {
   check<R>();
 }
 
-template<size_t R>
+template <size_t R>
 Kana::RomajiVariants::RomajiVariants(CharArray<R> r1, RMax r2, RMax r3)
     : _list{r1, r2, r3} {
   check<R>();
 }
 
-template<size_t R, size_t A>
+template <size_t R, size_t A>
 Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana)
     : Kana{romaji, hiragana, katakana, {}, {}, {}} {}
 
-template<size_t R, size_t A, size_t H, size_t K>
+template <size_t R, size_t A, size_t H, size_t K>
 Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
     CharArray<H> hepburn, CharArray<K> kunrei)
     : Kana{romaji, hiragana, katakana, hepburn, kunrei, {}} {
@@ -394,12 +394,12 @@ Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
   }
 }
 
-template<size_t R, size_t A>
+template <size_t R, size_t A>
 Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
     RomajiVariants&& variants)
     : Kana{romaji, hiragana, katakana, {}, {}, std::move(variants)} {}
 
-template<size_t R, size_t A>
+template <size_t R, size_t A>
 Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
     const char* hepburn, const char* kunrei, RomajiVariants&& variants)
     : _romaji{romaji}, _hiragana{hiragana}, _katakana{katakana},
@@ -414,11 +414,11 @@ Kana::Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
   validate();
 }
 
-template<typename... T>
+template <typename... T>
 DakutenKana::DakutenKana(Kana&& dakuten, T&&... t)
     : Kana{std::forward<T>(t)...}, _dakuten{std::move(dakuten), *this} {}
 
-template<typename... T>
+template <typename... T>
 HanDakutenKana::HanDakutenKana(Kana&& hanDakuten, T&&... t)
     : DakutenKana{std::forward<T>(t)...}, _hanDakuten{
                                               std::move(hanDakuten), *this} {}

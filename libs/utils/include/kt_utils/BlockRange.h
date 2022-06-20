@@ -16,7 +16,7 @@ protected:
     *i = block.wEnd();
   }
 
-  template<typename... Ts>
+  template <typename... Ts>
   static constexpr void fill(
       wchar_t* i, const UnicodeBlock& block, const Ts&... blocks) noexcept {
     fill(i, block);
@@ -37,7 +37,7 @@ protected:
 ///   const auto s{L"ひらがな"};
 ///   if (std::regex_search(s, allKana)) std::cout << "all Kana\n";
 /// \endcode
-template<typename... Ts> class BlockRange final : public BaseBlockRange {
+template <typename... Ts> class BlockRange final : public BaseBlockRange {
 public:
   /// ctor takes one or more `UnicodeBlock`s and populated internal array
   explicit constexpr BlockRange(

@@ -257,7 +257,7 @@ private:
 };
 
 /// enable bitwise operators for Kanji::Info
-template<> inline constexpr auto is_bitmask<Kanji::Info>{true};
+template <> inline constexpr auto is_bitmask<Kanji::Info>{true};
 
 // Kanji derived classes
 

@@ -32,7 +32,7 @@ public:
   ///     must have header names that match the static `Column` instance names)
   /// \return a list of Kanji instance of type `T`
   /// \throw DomainError if `f` is missing or has malformed data
-  template<typename T>
+  template <typename T>
   [[nodiscard]] static auto fromFile(KanjiDataRef d, const KanjiData::Path& f);
 protected:
   static Name name(File);
@@ -192,7 +192,7 @@ public:
   [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::LinkedOld; }
 };
 
-template<typename T>
+template <typename T>
 auto NumberedKanji::fromFile(KanjiDataRef d, const KanjiData::Path& f) {
   ColumnFile::Columns columns{NumberCol, NameCol, RadicalCol, ReadingCol};
   for (auto& i : T::RequiredColumns) columns.emplace_back(i);

@@ -68,7 +68,7 @@ private:
     Pred(const KanjiDataPtr& data, const KanjiData::Path& top,
         const String& name, bool showBreakdown);
 
-    template<typename T>
+    template <typename T>
     [[nodiscard]] String run(const T&, bool verbose, bool firstCount);
 
     [[nodiscard]] auto& name() const { return _name; }

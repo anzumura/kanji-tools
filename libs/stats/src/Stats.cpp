@@ -137,7 +137,7 @@ Stats::Pred::Pred(const KanjiDataPtr& data, const KanjiData::Path& top,
     : _data{data}, _top{top}, _name{name},
       _showBreakdown{showBreakdown}, _isKanji{name.ends_with("Kanji")} {}
 
-template<typename T>
+template <typename T>
 String Stats::Pred::run(const T& pred, bool verbose, bool firstCount) {
   const auto isHiragana{_name == "Hiragana"},
       isUnrecognized{_name == "Unrecognized"},

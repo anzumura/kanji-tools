@@ -7,16 +7,16 @@ namespace kanji_tools {
 
 namespace {
 
-template<typename T> void rangeError(const String& msg, T x) {
+template <typename T> void rangeError(const String& msg, T x) {
   throw RangeError(msg + ": '" + std::to_string(x) + "' out of range");
 }
-template<> void rangeError<Code>(const String& msg, Code x) {
+template <> void rangeError<Code>(const String& msg, Code x) {
   throw RangeError(msg + ": '" + toHex(x, 4) + "' out of range");
 }
 
-template<typename T, typename U> auto cast(U u) { return static_cast<T>(u); }
+template <typename T, typename U> auto cast(U u) { return static_cast<T>(u); }
 
-template<typename T> char toCharUnsigned(T x, const String& type) {
+template <typename T> char toCharUnsigned(T x, const String& type) {
   if (x > std::numeric_limits<uint8_t>::max())
     rangeError("toChar (" + type + ")", x);
   return cast<char>(x);

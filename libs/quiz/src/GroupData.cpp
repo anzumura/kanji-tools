@@ -39,7 +39,7 @@ void GroupData::add(const String& kanji, Map& m, const GroupPtr& group) const {
                       i.first->second->toString());
 }
 
-template<typename T>
+template <typename T>
 void GroupData::loadGroup(
     const KanjiData::Path& file, T& groups, List& list, GroupType groupType) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
@@ -100,7 +100,7 @@ GroupPtr GroupData::createGroup(size_t number, const String& name,
   return std::make_shared<PatternGroup>(number, name, members, pattern);
 }
 
-template<typename T>
+template <typename T>
 void GroupData::printGroups(const T& groups, const List& groupList) const {
   log() << "Loaded " << groups.size() << " kanji into " << groupList.size()
         << " groups\n";
@@ -166,7 +166,7 @@ void GroupData::printPatternGroup(const Group& group, TypeMap& types) const {
   }
 }
 
-template<typename T>
+template <typename T>
 void GroupData::printUniqueNames(
     const T& groups, const StringSet& uniqueNames) const {
   std::map<String, size_t> multipleGroups;

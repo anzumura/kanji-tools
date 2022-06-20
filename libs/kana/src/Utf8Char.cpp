@@ -171,7 +171,7 @@ bool Utf8Char::peekVariant(String& result, const char* loc) {
   return isValidMBUtf8(loc) && isVariationSelector(result = getMBUtf8(loc));
 }
 
-template<typename T>
+template <typename T>
 String Utf8Char::processOne(T& t, const String& cur, const String& next) {
   return next == CombiningVoiced ? t.combiningMark(cur, Kana::findDakuten(cur))
          : next == CombiningSemiVoiced

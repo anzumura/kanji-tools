@@ -31,7 +31,7 @@ public:
   /// ctor taking `const char*[]`, helpful in tests since it figures out size
   /// \tparam N size of the char array
   /// \param args list of args
-  template<size_t N>
+  template <size_t N>
   constexpr Args(const char* (&args)[N]) noexcept // NOLINT: not explicit
       : _argc{N}, _argv{args} {
     static_assert(N <= std::numeric_limits<Size>::max());

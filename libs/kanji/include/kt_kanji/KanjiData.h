@@ -183,7 +183,7 @@ protected:
   void addToLevels(const KanjiPtr&);
   void addToFrequencies(const KanjiPtr&);
 private:
-  template<typename T> using KanjiEnumMap = EnumMap<T, List>;
+  template <typename T> using KanjiEnumMap = EnumMap<T, List>;
   using OptPath = std::optional<Path>;
 
   [[nodiscard]] static OptPath searchUpForDataDir(Path);

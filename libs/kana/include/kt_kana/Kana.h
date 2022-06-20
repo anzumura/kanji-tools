@@ -18,7 +18,7 @@ class Kana {
 public:
   using Map = std::map<String, const class Kana*>;
   using OptString = std::optional<String>;
-  template<size_t N> using CharArray = const char (&)[N];
+  template <size_t N> using CharArray = const char (&)[N];
 
   inline static const OptString EmptyOptString; ///< empty OptString
 
@@ -67,18 +67,18 @@ public:
     RomajiVariants(RomajiVariants&&) = default; ///< only allow moving
 
     /// ctor for one variant
-    template<size_t R>
+    template <size_t R>
     explicit RomajiVariants(CharArray<R> r, bool kunrei = false);
 
     /// ctor for two variants, variants are same size like 'fa' (ファ) which has
     /// variants of 'fwa' and 'hwa'
-    template<size_t R>
+    template <size_t R>
     RomajiVariants(CharArray<R> r1, CharArray<R> r2, bool kunrei = false);
 
     /// ctor for three variants, these instances never have `kunrei` true, but
     /// one has differing sizes so need two template params, i.e, small 'ぇ'
     /// with Rōmaji of 'le' has a variant list of 'xe', 'lye' and 'xye'
-    template<size_t R> RomajiVariants(CharArray<R> r1, RMax r2, RMax r3);
+    template <size_t R> RomajiVariants(CharArray<R> r1, RMax r2, RMax r3);
 
     /// return list of variants
     [[nodiscard]] auto& list() const { return _list; }
@@ -87,7 +87,7 @@ public:
     [[nodiscard]] auto kunrei() const { return _kunrei; }
   private:
     /// all Rōmaji variants are either 2 or 3 characters long
-    template<size_t R> static consteval void check() {
+    template <size_t R> static consteval void check() {
       static_assert(R > RomajiArrayMin && R <= RomajiArrayMax);
     }
 
@@ -214,7 +214,7 @@ public:
   /// \param romaji unique Rōmaji reading (see Kana class docs)
   /// \param hiragana UTF-8 Hiragana value
   /// \param katakana UTF-8 Katakana value
-  template<size_t R, size_t A>
+  template <size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana);
 
   /// \doc Kana(CharArray<R>, CharArray<A>, CharArray<A>)
@@ -222,13 +222,13 @@ public:
   /// \tparam K size of `kunrei` char array
   /// \param hepburn Hepburn reading
   /// \param kunrei Kunrei reading
-  template<size_t R, size_t A, size_t H, size_t K>
+  template <size_t R, size_t A, size_t H, size_t K>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
       CharArray<H> hepburn, CharArray<K> kunrei);
 
   /// \doc Kana(CharArray<R>, CharArray<A>, CharArray<A>)
   /// \param variants list of one or more Rōmaji variants
-  template<size_t R, size_t A>
+  template <size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
       RomajiVariants&& variants);
 protected:
@@ -237,7 +237,7 @@ protected:
   /// that wouldn't benefit from move anyway because of SSO).
   Kana(Kana&&) = default;
 private:
-  template<size_t R, size_t A>
+  template <size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
       const char* hepburn, const char* kunrei, RomajiVariants&&);
 
@@ -280,7 +280,7 @@ class DakutenKana : public Kana {
 public:
   /// `dakuten` should be a Kana object with accented values (like 'ga') and the
   /// base class ctor is called with the remaining parameters in `T`
-  template<typename... T> explicit DakutenKana(Kana&& dakuten, T&&...);
+  template <typename... T> explicit DakutenKana(Kana&& dakuten, T&&...);
 
   /// return #_dakuten Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* dakuten() const final;
@@ -314,7 +314,7 @@ class HanDakutenKana final : public DakutenKana {
 public:
   /// `hanDakuten` should be a Kana object with accented values (like 'pa') and
   /// the base class ctor is called with the remaining parameters in `T`
-  template<typename... T> explicit HanDakutenKana(Kana&& hanDakuten, T&&...);
+  template <typename... T> explicit HanDakutenKana(Kana&& hanDakuten, T&&...);
 
   /// return #_hanDakuten Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* hanDakuten() const final;

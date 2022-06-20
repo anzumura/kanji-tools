@@ -12,18 +12,18 @@ namespace kanji_tools { /// \utils_group{EnumList}
 /// values of a scoped enum
 
 /// specialize to enable an enum to be used in EnumList class
-template<scoped_enum T> constexpr auto is_enumlist{false};
+template <scoped_enum T> constexpr auto is_enumlist{false};
 
 /// specialize to enable an enum to be used in EnumListWithNone class
-template<scoped_enum T> constexpr auto is_enumlist_with_none{false};
+template <scoped_enum T> constexpr auto is_enumlist_with_none{false};
 
-template<typename T>
+template <typename T>
 concept enumlist = is_enumlist<T>;
 
-template<typename T>
+template <typename T>
 concept enumlist_with_none = is_enumlist_with_none<T>;
 
-template<typename T>
+template <typename T>
 concept base_enumlist = enumlist<T> || enumlist_with_none<T>;
 
 /// base class with pure virtual toString() method as well as fromString() and
@@ -46,13 +46,13 @@ concept base_enumlist = enumlist<T> || enumlist_with_none<T>;
 /// A scoped enum can't be enabled for both EnumList and EnumListWithNone.
 ///
 /// \tparam T scoped enum with contiguous values starting at zero
-template<base_enumlist T> class BaseEnumList {
+template <base_enumlist T> class BaseEnumList {
 public:
   /// create an instance of EnumList or EnumListWithNone (depending on which
   /// bool has been specialized for `T`) from one or more String names
   /// \throw DomainError if an instance has already been created or if a name is
   ///     used more than once or if "None" is specified for an EnumListWithNone
-  template<typename... Names>
+  template <typename... Names>
   [[nodiscard]] static auto create(const String& name, Names...);
 
   /// return true if an instance of BaseEnumList<T> has been created
@@ -92,7 +92,7 @@ private:
 /// \tparam T scoped enum with contiguous values starting at zero
 /// \tparam N number of enum values used for iterating and index checking
 /// \tparam Names number of string names (same as N by default)
-template<base_enumlist T, Enum::Size N, Enum::Size Names = N>
+template <base_enumlist T, Enum::Size N, Enum::Size Names = N>
 class EnumListContainer : public EnumContainer<T, N>, public BaseEnumList<T> {
 public:
   using base = EnumContainer<T, N>;
@@ -106,7 +106,7 @@ public:
   /// return enum value at position `i`
   /// \tparam I must be in integral type
   /// \throw RangeError if `i` is negative or beyond the final enum value
-  template<std::integral I> [[nodiscard]] auto operator[](I i) const {
+  template <std::integral I> [[nodiscard]] auto operator[](I i) const {
     return to_enum<T>(base::checkIndex(i, base::IndexMsg));
   }
 
@@ -161,7 +161,7 @@ private:
 ///   enum class Colors : Enum::Size { Red, Green, Blue };
 ///
 ///   // need to specialize is_enumlist before calling 'create'
-///   template<> inline constexpr auto is_enumlist<Colors>{true};
+///   template <> inline constexpr auto is_enumlist<Colors>{true};
 ///
 ///   // call 'create' with strings in the same order as the enum values
 ///   inline const auto AllColors{BaseEnumList<Colors>::create("Red", "Green",
@@ -173,7 +173,7 @@ private:
 ///
 /// \tparam T scoped enum with contiguous values starting at zero
 /// \tparam N number of enum values
-template<enumlist T, Enum::Size N>
+template <enumlist T, Enum::Size N>
 class EnumList final : public EnumListContainer<T, N> {
 private:
   using base = EnumListContainer<T, N, N>;
@@ -182,7 +182,7 @@ private:
 
   explicit EnumList(const String& name) { base::setName(name, N - 1); }
 
-  template<typename... Names>
+  template <typename... Names>
   explicit EnumList(const String& name, Names... args) : EnumList{args...} {
     base::setName(name, N - 1 - sizeof...(args));
   }
@@ -202,7 +202,7 @@ private:
 ///   enum class Colors : Enum::Size { Red, Green, Blue, None };
 ///
 ///   // need to specialize is_enumlist_with_none before calling 'create'
-///   template<> inline constexpr auto is_enumlist_with_none<Colors>{true};
+///   template <> inline constexpr auto is_enumlist_with_none<Colors>{true};
 ///
 ///   // call 'create' with strings in the same order as the enum values and
 ///   // don't specify "None"
@@ -214,7 +214,7 @@ private:
 /// \endcode
 /// \tparam T scoped enum with contiguous values starting at zero
 /// \tparam N number of enum values (not including final 'None')
-template<enumlist_with_none T, Enum::Size N>
+template <enumlist_with_none T, Enum::Size N>
 class EnumListWithNone final : public EnumListContainer<T, N + 1, N> {
 public:
   using base = EnumListContainer<T, N + 1, N>;
@@ -249,7 +249,7 @@ private:
 
   explicit EnumListWithNone(const String& name) { setName(name, N - 1); }
 
-  template<typename... Names>
+  template <typename... Names>
   explicit EnumListWithNone(const String& name, Names... args)
       : EnumListWithNone{args...} {
     setName(name, N - 1 - sizeof...(args));
@@ -263,8 +263,8 @@ private:
 
 // out-of-class member definitions for BaseEnumList<T>
 
-template<base_enumlist T>
-template<typename... Names>
+template <base_enumlist T>
+template <typename... Names>
 auto BaseEnumList<T>::create(const String& name, Names... args) {
   static_assert(is_enumlist<T> != is_enumlist_with_none<T>,
       "both 'is_enumlist' and 'is_enumlist_with_none' are true");
@@ -280,14 +280,14 @@ auto BaseEnumList<T>::create(const String& name, Names... args) {
   }
 }
 
-template<base_enumlist T>
+template <base_enumlist T>
 T BaseEnumList<T>::fromString(const String& name) const {
   const auto i{_nameMap.find(name)};
   if (i == _nameMap.end()) domainError("name '" + name + "' not found");
   return i->second;
 }
 
-template<base_enumlist T>
+template <base_enumlist T>
 void BaseEnumList<T>::insert(const String& name, Enum::Size index) {
   if (!_nameMap.emplace(name, to_enum<T>(index)).second)
     domainError("duplicate name '" + name + "'");
@@ -297,29 +297,29 @@ void BaseEnumList<T>::insert(const String& name, Enum::Size index) {
 // instances of 'EnumList' or 'EnumListWithNone'
 
 /// return String name for `x`
-template<base_enumlist T> [[nodiscard]] const String& toString(T x) {
+template <base_enumlist T> [[nodiscard]] const String& toString(T x) {
   return BaseEnumList<T>::instance().toString(x);
 }
 
 /// write String name of `x` to `os`
-template<base_enumlist T> std::ostream& operator<<(std::ostream& os, T x) {
+template <base_enumlist T> std::ostream& operator<<(std::ostream& os, T x) {
   return os << toString(x);
 }
 
 /// return true if `x` is not T::None
-template<enumlist_with_none T>
+template <enumlist_with_none T>
 [[nodiscard]] constexpr auto hasValue(T x) noexcept {
   return x != T::None;
 }
 
 /// return true if `x` is T::None
-template<enumlist_with_none T>
+template <enumlist_with_none T>
 [[nodiscard]] constexpr auto operator!(T x) noexcept {
   return !hasValue(x);
 }
 
 /// return true if the next value after `x` is T::None
-template<enumlist_with_none T>
+template <enumlist_with_none T>
 [[nodiscard]] constexpr auto isNextNone(T x) noexcept {
   return to_enum<T>(to_underlying(x) + 1) == T::None;
 }

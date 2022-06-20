@@ -17,12 +17,12 @@ enum class TestEnum : Enum::Size { A, B, C, None };
 
 } // namespace
 
-template<> inline constexpr auto is_enumlist_with_none<Colors>{true};
+template <> inline constexpr auto is_enumlist_with_none<Colors>{true};
 
 inline const auto AllColors{
     BaseEnumList<Colors>::create("Red", "Green", "Blue")};
 
-template<> inline constexpr auto is_enumlist_with_none<TestEnum>{true};
+template <> inline constexpr auto is_enumlist_with_none<TestEnum>{true};
 
 TEST(EnumListWithNoneTest, FailForDuplicateName) {
   EXPECT_THROW(

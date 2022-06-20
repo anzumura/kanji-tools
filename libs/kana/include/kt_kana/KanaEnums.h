@@ -14,7 +14,7 @@ enum class CharType : Enum::Size {
   Romaji    ///< Rōmaji (ローマ字), Japanese written in Latin script
 };
 /// enable #CharType to be used in an EnumList
-template<> inline constexpr auto is_enumlist<CharType>{true};
+template <> inline constexpr auto is_enumlist<CharType>{true};
 /// create an EnumList for #CharType
 inline const auto CharTypes{
     BaseEnumList<CharType>::create("Hiragana", "Katakana", "Romaji")};
@@ -65,7 +65,7 @@ enum class ConvertFlags : Enum::Size {
   RemoveSpaces = 8   ///< remove spaces in %Kana output
 };
 /// enable bitwise operators for #ConvertFlags
-template<> inline constexpr auto is_bitmask<ConvertFlags>{true};
+template <> inline constexpr auto is_bitmask<ConvertFlags>{true};
 
 /// \end_group
 } // namespace kanji_tools

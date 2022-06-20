@@ -24,7 +24,7 @@ public:
 /// \return the return value of `f`
 /// \throw WhatMismatch if `f` throws an exception and `expectedWhat` doesn't
 ///     match what() (otherwise the original exception is re-thrown)
-template<typename F> auto call(const F& f, const String& expectedWhat) {
+template <typename F> auto call(const F& f, const String& expectedWhat) {
   try {
     return f();
   } catch (const std::exception& e) {

@@ -215,7 +215,7 @@ String Converter::fromKana(const String& kanaInput, CharType source) const {
   return result + processKana(kanaGroup, source, prevKana);
 }
 
-template<typename T>
+template <typename T>
 bool Converter::processOneKana(const T& done, CharType source,
     const String& kana, const String& kanaGroup, State& state) const {
   if (Kana::SmallTsu.containsKana(kana))

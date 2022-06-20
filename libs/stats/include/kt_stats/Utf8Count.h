@@ -132,7 +132,7 @@ private:
 };
 
 /// count based on a predicate `T` \stats{Utf8Count}
-template<typename T> class Utf8CountIf final : public Utf8Count {
+template <typename T> class Utf8CountIf final : public Utf8Count {
 public:
   explicit Utf8CountIf(T pred, const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})

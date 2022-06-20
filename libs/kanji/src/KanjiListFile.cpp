@@ -82,7 +82,7 @@ void KanjiListFile::load(const Path& file, FileType fileType,
   }
 }
 
-template<typename T>
+template <typename T>
 bool KanjiListFile::validate(
     const T& error, StringSet* uniqueNames, const String& token) {
   if (!isValidMBUtf8(token, true))

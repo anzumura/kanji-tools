@@ -227,7 +227,7 @@ void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
   }
 }
 
-template<auto Pred>
+template <auto Pred>
 void FileKanjiData::printCount(const String& name, size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<String>> examples;
@@ -314,7 +314,7 @@ void FileKanjiData::printGrades() const {
   log() << "  Total for all grades: " << all << '\n';
 }
 
-template<typename T, Enum::Size S>
+template <typename T, Enum::Size S>
 void FileKanjiData::printListStats(const EnumListWithNone<T, S>& all,
     T (Kanji::*p)() const, const String& name, bool showNoFrequency) const {
   log() << name << " breakdown:\n";

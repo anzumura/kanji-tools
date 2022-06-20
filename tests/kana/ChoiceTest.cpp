@@ -17,40 +17,40 @@ protected:
   using Range = Choice::Range;
 
   // helper functions to call _choice.get with '\n' as input
-  template<typename... Args>
+  template <typename... Args>
   auto getMsgDef(const String& msg, const Choices& c, Args... args) {
     _is << '\n';
     return _choice.get(msg, c, args...);
   }
-  template<typename... Args>
+  template <typename... Args>
   auto rangeMsgDef(Range r, const String& msg, Args... args) {
     _is << '\n';
     return _choice.get(r, msg, args...);
   }
 
   // write 'x' as input (followed by '\n') before calling 'get'
-  template<typename... Args>
+  template <typename... Args>
   auto getMsg(char x, const String& msg, const Choices& c, Args... args) {
     _is << x;
     return getMsgDef(msg, c, args...);
   }
-  template<typename... Args>
+  template <typename... Args>
   auto rangeMsg(Range r, char x, const String& msg, Args... args) {
     _is << x;
     return rangeMsgDef(r, msg, args...);
   }
 
   // helper functions that call 'get' with an empty message
-  template<typename... Args> auto getDef(const Choices& c, Args... args) {
+  template <typename... Args> auto getDef(const Choices& c, Args... args) {
     return getMsgDef("", c, args...);
   }
-  template<typename... Args> auto rangeDef(Range r, Args... args) {
+  template <typename... Args> auto rangeDef(Range r, Args... args) {
     return rangeMsgDef(r, "", args...);
   }
-  template<typename... Args> auto get(char x, const Choices& c, Args... args) {
+  template <typename... Args> auto get(char x, const Choices& c, Args... args) {
     return getMsg(x, "", c, args...);
   }
-  template<typename... Args> auto range(char x, const Range& r, Args... args) {
+  template <typename... Args> auto range(char x, const Range& r, Args... args) {
     return rangeMsg(x, "", r, args...);
   }
 

@@ -110,7 +110,7 @@ private:
   ///     it already exists in the same file
   /// \throw DomainError if `uniqueTypeNames` is not provided and `token` has
   ///     already been loaded in another file
-  template<typename T>
+  template <typename T>
   bool validate(const T& error, StringSet* uniqueNames, const String& token);
 
   /// return false if adding another entry would exceed #MaxEntries, otherwise
@@ -123,7 +123,7 @@ private:
 };
 
 /// template for KanjiListFile that loads a type of Kanji \kanji{KAnjiListFile}
-template<typename T> class TypedListFile : public KanjiListFile {
+template <typename T> class TypedListFile : public KanjiListFile {
 protected:
   TypedListFile(const Path& p, T type)
       : KanjiListFile{p, FileType::MultiplePerLine, &_uniqueTypeNames,

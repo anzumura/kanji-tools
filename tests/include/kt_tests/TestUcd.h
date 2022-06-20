@@ -12,7 +12,7 @@ namespace kanji_tools {
 /// \endcode
 class TestUcd final {
 private:
-  template<typename T> auto& set(T& x, const T& y) {
+  template <typename T> auto& set(T& x, const T& y) {
     x = y;
     return *this;
   }

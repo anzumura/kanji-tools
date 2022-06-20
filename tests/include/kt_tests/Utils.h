@@ -14,7 +14,7 @@ namespace kanji_tools {
 /// \param is input stream to search
 /// \param expected list of values to look for in `is`
 /// \return first 'not found' value or `nullopt` if all values were found
-template<auto P, typename T>
+template <auto P, typename T>
 [[nodiscard]] auto findMatches(std::istream& is, const T& expected)
     -> std::optional<std::remove_cvref_t<decltype(*std::begin(expected))>> {
   auto i{std::begin(expected)};
@@ -30,7 +30,7 @@ template<auto P, typename T>
 /// \param is input stream to search
 /// \param expected list of values to look for in `is`
 /// \return first 'not found' value or `nullopt` if all values were found
-template<typename T>
+template <typename T>
 [[nodiscard]] auto findEqualMatches(std::istream& is, const T& expected) {
   return findMatches<[](const String& x, const auto& y) { return x == y; }>(
       is, expected);
@@ -41,7 +41,7 @@ template<typename T>
 /// \param is input stream to search
 /// \param expected list of values to look for in `is`
 /// \return first 'not found' value or `nullopt` if all values were found
-template<typename T>
+template <typename T>
 [[nodiscard]] auto findEndMatches(std::istream& is, const T& expected) {
   return findMatches<[](const String& x, const auto& y) {
     return x.ends_with(y);

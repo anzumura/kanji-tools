@@ -42,17 +42,17 @@ private:
   void printListData(
       const KanjiListFile&, const StringList&, TypeStringList&) const;
   void noFreq(std::ptrdiff_t f, bool brackets = false) const;
-  template<auto Pred> void printCount(const String& name, size_t = 0) const;
+  template <auto Pred> void printCount(const String& name, size_t = 0) const;
   void printStats() const;
   void printGrades() const;
-  template<typename T, Enum::Size S>
+  template <typename T, Enum::Size S>
   void printListStats(const EnumListWithNone<T, S>&, T (Kanji::*)() const,
       const String&, bool showNoFrequency) const;
 
   LevelListFile dataFile(JlptLevels) const;
   KyuListFile dataFile(KenteiKyus) const;
 
-  template<typename V, size_t N> using List = const std::array<const V, N - 1>;
+  template <typename V, size_t N> using List = const std::array<const V, N - 1>;
 
   /// for (JLPT) levels loaded from files under 'data/jlpt'
   List<LevelListFile, AllJlptLevels.size()> _levels;

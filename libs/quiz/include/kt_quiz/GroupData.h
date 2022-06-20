@@ -41,7 +41,7 @@ private:
   /// add `kanji`-> `group` mapping or log an error if it's already been added
   void add(const String& kanji, Map&, const GroupPtr& group) const;
 
-  template<typename T>
+  template <typename T>
   void loadGroup(const KanjiData::Path&, T&, List&, GroupType);
 
   static KanjiListFile::StringList getKanjiNames(const String& name,
@@ -50,7 +50,7 @@ private:
   [[nodiscard]] static GroupPtr createGroup(size_t number, const String& name,
       const KanjiData::List&, Group::PatternType);
 
-  template<typename T> void printGroups(const T&, const List&) const;
+  template <typename T> void printGroups(const T&, const List&) const;
 
   using StringList = std::vector<String>;
   using TypeMap = std::map<KanjiTypes, StringList>;
@@ -58,7 +58,7 @@ private:
 
   void printMeaningGroup(const Group&, TypeMap&, StringSet&) const;
   void printPatternGroup(const Group&, TypeMap&) const;
-  template<typename T> void printUniqueNames(const T&, const StringSet&) const;
+  template <typename T> void printUniqueNames(const T&, const StringSet&) const;
   void printTypeBreakdown(TypeMap&) const;
   void printMissingFromType(const KanjiData::List&, StringList&) const;
 

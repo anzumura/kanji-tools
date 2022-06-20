@@ -9,7 +9,7 @@ namespace kanji_tools { /// \utils_group{EnumMap}
 
 /// base class for EnumMap that has a static #Empty value to share amongst
 /// different EnumMaps \utils{EnumMap}
-template<typename V> class BaseEnumMap {
+template <typename V> class BaseEnumMap {
 public:
   inline static const V Empty{};
 protected:
@@ -46,7 +46,7 @@ protected:
 /// \tparam T 'key' type (scoped enum with contiguous values starting at zero)
 /// \tparam V 'value' type (must have a default ctor)
 /// \tparam N number of enum values (calculated via the position of T::None)
-template<scoped_enum T, typename V, Enum::Size N = to_underlying(T::None)>
+template <scoped_enum T, typename V, Enum::Size N = to_underlying(T::None)>
 class EnumMap final : public EnumContainer<T, N>, public BaseEnumMap<V> {
 public:
   using base = EnumContainer<T, N>;

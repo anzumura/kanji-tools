@@ -104,7 +104,7 @@ const CodeString& emptyCodeString(); ///< \doc emptyString()
 ///     make results the same size for a given type, i.e., if `T` is `char` then
 ///     the result will have a size of 8
 /// \return #String with the binary representation of `x`
-template<typename T>
+template <typename T>
 [[nodiscard]] auto toBinary(T x, BracketType brackets, size_t minSize = 0) {
   static_assert(std::is_unsigned_v<T>);
   String result;
@@ -115,7 +115,7 @@ template<typename T>
 }
 
 /// overload of toBinary() that sets `brackets` to #BracketType::None
-template<typename T> [[nodiscard]] auto toBinary(T x, size_t minSize = 0) {
+template <typename T> [[nodiscard]] auto toBinary(T x, size_t minSize = 0) {
   return toBinary(x, BracketType::None, minSize);
 }
 
@@ -128,7 +128,7 @@ template<typename T> [[nodiscard]] auto toBinary(T x, size_t minSize = 0) {
 ///     make results the same size for a given type, i.e., if `T` is `char` then
 ///     the result will have a size of 2 (00 - FF)
 /// \return #String with the binary representation of `x`
-template<typename T>
+template <typename T>
 [[nodiscard]] auto toHex(
     T x, BracketType brackets, HexCase hexCase, size_t minSize = 0) {
   static_assert(std::is_unsigned_v<T>);
@@ -145,32 +145,32 @@ template<typename T>
 }
 
 /// overload of toHex() that sets `brackets` to #BracketType::None
-template<typename T>
+template <typename T>
 [[nodiscard]] auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
   return toHex(x, BracketType::None, hexCase, minSize);
 }
 
 /// overload of toHex() that sets `hexCase` to #HexCase::Lower
-template<typename T>
+template <typename T>
 [[nodiscard]] auto toHex(T x, BracketType brackets, size_t minSize = 0) {
   return toHex(x, brackets, HexCase::Lower, minSize);
 }
 
 /// overload of toHex() that sets `brackets` to #BracketType::None and `hexCase`
 /// to #HexCase::Lower
-template<typename T> [[nodiscard]] auto toHex(T x, size_t minSize = 0) {
+template <typename T> [[nodiscard]] auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }
 
 /// specialization of toBinary() for `T = char` that casts to `uint8_t`
-template<>
+template <>
 [[nodiscard]] inline auto toBinary(
     char x, BracketType brackets, size_t minSize) {
   return toBinary(toUChar(x), brackets, minSize);
 }
 
 /// specialization of toHex() for `T = char` that casts to `uint8_t`
-template<>
+template <>
 [[nodiscard]] inline auto toHex(
     char x, BracketType brackets, HexCase hexCase, size_t minSize) {
   return toHex(toUChar(x), brackets, hexCase, minSize);
@@ -211,7 +211,7 @@ template<>
 /// \tparam C function that returns converted value
 /// \param s String to convert
 /// \return converted copy of `s` or just `s` if `P` is false
-template<auto P, auto C> [[nodiscard]] auto firstConvert(const String& s) {
+template <auto P, auto C> [[nodiscard]] auto firstConvert(const String& s) {
   if (!s.empty() && P(s[0])) {
     String result{s};
     result[0] = toChar(C(result[0]));
