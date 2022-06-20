@@ -46,8 +46,7 @@ protected:
 /// \tparam T 'key' type (scoped enum with contiguous values starting at zero)
 /// \tparam V 'value' type (must have a default ctor)
 /// \tparam N number of enum values (calculated via the position of T::None)
-template<typename T, typename V, Enum::Size N = to_underlying(T::None),
-    std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
+template<scoped_enum T, typename V, Enum::Size N = to_underlying(T::None)>
 class EnumMap final : public EnumContainer<T, N>, public BaseEnumMap<V> {
 public:
   using base = EnumContainer<T, N>;

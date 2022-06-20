@@ -20,17 +20,19 @@ struct is_scoped_enum<T, true> final
 template<typename T>
 inline constexpr auto is_scoped_enum_v{is_scoped_enum<T>::value};
 
+template<typename T>
+concept scoped_enum = is_scoped_enum_v<T>;
+
 /// return the underlying value of `x` (part of 'C++23')
-template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
+template<scoped_enum T>
 [[nodiscard]] constexpr auto to_underlying(T x) noexcept {
   return static_cast<std::underlying_type_t<T>>(x);
 }
 
 /// cast `u` to a scoped enum - safer than using `static_cast` since `T` must be
 /// a scoped enum and `u` is underlying type for `T`
-template<typename T>
-[[nodiscard]] constexpr std::enable_if_t<is_scoped_enum_v<T>, T> to_enum(
-    std::underlying_type_t<T> u) noexcept {
+template<scoped_enum T>
+[[nodiscard]] constexpr T to_enum(std::underlying_type_t<T> u) noexcept {
   return static_cast<T>(u);
 }
 
