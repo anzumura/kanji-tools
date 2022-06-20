@@ -17,12 +17,15 @@ template <scoped_enum T> constexpr auto is_enumlist{false};
 /// specialize to enable an enum to be used in EnumListWithNone class
 template <scoped_enum T> constexpr auto is_enumlist_with_none{false};
 
+/// `T` is a scoped enum enabled for EnumList
 template <typename T>
 concept enumlist = is_enumlist<T>;
 
+/// `T` is a scoped enum enabled for EnumListWithNone
 template <typename T>
 concept enumlist_with_none = is_enumlist_with_none<T>;
 
+/// `T` is a scoped enum enabled for either EnumList or EnumListWithNone
 template <typename T>
 concept base_enumlist = enumlist<T> || enumlist_with_none<T>;
 

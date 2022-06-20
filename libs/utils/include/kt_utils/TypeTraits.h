@@ -19,9 +19,11 @@ struct is_scoped_enum<T, true> final
 /// true if `T` is a scoped enum (part of 'C++23')
 template <typename T> constexpr auto is_scoped_enum_v{is_scoped_enum<T>::value};
 
+/// `T` is a scoped enum
 template <typename T>
 concept scoped_enum = is_scoped_enum_v<T>;
 
+/// `T` is a scoped enum with an `unsigned` underlying type
 template <typename T>
 concept unsigned_scoped_enum =
     scoped_enum<T> && std::is_unsigned_v<std::underlying_type_t<T>>;
