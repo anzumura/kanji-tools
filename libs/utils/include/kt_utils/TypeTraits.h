@@ -23,6 +23,10 @@ inline constexpr auto is_scoped_enum_v{is_scoped_enum<T>::value};
 template<typename T>
 concept scoped_enum = is_scoped_enum_v<T>;
 
+template<typename T>
+concept unsigned_scoped_enum =
+    scoped_enum<T> && std::is_unsigned_v<std::underlying_type_t<T>>;
+
 /// return the underlying value of `x` (part of 'C++23')
 template<scoped_enum T>
 [[nodiscard]] constexpr auto to_underlying(T x) noexcept {

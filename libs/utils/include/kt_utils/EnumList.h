@@ -12,12 +12,10 @@ namespace kanji_tools { /// \utils_group{EnumList}
 /// values of a scoped enum
 
 /// specialize to enable an enum to be used in EnumList class
-template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-inline constexpr auto is_enumlist{false};
+template<scoped_enum T> constexpr auto is_enumlist{false};
 
 /// specialize to enable an enum to be used in EnumListWithNone class
-template<typename T, std::enable_if_t<is_scoped_enum_v<T>, int> = 0>
-inline constexpr auto is_enumlist_with_none{false};
+template<scoped_enum T> constexpr auto is_enumlist_with_none{false};
 
 template<typename T>
 concept enumlist = is_enumlist<T>;

@@ -16,11 +16,7 @@ namespace kanji_tools { /// \utils_group{Bitmask}
 /// \endcode
 ///
 /// \tparam T scoped enum with `unsigned` underlying type and power of 2 values
-template<typename T,
-    std::enable_if_t<is_scoped_enum_v<T> &&
-                         std::is_unsigned_v<std::underlying_type_t<T>>,
-        int> = 0>
-inline constexpr auto is_bitmask{false};
+template<unsigned_scoped_enum T> constexpr auto is_bitmask{false};
 
 template<typename T>
 concept bitmask = is_bitmask<T>;
