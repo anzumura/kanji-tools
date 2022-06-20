@@ -22,63 +22,55 @@ template<typename T,
         int> = 0>
 inline constexpr auto is_bitmask{false};
 
-/// resolves to type `T` if #is_bitmask<T> has been specialized to true
-/// \tparam T the scoped enum
-/// \tparam _ placeholder for #is_bitmask second template arg
-template<typename T, typename _ = T>
-using isBitmask = std::enable_if_t<is_bitmask<T>, _>;
-
-// the 7 bitwise operators enabled for 'bitmask' are: &, |, ^, ~, &=, |= and ^=
-
-/// bitwise *and operator* for enum `T` enabled with #is_bitmask
 template<typename T>
-[[nodiscard]] constexpr isBitmask<T> operator&(T x, T y) noexcept {
+concept Bitmask = is_bitmask<T>;
+
+// the 7 bitwise operators enabled for 'Bitmask' are: &, |, ^, ~, &=, |= and ^=
+
+/// 'bitwise and operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> [[nodiscard]] constexpr T operator&(T x, T y) noexcept {
   return to_enum<T>(to_underlying(x) & to_underlying(y));
 }
 
-/// bitwise *or operator* for enum `T` enabled with #is_bitmask
-template<typename T>
-[[nodiscard]] constexpr isBitmask<T> operator|(T x, T y) noexcept {
+/// 'bitwise or operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> [[nodiscard]] constexpr T operator|(T x, T y) noexcept {
   return to_enum<T>(to_underlying(x) | to_underlying(y));
 }
 
-/// bitwise *xor operator* for enum `T` enabled with #is_bitmask
-template<typename T>
-[[nodiscard]] constexpr isBitmask<T> operator^(T x, T y) noexcept {
+/// 'bitwise xor operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> [[nodiscard]] constexpr T operator^(T x, T y) noexcept {
   return to_enum<T>(to_underlying(x) ^ to_underlying(y));
 }
 
-/// bitwise *complement operator* for enum `T` enabled with #is_bitmask
-template<typename T>
-[[nodiscard]] constexpr isBitmask<T> operator~(T x) noexcept {
+/// 'bitwise complement operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> [[nodiscard]] constexpr T operator~(T x) noexcept {
   return to_enum<T>(~to_underlying(x));
 }
 
-/// bitwise *and-equal operator* for enum `T` enabled with #is_bitmask
-template<typename T> constexpr isBitmask<T>& operator&=(T& x, T y) noexcept {
+/// 'bitwise and-equal operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> constexpr T& operator&=(T& x, T y) noexcept {
   return x = x & y;
 }
 
-/// bitwise *or-equal operator* for enum `T` enabled with #is_bitmask
-template<typename T> constexpr isBitmask<T>& operator|=(T& x, T y) noexcept {
+/// 'bitwise or-equal operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> constexpr T& operator|=(T& x, T y) noexcept {
   return x = x | y;
 }
 
-/// bitwise *xor-equal operator* for enum `T` enabled with #is_bitmask
-template<typename T> constexpr isBitmask<T>& operator^=(T& x, T y) noexcept {
+/// 'bitwise xor-equal operator' for enum `T` enabled with #is_bitmask
+template<Bitmask T> constexpr T& operator^=(T& x, T y) noexcept {
   return x = x ^ y;
 }
 
 /// return true if `x` has a value, i.e., its underlying value is non-zero
 /// \details can help in cases like `if (hasValue(myEnum & MyEnum::Flag1)) ...`
-template<typename T>
-[[nodiscard]] constexpr isBitmask<T, bool> hasValue(T x) noexcept {
+template<Bitmask T> [[nodiscard]] constexpr bool hasValue(T x) noexcept {
   return to_underlying(x);
 }
 
 /// return true if `x` doesn't have a value, i.e., its underlying value is zero
 /// \details can help in cases like `if (!(myEnum & MyEnum::Flag1)) ...`
-template<typename T> [[nodiscard]] isBitmask<T, bool> operator!(T x) noexcept {
+template<Bitmask T> [[nodiscard]] bool operator!(T x) noexcept {
   return !hasValue(x);
 }
 
