@@ -91,8 +91,13 @@ public:
   [[nodiscard]] virtual Kanji::Frequency frequency(const String&) const = 0;
   [[nodiscard]] virtual JlptLevels level(const String&) const = 0;
   [[nodiscard]] virtual KenteiKyus kyu(const String&) const = 0;
-  [[nodiscard]] virtual RadicalRef ucdRadical(const String&, UcdPtr) const;
-  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr) const;
+  ///@}
+
+  /// return value from `u`, kanji String name is only used in exceptions
+  /// \details virtual to help support testing
+  /// \throw DomainError if `u` is nullptr @{
+  [[nodiscard]] virtual RadicalRef ucdRadical(const String&, UcdPtr u) const;
+  [[nodiscard]] virtual Strokes ucdStrokes(const String&, UcdPtr u) const;
   ///@}
 
   /// used by NumberedKanji ctors to get a Radical for the given String

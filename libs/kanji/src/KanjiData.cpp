@@ -95,7 +95,7 @@ Kanji::OptString KanjiData::getCompatibilityName(const String& kanji) const {
 
 const KanjiData::List& KanjiData::frequencyList(size_t bucket) const {
   return bucket < FrequencyBuckets ? _frequencies[bucket]
-                                   : BaseEnumMap<List>::Empty;
+                                   : BaseEnumMap<List>::Empty; // LCOV_EXCL_LINE
 }
 
 KanjiTypes KanjiData::getType(const String& name) const {
