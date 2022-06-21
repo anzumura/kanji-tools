@@ -101,6 +101,8 @@ private:
 /// TextKanjiData functions \kanji{TextKanjiData}
 class TextKanjiDataTestAccess {
 protected:
+  TextKanjiDataTestAccess() noexcept = default; ///< default ctor
+
   static void loadFrequencyReadings(TextKanjiData&, const KanjiData::Path&);
   static void loadOfficialLinkedKanji(TextKanjiData&, const KanjiData::Path&);
 };
