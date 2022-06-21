@@ -10,7 +10,7 @@ namespace kanji_tools { /// \kanji_group{TextKanjiData}
 /// The bulk of functionality for loading Kanji from '.txt' files is contained
 /// in this class, whereas the base class has functionality to support adding,
 /// validating, holding and looking up Kanji.
-class TextKanjiData : public KanjiData {
+class TextKanjiData final : public KanjiData {
 public:
   explicit TextKanjiData(const Args& = {}, std::ostream& out = std::cout,
       std::ostream& err = std::cerr);
@@ -18,29 +18,31 @@ public:
   [[nodiscard]] Kanji::Frequency frequency(const String& s) const final;
   [[nodiscard]] JlptLevels level(const String&) const final;
   [[nodiscard]] KenteiKyus kyu(const String&) const final;
-protected:
-  /// should be called immediately after populateJouyou() to load linked Kanji
-  /// \details This function creates a LinkedJinmeiKanji for each line in `file`
-  /// (line should start with a JouyouKanji). It will then create LinkedOldKanji
-  /// for all JouyouKanji 'oldNames' that aren't already LinkedJinmeiKanji.
-  void populateOfficialLinkedKanji(const Path& file);
-
-  /// load any readings from `file` to use for FrequencyKanji instead of falling
-  /// back to 'ucd.txt' readings, must be called before populateList()
-  void loadFrequencyReadings(const Path& file);
 private:
+  friend class TextKanjiDataTestAccess;
+
   using StringList = ListFile::StringList;
   using TypeStringList = std::map<KanjiTypes, StringList>;
   template <typename V, size_t N> using List = const std::array<const V, N - 1>;
 
+  /// load any readings from `file` to use for FrequencyKanji instead of falling
+  /// back to 'ucd.txt' readings, must be called before populateList()
+  void loadFrequencyReadings(const Path& file);
+
   /// calls NumberedKanji::fromFile() to load Jouyou Kanji
-  void populateJouyou();
+  void loadJouyouKanji();
+
+  /// should be called immediately after loadJouyouKanji() to load linked Kanji
+  /// \details This function creates a LinkedJinmeiKanji for each line in `file`
+  /// (line should start with a JouyouKanji). It will then create LinkedOldKanji
+  /// for all JouyouKanji 'oldNames' that aren't already LinkedJinmeiKanji.
+  void loadOfficialLinkedKanji(const Path& file);
 
   /// calls NumbererKanji::fromFile() to load Jinmei and some LinkedJinmei Kanji
-  void populateJinmei();
+  void loadJinmeiKanji();
 
   /// calls NumberedKanji::fromFile() to load Extra Kanji
-  void populateExtra();
+  void loadExtraKanji();
 
   /// load/process Kanji from `list` (includes frequency, JLPT and Kentei Kyus)
   void processList(const ListFile& list);
@@ -93,6 +95,14 @@ private:
   /// holds readings loaded from 'frequency-readings.txt' for FrequencyKanji
   /// that aren't part of any other group (so not Jouyou or Jinmei)
   std::map<String, String> _frequencyReadings;
+};
+
+/// test code can derive from this class to get access to some private
+/// TextKanjiData functions \kanji{TextKanjiData}
+class TextKanjiDataTestAccess {
+protected:
+  static void loadFrequencyReadings(TextKanjiData&, const KanjiData::Path&);
+  static void loadOfficialLinkedKanji(TextKanjiData&, const KanjiData::Path&);
 };
 
 /// \end_group

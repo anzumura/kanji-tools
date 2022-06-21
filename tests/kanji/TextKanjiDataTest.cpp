@@ -12,17 +12,12 @@ namespace kanji_tools {
 
 namespace {
 
-class TextKanjiDataTest : public ::testing::Test {
+class TextKanjiDataTest : public TextKanjiDataTestAccess,
+                          public ::testing::Test {
 protected:
-  class TestTextKanjiData : public TextKanjiData {
-  public:
-    using TextKanjiData::loadFrequencyReadings;
-    using TextKanjiData::populateOfficialLinkedKanji;
-    using TextKanjiData::TextKanjiData;
-  };
   static void SetUpTestSuite() {
     // Constructs TextKanjiData using the real data files
-    _data = std::make_shared<TestTextKanjiData>();
+    _data = std::make_shared<TextKanjiData>();
   }
 
   [[nodiscard]] static auto check(const KanjiData::List& l) { // NOLINT
@@ -47,7 +42,7 @@ protected:
     return variants;
   }
 
-  inline static std::shared_ptr<TestTextKanjiData> _data;
+  inline static std::shared_ptr<TextKanjiData> _data;
 };
 
 } // namespace
@@ -448,7 +443,7 @@ TEST_F(TextKanjiDataTest, SortByQualifiedName) {
 
 TEST_F(TextKanjiDataTest, FrequencyReadingDuplicate) {
   TestKanjiData::write("Name\tReading\n呑\tトン、ドン、の-む", false);
-  EXPECT_THROW(call([] { _data->loadFrequencyReadings(TestFile); },
+  EXPECT_THROW(call([] { loadFrequencyReadings(*_data, TestFile); },
                    "duplicate name - file: testFile.txt, row: 1"),
       DomainError);
 }
@@ -456,14 +451,14 @@ TEST_F(TextKanjiDataTest, FrequencyReadingDuplicate) {
 TEST_F(TextKanjiDataTest, LinkedJinmeiEntryNotFound) {
   // use a Kanji that's not in 'ucd.txt'
   TestKanjiData::write("㐁\t亞", false);
-  EXPECT_THROW(call([] { _data->populateOfficialLinkedKanji(TestFile); },
+  EXPECT_THROW(call([] { loadOfficialLinkedKanji(*_data, TestFile); },
                    "'㐁' not found - file: testFile.txt"),
       DomainError);
 }
 
 TEST_F(TextKanjiDataTest, LinkedJinmeiBadLine) {
   TestKanjiData::write("亜亞", false);
-  EXPECT_THROW(call([] { _data->populateOfficialLinkedKanji(TestFile); },
+  EXPECT_THROW(call([] { loadOfficialLinkedKanji(*_data, TestFile); },
                    "bad line '亜亞' - file: testFile.txt"),
       DomainError);
 }

@@ -37,10 +37,10 @@ TextKanjiData::TextKanjiData(
   getUcd().load(ListFile::getFile(dataDir(), UcdFile));
   radicals().load(ListFile::getFile(dataDir(), RadicalsFile));
   loadFrequencyReadings(ListFile::getFile(dataDir(), FrequencyReadingsFile));
-  populateJouyou();
-  populateOfficialLinkedKanji(ListFile::getFile(dataDir(), LinkedJinmeiFile));
-  populateJinmei();
-  populateExtra();
+  loadJouyouKanji();
+  loadOfficialLinkedKanji(ListFile::getFile(dataDir(), LinkedJinmeiFile));
+  loadJinmeiKanji();
+  loadExtraKanji();
   for (auto& i : _levels) processList(i);
   // Process '_frequency' before '_kyus' in order to create 'Frequency' type
   // before creating 'Kentei' kanji. This way, the 'Frequency' type is more
@@ -80,7 +80,14 @@ KenteiKyus TextKanjiData::kyu(const String& k) const {
   return KenteiKyus::None;
 }
 
-void TextKanjiData::populateJouyou() {
+void TextKanjiData::loadFrequencyReadings(const Path& file) {
+  const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
+  for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
+    if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
+      f.error("duplicate name");
+}
+
+void TextKanjiData::loadJouyouKanji() {
   auto results{NumberedKanji::fromFile<JouyouKanji>(
       *this, ListFile::getFile(dataDir(), JouyouFile))};
   for (const auto& i : results) {
@@ -91,30 +98,10 @@ void TextKanjiData::populateJouyou() {
   getTypes()[KanjiTypes::Jouyou] = std::move(results);
 }
 
-void TextKanjiData::populateJinmei() {
-  auto results{NumberedKanji::fromFile<JinmeiKanji>(
-      *this, ListFile::getFile(dataDir(), JinmeiFile))};
-  for (auto& linkedJinmei{getTypes()[KanjiTypes::LinkedJinmei]};
-       const auto& i : results) {
-    checkInsert(i);
-    for (auto& j : i->oldNames())
-      checkInsert(
-          linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
-  }
-  getTypes()[KanjiTypes::Jinmei] = std::move(results);
-}
-
-void TextKanjiData::populateExtra() {
-  auto results{NumberedKanji::fromFile<ExtraKanji>(
-      *this, ListFile::getFile(dataDir(), ExtraFile))};
-  for (const auto& i : results) checkInsert(i);
-  getTypes()[KanjiTypes::Extra] = std::move(results);
-}
-
-void TextKanjiData::populateOfficialLinkedKanji(const Path& file) {
+void TextKanjiData::loadOfficialLinkedKanji(const Path& file) {
   std::ifstream f{file};
   // each line in 'file' should be a Jouyou Kanji followed by the officially
-  // recognized 'Jinmei Variant' (so populateJouyou must be called first)
+  // recognized 'Jinmei Variant' (so loadJouyouKanji must be called first)
   auto& linkedJinmei{getTypes()[KanjiTypes::LinkedJinmei]};
   for (String line; std::getline(f, line);) {
     std::stringstream ss{line};
@@ -136,11 +123,24 @@ void TextKanjiData::populateOfficialLinkedKanji(const Path& file) {
         checkInsert(old, std::make_shared<LinkedOldKanji>(*this, j, i.second));
 }
 
-void TextKanjiData::loadFrequencyReadings(const Path& file) {
-  const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
-  for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
-    if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
-      f.error("duplicate name");
+void TextKanjiData::loadJinmeiKanji() {
+  auto results{NumberedKanji::fromFile<JinmeiKanji>(
+      *this, ListFile::getFile(dataDir(), JinmeiFile))};
+  for (auto& linkedJinmei{getTypes()[KanjiTypes::LinkedJinmei]};
+       const auto& i : results) {
+    checkInsert(i);
+    for (auto& j : i->oldNames())
+      checkInsert(
+          linkedJinmei, std::make_shared<LinkedJinmeiKanji>(*this, j, i));
+  }
+  getTypes()[KanjiTypes::Jinmei] = std::move(results);
+}
+
+void TextKanjiData::loadExtraKanji() {
+  auto results{NumberedKanji::fromFile<ExtraKanji>(
+      *this, ListFile::getFile(dataDir(), ExtraFile))};
+  for (const auto& i : results) checkInsert(i);
+  getTypes()[KanjiTypes::Extra] = std::move(results);
 }
 
 void TextKanjiData::processList(const ListFile& list) {
@@ -352,6 +352,18 @@ LevelListFile TextKanjiData::dataFile(JlptLevels x) const {
 
 KyuListFile TextKanjiData::dataFile(KenteiKyus x) const {
   return {dataDir() / Kentei / firstLower(toString(x)), x};
+}
+
+// TextKanjiDataTestAccess
+
+void TextKanjiDataTestAccess::loadFrequencyReadings(
+    TextKanjiData& data, const KanjiData::Path& file) {
+  data.loadFrequencyReadings(file);
+}
+
+void TextKanjiDataTestAccess::loadOfficialLinkedKanji(
+    TextKanjiData& data, const KanjiData::Path& file) {
+  data.loadOfficialLinkedKanji(file);
 }
 
 } // namespace kanji_tools
