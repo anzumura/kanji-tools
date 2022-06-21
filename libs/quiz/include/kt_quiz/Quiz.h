@@ -69,7 +69,7 @@ private:
   Question _currentQuestion;
   bool _showMeanings;
   Question _correctAnswers{0};
-  KanjiListFile::StringList _mistakes;
+  ListFile::StringList _mistakes;
 };
 
 /// \end_group

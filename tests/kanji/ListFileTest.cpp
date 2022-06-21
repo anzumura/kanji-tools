@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kt_kanji/KanjiListFile.h>
+#include <kt_kanji/ListFile.h>
 #include <kt_tests/WhatMismatch.h>
 #include <kt_utils/UnicodeBlock.h>
 
@@ -18,7 +18,7 @@ const fs::path GoodOnePerLine{TestDir / "goodOnePerLine"},
     BadOnePerLine{TestDir / "badOnePerLine"}, BadSymbol{TestDir / "badSymbol"},
     DuplicateSymbol{TestDir / "duplicateSymbol"}, BigFile{TestDir / "bigFile"};
 
-class KanjiListFileTest : public ::testing::Test {
+class ListFileTest : public ::testing::Test {
 protected:
   void SetUp() final {
     if (fs::exists(TestDir)) TearDown();
@@ -36,53 +36,52 @@ protected:
   }
 
   void TearDown() final {
-    KanjiListFile::clearUniqueCheckData();
+    ListFile::clearUniqueCheckData();
     fs::remove_all(TestDir);
   }
 };
 
 } // namespace
 
-TEST_F(KanjiListFileTest, Usage) {
+TEST_F(ListFileTest, Usage) {
   const String msg{"error msg"};
-  EXPECT_THROW(call([&msg] { KanjiListFile::usage(msg); }, msg), DomainError);
+  EXPECT_THROW(call([&msg] { ListFile::usage(msg); }, msg), DomainError);
 }
 
-TEST_F(KanjiListFileTest, MissingFileWithExtension) {
+TEST_F(ListFileTest, MissingFileWithExtension) {
   const String msg{"testDir must contain 'missing.txt'"};
   EXPECT_THROW(
-      call([] { return KanjiListFile::getFile(TestDir, "missing.txt"); }, msg),
+      call([] { return ListFile::getFile(TestDir, "missing.txt"); }, msg),
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, MissingFileWithoutExtension) {
+TEST_F(ListFileTest, MissingFileWithoutExtension) {
   const String msg{
       "testDir must contain 'missing' (also tried '.txt' extension)"};
-  EXPECT_THROW(
-      call([] { return KanjiListFile::getFile(TestDir, "missing"); }, msg),
+  EXPECT_THROW(call([] { return ListFile::getFile(TestDir, "missing"); }, msg),
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, PrintEmptyList) {
+TEST_F(ListFileTest, PrintEmptyList) {
   std::stringstream s;
-  KanjiListFile::print(s, {}, "items", {});
+  ListFile::print(s, {}, "items", {});
   EXPECT_EQ(s.str(), "");
 }
 
-TEST_F(KanjiListFileTest, PrintNonEmptyList) {
+TEST_F(ListFileTest, PrintNonEmptyList) {
   std::stringstream s;
-  KanjiListFile::print(s, {"foo", "bar"}, "items", {});
+  ListFile::print(s, {"foo", "bar"}, "items", {});
   EXPECT_EQ(s.str(), ">>> Found 2 items: foo bar\n");
 }
 
-TEST_F(KanjiListFileTest, PrintWithGroupName) {
+TEST_F(ListFileTest, PrintWithGroupName) {
   std::stringstream s;
-  KanjiListFile::print(s, {"a", "b", "c"}, "items", "bag");
+  ListFile::print(s, {"a", "b", "c"}, "items", "bag");
   EXPECT_EQ(s.str(), ">>> Found 3 items in bag: a b c\n");
 }
 
-TEST_F(KanjiListFileTest, GoodOnePerLine) {
-  const KanjiListFile f{GoodOnePerLine};
+TEST_F(ListFileTest, GoodOnePerLine) {
+  const ListFile f{GoodOnePerLine};
   EXPECT_EQ(f.level(), JlptLevels::None);
   EXPECT_EQ(f.kyu(), KenteiKyus::None);
   EXPECT_EQ(f.name(), "GoodOnePerLine");
@@ -96,7 +95,7 @@ TEST_F(KanjiListFileTest, GoodOnePerLine) {
   EXPECT_EQ(f.toString(), "北海道");
 }
 
-TEST_F(KanjiListFileTest, GoodOnePerLineLevel) {
+TEST_F(ListFileTest, GoodOnePerLineLevel) {
   const LevelListFile f{GoodOnePerLineLevel, JlptLevels::N2};
   EXPECT_EQ(f.level(), JlptLevels::N2);
   EXPECT_EQ(f.kyu(), KenteiKyus::None);
@@ -109,16 +108,15 @@ TEST_F(KanjiListFileTest, GoodOnePerLineLevel) {
   }
 }
 
-TEST_F(KanjiListFileTest, BadOnePerLine) {
+TEST_F(ListFileTest, BadOnePerLine) {
   EXPECT_THROW(
-      call([] { KanjiListFile{BadOnePerLine}; },
+      call([] { ListFile{BadOnePerLine}; },
           "got multiple tokens - line: 1, file: testDir/badOnePerLine"),
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, MultiplePerLine) {
-  const KanjiListFile f{
-      MultiplePerLine, KanjiListFile::FileType::MultiplePerLine};
+TEST_F(ListFileTest, MultiplePerLine) {
+  const ListFile f{MultiplePerLine, ListFile::FileType::MultiplePerLine};
   EXPECT_EQ(f.level(), JlptLevels::None);
   EXPECT_EQ(f.name(), "MultiplePerLine");
   const auto results = {"東", "西", "線"};
@@ -129,19 +127,18 @@ TEST_F(KanjiListFileTest, MultiplePerLine) {
   }
 }
 
-TEST_F(KanjiListFileTest, GlobalDuplicate) {
-  const KanjiListFile file{
-      MultiplePerLine, KanjiListFile::FileType::MultiplePerLine};
+TEST_F(ListFileTest, GlobalDuplicate) {
+  const ListFile file{MultiplePerLine, ListFile::FileType::MultiplePerLine};
   const auto f{[] {
     // trying to load the same file causes global duplicate error
-    KanjiListFile{MultiplePerLine, KanjiListFile::FileType::MultiplePerLine};
+    ListFile{MultiplePerLine, ListFile::FileType::MultiplePerLine};
   }};
   EXPECT_THROW(call(f, "found globally non-unique entry '東' - line: 1, file: "
                        "testDir/multiplePerLine"),
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, GlobalDuplicateLevel) {
+TEST_F(ListFileTest, GlobalDuplicateLevel) {
   const LevelListFile file{GoodOnePerLineLevel, JlptLevels::N2};
   const auto f{[] {
     // trying to load the same 'typed' file causes duplicate error
@@ -152,30 +149,30 @@ TEST_F(KanjiListFileTest, GlobalDuplicateLevel) {
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, BadSymbol) {
+TEST_F(ListFileTest, BadSymbol) {
   EXPECT_THROW(
-      call([] { KanjiListFile{BadSymbol}; },
+      call([] { ListFile{BadSymbol}; },
           "invalid multi-byte token 'a' - line: 1, file: testDir/badSymbol"),
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, DuplicateSymbol) {
+TEST_F(ListFileTest, DuplicateSymbol) {
   EXPECT_THROW(
-      call([] { KanjiListFile{DuplicateSymbol}; },
+      call([] { ListFile{DuplicateSymbol}; },
           "got duplicate token '車 - line: 2, file: testDir/duplicateSymbol"),
       DomainError);
 }
 
-TEST_F(KanjiListFileTest, MaxEntries) {
+TEST_F(ListFileTest, MaxEntries) {
   // need to write more than 65K unique multi-byte characters to a file so loop
   // over all 'CommonKanjiBlocks' (even though some aren't real characters)
   std::ofstream f{BigFile};
-  for (KanjiListFile::Index c{}; auto& i : CommonKanjiBlocks)
-    for (auto j = i.start(); j < i.end() && c <= KanjiListFile::MaxEntries + 1;
+  for (ListFile::Index c{}; auto& i : CommonKanjiBlocks)
+    for (auto j = i.start(); j < i.end() && c <= ListFile::MaxEntries + 1;
          ++j, ++c)
       f << toUtf8(j) << '\n';
   f.close();
-  EXPECT_THROW(call([] { KanjiListFile{BigFile}; },
+  EXPECT_THROW(call([] { ListFile{BigFile}; },
                    "exceeded '65534' entries, file: testDir/bigFile"),
       DomainError);
 }

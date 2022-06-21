@@ -19,9 +19,9 @@ const KanjiData::Path& GroupData::dataDir(const KanjiData::Path* dir) const {
 
 GroupData::GroupData(const KanjiDataPtr& data, const KanjiData::Path* dir)
     : _data{data} {
-  loadGroup(KanjiListFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
+  loadGroup(ListFile::getFile(dataDir(dir), "meaning-groups"), _meaningMap,
       _meaningGroups, GroupType::Meaning);
-  loadGroup(KanjiListFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
+  loadGroup(ListFile::getFile(dataDir(dir), "pattern-groups"), _patternMap,
       _patternGroups, GroupType::Pattern);
   if (_data->debug()) {
     printGroups(_meaningMap, _meaningGroups);
@@ -76,9 +76,9 @@ void GroupData::loadGroup(
   }
 }
 
-KanjiListFile::StringList GroupData::getKanjiNames(const String& name,
+ListFile::StringList GroupData::getKanjiNames(const String& name,
     const String& members, GroupType groupType, Group::PatternType& pattern) {
-  KanjiListFile::StringList kanjiNames;
+  ListFile::StringList kanjiNames;
   if (static const String Colon{"："}; groupType == GroupType::Pattern) {
     using enum Group::PatternType;
     pattern = name.starts_with(Colon)            ? Peer

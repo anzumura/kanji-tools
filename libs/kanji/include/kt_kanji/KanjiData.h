@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kt_kanji/Kanji.h>
-#include <kt_kanji/KanjiListFile.h>
+#include <kt_kanji/ListFile.h>
 #include <kt_kanji/RadicalData.h>
 #include <kt_kanji/UcdData.h>
 #include <kt_utils/Args.h>
@@ -25,7 +25,7 @@ public:
 
   using List = std::vector<KanjiPtr>;
   using Map = std::map<String, KanjiPtr>;
-  using Path = KanjiListFile::Path;
+  using Path = ListFile::Path;
 
   inline static const String DataArg{"-data"}, ///< arg to specify 'data' dir
       DebugArg{"-debug"},                      ///< arg for 'Full' #DebugMode

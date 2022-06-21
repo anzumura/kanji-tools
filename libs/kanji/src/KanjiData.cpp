@@ -32,7 +32,7 @@ Args::Size KanjiData::nextArg(const Args& args, Args::Size current) {
   return result;
 }
 
-void KanjiData::usage(const String& msg) { KanjiListFile::usage(msg); }
+void KanjiData::usage(const String& msg) { ListFile::usage(msg); }
 
 Kanji::Frequency KanjiData::maxFrequency() noexcept { return _maxFrequency; }
 
@@ -61,10 +61,10 @@ Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) {
 KanjiData::KanjiData(const Path& dataDir, DebugMode debugMode,
     std::ostream& out, std::ostream& err)
     : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
-  // Clearing KanjiListFile static data is only needed to help test code, for
-  // example KanjiListFile tests can leave some data in these sets before Quiz
+  // Clearing ListFile static data is only needed to help test code, for
+  // example ListFile tests can leave some data in these sets before Quiz
   // tests are run (leading to problems loading real files).
-  KanjiListFile::clearUniqueCheckData();
+  ListFile::clearUniqueCheckData();
   if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
 }
 
@@ -145,7 +145,7 @@ std::ostream& KanjiData::log(bool heading) const {
 fs::path KanjiData::getDataDir(const Args& args) {
   static const String ExpectedTextFiles{
       std::to_string(TextFilesInDataDir) + " expected '" +
-      KanjiListFile::TextFileExtension + "' files"};
+      ListFile::TextFileExtension + "' files"};
   for (Args::Size i{1}; i < args.size(); ++i)
     if (args[i] == DataArg) {
       if (i + 1 == args.size())
@@ -214,7 +214,7 @@ KanjiData::OptPath KanjiData::searchUpForDataDir(Path parent) {
 bool KanjiData::isValidDataDir(const Path& p) {
   return std::count_if(fs::directory_iterator(p), fs::directory_iterator{},
              [](const auto& i) {
-               return i.path().extension() == KanjiListFile::TextFileExtension;
+               return i.path().extension() == ListFile::TextFileExtension;
              }) == TextFilesInDataDir;
 }
 
@@ -306,12 +306,12 @@ void KanjiData::checkStrokes() const {
     // Jouyou and Extra type Kanji load strokes from their own files so print
     // any differences with data in _ucd (other types shouldn't have any diffs)
     for (auto t : AllKanjiTypes) {
-      KanjiListFile::StringList l;
+      ListFile::StringList l;
       for (auto& i : _types[t])
         if (const auto u{findUcd(i->name())};
             u && i->strokes().value() != u->strokes().value())
           l.emplace_back(i->name());
-      KanjiListFile::print(
+      ListFile::print(
           _out, l, toString(t) + " Kanji with different strokes", "_ucd");
     }
   }

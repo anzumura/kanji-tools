@@ -1,4 +1,4 @@
-#include <kt_kanji/FileKanjiData.h>
+#include <kt_kanji/TextKanjiData.h>
 #include <kt_quiz/Quiz.h>
 
 namespace kanji_tools {
@@ -10,7 +10,7 @@ constexpr auto ShowMeanings{"show meanings"}, HideMeanings{"hide meanings"};
 } // namespace
 
 void Quiz::run(const Args& args, std::ostream& out) {
-  const auto data{std::make_shared<FileKanjiData>(args, out)};
+  const auto data{std::make_shared<TextKanjiData>(args, out)};
   QuizLauncher{args, data, std::make_shared<GroupData>(data),
       std::make_shared<JukugoData>(data)};
 }

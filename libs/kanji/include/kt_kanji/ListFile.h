@@ -6,16 +6,16 @@
 #include <set>
 #include <vector>
 
-namespace kanji_tools { /// \kanji_group{KanjiListFile}
-/// KanjiListFile class
+namespace kanji_tools { /// \kanji_group{ListFile}
+/// ListFile class
 
-/// holds data loaded from files with Kanji string entries \kanji{KanjiListFile}
+/// holds data loaded from files with Kanji string entries \kanji{ListFile}
 ///
 /// Kanji can be specified either one per line or multiple per line separated by
 /// space. Uniqueness is verified when data is loaded and entries are stored in
 /// order in a list. There are derived classes for specific data types, i.e.,
 /// where all entries are for a 'JLPT Level' or a 'Kentei Kyu'.
-class KanjiListFile {
+class ListFile {
 public:
   using Index = uint16_t; ///< support up to 65K entries
   using Path = std::filesystem::path;
@@ -53,16 +53,15 @@ public:
     OnePerLine       ///< each line can only have a single Kanji
   };
 
-  /// public ctor used for a non-typed KanjiListFile (calls protected ctor)
+  /// public ctor used for a non-typed ListFile (calls protected ctor)
   /// \param p path to text file to load
   /// \param fileType how data is stored in `p`
   /// \throw DomainError if `p` is not found or is not a regular file
-  explicit KanjiListFile(
-      const Path& p, FileType fileType = FileType::OnePerLine);
+  explicit ListFile(const Path& p, FileType fileType = FileType::OnePerLine);
 
-  KanjiListFile(const KanjiListFile&) = delete; ///< deleted copy ctor
+  ListFile(const ListFile&) = delete; ///< deleted copy ctor
 
-  virtual ~KanjiListFile() = default; ///< default dtor
+  virtual ~ListFile() = default; ///< default dtor
 
   /// return index for `name` starting at `1` or return `0` for not found
   [[nodiscard]] Index getIndex(const String& name) const;
@@ -77,19 +76,19 @@ public:
   /// return the full contents of this list in a string (with no separates)
   [[nodiscard]] String toString() const;
 protected:
-  /// create a KanjiListFile object and call load()
+  /// create a ListFile object and call load()
   /// \param p path to text file to load
   /// \param fileType how data is stored in `p`
   /// \param uniqueNames optional set to use for making sure entries in `p`
   ///     are unique (instead of using a global set)
   /// \param name optional name, if empty then capitalized file name is used
   /// \throw DomainError if `p` is not found or is not a regular file
-  KanjiListFile(const Path& p, FileType fileType, StringSet* uniqueNames,
+  ListFile(const Path& p, FileType fileType, StringSet* uniqueNames,
       const String& name = {});
 private:
   using Map = std::map<String, Index>;
 
-  /// ensure uniqueness across non-typed KanjiListFile instances (currently only
+  /// ensure uniqueness across non-typed ListFile instances (currently only
   /// applies to 'frequency.txt')
   inline static StringSet _uniqueNames;
 
@@ -122,11 +121,11 @@ private:
   Map _map;
 };
 
-/// template for KanjiListFile that loads a type of Kanji \kanji{KAnjiListFile}
-template <typename T> class TypedListFile : public KanjiListFile {
+/// template for ListFile that loads a type of Kanji \kanji{ListFile}
+template <typename T> class TypedListFile : public ListFile {
 protected:
   TypedListFile(const Path& p, T type)
-      : KanjiListFile{p, FileType::MultiplePerLine, &_uniqueTypeNames,
+      : ListFile{p, FileType::MultiplePerLine, &_uniqueTypeNames,
             kanji_tools::toString(type)},
         _type{type} {}
 
@@ -137,7 +136,7 @@ private:
   inline static StringSet _uniqueTypeNames;
 };
 
-/// KanjiListFile for loading Kanji per JLPT Level \kanji{KanjiListFile}
+/// ListFile for loading Kanji per JLPT Level \kanji{ListFile}
 class LevelListFile final : public TypedListFile<JlptLevels> {
 public:
   LevelListFile(const Path& p, JlptLevels level) : TypedListFile{p, level} {}
@@ -145,7 +144,7 @@ public:
   [[nodiscard]] JlptLevels level() const final { return type(); }
 };
 
-/// KanjiListFile for loading Kanji per Kentei Kyu \kanji{KanjiListFile}
+/// ListFile for loading Kanji per Kentei Kyu \kanji{ListFile}
 class KyuListFile final : public TypedListFile<KenteiKyus> {
 public:
   KyuListFile(const Path& p, KenteiKyus kyu) : TypedListFile{p, kyu} {}

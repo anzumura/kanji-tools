@@ -18,7 +18,7 @@ namespace fs = std::filesystem;
 JukugoData::JukugoData(const KanjiDataPtr& data, const KanjiData::Path* dir) {
   const auto jukugoDir{dir ? *dir : data->dataDir() / "jukugo"};
   const auto f{[this, &jukugoDir, data](const char* file, KanjiGrades grade) {
-    const auto loaded{loadFile(KanjiListFile::getFile(jukugoDir, file), grade)};
+    const auto loaded{loadFile(ListFile::getFile(jukugoDir, file), grade)};
     if (data->debug())
       data->log() << "Loaded " << loaded << " for Grade: " << grade << '\n';
   }};

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kt_kanji/FileKanjiData.h>
+#include <kt_kanji/TextKanjiData.h>
 #include <kt_quiz/GroupData.h>
 #include <kt_tests/WhatMismatch.h>
 
@@ -16,7 +16,7 @@ protected:
   static GroupData create() { return GroupData{_data, &TestDir}; }
 
   static void SetUpTestSuite() {
-    _data = std::make_shared<FileKanjiData>(Args{}, _os, _es);
+    _data = std::make_shared<TextKanjiData>(Args{}, _os, _es);
   }
 
   void SetUp() final {

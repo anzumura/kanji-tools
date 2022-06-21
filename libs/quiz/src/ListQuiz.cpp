@@ -80,7 +80,7 @@ ListQuiz::ChoiceCount ListQuiz::populateAnswers(
   const auto correct{
       launcher().randomizeAnswers() ? randomCorrect(RandomGen) : ChoiceCount{}};
   // 'sameReading' prevents more than one choice having the same reading
-  KanjiListFile::StringSet sameReading{kanji.reading()};
+  ListFile::StringSet sameReading{kanji.reading()};
   _answers[correct] = currentQuestion();
   for (ChoiceCount i{}; i < _choiceCount; ++i)
     while (i != correct)

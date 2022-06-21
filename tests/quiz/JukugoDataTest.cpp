@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <kt_kanji/FileKanjiData.h>
+#include <kt_kanji/TextKanjiData.h>
 #include <kt_quiz/JukugoData.h>
 #include <kt_tests/WhatMismatch.h>
 
@@ -15,7 +15,7 @@ class JukugoDataTest : public ::testing::Test {
 protected:
   static JukugoData create() { return JukugoData{_data, &TestDir}; }
 
-  static void SetUpTestSuite() { _data = std::make_shared<FileKanjiData>(); }
+  static void SetUpTestSuite() { _data = std::make_shared<TextKanjiData>(); }
 
   static void write(const String& f, const String& s) {
     std::ofstream of{TestDir / f, std::ios_base::app};

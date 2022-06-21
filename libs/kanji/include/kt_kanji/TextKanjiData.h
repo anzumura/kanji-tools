@@ -2,17 +2,17 @@
 
 #include <kt_kanji/KanjiData.h>
 
-namespace kanji_tools { /// \kanji_group{FileKanjiData}
-/// FileKanjiData class for loading Kanji from '.txt' file
+namespace kanji_tools { /// \kanji_group{TextKanjiData}
+/// TextKanjiData class for loading Kanji from '.txt' file
 
-/// Implementation of KanjiData to load from text files \kanji{FileKanjiData}
+/// Implementation of KanjiData to load from text files \kanji{TextKanjiData}
 ///
 /// The bulk of functionality for loading Kanji from '.txt' files is contained
 /// in this class, whereas the base class has functionality to support adding,
 /// validating, holding and looking up Kanji.
-class FileKanjiData : public KanjiData {
+class TextKanjiData : public KanjiData {
 public:
-  explicit FileKanjiData(const Args& = {}, std::ostream& out = std::cout,
+  explicit TextKanjiData(const Args& = {}, std::ostream& out = std::cout,
       std::ostream& err = std::cerr);
 
   [[nodiscard]] Kanji::Frequency frequency(const String& s) const final;
@@ -29,8 +29,9 @@ protected:
   /// back to 'ucd.txt' readings, must be called before populateList()
   void loadFrequencyReadings(const Path& file);
 private:
-  using StringList = KanjiListFile::StringList;
+  using StringList = ListFile::StringList;
   using TypeStringList = std::map<KanjiTypes, StringList>;
+  template <typename V, size_t N> using List = const std::array<const V, N - 1>;
 
   /// calls NumberedKanji::fromFile() to load Jouyou Kanji
   void populateJouyou();
@@ -42,10 +43,10 @@ private:
   void populateExtra();
 
   /// load/process Kanji from `list` (includes frequency, JLPT and Kentei Kyus)
-  void processList(const KanjiListFile& list);
+  void processList(const ListFile& list);
 
   /// print details about data loaded from `list` if debug is enabled
-  void printListData(const KanjiListFile& list, const StringList& created,
+  void printListData(const ListFile& list, const StringList& created,
       TypeStringList& found) const;
 
   /// print totals per Kanji type and if fullDebug() is true then also print
@@ -76,10 +77,9 @@ private:
   /// \param brackets if true then put round brackets around `f`
   void noFreq(std::ptrdiff_t f, bool brackets = false) const;
 
+  /// used by ctor to populate #_levels and #_kyus @{
   LevelListFile dataFile(JlptLevels) const;
-  KyuListFile dataFile(KenteiKyus) const;
-
-  template <typename V, size_t N> using List = const std::array<const V, N - 1>;
+  KyuListFile dataFile(KenteiKyus) const; ///@}
 
   /// for (JLPT) levels loaded from files under 'data/jlpt'
   List<LevelListFile, AllJlptLevels.size()> _levels;
@@ -88,10 +88,10 @@ private:
   List<KyuListFile, AllKenteiKyus.size()> _kyus;
 
   /// top 2501 frequency kanji loaded from 'data/frequency.txt'
-  const KanjiListFile _frequency;
+  const ListFile _frequency;
 
   /// holds readings loaded from 'frequency-readings.txt' for FrequencyKanji
-  /// that aren't part of any other group (so not Jouyou or Jinmei).
+  /// that aren't part of any other group (so not Jouyou or Jinmei)
   std::map<String, String> _frequencyReadings;
 };
 

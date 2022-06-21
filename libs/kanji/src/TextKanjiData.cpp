@@ -1,6 +1,6 @@
-#include <kt_kanji/FileKanjiData.h>
 #include <kt_kanji/Kanji.h>
 #include <kt_kanji/OfficialKanji.h>
+#include <kt_kanji/TextKanjiData.h>
 #include <kt_utils/Utf8.h>
 
 #include <sstream>
@@ -20,7 +20,7 @@ constexpr auto MaxVariantSelectorExamples{5};
 
 } // namespace
 
-FileKanjiData::FileKanjiData(
+TextKanjiData::TextKanjiData(
     const Args& args, std::ostream& out, std::ostream& err)
     : KanjiData{getDataDir(args), getDebugMode(args), out, err},
       _levels{dataFile(JlptLevels::N5), dataFile(JlptLevels::N4),
@@ -33,14 +33,12 @@ FileKanjiData::FileKanjiData(
           dataFile(KenteiKyus::KJ2), dataFile(KenteiKyus::K2),
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
       _frequency{dataDir() / "frequency"} {
-  KanjiListFile::clearUniqueCheckData(); // cleanup data used for unique checks
-  getUcd().load(KanjiListFile::getFile(dataDir(), UcdFile));
-  radicals().load(KanjiListFile::getFile(dataDir(), RadicalsFile));
-  loadFrequencyReadings(
-      KanjiListFile::getFile(dataDir(), FrequencyReadingsFile));
+  ListFile::clearUniqueCheckData(); // cleanup data used for unique checks
+  getUcd().load(ListFile::getFile(dataDir(), UcdFile));
+  radicals().load(ListFile::getFile(dataDir(), RadicalsFile));
+  loadFrequencyReadings(ListFile::getFile(dataDir(), FrequencyReadingsFile));
   populateJouyou();
-  populateOfficialLinkedKanji(
-      KanjiListFile::getFile(dataDir(), LinkedJinmeiFile));
+  populateOfficialLinkedKanji(ListFile::getFile(dataDir(), LinkedJinmeiFile));
   populateJinmei();
   populateExtra();
   for (auto& i : _levels) processList(i);
@@ -66,25 +64,25 @@ FileKanjiData::FileKanjiData(
   }
 }
 
-Kanji::Frequency FileKanjiData::frequency(const String& s) const {
+Kanji::Frequency TextKanjiData::frequency(const String& s) const {
   return _frequency.getIndex(s);
 }
 
-JlptLevels FileKanjiData::level(const String& k) const {
+JlptLevels TextKanjiData::level(const String& k) const {
   for (auto& i : _levels)
     if (i.exists(k)) return i.level();
   return JlptLevels::None;
 }
 
-KenteiKyus FileKanjiData::kyu(const String& k) const {
+KenteiKyus TextKanjiData::kyu(const String& k) const {
   for (auto& i : _kyus)
     if (i.exists(k)) return i.kyu();
   return KenteiKyus::None;
 }
 
-void FileKanjiData::populateJouyou() {
+void TextKanjiData::populateJouyou() {
   auto results{NumberedKanji::fromFile<JouyouKanji>(
-      *this, KanjiListFile::getFile(dataDir(), JouyouFile))};
+      *this, ListFile::getFile(dataDir(), JouyouFile))};
   for (const auto& i : results) {
     // all Jouyou Kanji must have a grade
     assert(hasValue(i->grade()));
@@ -93,9 +91,9 @@ void FileKanjiData::populateJouyou() {
   getTypes()[KanjiTypes::Jouyou] = std::move(results);
 }
 
-void FileKanjiData::populateJinmei() {
+void TextKanjiData::populateJinmei() {
   auto results{NumberedKanji::fromFile<JinmeiKanji>(
-      *this, KanjiListFile::getFile(dataDir(), JinmeiFile))};
+      *this, ListFile::getFile(dataDir(), JinmeiFile))};
   for (auto& linkedJinmei{getTypes()[KanjiTypes::LinkedJinmei]};
        const auto& i : results) {
     checkInsert(i);
@@ -106,14 +104,14 @@ void FileKanjiData::populateJinmei() {
   getTypes()[KanjiTypes::Jinmei] = std::move(results);
 }
 
-void FileKanjiData::populateExtra() {
+void TextKanjiData::populateExtra() {
   auto results{NumberedKanji::fromFile<ExtraKanji>(
-      *this, KanjiListFile::getFile(dataDir(), ExtraFile))};
+      *this, ListFile::getFile(dataDir(), ExtraFile))};
   for (const auto& i : results) checkInsert(i);
   getTypes()[KanjiTypes::Extra] = std::move(results);
 }
 
-void FileKanjiData::populateOfficialLinkedKanji(const Path& file) {
+void TextKanjiData::populateOfficialLinkedKanji(const Path& file) {
   std::ifstream f{file};
   // each line in 'file' should be a Jouyou Kanji followed by the officially
   // recognized 'Jinmei Variant' (so populateJouyou must be called first)
@@ -138,14 +136,14 @@ void FileKanjiData::populateOfficialLinkedKanji(const Path& file) {
         checkInsert(old, std::make_shared<LinkedOldKanji>(*this, j, i.second));
 }
 
-void FileKanjiData::loadFrequencyReadings(const Path& file) {
+void TextKanjiData::loadFrequencyReadings(const Path& file) {
   const ColumnFile::Column nameCol{"Name"}, readingCol{"Reading"};
   for (ColumnFile f{file, {nameCol, readingCol}}; f.nextRow();)
     if (!_frequencyReadings.emplace(f.get(nameCol), f.get(readingCol)).second)
       f.error("duplicate name");
 }
 
-void FileKanjiData::processList(const KanjiListFile& list) {
+void TextKanjiData::processList(const ListFile& list) {
   const auto kenteiList{hasValue(list.kyu())};
   StringList created;
   TypeStringList found;
@@ -186,12 +184,12 @@ void FileKanjiData::processList(const KanjiListFile& list) {
   printListData(list, created, found);
 }
 
-void FileKanjiData::printListData(const KanjiListFile& list,
+void TextKanjiData::printListData(const ListFile& list,
     const StringList& created, TypeStringList& found) const {
   if (fullDebug()) {
-    KanjiListFile::print(
+    ListFile::print(
         out(), found[KanjiTypes::LinkedOld], "Linked Old", list.name());
-    KanjiListFile::print(out(), created,
+    ListFile::print(out(), created,
         String{"non-Jouyou/Jinmei"} + (hasValue(list.level()) ? "" : "/JLPT"),
         list.name());
     // list.level is None when processing 'frequency.txt' file (so not JLPT)
@@ -199,24 +197,23 @@ void FileKanjiData::printListData(const KanjiListFile& list,
       std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
           std::pair{&found[KanjiTypes::LinkedJinmei], "Linked "}};
       for (const auto& i : lists) {
-        KanjiListFile::StringList jlptJinmei, otherJinmei;
+        ListFile::StringList jlptJinmei, otherJinmei;
         for (auto& j : *i.first)
           (hasValue(level(j)) ? jlptJinmei : otherJinmei).emplace_back(j);
-        KanjiListFile::print(out(), jlptJinmei,
+        ListFile::print(out(), jlptJinmei,
             String{"JLPT "} + i.second + "Jinmei", list.name());
-        KanjiListFile::print(out(), otherJinmei,
+        ListFile::print(out(), otherJinmei,
             String{"non-JLPT "} + i.second + "Jinmei", list.name());
       }
     } else {
-      KanjiListFile::print(
-          out(), found[KanjiTypes::Jinmei], "Jinmei", list.name());
-      KanjiListFile::print(
+      ListFile::print(out(), found[KanjiTypes::Jinmei], "Jinmei", list.name());
+      ListFile::print(
           out(), found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
     }
   }
 }
 
-void FileKanjiData::printCountsAndStats() const {
+void TextKanjiData::printCountsAndStats() const {
   log() << "Loaded " << nameMap().size() << " Kanji (";
   for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
     if (i != AllKanjiTypes.begin()) out() << ' ';
@@ -241,7 +238,7 @@ void FileKanjiData::printCountsAndStats() const {
 }
 
 template <auto Pred>
-void FileKanjiData::printCount(const String& name, size_t printExamples) const {
+void TextKanjiData::printCount(const String& name, size_t printExamples) const {
   std::vector<std::pair<KanjiTypes, size_t>> counts;
   std::map<KanjiTypes, std::vector<String>> examples;
   size_t total{};
@@ -272,7 +269,7 @@ void FileKanjiData::printCount(const String& name, size_t printExamples) const {
   }
 }
 
-void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
+void TextKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
   if (f) {
     if (brackets)
       out() << " (";
@@ -283,7 +280,7 @@ void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
   }
 }
 
-void FileKanjiData::printGrades() const {
+void TextKanjiData::printGrades() const {
   log() << "Grade breakdown:\n";
   size_t all{};
   for (auto& jouyou{types()[KanjiTypes::Jouyou]}; auto i : AllKanjiGrades) {
@@ -315,7 +312,7 @@ void FileKanjiData::printGrades() const {
 }
 
 template <auto F, typename T>
-void FileKanjiData::printListStats(
+void TextKanjiData::printListStats(
     const T& list, const String& name, bool showNoFreq) const {
   log() << name << " breakdown:\n";
   size_t total{};
@@ -349,11 +346,11 @@ void FileKanjiData::printListStats(
   log() << "  Total for all " << name << "s: " << total << '\n';
 }
 
-LevelListFile FileKanjiData::dataFile(JlptLevels x) const {
+LevelListFile TextKanjiData::dataFile(JlptLevels x) const {
   return {dataDir() / Jlpt / firstLower(toString(x)), x};
 }
 
-KyuListFile FileKanjiData::dataFile(KenteiKyus x) const {
+KyuListFile TextKanjiData::dataFile(KenteiKyus x) const {
   return {dataDir() / Kentei / firstLower(toString(x)), x};
 }
 
