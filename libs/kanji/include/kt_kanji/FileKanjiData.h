@@ -32,22 +32,49 @@ private:
   using StringList = KanjiListFile::StringList;
   using TypeStringList = std::map<KanjiTypes, StringList>;
 
+  /// calls NumberedKanji::fromFile() to load Jouyou Kanji
   void populateJouyou();
+
+  /// calls NumbererKanji::fromFile() to load Jinmei and some LinkedJinmei Kanji
   void populateJinmei();
+
+  /// calls NumberedKanji::fromFile() to load Extra Kanji
   void populateExtra();
 
-  void processList(const KanjiListFile&);
+  /// load/process Kanji from `list` (includes frequency, JLPT and Kentei Kyus)
+  void processList(const KanjiListFile& list);
 
-  // functions to print loaded data if _debug is true
-  void printListData(
-      const KanjiListFile&, const StringList&, TypeStringList&) const;
-  void noFreq(std::ptrdiff_t f, bool brackets = false) const;
-  template <auto Pred> void printCount(const String& name, size_t = 0) const;
-  void printStats() const;
+  /// print details about data loaded from `list` if debug is enabled
+  void printListData(const KanjiListFile& list, const StringList& created,
+      TypeStringList& found) const;
+
+  /// print totals per Kanji type and if fullDebug() is true then also print
+  /// various stats per type like 'Has JLPT Level', 'Has frequency', etc.
+  void printCountsAndStats() const;
+
+  /// print total per Kanji type matching a predicate function followed examples
+  /// \tparam Pred predicate function taking a Kanji
+  /// \param name stat name (like 'Has JLPT Level')
+  /// \param printExamples number of examples to print, `0` means no examples
+  template <auto Pred>
+  void printCount(const String& name, size_t printExamples = 0) const;
+
+  /// print breakdown per Kanji 'grade' including total and total JLPT level
   void printGrades() const;
-  template <typename T, Enum::Size S>
-  void printListStats(const EnumListWithNone<T, S>&, T (Kanji::*)() const,
-      const String&, bool showNoFrequency) const;
+
+  /// print details per Kanji type for a given enum list
+  /// \tparam F Kanji member function, currently Kanji::level() and Kanji::kyu()
+  /// \tparam T type of enum list
+  /// \param list enum list, currently AllJlptLevels and AllKenteiKyus
+  /// \param name list name
+  /// \param showNoFreq if true, then counts without frequencies are included
+  template <auto F, typename T>
+  void printListStats(const T& list, const String& name, bool showNoFreq) const;
+
+  /// helper function for printing 'no frequency' totals
+  /// \param f no frequency count to print
+  /// \param brackets if true then put round brackets around `f`
+  void noFreq(std::ptrdiff_t f, bool brackets = false) const;
 
   LevelListFile dataFile(JlptLevels) const;
   KyuListFile dataFile(KenteiKyus) const;

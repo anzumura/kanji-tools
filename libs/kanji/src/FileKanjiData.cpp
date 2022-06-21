@@ -55,11 +55,11 @@ FileKanjiData::FileKanjiData(
   checkStrokes();
   if (debug()) {
     if (fullDebug()) log(true) << "Finished Loading Data\n>>>\n";
-    printStats();
+    printCountsAndStats();
     printGrades();
     if (fullDebug()) {
-      printListStats(AllJlptLevels, &Kanji::level, "Level", true);
-      printListStats(AllKenteiKyus, &Kanji::kyu, "Kyu", false);
+      printListStats<&Kanji::level>(AllJlptLevels, "Level", true);
+      printListStats<&Kanji::kyu>(AllKenteiKyus, "Kyu", false);
       radicals().print(*this);
       ucd().print(*this);
     }
@@ -216,14 +216,27 @@ void FileKanjiData::printListData(const KanjiListFile& list,
   }
 }
 
-void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
-  if (f) {
-    if (brackets)
-      out() << " (";
-    else
-      out() << ' ';
-    out() << "nf " << f;
-    if (brackets) out() << ')';
+void FileKanjiData::printCountsAndStats() const {
+  log() << "Loaded " << nameMap().size() << " Kanji (";
+  for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
+    if (i != AllKanjiTypes.begin()) out() << ' ';
+    out() << *i++ << ' ' << j.size();
+  }
+  out() << ")\n";
+  if (fullDebug()) {
+    printCount<[](auto& x) { return x->hasLevel(); }>("  Has JLPT level");
+    printCount<[](auto& x) {
+      return x->frequency() && !x->is(KanjiTypes::Jouyou) && !x->hasLevel();
+    }>("  Has frequency and not in Jouyou or JLPT");
+    printCount<[](auto& x) {
+      return x->is(KanjiTypes::Jinmei) && !x->frequency() && !x->hasLevel();
+    }>("  Jinmei with no frequency and not JLPT");
+    printCount<[](auto& x) { return !x->frequency(); }>("  NF (no-frequency)");
+    printCount<[](auto& x) { return x->strokes().hasVariant(); }>(
+        "  Has Variant Strokes");
+    printCount<[](auto& x) { return x->variant(); }>(
+        "  Has Variation Selectors", MaxVariantSelectorExamples);
+    printCount<[](auto& x) { return !x->oldNames().empty(); }>("Old Forms");
   }
 }
 
@@ -259,27 +272,14 @@ void FileKanjiData::printCount(const String& name, size_t printExamples) const {
   }
 }
 
-void FileKanjiData::printStats() const {
-  log() << "Loaded " << nameMap().size() << " Kanji (";
-  for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
-    if (i != AllKanjiTypes.begin()) out() << ' ';
-    out() << *i++ << ' ' << j.size();
-  }
-  out() << ")\n";
-  if (fullDebug()) {
-    printCount<[](auto& x) { return x->hasLevel(); }>("  Has JLPT level");
-    printCount<[](auto& x) {
-      return x->frequency() && !x->is(KanjiTypes::Jouyou) && !x->hasLevel();
-    }>("  Has frequency and not in Jouyou or JLPT");
-    printCount<[](auto& x) {
-      return x->is(KanjiTypes::Jinmei) && !x->frequency() && !x->hasLevel();
-    }>("  Jinmei with no frequency and not JLPT");
-    printCount<[](auto& x) { return !x->frequency(); }>("  NF (no-frequency)");
-    printCount<[](auto& x) { return x->strokes().hasVariant(); }>(
-        "  Has Variant Strokes");
-    printCount<[](auto& x) { return x->variant(); }>(
-        "  Has Variation Selectors", MaxVariantSelectorExamples);
-    printCount<[](auto& x) { return !x->oldNames().empty(); }>("Old Forms");
+void FileKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
+  if (f) {
+    if (brackets)
+      out() << " (";
+    else
+      out() << ' ';
+    out() << "nf " << f;
+    if (brackets) out() << ')';
   }
 }
 
@@ -314,18 +314,18 @@ void FileKanjiData::printGrades() const {
   log() << "  Total for all grades: " << all << '\n';
 }
 
-template <typename T, Enum::Size S>
-void FileKanjiData::printListStats(const EnumListWithNone<T, S>& all,
-    T (Kanji::*p)() const, const String& name, bool showNoFrequency) const {
+template <auto F, typename T>
+void FileKanjiData::printListStats(
+    const T& list, const String& name, bool showNoFreq) const {
   log() << name << " breakdown:\n";
   size_t total{};
-  for (const auto i : all) {
+  for (const auto i : list) {
     std::vector<std::pair<KanjiTypes, size_t>> counts;
     size_t iTotal{};
     for (auto j{AllKanjiTypes.begin()}; auto& l : types()) {
       const auto t{*j++};
-      if (const auto c{static_cast<size_t>(std::count_if(l.begin(), l.end(),
-              [i, &p](auto& x) { return ((*x).*p)() == i; }))};
+      if (const auto c{static_cast<size_t>(std::count_if(
+              l.begin(), l.end(), [i](auto& x) { return ((*x).*F)() == i; }))};
           c) {
         counts.emplace_back(t, c);
         iTotal += c;
@@ -337,10 +337,9 @@ void FileKanjiData::printListStats(const EnumListWithNone<T, S>& all,
       for (const auto& j : counts) {
         out() << j.first << ' ' << j.second;
         auto& l{types()[j.first]};
-        if (showNoFrequency)
-          noFreq(std::count_if(l.begin(), l.end(), [i, &p](auto& x) {
-            return ((*x).*p)() == i && !x->frequency();
-          }));
+        if (showNoFreq)
+          noFreq(std::count_if(l.begin(), l.end(),
+              [i](auto& x) { return ((*x).*F)() == i && !x->frequency(); }));
         iTotal -= j.second;
         if (iTotal) out() << ", ";
       }
