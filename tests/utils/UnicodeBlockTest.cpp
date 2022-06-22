@@ -7,9 +7,9 @@ namespace {
 
 using BlockSet = std::set<const UnicodeBlock*>;
 
-template <typename T>
-void checkRange(const T& blocks, BlockSet* allBlocks = {}) {
-  for (Code oldEnd{}; auto& i : blocks) {
+template <const auto& Blocks>
+void checkRange(BlockSet* allBlocks = {}) {
+  for (Code oldEnd{}; auto& i : Blocks) {
     EXPECT_LT(oldEnd, i.start());
     oldEnd = i.end();
     if (allBlocks) EXPECT_TRUE(allBlocks->insert(&i).second);
@@ -40,14 +40,14 @@ TEST(UnicodeBlockTest, UnicodeBlockStreamOperator) {
 
 TEST(UnicodeBlockTest, CheckNoOverlappingBlocks) {
   BlockSet allBlocks;
-  checkRange(HiraganaBlocks, &allBlocks);
-  checkRange(KatakanaBlocks, &allBlocks);
-  checkRange(PunctuationBlocks, &allBlocks);
-  checkRange(SymbolBlocks, &allBlocks);
-  checkRange(LetterBlocks, &allBlocks);
-  checkRange(CommonKanjiBlocks, &allBlocks);
-  checkRange(RareKanjiBlocks, &allBlocks);
-  checkRange(NonSpacingBlocks, &allBlocks);
+  checkRange<HiraganaBlocks>(&allBlocks);
+  checkRange<KatakanaBlocks>(&allBlocks);
+  checkRange<PunctuationBlocks>(&allBlocks);
+  checkRange<SymbolBlocks>(&allBlocks);
+  checkRange<LetterBlocks>(&allBlocks);
+  checkRange<CommonKanjiBlocks>(&allBlocks);
+  checkRange<RareKanjiBlocks>(&allBlocks);
+  checkRange<NonSpacingBlocks>(&allBlocks);
 }
 
 TEST(UnicodeBlockTest, CheckKanjiBlocks) {
