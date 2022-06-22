@@ -13,7 +13,11 @@ namespace {
 // course need to be updated if the number of '.txt' files changes.
 constexpr size_t TextFilesInDataDir{10};
 
+constexpr auto MaxVariantSelectorExamples{5};
+
 } // namespace
+
+// KanjiData public methods
 
 Args::Size KanjiData::nextArg(const Args& args, Args::Size current) {
   if (current > args.size())
@@ -56,16 +60,6 @@ Kanji::NelsonIds KanjiData::getNelsonIds(UcdPtr u) {
     while (ss >> id) ids.emplace_back(id);
   }
   return ids;
-}
-
-KanjiData::KanjiData(const Path& dataDir, DebugMode debugMode,
-    std::ostream& out, std::ostream& err)
-    : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
-  // Clearing ListFile static data is only needed to help test code, for
-  // example ListFile tests can leave some data in these sets before Quiz
-  // tests are run (leading to problems loading real files).
-  ListFile::clearUniqueCheckData();
-  if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
 }
 
 UcdPtr KanjiData::findUcd(const String& kanjiName) const {
@@ -138,8 +132,41 @@ const KanjiData::List& KanjiData::findByNelsonId(Kanji::NelsonId id) const {
   return i != _nelsonMap.end() ? i->second : BaseEnumMap<List>::Empty;
 }
 
+void KanjiData::printError(const String& msg) const {
+  static size_t count;
+  _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- "
+       << msg << std::setfill(' ') << '\n';
+}
+
 std::ostream& KanjiData::log(bool heading) const {
   return heading ? _out << ">>>\n>>> " : _out << ">>> ";
+}
+
+// KanjiData protected methods
+
+KanjiData::KanjiData(const Path& dataDir, DebugMode debugMode,
+    std::ostream& out, std::ostream& err)
+    : _dataDir{dataDir}, _debugMode{debugMode}, _out{out}, _err{err} {
+  // Clearing ListFile static data is only needed to help test code, for
+  // example ListFile tests can leave some data in these sets before Quiz
+  // tests are run (leading to problems loading real files).
+  ListFile::clearUniqueCheckData();
+  if (fullDebug()) log(true) << "Begin Loading Data\n>>>\n";
+}
+
+void KanjiData::finishedLoadingData() {
+  processUcd();
+  if (fullDebug()) log(true) << "Finished Loading Data\n>>>\n";
+  if (debug()) {
+    printCountsAndStats();
+    printGrades();
+    if (fullDebug()) {
+      printListStats<&Kanji::level>(AllJlptLevels, "Level", true);
+      printListStats<&Kanji::kyu>(AllKenteiKyus, "Kyu", false);
+      _radicals.print(*this);
+      _ucd.print(*this);
+    }
+  }
 }
 
 fs::path KanjiData::getDataDir(const Args& args) {
@@ -195,29 +222,6 @@ KanjiData::DebugMode KanjiData::getDebugMode(const Args& args) {
   return result;
 }
 
-KanjiData::OptPath KanjiData::searchUpForDataDir(Path parent) {
-  static const Path DataDir{"data"};
-  OptPath oldParent;
-  do {
-    // check if 'data' exists and contains the expected number of '.txt' files
-    if (const auto data{parent / DataDir};
-        fs::is_directory(data) && isValidDataDir(data))
-      return data;
-    oldParent = parent;
-    parent = oldParent->parent_path();
-    // 'has_parent_path' seems to always return true, i.e., parent of '/' is
-    // '/' so break if new 'parent' is equal to 'oldParent'.
-  } while (parent != oldParent);
-  return {};
-}
-
-bool KanjiData::isValidDataDir(const Path& p) {
-  return std::count_if(fs::directory_iterator(p), fs::directory_iterator{},
-             [](const auto& i) {
-               return i.path().extension() == ListFile::TextFileExtension;
-             }) == TextFilesInDataDir;
-}
-
 bool KanjiData::checkInsert(const KanjiPtr& kanji, UcdPtr ucd) {
   auto& k{*kanji};
   if (!_nameMap.emplace(k.name(), kanji).second) {
@@ -263,7 +267,32 @@ void KanjiData::addToFrequencies(const KanjiPtr& kanji) {
     _maxFrequency = kanji->frequency() + 1U;
 }
 
-void KanjiData::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
+// KanjiData private methods
+
+KanjiData::OptPath KanjiData::searchUpForDataDir(Path parent) {
+  static const Path DataDir{"data"};
+  OptPath oldParent;
+  do {
+    // check if 'data' exists and contains the expected number of '.txt' files
+    if (const auto data{parent / DataDir};
+        fs::is_directory(data) && isValidDataDir(data))
+      return data;
+    oldParent = parent;
+    parent = oldParent->parent_path();
+    // 'has_parent_path' seems to always return true, i.e., parent of '/' is
+    // '/' so break if new 'parent' is equal to 'oldParent'.
+  } while (parent != oldParent);
+  return {};
+}
+
+bool KanjiData::isValidDataDir(const Path& p) {
+  return std::count_if(fs::directory_iterator(p), fs::directory_iterator{},
+             [](const auto& i) {
+               return i.path().extension() == ListFile::TextFileExtension;
+             }) == TextFilesInDataDir;
+}
+
+void KanjiData::insertSanityChecks(const Kanji& kanji, UcdPtr u) const {
   const auto error{[this, &kanji](const String& s) {
     String v;
     if (kanji.variant()) v = " (non-variant: " + kanji.nonVariantName() + ")";
@@ -273,7 +302,7 @@ void KanjiData::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
   }};
 
   const auto kanjiType{kanji.type()};
-  if (const auto ucd{ucdIn ? ucdIn : _ucd.find(kanji.name())}; !ucd)
+  if (const auto ucd{u ? u : _ucd.find(kanji.name())}; !ucd)
     error("not found");
   else if (kanjiType == KanjiTypes::Jouyou && !ucd->joyo())
     error("not marked as 'Joyo'");
@@ -286,34 +315,160 @@ void KanjiData::insertSanityChecks(const Kanji& kanji, UcdPtr ucdIn) const {
   // skipping radical and strokes checks for now
 }
 
-void KanjiData::printError(const String& msg) const {
-  static size_t count;
-  _err << "ERROR[" << std::setfill('0') << std::setw(4) << ++count << "] --- "
-       << msg << std::setfill(' ') << '\n';
-}
-
 void KanjiData::processUcd() {
-  // Calling 'findKanjiByName' checks for a 'variation selector' version of
-  // 'name' so use it instead of checking for a match in _nameMap directly
-  // (this avoids creating 52 redundant kanji when processing 'ucd.txt').
+  // Calling findByName() checks for a 'variation selector' version of 'name' so
+  // use it instead of checking for a match in _nameMap directly (this avoids
+  // creating 52 redundant Kanji when processing 'ucd.txt').
   for (auto& newKanji{_types[KanjiTypes::Ucd]}; const auto& i : _ucd.map())
     if (!findByName(i.second.name()))
       checkInsert(newKanji, std::make_shared<UcdKanji>(*this, i.second));
+  if (fullDebug()) checkStrokes();
 }
 
 void KanjiData::checkStrokes() const {
+  // Jouyou and Extra type Kanji load strokes from their own files so print
+  // any differences with data in _ucd (other types shouldn't have any diffs)
+  for (auto t : AllKanjiTypes) {
+    ListFile::StringList l;
+    for (auto& i : _types[t])
+      if (const auto u{findUcd(i->name())};
+          u && i->strokes().value() != u->strokes().value())
+        l.emplace_back(i->name());
+    ListFile::print(
+        _out, l, toString(t) + " Kanji with different strokes", "_ucd");
+  }
+}
+
+void KanjiData::printCountsAndStats() const {
+  log() << "Loaded " << _nameMap.size() << " Kanji (";
+  for (auto i{AllKanjiTypes.begin()}; auto& j : _types) {
+    if (i != AllKanjiTypes.begin()) _out << ' ';
+    _out << *i++ << ' ' << j.size();
+  }
+  _out << ")\n";
   if (fullDebug()) {
-    // Jouyou and Extra type Kanji load strokes from their own files so print
-    // any differences with data in _ucd (other types shouldn't have any diffs)
-    for (auto t : AllKanjiTypes) {
-      ListFile::StringList l;
-      for (auto& i : _types[t])
-        if (const auto u{findUcd(i->name())};
-            u && i->strokes().value() != u->strokes().value())
-          l.emplace_back(i->name());
-      ListFile::print(
-          _out, l, toString(t) + " Kanji with different strokes", "_ucd");
+    printCount<[](auto& x) { return x->hasLevel(); }>("  Has JLPT level");
+    printCount<[](auto& x) {
+      return x->frequency() && !x->is(KanjiTypes::Jouyou) && !x->hasLevel();
+    }>("  Has frequency and not in Jouyou or JLPT");
+    printCount<[](auto& x) {
+      return x->is(KanjiTypes::Jinmei) && !x->frequency() && !x->hasLevel();
+    }>("  Jinmei with no frequency and not JLPT");
+    printCount<[](auto& x) { return !x->frequency(); }>("  NF (no-frequency)");
+    printCount<[](auto& x) { return x->strokes().hasVariant(); }>(
+        "  Has Variant Strokes");
+    printCount<[](auto& x) { return x->variant(); }>(
+        "  Has Variation Selectors", MaxVariantSelectorExamples);
+    printCount<[](auto& x) { return !x->oldNames().empty(); }>("Old Forms");
+  }
+}
+
+template <auto Pred>
+void KanjiData::printCount(const String& name, size_t printExamples) const {
+  std::vector<std::pair<KanjiTypes, size_t>> counts;
+  std::map<KanjiTypes, std::vector<String>> examples;
+  size_t total{};
+  for (auto i{AllKanjiTypes.begin()}; auto& l : _types) {
+    size_t count{};
+    const auto t{*i++};
+    if (printExamples)
+      for (auto& j : l) {
+        if (Pred(j) && ++count <= printExamples)
+          examples[t].emplace_back(j->name());
+      }
+    else
+      count = static_cast<size_t>(std::count_if(l.begin(), l.end(), Pred));
+    if (count) {
+      counts.emplace_back(t, count);
+      total += count;
     }
+  }
+  if (total) {
+    log() << name << ' ' << total << " (";
+    for (const auto& i : counts) {
+      _out << i.first << ' ' << i.second;
+      for (const auto& j : examples[i.first]) _out << ' ' << j;
+      total -= i.second;
+      if (total) _out << ", ";
+    }
+    _out << ")\n";
+  }
+}
+
+void KanjiData::printGrades() const {
+  log() << "Grade breakdown:\n";
+  size_t all{};
+  for (auto& jouyou{types()[KanjiTypes::Jouyou]}; auto i : AllKanjiGrades) {
+    const auto grade{[i](auto& x) { return x->grade() == i; }};
+    if (auto gradeCount{static_cast<size_t>(
+            std::count_if(jouyou.begin(), jouyou.end(), grade))};
+        gradeCount) {
+      all += gradeCount;
+      log() << "  Total for grade " << i << ": " << gradeCount;
+      noFreq(std::count_if(jouyou.begin(), jouyou.end(),
+                 [&grade](auto& x) { return grade(x) && !x->frequency(); }),
+          true);
+      _out << " (";
+      for (const auto level : AllJlptLevels) {
+        const auto gradeLevelCount{static_cast<size_t>(std::count_if(
+            jouyou.begin(), jouyou.end(), [&grade, level](auto& x) {
+              return grade(x) && x->level() == level;
+            }))};
+        if (gradeLevelCount) {
+          gradeCount -= gradeLevelCount;
+          _out << level << ' ' << gradeLevelCount;
+          if (gradeCount) _out << ", ";
+        }
+      }
+      _out << ")\n";
+    }
+  }
+  log() << "  Total for all grades: " << all << '\n';
+}
+
+template <auto F, typename T>
+void KanjiData::printListStats(
+    const T& list, const String& name, bool showNoFreq) const {
+  log() << name << " breakdown:\n";
+  size_t total{};
+  for (const auto i : list) {
+    std::vector<std::pair<KanjiTypes, size_t>> counts;
+    size_t iTotal{};
+    for (auto j{AllKanjiTypes.begin()}; auto& l : _types) {
+      const auto t{*j++};
+      if (const auto c{static_cast<size_t>(std::count_if(
+              l.begin(), l.end(), [i](auto& x) { return ((*x).*F)() == i; }))};
+          c) {
+        counts.emplace_back(t, c);
+        iTotal += c;
+      }
+    }
+    if (iTotal) {
+      total += iTotal;
+      log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
+      for (const auto& j : counts) {
+        _out << j.first << ' ' << j.second;
+        auto& l{types()[j.first]};
+        if (showNoFreq)
+          noFreq(std::count_if(l.begin(), l.end(),
+              [i](auto& x) { return ((*x).*F)() == i && !x->frequency(); }));
+        iTotal -= j.second;
+        if (iTotal) _out << ", ";
+      }
+      _out << ")\n";
+    }
+  }
+  log() << "  Total for all " << name << "s: " << total << '\n';
+}
+
+void KanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
+  if (f) {
+    if (brackets)
+      _out << " (";
+    else
+      _out << ' ';
+    _out << "nf " << f;
+    if (brackets) _out << ')';
   }
 }
 

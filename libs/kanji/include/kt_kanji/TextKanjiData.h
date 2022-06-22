@@ -51,34 +51,6 @@ private:
   void printListData(const ListFile& list, const StringList& created,
       TypeStringList& found) const;
 
-  /// print totals per Kanji type and if fullDebug() is true then also print
-  /// various stats per type like 'Has JLPT Level', 'Has frequency', etc.
-  void printCountsAndStats() const;
-
-  /// print total per Kanji type matching a predicate function followed examples
-  /// \tparam Pred predicate function taking a Kanji
-  /// \param name stat name (like 'Has JLPT Level')
-  /// \param printExamples number of examples to print, `0` means no examples
-  template <auto Pred>
-  void printCount(const String& name, size_t printExamples = 0) const;
-
-  /// print breakdown per Kanji 'grade' including total and total JLPT level
-  void printGrades() const;
-
-  /// print details per Kanji type for a given enum list
-  /// \tparam F Kanji member function, currently Kanji::level() and Kanji::kyu()
-  /// \tparam T type of enum list
-  /// \param list enum list, currently AllJlptLevels and AllKenteiKyus
-  /// \param name list name
-  /// \param showNoFreq if true, then counts without frequencies are included
-  template <auto F, typename T>
-  void printListStats(const T& list, const String& name, bool showNoFreq) const;
-
-  /// helper function for printing 'no frequency' totals
-  /// \param f no frequency count to print
-  /// \param brackets if true then put round brackets around `f`
-  void noFreq(std::ptrdiff_t f, bool brackets = false) const;
-
   /// used by ctor to populate #_levels and #_kyus @{
   LevelListFile dataFile(JlptLevels) const;
   KyuListFile dataFile(KenteiKyus) const; ///@}

@@ -149,6 +149,18 @@ public:
   /// used for putting a standard prefix on output messages when needed
   [[nodiscard]] std::ostream& log(bool heading = false) const;
 protected:
+  /// ctor called by derived classes
+  /// \param dataDir directory containing '.txt' files with Kanji related data
+  /// \param debugMode if not None then print info after loading and then exit
+  /// \param out stream to write standard output
+  /// \param err stream to write error output
+  KanjiData(const Path& dataDir, DebugMode debugMode,
+      std::ostream& out = std::cout, std::ostream& err = std::cerr);
+
+  /// this function calls processUcd() and then prints summary debug info
+  /// \details should be called by derived class after all data is loaded
+  void finishedLoadingData();
+
   /// get path to a directory containing '.txt' files required by this program
   /// \details This function first looks in `args` for #DataArg followed by a
   /// directory name and returns that value if found, otherwise it searches up
@@ -161,22 +173,6 @@ protected:
 
   /// return #DebugMode by looking for #DebugArg or #InfoArg flags in `args`
   [[nodiscard]] static DebugMode getDebugMode(const Args& args);
-
-  /// ctor called by derived classes
-  /// \param dataDir directory containing '.txt' files with Kanji related data
-  /// \param debugMode if not None then print info after loading and then exit
-  /// \param out stream to write standard output
-  /// \param err stream to write error output
-  KanjiData(const Path& dataDir, DebugMode debugMode,
-      std::ostream& out = std::cout, std::ostream& err = std::cerr);
-
-  /// create UcdKanji for any entries in #_ucd that don't already have a Kanji
-  /// created already (should be called after creating all other types)
-  void processUcd();
-
-  /// compares stroke values loaded from other files to strokes in 'ucd.txt' and
-  /// prints results (if -debug was specified), call after calling processUcd()
-  void checkStrokes() const;
 
   [[nodiscard]] auto& radicals() { return _radicals; }
   [[nodiscard]] auto& getUcd() { return _ucd; }
@@ -194,6 +190,46 @@ private:
   [[nodiscard]] static OptPath searchUpForDataDir(Path);
   [[nodiscard]] static bool isValidDataDir(const Path&);
 
+  /// called by checkInsert() to compare various properties of `kanji` and `u`
+  /// and print errors for any problems
+  void insertSanityChecks(const Kanji& kanji, UcdPtr u) const;
+
+  /// create UcdKanji for any entries in #_ucd that don't already have a Kanji
+  /// created already \details this method is called by finishedLoadingData()
+  void processUcd();
+
+  /// compares stroke values loaded from other files to strokes in 'ucd.txt' and
+  /// prints results (if -debug was specified) \details called by processUcd()
+  void checkStrokes() const;
+
+  /// print totals per Kanji type and if fullDebug() is true then also print
+  /// various stats per type like 'Has JLPT Level', 'Has frequency', etc.
+  void printCountsAndStats() const;
+
+  /// print total per Kanji type matching a predicate followed by examples
+  /// \tparam Pred predicate function taking a Kanji
+  /// \param name stat name (like 'Has JLPT Level')
+  /// \param printExamples number of examples to print, `0` means no examples
+  template <auto Pred>
+  void printCount(const String& name, size_t printExamples = 0) const;
+
+  /// print breakdown per Kanji 'grade' including total and total JLPT level
+  void printGrades() const;
+
+  /// print details per Kanji type for all values in a given EnumList
+  /// \tparam F Kanji member function, currently Kanji::level() and Kanji::kyu()
+  /// \tparam T type of EnumList
+  /// \param list enum list, currently AllJlptLevels and AllKenteiKyus
+  /// \param name list name
+  /// \param showNoFreq if true, then counts without frequencies are included
+  template <auto F, typename T>
+  void printListStats(const T& list, const String& name, bool showNoFreq) const;
+
+  /// helper function for printing 'no frequency' totals
+  /// \param f no frequency count to print
+  /// \param brackets if true then put round brackets around `f`
+  void noFreq(std::ptrdiff_t f, bool brackets = false) const;
+
   /// holds the 214 official Kanji Radicals
   RadicalData _radicals;
 
@@ -201,8 +237,6 @@ private:
   /// attributes. It also provides 'radical', 'strokes', 'meaning' and 'reading'
   /// when needed (mostly by non-NumberedKanji classes).
   UcdData _ucd;
-
-  void insertSanityChecks(const Kanji&, UcdPtr) const;
 
   const Path _dataDir;
   const DebugMode _debugMode;

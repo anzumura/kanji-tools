@@ -16,8 +16,6 @@ const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"}, ExtraFile{"extra"},
     FrequencyReadingsFile{"frequency-readings"},
     LinkedJinmeiFile{"linked-jinmei"}, Jlpt{"jlpt"}, Kentei{"kentei"};
 
-constexpr auto MaxVariantSelectorExamples{5};
-
 } // namespace
 
 TextKanjiData::TextKanjiData(
@@ -49,19 +47,7 @@ TextKanjiData::TextKanjiData(
   // rare kanji so keep it as the last type to be processed (before UcdKanji).
   processList(_frequency);
   for (auto& i : _kyus) processList(i);
-  processUcd();
-  checkStrokes();
-  if (debug()) {
-    if (fullDebug()) log(true) << "Finished Loading Data\n>>>\n";
-    printCountsAndStats();
-    printGrades();
-    if (fullDebug()) {
-      printListStats<&Kanji::level>(AllJlptLevels, "Level", true);
-      printListStats<&Kanji::kyu>(AllKenteiKyus, "Kyu", false);
-      radicals().print(*this);
-      ucd().print(*this);
-    }
-  }
+  finishedLoadingData();
 }
 
 Kanji::Frequency TextKanjiData::frequency(const String& s) const {
@@ -211,139 +197,6 @@ void TextKanjiData::printListData(const ListFile& list,
           out(), found[KanjiTypes::LinkedJinmei], "Linked Jinmei", list.name());
     }
   }
-}
-
-void TextKanjiData::printCountsAndStats() const {
-  log() << "Loaded " << nameMap().size() << " Kanji (";
-  for (auto i{AllKanjiTypes.begin()}; auto& j : types()) {
-    if (i != AllKanjiTypes.begin()) out() << ' ';
-    out() << *i++ << ' ' << j.size();
-  }
-  out() << ")\n";
-  if (fullDebug()) {
-    printCount<[](auto& x) { return x->hasLevel(); }>("  Has JLPT level");
-    printCount<[](auto& x) {
-      return x->frequency() && !x->is(KanjiTypes::Jouyou) && !x->hasLevel();
-    }>("  Has frequency and not in Jouyou or JLPT");
-    printCount<[](auto& x) {
-      return x->is(KanjiTypes::Jinmei) && !x->frequency() && !x->hasLevel();
-    }>("  Jinmei with no frequency and not JLPT");
-    printCount<[](auto& x) { return !x->frequency(); }>("  NF (no-frequency)");
-    printCount<[](auto& x) { return x->strokes().hasVariant(); }>(
-        "  Has Variant Strokes");
-    printCount<[](auto& x) { return x->variant(); }>(
-        "  Has Variation Selectors", MaxVariantSelectorExamples);
-    printCount<[](auto& x) { return !x->oldNames().empty(); }>("Old Forms");
-  }
-}
-
-template <auto Pred>
-void TextKanjiData::printCount(const String& name, size_t printExamples) const {
-  std::vector<std::pair<KanjiTypes, size_t>> counts;
-  std::map<KanjiTypes, std::vector<String>> examples;
-  size_t total{};
-  for (auto i{AllKanjiTypes.begin()}; auto& l : types()) {
-    size_t count{};
-    const auto t{*i++};
-    if (printExamples)
-      for (auto& j : l) {
-        if (Pred(j) && ++count <= printExamples)
-          examples[t].emplace_back(j->name());
-      }
-    else
-      count = static_cast<size_t>(std::count_if(l.begin(), l.end(), Pred));
-    if (count) {
-      counts.emplace_back(t, count);
-      total += count;
-    }
-  }
-  if (total) {
-    log() << name << ' ' << total << " (";
-    for (const auto& i : counts) {
-      out() << i.first << ' ' << i.second;
-      for (const auto& j : examples[i.first]) out() << ' ' << j;
-      total -= i.second;
-      if (total) out() << ", ";
-    }
-    out() << ")\n";
-  }
-}
-
-void TextKanjiData::noFreq(std::ptrdiff_t f, bool brackets) const {
-  if (f) {
-    if (brackets)
-      out() << " (";
-    else
-      out() << ' ';
-    out() << "nf " << f;
-    if (brackets) out() << ')';
-  }
-}
-
-void TextKanjiData::printGrades() const {
-  log() << "Grade breakdown:\n";
-  size_t all{};
-  for (auto& jouyou{types()[KanjiTypes::Jouyou]}; auto i : AllKanjiGrades) {
-    const auto grade{[i](auto& x) { return x->grade() == i; }};
-    if (auto gradeCount{static_cast<size_t>(
-            std::count_if(jouyou.begin(), jouyou.end(), grade))};
-        gradeCount) {
-      all += gradeCount;
-      log() << "  Total for grade " << i << ": " << gradeCount;
-      noFreq(std::count_if(jouyou.begin(), jouyou.end(),
-                 [&grade](auto& x) { return grade(x) && !x->frequency(); }),
-          true);
-      out() << " (";
-      for (const auto level : AllJlptLevels) {
-        const auto gradeLevelCount{static_cast<size_t>(std::count_if(
-            jouyou.begin(), jouyou.end(), [&grade, level](auto& x) {
-              return grade(x) && x->level() == level;
-            }))};
-        if (gradeLevelCount) {
-          gradeCount -= gradeLevelCount;
-          out() << level << ' ' << gradeLevelCount;
-          if (gradeCount) out() << ", ";
-        }
-      }
-      out() << ")\n";
-    }
-  }
-  log() << "  Total for all grades: " << all << '\n';
-}
-
-template <auto F, typename T>
-void TextKanjiData::printListStats(
-    const T& list, const String& name, bool showNoFreq) const {
-  log() << name << " breakdown:\n";
-  size_t total{};
-  for (const auto i : list) {
-    std::vector<std::pair<KanjiTypes, size_t>> counts;
-    size_t iTotal{};
-    for (auto j{AllKanjiTypes.begin()}; auto& l : types()) {
-      const auto t{*j++};
-      if (const auto c{static_cast<size_t>(std::count_if(
-              l.begin(), l.end(), [i](auto& x) { return ((*x).*F)() == i; }))};
-          c) {
-        counts.emplace_back(t, c);
-        iTotal += c;
-      }
-    }
-    if (iTotal) {
-      total += iTotal;
-      log() << "  Total for " << name << ' ' << i << ": " << iTotal << " (";
-      for (const auto& j : counts) {
-        out() << j.first << ' ' << j.second;
-        auto& l{types()[j.first]};
-        if (showNoFreq)
-          noFreq(std::count_if(l.begin(), l.end(),
-              [i](auto& x) { return ((*x).*F)() == i && !x->frequency(); }));
-        iTotal -= j.second;
-        if (iTotal) out() << ", ";
-      }
-      out() << ")\n";
-    }
-  }
-  log() << "  Total for all " << name << "s: " << total << '\n';
 }
 
 LevelListFile TextKanjiData::dataFile(JlptLevels x) const {
