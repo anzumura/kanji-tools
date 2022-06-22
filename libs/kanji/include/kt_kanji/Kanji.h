@@ -209,11 +209,16 @@ public:
 protected:
   /// common parameters and helper functions for Kanji ctors \kanji{Kanji}
   ///
-  /// Ctors in the Kanji hierarch take various different sets of parameters so
-  /// as a compromise, this struct holds the three most common ones. 'name' and
-  /// 'u' (Ucd) params are also the main values used to look up other values.
-  struct CtorParams {
-    /// use 'data', 'name' and 'u' fields to look up other values @{
+  /// Constructors in the Kanji hierarch take various sets of parameters so as a
+  /// compromise, this class holds the three most common ones. name() and Ucd()
+  /// are also the main values used to look up other values.
+  class CtorParams final {
+  public:
+    CtorParams(KanjiDataRef data, Name name) noexcept;
+
+    CtorParams(KanjiDataRef data, Name name, UcdPtr ucd) noexcept;
+
+    /// use _data, _name and _ucd fields to look up other values @{
     [[nodiscard]] Kanji::Frequency frequency() const;
     [[nodiscard]] bool hasNonTraditionalLinks() const;
     [[nodiscard]] bool hasTraditionalLinks() const;
@@ -225,11 +230,14 @@ protected:
     [[nodiscard]] Strokes strokes() const;
     /// @}
 
-    // NOLINTBEGIN: public data
-    KanjiDataRef data;
-    Name name;
-    UcdPtr u;
-    // NOLINTEND
+    [[nodiscard]] KanjiDataRef data() const noexcept { return _data; }
+    [[nodiscard]] Name name() const noexcept { return _name; }
+    [[nodiscard]] UcdPtr ucd() const noexcept { return _ucd; }
+
+  private:
+    KanjiDataRef _data;
+    Name _name;
+    UcdPtr _ucd;
   };
 
   /// ctor used by OfficialLinkedKanji and LoadedKanji classes

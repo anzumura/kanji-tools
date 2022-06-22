@@ -102,10 +102,10 @@ bool Kanji::operator==(const Kanji& x) const { return name() == x.name(); }
 // Kanji protected methods
 
 Kanji::Kanji(CtorParams params, RadicalRef radical, Strokes strokes)
-    : Kanji{params.name, params.data.getCompatibilityName(params.name), radical,
-          strokes, KanjiData::getPinyin(params.u),
-          KanjiData::getMorohashiId(params.u),
-          KanjiData::getNelsonIds(params.u)} {}
+    : Kanji{params.name(), params.data().getCompatibilityName(params.name()),
+          radical, strokes, KanjiData::getPinyin(params.ucd()),
+          KanjiData::getMorohashiId(params.ucd()),
+          KanjiData::getNelsonIds(params.ucd())} {}
 
 Kanji::Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
     Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
@@ -137,35 +137,43 @@ uint16_t Kanji::qualifiedNameRank() const { // NOLINT
 
 // Kanji::CtorParams
 
+Kanji::CtorParams::CtorParams(KanjiDataRef data, Name name) noexcept
+    : CtorParams{data, name, data.findUcd(name)} {}
+
+Kanji::CtorParams::CtorParams(KanjiDataRef data, Name name, UcdPtr ucd) noexcept
+    : _data{data}, _name{name}, _ucd{ucd} {}
+
 Kanji::Frequency Kanji::CtorParams::frequency() const {
-  return data.frequency(name);
+  return _data.frequency(_name);
 }
 
 bool Kanji::CtorParams::hasNonTraditionalLinks() const {
-  return u && u->hasNonTraditionalLinks();
+  return _ucd && _ucd->hasNonTraditionalLinks();
 }
 
 bool Kanji::CtorParams::hasTraditionalLinks() const {
-  return u && u->hasTraditionalLinks();
+  return _ucd && _ucd->hasTraditionalLinks();
 }
 
-KenteiKyus Kanji::CtorParams::kyu() const { return data.kyu(name); }
+KenteiKyus Kanji::CtorParams::kyu() const { return _data.kyu(_name); }
 
-JlptLevels Kanji::CtorParams::level() const { return data.level(name); }
+JlptLevels Kanji::CtorParams::level() const { return _data.level(_name); }
 
 bool Kanji::CtorParams::linkedReadings() const {
-  return u && u->linkedReadings();
+  return _ucd && _ucd->linkedReadings();
 }
 
 RadicalRef Kanji::CtorParams::radical() const {
-  return data.ucdRadical(name, u);
+  return _data.ucdRadical(_name, _ucd);
 }
 
 String Kanji::CtorParams::reading() const {
-  return data.ucd().getReadingsAsKana(u);
+  return _data.ucd().getReadingsAsKana(_ucd);
 }
 
-Strokes Kanji::CtorParams::strokes() const { return data.ucdStrokes(name, u); }
+Strokes Kanji::CtorParams::strokes() const {
+  return _data.ucdStrokes(_name, _ucd);
+}
 
 // Kanji::KanjiName
 
@@ -197,7 +205,7 @@ LoadedKanji::LoadedKanji(CtorParams params, RadicalRef radical, Reading reading,
 
 LoadedKanji::LoadedKanji(CtorParams params, RadicalRef radical, Reading reading)
     : LoadedKanji{params, radical, reading, params.strokes(),
-          UcdData::getMeaning(params.u)} {}
+          UcdData::getMeaning(params.ucd())} {}
 
 // OtherKanji
 
@@ -213,21 +221,20 @@ Kanji::OptString OtherKanji::newName() const {
 OtherKanji::OtherKanji(CtorParams params, Reading reading)
     : LoadedKanji{params, params.radical(), reading},
       _hasOldLinks{params.hasTraditionalLinks()},
-      _linkNames{linkNames(params.u)}, _linkedReadings{
-                                           params.linkedReadings()} {}
+      _linkNames{linkNames(params.ucd())}, _linkedReadings{
+                                               params.linkedReadings()} {}
 
 OtherKanji::OtherKanji(CtorParams params)
     : OtherKanji{params, params.reading()} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, Reading reading)
-    : OtherKanji{{data, name, data.findUcd(name)}, reading}, _kyu{data.kyu(
-                                                                 name)} {}
+    : OtherKanji{{data, name}, reading}, _kyu{data.kyu(name)} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name)
     : StandardKanji{data, name, data.kyu(name)} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, KenteiKyus kyu)
-    : OtherKanji{{data, name, data.findUcd(name)}}, _kyu{kyu} {}
+    : OtherKanji{{data, name}}, _kyu{kyu} {}
 
 FrequencyKanji::FrequencyKanji(
     KanjiDataRef data, Name name, Frequency frequency)
