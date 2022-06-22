@@ -207,16 +207,37 @@ public:
                                "+=Extra @=検定 #=1級 *=Ucd"};
 
 protected:
+  /// common parameters and helper functions for Kanji ctors \kanji{Kanji}
+  ///
+  /// Ctors in the Kanji hierarch take various different sets of parameters so
+  /// as a compromise, this struct holds the three most common ones. 'name' and
+  /// 'u' (Ucd) params are also the main values used to look up other values.
+  struct CtorParams {
+    /// use 'data', 'name' and 'u' fields to look up other values @{
+    [[nodiscard]] Kanji::Frequency frequency() const;
+    [[nodiscard]] bool hasNonTraditionalLinks() const;
+    [[nodiscard]] bool hasTraditionalLinks() const;
+    [[nodiscard]] KenteiKyus kyu() const;
+    [[nodiscard]] JlptLevels level() const;
+    [[nodiscard]] bool linkedReadings() const;
+    [[nodiscard]] RadicalRef radical() const;
+    [[nodiscard]] String reading() const;
+    [[nodiscard]] Strokes strokes() const;
+    /// @}
+
+    // NOLINTBEGIN: public data
+    KanjiDataRef data;
+    Name name;
+    UcdPtr u;
+    // NOLINTEND
+  };
+
   /// ctor used by OfficialLinkedKanji and LoadedKanji classes
-  Kanji(KanjiDataRef, Name, RadicalRef, Strokes, UcdPtr);
+  Kanji(CtorParams, RadicalRef, Strokes);
 
   /// ctor used by above ctor as well as test code
-  Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
-      Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
-      NelsonIds nelsonIds)
-      : _name{name}, _compatibilityName{compatibilityName}, _radical{radical},
-        _strokes{strokes}, _pinyin{pinyin}, _morohashiId{morohashiId},
-        _nelsonIds{std::move(nelsonIds)} {}
+  Kanji(Name, const OptString& compatibilityName, RadicalRef, Strokes,
+      const Pinyin&, const MorohashiId&, NelsonIds);
 
   inline static const LinkNames EmptyLinkNames;
 
@@ -275,12 +296,10 @@ protected:
   [[nodiscard]] static LinkNames linkNames(UcdPtr);
 
   /// ctor used by NumberedKanji
-  LoadedKanji(
-      KanjiDataRef, Name, RadicalRef, Strokes, Meaning, Reading, UcdPtr);
+  LoadedKanji(CtorParams, RadicalRef, Reading, Strokes, Meaning);
 
-  /// ctor used by NumberedKanji and OtherKanji: looks up 'meaning' and
-  /// 'strokes' from `UcdPtr`
-  LoadedKanji(KanjiDataRef, Name, RadicalRef, Reading, UcdPtr);
+  /// ctor used by NumberedKanji and OtherKanji: looks up 'strokes', 'meaning'
+  LoadedKanji(CtorParams, RadicalRef, Reading);
 
 private:
   const String _meaning;
@@ -300,9 +319,10 @@ public:
 
 protected:
   /// ctor used by 'StandardKanji': has 'reading'
-  OtherKanji(KanjiDataRef, Name, Reading, UcdPtr);
+  OtherKanji(CtorParams, Reading);
+
   /// ctor used by 'StandardKanji' and 'UcdKanji': looks up 'reading'
-  OtherKanji(KanjiDataRef, Name, UcdPtr);
+  explicit OtherKanji(CtorParams);
 
 private:
   const bool _hasOldLinks;

@@ -5,6 +5,8 @@
 
 namespace kanji_tools {
 
+// Kanji public methods
+
 // base implementations of virtual functions return default values
 
 Kanji::Frequency Kanji::frequency() const { return 0; }
@@ -18,24 +20,6 @@ Kanji::Link Kanji::link() const {
 JinmeiReasons Kanji::reason() const { return JinmeiReasons::None; }
 Kanji::Year Kanji::year() const { return 0; }
 bool Kanji::linkedReadings() const { return false; }
-
-Kanji::KanjiName::KanjiName(const String& name) : _name{name} {
-  assert(Utf8Char::size(_name) == 1);
-}
-
-bool Kanji::KanjiName::isVariant() const {
-  return Utf8Char::isCharWithVariationSelector(_name);
-}
-
-String Kanji::KanjiName::nonVariant() const {
-  return Utf8Char::noVariationSelector(_name);
-}
-
-Kanji::Kanji(
-    KanjiDataRef d, Name n, RadicalRef radical, Strokes strokes, UcdPtr u)
-    : Kanji{n, d.getCompatibilityName(n), radical, strokes,
-          KanjiData::getPinyin(u), KanjiData::getMorohashiId(u),
-          KanjiData::getNelsonIds(u)} {}
 
 String Kanji::compatibilityName() const {
   return _compatibilityName.value_or(_name.name());
@@ -115,6 +99,23 @@ bool Kanji::orderByStrokes(const Kanji& x) const {
 
 bool Kanji::operator==(const Kanji& x) const { return name() == x.name(); }
 
+// Kanji protected methods
+
+Kanji::Kanji(CtorParams params, RadicalRef radical, Strokes strokes)
+    : Kanji{params.name, params.data.getCompatibilityName(params.name), radical,
+          strokes, KanjiData::getPinyin(params.u),
+          KanjiData::getMorohashiId(params.u),
+          KanjiData::getNelsonIds(params.u)} {}
+
+Kanji::Kanji(Name name, const OptString& compatibilityName, RadicalRef radical,
+    Strokes strokes, const Pinyin& pinyin, const MorohashiId& morohashiId,
+    NelsonIds nelsonIds)
+    : _name{name}, _compatibilityName{compatibilityName}, _radical{radical},
+      _strokes{strokes}, _pinyin{pinyin}, _morohashiId{morohashiId},
+      _nelsonIds{std::move(nelsonIds)} {}
+
+// Kanji private methods
+
 // chained ':?' causes clang-tidy 'cognitive complexity' warning, but this
 // style seems nicer than multiple returns (in 'if' and 'switch' blocks)
 uint16_t Kanji::qualifiedNameRank() const { // NOLINT
@@ -134,6 +135,52 @@ uint16_t Kanji::qualifiedNameRank() const { // NOLINT
                                    : vK1;
 }
 
+// Kanji::CtorParams
+
+Kanji::Frequency Kanji::CtorParams::frequency() const {
+  return data.frequency(name);
+}
+
+bool Kanji::CtorParams::hasNonTraditionalLinks() const {
+  return u && u->hasNonTraditionalLinks();
+}
+
+bool Kanji::CtorParams::hasTraditionalLinks() const {
+  return u && u->hasTraditionalLinks();
+}
+
+KenteiKyus Kanji::CtorParams::kyu() const { return data.kyu(name); }
+
+JlptLevels Kanji::CtorParams::level() const { return data.level(name); }
+
+bool Kanji::CtorParams::linkedReadings() const {
+  return u && u->linkedReadings();
+}
+
+RadicalRef Kanji::CtorParams::radical() const {
+  return data.ucdRadical(name, u);
+}
+
+String Kanji::CtorParams::reading() const {
+  return data.ucd().getReadingsAsKana(u);
+}
+
+Strokes Kanji::CtorParams::strokes() const { return data.ucdStrokes(name, u); }
+
+// Kanji::KanjiName
+
+Kanji::KanjiName::KanjiName(const String& name) : _name{name} {
+  assert(Utf8Char::size(_name) == 1);
+}
+
+bool Kanji::KanjiName::isVariant() const {
+  return Utf8Char::isCharWithVariationSelector(_name);
+}
+
+String Kanji::KanjiName::nonVariant() const {
+  return Utf8Char::noVariationSelector(_name);
+}
+
 // LoadedKanji
 
 Kanji::LinkNames LoadedKanji::linkNames(UcdPtr u) {
@@ -144,15 +191,13 @@ Kanji::LinkNames LoadedKanji::linkNames(UcdPtr u) {
   return result;
 }
 
-LoadedKanji::LoadedKanji(KanjiDataRef data, Name name, RadicalRef radical,
-    Strokes strokes, Meaning meaning, Reading reading, UcdPtr u)
-    : Kanji{data, name, radical, strokes, u}, _meaning{meaning}, _reading{
-                                                                     reading} {}
+LoadedKanji::LoadedKanji(CtorParams params, RadicalRef radical, Reading reading,
+    Strokes strokes, Meaning meaning)
+    : Kanji{params, radical, strokes}, _meaning{meaning}, _reading{reading} {}
 
-LoadedKanji::LoadedKanji(
-    KanjiDataRef data, Name name, RadicalRef radical, Reading reading, UcdPtr u)
-    : LoadedKanji{data, name, radical, data.ucdStrokes(name, u),
-          UcdData::getMeaning(u), reading, u} {}
+LoadedKanji::LoadedKanji(CtorParams params, RadicalRef radical, Reading reading)
+    : LoadedKanji{params, radical, reading, params.strokes(),
+          UcdData::getMeaning(params.u)} {}
 
 // OtherKanji
 
@@ -165,23 +210,24 @@ Kanji::OptString OtherKanji::newName() const {
                                             : OptString{_linkNames[0]};
 }
 
-OtherKanji::OtherKanji(KanjiDataRef data, Name name, Reading reading, UcdPtr u)
-    : LoadedKanji{data, name, data.ucdRadical(name, u), reading, u},
-      _hasOldLinks{u && u->hasTraditionalLinks()}, _linkNames{linkNames(u)},
-      _linkedReadings{u && u->linkedReadings()} {}
+OtherKanji::OtherKanji(CtorParams params, Reading reading)
+    : LoadedKanji{params, params.radical(), reading},
+      _hasOldLinks{params.hasTraditionalLinks()},
+      _linkNames{linkNames(params.u)}, _linkedReadings{
+                                           params.linkedReadings()} {}
 
-OtherKanji::OtherKanji(KanjiDataRef data, Name name, UcdPtr u)
-    : OtherKanji{data, name, data.ucd().getReadingsAsKana(u), u} {}
+OtherKanji::OtherKanji(CtorParams params)
+    : OtherKanji{params, params.reading()} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, Reading reading)
-    : OtherKanji{data, name, reading, data.findUcd(name)}, _kyu{data.kyu(
-                                                               name)} {}
+    : OtherKanji{{data, name, data.findUcd(name)}, reading}, _kyu{data.kyu(
+                                                                 name)} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name)
     : StandardKanji{data, name, data.kyu(name)} {}
 
 StandardKanji::StandardKanji(KanjiDataRef data, Name name, KenteiKyus kyu)
-    : OtherKanji{data, name, data.findUcd(name)}, _kyu{kyu} {}
+    : OtherKanji{{data, name, data.findUcd(name)}}, _kyu{kyu} {}
 
 FrequencyKanji::FrequencyKanji(
     KanjiDataRef data, Name name, Frequency frequency)
@@ -195,6 +241,6 @@ KenteiKanji::KenteiKanji(KanjiDataRef data, Name name, KenteiKyus kyu)
     : StandardKanji{data, name, kyu} {}
 
 UcdKanji::UcdKanji(KanjiDataRef data, const Ucd& u)
-    : OtherKanji{data, u.name(), &u} {}
+    : OtherKanji{{data, u.name(), &u}} {}
 
 } // namespace kanji_tools

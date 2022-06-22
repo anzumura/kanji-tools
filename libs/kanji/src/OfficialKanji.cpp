@@ -12,17 +12,16 @@ Kanji::OptString NumberedKanji::extraTypeInfo() const {
 
 Kanji::Name NumberedKanji::name(File f) { return f.get(NameCol); }
 
-NumberedKanji::NumberedKanji(KanjiDataRef data, File f, Name name,
-    Strokes strokes, Meaning meaning, OldNames oldNames, UcdPtr u)
-    : LoadedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)), strokes,
-          meaning, f.get(ReadingCol), u},
-      _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
+NumberedKanji::NumberedKanji(CtorParams params, File f, Strokes strokes,
+    Meaning meaning, OldNames oldNames)
+    : LoadedKanji{params, params.data.getRadicalByName(f.get(RadicalCol)),
+          f.get(ReadingCol), strokes, meaning},
+      _kyu{params.kyu()}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
-NumberedKanji::NumberedKanji(KanjiDataRef data, File f, Name name,
-    OldNames oldNames, UcdPtr u) // LCOV_EXCL_LINE
-    : LoadedKanji{data, name, data.getRadicalByName(f.get(RadicalCol)),
-          f.get(ReadingCol), u},
-      _kyu{data.kyu(name)}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
+NumberedKanji::NumberedKanji(CtorParams params, File f, OldNames oldNames)
+    : LoadedKanji{params, params.data.getRadicalByName(f.get(RadicalCol)),
+          f.get(ReadingCol)},
+      _kyu{params.kyu()}, _number{f.getU16(NumberCol)}, _oldNames{oldNames} {}
 
 // OfficialKanji
 
@@ -32,15 +31,15 @@ Kanji::OptString OfficialKanji::extraTypeInfo() const {
                : NumberedKanji::extraTypeInfo();
 }
 
-OfficialKanji::OfficialKanji(KanjiDataRef data, File f, Name name, UcdPtr u)
-    : NumberedKanji{data, f, name, getOldNames(f), u},
-      _frequency{data.frequency(name)}, _level{data.level(name)},
-      _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
+OfficialKanji::OfficialKanji(CtorParams params, File f)
+    : NumberedKanji{params, f, getOldNames(f)}, _frequency{params.frequency()},
+      _level{params.level()}, _year{f.isEmpty(YearCol) ? Year{}
+                                                       : f.getU16(YearCol)} {}
 
-OfficialKanji::OfficialKanji(KanjiDataRef data, File f, Name name,
-    Strokes strokes, Meaning meaning) // LCOV_EXCL_LINE
-    : NumberedKanji{data, f, name, strokes, meaning, getOldNames(f),
-          data.findUcd(name)},
+OfficialKanji::OfficialKanji(
+    KanjiDataRef data, File f, Name name, Strokes strokes, Meaning meaning)
+    : NumberedKanji{{data, name, data.findUcd(name)}, f, strokes, meaning,
+          getOldNames(f)},
       _frequency{data.frequency(name)}, _level{data.level(name)},
       _year{f.isEmpty(YearCol) ? Year{} : f.getU16(YearCol)} {}
 
@@ -54,7 +53,7 @@ Kanji::LinkNames OfficialKanji::getOldNames(File f) {
 // JinmeiKanji
 
 JinmeiKanji::JinmeiKanji(KanjiDataRef data, File f)
-    : OfficialKanji{data, f, name(f), data.findUcd(f.get(NameCol))},
+    : OfficialKanji{{data, name(f), data.findUcd(f.get(NameCol))}, f},
       _reason{AllJinmeiReasons.fromString(f.get(ReasonCol))} {}
 
 Kanji::OptString JinmeiKanji::extraTypeInfo() const {
@@ -75,17 +74,16 @@ KanjiGrades JouyouKanji::getGrade(const String& s) {
 // ExtraKanji
 
 ExtraKanji::ExtraKanji(KanjiDataRef data, File f)
-    : ExtraKanji{data, f, name(f)} {}
+    : ExtraKanji{data, name(f), f} {}
 
-ExtraKanji::ExtraKanji(KanjiDataRef data, File f, Name name)
-    : ExtraKanji{data, f, name, data.findUcd(name)} {}
+ExtraKanji::ExtraKanji(KanjiDataRef data, Name name, File f)
+    : ExtraKanji{{data, name, data.findUcd(name)}, f} {}
 
-ExtraKanji::ExtraKanji(KanjiDataRef data, File f, Name name, UcdPtr u)
-    : NumberedKanji{data, f, name, Strokes{f.getU8(StrokesCol)},
-          f.get(MeaningCol),
-          u && u->hasTraditionalLinks() ? linkNames(u) : EmptyLinkNames, u},
-      _newName{u && u->hasNonTraditionalLinks()
-                   ? OptString{u->links()[0].name()}
+ExtraKanji::ExtraKanji(CtorParams params, File f)
+    : NumberedKanji{params, f, Strokes{f.getU8(StrokesCol)}, f.get(MeaningCol),
+          params.hasTraditionalLinks() ? linkNames(params.u) : EmptyLinkNames},
+      _newName{params.hasNonTraditionalLinks()
+                   ? OptString{params.u->links()[0].name()}
                    : std::nullopt} {}
 
 // OfficialLinkedKanji
@@ -96,12 +94,12 @@ Kanji::Reading OfficialLinkedKanji::reading() const { return _link->reading(); }
 
 Kanji::OptString OfficialLinkedKanji::newName() const { return _link->name(); }
 
-OfficialLinkedKanji::OfficialLinkedKanji(
-    KanjiDataRef data, Name name, Link link, UcdPtr u)
-    : Kanji{data, name, data.ucdRadical(name, u), data.ucdStrokes(name, u), u},
-      _frequency{data.frequency(name)}, _kyu{data.kyu(name)}, _link{link} {}
+OfficialLinkedKanji::OfficialLinkedKanji(CtorParams params, Link link)
+    : Kanji{params, params.radical(), params.strokes()},
+      _frequency{params.frequency()}, _kyu{params.kyu()}, _link{link} {}
 
-Kanji::Name OfficialLinkedKanji::check(Name name, Link link, bool isOld) {
+Kanji::CtorParams OfficialLinkedKanji::check(
+    KanjiDataRef data, Name name, Link link, bool isOld) {
   if (const auto t{link->type()};
       t != KanjiTypes::Jouyou && (isOld || t != KanjiTypes::Jinmei))
     throw DomainError{
@@ -110,15 +108,13 @@ Kanji::Name OfficialLinkedKanji::check(Name name, Link link, bool isOld) {
         (isOld ? emptyString()
                : String{"' or '"} + toString(KanjiTypes::Jinmei)) +
         "' for link " + link->name() + ", but got '" + toString(t) + "'"};
-  return name;
+  return {data, name, data.findUcd(name)};
 }
 
 LinkedJinmeiKanji::LinkedJinmeiKanji(KanjiDataRef data, Name name, Link link)
-    : OfficialLinkedKanji{
-          data, check(name, link, false), link, data.findUcd(name)} {}
+    : OfficialLinkedKanji{check(data, name, link, false), link} {}
 
 LinkedOldKanji::LinkedOldKanji(KanjiDataRef data, Name name, Link link)
-    : OfficialLinkedKanji{
-          data, check(name, link, true), link, data.findUcd(name)} {}
+    : OfficialLinkedKanji{check(data, name, link, true), link} {}
 
 } // namespace kanji_tools

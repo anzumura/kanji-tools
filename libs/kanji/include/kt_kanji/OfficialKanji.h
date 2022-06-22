@@ -44,10 +44,10 @@ protected:
       ReadingCol{"Reading"}, ReasonCol{"Reason"};
 
   /// ctor used by NumberedKanji and ExtraKanji: has a 'meaning' param
-  NumberedKanji(KanjiDataRef, File, Name, Strokes, Meaning, OldNames, UcdPtr);
+  NumberedKanji(CtorParams, File, Strokes, Meaning, OldNames);
 
   /// ctor used by OfficialKanji: 'strokes' and 'meaning' loaded from `UcdPtr`
-  NumberedKanji(KanjiDataRef, File, Name, OldNames, UcdPtr);
+  NumberedKanji(CtorParams, File, OldNames);
 
 private:
   const KenteiKyus _kyu;
@@ -66,9 +66,9 @@ public:
 
 protected:
   /// ctor used by JinmeiKanji
-  OfficialKanji(KanjiDataRef, File, Name, UcdPtr);
+  OfficialKanji(CtorParams, File);
 
-  /// ctor used by JouyouKanji, calls base with 'strokes' and 'meaning' params
+  /// ctor used by JouyouKanji, calls base with 'strokes' and 'meaning'
   OfficialKanji(KanjiDataRef, File, Name, Strokes, Meaning);
 
 private:
@@ -132,8 +132,8 @@ public:
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 
 private:
-  ExtraKanji(KanjiDataRef, File, Name);
-  ExtraKanji(KanjiDataRef, File, Name, UcdPtr);
+  ExtraKanji(KanjiDataRef, Name, File);
+  ExtraKanji(CtorParams, File);
 
   const OptString _newName;
 };
@@ -155,16 +155,18 @@ public:
   [[nodiscard]] OptString newName() const final;
 
 protected:
-  OfficialLinkedKanji(KanjiDataRef, Name, Link, UcdPtr);
+  OfficialLinkedKanji(CtorParams, Link);
 
   /// used by ctor to ensure `link` has expected type
+  /// \param data used to create Params return value
   /// \param name String name of instance being constructed
   /// \param link Kanji to use as the link
-  /// \param isOld true if called from LinkedOld ctor
-  /// \return `name` (the same value passed into the function)
+  /// \param isOld true if called from LinkedOldKanji ctor
+  /// \return Params structure to be passed to ctor
   /// \throw DomainError if `link` type is not Jouyou and (`isOld` is true or
   ///     `link` type is not Jinmei)
-  [[nodiscard]] static Name check(Name name, Link link, bool isOld);
+  [[nodiscard]] static CtorParams check(
+      KanjiDataRef data, Name name, Link link, bool isOld);
 
 private:
   const Frequency _frequency;
