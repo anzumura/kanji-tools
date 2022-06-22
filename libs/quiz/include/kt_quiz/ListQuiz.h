@@ -38,6 +38,7 @@ public:
   ListQuiz(const QuizLauncher& launcher, Question question, bool showMeanings,
       const List& list, Kanji::Info fields, ChoiceCount choiceCount,
       QuizStyle quizStyle);
+
 private:
   void start(const List&);
 

@@ -12,6 +12,7 @@ namespace kanji_tools { /// \utils_group{EnumMap}
 template <typename V> class BaseEnumMap {
 public:
   inline static const V Empty{};
+
 protected:
   BaseEnumMap() noexcept = default;
 };
@@ -138,6 +139,7 @@ public:
       comparable(_map == x._map);
       return index() - x.index();
     }
+
   private:
     friend EnumMap<T, V>; // calls private ctor
 
@@ -146,6 +148,7 @@ public:
 
     const EnumMap<T, V>* _map{};
   };
+
 private:
   std::array<V, N> _values{};
 };

@@ -25,6 +25,7 @@ public:
 
   /// return a list of Jukugo containing `kanji`
   [[nodiscard]] const List& find(const String& kanji) const;
+
 private:
   inline static const List EmptyList;
 

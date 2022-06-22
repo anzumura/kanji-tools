@@ -55,6 +55,7 @@ public:
 
   /// return size of the internal array (not including the final null)
   [[nodiscard]] static constexpr auto size() noexcept { return Size; }
+
 private:
   static constexpr auto Size{(sizeof...(Ts) + 1) * SizePerBlock};
 

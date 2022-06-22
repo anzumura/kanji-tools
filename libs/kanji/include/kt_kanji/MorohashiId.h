@@ -48,6 +48,7 @@ public:
       const MorohashiId&) const noexcept = default; // NOLINT: nullptr
 
   [[nodiscard]] String toString() const;
+
 private:
   /// functions used by ctor to validate and populate _id and _idType @{
   [[nodiscard]] static Id getId(const String&);

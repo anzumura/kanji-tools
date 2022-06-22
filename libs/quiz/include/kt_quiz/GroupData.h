@@ -32,6 +32,7 @@ public:
   [[nodiscard]] auto& log(bool heading = false) const {
     return _data->log(heading);
   }
+
 private:
   const KanjiData::Path& dataDir(const KanjiData::Path*) const;
 

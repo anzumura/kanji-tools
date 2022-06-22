@@ -38,6 +38,7 @@ protected:
 
   [[nodiscard]] auto& os() { return _os; }
   [[nodiscard]] auto& is() { return _is; }
+
 private:
   std::stringstream _os, _is;
 };

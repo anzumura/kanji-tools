@@ -44,6 +44,7 @@ public:
   [[nodiscard]] auto kunReading() const { return _kunReading; }
   [[nodiscard]] auto morohashi() const { return _morohashi; }
   [[nodiscard]] auto nelson() const { return _nelson; }
+
 private: // LCOV_EXCL_LINE
   size_t _count{}, _link{}, _variantStrokes{}, _meaning{}, _onReading{},
       _kunReading{}, _morohashi{}, _nelson{};

@@ -61,6 +61,7 @@ protected:
   [[nodiscard]] auto& getRadical() { return _testRadical; }
   [[nodiscard]] auto& getStrokes() { return _testStrokes; }
   [[nodiscard]] auto& getVStrokes() { return _testVStrokes; }
+
 private:
   String _testName{"一"}, _testRadical{"1"}, _testStrokes{"1"}, _testVStrokes{},
       _testJouyou{"Y"}, _testJinmei{}, _testMorohashi{"1"},

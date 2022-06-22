@@ -18,6 +18,7 @@ public:
   [[nodiscard]] Kanji::Frequency frequency(const String& s) const final;
   [[nodiscard]] JlptLevels level(const String&) const final;
   [[nodiscard]] KenteiKyus kyu(const String&) const final;
+
 private:
   friend class TextKanjiDataTestAccess;
 

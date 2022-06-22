@@ -26,6 +26,7 @@ public:
   [[nodiscard]] auto total() const {
     return _dakuten + _hanDakuten + _plain + _small;
   }
+
 private:
   uint16_t _dakuten{}, _hanDakuten{}, _plain{}, _small{};
 };

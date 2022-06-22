@@ -64,6 +64,7 @@ public:
   void printMeaning(
       const Kanji&, bool useNewLine = false, bool showMeaning = true) const;
   void printReviewDetails(const Kanji&) const;
+
 private:
   static constexpr uint16_t JukugoPerLine{3}, MaxJukugoSize{30};
 

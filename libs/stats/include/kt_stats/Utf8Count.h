@@ -78,6 +78,7 @@ public:
   [[nodiscard]] auto combiningMarks() const { return _combiningMarks; }
   [[nodiscard]] auto& map() const { return _map; }
   [[nodiscard]] auto debug() const { return _debug; }
+
 private:
   /// return true if `line` has an open bracket without a closing bracket when
   /// searching back from the end
@@ -137,6 +138,7 @@ public:
   explicit Utf8CountIf(T pred, const OptRegex& find = {},
       const std::wstring& replace = DefaultReplace, std::ostream* debug = {})
       : Utf8Count{find, replace, debug}, _pred{pred} {}
+
 private:
   [[nodiscard]] bool allowAdd(const String& token) const final {
     return _pred(token);

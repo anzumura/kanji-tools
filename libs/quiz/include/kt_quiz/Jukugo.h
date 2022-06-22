@@ -26,6 +26,7 @@ public:
 
   /// return 'name' plus 'reading' in wide brackets, e.g., "朝日 (あさひ)"
   [[nodiscard]] String nameAndReading() const;
+
 private:
   void error(const String&) const;
 

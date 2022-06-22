@@ -49,6 +49,7 @@ public:
   [[nodiscard]] auto& name() const { return _name; }
   [[nodiscard]] auto& members() const { return _members; }
   [[nodiscard]] String toString() const;
+
 protected:
   /// ctor called by derived classes
   /// \param number unique number per derived group type starting at `1`
@@ -62,6 +63,7 @@ protected:
   /// \param msg to be added to the exception message
   /// \throw DomainError containing the group name and `msg`
   void error(const String& msg) const;
+
 private:
   const Number _number;
   const String _name;
@@ -110,6 +112,7 @@ public:
 
   [[nodiscard]] GroupType type() const final;
   [[nodiscard]] PatternType patternType() const final;
+
 private:
   const PatternType _patternType;
 };

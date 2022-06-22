@@ -60,6 +60,7 @@ public:
   /// escaped, but no other accommodations are done for Markdown (like checking
   /// for other HTML type sequences).
   void printMarkdown(std::ostream& os = std::cout) const;
+
 private:
   using Widths = std::vector<size_t>; ///< list of column widths
   using Rows = std::vector<Row>;      ///< list or rows

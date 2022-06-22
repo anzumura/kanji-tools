@@ -23,12 +23,14 @@ public:
 
   /// return true if this Symbol is non-empty
   [[nodiscard]] explicit constexpr operator bool() const { return _id; }
+
 protected:
   using Map = std::map<String, Id>;
   using List = std::vector<const String*>;
 
   constexpr explicit BaseSymbol(Id id) noexcept : _id{id} {}
   BaseSymbol(const String& type, const String& name, Map&, List&);
+
 private:
   [[nodiscard]] static Id getId(
       const String& type, const String& name, Map&, List&);
@@ -92,6 +94,7 @@ public:
   [[nodiscard]] constexpr auto operator!=(const Symbol& x) const noexcept {
     return !operator==(x);
   }
+
 private:
   inline static Map _map;
   inline static List _list;

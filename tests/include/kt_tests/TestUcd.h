@@ -16,6 +16,7 @@ private:
     x = y;
     return *this;
   }
+
 public:
   using Links = Ucd::Links;
   using Meaning = Ucd::Meaning;
@@ -72,6 +73,7 @@ public:
   auto& meaningAndReadings(Meaning m, Reading on, Reading kun) {
     return meaning(m).readings(on, kun);
   }
+
 private:
   Code _code{};
   String _name, _block, _version, _pinyin;

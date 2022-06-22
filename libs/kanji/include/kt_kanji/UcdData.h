@@ -39,6 +39,7 @@ public:
 
   /// print a summary of Ucd data loaded (like various counts and examples)
   void print(const class KanjiData& data) const;
+
 private:
   [[nodiscard]] static Ucd::Links loadLinks(const class ColumnFile&, bool joyo);
   void processLinks(

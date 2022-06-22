@@ -103,6 +103,7 @@ public:
 
   /// return true if string passed to ctor is a valid UTF-8 string
   [[nodiscard]] bool isValid(bool sizeOne = true) const;
+
 private:
   /// return one multi-byte UTF-8 character starting at `loc`, `loc` is moved
   /// forward by 2 to 4 bytes (depending on the size of the value returned)

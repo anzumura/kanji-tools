@@ -89,6 +89,7 @@ protected:
   }
 
   [[nodiscard]] const MockKanjiData& data() { return _data; }
+
 private:
   const MockKanjiData _data;
 };

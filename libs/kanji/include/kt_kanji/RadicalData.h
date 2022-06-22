@@ -41,6 +41,7 @@ public:
   /// print example 'Common Kanji' from `data` for each Radical (sorted by
   /// ascending stroke count)
   void print(const class KanjiData& data) const;
+
 private:
   /// used by print() to control the max number of examples printed per Radical
   static constexpr auto MaxExamples{12};

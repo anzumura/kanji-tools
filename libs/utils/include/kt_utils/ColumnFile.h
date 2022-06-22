@@ -32,6 +32,7 @@ public:
 
     /// return the column number (which is globally unique per column name)
     [[nodiscard]] auto number() const { return _number; }
+
   private:
     const String _name;
     const size_t _number;
@@ -121,6 +122,7 @@ public:
 
   /// return the name of the file being processes
   [[nodiscard]] auto& fileName() const { return _fileName; }
+
 private:
   /// used by Column class constructor
   [[nodiscard]] static size_t getColumnNumber(const String& name);

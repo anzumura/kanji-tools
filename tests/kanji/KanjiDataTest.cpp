@@ -27,6 +27,7 @@ protected:
   void TearDown() final { fs::current_path(currentDir()); }
 
   [[nodiscard]] const Path& currentDir() const { return _currentDir; }
+
 private:
   const Path _currentDir;
 };

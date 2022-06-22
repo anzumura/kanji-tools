@@ -17,6 +17,7 @@ public:
   [[nodiscard]] Reading reading() const final { return TestReading; }
 
   void type(KanjiTypes t) { _type = t; }
+
 private:
   KanjiTypes _type{KanjiTypes::None};
 };

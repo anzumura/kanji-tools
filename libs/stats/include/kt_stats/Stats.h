@@ -48,11 +48,13 @@ public:
     [[nodiscard]] auto count() const { return _count; }
     [[nodiscard]] auto& name() const { return _name; }
     [[nodiscard]] auto& entry() const { return _entry; }
+
   private:
     size_t _count;
     String _name;
     KanjiPtr _entry;
   };
+
 private:
   /// class for gathering stats matching a predicate function \stats{Stats}
   class Pred final {
@@ -74,6 +76,7 @@ private:
     [[nodiscard]] auto& name() const { return _name; }
     [[nodiscard]] auto total() const { return _total; }
     [[nodiscard]] auto isKanji() const { return _isKanji; }
+
   private:
     /// for ostream 'set' functions
     enum IntDisplayValues {

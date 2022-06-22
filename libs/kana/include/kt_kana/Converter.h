@@ -78,6 +78,7 @@ public:
   /// update current target and flags, then convert `source` chars of `input`
   [[nodiscard]] String convert(CharType source, const String& input,
       CharType target, ConvertFlags = ConvertFlags::None);
+
 private:
   using Set = std::set<String>;
   using NarrowDelims = std::map<char, String>;
@@ -108,6 +109,7 @@ private:
     [[nodiscard]] auto& narrowDelimList() const { return _narrowDelimList; }
     [[nodiscard]] auto& narrowDelims() const { return _narrowDelims; }
     [[nodiscard]] auto& wideDelims() const { return _wideDelims; }
+
   private:
     /// insert and then `assert` that the value was added (can't do on one line
     /// like `assert(s.insert(x).second)` since the code wouldn't get executed

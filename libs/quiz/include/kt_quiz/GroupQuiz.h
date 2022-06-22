@@ -37,6 +37,7 @@ public:
   /// \throw DomainError if `list` is empty or `question` is > `list.size()`
   GroupQuiz(const QuizLauncher& launcher, Question question, bool showMeanings,
       const GroupData::List& list, MemberType memberType);
+
 private:
   using Bucket = std::optional<size_t>;
 

@@ -47,6 +47,7 @@ public:
   [[nodiscard]] auto& altForms() const { return _altForms; }
   [[nodiscard]] auto& longName() const { return _longName; }
   [[nodiscard]] auto& reading() const { return _reading; }
+
 private:
   const Number _number;
   const String _name;

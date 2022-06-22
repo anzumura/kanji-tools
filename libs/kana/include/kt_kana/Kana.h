@@ -85,6 +85,7 @@ public:
 
     /// return true if the first variant is a 'kunrei' variant
     [[nodiscard]] auto kunrei() const { return _kunrei; }
+
   private:
     /// all Rōmaji variants are either 2 or 3 characters long
     template <size_t R> static consteval void check() {
@@ -126,6 +127,7 @@ public:
 
     /// return Katakana iteration mark
     [[nodiscard]] auto& katakana() const { return _katakana; }
+
   private:
     friend Kana; // only Kana class can construct
     IterationMark(CharArray<OneKanaArraySize> hiragana,
@@ -231,11 +233,13 @@ public:
   template <size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
       RomajiVariants&& variants);
+
 protected:
   /// move ctor used by AccentedKana - moves #_variants and copies other fields
   /// since they are 'const' (copy is fine since other fields are short strings
   /// that wouldn't benefit from move anyway because of SSO).
   Kana(Kana&&) = default;
+
 private:
   template <size_t R, size_t A>
   Kana(CharArray<R> romaji, CharArray<A> hiragana, CharArray<A> katakana,
@@ -284,6 +288,7 @@ public:
 
   /// return #_dakuten Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* dakuten() const final;
+
 protected:
   /// represents an accented Kana \kana{Kana}
   ///
@@ -296,12 +301,14 @@ protected:
 
     /// return #_plain Kana
     [[nodiscard]] const Kana* plain() const final;
+
   private:
     /// populated by unaccented version by DakutenKana and HanDakutenKana, for
     /// example DakutenKana instance for け contains #_dakuten げ and in turn,
     /// げ will have #_plain set to the original け to allow lookup both ways
     const Kana& _plain;
   };
+
 private:
   const AccentedKana _dakuten;
 };
@@ -318,6 +325,7 @@ public:
 
   /// return #_hanDakuten Kana (which is an instance of AccentedKana)
   [[nodiscard]] const Kana* hanDakuten() const final;
+
 private:
   const AccentedKana _hanDakuten;
 };

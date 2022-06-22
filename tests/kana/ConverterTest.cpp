@@ -92,6 +92,7 @@ protected:
   }
 
   [[nodiscard]] auto& converter() { return _converter; }
+
 private:
   Converter _converter;
 };

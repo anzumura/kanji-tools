@@ -78,12 +78,14 @@ public:
   /// methods that support T::None)
   /// \throw DomainError if `name` doesn't map to an enum value of `T`
   [[nodiscard]] T fromString(const String& name) const;
+
 protected:
   static void domainError(const String& msg) { throw DomainError{msg}; }
 
   BaseEnumList() noexcept { _instance = this; }
 
   void insert(const String& name, Enum::Size index);
+
 private:
   inline static constinit const BaseEnumList<T>* _instance;
 
@@ -141,17 +143,20 @@ public:
     [[nodiscard]] auto operator-(const ConstIterator& x) const noexcept {
       return index() - x.index();
     }
+
   private:
     friend EnumListContainer<T, N, Names>; // calls private ctor
 
     explicit ConstIterator(Enum::Size i) noexcept : iBase{i} {}
   };
+
 protected:
   EnumListContainer() noexcept = default;
 
   void setName(const String& name, Enum::Size index) {
     BaseEnumList<T>::insert(_names[index] = name, index);
   }
+
 private:
   std::array<String, Names> _names;
 };
@@ -246,6 +251,7 @@ public:
   [[nodiscard]] auto fromStringAllowEmptyAndNone(const String& name) const {
     return name.empty() || name == None ? T::None : base::fromString(name);
   }
+
 private:
   inline const static String None{"None"};
   friend BaseEnumList<T>; // 'create' calls private ctor

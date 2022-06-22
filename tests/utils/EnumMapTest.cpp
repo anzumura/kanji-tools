@@ -22,6 +22,7 @@ protected:
   }
 
   auto& map() { return _map; }
+
 private:
   EnumMap<Colors, int> _map;
 };

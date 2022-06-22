@@ -85,6 +85,7 @@ protected:
 
   auto& is() { return _is; }
   auto& quiz() { return _quiz; }
+
 private:
   std::stringstream _is;
   QuizLauncher _quiz;

@@ -65,6 +65,7 @@ public:
 
     /// return Unicode in brackets plus the name, e.g.: [FA30] 侮
     [[nodiscard]] String codeAndName() const;
+
   private:
     const String _name;
   };
@@ -125,6 +126,7 @@ public:
   [[nodiscard]] bool linkedReadings() const;
   [[nodiscard]] String codeAndName() const;
   [[nodiscard]] String linkCodeAndNames() const;
+
 private:
   [[nodiscard]] static uint8_t getSources(
       const String& sources, bool joyo, bool jinmei);

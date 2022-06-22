@@ -42,6 +42,7 @@ public:
   /// by default return a string containing value(), but if `includeVariant` is
   /// true and variant() is non-zero then return 'value()/variant()'
   [[nodiscard]] String toString(bool includeVariant = false) const;
+
 private:
   const Size _value, _variant;
 };

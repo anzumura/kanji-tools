@@ -37,6 +37,7 @@ public:
 
     /// return version date as a `std::chrono::year_month`
     [[nodiscard]] constexpr auto date() const { return _date; }
+
   private:
     const StringView _version;
     const std::chrono::year_month _date;
@@ -76,6 +77,7 @@ public:
 
   /// return block name
   [[nodiscard]] constexpr auto name() const { return _name; }
+
 private:
   template <Code Start, Code End = Start> static consteval void checkRange() {
     static_assert(Start > MaxAscii);

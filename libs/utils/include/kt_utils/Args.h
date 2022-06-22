@@ -48,6 +48,7 @@ public:
   [[nodiscard]] constexpr explicit operator bool() const noexcept {
     return _argc;
   }
+
 private:
   [[nodiscard]] static Size checkInt(int);
 

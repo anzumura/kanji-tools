@@ -148,6 +148,7 @@ public:
 
   /// used for putting a standard prefix on output messages when needed
   [[nodiscard]] std::ostream& log(bool heading = false) const;
+
 protected:
   /// ctor called by derived classes
   /// \param dataDir directory containing '.txt' files with Kanji related data
@@ -183,6 +184,7 @@ protected:
   void addToKyus(const KanjiPtr&);
   void addToLevels(const KanjiPtr&);
   void addToFrequencies(const KanjiPtr&);
+
 private:
   template <typename T> using KanjiEnumMap = EnumMap<T, List>;
   using OptPath = std::optional<Path>;

@@ -33,6 +33,7 @@ public:
     of << s << '\n';
     of.close();
   }
+
 protected:
   TestKanjiData() : KanjiData{TestDir, DebugMode::None, _os, _es} {}
 

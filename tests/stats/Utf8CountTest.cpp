@@ -44,6 +44,7 @@ protected:
   void TearDown() final { fs::remove_all(TestDir); }
 
   auto& count() { return _count; }
+
 private:
   Utf8Count _count;
 };

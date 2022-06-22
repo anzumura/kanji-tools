@@ -34,6 +34,7 @@ public:
   /// \throw DomainError if `f` is missing or has malformed data
   template <typename T>
   [[nodiscard]] static auto fromFile(KanjiDataRef d, const KanjiData::Path& f);
+
 protected:
   static Name name(File);
 
@@ -47,6 +48,7 @@ protected:
 
   /// ctor used by OfficialKanji: 'strokes' and 'meaning' loaded from `UcdPtr`
   NumberedKanji(KanjiDataRef, File, Name, OldNames, UcdPtr);
+
 private:
   const KenteiKyus _kyu;
   const Number _number;
@@ -61,12 +63,14 @@ public:
   [[nodiscard]] Frequency frequency() const final { return _frequency; }
   [[nodiscard]] JlptLevels level() const final { return _level; }
   [[nodiscard]] Year year() const final { return _year; }
+
 protected:
   /// ctor used by JinmeiKanji
   OfficialKanji(KanjiDataRef, File, Name, UcdPtr);
 
   /// ctor used by JouyouKanji, calls base with 'strokes' and 'meaning' params
   OfficialKanji(KanjiDataRef, File, Name, Strokes, Meaning);
+
 private:
   [[nodiscard]] static LinkNames getOldNames(File);
 
@@ -88,6 +92,7 @@ public:
   /// additional columns required by JinmeiKanji, see fromFile()
   inline static const std::array RequiredColumns{
       OldNamesCol, YearCol, ReasonCol};
+
 private:
   const JinmeiReasons _reason;
 };
@@ -104,6 +109,7 @@ public:
   /// additional columns required by JouyouKanji, see fromFile()
   inline static const std::array RequiredColumns{
       OldNamesCol, YearCol, StrokesCol, GradeCol, MeaningCol};
+
 private:
   [[nodiscard]] static KanjiGrades getGrade(const String&);
   const KanjiGrades _grade;
@@ -124,6 +130,7 @@ public:
 
   /// additional columns required by ExtraKanji, see fromFile()
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
+
 private:
   ExtraKanji(KanjiDataRef, File, Name);
   ExtraKanji(KanjiDataRef, File, Name, UcdPtr);
@@ -146,6 +153,7 @@ public:
 
   [[nodiscard]] bool linkedReadings() const final { return true; }
   [[nodiscard]] OptString newName() const final;
+
 protected:
   OfficialLinkedKanji(KanjiDataRef, Name, Link, UcdPtr);
 
@@ -157,6 +165,7 @@ protected:
   /// \throw DomainError if `link` type is not Jouyou and (`isOld` is true or
   ///     `link` type is not Jinmei)
   [[nodiscard]] static Name check(Name name, Link link, bool isOld);
+
 private:
   const Frequency _frequency;
   const KenteiKyus _kyu;

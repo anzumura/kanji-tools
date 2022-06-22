@@ -75,6 +75,7 @@ public:
 
   /// return the full contents of this list in a string (with no separates)
   [[nodiscard]] String toString() const;
+
 protected:
   /// create a ListFile object and call load()
   /// \param p path to text file to load
@@ -85,6 +86,7 @@ protected:
   /// \throw DomainError if `p` is not found or is not a regular file
   ListFile(const Path& p, FileType fileType, StringSet* uniqueNames,
       const String& name = {});
+
 private:
   using Map = std::map<String, Index>;
 
@@ -130,6 +132,7 @@ protected:
         _type{type} {}
 
   [[nodiscard]] T type() const { return _type; }
+
 private:
   const T _type;
 

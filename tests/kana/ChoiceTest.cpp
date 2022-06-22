@@ -63,6 +63,7 @@ protected:
   [[nodiscard]] auto& os() { return _os; }
   [[nodiscard]] auto& is() { return _is; }
   [[nodiscard]] auto& choice() { return _choice; }
+
 private:
   std::stringstream _os, _is;
   Choice _choice;

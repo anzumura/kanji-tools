@@ -65,6 +65,7 @@ protected:
 
   [[nodiscard]] auto& is() { return _is; }
   [[nodiscard]] auto& quiz() { return _quiz; }
+
 private:
   std::stringstream _is;
   QuizLauncher _quiz;

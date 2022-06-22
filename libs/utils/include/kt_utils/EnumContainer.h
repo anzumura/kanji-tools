@@ -21,6 +21,7 @@ public:
 
   Enum(const Enum&) = delete;
   auto operator=(const Enum&) = delete;
+
 protected:
   inline static const String IndexMsg{"index '"}, EnumMsg{"enum '"},
       RangeMsg{"' is out of range"};
@@ -49,6 +50,7 @@ protected:
 
     [[nodiscard]] Size& index();
     [[nodiscard]] Size index() const;
+
   private:
     Size _index;
   };
@@ -65,6 +67,7 @@ protected:
 template <scoped_enum T, Enum::Size N> class EnumContainer : public Enum {
 public:
   [[nodiscard]] static constexpr auto size() noexcept { return N; }
+
 protected:
   [[nodiscard]] static auto getIndex(T x) {
     return checkIndex(to_underlying(x), EnumMsg);
@@ -114,10 +117,12 @@ protected:
     /// return a new iterator at current location - `i` (random-access iterator)
     /// \throw RangeError if new location would be before the beginning location
     [[nodiscard]] auto operator-(difference_type i) const;
+
   protected:
     explicit Iterator(Size index) noexcept : BaseIterator{index} {
       static_assert(std::derived_from<Derived, Iterator>);
     }
+
   private:
     [[nodiscard]] auto& derived() noexcept {
       return static_cast<Derived&>(*this);

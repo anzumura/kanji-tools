@@ -205,6 +205,7 @@ public:
   /// qualifiedName() method
   static constexpr auto Legend{".=常用 '=JLPT \"=Freq ^=人名用 ~=LinkJ %=LinkO "
                                "+=Extra @=検定 #=1級 *=Ucd"};
+
 protected:
   /// ctor used by OfficialLinkedKanji and LoadedKanji classes
   Kanji(KanjiDataRef, Name, RadicalRef, Strokes, UcdPtr);
@@ -218,6 +219,7 @@ protected:
         _nelsonIds{std::move(nelsonIds)} {}
 
   inline static const LinkNames EmptyLinkNames;
+
 private:
   /// helper class that provides additional checks and methods related to String
   /// 'name' of a Kanji (possibly extend this more later)
@@ -231,6 +233,7 @@ private:
     /// nonVariant() returns #_name without the selector.
     [[nodiscard]] bool isVariant() const;
     [[nodiscard]] String nonVariant() const;
+
   private:
     const String _name;
   };
@@ -266,6 +269,7 @@ class LoadedKanji : public Kanji {
 public:
   [[nodiscard]] Meaning meaning() const final { return _meaning; }
   [[nodiscard]] Reading reading() const final { return _reading; }
+
 protected:
   /// ctor used by OtherKanji and ExtraKanji to populate links from Ucd data
   [[nodiscard]] static LinkNames linkNames(UcdPtr);
@@ -277,6 +281,7 @@ protected:
   /// ctor used by NumberedKanji and OtherKanji: looks up 'meaning' and
   /// 'strokes' from `UcdPtr`
   LoadedKanji(KanjiDataRef, Name, RadicalRef, Reading, UcdPtr);
+
 private:
   const String _meaning;
   const String _reading;
@@ -292,11 +297,13 @@ public:
   [[nodiscard]] const LinkNames& oldNames() const final;
   [[nodiscard]] OptString newName() const final;
   [[nodiscard]] bool linkedReadings() const final { return _linkedReadings; }
+
 protected:
   /// ctor used by 'StandardKanji': has 'reading'
   OtherKanji(KanjiDataRef, Name, Reading, UcdPtr);
   /// ctor used by 'StandardKanji' and 'UcdKanji': looks up 'reading'
   OtherKanji(KanjiDataRef, Name, UcdPtr);
+
 private:
   const bool _hasOldLinks;
 
@@ -316,6 +323,7 @@ private:
 class StandardKanji : public OtherKanji {
 public:
   [[nodiscard]] KenteiKyus kyu() const final { return _kyu; }
+
 protected:
   /// ctor used by FrequencyKanji: has 'reading' and looks up 'kyu'
   StandardKanji(KanjiDataRef, Name, Reading);
@@ -325,6 +333,7 @@ protected:
 
   /// ctor used by KenteiKanji: has 'kyu'
   StandardKanji(KanjiDataRef, Name, KenteiKyus);
+
 private:
   const KenteiKyus _kyu;
 };
@@ -341,6 +350,7 @@ public:
 
   [[nodiscard]] KanjiTypes type() const final { return KanjiTypes::Frequency; }
   [[nodiscard]] Frequency frequency() const final { return _frequency; }
+
 private:
   const Frequency _frequency;
 };

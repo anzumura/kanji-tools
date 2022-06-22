@@ -10,5 +10,4 @@ AlignAfterOpenBracket: DontAlign # cSpell:disable-line
 AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine: WithoutElse
 AllowShortLoopsOnASingleLine: true
-EmptyLineBeforeAccessModifier: Never
 PointerAlignment: Left

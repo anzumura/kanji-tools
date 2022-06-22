@@ -33,6 +33,7 @@ protected:
   inline static JukugoDataPtr _jukugoData;
 
   auto& is() { return _is; }
+
 private:
   std::stringstream _is;
 };

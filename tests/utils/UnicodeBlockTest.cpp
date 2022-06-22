@@ -7,8 +7,7 @@ namespace {
 
 using BlockSet = std::set<const UnicodeBlock*>;
 
-template <const auto& Blocks>
-void checkRange(BlockSet* allBlocks = {}) {
+template <const auto& Blocks> void checkRange(BlockSet* allBlocks = {}) {
   for (Code oldEnd{}; auto& i : Blocks) {
     EXPECT_LT(oldEnd, i.start());
     oldEnd = i.end();
