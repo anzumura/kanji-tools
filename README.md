@@ -89,36 +89,26 @@ An effort was made to use modern C++ features including **C++ 11** `std::move`, 
 
 **C++ 20**:
 
-- [concepts](https://en.wikipedia.org/wiki/Concepts_(C%2B%2B))
-- [`[=, this]`](https://wg21.link/p0409) as lambda capture
-- template parameter lists on lambdas (see [link](https://wg21.link/p0428))
-- [three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison)
-- initializers in range-based for
+- [concepts](https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)), [`consteval`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1073r2.html) and [`constinit`](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1143r2.html)
+- [`[=, this]`](https://wg21.link/p0409) as lambda capture, template parameters on lambdas (see [link](https://wg21.link/p0428))
+- [three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison), initializers in range-based `for`
 - class types in non-type template parameters (see [link](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0732r2.pdf))
-- new [`consteval`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1073r2.html) and [`constinit`](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1143r2.html) keywords
-- `using` on scoped enums (see [link](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1099r5.html))
-- `contains`, `starts_with` and `ends_with` functions
+- `using` on scoped enums (see [link](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1099r5.html)), `contains`, `starts_with` and `ends_with`
 
 **C++ 17**:
 
-- new rules for `auto` deduction from braced-init-list
-- make `static_assert` text message optional
-- `[[nodiscard]]` attribute
-- `auto` as the type for a non-type template parameter
-- compile-time `if constexpr (expression)`
-- initializers in `if` and `switch` statements
-- class template argument deduction (CTAD), i.e., don't need `make_pair`, etc..
-- inline variables (allows defining variables in headers without violating the one definition rule)
-- `std::string_view`, `std::optional` and `std::size`
-- file system library
+- new rules for `auto` deduction from braced-init-list (see [link](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n3922.html))
+- `static_assert` text message is optional, `[[nodiscard]]` attribute
+- `auto` as the type for a non-type template parameter (see [link](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0127r2.html))
+- `if constexpr (expression)`, initializers in `if` and `switch` statements
+- class template argument deduction ([CTAD](https://en.cppreference.com/w/cpp/language/class_template_argument_deduction)), i.e., don't need `make_pair`, etc..
+- inline variables (variables in headers without violating the [one definition rule](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwii3O2O_cP4AhXOEc0KHRwXBpQQFnoECAgQAQ&url=https%3A%2F%2Fen.cppreference.com%2Fw%2Fcpp%2Flanguage%2Fdefinition&usg=AOvVaw0wwYTjnXINc7qeLpCzfkDu))
+- `std::filesystem`, `std::string_view`, `std::optional` and `std::size`
 
 **C++ 14**:
 
-- function return deduction
-- variable templates
-- binary literals
-- digit separators
-- generic lambdas (parameters can be declared as auto)
+- [function return deduction](https://en.wikipedia.org/wiki/C%2B%2B14#Function_return_type_deduction), [variable templates](https://en.wikipedia.org/wiki/C%2B%2B14#Variable_templates)
+- [binary literals](https://en.wikipedia.org/wiki/C%2B%2B14#Binary_literals), [digit separators](https://en.wikipedia.org/wiki/C%2B%2B14#Digit_separators), [generic lambdas](https://en.wikipedia.org/wiki/C%2B%2B14#Generic_lambdas)
 - `_t` and `_v` (instead of `::type` and `::value`), i.e., `std::is_unsigned_v`
 
 ## Kana Convert
