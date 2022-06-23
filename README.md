@@ -89,11 +89,11 @@ An effort was made to use modern C++ features including **C++ 11** `std::move`, 
 
 **C++ 20**:
 
-- [concepts](https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)), [`consteval`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1073r2.html) and [`constinit`](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1143r2.html)
+- [`concept`](https://en.wikipedia.org/wiki/Concepts_(C%2B%2B)), [`consteval`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p1073r2.html) and [`constinit`](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1143r2.html)
 - [`[=, this]`](https://wg21.link/p0409) as lambda capture, template parameters on lambdas (see [link](https://wg21.link/p0428))
 - [three-way comparison](https://en.wikipedia.org/wiki/Three-way_comparison), initializers in range-based `for`
 - class types in non-type template parameters (see [link](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0732r2.pdf))
-- `using` on scoped enums (see [link](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1099r5.html)), `contains`, `starts_with` and `ends_with`
+- [`using` on scoped enums](http://open-std.org/JTC1/SC22/WG21/docs/papers/2019/p1099r5.html), `contains`, `starts_with` and `ends_with`
 
 **C++ 17**:
 
