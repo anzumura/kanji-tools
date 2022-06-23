@@ -109,7 +109,7 @@ An effort was made to use modern C++ features including **C++ 11** `std::move`, 
 
 - [function return deduction](https://en.wikipedia.org/wiki/C%2B%2B14#Function_return_type_deduction), [variable templates](https://en.wikipedia.org/wiki/C%2B%2B14#Variable_templates)
 - [binary literals](https://en.wikipedia.org/wiki/C%2B%2B14#Binary_literals), [digit separators](https://en.wikipedia.org/wiki/C%2B%2B14#Digit_separators), [generic lambdas](https://en.wikipedia.org/wiki/C%2B%2B14#Generic_lambdas)
-- `_t` and `_v` (instead of `::type` and `::value`), i.e., `std::is_unsigned_v`
+- `_t` and `_v` (instead of `type` and `value`), i.e., `std::is_unsigned_v`
 
 ## Kana Convert
 
