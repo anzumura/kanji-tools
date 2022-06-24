@@ -132,7 +132,6 @@ public:
   inline static const std::array RequiredColumns{StrokesCol, MeaningCol};
 
 private:
-  ExtraKanji(KanjiDataRef, Name, File);
   ExtraKanji(CtorParams, File);
 
   const OptString _newName;

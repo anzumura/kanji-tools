@@ -73,10 +73,7 @@ KanjiGrades JouyouKanji::getGrade(const String& s) {
 // ExtraKanji
 
 ExtraKanji::ExtraKanji(KanjiDataRef data, File f)
-    : ExtraKanji{data, name(f), f} {}
-
-ExtraKanji::ExtraKanji(KanjiDataRef data, Name name, File f)
-    : ExtraKanji{{data, name}, f} {}
+    : ExtraKanji{{data, name(f)}, f} {}
 
 ExtraKanji::ExtraKanji(CtorParams params, File f)
     : NumberedKanji{params, f, Strokes{f.getU8(StrokesCol)}, f.get(MeaningCol),
