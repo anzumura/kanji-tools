@@ -22,7 +22,9 @@ public:
   [[nodiscard]] constexpr auto id() const noexcept { return _id; }
 
   /// return true if this Symbol is non-empty
-  [[nodiscard]] explicit constexpr operator bool() const { return _id; }
+  [[nodiscard]] explicit constexpr operator bool() const noexcept {
+    return _id;
+  }
 
 protected:
   using Map = std::map<String, Id>;
