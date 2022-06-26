@@ -45,8 +45,8 @@ inline constexpr auto BinaryDigits{2}, ///< number of binary digits (0 and 1)
 // Global Functions
 
 /// can be used by functions needing to return `const&` empty values
-const String& emptyString();
-const CodeString& emptyCodeString(); ///< \doc emptyString()
+[[nodiscard]] const String& emptyString();
+[[nodiscard]] const CodeString& emptyCodeString(); ///< \doc emptyString()
 
 /// return a copy of `s` surrounded in brackets of the given type
 [[nodiscard]] String addBrackets(const String& s, BracketType);
