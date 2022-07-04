@@ -68,8 +68,8 @@ FetchContent_MakeAvailable(googletest)
 ### ICU
 # icu build guide: https://unicode-org.github.io/icu/userguide/icu4c/build.html
 # icu download: https://github.com/unicode-org/icu/releases - get tar.gz
-#   tar -xzf Downloads/icu-release-70-1.tar
-#   cd icu-release-70-1/icu4c/source
+#   tar -xzf Downloads/icu-release-71-1.tar
+#   cd icu-release-71-1/icu4c/source
 #   ./runConfigureICU MacOSX --prefix=/opt/icu
 #   sudo make install
 #
@@ -78,15 +78,15 @@ FetchContent_MakeAvailable(googletest)
 # include_directories(BEFORE /opt/icu/include)
 
 ### Boost
-# boost guide: https://www.boost.org/doc/libs/1_78_0/more/getting_started
+# boost guide: https://www.boost.org/doc/libs/1_79_0/more/getting_started
 # boost download: https://www.boost.org/users/download - get 'tar.gz'
-#   tar -xzf Downloads/boost_1_78_0.tar 
-#   cd boost_1_78_0
+#   tar -xzf Downloads/boost_1_79_0.tar 
+#   cd boost_1_79_0
 #   ./bootstrap.sh --with-icu=/opt/icu --prefix=/opt/boost
 #   sudo ./b2 install
 #
 # uncomment the following lines to add Boost
-# find_package(Boost 1.78.0 REQUIRED regex locale)
+# find_package(Boost 1.79.0 REQUIRED regex locale)
 # if(Boost_FOUND)
 #   link_directories(${Boost_LINK_DIR})
 #   include_directories(SYSTEM ${Boost_INCLUDE_DIR})
