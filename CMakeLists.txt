@@ -60,8 +60,9 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  # 1.11.0 was released on June 11, 2021 (or change to HEAD)
-  GIT_TAG release-1.11.0
+  # 1.11.0 was released on June 11, 2021
+  # 1.12.1 was released on June 30, 2022
+  GIT_TAG release-1.12.1 # change to HEAD to get latest
 )
 FetchContent_MakeAvailable(googletest)
 
