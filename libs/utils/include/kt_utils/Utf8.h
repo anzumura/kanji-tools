@@ -46,7 +46,7 @@ namespace kanji_tools { /// \utils_group{Utf8}
     const std::wstring& s); ///< \doc toUtf8(const CodeString&)
 
 /// safe conversions of #Code to `wchar_t`
-constexpr wchar_t toWChar(Code x) noexcept {
+[[nodiscard]] constexpr wchar_t toWChar(Code x) noexcept {
   static_assert(sizeof(wchar_t) == sizeof(Code));
   return static_cast<wchar_t>(x);
 }
