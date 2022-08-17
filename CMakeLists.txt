@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14..3.23)
+cmake_minimum_required(VERSION 3.21)
 project(kanji_tools VERSION 1.0
                     DESCRIPTION "Tools for working with Japanese Kana and Kanji"
                     LANGUAGES CXX)

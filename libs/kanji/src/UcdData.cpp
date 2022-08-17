@@ -2,6 +2,7 @@
 #include <kt_kanji/KanjiData.h>
 #include <kt_utils/ColumnFile.h>
 
+#include <algorithm>
 #include <sstream>
 
 namespace kanji_tools {

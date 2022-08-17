@@ -3,6 +3,7 @@
 #include <kt_quiz/ListQuiz.h>
 #include <kt_quiz/QuizLauncher.h>
 
+#include <algorithm>
 #include <sstream>
 
 namespace kanji_tools {

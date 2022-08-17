@@ -1,5 +1,6 @@
 #include <kt_quiz/ListQuiz.h>
 
+#include <algorithm>
 #include <random>
 
 namespace kanji_tools {

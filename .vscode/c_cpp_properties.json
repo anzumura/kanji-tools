@@ -2,7 +2,7 @@
 {
   "env": {
     "clangVer": "clang/13.1.6",
-    "gccVer": "gcc/11.3.0_2",
+    "gccVer": "gcc/12.1.0",
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
       "${workspaceFolder}/libs/kana/include",
@@ -21,8 +21,8 @@
     "tools": "/Library/Developer/CommandLineTools",
     "sdk": "${tools}/SDKs/MacOSX.sdk/usr/include",
     "brew": "/opt/homebrew",
-    "g++": "${brew}/include/c++/11",
-    "gcc": "${brew}/Cellar/${gccVer}/lib/gcc/11/gcc/aarch64-apple-darwin21/11"
+    "g++": "${brew}/include/c++/12",
+    "gcc": "${brew}/Cellar/${gccVer}/lib/gcc/current/gcc/aarch64-apple-darwin21/12"
   },
   "configurations": [
     {
@@ -39,7 +39,7 @@
     },
     {
       "name": "Mac-GCC",
-      "compilerPath": "${brew}/bin/g++-11",
+      "compilerPath": "${brew}/bin/g++-12",
       "includePath": [
         "${localIncludePath}",
         "${g++}",

@@ -1,6 +1,7 @@
 #include <kt_kana/Utf8Char.h>
 #include <kt_kanji/OfficialKanji.h>
 
+#include <algorithm>
 #include <cassert>
 
 namespace kanji_tools {

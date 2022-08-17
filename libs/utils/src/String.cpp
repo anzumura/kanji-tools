@@ -1,6 +1,7 @@
 #include <kt_utils/Exception.h>
 #include <kt_utils/Utf8.h>
 
+#include <algorithm>
 #include <numeric>
 
 namespace kanji_tools {

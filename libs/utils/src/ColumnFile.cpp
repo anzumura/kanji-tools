@@ -1,6 +1,7 @@
 #include <kt_utils/ColumnFile.h>
 #include <kt_utils/Exception.h>
 
+#include <algorithm>
 #include <cassert>
 #include <set>
 #include <sstream>

@@ -1,6 +1,7 @@
 #include <kt_kana/DisplaySize.h>
 #include <kt_quiz/GroupQuiz.h>
 
+#include <algorithm>
 #include <optional>
 #include <random>
 

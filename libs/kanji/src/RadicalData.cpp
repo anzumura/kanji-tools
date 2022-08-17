@@ -2,6 +2,7 @@
 #include <kt_utils/ColumnFile.h>
 #include <kt_utils/UnicodeBlock.h>
 
+#include <algorithm>
 #include <numeric>
 #include <sstream>
 

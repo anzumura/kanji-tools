@@ -3,6 +3,7 @@
 #include <kt_quiz/GroupData.h>
 #include <kt_utils/ColumnFile.h>
 
+#include <algorithm>
 #include <sstream>
 
 namespace kanji_tools {
