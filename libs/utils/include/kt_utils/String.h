@@ -9,12 +9,14 @@ namespace kanji_tools { /// \utils_group{String}
 /// String and StringView type aliases may be changed to `std::u8` versions
 /// later once they get wider standard library support (streams, regex, etc.)
 using String = std::string;
-using StringView = std::string_view; ///< \doc String
+/// \doc String
+using StringView = std::string_view;
 
 /// type alias for Unicode code points (use `char32_t` instead of `wchar_t`
 /// since it's always 32 bits instead of platform dependent)
 using Code = char32_t;
-using CodeString = std::u32string; ///< \doc Code
+/// \doc Code
+using CodeString = std::u32string;
 
 // Global Enums
 
