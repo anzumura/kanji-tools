@@ -3,7 +3,7 @@
   "env": {
     "clangVer": "clang/13.1.6",
     "gccMajor": "12",
-    "gccVer": "gcc/${gccMajor}.1.0",
+    "gccVer": "gcc/${gccMajor}.2.0",
     "appleVer": "aarch64-apple-darwin21",
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
