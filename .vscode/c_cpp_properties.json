@@ -1,7 +1,7 @@
 // docs: https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference
 {
   "env": {
-    "clangVer": "clang/13.1.6",
+    "clangVer": "clang/14.0.0",
     "gccMajor": "12",
     "gccVer": "gcc/${gccMajor}.2.0",
     "appleVer": "aarch64-apple-darwin21",

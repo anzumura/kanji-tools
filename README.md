@@ -39,7 +39,7 @@ The five libraries are:
 
 ### VS Code Setup
 
-The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 13.1.6) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-12** (version 12.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake`, `doxygen` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to `wchar_t` and multi-byte handling that won't currently compile on *Windows 10*.
+The code was written using **[VS Code](https://code.visualstudio.com)** IDE on an *M1 Mac* and compiles with either **clang++** (version 14.0.0) installed via *Xcode* command-line tools (`xcode-select --install`) or **g++-12** (version 12.2.0) installed via **[Homebrew](https://brew.sh)** (`brew install gcc`). Some other useful brew formulas for this project are: `bash`, `clang-format`, `cmake`, `doxygen` and `gcovr`). It should also build on other *Unix*/*Linux* systems, but there are assumptions related to `wchar_t` and multi-byte handling that won't currently compile on *Windows 10*.
 
 Here are some links that might help with setup:
 
