@@ -48,7 +48,7 @@ protected:
 } // namespace
 
 TEST_F(TextKanjiDataTest, BasicChecks) {
-  EXPECT_EQ(_data->nameMap().size(), 23715);
+  EXPECT_EQ(_data->nameMap().size(), 23463);
   EXPECT_EQ(_data->level("院"), JlptLevels::N4);
   EXPECT_EQ(_data->frequency("蝦"), 2501);
   // Ucd data related
@@ -322,7 +322,7 @@ TEST_F(TextKanjiDataTest, UnicodeBlocksAndSources) {
   // missing JSource for common Kanji are either 'Kentei' or 'Ucd' type
   EXPECT_EQ(missingJSource.size(), 2);
   EXPECT_EQ(missingJSource[KanjiTypes::Kentei], 16);
-  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7472);
+  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7220);
 }
 
 TEST_F(TextKanjiDataTest, UcdLinks) {
@@ -377,9 +377,9 @@ TEST_F(TextKanjiDataTest, UcdLinks) {
   EXPECT_EQ(otherLinks[Extra], 10);
   EXPECT_EQ(otherLinks[Frequency], 15);
   EXPECT_EQ(otherLinks[Kentei], 232);
-  EXPECT_EQ(otherLinks[Ucd], 2838);
+  EXPECT_EQ(otherLinks[Ucd], 2592);
   EXPECT_EQ(otherLinks[LinkedJinmei], 0); // part of 'jinmeiLinks'
-  EXPECT_EQ(otherLinks[LinkedOld], 90);
+  EXPECT_EQ(otherLinks[LinkedOld], 89);
   uint32_t officialLinksToJinmei{}, officialLinksToJouyou{};
   for (auto& i : _data->types()[LinkedJinmei]) {
     auto& link{*i->link()};
@@ -470,8 +470,8 @@ TEST(KanjiDataPrintTest, Info) {
   std::stringstream os;
   TextKanjiData data(args, os);
   const auto expected = {
-      (">>> Loaded 23715 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
-       "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17471)"),
+      (">>> Loaded 23463 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
+       "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17219)"),
       ">>> Grade breakdown:",
       ">>>   Total for grade G1: 80 (N5 57, N4 15, N3 8)",
       ">>>   Total for grade G2: 160 (N5 43, N4 74, N3 43)",
@@ -516,7 +516,7 @@ TEST(KanjiDataPrintTest, Debug) {
       top = ++i; // use a variable to avoid hard-coding the number of tests
     } else {
       if (i = top; line.ends_with(": 生 甠 甡 産 產 甦 㽒 甤 甥 𤯳 甧")) dup();
-      if (++i; line.starts_with(">>>   Total for 214 radicals: 21181")) dup();
+      if (++i; line.starts_with(">>>   Total for 214 radicals: 20929")) dup();
       if (++i; line == ">>> Frequency Kanji with links 15:") dup();
       if (++i; line == ">>> Extra Kanji with links 10:") dup();
       totalChecks = i;

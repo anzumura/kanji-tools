@@ -399,7 +399,9 @@ function getLinks() {
   if [[ -z $linkType ]]; then
     for s in $kSimplifiedVariant; do
       linkTo=${s#*+} # remove leading U+
-      $1 $linkTo && linkType=Simplified && break
+      # Skip if kSimplifiedVariant is the same as current record being processed.
+      # For example, 'cp' 81E4 (臤) has kSimplifiedVariant="U+81E4 U+30021".
+      [[ $cp != $linkTo ]] && $1 $linkTo && linkType=Simplified && break
     done
     # Only use Compatibility, Definition and Semantic links if they refer to
     # another kanji with an On/Kun reading, i.e., if 'canLoadFrom' is true.

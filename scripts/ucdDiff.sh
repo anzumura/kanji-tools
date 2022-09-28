@@ -15,8 +15,8 @@ if [[ ! $LANG =~ UTF-8 ]]; then
   [[ ! $LANG =~ UTF-8 ]] && echo "failed to find a UTF-8 locale" && exit 1
 fi
 
-oldFile=~/ucd/13/$defaultFile
-newFile=~/ucd/14/$defaultFile
+oldFile=~/ucd/14/$defaultFile
+newFile=~/ucd/15/$defaultFile
 printOnlyCJK=false
 
 function usage() {
