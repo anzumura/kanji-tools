@@ -4,7 +4,7 @@
     "clangVer": "clang/14.0.0",
     "gccMajor": "12",
     "gccVer": "gcc/${gccMajor}.2.0",
-    "appleVer": "aarch64-apple-darwin21",
+    "appleVer": "aarch64-apple-darwin22",
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
       "${workspaceFolder}/libs/kana/include",
