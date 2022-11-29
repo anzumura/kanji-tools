@@ -21,6 +21,7 @@ const fs::path JouyouFile{"jouyou"}, JinmeiFile{"jinmei"}, ExtraFile{"extra"},
 TextKanjiData::TextKanjiData(
     const Args& args, std::ostream& out, std::ostream& err)
     : KanjiData{getDataDir(args), getDebugMode(args), out, err},
+      // GCOV_EXCL_START
       _levels{dataFile(JlptLevels::N5), dataFile(JlptLevels::N4),
           dataFile(JlptLevels::N3), dataFile(JlptLevels::N2),
           dataFile(JlptLevels::N1)},
@@ -30,6 +31,7 @@ TextKanjiData::TextKanjiData(
           dataFile(KenteiKyus::K4), dataFile(KenteiKyus::K3),
           dataFile(KenteiKyus::KJ2), dataFile(KenteiKyus::K2),
           dataFile(KenteiKyus::KJ1), dataFile(KenteiKyus::K1)},
+      // GCOV_EXCL_STOP
       _frequency{dataDir() / "frequency"} {
   ListFile::clearUniqueCheckData(); // cleanup data used for unique checks
   getUcd().load(ListFile::getFile(dataDir(), UcdFile));
