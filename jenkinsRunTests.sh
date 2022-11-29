@@ -79,7 +79,7 @@ if [[ -n $(find . -name $gcno | head -1) ]]; then
   # There are only a few usages of XCOV_* including some assert related code and
   # code related to terminal manipulation and direct user input.
   if otool -L $(ls ./*/*Test | head -1) | grep -q /lib/gcc/; then
-    covTool=gcov-11
+    covTool=gcov-12
     covPrefix=G
   else
     covTool=gcov
