@@ -40,7 +40,7 @@ void GroupData::add(const String& kanji, Map& m, const GroupPtr& group) const {
                       i.first->second->toString());
 }
 
-template <typename T>
+template <typename T> // LCOV_EXCL_LINE
 void GroupData::loadGroup(
     const KanjiData::Path& file, T& groups, List& list, GroupType groupType) {
   const ColumnFile::Column numberCol{"Number"}, nameCol{"Name"},
@@ -95,7 +95,8 @@ ListFile::StringList GroupData::getKanjiNames(const String& name,
 }
 
 GroupPtr GroupData::createGroup(size_t number, const String& name,
-    const KanjiData::List& members, Group::PatternType pattern) {
+    const KanjiData::List& members,
+    Group::PatternType pattern) { // LCOV_EXCL_LINE
   if (pattern == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, pattern);
