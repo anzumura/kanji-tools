@@ -16,9 +16,9 @@ const Choice::Choices PatternGroupChoices{{'1', "ア"}, {'2', "カ"}, {'3', "サ
 
 // Since there are over 1000 pattern groups, split them into 6 buckets based on
 // reading. The first bucket starts at 'ア', the second bucket starts at 'カ'
-// and so on (see 'PatternBucketChoices' above).
+// and so on (see 'PatternBucketChoices' above). LCOV_EXCL_START
 constexpr std::array PatternGroups{"：カ", "：サ", "：タ", "：ハ", "：ヤ"};
-
+// LCOV_EXCL_STOP
 constexpr auto RefreshOption{'\''}, EditOption{'*'};
 
 constexpr auto TotalLetters{'z' - 'a' + 1};

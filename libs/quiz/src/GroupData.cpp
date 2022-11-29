@@ -95,8 +95,8 @@ ListFile::StringList GroupData::getKanjiNames(const String& name,
 }
 
 GroupPtr GroupData::createGroup(size_t number, const String& name,
-    const KanjiData::List& members,
-    Group::PatternType pattern) { // LCOV_EXCL_LINE
+    const KanjiData::List& members, // LCOV_EXCL_LINE
+    Group::PatternType pattern) {
   if (pattern == Group::PatternType::None)
     return std::make_shared<MeaningGroup>(number, name, members);
   return std::make_shared<PatternGroup>(number, name, members, pattern);
