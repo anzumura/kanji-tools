@@ -255,12 +255,12 @@ void KanaConvert::printOptions() const {
 
 bool KanaConvert::processLine(const String& line) {
   if (line.empty()) return false;
+  static const Choice::Choices flagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
+      {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
   if (line == "c")
     _converter.flags(ConvertFlags::None);
   else if (line == "f")
-    flagArgs(_choice.get(">>> enter flag option",
-        {{'h', "Hepburn"}, {'k', "Kunrei"}, {'n', "NoProlongMark"},
-            {'r', "RemoveSpaces"}}));
+    flagArgs(_choice.get(">>> enter flag option", flagChoices));
   else if (line == "h")
     usage(false);
   else if (line.starts_with("-")) {
