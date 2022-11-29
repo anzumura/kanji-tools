@@ -51,8 +51,9 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   # -Wunused (see links above), but the following don't seem to be included:
   add_compile_options(-Wnon-virtual-dtor -Woverloaded-virtual -Wshadow)
 
-  # turn off a warning
-  add_compile_options(-Wno-parentheses)
+  # turn off warnings, 'restrict' only happens for release builds and happens
+  # deep inside GCC code (bits/char_traits.h:431:56)
+  add_compile_options(-Wno-parentheses -Wno-restrict)
 endif()
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O0")
 
