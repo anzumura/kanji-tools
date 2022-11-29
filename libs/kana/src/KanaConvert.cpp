@@ -255,8 +255,8 @@ void KanaConvert::printOptions() const {
 
 bool KanaConvert::processLine(const String& line) {
   if (line.empty()) return false;
-  static const Choice::Choices flagChoices{{'h', "Hepburn"}, {'k', "Kunrei"},
-      {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
+  static const Choice::Choices flagChoices{{'h', "Hepburn"}, // GCOV_EXCL_LINE
+      {'k', "Kunrei"}, {'n', "NoProlongMark"}, {'r', "RemoveSpaces"}};
   if (line == "c")
     _converter.flags(ConvertFlags::None);
   else if (line == "f")
