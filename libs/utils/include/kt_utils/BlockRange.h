@@ -48,7 +48,8 @@ public:
   /// return null terminated `wchar_t` array to be used in `wregex()`
   [[nodiscard]] auto operator()() const noexcept { return _range; }
 
-  /// return character at position `i`, will throw if `i` is out of range
+  /// return character at position `i`
+  /// \throw RangeError if `i` is out of range
   [[nodiscard]] auto operator[](size_t i) const {
     return _range[checkIndex(i, size())];
   }
