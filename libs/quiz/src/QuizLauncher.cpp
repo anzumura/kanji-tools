@@ -82,7 +82,7 @@ QuizLauncher::QuizLauncher(const Args& args, const KanjiDataPtr& data,
   auto endOptions{false}, showMeanings{false};
   for (auto i{KanjiData::nextArg(args)}; i < args.size();
        i = KanjiData::nextArg(args, i))
-    if (String arg{args[i]};
+    if (const String arg{args[i]};
         endOptions || !arg.starts_with("-") || arg.size() < 2) {
       processKanjiArg(arg);
       return; // exit after showing info for a Kanji, i.e., don't start a quiz

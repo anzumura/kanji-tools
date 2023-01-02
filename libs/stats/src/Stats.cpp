@@ -28,7 +28,7 @@ Stats::Stats(const Args& args, const KanjiDataPtr& data) : _data(data) {
   std::vector<String> files;
   for (auto i{KanjiData::nextArg(args)}; i < args.size();
        i = KanjiData::nextArg(args, i))
-    if (String arg{args[i]}; !endOptions && arg.starts_with("-")) {
+    if (const String arg{args[i]}; !endOptions && arg.starts_with("-")) {
       if (arg == "-h") {
         out() << HelpMessage;
         return;

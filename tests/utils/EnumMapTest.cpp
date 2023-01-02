@@ -134,7 +134,7 @@ TEST_F(EnumMapTest, CompareIteratorFromDifferentCollections) {
   // an initialized iterator can't be compared to an initialized one
   i = map().begin();
   EXPECT_THROW(call([&] { return i == j; }, "not comparable"), DomainError);
-  EnumMap<Colors, int> other; // all values are initially set to zero
+  const EnumMap<Colors, int> other; // all values are initially set to zero
   EXPECT_EQ(map().size(), other.size());
   j = other.begin();
   // iterators for different collections can't be compared even if they both

@@ -60,7 +60,7 @@ MorohashiId::Id MorohashiId::validate(
     else if (s[i] < CharZero || s[i] > CharNine)
       error("is non-numeric");
     else if (const Id x{static_cast<Id>(s[i] - CharZero)};
-             result > MaxId / Ten || (result *= Ten) > MaxId - x)
+             result > MaxId / Ten || (result *= Ten) > MaxId - x) // NOLINT
       error("exceeds max");
     else
       result += x;

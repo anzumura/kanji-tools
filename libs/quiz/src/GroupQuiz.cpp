@@ -61,12 +61,14 @@ GroupData::List GroupQuiz::prepareList(
   GroupData::List result;
   const auto bucketHasEnd{bucket && *bucket < PatternGroups.size()};
   for (auto startIncluding{!bucket.value_or(0)}; const auto& i : list) {
+    // NOLINTBEGIN(bugprone-unchecked-optional-access)
     if (startIncluding) {
       if (bucketHasEnd &&
           i->name().find(PatternGroups[*bucket]) != String::npos)
         break;
     } else if (i->name().find(PatternGroups[*bucket - 1]) != String::npos)
       startIncluding = true;
+    // NOLINTEND(bugprone-unchecked-optional-access)
     if (size_t memberCount{}; startIncluding) {
       for (auto& j : i->members())
         if (includeMember(*j)) ++memberCount;

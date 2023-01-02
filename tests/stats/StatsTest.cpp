@@ -31,7 +31,7 @@ protected:
   }
 
   static void run(const Args& args, const String& expectedIn) {
-    Stats stats(args, _data);
+    Stats{args, _data}; // NOLINT(bugprone-unused-raii)
     std::stringstream expected{expectedIn};
     for (String i, j; std::getline(_os, i) && std::getline(expected, j);)
       ASSERT_EQ(i, j);
@@ -135,7 +135,7 @@ TEST_F(StatsTest, PrintParentDirectoryIfLastComponentIsSlash) {
   const auto file{
       _data->dataDir() / "../tests/stats/sample-data/wiki-articles/"};
   const char* args[]{"", file.c_str()};
-  Stats stats(args, _data);
+  Stats{args, _data}; // NOLINT(bugprone-unused-raii)
   auto found{false};
   for (String line; !found && std::getline(_os, line);)
     found = line.starts_with(">>> Stats for: 'wiki-articles' (3 files)");

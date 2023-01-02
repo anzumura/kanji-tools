@@ -27,7 +27,7 @@ Args::Size KanjiData::nextArg(const Args& args, Args::Size current) {
                       std::to_string(args.size()) + "'");
   Args::Size result{current};
   if (args && ++result < args.size()) {
-    String arg{args[result]};
+    const String arg{args[result]};
     // '-data' should be followed by a 'path' so increment by 2. If -data isn't
     // followed by a path then an earlier call to 'getDataDir' would have failed
     // with a call to 'usage' which ends the program.
@@ -204,7 +204,7 @@ fs::path KanjiData::getDataDir(const Args& args) {
     }
   }
   if (!found) usage(NotFound + cur.string() + NotFoundEnd);
-  return *found;
+  return *found; // NOLINT(bugprone-unchecked-optional-access)
 }
 
 KanjiData::DebugMode KanjiData::getDebugMode(const Args& args) {

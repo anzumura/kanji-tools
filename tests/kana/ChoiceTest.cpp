@@ -233,10 +233,10 @@ TEST_F(ChoiceTest, QuitDescription) {
 }
 
 TEST_F(ChoiceTest, SetQuitFromConstructor) {
-  Choice choice{os(), 'e'};
+  const Choice choice{os(), 'e'};
   EXPECT_EQ(choice.quit(), 'e');
   EXPECT_EQ(choice.quitDescription(), "quit"); // default quit description
-  Choice choiceWithQuitDescription{os(), 'e', "end"};
+  const Choice choiceWithQuitDescription{os(), 'e', "end"};
   EXPECT_EQ(choiceWithQuitDescription.quitDescription(), "end");
 }
 
@@ -285,7 +285,7 @@ TEST_F(ChoiceTest, MissingDefaultOption) {
 
 TEST_F(ChoiceTest, DuplicateQuitOption) {
   choice().setQuit('q');
-  for (bool useQuit : {false, true}) {
+  for (const bool useQuit : {false, true}) {
     const auto f{[useQuit, this] {
       return choice().get(emptyString(), useQuit, {{'q', "abc"}});
     }};
@@ -296,7 +296,7 @@ TEST_F(ChoiceTest, DuplicateQuitOption) {
 TEST_F(ChoiceTest, DuplicateRangeOption) {
   const Choices choices{{'a', "12"}, {'c', "34"}};
   const String start{"range option '"}, end{"' already in choices"};
-  for (char rangeStart : {'a', 'b'}) {
+  for (const char rangeStart : {'a', 'b'}) {
     const auto f{[rangeStart, &choices, this] {
       return choice().get({rangeStart, 'c'}, emptyString(), choices); // NOLINT
     }};

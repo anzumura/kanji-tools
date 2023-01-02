@@ -182,7 +182,7 @@ void TextKanjiData::printListData(const ListFile& list,
         list.name());
     // list.level is None when processing 'frequency.txt' file (so not JLPT)
     if (!(list.kyu()) && !(list.level())) {
-      std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
+      const std::vector lists{std::pair{&found[KanjiTypes::Jinmei], ""},
           std::pair{&found[KanjiTypes::LinkedJinmei], "Linked "}};
       for (const auto& i : lists) {
         ListFile::StringList jlptJinmei, otherJinmei;

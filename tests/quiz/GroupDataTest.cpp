@@ -50,7 +50,7 @@ protected:
 
 TEST_F(GroupDataTest, SanityChecks) {
   // Constructs GroupData using the real '-groups.txt' data files
-  GroupData groupData(_data);
+  const GroupData groupData(_data);
   EXPECT_FALSE(groupData.meaningGroups().empty());
   EXPECT_FALSE(groupData.patternGroups().empty());
   // numbers are unique and each group member is in 'groupMap'

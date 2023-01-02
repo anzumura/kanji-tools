@@ -32,6 +32,11 @@ protected:
   inline static GroupDataPtr _groupData;
   inline static JukugoDataPtr _jukugoData;
 
+  template <size_t N>
+  static void run(const char* (&args)[N], std::istream* in = {}) {
+    QuizLauncher{args, _data, _groupData, _jukugoData, in};
+  }
+
   auto& is() { return _is; }
 
 private:
@@ -40,7 +45,7 @@ private:
 
 TEST_F(QuizLauncherTest, HelpMessage) {
   const char* args[]{"", "-h"};
-  const QuizLauncher ql{args, _data, _groupData, _jukugoData};
+  run(args);
   // look for a few strings instead of comparing the whole output
   const auto expected = {
       "-s   show English meanings by default (can be toggled on/off later)",
@@ -56,7 +61,7 @@ TEST_F(QuizLauncherTest, ValidOptions) {
       const char* args[]{"", i, j};
       if (i[1] == 'p') is() << "1\n"; // select pattern group bucket
       is() << "/\n";                  // send 'quit' option
-      const QuizLauncher ql{args, _data, _groupData, _jukugoData, &is()};
+      run(args, &is());
       EXPECT_TRUE(
           _os.str().ends_with("Select (-=show meanings, .=next, /=quit): "));
       EXPECT_EQ(_es.str(), "");
@@ -67,7 +72,7 @@ TEST_F(QuizLauncherTest, ValidOptions) {
 TEST_F(QuizLauncherTest, QuestionOrderQuit) {
   const char* args[]{"", "-p1", "-r"};
   is() << "/\n"; // quit instead of choosing a question order
-  const QuizLauncher ql{args, _data, _groupData, _jukugoData, &is()};
+  run(args, &is());
   EXPECT_TRUE(_os.str().ends_with(
       "List order (/=quit, b=from beginning, e=from end, r=random) def 'r': "));
 }
@@ -106,19 +111,17 @@ TEST_F(QuizLauncherTest, InvalidFormat) {
 
 TEST_F(QuizLauncherTest, InvalidQuestionNumber) {
   const char* args[]{"", "-r81", "-g1"};
-  const auto f{[&args] { QuizLauncher{args, _data, _groupData, _jukugoData}; }};
-  EXPECT_THROW(call(f, "entry num '81' is larger than total questions: 80"),
+  EXPECT_THROW(call([&args] { run(args); },
+                   "entry num '81' is larger than total questions: 80"),
       DomainError);
 }
 
 TEST_F(QuizLauncherTest, QuestionExceedsLimit) {
   for (const auto i : {"-r66000", "-t67000"}) {
     const char* args[]{"", i};
-    const auto f{[&args] {
-      QuizLauncher{args, _data, _groupData, _jukugoData};
-    }};
-    EXPECT_THROW(
-        call(f, "value for '" + String(i, 2) + "' exceeds limit"), DomainError);
+    EXPECT_THROW(call([&args] { run(args); },
+                     "value for '" + String(i, 2) + "' exceeds limit"),
+        DomainError);
   }
 }
 
@@ -127,7 +130,7 @@ TEST_F(QuizLauncherTest, SetProgramMode) {
       {std::pair{"--", false}, std::pair{"-r", false}, std::pair{"-t", true}}) {
     const char* args[]{"", i.first};
     // specifying '&is()' causes launcher to not start automatically
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData, &is()};
+    const QuizLauncher quiz{args, _data, _groupData, _jukugoData, &is()};
     EXPECT_EQ(quiz.isQuizMode(), i.second);
   }
 }
@@ -154,7 +157,7 @@ Rad 大(37), Strokes 8, fèng, S, N1, Frq 1624, K3
 )"};
   for (const auto i : {"奉", "1624", "m5894", "n212", "u5949"}) {
     const char* args[]{"", i};
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+    run(args);
     EXPECT_EQ(_os.str(), expected);
     reset();
   }
@@ -178,7 +181,7 @@ Rad 人(9), Strokes 5, zǐ, KJ1
 )"};
   for (const auto i : {"仔", "m367", "n358", "u4ed4"}) {
     const char* args[]{"", i};
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+    run(args);
     EXPECT_EQ(_os.str(), expected);
     reset();
   }
@@ -212,7 +215,7 @@ Rad 巾(50), Strokes 17, chú, New 㡡
 
 )"};
   const char* args[]{"", "n1491"};
-  QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+  run(args);
   EXPECT_EQ(_os.str(), expected);
 }
 
@@ -225,60 +228,53 @@ Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, T=Taiwan, V=Vietnam
 㐁 [3401] --- Not found in 'ucd.txt'
 )"};
   const char* args[]{"", "u3401"};
-  QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+  run(args);
   EXPECT_EQ(_os.str(), expected);
 }
 
 TEST_F(QuizLauncherTest, ShowByMorohashiNotFound) {
   const char* args[]{"", "m99P"};
-  QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+  run(args);
   EXPECT_EQ(_os.str(), "Found 0 matches for Morohashi ID 99P\n");
 }
 
 TEST_F(QuizLauncherTest, ShowByNelsonNotFound) {
   const char* args[]{"", "n6000"};
-  QuizLauncher quiz{args, _data, _groupData, _jukugoData};
+  run(args);
   EXPECT_EQ(_os.str(), "Found 0 matches for Nelson ID 6000\n");
 }
 
 TEST_F(QuizLauncherTest, ShowByFrequencyNotFound) {
   const char* args[]{"", "2502"};
-  const auto f{[&args] {
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
-  }};
-  EXPECT_THROW(call(f, "Kanji not found for frequency '2502'"), DomainError);
+  EXPECT_THROW(
+      call([&args] { run(args); }, "Kanji not found for frequency '2502'"),
+      DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidMorohashiId) {
   const char* args[]{"", "m123Q"};
-  const auto f{[&args] {
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
-  }};
-  EXPECT_THROW(call(f, "Morohashi ID '123Q' is non-numeric"), DomainError);
+  EXPECT_THROW(
+      call([&args] { run(args); }, "Morohashi ID '123Q' is non-numeric"),
+      DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidNelsonId) {
   const char* args[]{"", "n123B"};
-  const auto f{[&args] {
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
-  }};
-  EXPECT_THROW(call(f, "Nelson ID '123B' is non-numeric"), DomainError);
+  EXPECT_THROW(call([&args] { run(args); }, "Nelson ID '123B' is non-numeric"),
+      DomainError);
 }
 
 TEST_F(QuizLauncherTest, InvalidUnicode) {
   const char* args[]{"", "uABC"};
-  const auto f{[&args] {
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
-  }};
-  EXPECT_THROW(call(f, "Unicode value 'ABC' is invalid"), DomainError);
+  EXPECT_THROW(call([&args] { run(args); }, "Unicode value 'ABC' is invalid"),
+      DomainError);
 }
 
 TEST_F(QuizLauncherTest, UnrecognizedKanji) {
   const char* args[]{"", "a"};
-  const auto f{[&args] {
-    QuizLauncher quiz{args, _data, _groupData, _jukugoData};
-  }};
-  EXPECT_THROW(call(f, "unrecognized 'kanji' value 'a'" + Help), DomainError);
+  EXPECT_THROW(
+      call([&args] { run(args); }, "unrecognized 'kanji' value 'a'" + Help),
+      DomainError);
 }
 
 } // namespace kanji_tools

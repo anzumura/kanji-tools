@@ -138,7 +138,7 @@ TEST_F(KanjiTest, UcdKanjiWithNewName) {
   EXPECT_EQ(k.meaning(), "utmost");
   EXPECT_EQ(k.reading(), "ジン、まま");
   ASSERT_TRUE(k.newName());
-  EXPECT_EQ(*k.newName(), "犬");
+  EXPECT_EQ(*k.newName(), "犬"); // NOLINT(bugprone-unchecked-optional-access)
   EXPECT_EQ(k.info(), "Rad TestRadical(1), Strokes 8, New 犬");
   EXPECT_FALSE(k.extraTypeInfo());
 }

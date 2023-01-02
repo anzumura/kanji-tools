@@ -233,7 +233,7 @@ Number\tName\tRadical\tOldNames\tYear\tReason\tReading\n\
 TEST_F(NumberedKanjiTest, BadLinkedJinmei) {
   const auto fKanji{std::make_shared<TestKanji>("呑")};
   EXPECT_THROW(
-      call([&fKanji, this] { LinkedJinmeiKanji k(data(), "亙", fKanji); },
+      call([&fKanji, this] { const LinkedJinmeiKanji k(data(), "亙", fKanji); },
           "OfficialLinkedKanji 亙 wanted type 'Jouyou' or 'Jinmei' for link "
           "呑, but "
           "got 'None'"),
@@ -342,7 +342,7 @@ Number\tName\tRadical\tOldNames\tYear\tStrokes\tGrade\tMeaning\tReading\n\
 TEST_F(NumberedKanjiTest, BadLinkedOld) {
   const auto freqKanji{std::make_shared<TestKanji>("呑")};
   EXPECT_THROW(
-      call([&, this] { LinkedOldKanji k(data(), "艷", freqKanji); },
+      call([&, this] { const LinkedOldKanji k(data(), "艷", freqKanji); },
           "OfficialLinkedKanji 艷 wanted type 'Jouyou' for link 呑, but got "
           "'None'"),
       DomainError);

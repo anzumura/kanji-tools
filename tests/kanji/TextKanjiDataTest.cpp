@@ -155,7 +155,7 @@ TEST_F(TextKanjiDataTest, FrequencyTotals) {
 }
 
 TEST_F(TextKanjiDataTest, SortingAndPrintingQualifiedName) {
-  std::vector<String> list{"弓", "弖", "窮", "弼", "穹", "躬"};
+  const std::vector<String> list{"弓", "弖", "窮", "弼", "穹", "躬"};
   KanjiData::List kanjis;
   for (auto& i : list) {
     const auto k{_data->findByName(i)};
@@ -292,7 +292,6 @@ TEST_F(TextKanjiDataTest, UnicodeBlocksAndSources) {
   // Only some Ucd Kanji are in the 'rare' blocks. All other types (like
   // Jouyou, Jinmei Frequency, Kentei, etc.) should be in the 'common' blocks.
   uint32_t rareUcd{};
-  std::map<String, uint32_t> rareMissingJSource;
   std::map<KanjiTypes, uint32_t> missingJSource;
   for (auto& i : _data->ucd().map()) {
     auto& u{i.second};
@@ -468,7 +467,7 @@ TEST_F(TextKanjiDataTest, LinkedJinmeiBadLine) {
 TEST(KanjiDataPrintTest, Info) {
   const char* args[]{"", KanjiData::InfoArg.c_str()};
   std::stringstream os;
-  TextKanjiData data(args, os);
+  const TextKanjiData data(args, os);
   const auto expected = {
       (">>> Loaded 23463 Kanji (Jouyou 2136 Jinmei 633 LinkedJinmei 230 "
        "LinkedOld 163 Frequency 124 Extra 136 Kentei 2822 Ucd 17219)"),
@@ -488,7 +487,7 @@ TEST(KanjiDataPrintTest, Info) {
 TEST(KanjiDataPrintTest, Debug) {
   const char* args[]{"", KanjiData::DebugArg.c_str()};
   std::stringstream os;
-  TextKanjiData data(args, os);
+  const TextKanjiData data(args, os);
   String lastLine;
   size_t count{}, top{}, totalChecks{};
   std::set<size_t> found;

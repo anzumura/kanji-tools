@@ -16,7 +16,7 @@ protected:
 } // namespace
 
 TEST_F(TableTest, EmptyTable) {
-  Table t;
+  const Table t;
   t.print(_os);
   String line;
   // shouldn't print anything
@@ -46,8 +46,8 @@ TEST_F(TableTest, TableWithOnlyEmptyRows) {
 }
 
 TEST_F(TableTest, TableWithJustTitles) {
-  String world{"world"};
-  Table t{{"hello", world}};
+  const String world{"world"};
+  const Table t{{"hello", world}};
   t.print(_os);
   // clang-format off
   const auto expected = {

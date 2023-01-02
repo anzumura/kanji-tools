@@ -128,7 +128,7 @@ TEST_F(ConverterTest, CheckConvertFlags) {
 }
 
 TEST_F(ConverterTest, NoConversionIfSourceAndTargetAreTheSame) {
-  String s{"atatakaiあたたかいアタタカイ"};
+  const String s{"atatakaiあたたかいアタタカイ"};
   EXPECT_EQ(converter().convert(CharType::Romaji, s, CharType::Romaji), s);
   EXPECT_EQ(converter().convert(CharType::Hiragana, s, CharType::Hiragana), s);
   EXPECT_EQ(converter().convert(CharType::Katakana, s, CharType::Katakana), s);

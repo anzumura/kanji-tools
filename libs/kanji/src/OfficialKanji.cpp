@@ -26,6 +26,7 @@ NumberedKanji::NumberedKanji(CtorParams params, File f, OldNames oldNames)
 // OfficialKanji
 
 Kanji::OptString OfficialKanji::extraTypeInfo() const {
+  // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
   return _year ? OptString{*NumberedKanji::extraTypeInfo() + ' ' +
                            std::to_string(_year)}
                : NumberedKanji::extraTypeInfo();
@@ -56,6 +57,7 @@ JinmeiKanji::JinmeiKanji(KanjiDataRef data, File f)
                                              f.get(ReasonCol))} {}
 
 Kanji::OptString JinmeiKanji::extraTypeInfo() const {
+  // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
   return *OfficialKanji::extraTypeInfo() + " [" + toString(_reason) + ']';
 }
 

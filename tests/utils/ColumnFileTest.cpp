@@ -266,7 +266,7 @@ TEST_F(ColumnFileTest, GetU64MaxValueError) {
   EXPECT_TRUE(f.nextRow());
   EXPECT_EQ(f.getU64(Col, 0), maxValue); // 0 implies no max value
   EXPECT_TRUE(f.nextRow());
-  String msg{"exceeded max value of "};
+  const String msg{"exceeded max value of "};
   EXPECT_THROW(call([&] { f.getU64(Col, maxValue); },
                    msg + std::to_string(maxValue) + FileMsg +
                        ", row: 3, column: 'Col', value: '" +

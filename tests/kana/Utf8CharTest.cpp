@@ -191,7 +191,7 @@ TEST(Utf8CharTest, ErrorWithCombiningMarks) {
 TEST(Utf8CharTest, Valid) {
   EXPECT_EQ(Utf8Char{""}.valid(), MBUtf8Result::NotMultiByte);
   EXPECT_EQ(Utf8Char{"a"}.valid(), MBUtf8Result::NotMultiByte);
-  String x{"雪"};
+  const String x{"雪"};
   EXPECT_EQ(x.size(), 3);
   EXPECT_EQ(Utf8Char(x).valid(), MBUtf8Result::Valid);
   EXPECT_TRUE(Utf8Char(x).isValid());

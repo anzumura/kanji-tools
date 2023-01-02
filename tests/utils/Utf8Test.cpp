@@ -212,10 +212,10 @@ TEST(Utf8Test, ErrorForOverlong) {
   fromUtf8Error(String{toChar(TwoBits), toChar(Bit1 | bang)}, U"\ufffd");
   // overlong ō with 3 bytes
   constexpr auto Byte2{Bit1 | 0b101U}, Byte3{Bit1 | 0b1101U};
-  String overlongO{toChar(ThreeBits), toChar(Byte2), toChar(Byte3)};
+  const String overlongO{toChar(ThreeBits), toChar(Byte2), toChar(Byte3)};
   fromUtf8Error(overlongO, U"\ufffd");
   // overlong Euro symbol with 4 bytes
-  String x{"\xF0\x82\x82\xAC"};
+  const String x{"\xF0\x82\x82\xAC"};
   fromUtf8Error(x, U"\ufffd");
 }
 

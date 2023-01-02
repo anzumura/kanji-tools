@@ -65,6 +65,7 @@ String Kanji::info(Info fields) const {
   if (newName()) {
     assert(oldNames().empty());
     if (hasValue(fields & Info::New))
+      // NOLINTNEXTLINE(bugprone-unchecked-optional-access)
       add(NewMsg + *newName() + (linkedReadings() ? "*" : ""));
   } else if (hasValue(fields & Info::Old) && !oldNames().empty()) {
     String s;
