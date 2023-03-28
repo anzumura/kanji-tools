@@ -110,7 +110,7 @@ void JukugoData::createJukugo(
   // いっけん. Different readings are of course ok, but for now silently ignore
   // duplicates with the same reading in the same grade file (and report an
   // error if a duplicate is found in a different file).
-  JukugoKey key{name, reading};
+  const JukugoKey key{name, reading};
   if (const auto i{_uniqueJukugo.find(key)}; i == _uniqueJukugo.end()) {
     const auto jukugo{std::make_shared<Jukugo>(name, reading, grade)};
     Utf8Char nameChars{name};
