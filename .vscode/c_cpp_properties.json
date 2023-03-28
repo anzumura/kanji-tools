@@ -1,10 +1,6 @@
 // docs: https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference
 {
   "env": {
-    "clangVer": "clang/14.0.0",
-    "gccMajor": "12",
-    "gccVer": "gcc/${gccMajor}.2.0",
-    "appleVer": "aarch64-apple-darwin22",
     "googletest": "${workspaceFolder}/build/_deps/googletest-src",
     "localIncludePath": [
       "${workspaceFolder}/libs/kana/include",
@@ -22,9 +18,14 @@
     ],
     "tools": "/Library/Developer/CommandLineTools",
     "sdk": "${tools}/SDKs/MacOSX.sdk/usr/include",
+    // clang specific
+    "clangVer": "clang/14.0.0",
+    // gcc specific
+    "gccVer": "12",
+    "appleVer": "aarch64-apple-darwin22",
     "brew": "/opt/homebrew",
-    "g++": "${brew}/include/c++/${gccMajor}",
-    "gcc": "${brew}/Cellar/${gccVer}/lib/gcc/current/gcc/${appleVer}/${gccMajor}"
+    "g++": "${brew}/include/c++/${gccVer}",
+    "gcc": "${brew}/Cellar/gcc/${gccVer}.2.0/lib/gcc/current/gcc/${appleVer}/${gccVer}"
   },
   "configurations": [
     {
@@ -41,7 +42,7 @@
     },
     {
       "name": "Mac-GCC",
-      "compilerPath": "${brew}/bin/g++-${gccMajor}",
+      "compilerPath": "${brew}/bin/g++-${gccVer}",
       "includePath": [
         "${localIncludePath}",
         "${g++}",
