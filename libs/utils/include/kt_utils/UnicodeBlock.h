@@ -202,7 +202,7 @@ inline constexpr std::array PunctuationBlocks{
 /// symbols commonly used in Japanese text \details there are a lot more symbol
 /// blocks, but they haven't come up so far in sample data
 inline constexpr std::array SymbolBlocks{
-    makeBlock<0x2100, 0x214f>(UVer1_1, "Letterlike Symbols"),          // ℃
+    makeBlock<0x2100, 0x214f>(UVer1_1, "Letter like Symbols"),         // ℃
     makeBlock<0x2190, 0x21ff>(UVer1_1, "Arrows"),                      // →
     makeBlock<0x2200, 0x22ff>(UVer1_1, "Mathematical Operators"),      // ∀
     makeBlock<0x2500, 0x257f>(UVer1_1, "Box Drawing"),                 // ─
