@@ -46,7 +46,7 @@ public:
   }
 
   /// return null terminated `wchar_t` array to be used in `wregex()`
-  [[nodiscard]] auto operator()() const noexcept { return _range; }
+  [[nodiscard]] constexpr auto operator()() const noexcept { return _range; }
 
   /// return character at position `i`
   /// \throw RangeError if `i` is out of range
