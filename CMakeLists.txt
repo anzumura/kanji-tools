@@ -15,13 +15,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(CTest)
 endif()
 
+###
+### Compiler flags
+###
+
 # enable warnings and turn them into errors (-W is the same as -Wextra, but it's
 # deprecated for GCC so explicitly use -Wextra). -Wpedantic means 'Issue all the
 # warnings demanded by strict ISO C++'. Links for more info:
 # Clang: https://clang.llvm.org/docs/DiagnosticsReference.html
 # GCC: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-add_compile_options(-Wall -Wconversion -Werror -Wextra -Wextra-semi
-  -Wignored-qualifiers -Wnonnull -Wold-style-cast -Wpedantic -Wsuggest-override)
+add_compile_options(-Wall -Werror -Wextra -Wextra-semi -Wignored-qualifiers
+  -Wnonnull -Wold-style-cast -Wpedantic -Wsuggest-override)
 
 # to turn off a warning for a section of code use the following ('GCC' works for
 # both Clang and GCC):
@@ -57,13 +61,18 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O0")
 
+###
+### External dependencies
+###
+
 include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  # 1.11.0 was released on June 11, 2021
-  # 1.12.1 was released on June 30, 2022
-  GIT_TAG release-1.12.1 # change to HEAD to get latest
+  # release-1.11.0 was released on June 11, 2021
+  # release-1.12.1 was released on June 30, 2022
+  # v1.13.0 was released on Jan 17, 2023
+  GIT_TAG v1.13.0 # change to HEAD to get latest
 )
 FetchContent_MakeAvailable(googletest)
 
@@ -97,18 +106,19 @@ FetchContent_MakeAvailable(googletest)
 #   message(FATAL_ERROR "Boost not found!")
 # endif()
 
+###
+### Compile flags for libs, tests and main apps
+###
+
 # Need to add these after building googletest. 'switch-enum' happens even when a
 # 'default' exists. '-Wswitch' (enabled by default) only warns about a missing
 # enum value when there is no 'default'.
-add_compile_options(-Wswitch-enum)
+add_compile_options(-Wswitch-enum  -Wconversion)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wcovered-switch-default)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   add_compile_options(-Wdeprecated -Wuseless-cast)
 endif()
-
-set(LIB_PREFIX kanjiTools_) # prefix for libs created by this project
-set(LIBS kana kanji quiz stats utils) # list of libs created by this project
 
 # add options for test coverage (only affects debug builds)
 if(CODE_COVERAGE)
@@ -119,8 +129,29 @@ if(CODE_COVERAGE)
   endif()
 endif()
 
-# add tests (there is one 'test' program per lib)
+###
+### Libs
+###
+
+set(LIB_PREFIX kanjiTools_) # prefix for libs created by this project
+set(LIBS kana kanji quiz stats utils) # list of libs created by this project
+
+foreach(LIB ${LIBS})
+  set(TARGET ${LIB_PREFIX}${LIB})
+  add_subdirectory(libs/${LIB}/src)
+  target_include_directories(${TARGET} PUBLIC libs/${LIB}/include)
+endforeach()
+
+###
+### Tests (there is one 'test' program per lib)
+###
+
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # enable std::result_of_t (used by googletest) which was removed in C++20
+    # result_of was removed in AppleClang 14.0.3, but is still supported by gcc
+    add_compile_options(-D_LIBCPP_ENABLE_CXX20_REMOVED_FEATURES)
+  endif()
   foreach(LIB ${LIBS})
     set(TARGET ${LIB}Test)
     add_subdirectory(tests/${LIB})
@@ -129,12 +160,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   endforeach()
 endif()
 
-# add libs
-foreach(LIB ${LIBS})
-  set(TARGET ${LIB_PREFIX}${LIB})
-  add_subdirectory(libs/${LIB}/src)
-  target_include_directories(${TARGET} PUBLIC libs/${LIB}/include)
-endforeach()
+###
+### Main apps
+###
 
 # add this diagnostic flag here so that it only applies to main code (googletest
 # uses '0' as a pointer in 'gtest.cc' line 2660 and operator<=> equality tests
@@ -144,7 +172,10 @@ add_compile_options(-Wzero-as-null-pointer-constant)
 # add 'main' programs
 add_subdirectory(apps)
 
-# check if Doxygen is installed
+###
+### Doxygen
+###
+
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
   add_custom_target(doxygen ALL ${DOXYGEN_EXECUTABLE}

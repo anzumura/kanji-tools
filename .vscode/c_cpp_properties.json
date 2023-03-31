@@ -19,7 +19,7 @@
     "tools": "/Library/Developer/CommandLineTools",
     "sdk": "${tools}/SDKs/MacOSX.sdk/usr/include",
     // clang specific
-    "clangVer": "clang/14.0.0",
+    "clangVer": "clang/14.0.3",
     // gcc specific
     "gccVer": "12",
     "appleVer": "aarch64-apple-darwin22",
