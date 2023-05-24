@@ -21,11 +21,11 @@
     // clang specific
     "clangVer": "clang/14.0.3",
     // gcc specific
-    "gccVer": "12",
+    "gccVer": "13",
     "appleVer": "aarch64-apple-darwin22",
     "brew": "/opt/homebrew",
     "g++": "${brew}/include/c++/${gccVer}",
-    "gcc": "${brew}/Cellar/gcc/${gccVer}.2.0/lib/gcc/current/gcc/${appleVer}/${gccVer}"
+    "gcc": "${brew}/Cellar/gcc/${gccVer}.1.0/lib/gcc/current/gcc/${appleVer}/${gccVer}"
   },
   "configurations": [
     {
