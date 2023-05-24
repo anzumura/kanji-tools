@@ -50,12 +50,11 @@ TEST(EnumListTest, CallCreateTwice) {
   // parameter for the number of names provided.
   EXPECT_EQ(typeid(enumArray), typeid(EnumList<TestEnum, 3>));
   EXPECT_EQ(enumArray.size(), 3);
-  // 'instance' returns 'const BaseEnumList&', but the object returned is
-  // 'EnumList' (typeid ignores 'const', but put it in for clarity)
   auto& instance{enumArray.instance()};
   EXPECT_EQ(
-      typeid(std::result_of_t<decltype (&BaseEnumList<TestEnum>::instance)()>),
-      typeid(const BaseEnumList<TestEnum>&));
+      typeid(
+          std::invoke_result_t<decltype (&BaseEnumList<TestEnum>::instance)()>),
+      typeid(BaseEnumList<TestEnum> const& (*)()));
   EXPECT_EQ(typeid(instance), typeid(const EnumList<TestEnum, 3>&));
   // calling 'create' again should throw an exception
   EXPECT_THROW(
