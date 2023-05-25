@@ -60,12 +60,11 @@ TEST(EnumListWithNoneTest, CallCreateTwice) {
   // more 'None' value at the end)
   EXPECT_EQ(typeid(enumArray), typeid(EnumListWithNone<TestEnum, 3>));
   EXPECT_EQ(enumArray.size(), 4); // 'size' includes final 'None' value
-  // 'instance' returns 'const BaseEnumList&', but the object returned is
-  // 'EnumListWithNone'
   auto& instance{enumArray.instance()};
   EXPECT_EQ(
-      typeid(std::result_of_t<decltype (&BaseEnumList<TestEnum>::instance)()>),
-      typeid(const BaseEnumList<TestEnum>&));
+      typeid(
+          std::invoke_result_t<decltype (&BaseEnumList<TestEnum>::instance)()>),
+      typeid(BaseEnumList<TestEnum> const& (*)()));
   EXPECT_EQ(typeid(instance), typeid(const EnumListWithNone<TestEnum, 3>&));
   // calling 'create' again should throw an exception
   EXPECT_THROW(
