@@ -95,7 +95,7 @@ public:
   /// \li 18 JinmeiKanji: alternate forms of standard JinmeiKanji
   /// \li several hundred Kanji of other types also have non-empty 'oldNames'
   ///   populated from 'ucd.txt' 'Traditional Links'
-  /// LinkedOldKanji end up getting created (367 - 204 linkedJinmeiKanji)
+  /// 163 LinkedOldKanji end up getting created (367 - 204 linkedJinmeiKanji)
   [[nodiscard]] virtual OldNames oldNames() const { return EmptyLinkNames; }
 
   /// return the new name (usually not defined)
