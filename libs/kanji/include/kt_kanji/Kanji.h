@@ -90,7 +90,7 @@ public:
 
   /// return list of old names (usually empty)
   /// \details some JouyouKanji and JinmeiKanji have 'old' (旧字体) forms:
-  /// \li 365 JouyouKanji: 364 have 'oldNames' with one entry and ono has
+  /// \li 365 JouyouKanji: 364 have 'oldNames' with one entry and one has
   ///   'oldNames' with three entries (弁 has 辨, 瓣 and 辯)
   /// \li 18 JinmeiKanji: alternate forms of standard JinmeiKanji
   /// \li several hundred Kanji of other types also have non-empty 'oldNames'
