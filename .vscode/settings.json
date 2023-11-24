@@ -20,6 +20,7 @@
 //   "testMate.cpp.test.parallelExecutionLimit": 8
 // }
 {
+  "cmake.options.statusBarVisibility": "compact",
   "C_Cpp.default.cppStandard": "c++20",
   "C_Cpp.default.defines": [
     "GTEST_ENABLE_CATCH_EXCEPTIONS_=1",
