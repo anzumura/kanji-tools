@@ -15,7 +15,7 @@ protected:
   void SetUp() final {
     write("Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t"
           "MorohashiId\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\t"
-          "LinkNames\tLinkType\tMeaning\tOn\tKun",
+          "LinkNames\tLinkType\tMeaning\tOn\tKun\tJapanese",
         false);
   }
 
@@ -27,7 +27,7 @@ protected:
            _testJinmei + Tab + _testLinkCodes + Tab + _testLinkNames + Tab +
            _testLinkType + Tab + _testMeaning + Tab};
     r += includeOn ? "ICHI ITSU\t" : "\t";
-    write(r += includeKun ? "HITOTSU HITOTABI HAJIME" : "");
+    write(r += includeKun ? "HITOTSU HITOTABI HAJIME\t" : "\t");
   }
 
   auto& loadOne(bool includeOn = true, bool includeKun = true) {
@@ -40,11 +40,11 @@ protected:
     // write the Jōyō Kanji
     write("50E7\t僧\tCJK\t1.1\t9\t13\t\tsēng\t1076\t536,538\tGHJKTV\tJ0-414E\t"
           "Y\t\t\t\t\tBuddhist priest, monk; san of Sanskrit sangha\tSOU\t"
-          "BOUZU"); // cSpell:ignore BOUZU
+          "BOUZU\t"); // cSpell:ignore BOUZU
     // write the 'linked' Jinmeiyō Kanji
     write("FA31\t僧\tCJK_Compat_Ideographs\t3.2\t9\t14\t\t\t\t\tJ\tJ3-2E49\t\t"
           "Y\t50E7\t僧\tJinmei*\tBuddhist priest, monk; san of Sanskrit sangha"
-          "\tSOU\tBOUZU");
+          "\tSOU\tBOUZU\t");
     getUcd().load(TestFile);
     return *ucd().find("僧");
   }
@@ -212,9 +212,9 @@ TEST_F(UcdDataTest, ZeroStrokes) {
 }
 
 TEST_F(UcdDataTest, BigStrokes) {
-  getStrokes() = "55";
+  getStrokes() = "65";
   EXPECT_THROW(
-      call([this] { loadOne(); }, "strokes '55' out of range" + FileMsg),
+      call([this] { loadOne(); }, "strokes '65' out of range" + FileMsg),
       DomainError);
 }
 

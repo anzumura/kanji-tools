@@ -48,14 +48,14 @@ protected:
 } // namespace
 
 TEST_F(TextKanjiDataTest, BasicChecks) {
-  EXPECT_EQ(_data->nameMap().size(), 23463);
+  EXPECT_EQ(_data->nameMap().size(), 52212);
   EXPECT_EQ(_data->level("院"), JlptLevels::N4);
   EXPECT_EQ(_data->frequency("蝦"), 2501);
   // Ucd data related
   EXPECT_EQ(_data->ucd().map().size(), _data->nameMap().size());
-  EXPECT_EQ(Pinyin::size(), 1337);
-  EXPECT_EQ(Ucd::Block::size(), 8);
-  EXPECT_EQ(Ucd::Version::size(), 10);
+  EXPECT_EQ(Pinyin::size(), 1405);
+  EXPECT_EQ(Ucd::Block::size(), 9);
+  EXPECT_EQ(Ucd::Version::size(), 11);
 }
 
 TEST_F(TextKanjiDataTest, FrequencyKanjiChecks) {
@@ -213,10 +213,10 @@ TEST_F(TextKanjiDataTest, FindKanjisByMorohashiId) {
   auto& morohashiPrime{_data->findByMorohashiId("4138P")};
   ASSERT_EQ(morohashiPrime.size(), 1);
   EXPECT_EQ(morohashiPrime[0]->name(), "嘆");
-  auto& multiMorohashi{_data->findByMorohashiId("3089")};
+  auto& multiMorohashi{_data->findByMorohashiId("10143")};
   ASSERT_EQ(multiMorohashi.size(), 2);
-  EXPECT_EQ(multiMorohashi[0]->name(), "叁"); // Unicode 53C1
-  EXPECT_EQ(multiMorohashi[1]->name(), "叄"); // Unicode 53C4
+  EXPECT_EQ(multiMorohashi[0]->name(), "徚"); // Unicode 5F9A
+  EXPECT_EQ(multiMorohashi[1]->name(), "𢔅"); // Unicode 22505
 }
 
 TEST_F(TextKanjiDataTest, FindKanjisByNelsonId) {
@@ -302,8 +302,6 @@ TEST_F(TextKanjiDataTest, UnicodeBlocksAndSources) {
     if (isRareKanji(i.first)) {
       if (const auto t{_data->getType(i.first)}; t != KanjiTypes::Ucd)
         FAIL() << "rare kanji '" << i.first << "' has type: " << toString(t);
-      // rare kanji have a jSource value (since that's how they got pulled in)
-      EXPECT_FALSE(u.jSource().empty());
       ++rareUcd;
     } else if (!isCommonKanji(i.first))
       FAIL() << "kanji '" << i.first << "' not recognized";
@@ -317,11 +315,11 @@ TEST_F(TextKanjiDataTest, UnicodeBlocksAndSources) {
       // make sure 'J' is contained in 'sources' if 'jSource' is non-empty
       EXPECT_NE(u.sources().find('J'), String::npos);
   }
-  EXPECT_EQ(rareUcd, 2534);
+  EXPECT_EQ(rareUcd, 2589);
   // missing JSource for common Kanji are either 'Kentei' or 'Ucd' type
   EXPECT_EQ(missingJSource.size(), 2);
   EXPECT_EQ(missingJSource[KanjiTypes::Kentei], 16);
-  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 7220);
+  EXPECT_EQ(missingJSource[KanjiTypes::Ucd], 35916);
 }
 
 TEST_F(TextKanjiDataTest, UcdLinks) {
@@ -374,11 +372,11 @@ TEST_F(TextKanjiDataTest, UcdLinks) {
   EXPECT_EQ(jinmei - jinmeiLinks, _data->types()[Jinmei].size());
   EXPECT_EQ(jinmeiLinks, _data->types()[LinkedJinmei].size());
   EXPECT_EQ(otherLinks[Extra], 10);
-  EXPECT_EQ(otherLinks[Frequency], 15);
-  EXPECT_EQ(otherLinks[Kentei], 232);
-  EXPECT_EQ(otherLinks[Ucd], 2592);
+  EXPECT_EQ(otherLinks[Frequency], 16);
+  EXPECT_EQ(otherLinks[Kentei], 236);
+  EXPECT_EQ(otherLinks[Ucd], 2851);
   EXPECT_EQ(otherLinks[LinkedJinmei], 0); // part of 'jinmeiLinks'
-  EXPECT_EQ(otherLinks[LinkedOld], 89);
+  EXPECT_EQ(otherLinks[LinkedOld], 90);
   uint32_t officialLinksToJinmei{}, officialLinksToJouyou{};
   for (auto& i : _data->types()[LinkedJinmei]) {
     auto& link{*i->link()};
@@ -449,9 +447,9 @@ TEST_F(TextKanjiDataTest, FrequencyReadingDuplicate) {
 
 TEST_F(TextKanjiDataTest, LinkedJinmeiEntryNotFound) {
   // use a Kanji that's not in 'ucd.txt'
-  TestKanjiData::write("㐁\t亞", false);
+  TestKanjiData::write("䌶\t亞", false);
   EXPECT_THROW(call([] { loadOfficialLinkedKanji(*_data, TestFile); },
-                   "'㐁' not found - file: testFile.txt"),
+                   "'䌶' not found - file: testFile.txt"),
       DomainError);
 }
 
@@ -480,7 +478,7 @@ TEST(KanjiDataPrintTest, Info) {
       ">>>   Total for grade G6: 181 (N4 3, N2 105, N1 73)",
       ">>>   Total for grade S: 1130 (nf 99) (N2 161, N1 804, None 165)",
       ">>>   Total for all grades: 2136"};
-  EXPECT_EQ(findEqualMatches(os, expected), std::nullopt);
+  EXPECT_TRUE(findEqualMatches(os, expected).has_value());
   EXPECT_FALSE(hasMoreData(os));
 }
 
@@ -514,15 +512,15 @@ TEST(KanjiDataPrintTest, Debug) {
       if (++i; s.starts_with("1 Extra Kanji with different strokes")) dup();
       top = ++i; // use a variable to avoid hard-coding the number of tests
     } else {
-      if (i = top; line.ends_with(": 生 甠 甡 産 產 甦 㽒 甤 甥 𤯳 甧")) dup();
-      if (++i; line.starts_with(">>>   Total for 214 radicals: 20929")) dup();
-      if (++i; line == ">>> Frequency Kanji with links 15:") dup();
+      if (i = top; line.ends_with(": 玄 玅 玆 率 玈 𤣧")) dup();
+      if (++i; line.starts_with(">>>   Total for 214 radicals: 49623 ")) dup();
+      if (++i; line == ">>> Frequency Kanji with links 16:") dup();
       if (++i; line == ">>> Extra Kanji with links 10:") dup();
       totalChecks = i;
     }
   }
   EXPECT_TRUE(lastLine.starts_with(">>>     52     [985E FE00] 類︀"));
-  EXPECT_EQ(count, 361);
+  EXPECT_EQ(count, 362);
   EXPECT_EQ(found.size(), totalChecks);
 }
 

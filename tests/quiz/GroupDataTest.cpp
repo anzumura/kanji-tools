@@ -175,14 +175,14 @@ TEST_F(GroupDataTest, SameKanjiInMultiplePatternGroups) {
 }
 
 TEST_F(GroupDataTest, UnknownKanji) {
-  write(MeaningFile, "\n1\t方向\t北,艮,㐁");
+  write(MeaningFile, "\n1\t方向\t北,艮,䌶");
   // a Kanji that hasn't been loaded from any data files (so ultimately not in
   // 'data/ucd.txt') causes both an exception as well as output to stderr
   EXPECT_THROW(
       call([] { create(); }, "group failed to load all members" + MeaningErr),
       DomainError);
-  EXPECT_TRUE(_es.str().ends_with(
-      "failed to find member 㐁 in group: '方向', number: 1\n"));
+  EXPECT_TRUE(_es.str().ends_with(	
+      "failed to find member 䌶 in group: '方向', number: 1\n"));
 }
 
 TEST_F(GroupDataTest, CreateGroupError) {

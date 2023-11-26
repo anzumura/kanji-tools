@@ -15,7 +15,7 @@ const ColumnFile::Column CodeCol{"Code"}, NameCol{"Name"}, BlockCol{"Block"},
     NelsonIdsCol{"NelsonIds"}, SourcesCol{"Sources"}, JSourceCol{"JSource"},
     JoyoCol{"Joyo"}, JinmeiCol{"Jinmei"}, LinkCodesCol{"LinkCodes"},
     LinkNamesCol{"LinkNames"}, LinkTypeCol{"LinkType"}, MeaningCol{"Meaning"},
-    OnCol{"On"}, KunCol{"Kun"};
+    OnCol{"On"}, KunCol{"Kun"}, JapaneseCol("Japanese");
 
 // 'PrintCount' is used for debug printing. Some combinations are prevented by
 // 'load' function (like Joyo with a link or missing meaning), but count all
@@ -94,7 +94,7 @@ void UcdData::load(const KanjiData::Path& file) {
            {CodeCol, NameCol, BlockCol, VersionCol, RadicalCol, StrokesCol,
                VStrokesCol, PinyinCol, MorohashiIdCol, NelsonIdsCol, SourcesCol,
                JSourceCol, JoyoCol, JinmeiCol, LinkCodesCol, LinkNamesCol,
-               LinkTypeCol, MeaningCol, OnCol, KunCol}};
+               LinkTypeCol, MeaningCol, OnCol, KunCol, JapaneseCol}};
        f.nextRow();) {
     if (f.isEmpty(OnCol) && f.isEmpty(KunCol) && f.isEmpty(MorohashiIdCol) &&
         f.isEmpty(JSourceCol))
@@ -117,6 +117,8 @@ void UcdData::load(const KanjiData::Path& file) {
       const auto strokes{f.isEmpty(VStrokesCol) ? Strokes{f.getU8(StrokesCol)}
                                                 : Strokes{f.getU8(StrokesCol),
                                                       f.getU8(VStrokesCol)}};
+      // Later use value of new 'Japanese' column introduced in Unicode 15.1 in
+      // combination with On and Kun columns.
       if (!_map.emplace(std::piecewise_construct, std::make_tuple(name),
                    std::make_tuple(Ucd::Entry{f.getChar32(CodeCol), name},
                        f.get(BlockCol), f.get(VersionCol), radical, strokes,

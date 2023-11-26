@@ -14,8 +14,8 @@ public:
   using Size = uint8_t;
 
   /// max number of strokes and variant strokes found in current 'ucd.txt' data
-  /// for example, 9F98 (龘) has 48 strokes and 2C6A9 has 53 strokes @{
-  static constexpr Size Max{53}, MaxVariant{33};
+  /// for example, 9F98 (龘) has 48, 2C6A9 has 53 and 2053B (𠔻) has 64 @{
+  static constexpr Size Max{64}, MaxVariant{33};
   ///@}
 
   /// ctor for Strokes with a one stroke count

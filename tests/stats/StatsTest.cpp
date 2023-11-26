@@ -168,16 +168,16 @@ TEST_F(StatsTest, NonUcdKanji) {
   // 'UCD' here refers to Kanji in 'data/ucd.txt' which is a filtered set of
   // kanji from the original complete set (see scripts/parseUcdAllFlat.sh for
   // details).
-  write("丆㐁"); // include examples from 'common' and 'rare' unicode blocks
+  write("丆䌶"); // include examples from 'common' and 'rare' unicode blocks
   const char* args[]{"", "testDir"};
   run(args, R"(>>> Stats for: 'testDir' - showing top 5 Kanji per type
->>>    Non-UCD Kanji:      2, unique:    2           (㐁 1, 丆 1)
+>>>    Non-UCD Kanji:      2, unique:    2           (䌶 1, 丆 1)
 >>> Total Kana+Kanji: 2 (Kanji: 100.0%)
 )");
 }
 
 TEST_F(StatsTest, ShowBreakdown) {
-  write("ああア西西東南南南巽𫞉㐁");
+  write("ああア西西東南南南巽𫞉䌶");
   const char* args[]{"", "testDir", "-b"};
   run(args, R"(>>> Stats for: 'testDir' - showing top 5 Kanji per type
 >>>         Hiragana:      2, unique:    1
@@ -195,10 +195,10 @@ TEST_F(StatsTest, ShowBreakdown) {
 >>> Showing Breakdown for 'Rare Kanji':
   Rank  [Val Num] Freq, LV, Type
   1     [𫞉    1]    0, --, Ucd
->>>    Non-UCD Kanji:      1, unique:    1           (㐁 1)
+>>>    Non-UCD Kanji:      1, unique:    1           (䌶 1)
 >>> Showing Breakdown for 'Non-UCD Kanji':
   Rank  [Val Num], Unicode, Highest Count File
-  1     [㐁    1],  U+3401, test.txt
+  1     [䌶    1],  U+4336, test.txt
 >>> Total Kana+Kanji: 12 (Hiragana: 16.7%, Katakana: 8.3%, Kanji: 75.0%)
 )");
 }

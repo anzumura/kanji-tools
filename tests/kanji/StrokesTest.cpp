@@ -36,7 +36,7 @@ TEST(StrokesTest, ValidStrokesWithVariant) {
 
 TEST(StrokesTest, MaxStrokes) {
   const Strokes s{Strokes::Max, Strokes::MaxVariant};
-  EXPECT_EQ(s.toString(true), "53/33");
+  EXPECT_EQ(s.toString(true), "64/33");
 }
 
 TEST(StrokesTest, InvalidStrokes) {

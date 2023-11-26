@@ -10,7 +10,7 @@ declare -r program=parseUcdAllFlat.sh
 # - Block: name of the Unicode block (from the 'blk' tag)
 # - Version: Unicode version this character was added (from 'age' tag)
 # - Radical: radical number (1 to 214)
-# - Strokes: total strokes (including the radical)
+# - Strokes: toƒtal strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: optional first pīnyīn (拼音) reading from 'kMandarin'
 # - MorohashiId: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
@@ -25,6 +25,7 @@ declare -r program=parseUcdAllFlat.sh
 # - Meaning: optional semicolin separated English definitions
 # - On: optional space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: optional space-separated Japanese Kun readings (in all-caps Rōmaji)
+# - Japanese: optional space-deparated On/Kun readings in Kana (since ver 15.1)
 #
 # Further explanations are in comments at the end of this script.
 
@@ -60,12 +61,14 @@ function setVars() {
   local -r xml=${1:6} # strip leading '<char '
   shift               # more 'vars to unset' can be specified after $1 (XML arg)
   unset -v kJoyoKanji kJinmeiyoKanji kMorohashi $*
-  eval ${xml%/>} # strip trailing '/>' and set vars from remaining XML string
+  eval ${xml%/>} # s	trip trailing '/>' and set vars from remaining XML string
   radical=${kRSUnicode%%[.\']*}
   # Simplified radicals, i.e., a value ending with a single quote, shouldn't be
   # processed unless the radical is 199 (麥 麦). For example, 4336 (䌶) has
-  # kRSUnicode="120'.3" so it will result in a non-zero exit code.
-  [[ $radical -eq 199 || ! $kRSUnicode =~ ^[0-9]*\' ]]
+  # kRSUnicode="120'.3" so it will result in a non-zero exit code. Also keep
+  # radical 211'' since the double quote means 'non-Chinese simplified' - for
+  # example 9F62 (齢) has kRSUnicode=211''.5 (and it's a Jouyou Kanji)
+  [[ $radical =~ 199|211 || ! $kRSUnicode =~ ^[0-9]*\' ]]
 }
 
 function setOnKun() {
@@ -131,9 +134,15 @@ function populateArrays() {
   while read -r s; do
     setVars "$s" kDefinition kJapaneseOn kJapaneseKun || continue
     if [[ -n $kMorohashi ]]; then
+      # --- Before version 15.1 the following logic was needed:
       # Remove leading 0's and change single quotes to 'P' (Prime) so that 04138
       # changes to 4138 (maps to 嗩) and 04138' changes to 4138P (maps to 嘆).
       kMorohashi=$(echo $kMorohashi | sed -e 's/^0*//' -e "s/'/P/g")
+      # --- Unicode 15.1 fixed above problems, but made some other changes that
+      # require stripping 'selectors' after : and removing duplicate zero padded
+      # ids like for 342C which has '296 00296'
+      # --- Keep old and new logic for backwards compat  
+      kMorohashi=$(echo $kMorohashi | sed -e 's/[ :].*$//')
       # There are a few kMorohashi values that are all 0's so check if non-empty
       # again before setting global array.
       [[ -n $kMorohashi ]] && morohashi[$cp]=$kMorohashi
@@ -549,14 +558,14 @@ function processRecord() {
   echo -e "$cp\t\U$cp\t$blk\t$age\t$radical\t$strokes\t${vstrokes#0}\t\
 $kMandarin\t$localMorohashi\t${kNelson// /,}\t$sources\t$localJSource\t\
 ${kJoyoKanji:+Y}\t${kJinmeiyoKanji:+Y}\t$linkTo\t${linkTo:+\U${linkTo//,/,\\U}}\
-\t$linkType\t$localDefinition\t$resultOn\t$resultKun" >>$outFile
+\t$linkType\t$localDefinition\t$resultOn\t$resultKun\t$kJapanese" >>$outFile
 }
 
 function printResults() {
   log "Print results to '$outFile' ... " -n
   echo -e "Code\tName\tBlock\tVersion\tRadical\tStrokes\tVStrokes\tPinyin\t\
 MorohashiId\tNelsonIds\tSources\tJSource\tJoyo\tJinmei\tLinkCodes\tLinkNames\t\
-LinkType\tMeaning\tOn\tKun" >$outFile
+LinkType\tMeaning\tOn\tKun\tJapanese" >$outFile
   local s
   local -i count=0
   while read -r s; do
@@ -582,11 +591,11 @@ function checkTotal() {
 }
 
 # May need to update JSource and Morohashi expected totals when upgrading to a
-# new Unicode version (below numbers are based on Unicode 14.0). Nelson could go
+# new Unicode version (below numbers are based on Unicode 15.1). Nelson could go
 # up if any missing ones are added (see comments in 'processRecord'). Jouyou and
 # Jinmei numbers should only change if the Japanese government makes changes.
-checkTotal 'Unique JSource' ${#uniqueJSource[@]} 16226
-checkTotal 'Unique Morohashi' ${#uniqueMorohashi[@]} 17830
+checkTotal 'Unique JSource' ${#uniqueJSource[@]} 16222
+checkTotal 'Unique Morohashi' ${#uniqueMorohashi[@]} 49019
 checkTotal 'Unique Nelson ID' ${#uniqueNelson[@]} 5442
 checkTotal 'Total Jouyou' $totalJoyo 2136
 checkTotal 'Total Jinmei' $totalJinmei 633
@@ -608,7 +617,7 @@ $((totalReading - directReading - linkedReading)))"
 # More info on UCD file: https://unicode.org/reports/tr38/
 # This script was used to create 'data/ucd.txt'.
 #
-# There are over 140K characters in 'ucd.all.flat.txt' and most of them aren't
+# There are over 140K characters in 'ucd.all.flat.xml' and most of them aren't
 # relevant to the current functionality of this (kanji-tools) project so apply
 # some filtering before parsing (also significantly reduces the time to parse).
 #

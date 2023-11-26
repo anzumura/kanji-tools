@@ -225,9 +225,9 @@ Fields: N[1-5]=JLPT Level, K[1-10]=Kentei Kyu, G[1-6]=Grade (S=Secondary School)
 Suffix: .=常用 '=JLPT "=Freq ^=人名用 ~=LinkJ %=LinkO +=Extra @=検定 #=1級 *=Ucd
 Sources: G=China / Singapore, H=Hong Kong, J=Japan, K=Korea, T=Taiwan, V=Vietnam
 
-㐁 [3401] --- Not found in 'ucd.txt'
+䌶 [4336] --- Not found in 'ucd.txt'
 )"};
-  const char* args[]{"", "u3401"};
+  const char* args[]{"", "u4336"};
   run(args);
   EXPECT_EQ(_os.str(), expected);
 }
