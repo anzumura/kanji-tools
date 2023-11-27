@@ -10,7 +10,7 @@ declare -r program=parseUcdAllFlat.sh
 # - Block: name of the Unicode block (from the 'blk' tag)
 # - Version: Unicode version this character was added (from 'age' tag)
 # - Radical: radical number (1 to 214)
-# - Strokes: toƒtal strokes (including the radical)
+# - Strokes: total strokes (including the radical)
 # - VStrokes: strokes for first different 'adobe' count (blank if no diffs)
 # - Pinyin: optional first pīnyīn (拼音) reading from 'kMandarin'
 # - MorohashiId: optional 'Dai Kan-Wa Jiten (大漢和辞典)' index number
@@ -22,10 +22,10 @@ declare -r program=parseUcdAllFlat.sh
 # - LinkCodes: optional list of comma-separated link values in Unicode
 # - LinkNames: optional list of comma-separated link values in UTF-8
 # - LinkType: optional single value for the type of all the links
-# - Meaning: optional semicolin separated English definitions
+# - Meaning: optional semicolon separated English definitions
 # - On: optional space-separated Japanese On readings (in all-caps Rōmaji)
 # - Kun: optional space-separated Japanese Kun readings (in all-caps Rōmaji)
-# - Japanese: optional space-deparated On/Kun readings in Kana (since ver 15.1)
+# - Japanese: optional space-separated On/Kun readings in Kana (since ver 15.1)
 #
 # Further explanations are in comments at the end of this script.
 
@@ -76,7 +76,7 @@ function setOnKun() {
   resultKun=$2
 }
 
-# global arrays to help support links for variant and compat kanjis
+# global arrays to help support links for variant and compat kanji
 declare -A morohashi jSource definition on kun linkBack noLink readingLink
 
 # there are 18 Jinmeiyō Kanji that link to other Jinmei, but unfortunately UCD
@@ -141,7 +141,7 @@ function populateArrays() {
       # --- Unicode 15.1 fixed above problems, but made some other changes that
       # require stripping 'selectors' after : and removing duplicate zero padded
       # ids like for 342C which has '296 00296'
-      # --- Keep old and new logic for backwards compat  
+      # --- Keep old and new logic for backwards compat
       kMorohashi=$(echo $kMorohashi | sed -e 's/[ :].*$//')
       # There are a few kMorohashi values that are all 0's so check if non-empty
       # again before setting global array.
@@ -249,7 +249,7 @@ function processUtfLinks() {
           linkErrors+=("printf failed: cp=$1 link=$s 0x$link")
         fi
       else
-        linkErrors+=("iconv falied: cp=$1 link=$s")
+        linkErrors+=("iconv failed: cp=$1 link=$s")
       fi
     done < <(echo -n $2)
   fi
@@ -305,7 +305,7 @@ simplified ancient"
   local -i i=0
   for link in $types; do
     s=
-    # check the first 'defTypePasses' potential occurances of 'link' value.
+    # check the first 'defTypePasses' potential occurrences of 'link' value.
     for ((i = 0; i < $defTypePasses; ++i)); do
       findDefinitionLinksForType $link "$end$s"
       s+=[$delim]$end # one 'delim' followed by non-delim (ie 'end')
@@ -335,11 +335,11 @@ function getStrokesFromAdobeRef() {
   s=${s##*+}               # remove the 'C+num+' prefix
   s=${s#*\.}               # get 'y.z' (by removing prefix to .)
   strokes=$((${s/\./ + })) # y + z
-  # If there are mutiple Adobe refs then check 'VStrokes' from the second one in
+  # If there are multiple Adobe refs then check 'VStrokes' from the second in
   # the list. Some have more than two like 傑 (5091) which has kRSAdobe_Japan1_6
   # "C+1852+9.2.11 V+13433+9.2.11 V+13743+9.2.10". If strokes and vstrokes are
-  # different then check to see if they should be swapped. Swapping fixes stroke
-  # count for some charaters and breaks it for others so only swap if 'vstrokes'
+  # different then check to see if they should be swapped. Swapping fixes counts
+  # for some characters but breaks it for others so only swap if 'vstrokes'
   # represents the same radical and count as 'kRSUnicode' (RS = Radical+Stroke).
   # This fixes some, but also isn't prefect. Limiting swapping to only happen if
   # vstrokes matches 'kTotalStrokes' also helps, but there are still 52 Joyo and
@@ -637,7 +637,7 @@ $((totalReading - directReading - linkedReading)))"
 # - has Morohashi, but not Adobe: 5,721
 # - has Adobe, but not Morohashi: 1,010
 #
-# MorohashiId: Unicode 14.0 has 17,830 unique 'kMorohashi' valuse. This property
+# MorohashiId: Unicode 14.0 has 17,830 unique 'kMorohashi' values. This property
 # has one or more index numbers into 'Dai Kan-Wa Jiten' (a huge Chinese-Japanese
 # dictionary compiled by Tetsuji Morohashi). There are plans to cleanup/expand
 # this property to cover ~50K entries by Unicode 16.0.
@@ -646,13 +646,13 @@ $((totalReading - directReading - linkedReading)))"
 # or more Ids from the 'Classic Nelson' Japanese-English Character Dictionary.
 # 'Classic Nelson' was first published in 1962 and the Ids remained the same for
 # the 'Second Revised Edition' from 1974 (including the Thirtieth Printing in
-# 1989). These Ids don't match 'New Nelson' which was first publised in 1997.
+# 1989). These Ids don't match 'New Nelson' which was first published in 1997.
 #
 # Morohashi and Nelson Ids can be used for looking up kanji by the 'kanjiQuiz'
 # program (see QuizLauncher.cpp or run 'kanjiQuiz -h' for details).
 #
 # Sources: a list of letters where each letter represents a 'kIRG_xSource' field
-# that has a non-empty value to help determine the country where a charater is
+# that has a non-empty value to help determine the country where a character is
 # used (skip KP, M, S, U, and UK for now since they either don't have many
 # values or don't really represent an East Asian country). The 'kUnihanCore2020'
 # field is similar, but it's missing values like 'V' and 'S' and it's also not
