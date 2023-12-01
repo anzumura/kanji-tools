@@ -88,7 +88,7 @@ declare -A morohashi jSource definition on kun linkBack noLink readingLink
 #   2017 (one ideograph), and 230 ideographs are variants for which the code
 #   point of the standard Japanese form is specified.
 # For now, store the 18 kanji in 'noLink' to block setting links.
-while read i; do
+while read -r i; do
   noLink[${i%\ *}]=${i#*\ }
 done <<EOF
 4E98 亘
@@ -210,7 +210,7 @@ function printDefinitionLinkCounts {
     uniCounts=${defTypeUni[$s]}
     i=0
     pass=()
-    for ((j = 1; j <= $defTypePasses; ++j)); do
+    for ((j = 1; j <= defTypePasses; ++j)); do
       utf=$(echo $utfCounts | cut -d, -f$j)
       uni=$(echo $uniCounts | cut -d, -f$j)
       i+=$((utf + uni))
@@ -306,7 +306,7 @@ simplified ancient"
   for link in $types; do
     s=
     # check the first 'defTypePasses' potential occurrences of 'link' value.
-    for ((i = 0; i < $defTypePasses; ++i)); do
+    for ((i = 0; i < defTypePasses; ++i)); do
       findDefinitionLinksForType $link "$end$s"
       s+=[$delim]$end # one 'delim' followed by non-delim (ie 'end')
     done
