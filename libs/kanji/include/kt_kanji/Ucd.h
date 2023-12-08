@@ -28,7 +28,7 @@ public:
   /// represent the XML property from which the link was loaded \details '_R'
   /// means the link was also used to pull in readings. The script uses '*' for
   /// reading links so '*' has also been used in the names in 'AllUcdLinkTypes'.
-  /// '_R' are first to allow a '<' comparision to find all reading links. Note,
+  /// '_R' are first to allow a '<' comparison to find all reading links. Note,
   /// there is no non '_R' type for 'Semantic' by design.
   enum class LinkTypes : Enum::Size {
     Compatibility_R, ///< *kCompatibilityVariant* link also used for 'reading'
