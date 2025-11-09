@@ -116,7 +116,7 @@ template <typename T>
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * Bits), brackets);
 }
 
-/// overload of toBinary() that sets `brackets` to #BracketType::None
+/// overload of toBinary() that sets `brackets` to BracketType::None
 template <typename T> [[nodiscard]] auto toBinary(T x, size_t minSize = 0) {
   return toBinary(x, BracketType::None, minSize);
 }
@@ -146,20 +146,20 @@ template <typename T>
       addLeadingZeroes(result, minSize ? minSize : sizeof(T) * 2), brackets);
 }
 
-/// overload of toHex() that sets `brackets` to #BracketType::None
+/// overload of toHex() that sets `brackets` to BracketType::None
 template <typename T>
 [[nodiscard]] auto toHex(T x, HexCase hexCase, size_t minSize = 0) {
   return toHex(x, BracketType::None, hexCase, minSize);
 }
 
-/// overload of toHex() that sets `hexCase` to #HexCase::Lower
+/// overload of toHex() that sets `hexCase` to HexCase::Lower
 template <typename T>
 [[nodiscard]] auto toHex(T x, BracketType brackets, size_t minSize = 0) {
   return toHex(x, brackets, HexCase::Lower, minSize);
 }
 
-/// overload of toHex() that sets `brackets` to #BracketType::None and `hexCase`
-/// to #HexCase::Lower
+/// overload of toHex() that sets `brackets` to BracketType::None and `hexCase`
+/// to HexCase::Lower
 template <typename T> [[nodiscard]] auto toHex(T x, size_t minSize = 0) {
   return toHex(x, BracketType::None, HexCase::Lower, minSize);
 }

@@ -73,7 +73,8 @@ FetchContent_Declare(
   # release-1.12.1 was released on June 30, 2022
   # v1.13.0 was released on Jan 17, 2023
   # v1.14.0 was released on Aug 2, 2023
-  GIT_TAG v1.14.0 # change to HEAD to get latest
+  # v1.17.0 was released on Apr 30, 2025
+  GIT_TAG v1.17.0 # change to HEAD to get latest
 )
 FetchContent_MakeAvailable(googletest)
 
